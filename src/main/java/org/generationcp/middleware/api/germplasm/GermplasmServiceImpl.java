@@ -167,7 +167,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final Integer userId, final String cropName,
-		final org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto germplasmImportRequestDto) {
+		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final Map<Integer, GermplasmImportResponseDto> results = new HashMap<>();
 		final List<GermplasmImportDTO> germplasmDtoList = germplasmImportRequestDto.getGermplasmList();
 		final Map<String, Method> methodsMapByAbbr = this.getBreedingMethodsMapByAbbr(germplasmDtoList);
@@ -857,54 +857,81 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
+	private boolean isInvalidMutation(final Method method, final String progenitor2) {
+		return method.isGenerative() && Integer.valueOf(1).equals(method.getMprgn()) && StringUtils.isNotEmpty(progenitor2) && !"0"
+			.equals(progenitor2);
+	}
+
+	private boolean isInvalidMethodType(final Method method) {
+		return !method.isGenerative() && !method.isDerivativeOrMaintenance();
+	}
+
+	private boolean isNewGermplasmATerminalAncestor(final String progenitor1, final String progenitor2) {
+		return (StringUtils.isEmpty(progenitor1) && StringUtils.isEmpty(progenitor2)) || ("0".equals(progenitor1) && "0"
+			.equals(progenitor2));
+	}
+
 	private void setProgenitors(final Germplasm germplasm, final Method method, final String progenitor1, final String progenitor2,
 		final Map<String, Germplasm> progenitorsMap) {
 
-		if (!method.isGenerative() && !method.isDerivativeOrMaintenance()) {
+		if (isInvalidMethodType(method)) {
 			throw new MiddlewareRequestException("", "import.germplasm.invalid.method.type", new String[] {method.getMcode()});
 		}
 
-		if (method.isGenerative() && method.getMprgn().equals(1) && StringUtils.isNotEmpty(progenitor2) && !"0".equals(progenitor2)) {
+		if (isInvalidMutation(method, progenitor2)) {
 			throw new MiddlewareRequestException("", "germplasm.gpid2.must.be.zero.for.mutations");
 		}
 
-		if ((StringUtils.isEmpty(progenitor1) && StringUtils.isEmpty(progenitor2)) || ("0".equals(progenitor1) && "0"
-			.equals(progenitor2)) || method.isGenerative()) {
+		if (method.isGenerative() || this.isNewGermplasmATerminalAncestor(progenitor1, progenitor2)) {
 			germplasm.setGpid1(this.resolveGpid(progenitor1, progenitorsMap));
 			germplasm.setGpid2(this.resolveGpid(progenitor2, progenitorsMap));
 			return;
 		}
 
-		if (method.isDerivativeOrMaintenance()) {
-			final Germplasm progenitor2Germplasm = progenitorsMap.get(progenitor2);
-			if ("0".equals(progenitor1)) { //CASE: Known Immediate Source, Unknown Group Source
-				// If Immediate Source is Terminal Ancestor or Generative, then the Group Source is Progenitor 2 GID
-				// Otherwise, Group Source will be set to Progenitor 2 Group Source
-				germplasm.setGpid1(this.getNewGroupSource(progenitor2Germplasm));
-			} else { //CASE: Immediate Source is defined
+		//DERIVATIVE OR MAINTENANCE CASES
+		final Germplasm progenitor1Germplasm = progenitorsMap.get(progenitor1);
+		final Germplasm progenitor2Germplasm = progenitorsMap.get(progenitor2);
 
-				//When both progenitors are equals, and this one is Generative or a terminal node, then
-				//there is no need to validate immediate source. The new germplasm will be the first derivative node
-				//for a terminal ancestor or a generative node
-				boolean isFirstDerivativeNode =
-					progenitor1.equals(progenitor2) && (progenitor2Germplasm.getMethod().isGenerative() || progenitor2Germplasm
-						.isTerminalAncestor());
+		//Known Immediate Source, Unknown Group Source
+		if ("0".equals(progenitor1)) {
+			// If Immediate Source is Terminal Ancestor or Generative, then the Group Source is Progenitor 2 GID
+			// Otherwise, Group Source will be set to Progenitor 2 Group Source
+			germplasm.setGpid1(this.getNewGroupSource(progenitor2Germplasm));
+			germplasm.setGpid2(progenitor2Germplasm.getGid());
+			return;
+		}
 
-				// If Progenitor1 and Progenitor2 are defined, then
-				// ImmediateSource.GPID1 must be equals to Progenitor1 GID (Belongs to same group)
-				//FIXME Not defined yet but If progenitor2 = 0, then we should check if the progenitor1 is DER/MAN
-				//FIXME And get the group source for the DER/MAN node
-				if (!isFirstDerivativeNode && !"0".equals(progenitor2) && !progenitorsMap.get(progenitor2).getGpid1()
-					.equals(progenitorsMap.get(progenitor1).getGid())) {
-					throw new MiddlewareRequestException("", "import.germplasm.invalid.immediate.source.group",
-						new String[] {
-							String.valueOf(progenitorsMap.get(progenitor2).getGid()),
-							String.valueOf(progenitorsMap.get(progenitor1).getGid())});
-				}
+		//Defined BOTH Immediate Source and Group Source, They are equals and it is either GEN or a terminal node
+		if (progenitor1.equals(progenitor2) && (progenitor2Germplasm.getMethod().isGenerative() || progenitor2Germplasm
+			.isTerminalAncestor())) {
+			germplasm.setGpid1(progenitor1Germplasm.getGid());
+			germplasm.setGpid2(progenitor2Germplasm.getGid());
+			return;
+		}
 
-				germplasm.setGpid1(this.resolveGpid(progenitor1, progenitorsMap));
+		//Defined BOTH Immediate Source and Group Source
+		if (!"0".equals(progenitor2)) {
+			if (!progenitor2Germplasm.getGpid1().equals(progenitor1Germplasm.getGid())) {
+				throw new MiddlewareRequestException("", "import.germplasm.invalid.immediate.source.group",
+					new String[] {
+						String.valueOf(progenitor2Germplasm.getGid()),
+						String.valueOf(progenitor1Germplasm.getGid())});
 			}
-			germplasm.setGpid2(this.resolveGpid(progenitor2, progenitorsMap));
+			germplasm.setGpid1(progenitor1Germplasm.getGid());
+			germplasm.setGpid2(progenitor2Germplasm.getGid());
+			return;
+		}
+
+		//Defined ONLY GroupSource
+		if ("0".equals(progenitor2)) {
+			if (progenitor1Germplasm.getMethod().isGenerative() || progenitor1Germplasm.isTerminalAncestor()) {
+				germplasm.setGpid1(progenitor1Germplasm.getGid());
+				germplasm.setGpid2(this.resolveGpid(progenitor2, progenitorsMap));
+				return;
+			}
+			throw new MiddlewareRequestException("", "import.germplasm.invalid.derivative.group.source",
+				new String[] {String.valueOf(progenitor1Germplasm.getGid())});
+
 		}
 	}
 
@@ -1323,28 +1350,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			this.daoFactory.getGermplasmDao().save(germplasm);
 			this.updateGroupSource(oldGermplasm, germplasm);
-
-			System.out.println("Method: " + germplasm.getMethod().getMid());
-			System.out.println("Gnpgs: " + germplasm.getGnpgs());
-			System.out.println("Gpid1: " + germplasm.getGpid1());
-			System.out.println("Gpid2: " + germplasm.getGpid2());
-			System.out.println("otherProgenitors: " + germplasm.getOtherProgenitors());
-
-			//			throw new MiddlewareRequestException("", "");
 		}
 
 	}
 
 	private void updateGroupSource(final Germplasm oldGermplasm, final Germplasm newGermplasm) {
 		final UpdateGroupSourceAction updateGroupSourceAction = this.getUpdateGroupSourceAction(oldGermplasm, newGermplasm);
-		System.out.println("Action: " + updateGroupSourceAction);
-
 		if (updateGroupSourceAction == UpdateGroupSourceAction.NONE) {
 			return;
 		}
 		final Integer newGroupSource = this.getNewGroupSource(newGermplasm);
-		System.out.println("New group source: " + newGroupSource);
-
 		if (updateGroupSourceAction == UpdateGroupSourceAction.DIRECT) {
 			this.daoFactory.getGermplasmDao().updateGroupSource(newGermplasm.getGid(), newGroupSource);
 			return;
