@@ -52,7 +52,7 @@ public class GermplasmSearchResponse {
 
 	private Integer locationId;
 	private Integer breedingMethodId;
-	private Integer referenceId;
+	private String reference;
 
 	public GermplasmSearchResponse() {
 	}
@@ -285,12 +285,12 @@ public class GermplasmSearchResponse {
 		return this.locationAbbr;
 	}
 
-	public Integer getReferenceId() {
-		return this.referenceId;
+	public String getReference() {
+		return this.reference;
 	}
 
-	public void setReferenceId(final Integer referenceId) {
-		this.referenceId = referenceId;
+	public void setReference(final String reference) {
+		this.reference = reference;
 	}
 
 	public void setLocationAbbr(final String locationAbbr) {
