@@ -55,8 +55,8 @@
 
 	<changeSet author="lkovacic" id="v17.4.0-3">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT count(1) FROM permission p INNER JOIN workbench_sidebar_category_link wscl
+            <sqlCheck expectedResult="1">
+                SELECT count(1) > 0 FROM permission p INNER JOIN workbench_sidebar_category_link wscl
 					ON p.workbench_sidebar_category_link_id = wscl.sidebar_category_link_id
 					WHERE wscl.tool_name = 'germplasm_import'
             </sqlCheck>
