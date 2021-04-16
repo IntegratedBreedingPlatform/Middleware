@@ -28,6 +28,7 @@ import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
@@ -69,6 +70,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private static final String GRPLCE = "grplce";
 	private static final String DELETED = "deleted";
+
+	private static final String DER_MAN = "'" + MethodType.DERIVATIVE.getCode() + "','" + MethodType.MAINTENANCE.getCode() + "'";
 
 	private static final String QUERY_FROM_GERMPLASM = ") query from Germplasm: ";
 
@@ -1826,12 +1829,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	/**
-	 * Cases covered by this function:
-	 * 1. If node is a terminal ancestor (gpid1=gpid2=0) with DER/MAN method and gpid1 and/or gpid2 are modified
-	 * and method remains DER/MAN
-	 * 2. If the node is GEN and it is not a terminal ancestor (gpid1!=0 gpid2=!0), and it is converted to DER/MAN
-	 * Then all the derivative progeny with group source = node will have a new group source.
-	 * With no need to traverse the tree
+	 * Use this update when you are sure there is no need to traverse the progeny tree.
 	 *
 	 * @param oldGroupSource
 	 * @param newGroupSource
@@ -1839,7 +1837,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public void updateGroupSource(final Integer oldGroupSource, final Integer newGroupSource) {
 		final String sql =
 			"UPDATE germplsm SET gpid1 = :newGroupSource WHERE gpid1 = :oldGroupSource and "
-				+ " deleted = 0 and methn in (select mid from methods where mtype in ('DER','MAN'))";
+				+ " deleted = 0 and methn in (select mid from methods where mtype in (" + DER_MAN + "))";
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
 		sqlQuery.setParameter("newGroupSource", newGroupSource);
 		sqlQuery.setParameter("oldGroupSource", oldGroupSource);
@@ -1853,14 +1851,17 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public void updateDerivativeProgenyGroupSource(final Integer parentNode, final Integer newGroupSource) {
-		final List<Integer> immediateDerivativeProgeny = this.getImmediateDerivativeProgeny(Collections.singletonList(parentNode));
-		this.recursiveUpdate(immediateDerivativeProgeny, newGroupSource);
+	public void updateGroupSourceTraversingProgeny(final Integer parentNode, final Integer newGroupSource) {
+		this.updateDerAndManProgenyGroupSource(0, Collections.singletonList(parentNode), newGroupSource);
 	}
 
 	private List<Integer> getImmediateDerivativeProgeny(final List<Integer> parentNodes) {
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery("");
 		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery("select g.gid "
+				+ "from germplsm g "
+				+ "       inner join methods m on g.methn = m.mid "
+				+ "where g.deleted = 0 and m.mtype in (" + DER_MAN + ") and g.gpid2 in :parentNodes");
+			sqlQuery.setParameterList("parentNodes", parentNodes);
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
 			final String message = "Error with getImmediateDerivativeProgeny" + e.getMessage();
@@ -1869,14 +1870,33 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	private void recursiveUpdate(final List<Integer> parentNodes, final Integer newGroupSource) {
-		if (parentNodes.isEmpty()) {
-			return;
+	private Integer updateGroupSource(final List<Integer> gids, final Integer newGroupSource) {
+		final String sql =
+			"UPDATE germplsm SET gpid1 = :newGroupSource WHERE gid in (:gids)";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+		sqlQuery.setParameter("newGroupSource", newGroupSource);
+		sqlQuery.setParameterList("gids", gids);
+		try {
+			return sqlQuery.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error with updateGroupSource" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		//Execute update
-		final List<Integer> immediateDerivativeProgeny = this.getImmediateDerivativeProgeny(parentNodes);
-		this.recursiveUpdate(immediateDerivativeProgeny, newGroupSource);
 	}
 
+	private void updateDerAndManProgenyGroupSource(Integer level, final List<Integer> parentNodes, final Integer newGroupSource) {
+		final List<Integer> immediateDerivativeProgeny = this.getImmediateDerivativeProgeny(parentNodes);
+		if (immediateDerivativeProgeny.isEmpty()) {
+			return;
+		}
+		final Integer updated = this.updateGroupSource(immediateDerivativeProgeny, newGroupSource);
+		System.out.println("UpdateGroupSourceTraversingProgeny has updated the group source for " + updated + " germplasm: "
+			+ immediateDerivativeProgeny + " at level: " + level);
+		GermplasmDAO.LOG
+			.debug("UpdateGroupSourceTraversingProgeny has updated the group source for " + updated + " germplasm: "
+				+ immediateDerivativeProgeny + " at level: " + level);
+		this.updateDerAndManProgenyGroupSource(++level, immediateDerivativeProgeny, newGroupSource);
+	}
 
 }

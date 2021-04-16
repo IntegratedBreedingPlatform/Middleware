@@ -876,20 +876,32 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 
 		if (method.isDerivativeOrMaintenance()) {
-			if ("0".equals(progenitor1)) {
-				//If Progenitor1 is "0" and Progenitor2 is defined
-				//Then GPID1 = ImmediateSource.GPID1
-				germplasm.setGpid1(progenitorsMap.get(progenitor2).getGpid1());
-			} else {
-				//If Progenitor1 and Progenitor2 are defined, then
+			final Germplasm progenitor2Germplasm = progenitorsMap.get(progenitor2);
+			if ("0".equals(progenitor1)) { //CASE: Known Immediate Source, Unknown Group Source
+				// If Immediate Source is Terminal Ancestor or Generative, then the Group Source is Progenitor 2 GID
+				// Otherwise, Group Source will be set to Progenitor 2 Group Source
+				germplasm.setGpid1(this.getNewGroupSource(progenitor2Germplasm));
+			} else { //CASE: Immediate Source is defined
+
+				//When both progenitors are equals, and this one is Generative or a terminal node, then
+				//there is no need to validate immediate source. The new germplasm will be the first derivative node
+				//for a terminal ancestor or a generative node
+				boolean isFirstDerivativeNode =
+					progenitor1.equals(progenitor2) && (progenitor2Germplasm.getMethod().isGenerative() || progenitor2Germplasm
+						.isTerminalAncestor());
+
+				// If Progenitor1 and Progenitor2 are defined, then
 				// ImmediateSource.GPID1 must be equals to Progenitor1 GID (Belongs to same group)
-				if (!"0".equals(progenitor2) && !progenitorsMap.get(progenitor2).getGpid1()
+				//FIXME Not defined yet but If progenitor2 = 0, then we should check if the progenitor1 is DER/MAN
+				//FIXME And get the group source for the DER/MAN node
+				if (!isFirstDerivativeNode && !"0".equals(progenitor2) && !progenitorsMap.get(progenitor2).getGpid1()
 					.equals(progenitorsMap.get(progenitor1).getGid())) {
 					throw new MiddlewareRequestException("", "import.germplasm.invalid.immediate.source.group",
 						new String[] {
 							String.valueOf(progenitorsMap.get(progenitor2).getGid()),
 							String.valueOf(progenitorsMap.get(progenitor1).getGid())});
 				}
+
 				germplasm.setGpid1(this.resolveGpid(progenitor1, progenitorsMap));
 			}
 			germplasm.setGpid2(this.resolveGpid(progenitor2, progenitorsMap));
@@ -1318,7 +1330,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			System.out.println("Gpid2: " + germplasm.getGpid2());
 			System.out.println("otherProgenitors: " + germplasm.getOtherProgenitors());
 
-			throw new MiddlewareRequestException("", "");
+			//			throw new MiddlewareRequestException("", "");
 		}
 
 	}
@@ -1339,6 +1351,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 
 		if (updateGroupSourceAction == UpdateGroupSourceAction.RECURSIVE) {
+			this.daoFactory.getGermplasmDao().updateGroupSourceTraversingProgeny(newGermplasm.getGid(), newGroupSource);
 		}
 	}
 
