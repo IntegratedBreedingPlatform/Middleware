@@ -385,46 +385,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 	}
 
-	//New inventory functions, please locate them below this line to help cleaning in the near future.
-	private static final String SEARCH_LOT_QUERY = "SELECT lot.lotid as lotId, " //
-		+ "  lot.lot_uuid AS lotUUID, " //
-		+ "  lot.stock_id AS stockId, " //
-		+ "  lot.eid as gid, " //
-		+ "  g.mgid as mgid, " //
-		+ "  m.mname as germplasmMethodName, " //
-		+ "  gloc.lname as germplasmLocation, " //
-		+ "  n.nval as designation, "
-		+ "  CASE WHEN lot.status = 0 then '" + LotStatus.ACTIVE.name()  +"' else '"+ LotStatus.CLOSED.name()+ "' end as status, " //
-		+ "  lot.locid as locationId, " //
- 		+ "  l.lname as locationName, " //
-		+ "  lot.scaleid as unitId, " //
-		+ "  scale.name as unitName, " //
-		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" THEN transaction.trnqty ELSE 0 END) AS actualBalance, " //
-		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
-		+ ") THEN transaction.trnqty ELSE 0 END) AS availableBalance, " //
-		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND transaction.trntype = "
-		+ TransactionType.WITHDRAWAL.getId() + " THEN transaction.trnqty * -1 ELSE 0 END) AS reservedTotal, " //
-		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trntype = "
-		+ TransactionType.WITHDRAWAL.getId() + " THEN transaction.trnqty * -1 ELSE 0 END) AS withdrawalTotal, " //
-		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() + " and transaction.trntype = "
-		+ TransactionType.DEPOSIT.getId() + " THEN transaction.trnqty ELSE 0 END) AS pendingDepositsTotal, " //
-		+ "  lot.comments as notes, " //
-		+ "  users.uname as createdByUsername, " //
-		+ "  lot.created_date as createdDate, " //
-		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END) AS lastDepositDate, " //
-		+ "  MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END) AS lastWithdrawalDate, " //
-		+ "  g.germplsm_uuid as germplasmUUID " //
-		+ "FROM ims_lot lot " //
-		+ "       LEFT JOIN ims_transaction transaction ON transaction.lotid = lot.lotid AND transaction.trnstat <> " + TransactionStatus.CANCELLED.getIntValue()  //
-		+ "       INNER JOIN germplsm g on g.gid = lot.eid " //
-		+ "       INNER JOIN names n ON n.gid = lot.eid AND n.nstat = 1 " //
-		+ "       LEFT JOIN methods m ON m.mid = g.methn " //
-		+ "       LEFT JOIN location l on l.locid = lot.locid " //
-		+ "       LEFT JOIN location gloc on gloc.locid = g.glocn " //
-		+ "       LEFT join cvterm scale on scale.cvterm_id = lot.scaleid " //
-		+ "       INNER JOIN workbench.users users on users.userid = lot.userid " //
-		+ "WHERE g.deleted=0 "; //
-
 	private static void addSearchLotsQueryFiltersAndGroupBy(
 		final SqlQueryParamBuilder paramBuilder,
 		final LotsSearchDto lotsSearchDto) {
@@ -686,7 +646,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
 		try {
-			final StringBuilder searchLotQuerySql = new StringBuilder(SEARCH_LOT_QUERY);
+			final StringBuilder searchLotQuerySql = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
 			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(searchLotQuerySql), lotsSearchDto);
 			addSortToSearchLotsQuery(searchLotQuerySql, pageable);
 
@@ -733,10 +693,10 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
 		try {
-			final StringBuilder filteredLotsQuery = new StringBuilder(SEARCH_LOT_QUERY);
+			final StringBuilder filteredLotsQuery = new StringBuilder(SearchLotDaoQuery.getCountBaseQuery());
 			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filteredLotsQuery), lotsSearchDto);
 			final String countLotsQuery = "Select count(1) from (" + filteredLotsQuery + ") as filteredLots";
-			final SQLQuery query = this.getSession().createSQLQuery(countLotsQuery.toString());
+			final SQLQuery query = this.getSession().createSQLQuery(countLotsQuery);
 			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), lotsSearchDto);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
@@ -747,7 +707,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public List<UserDefinedField> getGermplasmAttributeTypes(final LotsSearchDto searchDto) {
 		try {
-			final StringBuilder lotsQuery = new StringBuilder(SEARCH_LOT_QUERY);
+			final StringBuilder lotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
 			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
 
 			final String sql = "select distinct {u.*} from atributs a inner join udflds u "
@@ -766,7 +726,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(final LotsSearchDto searchDto) {
 		try {
-			final StringBuilder lotsQuery = new StringBuilder(SEARCH_LOT_QUERY);
+			final StringBuilder lotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
 			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
 
 			final String sql = "select distinct {a.*} from atributs a inner join (" + lotsQuery + ") lots on lots.gid = a.gid";
@@ -800,7 +760,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		try {
 			final Map<String, BigInteger> lotsCountPerScaleName = new HashMap<>();
 
-			final StringBuilder filterLotsQuery = new StringBuilder(SEARCH_LOT_QUERY);
+			final StringBuilder filterLotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
 			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filterLotsQuery), lotsSearchDto);
 
 			final String countQuery = "SELECT scale.name, count(*) from ("  //
