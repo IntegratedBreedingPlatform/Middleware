@@ -1338,6 +1338,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.getOtherProgenitorsFinal(oldGermplasm, newGpid2Optional.orElse(null), newOtherProgenitorsOptional.orElse(null));
 
 		if (isPedigreeUpdateDetected(oldGermplasm, methodFinal, gpid1Final, gpid2Final, otherProgenitorsFinal)) {
+			//FIXME check if this is valid
 			germplasm.setMethod(methodFinal);
 			germplasm.setMethodId(methodFinal.getMid());
 			final Map<String, Germplasm> progenitorsMap = this.loadProgenitors(gpid1Final, gpid2Final);
