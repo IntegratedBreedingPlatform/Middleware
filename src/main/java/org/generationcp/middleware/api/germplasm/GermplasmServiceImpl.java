@@ -1193,6 +1193,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 			progenitorsDetailsDto.setBreedingMethodName(germplasmDto.getBreedingMethod());
 			progenitorsDetailsDto.setBreedingMethodCode(method.getMcode());
 			progenitorsDetailsDto.setBreedingMethodType(method.getMtype());
+			final Integer numberOfDerivativeProgeny = this.daoFactory.getGermplasmDao().getChildren(gid, 'M').size() +
+				this.daoFactory.getGermplasmDao().getChildren(gid, 'D').size();
+			progenitorsDetailsDto.setNumberOfDerivativeProgeny(numberOfDerivativeProgeny);
 
 			final List<Integer> maleParentsGids = new ArrayList<>();
 			maleParentsGids.add(germplasmDto.getGpid2());
