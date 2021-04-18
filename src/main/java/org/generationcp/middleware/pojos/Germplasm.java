@@ -333,8 +333,7 @@ public class Germplasm implements Serializable, Cloneable {
 	@JoinColumn(name = "gid")
 	private List<ExternalReference> externalReferences = new ArrayList<>();
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "gid")
+	@OneToMany(mappedBy = "germplasm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Progenitor> otherProgenitors = new ArrayList<>();
 
 	/**

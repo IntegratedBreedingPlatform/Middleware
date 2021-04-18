@@ -1890,7 +1890,20 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public void updateGroupSourceTraversingProgeny(final Integer parentNode, final Integer newGroupSource) {
-		this.updateDerAndManProgenyGroupSource(0, Collections.singletonList(parentNode), newGroupSource);
+		final List<Integer> derivativeNodes = new ArrayList<>();
+		this.findDerivativeNodes(Collections.singletonList(parentNode), derivativeNodes);
+		if (!derivativeNodes.isEmpty()) {
+			this.updateGroupSource(derivativeNodes, newGroupSource);
+		}
+	}
+
+	private void findDerivativeNodes(final List<Integer> parentNodes, final List<Integer> gids) {
+		final List<Integer> immediateDerivativeProgeny = this.getImmediateDerivativeProgeny(parentNodes);
+		if (immediateDerivativeProgeny.isEmpty()) {
+			return;
+		}
+		gids.addAll(immediateDerivativeProgeny);
+		this.findDerivativeNodes(immediateDerivativeProgeny, gids);
 	}
 
 	private List<Integer> getImmediateDerivativeProgeny(final List<Integer> parentNodes) {
@@ -1908,33 +1921,21 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	private Integer updateGroupSource(final List<Integer> gids, final Integer newGroupSource) {
+	private void updateGroupSource(final List<Integer> gids, final Integer newGroupSource) {
 		final String sql =
 			"UPDATE germplsm SET gpid1 = :newGroupSource WHERE gid in (:gids)";
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
 		sqlQuery.setParameter("newGroupSource", newGroupSource);
 		sqlQuery.setParameterList("gids", gids);
 		try {
-			return sqlQuery.executeUpdate();
+			GermplasmDAO.LOG.debug("updateGroupSource is trying to set the group source for the gids: " + gids);
+			final Integer updatedRows = sqlQuery.executeUpdate();
+			GermplasmDAO.LOG.debug("updateGroupSource has modified the group source for " + updatedRows + " germplasm");
 		} catch (final HibernateException e) {
 			final String message = "Error with updateGroupSource" + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-	}
-
-	private void updateDerAndManProgenyGroupSource(Integer level, final List<Integer> parentNodes, final Integer newGroupSource) {
-		final List<Integer> immediateDerivativeProgeny = this.getImmediateDerivativeProgeny(parentNodes);
-		if (immediateDerivativeProgeny.isEmpty()) {
-			return;
-		}
-		final Integer updated = this.updateGroupSource(immediateDerivativeProgeny, newGroupSource);
-		System.out.println("UpdateGroupSourceTraversingProgeny has updated the group source for " + updated + " germplasm: "
-			+ immediateDerivativeProgeny + " at level: " + level);
-		GermplasmDAO.LOG
-			.debug("UpdateGroupSourceTraversingProgeny has updated the group source for " + updated + " germplasm: "
-				+ immediateDerivativeProgeny + " at level: " + level);
-		this.updateDerAndManProgenyGroupSource(++level, immediateDerivativeProgeny, newGroupSource);
 	}
 
 }

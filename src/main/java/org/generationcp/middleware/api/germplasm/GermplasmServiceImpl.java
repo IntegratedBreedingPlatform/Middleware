@@ -941,7 +941,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			throw new MiddlewareRequestException("", "germplasm.update.other.progenitors.can.not.be.set.for.der.man");
 		} else {
 			//Generative validations
-			if (!CollectionUtils.isEmpty(otherProgenitors) && !method.getMprgn().equals(0)) {
+			if (!CollectionUtils.isEmpty(otherProgenitors) && !Integer.valueOf(0).equals(method.getMprgn())) {
 				throw new MiddlewareRequestException("",
 					"germplasm.update.other.progenitors.can.not.be.set.for.gen.with.mprgn.non.equal.zero");
 			}
@@ -1036,7 +1036,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasm.setReferenceId(0);
 
 			GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(germplasm));
-			this.daoFactory.getGermplasmDao().save(germplasm);
+			this.daoFactory.getGermplasmDao().saveOrUpdate(germplasm);
 
 			this.addCustomNameFieldsToSynonyms(germplasmDto);
 			germplasmDto.getSynonyms().forEach(synonym -> {
