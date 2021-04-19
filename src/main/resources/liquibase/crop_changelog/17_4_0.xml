@@ -7,15 +7,19 @@
     <changeSet author="gelli" id="v17.4.0-1">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
-                SELECT COUNT(1) FROM cvterm WHERE cvterm_id = 10185 AND name = 'X'
+                SELECT COUNT(1) FROM cvterm WHERE cvterm_id = 10185
             </sqlCheck>
         </preConditions>
         <comment>
-            Create cvterm for X-Non Replicated
+            Create entry_type X-Non Replicated if not exists, else create entry_type XRP-Non Replicated.
         </comment>
         <sql>
-            INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
-            VALUES (10185,2050,'X','Non Replicated',NULL,0,0);
+            INSERT INTO cvterm (name, cvterm_id, cv_id, definition, dbxref_id, is_obsolete, is_relationshiptype)
+            (SELECT CASE
+                    WHEN (SELECT COUNT(1) FROM cvterm WHERE name = 'X' AND cv_id = 2050 AND is_obsolete = 0) > 0 THEN 'XRP'
+                    ELSE 'X'
+                END,
+            10185,2050,'Non Replicated',NULL,0,0);
         </sql>
     </changeSet>
 
@@ -23,29 +27,31 @@
         <preConditions onFail="MARK_RAN">
             <and>
                 <sqlCheck expectedResult="0">
-                    SELECT COUNT(1) FROM cvterm_relationship WHERE object_id = 10185 AND subject_id = 17269 AND type_id = 1190;
+                    SELECT COUNT(1) FROM cvterm_relationship WHERE object_id = 10185 AND
+                    type_id = (SELECT cvterm_id FROM cvterm WHERE name = 'has value' AND cv_id = 1000 AND is_obsolete = 0) AND
+                    subject_id = (SELECT cvterm_id FROM cvterm WHERE name = 'Type of ENTRY_TYPE' AND cv_id = 1030 AND is_obsolete = 0);
                 </sqlCheck>
                 <sqlCheck expectedResult="1">
                     SELECT COUNT(1) FROM cvterm WHERE cvterm_id = 10185;
                 </sqlCheck>
                 <sqlCheck expectedResult="1">
-                    SELECT COUNT(1) FROM cvterm WHERE name = 'has value';
+                    SELECT COUNT(1) FROM cvterm WHERE name = 'has value' AND cv_id = 1000 AND is_obsolete = 0;
                 </sqlCheck>
                 <sqlCheck expectedResult="1">
-                    SELECT COUNT(1) FROM cvterm WHERE name = 'Type of ENTRY_TYPE';
+                    SELECT COUNT(1) FROM cvterm WHERE name = 'Type of ENTRY_TYPE' AND cv_id = 1030 AND is_obsolete = 0;
                 </sqlCheck>
             </and>
         </preConditions>
         <comment>
             Create cvterm_relationship for Non Replicated. Value of Type of ENTRY_TYPE.
-            Cvterms 'has value' and 'Type of ENTRY_TYPE' are fetched by names (which is unique) to make sure
+            Cvterms 'has value' and 'Type of ENTRY_TYPE' are fetched by names, cv_id, is_obsolete (which is unique) to make sure
             cvterm_relationship is using the correct cvterm_id.
         </comment>
         <sql>
             INSERT INTO cvterm_relationship (type_id, subject_id, object_id)
             VALUES (
-            (SELECT cvterm_id FROM cvterm WHERE name = 'has value'),
-            (SELECT cvterm_id FROM cvterm WHERE name = 'Type of ENTRY_TYPE'),
+            (SELECT cvterm_id FROM cvterm WHERE name = 'has value' AND cv_id = 1000 AND is_obsolete = 0),
+            (SELECT cvterm_id FROM cvterm WHERE name = 'Type of ENTRY_TYPE' AND cv_id = 1030 AND is_obsolete = 0),
             10185);
         </sql>
     </changeSet>
