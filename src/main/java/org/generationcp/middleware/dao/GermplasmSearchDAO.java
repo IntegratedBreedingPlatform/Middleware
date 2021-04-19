@@ -17,7 +17,10 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
+import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
@@ -74,6 +77,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	public static final String NAMES = "NAMES";
 	private static final String MIXED_UNITS_LABEL = "Mixed";
 	public static final String LOCATION_ID = "LOCATION_ID";
+	public static final String LOCATION_ABBR = "LOCATION_ABBR";
+	public static final String REFERENCE = "REFERENCE";
 	public static final String METHOD_ID = "METHOD_ID";
 
 	public static final String GID = ColumnLabels.GID.getName();
@@ -757,6 +762,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			query.addScalar(LOCATION_NAME);
 			query.addScalar(LOCATION_ID);
 			query.addScalar(METHOD_ID);
+			query.addScalar(LOCATION_ABBR);
+			query.addScalar(REFERENCE);
 
 			final List<String> filteredProperties = addedColumnsPropertyIds.stream()
 				.filter(s -> !this.GERMPLASM_TREE_NODE_PROPERTY_IDS.contains(s)).collect(Collectors.toList());
@@ -856,7 +863,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			+ " m.mname AS `" + GermplasmSearchDAO.METHOD_NAME + "`, \n"  //
 			+ " l.lname AS `" + GermplasmSearchDAO.LOCATION_NAME + "`, \n"
 			+ " m.mid AS `" + GermplasmSearchDAO.METHOD_ID + "`, \n"  //
-			+ " l.locid AS `" + GermplasmSearchDAO.LOCATION_ID + "` \n")
+			+ " l.locid AS `" + GermplasmSearchDAO.LOCATION_ID + "`, \n"
+			+ " l.labbr AS `" + GermplasmSearchDAO.LOCATION_ABBR + "`, \n"
+			+ " ref.analyt AS `" + GermplasmSearchDAO.REFERENCE + "` \n")
 		;
 
 		for (final String propertyId : addedColumnsPropertyIds) {
@@ -883,6 +892,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 		final Germplasm germplasm = (Germplasm) row[0];
 
+		response.setGermplasmUUID(germplasm.getGermplasmUUID());
 		response.setGid(germplasm.getGid());
 		response.setNames((String) row[1]);
 		response.setGroupId(germplasm.getMgid());
@@ -893,8 +903,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		response.setLocationName((String) row[7]);
 		response.setLocationId((Integer) row[8]);
 		response.setBreedingMethodId((Integer) row[9]);
+		response.setLocationAbbr((String) row[10]);
+		response.setReference((String) row[11]);
 
-		final int indexOffset = 10;
+		final int indexOffset = 12;
 		response.setGermplasmDate(this.getValueOfAddedColumns(GERMPLASM_DATE, row, addedColumnsPropertyIds, indexOffset));
 		response.setMethodCode(this.getValueOfAddedColumns(METHOD_ABBREVIATION, row, addedColumnsPropertyIds, indexOffset));
 		response.setMethodNumber(this.getValueOfAddedColumns(METHOD_NUMBER, row, addedColumnsPropertyIds, indexOffset));
@@ -1520,5 +1532,92 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		return this.getSession().createSQLQuery("select p.pid from progntrs p where p.gid in (:gids)") //
 			.setParameterList("gids", gids) //
 			.list();
+	}
+
+	public List<UserDefinedField> getGermplasmAttributeTypes(final GermplasmSearchRequest germplasmSearchRequest) {
+		try {
+
+			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
+			final String sql = "select distinct {u.*} from atributs a inner join udflds u "
+				+ " where a.atype = u.fldno"
+				+ " and a.gid in (:gids)"
+				+ " order by u.fname";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addEntity("u", UserDefinedField.class);
+			query.setParameterList("gids", gids);
+
+			return query.list();
+		} catch (final HibernateException e) {
+			final String message =
+				"Error with getGermplasmAttributeTypes(GermplasmSearchRequest=" + germplasmSearchRequest + ") : " + e.getMessage();
+			GermplasmSearchDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<UserDefinedField> getGermplasmNameTypes(final GermplasmSearchRequest germplasmSearchRequest) {
+		try {
+
+			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
+			final String sql = "select distinct {u.*} from names n inner join udflds u "
+				+ " where n.ntype = u.fldno"
+				+ " and n.gid in (:gids)"
+				+ " order by u.fname";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addEntity("u", UserDefinedField.class);
+			query.setParameterList("gids", gids);
+
+			return query.list();
+		} catch (final HibernateException e) {
+			final String message =
+				"Error with getGermplasmNameTypes(GermplasmSearchRequest=" + germplasmSearchRequest + ") : " + e.getMessage();
+			GermplasmSearchDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<Attribute> getGermplasmAttributeValues(final GermplasmSearchRequest germplasmSearchRequest) {
+		try {
+
+			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
+			final String sql = "select distinct {a.*} from atributs a "
+				+ "where a.gid in (:gids)";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addEntity("a", Attribute.class);
+			query.setParameterList("gids", gids);
+
+			final List<Attribute> attributes = query.list();
+			return attributes;
+
+		} catch (final HibernateException e) {
+			final String message =
+				"Error with getGermplasmAttributeValues(GermplasmSearchRequest=" + germplasmSearchRequest + ") : " + e.getMessage();
+			GermplasmSearchDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<Name> getGermplasmNameValues(final GermplasmSearchRequest germplasmSearchRequest) {
+		try {
+
+			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
+			final String sql = "select distinct {n.*} from names n "
+				+ "where n.gid in (:gids)  order by n.ntype, n.ndate asc";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addEntity("n", Name.class);
+			query.setParameterList("gids", gids);
+
+			final List<Name> names = query.list();
+			return names;
+		} catch (final HibernateException e) {
+			final String message =
+				"Error with getGermplasmNameValues(GermplasmSearchRequest=" + germplasmSearchRequest + ") : " + e.getMessage();
+			GermplasmSearchDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 }
