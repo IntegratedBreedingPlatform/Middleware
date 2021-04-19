@@ -17,6 +17,11 @@ public class MyStudiesServiceImpl implements MyStudiesService {
 	}
 
 	@Override
+	public long countMyStudies(final String programUUID, final Integer userId) {
+		return daoFactory.getDmsProjectDAO().countMyStudies(programUUID, userId);
+	}
+
+	@Override
 	public List<MyStudiesDTO> getMyStudies(final String programUUID, final Pageable pageable, final Integer userId) {
 		return this.daoFactory.getDmsProjectDAO().getMyStudies(programUUID, pageable, userId);
 	}

@@ -295,6 +295,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public long countMyLists(final String programUUID, final Integer userId) {
+		return this.daoFactory.getGermplasmListDAO().countMyLists(programUUID, userId);
+	}
+
+	@Override
 	public List<MyListsDTO> getMyLists(final String programUUID, final Pageable pageable, final Integer userId) {
 		return this.daoFactory.getGermplasmListDAO().getMyLists(programUUID, pageable, userId);
 	}

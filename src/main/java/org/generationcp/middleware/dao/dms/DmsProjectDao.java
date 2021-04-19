@@ -625,6 +625,24 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
+	public Long countMyStudies(final String programUUID, final int userId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
+				.add(Restrictions.eq("createdBy", String.valueOf(userId)))
+				.add(Restrictions.isNull("study"));
+			if (!StringUtils.isBlank(programUUID)) {
+				criteria.add(Restrictions.eq("programUUID", programUUID));
+			}
+			criteria.setProjection(Projections.rowCount());
+			return (Long) criteria.uniqueResult();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error with countMyStudies(programUUID=" + programUUID + ", userId= " + userId + " ): "
+				+ e.getMessage();
+			LOG.error(errorMessage);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+	}
+
 	public List<MyStudiesDTO> getMyStudies(final String programUUID, final Pageable pageable, final int userId) {
 		try {
 			final Map<Integer, MyStudiesDTO> myStudies = new LinkedHashMap<>();

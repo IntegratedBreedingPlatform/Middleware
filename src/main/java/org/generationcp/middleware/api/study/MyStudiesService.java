@@ -6,5 +6,8 @@ import java.util.List;
 
 public interface MyStudiesService {
 
+	long countMyStudies(String programUUID, Integer userId);
+
 	List<MyStudiesDTO> getMyStudies(String programUUID, Pageable pageable, Integer userId);
+
 }

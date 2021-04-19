@@ -33,6 +33,8 @@ public interface GermplasmListService {
 
 	Optional<GermplasmList> getGermplasmListByParentAndName(String germplasmListName, Integer parentId, String programUUID);
 
+	long countMyLists(String programUUID, Integer userId);
+
 	List<MyListsDTO> getMyLists(String programUUID, Pageable pageable, Integer userId);
 
 	Integer createGermplasmListFolder(Integer userId, String folderName, Integer parentId, String programUUID);

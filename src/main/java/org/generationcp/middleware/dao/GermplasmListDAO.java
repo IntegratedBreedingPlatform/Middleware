@@ -740,6 +740,22 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return (GermplasmList) criteria.uniqueResult();
 	}
 
+	public long countMyLists(final String programUUID, final Integer userId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
+				.add(Restrictions.eq("userId", userId));
+
+			criteria.add(Restrictions.ne(STATUS, STATUS_DELETED));
+			criteria.add(Restrictions.eq(PROGRAM_UUID, programUUID));
+			criteria.setProjection(Projections.rowCount());
+			return (long) criteria.uniqueResult();
+		} catch (final Exception e) {
+			final String message = "Error with countMyLists(programUUID=" + programUUID + ", userId= " + userId + " ): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
+	}
+
 	/**
 	 * @return lists owned by user (possibly along with statistical information in the future)
 	 */
