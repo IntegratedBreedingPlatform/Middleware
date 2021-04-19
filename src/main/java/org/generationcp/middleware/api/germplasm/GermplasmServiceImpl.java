@@ -897,7 +897,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if ("0".equals(progenitor1)) {
 			// If Immediate Source is Terminal Ancestor or Generative, then the Group Source is Progenitor 2 GID
 			// Otherwise, Group Source will be set to Progenitor 2 Group Source
-			germplasm.setGpid1(this.getNewGroupSource(progenitor2Germplasm));
+			germplasm.setGpid1(this.getProgenyGroupSource(progenitor2Germplasm));
 			germplasm.setGpid2(progenitor2Germplasm.getGid());
 			return;
 		}
@@ -1319,39 +1319,36 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Optional<Integer> newGpid2Optional = Optional.ofNullable(progenitorsUpdateRequestDto.getGpid2());
 		final Optional<List<Integer>> newOtherProgenitorsOptional = Optional.ofNullable(progenitorsUpdateRequestDto.getOtherProgenitors());
 
-		//Old values
-		final Germplasm oldGermplasm = (Germplasm) germplasm.clone();
+		//Old germplasm values.
+		final Germplasm germplasmBeforeUpdate = germplasm.clone();
 
-		//Final values
+		//Final values after combining request and existing germplasm data
 		final Method methodFinal =
 			(newBreedingMethodIdOptional.isPresent() && !newBreedingMethodIdOptional.get()
-				.equals(oldGermplasm.getMethod().getMid())) ?
+				.equals(germplasmBeforeUpdate.getMethod().getMid())) ?
 				this.daoFactory.getMethodDAO().getById(newBreedingMethodIdOptional.get()) :
-				oldGermplasm.getMethod();
+				germplasmBeforeUpdate.getMethod();
 
-		final Integer gpid1Final = newGpid1Optional.orElseGet(oldGermplasm::getGpid1);
+		final Integer gpid1Final = newGpid1Optional.orElseGet(germplasmBeforeUpdate::getGpid1);
 
 		//For mutations, if gpid1 is set and gpid2 is null, then new gpid2 is 0
 		final Integer gpid2Final = newGpid2Optional
-			.orElseGet(() -> ((methodFinal.getMprgn().equals(1) && newGpid1Optional.isPresent()) ? 0 : oldGermplasm.getGpid2()));
+			.orElseGet(() -> ((Integer.valueOf(1).equals(methodFinal.getMprgn()) && newGpid1Optional.isPresent()) ? 0 :
+				germplasmBeforeUpdate.getGpid2()));
 
 		final List<Integer> otherProgenitorsFinal =
-			this.getOtherProgenitorsFinal(oldGermplasm, newGpid2Optional.orElse(null), newOtherProgenitorsOptional.orElse(null));
+			this.getOtherProgenitorsFinal(germplasmBeforeUpdate, newGpid2Optional.orElse(null), newOtherProgenitorsOptional.orElse(null));
 
-		if (isPedigreeUpdateDetected(oldGermplasm, methodFinal, gpid1Final, gpid2Final, otherProgenitorsFinal)) {
-			//FIXME check if this is valid
+		if (isPedigreeUpdateDetected(germplasmBeforeUpdate, methodFinal, gpid1Final, gpid2Final, otherProgenitorsFinal)) {
 			germplasm.setMethod(methodFinal);
 			germplasm.setMethodId(methodFinal.getMid());
 			final Map<String, Germplasm> progenitorsMap = this.loadProgenitors(gpid1Final, gpid2Final);
 			this.setProgenitors(germplasm, methodFinal, String.valueOf(gpid1Final), String.valueOf(gpid2Final), progenitorsMap);
-
 			this.setOtherProgenitors(germplasm, methodFinal, otherProgenitorsFinal);
-
 			germplasm.setGnpgs(this.calculateGnpgs(methodFinal, String.valueOf(gpid1Final), String.valueOf(gpid2Final),
 				otherProgenitorsFinal.stream().map(String::valueOf).collect(Collectors.toList())));
-
 			this.daoFactory.getGermplasmDao().save(germplasm);
-			this.updateGroupSource(oldGermplasm, germplasm);
+			this.updateGroupSource(germplasmBeforeUpdate, germplasm);
 		}
 
 	}
@@ -1361,7 +1358,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (updateGroupSourceAction == UpdateGroupSourceAction.NONE) {
 			return;
 		}
-		final Integer newGroupSource = this.getNewGroupSource(newGermplasm);
+		final Integer newGroupSource = this.getProgenyGroupSource(newGermplasm);
 		if (updateGroupSourceAction == UpdateGroupSourceAction.DIRECT) {
 			this.daoFactory.getGermplasmDao().updateGroupSource(newGermplasm.getGid(), newGroupSource);
 			return;
@@ -1372,13 +1369,23 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private Integer getNewGroupSource(final Germplasm newGermplasm) {
-		if (newGermplasm.isTerminalAncestor() || newGermplasm.getMethod().isGenerative()) {
-			return newGermplasm.getGid();
+	private Integer getProgenyGroupSource(final Germplasm germplasm) {
+		//For a terminal node or a generative germplasm, the group source for any derivative progeny is itself.
+		//Otherwise the group source is gpid1
+		if (germplasm.isTerminalAncestor() || germplasm.getMethod().isGenerative()) {
+			return germplasm.getGid();
 		}
-		return newGermplasm.getGpid1();
+		return germplasm.getGpid1();
 	}
 
+	/**
+	 * With this function we avoid to traverse the tree whenever is possible.
+	 * Do not update this function if you are not clear enough about BMS germplasm tree management
+	 *
+	 * @param oldGermplasm Germplasm before any pedigree update
+	 * @param newGermplasm Germplasm after being modified
+	 * @return tree update action to be taken
+	 */
 	private UpdateGroupSourceAction getUpdateGroupSourceAction(final Germplasm oldGermplasm, final Germplasm newGermplasm) {
 		final Method oldMethod = oldGermplasm.getMethod();
 		final Method newMethod = newGermplasm.getMethod();
@@ -1399,23 +1406,24 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return UpdateGroupSourceAction.NONE;
 	}
 
-	private boolean isPedigreeUpdateDetected(final Germplasm oldGermplasm, final Method newMethod, final Integer newGpid1,
+	private boolean isPedigreeUpdateDetected(final Germplasm germplasmBeforeUpdate, final Method newMethod, final Integer newGpid1,
 		final Integer newGpid2,
 		final List<Integer> newOtherProgenitors) {
-		return !newMethod.getMid().equals(oldGermplasm.getMethod().getMid()) || isGpidUpdateDetected(oldGermplasm, newGpid1, newGpid2)
-			|| !oldGermplasm.otherProgenitorsGidsEquals(newOtherProgenitors);
+		return !newMethod.getMid().equals(germplasmBeforeUpdate.getMethod().getMid()) || isGpidUpdateDetected(germplasmBeforeUpdate,
+			newGpid1, newGpid2)
+			|| !germplasmBeforeUpdate.otherProgenitorsGidsEquals(newOtherProgenitors);
 	}
 
-	private boolean isGpidUpdateDetected(final Germplasm oldGermplasm, final Integer newGpid1, final Integer newGpid2) {
-		return !(oldGermplasm.getGpid1().equals(newGpid1) && oldGermplasm.getGpid2().equals(newGpid2));
+	private boolean isGpidUpdateDetected(final Germplasm germplasmBeforeUpdate, final Integer newGpid1, final Integer newGpid2) {
+		return !(germplasmBeforeUpdate.getGpid1().equals(newGpid1) && germplasmBeforeUpdate.getGpid2().equals(newGpid2));
 	}
 
-	private List<Integer> getOtherProgenitorsFinal(final Germplasm oldGermplasm, final Integer newGpid2,
+	private List<Integer> getOtherProgenitorsFinal(final Germplasm germplasmBeforeUpdate, final Integer newGpid2,
 		final List<Integer> newOtherProgenitors) {
 		if (Objects.nonNull(newGpid2)) {
 			return (CollectionUtils.isEmpty(newOtherProgenitors)) ? new ArrayList<>() : newOtherProgenitors;
 		}
-		return oldGermplasm.getOtherProgenitors().stream().map(Progenitor::getProgenitorGid).collect(Collectors.toList());
+		return germplasmBeforeUpdate.getOtherProgenitors().stream().map(Progenitor::getProgenitorGid).collect(Collectors.toList());
 	}
 
 	private Map<String, Germplasm> loadProgenitors(final Integer gpid1, final Integer gpid2) {
