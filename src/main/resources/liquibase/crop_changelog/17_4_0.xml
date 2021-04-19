@@ -49,5 +49,18 @@
             10185);
         </sql>
     </changeSet>
-
+    <changeSet author="cuenyad" id="v17.4.0-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(*) FROM program_preset where tool_section = 'GERMPLASM_LABEL_PRINTING_PRESET' AND name = 'Excel template selected fields'
+            </sqlCheck>
+        </preConditions>
+        <comment>
+            Insert Excel template default to GERMPLASM_LABEL_PRINTING_PRESET
+        </comment>
+   		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO program_preset (tool_id, tool_section, name, configuration)
+			VALUES ('23', 'GERMPLASM_LABEL_PRINTING_PRESET', 'Excel template default', '{\"type\":\"LabelPrintingPreset\",\"selectedFields\":[[8240,41,8189,8256,1712,48,1709]],\"barcodeSetting\":{\"barcodeNeeded\":false,\"automaticBarcode\":false,\"barcodeFields\":[]},\"includeHeadings\":true,\"fileConfiguration\":{\"outputType\":\"xls\"}}');
+       </sql>
+    </changeSet>
 </databaseChangeLog>
