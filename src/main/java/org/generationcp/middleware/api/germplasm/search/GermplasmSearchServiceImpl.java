@@ -48,10 +48,6 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 	public Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(final GermplasmSearchRequest germplasmSearchRequest) {
 		final List<Attribute> attributes = this.daoFactory.getGermplasmSearchDAO().getGermplasmAttributeValues(germplasmSearchRequest);
 
-		if (attributes.isEmpty()) {
-			return null;
-		}
-
 		final HashMap<Integer, Map<Integer, String>> attributeMapByGid = new HashMap<>();
 		for (final Attribute attribute : attributes) {
 			Map<Integer, String> attrByType = attributeMapByGid.get(attribute.getGermplasmId());
@@ -67,10 +63,6 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 	@Override
 	public Map<Integer, Map<Integer, String>> getGermplasmNameValues(final GermplasmSearchRequest germplasmSearchRequest) {
 		final List<Name> names = this.daoFactory.getGermplasmSearchDAO().getGermplasmNameValues(germplasmSearchRequest);
-
-		if (names.isEmpty()) {
-			return null;
-		}
 
 		final HashMap<Integer, Map<Integer, String>> nameMapByGid = new HashMap<>();
 		for (final Name name : names) {
