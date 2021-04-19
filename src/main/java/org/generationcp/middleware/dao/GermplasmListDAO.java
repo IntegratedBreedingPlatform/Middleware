@@ -35,6 +35,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
+import org.hibernate.sql.JoinType;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
@@ -763,9 +764,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
 				.add(Restrictions.eq("userId", userId));
-
 			criteria.add(Restrictions.ne(STATUS, STATUS_DELETED));
 			criteria.add(Restrictions.eq(PROGRAM_UUID, programUUID));
+			// FIXME sort by parent (null) => "Program lists"
+			criteria.createAlias("parent", "parent", JoinType.LEFT_OUTER_JOIN);
 			addOrder(criteria, pageable);
 			addPagination(criteria, pageable);
 

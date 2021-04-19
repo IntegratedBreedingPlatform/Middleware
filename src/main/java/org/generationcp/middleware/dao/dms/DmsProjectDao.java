@@ -649,6 +649,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Map<Integer, MyStudiesDTO> myStudies = new LinkedHashMap<>();
 
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
+				.createAlias("studyType", "studyType")
+				.createAlias("parent", "parent")
 				.add(Restrictions.eq("createdBy", String.valueOf(userId)))
 				.add(Restrictions.isNotNull("studyType"))
 				.add(Restrictions.eq("deleted", false));
