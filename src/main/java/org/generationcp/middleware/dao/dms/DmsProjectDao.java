@@ -629,7 +629,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
 				.add(Restrictions.eq("createdBy", String.valueOf(userId)))
-				.add(Restrictions.isNull("study"));
+				.add(Restrictions.isNotNull("studyType"))
+				.add(Restrictions.eq("deleted", false));
 			if (!StringUtils.isBlank(programUUID)) {
 				criteria.add(Restrictions.eq("programUUID", programUUID));
 			}
@@ -649,7 +650,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
 				.add(Restrictions.eq("createdBy", String.valueOf(userId)))
-				.add(Restrictions.isNull("study"));
+				.add(Restrictions.isNotNull("studyType"))
+				.add(Restrictions.eq("deleted", false));
 			if (!StringUtils.isBlank(programUUID)) {
 				criteria.add(Restrictions.eq("programUUID", programUUID));
 			}
