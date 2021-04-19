@@ -11,7 +11,7 @@
             </sqlCheck>
         </preConditions>
         <comment>
-            Create entry_type X-Non Replicated if not exists, else create entry_type XRP-Non Replicated.
+            Create Non-replicated entry type with id = 10185. The name will be X, if there is no such entry type yet, otherwise it will be XRP
         </comment>
         <sql>
             INSERT INTO cvterm (name, cvterm_id, cv_id, definition, dbxref_id, is_obsolete, is_relationshiptype)
