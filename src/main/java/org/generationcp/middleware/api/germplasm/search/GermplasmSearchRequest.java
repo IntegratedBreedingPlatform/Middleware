@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.germplasm.search;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 @AutoProperty
-public class GermplasmSearchRequest {
+public class GermplasmSearchRequest extends SearchRequestDto {
 
 	public static class IncludePedigree {
 
