@@ -1022,15 +1022,16 @@ public class Germplasm implements Serializable, Cloneable {
 	}
 
 	@Override
-	public Object clone() {
+	public Germplasm clone() {
 		Germplasm germplasm;
 		try {
 			germplasm = (Germplasm) super.clone();
 		} catch (final CloneNotSupportedException e) {
 			germplasm = new Germplasm(this.gid, this.methodId, this.gnpgs, this.gpid1, this.gpid2,
 				this.userId, this.lgid, this.locationId, this.gdate, this.preferredName);
+			germplasm.setMethod((Method) this.method.clone());
+			//TODO Complete with other objects
 		}
-		germplasm.setMethod((Method) this.method.clone());
 		return germplasm;
 	}
 }

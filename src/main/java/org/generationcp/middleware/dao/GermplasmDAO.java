@@ -1905,20 +1905,20 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public void updateGroupSourceTraversingProgeny(final Integer parentNode, final Integer newGroupSource) {
-		final List<Integer> derivativeNodes = new ArrayList<>();
-		this.findDerivativeNodes(Collections.singletonList(parentNode), derivativeNodes);
+		final List<Integer> derivativeNodes = this.findDerivativeNodes(Collections.singletonList(parentNode));
 		if (!derivativeNodes.isEmpty()) {
 			this.updateGroupSource(derivativeNodes, newGroupSource);
 		}
 	}
 
-	private void findDerivativeNodes(final List<Integer> parentNodes, final List<Integer> gids) {
+	private List<Integer> findDerivativeNodes(final List<Integer> parentNodes) {
+		final List<Integer> result = new ArrayList<>();
 		final List<Integer> immediateDerivativeProgeny = this.getImmediateDerivativeProgeny(parentNodes);
-		if (immediateDerivativeProgeny.isEmpty()) {
-			return;
+		if (!immediateDerivativeProgeny.isEmpty()) {
+			result.addAll(immediateDerivativeProgeny);
+			result.addAll(this.findDerivativeNodes(immediateDerivativeProgeny));
 		}
-		gids.addAll(immediateDerivativeProgeny);
-		this.findDerivativeNodes(immediateDerivativeProgeny, gids);
+		return result;
 	}
 
 	private List<Integer> getImmediateDerivativeProgeny(final List<Integer> parentNodes) {
