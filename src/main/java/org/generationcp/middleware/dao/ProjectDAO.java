@@ -72,6 +72,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			+ "			) "
 			+ "		AND ( :cropName IS NULL OR p.crop_type = :cropName ) "
 			+ " 	AND ( :programName IS NULL OR p.project_name = :programName ) "
+			+ " 	AND ( :programNameContainsString IS NULL OR p.project_name like :programNameContainsString ) "
 			+ " 	AND ( :programDbId IS NULL OR p.project_uuid = :programDbId ) ";
 
 	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
@@ -195,6 +196,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			sqlQuery.setParameter("userId", programSearchRequest.getLoggedInUserId());
 			sqlQuery.setParameter("cropName", programSearchRequest.getCommonCropName());
 			sqlQuery.setParameter("programName", programSearchRequest.getProgramName());
+			sqlQuery.setParameter("programNameContainsString", '%' + programSearchRequest.getProgramNameContainsString() + '%');
 			sqlQuery.setParameter("programDbId", programSearchRequest.getProgramDbId());
 
 			sqlQuery
@@ -246,6 +248,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			sqlQuery.setParameter("userId", programSearchRequest.getLoggedInUserId());
 			sqlQuery.setParameter("cropName", programSearchRequest.getCommonCropName());
 			sqlQuery.setParameter("programName", programSearchRequest.getProgramName());
+			sqlQuery.setParameter("programNameContainsString", programSearchRequest.getProgramNameContainsString());
 			sqlQuery.setParameter("programDbId", programSearchRequest.getProgramDbId());
 
 			return sqlQuery.list().size();
