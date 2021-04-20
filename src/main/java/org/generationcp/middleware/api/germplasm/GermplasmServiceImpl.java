@@ -77,8 +77,13 @@ import static java.util.stream.Collectors.groupingBy;
 @Transactional
 public class GermplasmServiceImpl implements GermplasmService {
 
+	// This enum is used to define the required action given a germplasm pedigree change
 	private enum UpdateGroupSourceAction {
-		NONE, DIRECT, RECURSIVE
+		NONE,
+		//Update the old group source by the new group source using a simple query
+		DIRECT,
+		//A recursive function to get all the derivative germplasm to be changed is required
+		RECURSIVE
 	}
 
 	public static final String PLOT_CODE = "PLOTCODE";
