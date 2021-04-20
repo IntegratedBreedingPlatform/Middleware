@@ -10,7 +10,6 @@
 
 package org.generationcp.middleware.dao.ims;
 
-import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -22,13 +21,15 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
-import org.hibernate.*;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.DateType;
@@ -37,12 +38,16 @@ import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link Lot}.
@@ -56,8 +61,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	private static final String AT_LOT_DAO = " at LotDAO: ";
 
 	private static final String ENTITY_TYPE = "entityType";
-
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
 
 	/*
 	 * NOTE setting the trnstat=0 for actual_balance to include anticipated transaction to the total_amount. This is only temporary change
@@ -385,273 +388,14 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 	}
 
-	private static void addSearchLotsQueryFiltersAndGroupBy(
-		final SqlQueryParamBuilder paramBuilder,
-		final LotsSearchDto lotsSearchDto) {
-
-		if (lotsSearchDto != null) {
-			final List<Integer> lotIds = lotsSearchDto.getLotIds();
-			if (lotIds != null && !lotIds.isEmpty()) {
-				paramBuilder.append(" and lot.lotid IN (:lotIds)");
-				paramBuilder.setParameterList("lotIds", lotIds);
-			}
-
-			final List<String> lotUUIDs = lotsSearchDto.getLotUUIDs();
-			if (lotUUIDs != null && !lotUUIDs.isEmpty()) {
-				paramBuilder.append(" and lot.lot_uuid IN (:lotUUIDs)");
-				paramBuilder.setParameterList("lotUUIDs", lotUUIDs);
-			}
-
-			final List<Integer> gids = lotsSearchDto.getGids();
-			if (gids != null && !gids.isEmpty()) {
-				paramBuilder.append(" and lot.eid IN (:gids)");
-				paramBuilder.setParameterList("gids", gids);
-			}
-
-			final List<Integer> mgids = lotsSearchDto.getMgids();
-			if (mgids != null && !mgids.isEmpty()) {
-				paramBuilder.append(" and g.mgid IN (:mgids)");
-				paramBuilder.setParameterList("mgids", mgids);
-			}
-
-			final List<Integer> locationIds = lotsSearchDto.getLocationIds();
-			if (locationIds != null && !locationIds.isEmpty()) {
-				paramBuilder.append(" and lot.locid IN (:locationIds)");
-				paramBuilder.setParameterList("locationIds", locationIds);
-			}
-
-			final List<Integer> unitIds = lotsSearchDto.getUnitIds();
-			if (unitIds != null && !unitIds.isEmpty()) {
-				paramBuilder.append(" and lot.scaleid IN (:unitIds)");
-				paramBuilder.setParameterList("unitIds", unitIds);
-			}
-
-			final String designation = lotsSearchDto.getDesignation();
-			if (designation != null) {
-				paramBuilder.append(" and n.nval like :designation");
-				paramBuilder.setParameter("designation", '%' + designation + '%');
-			}
-
-			final Integer lotStatus = lotsSearchDto.getStatus();
-			if (lotStatus != null) {
-				paramBuilder.append(" and lot.status = :lotStatus");
-				paramBuilder.setParameter("lotStatus", lotStatus);
-			}
-
-			final String notes = lotsSearchDto.getNotesContainsString();
-			if (notes != null) {
-				paramBuilder.append(" and lot.comments like :notes");
-				paramBuilder.setParameter("notes", '%' + notes + '%');
-			}
-
-			final String locationName = lotsSearchDto.getLocationNameContainsString();
-			if (locationName != null) {
-				paramBuilder.append(" and l.lname like :locationName");
-				paramBuilder.setParameter("locationName", '%' + locationName + '%');
-			}
-
-			final Date createdDateFrom = lotsSearchDto.getCreatedDateFrom();
-			if (createdDateFrom != null) {
-				paramBuilder.append(" and DATE(lot.created_date) >= :createdDateFrom");
-				paramBuilder.setParameter("createdDateFrom", DATE_FORMAT.format(createdDateFrom));
-			}
-
-			final Date createdDateTo = lotsSearchDto.getCreatedDateTo();
-			if (createdDateTo != null) {
-				paramBuilder.append(" and DATE(lot.created_date) <= :createdDateTo");
-				paramBuilder.setParameter("createdDateTo", DATE_FORMAT.format(createdDateTo));
-			}
-
-			final String createdByUsername =lotsSearchDto.getCreatedByUsername();
-			if (createdByUsername != null) {
-				paramBuilder.append(" and users.uname like :createdByUsername");
-				paramBuilder.setParameter("createdByUsername", '%' + createdByUsername + '%');
-			}
-
-			final List<Integer> germplasmListIds = lotsSearchDto.getGermplasmListIds();
-			if (germplasmListIds != null && !germplasmListIds.isEmpty()) {
-				paramBuilder.append(" and lot.eid in (select distinct (gid) from listdata where listid in (:germplasmListIds))"
-					+ " and lot.etype = 'GERMPLSM' ");
-				paramBuilder.setParameterList("germplasmListIds", germplasmListIds);
-			}
-
-			final String stockId = lotsSearchDto.getStockId();
-			if (stockId != null) {
-				paramBuilder.append(" and lot.stock_id like :stockId");
-				paramBuilder.setParameter("stockId", stockId + '%');
-			}
-
-			if (!CollectionUtils.isEmpty(lotsSearchDto.getGermplasmUUIDs())) {
-				paramBuilder.append(" and g.germplsm_uuid IN (:germplasmGuids)");
-				paramBuilder.setParameterList("germplasmGuids", lotsSearchDto.getGermplasmUUIDs());
-			}
-		}
-		paramBuilder.append(" GROUP BY lot.lotid ");
-
-		if (lotsSearchDto != null) {
-
-			paramBuilder.append(" having 1=1 ");
-
-			final Double minActualBalance = lotsSearchDto.getMinActualBalance();
-			if (minActualBalance != null) {
-				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() 
-					+ " THEN transaction.trnqty ELSE 0 END) >= :minActualBalance");
-				paramBuilder.setParameter("minActualBalance", minActualBalance);
-			}
-
-			final Double maxActualBalance = lotsSearchDto.getMaxActualBalance();
-			if (maxActualBalance != null) {
-				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() 
-					+ " THEN transaction.trnqty ELSE 0 END) <= :maxActualBalance");
-				paramBuilder.setParameter("maxActualBalance", maxActualBalance);
-			}
-
-			final Double minAvailableBalance = lotsSearchDto.getMinAvailableBalance();
-			if (minAvailableBalance != null) {
-				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() 
-					+ " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue() 
-					+ "     AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId() 
-					+ ") THEN transaction.trnqty ELSE 0 END) >= :minAvailableBalance");
-				paramBuilder.setParameter("minAvailableBalance", minAvailableBalance);
-			}
-
-			final Double maxAvailableBalance = lotsSearchDto.getMaxAvailableBalance();
-			if (maxAvailableBalance != null) {
-				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
-					+ " OR (transaction.trnstat = " + TransactionStatus.PENDING.getIntValue()
-					+ "     AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
-					+ " ) THEN transaction.trnqty ELSE 0 END) <= :maxAvailableBalance");
-				paramBuilder.setParameter("maxAvailableBalance", maxAvailableBalance);
-			}
-
-			final Double minReservedTotal = lotsSearchDto.getMinReservedTotal();
-			if (minReservedTotal != null) {
-				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue()
-					+ " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
-					+ " THEN transaction.trnqty * -1 ELSE 0 END) >= :minReservedTotal");
-				paramBuilder.setParameter("minReservedTotal", minReservedTotal);
-			}
-
-			final Double maxReservedTotal = lotsSearchDto.getMaxReservedTotal();
-			if (maxReservedTotal != null) {
-				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue()
-					+ " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
-					+ " THEN transaction.trnqty * -1 ELSE 0 END) <= :maxReservedTotal");
-				paramBuilder.setParameter("maxReservedTotal", maxReservedTotal);
-			}
-
-			final Double minWithdrawalTotal = lotsSearchDto.getMinWithdrawalTotal();
-			if (minWithdrawalTotal != null) {
-				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
-					+ " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
-					+ " THEN transaction.trnqty * -1 ELSE 0 END) >= :minWithdrawalTotal");
-				paramBuilder.setParameter("minWithdrawalTotal", minWithdrawalTotal);
-			}
-
-			final Double maxWithdrawalTotal = lotsSearchDto.getMaxWithdrawalTotal();
-			if (maxWithdrawalTotal != null) {
-				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
-					+ " AND transaction.trntype = " + TransactionType.WITHDRAWAL.getId()
-					+ " THEN transaction.trnqty * -1 ELSE 0 END) <= :maxWithdrawalTotal");
-				paramBuilder.setParameter("maxWithdrawalTotal", maxWithdrawalTotal);
-			}
-
-			final Double minPendingDepositsTotal = lotsSearchDto.getMinPendingDepositsTotal();
-			if (minPendingDepositsTotal != null) {
-				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue()
-					+ "  and transaction.trntype = " + TransactionType.DEPOSIT.getId()
-					+ "  THEN transaction.trnqty ELSE 0 END) >= :minPendingDepositsTotal");
-				paramBuilder.setParameter("minPendingDepositsTotal", minPendingDepositsTotal);
-			}
-
-			final Double maxPendingDepositsTotal = lotsSearchDto.getMaxPendingDepositsTotal();
-			if (maxPendingDepositsTotal != null) {
-				paramBuilder.append(" and SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.PENDING.getIntValue()
-					+ "  and transaction.trntype = " + TransactionType.DEPOSIT.getId()
-					+ "  THEN transaction.trnqty ELSE 0 END) <= :maxPendingDepositsTotal");
-				paramBuilder.setParameter("maxPendingDepositsTotal", maxPendingDepositsTotal);
-			}
-
-			final Date lastDepositDateFrom = lotsSearchDto.getLastDepositDateFrom();
-			if (lastDepositDateFrom != null) {
-				paramBuilder.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
-					+ " AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END)) >= :lastDepositDateFrom");
-				paramBuilder.setParameter("lastDepositDateFrom", DATE_FORMAT.format(lastDepositDateFrom));
-			}
-
-			final Date lastDepositDateTo = lotsSearchDto.getLastDepositDateTo();
-			if (lastDepositDateTo != null) {
-				paramBuilder.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
-					+ " AND transaction.trnqty >= 0 THEN transaction.trndate ELSE null END)) <= :lastDepositDateTo");
-				paramBuilder.setParameter("lastDepositDateTo", DATE_FORMAT.format(lastDepositDateTo));
-			}
-
-			final Date lastWithdrawalDateFrom = lotsSearchDto.getLastWithdrawalDateFrom();
-			if (lastWithdrawalDateFrom != null) {
-				paramBuilder.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
-					+ " AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END)) >= :lastWithdrawalDateFrom");
-				paramBuilder.setParameter("lastWithdrawalDateFrom", DATE_FORMAT.format(lastWithdrawalDateFrom));
-			}
-
-			final Date lastWithdrawalDateTo = lotsSearchDto.getLastWithdrawalDateTo();
-			if (lastWithdrawalDateTo != null) {
-				paramBuilder.append(" and DATE(MAX(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
-					+ " AND transaction.trnqty < 0 THEN transaction.trndate ELSE null END)) <= :lastWithdrawalDateTo");
-				paramBuilder.setParameter("lastWithdrawalDateTo", DATE_FORMAT.format(lastWithdrawalDateTo));
-			}
-
-			final List<Integer> plantingStudyIds = lotsSearchDto.getPlantingStudyIds();
-			if (plantingStudyIds != null && !plantingStudyIds.isEmpty()) {
-				paramBuilder.append(" and exists(select 1 \n" //
-					+ " from project study_filter_p \n" //
-					+ "	    inner join project study_filter_plotdata on study_filter_p.project_id = study_filter_plotdata.study_id \n" //
-					+ "     inner join nd_experiment study_filter_nde on study_filter_plotdata.project_id = study_filter_nde.project_id \n"
-					+ "     inner join ims_experiment_transaction study_filter_iet on study_filter_nde.nd_experiment_id = study_filter_iet.nd_experiment_id \n" 
-					+ "                and study_filter_iet.type = " + ExperimentTransactionType.PLANTING.getId()
-					+ "     inner join ims_transaction study_filter_transaction on study_filter_iet.trnid = study_filter_transaction.trnid \n"
-					+ "     inner join ims_lot study_filter_lot on study_filter_transaction.lotid = study_filter_lot.lotid \n" //
-					+ " where study_filter_p.project_id in (:plantingStudyIds) and study_filter_lot.lotid = lot.lotid)"); //
-				paramBuilder.setParameterList("plantingStudyIds", plantingStudyIds);
-			}
-
-			final List<Integer> harvestingStudyIds = lotsSearchDto.getHarvestingStudyIds();
-			if (harvestingStudyIds != null && !harvestingStudyIds.isEmpty()) {
-				paramBuilder.append(" and exists(select 1 \n" //
-					+ " from project study_filter_p \n" //
-					+ "	    inner join project study_filter_plotdata on study_filter_p.project_id = study_filter_plotdata.study_id \n" //
-					+ "     inner join nd_experiment study_filter_nde on study_filter_plotdata.project_id = study_filter_nde.project_id \n"
-					+ "     inner join ims_experiment_transaction study_filter_iet on study_filter_nde.nd_experiment_id = study_filter_iet.nd_experiment_id \n"
-					+ "                and study_filter_iet.type = " + ExperimentTransactionType.HARVESTING.getId()
-					+ "     inner join ims_transaction study_filter_transaction on study_filter_iet.trnid = study_filter_transaction.trnid \n"
-					+ "     inner join ims_lot study_filter_lot on study_filter_transaction.lotid = study_filter_lot.lotid \n" //
-					+ " where study_filter_p.project_id in (:harvestingStudyIds) and study_filter_lot.lotid = lot.lotid)"); //
-				paramBuilder.setParameterList("harvestingStudyIds", harvestingStudyIds);
-			}
-		}
-	}
-
-	private static void addSortToSearchLotsQuery(final StringBuilder lotsSearchQuery, final Pageable pageable) {
-		if (pageable != null) {
-			if (pageable.getSort() != null) {
-				final List<String> sorts = new ArrayList<>();
-				for (final Sort.Order order : pageable.getSort()) {
-					sorts.add(order.getProperty() + " " + order.getDirection().toString());
-				}
-				if (!sorts.isEmpty()) {
-					lotsSearchQuery.append(" ORDER BY ").append(Joiner.on(",").join(sorts));
-				}
-			}
-		}
-	}
-
 	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
 		try {
 			final StringBuilder searchLotQuerySql = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
-			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(searchLotQuerySql), lotsSearchDto);
-			addSortToSearchLotsQuery(searchLotQuerySql, pageable);
+			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(searchLotQuerySql), lotsSearchDto);
+			SearchLotDaoQuery.addSortToSearchLotsQuery(searchLotQuerySql, pageable);
 
 			final SQLQuery query = this.getSession().createSQLQuery(searchLotQuerySql.toString());
-			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), lotsSearchDto);
+			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), lotsSearchDto);
 
 			query.addScalar("lotId");
 			query.addScalar("lotUUID");
@@ -694,10 +438,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
 		try {
 			final StringBuilder filteredLotsQuery = new StringBuilder(SearchLotDaoQuery.getCountBaseQuery());
-			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filteredLotsQuery), lotsSearchDto);
+			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filteredLotsQuery), lotsSearchDto);
+			SearchLotDaoQuery.addLimit(filteredLotsQuery);
 			final String countLotsQuery = "Select count(1) from (" + filteredLotsQuery + ") as filteredLots";
 			final SQLQuery query = this.getSession().createSQLQuery(countLotsQuery);
-			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), lotsSearchDto);
+			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), lotsSearchDto);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
@@ -708,7 +453,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	public List<UserDefinedField> getGermplasmAttributeTypes(final LotsSearchDto searchDto) {
 		try {
 			final StringBuilder lotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
-			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
+			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
 
 			final String sql = "select distinct {u.*} from atributs a inner join udflds u "
 				+ " 	inner join (" + lotsQuery + ") lots on lots.gid = a.gid"
@@ -716,7 +461,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				+ " order by u.fname";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), searchDto);
+			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), searchDto);
 			query.addEntity("u", UserDefinedField.class);
 			return query.list();
 		} catch (final HibernateException e) {
@@ -727,12 +472,12 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	public Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(final LotsSearchDto searchDto) {
 		try {
 			final StringBuilder lotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
-			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
+			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
 
 			final String sql = "select distinct {a.*} from atributs a inner join (" + lotsQuery + ") lots on lots.gid = a.gid";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), searchDto);
+			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), searchDto);
 			query.addEntity("a", Attribute.class);
 			final List<Attribute> attributes = query.list();
 
@@ -761,14 +506,14 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			final Map<String, BigInteger> lotsCountPerScaleName = new HashMap<>();
 
 			final StringBuilder filterLotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
-			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filterLotsQuery), lotsSearchDto);
+			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filterLotsQuery), lotsSearchDto);
 
 			final String countQuery = "SELECT scale.name, count(*) from ("  //
 			+ filterLotsQuery + ") as lot left join cvterm scale on (scale.cvterm_id = lot.unitId) " //
 				+ "group by  scale.name "; //
 
 			final SQLQuery query = this.getSession().createSQLQuery(countQuery);
-			addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), lotsSearchDto);
+			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), lotsSearchDto);
 
 			final List<Object[]> result = query.list();
 			for (final Object[] row : result) {
