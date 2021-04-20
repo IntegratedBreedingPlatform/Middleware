@@ -1397,8 +1397,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (oldMethod.isGenerative() && newMethod.isDerivativeOrMaintenance() && !newGermplasm.isTerminalAncestor()) {
 			return UpdateGroupSourceAction.DIRECT;
 		}
-		if (oldMethod.isDerivativeOrMaintenance() && newMethod.isGenerative() && !(oldGermplasm.isTerminalAncestor() && newGermplasm
-			.isTerminalAncestor())) {
+		if (oldMethod.isDerivativeOrMaintenance() && newMethod.isGenerative() && !oldGermplasm.isTerminalAncestor()) {
 			return UpdateGroupSourceAction.RECURSIVE;
 		}
 		final boolean isGpidUpdateDetected = this.isGpidUpdateDetected(oldGermplasm, newGermplasm.getGpid1(), newGermplasm.getGpid2());
