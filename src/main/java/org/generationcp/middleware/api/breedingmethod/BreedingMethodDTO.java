@@ -15,6 +15,7 @@ public class BreedingMethodDTO {
 	private Integer methodClass;
 	private Integer mid;
 	private Integer numberOfProgenitors;
+	private Boolean bulkingMethod;
 
 	public BreedingMethodDTO() {
 	}
@@ -29,6 +30,7 @@ public class BreedingMethodDTO {
 		this.methodClass = method.getGeneq();
 		this.numberOfProgenitors = method.getMprgn();
 		this.mid = method.getMid();
+		this.bulkingMethod = method.isBulkingMethod();
 	}
 
 	public String getCode() {
@@ -108,5 +110,13 @@ public class BreedingMethodDTO {
 
 	public void setMid(final Integer mid) {
 		this.mid = mid;
+	}
+
+	public Boolean getBulkingMethod() {
+		return bulkingMethod;
+	}
+
+	public void setBulkingMethod(boolean bulkingMethod) {
+		this.bulkingMethod = bulkingMethod;
 	}
 }
