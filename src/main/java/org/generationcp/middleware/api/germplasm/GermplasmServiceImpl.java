@@ -490,7 +490,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		locationIdOptional.ifPresent(germplasm::setLocationId);
 		germplasmDateOptional.ifPresent(germplasm::setGdate);
 
-		this.saveOrUpdateReference(createdBy, germplasm, referenceOptional);
+		this.saveOrUpdateReference(germplasm, referenceOptional);
 		this.updateBreedingMethodAndProgenitors(germplasmUpdateDTO, germplasm, breedingMethodOptional, progenitorsMapByGid,
 			gidsOfGermplasmWithDescendants,
 			conflictErrors);
