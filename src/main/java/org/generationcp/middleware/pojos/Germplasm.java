@@ -50,6 +50,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -1019,6 +1020,10 @@ public class Germplasm implements Serializable, Cloneable {
 
 	public boolean isTerminalAncestor() {
 		return new Integer(0).equals(this.gpid1) && new Integer(0).equals(gpid2);
+	}
+
+	public Optional<Progenitor> findByProgNo(final Integer progNo) {
+		return this.otherProgenitors.stream().filter(p -> progNo.equals(p.getProgenitorNumber())).findFirst();
 	}
 
 	@Override

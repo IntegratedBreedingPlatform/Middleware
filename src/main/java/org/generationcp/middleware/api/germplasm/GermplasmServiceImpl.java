@@ -952,12 +952,23 @@ public class GermplasmServiceImpl implements GermplasmService {
 			}
 		}
 		if (!germplasm.otherProgenitorsGidsEquals(otherProgenitors)) {
-			germplasm.getOtherProgenitors().clear();
 			if (!CollectionUtils.isEmpty(otherProgenitors)) {
 				int progenitorNumber = 2;
 				for (final Integer otherProgenitorGid : otherProgenitors) {
-					germplasm.getOtherProgenitors().add(new Progenitor(germplasm, ++progenitorNumber, otherProgenitorGid));
+					progenitorNumber++;
+					final Optional<Progenitor> progenitorOptional = germplasm.findByProgNo(progenitorNumber);
+					if (progenitorOptional.isPresent()) {
+						progenitorOptional.get().setProgenitorGid(otherProgenitorGid);
+					} else {
+						germplasm.getOtherProgenitors().add(new Progenitor(germplasm, progenitorNumber, otherProgenitorGid));
+					}
 				}
+				final List<Progenitor> toRemove =
+					germplasm.getOtherProgenitors().stream().filter(p -> p.getProgenitorNumber() > 2 + otherProgenitors.size()).collect(
+						Collectors.toList());
+				germplasm.getOtherProgenitors().removeAll(toRemove);
+			} else {
+				germplasm.getOtherProgenitors().clear();
 			}
 		}
 	}
