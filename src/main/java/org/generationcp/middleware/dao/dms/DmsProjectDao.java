@@ -667,6 +667,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 			for (final DmsProject project : projects) {
 				final MyStudiesDTO myStudy = new MyStudiesDTO();
+				myStudy.setStudyId(project.getProjectId());
 				myStudy.setName(project.getName());
 				Preconditions.checkNotNull(project.getParent(), "folder is null");
 				myStudy.setFolder(project.getParent().getName());

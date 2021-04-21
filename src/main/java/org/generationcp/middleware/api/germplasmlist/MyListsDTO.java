@@ -5,11 +5,20 @@ import java.util.List;
 
 public class MyListsDTO {
 
+	private Integer listId;
 	private String name;
 	private String type;
 	private String typeName;
 	private String date;
 	private String folder;
+
+	public Integer getListId() {
+		return this.listId;
+	}
+
+	public void setListId(final Integer listId) {
+		this.listId = listId;
+	}
 
 	public String getName() {
 		return this.name;

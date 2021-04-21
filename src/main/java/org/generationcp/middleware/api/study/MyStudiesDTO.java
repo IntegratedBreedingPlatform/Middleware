@@ -77,11 +77,20 @@ public class MyStudiesDTO {
 		}
 	}
 
+	private Integer studyId;
 	private String name;
 	private String type;
 	private String date;
 	private String folder;
 	private MyStudyMetadata metadata;
+
+	public Integer getStudyId() {
+		return this.studyId;
+	}
+
+	public void setStudyId(final Integer studyId) {
+		this.studyId = studyId;
+	}
 
 	public String getName() {
 		return this.name;

@@ -780,6 +780,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			final List<MyListsDTO> mylists = new ArrayList<>();
 			for (final GermplasmList germplasmList : list) {
 				final MyListsDTO mylist = new MyListsDTO();
+				mylist.setListId(germplasmList.getId());
 				mylist.setName(germplasmList.getName());
 				mylist.setDate(Util.tryConvertDate(String.valueOf(germplasmList.getDate()),
 					Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
