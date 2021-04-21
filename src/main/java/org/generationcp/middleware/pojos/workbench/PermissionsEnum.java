@@ -29,7 +29,8 @@ public enum PermissionsEnum {
 	MANAGE_INVENTORY,
 	MANAGE_LOTS,
 	LOT_LABEL_PRINTING,
-	QUERIES;
+	QUERIES,
+	GERMPLASM_LABEL_PRINTING;
 
 	public static final String HAS_INVENTORY_VIEW = " or hasAnyAuthority('ADMIN'"
 		+ ",'CROP_MANAGEMENT'"

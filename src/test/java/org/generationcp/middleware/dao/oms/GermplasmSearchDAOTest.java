@@ -1180,8 +1180,48 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 	}
 
-	private void initializeGermplasms() {
+	@Test
+	public void testGetGermplasmAttributeTypes() {
+		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
+		final List<UserDefinedField> userDefinedFields = this.dao.getGermplasmAttributeTypes(request);
+		Assert.assertEquals(userDefinedFields.size(), 1);
+		Assert.assertTrue(userDefinedFields.stream().allMatch(userDefinedField -> userDefinedField.getFtable().equals("ATRIBUTS")));
+		Assert.assertEquals(userDefinedFields.get(0).getFcode(), "NOTE");
+		Assert.assertEquals(userDefinedFields.get(0).getFname(), "NOTES");
+	}
 
+	@Test
+	public void testGetGermplasmAttributeValues() {
+		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
+		final List<Attribute> attributes = this.dao.getGermplasmAttributeValues(request);
+		Assert.assertEquals(attributes.size(), 1);
+		Assert.assertEquals(attributes.get(0).getGermplasmId(), this.germplasmGID);
+		Assert.assertEquals(attributes.get(0).getAval(), this.attributeValue);
+
+	}
+
+	@Test
+	public void testGetGermplasmNameTypes() {
+		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
+		final List<UserDefinedField> userDefinedFields = this.dao.getGermplasmNameTypes(request);
+		Assert.assertEquals(2, userDefinedFields.size());
+		Assert.assertTrue(userDefinedFields.stream().allMatch(userDefinedField -> userDefinedField.getFtable().equals("NAMES")));
+		Assert.assertTrue(userDefinedFields.stream().anyMatch(userDefinedField -> userDefinedField.getFcode().equals("DRVNM")));
+		Assert.assertTrue(userDefinedFields.stream().anyMatch(userDefinedField -> userDefinedField.getFcode().equals("ACCNO")));
+
+	}
+
+	@Test
+	public void testGetGermplasmNameValues() {
+		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
+		final List<Name> names = this.dao.getGermplasmNameValues(request);
+		Assert.assertEquals(names.size(), 3);
+		Assert.assertTrue(names.contains(this.preferredName));
+		Assert.assertTrue(names.contains(this.preferredId));
+		Assert.assertTrue(names.stream().allMatch(name1 -> name1.getGermplasmId().equals(this.germplasmGID)));
+	}
+
+	private void initializeGermplasms() {
 		final Germplasm fParent =
 			GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.femaleParentGID = this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName(), this.cropType);
