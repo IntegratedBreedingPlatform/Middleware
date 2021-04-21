@@ -11,12 +11,6 @@
 
 package org.generationcp.middleware.pojos;
 
-import org.hibernate.envers.AuditOverride;
-import org.hibernate.envers.AuditOverrides;
-import org.hibernate.envers.Audited;
-
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,16 +20,13 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * POJO for progntrs table.
  *
  * @author klmanansala
  */
-@AuditOverrides({
-	@AuditOverride(forClass = AbstractEntity.class)
-})
-@Audited
 @Entity
 @Table(name = "progntrs")
 public class Progenitor extends AbstractEntity implements Serializable {

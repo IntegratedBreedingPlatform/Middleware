@@ -11,10 +11,6 @@
 
 package org.generationcp.middleware.pojos;
 
-import org.hibernate.envers.AuditOverride;
-import org.hibernate.envers.AuditOverrides;
-import org.hibernate.envers.Audited;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -29,10 +25,6 @@ import java.io.Serializable;
  *
  * @author klmanansala
  */
-@AuditOverrides({
-	@AuditOverride(forClass = AbstractEntity.class)
-})
-@Audited
 @Entity
 @Table(name = "names")
 public class Name extends AbstractEntity implements Serializable {

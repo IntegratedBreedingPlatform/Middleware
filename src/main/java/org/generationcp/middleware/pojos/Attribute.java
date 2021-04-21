@@ -11,12 +11,6 @@
 
 package org.generationcp.middleware.pojos;
 
-import org.hibernate.envers.AuditOverride;
-import org.hibernate.envers.AuditOverrides;
-import org.hibernate.envers.Audited;
-
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -26,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 
 /**
@@ -35,10 +30,6 @@ import javax.persistence.Table;
  */
 @NamedQueries({@NamedQuery(name = "getAttributesByGID",
 		query = "FROM Attribute a WHERE a.germplasmId = :gid AND a.typeId <> 9999 AND a.typeId <> 999")})
-@AuditOverrides({
-	@AuditOverride(forClass = AbstractEntity.class)
-})
-@Audited
 @Entity
 @Table(name = "atributs")
 public class Attribute extends AbstractEntity implements Serializable {

@@ -293,12 +293,6 @@
 			</exclusions>
 		</dependency>
 
-		<dependency>
-			<groupId>org.hibernate</groupId>
-			<artifactId>hibernate-envers</artifactId>
-			<version>${hibernate.version}</version>
-		</dependency>
-
 		<!-- Testing -->
 		<dependency>
 			<groupId>org.easytesting</groupId>

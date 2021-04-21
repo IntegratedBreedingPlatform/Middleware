@@ -21,11 +21,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Type;
-import org.hibernate.envers.AuditJoinTable;
-import org.hibernate.envers.AuditOverride;
-import org.hibernate.envers.AuditOverrides;
-import org.hibernate.envers.Audited;
-import org.hibernate.envers.NotAudited;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -113,10 +108,6 @@ import java.util.Map;
 
 	@NamedNativeQuery(name = "getProgenitor", query = "SELECT g.* FROM germplsm g, progntrs p WHERE g.gid = p.pid "
 		+ "and p.gid = :gid and p.pno = :pno and  g.deleted = 0  and g.grplce = 0", resultClass = Germplasm.class)})
-@AuditOverrides({
-	@AuditOverride(forClass = AbstractEntity.class)
-})
-@Audited
 @Entity
 @Table(name = "germplsm")
 // JAXB Element Tags for JSON output
@@ -311,7 +302,6 @@ public class Germplasm extends AbstractEntity implements Serializable {
 	@Column(name = "mgid")
 	private Integer mgid;
 
-	@AuditJoinTable(name = "germplasm_name_aud")
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "gid")
 	private List<Name> names = new ArrayList<Name>();
@@ -329,12 +319,10 @@ public class Germplasm extends AbstractEntity implements Serializable {
 	@JoinColumn(name = "gref", insertable = false, updatable = false)
 	private Bibref bibref;
 
-	@NotAudited
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "methn", insertable = false, updatable = false)
 	private Method method;
 
-	@AuditJoinTable(name = "germplasm_externalreference_aud")
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "gid")
 	private List<ExternalReference> externalReferences = new ArrayList<>();
