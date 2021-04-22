@@ -59,6 +59,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	private static final String PROGRAM_UUID = "programUUID";
 	private static final String NAME = "name";
 	private static final String PARENT = "parent";
+	private static final String TYPE = "type";
 
 	private static final String STATUS = "status";
 
@@ -747,6 +748,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 				.add(Restrictions.eq("userId", userId));
 
 			criteria.add(Restrictions.ne(STATUS, STATUS_DELETED));
+			criteria.add(Restrictions.ne(TYPE, GermplasmList.FOLDER_TYPE));
 			criteria.add(Restrictions.eq(PROGRAM_UUID, programUUID));
 			criteria.setProjection(Projections.rowCount());
 			return (long) criteria.uniqueResult();
@@ -765,6 +767,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
 				.add(Restrictions.eq("userId", userId));
 			criteria.add(Restrictions.ne(STATUS, STATUS_DELETED));
+			criteria.add(Restrictions.ne(TYPE, GermplasmList.FOLDER_TYPE));
 			criteria.add(Restrictions.eq(PROGRAM_UUID, programUUID));
 			// FIXME sort by parent (null) => "Program lists"
 			criteria.createAlias("parent", "parent", JoinType.LEFT_OUTER_JOIN);
