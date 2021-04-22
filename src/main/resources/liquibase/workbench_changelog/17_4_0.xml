@@ -154,7 +154,7 @@
             </sqlCheck>
 			<and>
 				<not>
-					<tableExists tableName="role_permission_temporary"></tableExists>
+					<tableExists tableName="roles_affected_temporary"></tableExists>
 				</not>
 			</and>
         </preConditions>
@@ -165,31 +165,31 @@
 			SET @import_germplasm_update_permission_id = (SELECT permission_id FROM permission WHERE name = 'IMPORT_GERMPLASM_UPDATES');
 			SET @germplasm_label_printing_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_LABEL_PRINTING');
 
-			#Create role_permission_temporary Table
-			CREATE TEMPORARY TABLE role_permission_temporary (
+			#Create roles_affected_temporary Table
+			CREATE TEMPORARY TABLE roles_affected_temporary (
 				role_id int(11) not null
 			);
 
 			#Insert role id in Temporary table
-			INSERT INTO role_permission_temporary (role_id)
+			INSERT INTO roles_affected_temporary (role_id)
 				SELECT DISTINCT(rp.role_id) FROM role_permission rp INNER JOIN  permission p ON rp.permission_id = p.permission_id
 					WHERE p.name IN ('GERMPLASM' , 'MANAGE_GERMPLASM') GROUP BY rp.role_id;
 
 			#Insert permissions in role_permission
 			INSERT INTO role_permission(role_id, permission_id)
-						SELECT rp.role_id, @import_germplasm_permission_id FROM role_permission_temporary rp;
+						SELECT rp.role_id, @import_germplasm_permission_id FROM roles_affected_temporary rp;
 
 			INSERT INTO role_permission(role_id, permission_id)
-						SELECT rp.role_id, @search_germplasm_permission_id FROM role_permission_temporary rp;
+						SELECT rp.role_id, @search_germplasm_permission_id FROM roles_affected_temporary rp;
 
 			INSERT INTO role_permission(role_id, permission_id)
-						SELECT rp.role_id, @import_germplasm_update_permission_id FROM role_permission_temporary rp;
+						SELECT rp.role_id, @import_germplasm_update_permission_id FROM roles_affected_temporary rp;
 
 			INSERT INTO role_permission(role_id, permission_id)
-						SELECT rp.role_id, @germplasm_label_printing_permission_id FROM role_permission_temporary rp;
+						SELECT rp.role_id, @germplasm_label_printing_permission_id FROM roles_affected_temporary rp;
 
-			#Delete role_permission_temporary Table
-			DROP TABLE role_permission_temporary;
+			#Delete roles_affected_temporary Table
+			DROP TABLE roles_affected_temporary;
 
 			#Delete GERMPLASM and MANAGE_GERMPLASM permission from role_permission
 			DELETE role_permission FROM role_permission WHERE permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name IN ('GERMPLASM' , 'MANAGE_GERMPLASM'));
