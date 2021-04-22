@@ -72,6 +72,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String GRPLCE = "grplce";
 	private static final String DELETED = "deleted";
 
+	private static final String DER_MAN = "'" + MethodType.DERIVATIVE.getCode() + "','" + MethodType.MAINTENANCE.getCode() + "'";
+
+	private static final String GEN = "'" + MethodType.GENERATIVE.getCode() + "'";
+
 	private static final String QUERY_FROM_GERMPLASM = ") query from Germplasm: ";
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
@@ -1863,4 +1867,94 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			throw new MiddlewareQueryException("Error in countAll(): " + e.getMessage(), e);
 		}
 	}
+
+	public List<Integer> getChildren(final Integer gid) {
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery("select gid "
+				+ "from germplsm "
+				+ "       inner join methods m on germplsm.methn = m.mid "
+				+ "where (((mtype = " + GEN + " and (gpid1 = :parent or gpid2 = :parent))) "
+				+ "  or (mtype in (" + DER_MAN + ") and (gpid2 = :parent or (gpid2 = 0 and gpid1 = :parent)))) and deleted = 0");
+			sqlQuery.setParameter("parent", gid);
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getChildren" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	/**
+	 * Use this update when you are sure there is no need to traverse the progeny tree.
+	 *
+	 * @param oldGroupSource
+	 * @param newGroupSource
+	 */
+	public void updateGroupSource(final Integer oldGroupSource, final Integer newGroupSource) {
+		final String sql =
+			"UPDATE germplsm SET gpid1 = :newGroupSource WHERE gpid1 = :oldGroupSource and "
+				+ " deleted = 0 and methn in (select mid from methods where mtype in (" + DER_MAN + "))";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+		sqlQuery.setParameter("newGroupSource", newGroupSource);
+		sqlQuery.setParameter("oldGroupSource", oldGroupSource);
+		try {
+			final int updatedRows = sqlQuery.executeUpdate();
+			GermplasmDAO.LOG.debug("updateGroupSource has updated the group source for " + updatedRows + " rows");
+		} catch (final HibernateException e) {
+			final String message = "Error with updateGroupSource" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	//TODO Performance testing was not completed by QA during 17.4. Pending for 18.1
+	public void updateGroupSourceTraversingProgeny(final Integer parentNode, final Integer newGroupSource) {
+		final List<Integer> derivativeNodes = this.findDerivativeNodes(Collections.singletonList(parentNode));
+		if (!derivativeNodes.isEmpty()) {
+			this.updateGroupSource(derivativeNodes, newGroupSource);
+		}
+	}
+
+	private List<Integer> findDerivativeNodes(final List<Integer> parentNodes) {
+		final List<Integer> result = new ArrayList<>();
+		final List<Integer> immediateDerivativeProgeny = this.getImmediateDerivativeProgeny(parentNodes);
+		if (!immediateDerivativeProgeny.isEmpty()) {
+			result.addAll(immediateDerivativeProgeny);
+			result.addAll(this.findDerivativeNodes(immediateDerivativeProgeny));
+		}
+		return result;
+	}
+
+	private List<Integer> getImmediateDerivativeProgeny(final List<Integer> parentNodes) {
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery("select g.gid "
+				+ "from germplsm g "
+				+ "       inner join methods m on g.methn = m.mid "
+				+ "where g.deleted = 0 and m.mtype in (" + DER_MAN + ") and g.gpid2 in :parentNodes");
+			sqlQuery.setParameterList("parentNodes", parentNodes);
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getImmediateDerivativeProgeny" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	private void updateGroupSource(final List<Integer> gids, final Integer newGroupSource) {
+		final String sql =
+			"UPDATE germplsm SET gpid1 = :newGroupSource WHERE gid in (:gids)";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+		sqlQuery.setParameter("newGroupSource", newGroupSource);
+		sqlQuery.setParameterList("gids", gids);
+		try {
+			GermplasmDAO.LOG.debug("updateGroupSource is trying to set the group source for the gids: " + gids);
+			final Integer updatedRows = sqlQuery.executeUpdate();
+			GermplasmDAO.LOG.debug("updateGroupSource has modified the group source for " + updatedRows + " germplasm");
+		} catch (final HibernateException e) {
+			final String message = "Error with updateGroupSource" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 }
