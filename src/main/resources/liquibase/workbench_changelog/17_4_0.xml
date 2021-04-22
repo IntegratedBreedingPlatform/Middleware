@@ -149,10 +149,10 @@
 	</changeSet>
 	<changeSet author="cuenyad" id="v17.4.0-5">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">
-                SELECT count(*) > 1 FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id WHERE p.name IN ('GERMPLASM' , 'MANAGE_GERMPLASM');
-            </sqlCheck>
 			<and>
+            	<sqlCheck expectedResult="1">
+                	SELECT count(*) > 1 FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id WHERE p.name IN ('GERMPLASM' , 'MANAGE_GERMPLASM');
+            	</sqlCheck>
 				<not>
 					<tableExists tableName="roles_affected_temporary"></tableExists>
 				</not>
