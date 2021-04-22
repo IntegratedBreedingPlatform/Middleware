@@ -74,6 +74,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private static final String DER_MAN = "'" + MethodType.DERIVATIVE.getCode() + "','" + MethodType.MAINTENANCE.getCode() + "'";
 
+	private static final String GEN = "'" + MethodType.GENERATIVE.getCode() + "'";
+
 	private static final String QUERY_FROM_GERMPLASM = ") query from Germplasm: ";
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
@@ -1866,6 +1868,22 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+	public List<Integer> getChildren(final Integer gid) {
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery("select gid "
+				+ "from germplsm "
+				+ "       inner join methods m on germplsm.methn = m.mid "
+				+ "where (((mtype = " + GEN + " and (gpid1 = :parent or gpid2 = :parent))) "
+				+ "  or (mtype in (" + DER_MAN + ") and (gpid2 = :parent or (gpid2 = 0 and gpid1 = :parent)))) and deleted = 0");
+			sqlQuery.setParameter("parent", gid);
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getChildren" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 	/**
 	 * Use this update when you are sure there is no need to traverse the progeny tree.
 	 *
@@ -1889,6 +1907,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+	//TODO Performance testing was not completed by QA during 17.4. Pending for 18.1
 	public void updateGroupSourceTraversingProgeny(final Integer parentNode, final Integer newGroupSource) {
 		final List<Integer> derivativeNodes = this.findDerivativeNodes(Collections.singletonList(parentNode));
 		if (!derivativeNodes.isEmpty()) {

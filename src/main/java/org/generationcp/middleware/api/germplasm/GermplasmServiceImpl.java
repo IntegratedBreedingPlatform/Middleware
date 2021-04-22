@@ -1363,12 +1363,25 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.setOtherProgenitors(germplasm, methodFinal, otherProgenitorsFinal);
 			germplasm.setGnpgs(this.calculateGnpgs(methodFinal, String.valueOf(gpid1Final), String.valueOf(gpid2Final),
 				otherProgenitorsFinal.stream().map(String::valueOf).collect(Collectors.toList())));
+
+			//FIXME This is a workaround to prevent germplasm with children to have new parents
+			//FIXME Once validation to check if a node is not moved below in the tree,remove this IF condition. Pending for 18.1
+			if ((!germplasm.getGpid1().equals(germplasmBeforeUpdate.getGpid1()) || !germplasm.getGpid2()
+				.equals(germplasmBeforeUpdate.getGpid2()))) {
+				final List<Integer> children = this.daoFactory.getGermplasmDao().getChildren(germplasm.getGid());
+				if (!children.isEmpty()) {
+					throw new MiddlewareRequestException("", "germplasm.update.germplasm.has.progeny.error",
+						new String[] {String.valueOf(gid)});
+				}
+			}
 			this.daoFactory.getGermplasmDao().save(germplasm);
-			this.updateGroupSource(germplasmBeforeUpdate, germplasm);
+			//FIXME Once validation to check if a node is not moved below in the tree, we can enable this update. Pending for 18.1
+			//this.updateGroupSource(germplasmBeforeUpdate, germplasm);
 		}
 
 	}
 
+	//FIXME Testing was completed by QA, except by recursive update performance
 	private void updateGroupSource(final Germplasm oldGermplasm, final Germplasm newGermplasm) {
 		final UpdateGroupSourceAction updateGroupSourceAction = this.getUpdateGroupSourceAction(oldGermplasm, newGermplasm);
 		if (updateGroupSourceAction == UpdateGroupSourceAction.NONE) {
