@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.germplasm;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -10,8 +11,8 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
-import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
+import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
@@ -24,8 +25,6 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
@@ -1749,25 +1748,26 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmUsedInOneOrMoreList() {
+	public void testGetGidsOfGermplasmWithDescendantsFilteredByMethod() {
+		final Method method = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), -1);
 
-		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
+		// Create germplasm with descendants
+		final Germplasm germplasmWithDescendants = this.createGermplasm(method, null, null,0, 0, 0);
+		final Germplasm germplasmDescendant = this.createGermplasm(method, null, null, 0, 0, 0);
+		germplasmDescendant.setGpid1(germplasmWithDescendants.getGid());
+		germplasmDescendant.setGpid2(germplasmWithDescendants.getGid());
+		this.daoFactory.getGermplasmDao().saveOrUpdate(germplasmDescendant);
+		final Germplasm germplasmDescendant2 = this.createGermplasm(method, null, null, 0, 0, 0);
+		germplasmDescendant2.setGpid1(germplasmDescendant.getGpid1());
+		germplasmDescendant2.setGpid2(germplasmDescendant.getGid());
+		this.daoFactory.getGermplasmDao().saveOrUpdate(germplasmDescendant2);
 
-		// Create germplasm list with listdata associated with germplasm
-		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(null);
-		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+		this.sessionProvder.getSession().flush();
 
-		final GermplasmListData germplasmListData =
-			new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "EntryCode", "SeedSource", "Germplasm Name 5", "GroupName", 0,
-				1);
-		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
+		final List<Integer> lists = Arrays.asList(germplasmWithDescendants.getGid());
+		final Set<Integer> gids = this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(Sets.newHashSet(lists));
 
-		final Set<Integer> gids =
-			this.germplasmService.getGermplasmUsedInOneOrMoreList(Lists.newArrayList(germplasm.getGid()));
-
-		Assert.assertEquals(1, gids.size());
-
+		Assert.assertEquals(0, gids.size());
 	}
 
 	@Test
@@ -1795,6 +1795,26 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		Assert.assertEquals(1, gids.size());
 
+	}
+
+	@Test
+	public void testUpdateGermplasmBasicDetails_Ok() {
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
+		final String reference = RandomStringUtils.randomAlphabetic(25);
+		final Location location = this.createLocation();
+		final String date = "20201010";
+		final GermplasmBasicDetailsDto germplasmBasicDetailsDto = new GermplasmBasicDetailsDto();
+		germplasmBasicDetailsDto.setBreedingLocationId(location.getLocid());
+		germplasmBasicDetailsDto.setCreationDate(date);
+		germplasmBasicDetailsDto.setReference(reference);
+
+		this.germplasmService.updateGermplasmBasicDetails(germplasm.getGid(), germplasmBasicDetailsDto);
+		final Germplasm afterSave = this.daoFactory.getGermplasmDao().getById(germplasm.getGid());
+		Assert.assertEquals(location.getLocid(), afterSave.getLocationId());
+		Assert.assertEquals(date, String.valueOf(afterSave.getGdate()));
+		final Bibref bibref = this.daoFactory.getBibrefDAO().getById(afterSave.getReferenceId());
+		Assert.assertEquals(reference, bibref.getAnalyt());
 	}
 
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,

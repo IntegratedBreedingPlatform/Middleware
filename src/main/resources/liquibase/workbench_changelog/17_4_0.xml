@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v17.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="release_note"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create release_note table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table release_note (
+				release_note_id int auto_increment
+					primary key,
+				version         	varchar(255)        	              not null,
+				release_date    	timestamp default 	CURRENT_TIMESTAMP not null,
+				has_coming_soon     tinyint(1) default  0                 not null,
+				constraint release_note_version_uindex
+					unique (version)
+			);
+		</sql>
+    </changeSet>
+
+		<changeSet author="lkovacic" id="v17.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="release_note"></tableExists>
+				<not>
+					<tableExists tableName="release_note_user"></tableExists>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Create release_note_user table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table release_note_user (
+				release_note_id int                                  not null,
+				user_id         int                                  not null,
+				view_date       timestamp  default CURRENT_TIMESTAMP not null on update CURRENT_TIMESTAMP,
+				show_again      tinyint(1) default 1                 not null,
+				primary key (release_note_id, user_id),
+				constraint release_note_user_users_userid_fk
+					foreign key (user_id) references users(userid),
+				constraint release_note_user_release_note_id_fk
+					foreign key (release_note_id) references release_note(release_note_id)
+			);
+		</sql>
+    </changeSet>
+	<changeSet author="cuenyad" id="v17.4.0-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'GERMPLASM_LABEL_PRINTING'
+            </sqlCheck>
+        </preConditions>
+        <comment>Manage Germplasm "Export data and labels" granular permissions</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @manage_germplasm_id = (select permission_id from permission where name = 'MANAGE_GERMPLASM');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('GERMPLASM_LABEL_PRINTING', 'Export data and labels', @manage_germplasm_id, null);
+
+			SET @germplasm_label_printing_id = (SELECT permission_id FROM permission where name = 'GERMPLASM_LABEL_PRINTING');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @germplasm_label_printing_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @germplasm_label_printing_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @germplasm_label_printing_id, '1');
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v17.4.0-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(1) > 0 FROM permission p INNER JOIN workbench_sidebar_category_link wscl
+					ON p.workbench_sidebar_category_link_id = wscl.sidebar_category_link_id
+					WHERE wscl.tool_name = 'germplasm_import'
+            </sqlCheck>
+        </preConditions>
+        <comment>Deprecate old import germplasm</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE permission
+				SET workbench_sidebar_category_link_id = NULL
+				WHERE workbench_sidebar_category_link_id = (SELECT sidebar_category_link_id
+															FROM workbench_sidebar_category_link
+															WHERE tool_name = 'germplasm_import');
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
+

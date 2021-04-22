@@ -2,6 +2,7 @@ package org.generationcp.middleware.domain.search_request.brapi.v1;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -117,7 +118,7 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	}
 
 	public String getProgenyDbId() {
-		return progenyDbId;
+		return this.progenyDbId;
 	}
 
 	public void setProgenyDbId(final String progenyDbId) {
@@ -125,7 +126,7 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	}
 
 	public String getExternalReferenceId() {
-		return externalReferenceId;
+		return this.externalReferenceId;
 	}
 
 	public void setExternalReferenceId(final String externalReferenceId) {
@@ -133,7 +134,7 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	}
 
 	public String getExternalReferenceSource() {
-		return externalReferenceSource;
+		return this.externalReferenceSource;
 	}
 
 	public void setExternalReferenceSource(final String externalReferenceSource) {
@@ -153,5 +154,14 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	@Override
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
+	}
+
+	public boolean noFiltersSpecified() {
+		return this.accessionNumbers.isEmpty() && this.commonCropNames.isEmpty() && this.germplasmDbIds.isEmpty() && this.germplasmGenus
+			.isEmpty() && this.germplasmNames.isEmpty()
+			&& this.germplasmPUIs.isEmpty() && this.germplasmSpecies.isEmpty() && StringUtils.isEmpty(this.preferredName) && StringUtils
+			.isEmpty(this.studyDbId) &&
+			StringUtils.isEmpty(this.parentDbId) && StringUtils.isEmpty(this.progenyDbId) && StringUtils
+			.isEmpty(this.externalReferenceId) && StringUtils.isEmpty(this.externalReferenceSource);
 	}
 }
