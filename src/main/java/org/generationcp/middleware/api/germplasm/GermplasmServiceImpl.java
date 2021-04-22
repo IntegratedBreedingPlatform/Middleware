@@ -953,6 +953,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 		if (!germplasm.otherProgenitorsGidsEquals(otherProgenitors)) {
 			if (!CollectionUtils.isEmpty(otherProgenitors)) {
+				//It is required to identify if germplasm and progenitor number already exists in the list
+				//So we replace the progenitorId instead of adding a new element to the bag
+				//This was required because Unique key progntrs_unique fails due to orphans are removed at the end of the transaction
 				int progenitorNumber = 2;
 				for (final Integer otherProgenitorGid : otherProgenitors) {
 					progenitorNumber++;
