@@ -55,7 +55,7 @@ import java.util.List;
 @XmlType(propOrder = {"mid", "mtype", "mcode", "mname", "mdesc", "mprgn", "mfprg", "mgrp", "mref", "muid", "snametype", "separator",
 		"prefix", "count", "suffix", "program_uuid"})
 @XmlAccessorType(XmlAccessType.NONE)
-public class Method implements Serializable {
+public class Method implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -488,5 +488,15 @@ public class Method implements Serializable {
 	public boolean isDerivativeOrMaintenance() {
 		return this.mtype != null && (MethodType.DERIVATIVE.getCode().equals(this.mtype.trim()) || MethodType.MAINTENANCE.getCode()
 			.equals(this.mtype.trim()));
+	}
+
+	@Override
+	public Object clone() {
+		try {
+			return super.clone();
+		} catch (CloneNotSupportedException e) {
+			return new Method(this.mid, this.mtype, this.mgrp, this.mcode, this.mname, this.mdesc, this.mref, this.mprgn,
+				this.mfprg, this.mattr, this.geneq, this.muid, this.lmid, this.mdate, this.uniqueID);
+		}
 	}
 }

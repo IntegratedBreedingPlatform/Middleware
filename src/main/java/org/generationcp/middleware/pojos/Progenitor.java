@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * POJO for progntrs table.
@@ -39,9 +38,9 @@ public class Progenitor implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "id")
 	private Integer id;
-	
-	@ManyToOne(targetEntity = Germplasm.class)
-	@JoinColumn(name = "gid", nullable = true)
+
+	@ManyToOne
+	@JoinColumn(name = "gid", nullable = false)
 	private Germplasm germplasm;
 	
 	@Basic(optional = false)
