@@ -8,7 +8,7 @@ public interface ReleaseNoteService {
 
 	boolean shouldShowReleaseNote(Integer userId);
 
-	Optional<ReleaseNote> getCurrentReleaseNote();
+	Optional<ReleaseNote> getLatestReleaseNote();
 
 	void dontShowAgain(Integer userId);
 

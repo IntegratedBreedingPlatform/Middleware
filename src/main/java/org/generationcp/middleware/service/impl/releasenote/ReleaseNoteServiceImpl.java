@@ -16,10 +16,12 @@ import java.util.Optional;
 @Transactional
 public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 
+	private final static String VERSION_DELIMITER = "\\.";
+
 	private final WorkbenchDaoFactory workbenchDaoFactory;
 
 	@Value("${bms.version}")
-	private String bmsVersion;
+	public String bmsVersion;
 
 	public ReleaseNoteServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.workbenchDaoFactory = new WorkbenchDaoFactory(sessionProvider);
@@ -28,7 +30,7 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 	@Override
 	public boolean shouldShowReleaseNote(final Integer userId) {
 		// Check if there is a release note available
-		final Optional<ReleaseNote> optionalReleaseNote = this.getCurrentReleaseNote();
+		final Optional<ReleaseNote> optionalReleaseNote = this.getLatestReleaseNote();
 		if (!optionalReleaseNote.isPresent()) {
 			return false;
 		}
@@ -45,13 +47,20 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 	}
 
 	@Override
-	public Optional<ReleaseNote> getCurrentReleaseNote() {
-		return this.workbenchDaoFactory.getReleaseNoteDAO().getReleaseNoteByVersion(this.bmsVersion);
+	public Optional<ReleaseNote> getLatestReleaseNote() {
+		final String[] numbering = this.bmsVersion.split(VERSION_DELIMITER);
+		if (numbering.length <= 1) {
+			//Unsupported version format
+			return Optional.empty();
+		}
+
+		String majorVersion = numbering[0] + VERSION_DELIMITER;
+		return this.workbenchDaoFactory.getReleaseNoteDAO().getLatestByMajorVersion(majorVersion);
 	}
 
 	@Override
 	public void dontShowAgain(final Integer userId) {
-		this.getCurrentReleaseNote().ifPresent(releaseNote ->
+		this.getLatestReleaseNote().ifPresent(releaseNote ->
 			this.getReleaseNoteUser(releaseNote.getId(), userId).ifPresent(releaseNoteUser -> {
 				releaseNoteUser.dontShowAgain();
 				this.workbenchDaoFactory.getReleaseNoteUserDAO().save(releaseNoteUser);
