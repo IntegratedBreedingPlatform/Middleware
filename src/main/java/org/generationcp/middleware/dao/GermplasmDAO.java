@@ -1829,6 +1829,21 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
+	public long countGermplasmDerivativeProgeny(final Integer gid) {
+		try {
+			final StringBuilder queryBuilder = new StringBuilder();
+			queryBuilder.append("SELECT COUNT(DISTINCT g.gid) FROM germplsm g ");
+			queryBuilder.append("WHERE g.gnpgs = -1 AND g.gpid2 = :gid AND g.deleted = 0  and g.grplce = 0");
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+			sqlQuery.setParameter("gid", gid);
+			return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error with countGermplasmDerivativeProgeny(gid=" + gid + ") " + e.getMessage();
+			GermplasmDAO.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
   /**
    * Only returns IDs of germplasm with progeny (Germplasm Id is assigned to other germplasm's gpid1, gpid2 OR progntrs.pid) with Method Type
    * DERIVATIVE AND MAINTENANCE
