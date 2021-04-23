@@ -1,9 +1,11 @@
 package org.generationcp.middleware.service.api.program;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Objects;
 
+@AutoProperty
 public class ProgramSearchRequest {
 
     private String commonCropName;
