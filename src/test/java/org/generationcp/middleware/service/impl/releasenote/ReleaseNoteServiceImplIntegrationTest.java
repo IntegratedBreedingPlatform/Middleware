@@ -39,7 +39,7 @@ public class ReleaseNoteServiceImplIntegrationTest extends IntegrationTestBase {
 	public void shouldShowReleaseNote_OK() {
 
 		//Should not be any release note yet
-		assertFalse(this.releaseNoteService.getLatestReleaseNote().isPresent());
+		assertFalse(this.releaseNoteService.getCurrentReleaseNote().isPresent());
 
 		//Create a release note
 		final LocalDate localDate = LocalDate.now().minusDays(1);
@@ -47,7 +47,7 @@ public class ReleaseNoteServiceImplIntegrationTest extends IntegrationTestBase {
 			new ReleaseNote(RELEASE_NOTE_VERSION, Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant())));
 
 		//Check the release note was created
-		final Optional<ReleaseNote> optionalLatestReleaseNote = this.releaseNoteService.getLatestReleaseNote();
+		final Optional<ReleaseNote> optionalLatestReleaseNote = this.releaseNoteService.getCurrentReleaseNote();
 		assertTrue(optionalLatestReleaseNote.isPresent());
 
 		final ReleaseNote releaseNote = optionalLatestReleaseNote.get();

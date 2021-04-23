@@ -6,6 +6,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNote;
 import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNoteUser;
 import org.generationcp.middleware.service.api.releasenote.ReleaseNoteService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,6 +18,9 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 
 	private final WorkbenchDaoFactory workbenchDaoFactory;
 
+	@Value("${bms.version}")
+	private String bmsVersion;
+
 	public ReleaseNoteServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.workbenchDaoFactory = new WorkbenchDaoFactory(sessionProvider);
 	}
@@ -24,7 +28,7 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 	@Override
 	public boolean shouldShowReleaseNote(final Integer userId) {
 		// Check if there is a release note available
-		final Optional<ReleaseNote> optionalReleaseNote = this.getLatestReleaseNote();
+		final Optional<ReleaseNote> optionalReleaseNote = this.getCurrentReleaseNote();
 		if (!optionalReleaseNote.isPresent()) {
 			return false;
 		}
@@ -41,13 +45,13 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 	}
 
 	@Override
-	public Optional<ReleaseNote> getLatestReleaseNote() {
-		return this.workbenchDaoFactory.getReleaseNoteDAO().getLatestReleaseNote();
+	public Optional<ReleaseNote> getCurrentReleaseNote() {
+		return this.workbenchDaoFactory.getReleaseNoteDAO().getReleaseNoteByVersion(this.bmsVersion);
 	}
 
 	@Override
 	public void dontShowAgain(final Integer userId) {
-		this.getLatestReleaseNote().ifPresent(releaseNote ->
+		this.getCurrentReleaseNote().ifPresent(releaseNote ->
 			this.getReleaseNoteUser(releaseNote.getId(), userId).ifPresent(releaseNoteUser -> {
 				releaseNoteUser.dontShowAgain();
 				this.workbenchDaoFactory.getReleaseNoteUserDAO().save(releaseNoteUser);

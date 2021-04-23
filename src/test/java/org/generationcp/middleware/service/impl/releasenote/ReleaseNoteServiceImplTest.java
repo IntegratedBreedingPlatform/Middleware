@@ -69,12 +69,12 @@ public class ReleaseNoteServiceImplTest {
 
 	@Test
 	public void shouldShowReleaseNote_NoReleaseNote() {
-		Mockito.when(this.releaseNoteDAO.getLatestReleaseNote()).thenReturn(Optional.empty());
+		Mockito.when(this.releaseNoteDAO.getReleaseNoteByVersion(ArgumentMatchers.anyString())).thenReturn(Optional.empty());
 
 		final boolean shouldShowReleaseNote = this.releaseNoteService.shouldShowReleaseNote(USER_ID);
 		assertFalse(shouldShowReleaseNote);
 
-		Mockito.verify(this.releaseNoteDAO).getLatestReleaseNote();
+		Mockito.verify(this.releaseNoteDAO).getReleaseNoteByVersion(ArgumentMatchers.anyString());
 		Mockito.verifyNoMoreInteractions(this.releaseNoteDAO);
 
 		Mockito.verifyZeroInteractions(this.releaseNoteUserDAO);
@@ -83,14 +83,14 @@ public class ReleaseNoteServiceImplTest {
 	@Test
 	public void shouldShowReleaseNote_HasNeverShownToUser() {
 		final ReleaseNote releaseNote = this.mockReleaseNote();
-		Mockito.when(this.releaseNoteDAO.getLatestReleaseNote()).thenReturn(Optional.of(releaseNote));
+		Mockito.when(this.releaseNoteDAO.getReleaseNoteByVersion(ArgumentMatchers.anyString())).thenReturn(Optional.of(releaseNote));
 
 		Mockito.when(this.releaseNoteUserDAO.getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID)).thenReturn(Optional.empty());
 
 		final boolean shouldShowReleaseNote = this.releaseNoteService.shouldShowReleaseNote(USER_ID);
 		assertTrue(shouldShowReleaseNote);
 
-		Mockito.verify(this.releaseNoteDAO).getLatestReleaseNote();
+		Mockito.verify(this.releaseNoteDAO).getReleaseNoteByVersion(ArgumentMatchers.anyString());
 		Mockito.verifyNoMoreInteractions(this.releaseNoteDAO);
 
 		Mockito.verify(this.releaseNoteUserDAO).getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID);
@@ -106,7 +106,7 @@ public class ReleaseNoteServiceImplTest {
 	@Test
 	public void shouldShowReleaseNote_UserDontWantToSeeItAgain() {
 		final ReleaseNote releaseNote = this.mockReleaseNote();
-		Mockito.when(this.releaseNoteDAO.getLatestReleaseNote()).thenReturn(Optional.of(releaseNote));
+		Mockito.when(this.releaseNoteDAO.getReleaseNoteByVersion(ArgumentMatchers.anyString())).thenReturn(Optional.of(releaseNote));
 
 		final ReleaseNoteUser releaseNoteUser = this.mockReleaseNoteUser(false);
 		Mockito.when(this.releaseNoteUserDAO.getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID)).thenReturn(Optional.of(releaseNoteUser));
@@ -114,7 +114,7 @@ public class ReleaseNoteServiceImplTest {
 		final boolean shouldShowReleaseNote = this.releaseNoteService.shouldShowReleaseNote(USER_ID);
 		assertFalse(shouldShowReleaseNote);
 
-		Mockito.verify(this.releaseNoteDAO).getLatestReleaseNote();
+		Mockito.verify(this.releaseNoteDAO).getReleaseNoteByVersion(ArgumentMatchers.anyString());
 		Mockito.verifyNoMoreInteractions(this.releaseNoteDAO);
 
 		Mockito.verify(this.releaseNoteUserDAO).getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID);
@@ -126,7 +126,7 @@ public class ReleaseNoteServiceImplTest {
 	@Test
 	public void shouldShowReleaseNote_UserWantsToSeeItAgain() {
 		final ReleaseNote releaseNote = this.mockReleaseNote();
-		Mockito.when(this.releaseNoteDAO.getLatestReleaseNote()).thenReturn(Optional.of(releaseNote));
+		Mockito.when(this.releaseNoteDAO.getReleaseNoteByVersion(ArgumentMatchers.anyString())).thenReturn(Optional.of(releaseNote));
 
 		final ReleaseNoteUser releaseNoteUser = this.mockReleaseNoteUser(true);
 		Mockito.when(this.releaseNoteUserDAO.getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID)).thenReturn(Optional.of(releaseNoteUser));
@@ -134,7 +134,7 @@ public class ReleaseNoteServiceImplTest {
 		final boolean shouldShowReleaseNote = this.releaseNoteService.shouldShowReleaseNote(USER_ID);
 		assertTrue(shouldShowReleaseNote);
 
-		Mockito.verify(this.releaseNoteDAO).getLatestReleaseNote();
+		Mockito.verify(this.releaseNoteDAO).getReleaseNoteByVersion(ArgumentMatchers.anyString());
 		Mockito.verifyNoMoreInteractions(this.releaseNoteDAO);
 
 		Mockito.verify(this.releaseNoteUserDAO).getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID);
@@ -144,11 +144,11 @@ public class ReleaseNoteServiceImplTest {
 	}
 
 	@Test
-	public void getLatestReleaseNote() {
+	public void getCurrentReleaseNote() {
 		final ReleaseNote releaseNote = this.mockReleaseNote();
-		Mockito.when(this.releaseNoteDAO.getLatestReleaseNote()).thenReturn(Optional.of(releaseNote));
+		Mockito.when(this.releaseNoteDAO.getReleaseNoteByVersion(ArgumentMatchers.anyString())).thenReturn(Optional.of(releaseNote));
 
-		final Optional<ReleaseNote> latestReleaseNote = this.releaseNoteService.getLatestReleaseNote();
+		final Optional<ReleaseNote> latestReleaseNote = this.releaseNoteService.getCurrentReleaseNote();
 		assertTrue(latestReleaseNote.isPresent());
 		assertThat(latestReleaseNote.get(), is(releaseNote));
 	}
@@ -156,7 +156,7 @@ public class ReleaseNoteServiceImplTest {
 	@Test
 	public void dontShowAgain() {
 		final ReleaseNote releaseNote = this.mockReleaseNote();
-		Mockito.when(this.releaseNoteDAO.getLatestReleaseNote()).thenReturn(Optional.of(releaseNote));
+		Mockito.when(this.releaseNoteDAO.getReleaseNoteByVersion(ArgumentMatchers.anyString())).thenReturn(Optional.of(releaseNote));
 
 		final ReleaseNoteUser releaseNoteUser = Mockito.mock(ReleaseNoteUser.class, Mockito.CALLS_REAL_METHODS);
 		Mockito.when(this.releaseNoteUserDAO.getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID)).thenReturn(Optional.of(releaseNoteUser));
