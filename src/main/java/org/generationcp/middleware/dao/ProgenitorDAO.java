@@ -59,13 +59,16 @@ public class ProgenitorDAO extends GenericDAO<Progenitor, Integer> {
 
 	public Progenitor getByGIDAndProgenitorNumber(final Integer gid, final Integer progenitorNumber) {
 		try {
-			List<Criterion> criterions = new ArrayList<>();
-			criterions.add(Restrictions.eq("progenitorNumber", progenitorNumber));
-			criterions.add(Restrictions.eq("germplasm.gid", gid));
-			List<Progenitor> progenitors = this.getByCriteria(criterions);
+
+			Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.createAlias("germplasm", "germplasm");
+			criteria.add(Restrictions.eq("germplasm.gid", gid));
+			criteria.add(Restrictions.eq("progenitorNumber", progenitorNumber));
+			List<Progenitor> progenitors = criteria.list();
 			if (!progenitors.isEmpty()) {
 				return progenitors.get(0);
 			}
+
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException(
 					"Error with getByGIDAndProgenitorNumber(gid=" + gid + ", pno=" + progenitorNumber + ") query from Progenitor: " + e.getMessage(), e);

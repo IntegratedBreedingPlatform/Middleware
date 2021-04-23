@@ -182,6 +182,20 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testCountGermplasmDerivativeProgeny() {
+		final Germplasm parentGermplsm =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 1, -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDataDM.addGermplasm(parentGermplsm, parentGermplsm.getPreferredName(), this.cropType);
+
+		final Germplasm childDerivativeGermplsm = GermplasmTestDataInitializer
+			.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDataDM.addGermplasm(childDerivativeGermplsm, childDerivativeGermplsm.getPreferredName(), this.cropType);
+
+		final long germplasmDerivativeProgenyCount = this.dao.countGermplasmDerivativeProgeny(parentGermplsm.getGid());
+		Assert.assertEquals((long)1, germplasmDerivativeProgenyCount);
+	}
+
+	@Test
 	public void testGetMaintenanceChildren() {
 		final Germplasm parentGermplsm =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 1, -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
