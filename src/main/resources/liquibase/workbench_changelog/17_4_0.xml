@@ -90,6 +90,18 @@
 															WHERE tool_name = 'germplasm_import');
 		</sql>
 	</changeSet>
+	
+	<changeSet author="corina" id="v17.4.0-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(*) > 0 FROM workbench_crop WHERE use_uuid=1;
+            </sqlCheck>
+        </preConditions>
+        <comment>Set workbench_crop.use_uuid to 0 in order to use short OBS_UNIT_IDs for barcoding</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE workbench_crop SET use_uuid=0 where use_uuid=1;
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v17.4.0-4">
         <preConditions onFail="MARK_RAN">
