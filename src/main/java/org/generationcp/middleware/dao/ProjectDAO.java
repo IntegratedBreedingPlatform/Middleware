@@ -72,6 +72,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			+ "			) "
 			+ "		AND ( :cropName IS NULL OR p.crop_type = :cropName ) "
 			+ " 	AND ( :programName IS NULL OR p.project_name = :programName ) "
+			+ " 	AND ( :programNameContainsString IS NULL OR p.project_name like :programNameContainsString ) "
 			+ " 	AND ( :programDbId IS NULL OR p.project_uuid = :programDbId ) ";
 
 	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
@@ -192,10 +193,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			final StringBuilder sb = new StringBuilder(GET_PROJECTS_BY_USER_ID);
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sb.toString());
-			sqlQuery.setParameter("userId", programSearchRequest.getLoggedInUserId());
-			sqlQuery.setParameter("cropName", programSearchRequest.getCommonCropName());
-			sqlQuery.setParameter("programName", programSearchRequest.getProgramName());
-			sqlQuery.setParameter("programDbId", programSearchRequest.getProgramDbId());
+			addProjectsByFilterParameters(programSearchRequest, sqlQuery);
 
 			sqlQuery
 					.addScalar("project_id")
@@ -240,13 +238,22 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		}
 	}
 
+	private static void addProjectsByFilterParameters(final ProgramSearchRequest programSearchRequest, final SQLQuery sqlQuery) {
+		sqlQuery.setParameter("userId", programSearchRequest.getLoggedInUserId());
+		sqlQuery.setParameter("cropName", programSearchRequest.getCommonCropName());
+		sqlQuery.setParameter("programName", programSearchRequest.getProgramName());
+		String programNameContainsString = null;
+		if (!StringUtils.isBlank(programSearchRequest.getProgramNameContainsString())) {
+			programNameContainsString = '%' + programSearchRequest.getProgramNameContainsString() + '%';
+		}
+		sqlQuery.setParameter("programNameContainsString", programNameContainsString);
+		sqlQuery.setParameter("programDbId", programSearchRequest.getProgramDbId());
+	}
+
 	public long countProjectsByFilter(final ProgramSearchRequest programSearchRequest) throws MiddlewareException {
 		try {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(GET_PROJECTS_BY_USER_ID);
-			sqlQuery.setParameter("userId", programSearchRequest.getLoggedInUserId());
-			sqlQuery.setParameter("cropName", programSearchRequest.getCommonCropName());
-			sqlQuery.setParameter("programName", programSearchRequest.getProgramName());
-			sqlQuery.setParameter("programDbId", programSearchRequest.getProgramDbId());
+			addProjectsByFilterParameters(programSearchRequest, sqlQuery);
 
 			return sqlQuery.list().size();
 		} catch (final HibernateException e) {
