@@ -125,13 +125,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	private void populateDescendantGroupMembers(final List<Germplasm> descendantGroupMembers, final Integer gid, final Integer mgid) {
-		// Get advanced children
-		final List<Germplasm> maintenanceAndDerivativeChildren = new ArrayList<>();
-		maintenanceAndDerivativeChildren.addAll(this.germplasmDAO.getChildren(gid, 'M'));
-		maintenanceAndDerivativeChildren.addAll(this.germplasmDAO.getChildren(gid, 'D'));
+		// Grouping only applies to advanced germplasm so we only need to retrieve non-generative children
+		final List<Germplasm> nonGenerativeChildren = this.germplasmDAO.getNonGenerativeChildren(gid, 'D');
 
 		//Filter children in the same maintenance group
-		final List<Germplasm> descendantGroupChildren = maintenanceAndDerivativeChildren.stream()
+		final List<Germplasm> descendantGroupChildren = nonGenerativeChildren.stream()
 			.filter(germplasm ->mgid.equals(germplasm.getMgid())).collect(Collectors.toList());
 		descendantGroupMembers.addAll(descendantGroupChildren);
 

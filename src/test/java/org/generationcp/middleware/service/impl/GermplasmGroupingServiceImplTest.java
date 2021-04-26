@@ -21,10 +21,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -836,12 +833,12 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm derivative = new Germplasm();
 		derivative.setGid(22);
 		derivative.setMgid(11);
-		Mockito.when(this.germplasmDAO.getChildren(rootGid, 'D')).thenReturn(Collections.singletonList(derivative));
+		Mockito.when(this.germplasmDAO.getNonGenerativeChildren(rootGid, 'D')).thenReturn(Collections.singletonList(derivative));
 
 		final Germplasm maintenance = new Germplasm();
 		maintenance.setGid(25);
 		maintenance.setMgid(0);
-		Mockito.when(this.germplasmDAO.getChildren(rootGid, 'M')).thenReturn(Collections.singletonList(maintenance));
+		Mockito.when(this.germplasmDAO.getNonGenerativeChildren(rootGid, 'M')).thenReturn(Collections.singletonList(maintenance));
 
 		final List<Germplasm> descendantGroupMembers =  this.germplasmGroupingService.getDescendantGroupMembers(rootGid, mgid);
 		Assert.assertEquals(1, descendantGroupMembers.size());

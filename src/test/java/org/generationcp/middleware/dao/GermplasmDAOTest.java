@@ -11,7 +11,6 @@
 package org.generationcp.middleware.dao;
 
 import com.google.common.collect.Lists;
-import liquibase.util.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -176,7 +175,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(childDerivativeGermplsm, childDerivativeGermplsm.getPreferredName(), this.cropType);
 
-		final List<Germplasm> results = this.dao.getChildren(parentGermplsm.getGid(), 'D');
+		final List<Germplasm> results = this.dao.getNonGenerativeChildren(parentGermplsm.getGid(), 'D');
 		Assert.assertNotNull(results);
 		Assert.assertEquals(childDerivativeGermplsm.getGid(), results.get(0).getGid());
 	}
@@ -209,7 +208,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		this.germplasmDataDM.addGermplasm(maintenanceChildrenGermplsm, maintenanceChildrenGermplsm.getPreferredName(), this.cropType);
 
-		final List<Germplasm> results = this.dao.getChildren(parentGermplsm.getGid(), 'M');
+		final List<Germplasm> results = this.dao.getNonGenerativeChildren(parentGermplsm.getGid(), 'M');
 		Assert.assertNotNull(results);
 		Assert.assertNotNull(results);
 		Assert.assertEquals(maintenanceChildrenGermplsm.getGid(), results.get(0).getGid());
