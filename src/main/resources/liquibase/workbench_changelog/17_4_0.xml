@@ -227,5 +227,18 @@
 			DELETE role_permission FROM role_permission WHERE permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name IN ('GERMPLASM' , 'MANAGE_GERMPLASM'));
 		</sql>
 	</changeSet>
+
+		<changeSet author="lkovacic" id="v17.4.0-6">
+        <preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="release_note" columnName="enabled"/>
+			</not>
+		</preConditions>
+        <comment>Add 'enabled' column to 'release_note' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			alter table release_note add enabled boolean default 1 not null;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
 

@@ -20,6 +20,7 @@ public class ReleaseNoteDAO extends GenericDAO<ReleaseNote, Integer> {
 	public Optional<ReleaseNote> getLatestByMajorVersion(final String majorVersion) {
 		final Criteria criteria = this.getSession().createCriteria(ReleaseNote.class);
 		criteria.add(Restrictions.like("version", majorVersion, MatchMode.START));
+		criteria.add(Restrictions.eq("enabled", true));
 		criteria.add(Restrictions.le("releaseDate", new Date()));
 		criteria.addOrder(Order.desc("releaseDate"));
 		criteria.setMaxResults(1);
