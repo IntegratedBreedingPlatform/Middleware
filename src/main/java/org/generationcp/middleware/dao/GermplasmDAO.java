@@ -1880,7 +1880,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			criteria.add(Restrictions.eq("grplce", 0));
 			criteria.setProjection(Projections.rowCount());
 			return (Long) criteria.uniqueResult();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in countAll(): " + e.getMessage(), e);
 		}
 	}

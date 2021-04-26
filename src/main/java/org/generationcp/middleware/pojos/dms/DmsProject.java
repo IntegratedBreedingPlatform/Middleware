@@ -196,7 +196,7 @@ public class DmsProject implements Serializable {
 	}
 
 	public boolean getDeleted() {
-		return deleted;
+		return this.deleted;
 	}
 
 	public void setDeleted(final boolean deleted) {
@@ -212,7 +212,7 @@ public class DmsProject implements Serializable {
 	}
 
 	public StudyType getStudyType() {
-		return studyType;
+		return this.studyType;
 	}
 
 	public void setStudyType(final StudyType studyType) {
@@ -278,7 +278,7 @@ public class DmsProject implements Serializable {
 	}
 
 	public DmsProject getParent() {
-		return parent;
+		return this.parent;
 	}
 
 	public void setParent(final DmsProject parent) {
@@ -286,7 +286,7 @@ public class DmsProject implements Serializable {
 	}
 
 	public DmsProject getStudy() {
-		return study;
+		return this.study;
 	}
 
 	public void setStudy(final DmsProject study) {
