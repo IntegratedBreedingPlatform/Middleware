@@ -138,7 +138,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			queryString.append("SELECT l.listid AS listId, ");
 			queryString.append("l.listname AS listName, ");
 			queryString.append("CAST(l.listdate AS CHAR(255)) AS creationDate, ");
-			queryString.append("l.listdesc AS description ");
+			queryString.append("l.listdesc AS description, ");
+			queryString.append("l.program_uuid AS programUUID ");
 			queryString.append("FROM listnms l ");
 			queryString.append("INNER JOIN listdata ld ON ld.listid = l.listid ");
 			queryString.append("WHERE ld.gid = :gid AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED);
@@ -148,6 +149,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			sqlQuery.addScalar("listName");
 			sqlQuery.addScalar("creationDate");
 			sqlQuery.addScalar("description");
+			sqlQuery.addScalar("programUUID");
 			sqlQuery.setParameter("gid", gid);
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmListDto.class));
 			return sqlQuery.list();
