@@ -11,11 +11,10 @@
 
 package org.generationcp.middleware.hibernate;
 
-import java.io.Serializable;
-
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.orm.hibernate3.SessionFactoryUtils;
+
+import java.io.Serializable;
 
 /**
  * <p>
@@ -56,7 +55,7 @@ public class HibernateSessionPerThreadProvider implements HibernateSessionProvid
 
 	@Override
 	public Session getSession() {
-		return SessionFactoryUtils.getSession(sessionFactory, false);
+		return sessionFactory.getCurrentSession();
 	}
 
 	/**

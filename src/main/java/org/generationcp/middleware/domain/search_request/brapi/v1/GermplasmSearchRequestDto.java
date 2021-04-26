@@ -2,6 +2,7 @@ package org.generationcp.middleware.domain.search_request.brapi.v1;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Lists;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -23,6 +24,8 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	private String studyDbId;
 	private String parentDbId;
 	private String progenyDbId;
+	private String externalReferenceId;
+	private String externalReferenceSource;
 
 	public GermplasmSearchRequestDto() {
 		this.accessionNumbers = Lists.newArrayList();
@@ -115,11 +118,27 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	}
 
 	public String getProgenyDbId() {
-		return progenyDbId;
+		return this.progenyDbId;
 	}
 
 	public void setProgenyDbId(final String progenyDbId) {
 		this.progenyDbId = progenyDbId;
+	}
+
+	public String getExternalReferenceId() {
+		return this.externalReferenceId;
+	}
+
+	public void setExternalReferenceId(final String externalReferenceId) {
+		this.externalReferenceId = externalReferenceId;
+	}
+
+	public String getExternalReferenceSource() {
+		return this.externalReferenceSource;
+	}
+
+	public void setExternalReferenceSource(final String externalReferenceSource) {
+		this.externalReferenceSource = externalReferenceSource;
 	}
 
 	@Override
@@ -135,5 +154,14 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	@Override
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
+	}
+
+	public boolean noFiltersSpecified() {
+		return this.accessionNumbers.isEmpty() && this.commonCropNames.isEmpty() && this.germplasmDbIds.isEmpty() && this.germplasmGenus
+			.isEmpty() && this.germplasmNames.isEmpty()
+			&& this.germplasmPUIs.isEmpty() && this.germplasmSpecies.isEmpty() && StringUtils.isEmpty(this.preferredName) && StringUtils
+			.isEmpty(this.studyDbId) &&
+			StringUtils.isEmpty(this.parentDbId) && StringUtils.isEmpty(this.progenyDbId) && StringUtils
+			.isEmpty(this.externalReferenceId) && StringUtils.isEmpty(this.externalReferenceSource);
 	}
 }

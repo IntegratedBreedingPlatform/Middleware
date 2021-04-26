@@ -11,10 +11,12 @@ public class GermplasmSearchResponse {
 	// canonical columns
 
 	private int gid;
+	private String germplasmUUID;
 	private Integer groupId;
 	private String names;
 	private String methodName;
 	private String locationName;
+	private String locationAbbr;
 	// includes 'Mixed'
 	private String availableBalance;
 	// includes 'Mixed'
@@ -50,6 +52,7 @@ public class GermplasmSearchResponse {
 
 	private Integer locationId;
 	private Integer breedingMethodId;
+	private String reference;
 
 	public GermplasmSearchResponse() {
 	}
@@ -268,6 +271,30 @@ public class GermplasmSearchResponse {
 
 	public void setBreedingMethodId(final Integer breedingMethodId) {
 		this.breedingMethodId = breedingMethodId;
+	}
+
+	public String getGermplasmUUID() {
+		return this.germplasmUUID;
+	}
+
+	public void setGermplasmUUID(final String germplasmUUID) {
+		this.germplasmUUID = germplasmUUID;
+	}
+
+	public String getLocationAbbr() {
+		return this.locationAbbr;
+	}
+
+	public String getReference() {
+		return this.reference;
+	}
+
+	public void setReference(final String reference) {
+		this.reference = reference;
+	}
+
+	public void setLocationAbbr(final String locationAbbr) {
+		this.locationAbbr = locationAbbr;
 	}
 
 	@Override

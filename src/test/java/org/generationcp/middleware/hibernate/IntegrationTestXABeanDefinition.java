@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
-import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
+import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -107,12 +107,11 @@ public class IntegrationTestXABeanDefinition {
 		LOG.debug(String.format("Created data source bean defintion for database '%s' with bean name '%s'.", cropDatabaseName, beanName));
 
 		final ImmutableMap<String, Object> sessionFactoryBeanDefinitionProperties =
-				ImmutableMap.of(IntegrationTestXABeanDefinition.DATA_SOURCE_ATTRIBUTE, dataSourceBeanDefinition, "configLocation",
-						xaDataSourceProperties.getHibernateConfigurationLocation(), "configurationClass",
-						org.hibernate.cfg.AnnotationConfiguration.class);
+			ImmutableMap.of(IntegrationTestXABeanDefinition.DATA_SOURCE_ATTRIBUTE, dataSourceBeanDefinition, "configLocation",
+				xaDataSourceProperties.getHibernateConfigurationLocation());
 		final RootBeanDefinition createRootBeanDefinition =
-				this.xaDatasourceUtilities.createRootBeanDefinition(AnnotationSessionFactoryBean.class, ImmutableMap.of(),
-						sessionFactoryBeanDefinitionProperties);
+			this.xaDatasourceUtilities.createRootBeanDefinition(LocalSessionFactoryBean.class, ImmutableMap.of(),
+				sessionFactoryBeanDefinitionProperties);
 		final String sessionFactoryBeanName = computeSessionFactoryName(cropDatabaseName);
 		registry.registerBeanDefinition(sessionFactoryBeanName, createRootBeanDefinition);
 

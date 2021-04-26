@@ -6,7 +6,7 @@ import java.util.Collection;
 
 /**
  * <p>
- *     Utility object to simplify SQLQuery optional params buiding.
+ *     Utility object to simplify SQLQuery optional params building.
  *     Allows to reuse the same method for building the query
  *     and setting the parameters after the query has been built
  * </p>
@@ -30,11 +30,11 @@ public class SqlQueryParamBuilder {
 		this.sqlBuilder = sqlBuilder;
 	}
 
-	public StringBuilder append(final String sql) {
+	public SqlQueryParamBuilder append(final String sql) {
 		if (this.sqlBuilder != null) {
 			this.sqlBuilder.append(sql);
 		}
-		return this.sqlBuilder;
+		return this;
 	}
 
 	public void setParameter(final String name, final Object val) {

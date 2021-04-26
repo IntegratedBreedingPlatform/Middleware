@@ -21,12 +21,11 @@ import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.program.ProgramFilters;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * This is the API used by the Workbench to retrieve Workbench project information.
@@ -55,17 +54,17 @@ public interface WorkbenchDataManager {
 	 * @param filters - the number of rows to retrieve
 	 * @return the number of all the projects
 	 */
-	long countProjectsByFilter(final Map<ProgramFilters, Object> filters);
+	//FIXME Remove this method, move tests. It is now in ProgramService
+	long countProjectsByFilter(final ProgramSearchRequest programSearchRequest);
 
 	/**
 	 * Gets the projects.
 	 *
-	 * @param start     - the starting record
-	 * @param numOfRows - the number of rows to retrieve
-	 * @param filters   - the filters that to be included in the query
+	 * @param pageable     - the starting record and number of page
+	 * @param programSearchRequest   - the filters that to be included in the query
 	 * @return All projects based on the given start, numOfRows and filters Map
 	 */
-	List<Project> getProjects(final int start, final int numOfRows, final Map<ProgramFilters, Object> filters);
+	List<Project> getProjects(final Pageable pageable, final ProgramSearchRequest programSearchRequest);
 
 	/**
 	 * Gets a project by Uuid. Should return only one value.
@@ -82,15 +81,6 @@ public interface WorkbenchDataManager {
 	 * @return the projects for given crop type
 	 */
 	List<Project> getProjectsByCrop(CropType cropType);
-
-	/**
-	 * Gets the list of Projects that the specified User is associated with.
-	 *
-	 * @param user     - the User associated with the projects to be retrieved
-	 * @param cropName - the Crop Name associated with the projects to be retrieved
-	 * @return the projects which the specified user is involved
-	 */
-	List<Project> getProjectsByUser(final WorkbenchUser user, final String cropName);
 
 	/**
 	 * Gets the list of Projects that the specified User is associated with.

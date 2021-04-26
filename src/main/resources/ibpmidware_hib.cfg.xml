@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE hibernate-configuration PUBLIC "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
-        "http://hibernate.sourceforge.net/hibernate-configuration-3.0.dtd">
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
     <session-factory>
     	<mapping class="org.generationcp.middleware.pojos.KeySequenceRegister"/>
@@ -10,6 +10,7 @@
         <mapping class="org.generationcp.middleware.pojos.Country"/>
         <mapping class="org.generationcp.middleware.pojos.Georef"/>
         <mapping class="org.generationcp.middleware.pojos.Germplasm"/>
+        <mapping class="org.generationcp.middleware.pojos.ExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.Location"/>
         <mapping class="org.generationcp.middleware.pojos.LocationDetails"/>
         <mapping class="org.generationcp.middleware.pojos.Locdes"/>
@@ -71,9 +72,11 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink"/>
         <mapping class="org.generationcp.middleware.pojos.naming.NamingConfiguration"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.CropPerson"/>
-         <mapping class="org.generationcp.middleware.pojos.workbench.RPackage"/>
-         <mapping class="org.generationcp.middleware.pojos.workbench.RCall"/>
-         <mapping class="org.generationcp.middleware.pojos.workbench.RCallParameter"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.RPackage"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.RCall"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.RCallParameter"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNote"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNoteUser"/>
 
         <!-- Mapping classes for new OMS schema -->
         <mapping class="org.generationcp.middleware.pojos.oms.CV"/>
@@ -118,5 +121,6 @@
         <mapping class="org.generationcp.middleware.pojos.search.SearchRequest"/>
 
         <mapping class="org.generationcp.middleware.pojos.GermplasmStudySource"/>
+
     </session-factory>
 </hibernate-configuration>

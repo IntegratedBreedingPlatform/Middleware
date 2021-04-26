@@ -823,7 +823,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<Method> getMethodsFromExperiments(final int dataSetId, final String variableId, final List<String> trialInstances) {
+	public List<Method> getMethodsFromExperiments(final int dataSetId, final Integer variableId, final List<String> trialInstances) {
 		return this.daoFactory.getMethodDAO().getMethodsFromExperiments(dataSetId, variableId, trialInstances);
 	}
 

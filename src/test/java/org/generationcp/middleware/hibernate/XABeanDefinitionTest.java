@@ -1,9 +1,8 @@
 
 package org.generationcp.middleware.hibernate;
 
-import java.util.Map;
-import java.util.Properties;
-
+import com.atomikos.jdbc.AtomikosDataSourceBean;
+import com.google.common.collect.ImmutableList;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -11,10 +10,10 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
-import org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean;
+import org.springframework.orm.hibernate4.LocalSessionFactoryBean;
 
-import com.atomikos.jdbc.AtomikosDataSourceBean;
-import com.google.common.collect.ImmutableList;
+import java.util.Map;
+import java.util.Properties;
 
 public class XABeanDefinitionTest {
 
@@ -96,7 +95,7 @@ public class XABeanDefinitionTest {
 				Matchers.any(Map.class), Matchers.any(Map.class));
 
 		Mockito.verify(mockXaDatasourceUtilities, Mockito.times(2)).createRootBeanDefinition(
-				Matchers.eq(AnnotationSessionFactoryBean.class), Matchers.any(Map.class), Matchers.any(Map.class));
+				Matchers.eq(LocalSessionFactoryBean.class), Matchers.any(Map.class), Matchers.any(Map.class));
 
 		Mockito.verify(mockBeanDefinitionRegistry, Mockito.times(1)).registerBeanDefinition(
 				"Test_Merged".toUpperCase() + XABeanDefinition.DATA_SOURCE, mockRootBeanDefinition);

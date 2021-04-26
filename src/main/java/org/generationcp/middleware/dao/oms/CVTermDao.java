@@ -39,6 +39,8 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.type.DoubleType;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -418,17 +420,23 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		try {
 			SQLQuery query = this.getSession().createSQLQuery(
-				"SELECT cvt_categorical.cvterm_id, cvt_categorical.name, cvt_categorical.definition, cvr_value.object_id, cvt_value.name "
-					+ "FROM cvterm_relationship cvr_categorical  "
-					+ "INNER JOIN cvterm cvt_categorical ON cvr_categorical.subject_id = cvt_categorical.cvterm_id "
-					+ "INNER JOIN cvterm_relationship cvr_scale ON cvr_categorical.subject_id = cvr_scale.subject_id "
-					+ "INNER JOIN cvterm_relationship cvr_scale_type ON cvr_scale.object_id = cvr_scale_type.subject_id "
-					+ "INNER JOIN cvterm_relationship cvr_value ON cvr_scale.object_id = cvr_value.subject_id and cvr_value.type_id = 1190 "
-					+ "INNER JOIN cvterm cvt_value ON cvr_value.object_id = cvt_value.cvterm_id "
-					+ "WHERE cvr_scale.type_id = 1220 and cvr_scale_type.type_id = 1105 AND cvr_scale_type.object_id = 1130 "
-					+ "    AND cvt_categorical.cvterm_id in (:traitIds) ");
+					"SELECT cvt_categorical.cvterm_id as variableId, cvt_categorical.name as variableName, cvt_categorical.definition as variableDescription, cvr_value.object_id as valueId, cvt_value.name as valueName "
+							+ "FROM cvterm_relationship cvr_categorical  "
+							+ "INNER JOIN cvterm cvt_categorical ON cvr_categorical.subject_id = cvt_categorical.cvterm_id "
+							+ "INNER JOIN cvterm_relationship cvr_scale ON cvr_categorical.subject_id = cvr_scale.subject_id "
+							+ "INNER JOIN cvterm_relationship cvr_scale_type ON cvr_scale.object_id = cvr_scale_type.subject_id "
+							+ "INNER JOIN cvterm_relationship cvr_value ON cvr_scale.object_id = cvr_value.subject_id and cvr_value.type_id = 1190 "
+							+ "INNER JOIN cvterm cvt_value ON cvr_value.object_id = cvt_value.cvterm_id "
+							+ "WHERE cvr_scale.type_id = 1220 and cvr_scale_type.type_id = 1105 AND cvr_scale_type.object_id = 1130 "
+							+ "    AND cvt_categorical.cvterm_id in (:traitIds) ");
 
 			query.setParameterList("traitIds", traitIds);
+
+			query.addScalar("variableId", IntegerType.INSTANCE);
+			query.addScalar("variableName", StringType.INSTANCE);
+			query.addScalar("variableDescription", StringType.INSTANCE);
+			query.addScalar("valueId", IntegerType.INSTANCE);
+			query.addScalar("valueName", StringType.INSTANCE);
 
 			List<Object[]> list = query.list();
 

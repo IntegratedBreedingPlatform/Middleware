@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
@@ -74,4 +75,6 @@ public interface StudyService {
 	long countStudies(StudySearchFilter studySearchFilter);
 
 	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId);
+
+	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
 }

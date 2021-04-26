@@ -11,12 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
@@ -29,14 +23,20 @@ import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link ExperimentProperty}.
@@ -138,7 +138,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.addScalar("instanceId").addScalar("siteName").addScalar("experimentId").addScalar("entryNumber")
 							.addScalar("germplasmName").addScalar("rep").addScalar("plotNo").addScalar("row").addScalar("col")
 							.addScalar("block_id").addScalar("trialInstance").addScalar("studyName").addScalar("gid")
-							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("obsUnitId", Hibernate.STRING);
+							.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("obsUnitId",
+						StringType.INSTANCE);
 			query.setParameter("studyId", projectId);
 			final List<Object[]> list = query.list();
 			if (list != null && !list.isEmpty()) {
@@ -217,7 +218,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 							.addScalar("instanceId").addScalar("siteName").addScalar("siteId").addScalar("experimentId").addScalar("entryNumber").addScalar("germplasmName").addScalar(
 							"rep").addScalar("plotNo").addScalar("row")
 							.addScalar("col").addScalar("blockId").addScalar("studyId").addScalar("trialInstance").addScalar("gid")
-							.addScalar("startDate").addScalar("season").addScalar("blockNo").addScalar("obsUnitId", Hibernate.STRING);
+							.addScalar("startDate").addScalar("season").addScalar("blockNo").addScalar("obsUnitId", StringType.INSTANCE);
 
 			if (blockId != null) {
 				query.setParameter("blockId", blockId);

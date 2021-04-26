@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.dao;
 
+import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
@@ -21,12 +22,19 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.BooleanType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +44,24 @@ import java.util.stream.Collectors;
 public class NameDAO extends GenericDAO<Name, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
+
+	private static final String SELECT_GERMPLASM_NAMES = "select n.nid as id, " //
+		+ "    n.gid as gid, " //
+		+ "    n.nval as name, " //
+		+ "    cast(ndate as char) as date, " //
+		+ "    l.locid as locationId, " //
+		+ "    l.lname as locationName, " //
+		+ "    u.fcode as nameTypeCode, " //
+		+ "    u.fname as nameTypeDescription, " //
+		+ "    CASE WHEN n.nstat = 1 THEN true ELSE false END as preferred " //
+		+ "from " //
+		+ "    names n " //
+		+ "        left join " //
+		+ "    udflds u on u.fldno = n.ntype " //
+		+ "        left join " //
+		+ "    location l on l.locid = n.nlocn " //
+		+ "where " //
+		+ "    n.nstat <> 9 and n.gid in (:gids)";
 
 	public List<Name> getByGIDWithFilters(final Integer gid, final Integer status, final GermplasmNameType type) {
 		if (type != null) {
@@ -470,6 +496,24 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			}
 		}
 		return returnList;
+	}
+
+	public List<GermplasmNameDto> getGermplasmNamesByGids(final List<Integer> gids) {
+		final StringBuilder queryBuilder =
+			new StringBuilder(SELECT_GERMPLASM_NAMES);
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+		sqlQuery.addScalar("id").addScalar("gid").addScalar("name").addScalar("date").addScalar("locationId").addScalar("locationName")
+			.addScalar("nameTypeCode")
+			.addScalar("nameTypeDescription").addScalar("preferred", new BooleanType());
+		sqlQuery.setParameterList("gids", gids);
+		sqlQuery.setResultTransformer(Transformers.aliasToBean(GermplasmNameDto.class));
+		try {
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getGermplasmNamesByGids" + e.getMessage();
+			NameDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 
 	private Map<Integer, String> createGidAndPreferredNameMap(final List<Object> list) {

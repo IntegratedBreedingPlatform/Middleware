@@ -1,14 +1,29 @@
 package org.generationcp.middleware.api.germplasm;
 
-import org.generationcp.middleware.domain.germplasm.GermplasmImportRequestDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmImportResponseDto;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
+import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
+import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
+import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
+import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public interface GermplasmService {
@@ -34,12 +49,13 @@ public interface GermplasmService {
 	 * code attribute is not present. Never returns null.
 	 *
 	 * @param gids
-	 * @return Map<gids, plotCodeValue>
+	 * @return Map<gids ,   plotCodeValue>
 	 */
 	Map<Integer, String> getPlotCodeValues(Set<Integer> gids);
 
 	/**
-	 * Returns all the attributes of the Germplasm identified by the given id.
+	 *
+	 Returns all the attributes of the Germplasm identified by the given id.
 	 *
 	 * @param gid - id of the Germplasm
 	 * @return a {@link List} of {@link Attribute}
@@ -48,13 +64,68 @@ public interface GermplasmService {
 
 	/**
 	 * @return the UDFLD table record that represents "plot code": ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE. If no record matching
-	 *         these critria is found, an empty record with fldno=0 is returned. Never returns null.
+	 * these critria is found, an empty record with fldno=0 is returned. Never returns null.
 	 */
 	UserDefinedField getPlotCodeField();
 
 	Map<Integer, GermplasmImportResponseDto> importGermplasm(Integer userId, String cropName,
-		List<GermplasmImportRequestDto> germplasmImportRequestDto);
+		GermplasmImportRequestDto germplasmImportRequestDto);
+
+	long countGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto);
+
+	List<GermplasmDto> findGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto, Pageable pageable);
 
 	Set<Integer> importGermplasmUpdates(Integer userId, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
+
+	List<GermplasmDTO> createGermplasm(Integer userId, String cropname, List<GermplasmImportRequest> germplasmImportRequestList);
+
+	GermplasmDTO updateGermplasm(Integer userId, String germplasmDbId, GermplasmUpdateRequest germplasmUpdateRequest);
+
+	long countFilteredGermplasm(GermplasmSearchRequestDto germplasmSearchRequestDTO);
+
+	List<GermplasmDTO> searchFilteredGermplasm(GermplasmSearchRequestDto germplasmSearchRequestDTO, Pageable pageable);
+
+	Optional<GermplasmDTO> getGermplasmDTOByGUID(String germplasmUUID);
+
+	long countGermplasmByStudy(Integer studyDbId);
+
+	List<GermplasmDTO> getGermplasmByStudy(Integer studyDbId, Pageable pageable);
+
+	/**
+	 * Delete the specified germplasm
+	 *
+	 * @param gids
+	 */
+	void deleteGermplasm(List<Integer> gids);
+
+	Set<Integer> getCodeFixedGidsByGidList(List<Integer> gids);
+
+	Set<Integer> getGidsWithOpenLots(List<Integer> gids);
+
+	Set<Integer> getGidsOfGermplasmWithDescendants(List<Integer> gids);
+
+	Set<Integer> getGermplasmUsedInLockedList(List<Integer> gids);
+
+	Set<Integer> getGermplasmUsedInStudies(List<Integer> gids);
+
+	PedigreeDTO getPedigree(Integer gid, String notation, Boolean includeSiblings);
+
+	ProgenyDTO getProgeny(final Integer gid);
+
+	List<AttributeDTO> getAttributesByGUID
+		(
+			String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
+
+	long countAttributesByGUID(String gemrplasmUUID, List<String> attributeDbIds);
+
+	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
+
+	GermplasmDto getGermplasmDtoById(Integer gid);
+
+	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
+
+	void updateGermplasmBasicDetails(Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
+
+	void updateGermplasmPedigree(Integer gid, ProgenitorsUpdateRequestDto progenitorsUpdateRequstDto);
 
 }

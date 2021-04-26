@@ -15,10 +15,10 @@ public class StudyTransactionsDto extends TransactionDto {
 		final Double amount, final Double lotAvailableBalance, final String notes, final Date createdDate, final Integer lotId, final String lotUUID,
 		final Integer gid, final String designation, final String stockId, final Integer scaleId, final String scaleName,
 		final String lotStatus, final String transactionStatus, final Integer locationId, final String locationName,
-		final String locationAbbr, final String comments) {
+		final String locationAbbr, final String comments, final String germplasmUUID) {
 
 		super(transactionId, createdByUsername, transactionType, amount, lotAvailableBalance, notes, createdDate, lotId, lotUUID, gid, designation, stockId,
-			scaleId, scaleName, lotStatus, transactionStatus, locationId, locationName, locationAbbr, comments);
+			scaleId, scaleName, lotStatus, transactionStatus, locationId, locationName, locationAbbr, comments, germplasmUUID);
 		this.observationUnits = new ArrayList<>();
 	}
 

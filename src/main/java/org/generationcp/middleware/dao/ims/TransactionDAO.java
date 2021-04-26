@@ -29,7 +29,6 @@ import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
@@ -37,11 +36,13 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanConstructorResultTransformer;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.DateType;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.util.CollectionUtils;
 
 import java.lang.reflect.Constructor;
 import java.math.BigInteger;
@@ -257,7 +258,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 	}
 
 	//New inventory functions, please locate them below this line to help cleaning in the near future.
-	private final String SEARCH_TRANSACTIONS_QUERY = "SELECT " //
+	private static final String SEARCH_TRANSACTIONS_QUERY = "SELECT " //
 		+ "    tr.trnid AS transactionId,"//
 		+ "    users.uname AS createdByUsername,"//
 		+ "(CASE WHEN trntype = " + TransactionType.DEPOSIT.getId() + " THEN '" + TransactionType.DEPOSIT.getValue()
@@ -286,7 +287,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		+ " lot.locid as lotLocationId, "
 		+ " loc.lname as lotLocationName, "//
 		+ " loc.labbr as lotLocationAbbr, "//
-		+ " lot.comments as lotComments "
+		+ " lot.comments as lotComments, "//
+		+ " g.germplsm_uuid as gerplsmUUID "
 		+ " FROM"//
 		+ "   ims_transaction tr "//
 		+ "        INNER JOIN"//
@@ -447,6 +449,19 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 					+ " where study_filter_p.project_id in (:harvestingStudyIds) and study_filter_iet.trnid = tr.trnid)"); //
 				paramBuilder.setParameterList("harvestingStudyIds", harvestingStudyIds);
 			}
+
+			if (!CollectionUtils.isEmpty(transactionsSearchDto.getGermplasmUUIDs())) {
+				paramBuilder.append(" and g.germplsm_uuid IN (:guids)");
+				paramBuilder.setParameterList("guids", transactionsSearchDto.getGermplasmUUIDs());
+			}
+
+			if (!CollectionUtils.isEmpty(transactionsSearchDto.getObservationUnitIds())) {
+				paramBuilder.append(" and exists (select 1 "
+					+ " from nd_experiment nde "
+					+ "		inner join ims_experiment_transaction ims_et on nde.nd_experiment_id = ims_et.nd_experiment_id "
+					+ " where nde.obs_unit_id in (:observationUnitIds) and ims_et.trnid = tr.trnid)");
+				paramBuilder.setParameterList("observationUnitIds", transactionsSearchDto.getObservationUnitIds());
+			}
 		}
 	}
 
@@ -572,7 +587,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				Integer.class,   // locationId
 				String.class,    // locationName
 				String.class,    // locationAbbr
-				String.class     // comments
+				String.class,    // comments
+				String.class     // germplsmUUID
 			);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
@@ -601,7 +617,8 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 				Integer.class,   // locationId
 				String.class,    // locationName
 				String.class,    // locationAbbr
-				String.class     // comments
+				String.class,    // comments
+				String.class	 // germplsmUUID
 			);
 		} catch (final NoSuchMethodException ex) {
 			throw new RuntimeException(ex);
@@ -615,7 +632,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("amount");
 		query.addScalar("availableBalance");
 		query.addScalar("notes");
-		query.addScalar("createdDate", Hibernate.DATE);
+		query.addScalar("createdDate", DateType.INSTANCE);
 		query.addScalar("lotLotId");
 		query.addScalar("lotUUID");
 		query.addScalar("lotGid");
@@ -629,6 +646,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		query.addScalar("lotLocationName");
 		query.addScalar("lotLocationAbbr");
 		query.addScalar("lotComments");
+		query.addScalar("gerplsmUUID");
 	}
 
 

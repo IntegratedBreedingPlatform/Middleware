@@ -26,7 +26,7 @@ public class UserProgramStateDataManagerImplTest extends IntegrationTestBase {
 		treeState.add("6");
 
 		this.manager.saveOrUpdateUserProgramTreeState(userId, programUuid, type, treeState);
-		final List<String> states = this.manager.getUserProgramTreeStateByUserIdProgramUuidAndType(userId, programUuid, type);
+		final List<String> states = this.manager.getUserProgramTreeState(userId, programUuid, type);
 		for (int index = 0; index < treeState.size(); index++) {
 			Assert
 				.assertEquals("Should be the same list after saving and retrieving", treeState.get(index).trim(), states.get(index).trim());

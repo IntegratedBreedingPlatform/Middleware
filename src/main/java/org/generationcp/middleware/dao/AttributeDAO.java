@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UDTableType;
@@ -21,13 +22,17 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
+import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link Attribute}.
@@ -108,7 +113,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 				returnList = query.list();
 			} catch (final HibernateException e) {
 				throw new MiddlewareQueryException("Error with getAttributeValuesByTypeAndGIDList(attributeType=" + attributeType
-						+ ", gidList=" + gidList + "): " + e.getMessage(), e);
+					+ ", gidList=" + gidList + "): " + e.getMessage(), e);
 			}
 		}
 		return returnList;
@@ -124,7 +129,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		Attribute attribute = null;
 		try {
 			final String sql = "SELECT {a.*} FROM atributs a INNER JOIN udflds u ON (a.atype=u.fldno)"
-					+ " WHERE a.gid = :gid AND u.ftable='ATRIBUTS' and u.fcode=:name";
+				+ " WHERE a.gid = :gid AND u.ftable='ATRIBUTS' and u.fcode=:name";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.addEntity("a", Attribute.class);
 			query.setParameter("gid", gid);
@@ -140,38 +145,76 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return attribute;
 	}
 
-	public List<AttributeDTO> getAttributesByGidAndAttributeIds(
-		final String gid, final List<String> attributeIds, final Integer pageSize, final Integer pageNumber) {
-
-		List<AttributeDTO> attributes;
+	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final String attributeType) {
 		try {
-			String sql = this.buildQueryForAttributes(attributeIds);
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("Select a.aid AS id, ");
+			queryString.append("a.aval AS value, ");
+			queryString.append("u.fcode AS attributeCode, ");
+			queryString.append("u.ftype AS attributeType, ");
+			queryString.append("u.fname AS attributeDescription, ");
+			queryString.append("CAST(a.adate AS CHAR(255)) AS date, ");
+			queryString.append("a.alocn AS locationId, ");
+			queryString.append("l.lname AS locationName ");
+			queryString.append("FROM atributs a ");
+			queryString.append("INNER JOIN udflds u ON a.atype = u.fldno ");
+			queryString.append("LEFT JOIN location l on a.alocn = l.locid ");
+			queryString.append("WHERE a.gid = :gid ");
+			if (StringUtils.isNotEmpty(attributeType)) {
+				queryString.append("AND u.ftype = :attributeType ");
+			}
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
+			sqlQuery.addScalar("id");
+			sqlQuery.addScalar("value");
+			sqlQuery.addScalar("attributeCode");
+			sqlQuery.addScalar("attributeType");
+			sqlQuery.addScalar("attributeDescription");
+			sqlQuery.addScalar("date");
+			sqlQuery.addScalar("locationId");
+			sqlQuery.addScalar("locationName");
+			sqlQuery.setParameter("gid", gid);
+			if (StringUtils.isNotEmpty(attributeType)) {
+				sqlQuery.setParameter("attributeType", attributeType);
+			}
+
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmAttributeDto.class));
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with getGermplasmAttributeDtos(gid=" + gid + ", attributeType=" + attributeType + "): " + e.getMessage(), e);
+		}
+	}
+
+	public List<AttributeDTO> getAttributesByGUIDAndAttributeIds(
+			final String germplasmUUID, final List<String> attributeIds, final Pageable pageable) {
+
+		final List<AttributeDTO> attributes;
+		try {
+			final String sql = this.buildQueryForAttributes(attributeIds);
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.addScalar("attributeCode").addScalar("attributeDbId").addScalar("attributeName").addScalar("determinedDate")
 				.addScalar("value");
-			query.setParameter("gid", gid);
+			query.setParameter("germplasmUUID", germplasmUUID);
 
 			if (attributeIds != null && !attributeIds.isEmpty()) {
 				query.setParameterList("attributs", attributeIds);
 			}
 
-			if (pageNumber != null && pageSize != null) {
-				query.setFirstResult(pageSize * (pageNumber - 1));
-				query.setMaxResults(pageSize);
-			}
+			addPaginationToSQLQuery(query, pageable);
 
 			query.setResultTransformer(Transformers.aliasToBean(AttributeDTO.class));
 
 			attributes = query.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getAttributesByGid(gidList=" + gid + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getAttributesByGid(gidList=" + germplasmUUID + "): " + e.getMessage(), e);
 		}
 		return attributes;
 	}
 
-	public long countAttributesByGid(final String gid, final List<String> attributeDbIds) {
+	public long countAttributesByGUID(final String germplasmUUID, final List<String> attributeDbIds) {
 		String sql = "SELECT COUNT(1) "
 			+ " FROM ("
 			+ this.buildQueryForAttributes(attributeDbIds);
@@ -179,7 +222,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		sql = sql + " ) as result ";
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
-		query.setParameter("gid", gid);
+		query.setParameter("germplasmUUID", germplasmUUID);
 
 		if (attributeDbIds != null && !attributeDbIds.isEmpty()) {
 			query.setParameterList("attributs", attributeDbIds);
@@ -217,8 +260,10 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			+ "    atributs a"
 			+ "        INNER JOIN"
 			+ "    udflds u ON a.atype = u.fldno "
+			+ "        INNER JOIN"
+			+ "    germplsm g ON a.gid = g.gid "
 			+ " WHERE"
-			+ "    a.gid = :gid AND u.ftable = 'ATRIBUTS'";
+			+ "    g.germplsm_uuid = :germplasmUUID AND u.ftable = 'ATRIBUTS'";
 
 		if (attributeIds != null && !attributeIds.isEmpty()) {
 			sql = sql + " AND u.fldno IN ( :attributs )";

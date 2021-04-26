@@ -11,10 +11,6 @@
 
 package org.generationcp.middleware.dao.gdms;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -23,7 +19,6 @@ import org.generationcp.middleware.pojos.gdms.CharValueElement;
 import org.generationcp.middleware.pojos.gdms.CharValues;
 import org.generationcp.middleware.pojos.gdms.MarkerSampleId;
 import org.hibernate.Criteria;
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
@@ -32,6 +27,10 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * DAO class for {@link CharValues}.
@@ -185,11 +184,11 @@ public class CharValuesDAO extends GenericDAO<CharValues, Integer> {
 						this.getSession().createSQLQuery(CharValuesDAO.GET_UNIQUE_ALLELIC_VALUES_BY_GIDS_AND_MIDS);
 				query.setParameterList("gids", gids);				
 				query.setParameterList("mids", mids);				
-				query.addScalar("gid", Hibernate.INTEGER);
-				query.addScalar("marker_id", Hibernate.INTEGER);
-				query.addScalar("char_value", Hibernate.STRING);
-				query.addScalar("acc_sample_id", Hibernate.INTEGER);
-				query.addScalar("marker_sample_id", Hibernate.INTEGER);
+				query.addScalar("gid", IntegerType.INSTANCE);
+				query.addScalar("marker_id", IntegerType.INSTANCE);
+				query.addScalar("char_value", StringType.INSTANCE);
+				query.addScalar("acc_sample_id", IntegerType.INSTANCE);
+				query.addScalar("marker_sample_id", IntegerType.INSTANCE);
 				results = query.list();
 
 					}

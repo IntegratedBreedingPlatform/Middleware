@@ -31,6 +31,7 @@ import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -39,6 +40,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -185,7 +187,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-				"Error encountered while saving Germplasm List Data: GermplasmListManager.addOrUpdateGermplasmListData(data="
+				"Error encountered while saving Germplasm List Data: GermplasmListServiceImpl.addGermplasmListData(data="
 					+ data + "): " + e.getMessage(),
 				e);
 		}
@@ -293,6 +295,16 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public long countMyLists(final String programUUID, final Integer userId) {
+		return this.daoFactory.getGermplasmListDAO().countMyLists(programUUID, userId);
+	}
+
+	@Override
+	public List<MyListsDTO> getMyLists(final String programUUID, final Pageable pageable, final Integer userId) {
+		return this.daoFactory.getGermplasmListDAO().getMyLists(programUUID, pageable, userId);
+	}
+
+	@Override
 	public Integer createGermplasmListFolder(final Integer userId, final String folderName, final Integer parentId,
 		final String programUUID) {
 
@@ -351,6 +363,71 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.orElseThrow(() -> new MiddlewareRequestException("", "list.folder.not.found"));
 
 		this.daoFactory.getGermplasmListDAO().makeTransient(folder);
+	}
+
+	@Override
+	public List<GermplasmListDto> getGermplasmLists(final Integer gid) {
+		return this.daoFactory.getGermplasmListDAO().getGermplasmListDtos(gid);
+	}
+
+	@Override
+	public void performGermplasmListEntriesDeletion(final List<Integer> gids) {
+		final List<Integer> germplasmListIds = this.daoFactory.getGermplasmListDAO().getListIdsByGIDs(gids);
+		if(org.apache.commons.collections.CollectionUtils.isNotEmpty(germplasmListIds)) {
+			final Map<Integer, List<GermplasmListData>> germplasmListDataMap = this.daoFactory.getGermplasmListDataDAO()
+				.getGermplasmDataListMapByListIds(germplasmListIds);
+			final List<GermplasmListData> germplasmListDataToBeDeleted = new ArrayList<>();
+			final List<GermplasmListData> germplasmListDataToBeUpdated = new ArrayList<>();
+			for (final Integer listId : germplasmListIds) {
+				final Iterator<GermplasmListData> iterator = germplasmListDataMap.get(listId).iterator();
+				while (iterator.hasNext()) {
+					final GermplasmListData germplasmListData = iterator.next();
+					if (germplasmListData.getGermplasm() != null && gids.contains(germplasmListData.getGermplasm().getGid())) {
+						iterator.remove();
+						germplasmListDataToBeDeleted.add(germplasmListData);
+					}
+				}
+
+				// Change entry IDs on listData
+				final List<GermplasmListData> listData = germplasmListDataMap.get(listId);
+				Integer entryId = 1;
+				for (final GermplasmListData germplasmListData : listData) {
+					germplasmListData.setEntryId(entryId);
+					entryId++;
+				}
+				germplasmListDataToBeUpdated.addAll(listData);
+			}
+
+			this.deleteGermplasmListData(germplasmListDataToBeDeleted);
+			this.updateGermplasmListData(germplasmListDataToBeUpdated);
+		}
+	}
+
+	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {
+		try {
+			for (final GermplasmListData data : germplasmListData) {
+				this.daoFactory.getGermplasmListDataDAO().update(data);
+			}
+		} catch (final Exception e) {
+
+			throw new MiddlewareQueryException(
+				"Error encountered while saving Germplasm List Data: GermplasmListServiceImpl.updateGermplasmListData(germplasmListData="
+					+ germplasmListData + "): " + e.getMessage(),
+				e);
+		}
+	}
+
+	private void deleteGermplasmListData(final List<GermplasmListData> germplasmListData) {
+		try {
+			for (final GermplasmListData data : germplasmListData) {
+				this.daoFactory.getGermplasmListDataDAO().makeTransient(data);
+			}
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+				"Error encountered while deleting Germplasm List Data: GermplasmListServiceImpl.deleteGermplasmListData(germplasmListData="
+					+ germplasmListData + "): " + e.getMessage(),
+				e);
+		}
 	}
 
 	private void addListDataProperties(final List<GermplasmListData> savedGermplasmListData, final Set<String> propertyNames) {
@@ -699,15 +776,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		public Integer getGid() {
-			return gid;
+			return this.gid;
 		}
 
 		public String getPreferredName() {
-			return preferredName;
+			return this.preferredName;
 		}
 
 		public Integer getGroupId() {
-			return groupId;
+			return this.groupId;
 		}
 	}
 

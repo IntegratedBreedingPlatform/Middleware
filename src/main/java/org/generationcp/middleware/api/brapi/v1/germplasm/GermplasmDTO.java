@@ -1,6 +1,7 @@
-package org.generationcp.middleware.domain.germplasm;
+package org.generationcp.middleware.api.brapi.v1.germplasm;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -36,8 +37,10 @@ public class GermplasmDTO {
 	private String seedSource;
 	private String entryNumber;
 	private String germplasmOrigin;
-	private List<String> synonyms;
+	private Map<String, String> synonyms;
 	private Map<String, String> additionalInfo;
+	private String gid;
+	private List<ExternalReferenceDTO> externalReferences;
 
 	private final static String documentationURL = null;
 
@@ -150,7 +153,6 @@ public class GermplasmDTO {
 
 	public void setInstituteCode(final String instituteCode) {
 		this.instituteCode = instituteCode;
-		this.instituteName = instituteCode;
 	}
 
 	public String getInstituteName() {
@@ -158,7 +160,6 @@ public class GermplasmDTO {
 	}
 
 	public void setInstituteName(final String instituteName) {
-		this.instituteCode = instituteName;
 		this.instituteName = instituteName;
 	}
 
@@ -244,11 +245,11 @@ public class GermplasmDTO {
 		this.germplasmOrigin = germplasmOrigin;
 	}
 
-	public List<String> getSynonyms() {
+	public Map<String, String> getSynonyms() {
 		return synonyms;
 	}
 
-	public void setSynonyms(List<String> synonyms) {
+	public void setSynonyms(final Map<String, String> synonyms) {
 		this.synonyms = synonyms;
 	}
 
@@ -258,6 +259,22 @@ public class GermplasmDTO {
 
 	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
 		this.additionalInfo = additionalInfo;
+	}
+
+	public String getGid() {
+		return this.gid;
+	}
+
+	public void setGid(final String gid) {
+		this.gid = gid;
+	}
+
+	public List<ExternalReferenceDTO> getExternalReferences() {
+		return externalReferences;
+	}
+
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	@Override
