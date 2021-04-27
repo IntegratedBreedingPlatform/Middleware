@@ -1370,10 +1370,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			//FIXME This is a workaround to prevent germplasm with children to have new parents
 			//FIXME Once validation to check if a node is not moved below in the tree,remove this IF condition. Pending for 18.1
-			final List<Integer> children = this.daoFactory.getGermplasmDao().getChildren(germplasm.getGid());
-			if (!children.isEmpty()) {
-				throw new MiddlewareRequestException("", "germplasm.update.germplasm.has.progeny.error",
-					new String[] {String.valueOf(gid)});
+			final UpdateGroupSourceAction updateGroupSourceAction = this.getUpdateGroupSourceAction(germplasmBeforeUpdate, germplasm);
+			final boolean gpidsWillBeChanged = !germplasm.getGpid1().equals(germplasmBeforeUpdate.getGpid1()) || !germplasm.getGpid2()
+				.equals(germplasmBeforeUpdate.getGpid2());
+			if (updateGroupSourceAction != UpdateGroupSourceAction.NONE || gpidsWillBeChanged) {
+				final List<Integer> children = this.daoFactory.getGermplasmDao().getChildren(germplasm.getGid());
+				final boolean hasChildren = !children.isEmpty();
+				if (hasChildren) {
+					throw new MiddlewareRequestException("", "germplasm.update.germplasm.has.progeny.error",
+						new String[] {String.valueOf(gid)});
+				}
 			}
 
 			this.daoFactory.getGermplasmDao().save(germplasm);
