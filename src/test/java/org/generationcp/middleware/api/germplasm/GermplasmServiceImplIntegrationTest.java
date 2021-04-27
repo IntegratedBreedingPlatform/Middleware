@@ -619,7 +619,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(
-				e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.immediate.source.must.belong.to.the.same.group"));
+				e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.invalid.immediate.source.group"));
 		}
 
 	}
