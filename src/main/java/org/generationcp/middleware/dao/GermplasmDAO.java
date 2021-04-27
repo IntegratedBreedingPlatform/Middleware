@@ -1891,7 +1891,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "from germplsm "
 				+ "       inner join methods m on germplsm.methn = m.mid "
 				+ "where (((mtype = " + GEN + " and (gpid1 = :parent or gpid2 = :parent))) "
-				+ "  or (mtype in (" + DER_MAN + ") and (gpid2 = :parent or (gpid2 = 0 and gpid1 = :parent)))) and deleted = 0");
+				+ "  or (mtype in (" + DER_MAN
+				+ ") and (gpid2 = :parent or (gpid2 = 0 and gpid1 = :parent)))) and deleted = 0 AND grplce = 0 ");
 			sqlQuery.setParameter("parent", gid);
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
