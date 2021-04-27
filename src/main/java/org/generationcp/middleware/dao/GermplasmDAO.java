@@ -93,7 +93,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		+ "    if(g.mgid > 0, true, false) as isGroupedLine, " //
 		+ "    g.mgid as groupId, " //
 		+ "    g.gpid1 as gpid1, "  //
-		+ "    g.gpid2 as gpid2 " //
+		+ "    g.gpid2 as gpid2, " //
+		+ "    g.germuid as createdByUserId " //
 		+ "    from " //
 		+ "    germplsm g " //
 		+ "        left join " //
@@ -1695,7 +1696,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			.addScalar("breedingLocationId")
 			.addScalar("breedingLocation").addScalar("breedingMethodId").addScalar("breedingMethod")
 			.addScalar("isGroupedLine", new BooleanType())
-			.addScalar("groupId").addScalar("gpid1").addScalar("gpid2");
+			.addScalar("groupId").addScalar("gpid1").addScalar("gpid2").addScalar("createdByUserId");
 	}
 
 	public List<GermplasmDto> findGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto, final Pageable pageable) {

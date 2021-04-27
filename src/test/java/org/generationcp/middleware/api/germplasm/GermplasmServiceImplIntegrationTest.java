@@ -57,6 +57,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.notNullValue;
@@ -1100,6 +1101,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasmDto.getNames(), hasSize(2));
 		assertThat(germplasmDto.getOtherProgenitors(), hasSize(1));
 		assertThat(germplasmDto.getOtherProgenitors().get(0), equalTo(progenitor.getProgenitorGid()));
+		assertThat(germplasmDto.getCreatedBy(), equalToIgnoringCase("admin"));
+		assertThat(germplasmDto.getCreatedByUserId(), equalTo(1));
 	}
 
 	@Test
@@ -1891,7 +1894,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Integer gpid1,
 		final Integer gpid2) {
 		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2,
-			0, 0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
+			1, 0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
 			0, 0, null, null, method);
 		if (StringUtils.isNotEmpty(germplasmUUID)) {
 			germplasm.setGermplasmUUID(germplasmUUID);

@@ -48,6 +48,8 @@ import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -100,6 +102,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmListService germplasmListService;
+
+	@Autowired
+	private UserService userService;
 
 	private final GermplasmMethodValidator germplasmMethodValidator;
 
@@ -1269,6 +1274,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasmDto.setGermplasmOrigin(this.daoFactory.getGermplasmStudySourceDAO().getGermplasmOrigin(gid));
 			final List<Progenitor> progenitors = this.daoFactory.getProgenitorDao().getByGID(gid);
 			germplasmDto.setOtherProgenitors(progenitors.stream().map(Progenitor::getProgenitorGid).collect(Collectors.toList()));
+			this.getCreatedByWorkbenchUserName(germplasmDto.getCreatedByUserId()).ifPresent(germplasmDto::setCreatedBy);
 		}
 		return germplasmDto;
 	}
@@ -1543,6 +1549,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 
 		return attributeMap;
+	}
+
+	private Optional<String> getCreatedByWorkbenchUserName(final Integer userId) {
+		final WorkbenchUser workbenchUser = this.userService.getUserById(userId);
+		if (workbenchUser != null) {
+			return Optional.of(workbenchUser.getName());
+		}
+		return Optional.empty();
 	}
 
 	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
