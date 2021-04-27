@@ -12,20 +12,17 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.util.Util;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
-import org.reflections.util.Utils;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
@@ -73,7 +70,8 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			+ "		AND ( :cropName IS NULL OR p.crop_type = :cropName ) "
 			+ " 	AND ( :programName IS NULL OR p.project_name = :programName ) "
 			+ " 	AND ( :programNameContainsString IS NULL OR p.project_name like :programNameContainsString ) "
-			+ " 	AND ( :programDbId IS NULL OR p.project_uuid = :programDbId ) ";
+			+ " 	AND ( :programDbId IS NULL OR p.project_uuid = :programDbId ) "
+			+ "		GROUP BY p.project_id, p.crop_type, p.project_name, p.project_uuid";
 
 	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
 
