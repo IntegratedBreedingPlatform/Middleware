@@ -1725,7 +1725,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGidsOfGermplasmWithDescendants() {
+	public void testGetGidsOfGermplasm_WithDescendants() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
 		// Create germplasm with descendants
@@ -1745,6 +1745,75 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendants.getGid()));
 
 		Assert.assertEquals(1, gids.size());
+
+	}
+
+	@Test
+	public void testGetGidsOfGermplasm_WhereDescendantIsDeleted() {
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+
+		// Create germplasm with deleted descendants
+		final Germplasm germplasmWithDescendants = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Germplasm germplasmDescendant = this.createGermplasm(method, null, null, 0, 0, 0);
+		germplasmDescendant.setGpid1(germplasmWithDescendants.getGid());
+		germplasmDescendant.setGpid2(germplasmWithDescendants.getGid());
+		germplasmDescendant.setDeleted(true);
+		this.daoFactory.getGermplasmDao().save(germplasmDescendant);
+		this.sessionProvder.getSession().flush();
+
+		final Set<Integer> gids =
+			this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendants.getGid()));
+
+		Assert.assertEquals(0, gids.size());
+
+	}
+
+	@Test
+	public void testGetGidsOfGermplasm_WithPolyCrossDescendant() {
+		final Method derivativeMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Method generativeMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
+
+		// Create germplasm with descendants
+		final Germplasm germplasmWithDescendant = this.createGermplasm(derivativeMethod, null, null, 0, 0, 0);
+		final Germplasm femaleParent = this.createGermplasm(derivativeMethod, null, null, 0, 0, 0);
+		final Germplasm maleParent = this.createGermplasm(derivativeMethod, null, null, 0, 0, 0);
+		final Germplasm germplasmDescendant = this.createGermplasm(generativeMethod, null, null, 0, 0, 0);
+		germplasmDescendant.setGpid1(femaleParent.getGid());
+		germplasmDescendant.setGpid2(maleParent.getGid());
+		this.daoFactory.getGermplasmDao().save(germplasmDescendant);
+
+		final Progenitor progenitor = new Progenitor(germplasmDescendant, 1, germplasmWithDescendant.getGid());
+		this.daoFactory.getProgenitorDao().save(progenitor);
+		this.sessionProvder.getSession().flush();
+
+		final Set<Integer> gids =
+			this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendant.getGid()));
+		Assert.assertEquals(0, gids.size());
+
+	}
+
+	@Test
+	public void testGetGidsOfGermplasm_WherePolyCrossDescendantIsDeleted() {
+		final Method derivativeMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Method generativeMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
+
+		// Create germplasm with deleted descendants
+		final Germplasm germplasmWithDescendant = this.createGermplasm(derivativeMethod, null, null, 0, 0, 0);
+		final Germplasm femaleParent = this.createGermplasm(derivativeMethod, null, null, 0, 0, 0);
+		final Germplasm maleParent = this.createGermplasm(derivativeMethod, null, null, 0, 0, 0);
+		final Germplasm germplasmDescendant = this.createGermplasm(generativeMethod, null, null, 0, 0, 0);
+		germplasmDescendant.setGpid1(femaleParent.getGid());
+		germplasmDescendant.setGpid2(maleParent.getGid());
+		germplasmDescendant.setDeleted(true);
+		this.daoFactory.getGermplasmDao().save(germplasmDescendant);
+
+		final Progenitor progenitor = new Progenitor(germplasmDescendant, 1, germplasmWithDescendant.getGid());
+		this.daoFactory.getProgenitorDao().save(progenitor);
+		this.sessionProvder.getSession().flush();
+
+		final Set<Integer> gids =
+			this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendant.getGid()));
+		Assert.assertEquals(0, gids.size());
 
 	}
 
