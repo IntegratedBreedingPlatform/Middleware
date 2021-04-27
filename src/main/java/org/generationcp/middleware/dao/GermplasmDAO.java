@@ -113,16 +113,18 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String FIND_GERMPLASM_BY_GIDS = " g.gid in (:gids) ";
 
 	private static final String FIND_GERMPLASM_WITHDESCENDANTS = "SELECT g.gid as gid FROM germplsm g "
-			+ "WHERE (EXISTS (SELECT 1 FROM germplsm descendant WHERE g.gid = descendant.gpid1 OR g.gid = descendant.gpid2 ) "
-			+ "OR EXISTS (SELECT 1 FROM progntrs p WHERE  g.gid = p.gid)) "
-			+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
+			+ "WHERE (EXISTS (SELECT 1 FROM germplsm descendant WHERE descendant.deleted = 0 AND "
+			+ " (g.gid = descendant.gpid1 OR g.gid = descendant.gpid2) ) "
+			+ " OR EXISTS (SELECT 1 FROM progntrs p INNER JOIN germplsm descendant ON descendant.gid = p.gid"
+			+ " 					WHERE  g.gid = p.pid  AND descendant.deleted = 0)) "
+			+ " AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
 
 	private static final String FIND_GERMPLASM_WITH_DERIVATIVE_OR_MAINTENANCE_DESCENDANTS = "SELECT g.gid as gid FROM germplsm g "
 			+ "WHERE (EXISTS "
 						+ " (SELECT 1 FROM germplsm descendant "
 						+ " INNER JOIN methods mtype ON mtype.mid = descendant.methn"
 						+ " WHERE (g.gid = descendant.gpid1 OR g.gid = descendant.gpid2) "
-						+ " AND mtype.mtype IN (:mtypes) ) "
+						+ " AND mtype.mtype IN (:mtypes) AND descendant.deleted = 0) "
 					+ ") "
 			+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
 
@@ -1878,7 +1880,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			criteria.add(Restrictions.eq("grplce", 0));
 			criteria.setProjection(Projections.rowCount());
 			return (Long) criteria.uniqueResult();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in countAll(): " + e.getMessage(), e);
 		}
 	}
