@@ -1,0 +1,18 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="clarysabel" id="v17.4.1-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<not><indexExists tableName="location" indexName="labbr_unique"></indexExists></not>
+				<sqlCheck expectedResult="0">select count(*) from (SELECT count(*) from location where labbr is not null group by labbr having count(*) > 1) a </sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Adding unique constraint labbr_unique to location table </comment>
+	    <addUniqueConstraint columnNames="labbr" constraintName="labbr_unique" tableName="location"/>
+	</changeSet>
+
+</databaseChangeLog>
