@@ -421,7 +421,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
-		final Map<Integer, Germplasm> progenitorsMapByGid,
+		final Map<String, Germplasm> progenitorsMapByGid,
 		final List<Integer> gidsOfGermplasmWithDescendants,
 		final Multimap<String, Object[]> conflictErrors) {
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
