@@ -33,7 +33,10 @@ public class ReleaseNote implements Serializable {
 	private Date releaseDate;
 
 	@Column(name = "has_coming_soon", nullable = false)
-	private Boolean hasComingSoon = false;
+	private boolean hasComingSoon = false;
+
+	@Column(name = "enabled", nullable = false)
+	private boolean enabled = true;
 
 	private ReleaseNote() {
 	}
@@ -55,8 +58,16 @@ public class ReleaseNote implements Serializable {
 		return releaseDate;
 	}
 
-	public Boolean getHasComingSoon() {
+	public boolean getHasComingSoon() {
 		return hasComingSoon;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(final boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	@Override
@@ -90,6 +101,10 @@ public class ReleaseNote implements Serializable {
 		builder.append(this.version);
 		builder.append(", releaseDate=");
 		builder.append(this.releaseDate);
+		builder.append(", hasComingSoon=");
+		builder.append(this.hasComingSoon);
+		builder.append(", enabled=");
+		builder.append(this.enabled);
 
 		builder.append("]");
 		return builder.toString();

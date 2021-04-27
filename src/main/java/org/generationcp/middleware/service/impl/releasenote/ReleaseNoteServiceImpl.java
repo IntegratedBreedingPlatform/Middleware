@@ -6,6 +6,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNote;
 import org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNoteUser;
 import org.generationcp.middleware.service.api.releasenote.ReleaseNoteService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +16,12 @@ import java.util.Optional;
 @Transactional
 public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 
+	private final static String VERSION_DELIMITER = "\\.";
+
 	private final WorkbenchDaoFactory workbenchDaoFactory;
+
+	@Value("${bms.version}")
+	public String bmsVersion;
 
 	public ReleaseNoteServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.workbenchDaoFactory = new WorkbenchDaoFactory(sessionProvider);
@@ -42,7 +48,14 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 
 	@Override
 	public Optional<ReleaseNote> getLatestReleaseNote() {
-		return this.workbenchDaoFactory.getReleaseNoteDAO().getLatestReleaseNote();
+		final String[] numbering = this.bmsVersion.split(VERSION_DELIMITER);
+		if (numbering.length <= 1) {
+			//Unsupported version format
+			return Optional.empty();
+		}
+
+		String majorVersion = numbering[0] + VERSION_DELIMITER;
+		return this.workbenchDaoFactory.getReleaseNoteDAO().getLatestByMajorVersion(majorVersion);
 	}
 
 	@Override
