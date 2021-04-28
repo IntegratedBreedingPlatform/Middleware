@@ -4,7 +4,43 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="clarysabel" id="v17.4.1-1">
+    <changeSet author="corina" id="v17.4.1-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) > 1 FROM location WHERE labbr='DEU';
+            </sqlCheck>
+        </preConditions>
+        <comment> Rename location abbreviation for West Germany (locid 82) to FRG. IBP-4308 </comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location SET labbr='FRG' WHERE labbr='DEU' AND locid=82;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="corina" id="v17.4.1-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) > 1 FROM location WHERE labbr='ATF';
+            </sqlCheck>
+        </preConditions>
+        <comment> Rename location abbreviation for French Southern Territories (locid 259) to TAAF. IBP-4308 </comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location SET labbr='TAAF',lname='French Southern and Antarctic Lands' WHERE labbr='ATF' AND locid=259;
+		</sql>
+	</changeSet>
+	
+	<changeSet author="corina" id="v17.4.1-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) > 1 FROM location WHERE labbr='UMI';
+            </sqlCheck>
+        </preConditions>
+        <comment> Rename location abbreviation for US PACIFIC IS (locid 265) to UMIP. IBP-4308 </comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location SET labbr='UMIP' WHERE labbr='UMI' AND locid=265;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v17.4.1-4">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<not><indexExists tableName="location" indexName="labbr_unique"></indexExists></not>
