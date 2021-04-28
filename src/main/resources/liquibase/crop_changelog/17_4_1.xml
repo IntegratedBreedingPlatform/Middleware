@@ -6,9 +6,14 @@
 
     <changeSet author="corina" id="v17.4.1-1">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">
-                SELECT COUNT(*) > 1 FROM location WHERE labbr='DEU';
-            </sqlCheck>
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) FROM location WHERE labbr='DEU' and locid=82;
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM location WHERE labbr='FRG';
+				</sqlCheck>
+			</and>
         </preConditions>
         <comment> Rename location abbreviation for West Germany (locid 82) to FRG. IBP-4308 </comment>
 		<sql dbms="mysql" splitStatements="true">
@@ -18,9 +23,14 @@
 	
 	<changeSet author="corina" id="v17.4.1-2">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">
-                SELECT COUNT(*) > 1 FROM location WHERE labbr='ATF';
-            </sqlCheck>
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) FROM location WHERE labbr='ATF' and locid=275;
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM location WHERE labbr='TAAF';
+				</sqlCheck>
+			</and>
         </preConditions>
         <comment> Rename location abbreviation for French Southern Territories (locid 275) to TAAF. IBP-4308 </comment>
 		<sql dbms="mysql" splitStatements="true">
@@ -30,9 +40,14 @@
 	
 	<changeSet author="corina" id="v17.4.1-3">
         <preConditions onFail="MARK_RAN">
+			<and>
             <sqlCheck expectedResult="1">
-                SELECT COUNT(*) > 1 FROM location WHERE labbr='UMI';
+                SELECT COUNT(*) FROM location WHERE labbr='UMI' and locid=282;
             </sqlCheck>
+			<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM location WHERE labbr='UMIP';
+			</sqlCheck>
+			</and>
         </preConditions>
         <comment> Rename location abbreviation for United States Minor Outlying Islands (locid 282) to UMIP. IBP-4308 </comment>
 		<sql dbms="mysql" splitStatements="true">
