@@ -661,7 +661,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.germplasm.has.existing.derivative.progeny"));
+			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.germplasm.has.progeny.error"));
 		}
 	}
 

@@ -322,8 +322,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final List<Integer> gidsOfGermplasmWithDescendants = this.getGidsOfGermplasmWithDescendants(germplasmList.stream().map(Germplasm::getGid)
 			.collect(Collectors.toList())).stream().collect(
 			Collectors.toList());
-		final List<Integer> gidsOfGermplasmWihDerivativeDescendants = this.getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(germplasmList);
-
 		final Map<String, Integer> nameCodesFieldNoMap = this.getNameTypesMapByCodes(germplasmUpdateDTOList);
 		final Map<String, Integer> attributeCodesFieldNoMap = this.getAttributesMapByCodes(germplasmUpdateDTOList);
 		final Map<String, Germplasm> progenitorsMapByGid = this.getGermplasmProgenitorsMapByGids(germplasmUpdateDTOList);
@@ -355,7 +353,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.saveGermplasmUpdateDTO(userId, attributeCodesFieldNoMap, nameCodesFieldNoMap,
 				germplasmUpdateDTOMap,
 				locationAbbreviationIdMap, codeBreedingMethodDTOMap, namesMap, attributesMap, germplasm,
-				progenitorsMapByGid, gidsOfGermplasmWithDescendants, gidsOfGermplasmWihDerivativeDescendants, conflictErrors);
+				progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors);
 		}
 
 		if (!conflictErrors.isEmpty()) {
@@ -433,14 +431,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
 		final Map<String, Germplasm> progenitorsMapByGid,
 		final List<Integer> gidsOfGermplasmWithDescendants,
-	    final List<Integer> gidsOfGermplasmWihDerivativeDescendants,
 		final Multimap<String, Object[]> conflictErrors) {
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
 			this.getGermplasmUpdateDTOByGidOrUUID(germplasm, germplasmUpdateDTOMap);
 		if (optionalGermplasmUpdateDTO.isPresent()) {
 			final GermplasmUpdateDTO germplasmUpdateDTO = optionalGermplasmUpdateDTO.get();
 			this.updateGermplasm(germplasm, germplasmUpdateDTO, locationAbbreviationIdMap, codeBreedingMethodDTOMap, progenitorsMapByGid,
-				gidsOfGermplasmWithDescendants, gidsOfGermplasmWihDerivativeDescendants,
+				gidsOfGermplasmWithDescendants,
 				conflictErrors);
 			this.saveAttributesAndNames(userId, attributeCodes, nameCodes, namesMap, attributesMap, germplasm,
 				conflictErrors,
@@ -500,7 +497,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, Method> codeBreedingMethodDTOMap,
 		final Map<String, Germplasm> progenitorsMapByGid,
 		final List<Integer> gidsOfGermplasmWithDescendants,
-		final List<Integer> gidsOfGermplasmWihDerivativeDescendants,
 		final Multimap<String, Object[]> conflictErrors) {
 
 		final Optional<Method> breedingMethodOptional =
@@ -519,7 +515,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		this.saveOrUpdateReference(germplasm, referenceOptional);
 		this.updateBreedingMethodAndProgenitors(germplasmUpdateDTO, germplasm, breedingMethodOptional, progenitorsMapByGid,
-			gidsOfGermplasmWithDescendants, gidsOfGermplasmWihDerivativeDescendants,
+			gidsOfGermplasmWithDescendants,
 			conflictErrors);
 
 		this.daoFactory.getGermplasmDao().update(germplasm);
@@ -529,7 +525,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Optional<Method> breedingMethodOptional,
 		final Map<String, Germplasm> progenitorsMapByGid,
 		final List<Integer> gidsOfGermplasmWithDescendants,
-		final List<Integer> gidsOfGermplasmWihDerivativeDescendants,
 		final Multimap<String, Object[]> conflictErrors) {
 
 		final Integer femaleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_1);
@@ -541,7 +536,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		if (!breedingMethodOptional.isPresent()) {
 			// If breeding method is not specified, update the progenitors based on existing method
-			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, gidsOfGermplasmWihDerivativeDescendants, conflictErrors, femaleParentGid,
+			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
 				maleParentGid,
 				germplasm.getMethod(), otherProgenitors);
 
@@ -555,7 +550,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasm.setMethodId(breedingMethod.getMid());
 
 			// Update the progenitors based on the new method
-			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, gidsOfGermplasmWihDerivativeDescendants, conflictErrors, femaleParentGid,
+			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
 				maleParentGid,
 				breedingMethod, otherProgenitors);
 		}
@@ -563,19 +558,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void updateProgenitors(final Germplasm germplasm, final Map<String, Germplasm> progenitorsMapByGid,
-		final List<Integer> gidsOfGermplasmWithDescendants, final List<Integer> gidsOfGermplasmWihDerivativeDescendants, final Multimap<String, Object[]> conflictErrors, final Integer femaleParentGid,
+		final List<Integer> gidsOfGermplasmWithDescendants, final Multimap<String, Object[]> conflictErrors, final Integer femaleParentGid,
 		final Integer maleParentGid, final Method breedingMethod, final List<Integer> otherProgenitors) {
-
 		if (breedingMethod.getMprgn() == 1) {
 			conflictErrors.put("germplasm.update.mutation.method.is.not.supported", new String[] {
 				String.valueOf(germplasm.getGid())});
-		} else if (breedingMethod.isGenerative() && gidsOfGermplasmWithDescendants.contains(germplasm.getGid())) {
-			// Prevent update if the GEN germplasm has any descendants.
+		} else if (gidsOfGermplasmWithDescendants.contains(germplasm.getGid())) {
+			// Prevent update if the germplasm has existing pedigree tree.
 			conflictErrors.put("germplasm.update.germplasm.has.progeny.error", new String[] {
-				String.valueOf(germplasm.getGid())});
-		} else if (breedingMethod.isDerivativeOrMaintenance() && gidsOfGermplasmWihDerivativeDescendants.contains(germplasm.getGid())) {
-			// Prevent update if the DER germplasm has existing DER descendants.
-			conflictErrors.put("germplasm.update.germplasm.has.existing.derivative.progeny", new String[] {
 				String.valueOf(germplasm.getGid())});
 		} else {
 			final String femaleParentGidString = String.valueOf(femaleParentGid);
