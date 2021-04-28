@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasm;
 
+import com.google.common.base.Functions;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
@@ -233,8 +234,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasm.setMethodId(method.getMid());
 
 			germplasm.setGnpgs(this.calculateGnpgs(method, germplasmDto.getProgenitor1(), germplasmDto.getProgenitor2(), null));
-			this.setProgenitors(germplasm, method, germplasmDto.getProgenitor1(), germplasmDto.getProgenitor2(), progenitorsMap);
-
+			final Multimap<String, Object[]> progenitorsErrors = ArrayListMultimap.create();
+			this.setProgenitors(germplasm, method, germplasmDto.getProgenitor1(), germplasmDto.getProgenitor2(), progenitorsMap,
+				progenitorsErrors);
+			if (!progenitorsErrors.isEmpty()) {
+				final Map.Entry<String, Object[]> error = progenitorsErrors.entries().iterator().next();
+				throw new MiddlewareRequestException("", error.getKey(), error.getValue());
+			}
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
 			germplasm.setUserId(userId);
@@ -313,10 +319,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 
 		final List<Germplasm> germplasmList = this.getGermplasmListByGIDorGermplasmUUID(germplasmUpdateDTOList);
-		final List<Integer> gidsOfGermplasmWithDescendants = this.getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(germplasmList);
+		final List<Integer> gidsOfGermplasmWithDescendants = this.getGidsOfGermplasmWithDescendants(germplasmList.stream().map(Germplasm::getGid)
+			.collect(Collectors.toList())).stream().collect(
+			Collectors.toList());
 		final Map<String, Integer> nameCodesFieldNoMap = this.getNameTypesMapByCodes(germplasmUpdateDTOList);
 		final Map<String, Integer> attributeCodesFieldNoMap = this.getAttributesMapByCodes(germplasmUpdateDTOList);
-		final Map<Integer, Germplasm> progenitorsMapByGid = this.getGermplasmProgenitorsMapByGids(germplasmUpdateDTOList);
+		final Map<String, Germplasm> progenitorsMapByGid = this.getGermplasmProgenitorsMapByGids(germplasmUpdateDTOList);
 
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap = new HashMap<>();
 		for (final GermplasmUpdateDTO germplasmUpdateDTO : germplasmUpdateDTOList) {
@@ -400,7 +408,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public List<AttributeDTO> getAttributesByGUID(
-			final String germplasmUUID, final List<String> attributeDbIds, final Pageable pageable) {
+		final String germplasmUUID, final List<String> attributeDbIds, final Pageable pageable) {
 		return this.daoFactory.getAttributeDAO().getAttributesByGUIDAndAttributeIds(germplasmUUID, attributeDbIds, pageable);
 	}
 
@@ -421,7 +429,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
-		final Map<Integer, Germplasm> progenitorsMapByGid,
+		final Map<String, Germplasm> progenitorsMapByGid,
 		final List<Integer> gidsOfGermplasmWithDescendants,
 		final Multimap<String, Object[]> conflictErrors) {
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
@@ -487,7 +495,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private void updateGermplasm(final Germplasm germplasm, final GermplasmUpdateDTO germplasmUpdateDTO,
 		final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Method> codeBreedingMethodDTOMap,
-		final Map<Integer, Germplasm> progenitorsMapByGid,
+		final Map<String, Germplasm> progenitorsMapByGid,
 		final List<Integer> gidsOfGermplasmWithDescendants,
 		final Multimap<String, Object[]> conflictErrors) {
 
@@ -515,18 +523,22 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private void updateBreedingMethodAndProgenitors(final GermplasmUpdateDTO germplasmUpdateDTO, final Germplasm germplasm,
 		final Optional<Method> breedingMethodOptional,
-		final Map<Integer, Germplasm> progenitorsMapByGid,
+		final Map<String, Germplasm> progenitorsMapByGid,
 		final List<Integer> gidsOfGermplasmWithDescendants,
 		final Multimap<String, Object[]> conflictErrors) {
 
 		final Integer femaleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_1);
 		final Integer maleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_2);
+		final List<Integer> otherProgenitors = germplasmUpdateDTO.getProgenitors().entrySet().stream()
+			.filter(entry -> !entry.getKey().equals(PROGENITOR_1) && !entry.getKey().equals(PROGENITOR_2))
+			.map(Map.Entry::getValue).collect(
+				Collectors.toList());
 
 		if (!breedingMethodOptional.isPresent()) {
 			// If breeding method is not specified, update the progenitors based on existing method
 			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
 				maleParentGid,
-				germplasm.getMethod());
+				germplasm.getMethod(), otherProgenitors);
 
 		} else if (this.germplasmMethodValidator
 			.isNewBreedingMethodValid(germplasm.getMethod(), breedingMethodOptional.get(), String.valueOf(germplasm.getGid()),
@@ -540,70 +552,29 @@ public class GermplasmServiceImpl implements GermplasmService {
 			// Update the progenitors based on the new method
 			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
 				maleParentGid,
-				breedingMethod);
+				breedingMethod, otherProgenitors);
 		}
 
 	}
 
-	private void updateProgenitors(final Germplasm germplasm, final Map<Integer, Germplasm> progenitorsMapByGid,
+	private void updateProgenitors(final Germplasm germplasm, final Map<String, Germplasm> progenitorsMapByGid,
 		final List<Integer> gidsOfGermplasmWithDescendants, final Multimap<String, Object[]> conflictErrors, final Integer femaleParentGid,
-		final Integer maleParentGid, final Method breedingMethod) {
+		final Integer maleParentGid, final Method breedingMethod, final List<Integer> otherProgenitors) {
 		if (breedingMethod.getMprgn() == 1) {
 			conflictErrors.put("germplasm.update.mutation.method.is.not.supported", new String[] {
 				String.valueOf(germplasm.getGid())});
 		} else if (gidsOfGermplasmWithDescendants.contains(germplasm.getGid())) {
 			// Prevent update if the germplasm has existing pedigree tree.
-			conflictErrors.put("germplasm.update.germplasm.has.existing.progeny", new String[] {
-					String.valueOf(germplasm.getGid())});
-		} else if (this.germplasmMethodValidator.isGenerative(breedingMethod.getMtype())) {
-			this.assignProgenitorForGenerativeMethod(germplasm, femaleParentGid, maleParentGid, breedingMethod);
-		} else if (this.germplasmMethodValidator.isMaintenanceOrDerivative(breedingMethod.getMtype())) {
-			this.assignProgenitorForDerivativeOrMaintenanceMethod(germplasm, progenitorsMapByGid, conflictErrors,
-					femaleParentGid, maleParentGid);
+			conflictErrors.put("germplasm.update.germplasm.has.progeny.error", new String[] {
+				String.valueOf(germplasm.getGid())});
+		} else {
+			final String femaleParentGidString = String.valueOf(femaleParentGid);
+			final String maleParentGidString = String.valueOf(maleParentGid);
+			germplasm.setGnpgs(this.calculateGnpgs(breedingMethod, femaleParentGidString, maleParentGidString, Lists.transform(otherProgenitors, Functions
+				.toStringFunction())));
+			this.setProgenitors(germplasm, breedingMethod, femaleParentGidString, maleParentGidString, progenitorsMapByGid, conflictErrors);
+			this.setOtherProgenitors(germplasm, breedingMethod, otherProgenitors, conflictErrors);
 		}
-	}
-
-	private void assignProgenitorForGenerativeMethod(final Germplasm germplasm, final Integer femaleParentGid, final Integer maleParentGid,
-		final Method newBreedingMethod) {
-
-		if (femaleParentGid != null && maleParentGid != null) {
-			if (femaleParentGid == 0 && maleParentGid == 0) {
-				germplasm.setGnpgs(0);
-			} else if (newBreedingMethod.getMprgn() != 1) {
-				germplasm.setGnpgs(2);
-			}
-			germplasm.setGpid1(femaleParentGid);
-			germplasm.setGpid2(maleParentGid);
-
-		}
-	}
-
-	private void assignProgenitorForDerivativeOrMaintenanceMethod(final Germplasm germplasm,
-		final Map<Integer, Germplasm> progenitorsMapByGid, final Multimap<String, Object[]> conflictErrors,
-		final Integer femaleParentGid, final Integer maleParentGid) {
-
-		if (femaleParentGid != null && maleParentGid != null) {
-			// Gnpgs of derivative/maintenance germplasm is always -1
-			germplasm.setGnpgs(-1);
-
-			if (femaleParentGid != 0 && maleParentGid != 0
-				&& progenitorsMapByGid.get(maleParentGid).getGpid1().intValue() != femaleParentGid) {
-				// Prevent update if the specified immediate source (male parent) does not belong to the same group
-				conflictErrors.put("germplasm.update.immediate.source.must.belong.to.the.same.group", new String[] {
-					String.valueOf(germplasm.getGid())});
-			} else if (femaleParentGid == 0 && maleParentGid != 0) {
-				// For Unknown Group Source
-				germplasm.setGpid1(progenitorsMapByGid.get(maleParentGid).getGpid1());
-				germplasm.setGpid2(maleParentGid);
-			} else {
-				// For Terminal node (group source = 0 and immediate source = 0)
-				// For Unknown Immediate Source (group source <> 0 and immediate source = 0)
-				// Known Group/Immediate Source (group source <> 0 and immediate source <> 0 and immediate source belongs to the same group)
-				germplasm.setGpid1(femaleParentGid);
-				germplasm.setGpid2(maleParentGid);
-			}
-		}
-
 	}
 
 	private void saveOrUpdateReference(final Germplasm germplasm, final Optional<String> referenceOptional) {
@@ -735,12 +706,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	}
 
-	private Map<Integer, Germplasm> getGermplasmProgenitorsMapByGids(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	private Map<String, Germplasm> getGermplasmProgenitorsMapByGids(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		final Set<Integer> progenitorGids =
 			germplasmUpdateDTOList.stream().map(dto -> dto.getProgenitors().values()).flatMap(Collection::stream)
 				.filter(value -> value != null).collect(Collectors.toSet());
 		return this.daoFactory.getGermplasmDao().getByGIDsOrUUIDListWithMethodAndBibref(progenitorGids, Collections.emptySet()).stream()
-			.collect(Collectors.toMap(Germplasm::getGid, Function.identity()));
+			.collect(Collectors.toMap(g -> String.valueOf(g.getGid()), Function.identity()));
 	}
 
 	private Map<String, Method> getBreedingMethodsMapByAbbr(final List<GermplasmImportDTO> germplasmDtos) {
@@ -883,14 +854,17 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void setProgenitors(final Germplasm germplasm, final Method method, final String progenitor1, final String progenitor2,
-		final Map<String, Germplasm> progenitorsMap) {
+		final Map<String, Germplasm> progenitorsMap, final Multimap<String, Object[]> progenitorErrors) {
 
-		if (isInvalidMethodType(method)) {
-			throw new MiddlewareRequestException("", "import.germplasm.invalid.method.type", new String[] {method.getMcode()});
+		if (this.isInvalidMethodType(method)) {
+			progenitorErrors
+				.put("import.germplasm.invalid.method.type", new String[] {String.valueOf(germplasm.getGid()), method.getMcode()});
+			return;
 		}
 
-		if (isInvalidMutation(method, progenitor2)) {
-			throw new MiddlewareRequestException("", "germplasm.gpid2.must.be.zero.for.mutations");
+		if (this.isInvalidMutation(method, progenitor2)) {
+			progenitorErrors.put("germplasm.gpid2.must.be.zero.for.mutations", new String[] {String.valueOf(germplasm.getGid())});
+			return;
 		}
 
 		if (method.isGenerative() || this.isNewGermplasmATerminalAncestor(progenitor1, progenitor2)) {
@@ -923,10 +897,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 		//Defined BOTH Immediate Source and Group Source
 		if (!"0".equals(progenitor2)) {
 			if (!progenitor2Germplasm.getGpid1().equals(progenitor1Germplasm.getGid())) {
-				throw new MiddlewareRequestException("", "import.germplasm.invalid.immediate.source.group",
-					new String[] {
-						String.valueOf(progenitor2Germplasm.getGid()),
-						String.valueOf(progenitor1Germplasm.getGid())});
+				progenitorErrors.put("import.germplasm.invalid.immediate.source.group", new String[] {
+					String.valueOf(germplasm.getGid()),
+					String.valueOf(progenitor2Germplasm.getGid()),
+					String.valueOf(progenitor1Germplasm.getGid())});
+				return;
 			}
 			germplasm.setGpid1(progenitor1Germplasm.getGid());
 			germplasm.setGpid2(progenitor2Germplasm.getGid());
@@ -940,20 +915,24 @@ public class GermplasmServiceImpl implements GermplasmService {
 				germplasm.setGpid2(this.resolveGpid(progenitor2, progenitorsMap));
 				return;
 			}
-			throw new MiddlewareRequestException("", "import.germplasm.invalid.derivative.group.source",
-				new String[] {String.valueOf(progenitor1Germplasm.getGid())});
-
+			progenitorErrors
+				.put("import.germplasm.invalid.derivative.group.source",
+					new String[] {String.valueOf(germplasm.getGid()), String.valueOf(progenitor1Germplasm.getGid())});
+			return;
 		}
 	}
 
-	private void setOtherProgenitors(final Germplasm germplasm, final Method method, final List<Integer> otherProgenitors) {
+	private void setOtherProgenitors(final Germplasm germplasm, final Method method, final List<Integer> otherProgenitors,
+		final Multimap<String, Object[]> progenitorErrors) {
 		if (method.isDerivativeOrMaintenance() && !CollectionUtils.isEmpty(otherProgenitors)) {
-			throw new MiddlewareRequestException("", "germplasm.update.other.progenitors.can.not.be.set.for.der.man");
+			progenitorErrors.put("germplasm.update.other.progenitors.can.not.be.set.for.der.man", new String[] {});
+			return;
 		} else {
 			//Generative validations
 			if (!CollectionUtils.isEmpty(otherProgenitors) && !Integer.valueOf(0).equals(method.getMprgn())) {
-				throw new MiddlewareRequestException("",
-					"germplasm.update.other.progenitors.can.not.be.set.for.gen.with.mprgn.non.equal.zero");
+				progenitorErrors
+					.put("germplasm.update.other.progenitors.can.not.be.set.for.gen.with.mprgn.non.equal.zero", new String[] {});
+				return;
 			}
 		}
 		if (!germplasm.otherProgenitorsGidsEquals(otherProgenitors)) {
@@ -1107,7 +1086,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public GermplasmDTO updateGermplasm(final Integer userId, final String germplasmDbId, final GermplasmUpdateRequest germplasmUpdateRequest) {
+	public GermplasmDTO updateGermplasm(final Integer userId, final String germplasmDbId,
+		final GermplasmUpdateRequest germplasmUpdateRequest) {
 		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 		final GermplasmDAO germplasmDao = this.daoFactory.getGermplasmDao();
 		final List<Germplasm> germplasmByGUIDs =
@@ -1366,11 +1346,19 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.getOtherProgenitorsFinal(germplasmBeforeUpdate, newGpid2Optional.orElse(null), newOtherProgenitorsOptional.orElse(null));
 
 		if (isPedigreeUpdateDetected(germplasmBeforeUpdate, methodFinal, gpid1Final, gpid2Final, otherProgenitorsFinal)) {
+			final Multimap<String, Object[]> progenitorsErrors = ArrayListMultimap.create();
 			germplasm.setMethod(methodFinal);
 			germplasm.setMethodId(methodFinal.getMid());
 			final Map<String, Germplasm> progenitorsMap = this.loadProgenitors(gpid1Final, gpid2Final);
-			this.setProgenitors(germplasm, methodFinal, String.valueOf(gpid1Final), String.valueOf(gpid2Final), progenitorsMap);
-			this.setOtherProgenitors(germplasm, methodFinal, otherProgenitorsFinal);
+			this.setProgenitors(germplasm, methodFinal, String.valueOf(gpid1Final), String.valueOf(gpid2Final), progenitorsMap,
+				progenitorsErrors);
+			this.setOtherProgenitors(germplasm, methodFinal, otherProgenitorsFinal, progenitorsErrors);
+
+			if (!progenitorsErrors.isEmpty()) {
+				final Map.Entry<String, Object[]> error = progenitorsErrors.entries().iterator().next();
+				throw new MiddlewareRequestException("", error.getKey(), error.getValue());
+			}
+
 			germplasm.setGnpgs(this.calculateGnpgs(methodFinal, String.valueOf(gpid1Final), String.valueOf(gpid2Final),
 				otherProgenitorsFinal.stream().map(String::valueOf).collect(Collectors.toList())));
 
