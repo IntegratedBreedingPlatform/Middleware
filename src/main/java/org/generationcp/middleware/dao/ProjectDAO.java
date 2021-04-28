@@ -36,10 +36,12 @@ import java.util.Map;
  */
 public class ProjectDAO extends GenericDAO<Project, Long> {
 
-	//User will be able to see the following programs:
-	// 1. If user has instance role, then all programs for the assigned crop will be listed
-	// 2. If user has crop role and no program roles associated to that crop, then all crop programs will be listed
-	// 3. If user has a program role, then user will see ONLY programs with explicit access no matter if he has crop role assigned
+	/**
+	 * User will be able to see the following programs: <br>
+	 *  1. If user has instance role, then all programs for the assigned crop will be listed <br>
+	 *  2. If user has crop role and no program roles associated to that crop, then all crop programs will be listed <br>
+	 *  3. If user has a program role, then user will see ONLY programs with explicit access no matter if he has crop role assigned <br>
+	 */
 	public static final String GET_PROJECTS_BY_USER_ID =
 		"SELECT  "
 			+ "    p.* "
