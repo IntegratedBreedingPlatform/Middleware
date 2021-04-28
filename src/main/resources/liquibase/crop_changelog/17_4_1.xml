@@ -22,9 +22,9 @@
                 SELECT COUNT(*) > 1 FROM location WHERE labbr='ATF';
             </sqlCheck>
         </preConditions>
-        <comment> Rename location abbreviation for French Southern Territories (locid 259) to TAAF. IBP-4308 </comment>
+        <comment> Rename location abbreviation for French Southern Territories (locid 275) to TAAF. IBP-4308 </comment>
 		<sql dbms="mysql" splitStatements="true">
-			UPDATE location SET labbr='TAAF',lname='French Southern and Antarctic Lands' WHERE labbr='ATF' AND locid=259;
+			UPDATE location SET labbr='TAAF',lname='French Southern and Antarctic Lands' WHERE labbr='ATF' AND locid=275;
 		</sql>
 	</changeSet>
 	
@@ -34,9 +34,9 @@
                 SELECT COUNT(*) > 1 FROM location WHERE labbr='UMI';
             </sqlCheck>
         </preConditions>
-        <comment> Rename location abbreviation for US PACIFIC IS (locid 265) to UMIP. IBP-4308 </comment>
+        <comment> Rename location abbreviation for United States Minor Outlying Islands (locid 282) to UMIP. IBP-4308 </comment>
 		<sql dbms="mysql" splitStatements="true">
-			UPDATE location SET labbr='UMIP' WHERE labbr='UMI' AND locid=265;
+			UPDATE location SET labbr='UMIP' WHERE labbr='UMI' AND locid=282;
 		</sql>
 	</changeSet>
 
