@@ -26,185 +26,184 @@ import java.util.List;
 import java.util.Random;
 import java.util.Set;
 
-public class ProjectDAOTest  extends IntegrationTestBase {
+public class ProjectDAOTest extends IntegrationTestBase {
 
-    @Autowired
-    private WorkbenchDataManager workbenchDataManager;
+	@Autowired
+	private WorkbenchDataManager workbenchDataManager;
 
-    @Autowired
-    private WorkbenchTestDataUtil workbenchTestDataUtil;
+	@Autowired
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
-    @Autowired
-    private UserService userService;
+	@Autowired
+	private UserService userService;
 
-    private ProjectDAO workbenchProjectDao;
+	private ProjectDAO workbenchProjectDao;
 
-    private CropType cropType;
-    private Project project1;
-    private Project project2;
-    private WorkbenchUser adminInstanceProgram;
-    private WorkbenchUser admin;
-    private WorkbenchUser programAdmin;
-    private WorkbenchUser cropAdmin;
-    private Role programAdminRole;
-    private Role instanceAdminRole;
-    private Role cropAdminRole;
+	private CropType cropType;
+	private Project project1;
+	private Project project2;
+	private WorkbenchUser adminInstanceProgram;
+	private WorkbenchUser admin;
+	private WorkbenchUser programAdmin;
+	private WorkbenchUser cropAdmin;
+	private Role programAdminRole;
+	private Role instanceAdminRole;
+	private Role cropAdminRole;
 
-    @Before
-    public void setup() {
+	@Before
+	public void setup() {
 
-        this.workbenchTestDataUtil.setUpWorkbench();
+		this.workbenchTestDataUtil.setUpWorkbench();
 
-        final RoleType programAdminRoleType =
-                this.workbenchDataManager.getRoleType(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.getId());
-        this.programAdminRole = new Role();
-        this.programAdminRole.setName("Test Program Role " + new Random().nextInt());
-        this.programAdminRole.setRoleType(programAdminRoleType);
-        this.programAdminRole.setActive(true);
-        this.workbenchDataManager.saveRole(programAdminRole);
+		final RoleType programAdminRoleType =
+			this.workbenchDataManager.getRoleType(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.getId());
+		this.programAdminRole = new Role();
+		this.programAdminRole.setName("Test Program Role " + new Random().nextInt());
+		this.programAdminRole.setRoleType(programAdminRoleType);
+		this.programAdminRole.setActive(true);
+		this.workbenchDataManager.saveRole(this.programAdminRole);
 
-        final org.generationcp.middleware.pojos.workbench.RoleType instanceRoleType =
-                this.workbenchDataManager.getRoleType(org.generationcp.middleware.domain.workbench.RoleType.INSTANCE.getId());
-        this.instanceAdminRole = new Role();
-        this.instanceAdminRole.setName("Test Instance Role " + new Random().nextInt());
-        this.instanceAdminRole.setRoleType(instanceRoleType);
-        this.instanceAdminRole.setActive(true);
-        this.workbenchDataManager.saveRole(instanceAdminRole);
+		final org.generationcp.middleware.pojos.workbench.RoleType instanceRoleType =
+			this.workbenchDataManager.getRoleType(org.generationcp.middleware.domain.workbench.RoleType.INSTANCE.getId());
+		this.instanceAdminRole = new Role();
+		this.instanceAdminRole.setName("Test Instance Role " + new Random().nextInt());
+		this.instanceAdminRole.setRoleType(instanceRoleType);
+		this.instanceAdminRole.setActive(true);
+		this.workbenchDataManager.saveRole(instanceAdminRole);
 
-        final org.generationcp.middleware.pojos.workbench.RoleType cropRoleType =
-                this.workbenchDataManager.getRoleType(org.generationcp.middleware.domain.workbench.RoleType.CROP.getId());
-        this.cropAdminRole = new Role();
-        this.cropAdminRole.setName("Test Crop Role " + new Random().nextInt());
-        this.cropAdminRole.setRoleType(cropRoleType);
-        this.cropAdminRole.setActive(true);
-        this.workbenchDataManager.saveRole(cropAdminRole);
+		final org.generationcp.middleware.pojos.workbench.RoleType cropRoleType =
+			this.workbenchDataManager.getRoleType(org.generationcp.middleware.domain.workbench.RoleType.CROP.getId());
+		this.cropAdminRole = new Role();
+		this.cropAdminRole.setName("Test Crop Role " + new Random().nextInt());
+		this.cropAdminRole.setRoleType(cropRoleType);
+		this.cropAdminRole.setActive(true);
+		this.workbenchDataManager.saveRole(cropAdminRole);
 
-        if (this.workbenchProjectDao == null) {
-            this.workbenchProjectDao = new ProjectDAO();
-            this.workbenchProjectDao.setSession(this.workbenchSessionProvider.getSession());
-        }
+		if (this.workbenchProjectDao == null) {
+			this.workbenchProjectDao = new ProjectDAO();
+			this.workbenchProjectDao.setSession(this.workbenchSessionProvider.getSession());
+		}
 
-        if (this.cropType == null) {
-            this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.name());
-        }
+		if (this.cropType == null) {
+			this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.name());
+		}
 
-        if (this.project1 == null) {
-            this.project1 = this.workbenchTestDataUtil.createTestProjectData();
-            this.workbenchDataManager.addProject(this.project1);
-        }
+		if (this.project1 == null) {
+			this.project1 = this.workbenchTestDataUtil.createTestProjectData();
+			this.workbenchDataManager.addProject(this.project1);
+		}
 
-        if (this.project2 == null) {
-            this.project2 = this.workbenchTestDataUtil.createTestProjectData();
-            this.workbenchDataManager.addProject(this.project2);
-        }
+		if (this.project2 == null) {
+			this.project2 = this.workbenchTestDataUtil.createTestProjectData();
+			this.workbenchDataManager.addProject(this.project2);
+		}
 
-        if (this.adminInstanceProgram == null) {
-            this.adminInstanceProgram = this.workbenchTestDataUtil.createTestUserData();
+		if (this.adminInstanceProgram == null) {
+			this.adminInstanceProgram = this.workbenchTestDataUtil.createTestUserData();
 			this.adminInstanceProgram.setRoles(Collections.emptyList());
-            this.userService.addUser(this.adminInstanceProgram);
+			this.userService.addUser(this.adminInstanceProgram);
 
-            this.assignRole(this.adminInstanceProgram, Arrays.asList(this.instanceAdminRole, this.programAdminRole));
-        }
+			this.assignRole(this.adminInstanceProgram, Arrays.asList(this.instanceAdminRole, this.programAdminRole));
+		}
 
-        if (this.admin == null) {
-            this.admin = this.workbenchTestDataUtil.createTestUserData();
-            this.admin.setName("Admin " + RandomStringUtils.randomAlphanumeric(5));
-            this.admin.setRoles(Collections.emptyList());
-            this.userService.addUser(this.admin);
+		if (this.admin == null) {
+			this.admin = this.workbenchTestDataUtil.createTestUserData();
+			this.admin.setName("Admin " + RandomStringUtils.randomAlphanumeric(5));
+			this.admin.setRoles(Collections.emptyList());
+			this.userService.addUser(this.admin);
 
-            this.assignRole(this.admin, Collections.singletonList( this.instanceAdminRole));
-        }
+			this.assignRole(this.admin, Collections.singletonList(this.instanceAdminRole));
+		}
 
-        if (this.programAdmin == null) {
-            this.programAdmin = this.workbenchTestDataUtil.createTestUserData();
-            this.programAdmin.setName("ProgramAdmin " + RandomStringUtils.randomAlphanumeric(5));
-            this.programAdmin.setRoles(Collections.emptyList());
-            this.userService.addUser(this.programAdmin);
-            this.assignRole(this.programAdmin, Collections.singletonList(this.programAdminRole));
+		if (this.programAdmin == null) {
+			this.programAdmin = this.workbenchTestDataUtil.createTestUserData();
+			this.programAdmin.setName("ProgramAdmin " + RandomStringUtils.randomAlphanumeric(5));
+			this.programAdmin.setRoles(Collections.emptyList());
+			this.userService.addUser(this.programAdmin);
+			this.assignRole(this.programAdmin, Collections.singletonList(this.programAdminRole));
 
-        }
+		}
 
-        if (this.cropAdmin == null) {
-            this.cropAdmin = this.workbenchTestDataUtil.createTestUserData();
-            this.cropAdmin.setName("CropAdmin " + RandomStringUtils.randomAlphanumeric(5));
-            this.cropAdmin.setRoles(Collections.emptyList());
-            this.userService.addUser(this.cropAdmin);
+		if (this.cropAdmin == null) {
+			this.cropAdmin = this.workbenchTestDataUtil.createTestUserData();
+			this.cropAdmin.setName("CropAdmin " + RandomStringUtils.randomAlphanumeric(5));
+			this.cropAdmin.setRoles(Collections.emptyList());
+			this.userService.addUser(this.cropAdmin);
 
-            this.assignRole(this.cropAdmin, Collections.singletonList(this.cropAdminRole));
-        }
+			this.assignRole(this.cropAdmin, Collections.singletonList(this.cropAdminRole));
+		}
 
-    }
+	}
 
-    @Test
-    public void testGetProgramsByUserIdAdminAndProgramUser() {
+	@Test
+	public void testGetProgramsByUserIdAdminAndProgramUser() {
 
-        final int count = this.workbenchDataManager.getProjects().size();
+		final int count = this.workbenchDataManager.getProjects().size();
 
-        final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
-        programSearchRequest.setLoggedInUserId(this.adminInstanceProgram.getUserid());
-        final Pageable pageable = new PageRequest(0, 100);
-        final List<Project> projects = this.workbenchProjectDao.getProjectsByFilter(pageable, programSearchRequest);
-        final Set<Project> projectSet = Sets.newHashSet(projects);
+		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+		programSearchRequest.setLoggedInUserId(this.adminInstanceProgram.getUserid());
+		final Pageable pageable = new PageRequest(0, 100);
+		final List<Project> projects = this.workbenchProjectDao.getProjectsByFilter(pageable, programSearchRequest);
+		final Set<Project> projectSet = Sets.newHashSet(projects);
 
-        Assert.assertEquals(count, projects.size());
-        Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
-    }
+		Assert.assertEquals(count, projects.size());
+		Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
+	}
 
-    @Test
-    public void testGetProgramsByUserIdAdminUser() {
+	@Test
+	public void testGetProgramsByUserIdAdminUser() {
 
-        final int count = this.workbenchDataManager.getProjects().size();
+		final int count = this.workbenchDataManager.getProjects().size();
 
-        final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
-        programSearchRequest.setLoggedInUserId(this.admin.getUserid());
-        final Pageable pageable = new PageRequest(0, 100);
-        final List<Project> projects = this.workbenchProjectDao.getProjectsByFilter(pageable, programSearchRequest);
-        final Set<Project> projectSet = Sets.newHashSet(projects);
+		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+		programSearchRequest.setLoggedInUserId(this.admin.getUserid());
+		final Pageable pageable = new PageRequest(0, 100);
+		final List<Project> projects = this.workbenchProjectDao.getProjectsByFilter(pageable, programSearchRequest);
+		final Set<Project> projectSet = Sets.newHashSet(projects);
 
-        Assert.assertEquals(count, projects.size());
-        Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
-    }
+		Assert.assertEquals(count, projects.size());
+		Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
+	}
 
+	@Test
+	public void testGetProgramsByUserIdProgramAdminUser() {
+		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+		programSearchRequest.setLoggedInUserId(this.programAdmin.getUserid());
+		final Pageable pageable = new PageRequest(0, 100);
+		final List<Project> projects = this.workbenchProjectDao.getProjectsByFilter(pageable, programSearchRequest);
+		final Set<Project> projectSet = Sets.newHashSet(projects);
 
-    @Test
-    public void testGetProgramsByUserIdProgramAdminUser() {
-        final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
-        programSearchRequest.setLoggedInUserId(this.programAdmin.getUserid());
-        final Pageable pageable = new PageRequest(0, 100);
-        final List<Project> projects = this.workbenchProjectDao.getProjectsByFilter(pageable, programSearchRequest);
-        final Set<Project> projectSet = Sets.newHashSet(projects);
+		Assert.assertEquals(1, projects.size());
+		Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
+	}
 
-        Assert.assertEquals(1, projects.size());
-        Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
-    }
+	@Test
+	public void testGetProgramsByUserIdCropUser() {
+		final int count = this.workbenchDataManager.getProjectsByCrop(this.cropType).size();
 
-    @Test
-    public void testGetProgramsByUserIdCropUser() {
-        final int count = this.workbenchDataManager.getProjectsByCrop(this.cropType).size();
+		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+		programSearchRequest.setLoggedInUserId(this.cropAdmin.getUserid());
+		final Pageable pageable = new PageRequest(0, 100);
+		final List<Project> projects = this.workbenchProjectDao.getProjectsByFilter(pageable, programSearchRequest);
+		final Set<Project> projectSet = Sets.newHashSet(projects);
 
-        final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
-        programSearchRequest.setLoggedInUserId(this.cropAdmin.getUserid());
-        final Pageable pageable = new PageRequest(0, 100);
-        final List<Project> projects = this.workbenchProjectDao.getProjectsByFilter(pageable, programSearchRequest);
-        final Set<Project> projectSet = Sets.newHashSet(projects);
+		Assert.assertEquals(count, projects.size());
+		Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
+	}
 
-        Assert.assertEquals(count, projects.size());
-        Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
-    }
+	private void assignRole(final WorkbenchUser user, final List<Role> roles) {
+		for (final Role role : roles) {
+			final UserRole userRole = new UserRole();
+			userRole.setUser(user);
+			userRole.setRole(role);
+			if (org.generationcp.middleware.domain.workbench.RoleType.CROP.name().equals(role.getRoleType().getName())) {
+				userRole.setCropType(this.cropType);
+			} else if (org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.name().equals(role.getRoleType().getName())) {
+				userRole.setCropType(this.cropType);
+				userRole.setWorkbenchProject(this.project1);
+			}
+			this.workbenchDataManager.saveOrUpdateUserRole(userRole);
+		}
 
-    private void assignRole(final WorkbenchUser user, final List<Role> roles) {
-        for (final Role role : roles) {
-            final UserRole userRole = new UserRole();
-            userRole.setUser(user);
-            userRole.setRole(role);
-            if (org.generationcp.middleware.domain.workbench.RoleType.CROP.name().equals(role.getRoleType().getName())) {
-                userRole.setCropType(this.cropType);
-            } else if (org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.name().equals(role.getRoleType().getName())) {
-                userRole.setCropType(this.cropType);
-                userRole.setWorkbenchProject(this.project1);
-            }
-            this.workbenchDataManager.saveOrUpdateUserRole(userRole);
-        }
-
-    }
+	}
 }
