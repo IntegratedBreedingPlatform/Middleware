@@ -319,7 +319,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 
 		final List<Germplasm> germplasmList = this.getGermplasmListByGIDorGermplasmUUID(germplasmUpdateDTOList);
-		final List<Integer> gidsOfGermplasmWithDescendants = this.getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(germplasmList);
+		final List<Integer> gidsOfGermplasmWithDescendants = this.getGidsOfGermplasmWithDescendants(germplasmList.stream().map(Germplasm::getGid)
+			.collect(Collectors.toList())).stream().collect(
+			Collectors.toList());
 		final Map<String, Integer> nameCodesFieldNoMap = this.getNameTypesMapByCodes(germplasmUpdateDTOList);
 		final Map<String, Integer> attributeCodesFieldNoMap = this.getAttributesMapByCodes(germplasmUpdateDTOList);
 		final Map<String, Germplasm> progenitorsMapByGid = this.getGermplasmProgenitorsMapByGids(germplasmUpdateDTOList);
@@ -563,7 +565,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				String.valueOf(germplasm.getGid())});
 		} else if (gidsOfGermplasmWithDescendants.contains(germplasm.getGid())) {
 			// Prevent update if the germplasm has existing pedigree tree.
-			conflictErrors.put("germplasm.update.germplasm.has.existing.progeny", new String[] {
+			conflictErrors.put("germplasm.update.germplasm.has.progeny.error", new String[] {
 				String.valueOf(germplasm.getGid())});
 		} else {
 			final String femaleParentGidString = String.valueOf(femaleParentGid);
