@@ -5,8 +5,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.Person;
-import org.generationcp.middleware.pojos.workbench.CropPerson;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -55,6 +53,8 @@ public class ProjectDAOTest  extends IntegrationTestBase {
     @Before
     public void setup() {
 
+        this.workbenchTestDataUtil.setUpWorkbench();
+
         final RoleType programAdminRoleType =
                 this.workbenchDataManager.getRoleType(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.getId());
         this.programAdminRole = new Role();
@@ -90,66 +90,51 @@ public class ProjectDAOTest  extends IntegrationTestBase {
 
         if (this.project1 == null) {
             this.project1 = this.workbenchTestDataUtil.createTestProjectData();
-            this.project1.setUserId(1);
-            this.project1.setCropType(this.cropType);
-            this.workbenchDataManager.addProject(project1);
+            this.workbenchDataManager.addProject(this.project1);
         }
 
         if (this.project2 == null) {
             this.project2 = this.workbenchTestDataUtil.createTestProjectData();
-            this.project2.setProjectName("Test Project 2" + new Random().nextInt());
-            this.project2.setUserId(1);
-            this.project2.setCropType(this.cropType);
-            this.workbenchDataManager.addProject(project2);
+            this.workbenchDataManager.addProject(this.project2);
         }
 
         if (this.adminInstanceProgram == null) {
-            this.adminInstanceProgram = this.createWorkbenchUser();
-            this.adminInstanceProgram.setName("InstanceProgram " + RandomStringUtils.randomAlphanumeric(5));
-            this.adminInstanceProgram.setPerson(this.createPerson());
-            this.adminInstanceProgram.setActive(true);
-            this.userService.addPerson(this.adminInstanceProgram.getPerson());
-            this.userService.addUser(adminInstanceProgram);
+            this.adminInstanceProgram = this.workbenchTestDataUtil.createTestUserData();
+			this.adminInstanceProgram.setRoles(Collections.emptyList());
+            this.userService.addUser(this.adminInstanceProgram);
 
             this.assignRole(this.adminInstanceProgram, Arrays.asList(this.instanceAdminRole, this.programAdminRole));
         }
 
         if (this.admin == null) {
-            this.admin = this.createWorkbenchUser();
+            this.admin = this.workbenchTestDataUtil.createTestUserData();
             this.admin.setName("Admin " + RandomStringUtils.randomAlphanumeric(5));
-            this.admin.setPerson(this.createPerson());
-            this.admin.setActive(true);
-            this.userService.addPerson(this.admin.getPerson());
-            this.userService.addUser(admin);
+            this.admin.setRoles(Collections.emptyList());
+            this.userService.addUser(this.admin);
 
             this.assignRole(this.admin, Collections.singletonList( this.instanceAdminRole));
         }
 
         if (this.programAdmin == null) {
-            this.programAdmin = this.createWorkbenchUser();
+            this.programAdmin = this.workbenchTestDataUtil.createTestUserData();
             this.programAdmin.setName("ProgramAdmin " + RandomStringUtils.randomAlphanumeric(5));
-            this.programAdmin.setPerson(this.createPerson());
-            this.programAdmin.setActive(true);
-            this.userService.addPerson(this.programAdmin.getPerson());
-            this.userService.addUser(programAdmin);
+            this.programAdmin.setRoles(Collections.emptyList());
+            this.userService.addUser(this.programAdmin);
             this.assignRole(this.programAdmin, Collections.singletonList(this.programAdminRole));
 
         }
 
         if (this.cropAdmin == null) {
-            this.cropAdmin = this.createWorkbenchUser();
+            this.cropAdmin = this.workbenchTestDataUtil.createTestUserData();
             this.cropAdmin.setName("CropAdmin " + RandomStringUtils.randomAlphanumeric(5));
-            this.cropAdmin.setPerson(this.createPerson());
-            this.cropAdmin.setActive(true);
-            this.userService.addPerson(this.cropAdmin.getPerson());
-            this.userService.addUser(cropAdmin);
+            this.cropAdmin.setRoles(Collections.emptyList());
+            this.userService.addUser(this.cropAdmin);
 
             this.assignRole(this.cropAdmin, Collections.singletonList(this.cropAdminRole));
         }
 
     }
 
-    // FIXME
     @Test
     public void testGetProgramsByUserIdAdminAndProgramUser() {
 
@@ -165,7 +150,6 @@ public class ProjectDAOTest  extends IntegrationTestBase {
         Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
     }
 
-    // FIXME
     @Test
     public void testGetProgramsByUserIdAdminUser() {
 
@@ -208,32 +192,7 @@ public class ProjectDAOTest  extends IntegrationTestBase {
         Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
     }
 
-    private Person createPerson() {
-        final List<CropType> cropTypes = Collections.singletonList(this.cropType);
-        Person person = new Person();
-        person.setFirstName("user_test" + new Random().nextInt());
-        person.setMiddleName("user_test");
-        person.setLastName("user_test" + new Random().nextInt());
-        person.setEmail(RandomStringUtils.randomAlphabetic(6) +"_user_test@sample.com");
-        person.setTitle("-");
-        person.setContact("-");
-        person.setExtension("-");
-        person.setFax("-");
-        person.setInstituteId(0);
-        person.setLanguage(0);
-        person.setNotes("-");
-        person.setPositionName("-");
-        person.setPhone("-");
-        person.setCrops(Sets.newHashSet(cropTypes));
-        return person;
-    }
-
     private void assignRole(final WorkbenchUser user, final List<Role> roles) {
-        final CropPerson cropPerson = new CropPerson();
-        cropPerson.setPerson(user.getPerson());
-        cropPerson.setCropType(this.cropType);
-        this.userService.saveCropPerson(cropPerson);
-
         for (final Role role : roles) {
             final UserRole userRole = new UserRole();
             userRole.setUser(user);
@@ -247,18 +206,5 @@ public class ProjectDAOTest  extends IntegrationTestBase {
             this.workbenchDataManager.saveOrUpdateUserRole(userRole);
         }
 
-    }
-
-    private WorkbenchUser createWorkbenchUser() {
-        final WorkbenchUser user = new WorkbenchUser();
-        user.setInstalid(1);
-        user.setStatus(1);
-        user.setAccess(1);
-        user.setType(1);
-        user.setName("user_test" + new Random().nextInt());
-        user.setPassword("user_password");
-        user.setAssignDate(20150101);
-        user.setCloseDate(20150101);
-        return user;
     }
 }
