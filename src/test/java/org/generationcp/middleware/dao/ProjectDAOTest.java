@@ -149,6 +149,7 @@ public class ProjectDAOTest  extends IntegrationTestBase {
 
     }
 
+    // FIXME
     @Test
     public void testGetProgramsByUserIdAdminAndProgramUser() {
 
@@ -164,6 +165,7 @@ public class ProjectDAOTest  extends IntegrationTestBase {
         Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
     }
 
+    // FIXME
     @Test
     public void testGetProgramsByUserIdAdminUser() {
 
