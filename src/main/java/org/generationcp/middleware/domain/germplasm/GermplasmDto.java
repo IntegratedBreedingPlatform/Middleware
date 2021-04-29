@@ -18,6 +18,10 @@ public class GermplasmDto {
 
 	private String creationDate;
 
+	private String createdBy;
+
+	private Integer createdByUserId;
+
 	private String reference;
 
 	private Integer breedingLocationId;
@@ -82,6 +86,22 @@ public class GermplasmDto {
 
 	public void setCreationDate(final String creationDate) {
 		this.creationDate = creationDate;
+	}
+
+	public String getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public void setCreatedBy(final String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Integer getCreatedByUserId() {
+		return this.createdByUserId;
+	}
+
+	public void setCreatedByUserId(final Integer createdByUserId) {
+		this.createdByUserId = createdByUserId;
 	}
 
 	public String getReference() {
@@ -194,4 +214,5 @@ public class GermplasmDto {
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
+
 }

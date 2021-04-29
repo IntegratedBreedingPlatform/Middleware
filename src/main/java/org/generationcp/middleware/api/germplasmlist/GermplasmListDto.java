@@ -14,6 +14,8 @@ public class GermplasmListDto {
 
 	private String description;
 
+	private String programUUID;
+
 	public GermplasmListDto() {
 
 	}
@@ -48,6 +50,14 @@ public class GermplasmListDto {
 
 	public void setDescription(final String description) {
 		this.description = description;
+	}
+
+	public String getProgramUUID() {
+		return this.programUUID;
+	}
+
+	public void setProgramUUID(final String programUUID) {
+		this.programUUID = programUUID;
 	}
 
 	@Override

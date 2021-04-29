@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -622,6 +623,121 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				e);
 		}
 
+	}
+
+	public Long countMyStudies(final String programUUID, final int userId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
+				.add(Restrictions.eq("createdBy", String.valueOf(userId)))
+				.add(Restrictions.isNotNull("studyType"))
+				.add(Restrictions.eq("deleted", false));
+			if (!StringUtils.isBlank(programUUID)) {
+				criteria.add(Restrictions.eq("programUUID", programUUID));
+			}
+			criteria.setProjection(Projections.rowCount());
+			return (Long) criteria.uniqueResult();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error with countMyStudies(programUUID=" + programUUID + ", userId= " + userId + " ): "
+				+ e.getMessage();
+			LOG.error(errorMessage);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+	}
+
+	public List<MyStudiesDTO> getMyStudies(final String programUUID, final Pageable pageable, final int userId) {
+		try {
+			final Map<Integer, MyStudiesDTO> myStudies = new LinkedHashMap<>();
+
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
+				.createAlias("studyType", "studyType")
+				.createAlias("parent", "parent")
+				.add(Restrictions.eq("createdBy", String.valueOf(userId)))
+				.add(Restrictions.isNotNull("studyType"))
+				.add(Restrictions.eq("deleted", false));
+			if (!StringUtils.isBlank(programUUID)) {
+				criteria.add(Restrictions.eq("programUUID", programUUID));
+			}
+			addPagination(criteria, pageable);
+			addOrder(criteria, pageable);
+			final List<DmsProject> projects = criteria.list();
+
+			if (projects.isEmpty()) {
+				return Collections.emptyList();
+			}
+
+			for (final DmsProject project : projects) {
+				final MyStudiesDTO myStudy = new MyStudiesDTO();
+				myStudy.setStudyId(project.getProjectId());
+				myStudy.setName(project.getName());
+				Preconditions.checkNotNull(project.getParent(), "folder is null");
+				myStudy.setFolder(project.getParent().getName());
+				myStudy.setDate(Util.tryConvertDate(project.getStartDate(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
+				myStudy.setType(project.getStudyType().getLabel());
+				myStudies.put(project.getProjectId(), myStudy);
+			}
+
+			/**
+			 * (count(ph.phenotype_id) / count(DISTINCT ph.phenotype_id)
+			 *   -> divide by how many times the count is duplicated because of joins
+			 */
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery("select p.project_id as studyId, " //
+				+ "     dataset.name as datasetName, " //
+				+ "     concat(gl.description, ' - ', l.lname) as instanceName, " //
+				+ "     ifnull( " //
+				+ "       floor(count(ph.value) / (count(ph.phenotype_id) / count(DISTINCT ph.phenotype_id))) " //
+				+ "         , 0) as confirmedCount, " //
+				+ "     ifnull( " //
+				+ "       floor(count(ph.draft_value) / (count(ph.phenotype_id) / count(DISTINCT ph.phenotype_id))) " //
+				+ "         , 0) as pendingCount, " //
+				+ "     ifnull( " //
+				+ "       floor(count(distinct nde.nd_experiment_id) * count(distinct pp.variable_id) " //
+				+ "           - count(ph.phenotype_id) / (count(ph.phenotype_id) / count(DISTINCT ph.phenotype_id))) " //
+				+ "         , 0) as unobservedCount " //
+				+ " from project p " //
+				+ "          left join project dataset on dataset.study_id = p.project_id " //
+				+ "          inner join projectprop pp on dataset.project_id = pp.project_id and pp.type_id in (" //
+				+ "               " + VariableType.TRAIT.getId() + ", " //
+				+ "               " + VariableType.SELECTION_METHOD.getId() //
+				+ "             ) and dataset.dataset_type_id in (" //
+				+ "               " + DatasetTypeEnum.PLOT_DATA.getId() + ", " //
+				+ "               " + DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId() + ", " //
+				+ "               " + DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId() + ", " //
+				+ "               " + DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId() + ", " //
+				+ "               " + DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId() //
+				+ "             ) " //
+				+ "          left join nd_experiment nde on nde.project_id = dataset.project_id " //
+				+ "          inner join nd_geolocation gl on nde.nd_geolocation_id = gl.nd_geolocation_id " //
+				+ "          left join nd_geolocationprop gp on gl.nd_geolocation_id = gp.nd_geolocation_id "  //
+				+ "             and gp.type_id = " + TermId.LOCATION_ID.getId() //
+				+ "             and gp.nd_geolocation_id = gl.nd_geolocation_id " //
+				+ "          left join location l on l.locid = gp.value " //
+				+ "          left join phenotype ph on nde.nd_experiment_id = ph.nd_experiment_id " //
+				+ "     where p.project_id in (:projectIds) " //
+				+ " group by dataset.project_id, nde.nd_geolocation_id");
+
+			sqlQuery.addScalar("studyId")
+				.addScalar("datasetName")
+				.addScalar("instanceName")
+				.addScalar("confirmedCount", new IntegerType())
+				.addScalar("pendingCount", new IntegerType())
+				.addScalar("unobservedCount", new IntegerType());
+			sqlQuery.setParameterList("projectIds", myStudies.keySet());
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(MyStudiesDTO.MyStudyMetadata.ObservationMetadata.class));
+
+			final List<MyStudiesDTO.MyStudyMetadata.ObservationMetadata> metadataList = sqlQuery.list();
+
+			for (final MyStudiesDTO.MyStudyMetadata.ObservationMetadata metadata : metadataList) {
+				final MyStudiesDTO myStudiesDTO = myStudies.get(metadata.getStudyId());
+				myStudiesDTO.getMetadata().getObservations().add(metadata);
+			}
+
+			return new ArrayList<>(myStudies.values());
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error with getMyStudies(programUUID=" + programUUID + ", userId= " + userId + " ): "
+				+ e.getMessage();
+			LOG.error(errorMessage);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
 	}
 
 	@SuppressWarnings("rawtypes")
