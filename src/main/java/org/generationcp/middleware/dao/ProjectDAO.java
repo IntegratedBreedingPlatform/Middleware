@@ -73,7 +73,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			+ " 	AND ( :programName IS NULL OR p.project_name = :programName ) "
 			+ " 	AND ( :programNameContainsString IS NULL OR p.project_name like :programNameContainsString ) "
 			+ " 	AND ( :programDbId IS NULL OR p.project_uuid = :programDbId ) "
-			+ "		GROUP BY p.project_id, p.crop_type, p.project_name, p.project_uuid";
+			+ "		GROUP BY p.project_id ";
 
 	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
 
