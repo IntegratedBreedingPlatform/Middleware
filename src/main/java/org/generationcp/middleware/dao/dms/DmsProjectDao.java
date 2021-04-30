@@ -1650,7 +1650,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studyInstanceDto.setLocationName(String.valueOf(result.get("locationName")));
 			studyInstanceDto.setProgramDbId(String.valueOf(result.get("programDbId")));
 			studyInstanceDto.setProgramName(String.valueOf(result.get("programName")));
-			studyInstanceDto.setContacts(Collections.singletonList(new ContactDto((Integer) result.get("contactDbId"),
+			studyInstanceDto.setContacts(Collections.singletonList(new ContactDto(String.valueOf(result.get("contactDbId")),
 				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
 			if(result.get("experimentalDesignId") != null) {
 				studyInstanceDto.setExperimentalDesign(new ExperimentalDesign(
@@ -1718,7 +1718,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studySummary.setProgramDbId(String.valueOf(result.get("programDbId")));
 			studySummary.setProgramName(String.valueOf(result.get("programName")));
 			studySummary.setActive(((Integer) result.get("active")) == 1);
-			studySummary.setContacts(Collections.singletonList(new ContactDto((Integer) result.get("contactDbId"),
+			studySummary.setContacts(Collections.singletonList(new ContactDto(String.valueOf(result.get("contactDbId")),
 				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
 			studyList.add(studySummary);
 		}

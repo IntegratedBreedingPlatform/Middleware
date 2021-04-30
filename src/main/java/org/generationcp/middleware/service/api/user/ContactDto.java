@@ -8,7 +8,7 @@ import org.pojomatic.annotations.AutoProperty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ContactDto {
 
-	private Integer contactDbId;
+	private String contactDbId;
 
 	private String name;
 
@@ -20,18 +20,18 @@ public class ContactDto {
 
 	private String instituteName = StringUtils.EMPTY;
 
-	public ContactDto(final Integer contactDbId, final String name, final String email, final String type) {
+	public ContactDto(final String contactDbId, final String name, final String email, final String type) {
 		this.contactDbId = contactDbId;
 		this.name = name;
 		this.email = email;
 		this.type = type;
 	}
 
-	public Integer getContactDbId() {
+	public String getContactDbId() {
 		return this.contactDbId;
 	}
 
-	public void setContactDbId(final Integer contactDbId) {
+	public void setContactDbId(final String contactDbId) {
 		this.contactDbId = contactDbId;
 	}
 
