@@ -240,29 +240,5 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v17.4.0-7">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<columnExists tableName="release_note" columnName="file_name"/>
-			</not>
-		</preConditions>
-        <comment>Add 'field_name' column to 'release_note' table</comment>
-		<sql dbms="mysql" splitStatements="true">
-			alter table release_note add file_name varchar(255) not null;
-		</sql>
-	</changeSet>
-
-	<changeSet author="lkovacic" id="v17.4.0-8">
-        <preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">
-                SELECT count(*) FROM release_note where version = '18.0'
-            </sqlCheck>
-		</preConditions>
-        <comment>Add release note for version 18.0</comment>
-		<sql dbms="mysql" splitStatements="true">
-			INSERT INTO release_note (version, release_date, has_coming_soon, enabled, file_name) VALUES ('18.0', CURRENT_TIMESTAMP, 0, 1, '18.0');
-		</sql>
-	</changeSet>
-
 </databaseChangeLog>
 
