@@ -832,7 +832,7 @@ public class GermplasmGroupingServiceImplTest {
 		final Integer rootGid = 13;
 		final Germplasm derivative = new Germplasm();
 		derivative.setGid(22);
-		derivative.setMgid(11);
+		derivative.setMgid(mgid);
 		Mockito.when(this.germplasmDAO.getNonGenerativeChildren(rootGid, 'D')).thenReturn(Collections.singletonList(derivative));
 
 		final Germplasm maintenance = new Germplasm();
