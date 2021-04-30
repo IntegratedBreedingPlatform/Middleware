@@ -1617,7 +1617,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sqlQuery.addScalar("locationName");
 		sqlQuery.addScalar("programDbId");
 		sqlQuery.addScalar("programName");
-		sqlQuery.addScalar("contactDbid");
+		sqlQuery.addScalar("contactDbId");
 		sqlQuery.addScalar("contactName");
 		sqlQuery.addScalar("email");
 		sqlQuery.addScalar("experimentalDesign");
