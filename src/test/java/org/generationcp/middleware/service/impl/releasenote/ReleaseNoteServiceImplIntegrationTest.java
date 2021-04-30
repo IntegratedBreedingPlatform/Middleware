@@ -39,7 +39,6 @@ public class ReleaseNoteServiceImplIntegrationTest extends IntegrationTestBase {
 		this.userId = this.findAdminUser();
 	}
 
-
 	@Test
 	public void shouldShowAndGetLatestReleaseNote_OK() {
 
@@ -89,7 +88,7 @@ public class ReleaseNoteServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private ReleaseNote insertReleaseNote(final String version, final LocalDate date) {
 		return this.workbenchDaoFactory.getReleaseNoteDAO().save(
-			new ReleaseNote(version, Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant())));
+			new ReleaseNote(version, Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant()), version));
 	}
 
 }
