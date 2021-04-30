@@ -121,7 +121,7 @@ public class MockDataUtil {
 		}
 
 		for (int i = 1; i <= MockDataUtil.germplasmArr.length; i++) {
-			Mockito.when(gDao.getChildren(i * -1, methodType)).thenReturn(
+			Mockito.when(gDao.getDescendants(i * -1, methodType)).thenReturn(
 					MockDataUtil.getChildren(i * -1, MockDataUtil.germplasmArr, methodType));
 		}
 	}
@@ -165,7 +165,7 @@ public class MockDataUtil {
 
 	/**
 	 * Prints the GermplasmPedigreeTree content.
-	 * 
+	 *
 	 * @param tree
 	 * @param depth
 	 */
