@@ -833,12 +833,12 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm derivative = new Germplasm();
 		derivative.setGid(22);
 		derivative.setMgid(mgid);
-		Mockito.when(this.germplasmDAO.getNonGenerativeChildren(rootGid, 'D')).thenReturn(Collections.singletonList(derivative));
+		Mockito.when(this.germplasmDAO.getDescendants(rootGid, 'D')).thenReturn(Collections.singletonList(derivative));
 
 		final Germplasm maintenance = new Germplasm();
 		maintenance.setGid(25);
 		maintenance.setMgid(0);
-		Mockito.when(this.germplasmDAO.getNonGenerativeChildren(rootGid, 'M')).thenReturn(Collections.singletonList(maintenance));
+		Mockito.when(this.germplasmDAO.getDescendants(rootGid, 'M')).thenReturn(Collections.singletonList(maintenance));
 
 		final List<Germplasm> descendantGroupMembers =  this.germplasmGroupingService.getDescendantGroupMembers(rootGid, mgid);
 		Assert.assertEquals(1, descendantGroupMembers.size());

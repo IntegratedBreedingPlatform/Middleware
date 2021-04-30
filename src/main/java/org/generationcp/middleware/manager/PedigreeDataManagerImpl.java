@@ -447,7 +447,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
 
 	private List<Germplasm> getChildren(final Integer gid, final char methodType) {
-		return this.daoFactory.getGermplasmDao().getNonGenerativeChildren(gid, methodType);
+		return this.daoFactory.getGermplasmDao().getDescendants(gid, methodType);
 	}
 
 	@Override
