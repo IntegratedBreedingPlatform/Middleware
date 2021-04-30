@@ -288,8 +288,13 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	@Transactional(isolation = Isolation.READ_UNCOMMITTED)
 	public List<Integer> addGermplasmListData(final List<GermplasmListData> germplasmListDatas) {
+		return this.addOrUpdateGermplasmListData(germplasmListDatas, Operation.ADD);
+	}
+
+	@Override
+	@Transactional(isolation = Isolation.READ_UNCOMMITTED)
+	public List<Integer> addGermplasmListDataWithReadUncommittedIsolation(final List<GermplasmListData> germplasmListDatas) {
 		return this.addOrUpdateGermplasmListData(germplasmListDatas, Operation.ADD);
 	}
 
