@@ -39,18 +39,17 @@ public class ReleaseNoteServiceImplIntegrationTest extends IntegrationTestBase {
 		this.userId = this.findAdminUser();
 	}
 
-
 	@Test
 	public void shouldShowAndGetLatestReleaseNote_OK() {
 
 		//Should not be any release note yet
 		assertFalse(this.releaseNoteService.getLatestReleaseNote().isPresent());
 
-		this.insertReleaseNote("17.3", LocalDate.now().minusMonths(1));
+		this.insertReleaseNote("16.3", LocalDate.now().minusMonths(1));
 		this.insertReleaseNote(this.bmsVersion, LocalDate.now().minusDays(4));
-		this.insertReleaseNote("18.1.0", LocalDate.now().minusDays(3));
+		this.insertReleaseNote("17.1.0", LocalDate.now().minusDays(3));
 
-		final ReleaseNote expectedReleaseNote = this.insertReleaseNote("18.2", LocalDate.now().minusDays(1));
+		final ReleaseNote expectedReleaseNote = this.insertReleaseNote("17.2", LocalDate.now().minusDays(1));
 
 		this.insertReleaseNote("18.3", LocalDate.now().plusDays(1));
 
@@ -89,7 +88,7 @@ public class ReleaseNoteServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private ReleaseNote insertReleaseNote(final String version, final LocalDate date) {
 		return this.workbenchDaoFactory.getReleaseNoteDAO().save(
-			new ReleaseNote(version, Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant())));
+			new ReleaseNote(version, Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant()), version));
 	}
 
 }

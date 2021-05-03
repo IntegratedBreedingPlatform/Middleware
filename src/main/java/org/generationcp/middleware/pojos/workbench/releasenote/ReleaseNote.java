@@ -38,12 +38,16 @@ public class ReleaseNote implements Serializable {
 	@Column(name = "enabled", nullable = false)
 	private boolean enabled = true;
 
+	@Column(name = "file_name", nullable = false)
+	private String fileName;
+
 	private ReleaseNote() {
 	}
 
-	public ReleaseNote(final String version, final Date releaseDate) {
+	public ReleaseNote(final String version, final Date releaseDate, final String fileName) {
 		this.version = version;
 		this.releaseDate = releaseDate;
+		this.fileName = fileName;
 	}
 
 	public Integer getId() {
@@ -66,8 +70,20 @@ public class ReleaseNote implements Serializable {
 		return enabled;
 	}
 
-	public void setEnabled(final boolean enabled) {
-		this.enabled = enabled;
+	public void enable() {
+		this.enabled = true;
+	}
+
+	public void disable() {
+		this.enabled = false;
+	}
+
+	public String getFileName() {
+		return this.fileName;
+	}
+
+	public void setFileName(final String fileName) {
+		this.fileName = fileName;
 	}
 
 	@Override
