@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v17.4.1-1">
+		<preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="4">
+                SELECT count(*)
+				FROM role_permission rp
+						 INNER JOIN role r ON rp.role_id = r.id
+						 INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE r.name = 'Readonly' AND p.name IN ('IMPORT_GERMPLASM', 'SEARCH_GERMPLASM', 'IMPORT_GERMPLASM_UPDATES', 'GERMPLASM_LABEL_PRINTING');
+            </sqlCheck>
+        </preConditions>
+        <comment>Remove germplasm import permissions for readonly user role</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			DELETE role_permission
+			FROM role_permission
+					 INNER JOIN role ON role_permission.role_id = role.id
+					 INNER JOIN permission ON role_permission.permission_id = permission.permission_id
+			WHERE role.name = 'Readonly' AND permission.name IN ('IMPORT_GERMPLASM_UPDATES', 'IMPORT_GERMPLASM');
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
