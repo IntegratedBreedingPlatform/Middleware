@@ -113,12 +113,17 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.crossWithUnknownParent, tree.getRoot().getGermplasm());
 		final List<GermplasmPedigreeTreeNode> nodes = tree.getRoot().getLinkedNodes();
 		Assert.assertEquals(1, nodes.size());
-		final Germplasm femaleGermplasm = nodes.get(0).getGermplasm();
- 		Assert.assertEquals(this.crossWithUnknownParent.getGpid1(), femaleGermplasm.getGid());
+
+		final GermplasmPedigreeTreeNode uknownNode = nodes.get(0);
+		final Germplasm unknownGermplasm = uknownNode.getGermplasm();
+
+		final Germplasm femaleGermplasm = uknownNode.getLinkedNodes().get(0).getGermplasm();
+		Assert.assertEquals(true, unknownGermplasm.getGid().equals(0));
 		Assert.assertEquals(this.femaleParent.getGid(), femaleGermplasm.getGid());
 		Assert.assertEquals(this.femaleParent.getPreferredName().getNval(), femaleGermplasm.getPreferredName().getNval());
 
-		final List<GermplasmPedigreeTreeNode> grandparentNodes = nodes.get(0).getLinkedNodes();
+		final GermplasmPedigreeTreeNode grandParentsTreeNode = uknownNode.getLinkedNodes().get(0); //Female Node
+		final List<GermplasmPedigreeTreeNode> grandparentNodes = grandParentsTreeNode.getLinkedNodes();
 		Assert.assertEquals(2, grandparentNodes.size());
 		final Germplasm maternalGP1 = grandparentNodes.get(0).getGermplasm();
 		Assert.assertEquals(this.maternalGrandParent1.getGid(), maternalGP1.getGid());
