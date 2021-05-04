@@ -19,6 +19,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.springframework.transaction.annotation.Isolation;
 
 import java.util.List;
 import java.util.Map;
@@ -256,6 +257,16 @@ public interface GermplasmListManager {
 	 */
 	@Deprecated
 	List<Integer> addGermplasmListData(List<GermplasmListData> germplasmListDatas);
+
+	/**
+	 * This method has {@link Isolation#READ_UNCOMMITTED} as isolation level in order to fix an issue (IBP-4537) for foreign key constraint failing.
+	 * Do not use it unless it's really necessary.
+	 *
+	 *
+	 * @param germplasmListDatas
+	 * @return a {@link List} of {@link GermplasmListData#getId()}
+	 */
+	List<Integer> addGermplasmListDataWithReadUncommittedIsolation(List<GermplasmListData> germplasmListDatas);
 
 	/**
 	 * Updates the database with the {@code GermplasmListData} objects specified.

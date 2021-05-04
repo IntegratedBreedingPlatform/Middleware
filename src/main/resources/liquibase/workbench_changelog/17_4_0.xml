@@ -228,7 +228,7 @@
 		</sql>
 	</changeSet>
 
-		<changeSet author="lkovacic" id="v17.4.0-6">
+	<changeSet author="lkovacic" id="v17.4.0-6">
         <preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="release_note" columnName="enabled"/>

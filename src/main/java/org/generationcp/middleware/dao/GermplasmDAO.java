@@ -672,7 +672,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return toreturn;
 	}
 
-	public List<Germplasm> getChildren(final Integer gid, final char methodType) {
+	public List<Germplasm> getDescendants(final Integer gid, final char methodType) {
 		final List<Germplasm> toreturn = new ArrayList<>();
 		try {
 			final String queryString = methodType == 'D' ? Germplasm.GET_DERIVATIVE_CHILDREN : Germplasm.GET_MAINTENANCE_CHILDREN;
@@ -690,7 +690,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error with getChildren(gid=" + gid + ", methodType=" + methodType + ") query: " + e.getMessage();
+			final String errorMessage = "Error with getDescendants(gid=" + gid + ", methodType=" + methodType + ") query: " + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -702,10 +702,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		try {
 			final List<Germplasm> children = new ArrayList<>();
 			// Get all derivative children
-			children.addAll(this.getChildren(gid, 'D'));
+			children.addAll(this.getDescendants(gid, 'D'));
 
 			// Get all maintenance children
-			children.addAll(this.getChildren(gid, 'M'));
+			children.addAll(this.getDescendants(gid, 'M'));
 
 			// Get all generative childern
 			children.addAll(this.getGenerativeChildren(gid));

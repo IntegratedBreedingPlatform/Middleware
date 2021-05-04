@@ -640,7 +640,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT DISTINCT p.project_id AS studyId, ");
 			queryString.append("p.name AS name, ");
-			queryString.append("p.description AS description ");
+			queryString.append("p.description AS description, ");
+			queryString.append("p.program_uuid AS programUUID ");
 			queryString.append("FROM stock s ");
 			queryString.append("INNER JOIN project p ON s.project_id = p.project_id ");
 			queryString.append("WHERE s.dbxref_id = :gid AND p.deleted = 0");
@@ -649,6 +650,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			sqlQuery.addScalar("studyId");
 			sqlQuery.addScalar("name");
 			sqlQuery.addScalar("description");
+			sqlQuery.addScalar("programUUID");
 			sqlQuery.setParameter("gid", gid);
 
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmStudyDto.class));
