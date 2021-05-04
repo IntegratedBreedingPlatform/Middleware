@@ -1014,10 +1014,15 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		final List<Map<String, Object>> results = sqlQuery.list();
 		final List<org.generationcp.middleware.api.location.Location> locations = new ArrayList<>();
 		for (final Map<String, Object> result : results) {
-			final Geometry geometry = new Geometry(
-				Arrays.asList((Double) result.get("longitude"), (Double) result.get("latitude"), (Double) result.get("altitude")),
-				"Point");
-			final Coordinate coordinate = new Coordinate(geometry, "Feature");
+
+			Coordinate coordinate = null;
+			final Double longitude = (Double) result.get("longitude");
+			final Double latitude = (Double) result.get("latitude");
+			final Double altitude = (Double) result.get("altitude");
+			if (longitude != null && latitude != null) {
+				final Geometry geometry = new Geometry(Arrays.asList(longitude, latitude, altitude), "Point");
+				coordinate = new Coordinate(geometry, "Feature");
+			}
 
 			final org.generationcp.middleware.api.location.Location location = new org.generationcp.middleware.api.location.Location()
 				.withLocationDbId(String.valueOf(result.get("locationDbId"))).withLocationType(String.valueOf(result.get("locationType")))
