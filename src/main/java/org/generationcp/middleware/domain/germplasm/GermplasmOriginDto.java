@@ -10,6 +10,7 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class GermplasmOriginDto {
 
+	private String programUUID;
 	private Integer studyId;
 	private String studyName;
 	private String observationUnitId;
@@ -19,6 +20,14 @@ public class GermplasmOriginDto {
 	private String positionCoordinateX;
 	private String positionCoordinateY;
 	private Map<String, Object> geoCoordinates;
+
+	public String getProgramUUID() {
+		return this.programUUID;
+	}
+
+	public void setProgramUUID(final String programUUID) {
+		this.programUUID = programUUID;
+	}
 
 	public Integer getStudyId() {
 		return studyId;

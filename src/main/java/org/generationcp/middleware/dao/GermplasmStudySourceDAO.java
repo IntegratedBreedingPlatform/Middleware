@@ -67,6 +67,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 
 	private static final String GET_GERMPLASM_STUDY_ORIGIN = "select study.project_id as studyId, " //
 		+ "  study.name as studyName, " //
+		+ "  study.program_uuid as programUUID, " //
 		+ "  ne.obs_unit_id as observationUnitId, " //
 		+ "  ne.json_props AS jsonProps, " //
 		+ "  fieldMapRow.value AS fieldMapRow, " //
@@ -172,7 +173,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
 			sqlQuery.setParameter("gid", gid);
 
-			sqlQuery.addScalar("studyId").addScalar("studyName")
+			sqlQuery.addScalar("programUUID").addScalar("studyId").addScalar("studyName")
 				.addScalar("observationUnitId").addScalar("jsonProps").addScalar("fieldMapRow")
 				.addScalar("fieldMapCol").addScalar("plotNumber", new IntegerType()).addScalar("blockNumber", new IntegerType())
 				.addScalar("repNumber", new IntegerType())
@@ -186,6 +187,7 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 			if (!results.isEmpty()) {
 				final Map<String, Object> result = results.get(0);
 				final GermplasmOriginDto germplasmOriginDto = new GermplasmOriginDto();
+				germplasmOriginDto.setProgramUUID((String) result.get("programUUID"));
 				germplasmOriginDto.setStudyId((Integer) result.get("studyId"));
 				germplasmOriginDto.setStudyName((String) result.get("studyName"));
 				germplasmOriginDto.setObservationUnitId((String) result.get("observationUnitId"));
