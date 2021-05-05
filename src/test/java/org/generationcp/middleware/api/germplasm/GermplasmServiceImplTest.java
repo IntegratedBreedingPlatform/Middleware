@@ -334,6 +334,7 @@ public class GermplasmServiceImplTest {
 	private Method createMethod() {
 		final Method method = new Method();
 		method.setMid(1);
+		method.setMprgn(0);
 		method.setMcode(this.methodAbbreviation.toUpperCase());
 		method.setMtype(MethodType.GENERATIVE.getCode());
 		return method;

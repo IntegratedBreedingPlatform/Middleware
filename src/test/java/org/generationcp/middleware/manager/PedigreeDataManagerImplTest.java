@@ -114,12 +114,17 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.crossWithUnknownParent, tree.getRoot().getGermplasm());
 		final List<GermplasmPedigreeTreeNode> nodes = tree.getRoot().getLinkedNodes();
 		Assert.assertEquals(1, nodes.size());
-		final Germplasm femaleGermplasm = nodes.get(0).getGermplasm();
- 		Assert.assertEquals(this.crossWithUnknownParent.getGpid1(), femaleGermplasm.getGid());
+
+		final GermplasmPedigreeTreeNode uknownNode = nodes.get(0);
+		final Germplasm unknownGermplasm = uknownNode.getGermplasm();
+
+		final Germplasm femaleGermplasm = uknownNode.getLinkedNodes().get(0).getGermplasm();
+		Assert.assertEquals(true, unknownGermplasm.getGid().equals(0));
 		Assert.assertEquals(this.femaleParent.getGid(), femaleGermplasm.getGid());
 		Assert.assertEquals(this.femaleParent.getPreferredName().getNval(), femaleGermplasm.getPreferredName().getNval());
 
-		final List<GermplasmPedigreeTreeNode> grandparentNodes = nodes.get(0).getLinkedNodes();
+		final GermplasmPedigreeTreeNode grandParentsTreeNode = uknownNode.getLinkedNodes().get(0); //Female Node
+		final List<GermplasmPedigreeTreeNode> grandparentNodes = grandParentsTreeNode.getLinkedNodes();
 		Assert.assertEquals(2, grandparentNodes.size());
 		final Germplasm maternalGP1 = grandparentNodes.get(0).getGermplasm();
 		Assert.assertEquals(this.maternalGrandParent1.getGid(), maternalGP1.getGid());
@@ -183,19 +188,23 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 
 		this.germplasmWithPolyCrosses = GermplasmTestDataInitializer.createGermplasm(1);
 		this.germplasmManager.save(this.germplasmWithPolyCrosses);
+		this.sessionProvder.getSession().flush();
 		final Integer gid = this.germplasmWithPolyCrosses.getGid();
 
 		// Change gpid2
 		Germplasm newGermplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		this.germplasmManager.save(newGermplasm);
+		this.sessionProvder.getSession().flush();
 		Integer newProgenitorId = newGermplasm.getGid();
 		Assert.assertNotEquals(0, this.germplasmWithPolyCrosses.getGpid2().intValue());
 		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 2, createdBy);
+		this.sessionProvder.getSession().flush();
 		Assert.assertEquals(newProgenitorId, this.germplasmManager.getGermplasmByGID(gid).getGpid2());
 
 		// New progenitor record should be created
 		final Integer progenitorGid = this.crossWithUnknownParent.getGid();
 		this.pedigreeManager.updateProgenitor(gid, progenitorGid, 3, createdBy);
+		this.sessionProvder.getSession().flush();
 		List<Germplasm> progenitors = this.germplasmManager.getProgenitorsByGIDWithPrefName(gid);
 		Assert.assertEquals(1, progenitors.size());
 		Assert.assertEquals(progenitorGid, progenitors.get(0).getGid());
@@ -204,8 +213,11 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		// Update existing progenitor record
 		newGermplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		this.germplasmManager.save(newGermplasm);
+		this.sessionProvder.getSession().flush();
 		newProgenitorId = newGermplasm.getGid();
 		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 3, createdBy);
+		this.sessionProvder.getSession().flush();
+
 		progenitors = this.germplasmManager.getProgenitorsByGIDWithPrefName(gid);
 		Assert.assertEquals(1, progenitors.size());
 		Assert.assertEquals(newProgenitorId, progenitors.get(0).getGid());

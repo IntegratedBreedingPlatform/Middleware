@@ -38,9 +38,9 @@ public class Progenitor extends AbstractEntity implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "id")
 	private Integer id;
-	
-	@ManyToOne(targetEntity = Germplasm.class)
-	@JoinColumn(name = "gid", nullable = true)
+
+	@ManyToOne
+	@JoinColumn(name = "gid", nullable = false)
 	private Germplasm germplasm;
 	
 	@Basic(optional = false)

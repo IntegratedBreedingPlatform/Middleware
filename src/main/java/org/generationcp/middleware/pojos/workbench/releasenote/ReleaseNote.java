@@ -33,14 +33,21 @@ public class ReleaseNote implements Serializable {
 	private Date releaseDate;
 
 	@Column(name = "has_coming_soon", nullable = false)
-	private Boolean hasComingSoon = false;
+	private boolean hasComingSoon = false;
+
+	@Column(name = "enabled", nullable = false)
+	private boolean enabled = true;
+
+	@Column(name = "file_name", nullable = false)
+	private String fileName;
 
 	private ReleaseNote() {
 	}
 
-	public ReleaseNote(final String version, final Date releaseDate) {
+	public ReleaseNote(final String version, final Date releaseDate, final String fileName) {
 		this.version = version;
 		this.releaseDate = releaseDate;
+		this.fileName = fileName;
 	}
 
 	public Integer getId() {
@@ -55,8 +62,28 @@ public class ReleaseNote implements Serializable {
 		return releaseDate;
 	}
 
-	public Boolean getHasComingSoon() {
+	public boolean getHasComingSoon() {
 		return hasComingSoon;
+	}
+
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void enable() {
+		this.enabled = true;
+	}
+
+	public void disable() {
+		this.enabled = false;
+	}
+
+	public String getFileName() {
+		return this.fileName;
+	}
+
+	public void setFileName(final String fileName) {
+		this.fileName = fileName;
 	}
 
 	@Override
@@ -90,6 +117,10 @@ public class ReleaseNote implements Serializable {
 		builder.append(this.version);
 		builder.append(", releaseDate=");
 		builder.append(this.releaseDate);
+		builder.append(", hasComingSoon=");
+		builder.append(this.hasComingSoon);
+		builder.append(", enabled=");
+		builder.append(this.enabled);
 
 		builder.append("]");
 		return builder.toString();

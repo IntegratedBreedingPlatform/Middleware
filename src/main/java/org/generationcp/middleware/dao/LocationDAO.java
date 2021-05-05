@@ -33,8 +33,8 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
-import org.hibernate.type.LongType;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.LongType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -1015,7 +1015,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		final List<org.generationcp.middleware.api.location.Location> locations = new ArrayList<>();
 		for (final Map<String, Object> result : results) {
 			final Geometry geometry = new Geometry(
-				Arrays.asList((Double) result.get("latitude"), (Double)result.get("longitude"), (Double)result.get("altitude")),
+				Arrays.asList((Double) result.get("longitude"), (Double) result.get("latitude"), (Double) result.get("altitude")),
 				"Point");
 			final Coordinate coordinate = new Coordinate(geometry, "Feature");
 

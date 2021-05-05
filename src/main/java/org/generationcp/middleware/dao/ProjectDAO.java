@@ -12,20 +12,17 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.util.Util;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
-import org.reflections.util.Utils;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
@@ -39,10 +36,12 @@ import java.util.Map;
  */
 public class ProjectDAO extends GenericDAO<Project, Long> {
 
-	//User will be able to see the following programs:
-	// 1. If user has instance role, then all programs for the assigned crop will be listed
-	// 2. If user has crop role and no program roles associated to that crop, then all crop programs will be listed
-	// 3. If user has a program role, then user will see ONLY programs with explicit access no matter if he has crop role assigned
+	/**
+	 * User will be able to see the following programs: <br>
+	 *  1. If user has instance role, then all programs for the assigned crop will be listed <br>
+	 *  2. If user has crop role and no program roles associated to that crop, then all crop programs will be listed <br>
+	 *  3. If user has a program role, then user will see ONLY programs with explicit access no matter if he has crop role assigned <br>
+	 */
 	public static final String GET_PROJECTS_BY_USER_ID =
 		"SELECT  "
 			+ "    p.* "
@@ -72,7 +71,9 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			+ "			) "
 			+ "		AND ( :cropName IS NULL OR p.crop_type = :cropName ) "
 			+ " 	AND ( :programName IS NULL OR p.project_name = :programName ) "
-			+ " 	AND ( :programDbId IS NULL OR p.project_uuid = :programDbId ) ";
+			+ " 	AND ( :programNameContainsString IS NULL OR p.project_name like :programNameContainsString ) "
+			+ " 	AND ( :programDbId IS NULL OR p.project_uuid = :programDbId ) "
+			+ "		GROUP BY p.project_id ";
 
 	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
 
@@ -192,10 +193,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			final StringBuilder sb = new StringBuilder(GET_PROJECTS_BY_USER_ID);
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sb.toString());
-			sqlQuery.setParameter("userId", programSearchRequest.getLoggedInUserId());
-			sqlQuery.setParameter("cropName", programSearchRequest.getCommonCropName());
-			sqlQuery.setParameter("programName", programSearchRequest.getProgramName());
-			sqlQuery.setParameter("programDbId", programSearchRequest.getProgramDbId());
+			addProjectsByFilterParameters(programSearchRequest, sqlQuery);
 
 			sqlQuery
 					.addScalar("project_id")
@@ -240,13 +238,22 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		}
 	}
 
+	private static void addProjectsByFilterParameters(final ProgramSearchRequest programSearchRequest, final SQLQuery sqlQuery) {
+		sqlQuery.setParameter("userId", programSearchRequest.getLoggedInUserId());
+		sqlQuery.setParameter("cropName", programSearchRequest.getCommonCropName());
+		sqlQuery.setParameter("programName", programSearchRequest.getProgramName());
+		String programNameContainsString = null;
+		if (!StringUtils.isBlank(programSearchRequest.getProgramNameContainsString())) {
+			programNameContainsString = '%' + programSearchRequest.getProgramNameContainsString() + '%';
+		}
+		sqlQuery.setParameter("programNameContainsString", programNameContainsString);
+		sqlQuery.setParameter("programDbId", programSearchRequest.getProgramDbId());
+	}
+
 	public long countProjectsByFilter(final ProgramSearchRequest programSearchRequest) throws MiddlewareException {
 		try {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(GET_PROJECTS_BY_USER_ID);
-			sqlQuery.setParameter("userId", programSearchRequest.getLoggedInUserId());
-			sqlQuery.setParameter("cropName", programSearchRequest.getCommonCropName());
-			sqlQuery.setParameter("programName", programSearchRequest.getProgramName());
-			sqlQuery.setParameter("programDbId", programSearchRequest.getProgramDbId());
+			addProjectsByFilterParameters(programSearchRequest, sqlQuery);
 
 			return sqlQuery.list().size();
 		} catch (final HibernateException e) {

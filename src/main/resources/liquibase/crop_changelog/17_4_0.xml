@@ -55,6 +55,7 @@
             10185);
         </sql>
     </changeSet>
+
     <changeSet author="cuenyad" id="v17.4.0-3">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
@@ -69,4 +70,36 @@
 			VALUES ('23', 'GERMPLASM_LABEL_PRINTING_PRESET', 'Excel template default', '{\"type\":\"LabelPrintingPreset\",\"selectedFields\":[[8240,41,8189,8256,1712,48,1709]],\"barcodeSetting\":{\"barcodeNeeded\":false,\"automaticBarcode\":false,\"barcodeFields\":[]},\"includeHeadings\":true,\"fileConfiguration\":{\"outputType\":\"xls\"}}');
        </sql>
     </changeSet>
+	
+	<changeSet author="corina" id="v17.4.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+					SELECT COUNT(*) > 0
+					FROM methods
+					WHERE `mid` IN (202,502) and mname LIKE 'Double  haploid%';
+			</sqlCheck>
+		</preConditions>
+		<comment>
+            Remove excess space between "Double" and "haploid" in method names. IBP-4238
+        </comment>
+		<sql dbms="mysql" splitStatements="false">
+			UPDATE methods set mname=REPLACE(mname,'Double  haploid','Double haploid') WHERE `mid` IN (202,502);
+		</sql>
+	</changeSet>
+	
+	<changeSet author="corina" id="v17.4.0-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+					SELECT COUNT(*) > 0 FROM methods WHERE mtype IN ('DER','MAN') AND mprgn != -1;
+			</sqlCheck>
+		</preConditions>
+		<comment>
+            Set methods.mprgn to -1 for derivative and maintenance methods. IBP-4533
+        </comment>
+		<sql dbms="mysql" splitStatements="false">
+			UPDATE methods set mprgn=-1 WHERE mtype IN ('DER','MAN') AND mprgn != -1;
+		</sql>
+	</changeSet>
+		
+        
 </databaseChangeLog>

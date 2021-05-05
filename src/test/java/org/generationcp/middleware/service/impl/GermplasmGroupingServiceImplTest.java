@@ -21,10 +21,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -829,23 +826,23 @@ public class GermplasmGroupingServiceImplTest {
 		}
 	}
 
-	public void testUnfixLines() {
+	@Test
+	public void testGetDescendantGroupMembers() {
+		final Integer mgid = 11;
+		final Integer rootGid = 13;
+		final Germplasm derivative = new Germplasm();
+		derivative.setGid(22);
+		derivative.setMgid(mgid);
+		Mockito.when(this.germplasmDAO.getDescendants(rootGid, 'D')).thenReturn(Collections.singletonList(derivative));
 
-		final int gid = 222;
+		final Germplasm maintenance = new Germplasm();
+		maintenance.setGid(25);
+		maintenance.setMgid(0);
+		Mockito.when(this.germplasmDAO.getDescendants(rootGid, 'M')).thenReturn(Collections.singletonList(maintenance));
 
-		final Set<Integer> gidsToProcess = new HashSet<>(Arrays.asList(gid));
-
-		this.germplasmGroupingService.unfixLines(gidsToProcess);
-
-		Mockito.verify(this.germplasmDAO).resetGermplasmGroup(new ArrayList<Integer>(gidsToProcess));
-
-	}
-
-	public void testGetGroupMembers() {
-		final Integer gid = 1;
-		final List<Germplasm> groupMembers = new ArrayList<>();
-		Mockito.when(this.germplasmDAO.getManagementGroupMembers(gid)).thenReturn(groupMembers);
-		Assert.assertSame(groupMembers, germplasmGroupingService.getGroupMembers(gid));
+		final List<Germplasm> descendantGroupMembers =  this.germplasmGroupingService.getDescendantGroupMembers(rootGid, mgid);
+		Assert.assertEquals(1, descendantGroupMembers.size());
+		Assert.assertEquals(derivative.getGid(), descendantGroupMembers.get(0).getGid());
 	}
 
 	private Map<Integer, Integer> getGermplasmIdMethodIdMap(final List<Germplasm> germplasm) {
