@@ -993,7 +993,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
-	public List<org.generationcp.middleware.api.location.Location> getLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
+	public List<org.generationcp.middleware.api.location.Location> getLocations(final LocationSearchRequest locationSearchRequest,
+		final Pageable pageable) {
 
 		final SQLQuery sqlQuery =
 			this.getSession().createSQLQuery(this.createGetLocationsQuery(locationSearchRequest));
@@ -1020,7 +1021,12 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			final Double latitude = (Double) result.get("latitude");
 			final Double altitude = (Double) result.get("altitude");
 			if (longitude != null && latitude != null) {
-				final Geometry geometry = new Geometry(Arrays.asList(longitude, latitude, altitude), "Point");
+				final List<Double> coordinatesList = Arrays.asList(longitude, latitude, altitude);
+				if (altitude != null) {
+					// Only add altitube if available.
+					coordinatesList.add(altitude);
+				}
+				final Geometry geometry = new Geometry(coordinatesList, "Point");
 				coordinate = new Coordinate(geometry, "Feature");
 			}
 
@@ -1069,10 +1075,10 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	private void addLocationSearchFilterParameters(final SQLQuery sqlQuery, final LocationSearchRequest locationSearchRequest) {
-		if(!StringUtils.isEmpty(locationSearchRequest.getLocationTypeName())) {
+		if (!StringUtils.isEmpty(locationSearchRequest.getLocationTypeName())) {
 			sqlQuery.setParameter("locationType", locationSearchRequest.getLocationTypeName());
 		}
-		if(!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
+		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
 			sqlQuery.setParameterList("locationId", locationSearchRequest.getLocationIds());
 		}
 
@@ -1095,10 +1101,10 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	private void appendLocationSearchFilter(final StringBuilder queryString, final LocationSearchRequest locationSearchRequest) {
 		queryString.append("WHERE 1=1 ");
-		if(!StringUtils.isEmpty(locationSearchRequest.getLocationTypeName())) {
+		if (!StringUtils.isEmpty(locationSearchRequest.getLocationTypeName())) {
 			queryString.append("AND ud.fname = :locationType ");
 		}
-		if(!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
+		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
 			queryString.append("AND l.locid IN (:locationId) ");
 		}
 

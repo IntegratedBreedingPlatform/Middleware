@@ -874,7 +874,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				studyMetadata.setStudyDescription((row[12] instanceof String) ? (String) row[12] : null);
 				studyMetadata.setStudyObjective((row[13] instanceof String) ? (String) row[13] : null);
 				studyMetadata.setExperimentalDesign((row[14] instanceof String) ? (String) row[14] : null);
-				studyMetadata.setLastUpdate((row[15] instanceof String) ? (String) row[15] : null);
+				studyMetadata.setLastUpdate(Util.tryParseDate((String) row[15]));
 				return studyMetadata;
 			} else {
 				return null;

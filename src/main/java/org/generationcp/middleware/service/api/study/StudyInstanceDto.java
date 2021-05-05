@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.util.serializer.DatePropertySerializer;
+import org.generationcp.middleware.util.serializer.SeasonPropertySerializer;
 import org.generationcp.middleware.util.serializer.StringToBooleanSerializer;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -95,6 +96,7 @@ public class StudyInstanceDto {
 
 	private String studyTypeName;
 
+	@JsonSerialize(using = SeasonPropertySerializer.class)
 	private List<SeasonDto> seasons;
 
 	private String locationDbId;
