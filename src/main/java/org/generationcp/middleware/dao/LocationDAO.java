@@ -1021,7 +1021,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			final Double latitude = (Double) result.get("latitude");
 			final Double altitude = (Double) result.get("altitude");
 			if (longitude != null && latitude != null) {
-				final List<Double> coordinatesList = Arrays.asList(longitude, latitude);
+				final List<Double> coordinatesList = new ArrayList<>();
+				coordinatesList.add(longitude);
+				coordinatesList.add(latitude);
 				if (altitude != null) {
 					// Only add altitube if available.
 					coordinatesList.add(altitude);

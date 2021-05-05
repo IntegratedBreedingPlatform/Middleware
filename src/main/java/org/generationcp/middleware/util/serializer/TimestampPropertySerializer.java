@@ -23,6 +23,8 @@ public class TimestampPropertySerializer extends JsonSerializer<Date> {
 			timestamp.put("timestamp", this.formatterWithTime.format(value));
 			timestamp.put("version", "1.0");
 			gen.writeObject(timestamp);
+		} else {
+			gen.writeNull();
 		}
 
 	}

@@ -21,6 +21,11 @@ public class DatePropertySerializer extends JsonSerializer<Date> {
 	public void serialize(final Date value, final JsonGenerator gen, final SerializerProvider serializers)
 		throws IOException {
 
+		if (value == null) {
+			gen.writeNull();
+			return;
+		}
+
 		if (serializers.getActiveView() != null) {
 			if (BrapiView.BrapiV1_3.class.equals(serializers.getActiveView()) || BrapiView.BrapiV1_2.class
 				.equals(serializers.getActiveView())) {
