@@ -46,5 +46,25 @@
 		</sql>
 	</changeSet>
 
-</databaseChangeLog>
+	<changeSet author="lkovacic" id="v17.4.1-4">
+		<preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="4">
+                SELECT count(*)
+				FROM role_permission rp
+						 INNER JOIN role r ON rp.role_id = r.id
+						 INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE r.id = 4 AND p.name IN ('IMPORT_GERMPLASM', 'SEARCH_GERMPLASM', 'IMPORT_GERMPLASM_UPDATES', 'GERMPLASM_LABEL_PRINTING');
+            </sqlCheck>
+        </preConditions>
+        <comment>Remove germplasm import permissions for readonly user role</comment>
+		<sql dbms="mysql" splitStatements="true">
 
+			DELETE role_permission
+			FROM role_permission
+					 INNER JOIN role ON role_permission.role_id = role.id
+					 INNER JOIN permission ON role_permission.permission_id = permission.permission_id
+			WHERE role.id = 4 AND permission.name IN ('IMPORT_GERMPLASM_UPDATES', 'IMPORT_GERMPLASM');
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
