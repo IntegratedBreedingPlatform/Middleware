@@ -1277,8 +1277,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final List<Map<String, Object>> results = sqlQuery.list();
 
 			for (final Map<String, Object> result : results) {
-				final ObservationLevel observationLevel = new ObservationLevel((Integer)result.get("datasetTypeId"),
-					String.valueOf(result.get("datasetName")));
+				final ObservationLevel observationLevel = new ObservationLevel((Integer)result.get("datasetTypeId"), "study");
 				final Integer studyId = (Integer) result.get("studyId");
 
 				observationLevelsMap.putIfAbsent(studyId, new ArrayList<>());
