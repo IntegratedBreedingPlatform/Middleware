@@ -234,7 +234,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
 					// Use female parent to continue traversal if source is unknown
 				} else if (femaleGid != 0) {
-					this.addNodeForKnownParent(node, level, femaleGid, excludeDerivativeLines);
+					this.addNodeForDerivativeUnKnownMaleParentKnownFemaleParent(node, level, femaleGid, excludeDerivativeLines);
 				}
 
 			} else if (germplasmOfNode.getGnpgs() >= 2) {
@@ -284,6 +284,14 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		final GermplasmPedigreeTreeNode nodeForParent = new GermplasmPedigreeTreeNode();
 		nodeForParent.setGermplasm(this.germplasmDataManager.getUnknownGermplasmWithPreferredName());
 		node.getLinkedNodes().add(nodeForParent);
+	}
+
+	private void addNodeForDerivativeUnKnownMaleParentKnownFemaleParent(final GermplasmPedigreeTreeNode node, final int level, final int femaleGid,
+																		boolean excludeDerivativeLines) {
+		final GermplasmPedigreeTreeNode nodeForParent = new GermplasmPedigreeTreeNode();
+		nodeForParent.setGermplasm(this.germplasmDataManager.getUnknownGermplasmWithPreferredName());
+		node.getLinkedNodes().add(nodeForParent);
+		this.addNodeForKnownParent(nodeForParent, level, femaleGid, excludeDerivativeLines);
 	}
 
 	/**
