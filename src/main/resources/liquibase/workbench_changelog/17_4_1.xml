@@ -35,7 +35,7 @@
 				FROM role_permission rp
 						 INNER JOIN role r ON rp.role_id = r.id
 						 INNER JOIN permission p ON rp.permission_id = p.permission_id
-				WHERE (r.name = 'Readonly' OR r.id = 4) AND p.name IN ('IMPORT_GERMPLASM', 'SEARCH_GERMPLASM', 'IMPORT_GERMPLASM_UPDATES', 'GERMPLASM_LABEL_PRINTING');
+				WHERE r.id = 4 AND p.name IN ('IMPORT_GERMPLASM', 'SEARCH_GERMPLASM', 'IMPORT_GERMPLASM_UPDATES', 'GERMPLASM_LABEL_PRINTING');
             </sqlCheck>
         </preConditions>
         <comment>Remove germplasm import permissions for readonly user role</comment>
@@ -45,7 +45,7 @@
 			FROM role_permission
 					 INNER JOIN role ON role_permission.role_id = role.id
 					 INNER JOIN permission ON role_permission.permission_id = permission.permission_id
-			WHERE (role.name = 'Readonly' OR role.id = 4) AND permission.name IN ('IMPORT_GERMPLASM_UPDATES', 'IMPORT_GERMPLASM');
+			WHERE role.id = 4 AND permission.name IN ('IMPORT_GERMPLASM_UPDATES', 'IMPORT_GERMPLASM');
 		</sql>
 	</changeSet>
 
