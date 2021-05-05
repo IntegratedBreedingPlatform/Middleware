@@ -1024,7 +1024,7 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 			germplasm = (Germplasm) super.clone();
 		} catch (final CloneNotSupportedException e) {
 			germplasm = new Germplasm(this.gid, this.methodId, this.gnpgs, this.gpid1, this.gpid2,
-				this.userId, this.lgid, this.locationId, this.gdate, this.preferredName);
+				this.lgid, this.locationId, this.gdate, this.preferredName);
 			germplasm.setMethod((Method) this.method.clone());
 			//TODO Complete with other objects
 		}
