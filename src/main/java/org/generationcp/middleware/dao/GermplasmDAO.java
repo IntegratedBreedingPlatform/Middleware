@@ -1916,11 +1916,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	 */
 	public void updateGroupSource(final Integer oldGroupSource, final Integer newGroupSource) {
 		final String sql =
-			"UPDATE germplsm SET gpid1 = :newGroupSource WHERE gpid1 = :oldGroupSource and "
+			"UPDATE germplsm SET gpid1 = :newGroupSource, modified_date = CURRENT_TIMESTAMP, modified_by = :userId WHERE gpid1 = :oldGroupSource and "
 				+ " deleted = 0 and methn in (select mid from methods where mtype in (" + DER_MAN + "))";
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
 		sqlQuery.setParameter("newGroupSource", newGroupSource);
 		sqlQuery.setParameter("oldGroupSource", oldGroupSource);
+		sqlQuery.setParameter("userId", ContextHolder.getLoggedInUserId());
 		try {
 			final int updatedRows = sqlQuery.executeUpdate();
 			GermplasmDAO.LOG.debug("updateGroupSource has updated the group source for " + updatedRows + " rows");
@@ -1966,10 +1967,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private void updateGroupSource(final List<Integer> gids, final Integer newGroupSource) {
 		final String sql =
-			"UPDATE germplsm SET gpid1 = :newGroupSource WHERE gid in (:gids)";
+			"UPDATE germplsm SET gpid1 = :newGroupSource, modified_date = CURRENT_TIMESTAMP, modified_by = :userId WHERE gid in (:gids)";
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
 		sqlQuery.setParameter("newGroupSource", newGroupSource);
 		sqlQuery.setParameterList("gids", gids);
+		sqlQuery.setParameter("userId", ContextHolder.getLoggedInUserId());
 		try {
 			GermplasmDAO.LOG.debug("updateGroupSource is trying to set the group source for the gids: " + gids);
 			final Integer updatedRows = sqlQuery.executeUpdate();
