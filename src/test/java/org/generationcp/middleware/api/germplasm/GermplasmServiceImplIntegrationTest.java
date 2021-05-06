@@ -1895,6 +1895,19 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.germplasmService.deleteGermplasm(Lists.newArrayList(germplasm.getGid()));
 
 		assertThat(this.germplasmService.getGermplasmByGIDs(Lists.newArrayList(germplasm.getGid())), iterableWithSize(0));
+
+		this.sessionProvder.getSession().flush();
+		this.sessionProvder.getSession().clear();
+
+		this.sessionProvder.getSession().refresh(germplasm);
+
+		final Germplasm deletedGermplasm = (Germplasm) this.sessionProvder.getSession().createQuery(
+			String.format("select G from %s G where gid=%s",
+				Germplasm.class.getCanonicalName(),
+				germplasm.getGid())).uniqueResult();
+		assertNotNull(deletedGermplasm);
+		assertThat(deletedGermplasm.getModifiedBy(), is(this.userId));
+		assertNotNull(deletedGermplasm.getModifiedDate());
 	}
 
 	@Test

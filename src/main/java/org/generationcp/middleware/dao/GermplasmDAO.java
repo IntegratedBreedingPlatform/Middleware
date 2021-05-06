@@ -15,6 +15,7 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
@@ -1234,9 +1235,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		try {
 			queryString.append("UPDATE germplsm SET deleted = 1, germplsm_uuid = CONCAT (germplsm_uuid, '#', '" + Util
-				.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS") + "')  where gid in (:gids)");
+				.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS") + "'), modified_date = CURRENT_TIMESTAMP, modified_by = :userId  WHERE gid in (:gids)");
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gids);
+			query.setParameter("userId", ContextHolder.getLoggedInUserId());
 			query.executeUpdate();
 
 		} catch (final HibernateException e) {
