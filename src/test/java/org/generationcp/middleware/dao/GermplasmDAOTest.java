@@ -711,6 +711,11 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(0, germplasm1.getMgid().intValue());
 		Assert.assertEquals(0, germplasm2.getMgid().intValue());
 
+		Assert.assertThat(germplasm1.getModifiedBy(), is(this.findAdminUser()));
+		Assert.assertNotNull(germplasm1.getModifiedDate());
+
+		Assert.assertThat(germplasm2.getModifiedBy(), is(this.findAdminUser()));
+		Assert.assertNotNull(germplasm2.getModifiedDate());
 	}
 
 	@Test

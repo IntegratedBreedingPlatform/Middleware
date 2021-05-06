@@ -1235,7 +1235,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		try {
 			queryString.append("UPDATE germplsm SET deleted = 1, germplsm_uuid = CONCAT (germplsm_uuid, '#', '" + Util
-				.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS") + "'), modified_date = CURRENT_TIMESTAMP, modified_by = :userId  WHERE gid in (:gids)");
+				.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS") + "'), modified_date = CURRENT_TIMESTAMP, modified_by = :userId "
+				+ "WHERE gid in (:gids)");
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gids);
 			query.setParameter("userId", ContextHolder.getLoggedInUserId());
@@ -1336,8 +1337,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		try {
 
-			final SQLQuery query = this.getSession().createSQLQuery("UPDATE germplsm SET mgid = 0 WHERE gid IN (:gids)");
+			final SQLQuery query = this.getSession().createSQLQuery("UPDATE germplsm SET mgid = 0, "
+				+ "modified_date = CURRENT_TIMESTAMP, modified_by = :userId WHERE gid IN (:gids)");
 			query.setParameterList("gids", gids);
+			query.setParameter("userId", ContextHolder.getLoggedInUserId());
 			query.executeUpdate();
 
 		} catch (final HibernateException e) {
