@@ -19,10 +19,6 @@ public class CustomIntegrator implements Integrator {
 	public void integrate(final Configuration configuration, final SessionFactoryImplementor sessionFactory,
 		final SessionFactoryServiceRegistry serviceRegistry) {
 
-		//TODO: check duplication strategy
-//		EventListenerRegistry listenerRegistry = serviceRegistry.getService( EventListenerRegistry.class );
-//		listenerRegistry.addDuplicationStrategy( EnversListenerDuplicationStrategy.INSTANCE );
-
 		final EventListenerRegistry service = sessionFactory.getServiceRegistry().getService(EventListenerRegistry.class);
 		service.getEventListenerGroup(EventType.PRE_UPDATE).appendListener(new CustomPreUpdateEventListener());
 	}

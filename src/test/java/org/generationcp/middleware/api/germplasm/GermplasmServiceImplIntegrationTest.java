@@ -66,6 +66,7 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -75,6 +76,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	public static final String NOTE = "NOTE";
 	public static final String NOLOC = "NOLOC";
 	public static final String CROP_NAME = "maize";
+
+	private static final String DEFAULT_BIBREF_FIELD = "-";
 
 	private DaoFactory daoFactory;
 
@@ -2082,16 +2085,80 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(reference, bibref.getAnalyt());
 	}
 
+	@Test
+	public void testImportGermplasmUpdates_AuditFields_ForReferenceAndAttrAndNames() {
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final int creationDate = 20200101;
+
+		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
+		final Bibref reference = this.createReference(UUID.randomUUID().toString());
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0, reference);
+		this.createAttribute(germplasm);
+
+		final Germplasm createdGermplasm = this.daoFactory.getGermplasmDao().getById(germplasm.getGid());
+		assertThat(createdGermplasm.getGid(), is(germplasm.getGid()));
+		assertThat(createdGermplasm.getNames(), hasSize(0));
+		assertNotNull(createdGermplasm.getBibref());
+		assertNotNull(createdGermplasm.getBibref());
+		assertThat(createdGermplasm.getBibref().getRefid(), is(reference.getRefid()));
+
+		final GermplasmUpdateDTO germplasmUpdateDTO =
+			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
+				Optional.of(newLocation), creationDate);
+
+		this.germplasmService.importGermplasmUpdates(this.userId, Collections.singletonList(germplasmUpdateDTO));
+
+		this.sessionProvder.getSession().flush();
+		this.sessionProvder.getSession().clear();
+
+		this.sessionProvder.getSession().refresh(germplasm);
+
+		final Germplasm updatedGermplasm = this.daoFactory.getGermplasmDao().getById(germplasm.getGid());
+		assertThat(updatedGermplasm.getGid(), is(germplasm.getGid()));
+		assertThat(updatedGermplasm.getModifiedBy(), is(this.userId));
+		assertNotNull(updatedGermplasm.getModifiedDate());
+		assertThat(updatedGermplasm.getNames(), hasSize(1));
+
+		final Name name = updatedGermplasm.getNames().get(0);
+		assertThat(name.getCreatedBy(), is(this.userId));
+		assertNotNull(name.getCreatedDate());
+
+		final Bibref updatedReference = this.daoFactory.getBibrefDAO().getById(reference.getRefid());
+		assertNotNull(updatedReference);
+		assertThat(updatedReference.getRefid(), is(reference.getRefid()));
+		assertThat(updatedReference.getModifiedBy(), is(this.userId));
+		assertNotNull(updatedReference.getModifiedDate());
+
+		final List<Attribute> attributeValuesGIDList =
+			this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Arrays.asList(germplasm.getGid()));
+		assertThat(attributeValuesGIDList, hasSize(1));
+		final Attribute attribute = attributeValuesGIDList.get(0);
+		assertThat(attribute.getModifiedBy(), is(this.userId));
+		assertNotNull(attribute.getModifiedDate());
+	}
+
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
-		final Integer gpid1,
-		final Integer gpid2) {
+		final Integer gpid1, final Integer gpid2) {
+		return this.createGermplasm(method, germplasmUUID, location, gnpgs, gpid1, gpid2, null);
+	}
+
+	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
+		final Integer gpid1, final Integer gpid2, final Bibref reference) {
 		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2,
 			0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
 			0, 0, null, null, method);
 		if (StringUtils.isNotEmpty(germplasmUUID)) {
 			germplasm.setGermplasmUUID(germplasmUUID);
 		}
+		germplasm.setBibref(reference);
 		this.daoFactory.getGermplasmDao().save(germplasm);
+
+		assertThat(germplasm.getCreatedBy(), is(this.userId));
+		assertNotNull(germplasm.getCreatedBy());
+		assertNull(germplasm.getModifiedBy());
+		assertNull(germplasm.getModifiedDate());
+
 		return germplasm;
 	}
 
@@ -2132,6 +2199,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getProgenitorDao().save(progenitor);
 		this.sessionProvder.getSession().flush();
 		this.daoFactory.getProgenitorDao().refresh(progenitor);
+
+		assertNotNull(progenitor.getCreatedDate());
+		assertThat(progenitor.getCreatedBy(), is(this.userId));
+		assertNull(progenitor.getModifiedDate());
+		assertNull(progenitor.getModifiedBy());
+
 		return progenitor;
 	}
 
@@ -2150,6 +2223,38 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 0);
 		return germplasmUpdateDTO;
+	}
+
+	private Bibref createReference(final String reference) {
+		final Bibref bibref = new Bibref(null, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, reference, DEFAULT_BIBREF_FIELD,
+			DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD,
+			DEFAULT_BIBREF_FIELD,
+			DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD);
+		this.daoFactory.getBibrefDAO().save(bibref);
+		assertThat(bibref.getCreatedBy(), is(this.userId));
+		assertNotNull(bibref.getCreatedBy());
+		assertNull(bibref.getModifiedDate());
+		assertNull(bibref.getModifiedBy());
+		return bibref;
+	}
+
+	private Attribute createAttribute(final Germplasm germplasm) {
+		final UserDefinedField newAttributeCode =
+			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
+				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
+
+		final Attribute attribute = new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "",
+			germplasm.getLocationId(),
+			0, germplasm.getGdate());
+		this.daoFactory.getAttributeDAO()
+			.save(attribute);
+
+		assertNotNull(attribute.getCreatedDate());
+		assertThat(attribute.getCreatedBy(), is(this.userId));
+		assertNull(attribute.getModifiedDate());
+		assertNull(attribute.getModifiedBy());
+
+		return attribute;
 	}
 
 }
