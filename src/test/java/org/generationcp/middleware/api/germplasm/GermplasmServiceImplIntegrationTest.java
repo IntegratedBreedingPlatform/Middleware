@@ -130,7 +130,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
 				Optional.of(newLocation), creationDate);
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -187,7 +187,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
 				Optional.of(newLocation), creationDate);
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -238,7 +238,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				Optional.of(newLocation), creationDate);
 
 		try {
-			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.preferred.name.duplicate.names"));
 		}
@@ -260,7 +260,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.setPreferredNameType("Some Non Existing Code");
 
 		try {
-			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.preferred.name.doesnt.exist"));
 		}
@@ -286,7 +286,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
 				Optional.of(newLocation), creationDate);
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		// Create duplicate names and attributes
 		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0,
@@ -304,7 +304,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				0, germplasm.getGdate()));
 
 		try {
-			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.duplicate.names"));
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.duplicate.attributes"));
@@ -425,7 +425,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
 
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -450,7 +450,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
 
 		try {
-			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.breeding.method.mismatch"));
@@ -471,7 +471,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
 
 		try {
-			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.number.of.progenitors.mismatch"));
@@ -491,7 +491,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
 
 		try {
-			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.mutation.method.is.not.supported"));
@@ -516,7 +516,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
 
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -549,7 +549,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
 		germplasmUpdateDTO.getProgenitors().put("PROGENITOR 3", germplasmOtherProgenitors.getGid());
 
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -584,7 +584,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
 
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -615,7 +615,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 0);
 
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -630,7 +630,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
 
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -660,7 +660,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
 
 		try {
-			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.germplasm.has.progeny.error"));
@@ -693,7 +693,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmDescendant.getGid());
 
 		try {
-			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(
@@ -726,7 +726,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmWithDescendants.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmDescendant2.getGid());
 
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -753,7 +753,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 0);
 
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -786,7 +786,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmDescendant.getGid());
 
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -817,7 +817,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmParent.getGid());
 
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -847,7 +847,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmParent.getGid());
 
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -869,7 +869,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -896,7 +896,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, parentGermplasm.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, parentGermplasm.getGid());
 
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -924,7 +924,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, parentGermplasm.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, parentGermplasm.getGid());
 
-		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -1374,7 +1374,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		request.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), DRVNM));
 		request.getAdditionalInfo().put(NOTE, RandomStringUtils.randomAlphabetic(20));
 		final List<GermplasmDTO> germplasmDTOList =
-			this.germplasmService.createGermplasm(this.userId, CROP_NAME, Collections.singletonList(request));
+			this.germplasmService.createGermplasm(CROP_NAME, Collections.singletonList(request));
 		assertThat(germplasmDTOList.size(), is(1));
 
 		final GermplasmDTO germplasmDTO = germplasmDTOList.get(0);
@@ -1487,7 +1487,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		request.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), DRVNM));
 		request.getAdditionalInfo().put(NOTE, RandomStringUtils.randomAlphabetic(20));
 
-		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(this.userId, germplasm.getGermplasmUUID(), request);
+		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(germplasm.getGermplasmUUID(), request);
 		final Integer gid = germplasm.getGid();
 		assertThat(germplasmDTO.getGid(), equalTo(gid.toString()));
 		assertThat(germplasmDTO.getGermplasmDbId(), equalTo(germplasm.getGermplasmUUID()));
@@ -1596,7 +1596,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		request.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), DRVNM));
 		request.getAdditionalInfo().put(NOTE, RandomStringUtils.randomAlphabetic(20));
 
-		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(this.userId, germplasm.getGermplasmUUID(), request);
+		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(germplasm.getGermplasmUUID(), request);
 		final Integer gid = germplasm.getGid();
 		assertThat(germplasmDTO.getGid(), equalTo(gid.toString()));
 		// Germplasm details remain unchanged
@@ -1704,7 +1704,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
 		request1.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), DRVNM));
 		request1.getAdditionalInfo().put(NOTE, RandomStringUtils.randomAlphabetic(20));
-		this.germplasmService.updateGermplasm(this.userId, germplasm.getGermplasmUUID(), request1);
+		this.germplasmService.updateGermplasm(germplasm.getGermplasmUUID(), request1);
 
 		// Update the names and attributes with new values
 		final GermplasmUpdateRequest request2 = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), null,
@@ -1718,7 +1718,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		request2.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), DRVNM));
 		request2.getAdditionalInfo().put(NOTE, RandomStringUtils.randomAlphabetic(20));
 
-		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(this.userId, germplasm.getGermplasmUUID(), request2);
+		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(germplasm.getGermplasmUUID(), request2);
 		final Integer gid = germplasm.getGid();
 		assertThat(germplasmDTO.getGid(), equalTo(gid.toString()));
 		// Germplasm details remain unchanged
@@ -1825,7 +1825,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
 
-		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(this.userId, UUID.randomUUID().toString(), request);
+		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(UUID.randomUUID().toString(), request);
 		Assert.fail("Expected to throw exception that germplasm with GUID does not exist but did not");
 	}
 
@@ -1847,7 +1847,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
 
-		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(this.userId, UUID.randomUUID().toString(), request);
+		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(UUID.randomUUID().toString(), request);
 		Assert.fail("Expected to throw exception that breeding method type is invalid but did not");
 	}
 
@@ -1869,7 +1869,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
 
-		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(this.userId, UUID.randomUUID().toString(), request);
+		final GermplasmDTO germplasmDTO = this.germplasmService.updateGermplasm(UUID.randomUUID().toString(), request);
 		Assert.fail("Expected to throw exception that breeding method.mpgrn should be the same");
 	}
 
@@ -2107,7 +2107,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
 				Optional.of(newLocation), creationDate);
 
-		this.germplasmService.importGermplasmUpdates(this.userId, Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		this.sessionProvder.getSession().flush();
 		this.sessionProvder.getSession().clear();
