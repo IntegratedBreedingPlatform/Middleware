@@ -7,6 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
@@ -24,6 +25,7 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
+import org.generationcp.middleware.pojos.ExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
@@ -1373,6 +1375,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
 		request.getSynonyms().add(new Synonym(RandomStringUtils.randomAlphabetic(20), DRVNM));
 		request.getAdditionalInfo().put(NOTE, RandomStringUtils.randomAlphabetic(20));
+
+		final ExternalReferenceDTO externalReferenceDTO = new ExternalReferenceDTO();
+		externalReferenceDTO.setReferenceID(UUID.randomUUID().toString());
+		externalReferenceDTO.setReferenceSource(UUID.randomUUID().toString());
+		request.setExternalReferences(Arrays.asList(externalReferenceDTO));
+
 		final List<GermplasmDTO> germplasmDTOList =
 			this.germplasmService.createGermplasm(CROP_NAME, Collections.singletonList(request));
 		assertThat(germplasmDTOList.size(), is(1));
@@ -1465,6 +1473,11 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasm.getGpid1(), equalTo(0));
 		assertThat(germplasm.getGpid2(), equalTo(0));
 		assertThat(germplasm.getCreatedBy(), equalTo(this.userId));
+
+		assertThat(germplasm.getExternalReferences(), hasSize(1));
+		final ExternalReference externalReference = germplasm.getExternalReferences().get(0);
+		assertThat(externalReference.getCreatedBy(), is(this.userId));
+		assertNotNull(externalReference.getCreatedDate());
 	}
 
 	@Test
@@ -2096,10 +2109,13 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0, reference);
 		this.createAttribute(germplasm);
 
+		final Location location = this.createLocation();
+		final Name name =
+			this.addName(germplasm.getGid(), this.variableTypeId, RandomStringUtils.randomAlphabetic(10), location.getLocid(),
+				this.creationDate, 0);
+
 		final Germplasm createdGermplasm = this.daoFactory.getGermplasmDao().getById(germplasm.getGid());
 		assertThat(createdGermplasm.getGid(), is(germplasm.getGid()));
-		assertThat(createdGermplasm.getNames(), hasSize(0));
-		assertNotNull(createdGermplasm.getBibref());
 		assertNotNull(createdGermplasm.getBibref());
 		assertThat(createdGermplasm.getBibref().getRefid(), is(reference.getRefid()));
 
@@ -2120,9 +2136,9 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertNotNull(updatedGermplasm.getModifiedDate());
 		assertThat(updatedGermplasm.getNames(), hasSize(1));
 
-		final Name name = updatedGermplasm.getNames().get(0);
-		assertThat(name.getCreatedBy(), is(this.userId));
-		assertNotNull(name.getCreatedDate());
+		final Name actualName = this.daoFactory.getNameDao().getNameByNameId(name.getNid());
+		assertThat(actualName.getModifiedBy(), is(this.userId));
+		assertNotNull(actualName.getModifiedDate());
 
 		final Bibref updatedReference = this.daoFactory.getBibrefDAO().getById(reference.getRefid());
 		assertNotNull(updatedReference);
@@ -2191,6 +2207,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(name);
 		this.sessionProvder.getSession().flush();
 		this.daoFactory.getNameDao().refresh(name);
+
+		assertNotNull(name.getCreatedDate());
+		assertThat(name.getCreatedBy(), is(this.userId));
+		assertNull(name.getModifiedDate());
+		assertNull(name.getModifiedBy());
+
 		return name;
 	}
 
