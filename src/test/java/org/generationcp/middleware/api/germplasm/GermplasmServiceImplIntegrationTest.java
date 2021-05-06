@@ -57,6 +57,7 @@ import java.util.stream.Collectors;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.equalToIgnoringCase;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.notNullValue;
@@ -412,13 +413,15 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testImportGermplasmUpdates_UpdateProgenitors_BreedingMethodNotSpecified() {
 
 		final Method method = this.createBreedingMethod("GEN", 2);
+		final Germplasm germplasmFemale = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Germplasm germplasmMale = this.createGermplasm(method, null, null, 0, 0, 0);
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
 		// Cretae GermplasmUpdateDTO with empty method.
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.empty(), Optional.empty(), null);
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 1);
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 2);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
 
 		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 
@@ -428,8 +431,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		assertEquals(method.getMid(), savedGermplasm.getMethodId());
 		assertEquals(2, savedGermplasm.getGnpgs().intValue());
-		assertEquals(1, savedGermplasm.getGpid1().intValue());
-		assertEquals(2, savedGermplasm.getGpid2().intValue());
+		assertEquals(germplasmFemale.getGid(), savedGermplasm.getGpid1());
+		assertEquals(germplasmMale.getGid(), savedGermplasm.getGpid2());
 
 	}
 
@@ -495,19 +498,21 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testImportGermplasmUpdates_Generative_UpdateCrossesKnownParents() {
+	public void testImportGermplasmUpdates_Generative_KnownParents() {
 
 		final Method method = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
 		final Method newMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
 
+		final Germplasm germplasmFemale = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Germplasm germplasmMale = this.createGermplasm(method, null, null, 0, 0, 0);
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
 
 		// Assign known parents
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 1);
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 2);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
 
 		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 
@@ -517,8 +522,77 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
 		assertEquals(2, savedGermplasm.getGnpgs().intValue());
-		assertEquals(1, savedGermplasm.getGpid1().intValue());
-		assertEquals(2, savedGermplasm.getGpid2().intValue());
+		assertEquals(germplasmFemale.getGid(), savedGermplasm.getGpid1());
+		assertEquals(germplasmMale.getGid(), savedGermplasm.getGpid2());
+
+	}
+
+	@Test
+	public void testImportGermplasmUpdates_Generative_KnownParents_WithOtherProgenitors() {
+
+		final Method method = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 0);
+		final Method newMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 0);
+
+		final Germplasm germplasmFemale = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Germplasm germplasmMale = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Germplasm germplasmOtherProgenitors = this.createGermplasm(method, null, null, 0, 0, 0);
+
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
+
+		final GermplasmUpdateDTO germplasmUpdateDTO =
+			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
+
+		// Assign known parents
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
+		germplasmUpdateDTO.getProgenitors().put("PROGENITOR 3", germplasmOtherProgenitors.getGid());
+
+		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+
+		final Germplasm savedGermplasm =
+			this.daoFactory.getGermplasmDao()
+				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
+
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(3, savedGermplasm.getGnpgs().intValue());
+		assertEquals(germplasmFemale.getGid(), savedGermplasm.getGpid1());
+		assertEquals(germplasmMale.getGid(), savedGermplasm.getGpid2());
+		assertFalse(savedGermplasm.getOtherProgenitors().isEmpty());
+
+	}
+
+	@Test
+	public void testImportGermplasmUpdates_Generative_KnownParents_WithoutOtherProgenitors() {
+
+		final Method method = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 0);
+		final Method newMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 0);
+
+		final Germplasm germplasmFemale = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Germplasm germplasmMale = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Germplasm germplasmOtherProgenitors = this.createGermplasm(method, null, null, 0, 0, 0);
+
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
+		germplasm.setOtherProgenitors(Lists.newArrayList(new Progenitor(germplasm, 1, germplasmOtherProgenitors.getGid())));
+		this.daoFactory.getGermplasmDao().saveOrUpdate(germplasm);
+
+		final GermplasmUpdateDTO germplasmUpdateDTO =
+			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
+
+		// Assign known parents
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
+
+		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+
+		final Germplasm savedGermplasm =
+			this.daoFactory.getGermplasmDao()
+				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
+
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(2, savedGermplasm.getGnpgs().intValue());
+		assertEquals(germplasmFemale.getGid(), savedGermplasm.getGpid1());
+		assertEquals(germplasmMale.getGid(), savedGermplasm.getGpid2());
+		assertTrue(savedGermplasm.getOtherProgenitors().isEmpty());
 
 	}
 
@@ -528,13 +602,15 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Method method = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
 		final Method newMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
 
+		final Germplasm germplasmFemale = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Germplasm germplasmMale = this.createGermplasm(method, null, null, 0, 0, 0);
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
 
 		// Assign unknown male parent
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 0);
 
 		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
@@ -545,12 +621,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
 		assertEquals(2, savedGermplasm.getGnpgs().intValue());
-		assertEquals(1, savedGermplasm.getGpid1().intValue());
+		assertEquals(germplasmFemale.getGid(), savedGermplasm.getGpid1());
 		assertEquals(0, savedGermplasm.getGpid2().intValue());
 
 		// Assign unknown female parent
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
 
 		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 
@@ -561,7 +637,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
 		assertEquals(2, savedGermplasm.getGnpgs().intValue());
 		assertEquals(0, savedGermplasm.getGpid1().intValue());
-		assertEquals(1, savedGermplasm.getGpid2().intValue());
+		assertEquals(germplasmMale.getGid(), savedGermplasm.getGpid2());
 
 	}
 
@@ -585,7 +661,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.germplasm.has.existing.progeny"));
+			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.germplasm.has.progeny.error"));
 		}
 	}
 
@@ -619,7 +695,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(
-				e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.immediate.source.must.belong.to.the.same.group"));
+				e.getErrorCodeParamsMultiMap().containsKey("import.germplasm.invalid.immediate.source.group"));
 		}
 
 	}
@@ -667,11 +743,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
+		final Germplasm germplasmFemale = this.createGermplasm(method, null, null, 0, 0, 0);
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
-		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 1);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 0);
 
 		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
@@ -682,7 +759,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
 		assertEquals(-1, savedGermplasm.getGnpgs().intValue());
-		assertEquals(1, savedGermplasm.getGpid1().intValue());
+		assertEquals(germplasmFemale.getGid(), savedGermplasm.getGpid1());
 		assertEquals(0, savedGermplasm.getGpid2().intValue());
 
 	}
@@ -721,6 +798,67 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testImportGermplasmUpdates_Derivative_UnknownGroupSource_ImmediateSourceIsGenerative() {
+
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Method generativeMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
+
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
+
+		// Create germplasm with descendants
+		final Germplasm germplasmParent = this.createGermplasm(generativeMethod, null, null, 0, 0, 0);
+		this.daoFactory.getGermplasmDao().saveOrUpdate(germplasmParent);
+
+		final GermplasmUpdateDTO germplasmUpdateDTO =
+			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmParent.getGid());
+
+		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+
+		final Germplasm savedGermplasm =
+			this.daoFactory.getGermplasmDao()
+				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
+
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(-1, savedGermplasm.getGnpgs().intValue());
+		assertEquals(germplasmParent.getGid(), savedGermplasm.getGpid1());
+		assertEquals(germplasmParent.getGid(), savedGermplasm.getGpid2());
+
+	}
+
+	@Test
+	public void testImportGermplasmUpdates_Derivative_UnknownGroupSource_ImmediateSourceIsTerminalNode() {
+
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
+
+		// Create germplasm with descendants
+		final Germplasm germplasmParent = this.createGermplasm(method, null, null, 0, 0, 0);
+		this.daoFactory.getGermplasmDao().saveOrUpdate(germplasmParent);
+
+		final GermplasmUpdateDTO germplasmUpdateDTO =
+			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmParent.getGid());
+
+		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+
+		final Germplasm savedGermplasm =
+			this.daoFactory.getGermplasmDao()
+				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
+
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(-1, savedGermplasm.getGnpgs().intValue());
+		assertEquals(germplasmParent.getGid(), savedGermplasm.getGpid1());
+		assertEquals(germplasmParent.getGid(), savedGermplasm.getGpid2());
+
+	}
+
+	@Test
 	public void testImportGermplasmUpdates_TerminalNode() {
 
 		final Method method = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
@@ -739,6 +877,61 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertEquals(0, savedGermplasm.getGnpgs().intValue());
 		assertEquals(0, savedGermplasm.getGpid1().intValue());
 		assertEquals(0, savedGermplasm.getGpid2().intValue());
+	}
+
+	@Test
+	public void testImportGermplasmUpdates_FemaleAndMaleParentsAreSame_ParentIsTerminalNode() {
+
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), 2);
+		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), 2);
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
+
+		// Create a terminal node germplasm
+		final Germplasm parentGermplasm = this.createGermplasm(method, null, null, 0, 0, 0);
+
+		final GermplasmUpdateDTO germplasmUpdateDTO =
+			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, parentGermplasm.getGid());
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, parentGermplasm.getGid());
+
+		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+
+		final Germplasm savedGermplasm =
+			this.daoFactory.getGermplasmDao()
+				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
+
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(-1, savedGermplasm.getGnpgs().intValue());
+		assertEquals(parentGermplasm.getGid(), savedGermplasm.getGpid1());
+		assertEquals(parentGermplasm.getGid(), savedGermplasm.getGpid2());
+	}
+
+	@Test
+	public void testImportGermplasmUpdates_FemaleAndMaleParentsAreSame_ParentIsGenerative() {
+
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), 2);
+		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), 2);
+		final Method generativeMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
+
+		// Create a generative germplasm
+		final Germplasm parentGermplasm = this.createGermplasm(generativeMethod, null, null, 0, 0, 0);
+
+		final GermplasmUpdateDTO germplasmUpdateDTO =
+			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, parentGermplasm.getGid());
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, parentGermplasm.getGid());
+
+		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+
+		final Germplasm savedGermplasm =
+			this.daoFactory.getGermplasmDao()
+				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
+
+		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
+		assertEquals(-1, savedGermplasm.getGnpgs().intValue());
+		assertEquals(parentGermplasm.getGid(), savedGermplasm.getGpid1());
+		assertEquals(parentGermplasm.getGid(), savedGermplasm.getGpid2());
 	}
 
 	@Test
@@ -1100,6 +1293,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasmDto.getNames(), hasSize(2));
 		assertThat(germplasmDto.getOtherProgenitors(), hasSize(1));
 		assertThat(germplasmDto.getOtherProgenitors().get(0), equalTo(progenitor.getProgenitorGid()));
+		assertThat(germplasmDto.getCreatedBy(), equalToIgnoringCase("admin"));
+		assertThat(germplasmDto.getCreatedByUserId(), equalTo(1));
 	}
 
 	@Test
@@ -1576,7 +1771,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		}
 		if (existingAttrTypes.containsKey(GermplasmImportRequest.CROPNM)) {
 			assertThat(germplasmDTO.getCommonCropName(), equalTo(request2.getCommonCropName()));
-			assertThat(germplasmAttributes.get(existingAttrTypes.get(GermplasmImportRequest.CROPNM)), equalTo(request2.getCommonCropName()));
+			assertThat(germplasmAttributes.get(existingAttrTypes.get(GermplasmImportRequest.CROPNM)),
+				equalTo(request2.getCommonCropName()));
 			assertThat(germplasmDTO.getAdditionalInfo().get(GermplasmImportRequest.CROPNM), equalTo(request2.getCommonCropName()));
 		}
 		if (existingAttrTypes.containsKey(GermplasmImportRequest.SPECIES)) {
@@ -1610,7 +1806,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasmLatest.getGpid1(), equalTo(germplasm.getGpid1()));
 		assertThat(germplasmLatest.getGpid2(), equalTo(germplasm.getGpid2()));
 	}
-
 
 	@Test(expected = MiddlewareRequestException.class)
 	public void test_updateGermplasm_InvalidGUID() {
@@ -1725,7 +1920,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGidsOfGermplasmWithDescendants() {
+	public void testGetGidsOfGermplasm_WithDescendants() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
 		// Create germplasm with descendants
@@ -1749,11 +1944,80 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testGetGidsOfGermplasm_WhereDescendantIsDeleted() {
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+
+		// Create germplasm with deleted descendants
+		final Germplasm germplasmWithDescendants = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Germplasm germplasmDescendant = this.createGermplasm(method, null, null, 0, 0, 0);
+		germplasmDescendant.setGpid1(germplasmWithDescendants.getGid());
+		germplasmDescendant.setGpid2(germplasmWithDescendants.getGid());
+		germplasmDescendant.setDeleted(true);
+		this.daoFactory.getGermplasmDao().save(germplasmDescendant);
+		this.sessionProvder.getSession().flush();
+
+		final Set<Integer> gids =
+			this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendants.getGid()));
+
+		Assert.assertEquals(0, gids.size());
+
+	}
+
+	@Test
+	public void testGetGidsOfGermplasm_WithPolyCrossDescendant() {
+		final Method derivativeMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Method generativeMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
+
+		// Create germplasm with descendants
+		final Germplasm germplasmWithDescendant = this.createGermplasm(derivativeMethod, null, null, 0, 0, 0);
+		final Germplasm femaleParent = this.createGermplasm(derivativeMethod, null, null, 0, 0, 0);
+		final Germplasm maleParent = this.createGermplasm(derivativeMethod, null, null, 0, 0, 0);
+		final Germplasm germplasmDescendant = this.createGermplasm(generativeMethod, null, null, 0, 0, 0);
+		germplasmDescendant.setGpid1(femaleParent.getGid());
+		germplasmDescendant.setGpid2(maleParent.getGid());
+		this.daoFactory.getGermplasmDao().save(germplasmDescendant);
+
+		final Progenitor progenitor = new Progenitor(germplasmDescendant, 1, germplasmWithDescendant.getGid());
+		this.daoFactory.getProgenitorDao().save(progenitor);
+		this.sessionProvder.getSession().flush();
+
+		final Set<Integer> gids =
+			this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendant.getGid()));
+		Assert.assertEquals(1, gids.size());
+
+	}
+
+	@Test
+	public void testGetGidsOfGermplasm_WherePolyCrossDescendantIsDeleted() {
+		final Method derivativeMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Method generativeMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
+
+		// Create germplasm with deleted descendants
+		final Germplasm germplasmWithDescendant = this.createGermplasm(derivativeMethod, null, null, 0, 0, 0);
+		final Germplasm femaleParent = this.createGermplasm(derivativeMethod, null, null, 0, 0, 0);
+		final Germplasm maleParent = this.createGermplasm(derivativeMethod, null, null, 0, 0, 0);
+		final Germplasm germplasmDescendant = this.createGermplasm(generativeMethod, null, null, 0, 0, 0);
+		germplasmDescendant.setGpid1(femaleParent.getGid());
+		germplasmDescendant.setGpid2(maleParent.getGid());
+		germplasmDescendant.setDeleted(true);
+		this.daoFactory.getGermplasmDao().save(germplasmDescendant);
+
+		final Progenitor progenitor = new Progenitor(germplasmDescendant, 1, germplasmWithDescendant.getGid());
+		this.daoFactory.getProgenitorDao().save(progenitor);
+		this.sessionProvder.getSession().flush();
+
+		final Set<Integer> gids =
+			this.germplasmService.getGidsOfGermplasmWithDescendants(Lists.newArrayList(germplasmWithDescendant.getGid()));
+		Assert.assertEquals(0, gids.size());
+
+	}
+
+	@Test
 	public void testGetGidsOfGermplasmWithDescendantsFilteredByMethod() {
 		final Method method = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), -1);
 
 		// Create germplasm with descendants
-		final Germplasm germplasmWithDescendants = this.createGermplasm(method, null, null,0, 0, 0);
+		final Germplasm germplasmWithDescendants = this.createGermplasm(method, null, null, 0, 0, 0);
 		final Germplasm germplasmDescendant = this.createGermplasm(method, null, null, 0, 0, 0);
 		germplasmDescendant.setGpid1(germplasmWithDescendants.getGid());
 		germplasmDescendant.setGpid2(germplasmWithDescendants.getGid());
@@ -1766,7 +2030,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final List<Integer> lists = Arrays.asList(germplasmWithDescendants.getGid());
-		final Set<Integer> gids = this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(Sets.newHashSet(lists));
+		final Set<Integer> gids =
+			this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(Sets.newHashSet(lists));
 
 		Assert.assertEquals(0, gids.size());
 	}
@@ -1822,7 +2087,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Integer gpid1,
 		final Integer gpid2) {
 		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2,
-			0, 0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
+			1, 0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
 			0, 0, null, null, method);
 		if (StringUtils.isNotEmpty(germplasmUUID)) {
 			germplasm.setGermplasmUUID(germplasmUUID);

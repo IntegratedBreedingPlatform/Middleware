@@ -90,6 +90,155 @@
 															WHERE tool_name = 'germplasm_import');
 		</sql>
 	</changeSet>
+	
+	<changeSet author="corina" id="v17.4.0-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(*) > 0 FROM workbench_crop WHERE use_uuid=1;
+            </sqlCheck>
+        </preConditions>
+        <comment>Set workbench_crop.use_uuid to 0 in order to use short OBS_UNIT_IDs for barcoding</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE workbench_crop SET use_uuid=0 where use_uuid=1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v17.4.0-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'EDIT_GERMPLASM'
+            </sqlCheck>
+        </preConditions>
+        <comment>Granular permissions for Edit Germplasm: Modify basic details, names, attributes and pedigree for Program Role Type</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @manage_germplasm_id = (select permission_id from permission where name = 'MANAGE_GERMPLASM');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('EDIT_GERMPLASM', 'Edit Germplasm', @manage_germplasm_id, null);
+
+			SET @edit_germplasm_id = (SELECT permission_id FROM permission where name = 'EDIT_GERMPLASM');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @edit_germplasm_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @edit_germplasm_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @edit_germplasm_id, '1');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MODIFY_BASIC_DETAILS', 'Modify Basic Details', @edit_germplasm_id, null);
+
+			SET @modify_basic_details_id = (SELECT permission_id FROM permission where name = 'MODIFY_BASIC_DETAILS');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @modify_basic_details_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @modify_basic_details_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @modify_basic_details_id, '1');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MODIFY_NAMES', 'Modify Names', @edit_germplasm_id, null);
+
+			SET @modify_names_id = (SELECT permission_id FROM permission where name = 'MODIFY_NAMES');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @modify_names_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @modify_names_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @modify_names_id, '1');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MODIFY_ATTRIBUTES', 'Modify Attributes', @edit_germplasm_id, null);
+
+			SET @modify_attributes_id = (SELECT permission_id FROM permission where name = 'MODIFY_ATTRIBUTES');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @modify_attributes_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @modify_attributes_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @modify_attributes_id, '1');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MODIFY_PEDIGREE', 'Modify Pedrigree', @edit_germplasm_id, null);
+
+			SET @modify_pedigree_id = (SELECT permission_id FROM permission where name = 'MODIFY_PEDIGREE');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @modify_pedigree_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @modify_pedigree_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @modify_pedigree_id, '1');
+		</sql>
+	</changeSet>
+	<changeSet author="cuenyad" id="v17.4.0-4-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'DELETE_GERMPLASM'
+            </sqlCheck>
+        </preConditions>
+        <comment>Granular permission for delete Germplasm for Program Role Type</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @manage_germplasm_id = (select permission_id from permission where name = 'MANAGE_GERMPLASM');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('DELETE_GERMPLASM', 'Delete Germplasm', @manage_germplasm_id, null);
+
+			SET @delete_germplasm_id = (SELECT permission_id FROM permission where name = 'DELETE_GERMPLASM');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @delete_germplasm_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @delete_germplasm_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @delete_germplasm_id, '1');
+		</sql>
+	</changeSet>
+	<changeSet author="cuenyad" id="v17.4.0-5">
+        <preConditions onFail="MARK_RAN">
+			<and>
+            	<sqlCheck expectedResult="1">
+                	SELECT count(*) > 1 FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id WHERE p.name IN ('GERMPLASM' , 'MANAGE_GERMPLASM');
+            	</sqlCheck>
+				<not>
+					<tableExists tableName="roles_affected_temporary"></tableExists>
+				</not>
+			</and>
+        </preConditions>
+        <comment>Replace GERMPLASM, MANAGE_GERMPLASM permissions assignment by IMPORT_GERMPLASM, SEARCH_GERMPLASM, IMPORT_GERMPLASM_UPDATES and GERMPLASM_LABEL_PRINTING</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET @import_germplasm_permission_id = (SELECT permission_id FROM permission WHERE name = 'IMPORT_GERMPLASM');
+			SET @search_germplasm_permission_id = (SELECT permission_id FROM permission WHERE name = 'SEARCH_GERMPLASM');
+			SET @import_germplasm_update_permission_id = (SELECT permission_id FROM permission WHERE name = 'IMPORT_GERMPLASM_UPDATES');
+			SET @germplasm_label_printing_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_LABEL_PRINTING');
+
+			#Create roles_affected_temporary Table
+			CREATE TEMPORARY TABLE roles_affected_temporary (
+				role_id int(11) not null
+			);
+
+			#Insert role id in Temporary table
+			INSERT INTO roles_affected_temporary (role_id)
+				SELECT DISTINCT(rp.role_id) FROM role_permission rp INNER JOIN  permission p ON rp.permission_id = p.permission_id
+					WHERE p.name IN ('GERMPLASM' , 'MANAGE_GERMPLASM') GROUP BY rp.role_id;
+
+			#Insert permissions in role_permission
+			INSERT INTO role_permission(role_id, permission_id)
+						SELECT rp.role_id, @import_germplasm_permission_id FROM roles_affected_temporary rp;
+
+			INSERT INTO role_permission(role_id, permission_id)
+						SELECT rp.role_id, @search_germplasm_permission_id FROM roles_affected_temporary rp;
+
+			INSERT INTO role_permission(role_id, permission_id)
+						SELECT rp.role_id, @import_germplasm_update_permission_id FROM roles_affected_temporary rp;
+
+			INSERT INTO role_permission(role_id, permission_id)
+						SELECT rp.role_id, @germplasm_label_printing_permission_id FROM roles_affected_temporary rp;
+
+			#Delete roles_affected_temporary Table
+			DROP TABLE roles_affected_temporary;
+
+			#Delete GERMPLASM and MANAGE_GERMPLASM permission from role_permission
+			DELETE role_permission FROM role_permission WHERE permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name IN ('GERMPLASM' , 'MANAGE_GERMPLASM'));
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v17.4.0-6">
+        <preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="release_note" columnName="enabled"/>
+			</not>
+		</preConditions>
+        <comment>Add 'enabled' column to 'release_note' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			alter table release_note add enabled boolean default 1 not null;
+		</sql>
+	</changeSet>
 
 </databaseChangeLog>
 

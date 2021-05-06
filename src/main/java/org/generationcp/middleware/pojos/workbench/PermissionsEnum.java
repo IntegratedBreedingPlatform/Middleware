@@ -13,6 +13,7 @@ public enum PermissionsEnum {
 	STUDIES,
 	LISTS,
 	SAMPLES_LISTS,
+	GERMPLASM_LISTS,
 	SITE_ADMIN,
 	MANAGE_ONTOLOGIES,
 	LOW_DENSITY,
@@ -68,7 +69,6 @@ public enum PermissionsEnum {
 		+ ", 'CREATE_LOTS')";
 
 	public static final String HAS_IMPORT_GERMPLASM = " or hasAnyAuthority('ADMIN'"
-		+ ", 'CROP_MANAGEMENT'"
 		+ ", 'GERMPLASM'"
 		+ ", 'MANAGE_GERMPLASM'"
 		+ ", 'IMPORT_GERMPLASM')";

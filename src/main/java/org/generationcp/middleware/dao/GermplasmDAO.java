@@ -93,7 +93,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		+ "    if(g.mgid > 0, true, false) as isGroupedLine, " //
 		+ "    g.mgid as groupId, " //
 		+ "    g.gpid1 as gpid1, "  //
-		+ "    g.gpid2 as gpid2 " //
+		+ "    g.gpid2 as gpid2, " //
+		+ "    g.germuid as createdByUserId " //
 		+ "    from " //
 		+ "    germplsm g " //
 		+ "        left join " //
@@ -113,16 +114,18 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String FIND_GERMPLASM_BY_GIDS = " g.gid in (:gids) ";
 
 	private static final String FIND_GERMPLASM_WITHDESCENDANTS = "SELECT g.gid as gid FROM germplsm g "
-			+ "WHERE (EXISTS (SELECT 1 FROM germplsm descendant WHERE g.gid = descendant.gpid1 OR g.gid = descendant.gpid2 ) "
-			+ "OR EXISTS (SELECT 1 FROM progntrs p WHERE  g.gid = p.gid)) "
-			+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
+			+ "WHERE (EXISTS (SELECT 1 FROM germplsm descendant WHERE descendant.deleted = 0 AND "
+			+ " (g.gid = descendant.gpid1 OR g.gid = descendant.gpid2) ) "
+			+ " OR EXISTS (SELECT 1 FROM progntrs p INNER JOIN germplsm descendant ON descendant.gid = p.gid"
+			+ " 					WHERE  g.gid = p.pid  AND descendant.deleted = 0)) "
+			+ " AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
 
 	private static final String FIND_GERMPLASM_WITH_DERIVATIVE_OR_MAINTENANCE_DESCENDANTS = "SELECT g.gid as gid FROM germplsm g "
 			+ "WHERE (EXISTS "
 						+ " (SELECT 1 FROM germplsm descendant "
 						+ " INNER JOIN methods mtype ON mtype.mid = descendant.methn"
 						+ " WHERE (g.gid = descendant.gpid1 OR g.gid = descendant.gpid2) "
-						+ " AND mtype.mtype IN (:mtypes) ) "
+						+ " AND mtype.mtype IN (:mtypes) AND descendant.deleted = 0) "
 					+ ") "
 			+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
 
@@ -669,7 +672,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return toreturn;
 	}
 
-	public List<Germplasm> getChildren(final Integer gid, final char methodType) {
+	public List<Germplasm> getDescendants(final Integer gid, final char methodType) {
 		final List<Germplasm> toreturn = new ArrayList<>();
 		try {
 			final String queryString = methodType == 'D' ? Germplasm.GET_DERIVATIVE_CHILDREN : Germplasm.GET_MAINTENANCE_CHILDREN;
@@ -687,7 +690,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error with getChildren(gid=" + gid + ", methodType=" + methodType + ") query: " + e.getMessage();
+			final String errorMessage = "Error with getDescendants(gid=" + gid + ", methodType=" + methodType + ") query: " + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -699,10 +702,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		try {
 			final List<Germplasm> children = new ArrayList<>();
 			// Get all derivative children
-			children.addAll(this.getChildren(gid, 'D'));
+			children.addAll(this.getDescendants(gid, 'D'));
 
 			// Get all maintenance children
-			children.addAll(this.getChildren(gid, 'M'));
+			children.addAll(this.getDescendants(gid, 'M'));
 
 			// Get all generative childern
 			children.addAll(this.getGenerativeChildren(gid));
@@ -1693,7 +1696,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			.addScalar("breedingLocationId")
 			.addScalar("breedingLocation").addScalar("breedingMethodId").addScalar("breedingMethod")
 			.addScalar("isGroupedLine", new BooleanType())
-			.addScalar("groupId").addScalar("gpid1").addScalar("gpid2");
+			.addScalar("groupId").addScalar("gpid1").addScalar("gpid2").addScalar("createdByUserId");
 	}
 
 	public List<GermplasmDto> findGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto, final Pageable pageable) {
@@ -1829,6 +1832,21 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
+	public long countGermplasmDerivativeProgeny(final Integer gid) {
+		try {
+			final StringBuilder queryBuilder = new StringBuilder();
+			queryBuilder.append("SELECT COUNT(DISTINCT g.gid) FROM germplsm g ");
+			queryBuilder.append("WHERE g.gnpgs = -1 AND g.gpid2 = :gid AND g.deleted = 0  and g.grplce = 0");
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+			sqlQuery.setParameter("gid", gid);
+			return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error with countGermplasmDerivativeProgeny(gid=" + gid + ") " + e.getMessage();
+			GermplasmDAO.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
   /**
    * Only returns IDs of germplasm with progeny (Germplasm Id is assigned to other germplasm's gpid1, gpid2 OR progntrs.pid) with Method Type
    * DERIVATIVE AND MAINTENANCE
@@ -1863,7 +1881,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			criteria.add(Restrictions.eq("grplce", 0));
 			criteria.setProjection(Projections.rowCount());
 			return (Long) criteria.uniqueResult();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in countAll(): " + e.getMessage(), e);
 		}
 	}
@@ -1874,7 +1892,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ "from germplsm "
 				+ "       inner join methods m on germplsm.methn = m.mid "
 				+ "where (((mtype = " + GEN + " and (gpid1 = :parent or gpid2 = :parent))) "
-				+ "  or (mtype in (" + DER_MAN + ") and (gpid2 = :parent or (gpid2 = 0 and gpid1 = :parent)))) and deleted = 0");
+				+ "  or (mtype in (" + DER_MAN
+				+ ") and (gpid2 = :parent or (gpid2 = 0 and gpid1 = :parent)))) and deleted = 0 AND grplce = 0 ");
 			sqlQuery.setParameter("parent", gid);
 			return sqlQuery.list();
 		} catch (final HibernateException e) {

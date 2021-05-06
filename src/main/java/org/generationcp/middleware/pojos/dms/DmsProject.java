@@ -195,11 +195,11 @@ public class DmsProject implements Serializable {
 		this.properties = properties;
 	}
 
-	public Boolean isDeleted() {
-		return deleted;
+	public boolean getDeleted() {
+		return this.deleted;
 	}
 
-	public void setDeleted(final Boolean deleted) {
+	public void setDeleted(final boolean deleted) {
 		this.deleted = deleted;
 	}
 
@@ -212,15 +212,11 @@ public class DmsProject implements Serializable {
 	}
 
 	public StudyType getStudyType() {
-		return studyType;
+		return this.studyType;
 	}
 
 	public void setStudyType(final StudyType studyType) {
 		this.studyType = studyType;
-	}
-
-	public void setDeleted(final boolean deleted) {
-		this.deleted = deleted;
 	}
 
 	public String getStartDate() {
@@ -282,7 +278,7 @@ public class DmsProject implements Serializable {
 	}
 
 	public DmsProject getParent() {
-		return parent;
+		return this.parent;
 	}
 
 	public void setParent(final DmsProject parent) {
@@ -290,7 +286,7 @@ public class DmsProject implements Serializable {
 	}
 
 	public DmsProject getStudy() {
-		return study;
+		return this.study;
 	}
 
 	public void setStudy(final DmsProject study) {

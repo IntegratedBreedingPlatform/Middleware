@@ -428,8 +428,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	public List<Integer> getGermplasmUsedInStudies(final List<Integer> gids)  {
 		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
+			criteria.createAlias("project", "project");
 			criteria.add(Restrictions.in("germplasm.gid", gids));
+			criteria.add(Restrictions.eq("project.deleted", false));
 			criteria.setProjection(Projections.distinct(Projections.property("germplasm.gid")));
 			return criteria.list();
 		} catch (final HibernateException e) {
@@ -638,7 +640,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT DISTINCT p.project_id AS studyId, ");
 			queryString.append("p.name AS name, ");
-			queryString.append("p.description AS description ");
+			queryString.append("p.description AS description, ");
+			queryString.append("p.program_uuid AS programUUID ");
 			queryString.append("FROM stock s ");
 			queryString.append("INNER JOIN project p ON s.project_id = p.project_id ");
 			queryString.append("WHERE s.dbxref_id = :gid AND p.deleted = 0");
@@ -647,6 +650,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			sqlQuery.addScalar("studyId");
 			sqlQuery.addScalar("name");
 			sqlQuery.addScalar("description");
+			sqlQuery.addScalar("programUUID");
 			sqlQuery.setParameter("gid", gid);
 
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmStudyDto.class));

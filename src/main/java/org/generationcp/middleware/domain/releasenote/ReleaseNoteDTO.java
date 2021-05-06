@@ -12,15 +12,18 @@ public class ReleaseNoteDTO {
 	private String version;
 	private Date releaseDate;
 	private boolean hasComingSoon;
+	private String fileName;
 
 	public ReleaseNoteDTO() {
 	}
 
-	public ReleaseNoteDTO(final Integer id, final String version, final Date releaseDate, final boolean hasComingSoon) {
+	public ReleaseNoteDTO(final Integer id, final String version, final Date releaseDate, final boolean hasComingSoon,
+		final String fileName) {
 		this.id = id;
 		this.version = version;
 		this.releaseDate = releaseDate;
 		this.hasComingSoon = hasComingSoon;
+		this.fileName = fileName;
 	}
 
 	public Integer getId() {
@@ -53,6 +56,14 @@ public class ReleaseNoteDTO {
 
 	public void setHasComingSoon(final boolean hasComingSoon) {
 		this.hasComingSoon = hasComingSoon;
+	}
+
+	public String getFileName() {
+		return this.fileName;
+	}
+
+	public void setFileName(final String fileName) {
+		this.fileName = fileName;
 	}
 
 	@Override
