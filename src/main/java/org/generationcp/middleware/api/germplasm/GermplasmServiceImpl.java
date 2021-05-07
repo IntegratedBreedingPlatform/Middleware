@@ -417,6 +417,20 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return this.daoFactory.getAttributeDAO().countAttributesByGUID(gemrplasmUUID, attributeDbIds);
 	}
 
+	@Override
+	public Germplasm getGermplasmWithPreferredName(final Integer gid) {
+		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
+		if (germplasm != null) {
+			germplasm.setPreferredName(this.daoFactory.getNameDao().getPreferredNameByGid(gid));
+		}
+		return germplasm;
+	}
+
+	@Override
+	public List<Germplasm> getProgenitorsWithPreferredName(final Integer gid) {
+		return this.daoFactory.getGermplasmDao().getProgenitorsByGIDWithPrefName(gid);
+	}
+
   private List<Integer> getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(final List<Germplasm> germplasmList) {
 	  final List<Integer> gids = germplasmList.stream().map(Germplasm::getGid).collect(Collectors.toList());
 

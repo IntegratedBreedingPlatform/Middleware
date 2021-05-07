@@ -1,9 +1,10 @@
 package org.generationcp.middleware.api.germplasm.pedigree;
 
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -14,7 +15,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	private final DaoFactory daoFactory;
 
 	@Resource
-	private GermplasmDataManager germplasmDataManager;
+	private GermplasmService germplasmService;
 
 	public GermplasmPedigreeServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -23,7 +24,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	@Override
 	public GermplasmTreeNode getGermplasmPedigreeTree(final Integer gid, final Integer level, final boolean includeDerivativeLines) {
 
-		final Germplasm root = this.germplasmDataManager.getGermplasmWithPrefName(gid);
+		final Germplasm root = this.germplasmService.getGermplasmWithPreferredName(gid);
 
 		final GermplasmTreeNode rootNode = new GermplasmTreeNode(root);
 		if (level > 1) {
@@ -48,7 +49,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 			if (germplasmOfNode.getGnpgs() == -1) {
 				if(excludeDerivativeLines) {
 					// get and add the source germplasm
-					final Germplasm parent = this.germplasmDataManager.getGermplasmWithPrefName(femaleGid);
+					final Germplasm parent = this.germplasmService.getGermplasmWithPreferredName(femaleGid);
 					if (parent != null) {
 						this.addNodeForKnownParents(node, level, parent, excludeDerivativeLines);
 					}
@@ -69,7 +70,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 				// IF there are more parents, get and add each of them
 				if (germplasmOfNode.getGnpgs() > 2) {
 					final List<Germplasm> otherParents =
-						this.germplasmDataManager.getProgenitorsByGIDWithPrefName(germplasmOfNode.getGid());
+						this.germplasmService.getProgenitorsWithPreferredName(germplasmOfNode.getGid());
 					node.setOtherProgenitors(new ArrayList<>());
 					for (final Germplasm otherParent : otherParents) {
 						final GermplasmTreeNode maleParentNode = new GermplasmTreeNode(otherParent);
@@ -102,7 +103,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	}
 
 	private void addMaleParentNode(final GermplasmTreeNode node, final int level, final Integer gid, final boolean excludeDerivativeLines) {
-		final Germplasm maleParent = this.germplasmDataManager.getGermplasmWithPrefName(gid);
+		final Germplasm maleParent = this.germplasmService.getGermplasmWithPreferredName(gid);
 		if(maleParent != null) {
 			final GermplasmTreeNode maleParentNode = new GermplasmTreeNode(maleParent);
 			node.setMaleParentNode(maleParentNode);
@@ -111,7 +112,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	}
 
 	private void addFemaleParentNode(final GermplasmTreeNode node, final int level, final Integer gid, final boolean excludeDerivativeLines) {
-		final Germplasm femaleParent = this.germplasmDataManager.getGermplasmWithPrefName(gid);
+		final Germplasm femaleParent = this.germplasmService.getGermplasmWithPreferredName(gid);
 		if(femaleParent != null) {
 			final GermplasmTreeNode femaleParentNode = new GermplasmTreeNode(femaleParent);
 			node.setFemaleParentNode(femaleParentNode);
@@ -120,6 +121,11 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	}
 
 	private GermplasmTreeNode createUnknownParent() {
-		return  new GermplasmTreeNode(this.germplasmDataManager.getUnknownGermplasmWithPreferredName());
+		final Germplasm germplasm = new Germplasm();
+		germplasm.setGid(0);
+		final Name preferredName = new Name();
+		preferredName.setNval(Name.UNKNOWN);
+		germplasm.setPreferredName(preferredName);
+		return  new GermplasmTreeNode(germplasm);
 	}
 }

@@ -184,6 +184,19 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return new ArrayList<>();
 	}
 
+	public Name getPreferredNameByGid(final Integer gid) {
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery("SELECT n.* FROM names n WHERE n.nstat = 1 AND n.gid = :gid");
+			query.setParameter("gid", gid);
+			query.addEntity("n", Name.class);
+			return (Name) query.uniqueResult();
+		} catch (final HibernateException e) {
+			final String message = "Error with getPreferredNameByGid(gid=" + gid + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 	public Name getNameByNameId(final Integer nId) {
 		try {
 			if (nId != null) {
