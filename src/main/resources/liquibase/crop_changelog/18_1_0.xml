@@ -11,66 +11,114 @@
 				<columnExists tableName="atributs" columnName="modified_by"/>
 				<columnExists tableName="atributs" columnName="created_date"/>
 				<columnExists tableName="atributs" columnName="modified_date"/>
+			</not>
+		</preConditions>
+        <comment>
+            Add fields for auditing to table 'atributs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE atributs CHANGE auid created_by int default 0 not null;
+			ALTER TABLE atributs ADD modified_by int null;
+			ALTER TABLE atributs ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE atributs ADD modified_date timestamp null;
+        </sql>
+    </changeSet>
 
+	<changeSet author="lkovacic" id="v18.1.0-2">
+        <preConditions onFail="MARK_RAN">
+			<not>
 				<columnExists tableName="bibrefs" columnName="created_by"/>
 				<columnExists tableName="bibrefs" columnName="modified_by"/>
 				<columnExists tableName="bibrefs" columnName="created_date"/>
 				<columnExists tableName="bibrefs" columnName="modified_date"/>
+			</not>
+		</preConditions>
+        <comment>
+            Add fields for auditing to table 'bibrefs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE bibrefs ADD created_by int default 0 not null;
+			ALTER TABLE bibrefs ADD modified_by int null;
+			ALTER TABLE bibrefs ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE bibrefs ADD modified_date timestamp null;
+        </sql>
+    </changeSet>
 
+	<changeSet author="lkovacic" id="v18.1.0-3">
+        <preConditions onFail="MARK_RAN">
+			<not>
 				<columnExists tableName="germplsm" columnName="created_by"/>
 				<columnExists tableName="germplsm" columnName="modified_by"/>
 				<columnExists tableName="germplsm" columnName="created_date"/>
 				<columnExists tableName="germplsm" columnName="modified_date"/>
+			</not>
+		</preConditions>
+        <comment>
+            Add fields for auditing to table 'germplsm'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE germplsm CHANGE germuid created_by int default 0 not null;
+			ALTER TABLE germplsm ADD modified_by int null;
+			ALTER TABLE germplsm ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE germplsm ADD modified_date timestamp null;
+        </sql>
+    </changeSet>
 
+	<changeSet author="lkovacic" id="v18.1.0-4">
+        <preConditions onFail="MARK_RAN">
+			<not>
 				<columnExists tableName="names" columnName="created_by"/>
 				<columnExists tableName="names" columnName="modified_by"/>
 				<columnExists tableName="names" columnName="created_date"/>
 				<columnExists tableName="names" columnName="modified_date"/>
+			</not>
+		</preConditions>
+        <comment>
+            Add fields for auditing to table 'names'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE names CHANGE nuid created_by int default 0 not null;
+			ALTER TABLE names ADD modified_by int null;
+			ALTER TABLE names ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE names ADD modified_date timestamp null;
+        </sql>
+    </changeSet>
 
+	<changeSet author="lkovacic" id="v18.1.0-5">
+        <preConditions onFail="MARK_RAN">
+			<not>
 				<columnExists tableName="progntrs" columnName="created_by"/>
 				<columnExists tableName="progntrs" columnName="modified_by"/>
 				<columnExists tableName="progntrs" columnName="created_date"/>
 				<columnExists tableName="progntrs" columnName="modified_date"/>
+			</not>
+		</preConditions>
+        <comment>
+            Add fields for auditing to table 'progntrs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE progntrs ADD created_by int default 0 not null;
+			ALTER TABLE progntrs ADD modified_by int null;
+			ALTER TABLE progntrs ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE progntrs ADD modified_date timestamp null;
+        </sql>
+    </changeSet>
 
+	<changeSet author="lkovacic" id="v18.1.0-6">
+        <preConditions onFail="MARK_RAN">
+			<not>
 				<columnExists tableName="external_reference" columnName="created_by"/>
 				<columnExists tableName="external_reference" columnName="modified_by"/>
 				<columnExists tableName="external_reference" columnName="modified_date"/>
 			</not>
 		</preConditions>
         <comment>
-            Add fields for auditing to tables: atributs, bibrefs, germplsm, names, progntrs and external_reference
+            Add fields for auditing to table 'external_reference'
         </comment>
         <sql dbms="mysql" splitStatements="true">
-
-			ALTER TABLE atributs CHANGE auid created_by int default 0 not null;
-			ALTER TABLE atributs ADD modified_by int null;
-			ALTER TABLE atributs ADD created_date timestamp default CURRENT_TIMESTAMP null;
-			ALTER TABLE atributs ADD modified_date timestamp null;
-
-			ALTER TABLE bibrefs ADD created_by int default 0 not null;
-			ALTER TABLE bibrefs ADD modified_by int null;
-			ALTER TABLE bibrefs ADD created_date timestamp default CURRENT_TIMESTAMP null;
-			ALTER TABLE bibrefs ADD modified_date timestamp null;
-
-			ALTER TABLE germplsm CHANGE germuid created_by int default 0 not null;
-			ALTER TABLE germplsm ADD modified_by int null;
-			ALTER TABLE germplsm ADD created_date timestamp default CURRENT_TIMESTAMP null;
-			ALTER TABLE germplsm ADD modified_date timestamp null;
-
-			ALTER TABLE names CHANGE nuid created_by int default 0 not null;
-			ALTER TABLE names ADD modified_by int null;
-			ALTER TABLE names ADD created_date timestamp default CURRENT_TIMESTAMP null;
-			ALTER TABLE names ADD modified_date timestamp null;
-
-			ALTER TABLE progntrs ADD created_by int default 0 not null;
-			ALTER TABLE progntrs ADD modified_by int null;
-			ALTER TABLE progntrs ADD created_date timestamp default CURRENT_TIMESTAMP null;
-			ALTER TABLE progntrs ADD modified_date timestamp null;
-
 			ALTER TABLE external_reference ADD created_by int default 0 not null;
 			ALTER TABLE external_reference ADD modified_by int null;
 			ALTER TABLE external_reference ADD modified_date timestamp null;
-
         </sql>
     </changeSet>
 
