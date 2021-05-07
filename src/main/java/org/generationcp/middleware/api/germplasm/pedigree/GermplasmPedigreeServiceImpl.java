@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.germplasm.pedigree;
 
 import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -31,6 +32,29 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 			this.addParents(rootNode, level, root, !includeDerivativeLines);
 		}
 		return rootNode;
+	}
+
+	@Override
+	public List<GermplasmDto> getGenerationHistory(final Integer gid) {
+		final List<GermplasmDto> germplasmGenerationHistory = new ArrayList<>();
+
+		GermplasmDto currentGermplasm = this.daoFactory.getGermplasmDao().getGermplasmDtoByGid(gid);
+		if (currentGermplasm != null) {
+			germplasmGenerationHistory.add(currentGermplasm);
+
+			while (currentGermplasm.getGnpgs() == -1) {
+				// trace back the sources
+				final Integer sourceId = currentGermplasm.getGpid2();
+				currentGermplasm = this.daoFactory.getGermplasmDao().getGermplasmDtoByGid(sourceId);
+
+				if (currentGermplasm != null) {
+					germplasmGenerationHistory.add(currentGermplasm);
+				} else {
+					break;
+				}
+			}
+		}
+		return germplasmGenerationHistory;
 	}
 
 	/**
