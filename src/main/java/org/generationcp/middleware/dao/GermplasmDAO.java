@@ -114,6 +114,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private static final String FIND_GERMPLASM_BY_GIDS = " g.gid in (:gids) ";
 
+	private static final String FIND_GERMPLASM_BY_MGID = " g.mgid = :gid AND  g.deleted = 0  and g.grplce = 0 ORDER BY g.gid";
+
 	private static final String FIND_GERMPLASM_WITHDESCENDANTS = "SELECT g.gid as gid FROM germplsm g "
 			+ "WHERE (EXISTS (SELECT 1 FROM germplsm descendant WHERE descendant.deleted = 0 AND "
 			+ " (g.gid = descendant.gpid1 OR g.gid = descendant.gpid2) ) "
@@ -1824,6 +1826,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
 		this.addScalarsToFindGermplasmMatchesQuery(sqlQuery);
 		sqlQuery.setParameterList("gids", gids);
+		sqlQuery.setResultTransformer(Transformers.aliasToBean(GermplasmDto.class));
+		try {
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getGermplasmDtoByGid" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<GermplasmDto> getManagementNeighbors(final Integer gid) {
+		final StringBuilder queryBuilder =
+			new StringBuilder(FIND_GERMPLASM_MATCHES_MAIN_QUERY);
+		queryBuilder.append(" WHERE ").append(FIND_GERMPLASM_BY_MGID);
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+		this.addScalarsToFindGermplasmMatchesQuery(sqlQuery);
+		sqlQuery.setParameter("gid", gid);
 		sqlQuery.setResultTransformer(Transformers.aliasToBean(GermplasmDto.class));
 		try {
 			return sqlQuery.list();

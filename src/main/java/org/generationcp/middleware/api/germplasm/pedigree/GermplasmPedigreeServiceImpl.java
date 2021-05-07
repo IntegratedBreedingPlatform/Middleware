@@ -57,6 +57,11 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		return germplasmGenerationHistory;
 	}
 
+	@Override
+	public List<GermplasmDto> getManagementNeighbors(final Integer gid) {
+		return this.daoFactory.getGermplasmDao().getManagementNeighbors(gid);
+	}
+
 	/**
 	 * Given a GermplasmPedigreeTreeNode and the level of the desired tree, add parents
 	 * to the node recursively until the specified level of the tree is reached.
