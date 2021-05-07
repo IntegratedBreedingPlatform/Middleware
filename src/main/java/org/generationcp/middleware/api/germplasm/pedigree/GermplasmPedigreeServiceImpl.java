@@ -42,7 +42,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	 */
 	private GermplasmTreeNode addParents(final GermplasmTreeNode node, final int level, final Germplasm germplasmOfNode,
 		final boolean excludeDerivativeLines) {
-		if (level != 0) {
+		if (level != 1) {
 			final Integer maleGid = germplasmOfNode.getGpid2();
 			final Integer femaleGid = germplasmOfNode.getGpid1();
 			if (germplasmOfNode.getGnpgs() == -1) {
