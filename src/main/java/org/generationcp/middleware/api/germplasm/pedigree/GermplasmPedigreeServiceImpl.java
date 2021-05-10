@@ -58,6 +58,11 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	}
 
 	@Override
+	public List<GermplasmDto> getGroupRelatives(final Integer gid) {
+		return this.daoFactory.getGermplasmDao().getGroupRelatives(gid);
+	}
+
+	@Override
 	public List<GermplasmDto> getManagementNeighbors(final Integer gid) {
 		return this.daoFactory.getGermplasmDao().getManagementNeighbors(gid);
 	}

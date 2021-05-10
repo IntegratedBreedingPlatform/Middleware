@@ -116,6 +116,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private static final String FIND_GERMPLASM_BY_MGID = " g.mgid = :gid AND  g.deleted = 0  and g.grplce = 0 ORDER BY g.gid";
 
+	private static final String FIND_GERMPLASM_GROUP_RELATIVES = "g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid "
+		+ "AND g.gpid1 != 0 AND  g.deleted = 0  AND g.grplce = 0";
+
 	private static final String FIND_GERMPLASM_WITHDESCENDANTS = "SELECT g.gid as gid FROM germplsm g "
 			+ "WHERE (EXISTS (SELECT 1 FROM germplsm descendant WHERE descendant.deleted = 0 AND "
 			+ " (g.gid = descendant.gpid1 OR g.gid = descendant.gpid2) ) "
@@ -1847,7 +1850,24 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		try {
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
-			final String message = "Error with getGermplasmDtoByGid" + e.getMessage();
+			final String message = "Error with getManagementNeighbors" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<GermplasmDto> getGroupRelatives(final Integer gid) {
+		final StringBuilder queryBuilder =
+			new StringBuilder(FIND_GERMPLASM_MATCHES_MAIN_QUERY);
+		queryBuilder.append(" JOIN germplsm g2 ON g.gpid1 = g2.gpid1 WHERE ").append(FIND_GERMPLASM_GROUP_RELATIVES);
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+		this.addScalarsToFindGermplasmMatchesQuery(sqlQuery);
+		sqlQuery.setParameter("gid", gid);
+		sqlQuery.setResultTransformer(Transformers.aliasToBean(GermplasmDto.class));
+		try {
+			return sqlQuery.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getGroupRelatives" + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
