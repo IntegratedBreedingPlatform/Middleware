@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 
 import javax.annotation.Resource;
@@ -67,6 +68,102 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		return this.daoFactory.getGermplasmDao().getManagementNeighbors(gid);
 	}
 
+	@Override
+	public GermplasmNeighborhoodNode getGermplasmMaintenanceNeighborhood(final Integer gid, final int numberOfStepsBackward,
+		final int numberOfStepsForward) {
+		return this.getNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward, 'M');
+	}
+
+	@Override
+	public GermplasmNeighborhoodNode getGermplasmDerivativeNeighborhood(final Integer gid, final int numberOfStepsBackward,
+		final int numberOfStepsForward) {
+		return this.getNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward, 'D');
+	}
+
+	private GermplasmNeighborhoodNode getNeighborhood(final Integer gid, final int numberOfStepsBackward, final int numberOfStepsForward,
+		final char methodType) {
+		final Object[] traceResult = this.traceRoot(gid, numberOfStepsBackward, methodType);
+
+		if (traceResult != null && traceResult.length >= 2) {
+			final Germplasm rootGermplasm = (Germplasm) traceResult[0];
+
+			final GermplasmNeighborhoodNode rootNode = new GermplasmNeighborhoodNode(rootGermplasm);
+			final Integer stepsLeft = (Integer) traceResult[1];
+
+
+			// get the derived lines from the root until the whole neighborhood is created
+			final int treeLevel = numberOfStepsBackward - stepsLeft + numberOfStepsForward;
+			return this.getDerivedLines(rootNode, treeLevel, methodType);
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Recursive function to get the derived lines given a Germplasm. This
+	 * constructs the derivative neighborhood.
+	 *
+	 * @param node
+	 * @param steps
+	 * @return
+	 */
+	private GermplasmNeighborhoodNode getDerivedLines(final GermplasmNeighborhoodNode node, final int steps, final char methodType) {
+		if (steps <= 0) {
+			return node;
+		} else {
+			final Integer gid = node.getGid();
+			final List<Germplasm> derivedGermplasms = this.daoFactory.getGermplasmDao().getDescendants(gid, methodType);
+			for (final Germplasm germplasm : derivedGermplasms) {
+				final GermplasmNeighborhoodNode derivedNode = new GermplasmNeighborhoodNode(germplasm);
+				node.getLinkedNodes().add(this.getDerivedLines(derivedNode, steps - 1, methodType));
+			}
+			return node;
+		}
+	}
+
+	/**
+	 * Recursive function which gets the root of a derivative neighborhood by
+	 * tracing back through the source germplasms. The function stops when the
+	 * steps are exhausted or a germplasm created by a generative method is
+	 * encountered, whichever comes first.
+	 *
+	 * @param gid
+	 * @param steps
+	 * @return Object[] - first element is the Germplasm POJO, second is an
+	 * Integer which is the number of steps left to take
+	 */
+	private Object[] traceRoot(final Integer gid, final int steps, final char methodType) {
+		final Germplasm germplasm = this.germplasmService.getGermplasmWithPreferredName(gid);
+
+		if (germplasm == null) {
+			return new Object[0];
+		} else if (steps == 0 || germplasm.getGnpgs() != -1) {
+			return new Object[] {germplasm, Integer.valueOf(steps)};
+		} else {
+			int nextStep = steps;
+
+			//for MAN neighborhood, move the step count only if the ancestor is a MAN.
+			//otherwise, skip through the ancestor without changing the step count
+			if (methodType == 'M') {
+				final Method method = this.daoFactory.getMethodDAO().getById(germplasm.getMethodId());
+				if (method != null && "MAN".equals(method.getMtype())) {
+					nextStep--;
+				}
+
+				//for DER neighborhood, always move the step count
+			} else {
+				nextStep--;
+			}
+
+			final Object[] returned = this.traceRoot(germplasm.getGpid2(), nextStep, methodType);
+			if (returned != null) {
+				return returned;
+			} else {
+				return new Object[] {germplasm, Integer.valueOf(steps)};
+			}
+		}
+	}
+
 	/**
 	 * Given a GermplasmPedigreeTreeNode and the level of the desired tree, add parents
 	 * to the node recursively until the specified level of the tree is reached.
@@ -105,7 +202,6 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 				if (germplasmOfNode.getGnpgs() > 2) {
 					final List<Germplasm> otherParents =
 						this.germplasmService.getProgenitorsWithPreferredName(germplasmOfNode.getGid());
-					node.setOtherProgenitors(new ArrayList<>());
 					for (final Germplasm otherParent : otherParents) {
 						final GermplasmTreeNode maleParentNode = new GermplasmTreeNode(otherParent);
 						node.getOtherProgenitors().add(this.addParents(maleParentNode, level-1, otherParent, excludeDerivativeLines));

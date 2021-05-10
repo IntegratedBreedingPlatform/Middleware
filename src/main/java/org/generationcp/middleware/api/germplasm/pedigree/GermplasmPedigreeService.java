@@ -13,4 +13,8 @@ public interface GermplasmPedigreeService {
 	List<GermplasmDto> getManagementNeighbors(Integer gid);
 
 	List<GermplasmDto> getGroupRelatives(Integer gid);
+
+	GermplasmNeighborhoodNode getGermplasmMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward);
+
+	GermplasmNeighborhoodNode getGermplasmDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward);
 }

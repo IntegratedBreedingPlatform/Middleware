@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.germplasm.pedigree;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @AutoProperty
@@ -16,7 +17,7 @@ public class GermplasmTreeNode {
 
 	private GermplasmTreeNode maleParentNode;
 
-	private List<GermplasmTreeNode> otherProgenitors;
+	private List<GermplasmTreeNode> otherProgenitors = new ArrayList<>();
 
 	public GermplasmTreeNode(final Integer gid, final String preferredName) {
 		this.gid = gid;
