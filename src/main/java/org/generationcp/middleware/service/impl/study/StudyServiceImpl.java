@@ -553,7 +553,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 						studySummary.addSeason(value);
 					} else if (variableId.equals(TermId.LOCATION_ID.getId())) {
 						studySummary.setLocationId(!StringUtils.isEmpty(value) ? value : null);
-					} else {
+					} else if (!StringUtils.isEmpty(value)) {
 						additionalProps.put(prop.getAlias(), value);
 					}
 				}
