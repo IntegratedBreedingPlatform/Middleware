@@ -332,7 +332,7 @@ public class Germplasm implements Serializable, Cloneable {
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "gid")
-	private List<ExternalReference> externalReferences = new ArrayList<>();
+	private List<GermplasmExternalReference> externalReferences = new ArrayList<>();
 
 	@OneToMany(mappedBy = "germplasm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Progenitor> otherProgenitors = new ArrayList<>();
@@ -694,11 +694,11 @@ public class Germplasm implements Serializable, Cloneable {
 		this.locationName = locationName;
 	}
 
-	public List<ExternalReference> getExternalReferences() {
+	public List<GermplasmExternalReference> getExternalReferences() {
 		return externalReferences;
 	}
 
-	public void setExternalReferences(final List<ExternalReference> externalReferences) {
+	public void setExternalReferences(final List<GermplasmExternalReference> externalReferences) {
 		this.externalReferences = externalReferences;
 	}
 

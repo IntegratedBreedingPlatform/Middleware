@@ -19,8 +19,8 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Entity
-@Table(name = "external_reference")
-public class ExternalReference implements Serializable {
+@Table(name = "external_reference_germplasm")
+public class GermplasmExternalReference implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,17 +43,17 @@ public class ExternalReference implements Serializable {
 	@Column(name = "created_date", nullable = false, updatable = false)
 	private Date createdDate = new Date();
 
-	public ExternalReference() {
+	public GermplasmExternalReference() {
 	}
 
-	public ExternalReference(final Germplasm germplasm, final String referenceId, final String source) {
+	public GermplasmExternalReference(final Germplasm germplasm, final String referenceId, final String source) {
 		this.germplasm = germplasm;
 		this.referenceId = referenceId;
 		this.source = source;
 	}
 
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(final Integer id) {
@@ -61,7 +61,7 @@ public class ExternalReference implements Serializable {
 	}
 
 	public Germplasm getGermplasm() {
-		return germplasm;
+		return this.germplasm;
 	}
 
 	public void setGermplasm(final Germplasm germplasm) {
@@ -69,7 +69,7 @@ public class ExternalReference implements Serializable {
 	}
 
 	public String getReferenceId() {
-		return referenceId;
+		return this.referenceId;
 	}
 
 	public void setReferenceId(final String referenceId) {
@@ -77,7 +77,7 @@ public class ExternalReference implements Serializable {
 	}
 
 	public String getSource() {
-		return source;
+		return this.source;
 	}
 
 	public void setSource(final String source) {
@@ -90,10 +90,10 @@ public class ExternalReference implements Serializable {
 
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof ExternalReference)) {
+		if (!(other instanceof GermplasmExternalReference)) {
 			return false;
 		}
-		final ExternalReference castOther = (ExternalReference) other;
+		final GermplasmExternalReference castOther = (GermplasmExternalReference) other;
 		return new EqualsBuilder().append(this.id, castOther.id).isEquals();
 	}
 
