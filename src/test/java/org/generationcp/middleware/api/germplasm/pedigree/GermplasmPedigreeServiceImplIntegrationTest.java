@@ -58,7 +58,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 			germplasm.getGid(), germplasm.getGid(), germplasm.getGid());
 
 		final List<GermplasmDto> managementNeighbors = this.germplasmPedigreeService.getManagementNeighbors(germplasm.getGid());
-		Assert.assertEquals(2, managementNeighbors.size());
+		Assert.assertEquals(1, managementNeighbors.size());
 		Assert.assertEquals(managementNeighbors.get(0).getGid(), managementNeighbor.getGid());
 	}
 
