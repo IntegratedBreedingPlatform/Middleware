@@ -14,6 +14,7 @@ import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
+import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -397,5 +398,7 @@ public interface WorkbenchDataManager {
 	 * @return Crops for which user has permissions to add a program
 	 */
 	List<CropType> getCropsWithAddProgramPermission(int workbenchUserId);
+
+	void saveOrUpdateProjectUserInfo(final ProjectUserInfo projectUserInfo);
 
 }

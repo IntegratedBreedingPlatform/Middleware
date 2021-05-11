@@ -533,4 +533,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		}
 	}
 
+	public void saveOrUpdateProjectUserInfo(final ProjectUserInfo projectUserInfo) {
+		this.workbenchDaoFactory.getProjectUserInfoDAO().merge(projectUserInfo);
+	}
 }
