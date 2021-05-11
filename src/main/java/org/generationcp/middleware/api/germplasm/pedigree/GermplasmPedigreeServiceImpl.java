@@ -182,7 +182,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 					// get and add the source germplasm
 					final Germplasm parent = this.germplasmService.getGermplasmWithPreferredName(femaleGid);
 					if (parent != null) {
-						this.addNodeForKnownParents(node, level, parent, excludeDerivativeLines);
+						this.addNodeForKnownParents(node, level, parent, true);
 					}
 				} else {
 					// Get and add the source germplasm, if it is unknown
@@ -191,7 +191,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 					// Use female parent to continue traversal if source is unknown
 					} else if (femaleGid != 0) {
 						node.setMaleParentNode(this.createUnknownParent());
-						this.addFemaleParentNode(node, level, femaleGid, excludeDerivativeLines);
+						this.addFemaleParentNode(node, level, femaleGid, false);
 					}
 				}
 			} else if (germplasmOfNode.getGnpgs() >= 2) {
