@@ -19,7 +19,7 @@
         <sql dbms="mysql" splitStatements="true">
 			ALTER TABLE atributs CHANGE auid created_by int default 0 not null;
 			ALTER TABLE atributs ADD modified_by int null;
-			ALTER TABLE atributs ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE atributs ADD created_date timestamp;
 			ALTER TABLE atributs ADD modified_date timestamp null;
         </sql>
     </changeSet>
@@ -39,7 +39,7 @@
         <sql dbms="mysql" splitStatements="true">
 			ALTER TABLE bibrefs ADD created_by int default 0 not null;
 			ALTER TABLE bibrefs ADD modified_by int null;
-			ALTER TABLE bibrefs ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE bibrefs ADD created_date timestamp default CURRENT_TIMESTAMP not null;
 			ALTER TABLE bibrefs ADD modified_date timestamp null;
         </sql>
     </changeSet>
@@ -59,7 +59,7 @@
         <sql dbms="mysql" splitStatements="true">
 			ALTER TABLE germplsm CHANGE germuid created_by int default 0 not null;
 			ALTER TABLE germplsm ADD modified_by int null;
-			ALTER TABLE germplsm ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE germplsm ADD created_date timestamp;
 			ALTER TABLE germplsm ADD modified_date timestamp null;
         </sql>
     </changeSet>
@@ -79,7 +79,7 @@
         <sql dbms="mysql" splitStatements="true">
 			ALTER TABLE names CHANGE nuid created_by int default 0 not null;
 			ALTER TABLE names ADD modified_by int null;
-			ALTER TABLE names ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE names ADD created_date timestamp;
 			ALTER TABLE names ADD modified_date timestamp null;
         </sql>
     </changeSet>
@@ -99,7 +99,7 @@
         <sql dbms="mysql" splitStatements="true">
 			ALTER TABLE progntrs ADD created_by int default 0 not null;
 			ALTER TABLE progntrs ADD modified_by int null;
-			ALTER TABLE progntrs ADD created_date timestamp default CURRENT_TIMESTAMP null;
+			ALTER TABLE progntrs ADD created_date timestamp default CURRENT_TIMESTAMP not null;
 			ALTER TABLE progntrs ADD modified_date timestamp null;
         </sql>
     </changeSet>
@@ -121,5 +121,180 @@
 			ALTER TABLE external_reference ADD modified_date timestamp null;
         </sql>
     </changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) > 0 FROM germplsm WHERE created_by = 0;</sqlCheck>
+		</preConditions>
+		<comment>
+            Data migration for field 'created_by' of table 'germplsm'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			UPDATE germplsm SET created_by = 1 WHERE created_by = 0;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) > 0 FROM germplsm WHERE created_date IS NOT NULL;</sqlCheck>
+		</preConditions>
+		<comment>
+            Data migration for field 'created_date' of table 'germplsm'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			set session sql_mode = 'NO_ZERO_DATE';
+			UPDATE germplsm SET created_date = COALESCE(str_to_date(gdate, '%Y%m%d %H%i%s'), CURRENT_TIMESTAMP) WHERE 1 = 1;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) > 0 FROM bibrefs WHERE created_by = 0;</sqlCheck>
+		</preConditions>
+		<comment>
+            Data migration for fields 'created_date' and 'created_by' of table 'bibrefs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			set session sql_mode = 'NO_ZERO_DATE';
+
+			UPDATE bibrefs b INNER JOIN germplsm g
+				ON b.refid = g.gref
+			SET b.created_date = g.created_date, b.created_by = g.created_by WHERE 1 = 1;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-10">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) > 0 FROM progntrs WHERE created_by = 0;</sqlCheck>
+		</preConditions>
+		<comment>
+			Data migration for fields 'created_date' and 'created_by' of table 'progntrs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			set session sql_mode = 'NO_ZERO_DATE';
+
+			UPDATE progntrs p INNER JOIN germplsm g
+    			ON p.gid = g.gid
+			SET p.created_date = g.gdate, p.created_by = g.created_by WHERE 1 = 1;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-11">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) > 0 FROM atributs WHERE created_by = 0;</sqlCheck>
+		</preConditions>
+		<comment>
+            Data migration for fields 'created_by' of table 'atributs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			UPDATE atributs a
+				INNER JOIN germplsm g on a.gid = g.gid
+				SET a.created_by = g.created_by WHERE a.created_by = 0;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-12">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) > 0 FROM atributs WHERE created_date IS NOT NULL;</sqlCheck>
+		</preConditions>
+		<comment>
+            Data migration for fields 'created_date' of table 'atributs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			set session sql_mode = 'NO_ZERO_DATE';
+
+			UPDATE atributs SET created_date = COALESCE(str_to_date(adate, '%Y%m%d %H%i%s'), CURRENT_TIMESTAMP) WHERE 1 = 1;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-13">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) > 0 FROM names WHERE created_by = 0;</sqlCheck>
+		</preConditions>
+		<comment>
+            Data migration for fields 'created_by' of table 'names'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			UPDATE names n
+				INNER JOIN germplsm g on n.gid = g.gid
+				SET n.created_by = g.created_by WHERE n.created_by = 0;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-13">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) > 0 FROM names WHERE created_date IS NOT NULL;</sqlCheck>
+		</preConditions>
+		<comment>
+            Data migration for fields 'created_date' of table 'names'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			set session sql_mode = 'NO_ZERO_DATE';
+
+			UPDATE names SET created_date = COALESCE(str_to_date(ndate, '%Y%m%d %H%i%s'), CURRENT_TIMESTAMP) WHERE 1 = 1;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-14">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) > 0 FROM external_reference WHERE created_by = 0;</sqlCheck>
+		</preConditions>
+		<comment>
+            Audit fields data migration for 'external_reference' table
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			UPDATE external_reference er
+				JOIN germplsm g on g.gid = er.gid
+			SET er.created_by = g.created_by;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-15">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM Information_Schema.Columns
+				WHERE TABLE_SCHEMA = DATABASE()
+					AND TABLE_NAME = 'germplsm'
+					AND COLUMN_NAME = 'created_date'
+				AND COLUMN_DEFAULT IS NOT NULL;</sqlCheck>
+		</preConditions>
+		<comment>
+            Set not nullable and default value to field 'created_date' of table 'germplsm'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE germplsm ALTER COLUMN created_date SET DEFAULT CURRENT_TIMESTAMP NOT NULL
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-16">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM Information_Schema.Columns
+				WHERE TABLE_SCHEMA = DATABASE()
+					AND TABLE_NAME = 'atributs'
+					AND COLUMN_NAME = 'created_date'
+				AND COLUMN_DEFAULT IS NOT NULL;</sqlCheck>
+		</preConditions>
+		<comment>
+            Set not nullable and default value to field 'created_date' of table 'atributs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE atributs ALTER COLUMN created_date SET DEFAULT CURRENT_TIMESTAMP NOT NULL
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-17">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM Information_Schema.Columns
+				WHERE TABLE_SCHEMA = DATABASE()
+					AND TABLE_NAME = 'names'
+					AND COLUMN_NAME = 'created_date'
+				AND COLUMN_DEFAULT IS NOT NULL;</sqlCheck>
+		</preConditions>
+		<comment>
+            Set not nullable and default value to field 'created_date' of table 'names'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE names ALTER COLUMN created_date SET DEFAULT CURRENT_TIMESTAMP NOT NULL
+        </sql>
+	</changeSet>
 
 </databaseChangeLog>
