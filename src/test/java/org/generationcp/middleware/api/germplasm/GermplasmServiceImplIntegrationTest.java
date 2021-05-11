@@ -2083,6 +2083,39 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(reference, bibref.getAnalyt());
 	}
 
+	@Test
+	public void testGetGermplasmWithPreferredName_Success() {
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Name preferredName =
+			this.addName(germplasm.getGid(), this.variableTypeId, RandomStringUtils.randomAlphabetic(10), this.noLocationId,
+				this.creationDate, 1);
+
+		final Germplasm germplasmWithPreferredName = this.germplasmService.getGermplasmWithPreferredName(germplasm.getGid());
+		Assert.assertEquals(germplasm.getGid(), germplasmWithPreferredName.getGid());
+		Assert.assertNotNull(germplasmWithPreferredName.getPreferredName());
+		Assert.assertEquals(preferredName.getNid(), germplasmWithPreferredName.getPreferredName().getNid());
+		Assert.assertEquals(preferredName.getNval(), germplasmWithPreferredName.getPreferredName().getNval());
+	}
+
+	@Test
+	public void testGetProgenitorsWithPreferredName_Success() {
+		final Method method = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Germplasm progenitor = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Name preferredName =
+			this.addName(progenitor.getGid(), this.variableTypeId, RandomStringUtils.randomAlphabetic(10), this.noLocationId,
+				this.creationDate, 1);
+		this.addProgenitor(germplasm, progenitor);
+
+		final List<Germplasm> progenitors = this.germplasmService.getProgenitorsWithPreferredName(germplasm.getGid());
+		final Germplasm progenitorWithPreferredName = progenitors.get(0);
+		Assert.assertEquals(progenitor.getGid(), progenitorWithPreferredName.getGid());
+		Assert.assertNotNull(progenitorWithPreferredName.getPreferredName());
+		Assert.assertEquals(preferredName.getNid(), progenitorWithPreferredName.getPreferredName().getNid());
+		Assert.assertEquals(preferredName.getNval(), progenitorWithPreferredName.getPreferredName().getNval());
+	}
+
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
 		final Integer gpid1,
 		final Integer gpid2) {
