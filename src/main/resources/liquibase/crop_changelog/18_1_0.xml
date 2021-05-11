@@ -221,7 +221,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v18.1.0-13">
+	<changeSet author="lkovacic" id="v18.1.0-14">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) > 0 FROM names WHERE created_date IS NOT NULL;</sqlCheck>
 		</preConditions>
@@ -235,7 +235,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v18.1.0-14">
+	<changeSet author="lkovacic" id="v18.1.0-15">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) > 0 FROM external_reference WHERE created_by = 0;</sqlCheck>
 		</preConditions>
@@ -249,7 +249,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v18.1.0-15">
+	<changeSet author="lkovacic" id="v18.1.0-16">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) FROM Information_Schema.Columns
 				WHERE TABLE_SCHEMA = DATABASE()
@@ -265,7 +265,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v18.1.0-16">
+	<changeSet author="lkovacic" id="v18.1.0-17">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) FROM Information_Schema.Columns
 				WHERE TABLE_SCHEMA = DATABASE()
@@ -281,7 +281,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v18.1.0-17">
+	<changeSet author="lkovacic" id="v18.1.0-18">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">SELECT count(*) FROM Information_Schema.Columns
 				WHERE TABLE_SCHEMA = DATABASE()
