@@ -573,8 +573,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
 
 	@Override
-	public Integer updateProgenitor(final Integer gid, final Integer progenitorId, final Integer progenitorNumber,
-		final Integer createdBy) {
+	public Integer updateProgenitor(final Integer gid, final Integer progenitorId, final Integer progenitorNumber) {
 
 		// check if the germplasm record identified by gid exists
 		final Germplasm child = this.germplasmDataManager.getGermplasmByGID(gid);

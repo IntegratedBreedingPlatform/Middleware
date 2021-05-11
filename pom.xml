@@ -292,7 +292,6 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-
 		<!-- Testing -->
 		<dependency>
 			<groupId>org.easytesting</groupId>

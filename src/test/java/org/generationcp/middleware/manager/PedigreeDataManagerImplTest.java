@@ -184,8 +184,6 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 	
 	@Test
 	public void tesUpdateProgenitor() {
-		Integer createdBy = new Random().nextInt();
-
 		this.germplasmWithPolyCrosses = GermplasmTestDataInitializer.createGermplasm(1);
 		this.germplasmManager.save(this.germplasmWithPolyCrosses);
 		this.sessionProvder.getSession().flush();
@@ -197,13 +195,13 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 		Integer newProgenitorId = newGermplasm.getGid();
 		Assert.assertNotEquals(0, this.germplasmWithPolyCrosses.getGpid2().intValue());
-		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 2, createdBy);
+		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 2);
 		this.sessionProvder.getSession().flush();
 		Assert.assertEquals(newProgenitorId, this.germplasmManager.getGermplasmByGID(gid).getGpid2());
 
 		// New progenitor record should be created
 		final Integer progenitorGid = this.crossWithUnknownParent.getGid();
-		this.pedigreeManager.updateProgenitor(gid, progenitorGid, 3, createdBy);
+		this.pedigreeManager.updateProgenitor(gid, progenitorGid, 3);
 		this.sessionProvder.getSession().flush();
 		List<Germplasm> progenitors = this.germplasmManager.getProgenitorsByGIDWithPrefName(gid);
 		Assert.assertEquals(1, progenitors.size());
@@ -215,7 +213,7 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		this.germplasmManager.save(newGermplasm);
 		this.sessionProvder.getSession().flush();
 		newProgenitorId = newGermplasm.getGid();
-		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 3, createdBy);
+		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 3);
 		this.sessionProvder.getSession().flush();
 
 		progenitors = this.germplasmManager.getProgenitorsByGIDWithPrefName(gid);
