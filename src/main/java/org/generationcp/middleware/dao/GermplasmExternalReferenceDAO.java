@@ -16,7 +16,7 @@ public class GermplasmExternalReferenceDAO extends GenericDAO<GermplasmExternalR
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmExternalReferenceDAO.class);
 
 	private static final String GET_EXTERNAL_REFERENCES =
-		"SELECT CAST(gid AS CHAR(255)) as gid, reference_id as referenceID, reference_source referenceSource FROM external_reference WHERE gid IN (:gids)";
+		"SELECT CAST(gid AS CHAR(255)) as entityId, reference_id as referenceID, reference_source referenceSource FROM external_reference WHERE gid IN (:gids)";
 
 	public List<ExternalReferenceDTO> getExternalReferencesByGids(final List<Integer> gids) {
 
