@@ -261,7 +261,7 @@
             Set not nullable and default value to field 'created_date' of table 'germplsm'
         </comment>
         <sql dbms="mysql" splitStatements="true">
-			ALTER TABLE germplsm ALTER COLUMN created_date SET DEFAULT CURRENT_TIMESTAMP NOT NULL
+			ALTER TABLE germplsm MODIFY created_date timestamp default CURRENT_TIMESTAMP NOT NULL;
         </sql>
 	</changeSet>
 
@@ -277,7 +277,7 @@
             Set not nullable and default value to field 'created_date' of table 'atributs'
         </comment>
         <sql dbms="mysql" splitStatements="true">
-			ALTER TABLE atributs ALTER COLUMN created_date SET DEFAULT CURRENT_TIMESTAMP NOT NULL
+			ALTER TABLE atributs MODIFY created_date timestamp default CURRENT_TIMESTAMP NOT NULL;
         </sql>
 	</changeSet>
 
@@ -293,7 +293,7 @@
             Set not nullable and default value to field 'created_date' of table 'names'
         </comment>
         <sql dbms="mysql" splitStatements="true">
-			ALTER TABLE names ALTER COLUMN created_date SET DEFAULT CURRENT_TIMESTAMP NOT NULL
+			ALTER TABLE names MODIFY created_date timestamp default CURRENT_TIMESTAMP NOT NULL;
         </sql>
 	</changeSet>
 
