@@ -130,7 +130,7 @@
             Data migration for field 'created_by' of table 'germplsm'
         </comment>
         <sql dbms="mysql" splitStatements="true">
-			UPDATE germplsm SET created_by = 1 WHERE created_by = 0;
+			UPDATE germplsm SET created_by = (SELECT userid FROM workbench.users WHERE uname = 'admin') WHERE created_by = 0;
         </sql>
 	</changeSet>
 
