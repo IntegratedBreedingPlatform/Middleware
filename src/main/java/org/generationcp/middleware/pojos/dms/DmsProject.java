@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos.dms;
 
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
+import org.generationcp.middleware.pojos.StudyExternalReference;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -127,6 +129,10 @@ public class DmsProject implements Serializable {
 
 	@Column(name = "created_by")
 	private String createdBy;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "project_id")
+	private List<StudyExternalReference> externalReferences = new ArrayList<>();
 
 	public DmsProject() {
 		super();
@@ -291,6 +297,14 @@ public class DmsProject implements Serializable {
 
 	public void setStudy(final DmsProject study) {
 		this.study = study;
+	}
+
+	public List<StudyExternalReference> getExternalReferences() {
+		return this.externalReferences;
+	}
+
+	public void setExternalReferences(final List<StudyExternalReference> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	@Override

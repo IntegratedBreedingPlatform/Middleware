@@ -695,7 +695,7 @@ public class Germplasm implements Serializable, Cloneable {
 	}
 
 	public List<GermplasmExternalReference> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
 	public void setExternalReferences(final List<GermplasmExternalReference> externalReferences) {

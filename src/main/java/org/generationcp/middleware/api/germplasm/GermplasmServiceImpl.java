@@ -1471,7 +1471,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private void populateExternalReferences(final List<GermplasmDTO> germplasmDTOList) {
 		final List<Integer> gids = germplasmDTOList.stream().map(g -> Integer.valueOf(g.getGid())).collect(Collectors.toList());
 		if (!gids.isEmpty()) {
-			final List<ExternalReferenceDTO> referenceDTOS = this.daoFactory.getExternalReferenceDAO().getExternalReferencesByGids(gids);
+			final List<ExternalReferenceDTO> referenceDTOS = this.daoFactory.getGermplasmExternalReferenceDAO().getExternalReferencesByGids(gids);
 			final Map<String, List<ExternalReferenceDTO>> referencesByGidMap = referenceDTOS.stream()
 				.collect(groupingBy(ExternalReferenceDTO::getEntityId));
 			for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
