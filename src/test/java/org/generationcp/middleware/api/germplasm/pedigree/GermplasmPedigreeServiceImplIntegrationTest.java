@@ -132,7 +132,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 
 		Assert.assertEquals(1, rootNode.getOtherProgenitors().size());
 		final GermplasmTreeNode maleParentNode2 = rootNode.getOtherProgenitors().get(0);
-		Assert.assertEquals(maleParent1.getGid(), maleParentNode2.getGid());
+		Assert.assertEquals(maleParent2.getGid(), maleParentNode2.getGid());
 	}
 
 	@Test
