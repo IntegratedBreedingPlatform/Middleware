@@ -30,7 +30,7 @@ public class GermplasmTreeNode {
 	}
 
 	public Integer getGid() {
-		return gid;
+		return this.gid;
 	}
 
 	public void setGid(final Integer gid) {
@@ -38,7 +38,7 @@ public class GermplasmTreeNode {
 	}
 
 	public String getPreferredName() {
-		return preferredName;
+		return this.preferredName;
 	}
 
 	public void setPreferredName(final String preferredName) {
@@ -46,7 +46,7 @@ public class GermplasmTreeNode {
 	}
 
 	public GermplasmTreeNode getFemaleParentNode() {
-		return femaleParentNode;
+		return this.femaleParentNode;
 	}
 
 	public void setFemaleParentNode(final GermplasmTreeNode femaleParentNode) {
@@ -54,7 +54,7 @@ public class GermplasmTreeNode {
 	}
 
 	public GermplasmTreeNode getMaleParentNode() {
-		return maleParentNode;
+		return this.maleParentNode;
 	}
 
 	public void setMaleParentNode(final GermplasmTreeNode maleParentNode) {
@@ -62,7 +62,7 @@ public class GermplasmTreeNode {
 	}
 
 	public List<GermplasmTreeNode> getOtherProgenitors() {
-		return otherProgenitors;
+		return this.otherProgenitors;
 	}
 
 	public void setOtherProgenitors(final List<GermplasmTreeNode> otherProgenitors) {

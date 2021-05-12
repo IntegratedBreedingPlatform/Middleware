@@ -187,7 +187,7 @@ public class GermplasmDto {
 	}
 
 	public Integer getGnpgs() {
-		return gnpgs;
+		return this.gnpgs;
 	}
 
 	public void setGnpgs(final Integer gnpgs) {

@@ -90,7 +90,6 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 			final GermplasmNeighborhoodNode rootNode = new GermplasmNeighborhoodNode(rootGermplasm);
 			final Integer stepsLeft = (Integer) traceResult[1];
 
-
 			// get the derived lines from the root until the whole neighborhood is created
 			final int treeLevel = numberOfStepsBackward - stepsLeft + numberOfStepsForward;
 			return this.getDerivedLines(rootNode, treeLevel, methodType);
@@ -178,7 +177,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 			final Integer maleGid = germplasmOfNode.getGpid2();
 			final Integer femaleGid = germplasmOfNode.getGpid1();
 			if (germplasmOfNode.getGnpgs() == -1) {
-				if(excludeDerivativeLines) {
+				if (excludeDerivativeLines) {
 					// get and add the source germplasm
 					final Germplasm parent = this.germplasmService.getGermplasmWithPreferredName(femaleGid);
 					if (parent != null) {
@@ -188,7 +187,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 					// Get and add the source germplasm, if it is unknown
 					if (maleGid != 0) {
 						this.addMaleParentNode(node, level, maleGid, false);
-					// Use female parent to continue traversal if source is unknown
+						// Use female parent to continue traversal if source is unknown
 					} else if (femaleGid != 0) {
 						node.setMaleParentNode(this.createUnknownParent());
 						this.addFemaleParentNode(node, level, femaleGid, false);
@@ -204,7 +203,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 						this.germplasmService.getProgenitorsWithPreferredName(germplasmOfNode.getGid());
 					for (final Germplasm otherParent : otherParents) {
 						final GermplasmTreeNode maleParentNode = new GermplasmTreeNode(otherParent);
-						node.getOtherProgenitors().add(this.addParents(maleParentNode, level-1, otherParent, excludeDerivativeLines));
+						node.getOtherProgenitors().add(this.addParents(maleParentNode, level - 1, otherParent, excludeDerivativeLines));
 					}
 				}
 			}
@@ -212,14 +211,15 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		return node;
 	}
 
-	private void addNodeForParents(final GermplasmTreeNode node, final int level, final Germplasm germplasm, final boolean excludeDerivativeLines) {
-		if(germplasm.getGpid1() == 0) {
+	private void addNodeForParents(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
+		final boolean excludeDerivativeLines) {
+		if (germplasm.getGpid1() == 0) {
 			node.setFemaleParentNode(this.createUnknownParent());
 		} else {
 			this.addFemaleParentNode(node, level, germplasm.getGpid1(), excludeDerivativeLines);
 		}
 
-		if(germplasm.getGpid2() == 0 ) {
+		if (germplasm.getGpid2() == 0) {
 			node.setMaleParentNode(this.createUnknownParent());
 		} else {
 			this.addMaleParentNode(node, level, germplasm.getGpid2(), excludeDerivativeLines);
@@ -227,26 +227,28 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 
 	}
 
-	private void addNodeForKnownParents(final GermplasmTreeNode node, final int level, final Germplasm germplasm, final boolean excludeDerivativeLines) {
-		addFemaleParentNode(node, level, germplasm.getGpid1(), excludeDerivativeLines);
-		addMaleParentNode(node, level, germplasm.getGpid2(), excludeDerivativeLines);
+	private void addNodeForKnownParents(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
+		final boolean excludeDerivativeLines) {
+		this.addFemaleParentNode(node, level, germplasm.getGpid1(), excludeDerivativeLines);
+		this.addMaleParentNode(node, level, germplasm.getGpid2(), excludeDerivativeLines);
 	}
 
 	private void addMaleParentNode(final GermplasmTreeNode node, final int level, final Integer gid, final boolean excludeDerivativeLines) {
 		final Germplasm maleParent = this.germplasmService.getGermplasmWithPreferredName(gid);
-		if(maleParent != null) {
+		if (maleParent != null) {
 			final GermplasmTreeNode maleParentNode = new GermplasmTreeNode(maleParent);
 			node.setMaleParentNode(maleParentNode);
-			this.addParents(maleParentNode, level -1, maleParent, excludeDerivativeLines);
+			this.addParents(maleParentNode, level - 1, maleParent, excludeDerivativeLines);
 		}
 	}
 
-	private void addFemaleParentNode(final GermplasmTreeNode node, final int level, final Integer gid, final boolean excludeDerivativeLines) {
+	private void addFemaleParentNode(final GermplasmTreeNode node, final int level, final Integer gid,
+		final boolean excludeDerivativeLines) {
 		final Germplasm femaleParent = this.germplasmService.getGermplasmWithPreferredName(gid);
-		if(femaleParent != null) {
+		if (femaleParent != null) {
 			final GermplasmTreeNode femaleParentNode = new GermplasmTreeNode(femaleParent);
 			node.setFemaleParentNode(femaleParentNode);
-			this.addParents(femaleParentNode, level -1, femaleParent, excludeDerivativeLines);
+			this.addParents(femaleParentNode, level - 1, femaleParent, excludeDerivativeLines);
 		}
 	}
 
@@ -256,6 +258,6 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		final Name preferredName = new Name();
 		preferredName.setNval(Name.UNKNOWN);
 		germplasm.setPreferredName(preferredName);
-		return  new GermplasmTreeNode(germplasm);
+		return new GermplasmTreeNode(germplasm);
 	}
 }

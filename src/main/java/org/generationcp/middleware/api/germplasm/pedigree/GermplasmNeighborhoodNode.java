@@ -26,7 +26,7 @@ public class GermplasmNeighborhoodNode {
 	}
 
 	public Integer getGid() {
-		return gid;
+		return this.gid;
 	}
 
 	public void setGid(final Integer gid) {
@@ -34,7 +34,7 @@ public class GermplasmNeighborhoodNode {
 	}
 
 	public String getPreferredName() {
-		return preferredName;
+		return this.preferredName;
 	}
 
 	public void setPreferredName(final String preferredName) {
@@ -42,7 +42,7 @@ public class GermplasmNeighborhoodNode {
 	}
 
 	public List<GermplasmNeighborhoodNode> getLinkedNodes() {
-		return linkedNodes;
+		return this.linkedNodes;
 	}
 
 	public void setLinkedNodes(final List<GermplasmNeighborhoodNode> linkedNodes) {
