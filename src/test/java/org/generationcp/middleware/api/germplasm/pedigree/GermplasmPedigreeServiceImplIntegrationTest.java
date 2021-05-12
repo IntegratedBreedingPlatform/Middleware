@@ -40,6 +40,49 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
+	public void testGetMaintenanceNeighborhood_Success() {
+		final Germplasm rootGermplasm = this.createGermplasm(this.maintenanceMethod, null, -1, 0, 0, 0);
+		final Germplasm descendantGemolasm = this.createGermplasm(this.maintenanceMethod, null, -1,
+			rootGermplasm.getGid(), rootGermplasm.getGid(), 0);
+		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, null, -1,
+			rootGermplasm.getGid(), descendantGemolasm.getGid(), 0);
+
+		final GermplasmNeighborhoodNode rootNode = this.germplasmPedigreeService.getGermplasmMaintenanceNeighborhood(germplasm.getGid(), 2, 2);
+		Assert.assertEquals(rootGermplasm.getGid(), rootNode.getGid());
+		Assert.assertEquals(1, rootNode.getLinkedNodes().size());
+
+		final GermplasmNeighborhoodNode descendantNode = rootNode.getLinkedNodes().get(0);
+		Assert.assertEquals(descendantGemolasm.getGid(), descendantGemolasm.getGid());
+		Assert.assertEquals(1, descendantNode.getLinkedNodes().size());
+
+		final GermplasmNeighborhoodNode germplasmNode = descendantNode.getLinkedNodes().get(0);
+		Assert.assertEquals(germplasm.getGid(), germplasmNode.getGid());
+		Assert.assertTrue(germplasmNode.getLinkedNodes().isEmpty());
+	}
+
+
+	@Test
+	public void testGetDerivativeNeighborhood_Success() {
+		final Germplasm rootGermplasm = this.createGermplasm(this.derivativeMethod, null, -1, 0, 0, 0);
+		final Germplasm descendantGemolasm = this.createGermplasm(this.derivativeMethod, null, -1,
+			rootGermplasm.getGid(), rootGermplasm.getGid(), 0);
+		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, null, -1,
+			rootGermplasm.getGid(), descendantGemolasm.getGid(), 0);
+
+		final GermplasmNeighborhoodNode rootNode = this.germplasmPedigreeService.getGermplasmDerivativeNeighborhood(germplasm.getGid(), 2, 2);
+		Assert.assertEquals(rootGermplasm.getGid(), rootNode.getGid());
+		Assert.assertEquals(1, rootNode.getLinkedNodes().size());
+
+		final GermplasmNeighborhoodNode descendantNode = rootNode.getLinkedNodes().get(0);
+		Assert.assertEquals(descendantGemolasm.getGid(), descendantGemolasm.getGid());
+		Assert.assertEquals(1, descendantNode.getLinkedNodes().size());
+
+		final GermplasmNeighborhoodNode germplasmNode = descendantNode.getLinkedNodes().get(0);
+		Assert.assertEquals(germplasm.getGid(), germplasmNode.getGid());
+		Assert.assertTrue(germplasmNode.getLinkedNodes().isEmpty());
+	}
+
+	@Test
 	public void testGetGenerationHistory_Success() {
 		final Germplasm parentGermplasm = this.createGermplasm(this.derivativeMethod, null, -1, 0, 0, 0);
 		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, null, -1,
