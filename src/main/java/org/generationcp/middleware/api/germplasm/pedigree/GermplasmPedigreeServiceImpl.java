@@ -19,6 +19,8 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	@Resource
 	private GermplasmService germplasmService;
 
+	private static final ThreadLocal<Integer> PEDIGREE_COUNTER = new ThreadLocal<>();
+
 	public GermplasmPedigreeServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
@@ -32,6 +34,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		if (level > 1) {
 			this.addParents(rootNode, level, root, !includeDerivativeLines);
 		}
+		rootNode.setNumberOfGenerations(this.countGenerations(gid, includeDerivativeLines));
 		return rootNode;
 	}
 
@@ -260,4 +263,77 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		germplasm.setPreferredName(preferredName);
 		return new GermplasmTreeNode(germplasm);
 	}
+
+	public Integer countGenerations(final Integer gid, final Boolean includeDerivativeLine) {
+		try {
+			PEDIGREE_COUNTER.set(1);
+			return this.getNumberOfGenerations(gid, includeDerivativeLine);
+		} finally {
+			PEDIGREE_COUNTER.remove();
+		}
+	}
+
+	public Integer getNumberOfGenerations(final Integer gid, final Boolean includeDerivativeLine) {
+		Integer maxPedigreeLevel = 0;
+
+		if (gid == null || gid == 0) {
+			return maxPedigreeLevel;
+		}
+
+		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
+
+		if (germplasm.getGnpgs() == -1) {
+			if (!includeDerivativeLine) {
+				maxPedigreeLevel = this.getMaxGenerationCountFromParent(germplasm.getGpid1(), false);
+			} else {
+				maxPedigreeLevel = this.getMaxGenerationCountFromParent(germplasm.getGpid2(), true);
+			}
+		} else if (germplasm.getGnpgs() >= 2) {
+			maxPedigreeLevel = this.getMaxGenerationCountFromBothParents(gid, includeDerivativeLine);
+			if (germplasm.getGnpgs() > 2) {
+				final List<Germplasm> otherParents =
+					this.germplasmService.getProgenitorsWithPreferredName(gid);
+				for (final Germplasm otherParent : otherParents) {
+					maxPedigreeLevel = Math.max(maxPedigreeLevel, this.getGenerationsCount(otherParent.getGid(), includeDerivativeLine));
+				}
+
+			}
+		}
+
+		return maxPedigreeLevel + 1;
+	}
+
+	private Integer getMaxGenerationCountFromBothParents(
+		final Integer gid, final boolean includeDerivativeLine) {
+		final int currentPedigreeCount = PEDIGREE_COUNTER.get();
+
+		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
+
+		final Integer numOfPedigreeFromParent1 = this.getGenerationsCount(germplasm.getGpid1(), includeDerivativeLine);
+		PEDIGREE_COUNTER.set(currentPedigreeCount);
+		final Integer numOfPedigreeFromParent2 = this.getGenerationsCount(germplasm.getGpid2(), includeDerivativeLine);
+
+		return Math.max(numOfPedigreeFromParent1, numOfPedigreeFromParent2);
+	}
+
+	private Integer getGenerationsCount(final Integer parentId, final boolean includeDerivativeLine) {
+		if (parentId != null) {
+			PEDIGREE_COUNTER.set(PEDIGREE_COUNTER.get() + 1);
+			return this.getNumberOfGenerations(parentId, includeDerivativeLine);
+		}
+		return 0;
+	}
+
+	private Integer getMaxGenerationCountFromParent(final Integer parentId, final boolean includeDerivativeLines) {
+		if(parentId == 0) {
+			return 0;
+		}
+		if (!includeDerivativeLines) {
+			return this.getMaxGenerationCountFromBothParents(parentId, false);
+		} else {
+			PEDIGREE_COUNTER.set(PEDIGREE_COUNTER.get() + 1);
+			return this.getNumberOfGenerations(parentId, true);
+		}
+	}
+
 }

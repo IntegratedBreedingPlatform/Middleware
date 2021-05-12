@@ -17,6 +17,8 @@ public class GermplasmTreeNode {
 
 	private GermplasmTreeNode maleParentNode;
 
+	private Integer numberOfGenerations;
+
 	private List<GermplasmTreeNode> otherProgenitors = new ArrayList<>();
 
 	public GermplasmTreeNode(final Integer gid, final String preferredName) {
@@ -68,4 +70,13 @@ public class GermplasmTreeNode {
 	public void setOtherProgenitors(final List<GermplasmTreeNode> otherProgenitors) {
 		this.otherProgenitors = otherProgenitors;
 	}
+
+	public Integer getNumberOfGenerations() {
+		return this.numberOfGenerations;
+	}
+
+	public void setNumberOfGenerations(final Integer numberOfGenerations) {
+		this.numberOfGenerations = numberOfGenerations;
+	}
+
 }
