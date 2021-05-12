@@ -28,6 +28,8 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 
 	private Integer userId;
 
+	private Integer DRVNM_ID;
+
 	@Autowired
 	private GermplasmPedigreeService germplasmPedigreeService;
 
@@ -38,15 +40,14 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 		this.generativeMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
 		this.maintenanceMethod = this.createBreedingMethod(MethodType.MAINTENANCE.getCode(), -1);
 		this.userId = this.findAdminUser();
+		this.DRVNM_ID = this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode("NAMES", "NAME", "DRVNM").getFldno();
 	}
 
 	@Test
 	public void testGetMaintenanceNeighborhood_Success() {
 		final Germplasm rootGermplasm = this.createGermplasm(this.maintenanceMethod, null, -1, 0, 0, 0);
-		this.addName(rootGermplasm.getGid(),RandomStringUtils.randomAlphabetic(10), 1);
 		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, null, -1,
 			rootGermplasm.getGid(), rootGermplasm.getGid(), 0);
-		this.addName(germplasm.getGid(),RandomStringUtils.randomAlphabetic(10), 1);
 
 		this.sessionProvder.getSession().flush();
 
@@ -63,10 +64,8 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	@Test
 	public void testGetDerivativeNeighborhood_Success() {
 		final Germplasm rootGermplasm = this.createGermplasm(this.derivativeMethod, null, -1, 0, 0, 0);
-		this.addName(rootGermplasm.getGid(),RandomStringUtils.randomAlphabetic(10), 1);
 		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, null, -1,
 			rootGermplasm.getGid(), rootGermplasm.getGid(), 0);
-		this.addName(germplasm.getGid(),RandomStringUtils.randomAlphabetic(10), 1);
 
 		this.sessionProvder.getSession().flush();
 
@@ -125,6 +124,14 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 			germplasm.setGermplasmUUID(germplasmUUID);
 		}
 		this.daoFactory.getGermplasmDao().save(germplasm);
+
+		//Add preferred name
+		final Name name =
+			new Name(null, germplasm.getGid(), this.DRVNM_ID, 1, this.userId, RandomStringUtils.randomAlphabetic(10), 0, 20201212, 0);
+		this.daoFactory.getNameDao().save(name);
+		this.sessionProvder.getSession().flush();
+		this.daoFactory.getNameDao().refresh(name);
+
 		return germplasm;
 	}
 
@@ -137,15 +144,6 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 		this.sessionProvder.getSession().flush();
 		this.daoFactory.getMethodDAO().refresh(method);
 		return method;
-	}
-
-	private Name addName(final Integer gid, final String nameVal, final int preferred) {
-		final Integer nameId = this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode("NAMES", "NAME", "DRVNM").getFldno();
-		final Name name = new Name(null, gid, nameId, preferred, this.userId, nameVal, 0, 20201212, 0);
-		this.daoFactory.getNameDao().save(name);
-		this.sessionProvder.getSession().flush();
-		this.daoFactory.getNameDao().refresh(name);
-		return name;
 	}
 
 }
