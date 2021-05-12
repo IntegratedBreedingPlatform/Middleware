@@ -8,6 +8,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,8 +44,115 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
-	public void testGetGermplasmPedigreeTree() {
+	public void testGetGermplasmPedigreeTree_When_DerivativeAndIncludeDerivativeLinesIsFalse() {
+		final Germplasm rootGermplasm = this.createGermplasm(this.derivativeMethod, -1, 0, 0, 0);
+		final Germplasm parentGermplasm = this.createGermplasm(this.maintenanceMethod, -1,
+			rootGermplasm.getGid(), rootGermplasm.getGid(), 0);
+		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, -1,
+			rootGermplasm.getGid(), parentGermplasm.getGid(), 0);
 
+		final GermplasmTreeNode rootNode = this.germplasmPedigreeService.getGermplasmPedigreeTree(germplasm.getGid(), 3, false);
+		Assert.assertEquals(germplasm.getGid(), rootNode.getGid());
+		Assert.assertNull(rootNode.getFemaleParentNode());
+		Assert.assertNull(rootNode.getMaleParentNode());
+		Assert.assertTrue(rootNode.getOtherProgenitors().isEmpty());
+	}
+
+	@Test
+	public void testGetGermplasmPedigreeTree_When_DerivativeAndIncludeDerivativeLinesIsTrue() {
+		final Germplasm ancestorGermplasm = this.createGermplasm(this.derivativeMethod, -1, 0, 0, 0);
+		final Germplasm parentGermplasm = this.createGermplasm(this.maintenanceMethod, -1,
+			ancestorGermplasm.getGid(), ancestorGermplasm.getGid(), 0);
+		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, -1,
+			ancestorGermplasm.getGid(), parentGermplasm.getGid(), 0);
+
+		final GermplasmTreeNode rootNode = this.germplasmPedigreeService.getGermplasmPedigreeTree(germplasm.getGid(), 3, true);
+		Assert.assertEquals(germplasm.getGid(), rootNode.getGid());
+		Assert.assertNull(rootNode.getFemaleParentNode());
+		Assert.assertTrue(rootNode.getOtherProgenitors().isEmpty());
+		Assert.assertNotNull(rootNode.getMaleParentNode());
+
+		final GermplasmTreeNode parentNode = rootNode.getMaleParentNode();
+		Assert.assertEquals(parentGermplasm.getGid(), parentNode.getGid());
+		Assert.assertNull(parentNode.getFemaleParentNode());
+		Assert.assertTrue(parentGermplasm.getOtherProgenitors().isEmpty());
+		Assert.assertNotNull(parentNode.getMaleParentNode());
+
+		final GermplasmTreeNode ancestorNode = parentNode.getMaleParentNode();
+		Assert.assertEquals(ancestorGermplasm.getGid(), ancestorNode.getGid());
+		Assert.assertNull(ancestorNode.getFemaleParentNode());
+		Assert.assertNull(ancestorNode.getMaleParentNode());
+		Assert.assertTrue(ancestorNode.getOtherProgenitors().isEmpty());
+	}
+
+	@Test
+	public void testGetGermplasmPedigreeTree_When_CrossWithKnownParents() {
+		final Germplasm femaleParent = this.createGermplasm(this.maintenanceMethod, -1,
+			0, 0, 0);
+		final Germplasm maleParent = this.createGermplasm(this.maintenanceMethod, -1,
+			0, 0, 0);
+		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, 2,
+			femaleParent.getGid(), maleParent.getGid(), 0);
+
+		final GermplasmTreeNode rootNode = this.germplasmPedigreeService.getGermplasmPedigreeTree(germplasm.getGid(), 2, true);
+		Assert.assertEquals(germplasm.getGid(), rootNode.getGid());
+		Assert.assertNotNull(rootNode.getFemaleParentNode());
+		Assert.assertNotNull(rootNode.getMaleParentNode());
+		Assert.assertTrue(rootNode.getOtherProgenitors().isEmpty());
+
+		final GermplasmTreeNode maleParentNode = rootNode.getMaleParentNode();
+		Assert.assertEquals(maleParent.getGid(), maleParentNode.getGid());
+
+		final GermplasmTreeNode femaleParentNode = rootNode.getFemaleParentNode();
+		Assert.assertEquals(femaleParent.getGid(), femaleParentNode.getGid());
+	}
+
+	@Test
+	public void testGetGermplasmPedigreeTree_When_PolyCross() {
+		final Germplasm femaleParent = this.createGermplasm(this.maintenanceMethod, -1,
+			0, 0, 0);
+		final Germplasm maleParent1 = this.createGermplasm(this.maintenanceMethod, -1,
+			0, 0, 0);
+		final Germplasm maleParent2 = this.createGermplasm(this.maintenanceMethod, -1,
+			0, 0, 0);
+		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, 2,
+			femaleParent.getGid(), maleParent1.getGid(), 0);
+		this.addProgenitor(germplasm, maleParent2);
+
+		final GermplasmTreeNode rootNode = this.germplasmPedigreeService.getGermplasmPedigreeTree(germplasm.getGid(), 2, true);
+		Assert.assertEquals(germplasm.getGid(), rootNode.getGid());
+		Assert.assertNotNull(rootNode.getFemaleParentNode());
+		Assert.assertNotNull(rootNode.getMaleParentNode());
+
+		final GermplasmTreeNode maleParentNode = rootNode.getMaleParentNode();
+		Assert.assertEquals(new Integer(0), maleParentNode.getGid());
+
+		final GermplasmTreeNode femaleParentNode = rootNode.getFemaleParentNode();
+		Assert.assertEquals(femaleParent.getGid(), femaleParentNode.getGid());
+
+		Assert.assertEquals(1, rootNode.getOtherProgenitors().size());
+		final GermplasmTreeNode maleParentNode2 = rootNode.getOtherProgenitors().get(0);
+		Assert.assertEquals(maleParent1.getGid(), maleParentNode2.getGid());
+	}
+
+	@Test
+	public void testGetGermplasmPedigreeTree_When_CrossWithUnknownMaleParent() {
+		final Germplasm femaleParent = this.createGermplasm(this.maintenanceMethod, -1,
+			0, 0, 0);
+		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, 2,
+			femaleParent.getGid(), 0, 0);
+
+		final GermplasmTreeNode rootNode = this.germplasmPedigreeService.getGermplasmPedigreeTree(germplasm.getGid(), 2, true);
+		Assert.assertEquals(germplasm.getGid(), rootNode.getGid());
+		Assert.assertNotNull(rootNode.getFemaleParentNode());
+		Assert.assertNotNull(rootNode.getMaleParentNode());
+		Assert.assertTrue(rootNode.getOtherProgenitors().isEmpty());
+
+		final GermplasmTreeNode maleParentNode = rootNode.getMaleParentNode();
+		Assert.assertEquals(new Integer(0), maleParentNode.getGid());
+
+		final GermplasmTreeNode femaleParentNode = rootNode.getFemaleParentNode();
+		Assert.assertEquals(femaleParent.getGid(), femaleParentNode.getGid());
 	}
 
 	@Test
@@ -145,6 +253,14 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 		this.sessionProvder.getSession().flush();
 		this.daoFactory.getMethodDAO().refresh(method);
 		return method;
+	}
+
+	private Progenitor addProgenitor(final Germplasm son, final Germplasm parent) {
+		final Progenitor progenitor = new Progenitor(son, 3, parent.getGid());
+		this.daoFactory.getProgenitorDao().save(progenitor);
+		this.sessionProvder.getSession().flush();
+		this.daoFactory.getProgenitorDao().refresh(progenitor);
+		return progenitor;
 	}
 
 }
