@@ -125,7 +125,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 		Assert.assertNotNull(rootNode.getMaleParentNode());
 
 		final GermplasmTreeNode maleParentNode = rootNode.getMaleParentNode();
-		Assert.assertEquals(new Integer(0), maleParentNode.getGid());
+		Assert.assertEquals(maleParent1.getGid(), maleParentNode.getGid());
 
 		final GermplasmTreeNode femaleParentNode = rootNode.getFemaleParentNode();
 		Assert.assertEquals(femaleParent.getGid(), femaleParentNode.getGid());
