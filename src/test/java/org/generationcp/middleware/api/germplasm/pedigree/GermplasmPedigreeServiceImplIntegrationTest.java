@@ -8,6 +8,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
+import org.generationcp.middleware.pojos.Name;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,8 +43,10 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	@Test
 	public void testGetMaintenanceNeighborhood_Success() {
 		final Germplasm rootGermplasm = this.createGermplasm(this.maintenanceMethod, null, -1, 0, 0, 0);
+		this.addName(rootGermplasm.getGid(),RandomStringUtils.randomAlphabetic(10), 1);
 		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, null, -1,
 			rootGermplasm.getGid(), rootGermplasm.getGid(), 0);
+		this.addName(germplasm.getGid(),RandomStringUtils.randomAlphabetic(10), 1);
 
 		this.sessionProvder.getSession().flush();
 
@@ -60,8 +63,10 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	@Test
 	public void testGetDerivativeNeighborhood_Success() {
 		final Germplasm rootGermplasm = this.createGermplasm(this.derivativeMethod, null, -1, 0, 0, 0);
+		this.addName(rootGermplasm.getGid(),RandomStringUtils.randomAlphabetic(10), 1);
 		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, null, -1,
 			rootGermplasm.getGid(), rootGermplasm.getGid(), 0);
+		this.addName(germplasm.getGid(),RandomStringUtils.randomAlphabetic(10), 1);
 
 		this.sessionProvder.getSession().flush();
 
@@ -132,6 +137,15 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 		this.sessionProvder.getSession().flush();
 		this.daoFactory.getMethodDAO().refresh(method);
 		return method;
+	}
+
+	private Name addName(final Integer gid, final String nameVal, final int preferred) {
+		final Integer nameId = this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode("NAMES", "NAME", "DRVNM").getFldno();
+		final Name name = new Name(null, gid, nameId, preferred, this.userId, nameVal, 0, 20201212, 0);
+		this.daoFactory.getNameDao().save(name);
+		this.sessionProvder.getSession().flush();
+		this.daoFactory.getNameDao().refresh(name);
+		return name;
 	}
 
 }
