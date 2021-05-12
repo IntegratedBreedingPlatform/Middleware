@@ -1,7 +1,6 @@
 package org.generationcp.middleware.api.germplasm.pedigree;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -44,9 +43,14 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
+	public void testGetGermplasmPedigreeTree() {
+
+	}
+
+	@Test
 	public void testGetMaintenanceNeighborhood_Success() {
-		final Germplasm rootGermplasm = this.createGermplasm(this.maintenanceMethod, null, -1, 0, 0, 0);
-		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, null, -1,
+		final Germplasm rootGermplasm = this.createGermplasm(this.maintenanceMethod, -1, 0, 0, 0);
+		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, -1,
 			rootGermplasm.getGid(), rootGermplasm.getGid(), 0);
 
 		this.sessionProvder.getSession().flush();
@@ -63,8 +67,8 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 
 	@Test
 	public void testGetDerivativeNeighborhood_Success() {
-		final Germplasm rootGermplasm = this.createGermplasm(this.derivativeMethod, null, -1, 0, 0, 0);
-		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, null, -1,
+		final Germplasm rootGermplasm = this.createGermplasm(this.derivativeMethod, -1, 0, 0, 0);
+		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, -1,
 			rootGermplasm.getGid(), rootGermplasm.getGid(), 0);
 
 		this.sessionProvder.getSession().flush();
@@ -81,8 +85,8 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 
 	@Test
 	public void testGetGenerationHistory_Success() {
-		final Germplasm parentGermplasm = this.createGermplasm(this.derivativeMethod, null, -1, 0, 0, 0);
-		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, null, -1,
+		final Germplasm parentGermplasm = this.createGermplasm(this.derivativeMethod, -1, 0, 0, 0);
+		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, -1,
 			parentGermplasm.getGid(), parentGermplasm.getGid(), 0);
 
 		final List<GermplasmDto> generationHistory = this.germplasmPedigreeService.getGenerationHistory(germplasm.getGid());
@@ -93,8 +97,8 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 
 	@Test
 	public void testGetManagementNeighbors_Success() {
-		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, null, -1, 0, 0, 0);
-		final Germplasm managementNeighbor = this.createGermplasm(this.derivativeMethod, null, -1,
+		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, -1, 0, 0, 0);
+		final Germplasm managementNeighbor = this.createGermplasm(this.derivativeMethod, -1,
 			germplasm.getGid(), germplasm.getGid(), germplasm.getGid());
 
 		final List<GermplasmDto> managementNeighbors = this.germplasmPedigreeService.getManagementNeighbors(germplasm.getGid());
@@ -104,10 +108,10 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 
 	@Test
 	public void testGetGroupRelatives_Success() {
-		final Germplasm parentGermplasm = this.createGermplasm(this.derivativeMethod, null, -1, 0, 0, 0);
-		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, null, -1,
+		final Germplasm parentGermplasm = this.createGermplasm(this.derivativeMethod, -1, 0, 0, 0);
+		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, -1,
 			parentGermplasm.getGid(), parentGermplasm.getGid(), 0);
-		final Germplasm relative = this.createGermplasm(this.derivativeMethod, null, -1,
+		final Germplasm relative = this.createGermplasm(this.derivativeMethod, -1,
 			parentGermplasm.getGid(), parentGermplasm.getGid(), 0);
 
 		final List<GermplasmDto> groupRelatives = this.germplasmPedigreeService.getGroupRelatives(germplasm.getGid());
@@ -115,14 +119,11 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 		Assert.assertEquals(groupRelatives.get(0).getGid(), relative.getGid());
 	}
 
-	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Integer gnpgs,
+	private Germplasm createGermplasm(final Method method, final Integer gnpgs,
 		final Integer gpid1, final Integer gpid2, final Integer mgid) {
 		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2,
 			this.userId, 0, 0, 20201212, 0,
 			0, mgid, null, null, method);
-		if (StringUtils.isNotEmpty(germplasmUUID)) {
-			germplasm.setGermplasmUUID(germplasmUUID);
-		}
 		this.daoFactory.getGermplasmDao().save(germplasm);
 
 		//Add preferred name
