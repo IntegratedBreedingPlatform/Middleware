@@ -11,4 +11,6 @@ public interface ProgramService {
 
 	long countFilteredPrograms(ProgramSearchRequest programSearchRequest);
 
+	void saveOrUpdateProjectUserInfo(Integer userId, String  programUUID);
+
 }
