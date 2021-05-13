@@ -1429,12 +1429,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getExternalReferenceId())) {
 			paramBuilder.append(" AND g.gid IN ( ");
-			paramBuilder.append(" SELECT ref.gid FROM external_reference ref WHERE ref.reference_id = :referenceId) "); //
+			paramBuilder.append(" SELECT ref.gid FROM external_reference_germplasm ref WHERE ref.reference_id = :referenceId) "); //
 		}
 
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getExternalReferenceSource())) {
 			paramBuilder.append(" AND g.gid IN (  ");
-			paramBuilder.append(" SELECT ref.gid FROM external_reference ref WHERE ref.reference_source = :referenceSource) "); //
+			paramBuilder.append(" SELECT ref.gid FROM external_reference_germplasm ref WHERE ref.reference_source = :referenceSource) "); //
 		}
 
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getPreferredName())) {

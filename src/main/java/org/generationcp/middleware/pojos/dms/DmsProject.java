@@ -131,7 +131,7 @@ public class DmsProject implements Serializable {
 	private String createdBy;
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "project_id")
+	@JoinColumn(name = "study_id")
 	private List<StudyExternalReference> externalReferences = new ArrayList<>();
 
 	public DmsProject() {
