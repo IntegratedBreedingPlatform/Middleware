@@ -72,16 +72,13 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			+ "		AND ( :cropName IS NULL OR p.crop_type = :cropName ) "
 			+ " 	AND ( :programName IS NULL OR p.project_name = :programName ) "
 			+ " 	AND ( :programNameContainsString IS NULL OR p.project_name like :programNameContainsString ) "
-			+ " 	AND ( :programDbId IS NULL OR p.project_uuid = :programDbId ) ";
-
-
-	public static final String GROUP_BY = "	GROUP BY p.project_id ";
+			+ " 	AND ( :programDbId IS NULL OR p.project_uuid = :programDbId ) "
+			+ " 	GROUP BY p.project_id ";
 
 	public static final String LAST_OPENED_PROJECT_SUB_QUERY = "  (SELECT w.project_id FROM workbench_project w "
 		+ " INNER JOIN workbench_project_user_info r ON w.project_id = r.project_id "
 		+ " WHERE r.user_id = :userId "
-		+ " AND w.project_id=p.project_id "
-		+ " AND r.last_open_date IS NOT NULL ORDER BY r.last_open_date DESC LIMIT 1)";
+		+ " AND r.last_open_date IS NOT NULL ORDER BY r.last_open_date DESC LIMIT 1) ";
 
 	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
 
@@ -199,18 +196,10 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		final List<Project> projects = new ArrayList<>();
 		try {
 			final StringBuilder sb = new StringBuilder(GET_PROJECTS_BY_USER_ID);
-
-			if (pageable.getPageNumber() == 0) {
-				sb.append(GROUP_BY);
-				sb.append("ORDER BY ");
+			// TODO Added this condition to sort by the last opened project
+				sb.append("ORDER BY project_id =");
 				sb.append(LAST_OPENED_PROJECT_SUB_QUERY);
 				sb.append("desc, p.project_id");
-			}else{
-				sb.append(" AND p.project_id != ");
-				sb.append(LAST_OPENED_PROJECT_SUB_QUERY);
-				sb.append(GROUP_BY);
-
-			}
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sb.toString());
 			addProjectsByFilterParameters(programSearchRequest, sqlQuery);
@@ -272,7 +261,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 
 	public long countProjectsByFilter(final ProgramSearchRequest programSearchRequest) throws MiddlewareException {
 		try {
-			final SQLQuery sqlQuery = this.getSession().createSQLQuery(GET_PROJECTS_BY_USER_ID + GROUP_BY);
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(GET_PROJECTS_BY_USER_ID);
 			addProjectsByFilterParameters(programSearchRequest, sqlQuery);
 
 			return sqlQuery.list().size();
