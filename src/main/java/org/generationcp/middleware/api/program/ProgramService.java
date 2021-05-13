@@ -13,4 +13,5 @@ public interface ProgramService {
 
 	void saveOrUpdateProjectUserInfo(Integer userId, String  programUUID);
 
+	ProgramDTO getLastOpenedProject(Integer userId);
 }

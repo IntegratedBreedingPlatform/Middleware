@@ -60,4 +60,10 @@ public class ProgramServiceImpl implements ProgramService {
 
 	}
 
+	@Override
+	public ProgramDTO getLastOpenedProject(final Integer userId) {
+		final Project project =  this.daoFactory.getProjectDAO().getLastOpenedProject(userId);
+		return project != null ? new ProgramDTO(project) : null;
+	}
+
 }
