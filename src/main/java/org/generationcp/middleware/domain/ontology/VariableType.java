@@ -45,7 +45,10 @@ public enum VariableType {
 	ANALYSIS_SUMMARY(1811, "Analysis Summary",
 			"Analysis Summary Variables", PhenotypicType.VARIATE),
 	OBSERVATION_UNIT(1812, "Observation Unit",
-			"Observation Unit Variables", PhenotypicType.UNASSIGNED);
+		"Observation Unit Variables", PhenotypicType.UNASSIGNED),
+	GERMPLASM_PASSPORT(1813, "Germplasm Passport", "Germplasm Passport", PhenotypicType.UNASSIGNED),
+	GERMPLASM_ATTRIBUTE(1814, "Germplasm Attribute", "Germplasm Attribute", PhenotypicType.UNASSIGNED);
+
 
 	private final Integer id;
 	private final String name;

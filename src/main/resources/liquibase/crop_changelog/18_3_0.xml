@@ -1,0 +1,215 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+    <changeSet author="clarysabel" id="v18.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1813;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Germplasm Passport' variable type</comment>
+        <sql>
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (1813, 1041, 'Germplasm Passport', 'Basic information used for the general management of the accession', null, 0, 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1814;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Germplasm Attribute' variable type</comment>
+        <sql>
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (1814, 1041, 'Germplasm Attribute', 'Variables which assessment may also require complex biochemical or molecular characterization methods', null, 0, 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 4031;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Assigned Attribute' method</comment>
+        <sql>
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (4031, 1020, 'Assigned Attribute', 'Standard method for assigned attribute', null, 0, 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 4032;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Assigned Passport Descriptor' method</comment>
+        <sql>
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (4032, 1020, 'Assigned Passport Descriptor', 'Standard method for assigned passport descriptor', null, 0, 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-5">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="udflds_attributes_bkp"></tableExists></not>
+		</preConditions>
+		<comment>Create and insert values in udflds_attributes_bkp in preparation for the attributes migration</comment>
+		<sql>
+			CREATE TABLE udflds_attributes_bkp (
+			  fldno            int,
+			  ftable           varchar(24),
+			  ftype            varchar(12),
+			  fcode            varchar(50),
+			  fname            varchar(50),
+			  ffmt             varchar(255),
+			  fdesc            varchar(255),
+			  lfldno           int,
+			  fuid             int,
+			  fdate            int,
+			  scaleid          int,
+			  cvterm_name      varchar(200),
+			  property_id      int,
+			  method_id        int,
+			  variable_type_id int,
+			  cvterm_id        int
+			);
+
+			INSERT INTO udflds_attributes_bkp (fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid, cvterm_name, method_id, variable_type_id)
+			SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid, CONCAT(fcode, '_A', SUBSTRING(ftype, 1, 1), '_text'), IF(ftype = 'PASSPORT', 4032, 4031), IF(ftype = 'PASSPORT', 1813, 1814)
+			FROM udflds WHERE ftable = 'ATRIBUTS' AND ftype IN ('ATTRIBUTE', 'PASSPORT', 'METHOD');
+
+			CREATE TEMPORARY TABLE new_properties
+			SELECT DISTINCT bkp.fname name
+			FROM udflds_attributes_bkp bkp
+			WHERE NOT EXISTS(SELECT name
+							 FROM cvterm
+							 WHERE cv_id = 1010 AND name = bkp.fname);
+
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			SELECT 1010, name, name, null, 0, 0 FROM new_properties;
+
+			DROP TEMPORARY TABLE new_properties;
+
+			UPDATE udflds_attributes_bkp bkp INNER JOIN cvterm cvterm ON bkp.fname = cvterm.name
+			SET bkp.property_id = cvterm.cvterm_id WHERE cvterm.cv_id = 1010;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-6">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="udflds_attributes_bkp"></tableExists>
+				<sqlCheck expectedResult="0">
+					SELECT
+					COUNT(*)
+					FROM
+					information_schema.routines
+					WHERE
+					routine_schema = DATABASE()
+					AND specific_name = 'migrate_attr_udflds_to_ontology';
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Create store procedure 'migrate_attr_udflds_to_ontology' to migrate attributes to the ontology</comment>
+		<sql splitStatements="false">
+			<![CDATA[
+				CREATE PROCEDURE migrate_attr_udflds_to_ontology()
+
+				  BEGIN
+				    DECLARE errno INT;
+				    DECLARE err_message VARCHAR(255);
+
+				    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+					BEGIN
+						GET CURRENT DIAGNOSTICS CONDITION 1 errno = MYSQL_ERRNO, err_message = MESSAGE_TEXT;
+						ROLLBACK;
+						SIGNAL SQLSTATE '45000'
+						SET MESSAGE_TEXT = err_message, MYSQL_ERRNO = errno;
+					END;
+
+				  	START TRANSACTION;
+				  	    -- Creating ontology variables
+						INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+						SELECT 1040, cvterm_name, fname, null, 0, 0 FROM udflds_attributes_bkp;
+
+						UPDATE udflds_attributes_bkp bkp INNER JOIN cvterm cvterm ON bkp.cvterm_name = cvterm.name
+						SET bkp.cvterm_id = cvterm.cvterm_id WHERE cvterm.cv_id = 1040;
+
+						INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+						SELECT 1200, cvterm_id, property_id FROM udflds_attributes_bkp;
+
+						INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+						SELECT 1210, cvterm_id, method_id FROM udflds_attributes_bkp;
+
+						INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+						SELECT 1220, cvterm_id, 6020 FROM udflds_attributes_bkp;
+
+						INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+						SELECT bkp.cvterm_id, 1800, cvterm.name, 0
+						FROM udflds_attributes_bkp bkp
+							   INNER JOIN cvterm cvterm ON bkp.variable_type_id = cvterm.cvterm_id;
+
+						-- Connecting attributes with the new ontology variables
+						ALTER TABLE atributs
+						  CHANGE atype old_atype_bkp int(11);
+
+						ALTER TABLE atributs
+						  ADD COLUMN atype int(11) DEFAULT NULL;
+
+						UPDATE atributs INNER JOIN udflds_attributes_bkp bkp ON bkp.fldno = old_atype_bkp
+						SET atype = bkp.cvterm_id WHERE 1 = 1;
+
+						CREATE TABLE atributs_invalid_atype_bkp AS
+						SELECT * FROM atributs WHERE atributs.atype IS NULL;
+						DELETE FROM atributs WHERE atributs.atype IS NULL;
+
+						ALTER TABLE atributs DROP COLUMN old_atype_bkp;
+						ALTER TABLE atributs
+						  MODIFY atype int(11) NOT NULL;
+						ALTER TABLE atributs
+						  ADD CONSTRAINT fk_atributs_cvterm FOREIGN KEY (atype) REFERENCES cvterm(cvterm_id);
+
+						-- Removing atributs from udflds
+						DELETE FROM udflds WHERE ftable = 'ATRIBUTS' AND ftype IN ('ATTRIBUTE', 'PASSPORT', 'METHOD');
+
+				  	COMMIT;
+				  END;
+			]]>
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'migrate_attr_udflds_to_ontology';
+			</sqlCheck>
+		</preConditions>
+		<comment>Run migrate_attr_udflds_to_ontology procedure</comment>
+		<sql dbms="mysql" splitStatements="false">
+			call migrate_attr_udflds_to_ontology();
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'migrate_attr_udflds_to_ontology';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE migrate_attr_udflds_to_ontology;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
