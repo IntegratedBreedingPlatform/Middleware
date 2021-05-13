@@ -568,8 +568,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 			conflictErrors.put("germplasm.update.germplasm.has.progeny.error", new String[] {
 				String.valueOf(germplasm.getGid())});
 		} else {
-			final String femaleParentGidString = String.valueOf(femaleParentGid);
-			final String maleParentGidString = String.valueOf(maleParentGid);
+			final String femaleParentGidString = femaleParentGid == null ? null : String.valueOf(femaleParentGid);
+			final String maleParentGidString = maleParentGid == null ? null : String.valueOf(maleParentGid);
 			germplasm.setGnpgs(this.calculateGnpgs(breedingMethod, femaleParentGidString, maleParentGidString, Lists.transform(otherProgenitors, Functions
 				.toStringFunction())));
 			this.setProgenitors(germplasm, breedingMethod, femaleParentGidString, maleParentGidString, progenitorsMapByGid, conflictErrors);
