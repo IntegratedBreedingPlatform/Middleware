@@ -16,9 +16,7 @@
         <comment>
             Rename external_reference table to external_reference_germplasm
         </comment>
-        <sql>
-           RENAME external_reference table TO external_reference_germplasm;
-        </sql>
+		<renameTable oldTableName="external_reference" newTableName="external_reference" />
     </changeSet>
 
 	 <changeSet author="darla" id="v18.1.0-2">
