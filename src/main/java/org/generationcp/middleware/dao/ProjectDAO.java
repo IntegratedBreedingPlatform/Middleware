@@ -75,6 +75,12 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 			+ " 	AND ( :programDbId IS NULL OR p.project_uuid = :programDbId ) "
 			+ "		GROUP BY p.project_id ";
 
+	public static final String ORDER_BY_LAST_OPENED_PROJECT = "ORDER BY(SELECT w.project_id FROM workbench_project w "
+		+ "INNER JOIN workbench_project_user_info r ON w.project_id = r.project_id "
+		+ "WHERE r.user_id = :userId "
+		+ "AND w.project_id=p.project_id "
+		+ "AND r.last_open_date IS NOT NULL ORDER BY r.last_open_date DESC LIMIT 1) DESC, p.project_id";
+
 	public Project getByUuid(final String projectUuid) throws MiddlewareQueryException {
 
 		try {
@@ -191,6 +197,10 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		final List<Project> projects = new ArrayList<>();
 		try {
 			final StringBuilder sb = new StringBuilder(GET_PROJECTS_BY_USER_ID);
+
+			if (pageable.getPageNumber() == 0) {
+				sb.append(ORDER_BY_LAST_OPENED_PROJECT);
+			}
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sb.toString());
 			addProjectsByFilterParameters(programSearchRequest, sqlQuery);
