@@ -116,14 +116,13 @@
 
 				  BEGIN
 				    DECLARE errno INT;
-				    DECLARE err_message VARCHAR(255);
 
 				    DECLARE EXIT HANDLER FOR SQLEXCEPTION
 					BEGIN
-						GET CURRENT DIAGNOSTICS CONDITION 1 errno = MYSQL_ERRNO, err_message = MESSAGE_TEXT;
+						GET CURRENT DIAGNOSTICS CONDITION 1 errno = MYSQL_ERRNO;
 						ROLLBACK;
 						SIGNAL SQLSTATE '45000'
-						SET MESSAGE_TEXT = err_message, MYSQL_ERRNO = errno;
+						SET MESSAGE_TEXT = 'An error has occurred. Please verify udflds_attributes_bkp and cvterm for duplicated names ', MYSQL_ERRNO = errno;
 					END;
 
 				  	START TRANSACTION;
@@ -147,26 +146,6 @@
 						SELECT bkp.cvterm_id, 1800, cvterm.name, 0
 						FROM udflds_attributes_bkp bkp
 							   INNER JOIN cvterm cvterm ON bkp.variable_type_id = cvterm.cvterm_id;
-
-						-- Connecting attributes with the new ontology variables
-						ALTER TABLE atributs
-						  CHANGE atype old_atype_bkp int(11);
-
-						ALTER TABLE atributs
-						  ADD COLUMN atype int(11) DEFAULT NULL;
-
-						UPDATE atributs INNER JOIN udflds_attributes_bkp bkp ON bkp.fldno = old_atype_bkp
-						SET atype = bkp.cvterm_id WHERE 1 = 1;
-
-						CREATE TABLE atributs_invalid_atype_bkp AS
-						SELECT * FROM atributs WHERE atributs.atype IS NULL;
-						DELETE FROM atributs WHERE atributs.atype IS NULL;
-
-						ALTER TABLE atributs DROP COLUMN old_atype_bkp;
-						ALTER TABLE atributs
-						  MODIFY atype int(11) NOT NULL;
-						ALTER TABLE atributs
-						  ADD CONSTRAINT fk_atributs_cvterm FOREIGN KEY (atype) REFERENCES cvterm(cvterm_id);
 
 						-- Removing atributs from udflds
 						DELETE FROM udflds WHERE ftable = 'ATRIBUTS' AND ftype IN ('ATTRIBUTE', 'PASSPORT', 'METHOD');
@@ -211,5 +190,156 @@
 			DROP PROCEDURE migrate_attr_udflds_to_ontology;
 		</sql>
 	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-9">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="udflds_attributes_bkp"></tableExists>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) > 0
+					FROM udflds_attributes_bkp
+					WHERE
+					cvterm_id is not null;
+				</sqlCheck>
+				<not>
+					<foreignKeyConstraintExists foreignKeyName="fk_atributs_cvterm"></foreignKeyConstraintExists>
+				</not>
+			</and>
+		</preConditions>
+		<comment>Connect attributes with the new ontology variables</comment>
+		<sql dbms="mysql">
+				ALTER TABLE atributs
+				  CHANGE atype old_atype_bkp int(11);
+
+				ALTER TABLE atributs
+				  ADD COLUMN atype int(11) DEFAULT NULL;
+
+				UPDATE atributs INNER JOIN udflds_attributes_bkp bkp ON bkp.fldno = old_atype_bkp
+				SET atype = bkp.cvterm_id WHERE 1 = 1;
+
+				CREATE TABLE atributs_invalid_atype_bkp AS
+				SELECT * FROM atributs WHERE atributs.atype IS NULL;
+				DELETE FROM atributs WHERE atributs.atype IS NULL;
+
+				ALTER TABLE atributs DROP COLUMN old_atype_bkp;
+				ALTER TABLE atributs MODIFY atype int(11) NOT NULL;
+
+				ALTER TABLE atributs
+				ADD CONSTRAINT fk_atributs_cvterm FOREIGN KEY (atype) REFERENCES cvterm(cvterm_id);
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-10">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="udflds_attributes_bkp"></tableExists>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) > 0
+					FROM udflds_attributes_bkp
+					WHERE
+					cvterm_id is not null;
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT
+					COUNT(*)
+					FROM
+					information_schema.routines
+					WHERE
+					routine_schema = DATABASE()
+					AND specific_name = 'replace_attr_process_code_in_methods';
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Create store procedure replace_attr_process_code_in_methods</comment>
+		<sql dbms="mysql" splitStatements="false">
+			<![CDATA[
+
+				CREATE PROCEDURE replace_attr_process_code_in_methods()
+
+				BEGIN
+
+				  DECLARE done INT DEFAULT FALSE;
+				  DECLARE attrsc_old, attrmp_old, attrfp_old VARCHAR(255);
+				  DECLARE attrsc_new, attrmp_new, attrfp_new VARCHAR(255);
+
+				  DECLARE cur_replace_tmp CURSOR FOR
+					SELECT * FROM codes_to_replace_tmp t WHERE EXISTS (
+						SELECT 1 FROM methods where prefix like CONCAT('%',t.ATTRSC_OLD,'%') or prefix like CONCAT('%',t.ATTRFP_OLD,'%')
+						or prefix like CONCAT('%',t.ATTRMP_OLD,'%') or suffix like CONCAT('%',t.ATTRSC_OLD,'%') or suffix like CONCAT('%',t.ATTRFP_OLD,'%')
+						or suffix like CONCAT('%',t.ATTRMP_OLD,'%')
+					);
+
+				  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+				  CREATE TEMPORARY TABLE codes_to_replace_tmp
+					SELECT CONCAT('[ATTRSC.', fcode, ']') as ATTRSC_OLD,
+						   CONCAT('[ATTRFP.', fcode, ']') as ATTRFP_OLD,
+						   CONCAT('[ATTRMP.', fcode, ']') as ATTRMP_OLD,
+						   CONCAT('[ATTRSC.', cvterm_id, ']') as ATTRSC_NEW,
+						   CONCAT('[ATTRFP.', cvterm_id, ']') as ATTRFP_NEW,
+						   CONCAT('[ATTRMP.', cvterm_id, ']') as ATTRMP_NEW
+					FROM udflds_attributes_bkp where ftype = 'ATTRIBUTE';
+
+				  OPEN cur_replace_tmp;
+
+				  read_loop: LOOP FETCH cur_replace_tmp
+					INTO attrsc_old, attrfp_old, attrmp_old, attrsc_new, attrfp_new, attrmp_new;
+
+					  IF done THEN LEAVE read_loop;
+					  END IF;
+
+					  UPDATE methods SET prefix = REPLACE(prefix, attrsc_old, attrsc_new) where prefix like CONCAT('%', attrsc_old,'%');
+					  UPDATE methods SET prefix = REPLACE(prefix, attrfp_old, attrfp_new) where prefix like CONCAT('%', attrfp_old,'%');
+					  UPDATE methods SET prefix = REPLACE(prefix, attrmp_old, attrmp_new) where prefix like CONCAT('%', attrmp_old,'%');
+					  UPDATE methods SET suffix = REPLACE(suffix, attrsc_old, attrsc_new) where suffix like CONCAT('%', attrsc_old,'%');
+					  UPDATE methods SET suffix = REPLACE(suffix, attrfp_old, attrfp_new) where suffix like CONCAT('%', attrfp_old,'%');
+					  UPDATE methods SET suffix = REPLACE(suffix, attrmp_old, attrmp_new) where suffix like CONCAT('%', attrmp_old,'%');
+
+				  END LOOP read_loop;
+
+				  CLOSE cur_replace_tmp;
+
+				  DROP TEMPORARY TABLE codes_to_replace_tmp;
+			 	END;
+			]]>
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-11">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'replace_attr_process_code_in_methods';
+			</sqlCheck>
+		</preConditions>
+		<comment>Run replace_attr_process_code_in_methods procedure</comment>
+		<sql dbms="mysql" splitStatements="false">
+			call replace_attr_process_code_in_methods();
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-12">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'replace_attr_process_code_in_methods';
+			</sqlCheck>
+		</preConditions>
+		<comment>Drop procedure replace_attr_process_code_in_methods</comment>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE replace_attr_process_code_in_methods;
+		</sql>
+	</changeSet>
+
 
 </databaseChangeLog>
