@@ -214,4 +214,252 @@
         </sql>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="v18.1.0-13">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="audit_cfg"/>
+			</not>
+		</preConditions>
+		<comment>
+            Add 'audit_cfg' table
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			create table audit_cfg (
+				id          int auto_increment
+					primary key,
+				entity_name varchar(255)         not null,
+				is_audited  tinyint(1) default 1 not null,
+				constraint audit_cfg_entity_name_uindex
+					unique (entity_name)
+			);
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-14">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(1) FROM audit_cfg;</sqlCheck>
+		</preConditions>
+		<comment>
+            Add data to 'audit_cfg' table
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO audit_cfg (entity_name, is_audited)
+			VALUES ('GERMPLASM', 1),
+				('ATTRIBUTE', 1),
+				('BIBREF', 1),
+				('NAME', 1),
+				('EXTERNAL_REFERENCE', 1),
+				('PROGENITOR', 1);
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-15">
+        <preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="germplsm_aud"></tableExists>
+			</not>
+		</preConditions>
+        <comment>
+            Create audit table 'germplsm_aud'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			CREATE TABLE germplsm_aud (
+				aud_id        int auto_increment primary key,
+				rev_type      tinyint                                not null,
+				gid           int                                    not null,
+				methn         int                          default 0 not null,
+				gnpgs         int                          default 0 not null,
+				gpid1         int                          default 0 not null,
+				gpid2         int                          default 0 not null,
+				created_by    int                          default 0 not null,
+				lgid          int                          default 0 not null,
+				glocn         int                          default 0 not null,
+				gdate         int                          default 0 not null,
+				gref          int                          default 0 not null,
+				grplce        int                          default 0 not null,
+				mgid          int                          default 0 null,
+				cid           int                                    null,
+				sid           int                                    null,
+				gchange       int                                    null,
+				deleted       tinyint(1) unsigned zerofill default 0 null,
+				germplsm_uuid varchar(60)                            null,
+				modified_by   int                                    null,
+				created_date  timestamp                              null,
+				modified_date timestamp                              null
+			);
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-16">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="atributs_aud"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create audit table 'atributs_aud'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE atributs_aud (
+				aud_id        int                      not null primary key,
+				rev_type      tinyint                  not null,
+				aid           int                      not null,
+				gid           int          default 0   not null,
+				atype         int          default 0   not null,
+				created_by    int          default 0   not null,
+				aval          varchar(255) default '-' not null,
+				alocn         int          default 0   null,
+				aref          int          default 0   null,
+				adate         int          default 0   null,
+				created_date  timestamp                null,
+				modified_date timestamp                null,
+				modified_by   int                      null
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-17">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="bibrefs_aud"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create audit table 'bibrefs_aud'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE bibrefs_aud (
+				aud_id        int                      not null primary key,
+				rev_type      tinyint                  not null,
+				refid         int                      not null,
+				pubtype       int          default 0   null,
+				pubdate       int          default 0   null,
+				authors       varchar(100) default '-' not null,
+				editors       varchar(100) default '-' not null,
+				analyt        varchar(255) default '-' not null,
+				monogr        varchar(255) default '-' not null,
+				series        varchar(255) default '-' not null,
+				volume        varchar(10)  default '-' not null,
+				issue         varchar(10)  default '-' not null,
+				pagecol       varchar(25)  default '-' not null,
+				publish       varchar(50)  default '-' not null,
+				pucity        varchar(30)  default '-' not null,
+				pucntry       varchar(75)  default '-' not null,
+				authorlist    int                      null,
+				editorlist    int                      null,
+				created_by    int          default 0   not null,
+				modified_by   int                      null,
+				created_date  timestamp                null,
+				modified_date timestamp                null
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-18">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="names_aud"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create audit table 'names_aud'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE names_aud (
+				aud_id        int                      not null primary key,
+				rev_type      tinyint                  not null,
+				nid           int                      not null,
+				gid           int          default 0   not null,
+				ntype         int          default 0   not null,
+				nstat         int          default 0   not null,
+				created_by    int          default 0   not null,
+				nval          varchar(255) default '-' not null,
+				nlocn         int          default 0   not null,
+				ndate         int          default 0   not null,
+				nref          int          default 0   not null,
+				modified_by   int                      null,
+				created_date  timestamp                null,
+				modified_date timestamp                null
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-19">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="progntrs_aud"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create audit table 'progntrs_aud'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE progntrs_aud (
+				aud_id        int           not null primary key,
+				rev_type      tinyint       not null,
+				gid           int default 0 not null,
+				pno           int default 0 not null,
+				pid           int default 0 not null,
+				id            int           not null,
+				created_by    int default 0 null,
+				modified_by   int           null,
+				created_date  timestamp     null,
+				modified_date timestamp     null
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-20">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="external_reference_aud"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create audit table 'external_reference_aud'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE external_reference_aud (
+				aud_id        int           not null primary key,
+				rev_type          tinyint       not null,
+				id               int           not null,
+				gid              int           not null,
+				reference_id     varchar(2000) not null,
+				reference_source varchar(255)  not null,
+				created_by       int default 0 not null,
+				modified_by      int           null,
+				created_date     timestamp     null,
+				modified_date    timestamp     null
+			);
+		</sql>
+	</changeSet>
+
+<!--	<changeSet author="lkovacic" id="v18.1.0-13">-->
+<!--		<preConditions onFail="MARK_RAN">-->
+<!--			<not>-->
+<!--				<tableExists tableName="user_change"/>-->
+<!--			</not>-->
+<!--		</preConditions>-->
+<!--		<comment>-->
+<!--            Add 'user_change' fields data migration for 'external_reference' table-->
+<!--        </comment>-->
+<!--        <sql dbms="mysql" splitStatements="true">-->
+<!--			UPDATE external_reference er-->
+<!--				JOIN germplsm g on g.gid = er.gid-->
+<!--			SET er.created_by = g.created_by WHERE er.created_by = 0;-->
+<!--			&lt;!&ndash; Fail safe &ndash;&gt;-->
+<!--			UPDATE external_reference SET created_by = (SELECT userid FROM workbench.users WHERE uname = 'admin') WHERE created_by = 0;-->
+<!--        </sql>-->
+<!--	</changeSet>-->
+
+	<!--	TODO: add user_change table	 -->
+	<!--	create table user_change-->
+	<!--(-->
+	<!--	id int auto_increment,-->
+	<!--	user_id int not null,-->
+	<!--	tx_id int not null,-->
+	<!--	constraint user_change_id_pk-->
+	<!--		primary key (id)-->
+	<!--);-->
+
 </databaseChangeLog>
