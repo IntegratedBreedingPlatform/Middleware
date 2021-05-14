@@ -244,12 +244,12 @@
         </comment>
         <sql dbms="mysql" splitStatements="true">
 			INSERT INTO audit_cfg (entity_name, is_audited)
-			VALUES ('GERMPLASM', 1),
-				('ATTRIBUTE', 1),
-				('BIBREF', 1),
-				('NAME', 1),
+			VALUES ('GERMPLSM', 1),
+				('ATRIBUTS', 1),
+				('BIBREFS', 1),
+				('NAMES', 1),
 				('EXTERNAL_REFERENCE', 1),
-				('PROGENITOR', 1);
+				('PROGNTRS', 1);
         </sql>
 	</changeSet>
 
