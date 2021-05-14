@@ -196,7 +196,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		final List<Project> projects = new ArrayList<>();
 		try {
 			final StringBuilder sb = new StringBuilder(GET_PROJECTS_BY_USER_ID);
-			// TODO Added this condition to sort by the last opened project
+			// Added this condition to sort by the last opened project
 				sb.append("ORDER BY project_id =");
 				sb.append(LAST_OPENED_PROJECT_SUB_QUERY);
 				sb.append("desc, p.project_id");
