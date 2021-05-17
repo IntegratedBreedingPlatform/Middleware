@@ -1,6 +1,6 @@
 GO
 
-CREATE TRIGGER trigger_attribute_aud_update
+CREATE TRIGGER trigger_atributs_aud_update
     AFTER UPDATE
     ON atributs
     FOR EACH ROW

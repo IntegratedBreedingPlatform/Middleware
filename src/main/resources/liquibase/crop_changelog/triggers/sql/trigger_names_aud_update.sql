@@ -1,6 +1,6 @@
 GO
 
-CREATE TRIGGER trigger_name_aud_update
+CREATE TRIGGER trigger_names_aud_update
     AFTER UPDATE
     ON names
     FOR EACH ROW
