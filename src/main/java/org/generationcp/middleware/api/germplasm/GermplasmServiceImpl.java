@@ -423,7 +423,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public Germplasm getGermplasmWithPreferredName(final Integer gid) {
 		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
 		if (germplasm != null) {
-			germplasm.setPreferredName(this.daoFactory.getNameDao().getPreferredNameByGid(gid));
+			// Old data has germplasm with multiple preferred names, get the first preferred name for those germplasm
+			// Replace with germplasm.setPreferredName(this.daoFactory.getNameDao().getPreferredNameByGid(gid)) when IBP-4596 is resolved
+			final List<Name> names = this.daoFactory.getNameDao().getByGIDWithFilters(gid, 1, null);
+			if (!names.isEmpty()) {
+				germplasm.setPreferredName(names.get(0));
+			}
 		}
 		return germplasm;
 	}

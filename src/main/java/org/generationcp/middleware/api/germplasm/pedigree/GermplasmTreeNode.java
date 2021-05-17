@@ -37,7 +37,8 @@ public class GermplasmTreeNode {
 
 	public GermplasmTreeNode(final Germplasm germplasm) {
 		this.gid = germplasm.getGid();
-		this.preferredName = germplasm.getPreferredName().getNval();
+		// Some germplasm have no preferred name. Remove null checking after IBP-4596 is fixed
+		this.preferredName = germplasm.getPreferredName() == null ? null : germplasm.getPreferredName().getNval();
 		this.numberOfProgenitors = germplasm.getGnpgs();
 		this.methodName = germplasm.getMethod().getMname();
 		this.methodCode = germplasm.getMethod().getMcode();
