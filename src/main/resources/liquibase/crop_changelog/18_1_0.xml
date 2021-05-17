@@ -301,7 +301,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE atributs_aud (
-				aud_id        int                      not null primary key,
+				aud_id        int auto_increment primary key,
 				rev_type      tinyint                  not null,
 				aid           int                      not null,
 				gid           int          default 0   not null,
@@ -329,7 +329,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE bibrefs_aud (
-				aud_id        int                      not null primary key,
+				aud_id        int auto_increment primary key,
 				rev_type      tinyint                  not null,
 				refid         int                      not null,
 				pubtype       int          default 0   null,
@@ -366,7 +366,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE names_aud (
-				aud_id        int                      not null primary key,
+				aud_id        int auto_increment primary key,
 				rev_type      tinyint                  not null,
 				nid           int                      not null,
 				gid           int          default 0   not null,
@@ -395,7 +395,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE progntrs_aud (
-				aud_id        int           not null primary key,
+				aud_id        int auto_increment primary key,
 				rev_type      tinyint       not null,
 				gid           int default 0 not null,
 				pno           int default 0 not null,
@@ -420,8 +420,8 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE external_reference_aud (
-				aud_id        int           not null primary key,
-				rev_type          tinyint       not null,
+				aud_id        	 int auto_increment primary key,
+				rev_type         tinyint       not null,
 				id               int           not null,
 				gid              int           not null,
 				reference_id     varchar(2000) not null,
