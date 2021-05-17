@@ -266,12 +266,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	}
 
 	private GermplasmTreeNode createUnknownParent() {
-		final Germplasm germplasm = new Germplasm();
-		germplasm.setGid(0);
-		final Name preferredName = new Name();
-		preferredName.setNval(Name.UNKNOWN);
-		germplasm.setPreferredName(preferredName);
-		return new GermplasmTreeNode(germplasm);
+		return new GermplasmTreeNode(0, Name.UNKNOWN, null, null, null);
 	}
 
 	public Integer getNumberOfGenerations(final Integer gid, final Boolean includeDerivativeLine) {
