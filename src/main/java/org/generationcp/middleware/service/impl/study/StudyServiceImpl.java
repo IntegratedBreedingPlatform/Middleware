@@ -14,7 +14,6 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
-import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -56,7 +55,6 @@ import org.generationcp.middleware.service.impl.study.generation.ExperimentModel
 import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -542,7 +540,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<StudySummary> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 		final List<StudySummary> studies = this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter, pageable);
-		final Map<Integer, StudySummary> studiesMap = studies.stream().collect(Collectors.toMap(StudySummary::getStudyDbid, Function.identity()));
+		final Map<Integer, StudySummary> studiesMap = studies.stream().collect(Collectors.toMap(StudySummary::getTrialDbId, Function.identity()));
 		final Set<Integer> studyIds = studiesMap.keySet();
 		if (!CollectionUtils.isEmpty(studyIds)) {
 			final List<DmsProject> projects = this.daoFactory.getDmsProjectDAO().getByIds(studyIds);
@@ -571,18 +569,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 							}
 						}
 
-						if (variableId.equals(TermId.SEASON_VAR_TEXT.getId())) {
-							studySummary.addSeason(value);
-						} else if (variableId.equals(TermId.LOCATION_ID.getId())) {
-							studySummary.setLocationId(!StringUtils.isEmpty(value) ? value : null);
-						} else if (!StringUtils.isEmpty(value)) {
+						if (!StringUtils.isEmpty(value)) {
 							additionalProps.put(prop.getAlias(), value);
 						}
 					}
 				}
 
 				studySummary.setOptionalInfo(additionalProps).setName(dmsProject.getName()).setProgramDbId(dmsProject.getProgramUUID())
-					.setStudyDbid(dmsProject.getProjectId());
+					.setTrialDbId(dmsProject.getProjectId());
 				final List<Integer> locationIds = studySearchFilter.getLocationDbId() != null ?
 					Collections.singletonList(Integer.parseInt(studySearchFilter.getLocationDbId())) :
 					Collections.emptyList();
@@ -613,7 +607,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public List<StudySummary> saveStudies(final CropType crop, final List<TrialImportRequestDTO> trialImportRequestDtoList, final Integer userId) {
-		final List<Integer> studyIds = new ArrayList<>();
+		final List<String> studyIds = new ArrayList<>();
 		for (final TrialImportRequestDTO trialImportRequestDto : trialImportRequestDtoList){
 			final DmsProject study = new DmsProject();
 			final String trialDescription = trialImportRequestDto.getTrialDescription();
@@ -692,13 +686,11 @@ public class StudyServiceImpl extends Service implements StudyService {
 			dmsProjectDAO.save(plotDataset);
 
 			this.saveTrialInstance(study, envDataset, crop);
-			studyIds.add(study.getProjectId());
+			studyIds.add(study.getProjectId().toString());
 		}
 		// Unless the session is flushed, the latest changes are not reflected in DTOs returned by method
 		this.sessionProvider.getSession().flush();
-		// FIXME make trialDbIds a list
-		final StudySearchFilter filter = new StudySearchFilter().withTrialDbId(studyIds.get(0).toString());
-		// Unless the session is flushed, the latest changes to germplasm,names and attributes are not reflected in object returned by method
+		final StudySearchFilter filter = new StudySearchFilter().withTrialDbIds(studyIds);
 		return this.getStudies(filter, null);
 	}
 

@@ -2,7 +2,9 @@ package org.generationcp.middleware.service.api.study;
 
 import org.pojomatic.Pojomatic;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class StudySearchFilter {
 
@@ -13,10 +15,10 @@ public class StudySearchFilter {
 	private String seasonDbId;
 	private String trialPUI;
 	private String studyPUI;
-	private String trialDbId;
+	private List<String> trialDbIds = new ArrayList<>();
 	private String trialName;
 	private String contactDbId;
-	private String studyDbId;
+	private List<String> studyDbIds = new ArrayList<>();
 	private Integer germplasmDbId;
 	private Integer observationVariableDbId;
 	private Boolean active;
@@ -25,17 +27,6 @@ public class StudySearchFilter {
 
 	public StudySearchFilter() {
 
-	}
-
-	public StudySearchFilter(final String studyTypeDbId, final String programDbId, final String locationDbId, final String seasonDbId,
-		final String trialDbId, final String studyDbId, final Boolean active) {
-		this.studyTypeDbId = studyTypeDbId;
-		this.programDbId = programDbId;
-		this.locationDbId = locationDbId;
-		this.seasonDbId = seasonDbId;
-		this.trialDbId = trialDbId;
-		this.studyDbId = studyDbId;
-		this.active = active;
 	}
 
 	public String getStudyTypeDbId() {
@@ -87,21 +78,21 @@ public class StudySearchFilter {
 		return this;
 	}
 
-	public String getTrialDbId() {
-		return this.trialDbId;
+	public List<String> getTrialDbIds() {
+		return this.trialDbIds;
 	}
 
-	public StudySearchFilter withTrialDbId(final String trialDbId) {
-		this.trialDbId = trialDbId;
+	public StudySearchFilter withTrialDbIds(final List<String>trialDbIds) {
+		this.trialDbIds = trialDbIds;
 		return this;
 	}
 
-	public String getStudyDbId() {
-		return this.studyDbId;
+	public List<String> getStudyDbIds() {
+		return this.studyDbIds;
 	}
 
-	public StudySearchFilter withStudyDbId(final String studyDbId) {
-		this.studyDbId = studyDbId;
+	public StudySearchFilter withStudyDbIds(final List<String> studyDbIds) {
+		this.studyDbIds = studyDbIds;
 		return this;
 	}
 

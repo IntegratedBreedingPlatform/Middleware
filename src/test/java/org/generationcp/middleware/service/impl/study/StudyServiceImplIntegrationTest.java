@@ -5,6 +5,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
+import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -14,6 +15,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -159,7 +161,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
 		this.sessionProvder.getSession().flush();
-		final StudySearchFilter studySearchFilter = new StudySearchFilter().withStudyDbId(geolocation.getLocationId().toString())
+		final StudySearchFilter studySearchFilter = new StudySearchFilter().withStudyDbIds(Collections.singletonList(geolocation.getLocationId().toString()))
 			.withProgramDbId(this.study.getProgramUUID());
 		final Pageable pageable = new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "trialName"));
 		final List<StudyInstanceDto> studyDetailsDtoList = this.studyService.getStudyInstances(studySearchFilter, pageable);
@@ -314,7 +316,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 			this.studyService.getStudies(new StudySearchFilter().withProgramDbId(this.commonTestProject.getUniqueID()), new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
 		Assert.assertEquals(2, studies.size());
 		StudySummary study1 = studies.get(1);
-		Assert.assertEquals(this.study.getProjectId(), study1.getStudyDbid());
+		Assert.assertEquals(this.study.getProjectId(), study1.getTrialDbId());
 		Assert.assertEquals(this.study.getName(), study1.getName());
 		Assert.assertEquals(this.study.getDescription(), study1.getDescription());
 		Assert.assertEquals(this.study.getProgramUUID(), study1.getProgramDbId());
@@ -324,7 +326,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		// Workbench person details cannot be retrieved properly from this service
 		Assert.assertEquals("Creator", study1.getContacts().get(0).getType());
 		final StudySummary study2 = studies.get(0);
-		Assert.assertEquals(newStudy.getProjectId(), study2.getStudyDbid());
+		Assert.assertEquals(newStudy.getProjectId(), study2.getTrialDbId());
 		Assert.assertEquals(newStudy.getName(), study2.getName());
 		Assert.assertEquals(newStudy.getDescription(), study2.getDescription());
 		Assert.assertEquals(newStudy.getProgramUUID(), study2.getProgramDbId());
@@ -338,7 +340,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		studies = this.studyService.getStudies(new StudySearchFilter().withLocationDbId(String.valueOf(location1)), null);
 		Assert.assertEquals(1, studies.size());
 		study1 = studies.get(0);
-		Assert.assertEquals(newStudy.getProjectId(), study1.getStudyDbid());
+		Assert.assertEquals(newStudy.getProjectId(), study1.getTrialDbId());
 		// Expecting environments of retrieved study to also be filtered by location
 		Assert.assertEquals(1, study1.getInstanceMetaData().size());
 		Assert.assertEquals(String.valueOf(location1), study1.getInstanceMetaData().get(0).getLocationDbId().toString());
@@ -369,7 +371,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 			this.studyService.getStudies(new StudySearchFilter().withProgramDbId(this.commonTestProject.getUniqueID()), new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
 		Assert.assertEquals("Deleted study is not included",2, studies.size());
 		StudySummary study1 = studies.get(1);
-		Assert.assertEquals(this.study.getProjectId(), study1.getStudyDbid());
+		Assert.assertEquals(this.study.getProjectId(), study1.getTrialDbId());
 		Assert.assertEquals(this.study.getName(), study1.getName());
 		Assert.assertEquals(this.study.getDescription(), study1.getDescription());
 		Assert.assertEquals(this.study.getProgramUUID(), study1.getProgramDbId());
@@ -378,7 +380,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		// Workbench person details cannot be retrieved properly from this service
 		Assert.assertEquals("Creator", study1.getContacts().get(0).getType());
 		final StudySummary study2 = studies.get(0);
-		Assert.assertEquals(newStudy.getProjectId(), study2.getStudyDbid());
+		Assert.assertEquals(newStudy.getProjectId(), study2.getTrialDbId());
 		Assert.assertEquals(newStudy.getName(), study2.getName());
 		Assert.assertEquals(newStudy.getDescription(), study2.getDescription());
 		Assert.assertEquals(newStudy.getProgramUUID(), study2.getProgramDbId());
@@ -391,7 +393,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		studies = this.studyService.getStudies(new StudySearchFilter().withLocationDbId(String.valueOf(location1)), null);
 		Assert.assertEquals(1, studies.size());
 		study1 = studies.get(0);
-		Assert.assertEquals(newStudy.getProjectId(), study1.getStudyDbid());
+		Assert.assertEquals(newStudy.getProjectId(), study1.getTrialDbId());
 		// Expecting environments of retrieved study to also be filtered by location
 		Assert.assertEquals(1, study1.getInstanceMetaData().size());
 		Assert.assertEquals(String.valueOf(location1), study1.getInstanceMetaData().get(0).getLocationDbId().toString());
@@ -462,24 +464,53 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testSaveStudy() {
-		final TrialImportRequestDTO importRequest = new TrialImportRequestDTO();
-		importRequest.setStartDate("2019-01-01");
-		importRequest.setEndDate("2020-12-31");
-		importRequest.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
-		importRequest.setTrialName(RandomStringUtils.randomAlphabetic(20));
-		importRequest.setProgramDbId(this.commonTestProject.getUniqueID());
-		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop, Arrays.asList(importRequest), this.testUser.getUserid());
-		final StudySummary study1 = savedStudies.get(0);
-		Assert.assertEquals(importRequest.getProgramDbId(), study1.getProgramDbId());
-		Assert.assertEquals(importRequest.getTrialDescription(), study1.getDescription());
-		Assert.assertEquals(importRequest.getTrialName(), study1.getName());
-		Assert.assertEquals(Util.tryConvertDate(importRequest.getStartDate(), Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT),
-			Util.convertDateToIntegerValue(study1.getStartDate()).toString());
-		Assert.assertEquals(Util.tryConvertDate(importRequest.getEndDate(), Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT),
-			Util.convertDateToIntegerValue(study1.getEndDate()).toString());
-		Assert.assertFalse(study1.isActive());
-		Assert.assertNotNull(study1.getStudyDbid());
+		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
+		importRequest1.setStartDate("2019-01-01");
+		importRequest1.setEndDate("2020-12-31");
+		importRequest1.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
+		final TrialImportRequestDTO importRequest2 = new TrialImportRequestDTO();
+		importRequest2.setStartDate("2019-01-01");
+		importRequest2.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest2.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest2.setProgramDbId(this.commonTestProject.getUniqueID());
 
+		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop, Arrays.asList(importRequest1, importRequest2), this.testUser.getUserid());
+		Assert.assertEquals(2, savedStudies.size());
+		this.verifyStudySummary(importRequest1, savedStudies.get(0));
+		this.verifyStudySummary(importRequest2, savedStudies.get(1));
+
+
+	}
+
+	private void verifyStudySummary(final TrialImportRequestDTO importRequestDTO, final StudySummary study) {
+		Assert.assertEquals(importRequestDTO.getProgramDbId(), study.getProgramDbId());
+		Assert.assertEquals(importRequestDTO.getTrialDescription(), study.getDescription());
+		Assert.assertEquals(importRequestDTO.getTrialName(), study.getName());
+		Assert.assertEquals(Util.tryConvertDate(importRequestDTO.getStartDate(), Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT),
+			Util.convertDateToIntegerValue(study.getStartDate()).toString());
+		if (importRequestDTO.getEndDate() != null) {
+			Assert.assertEquals(Util.tryConvertDate(importRequestDTO.getEndDate(), Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT),
+				Util.convertDateToIntegerValue(study.getEndDate()).toString());
+			Assert.assertFalse(study.isActive());
+		} else {
+			// If no end date, study is assumed active (non-completed)
+			Assert.assertTrue(study.isActive());
+		}
+		Assert.assertNotNull(study.getTrialDbId());
+		Assert.assertNotNull(study.getObservationUnitId());
+		Assert.assertEquals(1, study.getInstanceMetaData().size());
+		final InstanceMetadata study1Instance = study.getInstanceMetaData().get(0);
+		Assert.assertEquals("1", study1Instance.getInstanceNumber());
+		Assert.assertEquals(study.getTrialDbId(), study1Instance.getTrialDbId());
+		final Optional<Location> unspecifiedLocation = this.daoFactory.getLocationDAO().getUnspecifiedLocation();
+		if (unspecifiedLocation.isPresent()) {
+			final Integer locationId = unspecifiedLocation.get().getLocid();
+			Assert.assertEquals(locationId.toString(), study.getLocationId());
+			Assert.assertEquals(locationId, study1Instance.getLocationDbId());
+			Assert.assertEquals(unspecifiedLocation.get().getLname(), study1Instance.getLocationName());
+		}
 	}
 
 	private void createDeletedStudy() {

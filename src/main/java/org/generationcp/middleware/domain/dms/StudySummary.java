@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.pojomatic.Pojomatic;
@@ -19,19 +18,13 @@ public class StudySummary implements Serializable {
 
 	private static final long serialVersionUID = -515769070343491680L;
 
-	private Integer studyDbid;
+	private Integer trialDbId;
 
 	private String name;
 
 	private String description;
 
-	private String type;
-
 	private String observationUnitId;
-
-	private List<String> years = Lists.newArrayList();
-
-	private List<String> seasons = Lists.newArrayList();
 
 	private String locationId;
 
@@ -51,12 +44,12 @@ public class StudySummary implements Serializable {
 
 	private List<ContactDto> contacts = new ArrayList<>();
 
-	public Integer getStudyDbid() {
-		return this.studyDbid;
+	public Integer getTrialDbId() {
+		return this.trialDbId;
 	}
 
-	public StudySummary setStudyDbid(final Integer studyDbid) {
-		this.studyDbid = studyDbid;
+	public StudySummary setTrialDbId(final Integer trialDbId) {
+		this.trialDbId = trialDbId;
 		return this;
 	}
 
@@ -75,43 +68,6 @@ public class StudySummary implements Serializable {
 
 	public StudySummary setDescription(final String description) {
 		this.description = description;
-		return this;
-	}
-
-	public String getType() {
-		return this.type;
-	}
-
-	public StudySummary setType(final String type) {
-		this.type = type;
-		return this;
-	}
-
-	public List<String> getYears() {
-		return this.years;
-	}
-
-	public StudySummary setYears(final List<String> years) {
-		this.years = years;
-		return this;
-	}
-
-	public StudySummary addYear(final String year) {
-		this.years.add(year);
-		return this;
-	}
-
-	public List<String> getSeasons() {
-		return this.seasons;
-	}
-
-	public StudySummary setSeasons(final List<String> seasons) {
-		this.seasons = seasons;
-		return this;
-	}
-
-	public StudySummary addSeason(final String season) {
-		this.seasons.add(season);
 		return this;
 	}
 
