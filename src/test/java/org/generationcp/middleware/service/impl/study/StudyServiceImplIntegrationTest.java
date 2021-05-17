@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudySummary;
@@ -25,6 +26,7 @@ import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
@@ -82,8 +84,9 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.testUser = this.testDataInitializer.createUserForTesting();
+		// Null study end date means it's still active
 		this.study = this.testDataInitializer
-			.createStudy("Study1", "Study-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString());
+			.createStudy("Study1", "Study-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(), "20180205", null);
 
 		this.plot = this.testDataInitializer
 			.createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
@@ -266,7 +269,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		// Add new study with new location ID
 		final DmsProject newStudy = this.testDataInitializer
-			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString());
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(), null, null);
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
@@ -290,9 +293,9 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetStudies() throws Exception {
-		// Add new study assigned new location ID
+		// Add new completed study assigned new location ID
 		final DmsProject newStudy = this.testDataInitializer
-			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString());
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(), "20200101", "20201231");
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
@@ -317,6 +320,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(this.study.getProgramUUID(), study1.getProgramDbId());
 		Assert.assertEquals(this.studyExperiment.getObsUnitId(), study1.getObservationUnitId());
 		Assert.assertEquals(1, study1.getContacts().size());
+		Assert.assertTrue(study1.isActive());
 		// Workbench person details cannot be retrieved properly from this service
 		Assert.assertEquals("Creator", study1.getContacts().get(0).getType());
 		final StudySummary study2 = studies.get(0);
@@ -328,6 +332,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(1, study2.getInstanceMetaData().size());
 		Assert.assertEquals(1, study2.getContacts().size());
 		Assert.assertEquals("Creator", study2.getContacts().get(0).getType());
+		Assert.assertFalse(study2.isActive());
 
 		// Expecting only one study to be retrieved when filtered by location
 		studies = this.studyService.getStudies(new StudySearchFilter().withLocationDbId(String.valueOf(location1)), null);
@@ -343,7 +348,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testGetStudiesWithDeletedStudy() throws Exception {
 		// Add new study assigned new location ID
 		final DmsProject newStudy = this.testDataInitializer
-			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString());
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(), null, null);
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
@@ -399,7 +404,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		// Add new study with new location ID
 		final DmsProject newStudy = this.testDataInitializer
-			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString());
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(), null, null);
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
@@ -428,7 +433,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	public void shouldGetGermplasmStudies_OK() {
 		final DmsProject newStudy = this.testDataInitializer
 			.createStudy("Study " + RandomStringUtils.randomNumeric(5), "Study2-Description", 6,
-				this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString());
+				this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(), null, null);
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName(org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(10));
@@ -455,9 +460,31 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(newStudy.getDescription(), germplasmStudyDto.getDescription());
 	}
 
+	@Test
+	public void testSaveStudy() {
+		final TrialImportRequestDTO importRequest = new TrialImportRequestDTO();
+		importRequest.setStartDate("2019-01-01");
+		importRequest.setEndDate("2020-12-31");
+		importRequest.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest.setProgramDbId(this.commonTestProject.getUniqueID());
+		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop, Arrays.asList(importRequest), this.testUser.getUserid());
+		final StudySummary study1 = savedStudies.get(0);
+		Assert.assertEquals(importRequest.getProgramDbId(), study1.getProgramDbId());
+		Assert.assertEquals(importRequest.getTrialDescription(), study1.getDescription());
+		Assert.assertEquals(importRequest.getTrialName(), study1.getName());
+		Assert.assertEquals(Util.tryConvertDate(importRequest.getStartDate(), Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT),
+			Util.convertDateToIntegerValue(study1.getStartDate()).toString());
+		Assert.assertEquals(Util.tryConvertDate(importRequest.getEndDate(), Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT),
+			Util.convertDateToIntegerValue(study1.getEndDate()).toString());
+		Assert.assertFalse(study1.isActive());
+		Assert.assertNotNull(study1.getStudyDbid());
+
+	}
+
 	private void createDeletedStudy() {
 		final DmsProject deletedStudy = this.testDataInitializer
-			.createStudy("StudyDeleted", "StudyDeleted-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString());
+			.createStudy("StudyDeleted", "StudyDeleted-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(), null, null);
 		deletedStudy.setDeleted(true);
 		final DmsProject environmentDatasetDeleted =
 			this.testDataInitializer

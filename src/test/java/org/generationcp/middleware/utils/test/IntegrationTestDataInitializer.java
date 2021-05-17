@@ -113,13 +113,15 @@ public class IntegrationTestDataInitializer {
 		this.nameDAO.setSession(hibernateSessionProvider.getSession());
 	}
 
-	public DmsProject createStudy(final String name, final String description, final int studyTypeId, final String programUUID, final String createdBy) {
+	public DmsProject createStudy(final String name, final String description, final int studyTypeId, final String programUUID, final String createdBy, final String startDate, final String endDate) {
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setName(name);
 		dmsProject.setDescription(description);
 		dmsProject.setStudyType(this.studyTypeDAO.getById(studyTypeId));
 		dmsProject.setProgramUUID(programUUID);
 		dmsProject.setCreatedBy(createdBy);
+		dmsProject.setStartDate(startDate);
+		dmsProject.setEndDate(endDate);
 		this.dmsProjectDao.save(dmsProject);
 		this.dmsProjectDao.refresh(dmsProject);
 		return dmsProject;

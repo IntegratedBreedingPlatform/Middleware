@@ -1796,7 +1796,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append(" 	 pmain.name AS trialName, ");
 		sql.append("     MAX(pmain.start_date) AS startDate, ");
 		sql.append("     MAX(pmain.end_date) AS endDate, ");
-		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS active, ");
+		sql.append("     CASE WHEN pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) "
+			+ "THEN 0 ELSE 1 END AS active, ");
 		sql.append("     location.locid AS locationDbId, ");
 		sql.append("     location.lname AS locationName, ");
 		sql.append("     wp.project_name AS programName, ");
@@ -1834,7 +1835,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append(" 	 study_exp.obs_unit_id AS trialPUI, ");
 		sql.append("     pmain.start_date AS startDate, ");
 		sql.append("     pmain.end_date AS endDate, ");
-		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS active, ");
+		sql.append("     CASE WHEN pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) "
+			+ "THEN 0 ELSE 1 END AS active, ");
 		sql.append("     wp.project_name AS programName, ");
 		sql.append("     wp.project_uuid AS programDbId, ");
 		// locationDbId is not unique to study but can have different value per environment.

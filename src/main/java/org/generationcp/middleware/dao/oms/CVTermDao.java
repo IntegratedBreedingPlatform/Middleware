@@ -132,7 +132,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public Map<String, Map<Integer, VariableType>> getTermIdsWithTypeByNameOrSynonyms(final List<String> nameOrSynonyms,
 		final int cvId) {
-		final Map<String, Map<Integer, VariableType>> stdVarMap = new HashMap<String, Map<Integer, VariableType>>();
+		final Map<String, Map<Integer, VariableType>> stdVarMap = new HashMap<>();
 
 		// Store the names in the map in uppercase
 		for (int i = 0, size = nameOrSynonyms.size(); i < size; i++) {
@@ -163,7 +163,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					if (stdVarMap.containsKey(nameOrSynonym)) {
 						stdVarIdsWithType = stdVarMap.get(nameOrSynonym);
 					} else {
-						stdVarIdsWithType = new HashMap<Integer, VariableType>();
+						stdVarIdsWithType = new HashMap<>();
 						stdVarMap.put(nameOrSynonym, stdVarIdsWithType);
 					}
 					stdVarIdsWithType.put(cvtermId, this.getDefaultVariableType(cvtermId));
@@ -173,7 +173,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		} catch (final HibernateException e) {
 			this.logAndThrowException(
-				"Error in getTermsByNameOrSynonyms=" + nameOrSynonyms + " in CVTermDao: " + e.getMessage(), e);
+				"Error in getTermIdsWithTypeByNameOrSynonyms=" + nameOrSynonyms + " in CVTermDao: " + e.getMessage(), e);
 		}
 		return stdVarMap;
 	}

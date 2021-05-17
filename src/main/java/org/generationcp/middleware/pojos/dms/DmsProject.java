@@ -338,8 +338,14 @@ public class DmsProject implements Serializable {
 		builder.append(this.name);
 		builder.append(", description=");
 		builder.append(this.description);
+		builder.append(", startDate=");
+		builder.append(this.startDate);
+		builder.append(", endDate=");
+		builder.append(this.endDate);
 		builder.append(", deleted=");
 		builder.append(this.deleted);
+		builder.append(", study=");
+		builder.append(this.study);
 		builder.append("]");
 		return builder.toString();
 	}
