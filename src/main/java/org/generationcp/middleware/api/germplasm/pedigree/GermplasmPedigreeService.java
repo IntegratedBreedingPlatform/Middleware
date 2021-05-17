@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface GermplasmPedigreeService {
 
-	GermplasmTreeNode getGermplasmPedigreeTree(Integer gid, Integer level, boolean includeDerivativeLine);
+	GermplasmTreeNode getGermplasmPedigreeTree(Integer gid, Integer level, boolean includeDerivativeLines);
 
 	List<GermplasmDto> getGenerationHistory(Integer gid);
 
@@ -17,4 +17,6 @@ public interface GermplasmPedigreeService {
 	GermplasmNeighborhoodNode getGermplasmMaintenanceNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward);
 
 	GermplasmNeighborhoodNode getGermplasmDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward);
+
+	Integer countGenerations(Integer gid, boolean includeDerivativeLines);
 }

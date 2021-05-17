@@ -156,6 +156,70 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
+	public void testCountGenerations_When_DerivativeAndIncludeDerivativeLinesIsFalse() {
+		final Germplasm rootGermplasm = this.createGermplasm(this.derivativeMethod, -1, 0, 0, 0);
+		final Germplasm parentGermplasm = this.createGermplasm(this.maintenanceMethod, -1,
+			rootGermplasm.getGid(), rootGermplasm.getGid(), 0);
+		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, -1,
+			rootGermplasm.getGid(), parentGermplasm.getGid(), 0);
+
+		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), false);
+		Assert.assertEquals(new Integer(2), numberOfGenerations);
+	}
+
+	@Test
+	public void testCountGenerations_When_DerivativeAndIncludeDerivativeLinesIsTrue() {
+		final Germplasm ancestorGermplasm = this.createGermplasm(this.derivativeMethod, -1, 0, 0, 0);
+		final Germplasm parentGermplasm = this.createGermplasm(this.maintenanceMethod, -1,
+			ancestorGermplasm.getGid(), ancestorGermplasm.getGid(), 0);
+		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, -1,
+			ancestorGermplasm.getGid(), parentGermplasm.getGid(), 0);
+
+		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), false);
+		Assert.assertEquals(new Integer(3), numberOfGenerations);
+	}
+
+	@Test
+	public void testCountGenerations_When_CrossWithKnownParents() {
+		final Germplasm femaleParent = this.createGermplasm(this.maintenanceMethod, -1,
+			0, 0, 0);
+		final Germplasm maleParent = this.createGermplasm(this.maintenanceMethod, -1,
+			0, 0, 0);
+		final Germplasm germplasm = this.createGermplasm(this.generativeMethod, 2,
+			femaleParent.getGid(), maleParent.getGid(), 0);
+
+		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), false);
+		Assert.assertEquals(new Integer(2), numberOfGenerations);
+	}
+
+	@Test
+	public void testCountGenerations_When_PolyCross() {
+		final Germplasm femaleParent = this.createGermplasm(this.maintenanceMethod, -1,
+			0, 0, 0);
+		final Germplasm maleParent1 = this.createGermplasm(this.maintenanceMethod, -1,
+			0, 0, 0);
+		final Germplasm maleParent2 = this.createGermplasm(this.maintenanceMethod, -1,
+			0, 0, 0);
+		final Germplasm germplasm = this.createGermplasm(this.generativeMethod, 3,
+			femaleParent.getGid(), maleParent1.getGid(), 0);
+		this.addProgenitor(germplasm, maleParent2);
+
+		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), false);
+		Assert.assertEquals(new Integer(2), numberOfGenerations);
+	}
+
+	@Test
+	public void testCountGenerations_When_CrossWithUnknownMaleParent() {
+		final Germplasm femaleParent = this.createGermplasm(this.maintenanceMethod, -1,
+			0, 0, 0);
+		final Germplasm germplasm = this.createGermplasm(this.generativeMethod, 2,
+			femaleParent.getGid(), 0, 0);
+
+		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), false);
+		Assert.assertEquals(new Integer(2), numberOfGenerations);
+	}
+
+	@Test
 	public void testGetMaintenanceNeighborhood_Success() {
 		final Germplasm rootGermplasm = this.createGermplasm(this.maintenanceMethod, -1, 0, 0, 0);
 		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, -1,
@@ -255,12 +319,11 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 		return method;
 	}
 
-	private Progenitor addProgenitor(final Germplasm son, final Germplasm parent) {
+	private void addProgenitor(final Germplasm son, final Germplasm parent) {
 		final Progenitor progenitor = new Progenitor(son, 3, parent.getGid());
 		this.daoFactory.getProgenitorDao().save(progenitor);
 		this.sessionProvder.getSession().flush();
 		this.daoFactory.getProgenitorDao().refresh(progenitor);
-		return progenitor;
 	}
 
 }

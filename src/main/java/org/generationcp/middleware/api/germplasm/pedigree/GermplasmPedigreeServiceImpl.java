@@ -83,6 +83,16 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		return this.getNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward, 'D');
 	}
 
+	@Override
+	public Integer countGenerations(final Integer gid, final boolean includeDerivativeLine) {
+		try {
+			PEDIGREE_COUNTER.set(1);
+			return this.getNumberOfGenerations(gid, includeDerivativeLine);
+		} finally {
+			PEDIGREE_COUNTER.remove();
+		}
+	}
+
 	private GermplasmNeighborhoodNode getNeighborhood(final Integer gid, final int numberOfStepsBackward, final int numberOfStepsForward,
 		final char methodType) {
 		final Object[] traceResult = this.traceRoot(gid, numberOfStepsBackward, methodType);
@@ -172,7 +182,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	 *
 	 * @param node
 	 * @param level
-	 * @return the given GermplasmPedigreeTreeNode with its parents added to it
+	 * @return the given GermplasmTreeNode with its parents added to it
 	 */
 	private GermplasmTreeNode addParents(final GermplasmTreeNode node, final int level, final Germplasm germplasmOfNode,
 		final boolean excludeDerivativeLines) {
@@ -262,15 +272,6 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		preferredName.setNval(Name.UNKNOWN);
 		germplasm.setPreferredName(preferredName);
 		return new GermplasmTreeNode(germplasm);
-	}
-
-	public Integer countGenerations(final Integer gid, final Boolean includeDerivativeLine) {
-		try {
-			PEDIGREE_COUNTER.set(1);
-			return this.getNumberOfGenerations(gid, includeDerivativeLine);
-		} finally {
-			PEDIGREE_COUNTER.remove();
-		}
 	}
 
 	public Integer getNumberOfGenerations(final Integer gid, final Boolean includeDerivativeLine) {
