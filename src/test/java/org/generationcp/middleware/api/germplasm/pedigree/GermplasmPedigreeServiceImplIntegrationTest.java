@@ -176,7 +176,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 			ancestorGermplasm.getGid(), parentGermplasm.getGid(), 0);
 
 		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), true);
-		Assert.assertEquals(new Integer(2), numberOfGenerations);
+		Assert.assertEquals(new Integer(3), numberOfGenerations);
 	}
 
 	@Test
