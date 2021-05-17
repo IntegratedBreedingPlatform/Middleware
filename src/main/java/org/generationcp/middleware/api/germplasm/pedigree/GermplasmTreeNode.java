@@ -15,6 +15,10 @@ public class GermplasmTreeNode {
 
 	private Integer numberOfProgenitors;
 
+	private String methodName;
+
+	private String methodCode;
+
 	private GermplasmTreeNode femaleParentNode;
 
 	private GermplasmTreeNode maleParentNode;
@@ -23,16 +27,20 @@ public class GermplasmTreeNode {
 
 	private List<GermplasmTreeNode> otherProgenitors = new ArrayList<>();
 
-	public GermplasmTreeNode(final Integer gid, final String preferredName, final Integer numberOfProgenitors) {
+	public GermplasmTreeNode(final Integer gid, final String preferredName, final Integer numberOfProgenitors, final String methodName, final String methodCode) {
 		this.gid = gid;
 		this.preferredName = preferredName;
 		this.numberOfProgenitors = numberOfProgenitors;
+		this.methodName = methodName;
+		this.methodCode = methodCode;
 	}
 
 	public GermplasmTreeNode(final Germplasm germplasm) {
 		this.gid = germplasm.getGid();
 		this.preferredName = germplasm.getPreferredName().getNval();
 		this.numberOfProgenitors = germplasm.getGnpgs();
+		this.methodName = germplasm.getMethod().getMname();
+		this.methodCode = germplasm.getMethod().getMcode();
 	}
 
 	public Integer getGid() {
@@ -57,6 +65,22 @@ public class GermplasmTreeNode {
 
 	public void setNumberOfProgenitors(final Integer numberOfProgenitors) {
 		this.numberOfProgenitors = numberOfProgenitors;
+	}
+
+	public String getMethodName() {
+		return this.methodName;
+	}
+
+	public void setMethodName(final String methodName) {
+		this.methodName = methodName;
+	}
+
+	public String getMethodCode() {
+		return this.methodCode;
+	}
+
+	public void setMethodCode(final String methodCode) {
+		this.methodCode = methodCode;
 	}
 
 	public GermplasmTreeNode getFemaleParentNode() {
