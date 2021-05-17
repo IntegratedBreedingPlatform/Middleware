@@ -1,12 +1,16 @@
 package org.generationcp.middleware.audit;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.core.Is.is;
@@ -14,6 +18,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
 public abstract class AuditIntegrationTestBase extends IntegrationTestBase {
+
+	protected final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 	protected final String tableName;
 	protected final String primaryKeyField;
@@ -39,6 +45,14 @@ public abstract class AuditIntegrationTestBase extends IntegrationTestBase {
 		assertThat(trigger[3], is("AFTER"));
 	}
 
+	protected void enableEntityAudit() {
+		this.changeEntityAuditConfiguration(true);
+	}
+
+	protected void disableEntityAudit() {
+		this.changeEntityAuditConfiguration(false);
+	}
+
 	protected int countEntityAudit(final Integer primaryKeyValue) {
 		final String sql =
 			String.format("SELECT COUNT(1) FROM %s_aud WHERE %s = %s", this.tableName, this.primaryKeyField, primaryKeyValue);
@@ -50,45 +64,66 @@ public abstract class AuditIntegrationTestBase extends IntegrationTestBase {
 		return (Integer) this.sessionProvder.getSession().createSQLQuery(sql).uniqueResult();
 	}
 
-	protected String generateInsertQuery(final List<QueryParam> queryParams) {
+	protected Map<String, Object> getLastAudit(final Set<String> fieldNames) {
+		final String fields = fieldNames.stream().collect(Collectors.joining(","));
+		final String sql = String.format("SELECT %s FROM %s_aud order by aud_id DESC LIMIT 1", fields, this.tableName);
+		final SQLQuery sqlQuery = this.sessionProvder.getSession().createSQLQuery(sql);
+		sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		return (Map<String, Object>) sqlQuery.uniqueResult();
+	}
+
+	protected void insertEntity(final Map<String, Object> queryParams) {
 		List<String> fields = new ArrayList<>();
 		List<String> values = new ArrayList<>();
 
-		queryParams.forEach(queryParam -> {
-			fields.add(queryParam.fieldName);
-			values.add(queryParam.formatValue());
+		queryParams.entrySet().forEach(e -> {
+			fields.add(e.getKey());
+			values.add(this.formatValue(e.getValue()));
 		});
 
-		return new StringBuilder("INSERT INTO ")
+		final String sql = new StringBuilder("INSERT INTO ")
 			.append(this.tableName)
 			.append("(")
-			.append(fields.stream().collect(Collectors.joining(",")))
+			.append(fields.stream().collect(Collectors.joining(", ")))
 			.append(") VALUES (")
-			.append(values.stream().collect(Collectors.joining(",")))
+			.append(values.stream().collect(Collectors.joining(", ")))
 			.append(")")
 			.toString();
+
+		this.sessionProvder.getSession().createSQLQuery(sql).executeUpdate();
 	}
 
-	protected static class QueryParam {
+	protected void updateEntity(final Map<String, Object> queryParams, final Integer primaryKeyValue) {
+		StringBuilder sqlBuilder = new StringBuilder("UPDATE ")
+			.append(this.tableName)
+			.append(" SET ");
 
-		private final String fieldName;
-		private final Object value;
+		String assignments = queryParams.entrySet().stream().map(e -> String.format("%s = %s", e.getKey(), this.formatValue(e.getValue()))).collect(
+			Collectors.joining(", "));
 
-		public QueryParam(final String fieldName, final Object value) {
-			this.fieldName = fieldName;
-			this.value = value;
+		sqlBuilder.append(assignments)
+			.append(" WHERE ")
+			.append(String.format("%s = %s", this.primaryKeyField, primaryKeyValue));
+
+		this.sessionProvder.getSession().createSQLQuery(sqlBuilder.toString()).executeUpdate();
+	}
+
+	private String formatValue(final Object value) {
+		if (value instanceof String) {
+			return String.format("'%s'", value);
 		}
-
-		public String formatValue() {
-			if (value instanceof String) {
-				return String.format("'%s'", value);
-			}
-			if (value instanceof Date) {
-				return String.format("'%s'", new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(value));
-			}
-			return String.valueOf(value);
+		if (value instanceof Date) {
+			return String.format("'%s'", DATE_FORMAT.format(value));
 		}
+		return String.valueOf(value);
+	}
 
+	private void changeEntityAuditConfiguration(final boolean isAudited) {
+		final SQLQuery sqlQuery =
+			this.sessionProvder.getSession().createSQLQuery("UPDATE audit_cfg SET is_audited = :isAudited WHERE entity_name = :entityName");
+		sqlQuery.setParameter("isAudited", isAudited);
+		sqlQuery.setParameter("entityName", this.tableName);
+		sqlQuery.executeUpdate();
 	}
 
 }
