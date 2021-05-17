@@ -113,6 +113,7 @@ public class AttributeAuditIntegrationTest extends AuditIntegrationTestBase {
 		assertThat(audit.get("alocn"), is(entity.get("alocn")));
 		assertThat(audit.get("aref"), is(entity.get("aref")));
 		assertThat(audit.get("adate"), is(entity.get("adate")));
+		assertThat(audit.get("modified_by"), is(entity.get("modified_by")));
 		assertThat(DATE_FORMAT.format(audit.get("created_date")), is(DATE_FORMAT.format(entity.get(("created_date")))));
 		if (audit.get("modified_date") == null) {
 			assertThat(audit.get("modified_date"), is(entity.get("modified_date")));
