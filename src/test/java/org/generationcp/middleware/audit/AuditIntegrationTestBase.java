@@ -8,6 +8,7 @@ import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -20,6 +21,8 @@ import static org.junit.Assert.assertThat;
 public abstract class AuditIntegrationTestBase extends IntegrationTestBase {
 
 	protected final static SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	protected final static String AUDIT_PRIMARY_KEY_FIELD = "aud_id";
+	protected final static String REV_TYPE_FIELD = "rev_type";
 
 	protected final String tableName;
 	protected final String primaryKeyField;
@@ -106,6 +109,15 @@ public abstract class AuditIntegrationTestBase extends IntegrationTestBase {
 			.append(String.format("%s = %s", this.primaryKeyField, primaryKeyValue));
 
 		this.sessionProvder.getSession().createSQLQuery(sqlBuilder.toString()).executeUpdate();
+	}
+
+	protected LinkedHashSet<String> getFieldNames(final Set<String> fields) {
+		final LinkedHashSet<String> fieldNames = new LinkedHashSet<>();
+		fieldNames.addAll(fields);
+		fieldNames.add(this.primaryKeyField);
+		fieldNames.add(AUDIT_PRIMARY_KEY_FIELD);
+		fieldNames.add(REV_TYPE_FIELD);
+		return fieldNames;
 	}
 
 	private String formatValue(final Object value) {

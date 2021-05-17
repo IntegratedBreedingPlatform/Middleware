@@ -53,14 +53,11 @@ public class GermplasmAuditIntegrationTest extends AuditIntegrationTestBase {
 		final Integer germplasm1Gid = this.getLastInsertIdFromEntity();
 		assertThat(this.countEntityAudit(germplasm1Gid), is(1));
 
-		final LinkedHashSet<String> fieldNames = new LinkedHashSet<>();
-		fieldNames.addAll(insertGermplasm1QueryParams.keySet());
-		fieldNames.add("gid");
-		fieldNames.add("aud_id");
+		final LinkedHashSet<String> fieldNames = this.getFieldNames(insertGermplasm1QueryParams.keySet());
 
 		//Assert recently created germplasm
 		final Map<String, Object> insertAudit = this.getLastAudit(fieldNames);
-		this.assertAudit(insertAudit, insertGermplasm1QueryParams, false, germplasm1Gid);
+		this.assertAudit(insertAudit, insertGermplasm1QueryParams, 0,false, germplasm1Gid);
 
 		//Disable audit
 		this.disableEntityAudit();
@@ -85,7 +82,7 @@ public class GermplasmAuditIntegrationTest extends AuditIntegrationTestBase {
 
 		//Assert recently updated germplasm
 		final Map<String, Object> updateAudit = this.getLastAudit(fieldNames);
-		this.assertAudit(updateAudit, updateGermplasm1QueryParams1, true, germplasm1Gid);
+		this.assertAudit(updateAudit, updateGermplasm1QueryParams1, 1, true, germplasm1Gid);
 
 		//Disable audit
 		this.disableEntityAudit();
@@ -122,7 +119,8 @@ public class GermplasmAuditIntegrationTest extends AuditIntegrationTestBase {
 		return queryParams;
 	}
 
-	private void assertAudit(final Map<String, Object> audit, final Map<String, Object> entity, final boolean deleted, final int gid) {
+	private void assertAudit(final Map<String, Object> audit, final Map<String, Object> entity, final int revType, final boolean deleted, final int gid) {
+		assertThat(new Integer(audit.get("rev_type").toString()), is(revType));
 		assertThat(audit.get("methn"), is(entity.get("methn")));
 		assertThat(audit.get("gnpgs"), is(entity.get("gnpgs")));
 		assertThat(audit.get("gpid1"), is(entity.get("gpid1")));
@@ -145,8 +143,8 @@ public class GermplasmAuditIntegrationTest extends AuditIntegrationTestBase {
 		} else {
 			assertThat(DATE_FORMAT.format(audit.get("modified_date")), is(DATE_FORMAT.format(entity.get("modified_date"))));
 		}
-		assertThat(audit.get("gid"), is(gid));
-		assertNotNull(audit.get("aud_id"));
+		assertThat(audit.get(PRIMARY_KEY_FIELD), is(gid));
+		assertNotNull(audit.get(AUDIT_PRIMARY_KEY_FIELD));
 	}
 
 }
