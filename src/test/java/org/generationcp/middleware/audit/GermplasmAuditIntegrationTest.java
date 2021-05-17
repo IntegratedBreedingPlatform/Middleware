@@ -53,7 +53,7 @@ public class GermplasmAuditIntegrationTest extends AuditIntegrationTestBase {
 		final Integer germplasm1Gid = this.getLastInsertIdFromEntity();
 		assertThat(this.countEntityAudit(germplasm1Gid), is(1));
 
-		final LinkedHashSet<String> fieldNames = this.getFieldNames(insertGermplasm1QueryParams.keySet());
+		final LinkedHashSet<String> fieldNames = this.getSelectAuditFieldNames(insertGermplasm1QueryParams.keySet());
 
 		//Assert recently created germplasm
 		final Map<String, Object> insertAudit = this.getLastAudit(fieldNames);

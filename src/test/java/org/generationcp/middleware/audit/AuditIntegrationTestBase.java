@@ -111,7 +111,7 @@ public abstract class AuditIntegrationTestBase extends IntegrationTestBase {
 		this.sessionProvder.getSession().createSQLQuery(sqlBuilder.toString()).executeUpdate();
 	}
 
-	protected LinkedHashSet<String> getFieldNames(final Set<String> fields) {
+	protected LinkedHashSet<String> getSelectAuditFieldNames(final Set<String> fields) {
 		final LinkedHashSet<String> fieldNames = new LinkedHashSet<>();
 		fieldNames.addAll(fields);
 		fieldNames.add(this.primaryKeyField);
