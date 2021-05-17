@@ -13,6 +13,8 @@ public class GermplasmTreeNode {
 
 	private String preferredName;
 
+	private Integer numberOfProgenitors;
+
 	private GermplasmTreeNode femaleParentNode;
 
 	private GermplasmTreeNode maleParentNode;
@@ -21,14 +23,16 @@ public class GermplasmTreeNode {
 
 	private List<GermplasmTreeNode> otherProgenitors = new ArrayList<>();
 
-	public GermplasmTreeNode(final Integer gid, final String preferredName) {
+	public GermplasmTreeNode(final Integer gid, final String preferredName, final Integer numberOfProgenitors) {
 		this.gid = gid;
 		this.preferredName = preferredName;
+		this.numberOfProgenitors = numberOfProgenitors;
 	}
 
 	public GermplasmTreeNode(final Germplasm germplasm) {
 		this.gid = germplasm.getGid();
 		this.preferredName = germplasm.getPreferredName().getNval();
+		this.numberOfProgenitors = germplasm.getGnpgs();
 	}
 
 	public Integer getGid() {
@@ -45,6 +49,14 @@ public class GermplasmTreeNode {
 
 	public void setPreferredName(final String preferredName) {
 		this.preferredName = preferredName;
+	}
+
+	public Integer getNumberOfProgenitors() {
+		return this.numberOfProgenitors;
+	}
+
+	public void setNumberOfProgenitors(final Integer numberOfProgenitors) {
+		this.numberOfProgenitors = numberOfProgenitors;
 	}
 
 	public GermplasmTreeNode getFemaleParentNode() {
