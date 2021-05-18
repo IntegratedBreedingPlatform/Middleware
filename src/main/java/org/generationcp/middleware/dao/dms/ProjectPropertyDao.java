@@ -16,6 +16,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -156,6 +157,26 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error in getByTypeAndValue(" + typeId + ", " + value + ")";
+			ProjectPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public Map<Integer, List<ProjectProperty>> getPropsForProjectIds(final List<Integer> projectIds) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.in("project.projectId", projectIds));
+			final List<ProjectProperty> results = criteria.list();
+
+			final Map<Integer, List<ProjectProperty>> projectPropMap = new HashMap<>();
+			for (final ProjectProperty prop : results) {
+				final Integer projectId = prop.getProject().getProjectId();
+				projectPropMap.putIfAbsent(projectId, new ArrayList<>());
+				projectPropMap.get(projectId).add(prop);
+			}
+			return projectPropMap;
+		} catch (final HibernateException e) {
+			final String message = "Error in getPropsForProjectIds(" + projectIds + ")";
 			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

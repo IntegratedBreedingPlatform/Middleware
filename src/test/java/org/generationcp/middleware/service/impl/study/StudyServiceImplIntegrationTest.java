@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
@@ -42,6 +43,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Optional;
 import java.util.Random;
 
@@ -475,6 +477,10 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		importRequest2.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
 		importRequest2.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		importRequest2.setProgramDbId(this.commonTestProject.getUniqueID());
+		final ExternalReferenceDTO externalReference = new ExternalReferenceDTO();
+		externalReference.setReferenceID(RandomStringUtils.randomAlphabetic(20));
+		externalReference.setReferenceSource(RandomStringUtils.randomAlphabetic(20));
+		importRequest2.setExternalReferences(Collections.singletonList(externalReference));
 
 		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop, Arrays.asList(importRequest1, importRequest2), this.testUser.getUserid());
 		Assert.assertEquals(2, savedStudies.size());
@@ -510,6 +516,18 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 			Assert.assertEquals(locationId.toString(), study.getLocationId());
 			Assert.assertEquals(locationId, study1Instance.getLocationDbId());
 			Assert.assertEquals(unspecifiedLocation.get().getLname(), study1Instance.getLocationName());
+		}
+		if (!CollectionUtils.isEmpty(importRequestDTO.getExternalReferences())) {
+			Assert.assertNotNull(study.getExternalReferences());
+			Assert.assertEquals(importRequestDTO.getExternalReferences().size(), study.getExternalReferences().size());
+			final ListIterator<ExternalReferenceDTO> importReferencesIterator =
+				importRequestDTO.getExternalReferences().listIterator();
+			for (final ExternalReferenceDTO externalReference : study.getExternalReferences()) {
+				final ExternalReferenceDTO externalReferenceImportRequest = importReferencesIterator.next();
+				Assert.assertEquals(externalReferenceImportRequest.getReferenceID(), externalReference.getReferenceID());
+				Assert.assertEquals(externalReferenceImportRequest.getReferenceSource(), externalReference.getReferenceSource());
+				Assert.assertEquals(study.getTrialDbId().toString(), externalReference.getEntityId());
+			}
 		}
 	}
 

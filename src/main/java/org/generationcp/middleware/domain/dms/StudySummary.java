@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.pojomatic.Pojomatic;
@@ -44,94 +45,86 @@ public class StudySummary implements Serializable {
 
 	private List<ContactDto> contacts = new ArrayList<>();
 
+	private List<ExternalReferenceDTO> externalReferences = new ArrayList<>();
+
 	public Integer getTrialDbId() {
 		return this.trialDbId;
 	}
 
-	public StudySummary setTrialDbId(final Integer trialDbId) {
+	public void setTrialDbId(final Integer trialDbId) {
 		this.trialDbId = trialDbId;
-		return this;
 	}
 
 	public String getName() {
 		return this.name;
 	}
 
-	public StudySummary setName(final String name) {
+	public void setName(final String name) {
 		this.name = name;
-		return this;
 	}
 
 	public String getDescription() {
 		return this.description;
 	}
 
-	public StudySummary setDescription(final String description) {
+	public void setDescription(final String description) {
 		this.description = description;
-		return this;
 	}
 
 	public String getLocationId() {
 		return this.locationId;
 	}
 
-	public StudySummary setLocationId(final String locationId) {
+	public void setLocationId(final String locationId) {
 		this.locationId = locationId;
-		return this;
 	}
 
 	public String getProgramDbId() {
 		return this.programDbId;
 	}
 
-	public StudySummary setProgramDbId(final String programDbId) {
+	public void setProgramDbId(final String programDbId) {
 		this.programDbId = programDbId;
-		return this;
 	}
 
 	public String getProgramName() {
 		return this.programName;
 	}
 
-	public StudySummary setProgramName(final String programName) {
+	public void setProgramName(final String programName) {
 		this.programName = programName;
-		return this;
 	}
 
 	public Date getStartDate() {
 		return this.startDate;
 	}
 
-	public StudySummary setStartDate(final Date startDate) {
+	public void setStartDate(final Date startDate) {
 		this.startDate = startDate;
-		return this;
 	}
 
 	public Date getEndDate() {
 		return this.endDate;
 	}
 
-	public StudySummary setEndDate(final Date endDate) {
+	public void setEndDate(final Date endDate) {
 		this.endDate = endDate;
-		return this;
 	}
 
 	public boolean isActive() {
 		return this.active;
 	}
 
-	public StudySummary setActive(final boolean active) {
+	public void setActive(final boolean active) {
 		this.active = active;
-		return this;
 	}
 
 	public Map<String, String> getOptionalInfo() {
 		return this.optionalInfo;
 	}
 
-	public StudySummary setOptionalInfo(final Map<String, String> optionalInfo) {
+	public void setOptionalInfo(final Map<String, String> optionalInfo) {
 		this.optionalInfo = optionalInfo;
-		return this;
 	}
 
 	public List<InstanceMetadata> getInstanceMetaData() {
@@ -142,23 +135,28 @@ public class StudySummary implements Serializable {
 		return this.contacts;
 	}
 
-	public StudySummary setContacts(final List<ContactDto> contacts) {
+	public void setContacts(final List<ContactDto> contacts) {
 		this.contacts = contacts;
-		return this;
 	}
 
-	public StudySummary setInstanceMetaData(final List<InstanceMetadata> instanceMetaData) {
+	public void setInstanceMetaData(final List<InstanceMetadata> instanceMetaData) {
 		this.instanceMetaData = instanceMetaData;
-		return this;
 	}
 
 	public String getObservationUnitId() {
 		return this.observationUnitId;
 	}
 
-	public StudySummary setObservationUnitId(final String observationUnitId) {
+	public void setObservationUnitId(final String observationUnitId) {
 		this.observationUnitId = observationUnitId;
-		return this;
+	}
+
+	public List<ExternalReferenceDTO> getExternalReferences() {
+		return this.externalReferences;
+	}
+
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	@Override
@@ -175,6 +173,5 @@ public class StudySummary implements Serializable {
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
-
 
 }

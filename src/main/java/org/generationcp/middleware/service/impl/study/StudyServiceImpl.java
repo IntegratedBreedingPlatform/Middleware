@@ -11,9 +11,11 @@ import com.google.common.collect.Ordering;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
+import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -68,11 +70,11 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
@@ -360,7 +362,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					.getObservationSetVariables(environmentDataset.getProjectId(),
 						Lists.newArrayList(VariableType.ENVIRONMENT_CONDITION.getId()));
 				final List<MeasurementVariable> environmentParameters = new ArrayList<>();
-				List<Integer> variableIds = environmentConditions.stream().map(measurementVariable -> measurementVariable.getTermId())
+				List<Integer> variableIds = environmentConditions.stream().map(MeasurementVariable::getTermId)
 					.collect(Collectors.toList());
 				if (!variableIds.isEmpty()) {
 					environmentParameters.addAll(
@@ -369,7 +371,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final List<MeasurementVariable> environmentDetails = this.daoFactory.getDmsProjectDAO()
 					.getObservationSetVariables(environmentDataset.getProjectId(),
 						Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
-				variableIds = environmentDetails.stream().map(measurementVariable -> measurementVariable.getTermId())
+				variableIds = environmentDetails.stream().map(MeasurementVariable::getTermId)
 					.collect(Collectors.toList());
 				if (!variableIds.isEmpty()) {
 					environmentParameters.addAll(
@@ -382,7 +384,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				studyDetailsDto.setEnvironmentParameters(environmentParameters);
 
 				final Map<String, String> properties = new HashMap<>();
-				variableIds = environmentVariables.stream().map(measurementVariable -> measurementVariable.getTermId())
+				variableIds = environmentVariables.stream().map(MeasurementVariable::getTermId)
 					.collect(Collectors.toList());
 				properties.put("studyObjective", studyMetadata.getStudyObjective());
 				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(instanceId, variableIds));
@@ -405,7 +407,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	private List<MeasurementVariable> createGeolocationVariables(final List<MeasurementVariable> measurementVariables,
 		final Integer geolocationId) {
 		final List<MeasurementVariable> geolocationVariables = new ArrayList<>();
-		final List<Integer> variableIds = measurementVariables.stream().map(measurementVariable -> measurementVariable.getTermId())
+		final List<Integer> variableIds = measurementVariables.stream().map(MeasurementVariable::getTermId)
 			.collect(Collectors.toList());
 		if (variableIds.contains(TermId.ALTITUDE.getId()) || variableIds.contains(TermId.LATITUDE.getId())
 			|| variableIds.contains(TermId.LONGITUDE.getId()) || variableIds.contains(TermId.GEODETIC_DATUM.getId())) {
@@ -483,7 +485,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 						this.getEnvironmentVariables(studyEnvironmentVariablesMap, studyEnvironmentDatasetIdMap.get(trialDbId));
 
 					final List<MeasurementVariable> environmentParameterVariables = new ArrayList<>();
-					final List<Integer> variableIds = environmentVariables.stream().map(measurementVariable -> measurementVariable.getTermId())
+					final List<Integer> variableIds = environmentVariables.stream().map(MeasurementVariable::getTermId)
 						.collect(Collectors.toList());
 					if (!variableIds.isEmpty()) {
 						environmentParameterVariables.addAll(
@@ -540,52 +542,61 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<StudySummary> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 		final List<StudySummary> studies = this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter, pageable);
-		final Map<Integer, StudySummary> studiesMap = studies.stream().collect(Collectors.toMap(StudySummary::getTrialDbId, Function.identity()));
-		final Set<Integer> studyIds = studiesMap.keySet();
-		if (!CollectionUtils.isEmpty(studyIds)) {
-			final List<DmsProject> projects = this.daoFactory.getDmsProjectDAO().getByIds(studyIds);
-			final Map<Integer, Optional<DataType>> variableDataTypeMap = Maps.newHashMap();
-			// Add study settings in optionalInfo map
-			for (final DmsProject dmsProject : projects) {
-				final StudySummary studySummary = studiesMap.get(dmsProject.getProjectId());
-				final Map<String, String> additionalProps = Maps.newHashMap();
-				if (!CollectionUtils.isEmpty(dmsProject.getProperties())) {
-					for (final ProjectProperty prop : dmsProject.getProperties()) {
-						final Integer variableId = prop.getVariableId();
-						if (!variableDataTypeMap.containsKey(variableId)) {
-							// TODO optimize
-							final Optional<DataType> dataType = this.ontologyVariableDataManager.getDataType(prop.getVariableId());
-							variableDataTypeMap.put(variableId, dataType);
-						}
-						final Optional<DataType> variableDataType = variableDataTypeMap.get(variableId);
-						String value = prop.getValue();
-						if (variableDataType.isPresent() && DataType.CATEGORICAL_VARIABLE.getId().equals(variableDataType.get().getId())
-							&& StringUtils.isNotBlank(value) && NumberUtils.isDigits(value)) {
-							final Integer categoricalId = Integer.parseInt(value);
-							final String categoricalValue = this.ontologyVariableDataManager
-								.retrieveVariableCategoricalValue(dmsProject.getProgramUUID(), prop.getVariableId(), categoricalId);
-							if (!StringUtils.isEmpty(categoricalValue)) {
-								value = categoricalValue;
-							}
-						}
-
-						if (!StringUtils.isEmpty(value)) {
-							additionalProps.put(prop.getAlias(), value);
-						}
-					}
-				}
-
-				studySummary.setOptionalInfo(additionalProps).setName(dmsProject.getName()).setProgramDbId(dmsProject.getProgramUUID())
-					.setTrialDbId(dmsProject.getProjectId());
+		if (!CollectionUtils.isEmpty(studies)) {
+			final List<Integer> studyIds = studies.stream().map(StudySummary::getTrialDbId).collect(Collectors.toList());
+			final Map<Integer, List<ProjectProperty>> propsMap = this.daoFactory.getProjectPropertyDAO().getPropsForProjectIds(studyIds);
+			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
+				this.daoFactory.getStudyExternalReferenceDAO().getExternalReferences(studyIds).stream().collect(groupingBy(
+					ExternalReferenceDTO::getEntityId));
 				final List<Integer> locationIds = studySearchFilter.getLocationDbId() != null ?
 					Collections.singletonList(Integer.parseInt(studySearchFilter.getLocationDbId())) :
 					Collections.emptyList();
-				studySummary
-					.setInstanceMetaData(this.daoFactory.getGeolocationDao().getInstanceMetadata(dmsProject.getProjectId(), locationIds));
-			}
+			final Map<Integer, List<InstanceMetadata>> trialInstancesMap =
+				this.daoFactory.getGeolocationDao().getInstanceMetadata(studyIds, locationIds).stream().collect(groupingBy(
+					InstanceMetadata::getTrialDbId));
 
+			final Map<Integer, Optional<DataType>> variableDataTypeMap = Maps.newHashMap();
+			final Map<Integer, String> categoricalValueMap = Maps.newHashMap();
+			for (final StudySummary studySummary : studies) {
+				// Add study settings in optionalInfo map
+				final Integer studyId = studySummary.getTrialDbId();
+				this.setStudySettings(propsMap, variableDataTypeMap, categoricalValueMap, studySummary, studyId);
+				System.out.println("studyId " + studyId + " , external references: " + externalReferencesMap.get(studyId));
+				studySummary.setExternalReferences(externalReferencesMap.get(studyId.toString()));
+				studySummary
+					.setInstanceMetaData(trialInstancesMap.get(studyId));
+
+			}
 		}
 		return studies;
+	}
+
+	private void setStudySettings(final Map<Integer, List<ProjectProperty>> propsMap,
+		final Map<Integer, Optional<DataType>> variableDataTypeMap, final Map<Integer, String> categoricalValueMap,
+		final StudySummary studySummary, final Integer studyId) {
+		final Map<String, String> additionalProps = Maps.newHashMap();
+		if (!CollectionUtils.isEmpty(propsMap.get(studyId))) {
+			propsMap.get(studyId).stream().forEach(prop -> {
+				final Integer variableId = prop.getVariableId();
+				variableDataTypeMap.putIfAbsent(variableId, this.ontologyVariableDataManager.getDataType(prop.getVariableId()));
+				final Optional<DataType> variableDataType = variableDataTypeMap.get(variableId);
+				String value = prop.getValue();
+				if (variableDataType.isPresent() && DataType.CATEGORICAL_VARIABLE.getId().equals(variableDataType.get().getId())
+					&& StringUtils.isNotBlank(value) && NumberUtils.isDigits(value)) {
+					final Integer categoricalId = Integer.parseInt(value);
+					categoricalValueMap.putIfAbsent(categoricalId, this.ontologyVariableDataManager
+						.retrieveVariableCategoricalValue(studySummary.getProgramDbId(), prop.getVariableId(), categoricalId));
+					final String categoricalValue = categoricalValueMap.get(categoricalId);
+					if (!StringUtils.isEmpty(categoricalValue)) {
+						value = categoricalValue;
+					}
+				}
+				if (!StringUtils.isEmpty(value)) {
+					additionalProps.put(prop.getAlias(), value);
+				}
+			});
+			studySummary.setOptionalInfo(additionalProps);
+		}
 	}
 
 	@Override

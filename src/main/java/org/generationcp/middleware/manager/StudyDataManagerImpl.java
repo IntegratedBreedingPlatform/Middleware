@@ -1091,7 +1091,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public List<InstanceMetadata> getInstanceMetadata(final int studyId) {
-		return this.daoFactory.getGeolocationDao().getInstanceMetadata(studyId, new ArrayList<>());
+		return this.daoFactory.getGeolocationDao().getInstanceMetadata(Collections.singletonList(studyId), Collections.emptyList());
 	}
 
 	@Override
