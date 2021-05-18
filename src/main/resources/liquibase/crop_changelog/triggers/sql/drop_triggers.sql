@@ -10,3 +10,4 @@ DROP TRIGGER IF EXISTS trigger_names_aud_insert;
 DROP TRIGGER IF EXISTS trigger_names_aud_update;
 DROP TRIGGER IF EXISTS trigger_progntrs_aud_insert;
 DROP TRIGGER IF EXISTS trigger_progntrs_aud_update;
+DROP TRIGGER IF EXISTS trigger_progntrs_aud_delete;
