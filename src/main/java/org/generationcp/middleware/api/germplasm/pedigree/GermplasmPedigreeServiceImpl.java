@@ -216,8 +216,8 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 
 	private void addNodeForParents(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
 		final boolean excludeDerivativeLines) {
-		//for generative germplasm, do not add parents if female parent is unknown(male parent should also be unknown)
-		if(germplasm.getGpid1() != 0) {
+		//for generative germplasm, do not add parents if both parents are unknown
+		if(!(germplasm.getGpid1() == 0 && germplasm.getGpid2() == 0)) {
 			this.addFemaleParentNode(node, level, germplasm.getGpid1(), excludeDerivativeLines);
 			if (germplasm.getGpid2() == 0) {
 				node.setMaleParentNode(this.createUnknownParent());
