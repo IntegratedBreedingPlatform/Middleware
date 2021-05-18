@@ -207,18 +207,8 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 					}
 				}
 			} else if (germplasmOfNode.getGnpgs() >= 2) {
-				// Get and add female and male parents
+				// Get and add female and male parents for generative germplasm
 				this.addNodeForParents(node, level, germplasmOfNode, excludeDerivativeLines);
-
-				// IF there are more parents, get and add each of them
-				if (germplasmOfNode.getGnpgs() > 2) {
-					final List<Germplasm> otherParents =
-						this.germplasmService.getProgenitorsWithPreferredName(germplasmOfNode.getGid());
-					for (final Germplasm otherParent : otherParents) {
-						final GermplasmTreeNode maleParentNode = new GermplasmTreeNode(otherParent);
-						node.getOtherProgenitors().add(this.addParents(maleParentNode, level - 1, otherParent, excludeDerivativeLines));
-					}
-				}
 			}
 		}
 		return node;
@@ -226,18 +216,25 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 
 	private void addNodeForParents(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
 		final boolean excludeDerivativeLines) {
-		if (germplasm.getGpid1() == 0) {
-			node.setFemaleParentNode(this.createUnknownParent());
-		} else {
+		//for generative germplasm, do not add parents if female parent is unknown(male parent should also be unknown)
+		if(germplasm.getGpid1() != 0) {
 			this.addFemaleParentNode(node, level, germplasm.getGpid1(), excludeDerivativeLines);
-		}
+			if (germplasm.getGpid2() == 0) {
+				node.setMaleParentNode(this.createUnknownParent());
+			} else {
+				this.addMaleParentNode(node, level, germplasm.getGpid2(), excludeDerivativeLines);
+			}
 
-		if (germplasm.getGpid2() == 0) {
-			node.setMaleParentNode(this.createUnknownParent());
-		} else {
-			this.addMaleParentNode(node, level, germplasm.getGpid2(), excludeDerivativeLines);
+			// If there are more parents, get and add each of them
+			if (germplasm.getGnpgs() > 2) {
+				final List<Germplasm> otherParents =
+					this.germplasmService.getProgenitorsWithPreferredName(germplasm.getGid());
+				for (final Germplasm otherParent : otherParents) {
+					final GermplasmTreeNode maleParentNode = new GermplasmTreeNode(otherParent);
+					node.getOtherProgenitors().add(this.addParents(maleParentNode, level - 1, otherParent, excludeDerivativeLines));
+				}
+			}
 		}
-
 	}
 
 	private void addNodeForKnownParents(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
