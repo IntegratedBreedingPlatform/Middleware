@@ -216,8 +216,8 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 
 	private void addNodeForParents(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
 		final boolean excludeDerivativeLines) {
-		//for generative germplasm, do not add parents if both parents are unknown
-		if(!(germplasm.getGpid1() == 0 && germplasm.getGpid2() == 0)) {
+		// For generative germplasm, do not add any node if both parents are UNKNOWN (GID=0)
+		if (!(germplasm.getGpid1() == 0 && germplasm.getGpid2() == 0)) {
 			this.addFemaleParentNode(node, level, germplasm.getGpid1(), excludeDerivativeLines);
 			if (germplasm.getGpid2() == 0) {
 				node.setMaleParentNode(this.createUnknownParent());
@@ -318,7 +318,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	}
 
 	private Integer getMaxGenerationCountFromParent(final Integer parentId, final boolean includeDerivativeLines) {
-		if(parentId == 0) {
+		if (parentId == 0) {
 			return 0;
 		}
 		if (!includeDerivativeLines) {
