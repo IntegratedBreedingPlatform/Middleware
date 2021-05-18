@@ -33,6 +33,7 @@ public class AttributeAuditIntegrationTest extends AuditIntegrationTestBase {
 	public void shouldTriggersExists() {
 		this.checkTriggerExists("trigger_atributs_aud_insert", "INSERT");
 		this.checkTriggerExists("trigger_atributs_aud_update", "UPDATE");
+		this.checkTriggerExists("trigger_atributs_aud_delete", "DELETE");
 	}
 
 	@Test
@@ -86,6 +87,23 @@ public class AttributeAuditIntegrationTest extends AuditIntegrationTestBase {
 		this.updateEntity(updateAttribute1QueryParams2, attribute1Aid);
 
 		assertThat(this.countEntityAudit(attribute1Aid), is(2));
+
+		//Enable audit
+		this.enableEntityAudit();
+
+		this.deleteEntity(attribute1Aid);
+		assertThat(this.countEntityAudit(attribute1Aid), is(3));
+
+		//Assert recently deleted attribute
+		final Map<String, Object> deletedAudit = this.getLastAudit(fieldNames);
+		this.assertAudit(deletedAudit, updateAttribute1QueryParams2, 2, attribute1Aid);
+
+		//Disable audit
+		this.disableEntityAudit();
+
+		//Delete attribute 2, because the audit was disable shouldn't be audited
+		this.deleteEntity(attribute2Aid);
+		assertThat(this.countEntityAudit(attribute2Aid), is(0));
 	}
 
 	protected Map<String, Object> createQueryParams(final Integer modifiedBy, final Date modifiedDate) {
