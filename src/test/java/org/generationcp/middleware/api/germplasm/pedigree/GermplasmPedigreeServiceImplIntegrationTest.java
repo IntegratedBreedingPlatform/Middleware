@@ -163,7 +163,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, -1,
 			rootGermplasm.getGid(), parentGermplasm.getGid(), 0);
 
-		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), false);
+		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), false, true);
 		Assert.assertEquals(new Integer(1), numberOfGenerations);
 	}
 
@@ -175,7 +175,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 		final Germplasm germplasm = this.createGermplasm(this.maintenanceMethod, -1,
 			ancestorGermplasm.getGid(), parentGermplasm.getGid(), 0);
 
-		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), true);
+		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), true, true);
 		Assert.assertEquals(new Integer(3), numberOfGenerations);
 	}
 
@@ -188,7 +188,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 		final Germplasm germplasm = this.createGermplasm(this.generativeMethod, 2,
 			femaleParent.getGid(), maleParent.getGid(), 0);
 
-		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), false);
+		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), false, true);
 		Assert.assertEquals(new Integer(2), numberOfGenerations);
 	}
 
@@ -204,7 +204,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 			femaleParent.getGid(), maleParent1.getGid(), 0);
 		this.addProgenitor(germplasm, maleParent2);
 
-		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), false);
+		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), false, true);
 		Assert.assertEquals(new Integer(2), numberOfGenerations);
 	}
 
@@ -215,7 +215,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 		final Germplasm germplasm = this.createGermplasm(this.generativeMethod, 2,
 			femaleParent.getGid(), 0, 0);
 
-		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), false);
+		final Integer numberOfGenerations = this.germplasmPedigreeService.countGenerations(germplasm.getGid(), false, true);
 		Assert.assertEquals(new Integer(2), numberOfGenerations);
 	}
 

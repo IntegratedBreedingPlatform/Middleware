@@ -7,6 +7,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -19,22 +20,25 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	@Resource
 	private GermplasmService germplasmService;
 
-	private static final ThreadLocal<Integer> PEDIGREE_COUNTER = new ThreadLocal<>();
+	public static final int MAX_GENERATIONS_COUNT = 5;
+	private static final ThreadLocal<Integer> GENERATIONS_COUNTER = new ThreadLocal<>();
+	private static final ThreadLocal<Boolean> CALCULATE_FULL = new ThreadLocal<>();
 
 	public GermplasmPedigreeServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
-	public GermplasmTreeNode getGermplasmPedigreeTree(final Integer gid, final Integer level, final boolean includeDerivativeLines) {
-
+	public GermplasmTreeNode getGermplasmPedigreeTree(final Integer gid, Integer level, final boolean includeDerivativeLines) {
 		final Germplasm root = this.germplasmService.getGermplasmWithPreferredName(gid);
 
 		final GermplasmTreeNode rootNode = new GermplasmTreeNode(root);
+		//rootNode.setNumberOfGenerations(this.countGenerations(gid, includeDerivativeLines, level == null));
+		level = level == null? rootNode.getNumberOfGenerations() : level;
 		if (level > 1) {
 			this.addParents(rootNode, level, root, !includeDerivativeLines);
 		}
-		rootNode.setNumberOfGenerations(this.countGenerations(gid, includeDerivativeLines));
+
 		return rootNode;
 	}
 
@@ -84,12 +88,16 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	}
 
 	@Override
-	public Integer countGenerations(final Integer gid, final boolean includeDerivativeLine) {
+	public Integer countGenerations(final Integer gid, final boolean includeDerivativeLine, final boolean calculateFull) {
 		try {
-			PEDIGREE_COUNTER.set(1);
+			CALCULATE_FULL.set(calculateFull);
+			GENERATIONS_COUNTER.set(1);
 			return this.getNumberOfGenerations(gid, includeDerivativeLine);
-		} finally {
-			PEDIGREE_COUNTER.remove();
+		} catch (final MaxPedigreeLevelReachedException e) {
+			return GENERATIONS_COUNTER.get();
+		}finally {
+			GENERATIONS_COUNTER.remove();
+			CALCULATE_FULL.remove();
 		}
 	}
 
@@ -296,14 +304,25 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		return maxPedigreeLevel + 1;
 	}
 
+	protected void incrementGenerationsCounter() {
+		final int currentCount = GENERATIONS_COUNTER.get();
+		if ((currentCount + 1) > MAX_GENERATIONS_COUNT && !CALCULATE_FULL.get()) {
+			// Increment to return 6 if we don't need to calculate the full generations count
+			GENERATIONS_COUNTER.set(currentCount + 1);
+			throw MaxPedigreeLevelReachedException.getInstance();
+		} else {
+			GENERATIONS_COUNTER.set(currentCount + 1);
+		}
+	}
+
 	private Integer getMaxGenerationCountFromBothParents(
 		final Integer gid, final boolean includeDerivativeLine) {
-		final int currentPedigreeCount = PEDIGREE_COUNTER.get();
+		final int currentPedigreeCount = GENERATIONS_COUNTER.get();
 
 		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
 
 		final Integer numOfPedigreeFromParent1 = this.getGenerationsCount(germplasm.getGpid1(), includeDerivativeLine);
-		PEDIGREE_COUNTER.set(currentPedigreeCount);
+		GENERATIONS_COUNTER.set(currentPedigreeCount);
 		final Integer numOfPedigreeFromParent2 = this.getGenerationsCount(germplasm.getGpid2(), includeDerivativeLine);
 
 		return Math.max(numOfPedigreeFromParent1, numOfPedigreeFromParent2);
@@ -311,7 +330,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 
 	private Integer getGenerationsCount(final Integer parentId, final boolean includeDerivativeLine) {
 		if (parentId != null) {
-			PEDIGREE_COUNTER.set(PEDIGREE_COUNTER.get() + 1);
+			this.incrementGenerationsCounter();
 			return this.getNumberOfGenerations(parentId, includeDerivativeLine);
 		}
 		return 0;
@@ -324,7 +343,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		if (!includeDerivativeLines) {
 			return this.getMaxGenerationCountFromBothParents(parentId, false);
 		} else {
-			PEDIGREE_COUNTER.set(PEDIGREE_COUNTER.get() + 1);
+			this.incrementGenerationsCounter();
 			return this.getNumberOfGenerations(parentId, true);
 		}
 	}

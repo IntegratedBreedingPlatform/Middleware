@@ -18,5 +18,5 @@ public interface GermplasmPedigreeService {
 
 	GermplasmNeighborhoodNode getGermplasmDerivativeNeighborhood(Integer gid, int numberOfStepsBackward, int numberOfStepsForward);
 
-	Integer countGenerations(Integer gid, boolean includeDerivativeLines);
+	Integer countGenerations(Integer gid, boolean includeDerivativeLines, boolean calculateFull);
 }
