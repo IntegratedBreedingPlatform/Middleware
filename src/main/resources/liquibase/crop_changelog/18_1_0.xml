@@ -434,32 +434,24 @@
 		</sql>
 	</changeSet>
 
-<!--	<changeSet author="lkovacic" id="v18.1.0-13">-->
-<!--		<preConditions onFail="MARK_RAN">-->
-<!--			<not>-->
-<!--				<tableExists tableName="user_change"/>-->
-<!--			</not>-->
-<!--		</preConditions>-->
-<!--		<comment>-->
-<!--            Add 'user_change' fields data migration for 'external_reference' table-->
-<!--        </comment>-->
-<!--        <sql dbms="mysql" splitStatements="true">-->
-<!--			UPDATE external_reference er-->
-<!--				JOIN germplsm g on g.gid = er.gid-->
-<!--			SET er.created_by = g.created_by WHERE er.created_by = 0;-->
-<!--			&lt;!&ndash; Fail safe &ndash;&gt;-->
-<!--			UPDATE external_reference SET created_by = (SELECT userid FROM workbench.users WHERE uname = 'admin') WHERE created_by = 0;-->
-<!--        </sql>-->
-<!--	</changeSet>-->
-
-	<!--	TODO: add user_change table	 -->
-	<!--	create table user_change-->
-	<!--(-->
-	<!--	id int auto_increment,-->
-	<!--	user_id int not null,-->
-	<!--	tx_id int not null,-->
-	<!--	constraint user_change_id_pk-->
-	<!--		primary key (id)-->
-	<!--);-->
+	<changeSet author="lkovacic" id="v18.1.0-21">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="user_change"/>
+			</not>
+		</preConditions>
+		<comment>
+            Add table 'user_change'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			create table user_change (
+				id int auto_increment,
+				user_id int not null,
+				tx_id int not null,
+				constraint user_change_id_pk
+					primary key (id)
+			);
+        </sql>
+	</changeSet>
 
 </databaseChangeLog>
