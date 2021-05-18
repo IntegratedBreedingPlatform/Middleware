@@ -33,6 +33,7 @@ public class BibrefAuditIntegrationTest extends AuditIntegrationTestBase {
 	public void shouldTriggersExists() {
 		this.checkTriggerExists("trigger_bibrefs_aud_insert", "INSERT");
 		this.checkTriggerExists("trigger_bibrefs_aud_update", "UPDATE");
+		this.checkTriggerExists("trigger_bibrefs_aud_delete", "DELETE");
 	}
 
 	@Test
@@ -60,8 +61,8 @@ public class BibrefAuditIntegrationTest extends AuditIntegrationTestBase {
 		this.insertEntity(insertBibref2QueryParams);
 
 		//Because the audit was disabled, the bibref shouldn't be audited
-		final Integer bibref2Aid = this.getLastInsertIdFromEntity();
-		assertThat(this.countEntityAudit(bibref2Aid), is(0));
+		final Integer bibref2RefId = this.getLastInsertIdFromEntity();
+		assertThat(this.countEntityAudit(bibref2RefId), is(0));
 
 		//Enable audit
 		this.enableEntityAudit();
@@ -86,6 +87,23 @@ public class BibrefAuditIntegrationTest extends AuditIntegrationTestBase {
 		this.updateEntity(updateBibref1QueryParams2, bibref1RefId);
 
 		assertThat(this.countEntityAudit(bibref1RefId), is(2));
+
+		//Enable audit
+		this.enableEntityAudit();
+
+		this.deleteEntity(bibref1RefId);
+		assertThat(this.countEntityAudit(bibref1RefId), is(3));
+
+		//Assert recently deleted bibref
+		final Map<String, Object> deletedAudit = this.getLastAudit(fieldNames);
+		this.assertAudit(deletedAudit, updateBibref1QueryParams2, 2, bibref1RefId);
+
+		//Disable audit
+		this.disableEntityAudit();
+
+		//Delete bibref 2, because the audit was disable shouldn't be audited
+		this.deleteEntity(bibref2RefId);
+		assertThat(this.countEntityAudit(bibref2RefId), is(0));
 	}
 
 	protected Map<String, Object> createQueryParams(final Integer modifiedBy, final Date modifiedDate) {
