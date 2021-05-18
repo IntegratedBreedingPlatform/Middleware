@@ -1,6 +1,5 @@
 package org.generationcp.middleware.audit;
 
-import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.junit.Before;
 import org.junit.Test;

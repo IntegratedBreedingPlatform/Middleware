@@ -2,7 +2,6 @@ package org.generationcp.middleware.audit;
 
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.junit.Before;
@@ -14,7 +13,6 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Random;
-import java.util.UUID;
 
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
@@ -39,10 +37,11 @@ public class ProgenitorAuditIntegrationTest extends AuditIntegrationTestBase {
 	public void shouldTriggersExists() {
 		this.checkTriggerExists("trigger_progntrs_aud_insert", "INSERT");
 		this.checkTriggerExists("trigger_progntrs_aud_update", "UPDATE");
+		this.checkTriggerExists("trigger_progntrs_aud_delete", "DELETE");
 	}
 
 	@Test
-	public void shouldAuditInsertAndUpdate() {
+	public void shouldAuditInsertAndUpdateAndDelete() {
 		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName("LNAME");
 		this.daoFactory.getGermplasmDao().save(germplasm);
 
@@ -95,6 +94,23 @@ public class ProgenitorAuditIntegrationTest extends AuditIntegrationTestBase {
 		this.updateEntity(updateProgenitor1QueryParams2, progenitor1Aid);
 
 		assertThat(this.countEntityAudit(progenitor1Aid), is(2));
+
+		//Enable audit
+		this.enableEntityAudit();
+
+		this.deleteEntity(progenitor1Aid);
+		assertThat(this.countEntityAudit(progenitor1Aid), is(3));
+
+		//Assert recently deleted progenitor
+		final Map<String, Object> deletedAudit = this.getLastAudit(fieldNames);
+		this.assertAudit(deletedAudit, updateProgenitor1QueryParams2, 2, progenitor1Aid);
+
+		//Disable audit
+		this.disableEntityAudit();
+
+		//Delete progenitor 2, because the audit was disable shouldn't be audited
+		this.deleteEntity(progenitor2Aid);
+		assertThat(this.countEntityAudit(progenitor2Aid), is(0));
 	}
 
 	protected Map<String, Object> createQueryParams(final Integer gid, final Integer modifiedBy, final Date modifiedDate) {

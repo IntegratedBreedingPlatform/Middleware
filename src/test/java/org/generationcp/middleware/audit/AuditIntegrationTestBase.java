@@ -106,7 +106,20 @@ public abstract class AuditIntegrationTestBase extends IntegrationTestBase {
 
 		sqlBuilder.append(assignments)
 			.append(" WHERE ")
-			.append(String.format("%s = %s", this.primaryKeyField, primaryKeyValue));
+			.append(this.primaryKeyField)
+			.append(" = ")
+			.append(primaryKeyValue);
+
+		this.sessionProvder.getSession().createSQLQuery(sqlBuilder.toString()).executeUpdate();
+	}
+
+	protected void deleteEntity(final Integer primaryKeyValue) {
+		StringBuilder sqlBuilder = new StringBuilder("DELETE FROM ")
+			.append(this.tableName)
+			.append(" WHERE ")
+			.append(this.primaryKeyField)
+			.append(" = ")
+			.append(primaryKeyValue);
 
 		this.sessionProvder.getSession().createSQLQuery(sqlBuilder.toString()).executeUpdate();
 	}
