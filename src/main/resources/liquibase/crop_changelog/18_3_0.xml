@@ -82,7 +82,7 @@
 			FROM udflds_attributes_bkp bkp
 			WHERE NOT EXISTS(SELECT name
 							 FROM cvterm
-							 WHERE cv_id = 1010 AND name = bkp.fname);
+							 WHERE cv_id = 1010 AND name = bkp.fname AND is_obsolete = 0);
 
 			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
 			SELECT 1010, name, name, null, 0, 0 FROM new_properties;
@@ -195,6 +195,9 @@
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<tableExists tableName="udflds_attributes_bkp"></tableExists>
+				<not>
+					<tableExists tableName="atributs_invalid_atype_bkp"></tableExists>
+				</not>
 				<sqlCheck expectedResult="1">
 					SELECT COUNT(*) > 0
 					FROM udflds_attributes_bkp
@@ -340,6 +343,5 @@
 			DROP PROCEDURE replace_attr_process_code_in_methods;
 		</sql>
 	</changeSet>
-
 
 </databaseChangeLog>
