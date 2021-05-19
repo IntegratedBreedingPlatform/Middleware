@@ -33,7 +33,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		final Germplasm root = this.germplasmService.getGermplasmWithPreferredName(gid);
 
 		final GermplasmTreeNode rootNode = new GermplasmTreeNode(root);
-		//rootNode.setNumberOfGenerations(this.countGenerations(gid, includeDerivativeLines, level == null));
+		rootNode.setNumberOfGenerations(this.countGenerations(gid, includeDerivativeLines, level == null));
 		level = level == null? rootNode.getNumberOfGenerations() : level;
 		if (level > 1) {
 			this.addParents(rootNode, level, root, !includeDerivativeLines);
