@@ -38,6 +38,7 @@ public class GermplasmAuditIntegrationTest extends AuditIntegrationTestBase {
 	public void shouldTriggersExists() {
 		this.checkTriggerExists("trigger_germplsm_aud_insert", "INSERT");
 		this.checkTriggerExists("trigger_germplsm_aud_update", "UPDATE");
+		this.checkTriggerExists("trigger_germplsm_aud_delete", "DELETE");
 	}
 
 	@Test
@@ -93,6 +94,23 @@ public class GermplasmAuditIntegrationTest extends AuditIntegrationTestBase {
 		this.updateEntity(updateGermplasm1QueryParams2, germplasm1Gid);
 
 		assertThat(this.countEntityAudit(germplasm1Gid), is(2));
+
+		//Enable audit
+		this.enableEntityAudit();
+
+		this.deleteEntity(germplasm1Gid);
+		assertThat(this.countEntityAudit(germplasm1Gid), is(3));
+
+		//Assert recently deleted germplasm
+		final Map<String, Object> deletedAudit = this.getLastAudit(fieldNames);
+		this.assertAudit(deletedAudit, updateGermplasm1QueryParams2, 2, true, germplasm1Gid);
+
+		//Disable audit
+		this.disableEntityAudit();
+
+		//Delete germplasm 2, because the audit was disable shouldn't be audited
+		this.deleteEntity(germplasm2Gid);
+		assertThat(this.countEntityAudit(germplasm2Gid), is(0));
 	}
 
 	protected Map<String, Object> createQueryParams(final Integer methodId, final int deleted, final Integer modifiedBy, final Date modifiedDate) {
