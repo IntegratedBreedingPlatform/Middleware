@@ -45,6 +45,8 @@ public class Variable extends Term {
 	private Integer studies;
 	private Boolean hasPair;
   	private Boolean hasUsage;
+	private Integer germplasm;
+	private Integer breedingMethods;
 
 	public Variable() {
 		this.setVocabularyId(CvId.VARIABLES.getId());
@@ -181,12 +183,28 @@ public class Variable extends Term {
 		this.datasets = datasets;
 	}
 
+	public Integer getGermplasm() {
+		return this.germplasm;
+	}
+
+	public void setGermplasm(final Integer germplasm) {
+		this.germplasm = germplasm;
+	}
+
+	public Integer getBreedingMethods() {
+		return this.breedingMethods;
+	}
+
+	public void setBreedingMethods(final Integer breedingMethods) {
+		this.breedingMethods = breedingMethods;
+	}
+
 	@Override
 	public String toString() {
 		return "Variable{" + "alias='" + this.alias + '\'' + ", variableTypes=" + this.variableTypes + ", property=" + this.property
 				+ ", method=" + this.method + ", scale=" + this.scale + ", isFavorite=" + this.isFavorite + ", minValue='" + this.minValue
 				+ '\'' + ", maxValue='" + this.maxValue + '\'' + ", observations=" + this.observations + ", studies=" + this.studies +
-				", datasets=" + this.datasets + "} "
+				", datasets=" + this.datasets + ", germplasm=" + this.germplasm + ", breedingMethods=" + this.breedingMethods + "} "
 				+ super.toString();
 	}
 
@@ -237,6 +255,14 @@ public class Variable extends Term {
 
 		if (this.formula != null) {
 			Debug.println(indent + 3, "formula:" + this.formula);
+		}
+
+		if (this.germplasm != null) {
+			Debug.println(indent + 3, "germplasm:" + this.germplasm);
+		}
+
+		if (this.breedingMethods != null) {
+			Debug.println(indent + 3, "breedingMethods:" + this.breedingMethods);
 		}
 	}
 
