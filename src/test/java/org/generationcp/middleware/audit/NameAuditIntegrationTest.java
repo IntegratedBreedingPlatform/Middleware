@@ -33,6 +33,7 @@ public class NameAuditIntegrationTest extends AuditIntegrationTestBase {
 	public void shouldTriggersExists() {
 		this.checkTriggerExists("trigger_names_aud_insert", "INSERT");
 		this.checkTriggerExists("trigger_names_aud_update", "UPDATE");
+		this.checkTriggerExists("trigger_names_aud_delete", "DELETE");
 	}
 
 	@Test
@@ -43,14 +44,14 @@ public class NameAuditIntegrationTest extends AuditIntegrationTestBase {
 		Map<String, Object> insertName1QueryParams = this.createQueryParams(null, null);
 		this.insertEntity(insertName1QueryParams);
 
-		final Integer name1Aid = this.getLastInsertIdFromEntity();
-		assertThat(this.countEntityAudit(name1Aid), is(1));
+		final Integer name1Nid = this.getLastInsertIdFromEntity();
+		assertThat(this.countEntityAudit(name1Nid), is(1));
 
 		final LinkedHashSet<String> fieldNames = this.getSelectAuditFieldNames(insertName1QueryParams.keySet());
 
 		//Assert recently created name
 		final Map<String, Object> insertAudit = this.getLastAudit(fieldNames);
-		this.assertAudit(insertAudit, insertName1QueryParams, 0, name1Aid);
+		this.assertAudit(insertAudit, insertName1QueryParams, 0, name1Nid);
 
 		//Disable audit
 		this.disableEntityAudit();
@@ -60,8 +61,8 @@ public class NameAuditIntegrationTest extends AuditIntegrationTestBase {
 		this.insertEntity(insertName2QueryParams);
 
 		//Because the audit was disabled, the name shouldn't be audited
-		final Integer name2Aid = this.getLastInsertIdFromEntity();
-		assertThat(this.countEntityAudit(name2Aid), is(0));
+		final Integer name2Nid = this.getLastInsertIdFromEntity();
+		assertThat(this.countEntityAudit(name2Nid), is(0));
 
 		//Enable audit
 		this.enableEntityAudit();
@@ -69,13 +70,13 @@ public class NameAuditIntegrationTest extends AuditIntegrationTestBase {
 		//Update the name 1
 		final Map<String, Object> updateName1QueryParams1 =
 			this.createQueryParams(new Random().nextInt(), new Date());
-		this.updateEntity(updateName1QueryParams1, name1Aid);
+		this.updateEntity(updateName1QueryParams1, name1Nid);
 
-		assertThat(this.countEntityAudit(name1Aid), is(2));
+		assertThat(this.countEntityAudit(name1Nid), is(2));
 
 		//Assert recently updated name
 		final Map<String, Object> updateAudit = this.getLastAudit(fieldNames);
-		this.assertAudit(updateAudit, updateName1QueryParams1, 1, name1Aid);
+		this.assertAudit(updateAudit, updateName1QueryParams1, 1, name1Nid);
 
 		//Disable audit
 		this.disableEntityAudit();
@@ -83,9 +84,26 @@ public class NameAuditIntegrationTest extends AuditIntegrationTestBase {
 		//Update again the entity, because the audit was disable shouldn't be audited
 		final Map<String, Object> updateName1QueryParams2 =
 			this.createQueryParams(new Random().nextInt(), new Date());
-		this.updateEntity(updateName1QueryParams2, name1Aid);
+		this.updateEntity(updateName1QueryParams2, name1Nid);
 
-		assertThat(this.countEntityAudit(name1Aid), is(2));
+		assertThat(this.countEntityAudit(name1Nid), is(2));
+
+		//Enable audit
+		this.enableEntityAudit();
+
+		this.deleteEntity(name1Nid);
+		assertThat(this.countEntityAudit(name1Nid), is(3));
+
+		//Assert recently deleted name
+		final Map<String, Object> deletedAudit = this.getLastAudit(fieldNames);
+		this.assertAudit(deletedAudit, updateName1QueryParams2, 2, name1Nid);
+
+		//Disable audit
+		this.disableEntityAudit();
+
+		//Delete name 2, because the audit was disable shouldn't be audited
+		this.deleteEntity(name2Nid);
+		assertThat(this.countEntityAudit(name2Nid), is(0));
 	}
 
 	protected Map<String, Object> createQueryParams(final Integer modifiedBy, final Date modifiedDate) {

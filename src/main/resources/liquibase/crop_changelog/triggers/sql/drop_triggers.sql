@@ -16,6 +16,7 @@ DROP TRIGGER IF EXISTS trigger_germplsm_aud_delete;
 
 DROP TRIGGER IF EXISTS trigger_names_aud_insert;
 DROP TRIGGER IF EXISTS trigger_names_aud_update;
+DROP TRIGGER IF EXISTS trigger_names_aud_delete;
 
 DROP TRIGGER IF EXISTS trigger_progntrs_aud_insert;
 DROP TRIGGER IF EXISTS trigger_progntrs_aud_update;
