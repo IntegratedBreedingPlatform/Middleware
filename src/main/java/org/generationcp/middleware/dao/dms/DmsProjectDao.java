@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -1760,9 +1761,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (studySearchFilter.getObservationVariableDbId() != null) {
 			sqlQuery.setParameter("observationVariableDbId", studySearchFilter.getObservationVariableDbId());
 		}
-		if (studySearchFilter.getActive() != null) {
-			sqlQuery.setParameter("active", (studySearchFilter.getActive().booleanValue() ? 0 : 1));
-		}
 		if (!StringUtils.isEmpty(studySearchFilter.getContactDbId())) {
 			sqlQuery.setParameter("contactDbId", studySearchFilter.getContactDbId());
 		}
@@ -1965,7 +1963,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			sql.append(" AND wper.personid = :contactDbId ");
 		}
 		if (studySearchFilter.getActive() != null) {
-			sql.append(" AND pmain.deleted = :active ");
+			if (BooleanUtils.isTrue(studySearchFilter.getActive())) {
+				sql.append(" AND (pmain.end_date IS NULL or LENGTH(pmain.end_date) = 0 OR CONVERT(pmain.end_date, UNSIGNED) >= CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) ) ");
+			} else {
+				sql.append(" AND pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) ");
+			}
+
 		}
 		// Search Date Range
 		if (studySearchFilter.getSearchDateRangeStart() != null) {

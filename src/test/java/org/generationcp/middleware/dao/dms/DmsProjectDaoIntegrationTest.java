@@ -530,7 +530,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		studySearchFilter.setLocationDbId(locationId);
 		studySearchFilter.setStudyTypeDbId(String.valueOf(STUDY_TYPE_ID));
 		studySearchFilter.setSeasonDbId(String.valueOf(TermId.SEASON_DRY.getId()));
-		studySearchFilter.setActive(true);
+		studySearchFilter.setActive(false);
 
 		final Long count = (Long) this.dmsProjectDao.countStudyInstances(studySearchFilter);
 		final List<StudyInstanceDto> studyInstanceDtos =
@@ -549,7 +549,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(study.getStudyType().getLabel(), studyInstanceDto.getStudyTypeName());
 		Assert.assertEquals(String.valueOf(instance1.getLocationId()), studyInstanceDto.getStudyDbId());
 		Assert.assertEquals(study.getName() + " Environment Number 1", studyInstanceDto.getStudyName());
-		Assert.assertEquals("true", studyInstanceDto.getActive());
+		Assert.assertEquals("false", studyInstanceDto.getActive());
 		Assert.assertEquals("1", studyInstanceDto.getLocationDbId());
 		Assert.assertEquals("Afghanistan", studyInstanceDto.getLocationName());
 		Assert.assertEquals(String.valueOf(TermId.SEASON_DRY.getId()), studyInstanceDto.getSeasons().get(0).getSeasonDbId());
