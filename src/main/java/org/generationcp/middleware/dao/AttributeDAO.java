@@ -22,7 +22,6 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -32,13 +31,15 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * DAO class for {@link Attribute}.
  *
  */
 public class AttributeDAO extends GenericDAO<Attribute, Integer> {
+
+	private static final String COUNT_ATTRIBUTE_WITH_VARIABLE =
+		"SELECT COUNT(A.ATYPE) FROM ATRIBUTS A WHERE A.ATYPE= :variableId";
 
 	@SuppressWarnings("unchecked")
 	public List<Attribute> getByGID(final Integer gid) {
@@ -269,5 +270,18 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			sql = sql + " AND u.fldno IN ( :attributs )";
 		}
 		return sql;
+	}
+
+	public long countByVariable(final int variableId){
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(AttributeDAO.COUNT_ATTRIBUTE_WITH_VARIABLE);
+			query.setParameter("variableId", variableId);
+
+			return ((BigInteger) query.uniqueResult()).longValue();
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error at countByVariable=" + variableId + " in AttributeDAO: " + e.getMessage();
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
 	}
 }

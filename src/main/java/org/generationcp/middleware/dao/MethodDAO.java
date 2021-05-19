@@ -15,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.MethodType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -29,12 +28,11 @@ import org.hibernate.criterion.SimpleExpression;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -49,6 +47,16 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 	private static final String METHOD_NAME = "mname";
 
 	private static final Logger LOG = LoggerFactory.getLogger(MethodDAO.class);
+
+	private static final String COUNT_BREEDING_METHODS_WITH_VARIABLE =
+		" SELECT count(*) FROM methods where "
+			+ "\t    prefix like CONCAT('%[ATTRSC.',:variableId,']%') "
+			+ "\t or prefix like CONCAT('%[ATTRFP.',:variableId,']%') "
+			+ "\t or prefix like CONCAT('%[ATTRMP.',:variableId,']%') "
+			+ "\t or suffix like CONCAT('%[ATTRSC.',:variableId,']%') "
+			+ "\t or suffix like CONCAT('%[ATTRFP.',:variableId,']%') "
+			+ "\t or suffix like CONCAT('%[ATTRMP.',:variableId,']%') ";
+
 
 	@SuppressWarnings("unchecked")
 	public List<Method> getMethodsByIds(final List<Integer> ids) {
@@ -605,5 +613,24 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			criteria.add(Restrictions.in("mtype", methodTypes));
 		}
 		return criteria;
+	}
+
+	public long countByVariable(final int variableId){
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(MethodDAO.COUNT_BREEDING_METHODS_WITH_VARIABLE);
+			query.setParameter("variableId", variableId);
+			query.setParameter("variableId", variableId);
+			query.setParameter("variableId", variableId);
+			query.setParameter("variableId", variableId);
+			query.setParameter("variableId", variableId);
+			query.setParameter("variableId", variableId);
+
+
+			return ((BigInteger) query.uniqueResult()).longValue();
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error at countByVariable=" + variableId + " in AttributeDAO: " + e.getMessage();
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
 	}
 }
