@@ -32,15 +32,12 @@ public class ProgramServiceImplTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
-	private UserService userService;
-
 	private WorkbenchDaoFactory daoFactory;
 
 	@Before
 	public void setUp() {
 		this.programService = new ProgramServiceImpl(this.workbenchSessionProvider);
 		this.daoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
-		this.userService = new UserServiceImpl(this.workbenchSessionProvider);
 
 		if (this.testProject1 == null) {
 			this.testProject1 = this.buildProject("Project1 ");
@@ -49,8 +46,8 @@ public class ProgramServiceImplTest extends IntegrationTestBase {
 			this.testProject2 = this.buildProject("Project2 ");
 		}
 
-		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
-		this.workbenchUserTest = this.userService.addUser(user);
+		final Integer userId = this.findAdminUser();
+		this.workbenchUserTest = daoFactory.getWorkbenchUserDAO().getById(userId);
 		this.sessionProvder.getSession().flush();
 
 	}
