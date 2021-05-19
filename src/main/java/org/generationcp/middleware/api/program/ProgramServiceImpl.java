@@ -48,7 +48,7 @@ public class ProgramServiceImpl implements ProgramService {
 			this.daoFactory.getProjectUserInfoDAO().getByProjectIdAndUserId(project.getProjectId(), user.getUserid());
 		if (projectUserInfo != null) {
 			projectUserInfo.setLastOpenDate(new Date());
-			this.daoFactory.getProjectUserInfoDAO().save(projectUserInfo);
+			this.daoFactory.getProjectUserInfoDAO().update(projectUserInfo);
 		} else {
 			final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, user);
 			pUserInfo.setLastOpenDate(new Date());
@@ -56,7 +56,7 @@ public class ProgramServiceImpl implements ProgramService {
 		}
 
 		project.setLastOpenDate(new Date());
-		this.daoFactory.getProjectDAO().save(project);
+		this.daoFactory.getProjectDAO().update(project);
 
 	}
 
