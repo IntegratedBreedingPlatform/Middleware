@@ -8,6 +8,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.generationcp.middleware.service.impl.user.UserServiceImpl;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,6 @@ public class ProgramServiceImplTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
-	@Autowired
 	private UserService userService;
 
 	private WorkbenchDaoFactory daoFactory;
@@ -40,6 +40,7 @@ public class ProgramServiceImplTest extends IntegrationTestBase {
 	public void setUp() {
 		this.programService = new ProgramServiceImpl(this.workbenchSessionProvider);
 		this.daoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
+		this.userService = new UserServiceImpl(this.workbenchSessionProvider);
 
 		if (this.testProject1 == null) {
 			this.testProject1 = this.buildProject("Project1 ");
@@ -66,16 +67,16 @@ public class ProgramServiceImplTest extends IntegrationTestBase {
 	public void test_updateProjectUserInfo_Ok() {
 		this.programService.saveOrUpdateProjectUserInfo(this.workbenchUserTest.getUserid(), this.testProject2.getUniqueID());
 		this.sessionProvder.getSession().flush();
-		final ProgramDTO programDTO1 = this.programService.getLastOpenedProject(this.workbenchUserTest.getUserid());
-		assertEquals(programDTO1.getUniqueID(), this.testProject2.getUniqueID());
+		ProgramDTO programDTO = this.programService.getLastOpenedProject(this.workbenchUserTest.getUserid());
+		assertEquals(programDTO.getUniqueID(), this.testProject2.getUniqueID());
 
 		this.programService.saveOrUpdateProjectUserInfo(this.workbenchUserTest.getUserid(), this.testProject2.getUniqueID());
 		this.sessionProvder.getSession().flush();
-		final ProgramDTO programDTO2 = this.programService.getLastOpenedProject(this.workbenchUserTest.getUserid());
-		assertEquals(programDTO2.getUniqueID(), this.testProject2.getUniqueID());
+		programDTO = this.programService.getLastOpenedProject(this.workbenchUserTest.getUserid());
+		assertEquals(programDTO.getUniqueID(), this.testProject2.getUniqueID());
 	}
 
-	private Project buildProject(final String projectName){
+	private Project buildProject(final String projectName) {
 		final Project project = new Project();
 		project.setProjectName(projectName + RandomStringUtils.randomAlphanumeric(10));
 		project.setStartDate(new Date());
