@@ -50,25 +50,27 @@ public class ProgramServiceImplTest extends IntegrationTestBase {
 
 		final WorkbenchUser user = this.workbenchTestDataUtil.createTestUserData();
 		this.workbenchUserTest = this.userService.addUser(user);
+		this.sessionProvder.getSession().flush();
+
 	}
 
 	@Test
-	public void saveProjectUserInfo() {
+	public void test_saveProjectUserInfo_Ok() {
 		this.programService.saveOrUpdateProjectUserInfo(this.workbenchUserTest.getUserid(), this.testProject1.getUniqueID());
 		final ProgramDTO programDTO = this.programService.getLastOpenedProject(this.workbenchUserTest.getUserid());
+		this.sessionProvder.getSession().flush();
 		assertEquals(programDTO.getUniqueID(), this.testProject1.getUniqueID());
 	}
 
 	@Test
-	public void updateProjectUserInfo() {
-		final ProgramDTO programDTO = this.programService.getLastOpenedProject(this.workbenchUserTest.getUserid());
-		assertNull(programDTO);
-
-		this.programService.saveOrUpdateProjectUserInfo(this.workbenchUserTest.getUserid(), this.testProject1.getUniqueID());
+	public void test_updateProjectUserInfo_Ok() {
+		this.programService.saveOrUpdateProjectUserInfo(this.workbenchUserTest.getUserid(), this.testProject2.getUniqueID());
+		this.sessionProvder.getSession().flush();
 		final ProgramDTO programDTO1 = this.programService.getLastOpenedProject(this.workbenchUserTest.getUserid());
-		assertEquals(programDTO1.getUniqueID(), this.testProject1.getUniqueID());
+		assertEquals(programDTO1.getUniqueID(), this.testProject2.getUniqueID());
 
 		this.programService.saveOrUpdateProjectUserInfo(this.workbenchUserTest.getUserid(), this.testProject2.getUniqueID());
+		this.sessionProvder.getSession().flush();
 		final ProgramDTO programDTO2 = this.programService.getLastOpenedProject(this.workbenchUserTest.getUserid());
 		assertEquals(programDTO2.getUniqueID(), this.testProject2.getUniqueID());
 	}
@@ -81,6 +83,7 @@ public class ProgramServiceImplTest extends IntegrationTestBase {
 		project.setLastOpenDate(new Date());
 		project.setCropType(new CropType("maize"));
 		this.daoFactory.getProjectDAO().save(project);
+		this.sessionProvder.getSession().flush();
 		return project;
 	}
 }
