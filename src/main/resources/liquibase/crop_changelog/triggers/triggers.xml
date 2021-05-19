@@ -92,6 +92,17 @@
 		<comment>Add 'trigger_external_reference_aud_update' trigger</comment>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="v18.1.0-trigger_external_reference_aud_delete" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_external_reference_aud_delete.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_external_reference_aud_delete' trigger</comment>
+	</changeSet>
+
 	<changeSet author="lkovacic" id="v18.1.0-trigger_germplsm_aud_insert" runOnChange="true" runAlways="true">
     	<sqlFile path="sql/trigger_germplsm_aud_insert.sql"
 				 dbms="mysql"

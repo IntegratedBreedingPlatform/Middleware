@@ -8,6 +8,7 @@ DROP TRIGGER IF EXISTS trigger_bibrefs_aud_delete;
 
 DROP TRIGGER IF EXISTS trigger_external_reference_aud_insert;
 DROP TRIGGER IF EXISTS trigger_external_reference_aud_update;
+DROP TRIGGER IF EXISTS trigger_external_reference_aud_delete;
 
 DROP TRIGGER IF EXISTS trigger_germplsm_aud_insert;
 DROP TRIGGER IF EXISTS trigger_germplsm_aud_update;

@@ -38,6 +38,7 @@ public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestB
 	public void shouldTriggersExists() {
 		this.checkTriggerExists("trigger_external_reference_aud_insert", "INSERT");
 		this.checkTriggerExists("trigger_external_reference_aud_update", "UPDATE");
+		this.checkTriggerExists("trigger_external_reference_aud_delete", "DELETE");
 	}
 
 	@Test
@@ -51,14 +52,14 @@ public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestB
 		Map<String, Object> insertExternalReference1QueryParams = this.createQueryParams(germplasm.getGid(), null, null);
 		this.insertEntity(insertExternalReference1QueryParams);
 
-		final Integer externalReference1Aid = this.getLastInsertIdFromEntity();
-		assertThat(this.countEntityAudit(externalReference1Aid), is(1));
+		final Integer externalReference1Id = this.getLastInsertIdFromEntity();
+		assertThat(this.countEntityAudit(externalReference1Id), is(1));
 
 		final LinkedHashSet<String> fieldNames = this.getSelectAuditFieldNames(insertExternalReference1QueryParams.keySet());
 
 		//Assert recently created externalReference
 		final Map<String, Object> insertAudit = this.getLastAudit(fieldNames);
-		this.assertAudit(insertAudit, insertExternalReference1QueryParams, 0, externalReference1Aid);
+		this.assertAudit(insertAudit, insertExternalReference1QueryParams, 0, externalReference1Id);
 
 		//Disable audit
 		this.disableEntityAudit();
@@ -68,8 +69,8 @@ public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestB
 		this.insertEntity(insertExternalReference2QueryParams);
 
 		//Because the audit was disabled, the externalReference shouldn't be audited
-		final Integer externalReference2Aid = this.getLastInsertIdFromEntity();
-		assertThat(this.countEntityAudit(externalReference2Aid), is(0));
+		final Integer externalReference2Id = this.getLastInsertIdFromEntity();
+		assertThat(this.countEntityAudit(externalReference2Id), is(0));
 
 		//Enable audit
 		this.enableEntityAudit();
@@ -77,13 +78,13 @@ public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestB
 		//Update the externalReference 1
 		final Map<String, Object> updateExternalReference1QueryParams1 =
 			this.createQueryParams(germplasm.getGid(), new Random().nextInt(), new Date());
-		this.updateEntity(updateExternalReference1QueryParams1, externalReference1Aid);
+		this.updateEntity(updateExternalReference1QueryParams1, externalReference1Id);
 
-		assertThat(this.countEntityAudit(externalReference1Aid), is(2));
+		assertThat(this.countEntityAudit(externalReference1Id), is(2));
 
 		//Assert recently updated externalReference
 		final Map<String, Object> updateAudit = this.getLastAudit(fieldNames);
-		this.assertAudit(updateAudit, updateExternalReference1QueryParams1, 1, externalReference1Aid);
+		this.assertAudit(updateAudit, updateExternalReference1QueryParams1, 1, externalReference1Id);
 
 		//Disable audit
 		this.disableEntityAudit();
@@ -91,9 +92,26 @@ public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestB
 		//Update again the entity, because the audit was disable shouldn't be audited
 		final Map<String, Object> updateExternalReference1QueryParams2 =
 			this.createQueryParams(germplasm.getGid(), new Random().nextInt(), new Date());
-		this.updateEntity(updateExternalReference1QueryParams2, externalReference1Aid);
+		this.updateEntity(updateExternalReference1QueryParams2, externalReference1Id);
 
-		assertThat(this.countEntityAudit(externalReference1Aid), is(2));
+		assertThat(this.countEntityAudit(externalReference1Id), is(2));
+
+		//Enable audit
+		this.enableEntityAudit();
+
+		this.deleteEntity(externalReference1Id);
+		assertThat(this.countEntityAudit(externalReference1Id), is(3));
+
+		//Assert recently deleted externalReference
+		final Map<String, Object> deletedAudit = this.getLastAudit(fieldNames);
+		this.assertAudit(deletedAudit, updateExternalReference1QueryParams2, 2, externalReference1Id);
+
+		//Disable audit
+		this.disableEntityAudit();
+
+		//Delete externalReference 2, because the audit was disable shouldn't be audited
+		this.deleteEntity(externalReference2Id);
+		assertThat(this.countEntityAudit(externalReference2Id), is(0));
 	}
 
 	protected Map<String, Object> createQueryParams(final Integer gid, final Integer modifiedBy, final Date modifiedDate) {
