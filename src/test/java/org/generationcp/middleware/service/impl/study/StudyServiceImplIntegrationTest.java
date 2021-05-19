@@ -497,12 +497,10 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		externalReference.setReferenceSource(RandomStringUtils.randomAlphabetic(20));
 		importRequest2.setExternalReferences(Collections.singletonList(externalReference));
 
-		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop, Arrays.asList(importRequest1, importRequest2), this.testUser.getUserid());
+		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop.getCropName(), Arrays.asList(importRequest1, importRequest2), this.testUser.getUserid());
 		Assert.assertEquals(2, savedStudies.size());
 		this.verifyStudySummary(importRequest1, savedStudies.get(0));
 		this.verifyStudySummary(importRequest2, savedStudies.get(1));
-
-
 	}
 
 	private void verifyStudySummary(final TrialImportRequestDTO importRequestDTO, final StudySummary study) {

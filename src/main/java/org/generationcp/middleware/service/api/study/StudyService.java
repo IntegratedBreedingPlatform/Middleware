@@ -80,5 +80,5 @@ public interface StudyService {
 
 	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
 
-	List<StudySummary> saveStudies(CropType crop, List<TrialImportRequestDTO> trialImportRequestDtoList, Integer userId);
+	List<StudySummary> saveStudies(String crop, List<TrialImportRequestDTO> trialImportRequestDtoList, Integer userId);
 }

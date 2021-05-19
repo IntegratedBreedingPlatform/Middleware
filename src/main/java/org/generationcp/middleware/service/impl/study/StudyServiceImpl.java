@@ -30,6 +30,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.StudyExternalReference;
@@ -93,6 +94,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Resource
 	private ExperimentModelGenerator experimentModelGenerator;
+
+	@Resource
+	private WorkbenchDataManager workbenchDataManager;
 
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 
@@ -617,7 +621,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<StudySummary> saveStudies(final CropType crop, final List<TrialImportRequestDTO> trialImportRequestDtoList, final Integer userId) {
+	public List<StudySummary> saveStudies(final String cropName, final List<TrialImportRequestDTO> trialImportRequestDtoList, final Integer userId) {
+		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 		final List<String> studyIds = new ArrayList<>();
 		for (final TrialImportRequestDTO trialImportRequestDto : trialImportRequestDtoList){
 			final DmsProject study = new DmsProject();
@@ -696,7 +701,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			this.addDatasetVariables(plotDataset,false);
 			dmsProjectDAO.save(plotDataset);
 
-			this.saveTrialInstance(study, envDataset, crop);
+			this.saveTrialInstance(study, envDataset, cropType);
 			studyIds.add(study.getProjectId().toString());
 		}
 		// Unless the session is flushed, the latest changes are not reflected in DTOs returned by method
