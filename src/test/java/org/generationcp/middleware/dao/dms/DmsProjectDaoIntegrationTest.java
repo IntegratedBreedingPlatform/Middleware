@@ -524,10 +524,13 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final Geolocation instance1 = this.testDataInitializer.createInstance(summary, locationId, 1);
 		this.testDataInitializer.addGeolocationProp(instance1, TermId.SEASON_VAR.getId(), String.valueOf(TermId.SEASON_DRY.getId()), 1);
 
-		final StudySearchFilter studySearchFilter = new StudySearchFilter().withTrialDbId(study.getProjectId().toString())
-			.withStudyDbId(String.valueOf(instance1.getLocationId())).withLocationDbId(locationId)
-			.withStudyTypeDbId(String.valueOf(STUDY_TYPE_ID))
-			.withSeasonDbId(String.valueOf(TermId.SEASON_DRY.getId())).withActive(true);
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		studySearchFilter.setTrialDbIds(Collections.singletonList(study.getProjectId().toString()));
+		studySearchFilter.setStudyDbIds(Collections.singletonList(String.valueOf(instance1.getLocationId())));
+		studySearchFilter.setLocationDbId(locationId);
+		studySearchFilter.setStudyTypeDbId(String.valueOf(STUDY_TYPE_ID));
+		studySearchFilter.setSeasonDbId(String.valueOf(TermId.SEASON_DRY.getId()));
+		studySearchFilter.setActive(true);
 
 		final Long count = (Long) this.dmsProjectDao.countStudyInstances(studySearchFilter);
 		final List<StudyInstanceDto> studyInstanceDtos =

@@ -163,8 +163,9 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
 		this.sessionProvder.getSession().flush();
-		final StudySearchFilter studySearchFilter = new StudySearchFilter().withStudyDbIds(Collections.singletonList(geolocation.getLocationId().toString()))
-			.withProgramDbId(this.study.getProgramUUID());
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		studySearchFilter.setStudyDbIds(Collections.singletonList(geolocation.getLocationId().toString()));
+		studySearchFilter.setProgramDbId(this.study.getProgramUUID());
 		final Pageable pageable = new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "trialName"));
 		final List<StudyInstanceDto> studyDetailsDtoList = this.studyService.getStudyInstances(studySearchFilter, pageable);
 		Assert.assertNotNull(studyDetailsDtoList);
@@ -269,7 +270,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testCountStudies() throws Exception {
 		// Empty filter will retrieve all studies in crop
-		final long initialCount = this.studyService.countStudies(new StudySearchFilter());
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		final long initialCount = this.studyService.countStudies(studySearchFilter);
 
 		// Add new study with new location ID
 		final DmsProject newStudy = this.testDataInitializer
@@ -287,12 +289,14 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// New study should be retrieved for empty filter
-		Assert.assertEquals((int) initialCount + 1, this.studyService.countStudies(new StudySearchFilter()));
+		Assert.assertEquals((int) initialCount + 1, this.studyService.countStudies(studySearchFilter));
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
+		studySearchFilter.setProgramDbId(this.commonTestProject.getUniqueID());
 		Assert
-			.assertEquals(2, this.studyService.countStudies(new StudySearchFilter().withProgramDbId(this.commonTestProject.getUniqueID())));
+			.assertEquals(2, this.studyService.countStudies(studySearchFilter));
+		studySearchFilter.setLocationDbId(String.valueOf(location1));
 		// Expecting only one to be retrieved when filtered by location
-		Assert.assertEquals(1, this.studyService.countStudies(new StudySearchFilter().withLocationDbId(String.valueOf(location1))));
+		Assert.assertEquals(1, this.studyService.countStudies(studySearchFilter));
 	}
 
 	@Test
@@ -314,8 +318,11 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID, sorted by descending study name
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		studySearchFilter.setProgramDbId(this.commonTestProject.getUniqueID());
 		List<StudySummary> studies =
-			this.studyService.getStudies(new StudySearchFilter().withProgramDbId(this.commonTestProject.getUniqueID()), new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
+			this.studyService.getStudies(
+				studySearchFilter, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
 		Assert.assertEquals(2, studies.size());
 		StudySummary study1 = studies.get(1);
 		Assert.assertEquals(this.study.getProjectId(), study1.getTrialDbId());
@@ -338,8 +345,9 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Creator", study2.getContacts().get(0).getType());
 		Assert.assertFalse(study2.isActive());
 
+		studySearchFilter.setLocationDbId(String.valueOf(location1));
 		// Expecting only one study to be retrieved when filtered by location
-		studies = this.studyService.getStudies(new StudySearchFilter().withLocationDbId(String.valueOf(location1)), null);
+		studies = this.studyService.getStudies(studySearchFilter, null);
 		Assert.assertEquals(1, studies.size());
 		study1 = studies.get(0);
 		Assert.assertEquals(newStudy.getProjectId(), study1.getTrialDbId());
@@ -369,8 +377,11 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID, sorted by descending study name
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		studySearchFilter.setProgramDbId(this.commonTestProject.getUniqueID());
 		List<StudySummary> studies =
-			this.studyService.getStudies(new StudySearchFilter().withProgramDbId(this.commonTestProject.getUniqueID()), new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
+			this.studyService.getStudies(
+				studySearchFilter, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
 		Assert.assertEquals("Deleted study is not included",2, studies.size());
 		StudySummary study1 = studies.get(1);
 		Assert.assertEquals(this.study.getProjectId(), study1.getTrialDbId());
@@ -392,7 +403,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Creator", study2.getContacts().get(0).getType());
 
 		// Expecting only one study to be retrieved when filtered by location
-		studies = this.studyService.getStudies(new StudySearchFilter().withLocationDbId(String.valueOf(location1)), null);
+		studySearchFilter.setLocationDbId(String.valueOf(location1));
+		studies = this.studyService.getStudies(studySearchFilter, null);
 		Assert.assertEquals(1, studies.size());
 		study1 = studies.get(0);
 		Assert.assertEquals(newStudy.getProjectId(), study1.getTrialDbId());
@@ -404,7 +416,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testCountStudiesWithDeletedStudy() throws Exception {
 		// Empty filter will retrieve all studies in crop
-		final long initialCount = this.studyService.countStudies(new StudySearchFilter());
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		final long initialCount = this.studyService.countStudies(studySearchFilter);
 
 		// Add new study with new location ID
 		final DmsProject newStudy = this.testDataInitializer
@@ -425,12 +438,14 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		// New study should be retrieved for empty filter
-		Assert.assertEquals((int) initialCount + 1, this.studyService.countStudies(new StudySearchFilter()));
+		Assert.assertEquals((int) initialCount + 1, this.studyService.countStudies(studySearchFilter));
 		// Expecting only seeded studies for this test class/method to be retrieved when filtered by programUUID
+		studySearchFilter.setProgramDbId(this.commonTestProject.getUniqueID());
 		Assert
-			.assertEquals(2, this.studyService.countStudies(new StudySearchFilter().withProgramDbId(this.commonTestProject.getUniqueID())));
+			.assertEquals(2, this.studyService.countStudies(studySearchFilter));
+		studySearchFilter.setLocationDbId(String.valueOf(location1));
 		// Expecting only one to be retrieved when filtered by location
-		Assert.assertEquals(1, this.studyService.countStudies(new StudySearchFilter().withLocationDbId(String.valueOf(location1))));
+		Assert.assertEquals(1, this.studyService.countStudies(studySearchFilter));
 	}
 
 	@Test

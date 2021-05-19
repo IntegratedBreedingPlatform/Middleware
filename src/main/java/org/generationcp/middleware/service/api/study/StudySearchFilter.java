@@ -33,36 +33,32 @@ public class StudySearchFilter {
 		return this.studyTypeDbId;
 	}
 
-	public StudySearchFilter withStudyTypeDbId(final String studyTypeDbId) {
+	public void setStudyTypeDbId(final String studyTypeDbId) {
 		this.studyTypeDbId = studyTypeDbId;
-		return this;
 	}
 
 	public String getProgramDbId() {
 		return this.programDbId;
 	}
 
-	public StudySearchFilter withProgramDbId(final String programDbId) {
+	public void setProgramDbId(final String programDbId) {
 		this.programDbId = programDbId;
-		return this;
 	}
 
 	public String getLocationDbId() {
 		return this.locationDbId;
 	}
 
-	public StudySearchFilter withLocationDbId(final String locationDbId) {
+	public void setLocationDbId(final String locationDbId) {
 		this.locationDbId = locationDbId;
-		return this;
 	}
 
 	public String getSeasonDbId() {
 		return this.seasonDbId;
 	}
 
-	public StudySearchFilter withSeasonDbId(final String seasonDbId) {
+	public void setSeasonDbId(final String seasonDbId) {
 		this.seasonDbId = seasonDbId;
-		return this;
 	}
 
 	public String getStudyPUI() {
@@ -73,90 +69,77 @@ public class StudySearchFilter {
 		this.studyPUI = studyPUI;
 	}
 
-	public StudySearchFilter withStudyPUI(final String studyPUI) {
-		this.studyPUI = studyPUI;
-		return this;
-	}
 
 	public List<String> getTrialDbIds() {
 		return this.trialDbIds;
 	}
 
-	public StudySearchFilter withTrialDbIds(final List<String>trialDbIds) {
+	public void setTrialDbIds(final List<String>trialDbIds) {
 		this.trialDbIds = trialDbIds;
-		return this;
 	}
 
 	public List<String> getStudyDbIds() {
 		return this.studyDbIds;
 	}
 
-	public StudySearchFilter withStudyDbIds(final List<String> studyDbIds) {
+	public void setStudyDbIds(final List<String> studyDbIds) {
 		this.studyDbIds = studyDbIds;
-		return this;
 	}
 
 	public Boolean getActive() {
 		return this.active;
 	}
 
-	public StudySearchFilter withActive(final Boolean active) {
+	public void setActive(final Boolean active) {
 		this.active = active;
-		return this;
 	}
 
 	public String getCommonCropName() {
 		return this.commonCropName;
 	}
 
-	public StudySearchFilter withCommonCropName(final String commonCropName) {
+	public void setCommonCropName(final String commonCropName) {
 		this.commonCropName = commonCropName;
-		return this;
 	}
 
 	public String getTrialPUI() {
 		return this.trialPUI;
 	}
 
-	public StudySearchFilter withTrialPUI(final String trialPUI) {
+	public void setTrialPUI(final String trialPUI) {
 		this.trialPUI = trialPUI;
-		return this;
 	}
 
 	public String getTrialName() {
 		return this.trialName;
 	}
 
-	public StudySearchFilter withTrialName(final String trialName) {
+	public void setTrialName(final String trialName) {
 		this.trialName = trialName;
-		return this;
 	}
 
 	public String getContactDbId() {
 		return this.contactDbId;
 	}
 
-	public StudySearchFilter withContactDbId(final String contactDbId) {
+	public void setContactDbId(final String contactDbId) {
 		this.contactDbId = contactDbId;
-		return this;
 	}
 
 	public Date getSearchDateRangeStart() {
 		return this.searchDateRangeStart;
 	}
 
-	public StudySearchFilter withSearchDateRangeStart(final Date searchDateRangeStart) {
+	public void setSearchDateRangeStart(final Date searchDateRangeStart) {
 		this.searchDateRangeStart = searchDateRangeStart;
-		return this;
 	}
 
 	public Date getSearchDateRangeEnd() {
 		return this.searchDateRangeEnd;
 	}
 
-	public StudySearchFilter withSearchDateRangeEnd(final Date searchDateRangeEnd) {
+	public void setSearchDateRangeEnd(final Date searchDateRangeEnd) {
 		this.searchDateRangeEnd = searchDateRangeEnd;
-		return this;
 	}
 
 	public Integer getGermplasmDbId() {
@@ -167,9 +150,8 @@ public class StudySearchFilter {
 		this.germplasmDbId = germplasmDbId;
 	}
 
-	public StudySearchFilter withGermplasmDbid(final Integer germplasmDbId) {
+	public void setGermplasmDbid(final Integer germplasmDbId) {
 		this.germplasmDbId = germplasmDbId;
-		return this;
 	}
 
 	public Integer getObservationVariableDbId() {
@@ -178,11 +160,6 @@ public class StudySearchFilter {
 
 	public void setObservationVariableDbId(final Integer observationVariableDbId) {
 		this.observationVariableDbId = observationVariableDbId;
-	}
-
-	public StudySearchFilter withObservationVariableDbId(final Integer observationVariableDbId) {
-		this.observationVariableDbId = observationVariableDbId;
-		return this;
 	}
 
 	@Override

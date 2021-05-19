@@ -701,7 +701,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 		// Unless the session is flushed, the latest changes are not reflected in DTOs returned by method
 		this.sessionProvider.getSession().flush();
-		final StudySearchFilter filter = new StudySearchFilter().withTrialDbIds(studyIds);
+		final StudySearchFilter filter = new StudySearchFilter();
+		filter.setTrialDbIds(studyIds);
 		return this.getStudies(filter, null);
 	}
 
