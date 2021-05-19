@@ -90,6 +90,22 @@ public interface OntologyVariableDataManager {
 	 */
   	boolean isVariableUsedInStudy(final int variableId);
 
+	/**
+	 * This function will give boolean flag if variable is used in any germplasm or not
+	 *
+	 * @param variableId variableId for which to retrieve usage flag
+	 * @return boolean return true if variable is used else false
+	 */
+	boolean isVariableUsedInGermplasm(int variableId);
+
+	/**
+	 * This function will give boolean flag if variable is used in any breeding Methods or not
+	 *
+	 * @param variableId variableId for which to retrieve usage flag
+	 * @return boolean return true if variable is used else false
+	 */
+	boolean isVariableUsedInBreedingMethods(int variableId);
+
 	boolean areVariablesUsedInStudy(List<Integer> variablesIds);
 	
 	public List<VariableOverrides> getVariableOverridesByVariableIds(List<Integer> variableIds);

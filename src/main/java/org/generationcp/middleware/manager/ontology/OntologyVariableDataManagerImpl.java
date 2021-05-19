@@ -564,6 +564,10 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		variable.setDatasets((int) this.daoFactory.getDmsProjectDAO().countByVariable(variable.getId()));
 
+		variable.setGermplasm((int) this.daoFactory.getAttributeDAO().countByVariable(variable.getId()));
+
+		variable.setBreedingMethods((int) this.daoFactory.getMethodDAO().countByVariable(variable.getId()));
+
 		//setting variable observations, first observations will be null so set it to 0
 		Integer observations = 0;
 		for (VariableType v : variable.getVariableTypes()) {
@@ -572,7 +576,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		}
 		variable.setObservations(observations);
 		//it can be replaced by observations > 0
-		variable.setHasUsage(this.isVariableUsedInStudy(variable.getId()));
+		variable.setHasUsage(this.isVariableUsedInStudy(variable.getId()) || //
+			variable.getGermplasm() > 0 || //
+			variable.getBreedingMethods() > 0);
 
 	}
 
@@ -803,7 +809,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		this.checkTermIsVariable(term);
 
 		// check usage
-		final Boolean isUsed = this.isVariableUsedInStudy(variableId);
+		final Boolean isUsed = this.isVariableUsedInStudy(variableId) || //
+			this.isVariableUsedInGermplasm(variableId) || //
+			this.isVariableUsedInBreedingMethods(variableId);
 
 		if (isUsed) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.CAN_NOT_DELETE_USED_VARIABLE);
@@ -886,6 +894,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
 		query.setParameter("variableId", variableId);
 		return !query.list().isEmpty();
+	}
+
+	public boolean isVariableUsedInGermplasm(final int variableId) {
+		return this.daoFactory.getAttributeDAO().countByVariable(variableId) > 0;
+	}
+
+	public boolean isVariableUsedInBreedingMethods(final int variableId) {
+		return this.daoFactory.getMethodDAO().countByVariable(variableId) > 0;
 	}
 
 	private void updateVariableSynonym(final CVTerm term, final String newVariableName) {
