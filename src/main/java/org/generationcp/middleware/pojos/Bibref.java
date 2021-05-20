@@ -43,7 +43,7 @@ import java.io.Serializable;
 @XmlType(propOrder = {"refid", "typeFname", "pubdate", "authors", "editors", "analyt", "series", "volume", "issue", "publish", "pucity",
 		"pucntry"})
 @XmlAccessorType(XmlAccessType.NONE)
-public class Bibref implements Serializable {
+public class Bibref extends AbstractEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -116,15 +116,20 @@ public class Bibref implements Serializable {
 	@XmlElement(name = "publishingCountry")
 	private String pucntry;
 
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
 	public Bibref() {
 	}
 
-	public Bibref(Integer refid) {
+	@Deprecated
+	public Bibref(final Integer refid) {
 		this.refid = refid;
 	}
 
-	public Bibref(Integer refid, String authors, String editors, String analyt, String monogr, String series, String volume, String issue,
-			String pagecol, String publish, String pucity, String pucntry) {
+	public Bibref(final Integer refid, final String authors, final String editors, final String analyt,
+		final String monogr, final String series,
+		final String volume, final String issue, final String pagecol, final String publish, final String pucity, final String pucntry) {
 		this.refid = refid;
 		this.authors = authors;
 		this.editors = editors;

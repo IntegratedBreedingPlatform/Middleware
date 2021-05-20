@@ -83,10 +83,9 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		this.userDefinedFieldDao.save(attributeType3);
 		this.testAttributeTypes = Arrays.asList(attributeType1, attributeType2, attributeType3);
 
-		final int userId = Integer.valueOf(RandomStringUtils.randomNumeric(1));
-		this.attribute1 = new Attribute(null, germplasm1.getGid(), attributeType1.getFldno(), userId, RandomStringUtils.randomAlphabetic(100), null, null, null);
-		this.attribute2 = new Attribute(null, germplasm1.getGid(), attributeType2.getFldno(), userId, RandomStringUtils.randomAlphabetic(100), null, null, null);
-		this.attribute3 = new Attribute(null, germplasm2.getGid(), attributeType1.getFldno(), userId, RandomStringUtils.randomAlphabetic(100), null, null, null);
+		this.attribute1 = new Attribute(null, germplasm1.getGid(), attributeType1.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null);
+		this.attribute2 = new Attribute(null, germplasm1.getGid(), attributeType2.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null);
+		this.attribute3 = new Attribute(null, germplasm2.getGid(), attributeType1.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null);
 
 		this.attributeDao.save(this.attribute1);
 		this.attributeDao.save(this.attribute2);

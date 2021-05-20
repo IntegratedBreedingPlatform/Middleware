@@ -29,7 +29,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "progntrs")
-public class Progenitor implements Serializable {
+public class Progenitor extends AbstractEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -51,17 +51,13 @@ public class Progenitor implements Serializable {
 	@Column(name = "pid")
 	private Integer progenitorGid;
 
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
 	public Progenitor() {
-		super();
-	}
-
-	public Progenitor(Integer id) {
-		super();
-		this.id = id;
 	}
 
 	public Progenitor(final Germplasm germplasm, final Integer progenitorNumber, final Integer progenitorGid) {
-		super();
 		this.germplasm = germplasm;
 		this.progenitorNumber = progenitorNumber;
 		this.progenitorGid = progenitorGid;
