@@ -20,10 +20,6 @@ public class ProgramServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private ProgramServiceImpl programService;
 
-	private Project testProject1;
-
-	private Project testProject2;
-
 	private WorkbenchUser workbenchUserTest;
 
 	@Autowired
@@ -35,26 +31,21 @@ public class ProgramServiceImplIntegrationTest extends IntegrationTestBase {
 	public void setUp() {
 		this.programService = new ProgramServiceImpl(this.workbenchSessionProvider);
 		this.daoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
+	}
 
-		if (this.testProject1 == null) {
-			this.testProject1 = this.buildProject("Project1 ");
-		}
-		if (this.testProject2 == null) {
-			this.testProject2 = this.buildProject("Project2 ");
-		}
+	@Test
+	public void test_saveProjectUserInfo_Ok() {
+		final Project testProject1 = this.buildProject("Project1 ");
+		final Project testProject2 = this.buildProject("Project2 ");
 
 		final Integer userId = this.findAdminUser();
 		this.workbenchUserTest = this.daoFactory.getWorkbenchUserDAO().getById(userId);
 		this.sessionProvder.getSession().flush();
 
-	}
-
-	@Test
-	public void test_saveProjectUserInfo_Ok() {
-		this.programService.saveOrUpdateProjectUserInfo(this.workbenchUserTest.getUserid(), this.testProject1.getUniqueID());
+		this.programService.saveOrUpdateProjectUserInfo(this.workbenchUserTest.getUserid(), testProject1.getUniqueID());
 		final ProgramDTO programDTO = this.programService.getLastOpenedProject(this.workbenchUserTest.getUserid());
 		this.sessionProvder.getSession().flush();
-		assertEquals(programDTO.getUniqueID(), this.testProject1.getUniqueID());
+		assertEquals(programDTO.getUniqueID(), testProject1.getUniqueID());
 	}
 
 	private Project buildProject(final String projectName) {

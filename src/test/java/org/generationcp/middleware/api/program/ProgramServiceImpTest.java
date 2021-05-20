@@ -27,9 +27,6 @@ public class ProgramServiceImpTest {
 
 	private static final Integer USER_ID = new Random().nextInt();
 
-	private Project testProject1;
-	private Project testProject2;
-
 	@InjectMocks
 	private ProgramServiceImpl programService;
 
@@ -49,33 +46,29 @@ public class ProgramServiceImpTest {
 	public void init() {
 		Mockito.when(this.workbenchDaoFactory.getProjectUserInfoDAO()).thenReturn(this.projectUserInfoDAO);
 		Mockito.when(this.workbenchDaoFactory.getProjectDAO()).thenReturn(this.projectDAO);
-
-		final WorkbenchUser person = Mockito.mock(WorkbenchUser.class);
-		Mockito.when(person.getUserid()).thenReturn(USER_ID);
-		Mockito.when(this.userDAO.getById(USER_ID)).thenReturn(person);
 		Mockito.when(this.workbenchDaoFactory.getWorkbenchUserDAO()).thenReturn(this.userDAO);
-
 		ReflectionTestUtils.setField(this.programService, "daoFactory", this.workbenchDaoFactory);
-
-		this.testProject1 = buildProject("Project1 ");
-		this.testProject2 = buildProject("Project2 ");
-
-		Mockito.when(this.workbenchDaoFactory.getProjectDAO().getByUuid(this.testProject1.getUniqueID())).thenReturn(this.testProject1);
-		Mockito.when(this.workbenchDaoFactory.getProjectDAO().getByUuid(this.testProject2.getUniqueID())).thenReturn(this.testProject2);
-
 	}
 
 	@Test
 	public void test_updateProjectUserInfo_Ok() {
+		final Project testProject1 = buildProject("Project1 ");
+		final Project testProject2 = buildProject("Project2 ");
 		final ProjectUserInfo projectUserInfo = new ProjectUserInfo();
-		projectUserInfo.setProject(this.testProject2);
+		projectUserInfo.setProject(testProject2);
 		projectUserInfo.setLastOpenDate(new Date());
 
-		Mockito.when(this.workbenchDaoFactory.getProjectUserInfoDAO().getByProjectIdAndUserId(this.testProject2.getProjectId(), USER_ID))
+		final WorkbenchUser person = Mockito.mock(WorkbenchUser.class);
+		Mockito.when(person.getUserid()).thenReturn(USER_ID);
+		Mockito.when(this.userDAO.getById(USER_ID)).thenReturn(person);
+
+		Mockito.when(this.workbenchDaoFactory.getProjectDAO().getByUuid(testProject1.getUniqueID())).thenReturn(testProject1);
+		Mockito.when(this.workbenchDaoFactory.getProjectDAO().getByUuid(testProject2.getUniqueID())).thenReturn(testProject2);
+		Mockito.when(this.workbenchDaoFactory.getProjectUserInfoDAO().getByProjectIdAndUserId(testProject2.getProjectId(), USER_ID))
 			.thenReturn(projectUserInfo);
 
-		this.programService.saveOrUpdateProjectUserInfo(USER_ID, this.testProject1.getUniqueID());
-		this.programService.saveOrUpdateProjectUserInfo(USER_ID, this.testProject2.getUniqueID());
+		this.programService.saveOrUpdateProjectUserInfo(USER_ID, testProject1.getUniqueID());
+		this.programService.saveOrUpdateProjectUserInfo(USER_ID, testProject2.getUniqueID());
 		Mockito.verify(this.projectUserInfoDAO, Mockito.times(1)).save(Mockito.any());
 		Mockito.verify(this.projectUserInfoDAO, Mockito.times(1)).update(Mockito.any());
 		Mockito.verify(this.projectDAO, Mockito.times(2)).update(Mockito.any());
