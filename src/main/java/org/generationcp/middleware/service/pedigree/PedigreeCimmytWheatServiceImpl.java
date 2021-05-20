@@ -130,7 +130,7 @@ public class PedigreeCimmytWheatServiceImpl extends Service implements PedigreeS
 		List<Name> returnNameList = new ArrayList<Name>();
 		for (Name name : nameList) {
 			if (name.getNstat() != PedigreeCimmytWheatServiceImpl.NSTAT_DELETED && ntypeArray.contains(name.getTypeId())
-					&& nstatArray.contains(name.getNstat()) && !nuiArray.contains(name.getUserId())) {
+					&& nstatArray.contains(name.getNstat()) && !nuiArray.contains(name.getCreatedBy())) {
 				returnNameList.add(name);
 			}
 		}

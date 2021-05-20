@@ -36,8 +36,9 @@ import java.util.UUID;
 public abstract class IntegrationTestBase {
 
 	private static final Logger LOG = LoggerFactory.getLogger(IntegrationTestBase.class);
-	public static final int INDENT = 3;
 	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
+
+	public static final int INDENT = 3;
 
 	@Autowired
 	@Qualifier(value = "cropSessionProvider")
@@ -66,6 +67,8 @@ public abstract class IntegrationTestBase {
 	public void beforeEachTest() {
 		LOG.info("+++++ Test : " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + "() started +++++\n");
 		this.startTime = System.nanoTime();
+
+		ContextHolder.setLoggedInUserId(this.findAdminUser());
 	}
 
 	@After

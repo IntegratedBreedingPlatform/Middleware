@@ -103,7 +103,6 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		name.setNdate(Integer.valueOf(germplasmNameRequestDto.getDate()));
 		name.setLocationId(germplasmNameRequestDto.getLocationId());
 		name.setNstat(germplasmNameRequestDto.isPreferredName() ? 1 : 0);
-		name.setUserId(userid);
 		name.setReferenceId(0);
 		daoFactory.getNameDao().save(name);
 		return name.getNid();

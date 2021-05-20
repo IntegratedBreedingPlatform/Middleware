@@ -92,8 +92,7 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 	}
 
 	private Germplasm createGermplasm() {
-		final Germplasm germplasm = new Germplasm(null, 1, -1, 0, 0,
-			this.findAdminUser(), 0, 0, 0, 0,
+		final Germplasm germplasm = new Germplasm(null, 1, -1, 0, 0, 0, 0, 0, 0,
 			0, 0, null, null, null);
 
 		this.daoFactory.getGermplasmDao().save(germplasm);

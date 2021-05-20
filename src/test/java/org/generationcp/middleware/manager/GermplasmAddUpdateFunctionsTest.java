@@ -41,7 +41,6 @@ public class GermplasmAddUpdateFunctionsTest extends IntegrationTestBase {
 		g.setMgid(1);
 		g.setLgid(1);
 		// g.setUserId(Integer.valueOf(527));
-		g.setUserId(1);
 		g.setReferenceId(1);
 		g.setDeleted(Boolean.FALSE);
 
@@ -51,7 +50,6 @@ public class GermplasmAddUpdateFunctionsTest extends IntegrationTestBase {
 		n.setNval("Kevin 64");
 		n.setReferenceId(1);
 		n.setTypeId(1);
-		n.setUserId(1);
 
 		final CropType cropType = new CropType();
 		cropType.setUseUUID(false);

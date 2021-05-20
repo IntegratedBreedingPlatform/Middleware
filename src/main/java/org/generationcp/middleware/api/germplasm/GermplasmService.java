@@ -68,18 +68,18 @@ public interface GermplasmService {
 	 */
 	UserDefinedField getPlotCodeField();
 
-	Map<Integer, GermplasmImportResponseDto> importGermplasm(Integer userId, String cropName,
+	Map<Integer, GermplasmImportResponseDto> importGermplasm(String cropName,
 		GermplasmImportRequestDto germplasmImportRequestDto);
 
 	long countGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto);
 
 	List<GermplasmDto> findGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto, Pageable pageable);
 
-	Set<Integer> importGermplasmUpdates(Integer userId, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
+	Set<Integer> importGermplasmUpdates(List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
-	List<GermplasmDTO> createGermplasm(Integer userId, String cropname, List<GermplasmImportRequest> germplasmImportRequestList);
+	List<GermplasmDTO> createGermplasm(String cropname, List<GermplasmImportRequest> germplasmImportRequestList);
 
-	GermplasmDTO updateGermplasm(Integer userId, String germplasmDbId, GermplasmUpdateRequest germplasmUpdateRequest);
+	GermplasmDTO updateGermplasm(String germplasmDbId, GermplasmUpdateRequest germplasmUpdateRequest);
 
 	long countFilteredGermplasm(GermplasmSearchRequestDto germplasmSearchRequestDTO);
 
