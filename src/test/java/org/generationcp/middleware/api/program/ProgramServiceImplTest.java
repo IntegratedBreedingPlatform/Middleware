@@ -7,17 +7,22 @@ import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.user.UserService;
-import org.generationcp.middleware.service.impl.user.UserServiceImpl;
+import org.generationcp.middleware.util.Util;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
+import static com.jayway.awaitility.Awaitility.await;
+import static com.jayway.awaitility.Awaitility.with;
+import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ProgramServiceImplTest extends IntegrationTestBase {
 
@@ -47,7 +52,7 @@ public class ProgramServiceImplTest extends IntegrationTestBase {
 		}
 
 		final Integer userId = this.findAdminUser();
-		this.workbenchUserTest = daoFactory.getWorkbenchUserDAO().getById(userId);
+		this.workbenchUserTest = this.daoFactory.getWorkbenchUserDAO().getById(userId);
 		this.sessionProvder.getSession().flush();
 
 	}
@@ -61,16 +66,21 @@ public class ProgramServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void test_updateProjectUserInfo_Ok() {
+	public void test_updateProjectUserInfo_Ok() throws ParseException, InterruptedException {
 		this.programService.saveOrUpdateProjectUserInfo(this.workbenchUserTest.getUserid(), this.testProject2.getUniqueID());
+		final ProgramDTO programDTO1 = this.programService.getLastOpenedProject(this.workbenchUserTest.getUserid());
+		final Date lastOpenDateProgram1 = new SimpleDateFormat(Util.FRONTEND_TIMESTAMP_FORMAT).parse(programDTO1.getLastOpenDate());
 		this.sessionProvder.getSession().flush();
-		ProgramDTO programDTO = this.programService.getLastOpenedProject(this.workbenchUserTest.getUserid());
-		assertEquals(programDTO.getUniqueID(), this.testProject2.getUniqueID());
+
+		Thread.sleep(2000);
 
 		this.programService.saveOrUpdateProjectUserInfo(this.workbenchUserTest.getUserid(), this.testProject2.getUniqueID());
 		this.sessionProvder.getSession().flush();
-		programDTO = this.programService.getLastOpenedProject(this.workbenchUserTest.getUserid());
-		assertEquals(programDTO.getUniqueID(), this.testProject2.getUniqueID());
+
+		final ProgramDTO programDTO2 = this.programService.getLastOpenedProject(this.workbenchUserTest.getUserid());
+		final Date lastOpenDateProgram2 = new SimpleDateFormat(Util.FRONTEND_TIMESTAMP_FORMAT).parse(programDTO2.getLastOpenDate());
+
+		assertTrue(lastOpenDateProgram2.after(lastOpenDateProgram1));
 	}
 
 	private Project buildProject(final String projectName) {
