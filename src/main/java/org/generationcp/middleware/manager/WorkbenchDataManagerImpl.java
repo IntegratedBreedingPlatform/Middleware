@@ -10,7 +10,6 @@
 
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -28,7 +27,7 @@ import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -532,5 +531,4 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 			return new ArrayList<>(this.workbenchDaoFactory.getUserRoleDao().getCropsWithAddProgramPermissionForCropRoles(workbenchUserId));
 		}
 	}
-
 }
