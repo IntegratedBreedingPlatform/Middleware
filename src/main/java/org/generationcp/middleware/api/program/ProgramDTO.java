@@ -25,6 +25,7 @@ public class ProgramDTO {
 	//TODO Rename to cropName
 	private String crop;
 	private String startDate;
+	private String lastOpenDate;
 
 	public ProgramDTO() {
 	}
@@ -50,6 +51,7 @@ public class ProgramDTO {
 		// TODO get username
 		// program.setCreatedBy();
 		this.setStartDate(Util.formatDateAsStringValue(project.getStartDate(), Util.FRONTEND_DATE_FORMAT));
+		this.setLastOpenDate(Util.formatDateAsStringValue(project.getLastOpenDate(), Util.FRONTEND_TIMESTAMP_FORMAT));
 		final Set<WorkbenchUser> members = project.getMembers();
 		if (members != null && !members.isEmpty()) {
 			this.setMembers(members.stream().map(WorkbenchUser::getName).collect(toSet()));
@@ -110,6 +112,15 @@ public class ProgramDTO {
 
 	public void setStartDate(final String startDate) {
 		this.startDate = startDate;
+	}
+
+
+	public String getLastOpenDate() {
+		return this.lastOpenDate;
+	}
+
+	public void setLastOpenDate(final String lastOpenDate) {
+		this.lastOpenDate = lastOpenDate;
 	}
 
 }
