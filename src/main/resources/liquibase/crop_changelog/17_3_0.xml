@@ -27,7 +27,7 @@
 			   <constraints nullable="false"/>
            </column>
        </createTable>
-    </changeSet>
+	</changeSet>
 
 	<changeSet author="lkovacic" id="v17.3.0-2">
         <preConditions onFail="MARK_RAN">

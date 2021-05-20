@@ -83,8 +83,8 @@ public class UserDefinedFieldDAOTest extends IntegrationTestBase {
 		this.userDefinedFieldDao.save(nameType3);
 		this.nameTypes = Arrays.asList(nameType1, nameType2, nameType3);
 		
-		final Attribute attribute1 = new Attribute(null, germplasm1.getGid(), attributeType1.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
-		final Attribute attribute2 = new Attribute(null, germplasm2.getGid(), attributeType2.getFldno(), 1, RandomStringUtils.randomAlphabetic(100), null, null, null);
+		final Attribute attribute1 = new Attribute(null, germplasm1.getGid(), attributeType1.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null);
+		final Attribute attribute2 = new Attribute(null, germplasm2.getGid(), attributeType2.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null);
 		this.attributeDao.save(attribute1);
 		this.attributeDao.save(attribute2);
 		
