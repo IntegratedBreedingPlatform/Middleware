@@ -31,7 +31,6 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 		newAttribute.setGermplasmId(gid);
 		newAttribute.setTypeId(this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
 			dto.getAttributeType(), dto.getAttributeCode()).getFldno());
-		newAttribute.setUserId(userId);
 		newAttribute.setAval(dto.getValue());
 		newAttribute.setLocationId(dto.getLocationId());
 		newAttribute.setReferenceId(0);

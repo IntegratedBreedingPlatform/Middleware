@@ -16,11 +16,10 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
-import java.util.Date;
 
 @Entity
 @Table(name = "external_reference")
-public class ExternalReference implements Serializable {
+public class ExternalReference extends AbstractEntity implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -39,9 +38,6 @@ public class ExternalReference implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "reference_source")
 	private String source;
-
-	@Column(name = "created_date", nullable = false, updatable = false)
-	private Date createdDate = new Date();
 
 	public ExternalReference() {
 	}
@@ -82,10 +78,6 @@ public class ExternalReference implements Serializable {
 
 	public void setSource(final String source) {
 		this.source = source;
-	}
-
-	public Date getCreatedDate() {
-		return this.createdDate;
 	}
 
 	@Override

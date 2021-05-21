@@ -438,7 +438,6 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		germplasm.setGid(null);
-		germplasm.setUserId(this.testUser.getUserid());
 		this.daoFactory.getGermplasmDao().save(germplasm);
 
 		stockModel.setGermplasm(germplasm);
