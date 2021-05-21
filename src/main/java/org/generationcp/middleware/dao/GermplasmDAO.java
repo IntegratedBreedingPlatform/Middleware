@@ -1943,11 +1943,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public boolean isNewParentANodeChildren(final Set<Integer> newParents, final Integer node, final int maxRecursiveQueries) {
-		return isNewParentANodeChildren(new HashSet<>(), newParents, node, 0, maxRecursiveQueries);
+	public boolean isNewParentANodeDescendant(final Set<Integer> newParents, final Integer node, final int maxRecursiveQueries) {
+		return isNewParentANodeDescendant(new HashSet<>(), newParents, node, 0, maxRecursiveQueries);
 	}
 
-	private boolean isNewParentANodeChildren(final Set<Integer> path, final Set<Integer> parents, final Integer node, int level,
+	private boolean isNewParentANodeDescendant(final Set<Integer> path, final Set<Integer> parents, final Integer node, int level,
 		int maxRecursiveQueries) {
 
 		parents.remove(0);
@@ -1973,7 +1973,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				newParents.add((Integer) r[0]);
 				newParents.add((Integer) r[1]);
 			}
-			return isNewParentANodeChildren(path, newParents, node, level, maxRecursiveQueries);
+			return isNewParentANodeDescendant(path, newParents, node, level, maxRecursiveQueries);
 		} catch (final HibernateException e) {
 			final String message = "Error with isNewParentANodeChildren" + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);

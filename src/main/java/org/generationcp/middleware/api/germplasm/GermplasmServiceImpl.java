@@ -1373,7 +1373,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				gpids.add(germplasm.getGpid2());
 
 				final boolean isNewParentANodeChildren =
-					this.daoFactory.getGermplasmDao().isNewParentANodeChildren(gpids, germplasm.getGid(), maxRecursiveQueries);
+					this.daoFactory.getGermplasmDao().isNewParentANodeDescendant(gpids, germplasm.getGid(), maxRecursiveQueries);
 				if (isNewParentANodeChildren) {
 					throw new MiddlewareRequestException("", "germplasm.update.germplasm.new.parents.are.children", "");
 				}
