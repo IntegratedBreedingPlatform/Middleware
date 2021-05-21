@@ -4,15 +4,15 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="lkovacic" id="v18.1.0-function_checkEntityIsAudited" runOnChange="true">
-    	<sqlFile path="sql/check_entity_audited.sql"
+	<changeSet author="lkovacic" id="v18.1.0-function_checkTableIsAudited" runOnChange="true">
+    	<sqlFile path="sql/check_table_audited.sql"
 				 dbms="mysql"
 				 encoding="UTF-8"
 				 relativeToChangelogFile="true"
 				 endDelimiter="\nGO"
 				 splitStatements="true"
 				 stripComments="false"/>
-		<comment>Add 'checkEntityIsAudited' function</comment>
+		<comment>Add 'checkTableIsAudited' function</comment>
 	</changeSet>
 
 	<changeSet author="lkovacic" id="v18.1.0-getAuditModifiedByValue" runOnChange="true">

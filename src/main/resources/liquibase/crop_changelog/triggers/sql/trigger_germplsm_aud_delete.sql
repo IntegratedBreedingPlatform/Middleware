@@ -5,7 +5,7 @@ CREATE TRIGGER trigger_germplsm_aud_delete
     ON germplsm
     FOR EACH ROW
 BEGIN
-    IF (SELECT checkEntityIsAudited('GERMPLSM') = 1) THEN
+    IF (SELECT checkTableIsAudited('GERMPLSM') = 1) THEN
         SET @modifiedBy = getAuditModifiedByValue(OLD.modified_by);
         SET @modifiedDate = (SELECT COALESCE(OLD.modified_date, CURRENT_TIMESTAMP));
 

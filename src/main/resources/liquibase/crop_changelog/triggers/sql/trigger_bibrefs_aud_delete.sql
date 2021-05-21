@@ -5,7 +5,7 @@ CREATE TRIGGER trigger_bibrefs_aud_delete
     ON bibrefs
     FOR EACH ROW
 BEGIN
-    IF (SELECT checkEntityIsAudited('BIBREFS') = 1) THEN
+    IF (SELECT checkTableIsAudited('BIBREFS') = 1) THEN
         SET @modifiedBy = getAuditModifiedByValue(OLD.modified_by);
         SET @modifiedDate = (SELECT COALESCE(OLD.modified_date, CURRENT_TIMESTAMP));
 

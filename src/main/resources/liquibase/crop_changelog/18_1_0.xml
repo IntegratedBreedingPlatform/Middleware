@@ -227,10 +227,10 @@
 			create table audit_cfg (
 				id          int auto_increment
 					primary key,
-				entity_name varchar(255)         not null,
+				table_name  varchar(255)         not null,
 				is_audited  tinyint(1) default 1 not null,
-				constraint audit_cfg_entity_name_uindex
-					unique (entity_name)
+				constraint audit_cfg_table_name_uindex
+					unique (table_name)
 			);
         </sql>
 	</changeSet>
@@ -243,7 +243,7 @@
             Add data to 'audit_cfg' table
         </comment>
         <sql dbms="mysql" splitStatements="true">
-			INSERT INTO audit_cfg (entity_name, is_audited)
+			INSERT INTO audit_cfg (table_name, is_audited)
 			VALUES ('GERMPLSM', 1),
 				('ATRIBUTS', 1),
 				('BIBREFS', 1),

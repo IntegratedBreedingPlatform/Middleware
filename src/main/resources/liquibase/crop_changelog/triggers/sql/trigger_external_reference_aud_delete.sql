@@ -5,7 +5,7 @@ CREATE TRIGGER trigger_external_reference_aud_delete
     ON external_reference
     FOR EACH ROW
 BEGIN
-    IF (SELECT checkEntityIsAudited('EXTERNAL_REFERENCE') = 1) THEN
+    IF (SELECT checkTableIsAudited('EXTERNAL_REFERENCE') = 1) THEN
         SET @modifiedBy = getAuditModifiedByValue(OLD.modified_by);
         SET @modifiedDate = (SELECT COALESCE(OLD.modified_date, CURRENT_TIMESTAMP));
     

@@ -5,7 +5,7 @@ CREATE TRIGGER trigger_progntrs_aud_delete
     ON progntrs
     FOR EACH ROW
 BEGIN
-    IF (SELECT checkEntityIsAudited('PROGNTRS') = 1) THEN
+    IF (SELECT checkTableIsAudited('PROGNTRS') = 1) THEN
         SET @modifiedBy = getAuditModifiedByValue(OLD.modified_by);
         SET @modifiedDate = (SELECT COALESCE(OLD.modified_date, CURRENT_TIMESTAMP));
 

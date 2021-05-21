@@ -5,7 +5,7 @@ CREATE TRIGGER trigger_atributs_aud_delete
     ON atributs
     FOR EACH ROW
 BEGIN
-    IF (SELECT checkEntityIsAudited('ATRIBUTS') = 1) THEN
+    IF (SELECT checkTableIsAudited('ATRIBUTS') = 1) THEN
         SET @modifiedBy = getAuditModifiedByValue(OLD.modified_by);
         SET @modifiedDate = (SELECT COALESCE(OLD.modified_date, CURRENT_TIMESTAMP));
     

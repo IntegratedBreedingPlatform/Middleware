@@ -5,7 +5,7 @@ CREATE TRIGGER trigger_names_aud_delete
     ON names
     FOR EACH ROW
 BEGIN
-    IF (SELECT checkEntityIsAudited('NAMES') = 1) THEN
+    IF (SELECT checkTableIsAudited('NAMES') = 1) THEN
         SET @modifiedBy = getAuditModifiedByValue(OLD.modified_by);
         SET @modifiedDate = (SELECT COALESCE(OLD.modified_date, CURRENT_TIMESTAMP));
 

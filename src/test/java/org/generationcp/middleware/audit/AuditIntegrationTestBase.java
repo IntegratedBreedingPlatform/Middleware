@@ -145,9 +145,9 @@ public abstract class AuditIntegrationTestBase extends IntegrationTestBase {
 
 	private void changeEntityAuditConfiguration(final boolean isAudited) {
 		final SQLQuery sqlQuery =
-			this.sessionProvder.getSession().createSQLQuery("UPDATE audit_cfg SET is_audited = :isAudited WHERE entity_name = :entityName");
+			this.sessionProvder.getSession().createSQLQuery("UPDATE audit_cfg SET is_audited = :isAudited WHERE table_name = :tableName");
 		sqlQuery.setParameter("isAudited", isAudited);
-		sqlQuery.setParameter("entityName", this.tableName);
+		sqlQuery.setParameter("tableName", this.tableName);
 		sqlQuery.executeUpdate();
 	}
 
