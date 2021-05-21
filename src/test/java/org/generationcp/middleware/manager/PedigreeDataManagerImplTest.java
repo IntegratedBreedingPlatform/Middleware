@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
+import java.util.Random;
 
 
 public class PedigreeDataManagerImplTest extends IntegrationTestBase {
@@ -197,7 +198,7 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 2);
 		this.sessionProvder.getSession().flush();
 		Assert.assertEquals(newProgenitorId, this.germplasmManager.getGermplasmByGID(gid).getGpid2());
-		
+
 		// New progenitor record should be created
 		final Integer progenitorGid = this.crossWithUnknownParent.getGid();
 		this.pedigreeManager.updateProgenitor(gid, progenitorGid, 3);
