@@ -228,6 +228,12 @@ public class IntegrationTestDataInitializer {
 		return trait;
 	}
 
+	public CVTerm createCVTerm(final String name, final String definition, final Integer cvId) {
+		final CVTerm trait = CVTermTestDataInitializer.createTerm(name, definition, cvId);
+		this.cvTermDao.save(trait);
+		return trait;
+	}
+
 	public StockModel createTestStock(final DmsProject study, final ExperimentModel experimentModel) {
 		final StockModel stockModel = this.createTestStock(study);
 		experimentModel.setStock(stockModel);

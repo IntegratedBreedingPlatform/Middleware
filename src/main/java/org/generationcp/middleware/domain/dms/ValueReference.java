@@ -27,31 +27,31 @@ public class ValueReference extends Reference implements Serializable, Comparabl
 		super();
 	}
 
-	public ValueReference(int id, String name) {
+	public ValueReference(final int id, final String name) {
 		super.setId(id);
 		this.setKey(String.valueOf(id));
 		super.setName(name);
 	}
 
-	public ValueReference(String key, String name) {
+	public ValueReference(final String key, final String name) {
 		this.setKey(key);
 		super.setName(name);
 	}
 
-	public ValueReference(String key, String name, String description) {
+	public ValueReference(final String key, final String name, final String description) {
 		this.setKey(key);
 		super.setName(name);
 		super.setDescription(description);
 	}
 
-	public ValueReference(int id, String name, String description) {
+	public ValueReference(final int id, final String name, final String description) {
 		super.setId(id);
 		this.setKey(String.valueOf(id));
 		super.setName(name);
 		super.setDescription(description);
 	}
 
-	public ValueReference(TermSummary termSummary) {
+	public ValueReference(final TermSummary termSummary) {
 		super.setId(termSummary.getId());
 		this.setKey(termSummary.getId().toString());
 		super.setName(termSummary.getName());
@@ -59,7 +59,7 @@ public class ValueReference extends Reference implements Serializable, Comparabl
 	}
 
 	@Override
-	public int compareTo(ValueReference o) {
+	public int compareTo(final ValueReference o) {
 		return this.getName().compareTo(o.getName());
 	}
 
@@ -87,7 +87,7 @@ public class ValueReference extends Reference implements Serializable, Comparabl
 	/**
 	 * @param key the key to set
 	 */
-	 public void setKey(String key) {
+	 public void setKey(final String key) {
 		 this.key = key;
 	 }
 

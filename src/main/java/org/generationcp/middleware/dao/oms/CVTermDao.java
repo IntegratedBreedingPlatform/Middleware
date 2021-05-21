@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.h2h.CategoricalTraitInfo;
 import org.generationcp.middleware.domain.h2h.CategoricalValue;
 import org.generationcp.middleware.domain.h2h.TraitInfo;
@@ -130,6 +131,105 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return termIds;
 	}
 
+	public Map<String, MeasurementVariable> getVariablesByNamesAndVariableType(final List<String> names, final VariableType variableType) {
+		final Map<String, MeasurementVariable> stdVarMap = new HashMap<>();
+
+		// Store the names in the map in uppercase
+		for (int i = 0, size = names.size(); i < size; i++) {
+			names.set(i, names.get(i).toUpperCase());
+		}
+
+		try {
+			if (!names.isEmpty()) {
+
+				final StringBuilder sqlString = new StringBuilder().append("SELECT cvt.name, cvt.cvterm_id, dataType.object_id ")
+					.append(" FROM cvterm cvt ")
+					.append(" INNER JOIN cvterm_relationship hasScale ON hasScale.subject_id = cvt.cvterm_id AND hasScale.type_id = "
+						+ TermId.HAS_SCALE.getId() + " ")
+					.append(" INNER JOIN cvterm_relationship datatype ON dataType.subject_id = hasScale.object_id ")
+					.append(" 	AND dataType.type_id = ").append(TermId.HAS_TYPE.getId())
+					.append(" INNER JOIN cvtermprop variableType ON variableType.cvterm_id = cvt.cvterm_id ")
+					.append(" 	AND variableType.type_id = ").append(TermId.VARIABLE_TYPE.getId())
+					.append(" WHERE cvt.cv_id = :cvId and cvt.name IN (:names) AND cvt.is_obsolete = 0 ")
+					.append(" 	AND variableType.value = :variableType ");
+
+				final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
+				query.setParameter("cvId", CvId.VARIABLES.getId());
+				query.setParameterList("names", names);
+				query.setParameter("variableType", variableType.getName());
+
+				final List<Object[]> results = query.list();
+
+				for (final Object[] row : results) {
+					final String name = ((String) row[0]).trim().toUpperCase();
+					final Integer cvtermId = (Integer) row[1];
+					final Integer dataTypeId = (Integer) row[2];
+
+					final MeasurementVariable variable = new MeasurementVariable();
+					variable.setTermId(cvtermId);
+					variable.setDataTypeId(dataTypeId);
+					stdVarMap.put(name, variable);
+				}
+
+			}
+
+		} catch (final HibernateException e) {
+			this.logAndThrowException(
+				"Error in getVariablesByNamesAndVariableType=" + names + " in CVTermDao: " + e.getMessage(), e);
+		}
+		return stdVarMap;
+	}
+
+	public Map<String, MeasurementVariable> getVariablesBySynonymsAndVariableType(final List<String> names, final VariableType variableType) {
+		final Map<String, MeasurementVariable> stdVarMap = new HashMap<>();
+
+		// Store the names in the map in uppercase
+		for (int i = 0, size = names.size(); i < size; i++) {
+			names.set(i, names.get(i).toUpperCase());
+		}
+
+		try {
+			if (!names.isEmpty()) {
+
+				final StringBuilder sqlString = new StringBuilder().append("SELECT syn.synonym, cvt.cvterm_id, dataType.object_id ")
+					.append(" FROM cvterm cvt ")
+					.append(" INNER JOIN cvterm_relationship hasScale ON hasScale.subject_id = cvt.cvterm_id AND hasScale.type_id = "
+						+ TermId.HAS_SCALE.getId() + " ")
+					.append(" INNER JOIN cvterm_relationship datatype ON dataType.subject_id = hasScale.object_id ")
+					.append(" 	AND dataType.type_id = ").append(TermId.HAS_TYPE.getId())
+					.append(" INNER JOIN cvtermprop variableType ON variableType.cvterm_id = cvt.cvterm_id ")
+					.append(" 	AND variableType.type_id = ").append(TermId.VARIABLE_TYPE.getId())
+					.append(" INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
+					.append(" WHERE cvt.cv_id = :cvId AND syn.synonym IN (:names) AND cvt.is_obsolete = 0 ")
+					.append("  AND variableType.value = :variableType ");
+
+				final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
+				query.setParameter("cvId", CvId.VARIABLES.getId());
+				query.setParameterList("names", names);
+				query.setParameter("variableType", variableType.getName());
+
+				final List<Object[]> results = query.list();
+
+				for (final Object[] row : results) {
+					final String name = ((String) row[0]).trim().toUpperCase();
+					final Integer cvtermId = (Integer) row[1];
+					final Integer dataTypeId = (Integer) row[2];
+
+					final MeasurementVariable variable = new MeasurementVariable();
+					variable.setTermId(cvtermId);
+					variable.setDataTypeId(dataTypeId);
+					stdVarMap.put(name, variable);
+				}
+
+			}
+
+		} catch (final HibernateException e) {
+			this.logAndThrowException(
+				"Error in getVariablesBySynonymsAndVariableType=" + names + " in CVTermDao: " + e.getMessage(), e);
+		}
+		return stdVarMap;
+	}
+
 	public Map<String, Map<Integer, VariableType>> getTermIdsWithTypeByNameOrSynonyms(final List<String> nameOrSynonyms,
 		final int cvId) {
 		final Map<String, Map<Integer, VariableType>> stdVarMap = new HashMap<>();
@@ -146,7 +246,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					.append("FROM cvterm cvt ")
 					.append("WHERE cvt.cv_id = :cvId and cvt.name IN (:nameOrSynonyms) AND cvt.is_obsolete = 0 ")
 					.append("UNION ").append("SELECT syn.synonym, cvt.cvterm_id ")
-					.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
+					.append("FROM cvterm cvt ")
+					.append("INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
 					.append("AND cvt.cv_id = :cvId AND syn.synonym IN (:nameOrSynonyms) AND cvt.is_obsolete = 0");
 
 				final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());

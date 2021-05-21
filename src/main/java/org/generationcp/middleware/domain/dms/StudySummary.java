@@ -41,7 +41,7 @@ public class StudySummary implements Serializable {
 
 	private List<InstanceMetadata> instanceMetaData = new ArrayList<>();
 
-	private Map<String, String> optionalInfo = new HashMap<>();
+	private Map<String, String> additionalInfo = new HashMap<>();
 
 	private List<ContactDto> contacts = new ArrayList<>();
 
@@ -119,12 +119,12 @@ public class StudySummary implements Serializable {
 		this.active = active;
 	}
 
-	public Map<String, String> getOptionalInfo() {
-		return this.optionalInfo;
+	public Map<String, String> getAdditionalInfo() {
+		return this.additionalInfo;
 	}
 
-	public void setOptionalInfo(final Map<String, String> optionalInfo) {
-		this.optionalInfo = optionalInfo;
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
+		this.additionalInfo = additionalInfo;
 	}
 
 	public List<InstanceMetadata> getInstanceMetaData() {

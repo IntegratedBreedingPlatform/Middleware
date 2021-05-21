@@ -1,6 +1,8 @@
 package org.generationcp.middleware.service.impl.study;
 
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.bouncycastle.asn1.esf.CrlValidatedID;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
@@ -10,7 +12,9 @@ import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -22,6 +26,8 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -42,8 +48,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 
@@ -480,13 +488,21 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudy() {
+	public void testSaveStudy_AllInfoSaved() {
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
 		importRequest1.setEndDate("2020-12-31");
 		importRequest1.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
 		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
+
+		final Map<String, String> settingsMap = Maps.newHashMap();
+		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.STUDY_DETAIL).getName(), RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(this.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "20210501");
+		settingsMap.put(this.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(), RandomStringUtils.randomNumeric(10));
+		final List<String> possibleValues = Arrays.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
+		settingsMap.put(this.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(), possibleValues.get(0));
+		importRequest1.setAdditionalInfo(settingsMap);
 		final TrialImportRequestDTO importRequest2 = new TrialImportRequestDTO();
 		importRequest2.setStartDate("2019-01-01");
 		importRequest2.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
@@ -499,10 +515,91 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop, Arrays.asList(importRequest1, importRequest2), this.testUser.getUserid());
 		Assert.assertEquals(2, savedStudies.size());
-		this.verifyStudySummary(importRequest1, savedStudies.get(0));
+		final StudySummary study1 = savedStudies.get(0);
+		this.verifyStudySummary(importRequest1, study1);
 		this.verifyStudySummary(importRequest2, savedStudies.get(1));
+		// Verify study settings, only first study imported study details
+		Assert.assertNotNull(study1.getAdditionalInfo());
+		Assert.assertEquals(importRequest1.getAdditionalInfo().size(), study1.getAdditionalInfo().size());
+		for (final String key : importRequest1.getAdditionalInfo().keySet()) {
+			Assert.assertEquals(importRequest1.getAdditionalInfo().get(key), study1.getAdditionalInfo().get(key));
+		}
+	}
 
+	@Test
+	public void testSaveStudy_WithInvalidStudyVariableNames() {
+		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
+		importRequest1.setStartDate("2019-01-01");
+		importRequest1.setEndDate("2020-12-31");
+		importRequest1.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
 
+		final Map<String, String> settingsMap = Maps.newHashMap();
+		final String invalidVariableName = RandomStringUtils.randomAlphabetic(30);
+		settingsMap.put(invalidVariableName, RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.STUDY_DETAIL).getName(), RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(this.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "20210501");
+		importRequest1.setAdditionalInfo(settingsMap);
+
+		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop, Collections.singletonList(importRequest1), this.testUser.getUserid());
+		Assert.assertEquals(1, savedStudies.size());
+		final StudySummary study1 = savedStudies.get(0);
+		this.verifyStudySummary(importRequest1, study1);
+		Assert.assertNotNull(study1.getAdditionalInfo());
+		// Verify invalid study variable name was not saved, but the valid ones were
+		Assert.assertEquals(importRequest1.getAdditionalInfo().size()-1, study1.getAdditionalInfo().size());
+		Assert.assertFalse(study1.getAdditionalInfo().keySet().contains(invalidVariableName));
+	}
+
+	@Test
+	public void testSaveStudy_WithInvalidStudyVariableValues() {
+		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
+		importRequest1.setStartDate("2019-01-01");
+		importRequest1.setEndDate("2020-12-31");
+		importRequest1.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
+
+		final Map<String, String> settingsMap = Maps.newHashMap();
+		settingsMap.put(this.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(), RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(this.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "2021-05-01");
+		final List<String> possibleValues = Arrays.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
+		settingsMap.put(this.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(), RandomStringUtils.randomAlphabetic(30));
+		importRequest1.setAdditionalInfo(settingsMap);
+
+		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop, Collections.singletonList(importRequest1), this.testUser.getUserid());
+		Assert.assertEquals(1, savedStudies.size());
+		final StudySummary study1 = savedStudies.get(0);
+		this.verifyStudySummary(importRequest1, study1);
+		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
+	}
+
+	@Test
+	public void testSaveStudy_WithValidVariablesHavingNonStudyDetailVariableType() {
+		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
+		importRequest1.setStartDate("2019-01-01");
+		importRequest1.setEndDate("2020-12-31");
+		importRequest1.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
+
+		final Map<String, String> settingsMap = Maps.newHashMap();
+		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.SELECTION_METHOD).getName(), RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.ENVIRONMENT_DETAIL).getName(), RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.TREATMENT_FACTOR).getName(), RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(this.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.EXPERIMENTAL_DESIGN).getName(), RandomStringUtils.randomNumeric(5));
+		final List<String> possibleValues = Arrays.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
+		settingsMap.put(this.createCategoricalVariable(VariableType.GERMPLASM_DESCRIPTOR, possibleValues).getName(), possibleValues.get(1));
+		settingsMap.put(this.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.TRAIT).getName(), "20210501");
+
+		importRequest1.setAdditionalInfo(settingsMap);
+
+		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop, Collections.singletonList(importRequest1), this.testUser.getUserid());
+		Assert.assertEquals(1, savedStudies.size());
+		final StudySummary study1 = savedStudies.get(0);
+		this.verifyStudySummary(importRequest1, study1);
+		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
 	}
 
 	private void verifyStudySummary(final TrialImportRequestDTO importRequestDTO, final StudySummary study) {
@@ -545,6 +642,32 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 			}
 		}
 	}
+
+	private CVTerm createVariableWithScale(final DataType dataType, final VariableType variableType) {
+		final CVTerm variable = this.testDataInitializer.createTrait(RandomStringUtils.randomAlphabetic(20));
+		final CVTerm scale = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
+		this.daoFactory.getCvTermRelationshipDao().save(new CVTermRelationship(TermId.HAS_SCALE.getId(), variable.getCvTermId(), scale.getCvTermId()));
+		this.daoFactory.getCvTermRelationshipDao().save(new CVTermRelationship(TermId.HAS_TYPE.getId(), scale.getCvTermId(), dataType.getId()));
+		this.daoFactory.getCvTermPropertyDao().save(new CVTermProperty(TermId.VARIABLE_TYPE.getId(), variableType.getName(), 1, variable.getCvTermId()));
+		return variable;
+	}
+
+	private CVTerm createCategoricalVariable(final VariableType variableType, final List<String> possibleValues) {
+		final CVTerm variable = this.testDataInitializer.createTrait(RandomStringUtils.randomAlphabetic(20));
+		final CVTerm scale = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
+		this.daoFactory.getCvTermRelationshipDao().save(new CVTermRelationship(TermId.HAS_SCALE.getId(), variable.getCvTermId(), scale.getCvTermId()));
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), scale.getCvTermId(), DataType.CATEGORICAL_VARIABLE
+				.getId()));
+		this.daoFactory.getCvTermPropertyDao().save(new CVTermProperty(TermId.VARIABLE_TYPE.getId(), variableType.getName(), 1, variable.getCvTermId()));
+		for (final String value : possibleValues) {
+			final CVTerm categoricalValue = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(10), value, CvId.IBDB_TERMS.getId());
+			this.daoFactory.getCvTermRelationshipDao().save(new CVTermRelationship(TermId.HAS_VALUE.getId(), scale.getCvTermId(), categoricalValue.getCvTermId()));
+		}
+		return variable;
+	}
+
+
 
 	private void createDeletedStudy() {
 		final DmsProject deletedStudy = this.testDataInitializer

@@ -11,11 +11,10 @@
 
 package org.generationcp.middleware.dao.oms;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.hibernate.Criteria;
@@ -23,9 +22,15 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link CVTermRelationship}.
@@ -374,4 +379,31 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		query.addScalar("category", CVTermRelationshipDao.STRING);
 		return query.list();
 	}
+
+	public Map<Integer, List<ValueReference>> getCategoriesForCategoricalVariables(final List<Integer> variableIds) {
+		final Map<Integer, List<ValueReference>> map = new HashMap<>();
+		final SQLQuery query = this.getSession().createSQLQuery(
+			"SELECT var.subject_id as variableId, categ.cvterm_id as categoryId, categ.name, categ.definition "
+				+ " FROM cvterm categ "
+				+ " INNER JOIN cvterm_relationship scale_values ON scale_values.object_id = categ.cvterm_id AND scale_values.type_id = " + TermId.HAS_VALUE .getId()
+				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE .getId()
+				+ " INNER JOIN cvterm_relationship dataType on dataType.subject_id = var.object_id "
+				+ "  AND dataType.type_id = " + TermId.HAS_TYPE.getId() + " AND dataType.object_id = " + DataType.CATEGORICAL_VARIABLE.getId()
+				+ " WHERE var.subject_id IN (:variableIds) ");
+		query.setParameterList("variableIds", variableIds);
+		query.addScalar("variableId");
+		query.addScalar("categoryId");
+		query.addScalar("name");
+		query.addScalar("definition");
+		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+		final List<Map<String, Object>> results = query.list();
+		for (final Map<String, Object> result : results) {
+			final Integer variableId = (Integer) result.get("variableId");
+			map.putIfAbsent(variableId, new ArrayList<>());
+			map.get(variableId).add(new ValueReference((Integer) result.get("categoryId"), (String) result.get("name"), (String) result.get("definition")));
+		}
+		return map;
+	}
+
+
 }

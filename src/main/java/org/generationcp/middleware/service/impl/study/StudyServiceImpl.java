@@ -1,7 +1,6 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import com.google.common.base.Optional;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
@@ -18,9 +17,10 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -33,13 +33,17 @@ import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.StudyExternalReference;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.Service;
+import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
+import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.EnvironmentParameter;
@@ -72,6 +76,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -93,6 +98,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Resource
 	private ExperimentModelGenerator experimentModelGenerator;
+
+	@Resource
+	private VariableDataValidatorFactory variableDataValidatorFactory;
 
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 
@@ -117,16 +125,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		StudyServiceImpl.studyIdToProgramIdCache =
 			CacheBuilder.newBuilder().expireAfterWrite(100, TimeUnit.MINUTES).build(studyKeyCacheBuilder);
 		this.daoFactory = new DaoFactory(sessionProvider);
-	}
-
-	/**
-	 * Only used for tests.
-	 *
-	 * @param trialMeasurements
-	 */
-	StudyServiceImpl(final StudyMeasurements trialMeasurements) {
-		this.studyMeasurements = trialMeasurements;
-		this.daoFactory = new DaoFactory(this.sessionProvider);
 	}
 
 	@Override
@@ -388,9 +386,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 					.collect(Collectors.toList());
 				properties.put("studyObjective", studyMetadata.getStudyObjective());
 				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(instanceId, variableIds));
-				final Map<Integer, Map<String, String>> projectPropMap = this.daoFactory.getProjectPropertyDAO().getProjectPropsAndValuesByStudyIds(
-					Collections.singletonList(studyMetadata.getNurseryOrTrialId()));
-				if(projectPropMap.containsKey(studyMetadata.getNurseryOrTrialId())) {
+				final Map<Integer, Map<String, String>> projectPropMap =
+					this.daoFactory.getProjectPropertyDAO().getProjectPropsAndValuesByStudyIds(
+						Collections.singletonList(studyMetadata.getNurseryOrTrialId()));
+				if (projectPropMap.containsKey(studyMetadata.getNurseryOrTrialId())) {
 					properties.putAll(projectPropMap.get(studyMetadata.getNurseryOrTrialId()));
 				}
 				studyDetailsDto.setAdditionalInfo(properties);
@@ -461,12 +460,13 @@ public class StudyServiceImpl extends Service implements StudyService {
 	public List<StudyInstanceDto> getStudyInstances(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 		return this.daoFactory.getDmsProjectDAO().getStudyInstances(studySearchFilter, pageable);
 	}
+
 	@Override
 	public List<StudyInstanceDto> getStudyInstancesWithMetadata(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 		try {
 			final List<StudyInstanceDto> studyInstanceDtos = this.daoFactory.getDmsProjectDAO()
 				.getStudyInstances(studySearchFilter, pageable);
-			if(!CollectionUtils.isEmpty(studyInstanceDtos)) {
+			if (!CollectionUtils.isEmpty(studyInstanceDtos)) {
 				final List<Integer> studyIds = new ArrayList<>(studyInstanceDtos.stream().map(o -> Integer.valueOf(o.getTrialDbId()))
 					.collect(Collectors.toSet()));
 				final Map<Integer, List<ObservationLevel>> observationLevelsMap = this.daoFactory.getDmsProjectDAO()
@@ -478,7 +478,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final Map<Integer, Map<String, String>> studyAdditionalInfoMap = this.daoFactory.getProjectPropertyDAO()
 					.getProjectPropsAndValuesByStudyIds(studyIds);
 
-				for(final StudyInstanceDto studyInstanceDto: studyInstanceDtos) {
+				for (final StudyInstanceDto studyInstanceDto : studyInstanceDtos) {
 					final Integer trialDbId = Integer.valueOf(studyInstanceDto.getTrialDbId());
 					final Integer studyDbId = Integer.valueOf(studyInstanceDto.getStudyDbId());
 					final List<MeasurementVariable> environmentVariables =
@@ -504,7 +504,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 					studyInstanceDto.getAdditionalInfo()
 						.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(studyDbId, variableIds));
-					if(studyAdditionalInfoMap.containsKey(trialDbId)) {
+					if (studyAdditionalInfoMap.containsKey(trialDbId)) {
 						studyInstanceDto.getAdditionalInfo().putAll(studyAdditionalInfoMap.get(trialDbId));
 					}
 
@@ -522,7 +522,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	List<MeasurementVariable> getEnvironmentVariables(
 		final Map<Integer, List<MeasurementVariable>> studyEnvironmentVariablesMap, final Integer environmentDatasetId) {
 		final List<MeasurementVariable> environmentVariables;
-		if(studyEnvironmentVariablesMap.get(environmentDatasetId) == null) {
+		if (studyEnvironmentVariablesMap.get(environmentDatasetId) == null) {
 			environmentVariables = this.daoFactory.getDmsProjectDAO()
 				.getObservationSetVariables(
 					environmentDatasetId,
@@ -545,23 +545,20 @@ public class StudyServiceImpl extends Service implements StudyService {
 		if (!CollectionUtils.isEmpty(studies)) {
 			final List<Integer> studyIds = studies.stream().map(StudySummary::getTrialDbId).collect(Collectors.toList());
 			final Map<Integer, List<ProjectProperty>> propsMap = this.daoFactory.getProjectPropertyDAO().getPropsForProjectIds(studyIds);
+			final Map<Integer, List<ValueReference>> categoricalValuesMap = this.getCategoricalValuesMap(propsMap);
 			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
 				this.daoFactory.getStudyExternalReferenceDAO().getExternalReferences(studyIds).stream().collect(groupingBy(
 					ExternalReferenceDTO::getEntityId));
-				final List<Integer> locationIds = studySearchFilter.getLocationDbId() != null ?
-					Collections.singletonList(Integer.parseInt(studySearchFilter.getLocationDbId())) :
-					Collections.emptyList();
+			final List<Integer> locationIds = studySearchFilter.getLocationDbId() != null ?
+				Collections.singletonList(Integer.parseInt(studySearchFilter.getLocationDbId())) :
+				Collections.emptyList();
 			final Map<Integer, List<InstanceMetadata>> trialInstancesMap =
 				this.daoFactory.getGeolocationDao().getInstanceMetadata(studyIds, locationIds).stream().collect(groupingBy(
 					InstanceMetadata::getTrialDbId));
 
-			final Map<Integer, Optional<DataType>> variableDataTypeMap = Maps.newHashMap();
-			final Map<Integer, String> categoricalValueMap = Maps.newHashMap();
 			for (final StudySummary studySummary : studies) {
-				// Add study settings in optionalInfo map
 				final Integer studyId = studySummary.getTrialDbId();
-				this.setStudySettings(propsMap, variableDataTypeMap, categoricalValueMap, studySummary, studyId);
-				System.out.println("studyId " + studyId + " , external references: " + externalReferencesMap.get(studyId));
+				this.retrieveStudySettings(propsMap, categoricalValuesMap, studySummary, studyId);
 				studySummary.setExternalReferences(externalReferencesMap.get(studyId.toString()));
 				studySummary
 					.setInstanceMetaData(trialInstancesMap.get(studyId));
@@ -571,31 +568,39 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return studies;
 	}
 
-	private void setStudySettings(final Map<Integer, List<ProjectProperty>> propsMap,
-		final Map<Integer, Optional<DataType>> variableDataTypeMap, final Map<Integer, String> categoricalValueMap,
+	private Map<Integer, List<ValueReference>> getCategoricalValuesMap(final Map<Integer, List<ProjectProperty>> propsMap) {
+		final List<Integer> studySettingVariableIds = new ArrayList<>();
+		propsMap.values().stream().forEach(propList -> {
+				studySettingVariableIds.addAll(propList.stream().map(ProjectProperty::getVariableId).collect(Collectors.toList()));
+			}
+		);
+		if (CollectionUtils.isEmpty(studySettingVariableIds)) {
+			return Collections.emptyMap();
+		}
+		return this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(studySettingVariableIds);
+	}
+
+	private void retrieveStudySettings(final Map<Integer, List<ProjectProperty>> propsMap,
+		final Map<Integer, List<ValueReference>> categoricalVariablesMap,
 		final StudySummary studySummary, final Integer studyId) {
 		final Map<String, String> additionalProps = Maps.newHashMap();
 		if (!CollectionUtils.isEmpty(propsMap.get(studyId))) {
 			propsMap.get(studyId).stream().forEach(prop -> {
 				final Integer variableId = prop.getVariableId();
-				variableDataTypeMap.putIfAbsent(variableId, this.ontologyVariableDataManager.getDataType(prop.getVariableId()));
-				final Optional<DataType> variableDataType = variableDataTypeMap.get(variableId);
 				String value = prop.getValue();
-				if (variableDataType.isPresent() && DataType.CATEGORICAL_VARIABLE.getId().equals(variableDataType.get().getId())
-					&& StringUtils.isNotBlank(value) && NumberUtils.isDigits(value)) {
+				if (categoricalVariablesMap.containsKey(variableId) && StringUtils.isNotBlank(value) && NumberUtils.isDigits(value)){
 					final Integer categoricalId = Integer.parseInt(value);
-					categoricalValueMap.putIfAbsent(categoricalId, this.ontologyVariableDataManager
-						.retrieveVariableCategoricalValue(studySummary.getProgramDbId(), prop.getVariableId(), categoricalId));
-					final String categoricalValue = categoricalValueMap.get(categoricalId);
-					if (!StringUtils.isEmpty(categoricalValue)) {
-						value = categoricalValue;
+					final Map<Integer, ValueReference> categoricalValues = categoricalVariablesMap.get(variableId).stream()
+						.collect(Collectors.toMap(ValueReference::getId, Function.identity()));
+					if (categoricalValues.containsKey(categoricalId)) {
+						value = categoricalValues.get(categoricalId).getDescription();
 					}
 				}
 				if (!StringUtils.isEmpty(value)) {
 					additionalProps.put(prop.getAlias(), value);
 				}
 			});
-			studySummary.setOptionalInfo(additionalProps);
+			studySummary.setAdditionalInfo(additionalProps);
 		}
 	}
 
@@ -617,84 +622,46 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<StudySummary> saveStudies(final CropType crop, final List<TrialImportRequestDTO> trialImportRequestDtoList, final Integer userId) {
+	public List<StudySummary> saveStudies(final CropType crop, final List<TrialImportRequestDTO> trialImportRequestDtoList,
+		final Integer userId) {
 		final List<String> studyIds = new ArrayList<>();
-		for (final TrialImportRequestDTO trialImportRequestDto : trialImportRequestDtoList){
-			final DmsProject study = new DmsProject();
-			final String trialDescription = trialImportRequestDto.getTrialDescription();
-			study.setDescription(trialDescription);
-			final String trialName = trialImportRequestDto.getTrialName();
-			study.setName(trialName);
-			final String programUUID = trialImportRequestDto.getProgramDbId();
-			study.setProgramUUID(programUUID);
-			final String startDate = Util.tryConvertDate(trialImportRequestDto.getStartDate(), Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
-			if (startDate != null) {
-				study.setStartDate(startDate);
+		final StudyType studyTypeByName = this.daoFactory.getStudyTypeDao().getStudyTypeByName(StudyTypeDto.TRIAL_NAME);
+		final DatasetType envDatasetType = this.daoFactory.getDatasetTypeDao().getById(DatasetTypeEnum.SUMMARY_DATA.getId());
+		final DatasetType plotDatasetType = this.daoFactory.getDatasetTypeDao().getById(DatasetTypeEnum.PLOT_DATA.getId());
+		final List<String> studyDetailVariableNames = new ArrayList<>();
+		trialImportRequestDtoList.stream().forEach(dto -> {
+				studyDetailVariableNames.addAll(dto.getAdditionalInfo().keySet().stream().map(String::toUpperCase).collect(Collectors.toList()));
 			}
-			final String endDate = Util.tryConvertDate(trialImportRequestDto.getEndDate(), Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
-			if (endDate != null) {
-				study.setEndDate(endDate);
-			}
-			// TODO verify if study_update should be filled up upon creation
-			study.setStudyUpdate(Util.getCurrentDateAsStringValue());
-			study.setCreatedBy(String.valueOf(userId));
-			study.setStudyType(this.daoFactory.getStudyTypeDao().getStudyTypeByName(StudyTypeDto.TRIAL_NAME));
-			study.setParent(new DmsProject(DmsProject.SYSTEM_FOLDER_ID));
-			study.setDeleted(false);
-			// Save study settings
-			if (!CollectionUtils.isEmpty(trialImportRequestDto.getAdditionalInfo())) {
-				final List<ProjectProperty> properties = new ArrayList<>();
-				final Map<String, Map<Integer, VariableType>> nameOrSynonymsMap = this.daoFactory.getCvTermDao()
-					.getTermIdsWithTypeByNameOrSynonyms(new ArrayList<>(trialImportRequestDto.getAdditionalInfo().keySet()),
-						CvId.VARIABLES.getId());
-				trialImportRequestDto.getAdditionalInfo().entrySet().forEach(entry -> {
-					final Map<Integer, VariableType> variableMap = nameOrSynonymsMap.get(entry.getKey().toUpperCase());
-					// TODO check if VariableType is study detail
-					if (!CollectionUtils.isEmpty(variableMap)) {
-						final Integer rank = properties.size() + 1;
-						properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(), entry.getValue(), rank, variableMap.keySet().iterator().next(),
-							"TRIAL_INSTANCE"));
-					}
-				});
-				study.setProperties(properties);
-			}
-			// Save external references
-			if (trialImportRequestDto.getExternalReferences() != null) {
-				final List<StudyExternalReference> references = new ArrayList<>();
-				trialImportRequestDto.getExternalReferences().forEach(reference -> {
-					final StudyExternalReference externalReference =
-						new StudyExternalReference(study, reference.getReferenceID(), reference.getReferenceSource());
-					references.add(externalReference);
-				});
-				study.setExternalReferences(references);
-			}
+		);
+		final Map<String, MeasurementVariable> variableNamesMap =
+			this.daoFactory.getCvTermDao().getVariablesByNamesAndVariableType(studyDetailVariableNames, VariableType.STUDY_DETAIL);
+		final Map<String, MeasurementVariable> variableSynonymsMap =
+			this.daoFactory.getCvTermDao().getVariablesBySynonymsAndVariableType(studyDetailVariableNames, VariableType.STUDY_DETAIL);
+		final List<Integer> categoricalVariableIds = new ArrayList<>();
+		categoricalVariableIds.addAll(
+			variableNamesMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+				.map(MeasurementVariable::getTermId).collect(
+				Collectors.toList()));
+		categoricalVariableIds.addAll(
+			variableSynonymsMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+				.map(MeasurementVariable::getTermId).collect(
+				Collectors.toList()));
+		final Map<Integer, List<ValueReference>> categoricalVariablesMap =
+			this.getCategoricalVariablesMap(categoricalVariableIds);
+
+		for (final TrialImportRequestDTO trialImportRequestDto : trialImportRequestDtoList) {
+			final DmsProject study = this.createStudy(userId, studyTypeByName, trialImportRequestDto);
+			this.setStudySettings(trialImportRequestDto, study, variableNamesMap, variableSynonymsMap, categoricalVariablesMap);
+			this.setStudyExternalReferences(trialImportRequestDto, study);
 			final DmsProjectDao dmsProjectDAO = this.daoFactory.getDmsProjectDAO();
-			dmsProjectDAO.save(study);
+			this.daoFactory.getDmsProjectDAO().save(study);
 
 			// Save environment and plot datasets
-			final DmsProject envDataset = new DmsProject();
-			final String envDatasetname = trialName + StudyServiceImpl.ENVIRONMENT;
-			envDataset.setName(envDatasetname);
-			final String envDatasetDescription = trialDescription + StudyServiceImpl.ENVIRONMENT;
-			envDataset.setDescription(envDatasetDescription);
-			envDataset.setProgramUUID(programUUID);
-			envDataset.setStudy(study);
-			envDataset.setDatasetType(this.daoFactory.getDatasetTypeDao().getById(DatasetTypeEnum.SUMMARY_DATA.getId()));
-			envDataset.setParent(study);
-			this.addDatasetVariables(envDataset, true);
-			dmsProjectDAO.save(envDataset);
-
-			final DmsProject plotDataset = new DmsProject();
-			final String plotDatasetname = trialName + StudyServiceImpl.PLOT;
-			plotDataset.setName(plotDatasetname);
-			final String plotDatasetDescription = trialDescription + StudyServiceImpl.PLOT;
-			plotDataset.setDescription(plotDatasetDescription);
-			plotDataset.setProgramUUID(programUUID);
-			plotDataset.setStudy(study);
-			plotDataset.setDatasetType(this.daoFactory.getDatasetTypeDao().getById(DatasetTypeEnum.PLOT_DATA.getId()));
-			plotDataset.setParent(study);
-			this.addDatasetVariables(plotDataset,false);
-			dmsProjectDAO.save(plotDataset);
+			final DmsProject envDataset =
+				this.saveDataset(study, dmsProjectDAO, StudyServiceImpl.ENVIRONMENT,
+					envDatasetType, true);
+			this.saveDataset(study, dmsProjectDAO, StudyServiceImpl.PLOT,
+				plotDatasetType, false);
 
 			this.saveTrialInstance(study, envDataset, crop);
 			studyIds.add(study.getProjectId().toString());
@@ -705,6 +672,98 @@ public class StudyServiceImpl extends Service implements StudyService {
 		filter.setTrialDbIds(studyIds);
 		return this.getStudies(filter, null);
 	}
+
+	private Map<Integer, List<ValueReference>> getCategoricalVariablesMap(final List<Integer> categoricalVariableIds) {
+		if (CollectionUtils.isEmpty(categoricalVariableIds)) {
+			return Collections.emptyMap();
+		}
+		return this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(categoricalVariableIds);
+	}
+
+	private DmsProject createStudy(final Integer userId, final StudyType studyTypeByName,
+		final TrialImportRequestDTO trialImportRequestDto) {
+		final DmsProject study = new DmsProject();
+		final String trialDescription = trialImportRequestDto.getTrialDescription();
+		study.setDescription(trialDescription);
+		final String trialName = trialImportRequestDto.getTrialName();
+		study.setName(trialName);
+		final String programUUID = trialImportRequestDto.getProgramDbId();
+		study.setProgramUUID(programUUID);
+		final String startDate =
+			Util.tryConvertDate(trialImportRequestDto.getStartDate(), Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
+		if (startDate != null) {
+			study.setStartDate(startDate);
+		}
+		final String endDate =
+			Util.tryConvertDate(trialImportRequestDto.getEndDate(), Util.FRONTEND_DATE_FORMAT, Util.DATE_AS_NUMBER_FORMAT);
+		if (endDate != null) {
+			study.setEndDate(endDate);
+		}
+		study.setStudyUpdate(Util.getCurrentDateAsStringValue());
+		study.setCreatedBy(String.valueOf(userId));
+		study.setStudyType(studyTypeByName);
+		study.setParent(new DmsProject(DmsProject.SYSTEM_FOLDER_ID));
+		study.setDeleted(false);
+		return study;
+	}
+
+	private void setStudyExternalReferences(final TrialImportRequestDTO trialImportRequestDto, final DmsProject study) {
+		if (trialImportRequestDto.getExternalReferences() != null) {
+			final List<StudyExternalReference> references = new ArrayList<>();
+			trialImportRequestDto.getExternalReferences().forEach(reference -> {
+				final StudyExternalReference externalReference =
+					new StudyExternalReference(study, reference.getReferenceID(), reference.getReferenceSource());
+				references.add(externalReference);
+			});
+			study.setExternalReferences(references);
+		}
+	}
+
+	private DmsProject saveDataset(final DmsProject study, final DmsProjectDao dmsProjectDAO, final String suffix,
+		final DatasetType datasetType, final boolean isEnvironmentDataset) {
+		final DmsProject dataset = new DmsProject();
+		final String envDatasetname = study.getName() + suffix;
+		dataset.setName(envDatasetname);
+		final String envDatasetDescription = study.getDescription() + suffix;
+		dataset.setDescription(envDatasetDescription);
+		dataset.setProgramUUID(study.getProgramUUID());
+		dataset.setStudy(study);
+		dataset.setDatasetType(datasetType);
+		dataset.setParent(study);
+		this.addDatasetVariables(dataset, isEnvironmentDataset);
+		dmsProjectDAO.save(dataset);
+		return dataset;
+	}
+
+	private void setStudySettings(final TrialImportRequestDTO trialImportRequestDto, final DmsProject study,
+		final Map<String, MeasurementVariable> variableNamesMap, final Map<String, MeasurementVariable> variableSynonymsMap,
+		final Map<Integer, List<ValueReference>> categoricalValuesMap) {
+		if (!CollectionUtils.isEmpty(trialImportRequestDto.getAdditionalInfo())) {
+			final List<ProjectProperty> properties = new ArrayList<>();
+			trialImportRequestDto.getAdditionalInfo().entrySet().forEach(entry -> {
+			final String variableName = entry.getKey().toUpperCase();
+			// Lookup variable by name first, then synonym
+			final MeasurementVariable measurementVariable =
+				variableNamesMap.containsKey(variableName) ? variableNamesMap.get(variableName) : variableSynonymsMap.get(variableName);
+			if (measurementVariable != null) {
+				measurementVariable.setValue(entry.getValue());
+				final DataType dataType = DataType.getById(measurementVariable.getDataTypeId());
+				final java.util.Optional<VariableValueValidator> dataValidator =
+					this.variableDataValidatorFactory.getValidator(dataType);
+				if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
+					measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
+				}
+				if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
+					final Integer rank = properties.size() + 1;
+					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
+						measurementVariable.getValue(), rank, measurementVariable.getTermId(), entry.getKey()));
+				}
+			}
+		});
+		study.setProperties(properties);
+	}
+
+}
 
 	private void addDatasetVariables(final DmsProject dataset, final boolean isEnvironmentDataset) {
 		final ProjectProperty datasetNameProp =
@@ -738,12 +797,14 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 		// Study Experiment
 		final ExperimentModel studyExperiment =
-			this.experimentModelGenerator.generate(crop, study.getProjectId(), java.util.Optional.of(geolocation), ExperimentType.STUDY_INFORMATION);
+			this.experimentModelGenerator
+				.generate(crop, study.getProjectId(), java.util.Optional.of(geolocation), ExperimentType.STUDY_INFORMATION);
 		this.daoFactory.getExperimentDao().save(studyExperiment);
 
 		// Environment Experiment
 		final ExperimentModel envExperiment =
-			this.experimentModelGenerator.generate(crop, environmentDataset.getProjectId(), java.util.Optional.of(geolocation), ExperimentType.TRIAL_ENVIRONMENT);
+			this.experimentModelGenerator
+				.generate(crop, environmentDataset.getProjectId(), java.util.Optional.of(geolocation), ExperimentType.TRIAL_ENVIRONMENT);
 		this.daoFactory.getExperimentDao().save(envExperiment);
 	}
 
