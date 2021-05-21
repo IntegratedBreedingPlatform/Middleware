@@ -297,6 +297,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 			this.userId, 0, 0, 20201212, 0,
 			0, mgid, null, null, method);
 		this.daoFactory.getGermplasmDao().save(germplasm);
+		this.daoFactory.getGermplasmDao().refresh(germplasm);
 
 		//Add preferred name
 		final Name name =
