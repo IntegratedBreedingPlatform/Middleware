@@ -7,6 +7,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 
 import javax.annotation.Resource;
@@ -34,7 +35,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 
 		final GermplasmTreeNode rootNode = new GermplasmTreeNode(root);
 		rootNode.setNumberOfGenerations(this.countGenerations(gid, includeDerivativeLines, level == null));
-		level = level == null? rootNode.getNumberOfGenerations() : level;
+		level = level == null ? rootNode.getNumberOfGenerations() : level;
 		if (level > 1) {
 			this.addParents(rootNode, level, root, !includeDerivativeLines);
 		}
@@ -92,10 +93,11 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		try {
 			CALCULATE_FULL.set(calculateFull);
 			GENERATIONS_COUNTER.set(1);
-			return this.getNumberOfGenerations(gid, includeDerivativeLine);
+			final Germplasm root = this.germplasmService.getGermplasmWithPreferredName(gid);
+			return this.getNumberOfGenerations(root, includeDerivativeLine);
 		} catch (final MaxPedigreeLevelReachedException e) {
 			return GENERATIONS_COUNTER.get();
-		}finally {
+		} finally {
 			GENERATIONS_COUNTER.remove();
 			CALCULATE_FULL.remove();
 		}
@@ -192,31 +194,30 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	 * @param level
 	 * @return the given GermplasmTreeNode with its parents added to it
 	 */
-	private GermplasmTreeNode addParents(final GermplasmTreeNode node, final int level, final Germplasm germplasmOfNode,
+	private GermplasmTreeNode addParents(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
 		final boolean excludeDerivativeLines) {
 		if (level != 1) {
-			final Integer maleGid = germplasmOfNode.getGpid2();
-			final Integer femaleGid = germplasmOfNode.getGpid1();
-			if (germplasmOfNode.getGnpgs() == -1) {
+			final int maleGid = germplasm.getMaleParent() == null ? 0 : germplasm.getMaleParent().getGid();
+			final int femaleGid = germplasm.getFemaleParent() == null ? 0 : germplasm.getFemaleParent().getGid();
+			if (germplasm.getGnpgs() == -1) {
 				if (excludeDerivativeLines) {
 					// get and add the source germplasm
-					final Germplasm parent = this.germplasmService.getGermplasmWithPreferredName(femaleGid);
-					if (parent != null) {
-						this.addNodeForKnownParents(node, level, parent, true);
+					if (germplasm.getFemaleParent() != null) {
+						this.addNodeForKnownParents(node, level, germplasm.getFemaleParent(), true);
 					}
 				} else {
 					// Get and add the source germplasm, if it is unknown
 					if (maleGid != 0) {
-						this.addMaleParentNode(node, level, maleGid, false);
+						this.addMaleParentNode(node, level, germplasm.getMaleParent(), false);
 						// Use female parent to continue traversal if source is unknown
 					} else if (femaleGid != 0) {
 						node.setMaleParentNode(this.createUnknownParent());
-						this.addFemaleParentNode(node, level, femaleGid, false);
+						this.addFemaleParentNode(node, level, germplasm.getFemaleParent(), false);
 					}
 				}
-			} else if (germplasmOfNode.getGnpgs() >= 2) {
+			} else if (germplasm.getGnpgs() >= 2) {
 				// Get and add female and male parents for generative germplasm
-				this.addNodeForParents(node, level, germplasmOfNode, excludeDerivativeLines);
+				this.addNodeForParents(node, level, germplasm, excludeDerivativeLines);
 			}
 		}
 		return node;
@@ -226,11 +227,11 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		final boolean excludeDerivativeLines) {
 		// For generative germplasm, do not add any node if both parents are UNKNOWN (GID=0)
 		if (!(germplasm.getGpid1() == 0 && germplasm.getGpid2() == 0)) {
-			this.addFemaleParentNode(node, level, germplasm.getGpid1(), excludeDerivativeLines);
+			this.addFemaleParentNode(node, level, germplasm.getFemaleParent(), excludeDerivativeLines);
 			if (germplasm.getGpid2() == 0) {
 				node.setMaleParentNode(this.createUnknownParent());
 			} else {
-				this.addMaleParentNode(node, level, germplasm.getGpid2(), excludeDerivativeLines);
+				this.addMaleParentNode(node, level, germplasm.getMaleParent(), excludeDerivativeLines);
 			}
 
 			// If there are more parents, get and add each of them
@@ -247,26 +248,25 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 
 	private void addNodeForKnownParents(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
 		final boolean excludeDerivativeLines) {
-		this.addFemaleParentNode(node, level, germplasm.getGpid1(), excludeDerivativeLines);
-		this.addMaleParentNode(node, level, germplasm.getGpid2(), excludeDerivativeLines);
+		this.addFemaleParentNode(node, level, germplasm.getFemaleParent(), excludeDerivativeLines);
+		this.addMaleParentNode(node, level, germplasm.getMaleParent(), excludeDerivativeLines);
 	}
 
-	private void addMaleParentNode(final GermplasmTreeNode node, final int level, final Integer gid, final boolean excludeDerivativeLines) {
-		final Germplasm maleParent = this.germplasmService.getGermplasmWithPreferredName(gid);
-		if (maleParent != null) {
-			final GermplasmTreeNode maleParentNode = new GermplasmTreeNode(maleParent);
+	private void addMaleParentNode(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
+		final boolean excludeDerivativeLines) {
+		if (germplasm != null) {
+			final GermplasmTreeNode maleParentNode = new GermplasmTreeNode(germplasm);
 			node.setMaleParentNode(maleParentNode);
-			this.addParents(maleParentNode, level - 1, maleParent, excludeDerivativeLines);
+			this.addParents(maleParentNode, level - 1, germplasm, excludeDerivativeLines);
 		}
 	}
 
-	private void addFemaleParentNode(final GermplasmTreeNode node, final int level, final Integer gid,
+	private void addFemaleParentNode(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
 		final boolean excludeDerivativeLines) {
-		final Germplasm femaleParent = this.germplasmService.getGermplasmWithPreferredName(gid);
-		if (femaleParent != null) {
-			final GermplasmTreeNode femaleParentNode = new GermplasmTreeNode(femaleParent);
+		if (germplasm != null) {
+			final GermplasmTreeNode femaleParentNode = new GermplasmTreeNode(germplasm);
 			node.setFemaleParentNode(femaleParentNode);
-			this.addParents(femaleParentNode, level - 1, femaleParent, excludeDerivativeLines);
+			this.addParents(femaleParentNode, level - 1, germplasm, excludeDerivativeLines);
 		}
 	}
 
@@ -274,28 +274,25 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		return new GermplasmTreeNode(0, Name.UNKNOWN, null, null, null);
 	}
 
-	public Integer getNumberOfGenerations(final Integer gid, final Boolean includeDerivativeLine) {
+	public Integer getNumberOfGenerations(final Germplasm germplasm, final Boolean includeDerivativeLine) {
 		Integer maxPedigreeLevel = 0;
 
-		if (gid == null || gid == 0) {
+		if (germplasm == null || germplasm.getGid() == 0) {
 			return maxPedigreeLevel;
 		}
 
-		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
-
 		if (germplasm.getGnpgs() == -1) {
 			if (!includeDerivativeLine) {
-				maxPedigreeLevel = this.getMaxGenerationCountFromParent(germplasm.getGpid1(), false);
+				maxPedigreeLevel = this.getMaxGenerationCountFromParent(germplasm.getFemaleParent(), false);
 			} else {
-				maxPedigreeLevel = this.getMaxGenerationCountFromParent(germplasm.getGpid2(), true);
+				maxPedigreeLevel = this.getMaxGenerationCountFromParent(germplasm.getMaleParent(), true);
 			}
 		} else if (germplasm.getGnpgs() >= 2) {
-			maxPedigreeLevel = this.getMaxGenerationCountFromBothParents(gid, includeDerivativeLine);
+			maxPedigreeLevel = this.getMaxGenerationCountFromBothParents(germplasm, includeDerivativeLine);
 			if (germplasm.getGnpgs() > 2) {
-				final List<Germplasm> otherParents =
-					this.germplasmService.getProgenitorsWithPreferredName(gid);
-				for (final Germplasm otherParent : otherParents) {
-					maxPedigreeLevel = Math.max(maxPedigreeLevel, this.getGenerationsCount(otherParent.getGid(), includeDerivativeLine));
+				for (final Progenitor progenitor : germplasm.getOtherProgenitors()) {
+					maxPedigreeLevel =
+						Math.max(maxPedigreeLevel, this.getGenerationsCount(progenitor.getProgenitorGermplasm(), includeDerivativeLine));
 				}
 
 			}
@@ -316,35 +313,33 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	}
 
 	private Integer getMaxGenerationCountFromBothParents(
-		final Integer gid, final boolean includeDerivativeLine) {
+		final Germplasm germplasm, final boolean includeDerivativeLine) {
 		final int currentPedigreeCount = GENERATIONS_COUNTER.get();
 
-		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
-
-		final Integer numOfPedigreeFromParent1 = this.getGenerationsCount(germplasm.getGpid1(), includeDerivativeLine);
+		final Integer numOfPedigreeFromParent1 = this.getGenerationsCount(germplasm.getFemaleParent(), includeDerivativeLine);
 		GENERATIONS_COUNTER.set(currentPedigreeCount);
-		final Integer numOfPedigreeFromParent2 = this.getGenerationsCount(germplasm.getGpid2(), includeDerivativeLine);
+		final Integer numOfPedigreeFromParent2 = this.getGenerationsCount(germplasm.getMaleParent(), includeDerivativeLine);
 
 		return Math.max(numOfPedigreeFromParent1, numOfPedigreeFromParent2);
 	}
 
-	private Integer getGenerationsCount(final Integer parentId, final boolean includeDerivativeLine) {
-		if (parentId != null) {
+	private Integer getGenerationsCount(final Germplasm germplasm, final boolean includeDerivativeLine) {
+		if (germplasm != null) {
 			this.incrementGenerationsCounter();
-			return this.getNumberOfGenerations(parentId, includeDerivativeLine);
+			return this.getNumberOfGenerations(germplasm, includeDerivativeLine);
 		}
 		return 0;
 	}
 
-	private Integer getMaxGenerationCountFromParent(final Integer parentId, final boolean includeDerivativeLines) {
-		if (parentId == 0) {
+	private Integer getMaxGenerationCountFromParent(final Germplasm germplasm, final boolean includeDerivativeLines) {
+		if (germplasm == null || germplasm.getGid() == 0) {
 			return 0;
 		}
 		if (!includeDerivativeLines) {
-			return this.getMaxGenerationCountFromBothParents(parentId, false);
+			return this.getMaxGenerationCountFromBothParents(germplasm, false);
 		} else {
 			this.incrementGenerationsCounter();
-			return this.getNumberOfGenerations(parentId, true);
+			return this.getNumberOfGenerations(germplasm, true);
 		}
 	}
 
