@@ -75,14 +75,6 @@ public interface WorkbenchDataManager {
 	Project getProjectByUuid(String projectUuid);
 
 	/**
-	 * Gets the list of projects for specified crop.
-	 *
-	 * @param cropType - the crop for which its program will be retrieved
-	 * @return the projects for given crop type
-	 */
-	List<Project> getProjectsByCrop(CropType cropType);
-
-	/**
 	 * Gets the list of Projects that the specified User is associated with.
 	 *
 	 * @param cropName - the Crop Name associated with the projects to be retrieved
