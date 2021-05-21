@@ -513,7 +513,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		externalReference.setReferenceSource(RandomStringUtils.randomAlphabetic(20));
 		importRequest2.setExternalReferences(Collections.singletonList(externalReference));
 
-		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop, Arrays.asList(importRequest1, importRequest2), this.testUser.getUserid());
+		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop.getCropName(), Arrays.asList(importRequest1, importRequest2), this.testUser.getUserid());
 		Assert.assertEquals(2, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
@@ -542,7 +542,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		settingsMap.put(this.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "20210501");
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop, Collections.singletonList(importRequest1), this.testUser.getUserid());
+		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
@@ -568,7 +568,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		settingsMap.put(this.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(), RandomStringUtils.randomAlphabetic(30));
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop, Collections.singletonList(importRequest1), this.testUser.getUserid());
+		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
@@ -595,7 +595,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop, Collections.singletonList(importRequest1), this.testUser.getUserid());
+		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);

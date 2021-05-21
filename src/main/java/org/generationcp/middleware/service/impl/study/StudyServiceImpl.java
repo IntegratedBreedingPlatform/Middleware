@@ -20,7 +20,6 @@ import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -30,6 +29,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
+import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.StudyExternalReference;
@@ -101,6 +101,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Resource
 	private VariableDataValidatorFactory variableDataValidatorFactory;
+
+	@Resource
+	private WorkbenchDataManager workbenchDataManager;
 
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 
@@ -622,8 +625,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<StudySummary> saveStudies(final CropType crop, final List<TrialImportRequestDTO> trialImportRequestDtoList,
-		final Integer userId) {
+	public List<StudySummary> saveStudies(final String cropName, final List<TrialImportRequestDTO> trialImportRequestDtoList, final Integer userId) {
+		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 		final List<String> studyIds = new ArrayList<>();
 		final StudyType studyTypeByName = this.daoFactory.getStudyTypeDao().getStudyTypeByName(StudyTypeDto.TRIAL_NAME);
 		final DatasetType envDatasetType = this.daoFactory.getDatasetTypeDao().getById(DatasetTypeEnum.SUMMARY_DATA.getId());
@@ -663,7 +666,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			this.saveDataset(study, dmsProjectDAO, StudyServiceImpl.PLOT,
 				plotDatasetType, false);
 
-			this.saveTrialInstance(study, envDataset, crop);
+			this.saveTrialInstance(study, envDataset, cropType);
 			studyIds.add(study.getProjectId().toString());
 		}
 		// Unless the session is flushed, the latest changes are not reflected in DTOs returned by method
