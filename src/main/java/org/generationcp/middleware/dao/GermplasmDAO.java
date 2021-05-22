@@ -1975,7 +1975,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 			return isNewParentANodeDescendant(path, newParents, node, level, maxRecursiveQueries);
 		} catch (final HibernateException e) {
-			final String message = "Error with isNewParentANodeChildren" + e.getMessage();
+			final String message = "Error with isNewParentANodeDescendant" + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
