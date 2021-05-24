@@ -25,6 +25,7 @@ import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
+import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
@@ -48,6 +49,7 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
@@ -67,7 +69,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 
@@ -82,8 +83,6 @@ import static org.hamcrest.core.IsNot.not;
 import static org.junit.Assert.assertNotNull;
 
 public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
-
-	private static final Integer CREATED_BY = new Random().nextInt();
 
 	public static final String separator = "-";
 	private static final String parent1Name = "CML502";
@@ -115,6 +114,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	private ProgenitorDAO progenitorDAO;
 
 	private Project commonTestProject;
+
+	private CVTermDao cvTermDao;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
@@ -178,6 +179,12 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			this.keySequenceRegisterDAO = new KeySequenceRegisterDAO();
 			this.keySequenceRegisterDAO.setSession(this.sessionProvder.getSession());
 		}
+
+		if (this.cvTermDao == null) {
+			this.cvTermDao = new CVTermDao();
+			this.cvTermDao.setSession(this.sessionProvder.getSession());
+		}
+
 
 		this.cropType = new CropType();
 		this.cropType.setUseUUID(false);
@@ -1226,21 +1233,23 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasm, is(equalTo(germplasmDB)));
 		assertThat(germplasmDB, is(notNullValue()));
 
-		final UserDefinedField userdefinedField = this.createUserdefinedField("ATRIBUTS", "PASSPORT", "TEST_ATT");
-		assertThat(userdefinedField.getFldno(), is(notNullValue()));
+		final CVTerm cvTerm = new CVTerm();
+		cvTerm.setName(RandomStringUtils.randomAlphabetic(50));
+		cvTerm.setCv(1040);
+		cvTerm.setIsObsolete(false);
+		cvTerm.setIsRelationshipType(false);
+		this.cvTermDao.save(cvTerm);
+		this.sessionProvder.getSession().flush();
+		this.cvTermDao.refresh(cvTerm);
 
-		final UserDefinedField userdefinedFieldDB = this.userDefinedFieldDAO.getById(userdefinedField.getFldno());
-		assertThat(userdefinedFieldDB, is(notNullValue()));
-		assertThat(userdefinedField, is(equalTo(userdefinedFieldDB)));
-
-		final Attribute attr = this.createAttribute(germplasmDB, userdefinedFieldDB, attributeVal);
+		final Attribute attr = this.createAttribute(germplasmDB, cvTerm, attributeVal);
 		assertThat(attr.getAid(), is(notNullValue()));
 
 		final Attribute attrDB = this.germplasmDataManager.getAttributeById(attr.getAid());
 		assertThat(attrDB, is(notNullValue()));
 		assertThat(attr, is(equalTo(attrDB)));
 
-		final String attributeValue = this.germplasmDataManager.getAttributeValue(germplasmDB.getGid(), userdefinedField.getFcode());
+		final String attributeValue = this.germplasmDataManager.getAttributeValue(germplasmDB.getGid(), cvTerm.getCvTermId());
 		assertThat(attributeValue, is(notNullValue()));
 		assertThat(attributeVal, is(attributeValue));
 	}
@@ -1291,11 +1300,11 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(name1.getNval(), names.get(0));
 	}
 
-	private Attribute createAttribute(final Germplasm germplasm, final UserDefinedField userDefinedField, final String aval) {
+	private Attribute createAttribute(final Germplasm germplasm, final CVTerm variable, final String aval) {
 		final Attribute attr = new Attribute();
 		attr.setAid(1);
 		attr.setGermplasmId(germplasm.getGid());
-		attr.setTypeId(userDefinedField.getFldno());
+		attr.setTypeId(variable.getCvTermId());
 		attr.setAval(aval);
 		attr.setLocationId(0);
 		attr.setReferenceId(null);

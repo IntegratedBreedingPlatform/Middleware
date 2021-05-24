@@ -1124,10 +1124,10 @@ public interface GermplasmDataManager {
 
 	/**
 	 * @param gid
-	 * @param attributeName
-	 * @return Attribute value that matches with attribute name and gid
+	 * @param variableId
+	 * @return Attribute value that matches with variableId and gid
 	 */
-	String getAttributeValue(final Integer gid, final String attributeName);
+	String getAttributeValue(final Integer gid, final Integer variableId);
 
 	void save(Germplasm germplasm);
 

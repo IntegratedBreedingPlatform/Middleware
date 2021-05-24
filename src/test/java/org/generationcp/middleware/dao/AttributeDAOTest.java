@@ -3,8 +3,8 @@ package org.generationcp.middleware.dao;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -127,14 +127,6 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		attributes = this.attributeDao.getByGID(this.gids.get(2));
 		Assert.assertNotNull(attributes);
 		Assert.assertTrue(attributes.isEmpty());
-	}
-	
-	@Test
-	public void testGetAttribute() {
-		final String fcode = this.testAttributeTypes.get(0).getFcode();
-		Assert.assertNotNull(this.attributeDao.getAttribute(this.gids.get(0), fcode));
-		Assert.assertNotNull(this.attributeDao.getAttribute(this.gids.get(1), fcode));
-		Assert.assertNull(this.attributeDao.getAttribute(this.gids.get(2), fcode));
 	}
 
 	@Test
