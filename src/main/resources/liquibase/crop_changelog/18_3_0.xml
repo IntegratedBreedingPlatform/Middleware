@@ -74,7 +74,7 @@
 			);
 
 			INSERT INTO udflds_attributes_bkp (fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid, cvterm_name, method_id, variable_type_id)
-			SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid, CONCAT(fcode, '_A', SUBSTRING(ftype, 1, 1), '_text'), IF(ftype = 'PASSPORT', 4032, 4031), IF(ftype = 'PASSPORT', 1813, 1814)
+			SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid, CONCAT(REPLACE(fcode, ' ', ''), '_A', SUBSTRING(ftype, 1, 1), '_text'), IF(ftype = 'PASSPORT', 4032, 4031), IF(ftype = 'PASSPORT', 1813, 1814)
 			FROM udflds WHERE ftable = 'ATRIBUTS' AND ftype IN ('ATTRIBUTE', 'PASSPORT', 'METHOD');
 
 			CREATE TEMPORARY TABLE new_properties
