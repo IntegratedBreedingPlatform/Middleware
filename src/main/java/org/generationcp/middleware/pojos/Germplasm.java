@@ -118,7 +118,7 @@ import java.util.stream.Collectors;
 @XmlType(propOrder = {"gid", "gnpgs", "gpid1", "gpid2", "gdate"})
 @XmlAccessorType(XmlAccessType.NONE)
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "germplsm")
-public class Germplasm implements Serializable, Cloneable {
+public class Germplasm extends AbstractEntity implements Serializable, Cloneable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -272,10 +272,6 @@ public class Germplasm implements Serializable, Cloneable {
 	@Column(name = "gpid2")
 	@XmlElement(name = "secondParent")
 	private Integer gpid2;
-
-	@Basic(optional = false)
-	@Column(name = "germuid")
-	private Integer userId;
 
 	@Basic(optional = false)
 	@Column(name = "lgid")
@@ -497,21 +493,22 @@ public class Germplasm implements Serializable, Cloneable {
 	@Transient
 	private String immediateSourceGID = null;
 
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
 	public Germplasm() {
-		super();
 		this.deleted = false;
 	}
 
 	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
-		final Integer userId, final Integer lgid, final Integer locationId, final Integer gdate, final Integer referenceId,
+		final Integer lgid, final Integer locationId, final Integer gdate, final Integer referenceId,
 		final Integer grplce, final Integer mgid, final Name preferredName, final String preferredAbbreviation, final Method method) {
-		this();
+		this(gid);
 		this.gid = gid;
 		this.methodId = methodId;
 		this.gnpgs = gnpgs;
 		this.gpid1 = gpid1;
 		this.gpid2 = gpid2;
-		this.userId = userId;
 		this.lgid = lgid;
 		this.locationId = locationId;
 		this.gdate = gdate;
@@ -525,12 +522,14 @@ public class Germplasm implements Serializable, Cloneable {
 	}
 
 	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
-		final Integer userId, final Integer lgid, final Integer locationId, final Integer gdate, final Name preferredName) {
+		final Integer lgid, final Integer locationId, final Integer gdate, final Name preferredName) {
 
 		// gref =0, grplce = 0, mgid = 0
-		this(gid, methodId, gnpgs, gpid1, gpid2, userId, lgid, locationId, gdate, 0, 0, 0, preferredName, null, null);
+		this(gid, methodId, gnpgs, gpid1, gpid2, lgid, locationId, gdate, 0, 0, 0, preferredName, null, null);
 	}
 
+	//TODO: cleanup - remove it.
+	@Deprecated
 	public Germplasm(final Integer gid) {
 		this.gid = gid;
 	}
@@ -621,14 +620,6 @@ public class Germplasm implements Serializable, Cloneable {
 
 	public void setMethodId(final Integer methodId) {
 		this.methodId = methodId;
-	}
-
-	public Integer getUserId() {
-		return this.userId;
-	}
-
-	public void setUserId(final Integer userId) {
-		this.userId = userId;
 	}
 
 	public Integer getLocationId() {
@@ -736,8 +727,8 @@ public class Germplasm implements Serializable, Cloneable {
 		builder.append(this.gpid1);
 		builder.append(", gpid2=");
 		builder.append(this.gpid2);
-		builder.append(", userId=");
-		builder.append(this.userId);
+		builder.append(", createdBy=");
+		builder.append(super.getCreatedBy());
 		builder.append(", lgid=");
 		builder.append(this.lgid);
 		builder.append(", locationId=");
@@ -1033,7 +1024,7 @@ public class Germplasm implements Serializable, Cloneable {
 			germplasm = (Germplasm) super.clone();
 		} catch (final CloneNotSupportedException e) {
 			germplasm = new Germplasm(this.gid, this.methodId, this.gnpgs, this.gpid1, this.gpid2,
-				this.userId, this.lgid, this.locationId, this.gdate, this.preferredName);
+				this.lgid, this.locationId, this.gdate, this.preferredName);
 			germplasm.setMethod((Method) this.method.clone());
 			//TODO Complete with other objects
 		}
