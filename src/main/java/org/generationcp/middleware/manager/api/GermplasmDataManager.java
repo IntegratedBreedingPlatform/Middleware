@@ -992,24 +992,6 @@ public interface GermplasmDataManager {
 	Germplasm getGermplasmByLocalGid(Integer lgid);
 
 	/**
-	 * * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasm.GermplasmService#getPlotCodeField()}
-	 *
-	 * @return the UDFLD table record that represents "plot code": ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE. If no record matching
-	 * these critria is found, an empty record with fldno=0 is returned. Never returns null.
-	 */
-	@Deprecated
-	UserDefinedField getPlotCodeField();
-
-	/**
-	 * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasm.GermplasmService#getPlotCodeValue(Integer)}
-	 *
-	 * Returns value of the plot code (seed source) where the germplasm was created, identified by the given gid. Returns "Unknown" if plot
-	 * code attribute is not present. Never returns null.
-	 */
-	@Deprecated
-	String getPlotCodeValue(Integer gid);
-
-	/**
 	 * Enables us to query the udflds table
 	 *
 	 * @param table the ftable value

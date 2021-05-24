@@ -16,17 +16,17 @@ import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
-import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +50,6 @@ import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.hasItem;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
@@ -91,6 +90,9 @@ public class GermplasmServiceImplTest {
 	private BibrefDAO bibrefDAO;
 
 	@Mock
+	private OntologyDataManager ontologyDataManager;
+
+	@Mock
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Captor
@@ -121,6 +123,7 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.daoFactory.getBibrefDAO()).thenReturn(this.bibrefDAO);
 
 		this.germplasmService.setWorkbenchDataManager(this.workbenchDataManager);
+		this.germplasmService.setOntologyDataManager(ontologyDataManager);
 
 	}
 
@@ -140,12 +143,12 @@ public class GermplasmServiceImplTest {
 		assertThat("getPlotCodeValue() should never return null.", plotCode1, is(notNullValue()));
 		assertThat("Expected `Unknown` returned when there is no plot code attribute present.", "Unknown", is(plotCode1));
 		// Now setup data so that gid has plot code attribute associated with it.
-		final UserDefinedField udfld = Mockito.mock(UserDefinedField.class);
-		Mockito.when(udfld.getFcode()).thenReturn(GermplasmServiceImpl.PLOT_CODE);
+		final Term plotCodeVariable = Mockito.mock(Term.class);
+		Mockito.when(plotCodeVariable.getName()).thenReturn(GermplasmServiceImpl.PLOT_CODE);
 
-		Mockito.when(partiallyMockedUnit.getPlotCodeField()).thenReturn(udfld);
+		Mockito.when(partiallyMockedUnit.getPlotCodeField()).thenReturn(plotCodeVariable);
 		final Attribute plotCodeAttr = new Attribute();
-		plotCodeAttr.setTypeId(udfld.getFldno());
+		plotCodeAttr.setTypeId(plotCodeVariable.getId());
 		plotCodeAttr.setAval("The PlotCode Value");
 		attributes.add(plotCodeAttr);
 		Mockito.when(partiallyMockedUnit.getAttributesByGID(GID)).thenReturn(attributes);
@@ -175,9 +178,9 @@ public class GermplasmServiceImplTest {
 		ReflectionTestUtils.setField(partiallyMockedUnit, "daoFactory", this.daoFactory);
 
 		//Mock GermplasmServiceImpl#getPlotCodeField);
-		final UserDefinedField userDefinedField = Mockito.mock(UserDefinedField.class);
-		Mockito.when(userDefinedField.getFldno()).thenReturn(FIELD_NUMBER);
-		Mockito.doReturn(userDefinedField).when(partiallyMockedUnit).getPlotCodeField();
+		final Term term = Mockito.mock(Term.class);
+		Mockito.when(term.getId()).thenReturn(FIELD_NUMBER);
+		Mockito.doReturn(term).when(partiallyMockedUnit).getPlotCodeField();
 
 		final Map<Integer, String> plotCodeValues = partiallyMockedUnit.getPlotCodeValues(ImmutableSet.of(GID, unknownPlotCodeGid));
 		assertNotNull(plotCodeValues);
@@ -199,25 +202,12 @@ public class GermplasmServiceImplTest {
 
 	@Test
 	public void test_getPlotCodeField_OK() {
-		final UserDefinedField userDefinedField = Mockito.mock(UserDefinedField.class);
-		Mockito.when(userDefinedField.getFcode()).thenReturn(GermplasmServiceImpl.PLOT_CODE);
-		this.mockUserDefinedFieldDAOGetByFieldTableNameAndType(userDefinedField);
+		final Term plotCodeMock = Mockito.mock(Term.class);
+		Mockito.when(plotCodeMock.getName()).thenReturn(GermplasmServiceImpl.PLOT_CODE);
+		this.mockOntologyServiceFindByName(plotCodeMock);
 
-		final UserDefinedField actualPlotCodeField = this.germplasmService.getPlotCodeField();
-		assertThat(actualPlotCodeField, is(userDefinedField));
-
-		this.verifyUserDefinedFieldDAOGetByFieldTableNameAndType();
-	}
-
-	@Test
-	public void test_getPlotCodeField_NoPlotCodeNotAttrAssociated_OK() {
-		this.mockUserDefinedFieldDAOGetByFieldTableNameAndType(Mockito.mock(UserDefinedField.class));
-
-		final UserDefinedField actualPlotCodeField = this.germplasmService.getPlotCodeField();
-		assertNotNull(actualPlotCodeField);
-		assertThat(actualPlotCodeField.getFldno(), is(0));
-
-		this.verifyUserDefinedFieldDAOGetByFieldTableNameAndType();
+		final Term actualPlotCodeVariable = this.germplasmService.getPlotCodeField();
+		assertThat(actualPlotCodeVariable, is(plotCodeMock));
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
@@ -305,17 +295,9 @@ public class GermplasmServiceImplTest {
 		Mockito.verify(this.bibrefDAO, Mockito.times(1)).save(Mockito.any());
 	}
 
-	private void mockUserDefinedFieldDAOGetByFieldTableNameAndType(final UserDefinedField userDefinedField) {
-		Mockito.when(this.userDefinedFieldDAO.getByFieldTableNameAndType(ArgumentMatchers.eq(UDTableType.ATRIBUTS_PASSPORT.getTable()),
-			ArgumentMatchers.anySet())).thenReturn(Collections.singletonList(userDefinedField));
-	}
-
-	private void verifyUserDefinedFieldDAOGetByFieldTableNameAndType() {
-		Mockito.verify(this.userDefinedFieldDAO).getByFieldTableNameAndType(ArgumentMatchers.eq(UDTableType.ATRIBUTS_PASSPORT.getTable()),
-			this.stringSetArgumentCaptor.capture());
-		final Set<String> actualFieldTypes = this.stringSetArgumentCaptor.getValue();
-		assertThat(actualFieldTypes.size(), is(1));
-		assertThat(actualFieldTypes, hasItem(UDTableType.ATRIBUTS_PASSPORT.getType()));
+	private void mockOntologyServiceFindByName(final Term term) {
+		Mockito.when(this.ontologyDataManager.findTermByName(ArgumentMatchers.eq("PLOTCODE_AP_text"),
+			ArgumentMatchers.eq(1040))).thenReturn(term);
 	}
 
 	private GermplasmImportDTO createGermplasmImportDto() {

@@ -56,7 +56,6 @@ import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import uk.co.jemos.podam.api.PodamFactory;
@@ -728,57 +727,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		for (final UserDefinedField u : userDefineField) {
 			Debug.println(IntegrationTestBase.INDENT, u);
 		}
-	}
-
-	@Test
-	public void testGetPlotCodeField() {
-		final UserDefinedField plotCodeField = this.germplasmDataManager.getPlotCodeField();
-		// Should never return null no matter whether the plot code UDFLD is present in the target database or not.
-		assertThat("GermplasmDataManager.getPlotCodeField() should never return null.", plotCodeField, is(notNullValue()));
-		if (plotCodeField.getFldno() != 0) {
-			// Non-zero fldno is a case where the UDFLD table has a record matching ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE
-			// Usually the id of this record is 1552. Not asserting as we dont want tests to depend on primary key values to be exact.
-			assertThat("ATRIBUTS", is(equalTo(plotCodeField.getFtable())));
-			assertThat("PASSPORT", is(equalTo(plotCodeField.getFtype())));
-			assertThat("PLOTCODE", is(equalTo(plotCodeField.getFcode())));
-
-		}
-	}
-
-	@Test
-	public void testGetPlotCodeValue() {
-		final GermplasmDataManagerImpl unitToTest = new GermplasmDataManagerImpl();
-
-		// We want to mock away calls to other methods in same unit.
-		final GermplasmDataManagerImpl partiallyMockedUnit = Mockito.spy(unitToTest);
-		final Integer testGid = 1;
-
-		// First set up data such that no plot code attribute is associated.
-		Mockito.doReturn(null).when(partiallyMockedUnit).getPlotCodeField();
-		final List<Attribute> attributes = new ArrayList<Attribute>();
-		Mockito.doReturn(attributes).when(partiallyMockedUnit).getAttributesByGID(Matchers.anyInt());
-
-		final String plotCode1 = partiallyMockedUnit.getPlotCodeValue(testGid);
-		assertThat("getPlotCodeValue() should never return null.", plotCode1, is(notNullValue()));
-		assertThat("Expected `Unknown` returned when there is no plot code attribute present.", "Unknown", is(equalTo(plotCode1)));
-		// Now setup data so that gid has plot code attribute associated with it.
-		final UserDefinedField udfld = new UserDefinedField();
-		udfld.setFldno(1152);
-		udfld.setFtable("ATRIBUTS");
-		udfld.setFtype("PASSPORT");
-		udfld.setFcode("PLOTCODE");
-
-		Mockito.when(partiallyMockedUnit.getPlotCodeField()).thenReturn(udfld);
-		final Attribute plotCodeAttr = new Attribute();
-		plotCodeAttr.setTypeId(udfld.getFldno());
-		plotCodeAttr.setAval("The PlotCode Value");
-		attributes.add(plotCodeAttr);
-		Mockito.when(partiallyMockedUnit.getAttributesByGID(testGid)).thenReturn(attributes);
-
-		final String plotCode2 = partiallyMockedUnit.getPlotCodeValue(testGid);
-		assertThat("getPlotCodeValue() should never return null.", plotCode2, is(notNullValue()));
-		assertThat("Expected value of plot code attribute returned when plot code attribute is present.", plotCodeAttr.getAval(),
-			is(equalTo(plotCode2)));
 	}
 
 	@Test

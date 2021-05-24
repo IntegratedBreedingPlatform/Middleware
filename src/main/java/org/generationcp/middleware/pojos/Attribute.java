@@ -29,7 +29,7 @@ import java.io.Serializable;
  * @author klmanansala
  */
 @NamedQueries({@NamedQuery(name = "getAttributesByGID",
-		query = "FROM Attribute a WHERE a.germplasmId = :gid AND a.typeId <> 9999 AND a.typeId <> 999")})
+	query = "FROM Attribute a WHERE a.germplasmId = :gid ")})
 @Entity
 @Table(name = "atributs")
 public class Attribute extends AbstractEntity implements Serializable {

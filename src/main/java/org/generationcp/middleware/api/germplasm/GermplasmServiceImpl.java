@@ -2,7 +2,6 @@ package org.generationcp.middleware.api.germplasm;
 
 import com.google.common.base.Functions;
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
@@ -32,10 +31,13 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportD
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
@@ -89,7 +91,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		RECURSIVE
 	}
 
-	public static final String PLOT_CODE = "PLOTCODE";
+
+	public static final String PLOT_CODE = "PLOTCODE_AP_text";
 
 	private static final String DEFAULT_BIBREF_FIELD = "-";
 	public static final String PROGENITOR_1 = "PROGENITOR 1";
@@ -103,6 +106,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmListService germplasmListService;
+
+	@Autowired
+	private OntologyDataManager ontologyDataManager;
 
 	@Autowired
 	private UserService userService;
@@ -129,10 +135,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public String getPlotCodeValue(final Integer gid) {
-		final UserDefinedField plotCodeAttribute = this.getPlotCodeField();
+		final Term plotCodeVariable = this.getPlotCodeField();
 		final Optional<Attribute> plotCode = this.getAttributesByGID(gid)
 			.stream()
-			.filter(attribute -> attribute.getTypeId().equals(plotCodeAttribute.getFldno()))
+			.filter(attribute -> attribute.getTypeId().equals(plotCodeVariable.getId()))
 			.findFirst();
 		if (plotCode.isPresent()) {
 			return plotCode.get().getAval();
@@ -143,9 +149,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public Map<Integer, String> getPlotCodeValues(final Set<Integer> gids) {
-		final UserDefinedField plotCodeAttribute = this.getPlotCodeField();
+		final Term plotCodeVariable = this.getPlotCodeField();
 		final Map<Integer, String> plotCodeValuesByGids =
-			this.daoFactory.getAttributeDAO().getAttributeValuesByTypeAndGIDList(plotCodeAttribute.getFldno(), new ArrayList<>(gids))
+			this.daoFactory.getAttributeDAO().getAttributeValuesByTypeAndGIDList(plotCodeVariable.getId(), new ArrayList<>(gids))
 				.stream()
 				.collect(Collectors.toMap(Attribute::getGermplasmId, Attribute::getAval));
 
@@ -163,21 +169,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public UserDefinedField getPlotCodeField() {
-		final List<UserDefinedField> udfldAttributes =
-			this.daoFactory.getUserDefinedFieldDAO().getByFieldTableNameAndType(UDTableType.ATRIBUTS_PASSPORT.getTable(),
-				ImmutableSet.of(UDTableType.ATRIBUTS_PASSPORT.getType()));
-
-		final Optional<UserDefinedField> plotCodeField = udfldAttributes
-			.stream()
-			.filter(userDefinedField -> PLOT_CODE.equals(userDefinedField.getFcode()))
-			.findFirst();
-		if (plotCodeField.isPresent()) {
-			return plotCodeField.get();
-		}
-
-		// Defaulting to a UDFLD with fldno = 0 - this prevents NPEs and DB constraint violations.
-		return new UserDefinedField(0);
+	public Term getPlotCodeField() {
+		return this.ontologyDataManager.findTermByName(PLOT_CODE, CvId.VARIABLES.getId());
 	}
 
 	@Override
@@ -1552,5 +1545,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
+	}
+
+	public void setOntologyDataManager(final OntologyDataManager ontologyDataManager) {
+		this.ontologyDataManager = ontologyDataManager;
 	}
 }

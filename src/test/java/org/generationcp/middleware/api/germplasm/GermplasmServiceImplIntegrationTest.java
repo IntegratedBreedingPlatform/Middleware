@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportD
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
@@ -39,6 +40,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
@@ -75,7 +77,7 @@ import static org.junit.Assert.fail;
 public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 	public static final String DRVNM = "DRVNM";
-	public static final String NOTE = "NOTE";
+	public static final String NOTE = "NOTE_AA_text";
 	public static final String NOLOC = "NOLOC";
 	public static final String CROP_NAME = "maize";
 
@@ -98,7 +100,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.derivativeMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		this.generativeMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
 		this.variableTypeId = this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode("NAMES", "NAME", DRVNM).getFldno();
-		this.attributeId = this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", NOTE).getFldno();
+		this.attributeId = this.daoFactory.getCvTermDao().getByNameAndCvId(NOTE, CvId.VARIABLES.getId()).getCvTermId();
 		this.creationDate = "20201212";
 		this.name = RandomStringUtils.randomAlphabetic(10);
 		this.germplasmUUID = RandomStringUtils.randomAlphabetic(10);
@@ -334,13 +336,9 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		assertThat(this.germplasmService.getAttributesByGID(germplasm.getGid()), hasSize(0));
 
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
-
 		final Attribute attribute = new Attribute();
 		attribute.setGermplasmId(germplasm.getGid());
-		attribute.setTypeId(newAttributeCode.getFldno());
+		attribute.setTypeId(attributeId);
 		attribute.setAval(RandomStringUtils.randomAlphanumeric(50));
 		attribute.setAdate(germplasm.getGdate());
 
@@ -355,31 +353,16 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void test_getPlotCodeField_OK() {
-		final UserDefinedField plotCodeField = this.germplasmService.getPlotCodeField();
-		// Should never return null no matter whether the plot code UDFLD is present in the target database or not.
-		assertThat("GermplasmDataManager.getPlotCodeField() should never return null.", plotCodeField, is(notNullValue()));
-		if (plotCodeField.getFldno() != 0) {
-			// Non-zero fldno is a case where the UDFLD table has a record matching ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE
-			// Usually the id of this record is 1552. Not asserting as we dont want tests to depend on primary key values to be exact.
-
-			assertThat(plotCodeField.getFtable(), is(UDTableType.ATRIBUTS_PASSPORT.getTable()));
-			assertThat(plotCodeField.getFtype(), is(UDTableType.ATRIBUTS_PASSPORT.getType()));
-			assertThat(plotCodeField.getFcode(), is("PLOTCODE"));
-		}
-	}
-
-	@Test
 	public void test_getPlotCodeValue_OK() {
 		final String plotCodeValue = UUID.randomUUID().toString();
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
-		final UserDefinedField plotCodeAttr =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_PASSPORT.getTable(),
-				UDTableType.ATRIBUTS_PASSPORT.getType(), GermplasmServiceImpl.PLOT_CODE);
+		final CVTerm plotCodeVariable =
+			daoFactory.getCvTermDao().getByNameAndCvId("PLOTCODE_AP_text", CvId.VARIABLES.getId());
+
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), plotCodeAttr.getFldno(), plotCodeValue,
+			.save(new Attribute(null, germplasm.getGid(), plotCodeVariable.getCvTermId(), plotCodeValue,
 				germplasm.getLocationId(),
 				0, germplasm.getGdate()));
 
@@ -394,11 +377,11 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Germplasm germplasmWithoutPlotCode = this.createGermplasm(this.generativeMethod, null, null, 0, 0, 0);
 		final Germplasm germplasmWithPlotCode = this.createGermplasm(this.generativeMethod, null, null, 0, 0, 0);
 
-		final UserDefinedField plotCodeAttr =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_PASSPORT.getTable(),
-				UDTableType.ATRIBUTS_PASSPORT.getType(), GermplasmServiceImpl.PLOT_CODE);
+		final CVTerm plotCodeVariable =
+			daoFactory.getCvTermDao().getByNameAndCvId("PLOTCODE_AP_text", CvId.VARIABLES.getId());
+
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasmWithPlotCode.getGid(), plotCodeAttr.getFldno(),
+			.save(new Attribute(null, germplasmWithPlotCode.getGid(), plotCodeVariable.getCvTermId(),
 				plotCodeValue,
 				germplasmWithPlotCode.getLocationId(),
 				0, germplasmWithPlotCode.getGdate()));
