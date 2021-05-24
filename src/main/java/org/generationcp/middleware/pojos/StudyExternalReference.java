@@ -21,7 +21,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "external_reference_study")
-public class StudyExternalReference implements Serializable {
+public class StudyExternalReference extends AbstractEntity implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,9 +40,6 @@ public class StudyExternalReference implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "reference_source")
 	private String source;
-
-	@Column(name = "created_date", nullable = false, updatable = false)
-	private Date createdDate = new Date();
 
 	public StudyExternalReference() {
 	}
@@ -83,10 +80,6 @@ public class StudyExternalReference implements Serializable {
 
 	public void setSource(final String source) {
 		this.source = source;
-	}
-
-	public Date getCreatedDate() {
-		return this.createdDate;
 	}
 
 	@Override

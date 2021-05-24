@@ -40,9 +40,6 @@ public class GermplasmExternalReference extends AbstractEntity implements Serial
 	@Column(name = "reference_source")
 	private String source;
 
-	@Column(name = "created_date", nullable = false, updatable = false)
-	private Date createdDate = new Date();
-
 	public GermplasmExternalReference() {
 	}
 
