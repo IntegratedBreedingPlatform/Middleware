@@ -20,7 +20,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "external_reference_germplasm")
-public class GermplasmExternalReference implements Serializable {
+public class ExternalReference extends AbstractEntity implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -82,10 +82,6 @@ public class GermplasmExternalReference implements Serializable {
 
 	public void setSource(final String source) {
 		this.source = source;
-	}
-
-	public Date getCreatedDate() {
-		return this.createdDate;
 	}
 
 	@Override
