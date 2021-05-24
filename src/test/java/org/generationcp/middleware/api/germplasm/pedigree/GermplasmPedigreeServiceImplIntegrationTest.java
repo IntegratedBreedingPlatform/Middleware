@@ -293,15 +293,14 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 
 	private Germplasm createGermplasm(final Method method, final Integer gnpgs,
 		final Integer gpid1, final Integer gpid2, final Integer mgid) {
-		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2,
-			this.userId, 0, 0, 20201212, 0,
+		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2, 0, 0, 20201212, 0,
 			0, mgid, null, null, method);
 		this.daoFactory.getGermplasmDao().save(germplasm);
 		this.daoFactory.getGermplasmDao().refresh(germplasm);
 
 		//Add preferred name
 		final Name name =
-			new Name(null, germplasm.getGid(), this.DRVNM_ID, 1, this.userId, RandomStringUtils.randomAlphabetic(10), 0, 20201212, 0);
+			new Name(null, germplasm.getGid(), this.DRVNM_ID, 1, RandomStringUtils.randomAlphabetic(10), 0, 20201212, 0);
 		this.daoFactory.getNameDao().save(name);
 		this.sessionProvder.getSession().flush();
 		this.daoFactory.getNameDao().refresh(name);
