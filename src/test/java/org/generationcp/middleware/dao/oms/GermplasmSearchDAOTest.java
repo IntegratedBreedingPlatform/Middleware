@@ -173,8 +173,8 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		final GermplasmSearchRequest request =
 			this.createSearchRequest(this.preferredName.getNval(), SqlTextFilter.Type.CONTAINS);
 		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
-		Assert.assertTrue("The results should contain one germplasm since there's only one test data with name that contains "
-			+ this.preferredName.getNval(), results.size() == 1);
+		Assert.assertEquals("The results should contain one germplasm since there's only one test data with name that contains "
+				+ this.preferredName.getNval(), 1, results.size());
 		this.assertPossibleGermplasmFields(results);
 		this.assertInventoryFields(results);
 	}
@@ -1193,17 +1193,17 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	public void testGetGermplasmAttributeTypes() {
 		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
 		final List<UserDefinedField> userDefinedFields = this.dao.getGermplasmAttributeTypes(request);
-		Assert.assertEquals(userDefinedFields.size(), 1);
+		Assert.assertEquals(1, userDefinedFields.size());
 		Assert.assertTrue(userDefinedFields.stream().allMatch(userDefinedField -> userDefinedField.getFtable().equals("ATRIBUTS")));
-		Assert.assertEquals(userDefinedFields.get(0).getFcode(), "NOTE");
-		Assert.assertEquals(userDefinedFields.get(0).getFname(), "NOTES");
+		Assert.assertEquals( "NOTE", userDefinedFields.get(0).getFcode());
+		Assert.assertEquals("NOTES", userDefinedFields.get(0).getFname());
 	}
 
 	@Test
 	public void testGetGermplasmAttributeValues() {
 		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
 		final List<Attribute> attributes = this.dao.getGermplasmAttributeValues(request);
-		Assert.assertEquals(attributes.size(), 1);
+		Assert.assertEquals(1, attributes.size());
 		Assert.assertEquals(attributes.get(0).getGermplasmId(), this.germplasmGID);
 		Assert.assertEquals(attributes.get(0).getAval(), this.attributeValue);
 
@@ -1224,7 +1224,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	public void testGetGermplasmNameValues() {
 		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
 		final List<Name> names = this.dao.getGermplasmNameValues(request);
-		Assert.assertEquals(names.size(), 3);
+		Assert.assertEquals(3, names.size());
 		Assert.assertTrue(names.contains(this.preferredName));
 		Assert.assertTrue(names.contains(this.preferredId));
 		Assert.assertTrue(names.stream().allMatch(name1 -> name1.getGermplasmId().equals(this.germplasmGID)));
@@ -1392,7 +1392,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private GermplasmSearchRequest createSearchRequest(final Integer germplasmGID) {
 
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();
-		request.setGids(Arrays.asList(germplasmGID));
+		request.setGids(Collections.singletonList(germplasmGID));
 		return request;
 	}
 
