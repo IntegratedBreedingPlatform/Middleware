@@ -3,10 +3,13 @@ package org.generationcp.middleware;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Objects;
+
 public class ContextHolder {
 
 	private static ThreadLocal<String> currentCrop = new ThreadLocal<>();
 	private static ThreadLocal<String> currentProgram = new ThreadLocal<>();
+	private static ThreadLocal<Integer> loggedInUserId = new ThreadLocal<>();
 
 	public static void setCurrentCrop(final String crop) {
 		ContextHolder.currentCrop.set(crop);
@@ -14,6 +17,10 @@ public class ContextHolder {
 
 	public static void setCurrentProgram(final String program) {
 		ContextHolder.currentProgram.set(program);
+	}
+
+	public static void setLoggedInUserId(final Integer loggedInUserId) {
+		ContextHolder.loggedInUserId.set(loggedInUserId);
 	}
 
 	public static String getCurrentCrop() {
@@ -33,4 +40,14 @@ public class ContextHolder {
 		}
 		return currentProgramId;
 	}
+
+	public static Integer getLoggedInUserId() {
+		final Integer loggedInUserId = ContextHolder.loggedInUserId.get();
+
+		if (Objects.isNull(ContextHolder.loggedInUserId)) {
+			throw new IllegalStateException("Unable to use variable cache. Logged in user is null.");
+		}
+		return loggedInUserId;
+	}
+
 }
