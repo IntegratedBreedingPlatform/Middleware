@@ -20,7 +20,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "external_reference_germplasm")
-public class ExternalReference extends AbstractEntity implements Serializable {
+public class GermplasmExternalReference extends AbstractEntity implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

@@ -25,7 +25,7 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.ExternalReference;
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
@@ -1475,7 +1475,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasm.getCreatedBy(), equalTo(this.userId));
 
 		assertThat(germplasm.getExternalReferences(), hasSize(1));
-		final ExternalReference externalReference = germplasm.getExternalReferences().get(0);
+		final GermplasmExternalReference externalReference = germplasm.getExternalReferences().get(0);
 		assertThat(externalReference.getCreatedBy(), is(this.userId));
 		assertNotNull(externalReference.getCreatedDate());
 	}
