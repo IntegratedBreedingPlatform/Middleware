@@ -182,7 +182,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final Integer userId, final String cropName,
+	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final Map<Integer, GermplasmImportResponseDto> results = new HashMap<>();
 		final List<GermplasmImportDTO> germplasmDtoList = germplasmImportRequestDto.getGermplasmList();
@@ -229,6 +229,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				}
 			}
 
+			//TODO: use a constructor with the properly arguments
 			final Germplasm germplasm = new Germplasm();
 
 			final Method method = methodsMapByAbbr.get(germplasmDto.getBreedingMethodAbbr().toUpperCase());
@@ -244,7 +245,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 			}
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
-			germplasm.setUserId(userId);
 			germplasm.setLgid(0);
 			germplasm.setLocationId(locationsMapByAbbr.get(germplasmDto.getLocationAbbr().toUpperCase()));
 			germplasm.setDeleted(Boolean.FALSE);
@@ -272,14 +272,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			germplasmDto.getNames().forEach((k, v) -> {
 				final Name name = new Name(null, germplasm.getGid(), nameTypesMapByName.get(k.toUpperCase()),
-					(k.equalsIgnoreCase(germplasmDto.getPreferredName())) ? 1 : 0, userId, v, germplasm.getLocationId(),
+					(k.equalsIgnoreCase(germplasmDto.getPreferredName())) ? 1 : 0, v, germplasm.getLocationId(),
 					Util.getCurrentDateAsIntegerValue(), 0);
 				this.daoFactory.getNameDao().save(name);
 			});
 
 			if (germplasmDto.getAttributes() != null) {
 				germplasmDto.getAttributes().forEach((k, v) -> {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), attributesMapByName.get(k.toUpperCase()), userId, v,
+					final Attribute attribute = new Attribute(null, germplasm.getGid(), attributesMapByName.get(k.toUpperCase()), v,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					this.daoFactory.getAttributeDAO().save(attribute);
@@ -315,7 +315,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Set<Integer> importGermplasmUpdates(final Integer userId, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	public Set<Integer> importGermplasmUpdates(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 
@@ -352,7 +352,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			attributes.stream().collect(groupingBy(Attribute::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
 
 		for (final Germplasm germplasm : germplasmList) {
-			this.saveGermplasmUpdateDTO(userId, attributeCodesFieldNoMap, nameCodesFieldNoMap,
+			this.saveGermplasmUpdateDTO(attributeCodesFieldNoMap, nameCodesFieldNoMap,
 				germplasmUpdateDTOMap,
 				locationAbbreviationIdMap, codeBreedingMethodDTOMap, namesMap, attributesMap, germplasm,
 				progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors);
@@ -438,14 +438,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return this.daoFactory.getGermplasmDao().getProgenitorsByGIDWithPrefName(gid);
 	}
 
-	private void saveGermplasmUpdateDTO(final Integer userId, final Map<String, Integer> attributeCodes,
-		final Map<String, Integer> nameCodes,
-		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
-		final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
-		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
-		final Map<String, Germplasm> progenitorsMapByGid,
-		final List<Integer> gidsOfGermplasmWithDescendants,
-		final Multimap<String, Object[]> conflictErrors) {
+	private void saveGermplasmUpdateDTO(final Map<String, Integer> attributeCodes,
+	  final Map<String, Integer> nameCodes,
+	  final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
+	  final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
+	  final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
+	  final Map<String, Germplasm> progenitorsMapByGid,
+	  final List<Integer> gidsOfGermplasmWithDescendants,
+	  final Multimap<String, Object[]> conflictErrors) {
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
 			this.getGermplasmUpdateDTOByGidOrUUID(germplasm, germplasmUpdateDTOMap);
 		if (optionalGermplasmUpdateDTO.isPresent()) {
@@ -453,26 +453,26 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.updateGermplasm(germplasm, germplasmUpdateDTO, locationAbbreviationIdMap, codeBreedingMethodDTOMap, progenitorsMapByGid,
 				gidsOfGermplasmWithDescendants,
 				conflictErrors);
-			this.saveAttributesAndNames(userId, attributeCodes, nameCodes, namesMap, attributesMap, germplasm,
+			this.saveAttributesAndNames(attributeCodes, nameCodes, namesMap, attributesMap, germplasm,
 				conflictErrors,
 				germplasmUpdateDTO);
 			this.updatePreferredName(nameCodes, namesMap, germplasm, germplasmUpdateDTO, conflictErrors);
 		}
 	}
 
-	private void saveAttributesAndNames(final Integer userId, final Map<String, Integer> attributeCodes,
+	private void saveAttributesAndNames(final Map<String, Integer> attributeCodes,
 		final Map<String, Integer> nameCodes, final Map<Integer, List<Name>> namesMap, final Map<Integer, List<Attribute>> attributesMap,
 		final Germplasm germplasm, final Multimap<String, Object[]> conflictErrors, final GermplasmUpdateDTO germplasmUpdateDTO) {
 		for (final Map.Entry<String, String> codeValuesEntry : germplasmUpdateDTO.getNames().entrySet()) {
 			final String code = codeValuesEntry.getKey();
 			final String value = codeValuesEntry.getValue();
-			this.saveOrUpdateName(userId, nameCodes, namesMap, germplasm, code, value,
+			this.saveOrUpdateName(nameCodes, namesMap, germplasm, code, value,
 				conflictErrors);
 		}
 		for (final Map.Entry<String, String> codeValuesEntry : germplasmUpdateDTO.getAttributes().entrySet()) {
 			final String code = codeValuesEntry.getKey();
 			final String value = codeValuesEntry.getValue();
-			this.saveOrUpdateAttribute(userId, attributeCodes, attributesMap, germplasm,
+			this.saveOrUpdateAttribute(attributeCodes, attributesMap, germplasm,
 				code, value, conflictErrors);
 		}
 
@@ -611,7 +611,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private void saveOrUpdateName(final Integer userId, final Map<String, Integer> nameCodes,
+	private void saveOrUpdateName(final Map<String, Integer> nameCodes,
 		final Map<Integer, List<Name>> namesMap, final Germplasm germplasm,
 		final String code, final String value, final Multimap<String, Object[]> conflictErrors) {
 
@@ -635,7 +635,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				this.daoFactory.getNameDao().update(name);
 			} else {
 				// Create new record if name not yet exists
-				final Name name = new Name(null, germplasm.getGid(), nameTypeId, 0, userId,
+				final Name name = new Name(null, germplasm.getGid(), nameTypeId, 0,
 					value, germplasm.getLocationId(), germplasm.getGdate(), 0);
 				this.daoFactory.getNameDao().save(name);
 				germplasmNames.add(name);
@@ -644,7 +644,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private void saveOrUpdateAttribute(final Integer userId, final Map<String, Integer> attributeCodes,
+	private void saveOrUpdateAttribute(final Map<String, Integer> attributeCodes,
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
 		final String code, final String value, final Multimap<String, Object[]> conflictErrors) {
 		// Check first if the code to save is a valid Attribute
@@ -666,7 +666,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				this.daoFactory.getAttributeDAO().update(attribute);
 			} else {
 				this.daoFactory.getAttributeDAO()
-					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, userId, value,
+					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, value,
 						germplasm.getLocationId(),
 						0, germplasm.getGdate()));
 			}
@@ -1011,7 +1011,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<GermplasmDTO> createGermplasm(final Integer userId, final String cropname,
+	public List<GermplasmDTO> createGermplasm(final String cropname,
 		final List<GermplasmImportRequest> germplasmImportRequestList) {
 		final Map<String, Integer> locationsMap = this.getLocationsMapByLocAbbr(germplasmImportRequestList);
 		final Map<String, Integer> attributesMap = this.getAttributesMapByAttrCode(germplasmImportRequestList);
@@ -1040,7 +1040,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
-			germplasm.setUserId(userId);
 			germplasm.setLgid(0);
 			germplasm.setGnpgs(0);
 			germplasm.setGpid1(0);
@@ -1060,7 +1059,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				final Integer typeId = nameTypesMap.get(synonym.getType().toUpperCase());
 				if (typeId != null) {
 					final Name name = new Name(null, germplasm.getGid(), typeId,
-						0, userId, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
+						0, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
 					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
 						name.setNstat(1);
 					}
@@ -1082,7 +1081,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasmDto.getAdditionalInfo().forEach((k, v) -> {
 				final Integer typeId = attributesMap.get(k.toUpperCase());
 				if (typeId != null) {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, userId, v,
+					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, v,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					this.daoFactory.getAttributeDAO().save(attribute);
@@ -1100,7 +1099,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public GermplasmDTO updateGermplasm(final Integer userId, final String germplasmDbId,
+	public GermplasmDTO updateGermplasm(final String germplasmDbId,
 		final GermplasmUpdateRequest germplasmUpdateRequest) {
 		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 		final GermplasmDAO germplasmDao = this.daoFactory.getGermplasmDao();
@@ -1162,7 +1161,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 					nameDao.update(existingName);
 				} else {
 					final Name name = new Name(null, germplasm.getGid(), typeId,
-						0, userId, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
+						0, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
 					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
 						name.setNstat(1);
 					}
@@ -1187,7 +1186,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 					existingAttribute.setAval(v);
 					attributeDAO.update(existingAttribute);
 				} else {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, userId, v,
+					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, v,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					attributeDAO.save(attribute);
