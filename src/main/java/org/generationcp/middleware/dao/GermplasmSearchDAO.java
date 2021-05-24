@@ -1119,7 +1119,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		final List<Integer> germplasmListIds = germplasmSearchRequest.getGermplasmListIds();
 		if (germplasmListIds != null) {
 			paramBuilder.append(" and g.gid IN (select filter_l.gid from listdata filter_l "  //
-				+ "where filter_l.listid in (:germplasmListIds) and filter_l.gid = g.gid) ");
+				+ "where filter_l.listid in (:germplasmListIds)) ");
 			paramBuilder.setParameterList("germplasmListIds", germplasmListIds);
 		}
 
