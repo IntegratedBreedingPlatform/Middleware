@@ -67,6 +67,8 @@ import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.gdms.DatasetService;
+import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
+import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactoryImpl;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -366,5 +368,9 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmSearchService getGermplasmSearchService() {
 		return new GermplasmSearchServiceImpl(this.sessionProvider);
+	}
+
+	public VariableDataValidatorFactory getVariableDataValidatorFactory() {
+		return new VariableDataValidatorFactoryImpl();
 	}
 }
