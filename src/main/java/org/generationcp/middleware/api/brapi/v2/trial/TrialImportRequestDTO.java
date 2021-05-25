@@ -4,6 +4,7 @@ import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.pojos.workbench.Contact;
 import org.generationcp.middleware.service.api.user.ContactDto;
+import org.pojomatic.Pojomatic;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -150,5 +151,10 @@ public class TrialImportRequestDTO {
 
 	public void setTrialPUI(final String trialPUI) {
 		this.trialPUI = trialPUI;
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
 	}
 }
