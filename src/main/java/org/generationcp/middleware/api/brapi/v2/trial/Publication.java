@@ -1,5 +1,8 @@
 package org.generationcp.middleware.api.brapi.v2.trial;
 
+import org.pojomatic.annotations.AutoProperty;
+
+@AutoProperty
 public class Publication {
 
 	private String publicationPUI;
