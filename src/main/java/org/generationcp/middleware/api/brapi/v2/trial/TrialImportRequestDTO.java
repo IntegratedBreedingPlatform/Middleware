@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.brapi.v2.trial;
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.pojos.workbench.Contact;
+import org.generationcp.middleware.service.api.user.ContactDto;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -14,7 +15,7 @@ public class TrialImportRequestDTO {
 	private boolean active;
 	private Map<String, String> additionalInfo = new HashMap<>();
 	private String commonCropName;
-	private List<Contact> contacts = new ArrayList<>();
+	private List<ContactDto> contacts = new ArrayList<>();
 	private List<DatasetAuthorship> datasetAuthorships = new ArrayList<>();
 	private String documentationURL = StringUtils.EMPTY;
 	private List<ExternalReferenceDTO> externalReferences;
@@ -55,11 +56,11 @@ public class TrialImportRequestDTO {
 		this.commonCropName = commonCropName;
 	}
 
-	public List<Contact> getContacts() {
+	public List<ContactDto> getContacts() {
 		return this.contacts;
 	}
 
-	public void setContacts(final List<Contact> contacts) {
+	public void setContacts(final List<ContactDto> contacts) {
 		this.contacts = contacts;
 	}
 
