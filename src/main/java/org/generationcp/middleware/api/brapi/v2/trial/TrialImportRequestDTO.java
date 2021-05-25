@@ -15,14 +15,14 @@ public class TrialImportRequestDTO {
 	private Map<String, String> additionalInfo = new HashMap<>();
 	private String commonCropName;
 	private List<Contact> contacts = new ArrayList<>();
-	private List<String> datasetAuthorships = new ArrayList<>();
+	private List<DatasetAuthorship> datasetAuthorships = new ArrayList<>();
 	private String documentationURL = StringUtils.EMPTY;
 	private List<ExternalReferenceDTO> externalReferences;
 	private String endDate;
 	private String startDate;
 	private String programDbId;
 	private String programName;
-	private List<String> publications = new ArrayList<>();
+	private List<Publication> publications = new ArrayList<>();
 	private String trialDescription;
 	private String trialName;
 	private String trialPUI;
@@ -63,11 +63,11 @@ public class TrialImportRequestDTO {
 		this.contacts = contacts;
 	}
 
-	public List<String> getDatasetAuthorships() {
+	public List<DatasetAuthorship> getDatasetAuthorships() {
 		return this.datasetAuthorships;
 	}
 
-	public void setDatasetAuthorships(final List<String> datasetAuthorships) {
+	public void setDatasetAuthorships(final List<DatasetAuthorship> datasetAuthorships) {
 		this.datasetAuthorships = datasetAuthorships;
 	}
 
@@ -119,11 +119,11 @@ public class TrialImportRequestDTO {
 		this.programName = programName;
 	}
 
-	public List<String> getPublications() {
+	public List<Publication> getPublications() {
 		return this.publications;
 	}
 
-	public void setPublications(final List<String> publications) {
+	public void setPublications(final List<Publication> publications) {
 		this.publications = publications;
 	}
 
