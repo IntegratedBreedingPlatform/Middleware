@@ -60,7 +60,7 @@ public class ContactDto {
 	}
 
 	public String getOrcid() {
-		return orcid;
+		return this.orcid;
 	}
 
 	public void setOrcid(final String orcid) {
@@ -68,7 +68,7 @@ public class ContactDto {
 	}
 
 	public String getInstituteName() {
-		return instituteName;
+		return this.instituteName;
 	}
 
 	public void setInstituteName(final String instituteName) {

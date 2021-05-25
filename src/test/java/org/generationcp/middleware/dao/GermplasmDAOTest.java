@@ -1270,6 +1270,4 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName(), this.cropType);
 	}
 
-
-
 }

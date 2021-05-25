@@ -69,12 +69,11 @@ public class StudySearchFilter {
 		this.studyPUI = studyPUI;
 	}
 
-
 	public List<String> getTrialDbIds() {
 		return this.trialDbIds;
 	}
 
-	public void setTrialDbIds(final List<String>trialDbIds) {
+	public void setTrialDbIds(final List<String> trialDbIds) {
 		this.trialDbIds = trialDbIds;
 	}
 

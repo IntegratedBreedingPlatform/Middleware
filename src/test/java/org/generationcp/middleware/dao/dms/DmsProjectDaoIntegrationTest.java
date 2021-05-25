@@ -497,7 +497,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyIdEnvironmentDatasetIdMap() {
 		final DmsProject summary =
-			this.createDataset(this.study.getName() + " - Summary Dataset", this.study.getProgramUUID(), DatasetTypeEnum.SUMMARY_DATA.getId(),
+			this.createDataset(this.study.getName() + " - Summary Dataset", this.study.getProgramUUID(),
+				DatasetTypeEnum.SUMMARY_DATA.getId(),
 				this.study, this.study);
 		final Map<Integer, Integer> studyIdEnvIdMap = this.dmsProjectDao.getStudyIdEnvironmentDatasetIdMap(
 			Collections.singletonList(this.study.getProjectId()));

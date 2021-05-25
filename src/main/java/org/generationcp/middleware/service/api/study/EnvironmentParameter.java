@@ -6,7 +6,8 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-@JsonInclude(JsonInclude.Include.NON_NULL) @JsonPropertyOrder({"parameterName", "description", "unit", "unitPUI", "value", "valuePUI"})
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({"parameterName", "description", "unit", "unitPUI", "value", "valuePUI"})
 public class EnvironmentParameter {
 
 	private String description;
@@ -49,7 +50,6 @@ public class EnvironmentParameter {
 	public String getDescription() {
 		return this.description;
 	}
-
 
 	public EnvironmentParameter setDescription(final String description) {
 		this.description = description;

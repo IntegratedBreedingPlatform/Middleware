@@ -115,20 +115,20 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String FIND_GERMPLASM_BY_GIDS = " g.gid in (:gids) ";
 
 	private static final String FIND_GERMPLASM_WITHDESCENDANTS = "SELECT g.gid as gid FROM germplsm g "
-			+ "WHERE (EXISTS (SELECT 1 FROM germplsm descendant WHERE descendant.deleted = 0 AND "
-			+ " (g.gid = descendant.gpid1 OR g.gid = descendant.gpid2) ) "
-			+ " OR EXISTS (SELECT 1 FROM progntrs p INNER JOIN germplsm descendant ON descendant.gid = p.gid"
-			+ " 					WHERE  g.gid = p.pid  AND descendant.deleted = 0)) "
-			+ " AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
+		+ "WHERE (EXISTS (SELECT 1 FROM germplsm descendant WHERE descendant.deleted = 0 AND "
+		+ " (g.gid = descendant.gpid1 OR g.gid = descendant.gpid2) ) "
+		+ " OR EXISTS (SELECT 1 FROM progntrs p INNER JOIN germplsm descendant ON descendant.gid = p.gid"
+		+ " 					WHERE  g.gid = p.pid  AND descendant.deleted = 0)) "
+		+ " AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
 
 	private static final String FIND_GERMPLASM_WITH_DERIVATIVE_OR_MAINTENANCE_DESCENDANTS = "SELECT g.gid as gid FROM germplsm g "
-			+ "WHERE (EXISTS "
-						+ " (SELECT 1 FROM germplsm descendant "
-						+ " INNER JOIN methods mtype ON mtype.mid = descendant.methn"
-						+ " WHERE (g.gid = descendant.gpid1 OR g.gid = descendant.gpid2) "
-						+ " AND mtype.mtype IN (:mtypes) AND descendant.deleted = 0) "
-					+ ") "
-			+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
+		+ "WHERE (EXISTS "
+		+ " (SELECT 1 FROM germplsm descendant "
+		+ " INNER JOIN methods mtype ON mtype.mid = descendant.methn"
+		+ " WHERE (g.gid = descendant.gpid1 OR g.gid = descendant.gpid2) "
+		+ " AND mtype.mtype IN (:mtypes) AND descendant.deleted = 0) "
+		+ ") "
+		+ "AND g.gid IN (:gids) AND  g.deleted = 0 AND g.grplce = 0 ";
 
 	@Override
 	public Germplasm getById(final Integer gid, final boolean lock) {
@@ -691,7 +691,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error with getDescendants(gid=" + gid + ", methodType=" + methodType + ") query: " + e.getMessage();
+			final String errorMessage =
+				"Error with getDescendants(gid=" + gid + ", methodType=" + methodType + ") query: " + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -731,7 +732,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			// = Record is not deleted or replaced.
 			generativeChildrenCriteria.add(Restrictions.eq(GermplasmDAO.DELETED, Boolean.FALSE));
 
-			final List<Germplasm> children = new ArrayList<Germplasm>(generativeChildrenCriteria.getExecutableCriteria(this.getSession()).list());
+			final List<Germplasm> children =
+				new ArrayList<Germplasm>(generativeChildrenCriteria.getExecutableCriteria(this.getSession()).list());
 
 			// Find additional children via progenitor linkage
 			final DetachedCriteria otherChildrenCriteria = DetachedCriteria.forClass(Progenitor.class);
@@ -1192,7 +1194,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	public Germplasm getByLGid(final Integer lgid) {
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery("SELECT g.* FROM germplsm g WHERE g.deleted = 0 AND lgid=:lgid LIMIT 1");
+			final SQLQuery query =
+				this.getSession().createSQLQuery("SELECT g.* FROM germplsm g WHERE g.deleted = 0 AND lgid=:lgid LIMIT 1");
 			query.setParameter("lgid", lgid);
 			query.addEntity("g", Germplasm.class);
 
@@ -1351,7 +1354,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	}
 
-	private void addGermplasmSearchParameters(final SqlQueryParamBuilder paramBuilder, final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
+	private void addGermplasmSearchParameters(final SqlQueryParamBuilder paramBuilder,
+		final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getPreferredName())) {
 			paramBuilder.setParameter("preferredName", germplasmSearchRequestDTO.getPreferredName() + "%"); //
 		}
@@ -1402,7 +1406,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	// These are appended to the MAIN where clause because they are filters on (or EXISTS clause related to) the main germplasm object
-	private void addGermplasmSearchRequestFilters(final SqlQueryParamBuilder paramBuilder, final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
+	private void addGermplasmSearchRequestFilters(final SqlQueryParamBuilder paramBuilder,
+		final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmDbIds())) {
 			paramBuilder.append(" AND g.germplsm_uuid IN (:germplasmDbIds) ");
 		}
@@ -1540,8 +1545,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private String buildFilterGermplasmQuery(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
 		final StringBuilder queryBuilder = new StringBuilder();
-		queryBuilder.append(" SELECT g.gid " );
-		queryBuilder.append(" FROM germplsm g " );
+		queryBuilder.append(" SELECT g.gid ");
+		queryBuilder.append(" FROM germplsm g ");
 		queryBuilder.append(" WHERE g.deleted = 0 AND g.grplce = 0 ");
 		this.addGermplasmSearchRequestFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequestDTO);
 		return queryBuilder.toString();
@@ -1852,32 +1857,33 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
-  /**
-   * Only returns IDs of germplasm with progeny (Germplasm Id is assigned to other germplasm's gpid1, gpid2 OR progntrs.pid) with Method Type
-   * DERIVATIVE AND MAINTENANCE
-   *
-   * @param gids - gids to be checked for descendants
-   * @return - gids with derivative or maintenance descendants
-   */
-  public Set<Integer> getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(final Set<Integer> gids) {
 
-	final List<String> mtypes = Arrays.asList(MethodType.DERIVATIVE.getCode(), MethodType.MAINTENANCE.getCode());
-	try {
-	  if (!CollectionUtils.isEmpty(gids)) {
-		final SQLQuery query = this.getSession().createSQLQuery(FIND_GERMPLASM_WITH_DERIVATIVE_OR_MAINTENANCE_DESCENDANTS);
-		query.addScalar("gid", new IntegerType());
-		query.setParameterList("gids", gids);
-		query.setParameterList("mtypes", mtypes);
-		return Sets.newHashSet(query.list());
-	  }
-	  return Sets.newHashSet();
-	} catch (final HibernateException e) {
-	  final String errorMessage = "Error with getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(gids=" + gids + " mids=" + mtypes + e.getMessage();
-	  GermplasmDAO.LOG.error(errorMessage, e);
-	  throw new MiddlewareQueryException(errorMessage, e);
+	/**
+	 * Only returns IDs of germplasm with progeny (Germplasm Id is assigned to other germplasm's gpid1, gpid2 OR progntrs.pid) with Method Type
+	 * DERIVATIVE AND MAINTENANCE
+	 *
+	 * @param gids - gids to be checked for descendants
+	 * @return - gids with derivative or maintenance descendants
+	 */
+	public Set<Integer> getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(final Set<Integer> gids) {
+
+		final List<String> mtypes = Arrays.asList(MethodType.DERIVATIVE.getCode(), MethodType.MAINTENANCE.getCode());
+		try {
+			if (!CollectionUtils.isEmpty(gids)) {
+				final SQLQuery query = this.getSession().createSQLQuery(FIND_GERMPLASM_WITH_DERIVATIVE_OR_MAINTENANCE_DESCENDANTS);
+				query.addScalar("gid", new IntegerType());
+				query.setParameterList("gids", gids);
+				query.setParameterList("mtypes", mtypes);
+				return Sets.newHashSet(query.list());
+			}
+			return Sets.newHashSet();
+		} catch (final HibernateException e) {
+			final String errorMessage =
+				"Error with getGidsOfGermplasmWithDerivativeOrMaintenanceDescendants(gids=" + gids + " mids=" + mtypes + e.getMessage();
+			GermplasmDAO.LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
 	}
-  }
-
 
 	public long countNonDeletedGermplasm() {
 		try {

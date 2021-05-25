@@ -591,7 +591,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 			propsMap.get(studyId).stream().forEach(prop -> {
 				final Integer variableId = prop.getVariableId();
 				String value = prop.getValue();
-				if (categoricalVariablesMap.containsKey(variableId) && StringUtils.isNotBlank(value) && NumberUtils.isDigits(value)){
+				if (categoricalVariablesMap.containsKey(variableId) && StringUtils.isNotBlank(value) && NumberUtils.isDigits(value)) {
 					final Integer categoricalId = Integer.parseInt(value);
 					final Map<Integer, ValueReference> categoricalValues = categoricalVariablesMap.get(variableId).stream()
 						.collect(Collectors.toMap(ValueReference::getId, Function.identity()));
@@ -625,7 +625,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<StudySummary> saveStudies(final String cropName, final List<TrialImportRequestDTO> trialImportRequestDtoList, final Integer userId) {
+	public List<StudySummary> saveStudies(final String cropName, final List<TrialImportRequestDTO> trialImportRequestDtoList,
+		final Integer userId) {
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 		final List<String> studyIds = new ArrayList<>();
 		final StudyType studyTypeByName = this.daoFactory.getStudyTypeDao().getStudyTypeByName(StudyTypeDto.TRIAL_NAME);
@@ -633,7 +634,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final DatasetType plotDatasetType = this.daoFactory.getDatasetTypeDao().getById(DatasetTypeEnum.PLOT_DATA.getId());
 		final List<String> studyDetailVariableNames = new ArrayList<>();
 		trialImportRequestDtoList.stream().forEach(dto -> {
-				studyDetailVariableNames.addAll(dto.getAdditionalInfo().keySet().stream().map(String::toUpperCase).collect(Collectors.toList()));
+				studyDetailVariableNames
+					.addAll(dto.getAdditionalInfo().keySet().stream().map(String::toUpperCase).collect(Collectors.toList()));
 			}
 		);
 		final Map<String, MeasurementVariable> variableNamesMap =
@@ -744,29 +746,29 @@ public class StudyServiceImpl extends Service implements StudyService {
 		if (!CollectionUtils.isEmpty(trialImportRequestDto.getAdditionalInfo())) {
 			final List<ProjectProperty> properties = new ArrayList<>();
 			trialImportRequestDto.getAdditionalInfo().entrySet().forEach(entry -> {
-			final String variableName = entry.getKey().toUpperCase();
-			// Lookup variable by name first, then synonym
-			final MeasurementVariable measurementVariable =
-				variableNamesMap.containsKey(variableName) ? variableNamesMap.get(variableName) : variableSynonymsMap.get(variableName);
-			if (measurementVariable != null) {
-				measurementVariable.setValue(entry.getValue());
-				final DataType dataType = DataType.getById(measurementVariable.getDataTypeId());
-				final java.util.Optional<VariableValueValidator> dataValidator =
-					this.variableDataValidatorFactory.getValidator(dataType);
-				if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
-					measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
+				final String variableName = entry.getKey().toUpperCase();
+				// Lookup variable by name first, then synonym
+				final MeasurementVariable measurementVariable =
+					variableNamesMap.containsKey(variableName) ? variableNamesMap.get(variableName) : variableSynonymsMap.get(variableName);
+				if (measurementVariable != null) {
+					measurementVariable.setValue(entry.getValue());
+					final DataType dataType = DataType.getById(measurementVariable.getDataTypeId());
+					final java.util.Optional<VariableValueValidator> dataValidator =
+						this.variableDataValidatorFactory.getValidator(dataType);
+					if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
+						measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
+					}
+					if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
+						final Integer rank = properties.size() + 1;
+						properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
+							measurementVariable.getValue(), rank, measurementVariable.getTermId(), entry.getKey()));
+					}
 				}
-				if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
-					final Integer rank = properties.size() + 1;
-					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
-						measurementVariable.getValue(), rank, measurementVariable.getTermId(), entry.getKey()));
-				}
-			}
-		});
-		study.setProperties(properties);
-	}
+			});
+			study.setProperties(properties);
+		}
 
-}
+	}
 
 	private void addDatasetVariables(final DmsProject dataset, final boolean isEnvironmentDataset) {
 		final ProjectProperty datasetNameProp =

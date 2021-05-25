@@ -98,7 +98,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.testUser = this.testDataInitializer.createUserForTesting();
 		// Null study end date means it's still active
 		this.study = this.testDataInitializer
-			.createStudy("Study1", "Study-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(), "20180205", null);
+			.createStudy("Study1", "Study-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				"20180205", null);
 
 		this.plot = this.testDataInitializer
 			.createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
@@ -197,8 +198,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
-		this.testDataInitializer.addProjectProp(this.study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, String.valueOf(user.getPerson().getId()), 6);
-
+		this.testDataInitializer
+			.addProjectProp(this.study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, String.valueOf(user.getPerson().getId()), 6);
 
 		final StudyDetailsDto studyDetailsDto = this.studyService.getStudyDetailsByInstance(geolocation.getLocationId());
 
@@ -223,14 +224,16 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 			.createTestExperiment(dmsProject, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
 
 		//Add 'Crop_season_Code' as environment details with 'Wet season' as value
-		this.testDataInitializer.addProjectProp(dmsProject, TermId.SEASON_VAR.getId(), TermId.SEASON_VAR.name(), VariableType.ENVIRONMENT_DETAIL, null, 6);
+		this.testDataInitializer
+			.addProjectProp(dmsProject, TermId.SEASON_VAR.getId(), TermId.SEASON_VAR.name(), VariableType.ENVIRONMENT_DETAIL, null, 6);
 		this.testDataInitializer.addGeolocationProp(geolocation, TermId.SEASON_VAR.getId(), String.valueOf(TermId.SEASON_WET.getId()), 1);
 
 		//Add 'IrrigMethod_text' as environment details
 		final CVTerm irrMethodText = this.daoFactory.getCvTermDao().getById(8700);
 		assertNotNull(irrMethodText);
 
-		this.testDataInitializer.addProjectProp(dmsProject, irrMethodText.getCvTermId(), irrMethodText.getName(), VariableType.ENVIRONMENT_DETAIL, null, 6);
+		this.testDataInitializer
+			.addProjectProp(dmsProject, irrMethodText.getCvTermId(), irrMethodText.getName(), VariableType.ENVIRONMENT_DETAIL, null, 6);
 
 		//Use termId as value in order to check corner case. It must get the termId as value because the variable is not categorical
 		final String irrMethodTextValue = String.valueOf(TermId.SEASON_VAR.getId());
@@ -243,14 +246,18 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final CVTerm droughtTolerance = this.daoFactory.getCvTermDao().getById(17285);
 		assertNotNull(droughtTolerance);
 
-		this.testDataInitializer.addProjectProp(dmsProject, selectionTrait.getCvTermId(), selectionTrait.getName(), VariableType.ENVIRONMENT_CONDITION, null, 6);
-		this.testDataInitializer.addPhenotypes(Arrays.asList(testExperiment), selectionTrait.getCvTermId(), droughtTolerance.getCvTermId().toString());
+		this.testDataInitializer
+			.addProjectProp(dmsProject, selectionTrait.getCvTermId(), selectionTrait.getName(), VariableType.ENVIRONMENT_CONDITION, null,
+				6);
+		this.testDataInitializer
+			.addPhenotypes(Arrays.asList(testExperiment), selectionTrait.getCvTermId(), droughtTolerance.getCvTermId().toString());
 
 		//Add 'SITE_SOIL_PH' as environment details
 		final CVTerm siteSoilPH = this.daoFactory.getCvTermDao().getById(8270);
 		assertNotNull(siteSoilPH);
 
-		this.testDataInitializer.addProjectProp(dmsProject, siteSoilPH.getCvTermId(), siteSoilPH.getName(), VariableType.ENVIRONMENT_CONDITION, null, 6);
+		this.testDataInitializer
+			.addProjectProp(dmsProject, siteSoilPH.getCvTermId(), siteSoilPH.getName(), VariableType.ENVIRONMENT_CONDITION, null, 6);
 
 		//Use termId as value in order to check corner case. It must get the termId as value because the variable is not categorical
 		final String siteSoilPHValue = selectionTrait.getCvTermId().toString();
@@ -271,7 +278,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(environmentParameters, hasSize(4));
 		this.assertEnvironmentParameter(environmentParameters, TermId.SEASON_VAR.getId(), "Crop_season_Code", "1");
 		this.assertEnvironmentParameter(environmentParameters, irrMethodText.getCvTermId(), irrMethodText.getName(), irrMethodTextValue);
-		this.assertEnvironmentParameter(environmentParameters, selectionTrait.getCvTermId(), selectionTrait.getName(), droughtTolerance.getName());
+		this.assertEnvironmentParameter(environmentParameters, selectionTrait.getCvTermId(), selectionTrait.getName(),
+			droughtTolerance.getName());
 		this.assertEnvironmentParameter(environmentParameters, siteSoilPH.getCvTermId(), siteSoilPH.getName(), siteSoilPHValue);
 	}
 
@@ -283,7 +291,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		// Add new study with new location ID
 		final DmsProject newStudy = this.testDataInitializer
-			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(), null, null);
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				null, null);
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
@@ -311,7 +320,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testGetStudies() throws Exception {
 		// Add new completed study assigned new location ID
 		final DmsProject newStudy = this.testDataInitializer
-			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(), "20200101", "20201231");
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				"20200101", "20201231");
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
@@ -368,7 +378,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testGetStudiesWithDeletedStudy() throws Exception {
 		// Add new study assigned new location ID
 		final DmsProject newStudy = this.testDataInitializer
-			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(), null, null);
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				null, null);
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
@@ -390,7 +401,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		List<StudySummary> studies =
 			this.studyService.getStudies(
 				studySearchFilter, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
-		Assert.assertEquals("Deleted study is not included",2, studies.size());
+		Assert.assertEquals("Deleted study is not included", 2, studies.size());
 		StudySummary study1 = studies.get(1);
 		Assert.assertEquals(this.study.getProjectId(), study1.getTrialDbId());
 		Assert.assertEquals(this.study.getName(), study1.getName());
@@ -429,7 +440,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		// Add new study with new location ID
 		final DmsProject newStudy = this.testDataInitializer
-			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(), null, null);
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				null, null);
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
@@ -496,10 +508,13 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
 
 		final Map<String, String> settingsMap = Maps.newHashMap();
-		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.STUDY_DETAIL).getName(), RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.STUDY_DETAIL).getName(),
+			RandomStringUtils.randomAlphabetic(30));
 		settingsMap.put(this.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "20210501");
-		settingsMap.put(this.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(), RandomStringUtils.randomNumeric(10));
-		final List<String> possibleValues = Arrays.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
+		settingsMap.put(this.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(),
+			RandomStringUtils.randomNumeric(10));
+		final List<String> possibleValues = Arrays
+			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
 		settingsMap.put(this.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(), possibleValues.get(0));
 		importRequest1.setAdditionalInfo(settingsMap);
 		final TrialImportRequestDTO importRequest2 = new TrialImportRequestDTO();
@@ -512,7 +527,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		externalReference.setReferenceSource(RandomStringUtils.randomAlphabetic(20));
 		importRequest2.setExternalReferences(Collections.singletonList(externalReference));
 
-		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop.getCropName(), Arrays.asList(importRequest1, importRequest2), this.testUser.getUserid());
+		final List<StudySummary> savedStudies = this.studyService
+			.saveStudies(this.crop.getCropName(), Arrays.asList(importRequest1, importRequest2), this.testUser.getUserid());
 		Assert.assertEquals(2, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
@@ -537,17 +553,19 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final Map<String, String> settingsMap = Maps.newHashMap();
 		final String invalidVariableName = RandomStringUtils.randomAlphabetic(30);
 		settingsMap.put(invalidVariableName, RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.STUDY_DETAIL).getName(), RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.STUDY_DETAIL).getName(),
+			RandomStringUtils.randomAlphabetic(30));
 		settingsMap.put(this.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "20210501");
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid());
+		final List<StudySummary> savedStudies =
+			this.studyService.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
 		Assert.assertNotNull(study1.getAdditionalInfo());
 		// Verify invalid study variable name was not saved, but the valid ones were
-		Assert.assertEquals(importRequest1.getAdditionalInfo().size()-1, study1.getAdditionalInfo().size());
+		Assert.assertEquals(importRequest1.getAdditionalInfo().size() - 1, study1.getAdditionalInfo().size());
 		Assert.assertFalse(study1.getAdditionalInfo().keySet().contains(invalidVariableName));
 	}
 
@@ -561,13 +579,17 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
 
 		final Map<String, String> settingsMap = Maps.newHashMap();
-		settingsMap.put(this.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(), RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(this.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(),
+			RandomStringUtils.randomAlphabetic(30));
 		settingsMap.put(this.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "2021-05-01");
-		final List<String> possibleValues = Arrays.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
-		settingsMap.put(this.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(), RandomStringUtils.randomAlphabetic(30));
+		final List<String> possibleValues = Arrays
+			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
+		settingsMap.put(this.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(),
+			RandomStringUtils.randomAlphabetic(30));
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid());
+		final List<StudySummary> savedStudies =
+			this.studyService.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
@@ -584,17 +606,23 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
 
 		final Map<String, String> settingsMap = Maps.newHashMap();
-		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.SELECTION_METHOD).getName(), RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.ENVIRONMENT_DETAIL).getName(), RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.TREATMENT_FACTOR).getName(), RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.EXPERIMENTAL_DESIGN).getName(), RandomStringUtils.randomNumeric(5));
-		final List<String> possibleValues = Arrays.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
+		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.SELECTION_METHOD).getName(),
+			RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.ENVIRONMENT_DETAIL).getName(),
+			RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.TREATMENT_FACTOR).getName(),
+			RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(this.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.EXPERIMENTAL_DESIGN).getName(),
+			RandomStringUtils.randomNumeric(5));
+		final List<String> possibleValues = Arrays
+			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
 		settingsMap.put(this.createCategoricalVariable(VariableType.GERMPLASM_DESCRIPTOR, possibleValues).getName(), possibleValues.get(1));
 		settingsMap.put(this.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.TRAIT).getName(), "20210501");
 
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final List<StudySummary> savedStudies = this.studyService.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid());
+		final List<StudySummary> savedStudies =
+			this.studyService.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid());
 		Assert.assertEquals(1, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
@@ -645,32 +673,38 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 	private CVTerm createVariableWithScale(final DataType dataType, final VariableType variableType) {
 		final CVTerm variable = this.testDataInitializer.createTrait(RandomStringUtils.randomAlphabetic(20));
 		final CVTerm scale = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
-		this.daoFactory.getCvTermRelationshipDao().save(new CVTermRelationship(TermId.HAS_SCALE.getId(), variable.getCvTermId(), scale.getCvTermId()));
-		this.daoFactory.getCvTermRelationshipDao().save(new CVTermRelationship(TermId.HAS_TYPE.getId(), scale.getCvTermId(), dataType.getId()));
-		this.daoFactory.getCvTermPropertyDao().save(new CVTermProperty(TermId.VARIABLE_TYPE.getId(), variableType.getName(), 1, variable.getCvTermId()));
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_SCALE.getId(), variable.getCvTermId(), scale.getCvTermId()));
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), scale.getCvTermId(), dataType.getId()));
+		this.daoFactory.getCvTermPropertyDao()
+			.save(new CVTermProperty(TermId.VARIABLE_TYPE.getId(), variableType.getName(), 1, variable.getCvTermId()));
 		return variable;
 	}
 
 	private CVTerm createCategoricalVariable(final VariableType variableType, final List<String> possibleValues) {
 		final CVTerm variable = this.testDataInitializer.createTrait(RandomStringUtils.randomAlphabetic(20));
 		final CVTerm scale = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
-		this.daoFactory.getCvTermRelationshipDao().save(new CVTermRelationship(TermId.HAS_SCALE.getId(), variable.getCvTermId(), scale.getCvTermId()));
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_SCALE.getId(), variable.getCvTermId(), scale.getCvTermId()));
 		this.daoFactory.getCvTermRelationshipDao()
 			.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), scale.getCvTermId(), DataType.CATEGORICAL_VARIABLE
 				.getId()));
-		this.daoFactory.getCvTermPropertyDao().save(new CVTermProperty(TermId.VARIABLE_TYPE.getId(), variableType.getName(), 1, variable.getCvTermId()));
+		this.daoFactory.getCvTermPropertyDao()
+			.save(new CVTermProperty(TermId.VARIABLE_TYPE.getId(), variableType.getName(), 1, variable.getCvTermId()));
 		for (final String value : possibleValues) {
-			final CVTerm categoricalValue = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(10), value, CvId.IBDB_TERMS.getId());
-			this.daoFactory.getCvTermRelationshipDao().save(new CVTermRelationship(TermId.HAS_VALUE.getId(), scale.getCvTermId(), categoricalValue.getCvTermId()));
+			final CVTerm categoricalValue =
+				this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(10), value, CvId.IBDB_TERMS.getId());
+			this.daoFactory.getCvTermRelationshipDao()
+				.save(new CVTermRelationship(TermId.HAS_VALUE.getId(), scale.getCvTermId(), categoricalValue.getCvTermId()));
 		}
 		return variable;
 	}
 
-
-
 	private void createDeletedStudy() {
 		final DmsProject deletedStudy = this.testDataInitializer
-			.createStudy("StudyDeleted", "StudyDeleted-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(), null, null);
+			.createStudy("StudyDeleted", "StudyDeleted-Description", 6, this.commonTestProject.getUniqueID(),
+				this.testUser.getUserid().toString(), null, null);
 		deletedStudy.setDeleted(true);
 		final DmsProject environmentDatasetDeleted =
 			this.testDataInitializer
@@ -682,7 +716,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.testDataInitializer.createTestExperiment(deletedStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
 	}
 
-	private void assertEnvironmentParameter(final List<MeasurementVariable> environmentParameters, final int expectedTermId, final String expectedName,
+	private void assertEnvironmentParameter(final List<MeasurementVariable> environmentParameters, final int expectedTermId,
+		final String expectedName,
 		final String expectedValue) {
 		final Optional<MeasurementVariable> optional = environmentParameters
 			.stream()

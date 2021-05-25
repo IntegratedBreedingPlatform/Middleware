@@ -4,6 +4,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 
 public class CVTermTestDataInitializer {
+
 	public static CVTerm createTerm(final String name, final Integer cvId) {
 
 		final CVTerm term = new CVTerm();

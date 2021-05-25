@@ -113,7 +113,7 @@ public class ManagerFactory implements Serializable {
 
 	private String cropName;
 	private String pedigreeProfile;
-	private static ThreadLocal<ManagerFactory> currentManagerFactory = new ThreadLocal<ManagerFactory>();
+	private static final ThreadLocal<ManagerFactory> currentManagerFactory = new ThreadLocal<ManagerFactory>();
 
 	public ManagerFactory() {
 		ManagerFactory.currentManagerFactory.set(this);
@@ -173,7 +173,7 @@ public class ManagerFactory implements Serializable {
 
 	public OntologyVariableDataManager getOntologyVariableDataManager() {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
-				this.getOntologyScaleDataManager(), this.getFormulaService(), this.sessionProvider);
+			this.getOntologyScaleDataManager(), this.getFormulaService(), this.sessionProvider);
 	}
 
 	public PresetService getPresetService() {

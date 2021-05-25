@@ -41,7 +41,6 @@ import java.util.Map;
 
 /**
  * DAO class for {@link ProjectProperty}.
- *
  */
 public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
@@ -49,13 +48,12 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(ProjectPropertyDao.class);
 
 	/**
-	 *
 	 * @param variableNames
 	 * @return a map with Property names (In UPPERCASE) as keys and a map(variableId, variableType) as Value
 	 */
 	@SuppressWarnings("unchecked")
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByAlias(final List<String> variableNames, final String programUUID)
-			 {
+	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByAlias(final List<String> variableNames,
+		final String programUUID) {
 
 		final List<String> propertyNamesInUpperCase = Lists.transform(variableNames, new Function<String, String>() {
 
@@ -87,7 +85,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			}
 		} catch (final HibernateException e) {
 			final String message =
-					"Error in getStandardVariableIdsWithTypeByPropertyNames=" + variableNames + " in ProjectPropertyDao: " + e.getMessage();
+				"Error in getStandardVariableIdsWithTypeByPropertyNames=" + variableNames + " in ProjectPropertyDao: " + e.getMessage();
 			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -184,7 +182,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getDatasetVariableIdsForVariableTypeIds(final Integer projectId, final List<Integer> variableTypeIds,
-			final List<Integer> varIdsToExclude) {
+		final List<Integer> varIdsToExclude) {
 		final String mainSql = " SELECT variable_id " + " FROM projectprop pp " + " WHERE project_id = :projectId ";
 		final String existsClause = " AND pp.type_id IN (:variableTypeIds) ORDER BY rank ";
 		final boolean doExcludeIds = varIdsToExclude != null && !varIdsToExclude.isEmpty();
@@ -231,21 +229,23 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		excludedIds.add(TermId.LOCATION_ID.getId());
 		final String sql =
 			"	SELECT  "
-			+ "     cvterm.definition AS name,"
-			+ "		(CASE WHEN scale_type.object_id = " + TermId.CATEGORICAL_VARIABLE.getId()
-			+ "		THEN (SELECT incvterm.definition FROM cvterm incvterm WHERE incvterm.cvterm_id = pp.value) "
-			+ "		ELSE pp.value "
-			+ "		END) value, "
-			+ "		pp.project_id AS projectId "
-			+ " FROM projectprop pp "
-			+ " INNER JOIN cvterm cvterm ON cvterm.cvterm_id = pp.variable_id "
-			+ " INNER JOIN cvterm_relationship scale ON scale.subject_id = pp.variable_id AND scale.type_id = " + TermId.HAS_SCALE.getId()
-			+ " INNER JOIN cvterm_relationship scale_type ON scale_type.subject_id = scale.object_id AND scale_type.type_id = " + TermId.HAS_TYPE.getId()
-			+ " WHERE "
-			+ " pp.project_id IN (:studyIds) "
-			+ " AND pp.variable_id NOT IN (:excludedIds) "
+				+ "     cvterm.definition AS name,"
+				+ "		(CASE WHEN scale_type.object_id = " + TermId.CATEGORICAL_VARIABLE.getId()
+				+ "		THEN (SELECT incvterm.definition FROM cvterm incvterm WHERE incvterm.cvterm_id = pp.value) "
+				+ "		ELSE pp.value "
+				+ "		END) value, "
+				+ "		pp.project_id AS projectId "
+				+ " FROM projectprop pp "
+				+ " INNER JOIN cvterm cvterm ON cvterm.cvterm_id = pp.variable_id "
+				+ " INNER JOIN cvterm_relationship scale ON scale.subject_id = pp.variable_id AND scale.type_id = " + TermId.HAS_SCALE
+				.getId()
+				+ " INNER JOIN cvterm_relationship scale_type ON scale_type.subject_id = scale.object_id AND scale_type.type_id = "
+				+ TermId.HAS_TYPE.getId()
+				+ " WHERE "
+				+ " pp.project_id IN (:studyIds) "
+				+ " AND pp.variable_id NOT IN (:excludedIds) "
 				//Exclude Variables with scale PersonId (1901)
-			+ " AND scale.object_id != " + TermId.PERSON_ID.getId();
+				+ " AND scale.object_id != " + TermId.PERSON_ID.getId();
 
 		try {
 			final Query query =
@@ -270,7 +270,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	public void deleteProjectVariables(final Integer projectId, final List<Integer> variableIds) {
 		final String sql = "DELETE FROM projectprop WHERE project_id = :projectId and variable_id IN (:variableIds)";
 		final Query query =
-				this.getSession().createSQLQuery(sql);
+			this.getSession().createSQLQuery(sql);
 		query.setParameter("projectId", projectId);
 		query.setParameterList("variableIds", variableIds);
 		query.executeUpdate();
@@ -304,7 +304,8 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	}
 
 	private List<String> findPlotDatasetVariablesByTypesForStudy(final int studyIdentifier, final List<Integer> variableTypeIds) {
-		final String nameQuery = variableTypeIds.contains(VariableType.GERMPLASM_DESCRIPTOR.getId()) ? " SELECT CASE WHEN pp.alias IS NOT NULL AND pp.alias != '' THEN pp.alias ELSE cvt.name END as name" : " SELECT cvt.name ";
+		final String nameQuery = variableTypeIds.contains(VariableType.GERMPLASM_DESCRIPTOR.getId()) ?
+			" SELECT CASE WHEN pp.alias IS NOT NULL AND pp.alias != '' THEN pp.alias ELSE cvt.name END as name" : " SELECT cvt.name ";
 		final String variablesQuery = nameQuery +
 			" FROM  projectprop pp "
 			+ " INNER JOIN project ds ON ds.project_id = pp.project_ID AND ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
@@ -317,7 +318,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		sqlQuery.setParameterList("variableTypeIds", variableTypeIds);
 		return sqlQuery.list();
 	}
-
 
 	public List<ProjectProperty> getByStudyAndStandardVariableIds(final int studyId, final List<Integer> standardVariableIds) {
 		try {
@@ -364,7 +364,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			+ "   INNER JOIN projectprop pp ON (pp.variable_id = cvt.cvterm_id) \n"
 			+ " WHERE pp.type_id IN (:variablesTypes) AND pp.project_id = :studyId ";
 		final List<MeasurementVariableDto> measurementVariables =
-				this.getVariablesByStudy(datasetId, queryString, variableTypes);
+			this.getVariablesByStudy(datasetId, queryString, variableTypes);
 		if (!measurementVariables.isEmpty()) {
 			return Collections.unmodifiableList(measurementVariables);
 		}
@@ -383,7 +383,8 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			list = criteria.list();
 
 		} catch (final HibernateException e) {
-			final String message = "Error in getByProjectIdAndVariableIds(" + dmsProject.getProjectId() + ", " + standardVariableIds + ") in ProjectPropertyDao";
+			final String message = "Error in getByProjectIdAndVariableIds(" + dmsProject.getProjectId() + ", " + standardVariableIds
+				+ ") in ProjectPropertyDao";
 			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -397,7 +398,8 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			+ " FROM cvterm cvt \n"
 			+ "   INNER JOIN projectprop pp ON (pp.variable_id = cvt.cvterm_id) \n"
 			+ "   INNER JOIN project p ON p.project_id = pp.project_id \n"
-			+ " WHERE pp.type_id IN (:variablesTypes) AND p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
+			+ " WHERE pp.type_id IN (:variablesTypes) AND p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA
+			.getId()
 			+ " \n";
 		final List<MeasurementVariableDto> measurementVariables =
 			this.getVariablesByStudy(studyIdentifier, queryString, variableTypes);
@@ -406,6 +408,5 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		}
 		return Collections.unmodifiableList(Collections.<MeasurementVariableDto>emptyList());
 	}
-
 
 }

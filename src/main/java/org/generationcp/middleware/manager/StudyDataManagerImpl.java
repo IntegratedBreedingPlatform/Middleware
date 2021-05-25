@@ -566,7 +566,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 				for (final Variable variable : exp.getVariableList().getVariables()) {
 					final int val =
 						this.daoFactory.getPhenotypeDAO().updatePhenotypesByExperimentIdAndObervableId(experimentModel.getNdExperimentId(),
-						variable.getVariableType().getId(), variable.getValue());
+							variable.getVariableType().getId(), variable.getValue());
 					if (val == 0) {
 						this.getPhenotypeSaver().save(experimentModel.getNdExperimentId(), variable);
 					}
@@ -932,19 +932,23 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			for (final FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
 				if (trial.getBlockId() != null) {
 					trial.updateBlockInformation(this.locationDataManager.getBlockInformation(trial.getBlockId()));
-				} else if (!Util.isEmpty(trial.getFieldMapLabels())){
+				} else if (!Util.isEmpty(trial.getFieldMapLabels())) {
 					// Row and Column should not be empty
-					final List<FieldMapLabel> rows = trial.getFieldMapLabels().stream().filter(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getColumn()) > 0).collect(
-						Collectors.toList());
-					final List<FieldMapLabel> ranges = trial.getFieldMapLabels().stream().filter(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getRange()) > 0).collect(
-						Collectors.toList());
+					final List<FieldMapLabel> rows =
+						trial.getFieldMapLabels().stream().filter(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getColumn()) > 0).collect(
+							Collectors.toList());
+					final List<FieldMapLabel> ranges =
+						trial.getFieldMapLabels().stream().filter(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getRange()) > 0).collect(
+							Collectors.toList());
 					if (!Util.isEmpty(rows) && !Util.isEmpty(ranges)) {
 						// If fieldMapLabels is not empty but no blockId, set rowsInBlock
 						// and rangeInBlock value based fieldMapLabels
-						final List<FieldMapLabel> rowsInBlock = rows.stream().sorted(Comparator.comparingInt(FieldMapLabel::getColumn).reversed()).collect(
-							Collectors.toList());
-						final List<FieldMapLabel> range = ranges.stream().sorted(Comparator.comparingInt(FieldMapLabel::getRange).reversed()).collect(
-							Collectors.toList());
+						final List<FieldMapLabel> rowsInBlock =
+							rows.stream().sorted(Comparator.comparingInt(FieldMapLabel::getColumn).reversed()).collect(
+								Collectors.toList());
+						final List<FieldMapLabel> range =
+							ranges.stream().sorted(Comparator.comparingInt(FieldMapLabel::getRange).reversed()).collect(
+								Collectors.toList());
 						trial.setRowsInBlock(rowsInBlock.get(0).getColumn());
 						trial.setRangesInBlock(range.get(0).getRange());
 
@@ -1342,7 +1346,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	private boolean hasInvalidCoordinateValue(final List<FieldMapLabel> labels) {
 		if (!CollectionUtils.isEmpty(labels)) {
-			return labels.stream().anyMatch(fieldMapLabel -> Util.getIntValue(fieldMapLabel.getColumn()) <= 0 || Util.getIntValue(fieldMapLabel.getRange()) <= 0);
+			return labels.stream().anyMatch(
+				fieldMapLabel -> Util.getIntValue(fieldMapLabel.getColumn()) <= 0 || Util.getIntValue(fieldMapLabel.getRange()) <= 0);
 		}
 		return false;
 	}
@@ -1351,10 +1356,10 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		if (!CollectionUtils.isEmpty(labels)) {
 			final List<String> existing = new ArrayList<>();
 			for (final FieldMapLabel label : labels) {
-				if (existing.contains(label.getRange()+"-"+label.getColumn())) {
+				if (existing.contains(label.getRange() + "-" + label.getColumn())) {
 					return true;
 				} else {
-					existing.add(label.getRange()+"-"+label.getColumn());
+					existing.add(label.getRange() + "-" + label.getColumn());
 				}
 			}
 		}

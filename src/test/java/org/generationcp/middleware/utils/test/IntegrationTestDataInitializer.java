@@ -68,25 +68,25 @@ import java.util.UUID;
 
 public class IntegrationTestDataInitializer {
 
-	private ExperimentDao experimentDao;
-	private ExperimentPropertyDao experimentPropertyDao;
-	private GeolocationDao geolocationDao;
-	private GeolocationPropertyDao geolocationPropertyDao;
-	private StockDao stockDao;
-	private DmsProjectDao dmsProjectDao;
-	private GermplasmDAO germplasmDao;
-	private PhenotypeDao phenotypeDao;
-	private CVTermDao cvTermDao;
-	private SampleDao sampleDao;
-	private SampleListDao sampleListDao;
-	private ProjectPropertyDao projectPropertyDao;
-	private StudyTypeDAO studyTypeDAO;
-	private NameDAO nameDAO;
+	private final ExperimentDao experimentDao;
+	private final ExperimentPropertyDao experimentPropertyDao;
+	private final GeolocationDao geolocationDao;
+	private final GeolocationPropertyDao geolocationPropertyDao;
+	private final StockDao stockDao;
+	private final DmsProjectDao dmsProjectDao;
+	private final GermplasmDAO germplasmDao;
+	private final PhenotypeDao phenotypeDao;
+	private final CVTermDao cvTermDao;
+	private final SampleDao sampleDao;
+	private final SampleListDao sampleListDao;
+	private final ProjectPropertyDao projectPropertyDao;
+	private final StudyTypeDAO studyTypeDAO;
+	private final NameDAO nameDAO;
 
-	private WorkbenchDaoFactory workbenchDaoFactory;
-	private DaoFactory daoFactory;
-	private UserService userService;
-	private WorkbenchDataManager workbenchDataManager;
+	private final WorkbenchDaoFactory workbenchDaoFactory;
+	private final DaoFactory daoFactory;
+	private final UserService userService;
+	private final WorkbenchDataManager workbenchDataManager;
 
 	public IntegrationTestDataInitializer(final HibernateSessionProvider hibernateSessionProvider,
 		final HibernateSessionProvider workbenchSessionProvider) {
@@ -113,7 +113,8 @@ public class IntegrationTestDataInitializer {
 		this.nameDAO.setSession(hibernateSessionProvider.getSession());
 	}
 
-	public DmsProject createStudy(final String name, final String description, final int studyTypeId, final String programUUID, final String createdBy, final String startDate, final String endDate) {
+	public DmsProject createStudy(final String name, final String description, final int studyTypeId, final String programUUID,
+		final String createdBy, final String startDate, final String endDate) {
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setName(name);
 		dmsProject.setDescription(description);

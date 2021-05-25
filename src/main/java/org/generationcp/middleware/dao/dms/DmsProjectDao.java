@@ -1256,7 +1256,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return studyIdEnvironmentDatasetIdMap;
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error getting getStudyIdEnvironmentDatasetIdMap for studyIds=" + studyIds + ":" + e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				"Error getting getStudyIdEnvironmentDatasetIdMap for studyIds=" + studyIds + ":" + e.getMessage(), e);
 		}
 	}
 
@@ -1278,7 +1279,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final List<Map<String, Object>> results = sqlQuery.list();
 
 			for (final Map<String, Object> result : results) {
-				final ObservationLevel observationLevel = new ObservationLevel((Integer)result.get("datasetTypeId"), "study");
+				final ObservationLevel observationLevel = new ObservationLevel((Integer) result.get("datasetTypeId"), "study");
 				final Integer studyId = (Integer) result.get("studyId");
 
 				observationLevelsMap.putIfAbsent(studyId, new ArrayList<>());
@@ -1652,9 +1653,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studyInstanceDto.setProgramName(String.valueOf(result.get("programName")));
 			studyInstanceDto.setContacts(Collections.singletonList(new ContactDto(String.valueOf(result.get("contactDbId")),
 				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
-			if(result.get("experimentalDesignId") != null) {
+			if (result.get("experimentalDesignId") != null) {
 				studyInstanceDto.setExperimentalDesign(new ExperimentalDesign(
-					String.valueOf(result.get("experimentalDesignId")),	String.valueOf(result.get("experimentalDesign"))));
+					String.valueOf(result.get("experimentalDesignId")), String.valueOf(result.get("experimentalDesign"))));
 			}
 
 			final Map<String, String> lastUpdate = new HashMap<>();
@@ -1673,7 +1674,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.setActive(((Integer) result.get("active")) == 1 ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
 
 			final Map<String, String> properties = new HashMap<>();
-			properties.put("studyObjective", result.get("studyObjective") ==  null ? "" : String.valueOf(result.get("studyObjective")));
+			properties.put("studyObjective", result.get("studyObjective") == null ? "" : String.valueOf(result.get("studyObjective")));
 			studyInstanceDto.setAdditionalInfo(properties);
 
 			studyInstanceDtoList.add(studyInstanceDto);
@@ -1795,8 +1796,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append(" 	 pmain.name AS trialName, ");
 		sql.append("     MAX(pmain.start_date) AS startDate, ");
 		sql.append("     MAX(pmain.end_date) AS endDate, ");
-		sql.append("     CASE WHEN pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) "
-			+ "THEN 0 ELSE 1 END AS active, ");
+		sql.append(
+			"     CASE WHEN pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) "
+				+ "THEN 0 ELSE 1 END AS active, ");
 		sql.append("     location.locid AS locationDbId, ");
 		sql.append("     location.lname AS locationName, ");
 		sql.append("     wp.project_name AS programName, ");
@@ -1834,8 +1836,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append(" 	 study_exp.obs_unit_id AS trialPUI, ");
 		sql.append("     pmain.start_date AS startDate, ");
 		sql.append("     pmain.end_date AS endDate, ");
-		sql.append("     CASE WHEN pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) "
-			+ "THEN 0 ELSE 1 END AS active, ");
+		sql.append(
+			"     CASE WHEN pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) "
+				+ "THEN 0 ELSE 1 END AS active, ");
 		sql.append("     wp.project_name AS programName, ");
 		sql.append("     pmain.program_uuid AS programDbId, ");
 		// locationDbId is not unique to study but can have different value per environment.
@@ -1883,8 +1886,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     location ON geopropLocation.value = location.locid");
 		sql.append("         LEFT OUTER JOIN ");
-		sql.append("     nd_geolocationprop geopropExperimentalDesign ON geopropExperimentalDesign.nd_geolocation_id = geoloc.nd_geolocation_id"
-			+ " AND geopropExperimentalDesign.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		sql.append(
+			"     nd_geolocationprop geopropExperimentalDesign ON geopropExperimentalDesign.nd_geolocation_id = geoloc.nd_geolocation_id"
+				+ " AND geopropExperimentalDesign.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId());
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     cvterm cvtermExptDesign ON cvtermExptDesign.cvterm_id = geopropExperimentalDesign.value");
 		sql.append("         LEFT OUTER JOIN ");
@@ -1964,9 +1968,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		if (studySearchFilter.getActive() != null) {
 			if (BooleanUtils.isTrue(studySearchFilter.getActive())) {
-				sql.append(" AND (pmain.end_date IS NULL or LENGTH(pmain.end_date) = 0 OR CONVERT(pmain.end_date, UNSIGNED) >= CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) ) ");
+				sql.append(
+					" AND (pmain.end_date IS NULL or LENGTH(pmain.end_date) = 0 OR CONVERT(pmain.end_date, UNSIGNED) >= CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) ) ");
 			} else {
-				sql.append(" AND pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) ");
+				sql.append(
+					" AND pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) ");
 			}
 
 		}

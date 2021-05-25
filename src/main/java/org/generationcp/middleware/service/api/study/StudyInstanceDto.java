@@ -321,7 +321,7 @@ public class StudyInstanceDto {
 	}
 
 	public Map<String, String> getAdditionalInfo() {
-		return additionalInfo;
+		return this.additionalInfo;
 	}
 
 	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
@@ -329,7 +329,7 @@ public class StudyInstanceDto {
 	}
 
 	public List<ContactDto> getContacts() {
-		return contacts;
+		return this.contacts;
 	}
 
 	public void setContacts(final List<ContactDto> contacts) {
@@ -337,7 +337,7 @@ public class StudyInstanceDto {
 	}
 
 	public String getCulturalPractices() {
-		return culturalPractices;
+		return this.culturalPractices;
 	}
 
 	public void setCulturalPractices(final String culturalPractices) {
@@ -345,7 +345,7 @@ public class StudyInstanceDto {
 	}
 
 	public List<String> getDataLinks() {
-		return dataLinks;
+		return this.dataLinks;
 	}
 
 	public void setDataLinks(final List<String> dataLinks) {
@@ -353,7 +353,7 @@ public class StudyInstanceDto {
 	}
 
 	public List<EnvironmentParameter> getEnvironmentParameters() {
-		return environmentParameters;
+		return this.environmentParameters;
 	}
 
 	public void setEnvironmentParameters(final List<EnvironmentParameter> environmentParameters) {
@@ -361,7 +361,7 @@ public class StudyInstanceDto {
 	}
 
 	public ExperimentalDesign getExperimentalDesign() {
-		return experimentalDesign;
+		return this.experimentalDesign;
 	}
 
 	public void setExperimentalDesign(final ExperimentalDesign experimentalDesign) {
@@ -369,7 +369,7 @@ public class StudyInstanceDto {
 	}
 
 	public List<String> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
 	public void setExternalReferences(final List<String> externalReferences) {
@@ -377,7 +377,7 @@ public class StudyInstanceDto {
 	}
 
 	public String getGrowthFacility() {
-		return growthFacility;
+		return this.growthFacility;
 	}
 
 	public void setGrowthFacility(final String growthFacility) {
@@ -385,7 +385,7 @@ public class StudyInstanceDto {
 	}
 
 	public Map<String, String> getLastUpdate() {
-		return lastUpdate;
+		return this.lastUpdate;
 	}
 
 	public void setLastUpdate(final Map<String, String> lastUpdate) {
@@ -393,7 +393,7 @@ public class StudyInstanceDto {
 	}
 
 	public String getLicense() {
-		return license;
+		return this.license;
 	}
 
 	public void setLicense(final String license) {
@@ -401,7 +401,7 @@ public class StudyInstanceDto {
 	}
 
 	public String getObservationUnitsDescription() {
-		return observationUnitsDescription;
+		return this.observationUnitsDescription;
 	}
 
 	public void setObservationUnitsDescription(final String observationUnitsDescription) {
@@ -409,7 +409,7 @@ public class StudyInstanceDto {
 	}
 
 	public String getStudyCode() {
-		return studyCode;
+		return this.studyCode;
 	}
 
 	public void setStudyCode(final String studyCode) {
@@ -417,7 +417,7 @@ public class StudyInstanceDto {
 	}
 
 	public String getStudyDescription() {
-		return studyDescription;
+		return this.studyDescription;
 	}
 
 	public void setStudyDescription(final String studyDescription) {
@@ -425,7 +425,7 @@ public class StudyInstanceDto {
 	}
 
 	public String getStudyPUI() {
-		return studyPUI;
+		return this.studyPUI;
 	}
 
 	public void setStudyPUI(final String studyPUI) {
@@ -433,7 +433,7 @@ public class StudyInstanceDto {
 	}
 
 	public List<ObservationLevel> getObservationLevels() {
-		return observationLevels;
+		return this.observationLevels;
 	}
 
 	public void setObservationLevels(final List<ObservationLevel> observationLevels) {
