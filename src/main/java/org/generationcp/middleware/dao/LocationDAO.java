@@ -1025,7 +1025,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				coordinatesList.add(longitude);
 				coordinatesList.add(latitude);
 				if (altitude != null) {
-					// Only add altitube if available.
+					// Only add altitude if available.
 					coordinatesList.add(altitude);
 				}
 				final Geometry geometry = new Geometry(coordinatesList, "Point");

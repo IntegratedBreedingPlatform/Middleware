@@ -26,13 +26,8 @@ public class DatePropertySerializer extends JsonSerializer<Date> {
 			return;
 		}
 
-		if (serializers.getActiveView() != null) {
-			if (BrapiView.BrapiV1_3.class.equals(serializers.getActiveView()) || BrapiView.BrapiV1_2.class
-				.equals(serializers.getActiveView())) {
-				gen.writeString(this.formatterSimple.format(value));
-			} else {
-				gen.writeString(this.formatterWithTime.format(value));
-			}
+		if (serializers.getActiveView() != null && BrapiView.BrapiV2.class.equals(serializers.getActiveView())) {
+			gen.writeString(this.formatterWithTime.format(value));
 		} else {
 			gen.writeString(this.formatterSimple.format(value));
 		}
