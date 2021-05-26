@@ -1,11 +1,14 @@
 package org.generationcp.middleware.service.api.study;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.user.ContactDto;
+import org.generationcp.middleware.util.serializer.DatePropertySerializer;
+import org.generationcp.middleware.util.serializer.SeasonPropertySerializer;
+import org.generationcp.middleware.util.serializer.StringToBooleanSerializer;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -52,7 +55,7 @@ public class StudyInstanceDto {
 	private String observationUnitsDescription = StringUtils.EMPTY;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private String studyCode  = StringUtils.EMPTY;
+	private String studyCode = StringUtils.EMPTY;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String studyDescription;
@@ -63,16 +66,24 @@ public class StudyInstanceDto {
 	@JsonView(BrapiView.BrapiV2.class)
 	private List<ObservationLevel> observationLevels;
 
+	// Use custom serializer to convert string to boolean if active view is for 2.0
+	@JsonSerialize(using = StringToBooleanSerializer.class)
 	private String active;
 
 	private String commonCropName;
 
 	private String documentationURL;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	// Use custom serializer to format date according to view
+	// V1.2-3 - yyyy-MM-dd
+	// V2.0 - yyyy-MM-dd'T'HH:mm:ss.SSS'Z
+	@JsonSerialize(using = DatePropertySerializer.class)
 	private Date startDate;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	// User custom serializer to format date according to view
+	// V1.2-3 - yyyy-MM-dd
+	// V2.0 - yyyy-MM-dd'T'HH:mm:ss.SSS'Z
+	@JsonSerialize(using = DatePropertySerializer.class)
 	private Date endDate;
 
 	private String studyDbId;
@@ -85,6 +96,7 @@ public class StudyInstanceDto {
 
 	private String studyTypeName;
 
+	@JsonSerialize(using = SeasonPropertySerializer.class)
 	private List<SeasonDto> seasons;
 
 	private String locationDbId;

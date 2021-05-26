@@ -39,7 +39,7 @@ public class StudyMetadata {
 
 	private String experimentalDesign;
 
-	private String lastUpdate;
+	private Date lastUpdate;
 
 	private transient int hashCode;
 
@@ -49,7 +49,7 @@ public class StudyMetadata {
 	public StudyMetadata(final Integer nurseryOrTrialId, final Integer studyDbId, final Integer locationId, final Boolean active,
 		final Date endDate, final Date startDate, final Integer trialDbId, final List<String> seasons, final String trialName,
 		final String studyType, final String studyTypeName, final String studyName, final String studyDescription, final String experimentalDesign,
-		final String lastUpdate) {
+		final Date lastUpdate) {
 		this.nurseryOrTrialId = nurseryOrTrialId;
 		this.studyDbId = studyDbId;
 		this.locationId = locationId;
@@ -206,11 +206,11 @@ public class StudyMetadata {
 		return this;
 	}
 
-	public String getLastUpdate() {
+	public Date getLastUpdate() {
 		return this.lastUpdate;
 	}
 
-	public StudyMetadata setLastUpdate(final String lastUpdate) {
+	public StudyMetadata setLastUpdate(final Date lastUpdate) {
 		this.lastUpdate = lastUpdate;
 		return this;
 	}

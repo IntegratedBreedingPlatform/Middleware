@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.brapi.v1.germplasm;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -37,7 +38,7 @@ public class GermplasmDTO {
 	private String seedSource;
 	private String entryNumber;
 	private String germplasmOrigin;
-	private Map<String, String> synonyms;
+	private List<Synonym> synonyms;
 	private Map<String, String> additionalInfo;
 	private String gid;
 	private List<ExternalReferenceDTO> externalReferences;
@@ -245,11 +246,11 @@ public class GermplasmDTO {
 		this.germplasmOrigin = germplasmOrigin;
 	}
 
-	public Map<String, String> getSynonyms() {
+	public List<Synonym> getSynonyms() {
 		return synonyms;
 	}
 
-	public void setSynonyms(final Map<String, String> synonyms) {
+	public void setSynonyms(final List<Synonym> synonyms) {
 		this.synonyms = synonyms;
 	}
 

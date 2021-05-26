@@ -214,6 +214,16 @@
         </sql>
 	</changeSet>
 
+    <changeSet author="corina" id="v18.1.0-13">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM udflds WHERE ftable='ATRIBITS' AND ftype='PASSPORT' AND fcode='COLLSITE';</sqlCheck>
+		</preConditions>
+		<comment>Correct spelling of ftable for udflds COLLSITE</comment>
+        <sql>
+			UPDATE udflds SET ftable='ATRIBUTS' WHERE ftable='ATRIBITS' AND ftype='PASSPORT' AND fcode='COLLSITE';
+        </sql>
+    </changeSet>
+
 	<changeSet author="nahuel" id="v18.1.0-13">
         <preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
