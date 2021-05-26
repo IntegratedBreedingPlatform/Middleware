@@ -419,33 +419,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return this.daoFactory.getAttributeDAO().countAttributesByGUID(gemrplasmUUID, attributeDbIds);
 	}
 
-	@Override
-	public Germplasm getGermplasmWithPreferredName(final Integer gid) {
-		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
-		if (germplasm != null) {
-			// Old data has germplasm with multiple preferred names, get the first preferred name for those germplasm
-			// Replace with germplasm.setPreferredName(this.daoFactory.getNameDao().getPreferredNameByGid(gid)) when IBP-4596 is resolved
-			final List<Name> names = this.daoFactory.getNameDao().getByGIDWithFilters(gid, 1, null);
-			if (!names.isEmpty()) {
-				germplasm.setPreferredName(names.get(0));
-			}
-		}
-		return germplasm;
-	}
-
-	@Override
-	public List<Germplasm> getProgenitorsWithPreferredName(final Integer gid) {
-		return this.daoFactory.getGermplasmDao().getProgenitorsByGIDWithPrefName(gid);
-	}
-
 	private void saveGermplasmUpdateDTO(final Map<String, Integer> attributeCodes,
-	  final Map<String, Integer> nameCodes,
-	  final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
-	  final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
-	  final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
-	  final Map<String, Germplasm> progenitorsMapByGid,
-	  final List<Integer> gidsOfGermplasmWithDescendants,
-	  final Multimap<String, Object[]> conflictErrors) {
+		final Map<String, Integer> nameCodes,
+		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
+		final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
+		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
+		final Map<String, Germplasm> progenitorsMapByGid,
+		final List<Integer> gidsOfGermplasmWithDescendants,
+		final Multimap<String, Object[]> conflictErrors) {
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
 			this.getGermplasmUpdateDTOByGidOrUUID(germplasm, germplasmUpdateDTOMap);
 		if (optionalGermplasmUpdateDTO.isPresent()) {

@@ -44,7 +44,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
-	public void testGetGermplasmPedigreeTree_When_DerivativeAndIncludeDerivativeLinesIsFalse() {
+	public void testGetGermplasmPedigreeTree_DerivativeAndIncludeDerivativeLinesIsFalse() {
 		final Germplasm rootGermplasm = this.createGermplasm(this.derivativeMethod, -1, 0, 0, 0);
 		final Germplasm parentGermplasm = this.createGermplasm(this.maintenanceMethod, -1,
 			rootGermplasm.getGid(), rootGermplasm.getGid(), 0);
@@ -59,7 +59,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
-	public void testGetGermplasmPedigreeTree_When_DerivativeAndIncludeDerivativeLinesIsTrue() {
+	public void testGetGermplasmPedigreeTree_DerivativeAndIncludeDerivativeLinesIsTrue() {
 		final Germplasm ancestorGermplasm = this.createGermplasm(this.derivativeMethod, -1, 0, 0, 0);
 		final Germplasm parentGermplasm = this.createGermplasm(this.maintenanceMethod, -1,
 			ancestorGermplasm.getGid(), ancestorGermplasm.getGid(), 0);
@@ -86,7 +86,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
-	public void testGetGermplasmPedigreeTree_When_CrossWithKnownParents() {
+	public void testGetGermplasmPedigreeTree_CrossWithKnownParents() {
 		final Germplasm femaleParent = this.createGermplasm(this.maintenanceMethod, -1,
 			0, 0, 0);
 		final Germplasm maleParent = this.createGermplasm(this.maintenanceMethod, -1,
@@ -108,7 +108,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
-	public void testGetGermplasmPedigreeTree_When_PolyCross() {
+	public void testGetGermplasmPedigreeTree_PolyCross() {
 		final Germplasm femaleParent = this.createGermplasm(this.maintenanceMethod, -1,
 			0, 0, 0);
 		final Germplasm maleParent1 = this.createGermplasm(this.maintenanceMethod, -1,
@@ -136,7 +136,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
-	public void testGetGermplasmPedigreeTree_When_CrossWithUnknownMaleParent() {
+	public void testGetGermplasmPedigreeTree_CrossWithUnknownMaleParent() {
 		final Germplasm femaleParent = this.createGermplasm(this.maintenanceMethod, -1,
 			0, 0, 0);
 		final Germplasm germplasm = this.createGermplasm(this.generativeMethod, 2,
@@ -156,7 +156,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
-	public void testCountGenerations_When_DerivativeAndIncludeDerivativeLinesIsFalse() {
+	public void testCountGenerations_DerivativeAndIncludeDerivativeLinesIsFalse() {
 		final Germplasm rootGermplasm = this.createGermplasm(this.derivativeMethod, -1, 0, 0, 0);
 		final Germplasm parentGermplasm = this.createGermplasm(this.maintenanceMethod, -1,
 			rootGermplasm.getGid(), rootGermplasm.getGid(), 0);
@@ -168,7 +168,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
-	public void testCountGenerations_When_DerivativeAndIncludeDerivativeLinesIsTrue() {
+	public void testCountGenerations_DerivativeAndIncludeDerivativeLinesIsTrue() {
 		final Germplasm ancestorGermplasm = this.createGermplasm(this.derivativeMethod, -1, 0, 0, 0);
 		final Germplasm parentGermplasm = this.createGermplasm(this.maintenanceMethod, -1,
 			ancestorGermplasm.getGid(), ancestorGermplasm.getGid(), 0);
@@ -180,7 +180,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
-	public void testCountGenerations_When_CrossWithKnownParents() {
+	public void testCountGenerations_CrossWithKnownParents() {
 		final Germplasm femaleParent = this.createGermplasm(this.maintenanceMethod, -1,
 			0, 0, 0);
 		final Germplasm maleParent = this.createGermplasm(this.maintenanceMethod, -1,
@@ -193,7 +193,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
-	public void testCountGenerations_When_PolyCross() {
+	public void testCountGenerations_PolyCross() {
 		final Germplasm femaleParent = this.createGermplasm(this.maintenanceMethod, -1,
 			0, 0, 0);
 		final Germplasm maleParent1 = this.createGermplasm(this.maintenanceMethod, -1,
@@ -209,7 +209,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
-	public void testCountGenerations_When_CrossWithUnknownMaleParent() {
+	public void testCountGenerations_CrossWithUnknownMaleParent() {
 		final Germplasm femaleParent = this.createGermplasm(this.maintenanceMethod, -1,
 			0, 0, 0);
 		final Germplasm germplasm = this.createGermplasm(this.generativeMethod, 2,

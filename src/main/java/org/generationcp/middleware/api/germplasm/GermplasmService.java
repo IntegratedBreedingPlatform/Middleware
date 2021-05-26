@@ -127,8 +127,4 @@ public interface GermplasmService {
 
 	void updateGermplasmPedigree(Integer gid, ProgenitorsUpdateRequestDto progenitorsUpdateRequstDto);
 
-	Germplasm getGermplasmWithPreferredName(Integer gid);
-
-	List<Germplasm> getProgenitorsWithPreferredName(final Integer gid);
-
 }

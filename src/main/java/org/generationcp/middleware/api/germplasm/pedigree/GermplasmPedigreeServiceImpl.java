@@ -1,6 +1,5 @@
 package org.generationcp.middleware.api.germplasm.pedigree;
 
-import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -10,16 +9,12 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 
 public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 
 	private final DaoFactory daoFactory;
-
-	@Resource
-	private GermplasmService germplasmService;
 
 	public static final int MAX_GENERATIONS_COUNT = 5;
 	private static final ThreadLocal<Integer> GENERATIONS_COUNTER = new ThreadLocal<>();
@@ -30,14 +25,14 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	}
 
 	@Override
-	public GermplasmTreeNode getGermplasmPedigreeTree(final Integer gid, Integer level, final boolean includeDerivativeLines) {
-		final Germplasm root = this.germplasmService.getGermplasmWithPreferredName(gid);
+	public GermplasmTreeNode getGermplasmPedigreeTree(final Integer gid, final Integer level, final boolean includeDerivativeLines) {
+		final Germplasm root = this.daoFactory.getGermplasmDao().getById(gid);
 
 		final GermplasmTreeNode rootNode = new GermplasmTreeNode(root);
 		rootNode.setNumberOfGenerations(this.countGenerations(gid, includeDerivativeLines, level == null));
-		level = level == null ? rootNode.getNumberOfGenerations() : level;
-		if (level > 1) {
-			this.addParents(rootNode, level, root, !includeDerivativeLines);
+		final int finalLevel = level != null ? level : rootNode.getNumberOfGenerations();
+		if (finalLevel > 1) {
+			this.addParents(rootNode, finalLevel, root, !includeDerivativeLines);
 		}
 
 		return rootNode;
@@ -93,7 +88,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		try {
 			CALCULATE_FULL.set(calculateFull);
 			GENERATIONS_COUNTER.set(1);
-			final Germplasm root = this.germplasmService.getGermplasmWithPreferredName(gid);
+			final Germplasm root = this.daoFactory.getGermplasmDao().getById(gid);
 			return this.getNumberOfGenerations(root, includeDerivativeLine);
 		} catch (final MaxPedigreeLevelReachedException e) {
 			return GENERATIONS_COUNTER.get();
@@ -155,7 +150,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	 * Integer which is the number of steps left to take
 	 */
 	private Object[] traceRoot(final Integer gid, final int steps, final char methodType) {
-		final Germplasm germplasm = this.germplasmService.getGermplasmWithPreferredName(gid);
+		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
 
 		if (germplasm == null) {
 			return new Object[0];
@@ -236,9 +231,8 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 
 			// If there are more parents, get and add each of them
 			if (germplasm.getGnpgs() > 2) {
-				final List<Germplasm> otherParents =
-					this.germplasmService.getProgenitorsWithPreferredName(germplasm.getGid());
-				for (final Germplasm otherParent : otherParents) {
+				for (final Progenitor progenitor : germplasm.getOtherProgenitors()) {
+					final Germplasm otherParent = progenitor.getProgenitorGermplasm();
 					final GermplasmTreeNode maleParentNode = new GermplasmTreeNode(otherParent);
 					node.getOtherProgenitors().add(this.addParents(maleParentNode, level - 1, otherParent, excludeDerivativeLines));
 				}
@@ -274,7 +268,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		return new GermplasmTreeNode(0, Name.UNKNOWN, null, null, null);
 	}
 
-	public Integer getNumberOfGenerations(final Germplasm germplasm, final Boolean includeDerivativeLine) {
+	public Integer getNumberOfGenerations(final Germplasm germplasm, final boolean includeDerivativeLine) {
 		Integer maxPedigreeLevel = 0;
 
 		if (germplasm == null || germplasm.getGid() == 0) {

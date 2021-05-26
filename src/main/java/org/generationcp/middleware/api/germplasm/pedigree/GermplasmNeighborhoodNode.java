@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.germplasm.pedigree;
 
 import org.generationcp.middleware.pojos.Germplasm;
+import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
@@ -47,5 +48,20 @@ public class GermplasmNeighborhoodNode {
 
 	public void setLinkedNodes(final List<GermplasmNeighborhoodNode> linkedNodes) {
 		this.linkedNodes = linkedNodes;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 }
