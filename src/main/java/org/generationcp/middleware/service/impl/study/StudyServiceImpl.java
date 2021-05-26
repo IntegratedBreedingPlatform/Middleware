@@ -366,7 +366,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final Map<String, String> properties = new HashMap<>();
 				variableIds = environmentVariables.stream().map(measurementVariable -> measurementVariable.getTermId())
 					.collect(Collectors.toList());
-				properties.put("studyObjective", studyMetadata.getStudyObjective());
+				properties.put("studyObjective", studyMetadata.getStudyObjective() == null ? "" : studyMetadata.getStudyObjective());
 				properties.putAll(this.studyDataManager.getGeolocationPropsAndValuesByGeolocation(instanceId, variableIds));
 				final Map<Integer, Map<String, String>> projectPropMap = this.daoFactory.getProjectPropertyDAO().getProjectPropsAndValuesByStudyIds(
 					Collections.singletonList(studyMetadata.getNurseryOrTrialId()));
@@ -553,7 +553,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 						studySummary.addSeason(value);
 					} else if (variableId.equals(TermId.LOCATION_ID.getId())) {
 						studySummary.setLocationId(!StringUtils.isEmpty(value) ? value : null);
-					} else {
+					} else if (!StringUtils.isEmpty(value)) {
 						additionalProps.put(prop.getAlias(), value);
 					}
 				}

@@ -69,7 +69,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 		}
 
 		return this.daoFactory.getMethodDAO().filterMethods(methodSearchRequest, pageable).stream()
-			.map(BreedingMethodDTO::new)
+			.map(method -> new BreedingMethodDTO(method))
 			.collect(Collectors.toList());
 	}
 

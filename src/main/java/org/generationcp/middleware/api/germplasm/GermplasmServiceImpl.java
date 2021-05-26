@@ -1514,13 +1514,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final String defaultName = germplasmDTO.getGermplasmName();
 			final List<Name> names = gidNamesMap.get(gid);
 			if (!CollectionUtils.isEmpty(names)) {
-				final Map<String, String> synonymsMap = new HashMap<>();
+				final List<Synonym> synonymsList = new ArrayList<>();
 				final List<Name> synonyms =
 					names.stream().filter(n -> !n.getNval().equalsIgnoreCase(defaultName)).collect(Collectors.toList());
 				for (final Name name : synonyms) {
-					synonymsMap.put(nameTypesMap.get(name.getTypeId()), name.getNval());
+					synonymsList.add(new Synonym(name.getNval(), nameTypesMap.get(name.getTypeId())));
 				}
-				germplasmDTO.setSynonyms(synonymsMap);
+				germplasmDTO.setSynonyms(synonymsList);
 			}
 			germplasmDTO.setAdditionalInfo(gidAttributesMap.get(gid));
 		}
