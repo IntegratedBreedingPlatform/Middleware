@@ -20,11 +20,11 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -450,19 +450,19 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 	}
 
-	public List<UserDefinedField> getGermplasmAttributeTypes(final LotsSearchDto searchDto) {
+	public List<CVTerm> getGermplasmAttributeTypes(final LotsSearchDto searchDto) {
 		try {
 			final StringBuilder lotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
 
-			final String sql = "select distinct {u.*} from atributs a inner join udflds u "
+			final String sql = "select distinct {cv.*} from atributs a inner join cvterm cv "
 				+ " 	inner join (" + lotsQuery + ") lots on lots.gid = a.gid"
-				+ " where a.atype = u.fldno"
-				+ " order by u.fname";
+				+ " where a.atype = cv.cvterm_id"
+				+ " order by cv.name";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), searchDto);
-			query.addEntity("u", UserDefinedField.class);
+			query.addEntity("cv", CVTerm.class);
 			return query.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error at getGermplasmAttributeTypes() in LotDAO: " + e.getMessage(), e);
