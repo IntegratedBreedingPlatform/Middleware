@@ -1689,7 +1689,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			.addScalar("breedingLocationId")
 			.addScalar("breedingLocation").addScalar("breedingMethodId").addScalar("breedingMethod")
 			.addScalar("isGroupedLine", new BooleanType())
-			.addScalar("groupId").addScalar("gpid1").addScalar("gpid2").addScalar("gnpgs").addScalar("createdByUserId");
+			.addScalar("groupId").addScalar("gpid1").addScalar("gpid2").addScalar("numberOfProgenitors").addScalar("createdByUserId");
 	}
 
 	public List<GermplasmDto> findGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto, final Pageable pageable) {
