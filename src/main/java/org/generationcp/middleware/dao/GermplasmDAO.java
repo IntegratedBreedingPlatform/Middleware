@@ -95,7 +95,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		+ "    g.mgid as groupId, " //
 		+ "    g.gpid1 as gpid1, "  //
 		+ "    g.gpid2 as gpid2, "
-		+ "    g.gnpgs as gnpgs, "
+		+ "    g.gnpgs as numberOfProgenitors, "
 		+ "    g.created_by as createdByUserId " //
 		+ "    from " //
 		+ "    germplsm g " //
