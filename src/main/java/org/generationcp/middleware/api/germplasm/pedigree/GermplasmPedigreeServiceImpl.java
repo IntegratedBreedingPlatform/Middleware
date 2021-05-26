@@ -46,7 +46,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 		if (currentGermplasm != null) {
 			germplasmGenerationHistory.add(currentGermplasm);
 
-			while (currentGermplasm.getGnpgs() == -1) {
+			while (currentGermplasm.getNumberOfProgenitors() == -1) {
 				// trace back the sources
 				final Integer sourceId = currentGermplasm.getGpid2();
 				currentGermplasm = this.daoFactory.getGermplasmDao().getGermplasmDtoByGid(sourceId);
