@@ -52,7 +52,7 @@ public class GermplasmDataManagerDataInitializer {
 
     public static Name createGermplasmName(final Integer gid, final String name) {
         return new Name(null, gid, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(),
-                NSTAT_PREFERRED_VALUE, TEST_USER_ID, name, TEST_LOCATION_ID, 20160216, 0);
+                NSTAT_PREFERRED_VALUE, name, TEST_LOCATION_ID, 20160216, 0);
     }
 
     public static Map<Integer, GermplasmPedigreeTreeNode> createTreeNodeMap(final boolean singleParent) {

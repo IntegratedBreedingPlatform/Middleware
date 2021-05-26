@@ -874,7 +874,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				studyMetadata.setStudyDescription((row[12] instanceof String) ? (String) row[12] : null);
 				studyMetadata.setStudyObjective((row[13] instanceof String) ? (String) row[13] : null);
 				studyMetadata.setExperimentalDesign((row[14] instanceof String) ? (String) row[14] : null);
-				studyMetadata.setLastUpdate((row[15] instanceof String) ? (String) row[15] : null);
+				studyMetadata.setLastUpdate(Util.tryParseDate((String) row[15]));
 				return studyMetadata;
 			} else {
 				return null;
@@ -1277,8 +1277,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final List<Map<String, Object>> results = sqlQuery.list();
 
 			for (final Map<String, Object> result : results) {
-				final ObservationLevel observationLevel = new ObservationLevel((Integer)result.get("datasetTypeId"),
-					String.valueOf(result.get("datasetName")));
+				final ObservationLevel observationLevel = new ObservationLevel((Integer)result.get("datasetTypeId"), "study");
 				final Integer studyId = (Integer) result.get("studyId");
 
 				observationLevelsMap.putIfAbsent(studyId, new ArrayList<>());
@@ -1617,7 +1616,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sqlQuery.addScalar("locationName");
 		sqlQuery.addScalar("programDbId");
 		sqlQuery.addScalar("programName");
-		sqlQuery.addScalar("contactDbid");
+		sqlQuery.addScalar("contactDbId");
 		sqlQuery.addScalar("contactName");
 		sqlQuery.addScalar("email");
 		sqlQuery.addScalar("experimentalDesign");
@@ -1650,7 +1649,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studyInstanceDto.setLocationName(String.valueOf(result.get("locationName")));
 			studyInstanceDto.setProgramDbId(String.valueOf(result.get("programDbId")));
 			studyInstanceDto.setProgramName(String.valueOf(result.get("programName")));
-			studyInstanceDto.setContacts(Collections.singletonList(new ContactDto((Integer) result.get("contactDbId"),
+			studyInstanceDto.setContacts(Collections.singletonList(new ContactDto(String.valueOf(result.get("contactDbId")),
 				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
 			if(result.get("experimentalDesignId") != null) {
 				studyInstanceDto.setExperimentalDesign(new ExperimentalDesign(
@@ -1718,7 +1717,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studySummary.setProgramDbId(String.valueOf(result.get("programDbId")));
 			studySummary.setProgramName(String.valueOf(result.get("programName")));
 			studySummary.setActive(((Integer) result.get("active")) == 1);
-			studySummary.setContacts(Collections.singletonList(new ContactDto((Integer) result.get("contactDbId"),
+			studySummary.setContacts(Collections.singletonList(new ContactDto(String.valueOf(result.get("contactDbId")),
 				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
 			studyList.add(studySummary);
 		}

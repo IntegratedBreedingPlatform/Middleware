@@ -525,11 +525,9 @@ public interface FieldbookService {
 	 *
 	 * @param nameValue
 	 *            the name value
-	 * @param userId
-	 *            the user id
 	 * @return the integer
 	 */
-	Integer addGermplasm(String nameValue, int userId, CropType cropType);
+	Integer addGermplasm(String nameValue, CropType cropType);
 
 	/**
 	 * Adds the germplasm.

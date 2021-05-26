@@ -4,14 +4,224 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet author="corina" id="v18.1.0-1">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">SELECT count(*) FROM udflds WHERE ftable='ATRIBITS' AND fcode='COLLSITE';</sqlCheck>
+	<changeSet author="lkovacic" id="v18.1.0-1">
+        <preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="atributs" columnName="created_by"/>
+				<columnExists tableName="atributs" columnName="modified_by"/>
+				<columnExists tableName="atributs" columnName="created_date"/>
+				<columnExists tableName="atributs" columnName="modified_date"/>
+			</not>
 		</preConditions>
-		<comment>Correct spelling of ftable for udflds COLLSITE</comment>
-        <sql>
-			UPDATE udflds SET ftable='ATRIBUTS' WHERE ftable='ATRIBITS' AND fcode='COLLSITE';
+        <comment>
+            Add fields for auditing to table 'atributs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE atributs CHANGE auid created_by int default 0 not null;
+			ALTER TABLE atributs ADD modified_by int null;
+			ALTER TABLE atributs ADD created_date timestamp default CURRENT_TIMESTAMP not null;
+			ALTER TABLE atributs ADD modified_date timestamp null;
         </sql>
     </changeSet>
 
+	<changeSet author="lkovacic" id="v18.1.0-2">
+        <preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="bibrefs" columnName="created_by"/>
+				<columnExists tableName="bibrefs" columnName="modified_by"/>
+				<columnExists tableName="bibrefs" columnName="created_date"/>
+				<columnExists tableName="bibrefs" columnName="modified_date"/>
+			</not>
+		</preConditions>
+        <comment>
+            Add fields for auditing to table 'bibrefs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE bibrefs ADD created_by int default 0 not null;
+			ALTER TABLE bibrefs ADD modified_by int null;
+			ALTER TABLE bibrefs ADD created_date timestamp default CURRENT_TIMESTAMP not null;
+			ALTER TABLE bibrefs ADD modified_date timestamp null;
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-3">
+        <preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="germplsm" columnName="created_by"/>
+				<columnExists tableName="germplsm" columnName="modified_by"/>
+				<columnExists tableName="germplsm" columnName="created_date"/>
+				<columnExists tableName="germplsm" columnName="modified_date"/>
+			</not>
+		</preConditions>
+        <comment>
+            Add fields for auditing to table 'germplsm'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE germplsm CHANGE germuid created_by int default 0 not null;
+			ALTER TABLE germplsm ADD modified_by int null;
+			ALTER TABLE germplsm ADD created_date timestamp default CURRENT_TIMESTAMP not null;
+			ALTER TABLE germplsm ADD modified_date timestamp null;
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-4">
+        <preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="names" columnName="created_by"/>
+				<columnExists tableName="names" columnName="modified_by"/>
+				<columnExists tableName="names" columnName="created_date"/>
+				<columnExists tableName="names" columnName="modified_date"/>
+			</not>
+		</preConditions>
+        <comment>
+            Add fields for auditing to table 'names'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE names CHANGE nuid created_by int default 0 not null;
+			ALTER TABLE names ADD modified_by int null;
+			ALTER TABLE names ADD created_date timestamp default CURRENT_TIMESTAMP not null;
+			ALTER TABLE names ADD modified_date timestamp null;
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-5">
+        <preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="progntrs" columnName="created_by"/>
+				<columnExists tableName="progntrs" columnName="modified_by"/>
+				<columnExists tableName="progntrs" columnName="created_date"/>
+				<columnExists tableName="progntrs" columnName="modified_date"/>
+			</not>
+		</preConditions>
+        <comment>
+            Add fields for auditing to table 'progntrs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE progntrs ADD created_by int default 0 not null;
+			ALTER TABLE progntrs ADD modified_by int null;
+			ALTER TABLE progntrs ADD created_date timestamp default CURRENT_TIMESTAMP not null;
+			ALTER TABLE progntrs ADD modified_date timestamp null;
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-6">
+        <preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="external_reference" columnName="created_by"/>
+				<columnExists tableName="external_reference" columnName="modified_by"/>
+				<columnExists tableName="external_reference" columnName="modified_date"/>
+			</not>
+		</preConditions>
+        <comment>
+            Add fields for auditing to table 'external_reference'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			ALTER TABLE external_reference ADD created_by int default 0 not null;
+			ALTER TABLE external_reference ADD modified_by int null;
+			ALTER TABLE external_reference ADD modified_date timestamp null;
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(1) > 0 FROM germplsm WHERE created_by = 0;</sqlCheck>
+		</preConditions>
+		<comment>
+            Data migration for field 'created_by' of table 'germplsm'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			UPDATE germplsm SET created_by = (SELECT userid FROM workbench.users WHERE uname = 'admin') WHERE created_by = 0;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(1) > 0 FROM bibrefs WHERE created_by = 0;</sqlCheck>
+		</preConditions>
+		<comment>
+            Data migration for field 'created_by' of table 'bibrefs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			UPDATE bibrefs b INNER JOIN germplsm g
+				ON b.refid = g.gref
+			SET b.created_by = g.created_by WHERE b.created_by = 0;
+			<!-- Fail safe -->
+			UPDATE bibrefs SET created_by = (SELECT userid FROM workbench.users WHERE uname = 'admin') WHERE created_by = 0;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(1) > 0 FROM progntrs WHERE created_by = 0;</sqlCheck>
+		</preConditions>
+		<comment>
+			Data migration for field 'created_by' of table 'progntrs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			UPDATE progntrs p INNER JOIN germplsm g
+    			ON p.gid = g.gid
+			SET p.created_by = g.created_by WHERE p.created_by = 0;
+			<!-- Fail safe -->
+			UPDATE progntrs SET created_by = (SELECT userid FROM workbench.users WHERE uname = 'admin') WHERE created_by = 0;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-10">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(1) > 0 FROM atributs WHERE created_by = 0;</sqlCheck>
+		</preConditions>
+		<comment>
+            Data migration for field 'created_by' of table 'atributs'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			UPDATE atributs a
+				INNER JOIN germplsm g on a.gid = g.gid
+				SET a.created_by = g.created_by WHERE a.created_by = 0;
+			<!-- Fail safe -->
+			UPDATE atributs SET created_by = (SELECT userid FROM workbench.users WHERE uname = 'admin') WHERE created_by = 0;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-11">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(1) > 0 FROM names WHERE created_by = 0;</sqlCheck>
+		</preConditions>
+		<comment>
+            Data migration for fields 'created_by' of table 'names'
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			UPDATE names n
+				INNER JOIN germplsm g on n.gid = g.gid
+				SET n.created_by = g.created_by WHERE n.created_by = 0;
+			<!-- Fail safe -->
+			UPDATE names SET created_by = (SELECT userid FROM workbench.users WHERE uname = 'admin') WHERE created_by = 0;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-12">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(1) > 0 FROM external_reference WHERE created_by = 0;</sqlCheck>
+		</preConditions>
+		<comment>
+            Audit fields data migration for 'external_reference' table
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			UPDATE external_reference er
+				JOIN germplsm g on g.gid = er.gid
+			SET er.created_by = g.created_by WHERE er.created_by = 0;
+			<!-- Fail safe -->
+			UPDATE external_reference SET created_by = (SELECT userid FROM workbench.users WHERE uname = 'admin') WHERE created_by = 0;
+        </sql>
+	</changeSet>
+
+    <changeSet author="corina" id="v18.1.0-13">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM udflds WHERE ftable='ATRIBITS' AND ftype='PASSPORT' AND fcode='COLLSITE';</sqlCheck>
+		</preConditions>
+		<comment>Correct spelling of ftable for udflds COLLSITE</comment>
+        <sql>
+			UPDATE udflds SET ftable='ATRIBUTS' WHERE ftable='ATRIBITS' AND ftype='PASSPORT' AND fcode='COLLSITE';
+        </sql>
+    </changeSet>
+	
 </databaseChangeLog>
