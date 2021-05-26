@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.germplasm.search;
 
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public interface GermplasmSearchService {
 
 	long countSearchGermplasm(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
-	List<UserDefinedField> getGermplasmAttributeTypes(GermplasmSearchRequest germplasmSearchRequest);
+	List<CVTerm> getGermplasmAttributeTypes(GermplasmSearchRequest germplasmSearchRequest);
 
 	List<UserDefinedField> getGermplasmNameTypes(GermplasmSearchRequest germplasmSearchRequest);
 

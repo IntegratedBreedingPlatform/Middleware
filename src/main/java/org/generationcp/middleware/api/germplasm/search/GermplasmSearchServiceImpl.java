@@ -5,6 +5,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +36,7 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 	}
 
 	@Override
-	public List<UserDefinedField> getGermplasmAttributeTypes(final GermplasmSearchRequest germplasmSearchRequest) {
+	public List<CVTerm> getGermplasmAttributeTypes(final GermplasmSearchRequest germplasmSearchRequest) {
 		return this.daoFactory.getGermplasmSearchDAO().getGermplasmAttributeTypes(germplasmSearchRequest);
 	}
 

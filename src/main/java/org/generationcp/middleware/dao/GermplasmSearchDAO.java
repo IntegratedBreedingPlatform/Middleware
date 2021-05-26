@@ -24,6 +24,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
@@ -1534,17 +1535,17 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			.list();
 	}
 
-	public List<UserDefinedField> getGermplasmAttributeTypes(final GermplasmSearchRequest germplasmSearchRequest) {
+	public List<CVTerm> getGermplasmAttributeTypes(final GermplasmSearchRequest germplasmSearchRequest) {
 		try {
 
 			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
-			final String sql = "select distinct {u.*} from atributs a inner join udflds u "
-				+ " where a.atype = u.fldno"
+			final String sql = "select distinct {cv.*} from atributs a inner join cvterm cv "
+				+ " where a.atype = cv.cvterm_id"
 				+ " and a.gid in (:gids)"
-				+ " order by u.fname";
+				+ " order by cv.name";
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			query.addEntity("u", UserDefinedField.class);
+			query.addEntity("cv", CVTerm.class);
 			query.setParameterList("gids", gids);
 
 			return query.list();
