@@ -1,5 +1,6 @@
 package org.generationcp.middleware.hibernate;
 
+import org.generationcp.middleware.hibernate.listener.CustomPreDeleteEventListener;
 import org.generationcp.middleware.hibernate.listener.CustomPreUpdateEventListener;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -21,6 +22,7 @@ public class CustomIntegrator implements Integrator {
 
 		final EventListenerRegistry service = sessionFactory.getServiceRegistry().getService(EventListenerRegistry.class);
 		service.getEventListenerGroup(EventType.PRE_UPDATE).appendListener(new CustomPreUpdateEventListener());
+		service.getEventListenerGroup(EventType.PRE_DELETE).appendListener(new CustomPreDeleteEventListener());
 	}
 
 	@Override
