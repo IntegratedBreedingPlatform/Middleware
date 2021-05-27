@@ -516,7 +516,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="nahuel" id="v18.1.0-16">
+	<changeSet author="nahuel" id="v18.1.0-25">
         <preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(1) from cvterm where cvterm_id = 1121
