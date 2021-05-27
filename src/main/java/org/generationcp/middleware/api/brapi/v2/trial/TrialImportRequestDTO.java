@@ -2,7 +2,6 @@ package org.generationcp.middleware.api.brapi.v2.trial;
 
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
-import org.generationcp.middleware.pojos.workbench.Contact;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
