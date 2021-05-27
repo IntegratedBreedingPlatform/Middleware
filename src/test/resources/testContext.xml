@@ -290,6 +290,10 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
+	<bean id="germplasmPedigreeService" class="org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 	<bean id="locationService" class="org.generationcp.middleware.api.location.LocationServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
