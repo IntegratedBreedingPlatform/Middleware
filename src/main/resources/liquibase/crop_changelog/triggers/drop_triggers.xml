@@ -17,7 +17,7 @@
 
 	<changeSet author="lkovacic" id="v18.1.0-check_no_audit_triggers" runOnChange="true" runAlways="true">
     	<preConditions onFail="HALT" onFailMessage="There are still triggers for audit. Please, execute the following statement: SHOW TRIGGERS and add missings triggers in drop_triggers.sql">
-			<sqlCheck expectedResult="0">SELECT count(1) FROM information_schema.TRIGGERS WHERE TRIGGER_NAME LIKE '%_aud%';</sqlCheck>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM information_schema.TRIGGERS WHERE TRIGGER_NAME LIKE '%_aud%' AND TRIGGER_SCHEMA = (select database())</sqlCheck>
 		</preConditions>
 		<comment>Ensure all audit triggers has been dropped</comment>
 	</changeSet>
