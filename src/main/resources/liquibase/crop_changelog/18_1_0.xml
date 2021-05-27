@@ -276,7 +276,7 @@
        </createTable>
     </changeSet>
 
-	<changeSet author="nahuel" id="v18.1.0-14">
+	<changeSet author="nahuel" id="v18.1.0-16">
         <preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(1) from cvterm where cvterm_id = 1121
