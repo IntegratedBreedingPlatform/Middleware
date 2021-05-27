@@ -651,15 +651,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 			final DmsProject study = this.createStudy(userId, studyTypeByName, trialImportRequestDto);
 			this.setStudySettings(trialImportRequestDto, study, variableNamesMap, variableSynonymsMap, categoricalVariablesMap);
 			this.setStudyExternalReferences(trialImportRequestDto, study);
-			final DmsProjectDao dmsProjectDAO = this.daoFactory.getDmsProjectDAO();
 			this.daoFactory.getDmsProjectDAO().save(study);
 
 			// Save environment and plot datasets
 			final DmsProject envDataset =
-				this.saveDataset(study, dmsProjectDAO, StudyServiceImpl.ENVIRONMENT,
-					envDatasetType, true);
-			this.saveDataset(study, dmsProjectDAO, StudyServiceImpl.PLOT,
-				plotDatasetType, false);
+				this.saveDataset(study, StudyServiceImpl.ENVIRONMENT, envDatasetType, true);
+			this.saveDataset(study, StudyServiceImpl.PLOT, plotDatasetType, false);
 
 			this.saveTrialInstance(study, envDataset, cropType);
 			studyIds.add(study.getProjectId().toString());
@@ -717,7 +714,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		}
 	}
 
-	private DmsProject saveDataset(final DmsProject study, final DmsProjectDao dmsProjectDAO, final String suffix,
+	private DmsProject saveDataset(final DmsProject study, final String suffix,
 		final DatasetType datasetType, final boolean isEnvironmentDataset) {
 		final DmsProject dataset = new DmsProject();
 		final String envDatasetname = study.getName() + suffix;
@@ -729,7 +726,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		dataset.setDatasetType(datasetType);
 		dataset.setParent(study);
 		this.addDatasetVariables(dataset, isEnvironmentDataset);
-		dmsProjectDAO.save(dataset);
+		this.daoFactory.getDmsProjectDAO().save(dataset);
 		return dataset;
 	}
 
