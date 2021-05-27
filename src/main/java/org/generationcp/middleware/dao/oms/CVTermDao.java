@@ -141,7 +141,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		try {
 			if (!namesUppercase.isEmpty()) {
 
-				final StringBuilder sqlString = new StringBuilder().append("SELECT cvt.name AS name, cvt.cvterm_id AS termId, dataType.object_id As dataTypeId")
+				final StringBuilder sqlString = new StringBuilder().append("SELECT UPPER(cvt.name) AS name, cvt.cvterm_id AS termId, dataType.object_id As dataTypeId")
 					.append(" FROM cvterm cvt ")
 					.append(" INNER JOIN cvterm_relationship hasScale ON hasScale.subject_id = cvt.cvterm_id AND hasScale.type_id = "
 						+ TermId.HAS_SCALE.getId() + " ")
@@ -183,7 +183,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		try {
 			if (!namesUppercase.isEmpty()) {
 
-				final StringBuilder sqlString = new StringBuilder().append("SELECT syn.synonym AS name, cvt.cvterm_id AS termId, dataType.object_id AS dataTypeId ")
+				final StringBuilder sqlString = new StringBuilder().append("SELECT UPPER(syn.synonym) AS name, cvt.cvterm_id AS termId, dataType.object_id AS dataTypeId ")
 					.append(" FROM cvterm cvt ")
 					.append(" INNER JOIN cvterm_relationship hasScale ON hasScale.subject_id = cvt.cvterm_id AND hasScale.type_id = "
 						+ TermId.HAS_SCALE.getId() + " ")
