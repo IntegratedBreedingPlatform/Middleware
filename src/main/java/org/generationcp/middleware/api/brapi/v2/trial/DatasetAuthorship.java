@@ -57,4 +57,9 @@ public class DatasetAuthorship {
 		return Pojomatic.equals(this, o);
 	}
 
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
 }

@@ -163,4 +163,9 @@ public class TrialImportRequestDTO {
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
 }

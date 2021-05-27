@@ -34,4 +34,9 @@ public class Publication {
 	public String toString() {
 		return Pojomatic.toString(this);
 	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
 }
