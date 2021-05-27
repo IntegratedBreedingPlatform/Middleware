@@ -1,0 +1,25 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v18.1.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM workbench_tool WHERE name = 'backup_restore';
+            </sqlCheck>
+        </preConditions>
+        <comment>Remove 'backup_restore' tool</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE permission
+				SET workbench_sidebar_category_link_id = NULL
+				WHERE workbench_sidebar_category_link_id = (SELECT sidebar_category_link_id
+															FROM workbench_sidebar_category_link
+															WHERE tool_name = 'backup_restore');
+			DELETE FROM workbench_sidebar_category_link WHERE tool_name = 'backup_restore';
+			DELETE FROM workbench_tool WHERE name = 'backup_restore';
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
