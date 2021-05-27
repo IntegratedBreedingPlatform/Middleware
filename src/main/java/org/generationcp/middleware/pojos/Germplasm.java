@@ -330,6 +330,20 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	@JoinColumn(name = "gid")
 	private List<ExternalReference> externalReferences = new ArrayList<>();
 
+	@Basic(optional = false)
+	@XmlElement(name = "femaleParent")
+	@NotFound(action = NotFoundAction.IGNORE)
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "gpid1", insertable = false, updatable = false)
+	private Germplasm femaleParent;
+
+	@Basic(optional = false)
+	@XmlElement(name = "maleParent")
+	@OneToOne(fetch = FetchType.LAZY)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "gpid2", insertable = false, updatable = false)
+	private Germplasm maleParent;
+
 	@OneToMany(mappedBy = "germplasm", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<Progenitor> otherProgenitors = new ArrayList<>();
 
@@ -983,6 +997,22 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 
 	public void setOtherProgenitors(final List<Progenitor> otherProgenitors) {
 		this.otherProgenitors = otherProgenitors;
+	}
+
+	public Germplasm getFemaleParent() {
+		return this.femaleParent;
+	}
+
+	public void setFemaleParent(final Germplasm femaleParent) {
+		this.femaleParent = femaleParent;
+	}
+
+	public Germplasm getMaleParent() {
+		return this.maleParent;
+	}
+
+	public void setMaleParent(final Germplasm maleParent) {
+		this.maleParent = maleParent;
 	}
 
 	/**

@@ -90,11 +90,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Project> getProjectsByCrop(final CropType cropType) {
-		return this.workbenchDaoFactory.getProjectDAO().getProjectsByCrop(cropType);
-	}
-
-	@Override
 	public List<Project> getProjectsByCropName(final String cropName) {
 		return this.workbenchDaoFactory.getProjectDAO().getProjectsByCropName(cropName);
 	}

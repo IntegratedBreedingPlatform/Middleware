@@ -23,7 +23,6 @@ import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
-import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,9 +42,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private WorkbenchDataManager workbenchDataManager;
-
-	@Autowired
-	private UserService userService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -160,54 +156,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	public void testGetLastOpenedProject() {
 		final Project results = this.workbenchDataManager.getLastOpenedProject(this.testUser1.getUserid());
 		Assert.assertNotNull(results);
-	}
-
-	@Test
-	public void testGetProjectsList() {
-		final List<Project> results = this.workbenchDataManager.getProjects(0, 100);
-		Assert.assertNotNull(results);
-		Assert.assertFalse(results.isEmpty());
-	}
-
-	@Test
-	public void testGetProjectsByCrop() {
-		// Add another maize project and verify projects retrieved for maize crop
-		final CropType maizeCropType = new CropType(CropType.CropEnum.MAIZE.toString());
-		final int NUM_NEW_MAIZE_PROJECTS = 2;
-		final List<Project> maizeProjectsBeforeChange = this.workbenchDataManager.getProjectsByCrop(maizeCropType);
-		this.createTestProjectsForCrop(maizeCropType, NUM_NEW_MAIZE_PROJECTS);
-		this.verifyProjectsRetrievedPerCrop(maizeCropType, maizeProjectsBeforeChange, NUM_NEW_MAIZE_PROJECTS);
-
-		// for all other installed crops, except for maize, create projects and retrieve projects for that crop
-		final int NUM_NEW_PROJECTS = 3;
-		final List<CropType> installedCrops = this.workbenchDataManager.getInstalledCropDatabses();
-		for (final CropType crop : installedCrops) {
-			if (!crop.equals(maizeCropType)) {
-				final List<Project> projectsBeforeChange = this.workbenchDataManager.getProjectsByCrop(crop);
-				this.createTestProjectsForCrop(crop, NUM_NEW_PROJECTS);
-				this.verifyProjectsRetrievedPerCrop(crop, projectsBeforeChange, NUM_NEW_PROJECTS);
-			}
-		}
-
-	}
-
-	// Verify projects were retrieved properly for specified crop
-	private void verifyProjectsRetrievedPerCrop(final CropType cropType, final List<Project> projectsBeforeChange,
-		final int noOfNewProjects) {
-		final List<Project> projects = this.workbenchDataManager.getProjectsByCrop(cropType);
-		Assert.assertEquals("Number of " + cropType.getCropName() + " projects should have been incremented by " + noOfNewProjects,
-			projectsBeforeChange.size() + noOfNewProjects, projects.size());
-		for (final Project project : projects) {
-			Assert.assertEquals(cropType, project.getCropType());
-		}
-	}
-
-	private void createTestProjectsForCrop(final CropType cropType, final int noOfProjects) {
-		this.workbenchTestDataUtil.setCropType(cropType);
-		for (int i = 0; i < noOfProjects; i++) {
-			final Project project = this.workbenchTestDataUtil.createTestProjectData();
-			this.workbenchDataManager.addProject(project);
-		}
 	}
 
 	@Test
