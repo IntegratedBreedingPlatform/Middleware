@@ -22,7 +22,7 @@ public class CategoricalValueValidator implements VariableValueValidator {
 
 	private void verifyCategoricalDataType(final MeasurementVariable variable) {
 		if (!DataType.CATEGORICAL_VARIABLE.getId().equals(variable.getDataTypeId())) {
-			throw new IllegalStateException("The ensureCharacterDataType method must never be called for non character variables. "
+			throw new IllegalStateException("The verifyCategoricalDataType method must never be called for non categorical variables. "
 				+ "Please report this error to your administrator.");
 		} else if (CollectionUtils.isEmpty(variable.getPossibleValues())){
 			throw new IllegalStateException("The categorical variable " + variable.getTermId() + " do not have possible values. "

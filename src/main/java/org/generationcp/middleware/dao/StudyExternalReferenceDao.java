@@ -15,14 +15,12 @@ public class StudyExternalReferenceDao extends GenericDAO<StudyExternalReference
 
 	private static final Logger LOG = LoggerFactory.getLogger(StudyExternalReferenceDao.class);
 
-	private static final String GET_EXTERNAL_REFERENCES =
-		"SELECT CAST(study_id AS CHAR(255)) as entityId, reference_id as referenceID, reference_source referenceSource "
-			+ "FROM external_reference_study WHERE study_id IN (:studyIds)";
-
 	public List<ExternalReferenceDTO> getExternalReferences(final List<Integer> studyIds) {
 
 		try {
-			final SQLQuery sqlQuery = this.getSession().createSQLQuery(GET_EXTERNAL_REFERENCES);
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(
+				"SELECT CAST(study_id AS CHAR(255)) as entityId, reference_id as referenceID, reference_source referenceSource "
+					+ "FROM external_reference_study WHERE study_id IN (:studyIds)");
 
 			sqlQuery.addScalar("entityId").addScalar("referenceID").addScalar("referenceSource")
 				.setResultTransformer(new AliasToBeanResultTransformer(ExternalReferenceDTO.class));

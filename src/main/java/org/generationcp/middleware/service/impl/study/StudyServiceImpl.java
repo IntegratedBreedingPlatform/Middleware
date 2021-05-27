@@ -30,7 +30,6 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.StudyExternalReference;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -91,9 +90,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 	private StudyMeasurements studyMeasurements;
 
 	@Resource
-	private OntologyVariableDataManager ontologyVariableDataManager;
-
-	@Resource
 	private StudyDataManager studyDataManager;
 
 	@Resource
@@ -101,9 +97,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Resource
 	private VariableDataValidatorFactory variableDataValidatorFactory;
-
-	@Resource
-	private WorkbenchDataManager workbenchDataManager;
 
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 
@@ -627,7 +620,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public List<StudySummary> saveStudies(final String cropName, final List<TrialImportRequestDTO> trialImportRequestDtoList,
 		final Integer userId) {
-		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
+		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(cropName);
 		final List<String> studyIds = new ArrayList<>();
 		final StudyType studyTypeByName = this.daoFactory.getStudyTypeDao().getStudyTypeByName(StudyTypeDto.TRIAL_NAME);
 		final DatasetType envDatasetType = this.daoFactory.getDatasetTypeDao().getById(DatasetTypeEnum.SUMMARY_DATA.getId());

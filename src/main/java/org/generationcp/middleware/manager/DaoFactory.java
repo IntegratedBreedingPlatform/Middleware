@@ -4,6 +4,7 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
+import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.GermplasmExternalReferenceDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -356,6 +357,12 @@ public class DaoFactory {
 		final UserProgramTreeStateDAO userProgramTreeStateDAO = new UserProgramTreeStateDAO();
 		userProgramTreeStateDAO.setSession(this.sessionProvider.getSession());
 		return userProgramTreeStateDAO;
+	}
+
+	public CropTypeDAO getCropTypeDAO() {
+		final CropTypeDAO cropTypeDAO = new CropTypeDAO();
+		cropTypeDAO.setSession(this.sessionProvider.getSession());
+		return cropTypeDAO;
 	}
 
 	public BreedersQueryDao getBreedersQueryDao() {

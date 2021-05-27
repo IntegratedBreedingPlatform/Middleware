@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.brapi.v2.trial;
 
+import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
@@ -22,5 +23,15 @@ public class Publication {
 
 	public void setPublicationReference(final String publicationReference) {
 		this.publicationReference = publicationReference;
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
 	}
 }

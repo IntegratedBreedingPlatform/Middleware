@@ -39,6 +39,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
+import org.hibernate.transform.Transformers;
 import org.hibernate.type.DoubleType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -52,6 +53,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -134,15 +136,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	public Map<String, MeasurementVariable> getVariablesByNamesAndVariableType(final List<String> names, final VariableType variableType) {
 		final Map<String, MeasurementVariable> stdVarMap = new HashMap<>();
 
-		// Store the names in the map in uppercase
-		for (int i = 0, size = names.size(); i < size; i++) {
-			names.set(i, names.get(i).toUpperCase());
-		}
+		final List<String> namesUppercase = names.stream().map(String::toUpperCase).collect(Collectors.toList());
 
 		try {
-			if (!names.isEmpty()) {
+			if (!namesUppercase.isEmpty()) {
 
-				final StringBuilder sqlString = new StringBuilder().append("SELECT cvt.name, cvt.cvterm_id, dataType.object_id ")
+				final StringBuilder sqlString = new StringBuilder().append("SELECT cvt.name AS name, cvt.cvterm_id AS termId, dataType.object_id As dataTypeId")
 					.append(" FROM cvterm cvt ")
 					.append(" INNER JOIN cvterm_relationship hasScale ON hasScale.subject_id = cvt.cvterm_id AND hasScale.type_id = "
 						+ TermId.HAS_SCALE.getId() + " ")
@@ -155,21 +154,16 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 				final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 				query.setParameter("cvId", CvId.VARIABLES.getId());
-				query.setParameterList("names", names);
+				query.setParameterList("names", namesUppercase);
 				query.setParameter("variableType", variableType.getName());
 
-				final List<Object[]> results = query.list();
+				query.addScalar("name", StringType.INSTANCE);
+				query.addScalar("termId", IntegerType.INSTANCE);
+				query.addScalar("dataTypeId", IntegerType.INSTANCE);
+				query.setResultTransformer(Transformers.aliasToBean(MeasurementVariable.class));
+				final List<MeasurementVariable> results = query.list();
 
-				for (final Object[] row : results) {
-					final String name = ((String) row[0]).trim().toUpperCase();
-					final Integer cvtermId = (Integer) row[1];
-					final Integer dataTypeId = (Integer) row[2];
-
-					final MeasurementVariable variable = new MeasurementVariable();
-					variable.setTermId(cvtermId);
-					variable.setDataTypeId(dataTypeId);
-					stdVarMap.put(name, variable);
-				}
+				return results.stream().collect(Collectors.toMap(MeasurementVariable::getName, Function.identity()));
 
 			}
 
@@ -184,15 +178,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		final VariableType variableType) {
 		final Map<String, MeasurementVariable> stdVarMap = new HashMap<>();
 
-		// Store the names in the map in uppercase
-		for (int i = 0, size = names.size(); i < size; i++) {
-			names.set(i, names.get(i).toUpperCase());
-		}
+		final List<String> namesUppercase = names.stream().map(String::toUpperCase).collect(Collectors.toList());
 
 		try {
-			if (!names.isEmpty()) {
+			if (!namesUppercase.isEmpty()) {
 
-				final StringBuilder sqlString = new StringBuilder().append("SELECT syn.synonym, cvt.cvterm_id, dataType.object_id ")
+				final StringBuilder sqlString = new StringBuilder().append("SELECT syn.synonym AS name, cvt.cvterm_id AS termId, dataType.object_id AS dataTypeId ")
 					.append(" FROM cvterm cvt ")
 					.append(" INNER JOIN cvterm_relationship hasScale ON hasScale.subject_id = cvt.cvterm_id AND hasScale.type_id = "
 						+ TermId.HAS_SCALE.getId() + " ")
@@ -206,21 +197,16 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 				final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 				query.setParameter("cvId", CvId.VARIABLES.getId());
-				query.setParameterList("names", names);
+				query.setParameterList("names", namesUppercase);
 				query.setParameter("variableType", variableType.getName());
 
-				final List<Object[]> results = query.list();
+				query.addScalar("name", StringType.INSTANCE);
+				query.addScalar("termId", IntegerType.INSTANCE);
+				query.addScalar("dataTypeId", IntegerType.INSTANCE);
+				query.setResultTransformer(Transformers.aliasToBean(MeasurementVariable.class));
+				final List<MeasurementVariable> results = query.list();
 
-				for (final Object[] row : results) {
-					final String name = ((String) row[0]).trim().toUpperCase();
-					final Integer cvtermId = (Integer) row[1];
-					final Integer dataTypeId = (Integer) row[2];
-
-					final MeasurementVariable variable = new MeasurementVariable();
-					variable.setTermId(cvtermId);
-					variable.setDataTypeId(dataTypeId);
-					stdVarMap.put(name, variable);
-				}
+				return results.stream().collect(Collectors.toMap(MeasurementVariable::getName, Function.identity()));
 
 			}
 
