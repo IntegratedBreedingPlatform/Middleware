@@ -47,6 +47,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * DAO class for {@link Location}.
@@ -1143,5 +1144,13 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				this.getLogExceptionMessage("getDefaultLocationByType", "type", String.valueOf(type), e.getMessage(), "Location"),
 				e);
 		}
+	}
+
+	public Optional<Location> getUnspecifiedLocation() {
+		final List<Location> locations = this.getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
+		if (!locations.isEmpty()) {
+			return Optional.of(locations.get(0));
+		}
+		return Optional.empty();
 	}
 }

@@ -177,20 +177,6 @@ public class ProjectDAOTest extends IntegrationTestBase {
 		Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
 	}
 
-	@Test
-	public void testGetProgramsByUserIdCropUser() {
-		final int count = this.workbenchDataManager.getProjectsByCrop(this.cropType).size();
-
-		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
-		programSearchRequest.setLoggedInUserId(this.cropAdmin.getUserid());
-		final Pageable pageable = new PageRequest(0, 100);
-		final List<Project> projects = this.workbenchProjectDao.getProjectsByFilter(pageable, programSearchRequest);
-		final Set<Project> projectSet = Sets.newHashSet(projects);
-
-		Assert.assertEquals(count, projects.size());
-		Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
-	}
-
 	private void assignRole(final WorkbenchUser user, final List<Role> roles) {
 		for (final Role role : roles) {
 			final UserRole userRole = new UserRole();

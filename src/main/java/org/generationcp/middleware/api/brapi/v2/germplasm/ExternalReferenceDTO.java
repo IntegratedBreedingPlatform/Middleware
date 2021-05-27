@@ -12,7 +12,7 @@ import org.pojomatic.annotations.AutoProperty;
 public class ExternalReferenceDTO {
 
 	@JsonIgnore
-	private String gid;
+	private String entityId;
 
 	private String referenceID;
 
@@ -22,7 +22,7 @@ public class ExternalReferenceDTO {
 	}
 
 	public String getReferenceID() {
-		return referenceID;
+		return this.referenceID;
 	}
 
 	public void setReferenceID(final String referenceID) {
@@ -30,19 +30,19 @@ public class ExternalReferenceDTO {
 	}
 
 	public String getReferenceSource() {
-		return referenceSource;
+		return this.referenceSource;
 	}
 
 	public void setReferenceSource(final String referenceSource) {
 		this.referenceSource = referenceSource;
 	}
 
-	public String getGid() {
-		return gid;
+	public String getEntityId() {
+		return this.entityId;
 	}
 
-	public void setGid(final String gid) {
-		this.gid = gid;
+	public void setEntityId(final String entityId) {
+		this.entityId = entityId;
 	}
 
 	@Override

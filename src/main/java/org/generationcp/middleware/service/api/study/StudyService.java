@@ -1,8 +1,10 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.springframework.data.domain.Pageable;
@@ -77,4 +79,6 @@ public interface StudyService {
 	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId);
 
 	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
+
+	List<StudySummary> saveStudies(String crop, List<TrialImportRequestDTO> trialImportRequestDtoList, Integer userId);
 }

@@ -40,6 +40,8 @@ public class GermplasmDto {
 
 	private Integer gpid2;
 
+	private Integer numberOfProgenitors;
+
 	private List<Integer> otherProgenitors;
 
 	private GermplasmOriginDto germplasmOrigin;
@@ -182,6 +184,14 @@ public class GermplasmDto {
 
 	public void setGpid2(final Integer gpid2) {
 		this.gpid2 = gpid2;
+	}
+
+	public Integer getNumberOfProgenitors() {
+		return this.numberOfProgenitors;
+	}
+
+	public void setNumberOfProgenitors(final Integer numberOfProgenitors) {
+		this.numberOfProgenitors = numberOfProgenitors;
 	}
 
 	public List<Integer> getOtherProgenitors() {
