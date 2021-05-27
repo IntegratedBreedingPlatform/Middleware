@@ -310,7 +310,7 @@
 				('ATRIBUTS', 1),
 				('BIBREFS', 1),
 				('NAMES', 1),
-				('EXTERNAL_REFERENCE', 1),
+				('EXTERNAL_REFERENCE_GERMPLASM', 1),
 				('PROGNTRS', 1);
         </sql>
 	</changeSet>
@@ -474,14 +474,14 @@
 	<changeSet author="lkovacic" id="v18.1.0-23">
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<tableExists tableName="external_reference_aud"></tableExists>
+				<tableExists tableName="external_reference_germplasm_aud"></tableExists>
 			</not>
 		</preConditions>
 		<comment>
-			Create audit table 'external_reference_aud'
+			Create audit table 'external_reference_germplasm_aud'
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			CREATE TABLE external_reference_aud (
+			CREATE TABLE external_reference_germplasm_aud (
 				aud_id        	 int auto_increment primary key,
 				rev_type         tinyint       not null,
 				id               int           not null,

@@ -2,8 +2,8 @@ package org.generationcp.middleware.audit;
 
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.pojos.ExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,7 +26,7 @@ public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestB
 	private DaoFactory daoFactory;
 
 	public ExternalReferenceAuditIntegrationTest() {
-		super(ExternalReference.class.getAnnotation(Table.class).name(), PRIMARY_KEY_FIELD);
+		super(GermplasmExternalReference.class.getAnnotation(Table.class).name(), PRIMARY_KEY_FIELD);
 	}
 
 	@Before
@@ -36,9 +36,9 @@ public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestB
 
 	@Test
 	public void shouldTriggersExists() {
-		this.checkTriggerExists("trigger_external_reference_aud_insert", "INSERT");
-		this.checkTriggerExists("trigger_external_reference_aud_update", "UPDATE");
-		this.checkTriggerExists("trigger_external_reference_aud_delete", "DELETE");
+		this.checkTriggerExists("trigger_external_reference_germplasm_aud_insert", "INSERT");
+		this.checkTriggerExists("trigger_external_reference_germplasm_aud_update", "UPDATE");
+		this.checkTriggerExists("trigger_external_reference_germplasm_aud_delete", "DELETE");
 	}
 
 	@Test
