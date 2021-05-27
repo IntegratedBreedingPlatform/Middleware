@@ -16,7 +16,6 @@ import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -63,16 +62,15 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		try {
 			// Attributes will be migrated out of user defined fields later
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery("SELECT " //
-				+ "   u.fcode AS code," //
-				+ "   u.fldno AS id," //
-				+ "   u.fname AS name" //
-				+ " FROM  udflds u " //
-				+ " WHERE u.ftable = '" + UDTableType.ATRIBUTS_ATTRIBUTE.getTable() + "'" //
-				+ "   and u.ftype = '" + UDTableType.ATRIBUTS_ATTRIBUTE.getType() + "'"
-				+ "   and (u.fname like :fname or u.fcode like :fcode)"
+				+ "   cv.name AS code," //
+				+ "   cv.cvterm_id AS id," //
+				+ "   cv.definition AS name" //
+				+ " FROM cvterm cv INNER JOIN cvtermprop cp ON cv.cvterm_id = cp.cvterm_id " //
+				+ " WHERE cp.value = (select name from cvterm where cvterm_id = 1814) " //
+				+ "   AND (cv.definition like :fname or cv.name like :name)" //
 				+ " LIMIT 100 ");
 			sqlQuery.setParameter("fname", '%' + query + '%');
-			sqlQuery.setParameter("fcode", '%' + query + '%');
+			sqlQuery.setParameter("name", '%' + query + '%');
 			sqlQuery.addScalar("code");
 			sqlQuery.addScalar("id");
 			sqlQuery.addScalar("name");
@@ -147,44 +145,46 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return attribute;
 	}
 
-	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final String attributeType) {
+	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("Select a.aid AS id, ");
+			queryString.append("cv.cvterm_id as variableId, ");
 			queryString.append("a.aval AS value, ");
-			queryString.append("u.fcode AS attributeCode, ");
-			queryString.append("u.ftype AS attributeType, ");
-			queryString.append("u.fname AS attributeDescription, ");
+			queryString.append("cv.name AS variableName, ");
+			queryString.append("cp.value AS variableTypeName, ");
+			queryString.append("cv.definition AS variableDescription, ");
 			queryString.append("CAST(a.adate AS CHAR(255)) AS date, ");
 			queryString.append("a.alocn AS locationId, ");
 			queryString.append("l.lname AS locationName ");
 			queryString.append("FROM atributs a ");
-			queryString.append("INNER JOIN udflds u ON a.atype = u.fldno ");
+			queryString.append("INNER JOIN cvterm cv ON a.atype = cv.cvterm_id ");
+			queryString.append("INNER JOIN cvtermprop cp ON cp.type_id = 1800 and cv.cvterm_id = cp.cvterm_id ");
 			queryString.append("LEFT JOIN location l on a.alocn = l.locid ");
 			queryString.append("WHERE a.gid = :gid ");
-			if (StringUtils.isNotEmpty(attributeType)) {
-				queryString.append("AND u.ftype = :attributeType ");
+			if (variableTypeId != null) {
+				queryString.append("AND cp.value = (select name from cvterm where cvterm_id = :variableTypeId) ");
 			}
-
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
 			sqlQuery.addScalar("id");
+			sqlQuery.addScalar("variableId");
 			sqlQuery.addScalar("value");
-			sqlQuery.addScalar("attributeCode");
-			sqlQuery.addScalar("attributeType");
-			sqlQuery.addScalar("attributeDescription");
+			sqlQuery.addScalar("variableName");
+			sqlQuery.addScalar("variableTypeName");
+			sqlQuery.addScalar("variableDescription");
 			sqlQuery.addScalar("date");
 			sqlQuery.addScalar("locationId");
 			sqlQuery.addScalar("locationName");
 			sqlQuery.setParameter("gid", gid);
-			if (StringUtils.isNotEmpty(attributeType)) {
-				sqlQuery.setParameter("attributeType", attributeType);
+			if (variableTypeId != null) {
+				sqlQuery.setParameter("variableTypeId", variableTypeId);
 			}
 
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmAttributeDto.class));
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error with getGermplasmAttributeDtos(gid=" + gid + ", attributeType=" + attributeType + "): " + e.getMessage(), e);
+				"Error with getGermplasmAttributeDtos(gid=" + gid + ", variableTypeId=" + variableTypeId + "): " + e.getMessage(), e);
 		}
 	}
 
