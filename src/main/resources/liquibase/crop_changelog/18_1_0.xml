@@ -214,7 +214,17 @@
         </sql>
 	</changeSet>
 
-	 <changeSet author="darla" id="v18.1.0-13">
+    <changeSet author="corina" id="v18.1.0-13">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(*) FROM udflds WHERE ftable='ATRIBITS' AND ftype='PASSPORT' AND fcode='COLLSITE';</sqlCheck>
+		</preConditions>
+		<comment>Correct spelling of ftable for udflds COLLSITE</comment>
+        <sql>
+			UPDATE udflds SET ftable='ATRIBUTS' WHERE ftable='ATRIBITS' AND ftype='PASSPORT' AND fcode='COLLSITE';
+        </sql>
+    </changeSet>
+
+	<changeSet author="darla" id="v18.1.0-14">
         <preConditions onFail="MARK_RAN">
            <and>
 				<not>
@@ -229,7 +239,7 @@
 		<renameTable oldTableName="external_reference" newTableName="external_reference_germplasm" />
     </changeSet>
 
-	 <changeSet author="darla" id="v18.1.0-14">
+	 <changeSet author="darla" id="v18.1.0-15">
         <preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="external_reference_study"/>
