@@ -250,6 +250,12 @@
         <aop:scoped-proxy />
     </bean>
 
+	<bean id="variableDataValidatorFactory" factory-bean="managerFactory"
+		  factory-method="getVariableDataValidatorFactory">
+        <aop:scoped-proxy />
+    </bean>
+
+
 	<bean id="transactionService" class="org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>

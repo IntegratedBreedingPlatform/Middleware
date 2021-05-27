@@ -13,6 +13,6 @@ public class StringToBooleanSerializer extends JsonSerializer<String> {
 	public void serialize(final String value, final JsonGenerator gen, final SerializerProvider serializers)
 		throws IOException {
 		gen.writeObject(BrapiView.BrapiV2.class.equals(serializers.getActiveView())
-			? Boolean.valueOf(value) : value); 
+			? Boolean.valueOf(value) : value);
 	}
 }

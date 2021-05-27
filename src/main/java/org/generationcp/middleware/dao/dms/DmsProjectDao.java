@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -1255,7 +1256,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return studyIdEnvironmentDatasetIdMap;
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error getting getStudyIdEnvironmentDatasetIdMap for studyIds=" + studyIds + ":" + e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				"Error getting getStudyIdEnvironmentDatasetIdMap for studyIds=" + studyIds + ":" + e.getMessage(), e);
 		}
 	}
 
@@ -1277,7 +1279,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final List<Map<String, Object>> results = sqlQuery.list();
 
 			for (final Map<String, Object> result : results) {
-				final ObservationLevel observationLevel = new ObservationLevel((Integer)result.get("datasetTypeId"), "study");
+				final ObservationLevel observationLevel = new ObservationLevel((Integer) result.get("datasetTypeId"), "study");
 				final Integer studyId = (Integer) result.get("studyId");
 
 				observationLevelsMap.putIfAbsent(studyId, new ArrayList<>());
@@ -1651,9 +1653,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studyInstanceDto.setProgramName(String.valueOf(result.get("programName")));
 			studyInstanceDto.setContacts(Collections.singletonList(new ContactDto(String.valueOf(result.get("contactDbId")),
 				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
-			if(result.get("experimentalDesignId") != null) {
+			if (result.get("experimentalDesignId") != null) {
 				studyInstanceDto.setExperimentalDesign(new ExperimentalDesign(
-					String.valueOf(result.get("experimentalDesignId")),	String.valueOf(result.get("experimentalDesign"))));
+					String.valueOf(result.get("experimentalDesignId")), String.valueOf(result.get("experimentalDesign"))));
 			}
 
 			final Map<String, String> lastUpdate = new HashMap<>();
@@ -1672,7 +1674,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.setActive(((Integer) result.get("active")) == 1 ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
 
 			final Map<String, String> properties = new HashMap<>();
-			properties.put("studyObjective", result.get("studyObjective") ==  null ? "" : String.valueOf(result.get("studyObjective")));
+			properties.put("studyObjective", result.get("studyObjective") == null ? "" : String.valueOf(result.get("studyObjective")));
 			studyInstanceDto.setAdditionalInfo(properties);
 
 			studyInstanceDtoList.add(studyInstanceDto);
@@ -1708,7 +1710,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final List<StudySummary> studyList = new ArrayList<>();
 		for (final Map<String, Object> result : results) {
 			final StudySummary studySummary = new StudySummary();
-			studySummary.setStudyDbid((Integer) result.get("trialDbId"));
+			studySummary.setTrialDbId((Integer) result.get("trialDbId"));
 			studySummary.setName(String.valueOf(result.get("trialName")));
 			studySummary.setDescription(String.valueOf(result.get("trialDescription")));
 			studySummary.setObservationUnitId(String.valueOf(result.get("trialPUI")));
@@ -1716,6 +1718,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studySummary.setEndDate(Util.tryParseDate((String) result.get("endDate")));
 			studySummary.setProgramDbId(String.valueOf(result.get("programDbId")));
 			studySummary.setProgramName(String.valueOf(result.get("programName")));
+			studySummary.setLocationId(String.valueOf(result.get("locationDbId")));
 			studySummary.setActive(((Integer) result.get("active")) == 1);
 			studySummary.setContacts(Collections.singletonList(new ContactDto(String.valueOf(result.get("contactDbId")),
 				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
@@ -1726,8 +1729,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private void addStudySearchFilterParameters(final SQLQuery sqlQuery, final StudySearchFilter studySearchFilter) {
 
-		if (!StringUtils.isEmpty(studySearchFilter.getStudyDbId())) {
-			sqlQuery.setParameter("studyDbId", studySearchFilter.getStudyDbId());
+		if (!CollectionUtils.isEmpty(studySearchFilter.getStudyDbIds())) {
+			sqlQuery.setParameterList("studyDbIds", studySearchFilter.getStudyDbIds());
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
 			sqlQuery.setParameter("locationDbId", studySearchFilter.getLocationDbId());
@@ -1741,8 +1744,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (!StringUtils.isEmpty(studySearchFilter.getStudyTypeDbId())) {
 			sqlQuery.setParameter("studyTypeDbId", studySearchFilter.getStudyTypeDbId());
 		}
-		if (!StringUtils.isEmpty(studySearchFilter.getTrialDbId())) {
-			sqlQuery.setParameter("trialDbId", studySearchFilter.getTrialDbId());
+		if (!CollectionUtils.isEmpty(studySearchFilter.getTrialDbIds())) {
+			sqlQuery.setParameterList("trialDbIds", studySearchFilter.getTrialDbIds());
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getTrialName())) {
 			sqlQuery.setParameter("trialName", studySearchFilter.getTrialName());
@@ -1758,9 +1761,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		if (studySearchFilter.getObservationVariableDbId() != null) {
 			sqlQuery.setParameter("observationVariableDbId", studySearchFilter.getObservationVariableDbId());
-		}
-		if (studySearchFilter.getActive() != null) {
-			sqlQuery.setParameter("active", (studySearchFilter.getActive().booleanValue() ? 0 : 1));
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getContactDbId())) {
 			sqlQuery.setParameter("contactDbId", studySearchFilter.getContactDbId());
@@ -1796,7 +1796,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append(" 	 pmain.name AS trialName, ");
 		sql.append("     MAX(pmain.start_date) AS startDate, ");
 		sql.append("     MAX(pmain.end_date) AS endDate, ");
-		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS active, ");
+		sql.append(
+			"     CASE WHEN pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) "
+				+ "THEN 0 ELSE 1 END AS active, ");
 		sql.append("     location.locid AS locationDbId, ");
 		sql.append("     location.lname AS locationName, ");
 		sql.append("     wp.project_name AS programName, ");
@@ -1834,9 +1836,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append(" 	 study_exp.obs_unit_id AS trialPUI, ");
 		sql.append("     pmain.start_date AS startDate, ");
 		sql.append("     pmain.end_date AS endDate, ");
-		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS active, ");
+		sql.append(
+			"     CASE WHEN pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) "
+				+ "THEN 0 ELSE 1 END AS active, ");
 		sql.append("     wp.project_name AS programName, ");
-		sql.append("     wp.project_uuid AS programDbId, ");
+		sql.append("     pmain.program_uuid AS programDbId, ");
 		// locationDbId is not unique to study but can have different value per environment.
 		// Get the MIN or MAX depending on sort parameter and direction
 		if (pageable != null && pageable.getSort() != null && pageable.getSort().getOrderFor("locationDbId") != null
@@ -1882,8 +1886,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     location ON geopropLocation.value = location.locid");
 		sql.append("         LEFT OUTER JOIN ");
-		sql.append("     nd_geolocationprop geopropExperimentalDesign ON geopropExperimentalDesign.nd_geolocation_id = geoloc.nd_geolocation_id"
-			+ " AND geopropExperimentalDesign.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		sql.append(
+			"     nd_geolocationprop geopropExperimentalDesign ON geopropExperimentalDesign.nd_geolocation_id = geoloc.nd_geolocation_id"
+				+ " AND geopropExperimentalDesign.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId());
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     cvterm cvtermExptDesign ON cvtermExptDesign.cvterm_id = geopropExperimentalDesign.value");
 		sql.append("         LEFT OUTER JOIN ");
@@ -1923,8 +1928,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	private void appendStudySearchFilter(final StringBuilder sql, final StudySearchFilter studySearchFilter) {
-		if (!StringUtils.isEmpty(studySearchFilter.getStudyDbId())) {
-			sql.append(" AND geoloc.nd_geolocation_id = :studyDbId ");
+		if (!CollectionUtils.isEmpty(studySearchFilter.getStudyDbIds())) {
+			sql.append(" AND geoloc.nd_geolocation_id IN (:studyDbIds) ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
 			sql.append(" AND geopropLocation.value = :locationDbId ");
@@ -1938,8 +1943,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (!StringUtils.isEmpty(studySearchFilter.getStudyTypeDbId())) {
 			sql.append(" AND pmain.study_type_id = :studyTypeDbId ");
 		}
-		if (!StringUtils.isEmpty(studySearchFilter.getTrialDbId())) {
-			sql.append(" AND pmain.project_id = :trialDbId ");
+		if (!CollectionUtils.isEmpty(studySearchFilter.getTrialDbIds())) {
+			sql.append(" AND pmain.project_id IN (:trialDbIds) ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getTrialName())) {
 			sql.append(" AND pmain.name = :trialName ");
@@ -1962,7 +1967,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			sql.append(" AND wper.personid = :contactDbId ");
 		}
 		if (studySearchFilter.getActive() != null) {
-			sql.append(" AND pmain.deleted = :active ");
+			if (BooleanUtils.isTrue(studySearchFilter.getActive())) {
+				sql.append(
+					" AND (pmain.end_date IS NULL or LENGTH(pmain.end_date) = 0 OR CONVERT(pmain.end_date, UNSIGNED) >= CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) ) ");
+			} else {
+				sql.append(
+					" AND pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) ");
+			}
+
 		}
 		// Search Date Range
 		if (studySearchFilter.getSearchDateRangeStart() != null) {

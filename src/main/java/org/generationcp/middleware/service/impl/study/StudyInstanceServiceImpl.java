@@ -90,7 +90,7 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 			}
 
 			// The default value of an instance's location name is "Unspecified Location"
-			final Optional<Location> location = this.getUnspecifiedLocation();
+			final Optional<Location> location = this.daoFactory.getLocationDAO().getUnspecifiedLocation();
 
 			final Geolocation geolocation = new Geolocation();
 			geolocation.setDescription(String.valueOf(instanceNumber));
@@ -343,14 +343,6 @@ public class StudyInstanceServiceImpl implements StudyInstanceService {
 	public Optional<Integer> getDatasetIdForInstanceIdAndDatasetType(final Integer instanceId, final DatasetTypeEnum datasetTypeEnum) {
 		return
 			Optional.ofNullable(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, datasetTypeEnum));
-	}
-
-	protected Optional<Location> getUnspecifiedLocation() {
-		final List<Location> locations = this.daoFactory.getLocationDAO().getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
-		if (!locations.isEmpty()) {
-			return Optional.of(locations.get(0));
-		}
-		return Optional.empty();
 	}
 
 	private String getGeolocationMetaDataValue(final Geolocation geolocation, final int variableId) {

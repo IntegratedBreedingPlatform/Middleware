@@ -247,7 +247,7 @@ public class GermplasmDTO {
 	}
 
 	public List<Synonym> getSynonyms() {
-		return synonyms;
+		return this.synonyms;
 	}
 
 	public void setSynonyms(final List<Synonym> synonyms) {
@@ -271,7 +271,7 @@ public class GermplasmDTO {
 	}
 
 	public List<ExternalReferenceDTO> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
 	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {

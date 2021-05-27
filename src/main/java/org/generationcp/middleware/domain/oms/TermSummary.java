@@ -11,13 +11,13 @@ public class TermSummary {
 
 	private final String definition;
 
-	public TermSummary(Integer id, String name, String definition) {
+	public TermSummary(final Integer id, final String name, final String definition) {
 		this.id = id;
 		this.name = name;
 		this.definition = definition;
 	}
 
-	public static TermSummary createNonEmpty(Integer id, String name, String definition) {
+	public static TermSummary createNonEmpty(final Integer id, final String name, final String definition) {
 		if (id == null && StringUtils.isBlank(name) && StringUtils.isBlank(definition)) {
 			// Avoid creating an empty TermSummary
 			return null;
@@ -43,7 +43,7 @@ public class TermSummary {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -52,7 +52,7 @@ public class TermSummary {
 			return false;
 		}
 
-		TermSummary other = (TermSummary) obj;
+		final TermSummary other = (TermSummary) obj;
 		return this.getId().equals(other.getId());
 	}
 
