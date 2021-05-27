@@ -26,7 +26,7 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.ExternalReference;
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
@@ -1569,17 +1569,23 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		if (existingNameTypes.containsKey(GermplasmImportRequest.ACCNO)) {
 			assertThat(germplasmDTO.getAccessionNumber(), equalTo(request.getAccessionNumber()));
 			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.ACCNO)), equalTo(request.getAccessionNumber()));
-			assertThat(germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.ACCNO)).findAny().get().getSynonym(), equalTo(request.getAccessionNumber()));
+			assertThat(
+				germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.ACCNO)).findAny()
+					.get().getSynonym(), equalTo(request.getAccessionNumber()));
 		}
 		if (existingNameTypes.containsKey(GermplasmImportRequest.GENUS)) {
 			assertThat(germplasmDTO.getGenus(), equalTo(request.getGenus()));
 			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.GENUS)), equalTo(request.getGenus()));
-			assertThat(germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.GENUS)).findAny().get().getSynonym(), equalTo(request.getGenus()));
+			assertThat(
+				germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.GENUS)).findAny()
+					.get().getSynonym(), equalTo(request.getGenus()));
 		}
 		assertThat(germplasmDTO.getPedigree(), nullValue());
 		if (existingNameTypes.containsValue(GermplasmImportRequest.PED)) {
 			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.PED)), equalTo(request.getPedigree()));
-			assertThat(germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.PED)).findAny().get().getSynonym(), equalTo(request.getPedigree()));
+			assertThat(
+				germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.PED)).findAny().get()
+					.getSynonym(), equalTo(request.getPedigree()));
 		}
 
 		final Map<String, Integer> existingAttrTypes = this.daoFactory.getUserDefinedFieldDAO()
@@ -1638,7 +1644,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasm.getCreatedBy(), equalTo(this.userId));
 
 		assertThat(germplasm.getExternalReferences(), hasSize(1));
-		final ExternalReference externalReference = germplasm.getExternalReferences().get(0);
+		final GermplasmExternalReference externalReference = germplasm.getExternalReferences().get(0);
 		assertThat(externalReference.getCreatedBy(), is(this.userId));
 		assertNotNull(externalReference.getCreatedDate());
 	}
@@ -1685,17 +1691,23 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		if (existingNameTypes.containsKey(GermplasmImportRequest.ACCNO)) {
 			assertThat(germplasmDTO.getAccessionNumber(), equalTo(request.getAccessionNumber()));
 			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.ACCNO)), equalTo(request.getAccessionNumber()));
-			assertThat(germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.ACCNO)).findAny().get().getSynonym(), equalTo(request.getAccessionNumber()));
+			assertThat(
+				germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.ACCNO)).findAny()
+					.get().getSynonym(), equalTo(request.getAccessionNumber()));
 		}
 		if (existingNameTypes.containsKey(GermplasmImportRequest.GENUS)) {
 			assertThat(germplasmDTO.getGenus(), equalTo(request.getGenus()));
 			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.GENUS)), equalTo(request.getGenus()));
-			assertThat(germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.GENUS)).findAny().get().getSynonym(), equalTo(request.getGenus()));
+			assertThat(
+				germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.GENUS)).findAny()
+					.get().getSynonym(), equalTo(request.getGenus()));
 		}
 		assertThat(germplasmDTO.getPedigree(), nullValue());
 		if (existingNameTypes.containsValue(GermplasmImportRequest.PED)) {
 			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.PED)), equalTo(request.getPedigree()));
-			assertThat(germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.PED)).findAny().get().getSynonym(), equalTo(request.getPedigree()));
+			assertThat(
+				germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.PED)).findAny().get()
+					.getSynonym(), equalTo(request.getPedigree()));
 		}
 
 		final Map<String, Integer> existingAttrTypes = this.daoFactory.getUserDefinedFieldDAO()
@@ -1793,17 +1805,23 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		if (existingNameTypes.containsKey(GermplasmImportRequest.ACCNO)) {
 			assertThat(germplasmDTO.getAccessionNumber(), equalTo(request.getAccessionNumber()));
 			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.ACCNO)), equalTo(request.getAccessionNumber()));
-			assertThat(germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.ACCNO)).findAny().get().getSynonym(), equalTo(request.getAccessionNumber()));
+			assertThat(
+				germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.ACCNO)).findAny()
+					.get().getSynonym(), equalTo(request.getAccessionNumber()));
 		}
 		if (existingNameTypes.containsKey(GermplasmImportRequest.GENUS)) {
 			assertThat(germplasmDTO.getGenus(), equalTo(request.getGenus()));
 			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.GENUS)), equalTo(request.getGenus()));
-			assertThat(germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.GENUS)).findAny().get().getSynonym(), equalTo(request.getGenus()));
+			assertThat(
+				germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.GENUS)).findAny()
+					.get().getSynonym(), equalTo(request.getGenus()));
 		}
 		assertThat(germplasmDTO.getPedigree(), nullValue());
 		if (existingNameTypes.containsValue(GermplasmImportRequest.PED)) {
 			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.PED)), equalTo(request.getPedigree()));
-			assertThat(germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.PED)).findAny().get().getSynonym(), equalTo(request.getPedigree()));
+			assertThat(
+				germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.PED)).findAny().get()
+					.getSynonym(), equalTo(request.getPedigree()));
 		}
 
 		final Map<String, Integer> existingAttrTypes = this.daoFactory.getUserDefinedFieldDAO()
@@ -1915,17 +1933,23 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		if (existingNameTypes.containsKey(GermplasmImportRequest.ACCNO)) {
 			assertThat(germplasmDTO.getAccessionNumber(), equalTo(request2.getAccessionNumber()));
 			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.ACCNO)), equalTo(request2.getAccessionNumber()));
-			assertThat(germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.ACCNO)).findAny().get().getSynonym(), equalTo(request2.getAccessionNumber()));
+			assertThat(
+				germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.ACCNO)).findAny()
+					.get().getSynonym(), equalTo(request2.getAccessionNumber()));
 		}
 		if (existingNameTypes.containsKey(GermplasmImportRequest.GENUS)) {
 			assertThat(germplasmDTO.getGenus(), equalTo(request2.getGenus()));
 			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.GENUS)), equalTo(request2.getGenus()));
-			assertThat(germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.GENUS)).findAny().get().getSynonym(), equalTo(request2.getGenus()));
+			assertThat(
+				germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.GENUS)).findAny()
+					.get().getSynonym(), equalTo(request2.getGenus()));
 		}
 		assertThat(germplasmDTO.getPedigree(), nullValue());
 		if (existingNameTypes.containsValue(GermplasmImportRequest.PED)) {
 			assertThat(germplasmNames.get(existingNameTypes.get(GermplasmImportRequest.PED)), equalTo(request2.getPedigree()));
-			assertThat(germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.PED)).findAny().get().getSynonym(), equalTo(request2.getPedigree()));
+			assertThat(
+				germplasmDTO.getSynonyms().stream().filter(synonym -> synonym.getType().equals(GermplasmImportRequest.PED)).findAny().get()
+					.getSynonym(), equalTo(request2.getPedigree()));
 		}
 
 		final Map<String, Integer> existingAttrTypes = this.daoFactory.getUserDefinedFieldDAO()

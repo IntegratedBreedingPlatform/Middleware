@@ -328,7 +328,7 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "gid")
-	private List<ExternalReference> externalReferences = new ArrayList<>();
+	private List<GermplasmExternalReference> externalReferences = new ArrayList<>();
 
 	@Basic(optional = false)
 	@XmlElement(name = "femaleParent")
@@ -699,11 +699,11 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		this.locationName = locationName;
 	}
 
-	public List<ExternalReference> getExternalReferences() {
-		return externalReferences;
+	public List<GermplasmExternalReference> getExternalReferences() {
+		return this.externalReferences;
 	}
 
-	public void setExternalReferences(final List<ExternalReference> externalReferences) {
+	public void setExternalReferences(final List<GermplasmExternalReference> externalReferences) {
 		this.externalReferences = externalReferences;
 	}
 
@@ -992,7 +992,7 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	}
 
 	public List<Progenitor> getOtherProgenitors() {
-		return otherProgenitors;
+		return this.otherProgenitors;
 	}
 
 	public void setOtherProgenitors(final List<Progenitor> otherProgenitors) {
@@ -1020,7 +1020,8 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	 * @return True if all gids are equals to the ones in otherProgenitors list in any order
 	 */
 	public boolean otherProgenitorsGidsEquals(final List<Integer> gids) {
-		List<Integer> sortedExistingGids = this.otherProgenitors.stream().map(Progenitor::getProgenitorGid).collect(Collectors.toList());
+		final List<Integer> sortedExistingGids =
+			this.otherProgenitors.stream().map(Progenitor::getProgenitorGid).collect(Collectors.toList());
 		Collections.sort(sortedExistingGids);
 
 		if (sortedExistingGids.isEmpty() && gids == null) {
@@ -1040,7 +1041,7 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	}
 
 	public boolean isTerminalAncestor() {
-		return new Integer(0).equals(this.gpid1) && new Integer(0).equals(gpid2);
+		return new Integer(0).equals(this.gpid1) && new Integer(0).equals(this.gpid2);
 	}
 
 	public Optional<Progenitor> findByProgNo(final Integer progNo) {

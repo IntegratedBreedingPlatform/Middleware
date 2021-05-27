@@ -93,6 +93,12 @@ public class MeasurementVariable {
 		this.termId = termId;
 	}
 
+	public MeasurementVariable(final String name, final Integer termId, final Integer dataTypeId) {
+		this.name = name;
+		this.termId = termId;
+		this.dataTypeId = dataTypeId;
+	}
+
 	public MeasurementVariable(final String name, final String description, final String scale, final String method, final String property, final String dataType,
 			final String value, final String label) {
 		this.name = name;

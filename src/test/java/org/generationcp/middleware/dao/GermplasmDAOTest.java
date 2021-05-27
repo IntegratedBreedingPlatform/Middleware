@@ -29,7 +29,7 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.ExternalReference;
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -88,7 +88,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	private UserDefinedFieldDAO userDefinedFieldDao;
 	private ProgenitorDAO progenitorDao;
 	private StockDao stockDao;
-	private ExternalReferenceDAO externalReferenceDAO;
+	private GermplasmExternalReferenceDAO germplasmExternalReferenceDAO;
 	private DataSetupTest dataSetupTest;
 	private CropType cropType;
 
@@ -139,8 +139,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			this.stockDao = new StockDao();
 			this.stockDao.setSession(this.sessionProvder.getSession());
 
-			this.externalReferenceDAO = new ExternalReferenceDAO();
-			this.externalReferenceDAO.setSession(this.sessionProvder.getSession());
+			this.germplasmExternalReferenceDAO = new GermplasmExternalReferenceDAO();
+			this.germplasmExternalReferenceDAO.setSession(this.sessionProvder.getSession());
 
 			this.dataSetupTest = new DataSetupTest();
 			this.dataSetupTest.setDataImportService(this.dataImportService);
@@ -893,14 +893,14 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		this.dao.save(germplasm);
 
-		final ExternalReference externalReference = new ExternalReference();
-		externalReference.setGermplasm(germplasm);
-		externalReference.setSource(RandomStringUtils.randomAlphabetic(200));
-		externalReference.setReferenceId(RandomStringUtils.randomAlphabetic(500));
-		this.externalReferenceDAO.save(externalReference);
+		final GermplasmExternalReference germplasmExternalReference = new GermplasmExternalReference();
+		germplasmExternalReference.setGermplasm(germplasm);
+		germplasmExternalReference.setSource(RandomStringUtils.randomAlphabetic(200));
+		germplasmExternalReference.setReferenceId(RandomStringUtils.randomAlphabetic(500));
+		this.germplasmExternalReferenceDAO.save(germplasmExternalReference);
 
 		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
-		request.setExternalReferenceId(externalReference.getReferenceId());
+		request.setExternalReferenceId(germplasmExternalReference.getReferenceId());
 		final Long count = this.dao.countGermplasmDTOs(request);
 		Assert.assertThat(count.intValue(), is(1));
 	}
@@ -910,14 +910,14 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		this.dao.save(germplasm);
 
-		final ExternalReference externalReference = new ExternalReference();
-		externalReference.setGermplasm(germplasm);
-		externalReference.setSource(RandomStringUtils.randomAlphabetic(200));
-		externalReference.setReferenceId(RandomStringUtils.randomAlphabetic(500));
-		this.externalReferenceDAO.save(externalReference);
+		final GermplasmExternalReference germplasmExternalReference = new GermplasmExternalReference();
+		germplasmExternalReference.setGermplasm(germplasm);
+		germplasmExternalReference.setSource(RandomStringUtils.randomAlphabetic(200));
+		germplasmExternalReference.setReferenceId(RandomStringUtils.randomAlphabetic(500));
+		this.germplasmExternalReferenceDAO.save(germplasmExternalReference);
 
 		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
-		request.setExternalReferenceSource(externalReference.getSource());
+		request.setExternalReferenceSource(germplasmExternalReference.getSource());
 		final Long count = this.dao.countGermplasmDTOs(request);
 		Assert.assertThat(count.intValue(), is(1));
 	}
@@ -1269,7 +1269,5 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 				"LocationName");
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName(), this.cropType);
 	}
-
-
 
 }

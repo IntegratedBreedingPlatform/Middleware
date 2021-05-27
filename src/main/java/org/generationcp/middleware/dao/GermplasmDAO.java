@@ -74,9 +74,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String GRPLCE = "grplce";
 	private static final String DELETED = "deleted";
 
-	private static final String FIND_GPIDS = "select g.gpid1, g.gpid2 "
-		+ "from germplsm g where g.deleted = 0 and g.grplce = 0 and g.gid in :childrenNodes";
-
 	private static final String DER_MAN = "'" + MethodType.DERIVATIVE.getCode() + "','" + MethodType.MAINTENANCE.getCode() + "'";
 
 	private static final String GEN = "'" + MethodType.GENERATIVE.getCode() + "'";
@@ -1426,12 +1423,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getExternalReferenceId())) {
 			paramBuilder.append(" AND g.gid IN ( ");
-			paramBuilder.append(" SELECT ref.gid FROM external_reference ref WHERE ref.reference_id = :referenceId) "); //
+			paramBuilder.append(" SELECT ref.gid FROM external_reference_germplasm ref WHERE ref.reference_id = :referenceId) "); //
 		}
 
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getExternalReferenceSource())) {
 			paramBuilder.append(" AND g.gid IN (  ");
-			paramBuilder.append(" SELECT ref.gid FROM external_reference ref WHERE ref.reference_source = :referenceSource) "); //
+			paramBuilder.append(" SELECT ref.gid FROM external_reference_germplasm ref WHERE ref.reference_source = :referenceSource) "); //
 		}
 
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getPreferredName())) {
@@ -1998,7 +1995,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 
 		try {
-			final SQLQuery sqlQuery = this.getSession().createSQLQuery(FIND_GPIDS);
+			final SQLQuery sqlQuery = this.getSession()
+				.createSQLQuery("select g.gpid1, g.gpid2 from germplsm g where g.deleted = 0 and g.grplce = 0 and g.gid in :childrenNodes");
 			sqlQuery.setParameterList("childrenNodes", parents);
 			final List<Object[]> results = sqlQuery.list();
 			final Set<Integer> newParents = new HashSet<>();

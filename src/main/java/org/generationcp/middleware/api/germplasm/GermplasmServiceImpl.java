@@ -39,7 +39,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.ExternalReference;
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
@@ -1053,11 +1053,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 			});
 
 			if (germplasmDto.getExternalReferences() != null) {
-				final List<ExternalReference> references = new ArrayList<>();
+				final List<GermplasmExternalReference> references = new ArrayList<>();
 				germplasmDto.getExternalReferences().forEach(reference -> {
-					final ExternalReference externalReference =
-						new ExternalReference(germplasm, reference.getReferenceID(), reference.getReferenceSource());
-					references.add(externalReference);
+					final GermplasmExternalReference germplasmExternalReference =
+						new GermplasmExternalReference(germplasm, reference.getReferenceID(), reference.getReferenceSource());
+					references.add(germplasmExternalReference);
 				});
 				germplasm.setExternalReferences(references);
 			}
@@ -1471,9 +1471,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private void populateExternalReferences(final List<GermplasmDTO> germplasmDTOList) {
 		final List<Integer> gids = germplasmDTOList.stream().map(g -> Integer.valueOf(g.getGid())).collect(Collectors.toList());
 		if (!gids.isEmpty()) {
-			final List<ExternalReferenceDTO> referenceDTOS = this.daoFactory.getExternalReferenceDAO().getExternalReferencesByGids(gids);
+			final List<ExternalReferenceDTO> referenceDTOS =
+				this.daoFactory.getGermplasmExternalReferenceDAO().getExternalReferencesByGids(gids);
 			final Map<String, List<ExternalReferenceDTO>> referencesByGidMap = referenceDTOS.stream()
-				.collect(groupingBy(ExternalReferenceDTO::getGid));
+				.collect(groupingBy(ExternalReferenceDTO::getEntityId));
 			for (final GermplasmDTO germplasmDTO : germplasmDTOList) {
 				if (referencesByGidMap.containsKey(germplasmDTO.getGid())) {
 					germplasmDTO.setExternalReferences(referencesByGidMap.get(germplasmDTO.getGid()));

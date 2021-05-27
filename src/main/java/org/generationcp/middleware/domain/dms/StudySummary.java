@@ -1,7 +1,7 @@
 
 package org.generationcp.middleware.domain.dms;
 
-import com.google.common.collect.Lists;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.pojomatic.Pojomatic;
@@ -19,19 +19,13 @@ public class StudySummary implements Serializable {
 
 	private static final long serialVersionUID = -515769070343491680L;
 
-	private Integer studyDbid;
+	private Integer trialDbId;
 
 	private String name;
 
 	private String description;
 
-	private String type;
-
 	private String observationUnitId;
-
-	private List<String> years = Lists.newArrayList();
-
-	private List<String> seasons = Lists.newArrayList();
 
 	private String locationId;
 
@@ -47,135 +41,90 @@ public class StudySummary implements Serializable {
 
 	private List<InstanceMetadata> instanceMetaData = new ArrayList<>();
 
-	private Map<String, String> optionalInfo = new HashMap<>();
+	private Map<String, String> additionalInfo = new HashMap<>();
 
 	private List<ContactDto> contacts = new ArrayList<>();
 
-	public Integer getStudyDbid() {
-		return this.studyDbid;
+	private List<ExternalReferenceDTO> externalReferences = new ArrayList<>();
+
+	public Integer getTrialDbId() {
+		return this.trialDbId;
 	}
 
-	public StudySummary setStudyDbid(final Integer studyDbid) {
-		this.studyDbid = studyDbid;
-		return this;
+	public void setTrialDbId(final Integer trialDbId) {
+		this.trialDbId = trialDbId;
 	}
 
 	public String getName() {
 		return this.name;
 	}
 
-	public StudySummary setName(final String name) {
+	public void setName(final String name) {
 		this.name = name;
-		return this;
 	}
 
 	public String getDescription() {
 		return this.description;
 	}
 
-	public StudySummary setDescription(final String description) {
+	public void setDescription(final String description) {
 		this.description = description;
-		return this;
-	}
-
-	public String getType() {
-		return this.type;
-	}
-
-	public StudySummary setType(final String type) {
-		this.type = type;
-		return this;
-	}
-
-	public List<String> getYears() {
-		return this.years;
-	}
-
-	public StudySummary setYears(final List<String> years) {
-		this.years = years;
-		return this;
-	}
-
-	public StudySummary addYear(final String year) {
-		this.years.add(year);
-		return this;
-	}
-
-	public List<String> getSeasons() {
-		return this.seasons;
-	}
-
-	public StudySummary setSeasons(final List<String> seasons) {
-		this.seasons = seasons;
-		return this;
-	}
-
-	public StudySummary addSeason(final String season) {
-		this.seasons.add(season);
-		return this;
 	}
 
 	public String getLocationId() {
 		return this.locationId;
 	}
 
-	public StudySummary setLocationId(final String locationId) {
+	public void setLocationId(final String locationId) {
 		this.locationId = locationId;
-		return this;
 	}
 
 	public String getProgramDbId() {
 		return this.programDbId;
 	}
 
-	public StudySummary setProgramDbId(final String programDbId) {
+	public void setProgramDbId(final String programDbId) {
 		this.programDbId = programDbId;
-		return this;
 	}
 
 	public String getProgramName() {
 		return this.programName;
 	}
 
-	public StudySummary setProgramName(final String programName) {
+	public void setProgramName(final String programName) {
 		this.programName = programName;
-		return this;
 	}
 
 	public Date getStartDate() {
 		return this.startDate;
 	}
 
-	public StudySummary setStartDate(final Date startDate) {
+	public void setStartDate(final Date startDate) {
 		this.startDate = startDate;
-		return this;
 	}
 
 	public Date getEndDate() {
 		return this.endDate;
 	}
 
-	public StudySummary setEndDate(final Date endDate) {
+	public void setEndDate(final Date endDate) {
 		this.endDate = endDate;
-		return this;
 	}
 
 	public boolean isActive() {
 		return this.active;
 	}
 
-	public StudySummary setActive(final boolean active) {
+	public void setActive(final boolean active) {
 		this.active = active;
-		return this;
 	}
 
-	public Map<String, String> getOptionalInfo() {
-		return this.optionalInfo;
+	public Map<String, String> getAdditionalInfo() {
+		return this.additionalInfo;
 	}
 
-	public StudySummary setOptionalInfo(final Map<String, String> optionalInfo) {
-		this.optionalInfo = optionalInfo;
-		return this;
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
+		this.additionalInfo = additionalInfo;
 	}
 
 	public List<InstanceMetadata> getInstanceMetaData() {
@@ -186,23 +135,28 @@ public class StudySummary implements Serializable {
 		return this.contacts;
 	}
 
-	public StudySummary setContacts(final List<ContactDto> contacts) {
+	public void setContacts(final List<ContactDto> contacts) {
 		this.contacts = contacts;
-		return this;
 	}
 
-	public StudySummary setInstanceMetaData(final List<InstanceMetadata> instanceMetaData) {
+	public void setInstanceMetaData(final List<InstanceMetadata> instanceMetaData) {
 		this.instanceMetaData = instanceMetaData;
-		return this;
 	}
 
 	public String getObservationUnitId() {
 		return this.observationUnitId;
 	}
 
-	public StudySummary setObservationUnitId(final String observationUnitId) {
+	public void setObservationUnitId(final String observationUnitId) {
 		this.observationUnitId = observationUnitId;
-		return this;
+	}
+
+	public List<ExternalReferenceDTO> getExternalReferences() {
+		return this.externalReferences;
+	}
+
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	@Override
@@ -219,6 +173,5 @@ public class StudySummary implements Serializable {
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
-
 
 }

@@ -319,18 +319,18 @@ public class GermplasmImportRequest {
 	}
 
 	public Map<String, String> getCustomAttributeFieldsMap() {
-		 final Map<String, String> attrMap = new HashMap<>();
-		 attrMap.put(CROPNM, this.getCommonCropName());
-		 attrMap.put(ORIGIN, this.getGermplasmOrigin());
-		 attrMap.put(INSTCODE, this.getInstituteCode());
-		 attrMap.put(INSTNAME, this.getInstituteName());
-		 attrMap.put(PLOTCODE, this.getSeedSource());
-		 attrMap.put(SPECIES, this.getSpecies());
-		 attrMap.put(SPECIES_AUTH, this.getSpeciesAuthority());
-		 attrMap.put(SUBTAX, this.getSubtaxa());
-		 attrMap.put(SUBTAX_AUTH, this.getSubtaxaAuthority());
-		 return attrMap;
-    }
+		final Map<String, String> attrMap = new HashMap<>();
+		attrMap.put(CROPNM, this.getCommonCropName());
+		attrMap.put(ORIGIN, this.getGermplasmOrigin());
+		attrMap.put(INSTCODE, this.getInstituteCode());
+		attrMap.put(INSTNAME, this.getInstituteName());
+		attrMap.put(PLOTCODE, this.getSeedSource());
+		attrMap.put(SPECIES, this.getSpecies());
+		attrMap.put(SPECIES_AUTH, this.getSpeciesAuthority());
+		attrMap.put(SUBTAX, this.getSubtaxa());
+		attrMap.put(SUBTAX_AUTH, this.getSubtaxaAuthority());
+		return attrMap;
+	}
 
 	public Map<String, String> getCustomNamesFieldsMap() {
 		final Map<String, String> namesMap = new HashMap<>();
