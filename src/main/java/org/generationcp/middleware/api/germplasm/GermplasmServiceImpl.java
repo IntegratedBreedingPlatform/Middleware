@@ -53,6 +53,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -79,6 +80,9 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 @Transactional
 public class GermplasmServiceImpl implements GermplasmService {
+
+	@Value("${germplasm.edition.max.recursion}")
+	public int maxRecursiveQueries;
 
 	// This enum is used to define the required action given a germplasm pedigree change
 	private enum UpdateGroupSourceAction {
@@ -1359,28 +1363,27 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasm.setGnpgs(this.calculateGnpgs(methodFinal, String.valueOf(gpid1Final), String.valueOf(gpid2Final),
 				otherProgenitorsFinal.stream().map(String::valueOf).collect(Collectors.toList())));
 
-			//FIXME This is a workaround to prevent germplasm with children to have new parents
-			//FIXME Once validation to check if a node is not moved below in the tree,remove this IF condition. Pending for 18.1
-			final UpdateGroupSourceAction updateGroupSourceAction = this.getUpdateGroupSourceAction(germplasmBeforeUpdate, germplasm);
 			final boolean gpidsWillBeChanged = !germplasm.getGpid1().equals(germplasmBeforeUpdate.getGpid1()) || !germplasm.getGpid2()
 				.equals(germplasmBeforeUpdate.getGpid2());
-			if (updateGroupSourceAction != UpdateGroupSourceAction.NONE || gpidsWillBeChanged) {
-				final List<Integer> children = this.daoFactory.getGermplasmDao().getChildren(germplasm.getGid());
-				final boolean hasChildren = !children.isEmpty();
-				if (hasChildren) {
-					throw new MiddlewareRequestException("", "germplasm.update.germplasm.has.progeny.error",
-						new String[] {String.valueOf(gid)});
+			if (gpidsWillBeChanged) {
+				final Set<Integer> gpids = new HashSet<>();
+				gpids.add(germplasm.getGpid1());
+				gpids.add(germplasm.getGpid2());
+
+				final boolean isNewParentANodeChildren =
+					this.daoFactory.getGermplasmDao().isNewParentANodeDescendant(gpids, germplasm.getGid(), maxRecursiveQueries);
+				if (isNewParentANodeChildren) {
+					throw new MiddlewareRequestException("", "germplasm.update.germplasm.new.parents.are.children", "");
 				}
 			}
 
 			this.daoFactory.getGermplasmDao().save(germplasm);
-			//FIXME Once validation to check if a node is not moved below in the tree, we can enable this update. Pending for 18.1
-			//this.updateGroupSource(germplasmBeforeUpdate, germplasm);
+			this.updateGroupSource(germplasmBeforeUpdate, germplasm);
 		}
 
 	}
 
-	//FIXME Testing was completed by QA, except by recursive update performance
+
 	private void updateGroupSource(final Germplasm oldGermplasm, final Germplasm newGermplasm) {
 		final UpdateGroupSourceAction updateGroupSourceAction = this.getUpdateGroupSourceAction(oldGermplasm, newGermplasm);
 		if (updateGroupSourceAction == UpdateGroupSourceAction.NONE) {
@@ -1393,7 +1396,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 
 		if (updateGroupSourceAction == UpdateGroupSourceAction.RECURSIVE) {
-			this.daoFactory.getGermplasmDao().updateGroupSourceTraversingProgeny(newGermplasm.getGid(), newGroupSource);
+			this.daoFactory.getGermplasmDao()
+				.updateGroupSourceTraversingProgeny(newGermplasm.getGid(), newGroupSource, maxRecursiveQueries);
 		}
 	}
 
@@ -1508,13 +1512,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final String defaultName = germplasmDTO.getGermplasmName();
 			final List<Name> names = gidNamesMap.get(gid);
 			if (!CollectionUtils.isEmpty(names)) {
-				final Map<String, String> synonymsMap = new HashMap<>();
+				final List<Synonym> synonymsList = new ArrayList<>();
 				final List<Name> synonyms =
 					names.stream().filter(n -> !n.getNval().equalsIgnoreCase(defaultName)).collect(Collectors.toList());
 				for (final Name name : synonyms) {
-					synonymsMap.put(nameTypesMap.get(name.getTypeId()), name.getNval());
+					synonymsList.add(new Synonym(name.getNval(), nameTypesMap.get(name.getTypeId())));
 				}
-				germplasmDTO.setSynonyms(synonymsMap);
+				germplasmDTO.setSynonyms(synonymsList);
 			}
 			germplasmDTO.setAdditionalInfo(gidAttributesMap.get(gid));
 		}

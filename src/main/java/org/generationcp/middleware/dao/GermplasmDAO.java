@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.Operation;
@@ -72,6 +73,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private static final String GRPLCE = "grplce";
 	private static final String DELETED = "deleted";
+
+	private static final String FIND_GPIDS = "select g.gpid1, g.gpid2 "
+		+ "from germplsm g where g.deleted = 0 and g.grplce = 0 and g.gid in :childrenNodes";
 
 	private static final String DER_MAN = "'" + MethodType.DERIVATIVE.getCode() + "','" + MethodType.MAINTENANCE.getCode() + "'";
 
@@ -1796,7 +1800,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public GermplasmDto getGermplasmDtoByGid(final Integer gid) {
 		final StringBuilder queryBuilder =
 			new StringBuilder(FIND_GERMPLASM_MATCHES_MAIN_QUERY);
-		queryBuilder.append(" WHERE ").append(" g.gid in (:gids) ");
+		queryBuilder.append(" WHERE ").append(" g.gid in (:gids) and g.deleted = 0 AND g.grplce = 0");
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
 		this.addScalarsToFindGermplasmMatchesQuery(sqlQuery);
 		sqlQuery.setParameterList("gids", Collections.singletonList(gid));
@@ -1814,7 +1818,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public List<GermplasmDto> getGermplasmDtoByGids(final List<Integer> gids) {
 		final StringBuilder queryBuilder =
 			new StringBuilder(FIND_GERMPLASM_MATCHES_MAIN_QUERY);
-		queryBuilder.append(" WHERE ").append(" g.gid in (:gids) ");
+		queryBuilder.append(" WHERE ").append(" g.gid in (:gids) and g.deleted = 0 AND g.grplce = 0");
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
 		this.addScalarsToFindGermplasmMatchesQuery(sqlQuery);
 		sqlQuery.setParameterList("gids", gids);
@@ -1965,20 +1969,60 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	//TODO Performance testing was not completed by QA during 17.4. Pending for 18.1
-	public void updateGroupSourceTraversingProgeny(final Integer parentNode, final Integer newGroupSource) {
-		final List<Integer> derivativeNodes = this.findDerivativeNodes(Collections.singletonList(parentNode));
+	public void updateGroupSourceTraversingProgeny(final Integer parentNode, final Integer newGroupSource, final int maxRecursiveQueries) {
+		final List<Integer> derivativeNodes = this.findDerivativeNodes(Collections.singletonList(parentNode), 0, maxRecursiveQueries);
 		if (!derivativeNodes.isEmpty()) {
 			this.updateGroupSource(derivativeNodes, newGroupSource);
 		}
 	}
 
-	private List<Integer> findDerivativeNodes(final List<Integer> parentNodes) {
+	public boolean isNewParentANodeDescendant(final Set<Integer> newParents, final Integer node, final int maxRecursiveQueries) {
+		return isNewParentANodeDescendant(new HashSet<>(), newParents, node, 0, maxRecursiveQueries);
+	}
+
+	private boolean isNewParentANodeDescendant(final Set<Integer> path, final Set<Integer> parents, final Integer node, int level,
+		int maxRecursiveQueries) {
+
+		parents.remove(0);
+		parents.removeAll(path);
+		if (parents.contains(node)) {
+			return true;
+		}
+		if (parents.isEmpty()) {
+			return false;
+		}
+		path.addAll(parents);
+
+		if (++level > maxRecursiveQueries) {
+			throw new MiddlewareRequestException("", "germplasm.update.germplasm.max.recursive.queries.reached", "");
+		}
+
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(FIND_GPIDS);
+			sqlQuery.setParameterList("childrenNodes", parents);
+			final List<Object[]> results = sqlQuery.list();
+			final Set<Integer> newParents = new HashSet<>();
+			for (final Object[] r : results) {
+				newParents.add((Integer) r[0]);
+				newParents.add((Integer) r[1]);
+			}
+			return isNewParentANodeDescendant(path, newParents, node, level, maxRecursiveQueries);
+		} catch (final HibernateException e) {
+			final String message = "Error with isNewParentANodeDescendant" + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	private List<Integer> findDerivativeNodes(final List<Integer> parentNodes, int level, int maxRecursiveQueries) {
+		if (++level > maxRecursiveQueries) {
+			throw new MiddlewareRequestException("", "germplasm.update.germplasm.max.recursive.queries.reached", "");
+		}
 		final List<Integer> result = new ArrayList<>();
 		final List<Integer> immediateDerivativeProgeny = this.getImmediateDerivativeProgeny(parentNodes);
 		if (!immediateDerivativeProgeny.isEmpty()) {
 			result.addAll(immediateDerivativeProgeny);
-			result.addAll(this.findDerivativeNodes(immediateDerivativeProgeny));
+			result.addAll(this.findDerivativeNodes(immediateDerivativeProgeny, level, maxRecursiveQueries));
 		}
 		return result;
 	}

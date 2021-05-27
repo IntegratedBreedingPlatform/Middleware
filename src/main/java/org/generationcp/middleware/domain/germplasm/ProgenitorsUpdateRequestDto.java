@@ -18,6 +18,17 @@ public class ProgenitorsUpdateRequestDto {
 
 	private List<Integer> otherProgenitors;
 
+	public ProgenitorsUpdateRequestDto() {
+	}
+
+	public ProgenitorsUpdateRequestDto(final Integer breedingMethodId, final Integer gpid1, final Integer gpid2,
+		final List<Integer> otherProgenitors) {
+		this.breedingMethodId = breedingMethodId;
+		this.gpid1 = gpid1;
+		this.gpid2 = gpid2;
+		this.otherProgenitors = otherProgenitors;
+	}
+
 	public boolean allAttributesNull() {
 		return Objects.isNull(breedingMethodId) && Objects.isNull(gpid1) && Objects.isNull(gpid2) && CollectionUtils
 			.isEmpty(otherProgenitors);
