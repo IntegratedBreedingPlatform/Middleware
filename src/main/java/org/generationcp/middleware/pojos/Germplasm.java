@@ -326,8 +326,7 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	@JoinColumn(name = "methn", insertable = false, updatable = false)
 	private Method method;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "gid")
+	@OneToMany(mappedBy = "germplasm", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<GermplasmExternalReference> externalReferences = new ArrayList<>();
 
 	@Basic(optional = false)
