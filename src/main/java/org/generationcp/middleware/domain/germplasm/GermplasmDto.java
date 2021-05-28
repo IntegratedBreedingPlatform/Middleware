@@ -18,6 +18,10 @@ public class GermplasmDto {
 
 	private String creationDate;
 
+	private String createdBy;
+
+	private Integer createdByUserId;
+
 	private String reference;
 
 	private Integer breedingLocationId;
@@ -32,12 +36,22 @@ public class GermplasmDto {
 
 	private Integer groupId;
 
+	private Integer gpid1;
+
+	private Integer gpid2;
+
+	private Integer numberOfProgenitors;
+
+	private List<Integer> otherProgenitors;
+
+	private GermplasmOriginDto germplasmOrigin;
+
 	private List<GermplasmNameDto> names;
 
 	private List<GermplasmAttributeDto> attributes;
 
 	public Integer getGid() {
-		return gid;
+		return this.gid;
 	}
 
 	public void setGid(final Integer gid) {
@@ -45,7 +59,7 @@ public class GermplasmDto {
 	}
 
 	public String getGermplasmUUID() {
-		return germplasmUUID;
+		return this.germplasmUUID;
 	}
 
 	public void setGermplasmUUID(final String germplasmUUID) {
@@ -53,7 +67,7 @@ public class GermplasmDto {
 	}
 
 	public String getPreferredName() {
-		return preferredName;
+		return this.preferredName;
 	}
 
 	public void setPreferredName(final String preferredName) {
@@ -61,7 +75,7 @@ public class GermplasmDto {
 	}
 
 	public List<GermplasmNameDto> getNames() {
-		return names;
+		return this.names;
 	}
 
 	public void setNames(final List<GermplasmNameDto> names) {
@@ -69,15 +83,31 @@ public class GermplasmDto {
 	}
 
 	public String getCreationDate() {
-		return creationDate;
+		return this.creationDate;
 	}
 
 	public void setCreationDate(final String creationDate) {
 		this.creationDate = creationDate;
 	}
 
+	public String getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public void setCreatedBy(final String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Integer getCreatedByUserId() {
+		return this.createdByUserId;
+	}
+
+	public void setCreatedByUserId(final Integer createdByUserId) {
+		this.createdByUserId = createdByUserId;
+	}
+
 	public String getReference() {
-		return reference;
+		return this.reference;
 	}
 
 	public void setReference(final String reference) {
@@ -85,7 +115,7 @@ public class GermplasmDto {
 	}
 
 	public List<GermplasmAttributeDto> getAttributes() {
-		return attributes;
+		return this.attributes;
 	}
 
 	public void setAttributes(final List<GermplasmAttributeDto> attributes) {
@@ -93,7 +123,7 @@ public class GermplasmDto {
 	}
 
 	public String getBreedingLocation() {
-		return breedingLocation;
+		return this.breedingLocation;
 	}
 
 	public void setBreedingLocation(final String breedingLocation) {
@@ -101,7 +131,7 @@ public class GermplasmDto {
 	}
 
 	public String getBreedingMethod() {
-		return breedingMethod;
+		return this.breedingMethod;
 	}
 
 	public void setBreedingMethod(final String breedingMethod) {
@@ -109,15 +139,15 @@ public class GermplasmDto {
 	}
 
 	public boolean isGroupedLine() {
-		return isGroupedLine;
+		return this.isGroupedLine;
 	}
 
 	public void setGroupedLine(final boolean groupedLine) {
-		isGroupedLine = groupedLine;
+		this.isGroupedLine = groupedLine;
 	}
 
 	public Integer getGroupId() {
-		return groupId;
+		return this.groupId;
 	}
 
 	public void setGroupId(final Integer groupId) {
@@ -125,7 +155,7 @@ public class GermplasmDto {
 	}
 
 	public Integer getBreedingLocationId() {
-		return breedingLocationId;
+		return this.breedingLocationId;
 	}
 
 	public void setBreedingLocationId(final Integer breedingLocationId) {
@@ -133,11 +163,51 @@ public class GermplasmDto {
 	}
 
 	public Integer getBreedingMethodId() {
-		return breedingMethodId;
+		return this.breedingMethodId;
 	}
 
 	public void setBreedingMethodId(final Integer breedingMethodId) {
 		this.breedingMethodId = breedingMethodId;
+	}
+
+	public Integer getGpid1() {
+		return this.gpid1;
+	}
+
+	public void setGpid1(final Integer gpid1) {
+		this.gpid1 = gpid1;
+	}
+
+	public Integer getGpid2() {
+		return this.gpid2;
+	}
+
+	public void setGpid2(final Integer gpid2) {
+		this.gpid2 = gpid2;
+	}
+
+	public Integer getNumberOfProgenitors() {
+		return this.numberOfProgenitors;
+	}
+
+	public void setNumberOfProgenitors(final Integer numberOfProgenitors) {
+		this.numberOfProgenitors = numberOfProgenitors;
+	}
+
+	public List<Integer> getOtherProgenitors() {
+		return this.otherProgenitors;
+	}
+
+	public void setOtherProgenitors(final List<Integer> otherProgenitors) {
+		this.otherProgenitors = otherProgenitors;
+	}
+
+	public GermplasmOriginDto getGermplasmOrigin() {
+		return this.germplasmOrigin;
+	}
+
+	public void setGermplasmOrigin(final GermplasmOriginDto germplasmOrigin) {
+		this.germplasmOrigin = germplasmOrigin;
 	}
 
 	@Override
@@ -154,4 +224,5 @@ public class GermplasmDto {
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
+
 }

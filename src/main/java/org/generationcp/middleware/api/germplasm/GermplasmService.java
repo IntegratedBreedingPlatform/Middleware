@@ -3,9 +3,14 @@ package org.generationcp.middleware.api.germplasm;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
+import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
+import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
@@ -44,7 +49,7 @@ public interface GermplasmService {
 	 * code attribute is not present. Never returns null.
 	 *
 	 * @param gids
-	 * @return Map<gids, plotCodeValue>
+	 * @return Map<gids       ,               plotCodeValue>
 	 */
 	Map<Integer, String> getPlotCodeValues(Set<Integer> gids);
 
@@ -58,20 +63,22 @@ public interface GermplasmService {
 
 	/**
 	 * @return the UDFLD table record that represents "plot code": ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE. If no record matching
-	 *         these critria is found, an empty record with fldno=0 is returned. Never returns null.
+	 * these critria is found, an empty record with fldno=0 is returned. Never returns null.
 	 */
 	UserDefinedField getPlotCodeField();
 
-	Map<Integer, GermplasmImportResponseDto> importGermplasm(Integer userId, String cropName,
+	Map<Integer, GermplasmImportResponseDto> importGermplasm(String cropName,
 		GermplasmImportRequestDto germplasmImportRequestDto);
 
 	long countGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto);
 
 	List<GermplasmDto> findGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto, Pageable pageable);
 
-	Set<Integer> importGermplasmUpdates(Integer userId, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
-	
-	List<GermplasmDTO> createGermplasm(Integer userId, String cropname, List<GermplasmImportRequest> germplasmImportRequestList);
+	Set<Integer> importGermplasmUpdates(List<GermplasmUpdateDTO> germplasmUpdateDTOList);
+
+	List<GermplasmDTO> createGermplasm(String cropname, List<GermplasmImportRequest> germplasmImportRequestList);
+
+	GermplasmDTO updateGermplasm(String germplasmDbId, GermplasmUpdateRequest germplasmUpdateRequest);
 
 	long countFilteredGermplasm(GermplasmSearchRequestDto germplasmSearchRequestDTO);
 
@@ -96,7 +103,7 @@ public interface GermplasmService {
 
 	Set<Integer> getGidsOfGermplasmWithDescendants(List<Integer> gids);
 
-	Set<Integer> getGermplasmUsedInOneOrMoreList(List<Integer> gids);
+	Set<Integer> getGermplasmUsedInLockedList(List<Integer> gids);
 
 	Set<Integer> getGermplasmUsedInStudies(List<Integer> gids);
 
@@ -104,9 +111,20 @@ public interface GermplasmService {
 
 	ProgenyDTO getProgeny(final Integer gid);
 
-	List<AttributeDTO> getAttributesByGUID(
+	List<AttributeDTO> getAttributesByGUID
+		(
 			String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
 
 	long countAttributesByGUID(String gemrplasmUUID, List<String> attributeDbIds);
+
+	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
+
+	GermplasmDto getGermplasmDtoById(Integer gid);
+
+	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
+
+	void updateGermplasmBasicDetails(Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
+
+	void updateGermplasmPedigree(Integer gid, ProgenitorsUpdateRequestDto progenitorsUpdateRequstDto);
 
 }

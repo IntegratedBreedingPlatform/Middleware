@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.stream.Collectors;
 
 public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
@@ -117,8 +118,24 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	@Override
-	public List<Germplasm> getGroupMembers(final Integer gid) {
-		return this.germplasmDAO.getManagementGroupMembers(gid);
+	public List<Germplasm> getDescendantGroupMembers(final Integer gid, final Integer mgid) {
+		final List<Germplasm> descendantGroupMembers = new ArrayList<>();
+		this.populateDescendantGroupMembers(descendantGroupMembers, gid, mgid);
+		return descendantGroupMembers;
+	}
+
+	private void populateDescendantGroupMembers(final List<Germplasm> descendantGroupMembers, final Integer gid, final Integer mgid) {
+		// Grouping only applies to advanced germplasm so we only need to retrieve non-generative children
+		final List<Germplasm> nonGenerativeChildren = this.germplasmDAO.getDescendants(gid, 'D');
+
+		//Filter children in the same maintenance group
+		final List<Germplasm> descendantGroupChildren = nonGenerativeChildren.stream()
+			.filter(germplasm ->mgid.equals(germplasm.getMgid())).collect(Collectors.toList());
+		descendantGroupMembers.addAll(descendantGroupChildren);
+
+		for (final Germplasm germplasm: descendantGroupChildren) {
+			this.populateDescendantGroupMembers(descendantGroupMembers, germplasm.getGid(), mgid);
+		}
 	}
 
 	private void traverseAssignGroup(final GermplasmPedigreeTreeNode node, final Integer groupId, final boolean preserveExistingGroup) {
@@ -246,7 +263,6 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
 			newSelectionHistoryAtFixation.setNval(nameToCopyFrom.getNval());
 			newSelectionHistoryAtFixation.setNstat(0);
-			newSelectionHistoryAtFixation.setCreatedBy(nameToCopyFrom.getCreatedBy());
 			newSelectionHistoryAtFixation.setLocationId(nameToCopyFrom.getLocationId());
 			newSelectionHistoryAtFixation.setNdate(Util.getCurrentDateAsIntegerValue());
 			newSelectionHistoryAtFixation.setReferenceId(0);
@@ -303,7 +319,6 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		codedName.setNval(nameToCopyFrom.getNval());
 		// nstat = 1 means it is preferred name.
 		codedName.setNstat(1);
-		codedName.setCreatedBy(nameToCopyFrom.getCreatedBy());
 		codedName.setLocationId(nameToCopyFrom.getLocationId());
 		codedName.setNdate(Util.getCurrentDateAsIntegerValue());
 		codedName.setReferenceId(0);

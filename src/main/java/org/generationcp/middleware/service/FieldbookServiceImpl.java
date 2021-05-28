@@ -812,14 +812,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Override
 	public Integer addGermplasmName(final String nameValue, final int gid, final int userId, final int nameTypeId, final int locationId,
 			final Integer date) {
-		final Name name = new Name(null, new Germplasm(gid), nameTypeId, 0, userId, nameValue, locationId, date, 0);
+		final Name name = new Name(null, new Germplasm(gid), nameTypeId, 0, nameValue, locationId, date, 0);
 		return this.getGermplasmDataManager().addGermplasmName(name);
 	}
 
 	@Override
-	public Integer addGermplasm(final String nameValue, final int userId, final CropType cropType) {
-		final Name name = new Name(null, null, 1, 1, userId, nameValue, 0, 0, 0);
-		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, userId, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+	public Integer addGermplasm(final String nameValue, final CropType cropType) {
+		final Name name = new Name(null, null, 1, 1, nameValue, 0, 0, 0);
+		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
 		return this.getGermplasmDataManager().addGermplasm(germplasm, name, cropType);
 	}
 

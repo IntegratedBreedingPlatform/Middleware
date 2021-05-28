@@ -1258,7 +1258,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 
 		final GermplasmPedigreeTreeNode treeNode = new GermplasmPedigreeTreeNode();
-		final Germplasm female = new Germplasm(gid, null);
+		final Germplasm female = new Germplasm(gid);
 		female.setPreferredName(this.getPreferredName(names));
 		female.setPreferredAbbreviation(this.getNameByType(names, GermplasmNameType.LINE_NAME).getNval());
 		female.setSelectionHistory(this.getNameByType(names, GermplasmNameType.OLD_MUTANT_NAME_1).getNval());
@@ -1499,12 +1499,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public boolean hasExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
 		final Optional<Integer> gid) {
 		return this.daoFactory.getGermplasmDao().hasExistingCrosses(femaleParent, maleParentIds, gid);
-	}
-
-	@Override
-	public List<UserDefinedField> getUserDefinedFieldByTableTypeAndCodes(final String table, final Set<String> types,
-		final Set<String> codes) {
-		return this.daoFactory.getUserDefinedFieldDAO().getByCodes(table, types, codes);
 	}
 
 	@Override

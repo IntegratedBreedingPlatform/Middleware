@@ -12,7 +12,9 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -624,6 +626,121 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
+	public Long countMyStudies(final String programUUID, final int userId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
+				.add(Restrictions.eq("createdBy", String.valueOf(userId)))
+				.add(Restrictions.isNotNull("studyType"))
+				.add(Restrictions.eq("deleted", false));
+			if (!StringUtils.isBlank(programUUID)) {
+				criteria.add(Restrictions.eq("programUUID", programUUID));
+			}
+			criteria.setProjection(Projections.rowCount());
+			return (Long) criteria.uniqueResult();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error with countMyStudies(programUUID=" + programUUID + ", userId= " + userId + " ): "
+				+ e.getMessage();
+			LOG.error(errorMessage);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+	}
+
+	public List<MyStudiesDTO> getMyStudies(final String programUUID, final Pageable pageable, final int userId) {
+		try {
+			final Map<Integer, MyStudiesDTO> myStudies = new LinkedHashMap<>();
+
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
+				.createAlias("studyType", "studyType")
+				.createAlias("parent", "parent")
+				.add(Restrictions.eq("createdBy", String.valueOf(userId)))
+				.add(Restrictions.isNotNull("studyType"))
+				.add(Restrictions.eq("deleted", false));
+			if (!StringUtils.isBlank(programUUID)) {
+				criteria.add(Restrictions.eq("programUUID", programUUID));
+			}
+			addPagination(criteria, pageable);
+			addOrder(criteria, pageable);
+			final List<DmsProject> projects = criteria.list();
+
+			if (projects.isEmpty()) {
+				return Collections.emptyList();
+			}
+
+			for (final DmsProject project : projects) {
+				final MyStudiesDTO myStudy = new MyStudiesDTO();
+				myStudy.setStudyId(project.getProjectId());
+				myStudy.setName(project.getName());
+				Preconditions.checkNotNull(project.getParent(), "folder is null");
+				myStudy.setFolder(project.getParent().getName());
+				myStudy.setDate(Util.tryConvertDate(project.getStartDate(), Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
+				myStudy.setType(project.getStudyType().getLabel());
+				myStudies.put(project.getProjectId(), myStudy);
+			}
+
+			/**
+			 * (count(ph.phenotype_id) / count(DISTINCT ph.phenotype_id)
+			 *   -> divide by how many times the count is duplicated because of joins
+			 */
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery("select p.project_id as studyId, " //
+				+ "     dataset.name as datasetName, " //
+				+ "     concat(gl.description, ' - ', l.lname) as instanceName, " //
+				+ "     ifnull( " //
+				+ "       floor(count(ph.value) / (count(ph.phenotype_id) / count(DISTINCT ph.phenotype_id))) " //
+				+ "         , 0) as confirmedCount, " //
+				+ "     ifnull( " //
+				+ "       floor(count(ph.draft_value) / (count(ph.phenotype_id) / count(DISTINCT ph.phenotype_id))) " //
+				+ "         , 0) as pendingCount, " //
+				+ "     ifnull( " //
+				+ "       floor(count(distinct nde.nd_experiment_id) * count(distinct pp.variable_id) " //
+				+ "           - count(ph.phenotype_id) / (count(ph.phenotype_id) / count(DISTINCT ph.phenotype_id))) " //
+				+ "         , 0) as unobservedCount " //
+				+ " from project p " //
+				+ "          left join project dataset on dataset.study_id = p.project_id " //
+				+ "          inner join projectprop pp on dataset.project_id = pp.project_id and pp.type_id in (" //
+				+ "               " + VariableType.TRAIT.getId() + ", " //
+				+ "               " + VariableType.SELECTION_METHOD.getId() //
+				+ "             ) and dataset.dataset_type_id in (" //
+				+ "               " + DatasetTypeEnum.PLOT_DATA.getId() + ", " //
+				+ "               " + DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId() + ", " //
+				+ "               " + DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId() + ", " //
+				+ "               " + DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId() + ", " //
+				+ "               " + DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId() //
+				+ "             ) " //
+				+ "          left join nd_experiment nde on nde.project_id = dataset.project_id " //
+				+ "          inner join nd_geolocation gl on nde.nd_geolocation_id = gl.nd_geolocation_id " //
+				+ "          left join nd_geolocationprop gp on gl.nd_geolocation_id = gp.nd_geolocation_id "  //
+				+ "             and gp.type_id = " + TermId.LOCATION_ID.getId() //
+				+ "             and gp.nd_geolocation_id = gl.nd_geolocation_id " //
+				+ "          left join location l on l.locid = gp.value " //
+				+ "          left join phenotype ph on nde.nd_experiment_id = ph.nd_experiment_id " //
+				+ "     where p.project_id in (:projectIds) " //
+				+ " group by dataset.project_id, nde.nd_geolocation_id");
+
+			sqlQuery.addScalar("studyId")
+				.addScalar("datasetName")
+				.addScalar("instanceName")
+				.addScalar("confirmedCount", new IntegerType())
+				.addScalar("pendingCount", new IntegerType())
+				.addScalar("unobservedCount", new IntegerType());
+			sqlQuery.setParameterList("projectIds", myStudies.keySet());
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(MyStudiesDTO.MyStudyMetadata.ObservationMetadata.class));
+
+			final List<MyStudiesDTO.MyStudyMetadata.ObservationMetadata> metadataList = sqlQuery.list();
+
+			for (final MyStudiesDTO.MyStudyMetadata.ObservationMetadata metadata : metadataList) {
+				final MyStudiesDTO myStudiesDTO = myStudies.get(metadata.getStudyId());
+				myStudiesDTO.getMetadata().getObservations().add(metadata);
+			}
+
+			return new ArrayList<>(myStudies.values());
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error with getMyStudies(programUUID=" + programUUID + ", userId= " + userId + " ): "
+				+ e.getMessage();
+			LOG.error(errorMessage);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+	}
+
 	@SuppressWarnings("rawtypes")
 	public boolean checkIfProjectNameIsExistingInProgram(final String name, final String programUUID) {
 		try {
@@ -758,7 +875,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				studyMetadata.setStudyDescription((row[12] instanceof String) ? (String) row[12] : null);
 				studyMetadata.setStudyObjective((row[13] instanceof String) ? (String) row[13] : null);
 				studyMetadata.setExperimentalDesign((row[14] instanceof String) ? (String) row[14] : null);
-				studyMetadata.setLastUpdate((row[15] instanceof String) ? (String) row[15] : null);
+				studyMetadata.setLastUpdate(Util.tryParseDate((String) row[15]));
 				return studyMetadata;
 			} else {
 				return null;
@@ -1139,7 +1256,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			return studyIdEnvironmentDatasetIdMap;
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error getting getStudyIdEnvironmentDatasetIdMap for studyIds=" + studyIds + ":" + e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				"Error getting getStudyIdEnvironmentDatasetIdMap for studyIds=" + studyIds + ":" + e.getMessage(), e);
 		}
 	}
 
@@ -1161,8 +1279,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final List<Map<String, Object>> results = sqlQuery.list();
 
 			for (final Map<String, Object> result : results) {
-				final ObservationLevel observationLevel = new ObservationLevel((Integer)result.get("datasetTypeId"),
-					String.valueOf(result.get("datasetName")));
+				final ObservationLevel observationLevel = new ObservationLevel((Integer) result.get("datasetTypeId"), "study");
 				final Integer studyId = (Integer) result.get("studyId");
 
 				observationLevelsMap.putIfAbsent(studyId, new ArrayList<>());
@@ -1501,7 +1618,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sqlQuery.addScalar("locationName");
 		sqlQuery.addScalar("programDbId");
 		sqlQuery.addScalar("programName");
-		sqlQuery.addScalar("contactDbid");
+		sqlQuery.addScalar("contactDbId");
 		sqlQuery.addScalar("contactName");
 		sqlQuery.addScalar("email");
 		sqlQuery.addScalar("experimentalDesign");
@@ -1534,11 +1651,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studyInstanceDto.setLocationName(String.valueOf(result.get("locationName")));
 			studyInstanceDto.setProgramDbId(String.valueOf(result.get("programDbId")));
 			studyInstanceDto.setProgramName(String.valueOf(result.get("programName")));
-			studyInstanceDto.setContacts(Collections.singletonList(new ContactDto((Integer) result.get("contactDbId"),
+			studyInstanceDto.setContacts(Collections.singletonList(new ContactDto(String.valueOf(result.get("contactDbId")),
 				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
-			if(result.get("experimentalDesignId") != null) {
+			if (result.get("experimentalDesignId") != null) {
 				studyInstanceDto.setExperimentalDesign(new ExperimentalDesign(
-					String.valueOf(result.get("experimentalDesignId")),	String.valueOf(result.get("experimentalDesign"))));
+					String.valueOf(result.get("experimentalDesignId")), String.valueOf(result.get("experimentalDesign"))));
 			}
 
 			final Map<String, String> lastUpdate = new HashMap<>();
@@ -1557,7 +1674,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.setActive(((Integer) result.get("active")) == 1 ? Boolean.TRUE.toString() : Boolean.FALSE.toString());
 
 			final Map<String, String> properties = new HashMap<>();
-			properties.put("studyObjective", result.get("studyObjective") ==  null ? "" : String.valueOf(result.get("studyObjective")));
+			properties.put("studyObjective", result.get("studyObjective") == null ? "" : String.valueOf(result.get("studyObjective")));
 			studyInstanceDto.setAdditionalInfo(properties);
 
 			studyInstanceDtoList.add(studyInstanceDto);
@@ -1593,7 +1710,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final List<StudySummary> studyList = new ArrayList<>();
 		for (final Map<String, Object> result : results) {
 			final StudySummary studySummary = new StudySummary();
-			studySummary.setStudyDbid((Integer) result.get("trialDbId"));
+			studySummary.setTrialDbId((Integer) result.get("trialDbId"));
 			studySummary.setName(String.valueOf(result.get("trialName")));
 			studySummary.setDescription(String.valueOf(result.get("trialDescription")));
 			studySummary.setObservationUnitId(String.valueOf(result.get("trialPUI")));
@@ -1601,8 +1718,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studySummary.setEndDate(Util.tryParseDate((String) result.get("endDate")));
 			studySummary.setProgramDbId(String.valueOf(result.get("programDbId")));
 			studySummary.setProgramName(String.valueOf(result.get("programName")));
+			studySummary.setLocationId(String.valueOf(result.get("locationDbId")));
 			studySummary.setActive(((Integer) result.get("active")) == 1);
-			studySummary.setContacts(Collections.singletonList(new ContactDto((Integer) result.get("contactDbId"),
+			studySummary.setContacts(Collections.singletonList(new ContactDto(String.valueOf(result.get("contactDbId")),
 				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
 			studyList.add(studySummary);
 		}
@@ -1611,8 +1729,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private void addStudySearchFilterParameters(final SQLQuery sqlQuery, final StudySearchFilter studySearchFilter) {
 
-		if (!StringUtils.isEmpty(studySearchFilter.getStudyDbId())) {
-			sqlQuery.setParameter("studyDbId", studySearchFilter.getStudyDbId());
+		if (!CollectionUtils.isEmpty(studySearchFilter.getStudyDbIds())) {
+			sqlQuery.setParameterList("studyDbIds", studySearchFilter.getStudyDbIds());
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
 			sqlQuery.setParameter("locationDbId", studySearchFilter.getLocationDbId());
@@ -1626,8 +1744,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (!StringUtils.isEmpty(studySearchFilter.getStudyTypeDbId())) {
 			sqlQuery.setParameter("studyTypeDbId", studySearchFilter.getStudyTypeDbId());
 		}
-		if (!StringUtils.isEmpty(studySearchFilter.getTrialDbId())) {
-			sqlQuery.setParameter("trialDbId", studySearchFilter.getTrialDbId());
+		if (!CollectionUtils.isEmpty(studySearchFilter.getTrialDbIds())) {
+			sqlQuery.setParameterList("trialDbIds", studySearchFilter.getTrialDbIds());
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getTrialName())) {
 			sqlQuery.setParameter("trialName", studySearchFilter.getTrialName());
@@ -1643,9 +1761,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		if (studySearchFilter.getObservationVariableDbId() != null) {
 			sqlQuery.setParameter("observationVariableDbId", studySearchFilter.getObservationVariableDbId());
-		}
-		if (studySearchFilter.getActive() != null) {
-			sqlQuery.setParameter("active", (studySearchFilter.getActive().booleanValue() ? 0 : 1));
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getContactDbId())) {
 			sqlQuery.setParameter("contactDbId", studySearchFilter.getContactDbId());
@@ -1681,7 +1796,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append(" 	 pmain.name AS trialName, ");
 		sql.append("     MAX(pmain.start_date) AS startDate, ");
 		sql.append("     MAX(pmain.end_date) AS endDate, ");
-		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS active, ");
+		sql.append(
+			"     CASE WHEN pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) "
+				+ "THEN 0 ELSE 1 END AS active, ");
 		sql.append("     location.locid AS locationDbId, ");
 		sql.append("     location.lname AS locationName, ");
 		sql.append("     wp.project_name AS programName, ");
@@ -1719,9 +1836,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append(" 	 study_exp.obs_unit_id AS trialPUI, ");
 		sql.append("     pmain.start_date AS startDate, ");
 		sql.append("     pmain.end_date AS endDate, ");
-		sql.append("     CASE WHEN pmain.deleted = 0 THEN 1 ELSE 0 END AS active, ");
+		sql.append(
+			"     CASE WHEN pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) "
+				+ "THEN 0 ELSE 1 END AS active, ");
 		sql.append("     wp.project_name AS programName, ");
-		sql.append("     wp.project_uuid AS programDbId, ");
+		sql.append("     pmain.program_uuid AS programDbId, ");
 		// locationDbId is not unique to study but can have different value per environment.
 		// Get the MIN or MAX depending on sort parameter and direction
 		if (pageable != null && pageable.getSort() != null && pageable.getSort().getOrderFor("locationDbId") != null
@@ -1767,8 +1886,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     location ON geopropLocation.value = location.locid");
 		sql.append("         LEFT OUTER JOIN ");
-		sql.append("     nd_geolocationprop geopropExperimentalDesign ON geopropExperimentalDesign.nd_geolocation_id = geoloc.nd_geolocation_id"
-			+ " AND geopropExperimentalDesign.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId());
+		sql.append(
+			"     nd_geolocationprop geopropExperimentalDesign ON geopropExperimentalDesign.nd_geolocation_id = geoloc.nd_geolocation_id"
+				+ " AND geopropExperimentalDesign.type_id = " + TermId.EXPERIMENT_DESIGN_FACTOR.getId());
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     cvterm cvtermExptDesign ON cvtermExptDesign.cvterm_id = geopropExperimentalDesign.value");
 		sql.append("         LEFT OUTER JOIN ");
@@ -1808,8 +1928,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	}
 
 	private void appendStudySearchFilter(final StringBuilder sql, final StudySearchFilter studySearchFilter) {
-		if (!StringUtils.isEmpty(studySearchFilter.getStudyDbId())) {
-			sql.append(" AND geoloc.nd_geolocation_id = :studyDbId ");
+		if (!CollectionUtils.isEmpty(studySearchFilter.getStudyDbIds())) {
+			sql.append(" AND geoloc.nd_geolocation_id IN (:studyDbIds) ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getLocationDbId())) {
 			sql.append(" AND geopropLocation.value = :locationDbId ");
@@ -1823,8 +1943,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		if (!StringUtils.isEmpty(studySearchFilter.getStudyTypeDbId())) {
 			sql.append(" AND pmain.study_type_id = :studyTypeDbId ");
 		}
-		if (!StringUtils.isEmpty(studySearchFilter.getTrialDbId())) {
-			sql.append(" AND pmain.project_id = :trialDbId ");
+		if (!CollectionUtils.isEmpty(studySearchFilter.getTrialDbIds())) {
+			sql.append(" AND pmain.project_id IN (:trialDbIds) ");
 		}
 		if (!StringUtils.isEmpty(studySearchFilter.getTrialName())) {
 			sql.append(" AND pmain.name = :trialName ");
@@ -1847,7 +1967,14 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			sql.append(" AND wper.personid = :contactDbId ");
 		}
 		if (studySearchFilter.getActive() != null) {
-			sql.append(" AND pmain.deleted = :active ");
+			if (BooleanUtils.isTrue(studySearchFilter.getActive())) {
+				sql.append(
+					" AND (pmain.end_date IS NULL or LENGTH(pmain.end_date) = 0 OR CONVERT(pmain.end_date, UNSIGNED) >= CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) ) ");
+			} else {
+				sql.append(
+					" AND pmain.end_date IS NOT NULL AND LENGTH(pmain.end_date) > 0 AND CONVERT(pmain.end_date, UNSIGNED) < CONVERT(date_format(now(), '%Y%m%d'), UNSIGNED) ");
+			}
+
 		}
 		// Search Date Range
 		if (studySearchFilter.getSearchDateRangeStart() != null) {

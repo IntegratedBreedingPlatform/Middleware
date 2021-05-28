@@ -58,7 +58,9 @@ public class ProgramPresetDAO extends GenericDAO<ProgramPreset, Integer> {
 		try {
 			Criteria criteria = this.getSession().createCriteria(ProgramPreset.class);
 
-			criteria.add(Restrictions.eq("programUuid", programUUID));
+			criteria.add(Restrictions.or(
+				Restrictions.eq("programUuid", programUUID),
+				Restrictions.isNull("programUuid")));
 			criteria.add(Restrictions.eq("toolId", toolId));
 			criteria.add(Restrictions.eq("toolSection", toolSection));
 

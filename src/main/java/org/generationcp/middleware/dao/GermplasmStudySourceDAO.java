@@ -1,7 +1,10 @@
 package org.generationcp.middleware.dao;
 
-import liquibase.util.StringUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.germplasm.GermplasmOriginDto;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceDto;
@@ -11,16 +14,24 @@ import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
+import java.io.IOException;
 import java.math.BigInteger;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(GermplasmStudySourceDAO.class);
 
 	protected static final String GERMPLASM_STUDY_SOURCE_SEARCH_QUERY = "SELECT \n"
 		+ "gss.germplasm_study_source_id as `germplasmStudySourceId`,\n"
@@ -53,6 +64,43 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		+ "LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1\n"
 		+ "LEFT JOIN ims_lot lot ON lot.eid = gss.gid and lot.status = " + LotStatus.ACTIVE.getIntValue() + " "
 		+ "WHERE gss.project_id = :studyId ";
+
+	private static final String GET_GERMPLASM_STUDY_ORIGIN = "select study.project_id as studyId, " //
+		+ "  study.name as studyName, " //
+		+ "  study.program_uuid as programUUID, " //
+		+ "  ne.obs_unit_id as observationUnitId, " //
+		+ "  ne.json_props AS jsonProps, " //
+		+ "  fieldMapRow.value AS fieldMapRow, " //
+		+ "  fieldMapCol.value AS fieldMapCol, " //
+		+ "  plot.value AS plotNumber, " //
+		+ "  (SELECT ndep.value " //
+		+ "   FROM nd_experimentprop ndep " //
+		+ "          INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id " //
+		+ "   WHERE ndep.nd_experiment_id = ne.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') AS blockNumber, " //
+		+ "  (SELECT ndep.value " //
+		+ "   FROM nd_experimentprop ndep " //
+		+ "          INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id " //
+		+ "   WHERE ndep.nd_experiment_id = ne.nd_experiment_id AND ispcvt.name = 'REP_NO') AS repNumber, " //
+		+ "  (SELECT ndep.value " //
+		+ "   FROM nd_experimentprop ndep " //
+		+ "          INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id " //
+		+ "   WHERE ndep.nd_experiment_id = ne.nd_experiment_id AND ispcvt.name = 'COL') AS col, " //
+		+ "  (SELECT ndep.value " //
+		+ "   FROM nd_experimentprop ndep " //
+		+ "          INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id " //
+		+ "   WHERE ndep.nd_experiment_id = ne.nd_experiment_id AND ispcvt.name = 'ROW') AS row " //
+		+ "from germplasm_study_source source " //
+		+ "       inner join germplsm g on source.gid = g.gid " //
+		+ "       inner join nd_experiment ne on source.nd_experiment_id = ne.nd_experiment_id " //
+		+ "       inner join project plot_dataset on ne.project_id = plot_dataset.project_id " //
+		+ "       inner join project study on plot_dataset.study_id = study.project_id " //
+		+ "       LEFT JOIN nd_experimentprop plot ON plot.nd_experiment_id = ne.nd_experiment_id AND plot.type_id = "
+		+ TermId.PLOT_NO.getId() //
+		+ "       LEFT JOIN nd_experimentprop fieldMapRow ON fieldMapRow.nd_experiment_id = ne.nd_experiment_id AND fieldMapRow.type_id = "
+		+ TermId.FIELDMAP_RANGE.getId() //
+		+ "       LEFT JOIN nd_experimentprop fieldMapCol ON fieldMapCol.nd_experiment_id = ne.nd_experiment_id AND fieldMapCol.type_id = "
+		+ TermId.FIELDMAP_COLUMN.getId() //
+		+ " where source.gid = :gid AND g.deleted = 0 AND g.grplce = 0 and study.deleted = 0";
 
 	public List<GermplasmStudySource> getByGids(final Set<Integer> gids) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -117,6 +165,62 @@ public class GermplasmStudySourceDAO extends GenericDAO<GermplasmStudySource, In
 		criteria.add(Restrictions.eq("study.projectId", searchParameters.getStudyId()));
 		criteria.setMaxResults(Integer.MAX_VALUE);
 		return (long) criteria.uniqueResult();
+	}
+
+	public GermplasmOriginDto getGermplasmOrigin(final int gid) {
+		try {
+			final StringBuilder queryString = new StringBuilder(GET_GERMPLASM_STUDY_ORIGIN);
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
+			sqlQuery.setParameter("gid", gid);
+
+			sqlQuery.addScalar("programUUID").addScalar("studyId").addScalar("studyName")
+				.addScalar("observationUnitId").addScalar("jsonProps").addScalar("fieldMapRow")
+				.addScalar("fieldMapCol").addScalar("plotNumber", new IntegerType()).addScalar("blockNumber", new IntegerType())
+				.addScalar("repNumber", new IntegerType())
+				.addScalar("col")
+				.addScalar("row");
+
+			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+			final List<Map<String, Object>> results = sqlQuery.list();
+
+			if (!results.isEmpty()) {
+				final Map<String, Object> result = results.get(0);
+				final GermplasmOriginDto germplasmOriginDto = new GermplasmOriginDto();
+				germplasmOriginDto.setProgramUUID((String) result.get("programUUID"));
+				germplasmOriginDto.setStudyId((Integer) result.get("studyId"));
+				germplasmOriginDto.setStudyName((String) result.get("studyName"));
+				germplasmOriginDto.setObservationUnitId((String) result.get("observationUnitId"));
+				germplasmOriginDto.setPlotNumber((Integer) result.get("plotNumber"));
+				germplasmOriginDto.setBlockNumber(((result.get("blockNumber") != null)) ? (Integer) result.get("blockNumber") : null);
+				germplasmOriginDto.setRepNumber((Integer) result.get("repNumber"));
+				String x = result.get("row") != null ? (String) result.get("row") : null;
+				String y = result.get("col") != null ? (String) result.get("col") : null;
+				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
+					x = result.get("fieldMapRow") != null ? (String) result.get("fieldMapRow") : null;
+					y = result.get("fieldMapCol") != null ? (String) result.get("fieldMapCol") : null;
+				}
+				final String jsonProps = (String) result.get("jsonProps");
+				if (jsonProps != null) {
+					try {
+						final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
+						germplasmOriginDto.setGeoCoordinates((Map<String, Object>) jsonProp.get("geoCoordinates"));
+					} catch (final IOException e) {
+						LOG.error("couldn't parse json_props column for observationUnitDbId=" + germplasmOriginDto.getObservationUnitId(),
+							e);
+					}
+				}
+				germplasmOriginDto.setPositionCoordinateX(x);
+				germplasmOriginDto.setPositionCoordinateY(y);
+
+				return germplasmOriginDto;
+			}
+			return null;
+		} catch (final Exception e) {
+			final String message = "Error with getGermplasmOrigin query for gid " + gid + " " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 
 	private static void addSearchQueryFilters(

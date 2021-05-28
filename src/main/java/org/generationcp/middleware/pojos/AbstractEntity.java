@@ -7,8 +7,14 @@ import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 import java.util.Date;
 
+/**
+ * This class is used to audit fields. Take a look at {@link org.generationcp.middleware.hibernate.listener.CustomPreUpdateEventListener}
+ */
 @MappedSuperclass
 public abstract class AbstractEntity implements Serializable {
+
+	public static final String MODIFIED_DATE_FIELD_NAME = "modifiedDate";
+	public static final String MODIFIED_BY_FIELD_NAME = "modifiedBy";
 
 	private static final long serialVersionUID = -3183448477255317893L;
 
@@ -42,12 +48,6 @@ public abstract class AbstractEntity implements Serializable {
 
 	public Integer getModifiedBy() {
 		return modifiedBy;
-	}
-
-	//TODO: this method must be not public
-	public void update() {
-		this.modifiedBy = ContextHolder.getLoggedInUserId();
-		this.modifiedDate = new Date();
 	}
 
 }

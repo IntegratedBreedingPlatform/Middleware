@@ -15,6 +15,7 @@ public class BreedingMethodDTO {
 	private Integer methodClass;
 	private Integer mid;
 	private Integer numberOfProgenitors;
+	private Boolean isBulkingMethod;
 
 	public BreedingMethodDTO() {
 	}
@@ -29,6 +30,7 @@ public class BreedingMethodDTO {
 		this.methodClass = method.getGeneq();
 		this.numberOfProgenitors = method.getMprgn();
 		this.mid = method.getMid();
+		this.isBulkingMethod = method.isBulkingMethod();
 	}
 
 	public String getCode() {
@@ -80,7 +82,7 @@ public class BreedingMethodDTO {
 	}
 
 	public Integer getNumberOfProgenitors() {
-		return numberOfProgenitors;
+		return this.numberOfProgenitors;
 	}
 
 	public void setNumberOfProgenitors(final Integer numberOfProgenitors) {
@@ -108,5 +110,13 @@ public class BreedingMethodDTO {
 
 	public void setMid(final Integer mid) {
 		this.mid = mid;
+	}
+
+	public Boolean getIsBulkingMethod() {
+		return this.isBulkingMethod;
+	}
+
+	public void setIsBulkingMethod(final boolean isBulkingMethod) {
+		this.isBulkingMethod = isBulkingMethod;
 	}
 }

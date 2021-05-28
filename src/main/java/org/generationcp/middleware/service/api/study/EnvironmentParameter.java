@@ -6,7 +6,8 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-@JsonInclude(JsonInclude.Include.NON_NULL) @JsonPropertyOrder({"parameterName", "description", "unit", "unitPUI", "value", "valuePUI"})
+@JsonInclude(JsonInclude.Include.NON_NULL)
+@JsonPropertyOrder({"parameterName", "description", "unit", "unitPUI", "value", "valuePUI"})
 public class EnvironmentParameter {
 
 	private String description;
@@ -17,7 +18,7 @@ public class EnvironmentParameter {
 
 	private String unit;
 
-	private Integer unitPUI;
+	private String unitPUI;
 
 	private String value;
 
@@ -27,7 +28,7 @@ public class EnvironmentParameter {
 	}
 
 	public EnvironmentParameter(final String description, final String parameterName, final String parameterPUI, final String unit,
-		final Integer unitPUI, final String value, final String valuePUI) {
+		final String unitPUI, final String value, final String valuePUI) {
 		this.description = description;
 		this.parameterName = parameterName;
 		this.parameterPUI = parameterPUI;
@@ -42,14 +43,13 @@ public class EnvironmentParameter {
 		this.parameterName = measurementVariable.getName();
 		this.parameterPUI = String.valueOf(measurementVariable.getTermId());
 		this.unit = measurementVariable.getScale();
-		this.unitPUI = measurementVariable.getScaleId();
+		this.unitPUI = String.valueOf(measurementVariable.getScaleId());
 		this.value = measurementVariable.getValue();
 	}
 
 	public String getDescription() {
 		return this.description;
 	}
-
 
 	public EnvironmentParameter setDescription(final String description) {
 		this.description = description;
@@ -83,11 +83,11 @@ public class EnvironmentParameter {
 		return this;
 	}
 
-	public Integer getUnitPUI() {
+	public String getUnitPUI() {
 		return this.unitPUI;
 	}
 
-	public EnvironmentParameter setUnitPUI(final Integer unitPUI) {
+	public EnvironmentParameter setUnitPUI(final String unitPUI) {
 		this.unitPUI = unitPUI;
 		return this;
 	}

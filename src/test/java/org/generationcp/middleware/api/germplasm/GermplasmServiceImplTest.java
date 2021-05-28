@@ -234,7 +234,7 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.emptyList());
 		Mockito.when(this.workbenchDataManager.getCropTypeByName(this.cropName)).thenReturn(new CropType());
 
-		this.germplasmService.importGermplasm(1, this.cropName, germplasmImportRequestDto);
+		this.germplasmService.importGermplasm(this.cropName, germplasmImportRequestDto);
 	}
 
 	@Test
@@ -255,7 +255,7 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.emptyList());
 		Mockito.when(this.workbenchDataManager.getCropTypeByName(this.cropName)).thenReturn(new CropType());
 
-		partiallyMockedUnit.importGermplasm(1, this.cropName, germplasmImportRequestDto);
+		partiallyMockedUnit.importGermplasm(this.cropName, germplasmImportRequestDto);
 		Mockito.verify(partiallyMockedUnit, Mockito.times(0)).findGermplasmMatches(Mockito.any(), Mockito.isNull());
 	}
 
@@ -280,7 +280,7 @@ public class GermplasmServiceImplTest {
 		Mockito.doReturn(Collections.singletonList(this.createGermplasmDto())).when(partiallyMockedUnit)
 			.findGermplasmMatches(Mockito.any(GermplasmMatchRequestDto.class), ArgumentMatchers.isNull());
 
-		partiallyMockedUnit.importGermplasm(1, this.cropName, germplasmImportRequestDto);
+		partiallyMockedUnit.importGermplasm(this.cropName, germplasmImportRequestDto);
 		Mockito.verify(this.germplasmDAO, Mockito.times(0)).save(Mockito.any());
 	}
 
@@ -301,7 +301,7 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.singletonList(this.createLocation()));
 		Mockito.when(this.workbenchDataManager.getCropTypeByName(this.cropName)).thenReturn(new CropType());
 
-		partiallyMockedUnit.importGermplasm(1, this.cropName, germplasmImportRequestDto);
+		partiallyMockedUnit.importGermplasm(this.cropName, germplasmImportRequestDto);
 		Mockito.verify(this.bibrefDAO, Mockito.times(1)).save(Mockito.any());
 	}
 
@@ -334,6 +334,7 @@ public class GermplasmServiceImplTest {
 	private Method createMethod() {
 		final Method method = new Method();
 		method.setMid(1);
+		method.setMprgn(0);
 		method.setMcode(this.methodAbbreviation.toUpperCase());
 		method.setMtype(MethodType.GENERATIVE.getCode());
 		return method;

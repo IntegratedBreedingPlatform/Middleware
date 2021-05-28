@@ -114,7 +114,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public List<StudyEntryDto> saveStudyEntries(final Integer studyId, final List<StudyEntryDto> studyEntryDtoList) {
-
 		final List<Integer> entryIds = new ArrayList<>();
 		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
 			final StockModel entry = new StockModel(studyId, studyEntryDto);

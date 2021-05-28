@@ -234,7 +234,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 
 					// Use female parent to continue traversal if source is unknown
 				} else if (femaleGid != 0) {
-					this.addNodeForKnownParent(node, level, femaleGid, excludeDerivativeLines);
+					this.addNodeForDerivativeUnKnownMaleParentKnownFemaleParent(node, level, femaleGid, excludeDerivativeLines);
 				}
 
 			} else if (germplasmOfNode.getGnpgs() >= 2) {
@@ -284,6 +284,14 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		final GermplasmPedigreeTreeNode nodeForParent = new GermplasmPedigreeTreeNode();
 		nodeForParent.setGermplasm(this.germplasmDataManager.getUnknownGermplasmWithPreferredName());
 		node.getLinkedNodes().add(nodeForParent);
+	}
+
+	private void addNodeForDerivativeUnKnownMaleParentKnownFemaleParent(final GermplasmPedigreeTreeNode node, final int level, final int femaleGid,
+																		boolean excludeDerivativeLines) {
+		final GermplasmPedigreeTreeNode nodeForParent = new GermplasmPedigreeTreeNode();
+		nodeForParent.setGermplasm(this.germplasmDataManager.getUnknownGermplasmWithPreferredName());
+		node.getLinkedNodes().add(nodeForParent);
+		this.addNodeForKnownParent(nodeForParent, level, femaleGid, excludeDerivativeLines);
 	}
 
 	/**
@@ -447,7 +455,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
 
 	private List<Germplasm> getChildren(final Integer gid, final char methodType) {
-		return this.daoFactory.getGermplasmDao().getChildren(gid, methodType);
+		return this.daoFactory.getGermplasmDao().getDescendants(gid, methodType);
 	}
 
 	@Override
@@ -565,8 +573,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
 
 	@Override
-	public Integer updateProgenitor(final Integer gid, final Integer progenitorId, final Integer progenitorNumber,
-		final Integer createdBy) {
+	public Integer updateProgenitor(final Integer gid, final Integer progenitorId, final Integer progenitorNumber) {
 
 		// check if the germplasm record identified by gid exists
 		final Germplasm child = this.germplasmDataManager.getGermplasmByGID(gid);
@@ -612,7 +619,7 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 				}
 			} else {
 				// create new Progenitor record
-				final Progenitor newRecord = new Progenitor(new Germplasm(gid, createdBy), progenitorNumber, progenitorId, createdBy);
+				final Progenitor newRecord = new Progenitor(new Germplasm(gid), progenitorNumber, progenitorId);
 				final List<Progenitor> progenitors = new ArrayList<>();
 				progenitors.add(newRecord);
 				final int added = this.addOrUpdateProgenitors(progenitors);

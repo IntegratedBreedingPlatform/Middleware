@@ -10,6 +10,8 @@ public class GermplasmNameDto {
 	@JsonIgnore
 	private Integer gid;
 
+	private Integer id;
+
 	private String name;
 
 	private String date;
@@ -22,8 +24,10 @@ public class GermplasmNameDto {
 
 	private String nameTypeDescription;
 
+	private Boolean preferred;
+
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
@@ -31,7 +35,7 @@ public class GermplasmNameDto {
 	}
 
 	public String getDate() {
-		return date;
+		return this.date;
 	}
 
 	public void setDate(final String date) {
@@ -39,7 +43,7 @@ public class GermplasmNameDto {
 	}
 
 	public Integer getLocationId() {
-		return locationId;
+		return this.locationId;
 	}
 
 	public void setLocationId(final Integer locationId) {
@@ -47,7 +51,7 @@ public class GermplasmNameDto {
 	}
 
 	public String getLocationName() {
-		return locationName;
+		return this.locationName;
 	}
 
 	public void setLocationName(final String locationName) {
@@ -55,7 +59,7 @@ public class GermplasmNameDto {
 	}
 
 	public String getNameTypeCode() {
-		return nameTypeCode;
+		return this.nameTypeCode;
 	}
 
 	public void setNameTypeCode(final String nameTypeCode) {
@@ -63,7 +67,7 @@ public class GermplasmNameDto {
 	}
 
 	public String getNameTypeDescription() {
-		return nameTypeDescription;
+		return this.nameTypeDescription;
 	}
 
 	public void setNameTypeDescription(final String nameTypeDescription) {
@@ -71,11 +75,27 @@ public class GermplasmNameDto {
 	}
 
 	public Integer getGid() {
-		return gid;
+		return this.gid;
 	}
 
 	public void setGid(final Integer gid) {
 		this.gid = gid;
+	}
+
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(final Integer id) {
+		this.id = id;
+	}
+
+	public Boolean isPreferred() {
+		return this.preferred;
+	}
+
+	public void setPreferred(final Boolean preferred) {
+		this.preferred = preferred;
 	}
 
 	@Override

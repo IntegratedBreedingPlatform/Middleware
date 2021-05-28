@@ -76,9 +76,16 @@ public class CVTermRelationship implements Serializable {
 	public CVTermRelationship() {
 	}
 
-	public CVTermRelationship(Integer cvTermRelationshipId, Integer typeId, Integer subjectId, Integer objectId) {
+	public CVTermRelationship(final Integer cvTermRelationshipId, final Integer typeId, final Integer subjectId, final Integer objectId) {
 		super();
 		this.cvTermRelationshipId = cvTermRelationshipId;
+		this.typeId = typeId;
+		this.subjectId = subjectId;
+		this.objectId = objectId;
+	}
+
+	public CVTermRelationship(final Integer typeId, final Integer subjectId, final Integer objectId) {
+		super();
 		this.typeId = typeId;
 		this.subjectId = subjectId;
 		this.objectId = objectId;
@@ -88,7 +95,7 @@ public class CVTermRelationship implements Serializable {
 		return this.cvTermRelationshipId;
 	}
 
-	public void setCvTermRelationshipId(Integer cvTermRelationshipId) {
+	public void setCvTermRelationshipId(final Integer cvTermRelationshipId) {
 		this.cvTermRelationshipId = cvTermRelationshipId;
 	}
 
@@ -96,7 +103,7 @@ public class CVTermRelationship implements Serializable {
 		return this.typeId;
 	}
 
-	public void setTypeId(Integer typeId) {
+	public void setTypeId(final Integer typeId) {
 		this.typeId = typeId;
 	}
 
@@ -104,7 +111,7 @@ public class CVTermRelationship implements Serializable {
 		return this.subjectId;
 	}
 
-	public void setSubjectId(Integer subjectId) {
+	public void setSubjectId(final Integer subjectId) {
 		this.subjectId = subjectId;
 	}
 
@@ -112,7 +119,7 @@ public class CVTermRelationship implements Serializable {
 		return this.objectId;
 	}
 
-	public void setObjectId(Integer objectId) {
+	public void setObjectId(final Integer objectId) {
 		this.objectId = objectId;
 	}
 
@@ -125,7 +132,7 @@ public class CVTermRelationship implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -135,7 +142,7 @@ public class CVTermRelationship implements Serializable {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		CVTermRelationship other = (CVTermRelationship) obj;
+		final CVTermRelationship other = (CVTermRelationship) obj;
 		if (this.cvTermRelationshipId == null) {
 			if (other.cvTermRelationshipId != null) {
 				return false;

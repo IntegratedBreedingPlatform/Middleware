@@ -11,31 +11,27 @@
 
 package org.generationcp.middleware.pojos;
 
-import org.hibernate.envers.AuditOverride;
-import org.hibernate.envers.AuditOverrides;
-import org.hibernate.envers.Audited;
-
-import java.io.Serializable;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * POJO for progntrs table.
  *
  * @author klmanansala
  */
-@AuditOverrides({
-	@AuditOverride(forClass = AbstractEntity.class)
-})
-@Audited
 @Entity
 @Table(name = "progntrs")
 public class Progenitor extends AbstractEntity implements Serializable {
@@ -47,9 +43,9 @@ public class Progenitor extends AbstractEntity implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "id")
 	private Integer id;
-	
-	@ManyToOne(targetEntity = Germplasm.class)
-	@JoinColumn(name = "gid", nullable = true)
+
+	@ManyToOne
+	@JoinColumn(name = "gid", nullable = false)
 	private Germplasm germplasm;
 	
 	@Basic(optional = false)
@@ -60,13 +56,18 @@ public class Progenitor extends AbstractEntity implements Serializable {
 	@Column(name = "pid")
 	private Integer progenitorGid;
 
-	//TODO: review if it's needed by hibernate
-//	public Progenitor() {
-//		super(null);
-//	}
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
+	@OneToOne(fetch = FetchType.LAZY)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "pid", insertable = false, updatable = false)
+	private Germplasm progenitorGermplasm;
 
-	public Progenitor(final Germplasm germplasm, final Integer progenitorNumber, final Integer progenitorGid, final Integer createdBy) {
-//		super(createdBy);
+	public Progenitor() {
+	}
+
+	public Progenitor(final Germplasm germplasm, final Integer progenitorNumber, final Integer progenitorGid) {
 		this.germplasm = germplasm;
 		this.progenitorNumber = progenitorNumber;
 		this.progenitorGid = progenitorGid;
@@ -143,6 +144,14 @@ public class Progenitor extends AbstractEntity implements Serializable {
 	public String toString() {
 		return "Progenitor [id=" + id + ", gid=" + germplasm.getGid() + ", progenitorNumber=" + progenitorNumber + ", progenitorGid="
 				+ progenitorGid + "]";
+	}
+
+	public Germplasm getProgenitorGermplasm() {
+		return this.progenitorGermplasm;
+	}
+
+	public void setProgenitorGermplasm(final Germplasm progenitorGermplasm) {
+		this.progenitorGermplasm = progenitorGermplasm;
 	}
 
 

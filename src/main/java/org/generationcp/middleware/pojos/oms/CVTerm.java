@@ -92,8 +92,8 @@ public class CVTerm implements Serializable {
 	public CVTerm() {
 	}
 
-	public CVTerm(Integer cvTermId, Integer cv, String name, String definition, Integer dbxRefId, Integer isObsolete,
-			Integer isRelationshipType) {
+	public CVTerm(final Integer cvTermId, final Integer cv, final String name, final String definition, final Integer dbxRefId, final Integer isObsolete,
+			final Integer isRelationshipType) {
 		super();
 		this.cvTermId = cvTermId;
 		this.cvId = cv;
@@ -108,7 +108,7 @@ public class CVTerm implements Serializable {
 		return this.cvTermId;
 	}
 
-	public void setCvTermId(Integer cvTermId) {
+	public void setCvTermId(final Integer cvTermId) {
 		this.cvTermId = cvTermId;
 	}
 
@@ -116,7 +116,7 @@ public class CVTerm implements Serializable {
 		return this.cvId;
 	}
 
-	public void setCv(Integer cv) {
+	public void setCv(final Integer cv) {
 		this.cvId = cv;
 	}
 
@@ -124,7 +124,7 @@ public class CVTerm implements Serializable {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -132,7 +132,7 @@ public class CVTerm implements Serializable {
 		return this.definition;
 	}
 
-	public void setDefinition(String definition) {
+	public void setDefinition(final String definition) {
 		this.definition = definition;
 	}
 
@@ -140,7 +140,7 @@ public class CVTerm implements Serializable {
 		return this.dbxRefId;
 	}
 
-	public void setDbxRefId(Integer dbxRefId) {
+	public void setDbxRefId(final Integer dbxRefId) {
 		this.dbxRefId = dbxRefId;
 	}
 
@@ -148,7 +148,7 @@ public class CVTerm implements Serializable {
 		return this.isObsolete > 0;
 	}
 
-	public void setIsObsolete(Boolean isObsolete) {
+	public void setIsObsolete(final Boolean isObsolete) {
 
 		this.isObsolete = isObsolete ? 1 : 0;
 	}
@@ -157,7 +157,7 @@ public class CVTerm implements Serializable {
 		return this.isRelationshipType > 0;
 	}
 
-	public void setIsRelationshipType(Boolean isRelationshipType) {
+	public void setIsRelationshipType(final Boolean isRelationshipType) {
 		this.isRelationshipType = isRelationshipType ? 1 : 0;
 	}
 
@@ -176,7 +176,7 @@ public class CVTerm implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -186,7 +186,7 @@ public class CVTerm implements Serializable {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		CVTerm other = (CVTerm) obj;
+		final CVTerm other = (CVTerm) obj;
 		if (this.cvId == null) {
 			if (other.cvId != null) {
 				return false;
@@ -241,7 +241,7 @@ public class CVTerm implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("CVTerm [cvTermId=");
 		builder.append(this.cvTermId);
 		builder.append(", cvId=");

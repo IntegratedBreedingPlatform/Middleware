@@ -4,9 +4,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.hibernate.envers.AuditOverride;
-import org.hibernate.envers.AuditOverrides;
-import org.hibernate.envers.Audited;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -19,14 +17,11 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Date;
 
-@AuditOverrides({
-	@AuditOverride(forClass = AbstractEntity.class)
-})
-@Audited
 @Entity
-@Table(name = "external_reference")
-public class ExternalReference extends AbstractEntity implements Serializable {
+@Table(name = "external_reference_study")
+public class StudyExternalReference extends AbstractEntity implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -35,8 +30,8 @@ public class ExternalReference extends AbstractEntity implements Serializable {
 	private Integer id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "gid")
-	private Germplasm germplasm;
+	@JoinColumn(name = "study_id")
+	private DmsProject study;
 
 	@Basic(optional = false)
 	@Column(name = "reference_id")
@@ -46,24 +41,33 @@ public class ExternalReference extends AbstractEntity implements Serializable {
 	@Column(name = "reference_source")
 	private String source;
 
+	public StudyExternalReference() {
+	}
+
+	public StudyExternalReference(final DmsProject study, final String referenceId, final String source) {
+		this.study = study;
+		this.referenceId = referenceId;
+		this.source = source;
+	}
+
 	public Integer getId() {
-		return id;
+		return this.id;
 	}
 
 	public void setId(final Integer id) {
 		this.id = id;
 	}
 
-	public Germplasm getGermplasm() {
-		return germplasm;
+	public DmsProject getStudy() {
+		return this.study;
 	}
 
-	public void setGermplasm(final Germplasm germplasm) {
-		this.germplasm = germplasm;
+	public void setStudy(final DmsProject study) {
+		this.study = study;
 	}
 
 	public String getReferenceId() {
-		return referenceId;
+		return this.referenceId;
 	}
 
 	public void setReferenceId(final String referenceId) {
@@ -71,28 +75,19 @@ public class ExternalReference extends AbstractEntity implements Serializable {
 	}
 
 	public String getSource() {
-		return source;
+		return this.source;
 	}
 
 	public void setSource(final String source) {
 		this.source = source;
 	}
 
-	public ExternalReference() {
-	}
-
-	public ExternalReference(final Germplasm germplasm, final String referenceId, final String source) {
-		this.germplasm = germplasm;
-		this.referenceId = referenceId;
-		this.source = source;
-	}
-
 	@Override
 	public boolean equals(final Object other) {
-		if (!(other instanceof ExternalReference)) {
+		if (!(other instanceof StudyExternalReference)) {
 			return false;
 		}
-		final ExternalReference castOther = (ExternalReference) other;
+		final StudyExternalReference castOther = (StudyExternalReference) other;
 		return new EqualsBuilder().append(this.id, castOther.id).isEquals();
 	}
 

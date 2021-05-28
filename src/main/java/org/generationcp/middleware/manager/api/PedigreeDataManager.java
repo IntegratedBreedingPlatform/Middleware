@@ -209,10 +209,9 @@ public interface PedigreeDataManager {
 	 * @param gid the gid
 	 * @param progenitorId the progenitor id
 	 * @param progenitorNumber the progenitor number
-	 * @param createdBy
 	 * @return Returns the id of the updated Progenitor
 	 */
-	Integer updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber, final Integer createdBy);
+	Integer updateProgenitor(Integer gid, Integer progenitorId, Integer progenitorNumber);
 
 	/***
 	 * Returns female parent and male parent of given gid

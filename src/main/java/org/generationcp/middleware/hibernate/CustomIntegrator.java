@@ -1,5 +1,6 @@
 package org.generationcp.middleware.hibernate;
 
+import org.generationcp.middleware.hibernate.listener.CustomPreDeleteEventListener;
 import org.generationcp.middleware.hibernate.listener.CustomPreUpdateEventListener;
 import org.hibernate.cfg.Configuration;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
@@ -10,7 +11,8 @@ import org.hibernate.metamodel.source.MetadataImplementor;
 import org.hibernate.service.spi.SessionFactoryServiceRegistry;
 
 /**
- * For the integrator to be automatically used when Hibernate starts up, it's added in META-INF/services/org.hibernate.integrator.spi.Integrator
+ * A file in META-INF/services/org.hibernate.integrator.spi.Integrator was added in order to be discovered by ServiceLoader (Java SPI). So, this integrator
+ * will be used automatically when Hibernate starts up.
  */
 public class CustomIntegrator implements Integrator {
 
@@ -18,12 +20,9 @@ public class CustomIntegrator implements Integrator {
 	public void integrate(final Configuration configuration, final SessionFactoryImplementor sessionFactory,
 		final SessionFactoryServiceRegistry serviceRegistry) {
 
-		//TODO: check duplication strategy
-//		EventListenerRegistry listenerRegistry = serviceRegistry.getService( EventListenerRegistry.class );
-//		listenerRegistry.addDuplicationStrategy( EnversListenerDuplicationStrategy.INSTANCE );
-
 		final EventListenerRegistry service = sessionFactory.getServiceRegistry().getService(EventListenerRegistry.class);
 		service.getEventListenerGroup(EventType.PRE_UPDATE).appendListener(new CustomPreUpdateEventListener());
+		service.getEventListenerGroup(EventType.PRE_DELETE).appendListener(new CustomPreDeleteEventListener());
 	}
 
 	@Override

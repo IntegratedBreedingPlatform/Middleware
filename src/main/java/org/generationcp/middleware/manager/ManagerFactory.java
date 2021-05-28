@@ -15,6 +15,10 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchServiceImpl;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListServiceImpl;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -63,6 +67,8 @@ import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.gdms.DatasetService;
+import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
+import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactoryImpl;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -107,7 +113,7 @@ public class ManagerFactory implements Serializable {
 
 	private String cropName;
 	private String pedigreeProfile;
-	private static ThreadLocal<ManagerFactory> currentManagerFactory = new ThreadLocal<ManagerFactory>();
+	private static final ThreadLocal<ManagerFactory> currentManagerFactory = new ThreadLocal<ManagerFactory>();
 
 	public ManagerFactory() {
 		ManagerFactory.currentManagerFactory.set(this);
@@ -167,7 +173,7 @@ public class ManagerFactory implements Serializable {
 
 	public OntologyVariableDataManager getOntologyVariableDataManager() {
 		return new OntologyVariableDataManagerImpl(this.getOntologyMethodDataManager(), this.getOntologyPropertyDataManager(),
-				this.getOntologyScaleDataManager(), this.getFormulaService(), this.sessionProvider);
+			this.getOntologyScaleDataManager(), this.getFormulaService(), this.sessionProvider);
 	}
 
 	public PresetService getPresetService() {
@@ -354,5 +360,17 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmService getGermplasmService() {
 		return new GermplasmServiceImpl(this.sessionProvider);
+	}
+
+	public GermplasmListService getGermplasmListService() {
+		return new GermplasmListServiceImpl(this.sessionProvider);
+	}
+
+	public GermplasmSearchService getGermplasmSearchService() {
+		return new GermplasmSearchServiceImpl(this.sessionProvider);
+	}
+
+	public VariableDataValidatorFactory getVariableDataValidatorFactory() {
+		return new VariableDataValidatorFactoryImpl();
 	}
 }

@@ -11,10 +11,6 @@
 
 package org.generationcp.middleware.pojos;
 
-import org.hibernate.envers.AuditOverride;
-import org.hibernate.envers.AuditOverrides;
-import org.hibernate.envers.Audited;
-
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 
@@ -35,10 +31,6 @@ import java.io.Serializable;
  *
  * @author klmanansala
  */
-@AuditOverrides({
-	@AuditOverride(forClass = AbstractEntity.class)
-})
-@Audited
 @Entity
 @Table(name = "names")
 public class Name extends AbstractEntity implements Serializable {
@@ -105,19 +97,19 @@ public class Name extends AbstractEntity implements Serializable {
 	@Column(name = "nref")
 	private Integer referenceId;
 
-	@Deprecated
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
 	public Name() {
-//		super(null);
 	}
 
+	@Deprecated
 	public Name(final Integer nid) {
-//		super(null);
 		this.nid = nid;
 	}
 
-	public Name(final Integer nid, final Germplasm germplasm, final Integer typeId, final Integer nstat, final Integer createdBy,
-			final String nval, final Integer locationId, final Integer ndate, final Integer referenceId) {
-//		super(createdBy);
+	public Name(final Integer nid, final Germplasm germplasm, final Integer typeId, final Integer nstat,
+		final String nval, final Integer locationId, final Integer ndate, final Integer referenceId) {
 		this.nid = nid;
 		this.germplasm = germplasm;
 		this.typeId = typeId;
@@ -174,11 +166,6 @@ public class Name extends AbstractEntity implements Serializable {
 
 	public void setTypeId(final Integer typeId) {
 		this.typeId = typeId;
-	}
-
-//	@Override
-	public void setCreatedBy(final Integer createdBy) {
-//		super.setCreatedBy(createdBy);
 	}
 
 	public Integer getLocationId() {
