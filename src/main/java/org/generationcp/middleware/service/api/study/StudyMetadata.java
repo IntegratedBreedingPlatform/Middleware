@@ -39,7 +39,7 @@ public class StudyMetadata {
 
 	private String experimentalDesign;
 
-	private String lastUpdate;
+	private Date lastUpdate;
 
 	private transient int hashCode;
 
@@ -48,8 +48,9 @@ public class StudyMetadata {
 
 	public StudyMetadata(final Integer nurseryOrTrialId, final Integer studyDbId, final Integer locationId, final Boolean active,
 		final Date endDate, final Date startDate, final Integer trialDbId, final List<String> seasons, final String trialName,
-		final String studyType, final String studyTypeName, final String studyName, final String studyDescription, final String experimentalDesign,
-		final String lastUpdate) {
+		final String studyType, final String studyTypeName, final String studyName, final String studyDescription,
+		final String experimentalDesign,
+		final Date lastUpdate) {
 		this.nurseryOrTrialId = nurseryOrTrialId;
 		this.studyDbId = studyDbId;
 		this.locationId = locationId;
@@ -68,7 +69,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getNurseryOrTrialId() {
-		return nurseryOrTrialId;
+		return this.nurseryOrTrialId;
 	}
 
 	public StudyMetadata setNurseryOrTrialId(final Integer nurseryOrTrialId) {
@@ -77,7 +78,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getStudyDbId() {
-		return studyDbId;
+		return this.studyDbId;
 	}
 
 	public StudyMetadata setStudyDbId(final Integer studyDbId) {
@@ -86,7 +87,7 @@ public class StudyMetadata {
 	}
 
 	public String getStudyName() {
-		return studyName;
+		return this.studyName;
 	}
 
 	public StudyMetadata setStudyName(final String studyName) {
@@ -95,7 +96,7 @@ public class StudyMetadata {
 	}
 
 	public String getStudyType() {
-		return studyType;
+		return this.studyType;
 	}
 
 	public StudyMetadata setStudyType(final String studyType) {
@@ -104,7 +105,7 @@ public class StudyMetadata {
 	}
 
 	public List<String> getSeasons() {
-		return seasons;
+		return this.seasons;
 	}
 
 	public StudyMetadata setSeasons(final List<String> seasons) {
@@ -113,7 +114,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getTrialDbId() {
-		return trialDbId;
+		return this.trialDbId;
 	}
 
 	public StudyMetadata setTrialDbId(final Integer trialDbId) {
@@ -122,7 +123,7 @@ public class StudyMetadata {
 	}
 
 	public String getTrialName() {
-		return trialName;
+		return this.trialName;
 	}
 
 	public StudyMetadata setTrialName(final String trialName) {
@@ -131,7 +132,7 @@ public class StudyMetadata {
 	}
 
 	public Date getStartDate() {
-		return startDate;
+		return this.startDate;
 	}
 
 	public StudyMetadata setStartDate(final Date startDate) {
@@ -140,7 +141,7 @@ public class StudyMetadata {
 	}
 
 	public Date getEndDate() {
-		return endDate;
+		return this.endDate;
 	}
 
 	public StudyMetadata setEndDate(final Date endDate) {
@@ -149,7 +150,7 @@ public class StudyMetadata {
 	}
 
 	public Boolean getActive() {
-		return active;
+		return this.active;
 	}
 
 	public StudyMetadata setActive(final Boolean active) {
@@ -158,7 +159,7 @@ public class StudyMetadata {
 	}
 
 	public Integer getLocationId() {
-		return locationId;
+		return this.locationId;
 	}
 
 	public StudyMetadata setLocationId(final Integer locationId) {
@@ -167,7 +168,7 @@ public class StudyMetadata {
 	}
 
 	public String getStudyDescription() {
-		return studyDescription;
+		return this.studyDescription;
 	}
 
 	public StudyMetadata setStudyDescription(final String studyDescription) {
@@ -184,7 +185,6 @@ public class StudyMetadata {
 		return this;
 	}
 
-
 	public String getStudyTypeName() {
 		return this.studyTypeName;
 	}
@@ -193,7 +193,7 @@ public class StudyMetadata {
 		this.studyTypeName = studyTypeName;
 	}
 
-	public void addSeason(String season) {
+	public void addSeason(final String season) {
 		this.seasons.add(season);
 	}
 
@@ -206,19 +206,20 @@ public class StudyMetadata {
 		return this;
 	}
 
-	public String getLastUpdate() {
+	public Date getLastUpdate() {
 		return this.lastUpdate;
 	}
 
-	public StudyMetadata setLastUpdate(final String lastUpdate) {
+	public StudyMetadata setLastUpdate(final Date lastUpdate) {
 		this.lastUpdate = lastUpdate;
 		return this;
 	}
 
-	@Override public boolean equals(final Object other) {
+	@Override
+	public boolean equals(final Object other) {
 		if (!(other instanceof StudyMetadata))
 			return false;
-		StudyMetadata castOther = (StudyMetadata) other;
+		final StudyMetadata castOther = (StudyMetadata) other;
 		return new EqualsBuilder().append(this.nurseryOrTrialId, castOther.getNurseryOrTrialId())
 			.append(this.studyDbId, castOther.getStudyDbId()).append(this.studyName, castOther.getStudyName())
 			.append(this.studyDescription, castOther.getStudyDescription())
@@ -229,12 +230,16 @@ public class StudyMetadata {
 			.append(this.active, castOther.getActive()).append(this.locationId, castOther.getLocationId()).isEquals();
 	}
 
-	@Override public int hashCode() {
-		if (hashCode == 0) {
-			hashCode = new HashCodeBuilder().append(nurseryOrTrialId).append(studyDbId).append(studyName).append(studyType).append(seasons)
-				.append(trialDbId).append(trialName).append(startDate).append(endDate).append(active).append(locationId).toHashCode();
+	@Override
+	public int hashCode() {
+		if (this.hashCode == 0) {
+			this.hashCode = new HashCodeBuilder().append(this.nurseryOrTrialId).append(this.studyDbId).append(this.studyName).append(
+				this.studyType).append(
+				this.seasons)
+				.append(this.trialDbId).append(this.trialName).append(this.startDate).append(this.endDate).append(this.active).append(
+					this.locationId).toHashCode();
 		}
-		return hashCode;
+		return this.hashCode;
 	}
 
 }

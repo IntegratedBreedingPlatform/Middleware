@@ -2,7 +2,9 @@ package org.generationcp.middleware.service.api.study;
 
 import org.pojomatic.Pojomatic;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class StudySearchFilter {
 
@@ -13,10 +15,10 @@ public class StudySearchFilter {
 	private String seasonDbId;
 	private String trialPUI;
 	private String studyPUI;
-	private String trialDbId;
+	private List<String> trialDbIds = new ArrayList<>();
 	private String trialName;
 	private String contactDbId;
-	private String studyDbId;
+	private List<String> studyDbIds = new ArrayList<>();
 	private Integer germplasmDbId;
 	private Integer observationVariableDbId;
 	private Boolean active;
@@ -27,51 +29,36 @@ public class StudySearchFilter {
 
 	}
 
-	public StudySearchFilter(final String studyTypeDbId, final String programDbId, final String locationDbId, final String seasonDbId,
-		final String trialDbId, final String studyDbId, final Boolean active) {
-		this.studyTypeDbId = studyTypeDbId;
-		this.programDbId = programDbId;
-		this.locationDbId = locationDbId;
-		this.seasonDbId = seasonDbId;
-		this.trialDbId = trialDbId;
-		this.studyDbId = studyDbId;
-		this.active = active;
-	}
-
 	public String getStudyTypeDbId() {
 		return this.studyTypeDbId;
 	}
 
-	public StudySearchFilter withStudyTypeDbId(final String studyTypeDbId) {
+	public void setStudyTypeDbId(final String studyTypeDbId) {
 		this.studyTypeDbId = studyTypeDbId;
-		return this;
 	}
 
 	public String getProgramDbId() {
 		return this.programDbId;
 	}
 
-	public StudySearchFilter withProgramDbId(final String programDbId) {
+	public void setProgramDbId(final String programDbId) {
 		this.programDbId = programDbId;
-		return this;
 	}
 
 	public String getLocationDbId() {
 		return this.locationDbId;
 	}
 
-	public StudySearchFilter withLocationDbId(final String locationDbId) {
+	public void setLocationDbId(final String locationDbId) {
 		this.locationDbId = locationDbId;
-		return this;
 	}
 
 	public String getSeasonDbId() {
 		return this.seasonDbId;
 	}
 
-	public StudySearchFilter withSeasonDbId(final String seasonDbId) {
+	public void setSeasonDbId(final String seasonDbId) {
 		this.seasonDbId = seasonDbId;
-		return this;
 	}
 
 	public String getStudyPUI() {
@@ -82,90 +69,76 @@ public class StudySearchFilter {
 		this.studyPUI = studyPUI;
 	}
 
-	public StudySearchFilter withStudyPUI(final String studyPUI) {
-		this.studyPUI = studyPUI;
-		return this;
+	public List<String> getTrialDbIds() {
+		return this.trialDbIds;
 	}
 
-	public String getTrialDbId() {
-		return this.trialDbId;
+	public void setTrialDbIds(final List<String> trialDbIds) {
+		this.trialDbIds = trialDbIds;
 	}
 
-	public StudySearchFilter withTrialDbId(final String trialDbId) {
-		this.trialDbId = trialDbId;
-		return this;
+	public List<String> getStudyDbIds() {
+		return this.studyDbIds;
 	}
 
-	public String getStudyDbId() {
-		return this.studyDbId;
-	}
-
-	public StudySearchFilter withStudyDbId(final String studyDbId) {
-		this.studyDbId = studyDbId;
-		return this;
+	public void setStudyDbIds(final List<String> studyDbIds) {
+		this.studyDbIds = studyDbIds;
 	}
 
 	public Boolean getActive() {
 		return this.active;
 	}
 
-	public StudySearchFilter withActive(final Boolean active) {
+	public void setActive(final Boolean active) {
 		this.active = active;
-		return this;
 	}
 
 	public String getCommonCropName() {
 		return this.commonCropName;
 	}
 
-	public StudySearchFilter withCommonCropName(final String commonCropName) {
+	public void setCommonCropName(final String commonCropName) {
 		this.commonCropName = commonCropName;
-		return this;
 	}
 
 	public String getTrialPUI() {
 		return this.trialPUI;
 	}
 
-	public StudySearchFilter withTrialPUI(final String trialPUI) {
+	public void setTrialPUI(final String trialPUI) {
 		this.trialPUI = trialPUI;
-		return this;
 	}
 
 	public String getTrialName() {
 		return this.trialName;
 	}
 
-	public StudySearchFilter withTrialName(final String trialName) {
+	public void setTrialName(final String trialName) {
 		this.trialName = trialName;
-		return this;
 	}
 
 	public String getContactDbId() {
 		return this.contactDbId;
 	}
 
-	public StudySearchFilter withContactDbId(final String contactDbId) {
+	public void setContactDbId(final String contactDbId) {
 		this.contactDbId = contactDbId;
-		return this;
 	}
 
 	public Date getSearchDateRangeStart() {
 		return this.searchDateRangeStart;
 	}
 
-	public StudySearchFilter withSearchDateRangeStart(final Date searchDateRangeStart) {
+	public void setSearchDateRangeStart(final Date searchDateRangeStart) {
 		this.searchDateRangeStart = searchDateRangeStart;
-		return this;
 	}
 
 	public Date getSearchDateRangeEnd() {
 		return this.searchDateRangeEnd;
 	}
 
-	public StudySearchFilter withSearchDateRangeEnd(final Date searchDateRangeEnd) {
+	public void setSearchDateRangeEnd(final Date searchDateRangeEnd) {
 		this.searchDateRangeEnd = searchDateRangeEnd;
-		return this;
 	}
 
 	public Integer getGermplasmDbId() {
@@ -176,9 +149,8 @@ public class StudySearchFilter {
 		this.germplasmDbId = germplasmDbId;
 	}
 
-	public StudySearchFilter withGermplasmDbid(final Integer germplasmDbId) {
+	public void setGermplasmDbid(final Integer germplasmDbId) {
 		this.germplasmDbId = germplasmDbId;
-		return this;
 	}
 
 	public Integer getObservationVariableDbId() {
@@ -187,11 +159,6 @@ public class StudySearchFilter {
 
 	public void setObservationVariableDbId(final Integer observationVariableDbId) {
 		this.observationVariableDbId = observationVariableDbId;
-	}
-
-	public StudySearchFilter withObservationVariableDbId(final Integer observationVariableDbId) {
-		this.observationVariableDbId = observationVariableDbId;
-		return this;
 	}
 
 	@Override

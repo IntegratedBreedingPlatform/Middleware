@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.Date;
 
-public class CustomPreUpdateEventListener implements PreUpdateEventListener {
+public class CustomPreUpdateEventListener extends AbstractEventListener implements PreUpdateEventListener {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CustomPreUpdateEventListener.class);
 
@@ -23,8 +23,7 @@ public class CustomPreUpdateEventListener implements PreUpdateEventListener {
 	 */
 	@Override
 	public boolean onPreUpdate(final PreUpdateEvent event) {
-		//Check if the entity extends from AbstractEntity
-		if (AbstractEntity.class.isAssignableFrom(event.getEntity().getClass())) {
+		if (this.checkEntityExtendsAbstractEntity(event.getEntity().getClass())) {
 			this.setValue(event.getPersister(), event.getState(), AbstractEntity.MODIFIED_DATE_FIELD_NAME, new Date());
 			this.setValue(event.getPersister(), event.getState(), AbstractEntity.MODIFIED_BY_FIELD_NAME, ContextHolder.getLoggedInUserId());
 		}

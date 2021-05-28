@@ -11,14 +11,19 @@
 
 package org.generationcp.middleware.pojos;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 
@@ -54,6 +59,11 @@ public class Progenitor extends AbstractEntity implements Serializable {
 	/**
 	 * Don't use it. This constructor is required by hibernate.
 	 */
+	@OneToOne(fetch = FetchType.LAZY)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "pid", insertable = false, updatable = false)
+	private Germplasm progenitorGermplasm;
+
 	public Progenitor() {
 	}
 
@@ -134,6 +144,14 @@ public class Progenitor extends AbstractEntity implements Serializable {
 	public String toString() {
 		return "Progenitor [id=" + id + ", gid=" + germplasm.getGid() + ", progenitorNumber=" + progenitorNumber + ", progenitorGid="
 				+ progenitorGid + "]";
+	}
+
+	public Germplasm getProgenitorGermplasm() {
+		return this.progenitorGermplasm;
+	}
+
+	public void setProgenitorGermplasm(final Germplasm progenitorGermplasm) {
+		this.progenitorGermplasm = progenitorGermplasm;
 	}
 
 

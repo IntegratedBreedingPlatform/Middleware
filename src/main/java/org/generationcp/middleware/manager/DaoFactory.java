@@ -4,7 +4,8 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
-import org.generationcp.middleware.dao.ExternalReferenceDAO;
+import org.generationcp.middleware.dao.CropTypeDAO;
+import org.generationcp.middleware.dao.GermplasmExternalReferenceDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
@@ -23,6 +24,7 @@ import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
+import org.generationcp.middleware.dao.StudyExternalReferenceDao;
 import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
@@ -357,6 +359,12 @@ public class DaoFactory {
 		return userProgramTreeStateDAO;
 	}
 
+	public CropTypeDAO getCropTypeDAO() {
+		final CropTypeDAO cropTypeDAO = new CropTypeDAO();
+		cropTypeDAO.setSession(this.sessionProvider.getSession());
+		return cropTypeDAO;
+	}
+
 	public BreedersQueryDao getBreedersQueryDao() {
 		return new BreedersQueryDao(this.sessionProvider.getSession());
 	}
@@ -533,10 +541,16 @@ public class DaoFactory {
 		return phenotypeOutlierDao;
 	}
 
-	public ExternalReferenceDAO getExternalReferenceDAO() {
-		final ExternalReferenceDAO externalReferenceDAO = new ExternalReferenceDAO();
-		externalReferenceDAO.setSession(this.sessionProvider.getSession());
-		return externalReferenceDAO;
+	public GermplasmExternalReferenceDAO getGermplasmExternalReferenceDAO() {
+		final GermplasmExternalReferenceDAO germplasmExternalReferenceDAO = new GermplasmExternalReferenceDAO();
+		germplasmExternalReferenceDAO.setSession(this.sessionProvider.getSession());
+		return germplasmExternalReferenceDAO;
+	}
+
+	public StudyExternalReferenceDao getStudyExternalReferenceDAO() {
+		final StudyExternalReferenceDao studyExternalReferenceDAO = new StudyExternalReferenceDao();
+		studyExternalReferenceDAO.setSession(this.sessionProvider.getSession());
+		return studyExternalReferenceDAO;
 	}
 
 }

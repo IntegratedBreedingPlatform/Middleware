@@ -66,6 +66,13 @@ public class CVTermProperty implements Serializable {
 	@Column(name = "cvterm_id")
 	private Integer cvTermId;
 
+	public CVTermProperty(final Integer typeId, final String value, final Integer rank, final Integer cvTermId) {
+		this.typeId = typeId;
+		this.value = value;
+		this.rank = rank;
+		this.cvTermId = cvTermId;
+	}
+
 	public Integer getCvTermPropertyId() {
 		return this.cvTermPropertyId;
 	}
@@ -73,7 +80,7 @@ public class CVTermProperty implements Serializable {
 	public CVTermProperty() {
 	}
 
-	public CVTermProperty(Integer cvTermPropertyId, Integer cvTermId, Integer typeId, String value, Integer rank) {
+	public CVTermProperty(final Integer cvTermPropertyId, final Integer cvTermId, final Integer typeId, final String value, final Integer rank) {
 		super();
 		this.cvTermPropertyId = cvTermPropertyId;
 		this.cvTermId = cvTermId;
@@ -82,7 +89,7 @@ public class CVTermProperty implements Serializable {
 		this.rank = rank;
 	}
 
-	public void setCvTermPropertyId(Integer cvTermPropertyId) {
+	public void setCvTermPropertyId(final Integer cvTermPropertyId) {
 		this.cvTermPropertyId = cvTermPropertyId;
 	}
 
@@ -90,7 +97,7 @@ public class CVTermProperty implements Serializable {
 		return this.typeId;
 	}
 
-	public void setTypeId(Integer typeId) {
+	public void setTypeId(final Integer typeId) {
 		this.typeId = typeId;
 	}
 
@@ -98,7 +105,7 @@ public class CVTermProperty implements Serializable {
 		return this.value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 
@@ -106,7 +113,7 @@ public class CVTermProperty implements Serializable {
 		return this.rank;
 	}
 
-	public void setRank(Integer rank) {
+	public void setRank(final Integer rank) {
 		this.rank = rank;
 	}
 
@@ -114,7 +121,7 @@ public class CVTermProperty implements Serializable {
 		return this.cvTermId;
 	}
 
-	public void setCvTermId(Integer cvTermId) {
+	public void setCvTermId(final Integer cvTermId) {
 		this.cvTermId = cvTermId;
 	}
 
@@ -127,7 +134,7 @@ public class CVTermProperty implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -137,7 +144,7 @@ public class CVTermProperty implements Serializable {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		CVTermProperty other = (CVTermProperty) obj;
+		final CVTermProperty other = (CVTermProperty) obj;
 		if (this.cvTermPropertyId == null) {
 			if (other.cvTermPropertyId != null) {
 				return false;

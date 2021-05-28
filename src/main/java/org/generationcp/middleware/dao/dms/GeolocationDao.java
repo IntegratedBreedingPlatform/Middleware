@@ -357,7 +357,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return null;
 	}
 
-	public List<InstanceMetadata> getInstanceMetadata(final int studyId, final List<Integer> locationIds) {
+	public List<InstanceMetadata> getInstanceMetadata(final List<Integer> studyIds, final List<Integer> locationIds) {
 
 		final String queryString = "select \n" + "    geoloc.nd_geolocation_id as instanceDBId, \n"
 			+ "    geoloc.description as instanceNumber, \n" + "    pmain.project_id trialDbId, \n"
@@ -373,7 +373,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			+ "    inner join project pmain on pmain.project_id = proj.study_id \n"
 			+ "    left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 			+ "	   left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
-			+ " where nde.type_id = 1020 and pmain.project_id = :studyId \n";
+			+ " where nde.type_id = 1020 and pmain.project_id IN (:studyIds) \n";
 
 		final StringBuilder strBuilder = new StringBuilder(queryString);
 		final boolean locationFilterSpecified = !CollectionUtils.isEmpty(locationIds);
@@ -384,7 +384,7 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		strBuilder.append("    order by geoloc.nd_geolocation_id asc \n");
 		final SQLQuery query = this.getSession().createSQLQuery(strBuilder.toString());
 
-		query.setParameter("studyId", studyId);
+		query.setParameterList("studyIds", studyIds);
 		if (locationFilterSpecified) {
 			query.setParameterList("locationIds", locationIds);
 		}

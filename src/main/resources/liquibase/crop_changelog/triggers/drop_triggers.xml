@@ -1,0 +1,25 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v18.1.0-drop_audit_triggers" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/drop_triggers.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter=";"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Drop triggers</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-check_no_audit_triggers" runOnChange="true" runAlways="true">
+    	<preConditions onFail="HALT" onFailMessage="There are still triggers for audit. Please, execute the following statement: SHOW TRIGGERS and add missings triggers in drop_triggers.sql">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM information_schema.TRIGGERS WHERE TRIGGER_NAME LIKE '%_aud%' AND TRIGGER_SCHEMA = (select database())</sqlCheck>
+		</preConditions>
+		<comment>Ensure all audit triggers has been dropped</comment>
+	</changeSet>
+	
+</databaseChangeLog>
