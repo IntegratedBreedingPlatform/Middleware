@@ -65,7 +65,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 				+ "   cv.name AS code," //
 				+ "   cv.cvterm_id AS id," //
 				+ "   cv.definition AS name" //
-				+ " FROM cvterm cv INNER JOIN cvtermprop cp ON cv.cvterm_id = cp.cvterm_id " //
+				+ " FROM cvterm cv INNER JOIN cvtermprop cp ON cp.type_id = 1800 and cv.cvterm_id = cp.cvterm_id " //
 				+ " WHERE cp.value = (select name from cvterm where cvterm_id = 1814) " //
 				+ "   AND (cv.definition like :fname or cv.name like :name)" //
 				+ " LIMIT 100 ");
