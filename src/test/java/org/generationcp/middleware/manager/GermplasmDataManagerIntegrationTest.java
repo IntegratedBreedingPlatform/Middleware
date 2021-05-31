@@ -1125,9 +1125,17 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetNamesByGidsAndNTypeIdsInMap() {
-		final int GID1 = 1;
-		final int GID2 = 2;
-		final int GID3 = 3;
+
+		final Germplasm germplasm1 = this.germplasmDAO
+			.save(GermplasmTestDataInitializer.createGermplasm(20150101, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName"));
+		final Germplasm germplasm2 = this.germplasmDAO
+			.save(GermplasmTestDataInitializer.createGermplasm(20150101, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName"));
+		final Germplasm germplasm3 = this.germplasmDAO
+			.save(GermplasmTestDataInitializer.createGermplasm(20150101, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName"));
+
+		final int GID1 = germplasm1.getGid();
+		final int GID2 = germplasm2.getGid();
+		final int GID3 = germplasm3.getGid();
 
 		//Get the names map before adding new names
 		final Map<Integer, List<Name>> namesMap = this.germplasmDataManager.getNamesByGidsAndNTypeIdsInMap(Arrays.asList(GID1, GID2, GID3),
