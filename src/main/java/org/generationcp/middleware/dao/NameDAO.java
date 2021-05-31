@@ -21,6 +21,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
@@ -61,6 +62,10 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		+ "    location l on l.locid = n.nlocn " //
 		+ "where " //
 		+ "    n.nstat <> 9 and n.gid in (:gids)";
+
+	public NameDAO(final Session session) {
+		super(session);
+	}
 
 	public List<Name> getByGIDWithFilters(final Integer gid, final Integer status, final GermplasmNameType type) {
 		if (type != null) {

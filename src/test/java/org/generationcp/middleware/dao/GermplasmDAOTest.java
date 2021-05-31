@@ -112,8 +112,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		if (this.dao == null) {
-			this.dao = new GermplasmDAO();
-			this.dao.setSession(this.sessionProvder.getSession());
+			this.dao = new GermplasmDAO(this.sessionProvder.getSession());
 
 			this.lotDAO = new LotDAO();
 			this.lotDAO.setSession(this.sessionProvder.getSession());
@@ -127,11 +126,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			this.locationDAO = new LocationDAO();
 			this.locationDAO.setSession(this.sessionProvder.getSession());
 
-			this.nameDAO = new NameDAO();
-			this.nameDAO.setSession(this.sessionProvder.getSession());
+			this.nameDAO = new NameDAO(this.sessionProvder.getSession());
 
-			this.userDefinedFieldDao = new UserDefinedFieldDAO();
-			this.userDefinedFieldDao.setSession(this.sessionProvder.getSession());
+			this.userDefinedFieldDao = new UserDefinedFieldDAO(this.sessionProvder.getSession());
 
 			this.progenitorDao = new ProgenitorDAO();
 			this.progenitorDao.setSession(this.sessionProvder.getSession());
@@ -1197,7 +1194,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Name name = GermplasmTestDataInitializer.createGermplasmName(germplasmGID, RandomStringUtils.randomAlphanumeric(50));
 		name.setTypeId(attributeField.getFldno());
 		name.setNstat(0); // TODO Review
-		this.germplasmDataDM.addGermplasmName(name);
+		this.nameDAO.save(name);
 		return name;
 	}
 

@@ -19,6 +19,7 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
@@ -166,7 +167,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataDM);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataDM, new NameDAO(this.sessionProvder
+				.getSession()));
 		}
 		final Properties mockProperties = Mockito.mock(Properties.class);
 		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");

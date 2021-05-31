@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware;
 
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -15,10 +16,12 @@ public class GermplasmTestDataGenerator {
 	private static final Integer TEST_METHOD_ID = 101;
 	public static final String TEST_METHOD_NAME = "Single cross";
 
-	private GermplasmDataManager germplasmDataManager;
+	private final GermplasmDataManager germplasmDataManager;
+	private final NameDAO nameDAO;
 
-	public GermplasmTestDataGenerator(final GermplasmDataManager manager) {
+	public GermplasmTestDataGenerator(final GermplasmDataManager manager, final NameDAO nameDAO) {
 		this.germplasmDataManager = manager;
+		this.nameDAO = nameDAO;
 	}
 
 	public Germplasm createGermplasmWithPreferredAndNonpreferredNames() {
@@ -32,7 +35,7 @@ public class GermplasmTestDataGenerator {
 
 		final Name otherName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid(), "Other Name ");
 		otherName.setNstat(0);
-		this.germplasmDataManager.addGermplasmName(otherName);
+		this.nameDAO.save(otherName);
 
 		return germplasm;
 	}

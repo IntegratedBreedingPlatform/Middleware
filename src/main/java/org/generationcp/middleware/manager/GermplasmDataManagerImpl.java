@@ -310,14 +310,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Integer addGermplasmName(final Name name) {
-		final List<Name> names = new ArrayList<>();
-		names.add(name);
-		final List<Integer> ids = this.addOrUpdateGermplasmName(names, Operation.ADD);
-		return !ids.isEmpty() ? ids.get(0) : null;
-	}
-
-	@Override
 	public List<Integer> addGermplasmName(final List<Name> names) {
 		return this.addOrUpdateGermplasmName(names, Operation.ADD);
 	}
@@ -415,11 +407,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 
 		return results;
-	}
-
-	@Override
-	public List<Method> getNonGenerativeMethodsByID(final List<Integer> ids) {
-		return this.daoFactory.getMethodDAO().getMethodsNotGenerativeById(ids);
 	}
 
 	@Override
@@ -1337,11 +1324,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) {
-		return this.daoFactory.getMethodDAO().getDerivativeAndMaintenanceMethods(ids);
-	}
-
-	@Override
 	public List<String> getMethodCodeByMethodIds(final Set<Integer> methodIds) {
 		return this.daoFactory.getMethodDAO().getMethodCodeByMethodIds(methodIds);
 	}
@@ -1447,11 +1429,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Method> getAllMethodsNotBulkingNotGenerative() {
 		return this.daoFactory.getMethodDAO().getAllMethodsNotBulkingNotGenerative();
-	}
-
-	@Override
-	public List<Method> getNoBulkingMethodsByType(final String type, final String programUUID) {
-		return this.daoFactory.getMethodDAO().getNoBulkingMethodsByType(type, programUUID);
 	}
 
 	@Override

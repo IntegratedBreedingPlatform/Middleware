@@ -39,11 +39,8 @@ public class NameDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		final Session session = this.sessionProvder.getSession();
-		NameDAOTest.nameDAO = new NameDAO();
-		NameDAOTest.nameDAO.setSession(session);
-		NameDAOTest.germplasmDAO = new GermplasmDAO();
-		NameDAOTest.germplasmDAO.setSession(session);
+		NameDAOTest.nameDAO = new NameDAO(this.sessionProvder.getSession());
+		NameDAOTest.germplasmDAO = new GermplasmDAO(this.sessionProvder.getSession());
 	}
 
 	@Test

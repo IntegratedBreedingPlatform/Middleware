@@ -16,6 +16,7 @@ import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -163,7 +164,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.manager.addGermplasmListData(listData);
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.dataManager);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.dataManager, new NameDAO(this.sessionProvder
+				.getSession()));
 		}
 
 	}

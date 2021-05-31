@@ -203,15 +203,6 @@ public interface LocationDataManager {
 	 * Returns the Location records with type matching the given parameter. The
 	 * data is retrieved from both local and central databases.
 	 *
-	 * @param type - search string for the type of the locations
-	 * @return List of Location POJOs
-	 */
-	List<Location> getLocationsByType(Integer type);
-
-	/**
-	 * Returns the Location records with type matching the given parameter. The
-	 * data is retrieved from both local and central databases.
-	 *
 	 * @param type        - search string for the type of the locations
 	 * @param programUUID - unique id of the current program
 	 * @return List of Location POJOs

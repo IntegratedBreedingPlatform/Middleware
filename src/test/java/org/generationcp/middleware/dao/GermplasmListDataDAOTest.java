@@ -41,7 +41,8 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		this.germplasmListDataDAO.setSession(this.sessionProvder.getSession());
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
 
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager, new NameDAO(this.sessionProvder
+			.getSession()));
 	}
 
 	@Test
