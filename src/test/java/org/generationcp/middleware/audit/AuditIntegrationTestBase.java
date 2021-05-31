@@ -37,7 +37,8 @@ public abstract class AuditIntegrationTestBase extends IntegrationTestBase {
 			.getSession()
 			.createSQLQuery(
 				String.format(
-					"SELECT EVENT_OBJECT_TABLE, TRIGGER_NAME, EVENT_MANIPULATION, ACTION_TIMING FROM information_schema.TRIGGERS WHERE TRIGGER_NAME = '%s'",
+					"SELECT EVENT_OBJECT_TABLE, TRIGGER_NAME, EVENT_MANIPULATION, ACTION_TIMING FROM information_schema.TRIGGERS "
+						+ "WHERE TRIGGER_NAME = '%s' AND TRIGGER_SCHEMA = (select database())",
 					triggerName))
 			.uniqueResult();
 		assertNotNull(trigger);
