@@ -491,7 +491,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		for (final Name name : germplasm.getNames()) {
 			// No explicit save of name entity anywhere but should still be saved through cascade on flush.
 			Assert.assertNotNull(name.getNid());
-			Assert.assertEquals(germplasm.getGid(), name.getGermplasm());
+			Assert.assertEquals(germplasm.getGid(), name.getGermplasm().getGid());
 		}
 	}
 
