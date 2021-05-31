@@ -85,7 +85,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
-	public Integer createName(final Integer userid, final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid) {
+	public Integer createName(final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid) {
 		if (germplasmNameRequestDto.isPreferredName()) {
 			final Name preferredName = this.getPreferredNameOfGermplasm(gid);
 			if (preferredName != null) {
