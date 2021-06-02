@@ -19,6 +19,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.NonUniqueResultException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
@@ -37,6 +38,10 @@ import java.util.Set;
 public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserDefinedFieldDAO.class);
+
+	public UserDefinedFieldDAO(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<UserDefinedField> getByFieldTableNameAndType(final String tableName, final Set<String> fieldType) {

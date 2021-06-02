@@ -12,12 +12,6 @@
 
 package org.generationcp.middleware.dao;
 
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.GermplasmNameType;
@@ -27,6 +21,12 @@ import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
 
 public class NameDAOTest extends IntegrationTestBase {
 
@@ -39,11 +39,8 @@ public class NameDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		final Session session = this.sessionProvder.getSession();
-		NameDAOTest.nameDAO = new NameDAO();
-		NameDAOTest.nameDAO.setSession(session);
-		NameDAOTest.germplasmDAO = new GermplasmDAO();
-		NameDAOTest.germplasmDAO.setSession(session);
+		NameDAOTest.nameDAO = new NameDAO(this.sessionProvder.getSession());
+		NameDAOTest.germplasmDAO = new GermplasmDAO(this.sessionProvder.getSession());
 	}
 
 	@Test
@@ -200,7 +197,7 @@ public class NameDAOTest extends IntegrationTestBase {
 	public Name createNameTestData(final int dateIntValue, final int gid, final Integer nStat, final String nameValue,
 			final GermplasmNameType nType) {
 		final Name name = new Name();
-		name.setGermplasmId(gid);
+		name.setGermplasm(new Germplasm(gid));
 		name.setTypeId(nType.getUserDefinedFieldID());
 		name.setNval(nameValue);
 		name.setLocationId(0);

@@ -34,8 +34,7 @@ public class UserDefinedFieldDAOTest extends IntegrationTestBase {
 		final Session session = this.sessionProvder.getSession();
 		
 		if (this.userDefinedFieldDao == null) {
-			this.userDefinedFieldDao = new UserDefinedFieldDAO();
-			this.userDefinedFieldDao.setSession(session);
+			this.userDefinedFieldDao = new UserDefinedFieldDAO(session);
 		}
 		
 		if (this.attributeDao == null) {
@@ -44,13 +43,11 @@ public class UserDefinedFieldDAOTest extends IntegrationTestBase {
 		}
 		
 		if (this.nameDao == null) {
-			this.nameDao = new NameDAO();
-			this.nameDao.setSession(session);
+			this.nameDao = new NameDAO(session);
 		}
 		
 		if (this.germplasmDao == null) {
-			this.germplasmDao = new GermplasmDAO();
-			this.germplasmDao.setSession(session);
+			this.germplasmDao = new GermplasmDAO(session);
 		}
 		
 		if (this.gids == null) {

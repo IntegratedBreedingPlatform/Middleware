@@ -11,12 +11,18 @@
 
 package org.generationcp.middleware.pojos;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 
@@ -64,9 +70,10 @@ public class Name extends AbstractEntity implements Serializable {
 	@Column(name = "nid")
 	private Integer nid;
 
-	@Basic(optional = false)
-	@Column(name = "gid")
-	private Integer germplasmId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "gid", updatable = false)
+	private Germplasm germplasm;
 
 	@Basic(optional = false)
 	@Column(name = "ntype")
@@ -101,10 +108,10 @@ public class Name extends AbstractEntity implements Serializable {
 		this.nid = nid;
 	}
 
-	public Name(final Integer nid, final Integer germplasmId, final Integer typeId, final Integer nstat,
+	public Name(final Integer nid, final Germplasm germplasm, final Integer typeId, final Integer nstat,
 		final String nval, final Integer locationId, final Integer ndate, final Integer referenceId) {
 		this.nid = nid;
-		this.germplasmId = germplasmId;
+		this.germplasm = germplasm;
 		this.typeId = typeId;
 		this.nstat = nstat;
 		this.nval = nval;
@@ -145,12 +152,12 @@ public class Name extends AbstractEntity implements Serializable {
 		this.ndate = ndate;
 	}
 
-	public Integer getGermplasmId() {
-		return this.germplasmId;
+	public Germplasm getGermplasm() {
+		return germplasm;
 	}
 
-	public void setGermplasmId(final Integer germplasmId) {
-		this.germplasmId = germplasmId;
+	public void setGermplasm(final Germplasm germplasm) {
+		this.germplasm = germplasm;
 	}
 
 	public Integer getTypeId() {
@@ -203,8 +210,8 @@ public class Name extends AbstractEntity implements Serializable {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Name [nid=");
 		builder.append(this.nid);
-		builder.append(", germplasmId=");
-		builder.append(this.germplasmId);
+		builder.append(", germplasm=");
+		builder.append(this.germplasm);
 		builder.append(", typeId=");
 		builder.append(this.typeId);
 		builder.append(", nstat=");

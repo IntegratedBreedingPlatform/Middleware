@@ -267,12 +267,12 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		final int start = 0;
 		final int numOfRows = 5;
 
-		final List<Location> locations = this.manager.getLocationsByType(type);
+		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
+		final List<Location> locations = this.manager.getLocationsByType(type, programUUID);
 		Assert.assertNotNull("Expecting to have returned results.", locations);
 		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByType(type=" + type + "): " + locations.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, locations);
 
-		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
 		final List<Location> locationsByProgramUUID = this.manager.getLocationsByType(type, programUUID);
 		Assert.assertNotNull("Expecting to have returned results.", locationsByProgramUUID);
 		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByType(type=" + type + "): " + locations.size());

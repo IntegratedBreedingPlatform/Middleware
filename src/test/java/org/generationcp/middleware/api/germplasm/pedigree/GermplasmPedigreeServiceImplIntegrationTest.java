@@ -300,7 +300,7 @@ public class GermplasmPedigreeServiceImplIntegrationTest extends IntegrationTest
 
 		//Add preferred name
 		final Name name =
-			new Name(null, germplasm.getGid(), this.DRVNM_ID, 1, RandomStringUtils.randomAlphabetic(10), 0, 20201212, 0);
+			new Name(null, germplasm, this.DRVNM_ID, 1, RandomStringUtils.randomAlphabetic(10), 0, 20201212, 0);
 		this.daoFactory.getNameDao().save(name);
 		this.sessionProvder.getSession().flush();
 		this.daoFactory.getNameDao().refresh(name);
