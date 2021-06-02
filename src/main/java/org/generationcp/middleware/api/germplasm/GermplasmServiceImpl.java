@@ -39,8 +39,8 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
@@ -1365,7 +1365,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			final boolean gpidsWillBeChanged = !germplasm.getGpid1().equals(germplasmBeforeUpdate.getGpid1()) || !germplasm.getGpid2()
 				.equals(germplasmBeforeUpdate.getGpid2());
-			if (gpidsWillBeChanged) {
+			final boolean hasProgeny = !this.daoFactory.getGermplasmDao().getChildren(germplasm.getGid()).isEmpty();
+			if (gpidsWillBeChanged && hasProgeny) {
 				final Set<Integer> gpids = new HashSet<>();
 				gpids.add(germplasm.getGpid1());
 				gpids.add(germplasm.getGpid2());
