@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -58,7 +59,8 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 	@Before
 	public void setUp() {
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager, new NameDAO(this.sessionProvder
+				.getSession()));
 		}
 	}
 

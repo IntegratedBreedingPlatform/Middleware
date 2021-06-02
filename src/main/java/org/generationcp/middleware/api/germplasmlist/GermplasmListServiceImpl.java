@@ -129,7 +129,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
 		final Map<Integer, String> preferredNamesMap = this.germplasmDataManager.getPreferredNamesByGids(gids);
 		final Map<Integer, List<Name>> namesByGid = this.daoFactory.getNameDao().getNamesByGids(gids)
-			.stream().collect(groupingBy(Name::getGermplasmId));
+			.stream().collect(groupingBy(n -> n.getGermplasm().getGid()));
 
 		final Integer currentUserId = loggedInUser.getUserid();
 		final GermplasmList parent = request.getParentFolderId() != null ?

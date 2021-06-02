@@ -51,7 +51,7 @@ public class GermplasmDataManagerDataInitializer {
     }
 
     public static Name createGermplasmName(final Integer gid, final String name) {
-        return new Name(null, gid, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(),
+        return new Name(null, new Germplasm(gid), GermplasmNameType.LINE_NAME.getUserDefinedFieldID(),
                 NSTAT_PREFERRED_VALUE, name, TEST_LOCATION_ID, 20160216, 0);
     }
 

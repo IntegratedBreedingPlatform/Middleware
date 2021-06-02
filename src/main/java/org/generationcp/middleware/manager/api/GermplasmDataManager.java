@@ -257,14 +257,6 @@ public interface GermplasmDataManager {
 	Integer updateGermplasmPrefAbbrev(Integer gid, String newPrefAbbrev);
 
 	/**
-	 * Inserts a single {@code Name} object into the database.
-	 *
-	 * @param name - The {@code Name} object to be persisted to the database. Must be a valid {@code Name} object.
-	 * @return Returns the id of the newly-added Germplasm {@code Name}.
-	 */
-	Integer addGermplasmName(Name name);
-
-	/**
 	 * Inserts a list of multiple {@code Name} objects into the database.
 	 *
 	 * @param names - A list of {@code Name} objects to be persisted to the database. {@code Name} objects must be valid.
@@ -838,8 +830,6 @@ public interface GermplasmDataManager {
 	 */
 	List<Method> getMethodsByIDs(List<Integer> ids);
 
-	List<Method> getNonGenerativeMethodsByID(List<Integer> ids);
-
 	/**
 	 * Get gDates given GIDs.
 	 *
@@ -1010,8 +1000,6 @@ public interface GermplasmDataManager {
 	 */
 	Integer countSearchForGermplasm(GermplasmSearchParameter germplasmSearchParameter);
 
-	List<Method> getDerivativeAndMaintenanceMethods(List<Integer> ids);
-
 	/**
 	 * Given a set of gids return the gid and all its parents including all their names.
 	 *
@@ -1080,13 +1068,6 @@ public interface GermplasmDataManager {
 	 * @return List of all no-bulking and no generative methods
 	 */
 	List<Method> getAllMethodsNotBulkingNotGenerative();
-
-	/**
-	 * @param type
-	 * @param programUUID
-	 * @return List of all no-bulking methods given a type and a program
-	 */
-	List<Method> getNoBulkingMethodsByType(final String type, final String programUUID);
 
 	/**
 	 * Given a List of GIDs, return a Map of GIDs to PreferredName.

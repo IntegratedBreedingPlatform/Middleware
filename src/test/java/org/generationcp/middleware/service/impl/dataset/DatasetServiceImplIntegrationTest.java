@@ -5,6 +5,7 @@ import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -81,7 +82,8 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         }
 
         if (this.germplasmTestDataGenerator == null) {
-            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager);
+            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, new NameDAO(this.sessionProvder
+                .getSession()));
         }
 
         if (this.studyId == null) {

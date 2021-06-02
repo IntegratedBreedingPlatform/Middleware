@@ -58,14 +58,12 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	public GermplasmGroupingServiceImpl(final HibernateSessionProvider sessionProvider) {
-		this.germplasmDAO = new GermplasmDAO();
-		this.germplasmDAO.setSession(sessionProvider.getSession());
+		this.germplasmDAO = new GermplasmDAO(sessionProvider.getSession());
 
 		this.methodDAO = new MethodDAO();
 		this.methodDAO.setSession(sessionProvider.getSession());
 
-		this.userDefinedFieldDAO = new UserDefinedFieldDAO();
-		this.userDefinedFieldDAO.setSession(sessionProvider.getSession());
+		this.userDefinedFieldDAO = new UserDefinedFieldDAO(sessionProvider.getSession());
 
 		this.germplasmDataManager = new GermplasmDataManagerImpl(sessionProvider);
 
@@ -259,7 +257,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			final UserDefinedField selHisFixNameType =
 					this.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 			final Name newSelectionHistoryAtFixation = new Name();
-			newSelectionHistoryAtFixation.setGermplasmId(germplasm.getGid());
+			newSelectionHistoryAtFixation.setGermplasm(germplasm);
 			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
 			newSelectionHistoryAtFixation.setNval(nameToCopyFrom.getNval());
 			newSelectionHistoryAtFixation.setNstat(0);
@@ -314,7 +312,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 
 		final Name codedName = new Name();
-		codedName.setGermplasmId(germplasm.getGid());
+		codedName.setGermplasm(germplasm);
 		codedName.setTypeId(nameToCopyFrom.getTypeId());
 		codedName.setNval(nameToCopyFrom.getNval());
 		// nstat = 1 means it is preferred name.

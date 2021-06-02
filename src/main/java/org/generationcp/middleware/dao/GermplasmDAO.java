@@ -40,6 +40,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
@@ -108,6 +109,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		+ "    names n on n.gid = g.gid and n.nstat = 1 " //
 		+ "        left join " //
 		+ "    bibrefs r on g.gref = r.refid ";
+
+	public GermplasmDAO(final Session session) {
+		super(session);
+	}
 
 	@Override
 	public Germplasm getById(final Integer gid, final boolean lock) {
@@ -1133,7 +1138,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final Integer nstat = Integer.valueOf(resultArray[4].toString());
 
 			name = new Name(nid);
-			name.setGermplasmId(gid);
+			name.setGermplasm(new Germplasm(gid));
 			name.setNval(nval);
 			name.setTypeId(ntype);
 			name.setNstat(nstat);

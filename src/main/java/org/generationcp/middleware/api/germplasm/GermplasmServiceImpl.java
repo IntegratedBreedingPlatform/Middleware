@@ -266,7 +266,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.daoFactory.getGermplasmDao().save(germplasm);
 
 			germplasmDto.getNames().forEach((k, v) -> {
-				final Name name = new Name(null, germplasm.getGid(), nameTypesMapByName.get(k.toUpperCase()),
+				final Name name = new Name(null, germplasm, nameTypesMapByName.get(k.toUpperCase()),
 					(k.equalsIgnoreCase(germplasmDto.getPreferredName())) ? 1 : 0, v, germplasm.getLocationId(),
 					Util.getCurrentDateAsIntegerValue(), 0);
 				this.daoFactory.getNameDao().save(name);
@@ -611,7 +611,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				this.daoFactory.getNameDao().update(name);
 			} else {
 				// Create new record if name not yet exists
-				final Name name = new Name(null, germplasm.getGid(), nameTypeId, 0,
+				final Name name = new Name(null, germplasm, nameTypeId, 0,
 					value, germplasm.getLocationId(), germplasm.getGdate(), 0);
 				this.daoFactory.getNameDao().save(name);
 				germplasmNames.add(name);
@@ -1034,7 +1034,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasmDto.getSynonyms().forEach(synonym -> {
 				final Integer typeId = nameTypesMap.get(synonym.getType().toUpperCase());
 				if (typeId != null) {
-					final Name name = new Name(null, germplasm.getGid(), typeId,
+					final Name name = new Name(null, germplasm, typeId,
 						0, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
 					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
 						name.setNstat(1);
@@ -1136,7 +1136,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 					existingName.setNval(synonym.getSynonym());
 					nameDao.update(existingName);
 				} else {
-					final Name name = new Name(null, germplasm.getGid(), typeId,
+					final Name name = new Name(null, germplasm, typeId,
 						0, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
 					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
 						name.setNstat(1);

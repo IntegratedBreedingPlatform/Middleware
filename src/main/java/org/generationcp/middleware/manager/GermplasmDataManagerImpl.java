@@ -20,7 +20,6 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
@@ -311,14 +310,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Integer addGermplasmName(final Name name) {
-		final List<Name> names = new ArrayList<>();
-		names.add(name);
-		final List<Integer> ids = this.addOrUpdateGermplasmName(names, Operation.ADD);
-		return !ids.isEmpty() ? ids.get(0) : null;
-	}
-
-	@Override
 	public List<Integer> addGermplasmName(final List<Name> names) {
 		return this.addOrUpdateGermplasmName(names, Operation.ADD);
 	}
@@ -396,7 +387,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 		final List<Name> nameList = this.daoFactory.getNameDao().getNamesByTypeAndGIDList(nameType, gidList);
 		for (final Name name : nameList) {
-			returnMap.put(name.getGermplasmId(), name.getNval());
+			returnMap.put(name.getGermplasm().getGid(), name.getNval());
 		}
 
 		return returnMap;
@@ -416,11 +407,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 
 		return results;
-	}
-
-	@Override
-	public List<Method> getNonGenerativeMethodsByID(final List<Integer> ids) {
-		return this.daoFactory.getMethodDAO().getMethodsNotGenerativeById(ids);
 	}
 
 	@Override
@@ -758,9 +744,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public List<Integer> addGermplasm(final List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples, final CropType cropType) {
 		final List<Integer> listOfGermplasm = new ArrayList<>();
 		try {
-			final GermplasmDAO dao = this.daoFactory.getGermplasmDao();
-			final NameDAO nameDao = this.daoFactory.getNameDao();
-			final ProgenitorDAO progenitorDao = this.daoFactory.getProgenitorDao();
 
 			for (final Triple<Germplasm, Name, List<Progenitor>> triple : germplasmTriples) {
 				final Germplasm germplasm = triple.getLeft();
@@ -780,14 +763,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 				GermplasmGuidGenerator.generateGermplasmGuids(cropType, Arrays.asList(germplasm));
 
-				final Germplasm germplasmSaved = dao.save(germplasm);
-				listOfGermplasm.add(germplasmSaved.getGid());
-				name.setGermplasmId(germplasmSaved.getGid());
-				nameDao.save(name);
+				name.setGermplasm(germplasm);
+				germplasm.getNames().clear();
+				germplasm.getNames().add(name);
+				this.daoFactory.getGermplasmDao().save(germplasm);
+
+				listOfGermplasm.add(germplasm.getGid());
 
 				for (final Progenitor progenitor : progenitors) {
-					progenitor.setGermplasm(germplasmSaved);
-					progenitorDao.save(progenitor);
+					progenitor.setGermplasm(germplasm);
+					this.daoFactory.getProgenitorDao().save(progenitor);
 				}
 			}
 
@@ -1311,11 +1296,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) {
-		return this.daoFactory.getMethodDAO().getDerivativeAndMaintenanceMethods(ids);
-	}
-
-	@Override
 	public List<String> getMethodCodeByMethodIds(final Set<Integer> methodIds) {
 		return this.daoFactory.getMethodDAO().getMethodCodeByMethodIds(methodIds);
 	}
@@ -1421,11 +1401,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Method> getAllMethodsNotBulkingNotGenerative() {
 		return this.daoFactory.getMethodDAO().getAllMethodsNotBulkingNotGenerative();
-	}
-
-	@Override
-	public List<Method> getNoBulkingMethodsByType(final String type, final String programUUID) {
-		return this.daoFactory.getMethodDAO().getNoBulkingMethodsByType(type, programUUID);
 	}
 
 	@Override

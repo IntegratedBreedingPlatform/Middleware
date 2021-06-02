@@ -112,8 +112,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		if (this.dao == null) {
-			this.dao = new GermplasmDAO();
-			this.dao.setSession(this.sessionProvder.getSession());
+			this.dao = new GermplasmDAO(this.sessionProvder.getSession());
 
 			this.lotDAO = new LotDAO();
 			this.lotDAO.setSession(this.sessionProvder.getSession());
@@ -127,11 +126,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			this.locationDAO = new LocationDAO();
 			this.locationDAO.setSession(this.sessionProvder.getSession());
 
-			this.nameDAO = new NameDAO();
-			this.nameDAO.setSession(this.sessionProvder.getSession());
+			this.nameDAO = new NameDAO(this.sessionProvder.getSession());
 
-			this.userDefinedFieldDao = new UserDefinedFieldDAO();
-			this.userDefinedFieldDao.setSession(this.sessionProvder.getSession());
+			this.userDefinedFieldDao = new UserDefinedFieldDAO(this.sessionProvder.getSession());
 
 			this.progenitorDao = new ProgenitorDAO();
 			this.progenitorDao.setSession(this.sessionProvder.getSession());
@@ -405,7 +402,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(maleParent);
 
 		final Name maleParentPreferredName = maleParent.getPreferredName();
-		maleParentPreferredName.setGermplasmId(maleParent.getGid());
+		maleParentPreferredName.setGermplasm(maleParent);
 		this.nameDAO.save(maleParentPreferredName);
 
 		final Germplasm cross = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
@@ -416,7 +413,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(cross);
 
 		final Name crossPreferredName = cross.getPreferredName();
-		crossPreferredName.setGermplasmId(cross.getGid());
+		crossPreferredName.setGermplasm(cross);
 		this.nameDAO.save(crossPreferredName);
 
 		final Germplasm advance = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
@@ -482,7 +479,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		// Name collection mapping is uni-directional OneToMany right now, so the other side of the relationship has to be managed manually.
 		for (final Name name : germplasm.getNames()) {
-			name.setGermplasmId(germplasm.getGid());
+			name.setGermplasm(germplasm);
 		}
 
 		// In real app flush will happen automatically on tx commit. We don't commit tx in tests, so flush manually.
@@ -491,7 +488,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		for (final Name name : germplasm.getNames()) {
 			// No explicit save of name entity anywhere but should still be saved through cascade on flush.
 			Assert.assertNotNull(name.getNid());
-			Assert.assertEquals(germplasm.getGid(), name.getGermplasmId());
+			Assert.assertEquals(germplasm.getGid(), name.getGermplasm().getGid());
 		}
 	}
 
@@ -1197,7 +1194,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Name name = GermplasmTestDataInitializer.createGermplasmName(germplasmGID, RandomStringUtils.randomAlphanumeric(50));
 		name.setTypeId(attributeField.getFldno());
 		name.setNstat(0); // TODO Review
-		this.germplasmDataDM.addGermplasmName(name);
+		this.nameDAO.save(name);
 		return name;
 	}
 

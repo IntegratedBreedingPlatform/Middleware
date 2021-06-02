@@ -181,7 +181,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
-		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0,
+		this.daoFactory.getNameDao().save(new Name(null, germplasm, newNameCode.getFldno(), 0,
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
 		this.daoFactory.getAttributeDAO()
@@ -235,7 +235,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
 		// Create Duplicate PreferredName assigned
-		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 1,
+		this.daoFactory.getNameDao().save(new Name(null, germplasm, newNameCode.getFldno(), 1,
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
@@ -294,9 +294,9 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
 
 		// Create duplicate names and attributes
-		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0,
+		this.daoFactory.getNameDao().save(new Name(null, germplasm, newNameCode.getFldno(), 0,
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
-		this.daoFactory.getNameDao().save(new Name(null, germplasm.getGid(), newNameCode.getFldno(), 0,
+		this.daoFactory.getNameDao().save(new Name(null, germplasm, newNameCode.getFldno(), 0,
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
 		this.daoFactory.getAttributeDAO()
@@ -1012,7 +1012,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void test_importGermplasm_matchFound_ok() {
 		final Germplasm germplasm = this.createGermplasm(this.generativeMethod, this.germplasmUUID, null, 0, 0, 0);
-		this.addName(germplasm.getGid(), this.variableTypeId, this.name, this.noLocationId, this.creationDate, 1);
+		this.addName(germplasm, this.variableTypeId, this.name, this.noLocationId, this.creationDate, 1);
 		this.sessionProvder.getSession().flush();
 
 		final GermplasmImportDTO germplasmImportDto =
@@ -1249,9 +1249,9 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				progenitor2.getGid());
 
 		final Name preferredName =
-			this.addName(germplasm.getGid(), this.variableTypeId, RandomStringUtils.randomAlphabetic(10), location.getLocid(),
+			this.addName(germplasm, this.variableTypeId, RandomStringUtils.randomAlphabetic(10), location.getLocid(),
 				this.creationDate, 1);
-		this.addName(germplasm.getGid(), this.variableTypeId, RandomStringUtils.randomAlphabetic(10), location.getLocid(),
+		this.addName(germplasm, this.variableTypeId, RandomStringUtils.randomAlphabetic(10), location.getLocid(),
 			this.creationDate, 0);
 
 		final Germplasm progenitor3 = this.createGermplasm(this.generativeMethod, RandomStringUtils.randomAlphabetic(10), null, 0, 0, 0);
@@ -2294,7 +2294,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final Location location = this.createLocation();
 		final Name name =
-			this.addName(germplasm.getGid(), this.variableTypeId, RandomStringUtils.randomAlphabetic(10), location.getLocid(),
+			this.addName(germplasm, this.variableTypeId, RandomStringUtils.randomAlphabetic(10), location.getLocid(),
 				this.creationDate, 0);
 
 		final Germplasm createdGermplasm = this.daoFactory.getGermplasmDao().getById(germplasm.getGid());
@@ -2385,9 +2385,9 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		return location;
 	}
 
-	private Name addName(final Integer gid, final Integer nameId, final String nameVal, final Integer locId, final String date,
+	private Name addName(final Germplasm germplasm, final Integer nameId, final String nameVal, final Integer locId, final String date,
 		final int preferred) {
-		final Name name = new Name(null, gid, nameId, preferred, nameVal, locId, Integer.valueOf(date), 0);
+		final Name name = new Name(null, germplasm, nameId, preferred, nameVal, locId, Integer.valueOf(date), 0);
 		this.daoFactory.getNameDao().save(name);
 		this.sessionProvder.getSession().flush();
 		this.daoFactory.getNameDao().refresh(name);

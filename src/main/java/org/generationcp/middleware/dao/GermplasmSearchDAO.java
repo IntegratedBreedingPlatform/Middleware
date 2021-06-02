@@ -30,6 +30,7 @@ import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -182,6 +183,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		GermplasmSearchDAO.fromClauseColumnsMap.put(GermplasmSearchDAO.IMMEDIATE_SOURCE_PREFERRED_NAME,
 			"LEFT JOIN names immediateSource ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 \n");
 
+	}
+
+	public GermplasmSearchDAO(final Session session) {
+		super(session);
 	}
 
 	// TODO Remove (see searchGermplasm)

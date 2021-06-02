@@ -109,8 +109,7 @@ public class IntegrationTestDataInitializer {
 		this.userService = new UserServiceImpl(workbenchSessionProvider);
 		this.studyTypeDAO = new StudyTypeDAO();
 		this.studyTypeDAO.setSession(hibernateSessionProvider.getSession());
-		this.nameDAO = new NameDAO();
-		this.nameDAO.setSession(hibernateSessionProvider.getSession());
+		this.nameDAO = new NameDAO(hibernateSessionProvider.getSession());
 	}
 
 	public DmsProject createStudy(final String name, final String description, final int studyTypeId, final String programUUID,

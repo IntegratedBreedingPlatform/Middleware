@@ -2,9 +2,7 @@
 package org.generationcp.middleware.service.impl;
 
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.pojos.KeySequenceRegister;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.hibernate.Session;
@@ -48,19 +46,12 @@ public class KeySequenceRegisterServiceImplIntegrationTest extends IntegrationTe
 	private PlatformTransactionManager platformTransactionManager;
 
 	private KeySequenceRegisterDAO keySequenceRegisterDao;
-	private GermplasmDAO germplasmDAO;
-	private NameDAO nameDAO;
-
 
 	@Before
 	public void setup() {
 		final Session session = this.sessionProvder.getSession();
 		this.keySequenceRegisterDao = new KeySequenceRegisterDAO();
 		this.keySequenceRegisterDao.setSession(session);
-		this.nameDAO = new NameDAO();
-		this.nameDAO.setSession(session);
-		this.germplasmDAO = new GermplasmDAO();
-		this.germplasmDAO.setSession(session);
 	}
 
 	@Test

@@ -21,6 +21,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
@@ -75,6 +76,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 	private UserDefinedFieldDAO userDefinedFieldDao;
 	private GermplasmDAO germplasmDao;
+	private NameDAO nameDAO;
 
 	private Integer germplasmGID;
 	private Integer femaleParentGID;
@@ -112,18 +114,18 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		if (this.dao == null) {
-			this.dao = new GermplasmSearchDAO();
-			this.dao.setSession(this.sessionProvder.getSession());
+			this.dao = new GermplasmSearchDAO(this.sessionProvder.getSession());
 
 		}
 		if (this.germplasmDao == null) {
-			this.germplasmDao = new GermplasmDAO();
-			this.germplasmDao.setSession(this.sessionProvder.getSession());
+			this.germplasmDao = new GermplasmDAO(this.sessionProvder.getSession());
 
 		}
 		if (this.userDefinedFieldDao == null) {
-			this.userDefinedFieldDao = new UserDefinedFieldDAO();
-			this.userDefinedFieldDao.setSession(this.sessionProvder.getSession());
+			this.userDefinedFieldDao = new UserDefinedFieldDAO(this.sessionProvder.getSession());
+		}
+		if (this.nameDAO == null) {
+			this.nameDAO = new NameDAO(this.sessionProvder.getSession());
 		}
 
 		this.cropType = new CropType();
@@ -1237,7 +1239,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(3, names.size());
 		Assert.assertTrue(names.contains(this.preferredName));
 		Assert.assertTrue(names.contains(this.preferredId));
-		Assert.assertTrue(names.stream().allMatch(name1 -> name1.getGermplasmId().equals(this.germplasmGID)));
+		Assert.assertTrue(names.stream().allMatch(name1 -> name1.getGermplasm().getGid().equals(this.germplasmGID)));
 	}
 
 	@Test
@@ -1283,7 +1285,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		// Add Preferred Id, nstat = 8 means the name is preferred Id
 		this.preferredId = GermplasmTestDataInitializer.createGermplasmName(this.germplasmGID, "Preferred Id of " + this.germplasmGID);
 		this.preferredId.setNstat(8);
-		this.germplasmDataDM.addGermplasmName(this.preferredId);
+		this.nameDAO.save(this.preferredId);
 
 		// Add name of CODE1 type
 		this.code1NameTypeValue = "Code1 Name of " + this.germplasmGID;
@@ -1292,7 +1294,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			GermplasmTestDataInitializer.createGermplasmName(this.germplasmGID, this.code1NameTypeValue);
 		code1Name.setTypeId(nameType.getFldno());
 		code1Name.setNstat(0);
-		this.germplasmDataDM.addGermplasmName(code1Name);
+		this.nameDAO.save(code1Name);
 
 		// Add NOTE attribute
 		final UserDefinedField attributeField = this.userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", NOTE_ATTRIBUTE);
@@ -1366,7 +1368,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			final Name tempPreferredId =
 				GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Preferred Id of " + tempGermplasmGid);
 			tempPreferredId.setNstat(8);
-			this.germplasmDataDM.addGermplasmName(tempPreferredId);
+			this.nameDAO.save(tempPreferredId);
 
 			// Add name of CODE1 type
 			final UserDefinedField nameType = this.userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", DERIVATIVE_NAME_CODE);
@@ -1374,7 +1376,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 				GermplasmTestDataInitializer.createGermplasmName(tempGermplasmGid, "Code1 Name of " + tempGermplasmGid);
 			code1Name.setTypeId(nameType.getFldno());
 			code1Name.setNstat(0);
-			this.germplasmDataDM.addGermplasmName(code1Name);
+			this.nameDAO.save(code1Name);
 
 			// Add NOTE attribute
 			final UserDefinedField attributeField = this.userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", NOTE_ATTRIBUTE);
