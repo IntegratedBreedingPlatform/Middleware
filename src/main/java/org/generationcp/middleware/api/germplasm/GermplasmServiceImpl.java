@@ -1356,7 +1356,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			final boolean gpidsWillBeChanged = !germplasm.getGpid1().equals(germplasmBeforeUpdate.getGpid1()) || !germplasm.getGpid2()
 				.equals(germplasmBeforeUpdate.getGpid2());
-			if (gpidsWillBeChanged) {
+			final boolean hasProgeny = !this.daoFactory.getGermplasmDao().getChildren(germplasm.getGid()).isEmpty();
+			if (gpidsWillBeChanged && hasProgeny) {
 				final Set<Integer> gpids = new HashSet<>();
 				gpids.add(germplasm.getGpid1());
 				gpids.add(germplasm.getGpid2());
