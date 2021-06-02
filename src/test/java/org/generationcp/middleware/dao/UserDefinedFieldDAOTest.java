@@ -1,8 +1,5 @@
 package org.generationcp.middleware.dao;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -16,6 +13,9 @@ import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Arrays;
+import java.util.List;
 
 
 
@@ -82,9 +82,13 @@ public class UserDefinedFieldDAOTest extends IntegrationTestBase {
 		this.userDefinedFieldDao.save(nameType2);
 		this.userDefinedFieldDao.save(nameType3);
 		this.nameTypes = Arrays.asList(nameType1, nameType2, nameType3);
-		
-		final Attribute attribute1 = new Attribute(null, germplasm1.getGid(), attributeType1.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null);
-		final Attribute attribute2 = new Attribute(null, germplasm2.getGid(), attributeType2.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null);
+
+		final Attribute attribute1 =
+			new Attribute(null, germplasm1.getGid(), attributeType1.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null,
+				null);
+		final Attribute attribute2 =
+			new Attribute(null, germplasm2.getGid(), attributeType2.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null,
+				null);
 		this.attributeDao.save(attribute1);
 		this.attributeDao.save(attribute2);
 		

@@ -41,8 +41,8 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
@@ -274,7 +274,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			if (germplasmDto.getAttributes() != null) {
 				germplasmDto.getAttributes().forEach((k, v) -> {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), attributesMapByName.get(k.toUpperCase()), v,
+					final Attribute attribute = new Attribute(null, germplasm.getGid(), attributesMapByName.get(k.toUpperCase()), v, null,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					this.daoFactory.getAttributeDAO().save(attribute);
@@ -642,7 +642,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				this.daoFactory.getAttributeDAO().update(attribute);
 			} else {
 				this.daoFactory.getAttributeDAO()
-					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, value,
+					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, value, null,
 						germplasm.getLocationId(),
 						0, germplasm.getGdate()));
 			}
@@ -1057,7 +1057,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasmDto.getAdditionalInfo().forEach((k, v) -> {
 				final Integer typeId = attributesMap.get(k.toUpperCase());
 				if (typeId != null) {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, v,
+					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, v, null,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					this.daoFactory.getAttributeDAO().save(attribute);
@@ -1162,7 +1162,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 					existingAttribute.setAval(v);
 					attributeDAO.update(existingAttribute);
 				} else {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, v,
+					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, v, null,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					attributeDAO.save(attribute);

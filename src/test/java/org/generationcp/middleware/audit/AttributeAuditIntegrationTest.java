@@ -112,6 +112,7 @@ public class AttributeAuditIntegrationTest extends AuditIntegrationTestBase {
 		queryParams.put("atype", new Random().nextInt());
 		queryParams.put("created_by", new Random().nextInt());
 		queryParams.put("aval", UUID.randomUUID().toString());
+		queryParams.put("cval_id", new Random().nextInt());
 		queryParams.put("alocn", new Random().nextInt());
 		queryParams.put("aref", new Random().nextInt());
 		queryParams.put("adate", new Random().nextInt());
@@ -128,6 +129,7 @@ public class AttributeAuditIntegrationTest extends AuditIntegrationTestBase {
 		assertThat(audit.get("atype"), is(entity.get("atype")));
 		assertThat(audit.get("created_by"), is(entity.get("created_by")));
 		assertThat(audit.get("aval"), is(entity.get("aval")));
+		assertThat(audit.get("cval_id"), is(entity.get("cval_id")));
 		assertThat(audit.get("alocn"), is(entity.get("alocn")));
 		assertThat(audit.get("aref"), is(entity.get("aref")));
 		assertThat(audit.get("adate"), is(entity.get("adate")));

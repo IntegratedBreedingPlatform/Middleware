@@ -27,8 +27,8 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
@@ -185,7 +185,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "",
+			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "", null,
 				germplasm.getLocationId(),
 				0, germplasm.getGdate()));
 
@@ -300,11 +300,11 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "",
+			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "", null,
 				germplasm.getLocationId(),
 				0, germplasm.getGdate()));
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "",
+			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "", null,
 				germplasm.getLocationId(),
 				0, germplasm.getGdate()));
 
@@ -363,7 +363,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			daoFactory.getCvTermDao().getByNameAndCvId("PLOTCODE_AP_text", CvId.VARIABLES.getId());
 
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), plotCodeVariable.getCvTermId(), plotCodeValue,
+			.save(new Attribute(null, germplasm.getGid(), plotCodeVariable.getCvTermId(), plotCodeValue, null,
 				germplasm.getLocationId(),
 				0, germplasm.getGdate()));
 
@@ -383,7 +383,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		this.daoFactory.getAttributeDAO()
 			.save(new Attribute(null, germplasmWithPlotCode.getGid(), plotCodeVariable.getCvTermId(),
-				plotCodeValue,
+				plotCodeValue, null,
 				germplasmWithPlotCode.getLocationId(),
 				0, germplasmWithPlotCode.getGdate()));
 
@@ -2450,7 +2450,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
 				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
 
-		final Attribute attribute = new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "",
+		final Attribute attribute = new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "", null,
 			germplasm.getLocationId(),
 			0, germplasm.getGdate());
 		this.daoFactory.getAttributeDAO()
