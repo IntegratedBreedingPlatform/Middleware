@@ -152,15 +152,11 @@ public class DaoFactory {
 	}
 
 	public GermplasmDAO getGermplasmDao() {
-		final GermplasmDAO germplasmDao = new GermplasmDAO();
-		germplasmDao.setSession(this.sessionProvider.getSession());
-		return germplasmDao;
+		return new GermplasmDAO(this.sessionProvider.getSession());
 	}
 
 	public GermplasmSearchDAO getGermplasmSearchDAO() {
-		final GermplasmSearchDAO germplasmSearchDAO = new GermplasmSearchDAO();
-		germplasmSearchDAO.setSession(this.sessionProvider.getSession());
-		return germplasmSearchDAO;
+		return new GermplasmSearchDAO(this.sessionProvider.getSession());
 	}
 
 	public GermplasmListDAO getGermplasmListDAO() {
@@ -246,9 +242,7 @@ public class DaoFactory {
 	}
 
 	public NameDAO getNameDao() {
-		final NameDAO nameDAO = new NameDAO();
-		nameDAO.setSession(this.sessionProvider.getSession());
-		return nameDAO;
+		return new NameDAO(this.sessionProvider.getSession());
 	}
 
 	public ProgenitorDAO getProgenitorDao() {
@@ -294,9 +288,7 @@ public class DaoFactory {
 	}
 
 	public UserDefinedFieldDAO getUserDefinedFieldDAO() {
-		final UserDefinedFieldDAO userDefinedFieldDAO = new UserDefinedFieldDAO();
-		userDefinedFieldDAO.setSession(this.sessionProvider.getSession());
-		return userDefinedFieldDAO;
+		return new UserDefinedFieldDAO(this.sessionProvider.getSession());
 	}
 
 	public ProgramFavoriteDAO getProgramFavoriteDao() {

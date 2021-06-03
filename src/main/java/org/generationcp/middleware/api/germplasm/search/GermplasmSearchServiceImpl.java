@@ -66,12 +66,12 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 
 		final HashMap<Integer, Map<Integer, String>> nameMapByGid = new HashMap<>();
 		for (final Name name : names) {
-			Map<Integer, String> nameByType = nameMapByGid.get(name.getGermplasmId());
+			Map<Integer, String> nameByType = nameMapByGid.get(name.getGermplasm().getGid());
 			if (nameByType == null) {
 				nameByType = new HashMap<>();
 			}
 			nameByType.put(name.getTypeId(), name.getNval());
-			nameMapByGid.put(name.getGermplasmId(), nameByType);
+			nameMapByGid.put(name.getGermplasm().getGid(), nameByType);
 		}
 		return nameMapByGid;
 	}

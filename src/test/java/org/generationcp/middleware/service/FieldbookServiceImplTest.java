@@ -138,28 +138,6 @@ public class FieldbookServiceImplTest {
 	}
 
 	@Test
-	public void testSaveMeasurementsTrue() {
-		final Measurements measurements = Mockito.mock(Measurements.class);
-		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer.createMeasurementVariableList();
-		final List<MeasurementRow> observations =
-			MeasurementRowTestDataInitializer.createMeasurementRowList(1, "Test Name", "Test Value", new MeasurementVariable());
-		this.fieldbookServiceImpl.saveMeasurements(true, variates, observations, measurements);
-		// Verify that the method is called
-		Mockito.verify(measurements).saveMeasurements(observations);
-	}
-
-	@Test
-	public void testSaveMeasurementsFalse() {
-		final Measurements measurements = Mockito.mock(Measurements.class);
-		final List<MeasurementVariable> variates = MeasurementVariableTestDataInitializer.createMeasurementVariableList();
-		final List<MeasurementRow> observations =
-			MeasurementRowTestDataInitializer.createMeasurementRowList(1, "Test Name", "Test Value", new MeasurementVariable());
-		this.fieldbookServiceImpl.saveMeasurements(false, variates, observations, measurements);
-		// Verify that the method is never called
-		Mockito.verify(measurements, Mockito.times(0)).saveMeasurements(observations);
-	}
-
-	@Test
 	public void getLocationsByProgramUUID() {
 		final List<Location> locations = this.fieldbookServiceImpl.getLocationsByProgramUUID(FieldbookServiceImplTest.PROGRAM_UUID);
 
@@ -167,49 +145,7 @@ public class FieldbookServiceImplTest {
 		Assert.assertNotNull("The return locations list should not be null", locations);
 	}
 
-	@Test
-	public void testSaveOrUpdateStudyDesignDataFactorIsCategorical() {
 
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setDataTypeId(TermId.CATEGORICAL_VARIABLE.getId());
-
-		final ExperimentPropertySaver experimentPropertySaver = Mockito.mock(ExperimentPropertySaver.class);
-		final int termId = 234;
-		final String cValueId = "749793";
-		final String value = "My Value";
-		final MeasurementData measurementData = new MeasurementData();
-		measurementData.setcValueId(cValueId);
-		measurementData.setValue(value);
-		measurementData.setMeasurementVariable(measurementVariable);
-
-		this.fieldbookServiceImpl.saveOrUpdateTrialDesignData(experimentPropertySaver, new ExperimentModel(), measurementData, termId);
-
-		Mockito.verify(experimentPropertySaver)
-			.saveOrUpdateProperty(ArgumentMatchers.any(ExperimentModel.class), ArgumentMatchers.eq(termId), ArgumentMatchers.eq(cValueId));
-
-	}
-
-	@Test
-	public void testSaveOrUpdateStudyDesignDataFactorIsNotCategorical() {
-
-		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setDataTypeId(TermId.CHARACTER_VARIABLE.getId());
-
-		final ExperimentPropertySaver experimentPropertySaver = Mockito.mock(ExperimentPropertySaver.class);
-		final int termId = 234;
-		final String cValueId = "749793";
-		final String value = "My Value";
-		final MeasurementData measurementData = new MeasurementData();
-		measurementData.setcValueId(cValueId);
-		measurementData.setValue(value);
-		measurementData.setMeasurementVariable(measurementVariable);
-
-		this.fieldbookServiceImpl.saveOrUpdateTrialDesignData(experimentPropertySaver, new ExperimentModel(), measurementData, termId);
-
-		Mockito.verify(experimentPropertySaver)
-			.saveOrUpdateProperty(ArgumentMatchers.any(ExperimentModel.class), ArgumentMatchers.eq(termId), ArgumentMatchers.eq(value));
-
-	}
 
 	@Test
 	public void testAddLocation() {

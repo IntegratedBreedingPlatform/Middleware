@@ -41,22 +41,6 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 	private static final StringType STRING = new StringType();
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getSubjectIdsByTypeAndObject(final Integer typeId, final Integer objectId) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("typeId", typeId));
-			criteria.add(Restrictions.eq("objectId", objectId));
-			criteria.setProjection(Projections.property("subjectId"));
-
-			return criteria.list();
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getSubjectIdsByTypeAndObject=" + typeId + ", " + objectId
-				+ ") query from CVTermRelationship: " + e.getMessage(), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<Integer> getObjectIdByTypeAndSubject(final Integer typeId, final Integer subjectId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());

@@ -44,8 +44,7 @@ public class GermplasmNamingReferenceDataResolverImpl implements GermplasmNaming
 	}
 
 	public GermplasmNamingReferenceDataResolverImpl(final HibernateSessionProvider sessionProvider) {
-		this.userDefinedFieldDAO = new UserDefinedFieldDAO();
-		this.userDefinedFieldDAO.setSession(sessionProvider.getSession());
+		this.userDefinedFieldDAO = new UserDefinedFieldDAO(sessionProvider.getSession());
 		this.ontologyVariableDataManager = new OntologyVariableDataManagerImpl(sessionProvider);
 	}
 

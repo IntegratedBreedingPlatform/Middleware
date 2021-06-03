@@ -39,8 +39,8 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
-import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
@@ -275,7 +275,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.daoFactory.getGermplasmDao().save(germplasm);
 
 			germplasmDto.getNames().forEach((k, v) -> {
-				final Name name = new Name(null, germplasm.getGid(), nameTypesMapByName.get(k.toUpperCase()),
+				final Name name = new Name(null, germplasm, nameTypesMapByName.get(k.toUpperCase()),
 					(k.equalsIgnoreCase(germplasmDto.getPreferredName())) ? 1 : 0, v, germplasm.getLocationId(),
 					Util.getCurrentDateAsIntegerValue(), 0);
 				this.daoFactory.getNameDao().save(name);
@@ -620,7 +620,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				this.daoFactory.getNameDao().update(name);
 			} else {
 				// Create new record if name not yet exists
-				final Name name = new Name(null, germplasm.getGid(), nameTypeId, 0,
+				final Name name = new Name(null, germplasm, nameTypeId, 0,
 					value, germplasm.getLocationId(), germplasm.getGdate(), 0);
 				this.daoFactory.getNameDao().save(name);
 				germplasmNames.add(name);
@@ -1043,7 +1043,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasmDto.getSynonyms().forEach(synonym -> {
 				final Integer typeId = nameTypesMap.get(synonym.getType().toUpperCase());
 				if (typeId != null) {
-					final Name name = new Name(null, germplasm.getGid(), typeId,
+					final Name name = new Name(null, germplasm, typeId,
 						0, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
 					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
 						name.setNstat(1);
@@ -1145,7 +1145,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 					existingName.setNval(synonym.getSynonym());
 					nameDao.update(existingName);
 				} else {
-					final Name name = new Name(null, germplasm.getGid(), typeId,
+					final Name name = new Name(null, germplasm, typeId,
 						0, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
 					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
 						name.setNstat(1);
@@ -1365,7 +1365,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			final boolean gpidsWillBeChanged = !germplasm.getGpid1().equals(germplasmBeforeUpdate.getGpid1()) || !germplasm.getGpid2()
 				.equals(germplasmBeforeUpdate.getGpid2());
-			if (gpidsWillBeChanged) {
+			final boolean hasProgeny = !this.daoFactory.getGermplasmDao().getChildren(germplasm.getGid()).isEmpty();
+			if (gpidsWillBeChanged && hasProgeny) {
 				final Set<Integer> gpids = new HashSet<>();
 				gpids.add(germplasm.getGpid1());
 				gpids.add(germplasm.getGpid2());

@@ -156,19 +156,6 @@ public class MeasurementsTest {
 	}
 
 	@Test
-	public void makeSureCorrectHibernateFlushTypeIsUsed() throws Exception {
-		final MeasurementData testMeasurementData =
-				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "1");
-		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
-
-		Mockito.when(this.mockHibernateSessiong.getFlushMode()).thenReturn(FlushMode.AUTO);
-		this.measurements.saveMeasurements(Collections.<MeasurementRow>singletonList(measurementRow));
-		Mockito.verify(this.mockHibernateSessiong).setFlushMode(FlushMode.MANUAL);
-		Mockito.verify(this.mockHibernateSessiong).flush();
-		Mockito.verify(this.mockHibernateSessiong).setFlushMode(FlushMode.AUTO);
-	}
-
-	@Test
 	public void testMeasurementDataAreSavedAsPhenotypes() throws Exception {
 		this.testSavingMeasurements("Numeric Value", TermId.NUMERIC_VARIABLE.getId());
 	}

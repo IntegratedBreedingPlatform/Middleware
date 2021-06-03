@@ -21,6 +21,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
@@ -61,6 +62,10 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		+ "    location l on l.locid = n.nlocn " //
 		+ "where " //
 		+ "    n.nstat <> 9 and n.gid in (:gids)";
+
+	public NameDAO(final Session session) {
+		super(session);
+	}
 
 	public List<Name> getByGIDWithFilters(final Integer gid, final Integer status, final GermplasmNameType type) {
 		if (type != null) {
@@ -131,7 +136,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		try {
 			if (gid != null) {
 				final Criteria crit = this.getSession().createCriteria(Name.class);
-				crit.add(Restrictions.eq("germplasmId", gid));
+				crit.createAlias("germplasm", "germplasm");
+				crit.add(Restrictions.eq("germplasm.gid", gid));
 				crit.add(Restrictions.eq("nval", nval));
 				final List<Name> names = crit.list();
 				if (names.isEmpty()) {
@@ -333,7 +339,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Name.class);
-			criteria.add(Restrictions.in("germplasmId", gids));
+			criteria.createAlias("germplasm", "germplasm");
+			criteria.add(Restrictions.in("germplasm.gid", gids));
 
 			toReturn = criteria.list();
 		} catch (final HibernateException e) {
@@ -374,14 +381,15 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Name.class);
-			criteria.add(Restrictions.in("germplasmId", gids));
+			criteria.createAlias("germplasm", "germplasm");
+			criteria.add(Restrictions.in("germplasm.gid", gids));
 			if (!CollectionUtils.isEmpty(ntypeIds)) {
 				criteria.add(Restrictions.in("typeId", ntypeIds));
 			}
 
 			final List<Name> list = criteria.list();
 
-			return list.stream().collect(Collectors.groupingBy(Name::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
+			return list.stream().collect(Collectors.groupingBy(n -> n.getGermplasm().getGid(), LinkedHashMap::new, Collectors.toList()));
 
 		} catch (final HibernateException e) {
 			final String message =
