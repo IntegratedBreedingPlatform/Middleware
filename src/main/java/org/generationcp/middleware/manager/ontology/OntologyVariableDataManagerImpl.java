@@ -72,6 +72,7 @@ import java.util.Set;
 @Transactional
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
 
+	private static final String NAMES = "names";
 	private static final String PROPERTY_IDS = "propertyIds";
 	private static final String VARIABLE_IDS = "variableIds";
 	private static final String SCALE_IDS = "scaleIds";
@@ -126,13 +127,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	@SuppressWarnings("rawtypes")
 	@Override
+	//FIXME Move queries to DAOs https://ibplatform.atlassian.net/browse/IBP-4705
 	public List<Variable> getWithFilter(final VariableFilter variableFilter) {
 
 		final Map<Integer, Variable> map = new HashMap<>();
 
 		try {
 
-			final Map<String, List<Integer>> listParameters = new HashMap<>();
+			final Map<String, List<? extends Object>> listParameters = new HashMap<>();
 
 			String filterClause = "";
 
@@ -172,7 +174,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 						listParameters.put(PROPERTY_IDS, variableFilter.getPropertyIds());
 					}
 
-					final List<Integer> propertyIds = listParameters.get(PROPERTY_IDS);
+					final List<Integer> propertyIds = (List<Integer>) listParameters.get(PROPERTY_IDS);
 					for (final Object row : queryResults) {
 						propertyIds.add(Util.typeSafeObjectToInteger(row));
 					}
@@ -212,7 +214,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 						listParameters.put(SCALE_IDS, variableFilter.getScaleIds());
 					}
 
-					final List<Integer> scaleIds = listParameters.get(SCALE_IDS);
+					final List<Integer> scaleIds = (List<Integer>) listParameters.get(SCALE_IDS);
 					for (final Object row : queryResults) {
 						scaleIds.add(Util.typeSafeObjectToInteger(row));
 					}
@@ -257,7 +259,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 						listParameters.put(VARIABLE_IDS, variableFilter.getVariableIds());
 					}
 
-					final List<Integer> variableIds = listParameters.get(VARIABLE_IDS);
+					final List<Integer> variableIds = (List<Integer>) listParameters.get(VARIABLE_IDS);
 					for (final Object row : queryResults) {
 						variableIds.add(Util.typeSafeObjectToInteger(row));
 					}
@@ -267,14 +269,25 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 						return new ArrayList<>();
 					}
 				}
+
+				// check of variable name or alias if program uuid is set
+				if (!variableFilter.getNames().isEmpty()) {
+					filterClause += " and (v.name in (:names) ";
+					if (variableFilter.getProgramUuid() != null) {
+						filterClause += " or vpo.alias in (:names) ";
+					}
+					filterClause += ")";
+					listParameters.put(NAMES, variableFilter.getNames());
+				}
 			}
 
 			String selectQueryProgramUUIDDependant;
 			String leftJoinsProgramUUIDDependant = "";
 			if (variableFilter.getProgramUuid() == null) {
-				selectQueryProgramUUIDDependant = "'' g_alias, '' g_min_value, '' g_max_value, '' p_alias, '' p_min_value, '' p_max_value, '' fid ";
+				selectQueryProgramUUIDDependant = "'' p_alias, '' p_min_value, '' p_max_value, '' fid ";
 			} else {
-				selectQueryProgramUUIDDependant = " vo.alias g_alias, vo.expected_min g_min_value, vo.expected_max g_max_value, vpo.alias p_alias, vpo.expected_min p_min_value, vpo.expected_max p_max_value, pf.id fid ";
+				selectQueryProgramUUIDDependant =
+					" vpo.alias p_alias, vpo.expected_min p_min_value, vpo.expected_max p_max_value, pf.id fid ";
 				leftJoinsProgramUUIDDependant = " left join variable_overrides vo on vo.cvterm_id = v.cvterm_id and vo.program_uuid is null "
 						+ "left join variable_overrides vpo on vpo.cvterm_id = v.cvterm_id and vpo.program_uuid = :programUuid "
 						+ "left join program_favorites pf on pf.entity_id = v.cvterm_id and pf.program_uuid = :programUuid and pf.entity_type = 'VARIABLES' ";
@@ -292,8 +305,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 									+ leftJoinsProgramUUIDDependant
 									+ "WHERE (v.cv_id = 1040) " + filterClause)
 					.addScalar("vid").addScalar("vn").addScalar("vd").addScalar("pid").addScalar("pn").addScalar("pd").addScalar("mid")
-					.addScalar("mn").addScalar("md").addScalar("sid").addScalar("sn").addScalar("sd").addScalar("g_alias")
-					.addScalar("g_min_value").addScalar("g_max_value").addScalar("p_alias").addScalar("p_min_value")
+				.addScalar("mn").addScalar("md").addScalar("sid").addScalar("sn").addScalar("sd").addScalar("p_alias")
+				.addScalar("p_min_value")
 					.addScalar("p_max_value").addScalar("fid");
 
 			if (variableFilter.getProgramUuid() != null) {
@@ -339,24 +352,15 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				variable.setScale(sMap.get(scaleId));
 
 				// Alias, Expected Min Value, Expected Max Value
-				final String gAlias = (String) items[12];
-				final String gExpMin = (String) items[13];
-				final String gExpMax = (String) items[14];
-				final String pAlias = (String) items[15];
-				final String pExpMin = (String) items[16];
-				final String pExpMax = (String) items[17];
+				final String pAlias = (String) items[12];
+				final String pExpMin = (String) items[13];
+				final String pExpMax = (String) items[14];
 
-				if (pAlias == null && pExpMin == null && pExpMax == null) {
-					variable.setAlias(gAlias);
-					variable.setMinValue(gExpMin);
-					variable.setMaxValue(gExpMax);
-				} else {
-					variable.setAlias(pAlias);
-					variable.setMinValue(pExpMin);
-					variable.setMaxValue(pExpMax);
-				}
+				variable.setAlias(pAlias);
+				variable.setMinValue(pExpMin);
+				variable.setMaxValue(pExpMax);
 
-				variable.setIsFavorite(items[18] != null);
+				variable.setIsFavorite(items[15] != null);
 				map.put(variable.getId(), variable);
 			}
 

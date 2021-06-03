@@ -1,10 +1,10 @@
 package org.generationcp.middleware.manager.ontology.daoElements;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class VariableFilter {
 	private String programUuid;
@@ -19,12 +19,13 @@ public class VariableFilter {
 	private final List<DataType> dataTypes = new ArrayList<>();
 	private final List<VariableType> variableTypes = new ArrayList<>();
 	private final List<String> propertyClasses = new ArrayList<>();
+	private final List<String> names = new ArrayList<>();
 
 	public String getProgramUuid() {
 		return programUuid;
 	}
 
-	public void setProgramUuid(String programUuid) {
+	public void setProgramUuid(final String programUuid) {
 		this.programUuid = programUuid;
 	}
 
@@ -32,7 +33,7 @@ public class VariableFilter {
 		return fetchAll;
 	}
 
-	public void setFetchAll(boolean fetchAll) {
+	public void setFetchAll(final boolean fetchAll) {
 		this.fetchAll = fetchAll;
 	}
 
@@ -40,7 +41,7 @@ public class VariableFilter {
 		return favoritesOnly;
 	}
 
-	public void setFavoritesOnly(boolean favoritesOnly) {
+	public void setFavoritesOnly(final boolean favoritesOnly) {
 		this.favoritesOnly = favoritesOnly;
 	}
 
@@ -48,7 +49,7 @@ public class VariableFilter {
 		return methodIds;
 	}
 
-	public void addMethodId(Integer id){
+	public void addMethodId(final Integer id) {
 		this.methodIds.add(id);
 	}
 
@@ -56,7 +57,7 @@ public class VariableFilter {
 		return propertyIds;
 	}
 
-	public void addPropertyId(Integer id){
+	public void addPropertyId(final Integer id) {
 		this.propertyIds.add(id);
 	}
 
@@ -64,7 +65,7 @@ public class VariableFilter {
 		return scaleIds;
 	}
 
-	public void addScaleId(Integer id){
+	public void addScaleId(final Integer id) {
 		this.scaleIds.add(id);
 	}
 
@@ -72,7 +73,7 @@ public class VariableFilter {
 		return variableIds;
 	}
 
-	public void addVariableId(Integer id){
+	public void addVariableId(final Integer id) {
 		this.variableIds.add(id);
 	}
 
@@ -80,7 +81,7 @@ public class VariableFilter {
 		return excludedVariableIds;
 	}
 
-	public void addExcludedVariableId(Integer id){
+	public void addExcludedVariableId(final Integer id) {
 		this.excludedVariableIds.add(id);
 	}
 
@@ -88,7 +89,7 @@ public class VariableFilter {
 		return dataTypes;
 	}
 
-	public void addDataType(DataType dataType){
+	public void addDataType(final DataType dataType) {
 		this.dataTypes.add(dataType);
 	}
 
@@ -96,7 +97,7 @@ public class VariableFilter {
 		return variableTypes;
 	}
 
-	public void addVariableType(VariableType variableType){
+	public void addVariableType(final VariableType variableType) {
 		this.variableTypes.add(variableType);
 	}
 
@@ -104,9 +105,18 @@ public class VariableFilter {
 		return propertyClasses;
 	}
 
-	public void addPropertyClass(String className){
+	public void addPropertyClass(final String className) {
 		this.propertyClasses.add(className);
 	}
+
+	public List<String> getNames() {
+		return names;
+	}
+
+	public void addName(final String name) {
+		this.names.add(name);
+	}
+
 
 	@Override
 	public String toString() {
@@ -121,17 +131,18 @@ public class VariableFilter {
 				", dataTypes=" + dataTypes +
 				", variableTypes=" + variableTypes +
 				", propertyClasses=" + propertyClasses +
-				'}';
+			", names=" + names +
+			'}';
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public boolean equals(final Object o) {
 		if (this == o)
 			return true;
 		if (!(o instanceof VariableFilter))
 			return false;
 
-		VariableFilter that = (VariableFilter) o;
+		final VariableFilter that = (VariableFilter) o;
 
 		if (isFetchAll() != that.isFetchAll())
 			return false;
@@ -151,6 +162,8 @@ public class VariableFilter {
 			return false;
 		if (getVariableTypes() != null ? !getVariableTypes().equals(that.getVariableTypes()) : that.getVariableTypes() != null)
 			return false;
+		if (getNames() != null ? !getNames().equals(that.getNames()) : that.getNames() != null)
+			return false;
 		return !(getPropertyClasses() != null ? !getPropertyClasses().equals(that.getPropertyClasses()) : that.getPropertyClasses() != null);
 	}
 
@@ -166,6 +179,7 @@ public class VariableFilter {
 		result = 31 * result + (getDataTypes() != null ? getDataTypes().hashCode() : 0);
 		result = 31 * result + (getVariableTypes() != null ? getVariableTypes().hashCode() : 0);
 		result = 31 * result + (getPropertyClasses() != null ? getPropertyClasses().hashCode() : 0);
+		result = 31 * result + (getNames() != null ? getNames().hashCode() : 0);
 		return result;
 	}
 }
