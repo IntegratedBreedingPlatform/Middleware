@@ -72,6 +72,15 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	}
 
+	public GermplasmGroupingServiceImpl(final HibernateSessionProvider sessionProvider, final String cropName) {
+		this.germplasmDAO = new GermplasmDAO(sessionProvider.getSession());
+		this.methodDAO = new MethodDAO();
+		this.methodDAO.setSession(sessionProvider.getSession());
+		this.userDefinedFieldDAO = new UserDefinedFieldDAO(sessionProvider.getSession());
+		this.germplasmDataManager = new GermplasmDataManagerImpl(sessionProvider);
+		this.cropName = cropName;
+	}
+
 	public GermplasmGroupingServiceImpl(final GermplasmDAO germplasmDAO, final MethodDAO methodDAO,
 			final UserDefinedFieldDAO userDefinedFieldDAO, final GermplasmDataManager germplasmDataManager, final String cropName) {
 		this.germplasmDAO = germplasmDAO;
