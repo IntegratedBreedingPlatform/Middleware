@@ -38,7 +38,6 @@ import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -202,6 +201,7 @@ public interface StudyDataManager {
 	 * @param createdBy
 	 * @return StudyReference corresponding to the newly-created Study
 	 */
+	//FIXME Only used in tests, fix tests and remove function https://ibplatform.atlassian.net/browse/IBP-4706
 	StudyReference addStudy(
 		CropType crop, int parentFolderId, VariableTypeList variableTypeList, StudyValues studyValues, String programUUID,
 		final StudyTypeDto studyType, final String description, final String startDate, final String endDate,
@@ -236,6 +236,7 @@ public interface StudyDataManager {
 	 *                         ExperimentType.SUMMARY
 	 * @param experimentValues The values to set
 	 */
+	//FIXME Only used in tests, fix tests and remove function https://ibplatform.atlassian.net/browse/IBP-4706
 	void addExperiment(
 		final CropType crop, final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues);
 
@@ -257,6 +258,7 @@ public interface StudyDataManager {
 	 * @param variableList the variable list
 	 * @return ID of the trial environment data created.
 	 */
+	//FIXME Only used in tests, fix tests and remove function https://ibplatform.atlassian.net/browse/IBP-4706
 	int addTrialEnvironment(VariableList variableList);
 
 	/**
@@ -266,6 +268,7 @@ public interface StudyDataManager {
 	 * @param variableList the variable list
 	 * @return ID of the stock data created
 	 */
+	//FIXME Only used in tests, fix tests and remove function https://ibplatform.atlassian.net/browse/IBP-4706
 	int addStock(int studyId, VariableList variableList);
 
 	/**
@@ -632,7 +635,7 @@ public interface StudyDataManager {
 	 * @param geolocationId
 	 * @return trial instance number
 	 */
-	public String getTrialInstanceNumberByGeolocationId(int geolocationId);
+	String getTrialInstanceNumberByGeolocationId(int geolocationId);
 
 	/**
 	 * Retrieves all DMS project names with no program uuid.
@@ -640,7 +643,7 @@ public interface StudyDataManager {
 	 * @return list of DMS project names with no programUUID
 	 * @
 	 */
-	public List<String> getAllSharedProjectNames();
+	List<String> getAllSharedProjectNames();
 
 	/**
 	 * Checks whether the specified locationIds exist in a given dataset
@@ -653,8 +656,6 @@ public interface StudyDataManager {
 	boolean checkIfAnyLocationIDsExistInExperiments(int studyId, int datasetTypeId, List<Integer> locationIds);
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
-
-	Phenotype getPhenotypeById(int phenotypeId);
 
 	StudyMetadata getStudyMetadataForInstance(Integer instanceId);
 

@@ -88,25 +88,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	protected static final String VARIABLE_FORMULA_DEFINITION = "formulaDefinition";
 	public static final String VARIABLE_TYPE_NAMES = "variableTypeNames";
 
-	public CVTerm getByCvIdAndDefinition(final Integer cvId, final String definition) {
-		CVTerm term = null;
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("cvId", cvId));
-			criteria.add(Restrictions.eq("definition", definition));
-			criteria.add(Restrictions.eq("isObsolete", 0));
-
-			term = (CVTerm) criteria.uniqueResult();
-
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getByCvIdAndDefinition=" + cvId + ", " + definition
-				+ " query on CVTermDao: " + e.getMessage(), e);
-		}
-
-		return term;
-	}
-
 	public List<Integer> getTermsByNameOrSynonym(final String nameOrSynonym, final int cvId) {
 		final List<Integer> termIds = new ArrayList<>();
 		try {
@@ -133,6 +114,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return termIds;
 	}
 
+	//FIXME This function is redundant, better to use the one implemented in OntologyVariableDataManagerImpl (move to CVTermDao)
 	public Map<String, MeasurementVariable> getVariablesByNamesAndVariableType(final List<String> names, final VariableType variableType) {
 		final Map<String, MeasurementVariable> stdVarMap = new HashMap<>();
 

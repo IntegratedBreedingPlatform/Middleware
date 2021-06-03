@@ -127,6 +127,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	@SuppressWarnings("rawtypes")
 	@Override
+	//FIXME Move queries to DAOs https://ibplatform.atlassian.net/browse/IBP-4705
 	public List<Variable> getWithFilter(final VariableFilter variableFilter) {
 
 		final Map<Integer, Variable> map = new HashMap<>();
