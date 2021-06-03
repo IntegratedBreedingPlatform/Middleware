@@ -71,28 +71,6 @@ public class PedigreeDataManagerTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetPedigreeLevelCount() throws Exception {
-		Integer gid = 1;
-		boolean includeDerivativeLine = false;
-		Integer pedigreeLevelCount = this.pedigreeManager.countPedigreeLevel(gid, includeDerivativeLine);
-		Debug.println(Integer.toString(pedigreeLevelCount));
-		Assert.assertNotNull("It should not be null", pedigreeLevelCount);
-		Assert.assertEquals("It should be equal to 1", new Integer(1), pedigreeLevelCount);
-
-	}
-
-	@Test
-	public void testGetPedigreeLevelCount_IncludeDerivative() throws Exception {
-		Integer gid = 1;
-		boolean includeDerivativeLine = true;
-		Integer pedigreeLevelCount = this.pedigreeManager.countPedigreeLevel(gid, includeDerivativeLine);
-		Debug.println(Integer.toString(pedigreeLevelCount));
-		Assert.assertNotNull("It should not be null", pedigreeLevelCount);
-		Assert.assertEquals("It should be equal to 1", new Integer(1), pedigreeLevelCount);
-
-	}
-
-	@Test
 	public void testGeneratePedigreeTree2() throws MiddlewareQueryException {
 		int gid = 1;
 		int levels = 3;
@@ -126,77 +104,7 @@ public class PedigreeDataManagerTest extends IntegrationTestBase {
 		}
 	}
 
-	@Test
-	public void testGetDerivativeNeighborhood() throws Exception {
-		Integer gid = Integer.valueOf(1);
-		int stepsBack = 3;
-		int stepsForward = 3;
-		GermplasmPedigreeTree tree = this.pedigreeManager.getDerivativeNeighborhood(gid, stepsBack, stepsForward);
-		Debug.println(IntegrationTestBase.INDENT, "testGetDerivativeNeighborhood(" + gid + ", " + stepsBack + ", " + stepsForward + "): ");
-		if (tree != null) {
-			this.printNode(tree.getRoot(), 1);
-		}
-	}
 
-	@Test
-	public void testGetDerivativeNeighborhood2() throws Exception {
-
-		MockDataUtil.mockNeighborhoodTestData(this.pedigreeManager, 'D');
-		GermplasmPedigreeTree tree;
-
-		Debug.println(IntegrationTestBase.INDENT, "TestCase #1: GID = TOP node (GID, Backward, Forward = -1, 0, 6)");
-		tree = this.pedigreeManager.getDerivativeNeighborhood(-1, 0, 6);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11****-12****-13*****-14**-8***-15****-17****-18*****-20***-16****-19",
-				MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT, "TestCase #2: GID = LEAF node (GID, Backward, Forward = -5, 2, 10)");
-		tree = this.pedigreeManager.getDerivativeNeighborhood(-5, 2, 10);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11****-12****-13*****-14**-8***-15****-17****-18*****-20***-16****-19",
-				MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT,
-				"TestCase #3: GID = MID node AND Backward < Depth of LEAF (GID, Backward, Forward = -11, 1, 10)");
-		tree = this.pedigreeManager.getDerivativeNeighborhood(-11, 1, 10);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-7*-11**-12**-13***-14", MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT,
-				"TestCase #4: GID = MID node AND Backward = Dept of LEAF (GID, Backward, Forward = -11, 3, 10)");
-		tree = this.pedigreeManager.getDerivativeNeighborhood(-11, 3, 10);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11****-12****-13*****-14**-8***-15****-17****-18*****-20***-16****-19",
-				MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT,
-				"TestCase #5: GID = MID node AND Backward > Dept of LEAF (GID, Backward, Forward = -11, 5, 10)");
-		tree = this.pedigreeManager.getDerivativeNeighborhood(-11, 5, 10);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11****-12****-13*****-14**-8***-15****-17****-18*****-20***-16****-19",
-				MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT,
-				"TestCase #6: GID = MID node AND Forward < Tree Depth - MID depth (GID, Backward, Forward = -3, 1, 2)");
-		tree = this.pedigreeManager.getDerivativeNeighborhood(-3, 1, 2);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-1*-2**-4***-9***-10**-5*-3**-6**-7***-11**-8***-15***-16", MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT,
-				"TestCase #7: GID is MAN, but Ancestors and Descendants have non-MAN members (GID, Backward, Forward = -15, 2, 1)");
-		tree = this.pedigreeManager.getDerivativeNeighborhood(-15, 2, 1);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-3*-6*-7**-11***-12***-13*-8**-15***-17***-18**-16***-19", MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT,
-				"TestCase #8: Should stop at GEN even if Backward count is not exhausted (GID, Backward, Forward = -9, 4, 1)");
-		tree = this.pedigreeManager.getDerivativeNeighborhood(-9, 4, 1);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-4*-9*-10", MockDataUtil.printTree(tree, "*", ""));
-
-		// cleanup
-		MockDataUtil.cleanupMockMaintenanceTestData(this.pedigreeManager);
-	}
 
 	private void printNode(GermplasmPedigreeTreeNode node, int level) {
 		StringBuffer tabs = new StringBuffer();
@@ -211,62 +119,6 @@ public class PedigreeDataManagerTest extends IntegrationTestBase {
 		for (GermplasmPedigreeTreeNode parent : node.getLinkedNodes()) {
 			this.printNode(parent, level + 1);
 		}
-	}
-
-	@Test
-	public void testGetMaintenanceNeighborhood() throws Exception {
-
-		MockDataUtil.mockNeighborhoodTestData(this.pedigreeManager, 'M');
-		GermplasmPedigreeTree tree;
-
-		Debug.println(IntegrationTestBase.INDENT, "TestCase #1: GID = TOP node (GID, Backward, Forward = -1, 0, 6)");
-		tree = this.pedigreeManager.getMaintenanceNeighborhood(-1, 0, 6);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-1*-2*-3**-6**-7***-11****-12****-13*****-14", MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT, "TestCase #2: GID = LEAF node (GID, Backward, Forward = -5, 2, 10)");
-		tree = this.pedigreeManager.getMaintenanceNeighborhood(-5, 2, 10);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-1*-2*-3**-6**-7***-11****-12****-13*****-14", MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT,
-				"TestCase #3: GID = MID node AND Backward < Depth of LEAF (GID, Backward, Forward = -11, 1, 10)");
-		tree = this.pedigreeManager.getMaintenanceNeighborhood(-11, 1, 10);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-7*-11**-12**-13***-14", MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT,
-				"TestCase #4: GID = MID node AND Backward = Dept of LEAF (GID, Backward, Forward = -11, 3, 10)");
-		tree = this.pedigreeManager.getMaintenanceNeighborhood(-11, 3, 10);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-1*-2*-3**-6**-7***-11****-12****-13*****-14", MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT,
-				"TestCase #5: GID = MID node AND Backward > Dept of LEAF (GID, Backward, Forward = -11, 5, 10)");
-		tree = this.pedigreeManager.getMaintenanceNeighborhood(-11, 5, 10);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-1*-2*-3**-6**-7***-11****-12****-13*****-14", MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT,
-				"TestCase #6: GID = MID node AND Forward < Tree Depth - MID depth (GID, Backward, Forward = -3, 1, 2)");
-		tree = this.pedigreeManager.getMaintenanceNeighborhood(-3, 1, 2);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-1*-2*-3**-6**-7***-11", MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT,
-				"TestCase #7: GID is MAN, but Ancestors and Descendants have non-MAN members (GID, Backward, Forward = -15, 2, 1)");
-		tree = this.pedigreeManager.getMaintenanceNeighborhood(-15, 2, 1);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-1*-2*-3**-6**-7***-11", MockDataUtil.printTree(tree, "*", ""));
-
-		Debug.println(IntegrationTestBase.INDENT,
-				"TestCase #8: Should stop at GEN even if Backward count is not exhausted (GID, Backward, Forward = -9, 4, 1)");
-		tree = this.pedigreeManager.getMaintenanceNeighborhood(-9, 4, 1);
-		MockDataUtil.printTree(tree);
-		Assert.assertEquals("-4*-9*-10", MockDataUtil.printTree(tree, "*", ""));
-
-		// cleanup
-		MockDataUtil.cleanupMockMaintenanceTestData(this.pedigreeManager);
 	}
 
 	@Test
