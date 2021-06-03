@@ -50,7 +50,7 @@ public interface GermplasmGroupingService {
 	 *                                       breeding method of the germplasm is one of the hybris methods
 	 *                                       specified in this set. Must not be null.
 	 */
-	void processGroupInheritanceForCrosses(Map<Integer, Integer> germplasmIdMethodIdMap, boolean applyNewGroupToPreviousCrosses,
+	void processGroupInheritanceForCrosses(String cropName, Map<Integer, Integer> germplasmIdMethodIdMap, boolean applyNewGroupToPreviousCrosses,
 			Set<Integer> hybridMethods);
 
 	/**

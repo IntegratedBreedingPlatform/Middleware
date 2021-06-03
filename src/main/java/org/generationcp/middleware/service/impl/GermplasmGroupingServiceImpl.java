@@ -2,12 +2,8 @@ package org.generationcp.middleware.service.impl;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
-import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.MethodDAO;
-import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
-import org.generationcp.middleware.manager.ManagerFactory;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
@@ -24,6 +20,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -43,42 +40,17 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	static final String CODED_NAME_2 = "CODE2";
 	static final String CODED_NAME_3 = "CODE3";
 
-	private GermplasmDAO germplasmDAO;
-
-	private MethodDAO methodDAO;
-
-	private UserDefinedFieldDAO userDefinedFieldDAO;
-
+	@Resource
 	private GermplasmDataManager germplasmDataManager;
 
-	private String cropName;
+	private DaoFactory daoFactory;
 
 	public GermplasmGroupingServiceImpl() {
 
 	}
 
 	public GermplasmGroupingServiceImpl(final HibernateSessionProvider sessionProvider) {
-		this.germplasmDAO = new GermplasmDAO(sessionProvider.getSession());
-
-		this.methodDAO = new MethodDAO();
-		this.methodDAO.setSession(sessionProvider.getSession());
-
-		this.userDefinedFieldDAO = new UserDefinedFieldDAO(sessionProvider.getSession());
-
-		this.germplasmDataManager = new GermplasmDataManagerImpl(sessionProvider);
-
-		final ManagerFactory managerFactory = ManagerFactory.getCurrentManagerFactoryThreadLocal().get();
-		this.cropName = managerFactory.getCropName();
-
-	}
-
-	public GermplasmGroupingServiceImpl(final GermplasmDAO germplasmDAO, final MethodDAO methodDAO,
-			final UserDefinedFieldDAO userDefinedFieldDAO, final GermplasmDataManager germplasmDataManager, final String cropName) {
-		this.germplasmDAO = germplasmDAO;
-		this.methodDAO = methodDAO;
-		this.userDefinedFieldDAO = userDefinedFieldDAO;
-		this.germplasmDataManager = germplasmDataManager;
-		this.cropName = cropName;
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
@@ -99,19 +71,19 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	@Override
 	@Transactional
 	public void unfixLines(final Set<Integer> gids) {
-		this.germplasmDAO.resetGermplasmGroup(new ArrayList<Integer>(gids));
+		this.daoFactory.getGermplasmDao().resetGermplasmGroup(new ArrayList<>(gids));
 	}
 
 	@Override
 	public GermplasmGroup getGroupMembers(final Germplasm founder) {
 		final GermplasmGroup germplasmGroup = new GermplasmGroup();
 
-		final Method method = this.methodDAO.getById(founder.getMethodId());
+		final Method method = this.daoFactory.getMethodDAO().getById(founder.getMethodId());
 		founder.setMethod(method);
 
 		germplasmGroup.setFounder(founder);
 		germplasmGroup.setGroupId(founder.getMgid());
-		germplasmGroup.setGroupMembers(this.germplasmDAO.getManagementGroupMembers(founder.getMgid()));
+		germplasmGroup.setGroupMembers(this.daoFactory.getGermplasmDao().getManagementGroupMembers(founder.getMgid()));
 		return germplasmGroup;
 	}
 
@@ -124,7 +96,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private void populateDescendantGroupMembers(final List<Germplasm> descendantGroupMembers, final Integer gid, final Integer mgid) {
 		// Grouping only applies to advanced germplasm so we only need to retrieve non-generative children
-		final List<Germplasm> nonGenerativeChildren = this.germplasmDAO.getDescendants(gid, 'D');
+		final List<Germplasm> nonGenerativeChildren = this.daoFactory.getGermplasmDao().getDescendants(gid, 'D');
 
 		//Filter children in the same maintenance group
 		final List<Germplasm> descendantGroupChildren = nonGenerativeChildren.stream()
@@ -159,7 +131,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		final GermplasmPedigreeTreeNode node = new GermplasmPedigreeTreeNode();
 		node.setGermplasm(germplasm);
 
-		final List<Germplasm> allChildren = this.germplasmDAO.getAllChildren(germplasm.getGid());
+		final List<Germplasm> allChildren = this.daoFactory.getGermplasmDao().getAllChildren(germplasm.getGid());
 
 		final String indent = Strings.padStart(">", level + 1, '-');
 		final Set<Integer> childrenIds = new TreeSet<>();
@@ -190,7 +162,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 							germplasm.getGid(), germplasm.getMgid(), groupId);
 		}
 
-		final Method method = this.methodDAO.getById(germplasm.getMethodId());
+		final Method method = this.daoFactory.getMethodDAO().getById(germplasm.getMethodId());
 		if (method != null && method.isGenerative()) {
 			GermplasmGroupingServiceImpl.LOG
 					.info("Method {} ({}), of the germplasm (gid {}) is generative. MGID assignment for generative germplasm is not supported.",
@@ -206,7 +178,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			GermplasmGroupingServiceImpl.LOG.info("Assigning mgid = [{}] for germplasm with gid = [{}]", groupId, germplasm.getGid());
 			germplasm.setMgid(groupId);
 			this.copySelectionHistory(germplasm);
-			this.germplasmDAO.save(germplasm);
+			this.daoFactory.getGermplasmDao().save(germplasm);
 		}
 
 		return true;
@@ -275,7 +247,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	UserDefinedField getSelectionHistoryNameType(final String nameType) {
-		final UserDefinedField selectionHistoryNameType = this.userDefinedFieldDAO.getByTableTypeAndCode("NAMES", "NAME", nameType);
+		final UserDefinedField selectionHistoryNameType = this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode("NAMES", "NAME", nameType);
 		if (selectionHistoryNameType == null) {
 			throw new IllegalStateException(
 					"Missing required reference data: Please ensure User defined field (UDFLD) record for name type '" + nameType
@@ -340,7 +312,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	@Override
 	public void copyParentalSelectionHistoryAtFixation(final Germplasm germplasm) {
-		final Germplasm parent = this.germplasmDAO.getById(germplasm.getGpid2());
+		final Germplasm parent = this.daoFactory.getGermplasmDao().getById(germplasm.getGpid2());
 		final Name parentSelectionHistoryAtFixation =
 				this.getSelectionHistory(parent, GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 
@@ -376,16 +348,16 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	// have good visualization tools in BMS to verify results of such
 	// complex operations. INFO LOGGing helps.
 	@Override
-	public void processGroupInheritanceForCrosses(final Map<Integer, Integer> germplasmIdMethodIdMap, final boolean applyNewGroupToPreviousCrosses,
+	public void processGroupInheritanceForCrosses(final String cropName, final Map<Integer, Integer> germplasmIdMethodIdMap, final boolean applyNewGroupToPreviousCrosses,
 			final Set<Integer> hybridMethods) {
 		final GermplasmCache germplasmCache = new GermplasmCache(this.germplasmDataManager, 2);
 		final Set<Integer> gidsOfCrosses = germplasmIdMethodIdMap.keySet();
-		germplasmCache.initialiseCache(this.cropName, gidsOfCrosses, 2);
+		germplasmCache.initialiseCache(cropName, gidsOfCrosses, 2);
 		// We passed method is as map to optimize performance instead of retrieving cross to get the germplasm method
 		for (final Map.Entry<Integer, Integer> germplasmData : germplasmIdMethodIdMap.entrySet()) {
 			final Integer methodId = germplasmData.getValue();
 			if (hybridMethods.contains(methodId)) {
-				final Germplasm cross = this.getGermplasmFromOptionalValue(germplasmCache, germplasmData.getKey());
+				final Germplasm cross = this.getGermplasmFromOptionalValue(cropName, germplasmCache, germplasmData.getKey());
 				if (cross != null) {
 					GermplasmGroupingServiceImpl.LOG
 							.info("Processing group inheritance for cross: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.",
@@ -393,8 +365,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 				}
 
 				GermplasmGroupingServiceImpl.LOG.info("Breeding method {} of the cross is hybrid.", cross.getMethodId());
-				final Germplasm parent1 = this.getGermplasmFromOptionalValue(germplasmCache, cross.getGpid1());
-				final Germplasm parent2 = this.getGermplasmFromOptionalValue(germplasmCache, cross.getGpid2());
+				final Germplasm parent1 = this.getGermplasmFromOptionalValue(cropName, germplasmCache, cross.getGpid1());
+				final Germplasm parent2 = this.getGermplasmFromOptionalValue(cropName, germplasmCache, cross.getGpid2());
 				if (parent1 != null) {
 					GermplasmGroupingServiceImpl.LOG
 						.info("Parent 1: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.", parent1.getGid(), parent1.getGpid1(),
@@ -413,7 +385,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 				if (bothParentsHaveMGID) {
 					GermplasmGroupingServiceImpl.LOG
 						.info("Both parents have MGIDs. Parent1 mgid {}. Parent2 mgid {}.", parent1.getMgid(), parent2.getMgid());
-					final List<Germplasm> previousCrosses = this.germplasmDAO.getPreviousCrossesBetweenParentGroups(cross);
+					final List<Germplasm> previousCrosses = this.daoFactory.getGermplasmDao().getPreviousCrossesBetweenParentGroups(cross);
 
 					// Remove members of the current processing batch from the
 					// list of "previous crosses" retrieved.
@@ -474,11 +446,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 								.info("Applying the new mgid {} to the previous crosses as well.", cross.getMgid());
 							for (final Germplasm previousCross : previousCrosses) {
 								previousCross.setMgid(cross.getMgid());
-								this.germplasmDAO.save(previousCross);
+								this.daoFactory.getGermplasmDao().save(previousCross);
 							}
 						}
 					}
-					this.germplasmDAO.save(cross);
+					this.daoFactory.getGermplasmDao().save(cross);
 				} else {
 					GermplasmGroupingServiceImpl.LOG.info("Both parents do not have MGID. No MGID for cross to inherit.");
 				}
@@ -489,11 +461,19 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		}
 	}
 
-	private Germplasm getGermplasmFromOptionalValue(final GermplasmCache germplasmCache, final Integer crossGID) {
-		final Optional<Germplasm> germplasm = germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, crossGID));
+	private Germplasm getGermplasmFromOptionalValue(final String cropName, final GermplasmCache germplasmCache, final Integer crossGID) {
+		final Optional<Germplasm> germplasm = germplasmCache.getGermplasm(new CropGermplasmKey(cropName, crossGID));
 		if (germplasm.isPresent()) {
 			return germplasm.get();
 		}
 		return null;
+	}
+
+	void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
+
+	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
+		this.germplasmDataManager = germplasmDataManager;
 	}
 }
