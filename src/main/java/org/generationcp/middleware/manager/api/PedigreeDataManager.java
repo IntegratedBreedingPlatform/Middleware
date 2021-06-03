@@ -11,15 +11,15 @@
 
 package org.generationcp.middleware.manager.api;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
-
 import com.google.common.collect.Table;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 
 public interface PedigreeDataManager {
 
@@ -135,54 +135,6 @@ public interface PedigreeDataManager {
 	 * @return count of children
 	 */
 	long countDescendants(Integer gid);
-
-	/**
-	 * Returns the Germplasm which are management group neighbors of the Germplasm identified by the given GID. The given Germplasm is
-	 * assumed to be a root of a management group. The Germplasm POJOs included in the results come with their preferred names which can be
-	 * accessed by calling Germplasm.getPreferredName().
-	 *
-	 * @param gid - gid of the Germplasm
-	 * @param start - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return List of Germplasm POJOs
-	 */
-	List<Germplasm> getManagementNeighbors(Integer gid, int start, int numOfRows);
-
-	/**
-	 * Returns the number of management neighbors of the Germplasm with the given id.
-	 *
-	 * @param gid - the Germplasm id
-	 * @return the number of management neighbors
-	 */
-	long countManagementNeighbors(Integer gid);
-
-	/**
-	 * Returns the number of group relatives a Germplasm has.
-	 *
-	 * @param gid
-	 * @return The number of group relatives of a Germplasm
-	 */
-	long countGroupRelatives(Integer gid);
-
-	/**
-	 * Returns the Germplasm which are group relatives of the Germplasm identified by the given GID. The Germplasm POJOs included in the
-	 * results come with their preferred names which can be accessed by calling Germplasm.getPreferredName().
-	 *
-	 * @param gid
-	 * @return List of Germplasm POJOs
-	 */
-	List<Germplasm> getGroupRelatives(Integer gid, int start, int numRows);
-
-	/**
-	 * Returns the generation history of the Germplasm identified by the given GID. The history is created by tracing back through the
-	 * source germplasms from the given Germplasm through its progenitors, up until a Germplasm created by a generative method is
-	 * encountered. The Germplasm POJOs included in the results come with their preferred names which can be accessed by calling
-	 * Germplasm.getPreferredName().
-	 *
-	 * @param gid
-	 * @return List of Germplasm POJOs, arranged from the given Germplasm down to the last source on the generation history
-	 */
-	List<Germplasm> getGenerationHistory(Integer gid);
 
 	/**
 	 * Returns the Germplasm representing the parent of the child Germplasm identified by the given gid and having the given progenitor

@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import java.util.List;
-
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
@@ -25,6 +23,8 @@ import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 @Ignore("Historic failing test. Disabled temporarily. Developers working in this area please spend some time to fix and remove @Ignore.")
 public class PedigreeDataManagerTest extends IntegrationTestBase {
@@ -112,49 +112,6 @@ public class PedigreeDataManagerTest extends IntegrationTestBase {
 			}
 		}
 		return outputString.toString();
-	}
-
-	@Test
-	public void testGetManagementNeighbors() throws Exception {
-		Integer gid = Integer.valueOf(1);
-		int count = (int) this.pedigreeManager.countManagementNeighbors(gid);
-		List<Germplasm> neighbors = this.pedigreeManager.getManagementNeighbors(gid, 0, count);
-		Assert.assertNotNull(neighbors);
-		Assert.assertFalse(neighbors.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGetManagementNeighbors(" + gid + "):" + count);
-		for (Germplasm g : neighbors) {
-			String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
-			Debug.println(IntegrationTestBase.INDENT, g.getGid() + " : " + name);
-		}
-	}
-
-	@Test
-	public void testGetGroupRelatives() throws Exception {
-		Integer gid = Integer.valueOf(1);
-
-		long count = this.pedigreeManager.countGroupRelatives(gid);
-		List<Germplasm> neighbors = this.pedigreeManager.getGroupRelatives(gid, 0, (int) count);
-		Assert.assertNotNull(neighbors);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGroupRelatives(" + gid + "):" + neighbors.size());
-		for (Germplasm g : neighbors) {
-			String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
-			Debug.println(IntegrationTestBase.INDENT, g.getGid() + " : " + name);
-		}
-	}
-
-	@Test
-	public void testGetGenerationHistory() throws Exception {
-		Integer gid = Integer.valueOf(50533);
-		List<Germplasm> results = this.pedigreeManager.getGenerationHistory(gid);
-		Assert.assertNotNull(results);
-		Assert.assertFalse(results.isEmpty());
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGenerationHistory(" + gid + "):" + results.size());
-		for (Germplasm g : results) {
-			String name = g.getPreferredName() != null ? g.getPreferredName().getNval() : null;
-			Debug.println(IntegrationTestBase.INDENT, g.getGid() + " : " + name);
-		}
 	}
 
 	@Test
@@ -329,19 +286,4 @@ public class PedigreeDataManagerTest extends IntegrationTestBase {
 		Debug.println(IntegrationTestBase.INDENT, "testCountDescendants(" + gid + "):" + count);
 	}
 
-	@Test
-	public void testCountGroupRelatives() throws Exception {
-		Integer gid = 1; // change gid value
-		long count = this.pedigreeManager.countGroupRelatives(gid);
-		Assert.assertNotNull(count);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGroupRelatives(" + gid + "):" + count);
-	}
-
-	@Test
-	public void testCountManagementNeighbors() throws Exception {
-		Integer gid = 1; // change gid value
-		long count = this.pedigreeManager.countManagementNeighbors(gid);
-		Assert.assertNotNull(count);
-		Debug.println(IntegrationTestBase.INDENT, "testCountManagementNeighbors(" + gid + "):" + count);
-	}
 }

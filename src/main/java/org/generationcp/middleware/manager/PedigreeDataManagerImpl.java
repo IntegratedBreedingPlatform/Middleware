@@ -497,49 +497,6 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 		return this.daoFactory.getGermplasmDao().countGermplasmDescendantByGID(gid);
 	}
 
-	@Override
-	public List<Germplasm> getManagementNeighbors(final Integer gid, final int start, final int numOfRows) {
-		return this.daoFactory.getGermplasmDao().getManagementNeighbors(gid, start, numOfRows);
-	}
-
-	@Override
-	public long countManagementNeighbors(final Integer gid) {
-		return this.daoFactory.getGermplasmDao().countManagementNeighbors(gid);
-	}
-
-	@Override
-	public long countGroupRelatives(final Integer gid) {
-		return this.daoFactory.getGermplasmDao().countGroupRelatives(gid);
-	}
-
-	@Override
-	public List<Germplasm> getGroupRelatives(final Integer gid, final int start, final int numRows) {
-		return this.daoFactory.getGermplasmDao().getGroupRelatives(gid, start, numRows);
-	}
-
-	@Override
-	public List<Germplasm> getGenerationHistory(final Integer gid) {
-		final List<Germplasm> toreturn = new ArrayList<>();
-
-		Germplasm currentGermplasm = this.germplasmDataManager.getGermplasmWithPrefName(gid);
-		if (currentGermplasm != null) {
-			toreturn.add(currentGermplasm);
-
-			while (currentGermplasm.getGnpgs() == -1) {
-				// trace back the sources
-				final Integer sourceId = currentGermplasm.getGpid2();
-				currentGermplasm = this.getGermplasmDataManager().getGermplasmWithPrefName(sourceId);
-
-				if (currentGermplasm != null) {
-					toreturn.add(currentGermplasm);
-				} else {
-					break;
-				}
-			}
-		}
-		return toreturn;
-	}
-
 	public GermplasmDataManager getGermplasmDataManager() {
 		return this.germplasmDataManager;
 	}
