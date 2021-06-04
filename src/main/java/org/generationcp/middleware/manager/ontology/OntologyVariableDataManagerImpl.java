@@ -47,6 +47,7 @@ import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -1070,5 +1071,41 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Override
 	public long countAllVariables(final List<Integer> variableTypes) {
 		return this.daoFactory.getCvTermDao().countAllVariables(variableTypes);
+	}
+
+	@Override
+	public List<Variable> searchAttributeVariables(final String query, final String programUUID) {
+		if (StringUtils.isBlank(query)) {
+			return Collections.EMPTY_LIST;
+		}
+		try {
+			final SQLQuery sqlQuery = this.getActiveSession().createSQLQuery("SELECT " //
+				+ "   cv.name as name, " //
+				+ "   vo.alias as alias, " //
+				+ "   cv.cvterm_id AS id," //
+				+ "   cv.definition AS definition" //
+				+ " FROM cvterm cv INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
+				+ " and cv.cvterm_id = cp.cvterm_id " //
+				+ " LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID " //
+				+ " WHERE cp.value in (select name from cvterm where cvterm_id in ("
+				+ VariableType.GERMPLASM_PASSPORT.getId() + ","
+				+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ")) " //
+				+ "   AND (cv.definition like :fname or cv.name like :name or vo.alias like :alias )" //
+				+ " LIMIT 100 ");
+			sqlQuery.setParameter("programUUID", programUUID);
+			sqlQuery.setParameter("fname", '%' + query + '%');
+			sqlQuery.setParameter("name", '%' + query + '%');
+			sqlQuery.setParameter("alias", '%' + query + '%');
+			sqlQuery.addScalar("name");
+			sqlQuery.addScalar("alias");
+			sqlQuery.addScalar("id");
+			sqlQuery.addScalar("definition");
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(Variable.class));
+
+			return sqlQuery.list();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with searchAttributes(query=" + query + "): " + e.getMessage(), e);
+		}
 	}
 }
