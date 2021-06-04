@@ -126,6 +126,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Deprecated
 	public List<UserDefinedField> getAttributeTypesByGIDList(final List<Integer> gidList) {
 		List<UserDefinedField> returnList = new ArrayList<>();
 		if (gidList != null && !gidList.isEmpty()) {

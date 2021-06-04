@@ -1529,14 +1529,20 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		// retrieve attribute values
 		final List<Attribute> attributeList = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(gidList);
-		final Map<Integer, String> attributeTypeMap = this.daoFactory.getUserDefinedFieldDAO().getAttributeTypesByGIDList(gidList).stream()
-			.collect(Collectors.toMap(UserDefinedField::getFldno, UserDefinedField::getFcode));
+		final Set<Integer> variableIds = attributeList.stream().map(Attribute::getTypeId).collect(Collectors.toSet());
+
+		final VariableFilter variableFilter = new VariableFilter();
+		variableIds.forEach(variableFilter::addVariableId);
+
+		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+		final Map<Integer, Variable> variableMap = variables.stream().collect(Collectors.toMap(Variable::getId, Function.identity()));
+
 		for (final Attribute attribute : attributeList) {
 			Map<String, String> attrByType = attributeMap.get(attribute.getGermplasmId());
 			if (attrByType == null) {
 				attrByType = new HashMap<>();
 			}
-			final String attributeType = attributeTypeMap.get(attribute.getTypeId());
+			final String attributeType = variableMap.get(attribute.getTypeId()).getName();
 			attrByType.put(attributeType, attribute.getAval());
 			attributeMap.put(attribute.getGermplasmId(), attrByType);
 		}

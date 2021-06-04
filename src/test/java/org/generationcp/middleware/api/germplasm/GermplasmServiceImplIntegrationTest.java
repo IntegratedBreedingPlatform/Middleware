@@ -23,8 +23,11 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -90,6 +93,9 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
 	private GermplasmService germplasmService;
+
+	@Autowired
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	private Integer noLocationId, variableTypeId, attributeId, clientId, userId;
 	private String creationDate, name, germplasmUUID, reference, note;
@@ -1531,6 +1537,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			.getByCodes(UDTableType.NAMES_NAME.getTable(),
 				Collections.singleton(UDTableType.NAMES_NAME.getType()), new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_NAMETYPES))
 			.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+
 		final Map<Integer, String> germplasmNames = this.daoFactory.getNameDao().getNamesByGids(Collections.singletonList(gid)).stream()
 			.collect(Collectors.toMap(Name::getTypeId, Name::getNval));
 		if (existingNameTypes.containsKey(GermplasmImportRequest.ACCNO)) {
@@ -1555,11 +1562,13 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 					.getSynonym(), equalTo(request.getPedigree()));
 		}
 
-		final Map<String, Integer> existingAttrTypes = this.daoFactory.getUserDefinedFieldDAO()
-			.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()))
-				, new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES))
-			.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+		final VariableFilter variableFilter = new VariableFilter();
+		GermplasmServiceImpl.ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
+		GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES.forEach(variableFilter::addName);
+
+		final Map<String, Integer> existingAttrTypes = this.ontologyVariableDataManager.getWithFilter(variableFilter)
+			.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
+
 		final Map<Integer, String> germplasmAttributes =
 			this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Collections.singletonList(gid)).stream()
 				.collect(Collectors.toMap(Attribute::getTypeId, Attribute::getAval));
@@ -1677,11 +1686,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 					.getSynonym(), equalTo(request.getPedigree()));
 		}
 
-		final Map<String, Integer> existingAttrTypes = this.daoFactory.getUserDefinedFieldDAO()
-			.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()))
-				, new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES))
-			.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+		final VariableFilter variableFilter = new VariableFilter();
+		GermplasmServiceImpl.ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
+		GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES.forEach(variableFilter::addName);
+
+		final Map<String, Integer> existingAttrTypes = this.ontologyVariableDataManager.getWithFilter(variableFilter)
+			.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
 		final Map<Integer, String> germplasmAttributes =
 			this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Collections.singletonList(gid)).stream()
 				.collect(Collectors.toMap(Attribute::getTypeId, Attribute::getAval));
@@ -1791,11 +1801,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 					.getSynonym(), equalTo(request.getPedigree()));
 		}
 
-		final Map<String, Integer> existingAttrTypes = this.daoFactory.getUserDefinedFieldDAO()
-			.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()))
-				, new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES))
-			.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+		final VariableFilter variableFilter = new VariableFilter();
+		GermplasmServiceImpl.ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
+		GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES.forEach(variableFilter::addName);
+
+		final Map<String, Integer> existingAttrTypes = this.ontologyVariableDataManager.getWithFilter(variableFilter)
+			.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
 		final Map<Integer, String> germplasmAttributes =
 			this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Collections.singletonList(gid)).stream()
 				.collect(Collectors.toMap(Attribute::getTypeId, Attribute::getAval));
@@ -1919,11 +1930,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 					.getSynonym(), equalTo(request2.getPedigree()));
 		}
 
-		final Map<String, Integer> existingAttrTypes = this.daoFactory.getUserDefinedFieldDAO()
-			.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()))
-				, new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES))
-			.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+		final VariableFilter variableFilter = new VariableFilter();
+		GermplasmServiceImpl.ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
+		GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES.forEach(variableFilter::addName);
+
+		final Map<String, Integer> existingAttrTypes = this.ontologyVariableDataManager.getWithFilter(variableFilter)
+			.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
 		final Map<Integer, String> germplasmAttributes =
 			this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Collections.singletonList(gid)).stream()
 				.collect(Collectors.toMap(Attribute::getTypeId, Attribute::getAval));

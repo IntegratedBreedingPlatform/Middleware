@@ -96,16 +96,6 @@ public class UserDefinedFieldDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAttributeTypesByGIDList() {
-		final List<UserDefinedField> attributeTypesByGIDList = this.userDefinedFieldDao.getAttributeTypesByGIDList(this.gids);
-		Assert.assertNotNull(attributeTypesByGIDList);
-		Assert.assertEquals(this.attributeTypes.size()-1, attributeTypesByGIDList.size());
-		Assert.assertTrue(attributeTypesByGIDList.contains(this.attributeTypes.get(0)));
-		Assert.assertTrue(attributeTypesByGIDList.contains(this.attributeTypes.get(1)));
-		Assert.assertFalse(attributeTypesByGIDList.contains(this.attributeTypes.get(2)));
-	} 
-	
-	@Test
 	public void testGetNameTypesByGIDList() {
 		final List<UserDefinedField> nameTypesByGID = this.userDefinedFieldDao.getNameTypesByGIDList(this.gids);
 		Assert.assertNotNull(nameTypesByGID);

@@ -23,6 +23,7 @@ import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
@@ -1444,28 +1445,36 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getAccessionNumbers())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT n.gid  ");
 			paramBuilder.append(" FROM names n ");
-			paramBuilder.append(" INNER JOIN udflds u on n.ntype = u.fldno AND u.fcode = '" + GermplasmImportRequest.ACCNO + "'");
+			paramBuilder.append(
+				" INNER JOIN cvterm c on a.atype = c.cvterm_id AND c.name = '" + GermplasmImportRequest.ACCNO + "' and c.cv_id = "
+					+ CvId.VARIABLES.getId());
 			paramBuilder.append(" WHERE n.nval IN (:accessionNumbers)  ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getCommonCropNames())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT a.gid  ");
 			paramBuilder.append(" FROM atributs a");
-			paramBuilder.append(" INNER JOIN udflds u on a.atype = u.fldno AND u.fcode = '" + GermplasmImportRequest.CROPNM + "'");
+			paramBuilder.append(
+				" INNER JOIN cvterm c on a.atype = c.cvterm_id AND c.name = '" + GermplasmImportRequest.CROPNM + "' and c.cv_id = "
+					+ CvId.VARIABLES.getId());
 			paramBuilder.append(" WHERE a.aval IN (:commonCropNames)  ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmGenus())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT n.gid  ");
 			paramBuilder.append(" FROM names n ");
-			paramBuilder.append(" INNER JOIN udflds u on n.ntype = u.fldno AND u.fcode = '" + GermplasmImportRequest.GENUS + "'");
+			paramBuilder.append(
+				" INNER JOIN cvterm c on a.atype = c.cvterm_id AND c.name = '" + GermplasmImportRequest.GENUS + "' and c.cv_id = "
+					+ CvId.VARIABLES.getId());
 			paramBuilder.append(" WHERE n.nval IN (:germplasmGenus)  ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT a.gid  ");
 			paramBuilder.append(" FROM atributs a");
-			paramBuilder.append(" INNER JOIN udflds u on a.atype = u.fldno AND u.fcode = '" + GermplasmImportRequest.SPECIES + "'");
+			paramBuilder.append(
+				" INNER JOIN cvterm c on a.atype = c.cvterm_id AND c.name = '" + GermplasmImportRequest.SPECIES + "' and c.cv_id = "
+					+ CvId.VARIABLES.getId());
 			paramBuilder.append(" WHERE a.aval IN (:germplasmSpecies)  ) ");
 		}
 
@@ -1511,15 +1520,15 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			+ "   loc.labbr AS countryOfOriginCode, " //
 			+ "   max(if(n.nstat = 1, n.nval, null)) as germplasmName, " //
 			+ "  max(if(ntype.fcode = 'GENUS', n.nval, null)) as genus," //
-			+ "   max(if(atype.fcode = 'PLOTCODE', a.aval, null)) as germplasmSeedSource,  "
-			+ "   max(if(atype.fcode = 'SPNAM', a.aval, null)) as species, "
-			+ "   max(if(atype.fcode = 'SPAUTH', a.aval, null)) as speciesAUthority, "
-			+ "   max(if(atype.fcode = 'SUBTAX', a.aval, null)) as subtaxa, "
-			+ "   max(if(atype.fcode = 'STAUTH', a.aval, null)) as subtaxaAuthority, "
-			+ "   max(if(atype.fcode = 'INSTCODE', a.aval, null)) as instituteCode, "
-			+ "   max(if(atype.fcode = 'ORIGININST', a.aval, null)) as instituteName, "
-			+ "   max(if(atype.fcode = 'SORIG', a.aval, null)) as germplasmOrigin, "
-			+ "   max(if(atype.fcode = 'CROPNM', a.aval, null)) as commonCropName, "
+			+ "   max(if(atype.name = 'PLOTCODE_AP_text', a.aval, null)) as germplasmSeedSource,  "
+			+ "   max(if(atype.name = 'SPNAM_AP_text', a.aval, null)) as species, "
+			+ "   max(if(atype.name = 'SPAUTH_AP_text', a.aval, null)) as speciesAUthority, "
+			+ "   max(if(atype.name = 'SUBTAX_AP_text', a.aval, null)) as subtaxa, "
+			+ "   max(if(atype.name = 'STAUTH_AP_text', a.aval, null)) as subtaxaAuthority, "
+			+ "   max(if(atype.name = 'INSTCODE_AP_text', a.aval, null)) as instituteCode, "
+			+ "   max(if(atype.name = 'ORIGININST_AP_text', a.aval, null)) as instituteName, "
+			+ "   max(if(atype.name = 'SORIG_AP_text', a.aval, null)) as germplasmOrigin, "
+			+ "   max(if(atype.name = 'CROPNM_AP_text', a.aval, null)) as commonCropName, "
 			+ "   convert(g.methn, char) as breedingMethodDbId ";
 	}
 
@@ -1527,7 +1536,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return "  FROM germplsm g "
 			+ "  	LEFT join location loc ON g.glocn = loc.locid "
 			+ "  	LEFT JOIN atributs a ON a.gid = g.gid "
-			+ "  	LEFT JOIN udflds atype ON atype.fldno = a.atype "
+			+ "  	LEFT JOIN cvterm atype ON atype.cvterm_id = a.atype "
 			+ "  	LEFT join names n ON n.gid = g.gid and n.nstat != 9 "
 			+ "  	LEFT JOIN udflds ntype ON ntype.fldno = n.ntype ";
 	}
