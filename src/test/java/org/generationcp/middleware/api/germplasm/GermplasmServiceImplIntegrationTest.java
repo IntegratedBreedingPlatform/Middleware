@@ -128,9 +128,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final UserDefinedField newNameCode =
 			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
 				UDTableType.NAMES_NAME.getType(), DRVNM);
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
 
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
@@ -160,7 +157,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertEquals("Name for " + germplasm.getGid(), savedName.getNval());
 
 		final Attribute savedAttribute = attributes.get(0);
-		assertEquals(newAttributeCode.getFldno(), savedAttribute.getTypeId());
+		assertEquals(attributeId, savedAttribute.getTypeId());
 		assertEquals(newLocation.getLocid(), savedAttribute.getLocationId());
 		assertEquals(creationDate, savedAttribute.getAdate().intValue());
 		assertEquals("Note for " + germplasm.getGid(), savedAttribute.getAval());
@@ -177,9 +174,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final UserDefinedField newNameCode =
 			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
 				UDTableType.NAMES_NAME.getType(), DRVNM);
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
 
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
@@ -187,7 +181,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "", null,
+			.save(new Attribute(null, germplasm.getGid(), attributeId, "", null,
 				germplasm.getLocationId(),
 				0, germplasm.getGdate()));
 
@@ -195,6 +189,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
 				Optional.of(newLocation), creationDate);
 		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
+		this.sessionProvder.getSession().flush();
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -217,7 +212,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertEquals("Name for " + germplasm.getGid(), savedName.getNval());
 
 		final Attribute savedAttribute = attributes.get(0);
-		assertEquals(newAttributeCode.getFldno(), savedAttribute.getTypeId());
+		assertEquals(attributeId, savedAttribute.getTypeId());
 		assertEquals(newLocation.getLocid(), savedAttribute.getLocationId());
 		assertEquals(creationDate, savedAttribute.getAdate().intValue());
 		assertEquals("Note for " + germplasm.getGid(), savedAttribute.getAval());
@@ -275,7 +270,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testImportGermplasmUpdates_DuplicateNamesAndAttributes() {
+	public void testImportGermplasmUpdates_DuplicateNames() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
@@ -284,9 +279,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final UserDefinedField newNameCode =
 			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
 				UDTableType.NAMES_NAME.getType(), DRVNM);
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
 
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
@@ -301,20 +293,10 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(new Name(null, germplasm, newNameCode.getFldno(), 0,
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
-		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "", null,
-				germplasm.getLocationId(),
-				0, germplasm.getGdate()));
-		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "", null,
-				germplasm.getLocationId(),
-				0, germplasm.getGdate()));
-
 		try {
 			this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.duplicate.names"));
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.duplicate.attributes"));
 		}
 
 	}
@@ -2448,11 +2430,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private Attribute createAttribute(final Germplasm germplasm) {
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
 
-		final Attribute attribute = new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "", null,
+		final Attribute attribute = new Attribute(null, germplasm.getGid(), attributeId, "", null,
 			germplasm.getLocationId(),
 			0, germplasm.getGdate());
 		this.daoFactory.getAttributeDAO()

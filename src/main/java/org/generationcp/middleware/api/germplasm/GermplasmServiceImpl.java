@@ -464,7 +464,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				conflictErrors);
 		}
 		for (final Map.Entry<String, String> codeValuesEntry : germplasmUpdateDTO.getAttributes().entrySet()) {
-			final String code = codeValuesEntry.getKey();
+			final String code = codeValuesEntry.getKey().toUpperCase();
 			final String value = codeValuesEntry.getValue();
 			this.saveOrUpdateAttribute(attributeCodes, attributesMap, germplasm,
 				code, value, conflictErrors);
@@ -973,18 +973,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 			.collect(Collectors.toMap(l -> l.getLabbr().toUpperCase(), Location::getLocid));
 	}
 
-	private Map<String, Integer> getAttributesMapByAttrCode(final List<GermplasmImportRequest> germplasmImportRequestList) {
+	private Map<String, Variable> getAttributesMapByAttrCode(final List<GermplasmImportRequest> germplasmImportRequestList) {
 		final Set<String> attributes = new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES);
 		germplasmImportRequestList.forEach(g -> {
 			if (!CollectionUtils.isEmpty(g.getAdditionalInfo())) {
 				attributes.addAll(g.getAdditionalInfo().keySet());
 			}
 		});
-		final List<UserDefinedField> attributesUdfldList = this.daoFactory.getUserDefinedFieldDAO()
-			.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType())),
-				attributes);
-		return attributesUdfldList.stream().collect(Collectors.toMap(u -> u.getFcode().toUpperCase(), UserDefinedField::getFldno));
+		return this.getAttributesMap(null, attributes);
 	}
 
 	private Map<String, Integer> getNameTypesMapByNameTypeCode(final List<GermplasmImportRequest> germplasmImportRequestList) {
@@ -1001,7 +997,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public List<GermplasmDTO> createGermplasm(final String cropname,
 		final List<GermplasmImportRequest> germplasmImportRequestList) {
 		final Map<String, Integer> locationsMap = this.getLocationsMapByLocAbbr(germplasmImportRequestList);
-		final Map<String, Integer> attributesMap = this.getAttributesMapByAttrCode(germplasmImportRequestList);
+		final Map<String, Variable> attributesMap = this.getAttributesMapByAttrCode(germplasmImportRequestList);
 		final Map<String, Integer> nameTypesMap = this.getNameTypesMapByNameTypeCode(germplasmImportRequestList);
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropname);
 
@@ -1066,9 +1062,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			this.addCustomAttributeFieldsToAdditionalInfo(germplasmDto);
 			germplasmDto.getAdditionalInfo().forEach((k, v) -> {
-				final Integer typeId = attributesMap.get(k.toUpperCase());
-				if (typeId != null) {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, v, null,
+				final Variable variable = attributesMap.get(k.toUpperCase());
+				if (variable != null) {
+					final Attribute attribute = new Attribute(null, germplasm.getGid(), variable.getId(), v, null,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					this.daoFactory.getAttributeDAO().save(attribute);
@@ -1162,18 +1158,18 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<Integer, Attribute> existingAttributesByType = attributeDAO.getByGID(germplasm.getGid()).stream()
 			.collect(Collectors.toMap(Attribute::getTypeId,
 				Function.identity()));
-		final Map<String, Integer> attributesMap = this.getAttributesMapByAttrCode(Collections.singletonList(germplasmUpdateRequest));
+		final Map<String, Variable> attributesMap = this.getAttributesMapByAttrCode(Collections.singletonList(germplasmUpdateRequest));
 		this.addCustomAttributeFieldsToAdditionalInfo(germplasmUpdateRequest);
 		germplasmUpdateRequest.getAdditionalInfo().forEach((k, v) -> {
-			final Integer typeId = attributesMap.get(k.toUpperCase());
-			if (typeId != null) {
+			final Variable variable = attributesMap.get(k.toUpperCase());
+			if (variable != null) {
 				// Create new attribute if none of that type exists, otherwise update value of existing one
-				if (existingAttributesByType.containsKey(typeId)) {
-					final Attribute existingAttribute = existingAttributesByType.get(typeId);
+				if (existingAttributesByType.containsKey(variable.getId())) {
+					final Attribute existingAttribute = existingAttributesByType.get(variable.getId());
 					existingAttribute.setAval(v);
 					attributeDAO.update(existingAttribute);
 				} else {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), typeId, v, null,
+					final Attribute attribute = new Attribute(null, germplasm.getGid(), variable.getId(), v, null,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					attributeDAO.save(attribute);
