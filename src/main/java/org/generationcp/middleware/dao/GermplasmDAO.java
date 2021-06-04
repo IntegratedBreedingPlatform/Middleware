@@ -1445,9 +1445,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getAccessionNumbers())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT n.gid  ");
 			paramBuilder.append(" FROM names n ");
-			paramBuilder.append(
-				" INNER JOIN cvterm c on a.atype = c.cvterm_id AND c.name = '" + GermplasmImportRequest.ACCNO + "' and c.cv_id = "
-					+ CvId.VARIABLES.getId());
+			paramBuilder.append(" INNER JOIN udflds u on n.ntype = u.fldno AND u.fcode = '" + GermplasmImportRequest.ACCNO + "'");
 			paramBuilder.append(" WHERE n.nval IN (:accessionNumbers)  ) ");
 		}
 
@@ -1463,9 +1461,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmGenus())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT n.gid  ");
 			paramBuilder.append(" FROM names n ");
-			paramBuilder.append(
-				" INNER JOIN cvterm c on a.atype = c.cvterm_id AND c.name = '" + GermplasmImportRequest.GENUS + "' and c.cv_id = "
-					+ CvId.VARIABLES.getId());
+			paramBuilder.append(" INNER JOIN udflds u on n.ntype = u.fldno AND u.fcode = '" + GermplasmImportRequest.GENUS + "'");
 			paramBuilder.append(" WHERE n.nval IN (:germplasmGenus)  ) ");
 		}
 
