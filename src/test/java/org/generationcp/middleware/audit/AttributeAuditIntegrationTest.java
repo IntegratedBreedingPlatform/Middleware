@@ -1,6 +1,9 @@
 package org.generationcp.middleware.audit;
 
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,13 +23,15 @@ public class AttributeAuditIntegrationTest extends AuditIntegrationTestBase {
 
 	private static final String PRIMARY_KEY_FIELD = "aid";
 
+	private DaoFactory daoFactory;
+
 	public AttributeAuditIntegrationTest() {
 		super(Attribute.class.getAnnotation(Table.class).name(), PRIMARY_KEY_FIELD);
 	}
 
 	@Before
 	public void setUp() {
-
+		this.daoFactory = new DaoFactory(this.sessionProvder);
 	}
 
 	@Test
@@ -107,12 +112,13 @@ public class AttributeAuditIntegrationTest extends AuditIntegrationTestBase {
 	}
 
 	protected Map<String, Object> createQueryParams(final Integer modifiedBy, final Date modifiedDate) {
+		final CVTerm cvTerm = daoFactory.getCvTermDao().getTermsByCvId(CvId.VARIABLES, 0, 1).get(0);
 		final Map<String, Object> queryParams = new LinkedHashMap<>();
 		queryParams.put("gid", new Random().nextInt());
-		queryParams.put("atype", new Random().nextInt());
+		queryParams.put("atype", cvTerm.getCvTermId());
 		queryParams.put("created_by", new Random().nextInt());
 		queryParams.put("aval", UUID.randomUUID().toString());
-		queryParams.put("cval_id", new Random().nextInt());
+		queryParams.put("cval_id", cvTerm.getCvTermId());
 		queryParams.put("alocn", new Random().nextInt());
 		queryParams.put("aref", new Random().nextInt());
 		queryParams.put("adate", new Random().nextInt());
