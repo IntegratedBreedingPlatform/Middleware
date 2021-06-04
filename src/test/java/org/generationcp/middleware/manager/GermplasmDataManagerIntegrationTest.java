@@ -36,7 +36,6 @@ import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -93,9 +92,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
 	private LocationDataManager locationManager;
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -651,6 +647,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddGermplasmAttribute() {
+		final CVTerm cvTerm = this.createAttributeVariable();
+
 		final Integer gid = 50533;
 		final Attribute attribute = new Attribute();
 		attribute.setAdate(0);
@@ -658,7 +656,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		attribute.setGermplasmId(gid);
 		attribute.setLocationId(0);
 		attribute.setReferenceId(0);
-		attribute.setTypeId(0);
+		attribute.setTypeId(cvTerm.getCvTermId());
 		final Integer id = this.germplasmDataManager.addGermplasmAttribute(attribute);
 		Debug.println(IntegrationTestBase.INDENT, "testAddGermplasmAttribute(" + gid + "): " + id + " = " + attribute);
 	}
@@ -1000,9 +998,11 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddAttribute() {
+		final CVTerm cvTerm = this.createAttributeVariable();
+
 		final Attribute attr = new Attribute();
 		attr.setGermplasmId(237431);
-		attr.setTypeId(1);
+		attr.setTypeId(cvTerm.getCvTermId());
 		attr.setAval("EARLY");
 		attr.setLocationId(31);
 		attr.setReferenceId(0);
@@ -1186,14 +1186,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasm, is(equalTo(germplasmDB)));
 		assertThat(germplasmDB, is(notNullValue()));
 
-		final CVTerm cvTerm = new CVTerm();
-		cvTerm.setName(RandomStringUtils.randomAlphabetic(50));
-		cvTerm.setCv(1040);
-		cvTerm.setIsObsolete(false);
-		cvTerm.setIsRelationshipType(false);
-		this.cvTermDao.save(cvTerm);
-		this.sessionProvder.getSession().flush();
-		this.cvTermDao.refresh(cvTerm);
+		final CVTerm cvTerm = this.createAttributeVariable();
 
 		final Attribute attr = this.createAttribute(germplasmDB, cvTerm, attributeVal);
 		assertThat(attr.getAid(), is(notNullValue()));
@@ -1300,5 +1293,17 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 		this.germplasmDAO.save(germplasm);
 		return germplasm;
+	}
+
+	private CVTerm createAttributeVariable() {
+		final CVTerm cvTerm = new CVTerm();
+		cvTerm.setName(RandomStringUtils.randomAlphabetic(50));
+		cvTerm.setCv(1040);
+		cvTerm.setIsObsolete(false);
+		cvTerm.setIsRelationshipType(false);
+		this.cvTermDao.save(cvTerm);
+		this.sessionProvder.getSession().flush();
+		this.cvTermDao.refresh(cvTerm);
+		return cvTerm;
 	}
 }
