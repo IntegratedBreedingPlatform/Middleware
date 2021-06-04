@@ -129,4 +129,7 @@ public interface OntologyVariableDataManager {
 		String cropname, Integer pageSize, Integer pageNumber);
 
 	long countAllVariables(List<Integer> variableTypes);
+
+	List<Variable> searchAttributeVariables(String query, String programUUID);
+
 }
