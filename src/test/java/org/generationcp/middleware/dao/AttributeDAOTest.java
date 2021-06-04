@@ -4,10 +4,12 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
@@ -20,13 +22,12 @@ import java.util.List;
 
 public class AttributeDAOTest extends IntegrationTestBase {
 	
-	private UserDefinedFieldDAO userDefinedFieldDao;
 	private AttributeDAO attributeDao;
+	private CVTermDao cvTermDao;
 	private GermplasmDAO germplasmDao;
 	private List<Integer> gids;
 	private List<String> guids;
-	private List<UserDefinedField> testAttributeTypes;
-	private Integer previousAttributeTypesCount = 0;
+	private List<CVTerm> testAttributeTypes;
 	private Attribute attribute1;
 	private Attribute attribute2;
 	private Attribute attribute3;
@@ -34,9 +35,10 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	@Before
 	public void setup() {
 		final Session session = this.sessionProvder.getSession();
-		
-		if (this.userDefinedFieldDao == null) {
-			this.userDefinedFieldDao = new UserDefinedFieldDAO(session);
+
+		if (this.cvTermDao == null) {
+			this.cvTermDao = new CVTermDao();
+			this.cvTermDao.setSession(session);
 		}
 		
 		if (this.attributeDao == null) {
@@ -49,10 +51,6 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		}
 		
 		if (CollectionUtils.isEmpty(this.gids) || CollectionUtils.isEmpty(this.guids)) {
-			final List<UserDefinedField> existingAttributeTypes = this.attributeDao.getAttributeTypes();
-			if (existingAttributeTypes != null && !existingAttributeTypes.isEmpty()) {
-				this.previousAttributeTypesCount = existingAttributeTypes.size();
-			}
 			this.setupTestData();
 		}
 	}
@@ -73,22 +71,32 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		this.gids = Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid());
 		this.guids = Arrays.asList(germplasm1.getGermplasmUUID(), germplasm2.getGermplasmUUID(), germplasm3.getGermplasmUUID());
 
-		final UserDefinedField attributeType1 = new UserDefinedField(null, "ATRIBUTS", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
-		final UserDefinedField attributeType2 = new UserDefinedField(null, "ATRIBUTS", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
-		final UserDefinedField attributeType3 = new UserDefinedField(null, "ATRIBUTS", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
-		this.userDefinedFieldDao.save(attributeType1);
-		this.userDefinedFieldDao.save(attributeType2);
-		this.userDefinedFieldDao.save(attributeType3);
+		final CVTerm attributeType1 =
+			new CVTerm(null, CvId.VARIABLES.getId(), RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), null,
+				0, 0);
+		final CVTerm attributeType2 =
+			new CVTerm(null, CvId.VARIABLES.getId(), RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), null,
+				0, 0);
+		final CVTerm attributeType3 =
+			new CVTerm(null, CvId.VARIABLES.getId(), RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), null,
+				0, 0);
+
+		this.cvTermDao.save(attributeType1);
+		this.cvTermDao.save(attributeType2);
+		this.cvTermDao.save(attributeType3);
 		this.testAttributeTypes = Arrays.asList(attributeType1, attributeType2, attributeType3);
 
 		this.attribute1 =
-			new Attribute(null, germplasm1.getGid(), attributeType1.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null,
+			new Attribute(null, germplasm1.getGid(), attributeType1.getCvTermId(), RandomStringUtils.randomAlphabetic(100), null, null,
+				null,
 				null);
 		this.attribute2 =
-			new Attribute(null, germplasm1.getGid(), attributeType2.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null,
+			new Attribute(null, germplasm1.getGid(), attributeType2.getCvTermId(), RandomStringUtils.randomAlphabetic(100), null, null,
+				null,
 				null);
 		this.attribute3 =
-			new Attribute(null, germplasm2.getGid(), attributeType1.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null,
+			new Attribute(null, germplasm2.getGid(), attributeType1.getCvTermId(), RandomStringUtils.randomAlphabetic(100), null, null,
+				null,
 				null);
 
 		this.attributeDao.save(this.attribute1);
@@ -97,23 +105,17 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testGetAttributeTypes() {
-		final List<UserDefinedField> attributeTypes = this.attributeDao.getAttributeTypes();
-		Assert.assertNotNull(attributeTypes);
-		Assert.assertEquals(this.previousAttributeTypesCount + this.testAttributeTypes.size(), attributeTypes.size());
-	}
-	
-	@Test
 	public void testGetAttributeValuesByTypeAndGIDList() {
-		List<Attribute> attributes = this.attributeDao.getAttributeValuesByTypeAndGIDList(this.testAttributeTypes.get(0).getFldno(), this.gids);
+		List<Attribute> attributes =
+			this.attributeDao.getAttributeValuesByTypeAndGIDList(this.testAttributeTypes.get(0).getCvTermId(), this.gids);
 		Assert.assertNotNull(attributes);
 		Assert.assertEquals(2, attributes.size());
-		
-		attributes = this.attributeDao.getAttributeValuesByTypeAndGIDList(this.testAttributeTypes.get(1).getFldno(), this.gids);
+
+		attributes = this.attributeDao.getAttributeValuesByTypeAndGIDList(this.testAttributeTypes.get(1).getCvTermId(), this.gids);
 		Assert.assertNotNull(attributes);
 		Assert.assertEquals(1, attributes.size());
-		
-		attributes = this.attributeDao.getAttributeValuesByTypeAndGIDList(this.testAttributeTypes.get(2).getFldno(), this.gids);
+
+		attributes = this.attributeDao.getAttributeValuesByTypeAndGIDList(this.testAttributeTypes.get(2).getCvTermId(), this.gids);
 		Assert.assertNotNull(attributes);
 		Assert.assertTrue(attributes.isEmpty());
 	}

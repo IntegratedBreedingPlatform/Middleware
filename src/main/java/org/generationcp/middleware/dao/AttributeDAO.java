@@ -11,12 +11,8 @@
 
 package org.generationcp.middleware.dao;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -31,7 +27,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -95,6 +90,8 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
+	@Deprecated
+	//FIXME Needs to be deleted
 	public List<UserDefinedField> getAttributeTypes() {
 		final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class).add(Restrictions.eq("ftable", "ATRIBUTS"));
 		return criteria.list();
@@ -229,22 +226,22 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
 	private String buildQueryForAttributes(final List<String> attributeIds) {
 		String sql = "SELECT "
-			+ "    u.fcode AS attributeCode,"
-			+ "    u.fldno AS attributeDbId,"
-			+ "    u.fname AS attributeName,"
+			+ "    u.name AS attributeCode,"
+			+ "    u.cvterm_id AS attributeDbId,"
+			+ "    u.definition AS attributeName,"
 			+ "    a.adate AS determinedDate,"
 			+ "    a.aval AS value "
 			+ " FROM"
 			+ "    atributs a"
 			+ "        INNER JOIN"
-			+ "    udflds u ON a.atype = u.fldno "
+			+ "    cvterm u ON a.atype = u.cvterm_id "
 			+ "        INNER JOIN"
 			+ "    germplsm g ON a.gid = g.gid "
 			+ " WHERE"
-			+ "    g.germplsm_uuid = :germplasmUUID AND u.ftable = 'ATRIBUTS'";
+			+ "    g.germplsm_uuid = :germplasmUUID ";
 
 		if (attributeIds != null && !attributeIds.isEmpty()) {
-			sql = sql + " AND u.fldno IN ( :attributs )";
+			sql = sql + " AND u.cvterm_id IN ( :attributs )";
 		}
 		return sql;
 	}
