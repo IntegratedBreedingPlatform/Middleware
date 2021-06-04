@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.gms.search.GermplasmSortableColumn;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -952,7 +953,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		queryBuilder.append(this.createFromClause(addedColumnsPropertyIds, attributeTypesMap, nameTypesMap));
 
 		final List<Integer> preFilteredGids = new ArrayList<>();
-		final boolean isPrefilterEmpty = this.addPreFilteredGids(germplasmSearchRequest, preFilteredGids);
+		final boolean isPrefilterEmpty = this.addPreFilteredGids(germplasmSearchRequest, preFilteredGids, programUUID);
 
 		if (isPrefilterEmpty) {
 			return Collections.EMPTY_LIST;
@@ -1017,7 +1018,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 			final List<Integer> preFilteredGids = new ArrayList<>();
 
-			final boolean isPrefilterEmpty = this.addPreFilteredGids(germplasmSearchRequest, preFilteredGids);
+			final boolean isPrefilterEmpty = this.addPreFilteredGids(germplasmSearchRequest, preFilteredGids, programUUID);
 			if (isPrefilterEmpty) {
 				return 0;
 			}
@@ -1281,7 +1282,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	 *
 	 * @return true if request contains prefiltering and it has no matches.
 	 */
-	private boolean addPreFilteredGids(final GermplasmSearchRequest germplasmSearchRequest, final List<Integer> prefilteredGids) {
+	private boolean addPreFilteredGids(final GermplasmSearchRequest germplasmSearchRequest, final List<Integer> prefilteredGids, final String programUUID) {
 
 		final SqlTextFilter femaleParentName = germplasmSearchRequest.getFemaleParentName();
 		if (femaleParentName != null) {
@@ -1359,8 +1360,14 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			while (iterator.hasNext()) {
 				final Map.Entry<String, String> entry = iterator.next();
 				queryBuilder.append(String.format("a.gid in (select a.gid from atributs a \n"
-					+ " inner join udflds u on a.atype = u.fldno \n"
-					+ " where u.fcode = :attributeKey%s and aval like :attributeValue%<s )", entry.getKey()));
+					+ " INNER JOIN cvterm cv on a.atype = cv.cvterm_id \n"
+					+ " INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id "
+					+ " LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID " //
+					+ " WHERE cp.value in (select name from cvterm where cvterm_id in ("
+					+ VariableType.GERMPLASM_PASSPORT.getId() + ","
+					+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ")) " //
+						+ " AND ( cv.name = :attributeKey%s  or vo.alias = :attributeKey%s ) and a.aval like :attributeValue%<s )",
+					entry.getKey(), entry.getKey()));
 				if (iterator.hasNext()) {
 					queryBuilder.append(" and ");
 				}
@@ -1368,7 +1375,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			queryBuilder.append(LIMIT_CLAUSE);
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+			sqlQuery.setParameter("programUUID", programUUID);
 			for (final Map.Entry<String, String> entry : attributes.entrySet()) {
+				sqlQuery.setParameter("attributeKey" + entry.getKey(), entry.getKey());
 				sqlQuery.setParameter("attributeKey" + entry.getKey(), entry.getKey());
 				sqlQuery.setParameter("attributeValue" + entry.getKey(), '%' + entry.getValue() + '%');
 			}
