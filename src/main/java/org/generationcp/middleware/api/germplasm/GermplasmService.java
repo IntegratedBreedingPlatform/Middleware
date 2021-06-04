@@ -66,14 +66,14 @@ public interface GermplasmService {
 	 */
 	Term getPlotCodeField();
 
-	Map<Integer, GermplasmImportResponseDto> importGermplasm(String cropName,
+	Map<Integer, GermplasmImportResponseDto> importGermplasm(String cropName, String programUUID,
 		GermplasmImportRequestDto germplasmImportRequestDto);
 
 	long countGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto);
 
 	List<GermplasmDto> findGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto, Pageable pageable);
 
-	Set<Integer> importGermplasmUpdates(List<GermplasmUpdateDTO> germplasmUpdateDTOList);
+	Set<Integer> importGermplasmUpdates(String programUUID, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
 	List<GermplasmDTO> createGermplasm(String cropname, List<GermplasmImportRequest> germplasmImportRequestList);
 

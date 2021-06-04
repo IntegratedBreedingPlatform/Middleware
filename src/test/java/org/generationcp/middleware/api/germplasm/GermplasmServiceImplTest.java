@@ -22,6 +22,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
@@ -45,7 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -95,11 +95,11 @@ public class GermplasmServiceImplTest {
 	@Mock
 	private WorkbenchDataManager workbenchDataManager;
 
-	@Captor
-	private ArgumentCaptor<List<Integer>> integerListArgumentCaptor;
+	@Mock
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Captor
-	private ArgumentCaptor<Set<String>> stringSetArgumentCaptor;
+	private ArgumentCaptor<List<Integer>> integerListArgumentCaptor;
 
 	private final String locationAbbreviation = RandomStringUtils.randomAlphabetic(3);
 
@@ -108,6 +108,8 @@ public class GermplasmServiceImplTest {
 	private final String germplasmUUID = RandomStringUtils.randomAlphabetic(36);
 
 	private final String cropName = "maize";
+
+	private final String programUUID = RandomStringUtils.randomAlphabetic(16);
 
 	@Before
 	public void setUp() {
@@ -123,7 +125,8 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.daoFactory.getBibrefDAO()).thenReturn(this.bibrefDAO);
 
 		this.germplasmService.setWorkbenchDataManager(this.workbenchDataManager);
-		this.germplasmService.setOntologyDataManager(ontologyDataManager);
+		this.germplasmService.setOntologyDataManager(this.ontologyDataManager);
+		this.germplasmService.setOntologyVariableDataManager(this.ontologyVariableDataManager);
 
 	}
 
@@ -224,7 +227,7 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.emptyList());
 		Mockito.when(this.workbenchDataManager.getCropTypeByName(this.cropName)).thenReturn(new CropType());
 
-		this.germplasmService.importGermplasm(this.cropName, germplasmImportRequestDto);
+		this.germplasmService.importGermplasm(this.cropName, programUUID, germplasmImportRequestDto);
 	}
 
 	@Test
@@ -245,7 +248,7 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.emptyList());
 		Mockito.when(this.workbenchDataManager.getCropTypeByName(this.cropName)).thenReturn(new CropType());
 
-		partiallyMockedUnit.importGermplasm(this.cropName, germplasmImportRequestDto);
+		partiallyMockedUnit.importGermplasm(this.cropName, programUUID, germplasmImportRequestDto);
 		Mockito.verify(partiallyMockedUnit, Mockito.times(0)).findGermplasmMatches(Mockito.any(), Mockito.isNull());
 	}
 
@@ -270,7 +273,7 @@ public class GermplasmServiceImplTest {
 		Mockito.doReturn(Collections.singletonList(this.createGermplasmDto())).when(partiallyMockedUnit)
 			.findGermplasmMatches(Mockito.any(GermplasmMatchRequestDto.class), ArgumentMatchers.isNull());
 
-		partiallyMockedUnit.importGermplasm(this.cropName, germplasmImportRequestDto);
+		partiallyMockedUnit.importGermplasm(this.cropName, programUUID, germplasmImportRequestDto);
 		Mockito.verify(this.germplasmDAO, Mockito.times(0)).save(Mockito.any());
 	}
 
@@ -291,7 +294,7 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.singletonList(this.createLocation()));
 		Mockito.when(this.workbenchDataManager.getCropTypeByName(this.cropName)).thenReturn(new CropType());
 
-		partiallyMockedUnit.importGermplasm(this.cropName, germplasmImportRequestDto);
+		partiallyMockedUnit.importGermplasm(this.cropName, programUUID, germplasmImportRequestDto);
 		Mockito.verify(this.bibrefDAO, Mockito.times(1)).save(Mockito.any());
 	}
 

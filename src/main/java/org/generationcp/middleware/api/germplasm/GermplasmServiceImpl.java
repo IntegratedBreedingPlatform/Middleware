@@ -33,12 +33,16 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -101,6 +105,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public static final String PROGENITOR_1 = "PROGENITOR 1";
 	public static final String PROGENITOR_2 = "PROGENITOR 2";
 	private static final String DEFAULT_METHOD = "UDM";
+	public static final List<VariableType> ATTRIBUTE_TYPES =
+		Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE, VariableType.GERMPLASM_PASSPORT);
 
 	private final DaoFactory daoFactory;
 
@@ -112,6 +118,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private OntologyDataManager ontologyDataManager;
+
+	@Autowired
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Autowired
 	private UserService userService;
@@ -177,13 +186,19 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName,
+	public Map<Integer, GermplasmImportResponseDto> importGermplasm(final String cropName, final String programUUID,
 		final GermplasmImportRequestDto germplasmImportRequestDto) {
 		final Map<Integer, GermplasmImportResponseDto> results = new HashMap<>();
 		final List<GermplasmImportDTO> germplasmDtoList = germplasmImportRequestDto.getGermplasmList();
 		final Map<String, Method> methodsMapByAbbr = this.getBreedingMethodsMapByAbbr(germplasmDtoList);
 		final Map<String, Integer> locationsMapByAbbr = this.getLocationsMapByAbbr(germplasmDtoList);
-		final Map<String, Integer> attributesMapByName = this.getAttributesMapByName(germplasmDtoList);
+		final Set<String> attributesKeys = new HashSet<>();
+		germplasmDtoList.forEach(g -> {
+			if (g.getAttributes() != null && !g.getAttributes().isEmpty()) {
+				attributesKeys.addAll(g.getAttributes().keySet());
+			}
+		});
+		final Map<String, Variable> attributesMapByName = this.getAttributesMap(programUUID, attributesKeys);
 		final Map<String, Integer> nameTypesMapByName = this.getNameTypesMapByName(germplasmDtoList);
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 
@@ -224,7 +239,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 				}
 			}
 
-			//TODO: use a constructor with the properly arguments
 			final Germplasm germplasm = new Germplasm();
 
 			final Method method = methodsMapByAbbr.get(germplasmDto.getBreedingMethodAbbr().toUpperCase());
@@ -274,7 +288,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			if (germplasmDto.getAttributes() != null) {
 				germplasmDto.getAttributes().forEach((k, v) -> {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), attributesMapByName.get(k.toUpperCase()), v, null,
+					final Attribute attribute =
+						new Attribute(null, germplasm.getGid(), attributesMapByName.get(k.toUpperCase()).getId(), v, null,
 						germplasm.getLocationId(),
 						0, Util.getCurrentDateAsIntegerValue());
 					this.daoFactory.getAttributeDAO().save(attribute);
@@ -310,7 +325,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Set<Integer> importGermplasmUpdates(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
+	public Set<Integer> importGermplasmUpdates(final String programUUID, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 
@@ -320,7 +335,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 			.collect(Collectors.toList())).stream().collect(
 			Collectors.toList());
 		final Map<String, Integer> nameCodesFieldNoMap = this.getNameTypesMapByCodes(germplasmUpdateDTOList);
-		final Map<String, Integer> attributeCodesFieldNoMap = this.getAttributesMapByCodes(germplasmUpdateDTOList);
+		final Set<String> attributeKeys = new HashSet<>();
+		germplasmUpdateDTOList.forEach(
+			g -> attributeKeys.addAll(g.getAttributes().keySet().stream().map(String::toUpperCase).collect(Collectors.toList())));
+		final Map<String, Variable> attributeCodesFieldNoMap = this.getAttributesMap(programUUID, attributeKeys);
 		final Map<String, Germplasm> progenitorsMapByGid = this.getGermplasmProgenitorsMapByGids(germplasmUpdateDTOList);
 
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap = new HashMap<>();
@@ -414,7 +432,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return this.daoFactory.getAttributeDAO().countAttributesByGUID(gemrplasmUUID, attributeDbIds);
 	}
 
-	private void saveGermplasmUpdateDTO(final Map<String, Integer> attributeCodes,
+	private void saveGermplasmUpdateDTO(final Map<String, Variable> attributeCodes,
 		final Map<String, Integer> nameCodes,
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
@@ -436,7 +454,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private void saveAttributesAndNames(final Map<String, Integer> attributeCodes,
+	private void saveAttributesAndNames(final Map<String, Variable> attributeCodes,
 		final Map<String, Integer> nameCodes, final Map<Integer, List<Name>> namesMap, final Map<Integer, List<Attribute>> attributesMap,
 		final Germplasm germplasm, final Multimap<String, Object[]> conflictErrors, final GermplasmUpdateDTO germplasmUpdateDTO) {
 		for (final Map.Entry<String, String> codeValuesEntry : germplasmUpdateDTO.getNames().entrySet()) {
@@ -620,12 +638,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private void saveOrUpdateAttribute(final Map<String, Integer> attributeCodes,
+	private void saveOrUpdateAttribute(final Map<String, Variable> attributeCodes,
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
 		final String code, final String value, final Multimap<String, Object[]> conflictErrors) {
 		// Check first if the code to save is a valid Attribute
 		if (attributeCodes.containsKey(code) && liquibase.util.StringUtils.isNotEmpty(value)) {
-			final Integer attributeTypeId = attributeCodes.get(code);
+			final Integer attributeTypeId = attributeCodes.get(code).getId();
 			final List<Attribute> germplasmAttributes = attributesMap.getOrDefault(germplasm.getGid(), new ArrayList<>());
 			final List<Attribute> attributesByType =
 				germplasmAttributes.stream().filter(n -> n.getTypeId().equals(attributeTypeId)).collect(Collectors.toList());
@@ -726,19 +744,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 				UserDefinedField::getFcode, UserDefinedField::getFldno));
 	}
 
-	private Map<String, Integer> getAttributesMapByCodes(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
-		final Set<String> attributesCode = new HashSet<>();
-		germplasmUpdateDTOList.forEach(
-			g -> attributesCode.addAll(g.getAttributes().keySet().stream().map(String::toUpperCase).collect(Collectors.toList())));
-
-		// Retrieve the field id of attributes and names
-		return
-			this.daoFactory.getUserDefinedFieldDAO().getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType())),
-				attributesCode).stream().collect(Collectors.toMap(
-				UserDefinedField::getFcode, UserDefinedField::getFldno));
-	}
-
 	private Map<String, Integer> getNameTypesMapByName(final List<GermplasmImportDTO> germplasmDtos) {
 		final Set<String> nameTypes = new HashSet<>();
 		germplasmDtos.forEach(g -> nameTypes.addAll(g.getNames().keySet()));
@@ -747,23 +752,29 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return nameTypesUdfldList.stream().collect(Collectors.toMap(u -> u.getFcode().toUpperCase(), UserDefinedField::getFldno));
 	}
 
-	private Map<String, Integer> getAttributesMapByName(final List<GermplasmImportDTO> germplasmDtos) {
-		final Set<String> attributes = new HashSet<>();
-		germplasmDtos.forEach(g -> {
-			if (g.getAttributes() != null && !g.getAttributes().isEmpty()) {
-				attributes.addAll(g.getAttributes().keySet());
-			}
-		});
-		if (!attributes.isEmpty()) {
-			final List<UserDefinedField> attributesUdfldList = this.daoFactory.getUserDefinedFieldDAO()
-				.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-					new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType())),
-					attributes);
-			return attributesUdfldList.stream().collect(Collectors.toMap(u -> u.getFcode().toUpperCase(), UserDefinedField::getFldno));
+	private Map<String, Variable> getAttributesMap(final String programUUID, final Set<String> variableNamesOrAlias) {
+		if (!variableNamesOrAlias.isEmpty()) {
+			final VariableFilter variableFilter = new VariableFilter();
+			variableFilter.setProgramUuid(programUUID);
+			ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
+			variableNamesOrAlias.forEach(variableFilter::addName);
+
+			final List<Variable> existingAttributeVariables =
+				this.ontologyVariableDataManager.getWithFilter(variableFilter);
+
+			final Map<String, Variable> map = new HashMap<>();
+			existingAttributeVariables.forEach(a -> {
+				map.put(a.getName().toUpperCase(), a);
+				if (StringUtils.isNotEmpty(a.getAlias())) {
+					map.put(a.getAlias().toUpperCase(), a);
+				}
+			});
+			return map;
 		} else {
 			return new HashMap<>();
 		}
 	}
+
 
 	private Integer calculateGnpgs(final Method method, final String progenitor1, final String progenitor2,
 		final List<String> otherProgenitors) {
@@ -1551,5 +1562,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	public void setOntologyDataManager(final OntologyDataManager ontologyDataManager) {
 		this.ontologyDataManager = ontologyDataManager;
+	}
+
+	public void setOntologyVariableDataManager(
+		final OntologyVariableDataManager ontologyVariableDataManager) {
+		this.ontologyVariableDataManager = ontologyVariableDataManager;
 	}
 }
