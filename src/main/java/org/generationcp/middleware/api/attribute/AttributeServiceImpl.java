@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.attribute;
 
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.springframework.stereotype.Service;
@@ -18,8 +19,8 @@ public class AttributeServiceImpl implements AttributeService {
 	}
 
 	@Override
-	public List<AttributeDTO> searchAttributes(final String query) {
-		return this.daoFactory.getAttributeDAO().searchAttributes(query);
+	public List<Variable> searchAttributes(final String query, final String programUUID) {
+		return this.daoFactory.getAttributeDAO().searchAttributes(query, programUUID);
 	}
 
 }

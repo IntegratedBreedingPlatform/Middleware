@@ -57,6 +57,15 @@ public class Variable extends Term {
 		this.setVocabularyId(CvId.VARIABLES.getId());
 	}
 
+	public Variable(final int id, final String name, final String definition, final String alias) {
+		this.setId(id);
+		this.setName(name);
+		this.setDefinition(definition);
+		this.setAlias(alias);
+		this.setVocabularyId(CvId.VARIABLES.getId());
+
+	}
+
 	public String getAlias() {
 		return this.alias;
 	}

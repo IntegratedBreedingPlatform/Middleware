@@ -14,6 +14,9 @@ package org.generationcp.middleware.dao;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -55,26 +58,33 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return toReturn;
 	}
 
-	public List<org.generationcp.middleware.api.attribute.AttributeDTO> searchAttributes(final String query) {
+	public List<Variable> searchAttributes(final String query, final String programUUID) {
 		if (StringUtils.isBlank(query)) {
 			return Collections.EMPTY_LIST;
 		}
 		try {
 			// Attributes will be migrated out of user defined fields later
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery("SELECT " //
-				+ "   cv.name AS code," //
+				+ "   cv.name as name, " //
+				+ "   vo.alias as alias, " //
 				+ "   cv.cvterm_id AS id," //
-				+ "   cv.definition AS name" //
-				+ " FROM cvterm cv INNER JOIN cvtermprop cp ON cp.type_id = 1800 and cv.cvterm_id = cp.cvterm_id " //
-				+ " WHERE cp.value = (select name from cvterm where cvterm_id = 1814) " //
-				+ "   AND (cv.definition like :fname or cv.name like :name)" //
+				+ "   cv.definition AS definition" //
+				+ " FROM cvterm cv INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id " //
+				+ " LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID " //
+				+ " WHERE cp.value in (select name from cvterm where cvterm_id in ("
+				+ 		VariableType.GERMPLASM_PASSPORT.getId() + ","
+				+ 		VariableType.GERMPLASM_ATTRIBUTE.getId() + ")) " //
+				+ "   AND (cv.definition like :fname or cv.name like :name or vo.alias like :alias )" //
 				+ " LIMIT 100 ");
+			sqlQuery.setParameter("programUUID", programUUID);
 			sqlQuery.setParameter("fname", '%' + query + '%');
 			sqlQuery.setParameter("name", '%' + query + '%');
-			sqlQuery.addScalar("code");
-			sqlQuery.addScalar("id");
+			sqlQuery.setParameter("alias", '%' + query + '%');
 			sqlQuery.addScalar("name");
-			sqlQuery.setResultTransformer(Transformers.aliasToBean(org.generationcp.middleware.api.attribute.AttributeDTO.class));
+			sqlQuery.addScalar("alias");
+			sqlQuery.addScalar("id");
+			sqlQuery.addScalar("definition");
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(Variable.class));
 
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
