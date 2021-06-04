@@ -5,7 +5,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserDefinedFieldTestDataInitializer;
-import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -26,7 +25,6 @@ public class UserDefinedFieldDAOTest extends IntegrationTestBase {
 	private NameDAO nameDao;
 	private GermplasmDAO germplasmDao;
 	private List<Integer> gids;
-	private List<UserDefinedField> attributeTypes;
 	private List<UserDefinedField> nameTypes;
 	
 	@Before
@@ -64,14 +62,6 @@ public class UserDefinedFieldDAOTest extends IntegrationTestBase {
 		this.germplasmDao.save(germplasm2);
 		this.gids = Arrays.asList(germplasm1.getGid(), germplasm2.getGid());
 		
-		final UserDefinedField attributeType1 = new UserDefinedField(null, "ATRIBUTS", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
-		final UserDefinedField attributeType2 = new UserDefinedField(null, "ATRIBUTS", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
-		final UserDefinedField attributeType3 = new UserDefinedField(null, "ATRIBUTS", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
-		this.userDefinedFieldDao.save(attributeType1);
-		this.userDefinedFieldDao.save(attributeType2);
-		this.userDefinedFieldDao.save(attributeType3);
-		this.attributeTypes = Arrays.asList(attributeType1, attributeType2,attributeType3);
-		
 		final UserDefinedField nameType1 = new UserDefinedField(null, "NAMES", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
 		final UserDefinedField nameType2 = new UserDefinedField(null, "NAMES", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
 		final UserDefinedField nameType3 = new UserDefinedField(null, "NAMES", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
@@ -79,15 +69,6 @@ public class UserDefinedFieldDAOTest extends IntegrationTestBase {
 		this.userDefinedFieldDao.save(nameType2);
 		this.userDefinedFieldDao.save(nameType3);
 		this.nameTypes = Arrays.asList(nameType1, nameType2, nameType3);
-
-		final Attribute attribute1 =
-			new Attribute(null, germplasm1.getGid(), attributeType1.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null,
-				null);
-		final Attribute attribute2 =
-			new Attribute(null, germplasm2.getGid(), attributeType2.getFldno(), RandomStringUtils.randomAlphabetic(100), null, null, null,
-				null);
-		this.attributeDao.save(attribute1);
-		this.attributeDao.save(attribute2);
 		
 		final Name name1 = NameTestDataInitializer.createName(nameType1.getFldno(), germplasm1.getGid(), RandomStringUtils.randomAlphabetic(100));
 		final Name name2 = NameTestDataInitializer.createName(nameType2.getFldno(), germplasm2.getGid(), RandomStringUtils.randomAlphabetic(100));
