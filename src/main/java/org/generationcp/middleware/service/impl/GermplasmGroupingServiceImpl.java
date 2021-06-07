@@ -97,6 +97,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		founder.setMethod(method);
 
 		germplasmGroup.setFounder(new GermplasmGroupMember(founder));
+		germplasmGroup.setGenerative(method.isGenerative());
 		germplasmGroup.setGroupId(founder.getMgid());
 		germplasmGroup.setGroupMembers(this.daoFactory.getGermplasmDao().getMembersForManagementGroup(founder.getMgid()));
 		return germplasmGroup;

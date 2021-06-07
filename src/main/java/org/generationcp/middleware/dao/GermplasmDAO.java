@@ -776,12 +776,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (mgid == null || mgid == 0) {
 			return Collections.emptyList();
 		}
-		return this.getSession().createSQLQuery("SELECT g.gid, n.nval as preferredName, if(m.mtype = 'GEN', true, false) as isGenerative "
+		return this.getSession().createSQLQuery("SELECT g.gid, n.nval as preferredName "
 			+ " FROM germplsm g "
 			+ " LEFT JOIN names n on n.gid = g.gid AND nstat = 1"
 			+ " INNER JOIN methods m on m.mid = g.methn "
 			+ " WHERE g.deleted = 0 and g.grplce = 0 AND g.mgid = :mgid ") //
-			.addScalar("gid").addScalar("preferredName").addScalar("isGenerative", new BooleanType())
+			.addScalar("gid").addScalar("preferredName")
 			.setParameter("mgid", mgid)
 			.setResultTransformer(Transformers.aliasToBean(GermplasmGroupMember.class)) //
 			.list();

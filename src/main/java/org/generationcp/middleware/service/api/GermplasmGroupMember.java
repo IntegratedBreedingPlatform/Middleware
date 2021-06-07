@@ -9,22 +9,19 @@ public class GermplasmGroupMember {
 
 	private Integer gid;
 	private String preferredName;
-	private boolean isGenerative;
 
 	public GermplasmGroupMember() {
 
 	}
 
-	public GermplasmGroupMember(final Integer gid, final String preferredName, final boolean isGenerative) {
+	public GermplasmGroupMember(final Integer gid, final String preferredName) {
 		this.gid = gid;
 		this.preferredName = preferredName;
-		this.isGenerative = isGenerative;
 	}
 
 	public GermplasmGroupMember(final Germplasm germplasm) {
 		this.gid = germplasm.getGid();
 		this.preferredName = germplasm.getPreferredName().getNval();
-		this.isGenerative = germplasm.getMethod().isGenerative();
 	}
 
 	public Integer getGid() {
@@ -41,14 +38,6 @@ public class GermplasmGroupMember {
 
 	public void setPreferredName(final String preferredName) {
 		this.preferredName = preferredName;
-	}
-
-	public boolean isGenerative() {
-		return isGenerative;
-	}
-
-	public void setGenerative(final boolean generative) {
-		this.isGenerative = generative;
 	}
 
 	@Override
