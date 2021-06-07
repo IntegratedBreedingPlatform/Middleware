@@ -17,14 +17,14 @@ public interface GermplasmGroupingService {
 	 * At the database level, this equates to assigning an mgid for the
 	 * germplasm and its descendents based on certain rules.
 	 *
-	 * @param germplasm             The germplasm to "fix".
+	 * @param gid            GID to "fix".
 	 * @param includeDescendants    Whether to include descendants in the new group being created.
 	 * @param preserveExistingGroup flag to indicate whether existing group (mgid) should be
 	 *                              preserved.
 	 * @return {@link GermplasmGroup} summary of the result of the grouping
 	 * process.
 	 */
-	GermplasmGroup markFixed(Germplasm germplasm, boolean includeDescendants, boolean preserveExistingGroup);
+	GermplasmGroup markFixed(Integer gid, boolean includeDescendants, boolean preserveExistingGroup);
 
 	/**
 	 * Unfix a list of germplasm (line).

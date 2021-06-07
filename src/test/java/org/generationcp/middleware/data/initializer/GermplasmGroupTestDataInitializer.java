@@ -6,8 +6,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.service.api.GermplasmGroup;
+import org.generationcp.middleware.service.api.GermplasmGroupMember;
 
 public class GermplasmGroupTestDataInitializer {
 
@@ -21,7 +23,7 @@ public class GermplasmGroupTestDataInitializer {
 		final GermplasmGroup germplasmGroup = new GermplasmGroup();
 
 		// the founder germplasm gid is the mgid of a germplasm group
-		final Germplasm founder = this.germplasmInitializer.createGermplasm(groupId);
+		final GermplasmGroupMember founder = new GermplasmGroupMember(groupId, RandomStringUtils.randomAlphabetic(10), true);
 		germplasmGroup.setFounder(founder);
 
 		final List<Germplasm> groupMembers = new ArrayList<Germplasm>();

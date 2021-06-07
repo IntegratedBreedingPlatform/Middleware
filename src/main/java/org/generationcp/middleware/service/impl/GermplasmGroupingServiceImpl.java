@@ -12,6 +12,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.api.GermplasmGroup;
+import org.generationcp.middleware.service.api.GermplasmGroupMember;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.service.pedigree.GermplasmCache;
 import org.generationcp.middleware.service.pedigree.cache.keys.CropGermplasmKey;
@@ -55,14 +56,15 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	@Override
 	@Transactional
-	public GermplasmGroup markFixed(final Germplasm germplasmToFix, final boolean includeDescendants, final boolean preserveExistingGroup) {
-		GermplasmGroupingServiceImpl.LOG.info("Marking germplasm with gid {} as fixed.", germplasmToFix.getGid());
+	public GermplasmGroup markFixed(final Integer gid, final boolean includeDescendants, final boolean preserveExistingGroup) {
+		GermplasmGroupingServiceImpl.LOG.info("Marking germplasm with gid {} as fixed.", gid);
 
+		final Germplasm germplasmToFix = this.daoFactory.getGermplasmDao().getById(gid);
 		if (includeDescendants) {
 			final GermplasmPedigreeTree tree = this.getDescendantTree(germplasmToFix);
-			this.traverseAssignGroup(tree.getRoot(), germplasmToFix.getGid(), preserveExistingGroup);
+			this.traverseAssignGroup(tree.getRoot(), gid, preserveExistingGroup);
 		} else {
-			this.assignGroup(germplasmToFix, germplasmToFix.getGid(), preserveExistingGroup);
+			this.assignGroup(germplasmToFix, gid, preserveExistingGroup);
 		}
 
 		return this.getGroupMembers(germplasmToFix);
@@ -81,9 +83,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		final Method method = this.daoFactory.getMethodDAO().getById(founder.getMethodId());
 		founder.setMethod(method);
 
-		germplasmGroup.setFounder(founder);
+		germplasmGroup.setFounder(new GermplasmGroupMember(founder));
 		germplasmGroup.setGroupId(founder.getMgid());
-		germplasmGroup.setGroupMembers(this.daoFactory.getGermplasmDao().getManagementGroupMembers(founder.getMgid()));
+		germplasmGroup.setGroupMembers(this.daoFactory.getGermplasmDao().getMembersForManagementGroup(founder.getMgid()));
 		return germplasmGroup;
 	}
 

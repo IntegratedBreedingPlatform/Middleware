@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.generationcp.middleware.service.api.GermplasmGroupMember;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
@@ -768,6 +769,22 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			GermplasmDAO.LOG.error(message, mgid, e.getMessage());
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<GermplasmGroupMember> getMembersForManagementGroup(final Integer mgid) {
+		if (mgid == null || mgid == 0) {
+			return Collections.emptyList();
+		}
+		return this.getSession().createSQLQuery("SELECT g.gid, n.nval as preferredName, if(m.mtype = 'GEN', true, false) as isGenerative "
+			+ " FROM germplsm g "
+			+ " LEFT JOIN names n on n.gid = g.gid AND nstat = 1"
+			+ " INNER JOIN methods m on m.mid = g.methn "
+			+ " WHERE g.deleted = 0 and g.grplce = 0 AND g.mgid = :mgid ") //
+			.addScalar("gid").addScalar("preferredName").addScalar("isGenerative", new BooleanType())
+			.setParameter("mgid", mgid)
+			.setResultTransformer(Transformers.aliasToBean(GermplasmGroupMember.class)) //
+			.list();
 	}
 
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
