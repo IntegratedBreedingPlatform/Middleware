@@ -199,20 +199,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		"SELECT COUNT(DISTINCT g.gid) FROM germplsm g JOIN names n ON g.gid = n.gid and n.nstat != 9 WHERE  g.deleted = 0  AND g.grplce = 0 AND "
 			+ "( nval LIKE :name OR nval LIKE :noSpaceName OR nval LIKE :standardizedName )";
 
-	/**
-	 * Used in germplasm data manager searchForGermplasm
-	 */
-	public static final String GENERAL_SELECT_FROM = "SELECT * FROM ";
-	public static final String GERMPLASM_ALIAS = "AS germplasm ";
-	public static final String INVENTORY_ALIAS = "AS inventory ";
-	public static final String JOIN_ON_GERMPLASM_AND_INVENTORY = "ON germplasm.gid = inventory.entity_id ";
-	public static final String SEARCH_GERMPLASM_WITH_INVENTORY =
-		"SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED) as availInv, Count(DISTINCT lotid) as seedRes "
-			+ "FROM ( SELECT i.lotid, i.eid AS entity_id, " + "SUM(trnqty) AS avail_bal " + "FROM ims_lot i "
-			+ "LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-			+ "WHERE i.status = 0 AND i.etype = 'GERMPLSM' " + "GROUP BY i.lotid " + "HAVING avail_bal > -1) inv "
-			+ "GROUP BY entity_id";
-
 	public static final String GET_GERMPLASM_DATES_BY_GIDS = "SELECT gid, gdate " + "FROM germplsm " + "WHERE gid IN (:gids)";
 	public static final String GET_METHOD_IDS_BY_GIDS = "SELECT gid, methn " + "FROM germplsm " + "WHERE gid IN (:gids)";
 	public static final String GET_PARENT_NAMES_BY_STUDY_ID =
@@ -305,9 +291,8 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	@Column(name = "mgid")
 	private Integer mgid;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "gid")
-	private List<Name> names = new ArrayList<Name>();
+	@OneToMany(mappedBy = "germplasm", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<Name> names = new ArrayList<>();
 
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	@Basic(optional = false)

@@ -116,8 +116,7 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		this.dmsProjectDao = new DmsProjectDao();
 		this.dmsProjectDao.setSession(this.sessionProvder.getSession());
 
-		this.germplasmDao = new GermplasmDAO();
-		this.germplasmDao.setSession(this.sessionProvder.getSession());
+		this.germplasmDao = new GermplasmDAO(this.sessionProvder.getSession());
 
 		this.experimentDao = new ExperimentDao();
 		this.experimentDao.setSession(this.sessionProvder.getSession());

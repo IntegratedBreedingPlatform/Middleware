@@ -31,13 +31,11 @@ public class GermplasmGroupingServiceImplIntegrationTest extends IntegrationTest
 	@Before
 	public void setUp() throws Exception {
 		if (this.germplasmDAO == null) {
-			this.germplasmDAO = new GermplasmDAO();
-			this.germplasmDAO.setSession(this.sessionProvder.getSession());
+			this.germplasmDAO = new GermplasmDAO(this.sessionProvder.getSession());
 		}
 
 		if (this.nameDAO == null) {
-			this.nameDAO = new NameDAO();
-			this.nameDAO.setSession(this.sessionProvder.getSession());
+			this.nameDAO = new NameDAO(this.sessionProvder.getSession());
 		}
 
 		if (this.methodDAO == null) {
@@ -46,8 +44,7 @@ public class GermplasmGroupingServiceImplIntegrationTest extends IntegrationTest
 		}
 
 		if (this.userDefinedFieldDAO == null) {
-			this.userDefinedFieldDAO = new UserDefinedFieldDAO();
-			this.userDefinedFieldDAO.setSession(this.sessionProvder.getSession());
+			this.userDefinedFieldDAO = new UserDefinedFieldDAO(this.sessionProvder.getSession());
 		}
 	}
 

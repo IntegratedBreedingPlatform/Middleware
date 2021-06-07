@@ -26,8 +26,7 @@ public class ProgenitorDAOTest extends IntegrationTestBase {
 		}
 		
 		if (this.germplasmDao == null) {
-			this.germplasmDao = new GermplasmDAO();
-			this.germplasmDao.setSession(this.sessionProvder.getSession());
+			this.germplasmDao = new GermplasmDAO(this.sessionProvder.getSession());
 		}
 		
 		if (this.testGermplasm == null) {
