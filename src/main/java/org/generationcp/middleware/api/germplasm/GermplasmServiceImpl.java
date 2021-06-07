@@ -155,7 +155,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (plotCode.isPresent()) {
 			return plotCode.get().getAval();
 		}
-
 		return GermplasmListDataDAO.SOURCE_UNKNOWN;
 	}
 
@@ -288,6 +287,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			if (germplasmDto.getAttributes() != null) {
 				germplasmDto.getAttributes().forEach((k, v) -> {
+					//FIXME Check variable types and skip if invalid, find cvalue_id for categorical variables
 					final Attribute attribute =
 						new Attribute(null, germplasm.getGid(), attributesMapByName.get(k.toUpperCase()).getId(), v, null,
 						germplasm.getLocationId(),
@@ -642,7 +642,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
 		final String code, final String value, final Multimap<String, Object[]> conflictErrors) {
 		// Check first if the code to save is a valid Attribute
-		if (attributeCodes.containsKey(code) && liquibase.util.StringUtils.isNotEmpty(value)) {
+		if (attributeCodes.containsKey(code) && StringUtils.isNotEmpty(value)) {
 			final Integer attributeTypeId = attributeCodes.get(code).getId();
 			final List<Attribute> germplasmAttributes = attributesMap.getOrDefault(germplasm.getGid(), new ArrayList<>());
 			final List<Attribute> attributesByType =
@@ -652,17 +652,20 @@ public class GermplasmServiceImpl implements GermplasmService {
 			if (attributesByType.size() > 1) {
 				conflictErrors.put("germplasm.update.duplicate.attributes", new String[] {
 					code, String.valueOf(germplasm.getGid())});
-			} else if (attributesByType.size() == 1) {
-				final Attribute attribute = attributesByType.get(0);
-				attribute.setLocationId(germplasm.getLocationId());
-				attribute.setAdate(germplasm.getGdate());
-				attribute.setAval(value);
-				this.daoFactory.getAttributeDAO().update(attribute);
 			} else {
-				this.daoFactory.getAttributeDAO()
-					.save(new Attribute(null, germplasm.getGid(), attributeTypeId, value, null,
-						germplasm.getLocationId(),
-						0, germplasm.getGdate()));
+				//FIXME Check variable types and skip if invalid, find cvalue_id for categorical variables
+				if (attributesByType.size() == 1) {
+					final Attribute attribute = attributesByType.get(0);
+					attribute.setLocationId(germplasm.getLocationId());
+					attribute.setAdate(germplasm.getGdate());
+					attribute.setAval(value);
+					this.daoFactory.getAttributeDAO().update(attribute);
+				} else {
+					this.daoFactory.getAttributeDAO()
+						.save(new Attribute(null, germplasm.getGid(), attributeTypeId, value, null,
+							germplasm.getLocationId(),
+							0, germplasm.getGdate()));
+				}
 			}
 		}
 	}
