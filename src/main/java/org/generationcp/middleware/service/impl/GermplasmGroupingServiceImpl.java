@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
@@ -56,18 +57,23 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	@Override
 	@Transactional
-	public GermplasmGroup markFixed(final Integer gid, final boolean includeDescendants, final boolean preserveExistingGroup) {
-		GermplasmGroupingServiceImpl.LOG.info("Marking germplasm with gid {} as fixed.", gid);
+	public List<GermplasmGroup> markFixed(final List<Integer> gids, final boolean includeDescendants, final boolean preserveExistingGroup) {
+		final Map<Integer, Germplasm> germplasmMap = this.daoFactory.getGermplasmDao().getByGIDList(gids).stream().collect(Collectors.toMap(
+			Germplasm::getGid, Function.identity()));
+		final List<GermplasmGroup> germplasmGroupList = new ArrayList<>();
+		for (final Integer gid : gids) {
+			GermplasmGroupingServiceImpl.LOG.info("Marking germplasm with gid {} as fixed.", gid);
+			final Germplasm germplasmToFix = germplasmMap.get(gid);
+			if (includeDescendants) {
+				final GermplasmPedigreeTree tree = this.getDescendantTree(germplasmToFix);
+				this.traverseAssignGroup(tree.getRoot(), gid, preserveExistingGroup);
+			} else {
+				this.assignGroup(germplasmToFix, gid, preserveExistingGroup);
+			}
 
-		final Germplasm germplasmToFix = this.daoFactory.getGermplasmDao().getById(gid);
-		if (includeDescendants) {
-			final GermplasmPedigreeTree tree = this.getDescendantTree(germplasmToFix);
-			this.traverseAssignGroup(tree.getRoot(), gid, preserveExistingGroup);
-		} else {
-			this.assignGroup(germplasmToFix, gid, preserveExistingGroup);
+			germplasmGroupList.add(this.getGroupMembers(germplasmToFix));
 		}
-
-		return this.getGroupMembers(germplasmToFix);
+		return germplasmGroupList;
 	}
 
 	@Override

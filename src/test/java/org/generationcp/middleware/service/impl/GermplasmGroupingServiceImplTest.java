@@ -146,7 +146,7 @@ public class GermplasmGroupingServiceImplTest {
 	public void testMarkFixedCase1() {
 		this.germplasmToFix.getNames().add(this.selectionHistoryNameParent);
 
-		this.germplasmGroupingService.markFixed(this.gidToFix, false, false);
+		this.germplasmGroupingService.markFixed(Collections.singletonList(this.gidToFix), false, false);
 
 		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", this.gidToFix, this.germplasmToFix.getMgid());
 		Assert.assertEquals("Existing selection history should remain preferred name.", GermplasmGroupingServiceImplTest.PREFERRED_CODE,
@@ -180,7 +180,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		Mockito.when(this.germplasmDAO.getAllChildren(this.gidToFix)).thenReturn(Lists.newArrayList(child1, child2));
 
-		this.germplasmGroupingService.markFixed(this.gidToFix, true, false);
+		this.germplasmGroupingService.markFixed(Collections.singletonList(this.gidToFix), true, false);
 
 		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", this.gidToFix, this.germplasmToFix.getMgid());
 		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", this.gidToFix, child1.getMgid());
@@ -234,7 +234,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		Mockito.when(this.germplasmDAO.getAllChildren(this.gidToFix)).thenReturn(Lists.newArrayList(child1, child2));
 
-		this.germplasmGroupingService.markFixed(this.gidToFix, false, false);
+		this.germplasmGroupingService.markFixed(Collections.singletonList(this.gidToFix), false, false);
 
 		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", this.gidToFix, this.germplasmToFix.getMgid());
 		Assert.assertEquals("Expecting child1 mgid to remain the same as before.", new Integer(222), child1.getMgid());
@@ -253,7 +253,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		this.germplasmToFix.setMgid(expectedMGID);
 
-		this.germplasmGroupingService.markFixed(this.gidToFix, false, true);
+		this.germplasmGroupingService.markFixed(Collections.singletonList(this.gidToFix), false, true);
 
 		Assert.assertEquals("Expecting founder/parent mgid to be preserved.", expectedMGID, this.germplasmToFix.getMgid());
 
@@ -268,7 +268,7 @@ public class GermplasmGroupingServiceImplTest {
 	public void testMarkFixedCase4_2() {
 		this.germplasmToFix.setMgid(0);
 
-		this.germplasmGroupingService.markFixed(this.gidToFix, false, true);
+		this.germplasmGroupingService.markFixed(Collections.singletonList(this.gidToFix), false, true);
 
 		Assert.assertEquals("Expecting founder/parent mgid to be set to be the same as gid.", this.gidToFix,
 				germplasmToFix.getMgid());
@@ -294,7 +294,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		Mockito.when(this.germplasmDAO.getAllChildren(this.gidToFix)).thenReturn(Lists.newArrayList(child1, child2));
 
-		this.germplasmGroupingService.markFixed(this.gidToFix, true, false);
+		this.germplasmGroupingService.markFixed(Collections.singletonList(this.gidToFix), true, false);
 
 		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", this.gidToFix, this.germplasmToFix.getMgid());
 		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", this.gidToFix, child1.getMgid());
@@ -327,7 +327,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		Mockito.when(this.germplasmDAO.getAllChildren(this.gidToFix)).thenReturn(Lists.newArrayList(child1, child2));
 
-		this.germplasmGroupingService.markFixed(this.gidToFix, true, false);
+		this.germplasmGroupingService.markFixed(Collections.singletonList(this.gidToFix), true, false);
 
 		Assert.assertEquals("Expecting no mgid changes when method is generative.", expectedParentMGID, this.germplasmToFix.getMgid());
 
@@ -356,7 +356,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		Mockito.when(this.germplasmDAO.getAllChildren(this.gidToFix)).thenReturn(Lists.newArrayList(child1, child2));
 
-		this.germplasmGroupingService.markFixed(this.gidToFix, true, false);
+		this.germplasmGroupingService.markFixed(Collections.singletonList(this.gidToFix), true, false);
 
 		Assert.assertEquals("Expecting founder/parent mgid to be set the same as gid.", this.gidToFix, this.germplasmToFix.getMgid());
 		Assert.assertEquals("Expecting child1 mgid to be set the same as founder/parent gid.", this.gidToFix, child1.getMgid());

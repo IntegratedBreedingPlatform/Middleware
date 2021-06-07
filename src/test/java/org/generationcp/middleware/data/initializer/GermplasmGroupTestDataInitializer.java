@@ -1,19 +1,16 @@
 
 package org.generationcp.middleware.data.initializer;
 
+import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.service.api.GermplasmGroup;
+import org.generationcp.middleware.service.api.GermplasmGroupMember;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.RandomStringUtils;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.service.api.GermplasmGroup;
-import org.generationcp.middleware.service.api.GermplasmGroupMember;
-
 public class GermplasmGroupTestDataInitializer {
-
-	private final GermplasmTestDataInitializer germplasmInitializer = new GermplasmTestDataInitializer();
 
 	public GermplasmGroupTestDataInitializer() {
 		// do nothing
@@ -23,21 +20,21 @@ public class GermplasmGroupTestDataInitializer {
 		final GermplasmGroup germplasmGroup = new GermplasmGroup();
 
 		// the founder germplasm gid is the mgid of a germplasm group
-		final GermplasmGroupMember founder = new GermplasmGroupMember(groupId, RandomStringUtils.randomAlphabetic(10), true);
+		final GermplasmGroupMember founder = new GermplasmGroupMember(groupId, RandomStringUtils.randomAlphabetic(10), false);
 		germplasmGroup.setFounder(founder);
 
-		final List<Germplasm> groupMembers = new ArrayList<Germplasm>();
+		final List<GermplasmGroupMember> groupMembers = new ArrayList<>();
 		for (int i = 1; i <= noOfEntries; i++) {
-			final Germplasm groupMember = this.germplasmInitializer.createGermplasm(i);
-			groupMember.setMgid(groupId);
+			final GermplasmGroupMember groupMember = new GermplasmGroupMember(groupId, RandomStringUtils.randomAlphabetic(10), false);
 			groupMembers.add(groupMember);
 		}
+		germplasmGroup.setGroupMembers(groupMembers);
 
 		return germplasmGroup;
 	}
 
 	public List<GermplasmGroup> createGermplasmGroupList(final List<Integer> groupIds, final Integer noOfEntriesPerGroup) {
-		final List<GermplasmGroup> germplasmGroupList = new ArrayList<GermplasmGroup>();
+		final List<GermplasmGroup> germplasmGroupList = new ArrayList<>();
 
 		for (final Integer groupId : groupIds) {
 			germplasmGroupList.add(this.createGermplasmGroup(groupId, noOfEntriesPerGroup));
@@ -47,7 +44,7 @@ public class GermplasmGroupTestDataInitializer {
 	}
 
 	public Map<Integer, GermplasmGroup> createGermplasmGroupMap(final Map<Integer, Integer> groupIdNoOfEntriesPerGroupMap) {
-		final Map<Integer, GermplasmGroup> germplasmGroupList = new HashMap<Integer, GermplasmGroup>();
+		final Map<Integer, GermplasmGroup> germplasmGroupList = new HashMap<>();
 
 		for (final Map.Entry<Integer, Integer> entry : groupIdNoOfEntriesPerGroupMap.entrySet()) {
 			final Integer groupId = entry.getKey();

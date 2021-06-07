@@ -15,16 +15,16 @@ public interface GermplasmGroupingService {
 	 * refer to this transition as line becoming "fixed".
 	 * <p>
 	 * At the database level, this equates to assigning an mgid for the
-	 * germplasm and its descendents based on certain rules.
+	 * germplasm and their descendents based on certain rules.
 	 *
-	 * @param gid            GID to "fix".
+	 * @param gids            GIDs to "fix".
 	 * @param includeDescendants    Whether to include descendants in the new group being created.
 	 * @param preserveExistingGroup flag to indicate whether existing group (mgid) should be
 	 *                              preserved.
 	 * @return {@link GermplasmGroup} summary of the result of the grouping
 	 * process.
 	 */
-	GermplasmGroup markFixed(Integer gid, boolean includeDescendants, boolean preserveExistingGroup);
+	List<GermplasmGroup> markFixed(List<Integer> gids, boolean includeDescendants, boolean preserveExistingGroup);
 
 	/**
 	 * Unfix a list of germplasm (line).
