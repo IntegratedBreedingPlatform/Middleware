@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.impl;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -78,8 +79,14 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	@Override
 	@Transactional
-	public void unfixLines(final Set<Integer> gids) {
-		this.daoFactory.getGermplasmDao().resetGermplasmGroup(new ArrayList<>(gids));
+	public List<Integer> unfixLines(final List<Integer> gids) {
+		final List<Integer> gidsToUnFix = new ArrayList<>(gids);
+		final GermplasmDAO germplasmDao = this.daoFactory.getGermplasmDao();
+		final List<Integer> unfixedLines =
+			germplasmDao.getGermplasmWithoutGroup(gids).stream().map(Germplasm::getGid).collect(Collectors.toList());
+		gidsToUnFix.removeAll(unfixedLines);
+		germplasmDao.resetGermplasmGroup(gidsToUnFix);
+		return gidsToUnFix;
 	}
 
 	@Override

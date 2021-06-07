@@ -35,9 +35,9 @@ public interface GermplasmGroupingService {
 	 * At the database level, this will reset the mgid of a germplasm to zero.
 	 *
 	 * @param gids - List of gids
-	 * @return
+	 * @return list of gids which removed from whichever group they've been assigned to
 	 */
-	void unfixLines(Set<Integer> gids);
+	List<Integer> unfixLines(List<Integer> gids);
 
 	/**
 	 * Service to apply group (MGID) inheritance to newly created crosses.
