@@ -31,7 +31,7 @@ public class StudyInstanceDto {
 	private String culturalPractices;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private List<String> dataLinks = new ArrayList<>();
+	private List<DataLink> dataLinks = new ArrayList<>();
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private List<EnvironmentParameter> environmentParameters;
@@ -344,11 +344,11 @@ public class StudyInstanceDto {
 		this.culturalPractices = culturalPractices;
 	}
 
-	public List<String> getDataLinks() {
+	public List<DataLink> getDataLinks() {
 		return this.dataLinks;
 	}
 
-	public void setDataLinks(final List<String> dataLinks) {
+	public void setDataLinks(final List<DataLink> dataLinks) {
 		this.dataLinks = dataLinks;
 	}
 
