@@ -64,11 +64,10 @@ import java.util.List;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-@Ignore("Test broken after Attribute migration need to be fixed")
 public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 	private static final Integer GROUP_ID = 10;
-	private static final String NOTE_ATTRIBUTE = "NOTE";
+	private static final String NOTE_ATTRIBUTE = "NOTE_AA_text";
 	private static final String DERIVATIVE_NAME_CODE = "DRVNM";
 	private static final String DERIVATIVE_NAME = "DERIVATIVE NAME";
 
@@ -915,13 +914,13 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		propertyIds.add(NOTE_ATTRIBUTE);
 
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
-		this.mockSortState(new String[] {NOTE_ATTRIBUTE}, new boolean[] {true});
+		this.mockSortState(new String[] {NOTE_ATTRIBUTE.toUpperCase()}, new boolean[] {true});
 
 		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
-			list.add(g.getAttributeTypesValueMap().get(NOTE_ATTRIBUTE));
+			list.add(g.getAttributeTypesValueMap().get(NOTE_ATTRIBUTE.toUpperCase()));
 		}
 
 		// Check if the list is in ascending order
@@ -939,13 +938,13 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		propertyIds.add(NOTE_ATTRIBUTE);
 
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
-		this.mockSortState(new String[] {NOTE_ATTRIBUTE}, new boolean[] {false});
+		this.mockSortState(new String[] {NOTE_ATTRIBUTE.toUpperCase()}, new boolean[] {false});
 
 		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
-			list.add(g.getAttributeTypesValueMap().get(NOTE_ATTRIBUTE));
+			list.add(g.getAttributeTypesValueMap().get(NOTE_ATTRIBUTE.toUpperCase()));
 		}
 
 		// Check if the list is in descending order
@@ -1206,8 +1205,8 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
 		final List<CVTerm> cVTerms = this.dao.getGermplasmAttributeTypes(request);
 		Assert.assertEquals(cVTerms.size(), 1);
-		Assert.assertTrue(cVTerms.stream().allMatch(cVTerm -> cVTerm.getName().equals("ATRIBUTS")));
-		Assert.assertEquals(cVTerms.get(0).getName(), "NOTE");
+		Assert.assertTrue(cVTerms.stream().allMatch(cVTerm -> cVTerm.getName().equalsIgnoreCase(NOTE_ATTRIBUTE.toUpperCase())));
+		Assert.assertEquals(cVTerms.get(0).getName(), NOTE_ATTRIBUTE);
 		Assert.assertEquals(cVTerms.get(0).getDefinition(), "NOTES");
 	}
 
@@ -1297,9 +1296,8 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		this.nameDAO.save(code1Name);
 
 		// Add NOTE attribute
-		final UserDefinedField attributeField = this.userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", NOTE_ATTRIBUTE);
-
 		final VariableFilter attributeVariableTypeFilter = new VariableFilter();
+		attributeVariableTypeFilter.addName(NOTE_ATTRIBUTE);
 		attributeVariableTypeFilter.addVariableType(VariableType.GERMPLASM_ATTRIBUTE);
 		final List<Variable> attributeDTOs = this.ontologyVariableDataManager.getWithFilter(attributeVariableTypeFilter);
 
@@ -1379,11 +1377,14 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			this.nameDAO.save(code1Name);
 
 			// Add NOTE attribute
-			final UserDefinedField attributeField = this.userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", NOTE_ATTRIBUTE);
+			final VariableFilter variableFilter = new VariableFilter();
+			variableFilter.addName(NOTE_ATTRIBUTE);
+			variableFilter.addVariableType(VariableType.GERMPLASM_ATTRIBUTE);
+			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 
 			final Attribute attribute = new Attribute();
 			attribute.setGermplasmId(tempGermplasmGid);
-			attribute.setTypeId(attributeField.getFldno());
+			attribute.setTypeId(variables.get(0).getId());
 			attribute.setAval("Attribute of " + tempGermplasmGid);
 			attribute.setAdate(tempGermplasmDate);
 
