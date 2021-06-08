@@ -96,15 +96,6 @@ public interface GermplasmDataManager {
 	List<Country> getAllCountry();
 
 	/**
-	 * Retrieves all the Germplasm entries
-	 *
-	 * @param start     - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @return All the germplasms from the database instance satisfying the start and numOfRows parameters
-	 */
-	List<Germplasm> getAllGermplasm(int start, int numOfRows);
-
-	/**
 	 * Returns the germplasm records that were created by the methods with names matching the given parameter.
 	 *
 	 * @param name      - search string for the name of the methods
@@ -174,21 +165,6 @@ public interface GermplasmDataManager {
 	List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type);
 
 	/**
-	 * Returns all the names of the Germplasm identified by the gid parameter.
-	 * <p>
-	 * Results may be filtered by name status. Accepted values are 0 - 10. If the given status is zero all names will be included except
-	 * deleted names
-	 * <p>
-	 * Results may also be filtered by type list. These must be valid integer values
-	 *
-	 * @param gid    the germplasm identifier
-	 * @param status the name status used to filter the results
-	 * @param type   the type used to filter the results
-	 * @return List of {@link Name}
-	 */
-	List<Name> getByGIDWithListTypeFilters(Integer gid, Integer status, List<Integer> type);
-
-	/**
 	 * Returns the preferred name of the Germplasm identified by the gid parameter.
 	 *
 	 * @param gid - id of the Germplasm
@@ -248,15 +224,6 @@ public interface GermplasmDataManager {
 	Integer updateGermplasmPrefName(Integer gid, String newPrefName);
 
 	/**
-	 * Sets the specified Abbreviation as the specified Germplasm's new preferred Abbreviation.
-	 *
-	 * @param gid           - id of the Germplasm to be updated
-	 * @param newPrefAbbrev - new abbreviation to set as the preferred abbreviation
-	 * @return Returns the id of the updated {@code Germplasm} record
-	 */
-	Integer updateGermplasmPrefAbbrev(Integer gid, String newPrefAbbrev);
-
-	/**
 	 * Inserts a list of multiple {@code Name} objects into the database.
 	 *
 	 * @param names - A list of {@code Name} objects to be persisted to the database. {@code Name} objects must be valid.
@@ -271,14 +238,6 @@ public interface GermplasmDataManager {
 	 * @return Returns the id of the updated Germplasm {@code Name}.
 	 */
 	Integer updateGermplasmName(Name name);
-
-	/**
-	 * Updates the database with multiple {@code Name} objects specified.
-	 *
-	 * @param names - A list of {@code Name} objects to be updated in the database. {@code Name} objects must be valid.
-	 * @return Returns the id of the updated Germplasm {@code Name}s.
-	 */
-	List<Integer> updateGermplasmName(List<Name> names);
 
 	/**
 	 * Returns all the available attribute types
@@ -384,13 +343,6 @@ public interface GermplasmDataManager {
 	 * @return the all methods not generative
 	 */
 	List<Method> getAllMethodsNotGenerative();
-
-	/**
-	 * Returns count of all the method records.
-	 *
-	 * @return count of methods
-	 */
-	long countAllMethods();
 
 	/**
 	 * Returns all the method records matching the given type. Retrieves from both local and central databases.
@@ -500,14 +452,6 @@ public interface GermplasmDataManager {
 	List<Term> getMethodClasses();
 
 	/**
-	 * Returns the udfld record identified by the given id.
-	 *
-	 * @param id - the id of the udfld record
-	 * @return the Udflds POJO representing the record
-	 */
-	UserDefinedField getUserDefinedFieldByID(Integer id);
-
-	/**
 	 * Returns the udfld records identified by the given tablename and field type.
 	 *
 	 * @param tableName - the value of the ftable record
@@ -525,13 +469,6 @@ public interface GermplasmDataManager {
 	 * @return the Udflds POJO representing the record
 	 */
 	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndFTypeAndFName(String tableName, String fieldType, String fieldName);
-
-	/**
-	 * Return the UserDefinedField using local field no
-	 *
-	 * @return
-	 */
-	UserDefinedField getUserDefinedFieldByLocalFieldNo(Integer lfldno);
 
 	/**
 	 * Please use LocationDataManager.getCountryById().
@@ -782,11 +719,6 @@ public interface GermplasmDataManager {
 	Map<Integer, String> getPreferredNamesByGids(List<Integer> gids);
 
 	/**
-	 * @return the preferred name ids by gids
-	 */
-	Map<Integer, Integer> getPreferredNameIdsByGIDs(List<Integer> gids);
-
-	/**
 	 * Given a List of GIDs, return the list of gids mapped to their corresponding location name.
 	 *
 	 * @param gids the gids
@@ -902,14 +834,6 @@ public interface GermplasmDataManager {
 	List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, int max, String programUUID);
 
 	/**
-	 * count favorite methods/locations
-	 *
-	 * @param type - can be FavoriteType.METHOD or FavoriteType.LOCATION
-	 * @return count of ProgramFavorite list
-	 */
-	int countProgramFavorites(ProgramFavorite.FavoriteType type);
-
-	/**
 	 * Saves the list of favorite methods/locations
 	 *
 	 * @param list of ProgramFavorite
@@ -932,14 +856,6 @@ public interface GermplasmDataManager {
 	 * @return none
 	 */
 	void deleteProgramFavorites(List<ProgramFavorite> list);
-
-	/**
-	 * Deletes a favorite method/location
-	 *
-	 * @param favorite the code
-	 * @return none
-	 */
-	void deleteProgramFavorite(ProgramFavorite favorite);
 
 	/**
 	 * check if name and standardized version of it already exists.
@@ -1035,8 +951,6 @@ public interface GermplasmDataManager {
 	 */
 	List<Method> getFavoriteMethodsByMethodType(String methodType, String programUUID);
 
-	public List<Germplasm> getSortedGermplasmWithPrefName(final List<Integer> gids);
-
 	/**
 	 * Return the pedigree for a list of germplasms
 	 *
@@ -1052,22 +966,6 @@ public interface GermplasmDataManager {
 	 * @return
 	 */
 	List<String> getMethodCodeByMethodIds(Set<Integer> methodIds);
-
-	/**
-	 * @return List of all no bulking methods
-	 */
-	List<Method> getAllNoBulkingMethods();
-
-	/**
-	 * @param ids
-	 * @return List of all no-bulking methods for a list of ids
-	 */
-	List<Method> getNoBulkingMethodsByIdList(final List<Integer> ids);
-
-	/**
-	 * @return List of all no-bulking and no generative methods
-	 */
-	List<Method> getAllMethodsNotBulkingNotGenerative();
 
 	/**
 	 * Given a List of GIDs, return a Map of GIDs to PreferredName.
@@ -1113,14 +1011,5 @@ public interface GermplasmDataManager {
 	List<Germplasm> getExistingCrosses(Integer femaleParent, List<Integer> maleParentIds, Optional<Integer> gid);
 
 	boolean hasExistingCrosses(Integer femaleParent, List<Integer> maleParentIds, Optional<Integer> gid);
-
-	/**
-	 * Returns the udfld records identified by the given tablename and field type.
-	 *
-	 * @param tableName  - the value of the ftable record
-	 * @param fieldTypes - the values of the ftype record
-	 * @return the Udflds POJO representing the record
-	 */
-	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final Set<String> fieldTypes);
 
 }
