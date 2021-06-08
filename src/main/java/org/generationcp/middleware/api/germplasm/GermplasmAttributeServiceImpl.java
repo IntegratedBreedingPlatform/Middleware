@@ -31,7 +31,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	public Integer createGermplasmAttribute(final Integer gid, final GermplasmAttributeRequestDto dto, final Integer userId) {
+	public Integer createGermplasmAttribute(final Integer gid, final GermplasmAttributeRequestDto dto) {
 		final Variable variable = this.ontologyVariableDataManager.getVariable(null, dto.getVariableId(), false);
 		final Attribute newAttribute = new Attribute();
 		newAttribute.setGermplasmId(gid);

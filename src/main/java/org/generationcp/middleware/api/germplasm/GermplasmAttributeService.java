@@ -9,7 +9,7 @@ public interface GermplasmAttributeService {
 
 	List<GermplasmAttributeDto> getGermplasmAttributeDtos(Integer gid, Integer variableTypeId);
 
-	Integer createGermplasmAttribute(Integer gid, GermplasmAttributeRequestDto dto, Integer userId);
+	Integer createGermplasmAttribute(Integer gid, GermplasmAttributeRequestDto dto);
 
 	void updateGermplasmAttribute(Integer attributeId, GermplasmAttributeRequestDto dto);
 
