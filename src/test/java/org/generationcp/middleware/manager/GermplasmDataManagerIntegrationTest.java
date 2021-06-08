@@ -758,33 +758,12 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllGermplasm() {
-		final List<Germplasm> germplasms = this.germplasmDataManager.getAllGermplasm(0, 100);
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasms);
-	}
-
-	@Test
-	public void testGetBibliographicalReferenceById() {
-		final int id = 1;
-		final Bibref bibref = this.germplasmDataManager.getBibliographicReferenceByID(id);
-		Debug.println(IntegrationTestBase.INDENT, "testGetBibliographicalReferenceById(" + id + "): " + bibref);
-	}
-
-	@Test
 	public void testGetMethodByID() {
 		final int id = 4;
 		final Method methodid = this.germplasmDataManager.getMethodByID(id);
 		assertThat(methodid, is(notNullValue()));
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodByID(" + id + "): ");
 		Debug.println(IntegrationTestBase.INDENT, methodid);
-	}
-
-	@Test
-	public void testGetUserDefinedFieldByID() {
-		final Integer id = 1;
-		final UserDefinedField result = this.germplasmDataManager.getUserDefinedFieldByID(id);
-		assertThat(result, is(notNullValue()));
-		Debug.println(IntegrationTestBase.INDENT, result);
 	}
 
 	@Test
