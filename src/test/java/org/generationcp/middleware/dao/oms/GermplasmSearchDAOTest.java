@@ -225,7 +225,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	public void testSearchGermplasmIncludePedigreeGenerative() {
 		this.createPedigree();
 
-		final GermplasmSearchRequest request = this.createSearchRequest(descendant.getGid());
+		final GermplasmSearchRequest request = this.createSearchRequest(this.descendant.getGid());
 		final GermplasmSearchRequest.IncludePedigree includePedigree = new GermplasmSearchRequest.IncludePedigree();
 		includePedigree.setGenerationLevel(1);
 		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.GENERATIVE);
@@ -248,7 +248,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	public void testSearchGermplasmIncludePedigreeGenerativeLevelTwo() {
 		this.createPedigree();
 
-		final GermplasmSearchRequest request = this.createSearchRequest(descendant.getGid());
+		final GermplasmSearchRequest request = this.createSearchRequest(this.descendant.getGid());
 		final GermplasmSearchRequest.IncludePedigree includePedigree = new GermplasmSearchRequest.IncludePedigree();
 		includePedigree.setGenerationLevel(2);
 		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.GENERATIVE);
@@ -271,7 +271,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	public void testSearchGermplasmIncludePedigreeDerivative() {
 		this.createPedigree();
 
-		final GermplasmSearchRequest request = this.createSearchRequest(descendant.getGid());
+		final GermplasmSearchRequest request = this.createSearchRequest(this.descendant.getGid());
 		final GermplasmSearchRequest.IncludePedigree includePedigree = new GermplasmSearchRequest.IncludePedigree();
 		includePedigree.setGenerationLevel(1);
 		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.DERIVATIVE);
@@ -294,7 +294,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	public void testSearchGermplasmIncludePedigreeBoth() {
 		this.createPedigree();
 
-		final GermplasmSearchRequest request = this.createSearchRequest(descendant.getGid());
+		final GermplasmSearchRequest request = this.createSearchRequest(this.descendant.getGid());
 		final GermplasmSearchRequest.IncludePedigree includePedigree = new GermplasmSearchRequest.IncludePedigree();
 		includePedigree.setGenerationLevel(2);
 		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.BOTH);
@@ -317,7 +317,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	public void testSearchGermplasmIncludePedigreeBothLevelThree() {
 		this.createPedigree();
 
-		final GermplasmSearchRequest request = this.createSearchRequest(descendant.getGid());
+		final GermplasmSearchRequest request = this.createSearchRequest(this.descendant.getGid());
 		final GermplasmSearchRequest.IncludePedigree includePedigree = new GermplasmSearchRequest.IncludePedigree();
 		includePedigree.setGenerationLevel(3);
 		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.BOTH);
@@ -1204,10 +1204,10 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	public void testGetGermplasmAttributeTypes() {
 		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
 		final List<CVTerm> cVTerms = this.dao.getGermplasmAttributeTypes(request);
-		Assert.assertEquals(cVTerms.size(), 1);
+		Assert.assertEquals(1, cVTerms.size());
 		Assert.assertTrue(cVTerms.stream().allMatch(cVTerm -> cVTerm.getName().equalsIgnoreCase(NOTE_ATTRIBUTE.toUpperCase())));
-		Assert.assertEquals(cVTerms.get(0).getName(), NOTE_ATTRIBUTE);
-		Assert.assertEquals(cVTerms.get(0).getDefinition(), "NOTES");
+		Assert.assertEquals(NOTE_ATTRIBUTE, cVTerms.get(0).getName());
+		Assert.assertEquals("NOTES", cVTerms.get(0).getDefinition());
 	}
 
 	@Test
@@ -1513,23 +1513,23 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	private void createPedigree() {
-		greatGrandParentGermplasm =
+		this.greatGrandParentGermplasm =
 			GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		this.germplasmDataDM.addGermplasm(greatGrandParentGermplasm, greatGrandParentGermplasm.getPreferredName(), this.cropType);
+		this.germplasmDataDM.addGermplasm(this.greatGrandParentGermplasm, this.greatGrandParentGermplasm.getPreferredName(), this.cropType);
 
-		grandParentGermplasm = GermplasmTestDataInitializer
-			.createGermplasm(this.germplasmDate, greatGrandParentGermplasm.getGid(), 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName",
+		this.grandParentGermplasm = GermplasmTestDataInitializer
+			.createGermplasm(this.germplasmDate, this.greatGrandParentGermplasm.getGid(), 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName",
 				"LocationName");
-		this.germplasmDataDM.addGermplasm(grandParentGermplasm, grandParentGermplasm.getPreferredName(), this.cropType);
+		this.germplasmDataDM.addGermplasm(this.grandParentGermplasm, this.grandParentGermplasm.getPreferredName(), this.cropType);
 
-		groupSource = GermplasmTestDataInitializer
-			.createGermplasm(this.germplasmDate, grandParentGermplasm.getGid(), 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		this.germplasmDataDM.addGermplasm(groupSource, groupSource.getPreferredName(), this.cropType);
+		this.groupSource = GermplasmTestDataInitializer
+			.createGermplasm(this.germplasmDate, this.grandParentGermplasm.getGid(), 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDataDM.addGermplasm(this.groupSource, this.groupSource.getPreferredName(), this.cropType);
 
-		descendant = GermplasmTestDataInitializer
-			.createGermplasm(this.germplasmDate, groupSource.getGid(), groupSource.getGid(), -1, 0, 0, 1, 1, 0, 1, 1, "MethodName",
+		this.descendant = GermplasmTestDataInitializer
+			.createGermplasm(this.germplasmDate, this.groupSource.getGid(), this.groupSource.getGid(), -1, 0, 0, 1, 1, 0, 1, 1, "MethodName",
 				"LocationName");
-		this.germplasmDataDM.addGermplasm(descendant, descendant.getPreferredName(), this.cropType);
+		this.germplasmDataDM.addGermplasm(this.descendant, this.descendant.getPreferredName(), this.cropType);
 	}
 
 }
