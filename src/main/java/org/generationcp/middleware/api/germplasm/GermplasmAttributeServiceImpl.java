@@ -4,6 +4,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
@@ -61,13 +62,16 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	private Integer resolveCategoricalValueId(final Variable variable, final String value) {
-		BigInteger categoricalValueId = null;
+		Integer categoricalValueId = null;
 		if (variable.getScale().getDataType().getId().equals(TermId.CATEGORICAL_VARIABLE.getId())) {
 			categoricalValueId =
 				variable.getScale().getCategories().stream().filter(category -> value.equalsIgnoreCase(category.getName())).findFirst()
-					.map(category -> BigInteger.valueOf(category.getId())).orElse(null);
+					.map(category -> BigInteger.valueOf(category.getId()).intValue()).orElse(null);
+			if (categoricalValueId == null) {
+				throw new MiddlewareRequestException("", "germplasm.attribute.invalid.categorical.value", variable.getName());
+			}
 		}
-		return categoricalValueId != null ? categoricalValueId.intValue() : null;
+		return categoricalValueId;
 	}
 
 }
