@@ -890,6 +890,13 @@ public interface GermplasmDataManager {
 	 */
 	Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
 
+	/*
+	 * get the Germplasm from the crop database based on local gid reference
+	 *
+	 * @param lgid
+	 */
+	Germplasm getGermplasmByLocalGid(Integer lgid);
+
 	/**
 	 * Enables us to query the udflds table
 	 *
