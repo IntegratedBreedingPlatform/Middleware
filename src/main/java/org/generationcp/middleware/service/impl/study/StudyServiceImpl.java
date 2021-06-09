@@ -795,12 +795,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 			this.experimentModelGenerator
 				.generate(crop, study.getProjectId(), java.util.Optional.of(geolocation), ExperimentType.STUDY_INFORMATION);
 		this.daoFactory.getExperimentDao().save(studyExperiment);
-
-		// Environment Experiment
-		final ExperimentModel envExperiment =
-			this.experimentModelGenerator
-				.generate(crop, environmentDataset.getProjectId(), java.util.Optional.of(geolocation), ExperimentType.TRIAL_ENVIRONMENT);
-		this.daoFactory.getExperimentDao().save(envExperiment);
 	}
 
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
