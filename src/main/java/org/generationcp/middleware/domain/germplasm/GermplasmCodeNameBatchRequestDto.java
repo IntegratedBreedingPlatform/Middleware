@@ -7,11 +7,11 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.List;
 
 @AutoProperty
-public class GermplasmNameBatchRequestDto {
+public class GermplasmCodeNameBatchRequestDto {
 
 	private List<Integer> gids;
 	private String nameType;
-	private GermplasmNameSetting germplasmNameSetting;
+	private GermplasmNameSetting germplasmCodeNameSetting;
 
 	public List<Integer> getGids() {
 		return this.gids;
@@ -29,12 +29,12 @@ public class GermplasmNameBatchRequestDto {
 		this.nameType = nameType;
 	}
 
-	public GermplasmNameSetting getGermplasmNameSetting() {
-		return this.germplasmNameSetting;
+	public GermplasmNameSetting getGermplasmCodeNameSetting() {
+		return this.germplasmCodeNameSetting;
 	}
 
-	public void setGermplasmNameSetting(final GermplasmNameSetting germplasmNameSetting) {
-		this.germplasmNameSetting = germplasmNameSetting;
+	public void setGermplasmCodeNameSetting(final GermplasmNameSetting germplasmCodeNameSetting) {
+		this.germplasmCodeNameSetting = germplasmCodeNameSetting;
 	}
 
 	@Override
