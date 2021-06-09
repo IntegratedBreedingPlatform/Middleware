@@ -269,6 +269,22 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		}
 	}
 
+	public List<String> getCategoriesUsedInAttributes(final int scaleId) {
+		final SQLQuery query = this.getSession().createSQLQuery(
+			"SELECT v.name category "
+				+ " FROM cvterm_relationship scale_values "
+				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id "
+				+ " WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = " + TermId.HAS_VALUE.getId()
+				+ " AND EXISTS ( "
+				+ "     SELECT 1    	 "
+				+ "     FROM atributs a "
+				+ "     WHERE a.cval_id = v.cvterm_id ) "
+				+ "");
+		query.setParameter("scaleId", scaleId);
+		query.addScalar("category", CVTermRelationshipDao.STRING);
+		return query.list();
+	}
+
 	@SuppressWarnings("unchecked")
 	protected List<String> getScaleCategoriesUsedInObservations(final int scaleId) {
 		final SQLQuery query = this.getSession().createSQLQuery(
