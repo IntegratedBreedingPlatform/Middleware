@@ -58,6 +58,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
+import org.generationcp.middleware.util.VariableValueUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
@@ -287,12 +288,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			if (germplasmDto.getAttributes() != null) {
 				germplasmDto.getAttributes().forEach((k, v) -> {
-					//FIXME Check variable types and skip if invalid, find cvalue_id for categorical variables
-					final Attribute attribute =
-						new Attribute(null, germplasm.getGid(), attributesMapByName.get(k.toUpperCase()).getId(), v, null,
-						germplasm.getLocationId(),
-						0, Util.getCurrentDateAsIntegerValue());
-					this.daoFactory.getAttributeDAO().save(attribute);
+					final Variable variable = attributesMapByName.get(k.toUpperCase());
+					final boolean isValidValue = VariableValueUtil.isValidAttributeValue(variable, v);
+					if (isValidValue) {
+						final Integer cValueId = VariableValueUtil.resolveCategoricalValueId(variable, v);
+						final Attribute attribute =
+							new Attribute(null, germplasm.getGid(), variable.getId(), v, cValueId,
+								germplasm.getLocationId(),
+								0, Util.getCurrentDateAsIntegerValue());
+						this.daoFactory.getAttributeDAO().save(attribute);
+					}
 				});
 			}
 			results.put(germplasmDto.getClientId(),
@@ -643,28 +648,32 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final String code, final String value, final Multimap<String, Object[]> conflictErrors) {
 		// Check first if the code to save is a valid Attribute
 		if (attributeCodes.containsKey(code) && StringUtils.isNotEmpty(value)) {
-			final Integer attributeTypeId = attributeCodes.get(code).getId();
+			final Variable variable = attributeCodes.get(code);
 			final List<Attribute> germplasmAttributes = attributesMap.getOrDefault(germplasm.getGid(), new ArrayList<>());
 			final List<Attribute> attributesByType =
-				germplasmAttributes.stream().filter(n -> n.getTypeId().equals(attributeTypeId)).collect(Collectors.toList());
+				germplasmAttributes.stream().filter(n -> n.getTypeId().equals(variable.getId())).collect(Collectors.toList());
 
 			// Check if there are multiple attributes with same type
 			if (attributesByType.size() > 1) {
 				conflictErrors.put("germplasm.update.duplicate.attributes", new String[] {
 					code, String.valueOf(germplasm.getGid())});
 			} else {
-				//FIXME Check variable types and skip if invalid, find cvalue_id for categorical variables
-				if (attributesByType.size() == 1) {
-					final Attribute attribute = attributesByType.get(0);
-					attribute.setLocationId(germplasm.getLocationId());
-					attribute.setAdate(germplasm.getGdate());
-					attribute.setAval(value);
-					this.daoFactory.getAttributeDAO().update(attribute);
-				} else {
-					this.daoFactory.getAttributeDAO()
-						.save(new Attribute(null, germplasm.getGid(), attributeTypeId, value, null,
-							germplasm.getLocationId(),
-							0, germplasm.getGdate()));
+				final boolean isValidValue = VariableValueUtil.isValidAttributeValue(variable, value);
+				if (isValidValue) {
+					final Integer cValueId = VariableValueUtil.resolveCategoricalValueId(variable, value);
+					if (attributesByType.size() == 1) {
+						final Attribute attribute = attributesByType.get(0);
+						attribute.setLocationId(germplasm.getLocationId());
+						attribute.setAdate(germplasm.getGdate());
+						attribute.setAval(value);
+						attribute.setcValueId(cValueId);
+						this.daoFactory.getAttributeDAO().update(attribute);
+					} else {
+						this.daoFactory.getAttributeDAO()
+							.save(new Attribute(null, germplasm.getGid(), variable.getId(), value, cValueId,
+								germplasm.getLocationId(),
+								0, germplasm.getGdate()));
+					}
 				}
 			}
 		}
