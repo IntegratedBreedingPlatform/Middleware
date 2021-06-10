@@ -258,4 +258,21 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
+
+	public long countByVariables(final List<Integer> variablesIds){
+		try {
+			final SQLQuery query =
+				this.getSession().createSQLQuery("SELECT COUNT(ATYPE) "
+					+ "FROM ATRIBUTS A "
+					+ "WHERE ATYPE in (:variableId) order by ATYPE"
+				);
+			query.setParameterList("variableId", variablesIds);
+
+			return ((BigInteger) query.uniqueResult()).longValue();
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error at countByVariables=" + variablesIds + " in AttributeDAO: " + e.getMessage();
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
 }

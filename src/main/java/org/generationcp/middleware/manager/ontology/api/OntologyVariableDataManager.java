@@ -107,7 +107,9 @@ public interface OntologyVariableDataManager {
 	boolean isVariableUsedInBreedingMethods(int variableId);
 
 	boolean areVariablesUsedInStudy(List<Integer> variablesIds);
-	
+
+	boolean areVariablesUsedInAttributes(List<Integer> variablesIds);
+
 	public List<VariableOverrides> getVariableOverridesByVariableIds(List<Integer> variableIds);
 
 	public VariableOverrides getVariableOverridesByVariableIdAndProgram(final Integer variableId, final String programUuid);
