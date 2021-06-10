@@ -47,7 +47,6 @@ import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -358,8 +357,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				final String pExpMax = (String) items[14];
 
 				variable.setAlias(pAlias);
-				variable.setMinValue(pExpMin);
-				variable.setMaxValue(pExpMax);
+				variable.setMinValue((StringUtils.isEmpty(pExpMin)) ? null : pExpMin);
+				variable.setMaxValue((StringUtils.isEmpty(pExpMax)) ? null : pExpMax);
 
 				variable.setIsFavorite(items[15] != null);
 				map.put(variable.getId(), variable);
