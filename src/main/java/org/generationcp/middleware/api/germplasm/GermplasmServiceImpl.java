@@ -1076,10 +1076,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasmDto.getAdditionalInfo().forEach((k, v) -> {
 				final Variable variable = attributesMap.get(k.toUpperCase());
 				if (variable != null) {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), variable.getId(), v, null,
-						germplasm.getLocationId(),
-						0, Util.getCurrentDateAsIntegerValue());
-					this.daoFactory.getAttributeDAO().save(attribute);
+					final boolean isValidValue = VariableValueUtil.isValidAttributeValue(variable, v);
+					if (isValidValue) {
+						final Integer cValueId = VariableValueUtil.resolveCategoricalValueId(variable, v);
+						final Attribute attribute = new Attribute(null, germplasm.getGid(), variable.getId(), v, cValueId,
+							germplasm.getLocationId(),
+							0, Util.getCurrentDateAsIntegerValue());
+						this.daoFactory.getAttributeDAO().save(attribute);
+					}
 				}
 			});
 
@@ -1175,16 +1179,21 @@ public class GermplasmServiceImpl implements GermplasmService {
 		germplasmUpdateRequest.getAdditionalInfo().forEach((k, v) -> {
 			final Variable variable = attributesMap.get(k.toUpperCase());
 			if (variable != null) {
-				// Create new attribute if none of that type exists, otherwise update value of existing one
-				if (existingAttributesByType.containsKey(variable.getId())) {
-					final Attribute existingAttribute = existingAttributesByType.get(variable.getId());
-					existingAttribute.setAval(v);
-					attributeDAO.update(existingAttribute);
-				} else {
-					final Attribute attribute = new Attribute(null, germplasm.getGid(), variable.getId(), v, null,
-						germplasm.getLocationId(),
-						0, Util.getCurrentDateAsIntegerValue());
-					attributeDAO.save(attribute);
+				final boolean isValidValue = VariableValueUtil.isValidAttributeValue(variable, v);
+				if (isValidValue) {
+					final Integer cValueId = VariableValueUtil.resolveCategoricalValueId(variable, v);
+					// Create new attribute if none of that type exists, otherwise update value of existing one
+					if (existingAttributesByType.containsKey(variable.getId())) {
+						final Attribute existingAttribute = existingAttributesByType.get(variable.getId());
+						existingAttribute.setAval(v);
+						existingAttribute.setcValueId(cValueId);
+						attributeDAO.update(existingAttribute);
+					} else {
+						final Attribute attribute = new Attribute(null, germplasm.getGid(), variable.getId(), v, cValueId,
+							germplasm.getLocationId(),
+							0, Util.getCurrentDateAsIntegerValue());
+						attributeDAO.save(attribute);
+					}
 				}
 			}
 		});
