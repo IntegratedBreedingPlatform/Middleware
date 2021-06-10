@@ -1079,30 +1079,49 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			return Collections.EMPTY_LIST;
 		}
 		try {
-			final SQLQuery sqlQuery = this.getActiveSession().createSQLQuery("SELECT " //
-				+ "   cv.name as name, " //
-				+ "   vo.alias as alias, " //
-				+ "   cv.cvterm_id AS id," //
-				+ "   cv.definition AS definition" //
-				+ " FROM cvterm cv INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
-				+ " and cv.cvterm_id = cp.cvterm_id " //
-				+ " LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID " //
-				+ " WHERE cp.value in (select name from cvterm where cvterm_id in ("
-				+ VariableType.GERMPLASM_PASSPORT.getId() + ","
+			final SQLQuery sqlQuery = this.getActiveSession().createSQLQuery("select "
+				+ "v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, \n"
+				+ "vpo.alias p_alias, vpo.expected_min p_min_value, vpo.expected_max p_max_value" //
+				+ " FROM cvterm v INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
+				+ " and v.cvterm_id = cp.cvterm_id " //
+				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
+				+ " left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
+				+ " left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
+				+ " left join variable_overrides vpo ON vpo.cvterm_id = v.cvterm_id AND vpo.program_uuid = :programUUID " //
+				+ " WHERE v.cv_id = " + CvId.VARIABLES.getId() + " "  //
+				+ "		and cp.value in (select name from cvterm where cvterm_id in (" //
+				+ VariableType.GERMPLASM_PASSPORT.getId() + "," //
 				+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ")) " //
-				+ "   AND (cv.definition like :fname or cv.name like :name or vo.alias like :alias )" //
+				+ "   AND (v.definition like :fname or v.name like :name or vpo.alias like :alias )" //
 				+ " LIMIT 100 ");
 			sqlQuery.setParameter("programUUID", programUUID);
 			sqlQuery.setParameter("fname", '%' + query + '%');
 			sqlQuery.setParameter("name", '%' + query + '%');
 			sqlQuery.setParameter("alias", '%' + query + '%');
-			sqlQuery.addScalar("name");
-			sqlQuery.addScalar("alias");
-			sqlQuery.addScalar("id");
-			sqlQuery.addScalar("definition");
-			sqlQuery.setResultTransformer(Transformers.aliasToBean(Variable.class));
 
-			return sqlQuery.list();
+			final List queryResults = sqlQuery.list();
+			final List<Variable> variables = new ArrayList<>();
+			for (final Object row : queryResults) {
+				final Object[] items = (Object[]) row;
+				final Variable variable =
+					new Variable(new Term(Util.typeSafeObjectToInteger(items[0]), (String) items[1], (String) items[2]));
+				variable.setMethod(new Method(new Term(Util.typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5])));
+				variable.setProperty(new Property(new Term(Util.typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8])));
+				variable.setScale(new Scale(new Term(Util.typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11])));
+
+				// Alias, Expected Min Value, Expected Max Value
+				final String pAlias = (String) items[12];
+				final String pExpMin = (String) items[13];
+				final String pExpMax = (String) items[14];
+
+				variable.setAlias(pAlias);
+				variable.setMinValue(pExpMin);
+				variable.setMaxValue(pExpMax);
+
+				variables.add(variable);
+			}
+
+			return variables;
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error with searchAttributes(query=" + query + "): " + e.getMessage(), e);
