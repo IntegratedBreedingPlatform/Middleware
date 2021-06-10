@@ -109,7 +109,7 @@ public class XABeanDefinition {
 				this.xaDatasourceUtilities.createRootBeanDefinition(AtomikosDataSourceBean.class, ImmutableMap.<String, Object>of(
 						"init-method", "init", "destroy-method", "close", "depends-on", "transactionManager"), this
 						.getDataSourceBeanDefinitionProperties(cropDatabaseName, xaDataSourceProperties));
-		final String beanName = cropDatabaseName.toUpperCase() + XABeanDefinition.DATA_SOURCE;
+		final String beanName = getDataSourceName(cropDatabaseName);
 		registry.registerBeanDefinition(beanName, dataSourceBeanDefinition);
 
 		LOG.debug(String.format("Created data source bean defintion for database '%s' with bean name '%s'.", cropDatabaseName, beanName));
@@ -189,5 +189,9 @@ public class XABeanDefinition {
 		databaseConnectionProperties.setProperty("sessionVariables", "group_concat_max_len=500000");
 
 		return databaseConnectionProperties;
+	}
+
+	public static String getDataSourceName(final String dbName) {
+		return dbName.toUpperCase() + XABeanDefinition.DATA_SOURCE;
 	}
 }
