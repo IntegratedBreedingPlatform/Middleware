@@ -171,7 +171,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetScaleCategoriesUsedInStudies() {
 		this.createStudyData();
-		final List<String> usedCategories = this.cvtermRelationshipDao.getCategoriesUsedInStudies(this.scale.getCvTermId());
+		final List<String> usedCategories = this.cvtermRelationshipDao.getCategoriesInUse(this.scale.getCvTermId());
 		assertEquals(6, usedCategories.size());
 		assertEquals(this.categories.get(0).getName(), usedCategories.get(0));
 		assertEquals(this.categories.get(1).getName(), usedCategories.get(1));
