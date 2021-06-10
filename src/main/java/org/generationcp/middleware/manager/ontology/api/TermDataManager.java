@@ -63,7 +63,6 @@ public interface TermDataManager {
 	 * @param scaleId
 	 * @return
 	 */
-	public List<String> getCategoriesUsedInStudies(int scaleId);
+	public List<String> getCategoriesInUse(int scaleId);
 
-	public List<String> getCategoriesUsedInAttributes(int scaleId);
 }
