@@ -110,11 +110,9 @@ public interface GermplasmService {
 
 	ProgenyDTO getProgeny(final Integer gid);
 
-	List<AttributeDTO> getAttributesByGUID
-		(
-			String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
+	List<AttributeDTO> getAttributesByGUID(String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
 
-	long countAttributesByGUID(String gemrplasmUUID, List<String> attributeDbIds);
+	long countAttributesByGUID(String germplasmUUID, List<String> attributeDbIds);
 
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
 
