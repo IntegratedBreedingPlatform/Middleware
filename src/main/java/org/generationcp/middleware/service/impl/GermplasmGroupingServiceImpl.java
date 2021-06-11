@@ -20,9 +20,10 @@ import org.generationcp.middleware.service.pedigree.cache.keys.CropGermplasmKey;
 import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +33,8 @@ import java.util.TreeSet;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+@Service
+@Transactional
 public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmGroupingServiceImpl.class);
@@ -43,25 +46,20 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	static final String CODED_NAME_2 = "CODE2";
 	static final String CODED_NAME_3 = "CODE3";
 
-	@Resource
+	@Autowired
 	private GermplasmDataManager germplasmDataManager;
 
 	private DaoFactory daoFactory;
-
-	public GermplasmGroupingServiceImpl() {
-
-	}
 
 	public GermplasmGroupingServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
-	@Transactional
 	public List<GermplasmGroup> markFixed(final List<Integer> gids, final boolean includeDescendants, final boolean preserveExistingGroup) {
-		final Map<Integer, Germplasm> germplasmMap = this.daoFactory.getGermplasmDao().getByGIDList(gids).stream().collect(Collectors.toMap(
+		final List<Germplasm> germplasmList = this.daoFactory.getGermplasmDao().getByGIDList(gids);
+		final Map<Integer, Germplasm> germplasmMap = germplasmList.stream().collect(Collectors.toMap(
 			Germplasm::getGid, Function.identity()));
-		final List<GermplasmGroup> germplasmGroupList = new ArrayList<>();
 		for (final Integer gid : gids) {
 			GermplasmGroupingServiceImpl.LOG.info("Marking germplasm with gid {} as fixed.", gid);
 			final Germplasm germplasmToFix = germplasmMap.get(gid);
@@ -71,14 +69,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 			} else {
 				this.assignGroup(germplasmToFix, gid, preserveExistingGroup);
 			}
-
-			germplasmGroupList.add(this.getGroupMembers(germplasmToFix));
 		}
-		return germplasmGroupList;
+		return this.getGroupMembersForGermplasm(germplasmList);
 	}
 
 	@Override
-	@Transactional
 	public List<Integer> unfixLines(final List<Integer> gids) {
 		final List<Integer> gidsToUnFix = new ArrayList<>(gids);
 		final GermplasmDAO germplasmDao = this.daoFactory.getGermplasmDao();
@@ -90,17 +85,27 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	@Override
-	public GermplasmGroup getGroupMembers(final Germplasm founder) {
-		final GermplasmGroup germplasmGroup = new GermplasmGroup();
+	public List<GermplasmGroup> getGroupMembers(final List<Integer> gids) {
+		final List<Germplasm> germplasmList = this.daoFactory.getGermplasmDao().getByGIDList(gids);
+		return this.getGroupMembersForGermplasm(germplasmList);
+	}
 
-		final Method method = this.daoFactory.getMethodDAO().getById(founder.getMethodId());
-		founder.setMethod(method);
+	private List<GermplasmGroup> getGroupMembersForGermplasm(final List<Germplasm> germplasmList) {
+		final List<GermplasmGroup> germplasmGroupList = new ArrayList<>();
+		for (final Germplasm founder : germplasmList) {
+			final GermplasmGroup germplasmGroup = new GermplasmGroup();
 
-		germplasmGroup.setFounder(new GermplasmGroupMember(founder));
-		germplasmGroup.setGenerative(method.isGenerative());
-		germplasmGroup.setGroupId(founder.getMgid());
-		germplasmGroup.setGroupMembers(this.daoFactory.getGermplasmDao().getMembersForManagementGroup(founder.getMgid()));
-		return germplasmGroup;
+			final Method method = this.daoFactory.getMethodDAO().getById(founder.getMethodId());
+			founder.setMethod(method);
+
+			germplasmGroup.setFounderGid(founder.getGid());
+			germplasmGroup.setGenerative(method.isGenerative());
+			germplasmGroup.setGroupId(founder.getMgid());
+			this.daoFactory.getGermplasmDao().getManagementGroupMembers(founder.getMgid()).forEach(germplasmGroup::addGroupMember);
+			germplasmGroupList.add(germplasmGroup);
+		}
+
+		return germplasmGroupList;
 	}
 
 	@Override
@@ -485,11 +490,4 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		return null;
 	}
 
-	void setDaoFactory(final DaoFactory daoFactory) {
-		this.daoFactory = daoFactory;
-	}
-
-	void setGermplasmDataManager(final GermplasmDataManager germplasmDataManager) {
-		this.germplasmDataManager = germplasmDataManager;
-	}
 }

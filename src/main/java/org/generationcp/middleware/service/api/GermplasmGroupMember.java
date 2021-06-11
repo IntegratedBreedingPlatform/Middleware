@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -21,7 +22,10 @@ public class GermplasmGroupMember {
 
 	public GermplasmGroupMember(final Germplasm germplasm) {
 		this.gid = germplasm.getGid();
-		this.preferredName = germplasm.getPreferredName().getNval();
+		final Name preferredName = germplasm.getPreferredName();
+		if (preferredName != null) {
+			this.preferredName = preferredName.getNval();
+		}
 	}
 
 	public Integer getGid() {

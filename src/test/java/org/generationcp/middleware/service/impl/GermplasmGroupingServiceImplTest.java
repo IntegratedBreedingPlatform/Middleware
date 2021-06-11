@@ -24,6 +24,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Collections;
 import java.util.List;
@@ -73,8 +74,8 @@ public class GermplasmGroupingServiceImplTest {
 	@Before
 	public void beforeEachTest() {
 		MockitoAnnotations.initMocks(this);
-		this.germplasmGroupingService.setDaoFactory(this.daoFactory);
-		this.germplasmGroupingService.setGermplasmDataManager(this.germplasmDataManager);
+		ReflectionTestUtils.setField(this.germplasmGroupingService, "daoFactory", this.daoFactory);
+		ReflectionTestUtils.setField(this.germplasmGroupingService, "germplasmDataManager", this.germplasmDataManager);
 		Mockito.doReturn(this.germplasmDAO).when(this.daoFactory).getGermplasmDao();
 		Mockito.doReturn(this.methodDAO).when(this.daoFactory).getMethodDAO();
 		Mockito.doReturn(this.userDefinedFieldDAO).when(this.daoFactory).getUserDefinedFieldDAO();

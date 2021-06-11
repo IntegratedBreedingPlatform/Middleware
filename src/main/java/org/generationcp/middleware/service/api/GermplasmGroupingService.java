@@ -65,7 +65,7 @@ public interface GermplasmGroupingService {
 	 * Get all group members where the given germplasm is a founder. For the
 	 * founder gid = mgid.
 	 */
-	GermplasmGroup getGroupMembers(Germplasm founder);
+	List<GermplasmGroup> getGroupMembers(List<Integer> gids);
 
 	GermplasmPedigreeTree getDescendantTree(Germplasm germplasm);
 

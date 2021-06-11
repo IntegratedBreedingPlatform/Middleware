@@ -18,11 +18,8 @@ public class GermplasmGroupTestDataInitializer {
 
 	public GermplasmGroup createGermplasmGroup(final Integer groupId, final Integer noOfEntries) {
 		final GermplasmGroup germplasmGroup = new GermplasmGroup();
-
-		// the founder germplasm gid is the mgid of a germplasm group
-		final GermplasmGroupMember founder = new GermplasmGroupMember(groupId, RandomStringUtils.randomAlphabetic(10));
-		germplasmGroup.setFounder(founder);
-
+		germplasmGroup.setFounderGid(groupId);
+		germplasmGroup.setGroupId(groupId);
 		final List<GermplasmGroupMember> groupMembers = new ArrayList<>();
 		for (int i = 1; i <= noOfEntries; i++) {
 			final GermplasmGroupMember groupMember = new GermplasmGroupMember(groupId, RandomStringUtils.randomAlphabetic(10));
