@@ -482,6 +482,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 			if (!CollectionUtils.isEmpty(studyInstanceDtos)) {
 				final List<Integer> studyIds = new ArrayList<>(studyInstanceDtos.stream().map(o -> Integer.valueOf(o.getTrialDbId()))
 					.collect(Collectors.toSet()));
+				final List<Integer> studyInstanceIds = new ArrayList<>(studyInstanceDtos.stream().map(o -> Integer.valueOf(o.getStudyDbId()))
+					.collect(Collectors.toSet()));
 				final Map<Integer, List<ObservationLevel>> observationLevelsMap = this.daoFactory.getDmsProjectDAO()
 					.getObservationLevelsMap(studyIds);
 				final Map<Integer, Integer> studyEnvironmentDatasetIdMap = this.daoFactory.getDmsProjectDAO()
@@ -490,6 +492,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 				final Map<Integer, List<MeasurementVariable>> studyEnvironmentVariablesMap = new HashMap<>();
 				final Map<Integer, Map<String, String>> studyAdditionalInfoMap = this.daoFactory.getProjectPropertyDAO()
 					.getProjectPropsAndValuesByStudyIds(studyIds);
+				final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
+					this.daoFactory.getStudyInstanceExternalReferenceDao().getExternalReferences(studyInstanceIds).stream().collect(groupingBy(
+						ExternalReferenceDTO::getEntityId));
 
 				for (final StudyInstanceDto studyInstanceDto : studyInstanceDtos) {
 					final Integer trialDbId = Integer.valueOf(studyInstanceDto.getTrialDbId());
@@ -521,6 +526,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 						studyInstanceDto.getAdditionalInfo().putAll(studyAdditionalInfoMap.get(trialDbId));
 					}
 
+					studyInstanceDto.setExternalReferences(externalReferencesMap.get(studyInstanceDto.getStudyDbId()));
 					studyInstanceDto.setObservationLevels(observationLevelsMap.get(trialDbId));
 				}
 			}

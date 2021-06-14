@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.util.serializer.DatePropertySerializer;
@@ -40,7 +41,7 @@ public class StudyInstanceDto {
 	private ExperimentalDesign experimentalDesign;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private List<String> externalReferences;
+	private List<ExternalReferenceDTO> externalReferences;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String growthFacility;
@@ -368,11 +369,11 @@ public class StudyInstanceDto {
 		this.experimentalDesign = experimentalDesign;
 	}
 
-	public List<String> getExternalReferences() {
+	public List<ExternalReferenceDTO> getExternalReferences() {
 		return this.externalReferences;
 	}
 
-	public void setExternalReferences(final List<String> externalReferences) {
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
 		this.externalReferences = externalReferences;
 	}
 
