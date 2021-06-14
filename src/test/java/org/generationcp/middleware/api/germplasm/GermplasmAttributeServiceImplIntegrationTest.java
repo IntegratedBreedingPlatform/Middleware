@@ -82,7 +82,7 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 		final Germplasm germplasm = this.createGermplasm();
 		final Integer createdAttributeId = this.createAttribute(germplasm.getGid());
 		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(
-			germplasm.getGid(), VariableType.GERMPLASM_ATTRIBUTE.getId());
+			germplasm.getGid(), VariableType.GERMPLASM_ATTRIBUTE.getId(), null);
 		final List<GermplasmAttributeDto> filteredDtos = germplasmAttributeDtos.stream().filter(dto -> dto.getId().equals(createdAttributeId))
 			.collect(Collectors.toList());
 		Assert.assertFalse(CollectionUtils.isEmpty(filteredDtos));
