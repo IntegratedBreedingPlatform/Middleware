@@ -309,11 +309,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<UserDefinedField> getAttributeTypesByGIDList(final List<Integer> gidList) {
-		return this.daoFactory.getUserDefinedFieldDAO().getAttributeTypesByGIDList(gidList);
-	}
-
-	@Override
 	public Map<Integer, String> getAttributeValuesByTypeAndGIDList(final Integer attributeType, final List<Integer> gidList) {
 		final Map<Integer, String> returnMap = new HashMap<>();
 		// initialize map with GIDs
@@ -1293,11 +1288,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public Map<Integer, String[]> getParentsInfoByGIDList(final List<Integer> gidList) {
 		return this.daoFactory.getGermplasmDao().getParentsInfoByGIDList(gidList);
-	}
-
-	@Override
-	public List<UserDefinedField> getAllAttributesTypes() {
-		return this.daoFactory.getAttributeDAO().getAttributeTypes();
 	}
 
 	@Override

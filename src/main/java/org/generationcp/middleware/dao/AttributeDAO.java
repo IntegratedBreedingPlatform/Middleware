@@ -16,12 +16,9 @@ import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.UserDefinedField;
-import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.springframework.data.domain.Pageable;
@@ -88,14 +85,6 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			}
 		}
 		return returnList;
-	}
-
-	@SuppressWarnings("unchecked")
-	@Deprecated
-	//FIXME Needs to be deleted
-	public List<UserDefinedField> getAttributeTypes() {
-		final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class).add(Restrictions.eq("ftable", "ATRIBUTS"));
-		return criteria.list();
 	}
 
 	public Attribute getAttributeByGidAndVariableId(final Integer gid, final Integer variableId) {

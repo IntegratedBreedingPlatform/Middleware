@@ -896,16 +896,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void getAttributeTypesByGIDList() throws MiddlewareQueryException {
-		final List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
-		final List<UserDefinedField> results = this.germplasmDataManager.getAttributeTypesByGIDList(gids);
-		Debug.println(IntegrationTestBase.INDENT, "getAttributeTypesByGIDList(" + gids + "): ");
-		for (final UserDefinedField field : results) {
-			Debug.println(IntegrationTestBase.INDENT, field.getFname());
-		}
-	}
-
-	@Test
 	public void getAttributeValuesByTypeAndGIDList() throws MiddlewareQueryException {
 		final List<Integer> gids = Arrays.asList(1, 2, 3, 4, 5);
 		final int attributeType = 1115;
@@ -1130,15 +1120,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		assertThat(result.get(2)[1], is(equalTo(parent2Name)));
 		assertThat(result.get(3)[0], is(equalTo(separator)));
 		assertThat(result.get(3)[1], is(equalTo(parent3Name)));
-	}
-
-	@Test
-	public void testGetAllAttributeTypes() {
-		final List<UserDefinedField> attributeTypes = this.germplasmDataManager.getAllAttributesTypes();
-		assertThat(attributeTypes, is(notNullValue()));
-		for (final UserDefinedField field : attributeTypes) {
-			assertThat("ATRIBUTS", is(equalTo(field.getFtable())));
-		}
 	}
 
 	@Test

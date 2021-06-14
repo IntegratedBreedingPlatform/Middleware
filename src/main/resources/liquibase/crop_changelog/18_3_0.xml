@@ -242,6 +242,35 @@
 					WHERE
 					cvterm_id is not null;
 				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					select count(*) > 0 from listdataprops l inner join udflds_attributes_bkp bkp on bkp.fcode = l.column_name;
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Replace old attributes names in listdataprops with the new variable names</comment>
+		<sql dbms="mysql">
+			ALTER TABLE listdataprops
+			  ADD COLUMN column_name_tmp varchar(50) DEFAULT NULL;
+
+			UPDATE listdataprops INNER JOIN udflds_attributes_bkp bkp ON bkp.fcode = column_name
+			SET column_name_tmp = bkp.cvterm_name WHERE 1 = 1;
+
+			UPDATE listdataprops SET column_name = UPPER(column_name_tmp) WHERE column_name_tmp IS NOT NULL;
+
+			ALTER TABLE listdataprops DROP COLUMN column_name_tmp;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-11">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="udflds_attributes_bkp"></tableExists>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) > 0
+					FROM udflds_attributes_bkp
+					WHERE
+					cvterm_id is not null;
+				</sqlCheck>
 				<sqlCheck expectedResult="0">
 					SELECT
 					COUNT(*)
@@ -308,7 +337,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="clarysabel" id="v18.3.0-11">
+	<changeSet author="clarysabel" id="v18.3.0-12">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -326,7 +355,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="clarysabel" id="v18.3.0-12">
+	<changeSet author="clarysabel" id="v18.3.0-13">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT
@@ -344,7 +373,7 @@
 		</sql>
 	</changeSet>
 	
-	<changeSet author="clarysabel" id="v18.3.0-13">
+	<changeSet author="clarysabel" id="v18.3.0-14">
 		<preConditions onFail="MARK_RAN">
 			<not><columnExists tableName="atributs" columnName="cval_id"></columnExists></not>
 		</preConditions>
@@ -356,7 +385,7 @@
 		</addColumn>
 	</changeSet>
 
-	<changeSet author="clarysabel" id="v18.3.0-14">
+	<changeSet author="clarysabel" id="v18.3.0-15">
 		<preConditions onFail="MARK_RAN">
 			<not><columnExists tableName="atributs_aud" columnName="cval_id"></columnExists></not>
 		</preConditions>

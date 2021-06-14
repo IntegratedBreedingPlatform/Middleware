@@ -240,13 +240,6 @@ public interface GermplasmDataManager {
 	Integer updateGermplasmName(Name name);
 
 	/**
-	 * Returns all the available attribute types
-	 *
-	 * @return List of UserDefinedField POJOs that contains all the attribute types
-	 */
-	List<UserDefinedField> getAllAttributesTypes();
-
-	/**
 	 * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasm.GermplasmService#getAttributesByGID(Integer)}
 	 *
 	 * Returns all the attributes of the Germplasm identified by the given id.
@@ -256,14 +249,6 @@ public interface GermplasmDataManager {
 	 */
 	@Deprecated
 	List<Attribute> getAttributesByGID(Integer gid);
-
-	/**
-	 * Returns all the list of attribute types identified by the given list of gids.
-	 *
-	 * @param gidList - list of GIDs
-	 * @return List of UserDefinedField POJOs that contains the attribute types and names for the given GIDs.
-	 */
-	List<UserDefinedField> getAttributeTypesByGIDList(List<Integer> gidList);
 
 	/**
 	 * Returns a Map of GIDs to the attribute values given an attribute type and a list of GIDs.
