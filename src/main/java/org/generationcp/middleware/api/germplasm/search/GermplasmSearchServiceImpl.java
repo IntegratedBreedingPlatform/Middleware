@@ -1,11 +1,11 @@
 package org.generationcp.middleware.api.germplasm.search;
 
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +36,8 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 	}
 
 	@Override
-	public List<CVTerm> getGermplasmAttributeTypes(final GermplasmSearchRequest germplasmSearchRequest) {
-		return this.daoFactory.getGermplasmSearchDAO().getGermplasmAttributeTypes(germplasmSearchRequest);
+	public List<Variable> getGermplasmAttributeVariables(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
+		return this.daoFactory.getGermplasmSearchDAO().getGermplasmAttributeVariables(germplasmSearchRequest, programUUID);
 	}
 
 	@Override

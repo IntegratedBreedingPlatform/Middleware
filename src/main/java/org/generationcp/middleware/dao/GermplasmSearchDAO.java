@@ -10,7 +10,13 @@ import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.gms.search.GermplasmSortableColumn;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -25,7 +31,6 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
@@ -1575,20 +1580,51 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			.list();
 	}
 
-	public List<CVTerm> getGermplasmAttributeTypes(final GermplasmSearchRequest germplasmSearchRequest) {
+	public List<Variable> getGermplasmAttributeVariables(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
+		final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
 		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery("select "
+				+ "v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, \n"
+				+ "vpo.alias p_alias, vpo.expected_min p_min_value, vpo.expected_max p_max_value" //
+				+ " FROM cvterm v INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
+				+ " and v.cvterm_id = cp.cvterm_id " //
+				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
+				+ " left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
+				+ " left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
+				+ " left join variable_overrides vpo ON vpo.cvterm_id = v.cvterm_id AND vpo.program_uuid = :programUUID " //
+				+ " inner join atributs a  on a.atype = v.cvterm_id " //
+				+ " WHERE v.cv_id = " + CvId.VARIABLES.getId() + " "  //
+				+ "		and cp.value in (select name from cvterm where cvterm_id in (" //
+				+ VariableType.GERMPLASM_PASSPORT.getId() + "," //
+				+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ")"
+				+ ") " //
+				+ " and a.gid in (:gids)" //
+				+ " group by v.cvterm_id");
+			sqlQuery.setParameter("programUUID", programUUID);
+			sqlQuery.setParameterList("gids", gids);
 
-			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
-			final String sql = "select distinct {cv.*} from atributs a inner join cvterm cv "
-				+ " where a.atype = cv.cvterm_id"
-				+ " and a.gid in (:gids)"
-				+ " order by cv.name";
+			final List queryResults = sqlQuery.list();
+			final List<Variable> variables = new ArrayList<>();
+			for (final Object row : queryResults) {
+				final Object[] items = (Object[]) row;
+				final Variable variable =
+					new Variable(new Term(Util.typeSafeObjectToInteger(items[0]), (String) items[1], (String) items[2]));
+				variable.setMethod(new Method(new Term(Util.typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5])));
+				variable.setProperty(new Property(new Term(Util.typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8])));
+				variable.setScale(new Scale(new Term(Util.typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11])));
 
-			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			query.addEntity("cv", CVTerm.class);
-			query.setParameterList("gids", gids);
+				// Alias, Expected Min Value, Expected Max Value
+				final String pAlias = (String) items[12];
+				final String pExpMin = (String) items[13];
+				final String pExpMax = (String) items[14];
 
-			return query.list();
+				variable.setAlias(pAlias);
+				variable.setMinValue(pExpMin);
+				variable.setMaxValue(pExpMax);
+
+				variables.add(variable);
+			}
+			return variables;
 		} catch (final HibernateException e) {
 			final String message =
 				"Error with getGermplasmAttributeTypes(GermplasmSearchRequest=" + germplasmSearchRequest + ") : " + e.getMessage();
