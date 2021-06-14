@@ -1182,22 +1182,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return germplasms;
 	}
 
-	public Germplasm getByLGid(final Integer lgid) {
-		try {
-			final SQLQuery query =
-				this.getSession().createSQLQuery("SELECT g.* FROM germplsm g WHERE g.deleted = 0 AND lgid=:lgid LIMIT 1");
-			query.setParameter("lgid", lgid);
-			query.addEntity("g", Germplasm.class);
-
-			return (Germplasm) query.uniqueResult();
-
-		} catch (final HibernateException e) {
-			final String message = "Error with getByLGid(lgid=" + lgid + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
-			GermplasmDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	public Map<Integer, String[]> getParentsInfoByGIDList(final List<Integer> gidList) {
 		try {

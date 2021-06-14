@@ -1192,11 +1192,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return new Name();
 	}
 
-	@Override
-	public Germplasm getGermplasmByLocalGid(final Integer lgid) {
-		return this.daoFactory.getGermplasmDao().getByLGid(lgid);
-	}
-
 	/**
 	 * (non-Javadoc)
 	 */

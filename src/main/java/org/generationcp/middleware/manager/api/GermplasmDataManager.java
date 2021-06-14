@@ -574,7 +574,7 @@ public interface GermplasmDataManager {
 	 * @param preferredName the preferred name
 	 * @return the id of the {@code Germplasm} record added
 	 */
-	Integer addGermplasm(Germplasm germplasm, Name preferredName, final CropType cropType);
+	Integer addGermplasm(Germplasm germplasm, Name preferredName, CropType cropType);
 
 	/**
 	 * Given a map of valid Germplasm and Name objects, add new records for the given parameters.
@@ -875,13 +875,6 @@ public interface GermplasmDataManager {
 	 */
 	Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
 
-	/*
-	 * get the Germplasm from the crop database based on local gid reference
-	 *
-	 * @param lgid
-	 */
-	Germplasm getGermplasmByLocalGid(Integer lgid);
-
 	/**
 	 * Enables us to query the udflds table
 	 *
@@ -890,7 +883,7 @@ public interface GermplasmDataManager {
 	 * @param code  we are looking for
 	 * @return
 	 */
-	UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code);
+	UserDefinedField getUserDefinedFieldByTableTypeAndCode(String table, String type, String code);
 
 	/**
 	 * Return the count of germplasm search results based on the following parameters:
@@ -958,7 +951,7 @@ public interface GermplasmDataManager {
 	 * @param gids the gids
 	 * @return the preferred names by gids
 	 */
-	Map<Integer, String> getGroupSourcePreferredNamesByGids(final List<Integer> gids);
+	Map<Integer, String> getGroupSourcePreferredNamesByGids(List<Integer> gids);
 
 	/**
 	 * Given a List of GIDs, return a Map of GIDs to PreferredName.
@@ -966,14 +959,14 @@ public interface GermplasmDataManager {
 	 * @param gids the gids
 	 * @return the preferred names by gids
 	 */
-	Map<Integer, String> getImmediateSourcePreferredNamesByGids(final List<Integer> gids);
+	Map<Integer, String> getImmediateSourcePreferredNamesByGids(List<Integer> gids);
 
 	/**
 	 * @param gid
 	 * @param variableId
 	 * @return Attribute value that matches with variableId and gid
 	 */
-	String getAttributeValue(final Integer gid, final Integer variableId);
+	String getAttributeValue(Integer gid, Integer variableId);
 
 	void save(Germplasm germplasm);
 
@@ -987,7 +980,7 @@ public interface GermplasmDataManager {
 
 	Germplasm getUnknownGermplasmWithPreferredName();
 
-	List<Integer> addOrUpdateGermplasm(final List<Germplasm> germplasms, final Operation operation);
+	List<Integer> addOrUpdateGermplasm(List<Germplasm> germplasms, Operation operation);
 
 	List<Attribute> getAttributeByIds(List<Integer> ids);
 
