@@ -226,11 +226,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Attribute> getAttributesByGID(final Integer gid) {
-		return this.daoFactory.getAttributeDAO().getByGID(gid);
-	}
-
-	@Override
 	public Map<Integer, String> getAttributeValuesByTypeAndGIDList(final Integer attributeType, final List<Integer> gidList) {
 		final Map<Integer, String> returnMap = new HashMap<>();
 		// initialize map with GIDs
@@ -450,15 +445,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				"Error encountered while deleting Method: GermplasmDataMananger.deleteMethod(method=" + method + "): " + e.getMessage(),
 				e);
 		}
-	}
-
-	/**
-	 * @deprecated
-	 */
-	@Override
-	@Deprecated
-	public Country getCountryById(final Integer id) {
-		return this.daoFactory.getCountryDao().getById(id, false);
 	}
 
 	/**
@@ -754,15 +740,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Method> getMethodsByGroupIncludesGgroup(final String group) {
 		return this.daoFactory.getMethodDAO().getByGroupIncludesGgroup(group);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	@Override
-	@Deprecated
-	public List<Location> getAllBreedingLocations() {
-		return this.daoFactory.getLocationDAO().getAllBreedingLocations();
 	}
 
 	@Override

@@ -342,13 +342,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAttributesByGID() {
-		final int gid = 50533;
-		final List<Attribute> attributes = this.germplasmDataManager.getAttributesByGID(gid);
-		Debug.println(IntegrationTestBase.INDENT, "testGetAttributesByGID(" + gid + "): " + attributes);
-	}
-
-	@Test
 	public void testAddMethod() throws MiddlewareQueryException {
 		Method method = new Method();
 		method.setMname("yesno");

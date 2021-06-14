@@ -167,17 +167,6 @@ public interface GermplasmDataManager {
 	List<Integer> addGermplasmName(List<Name> names);
 
 	/**
-	 * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasm.GermplasmService#getAttributesByGID(Integer)}
-	 *
-	 * Returns all the attributes of the Germplasm identified by the given id.
-	 *
-	 * @param gid - id of the Germplasm
-	 * @return List of Atributs POJOs
-	 */
-	@Deprecated
-	List<Attribute> getAttributesByGID(Integer gid);
-
-	/**
 	 * Returns a Map of GIDs to the attribute values given an attribute type and a list of GIDs.
 	 *
 	 * @param attributeType - attribute type of the values to retrieve
@@ -383,18 +372,6 @@ public interface GermplasmDataManager {
 	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndFTypeAndFName(String tableName, String fieldType, String fieldName);
 
 	/**
-	 * Please use LocationDataManager.getCountryById().
-	 * <p>
-	 * Returns the country record identified by the given id.
-	 *
-	 * @param id - id of the country record
-	 * @return the Country POJO representing the record
-	 * @deprecated
-	 */
-	@Deprecated
-	Country getCountryById(Integer id);
-
-	/**
 	 * Please use LocationDataManager.getLocationById().
 	 * <p>
 	 * Returns the location record identified by the given id.
@@ -558,19 +535,6 @@ public interface GermplasmDataManager {
 	 * @return List of GidNidElement based on the specified list of germplasm names
 	 */
 	List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(List<String> germplasmNames, GetGermplasmByNameModes mode);
-
-	/**
-	 * Please use LocationDataManager.getAllBreedingLocations().
-	 * <p>
-	 * Get all breeding locations.
-	 * <p>
-	 * Return a List of Locations which represent the breeding locations stored in the location table of IBDB.
-	 *
-	 * @return the all breeding locations
-	 * @deprecated
-	 */
-	@Deprecated
-	List<Location> getAllBreedingLocations();
 
 	/**
 	 * Returns the String representation of next available sequence number for Germplasm Names with given prefix
