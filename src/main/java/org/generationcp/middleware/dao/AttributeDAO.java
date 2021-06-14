@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -118,13 +119,13 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return attribute;
 	}
 
-	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId) {
+	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId, final String programUUID) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("Select a.aid AS id, ");
 			queryString.append("cv.cvterm_id as variableId, ");
 			queryString.append("a.aval AS value, ");
-			queryString.append("cv.name AS variableName, ");
+			queryString.append("IFNULL(vpo.alias, cv.name) AS variableName, ");
 			queryString.append("cp.value AS variableTypeName, ");
 			queryString.append("cv.definition AS variableDescription, ");
 			queryString.append("CAST(a.adate AS CHAR(255)) AS date, ");
@@ -132,8 +133,9 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			queryString.append("l.lname AS locationName ");
 			queryString.append("FROM atributs a ");
 			queryString.append("INNER JOIN cvterm cv ON a.atype = cv.cvterm_id ");
-			queryString.append("INNER JOIN cvtermprop cp ON cp.type_id = 1800 and cv.cvterm_id = cp.cvterm_id ");
+			queryString.append("INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id ");
 			queryString.append("LEFT JOIN location l on a.alocn = l.locid ");
+			queryString.append("LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = cv.cvterm_id AND vpo.program_uuid = :programUUID ");
 			queryString.append("WHERE a.gid = :gid ");
 			if (variableTypeId != null) {
 				queryString.append("AND cp.value = (select name from cvterm where cvterm_id = :variableTypeId) ");
@@ -153,6 +155,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 				sqlQuery.setParameter("variableTypeId", variableTypeId);
 			}
 
+			sqlQuery.setParameter("programUUID", programUUID);
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmAttributeDto.class));
 			return sqlQuery.list();
 		} catch (final HibernateException e) {

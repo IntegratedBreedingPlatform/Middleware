@@ -25,8 +25,8 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 
 	@Override
 	//FIXME Should receive a filter object and allows filtering by attributeId and variableId
-	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId) {
-		return this.daoFactory.getAttributeDAO().getGermplasmAttributeDtos(gid, variableTypeId);
+	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId, final String programUUID) {
+		return this.daoFactory.getAttributeDAO().getGermplasmAttributeDtos(gid, variableTypeId, programUUID);
 	}
 
 	@Override

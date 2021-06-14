@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface GermplasmAttributeService {
 
-	List<GermplasmAttributeDto> getGermplasmAttributeDtos(Integer gid, Integer variableTypeId);
+	List<GermplasmAttributeDto> getGermplasmAttributeDtos(Integer gid, Integer variableTypeId, String programUUID);
 
 	Integer createGermplasmAttribute(Integer gid, GermplasmAttributeRequestDto dto);
 
