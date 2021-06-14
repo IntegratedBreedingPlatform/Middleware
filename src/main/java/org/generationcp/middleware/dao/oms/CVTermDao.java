@@ -174,6 +174,53 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return stdVarMap;
 	}
 
+	public Map<Integer, MeasurementVariable> getVariablesByIdsAndVariableTypes(final List<String> ids, final List<String> variableTypes) {
+		final Map<Integer, MeasurementVariable> stdVarMap = new HashMap<>();
+
+		try {
+			if (!ids.isEmpty()) {
+
+				final StringBuilder sqlString = new StringBuilder().append("SELECT variableType.value AS variableTypeName, cvt.cvterm_id AS termId, dataType.object_id As dataTypeId")
+					.append(" FROM cvterm cvt ")
+					.append(" INNER JOIN cvterm_relationship hasScale ON hasScale.subject_id = cvt.cvterm_id AND hasScale.type_id = "
+						+ TermId.HAS_SCALE.getId() + " ")
+					.append(" INNER JOIN cvterm_relationship datatype ON dataType.subject_id = hasScale.object_id ")
+					.append(" 	AND dataType.type_id = ").append(TermId.HAS_TYPE.getId())
+					.append(" INNER JOIN cvtermprop variableType ON variableType.cvterm_id = cvt.cvterm_id ")
+					.append(" 	AND variableType.type_id = ").append(TermId.VARIABLE_TYPE.getId())
+					.append(" WHERE cvt.cv_id = :cvId and cvt.cvterm_id IN (:ids) AND cvt.is_obsolete = 0 ")
+					.append(" 	AND variableType.value IN (:variableTypes) ");
+
+				final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
+				query.setParameter("cvId", CvId.VARIABLES.getId());
+				query.setParameterList("ids", ids);
+				query.setParameterList("variableTypes", variableTypes);
+
+				query.addScalar("variableTypeName", StringType.INSTANCE);
+				query.addScalar("termId", IntegerType.INSTANCE);
+				query.addScalar("dataTypeId", IntegerType.INSTANCE);
+				final List<Object[]> results = query.list();
+
+				for (final Object[] row : results) {
+					final MeasurementVariable measurementVariable = new MeasurementVariable();
+					final VariableType variableType = VariableType.getByName((String) row[0]);
+					measurementVariable.setVariableType(variableType);
+					measurementVariable.setTermId((Integer) row[1]);
+					measurementVariable.setDataTypeId((Integer) row[2]);
+					stdVarMap.put(measurementVariable.getTermId(), measurementVariable);
+				}
+
+				return stdVarMap;
+
+			}
+
+		} catch (final HibernateException e) {
+			this.logAndThrowException(
+				"Error in getVariablesByIdsAndVariableTypes=" + ids + " in CVTermDao: " + e.getMessage(), e);
+		}
+		return stdVarMap;
+	}
+
 	public Map<String, MeasurementVariable> getVariablesBySynonymsAndVariableType(final List<String> names,
 		final VariableType variableType) {
 		final Map<String, MeasurementVariable> stdVarMap = new HashMap<>();

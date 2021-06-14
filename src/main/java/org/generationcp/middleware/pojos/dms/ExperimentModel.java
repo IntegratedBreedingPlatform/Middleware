@@ -105,6 +105,8 @@ public class ExperimentModel implements Serializable {
 	@Column(name = "observation_unit_no")
 	private Integer observationUnitNo;
 
+
+
 	public ExperimentModel() {
 	}
 
@@ -177,11 +179,11 @@ public class ExperimentModel implements Serializable {
 	public void setProject(final DmsProject project) {
 		this.project = project;
 	}
-	
+
 	public StockModel getStock() {
 		return this.stock;
 	}
-	
+
 	public void setStock(final StockModel stock) {
 		this.stock = stock;
 	}

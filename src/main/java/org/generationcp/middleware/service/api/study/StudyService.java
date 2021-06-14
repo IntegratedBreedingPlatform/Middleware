@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.domain.dms.StudySummary;
@@ -81,4 +82,6 @@ public interface StudyService {
 	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
 
 	List<StudySummary> saveStudies(String crop, List<TrialImportRequestDTO> trialImportRequestDtoList, Integer userId);
+
+	List<StudyInstanceDto> saveStudyInstances(String crop, List<StudyImportRequestDTO> studyImportRequestDTOS, Integer userId);
 }

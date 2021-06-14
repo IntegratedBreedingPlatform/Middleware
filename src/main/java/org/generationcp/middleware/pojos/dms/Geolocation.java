@@ -12,6 +12,7 @@
 package org.generationcp.middleware.pojos.dms;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.persistence.Basic;
@@ -22,18 +23,21 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 
 import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.pojos.InstanceExternalReference;
+import org.generationcp.middleware.pojos.StudyExternalReference;
 import org.hibernate.annotations.BatchSize;
 
 /**
  *
  * The Geolocation table maps to the Location module of the logical data model. Information in this table corresponds to actual physical
  * locations where Field Trials are conducted.
- * 
+ *
  * @author Darla Ani
  *
  */
@@ -73,6 +77,10 @@ public class Geolocation implements Serializable {
 	@OneToMany(mappedBy = "geolocation", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	@BatchSize(size = 5000)
 	private List<GeolocationProperty> properties;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "nd_geolocation_id")
+	private List<InstanceExternalReference> externalReferences = new ArrayList<>();
 
 	public Geolocation() {
 
@@ -137,6 +145,14 @@ public class Geolocation implements Serializable {
 
 	public void setProperties(List<GeolocationProperty> properties) {
 		this.properties = properties;
+	}
+
+	public List<InstanceExternalReference> getExternalReferences() {
+		return externalReferences;
+	}
+
+	public void setExternalReferences(final List<InstanceExternalReference> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	@Override
