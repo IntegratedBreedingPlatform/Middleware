@@ -12,9 +12,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
@@ -41,9 +43,7 @@ public class GermplasmGroupingServiceImplIntegrationTest extends IntegrationTest
 	@Test
 	public void testMarkFixed_Derivative(){
 		final Germplasm germplasm1 = this.createGermplasm("DER", -1, 0, 0);
-		this.daoFactory.getGermplasmDao().save(germplasm1);
 		final Germplasm germplasm2 =this.createGermplasm("DER", -1, germplasm1.getGid(), 0);
-		this.daoFactory.getGermplasmDao().save(germplasm2);
 		final List<GermplasmGroup> germplasmGroups =
 			this.germplasmGroupingService.markFixed(Arrays.asList(germplasm1.getGid(), germplasm2.getGid()), false, false);
 		Assert.assertEquals(2, germplasmGroups.size());
@@ -54,9 +54,7 @@ public class GermplasmGroupingServiceImplIntegrationTest extends IntegrationTest
 	@Test
 	public void testMarkFixed_Generative(){
 		final Germplasm germplasm1 = this.createGermplasm("GEN", 2, 0, 0);
-		this.daoFactory.getGermplasmDao().save(germplasm1);
 		final Germplasm germplasm2 =this.createGermplasm("GEN", 2, germplasm1.getGid(), 0);
-		this.daoFactory.getGermplasmDao().save(germplasm2);
 		final List<GermplasmGroup> germplasmGroups =
 			this.germplasmGroupingService.markFixed(Arrays.asList(germplasm1.getGid(), germplasm2.getGid()), false, false);
 		Assert.assertEquals(2, germplasmGroups.size());
@@ -64,16 +62,48 @@ public class GermplasmGroupingServiceImplIntegrationTest extends IntegrationTest
 		this.verifyGermplasmGroupWasNotFixed(germplasm2,germplasmGroups.get(1));
 	}
 
+	@Test
+	public void testUnfixLines(){
+		final Germplasm germplasm1 = this.createGermplasm("GEN", 2, 0, 1);
+		final Germplasm germplasm2 =this.createGermplasm("DER", 2, 0, 1);
+		final Germplasm germplasm3 =this.createGermplasm("DER", 2, 0, 0);
+
+		final List<Integer> gids = Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid());
+		final List<Integer> unfixedGids =
+			this.germplasmGroupingService.unfixLines(gids);
+		Assert.assertTrue(unfixedGids.contains(germplasm1.getGid()));
+		Assert.assertTrue(unfixedGids.contains(germplasm2.getGid()));
+		Assert.assertFalse(unfixedGids.contains(germplasm3.getGid()));
+		Assert.assertEquals(gids, this.daoFactory.getGermplasmDao().getGermplasmWithoutGroup(gids).stream().map(Germplasm::getGid).collect(
+			Collectors.toList()));
+	}
+
+	@Test
+	public void testUnfixLines_NoneFixed(){
+		final Germplasm germplasm1 = this.createGermplasm("GEN", 2, 0, 0);
+		final Germplasm germplasm2 =this.createGermplasm("DER", 2, 0, 0);
+		final Germplasm germplasm3 =this.createGermplasm("DER", 2, 0, 0);
+
+		final List<Integer> unfixedGids =
+			this.germplasmGroupingService.unfixLines(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
+		Assert.assertTrue(CollectionUtils.isEmpty(unfixedGids));
+	}
+
 	private void verifyGermplasmGroupWasFixed(final Germplasm germplasm, final GermplasmGroup germplasmGroup) {
 		Assert.assertEquals(germplasm.getGid(), germplasmGroup.getFounderGid());
 		Assert.assertEquals(germplasm.getGid(), germplasmGroup.getGroupId());
 		Assert.assertFalse(germplasmGroup.isGenerative());
-		// Verify getting germplasm anew that MGID was updated
-		final Germplasm latestGermplasm = this.daoFactory.getGermplasmDao().getById(germplasm.getGid());
-		Assert.assertEquals(germplasmGroup.getGroupId(), latestGermplasm.getMgid());
+		this.verifyGermplasmGroupID(germplasm.getGid(), germplasmGroup.getGroupId());
 		Assert.assertEquals(1, germplasmGroup.getGroupMembers().size());
 		Assert.assertEquals(germplasm.getGid(), germplasmGroup.getGroupMembers().get(0).getGid());
 		Assert.assertEquals(germplasm.getPreferredName().getNval(), germplasmGroup.getGroupMembers().get(0).getPreferredName());
+	}
+
+	private void verifyGermplasmGroupID(final Integer gid, final Integer groupId) {
+		this.sessionProvder.getSession().flush();
+		// Verify getting germplasm anew that MGID was updated
+		final Germplasm latestGermplasm = this.daoFactory.getGermplasmDao().getById(gid);
+		Assert.assertEquals(groupId, latestGermplasm.getMgid());
 	}
 
 	private void verifyGermplasmGroupWasNotFixed(final Germplasm germplasm, final GermplasmGroup germplasmGroup) {
@@ -81,17 +111,16 @@ public class GermplasmGroupingServiceImplIntegrationTest extends IntegrationTest
 		Assert.assertEquals(0, germplasmGroup.getGroupId().intValue());
 		Assert.assertTrue(germplasmGroup.isGenerative());
 		// Verify getting germplasm anew that MGID was not updated
-		final Germplasm latestGermplasm = this.daoFactory.getGermplasmDao().getById(germplasm.getGid());
-		Assert.assertEquals(0, latestGermplasm.getMgid().intValue());
+		this.verifyGermplasmGroupID(germplasm.getGid(), germplasmGroup.getGroupId());
 		Assert.assertEquals(0, germplasmGroup.getGroupMembers().size());
 	}
 
 	private Germplasm createGermplasm(final String breedingMethodType, final Integer gnpgs,
-		final Integer gpid1, final Integer gpid2) {
+		final Integer gpid1, Integer mgid) {
 		final Method method = this.createBreedingMethod(breedingMethodType);
-		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2,
+		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, 0,
 			0, 0, Integer.parseInt(this.creationDate), 0,
-			0, 0, null, null, method);
+			0, mgid, null, null, method);
 
 		this.daoFactory.getGermplasmDao().save(germplasm);
 		final Name name = new Name(null, germplasm, 1, 1, RandomStringUtils.randomAlphabetic(20), 0, 0, 0);
