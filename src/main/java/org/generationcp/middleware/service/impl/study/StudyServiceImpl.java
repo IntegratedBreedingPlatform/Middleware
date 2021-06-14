@@ -724,14 +724,19 @@ public class StudyServiceImpl extends Service implements StudyService {
 			environmentVariablesMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(Collectors.toList());
 
+		//Include season variable to the categorical values
+		categoricalVariableIds.add(TermId.SEASON_VAR.getId());
+
 		final Map<Integer, List<ValueReference>> categoricalVariablesMap =
 			this.getCategoricalVariablesMap(categoricalVariableIds);
+
+		final Map<Integer, List<Integer>> studyIdAddedEnvironmentVariablesMap = new HashMap<>();
 
 		for (final StudyImportRequestDTO requestDTO : studyImportRequestDTOS) {
 			final Integer trialId = Integer.valueOf(requestDTO.getTrialDbId());
 			final Integer environmentDatasetId = trialIdEnvironmentDatasetMap.get(trialId).getProjectId();
 			this.addEnvironmentVariablesIfNecessary(requestDTO, studyIdEnvironmentVariablesMap, environmentDatasetId,
-				environmentVariablesMap);
+				environmentVariablesMap, studyIdAddedEnvironmentVariablesMap);
 
 			// Retrieve existing study instances
 			final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(trialId);
@@ -761,6 +766,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 				this.experimentModelGenerator
 					.generate(cropType, environmentDatasetId, Optional.of(geolocation), ExperimentType.TRIAL_ENVIRONMENT);
 			this.addEnvironmentVariableValues(requestDTO, environmentVariablesMap, categoricalVariablesMap, geolocation, experimentModel);
+			this.addSeasonVariableIfNecessary(requestDTO, studyIdEnvironmentVariablesMap, studyIdAddedEnvironmentVariablesMap,
+				environmentDatasetId, geolocation, categoricalVariablesMap);
 			this.setInstanceExternalReferences(requestDTO, geolocation);
 			this.daoFactory.getGeolocationDao().saveOrUpdate(geolocation);
 			this.daoFactory.getExperimentDao().save(experimentModel);
@@ -772,6 +779,47 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final StudySearchFilter filter = new StudySearchFilter();
 		filter.setStudyDbIds(studyIds);
 		return this.getStudyInstancesWithMetadata(filter, null);
+	}
+
+	private void addSeasonVariableIfNecessary(final StudyImportRequestDTO requestDTO,
+		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap,
+		final Map<Integer, List<Integer>> studyIdAddedEnvironmentVariablesMap, final Integer environmentDatasetId,
+		final Geolocation geolocation, final Map<Integer, List<ValueReference>> categoricalVariablesMap) {
+		if(!CollectionUtils.isEmpty(requestDTO.getSeasons())) {
+			final Integer trialDbId = Integer.valueOf(requestDTO.getTrialDbId());
+
+			final MeasurementVariable seasonVariable = new MeasurementVariable();
+			seasonVariable.setTermId(TermId.SEASON_VAR.getId());
+			seasonVariable.setPossibleValues(categoricalVariablesMap.get(TermId.SEASON_VAR.getId()));
+			seasonVariable.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId());
+			seasonVariable.setValue(requestDTO.getSeasons().get(0));
+
+			final DataType dataType = DataType.getById(seasonVariable.getDataTypeId());
+			final java.util.Optional<VariableValueValidator> seasonValidator =
+				this.variableDataValidatorFactory.getValidator(dataType);
+
+			if(!seasonValidator.isPresent() || seasonValidator.get().isValid(seasonVariable, false)) {
+				studyIdAddedEnvironmentVariablesMap.putIfAbsent(trialDbId, new ArrayList<>());
+				//Add season variable if not present to the study
+				if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(seasonVariable.getTermId())
+					&& !studyIdAddedEnvironmentVariablesMap.get(trialDbId).contains(seasonVariable.getTermId())) {
+					this.datasetService
+						.addDatasetVariable(environmentDatasetId, seasonVariable.getTermId(), VariableType.ENVIRONMENT_DETAIL, null);
+					studyIdAddedEnvironmentVariablesMap.get(trialDbId).add(seasonVariable.getTermId());
+				}
+
+				//Add season value for the environment
+				if(geolocation.getProperties() == null) {
+					geolocation.setProperties(new ArrayList<>());
+				}
+				final Map<String, Integer> seasonValuesMap = categoricalVariablesMap.get(seasonVariable.getTermId()).stream()
+					.collect(Collectors.toMap(ValueReference::getDescription, ValueReference::getId));
+				LOG.error(categoricalVariablesMap.get(seasonVariable.getTermId()).get(0).toString());
+				final GeolocationProperty seasonProperty = new GeolocationProperty(geolocation,
+					String.valueOf(seasonValuesMap.get(seasonVariable.getValue())), 1, seasonVariable.getTermId());
+				geolocation.getProperties().add(seasonProperty);
+			}
+		}
 	}
 
 	private void addEnvironmentVariableValues(final StudyImportRequestDTO requestDTO,
@@ -803,7 +851,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 						if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
 							measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
 						}
-						if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
+						if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable, true)) {
 							if (VariableType.ENVIRONMENT_DETAIL.getId().equals(measurementVariable.getVariableType().getId())) {
 								if (GEOLOCATION_METADATA.contains(measurementVariable.getTermId())) {
 									this.mapGeolocationMetaData(geolocation, environmentParameter);
@@ -845,14 +893,17 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 	private void addEnvironmentVariablesIfNecessary(final StudyImportRequestDTO requestDTO,
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap, final Integer environmentDatasetId,
-		final Map<Integer, MeasurementVariable> environmentVariablesMap) {
+		final Map<Integer, MeasurementVariable> environmentVariablesMap, final Map<Integer, List<Integer>> studyIdAddedEnvironmentVariablesMap) {
 		if (!CollectionUtils.isEmpty(requestDTO.getEnvironmentParameters())) {
 			final Integer trialDbId = Integer.valueOf(requestDTO.getTrialDbId());
+			studyIdAddedEnvironmentVariablesMap.putIfAbsent(trialDbId, new ArrayList<>());
 			for (final EnvironmentParameter environmentParameter : requestDTO.getEnvironmentParameters()) {
 				final Integer variableId = Integer.valueOf(environmentParameter.getParameterPUI());
-				if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(variableId)) {
+				if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(variableId)
+					&& !studyIdAddedEnvironmentVariablesMap.get(trialDbId).contains(variableId)) {
 					final VariableType variableType = environmentVariablesMap.get(variableId).getVariableType();
 					this.datasetService.addDatasetVariable(environmentDatasetId, variableId, variableType, null);
+					studyIdAddedEnvironmentVariablesMap.get(trialDbId).add(variableId);
 				}
 			}
 		}
@@ -950,7 +1001,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
 						measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
 					}
-					if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
+					if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable, false)) {
 						final Integer rank = properties.size() + 1;
 						properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
 							measurementVariable.getValue(), rank, measurementVariable.getTermId(), entry.getKey()));

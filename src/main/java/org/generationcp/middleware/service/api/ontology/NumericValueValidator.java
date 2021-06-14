@@ -8,7 +8,7 @@ import org.generationcp.middleware.domain.ontology.DataType;
 public class NumericValueValidator implements VariableValueValidator {
 
 	@Override
-	public boolean isValid(final MeasurementVariable variable) {
+	public boolean isValid(final MeasurementVariable variable, final boolean useCategoricalValueId) {
 		this.ensureNumericDataType(variable.getDataTypeId());
 		return StringUtils.isEmpty(variable.getValue()) || NumberUtils.isNumber(variable.getValue().trim());
 	}
