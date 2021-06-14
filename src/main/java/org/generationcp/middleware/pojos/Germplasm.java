@@ -62,32 +62,7 @@ import java.util.stream.Collectors;
 	@NamedQuery(name = "getAllGermplasm", query = "FROM Germplasm"),
 	@NamedQuery(name = "countAllGermplasm", query = "SELECT COUNT(g) FROM Germplasm g"),
 
-	@NamedQuery(name = "countMatchGermplasmInList", query = "SELECT COUNT(g) FROM Germplasm g WHERE g.gid IN (:gids)"),
-
-	@NamedQuery(name = "getGermplasmByMethodNameUsingEqual",
-		query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
-
-	@NamedQuery(name = "countGermplasmByMethodNameUsingEqual",
-		query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname = :name"),
-
-	@NamedQuery(name = "getGermplasmByMethodNameUsingLike",
-		query = "SELECT g FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
-
-	@NamedQuery(name = "countGermplasmByMethodNameUsingLike",
-		query = "SELECT COUNT(g) FROM Germplasm g, Method m WHERE g.methodId = m.mid AND m.mname like :name"),
-
-	@NamedQuery(name = "getGermplasmByLocationNameUsingEqual",
-		query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
-
-	@NamedQuery(name = "countGermplasmByLocationNameUsingEqual",
-		query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname = :name"),
-
-	@NamedQuery(name = "getGermplasmByLocationNameUsingLike",
-		query = "SELECT g FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name"),
-
-	@NamedQuery(name = "countGermplasmByLocationNameUsingLike",
-		query = "SELECT COUNT(g) FROM Germplasm g, Location l WHERE g.locationId = l.locid AND l.lname like :name")
-
+	@NamedQuery(name = "countMatchGermplasmInList", query = "SELECT COUNT(g) FROM Germplasm g WHERE g.gid IN (:gids)")
 })
 @NamedNativeQueries({
 	@NamedNativeQuery(name = "getGermplasmDescendants",
@@ -129,21 +104,10 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	public static final String GET_BY_PREF_NAME = "getGermplasmByPrefName";
 	public static final String COUNT_BY_PREF_NAME =
 		"SELECT COUNT(g.gid) " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " + "WHERE n.nval = :name";
-	public static final String GET_BY_METHOD_NAME_USING_EQUAL = "getGermplasmByMethodNameUsingEqual";
-	public static final String COUNT_BY_METHOD_NAME_USING_EQUAL = "countGermplasmByMethodNameUsingEqual";
-	public static final String GET_BY_METHOD_NAME_USING_LIKE = "getGermplasmByMethodNameUsingLike";
-	public static final String COUNT_BY_METHOD_NAME_USING_LIKE = "countGermplasmByMethodNameUsingLike";
-	public static final String GET_BY_LOCATION_NAME_USING_EQUAL = "getGermplasmByLocationNameUsingEqual";
-	public static final String COUNT_BY_LOCATION_NAME_USING_EQUAL = "countGermplasmByLocationNameUsingEqual";
-	public static final String GET_BY_LOCATION_NAME_USING_LIKE = "getGermplasmByLocationNameUsingLike";
-	public static final String COUNT_BY_LOCATION_NAME_USING_LIKE = "countGermplasmByLocationNameUsingLike";
 
 	public static final String GET_BY_GID_WITH_PREF_NAME =
 		"SELECT {g.*}, {n.*} " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 " + "WHERE g.gid = :gid";
 
-	public static final String GET_BY_GID_WITH_PREF_ABBREV =
-		"SELECT {g.*}, {n.*}, {abbrev.*} " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
-			+ "LEFT JOIN names abbrev ON g.gid = abbrev.gid AND abbrev.nstat = 2 " + "WHERE g.gid = :gid";
 	public static final String GET_DESCENDANTS = "getGermplasmDescendants";
 
 	public static final String COUNT_DESCENDANTS =

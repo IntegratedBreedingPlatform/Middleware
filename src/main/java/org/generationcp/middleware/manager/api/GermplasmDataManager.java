@@ -65,26 +65,6 @@ public interface GermplasmDataManager {
 	long countGermplasmByName(String name, Operation op);
 
 	/**
-	 * Returns the germplasm records that were created at the locations with names matching the given parameter.
-	 *
-	 * @param name      - search string for the name of the locations
-	 * @param start     - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param op        - can be EQUAL like LIKE
-	 * @return List of Germplasm POJOs
-	 */
-	List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op);
-
-	/**
-	 * Returns the number of germplasm records that were created at the locations with names matching the given parameter.
-	 *
-	 * @param name - search string for the name of the locations
-	 * @param op   - can be EQUAL like LIKE
-	 * @return Number of Germplasms
-	 */
-	long countGermplasmByLocationName(String name, Operation op);
-
-	/**
 	 * Please use LocationDataManager.getAllCountry().
 	 * <p>
 	 * Returns all country records.
@@ -94,26 +74,6 @@ public interface GermplasmDataManager {
 	 */
 	@Deprecated
 	List<Country> getAllCountry();
-
-	/**
-	 * Returns the germplasm records that were created by the methods with names matching the given parameter.
-	 *
-	 * @param name      - search string for the name of the methods
-	 * @param start     - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param op        - can be EQUAL or LIKE
-	 * @return List of Germplasm POJOS
-	 */
-	List<Germplasm> getGermplasmByMethodName(String name, int start, int numOfRows, Operation op);
-
-	/**
-	 * Returns the number of germplasm records that were created by methods with names matching the given parameter.
-	 *
-	 * @param name - search string for the name of the methods
-	 * @param op   - can be equal or like
-	 * @return number of germplasm records
-	 */
-	long countGermplasmByMethodName(String name, Operation op);
 
 	/**
 	 * Returns the germplasm record identified by the given id.
@@ -130,15 +90,6 @@ public interface GermplasmDataManager {
 	 * @return the Germplasm POJO representing the record
 	 */
 	Germplasm getGermplasmWithPrefName(Integer gid);
-
-	/**
-	 * Given a gid, return the Germplasm POJO representing the record identified by the id with its preferred name and preferred
-	 * abbreviation.
-	 *
-	 * @param gid - the id of the germplasm record to be retrieved
-	 * @return the Germplasm POJO representing the record
-	 */
-	Germplasm getGermplasmWithPrefAbbrev(Integer gid);
 
 	/**
 	 * Returns the Name record identified by the given id.
@@ -181,22 +132,6 @@ public interface GermplasmDataManager {
 	Name getPreferredAbbrevByGID(Integer gid);
 
 	/**
-	 * Returns the preferred ID of the Germplasm identified by the gid parameter.
-	 *
-	 * @param gid - id of the Germplasm
-	 * @return {@code Name} POJO of the Germplasm's preferred ID. Returns {@code null} when no preferred ID is found.
-	 */
-	Name getPreferredIdByGID(Integer gid);
-
-	/**
-	 * Returns a list of preferred IDs of the Germplasms associated with the Germplasm List identified by the listId parameter.
-	 *
-	 * @param listId - id of the Germplasm List
-	 * @return {@code Name} A list of POJOs of the Germplasms' preferred IDs. Returns an empty list when no preferred ID is found.
-	 */
-	List<Name> getPreferredIdsByListId(Integer listId);
-
-	/**
 	 * Returns the value (NVAL field) of preferred name of the Germplasm identified by the gid parameter.
 	 *
 	 * @param gid - id of the Germplasm
@@ -230,14 +165,6 @@ public interface GermplasmDataManager {
 	 * @return Returns the id of the newly-added Germplasm {@code Name}s.
 	 */
 	List<Integer> addGermplasmName(List<Name> names);
-
-	/**
-	 * Updates a single {@code Name} object in the database.
-	 *
-	 * @param name - The {@code Name} object to be updated in the database. Must be a valid {@code Name} object.
-	 * @return Returns the id of the updated Germplasm {@code Name}.
-	 */
-	Integer updateGermplasmName(Name name);
 
 	/**
 	 * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasm.GermplasmService#getAttributesByGID(Integer)}

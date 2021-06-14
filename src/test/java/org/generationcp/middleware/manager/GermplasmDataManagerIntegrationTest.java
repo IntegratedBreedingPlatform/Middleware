@@ -246,74 +246,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmByLocationNameUsingEqual() {
-		final String name = "Philippines";
-		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByLocationName(name, 0, 5, Operation.EQUAL);
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByLocationNameUsingEqual(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
-	public void testCountGermplasmByLocationNameUsingEqual() {
-		final String name = "Philippines";
-		final long count = this.germplasmDataManager.countGermplasmByLocationName(name, Operation.EQUAL);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByLocationNameUsingEqual(" + name + "): " + count);
-	}
-
-	@Test
-	public void testGetGermplasmByLocationNameUsingLike() {
-		final String name = "International%";
-		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByLocationName(name, 0, 5, Operation.LIKE);
-		assertThat(germplasmList, is(notNullValue()));
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByLocationNameUsingLike(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
-	public void testCountGermplasmByLocationNameUsingLike() {
-		final String name = "International%";
-		final long count = this.germplasmDataManager.countGermplasmByLocationName(name, Operation.LIKE);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByLocationNameUsingLike(" + name + "): " + count);
-	}
-
-	@Test
-	public void testGetGermplasmByMethodNameUsingEqual() {
-		final String name = "SINGLE CROSS";
-
-		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByMethodName(name, 0, 5, Operation.EQUAL);
-		assertThat(germplasmList, is(notNullValue()));
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByMethodNameUsingEqual(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
-	public void testCountGermplasmByMethodNameUsingEqual() {
-		final String name = "SINGLE CROSS";
-		final long count = this.germplasmDataManager.countGermplasmByMethodName(name, Operation.EQUAL);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByMethodNameUsingEqual(" + name + "): " + count);
-	}
-
-	@Test
-	public void testGetGermplasmByMethodNameUsingLike() {
-		final String name = "%CROSS%";
-
-		final List<Germplasm> germplasmList = this.germplasmDataManager.getGermplasmByMethodName(name, 0, 5, Operation.LIKE);
-		assertThat(germplasmList, is(notNullValue()));
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmByMethodNameUsingLike(" + name + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, germplasmList);
-	}
-
-	@Test
-	public void testCountGermplasmByMethodNameUsingLike() {
-		final String name = "%CROSS%";
-		final long count = this.germplasmDataManager.countGermplasmByMethodName(name, Operation.LIKE);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmByMethodNameUsingLike(" + name + "): " + count);
-	}
-
-	@Test
 	public void testGetGermplasmByGID() {
 		final int gid = 50533;
 		final Germplasm germplasm = this.germplasmDataManager.getGermplasmByGID(gid);
@@ -329,13 +261,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		if (germplasm != null) {
 			Debug.println("  preferredName = " + germplasm.getPreferredName());
 		}
-	}
-
-	@Test
-	public void testGetGermplasmWithPrefAbbrev() {
-		final int gid = 151;
-		final Germplasm germplasm = this.germplasmDataManager.getGermplasmWithPrefAbbrev(gid);
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmWithPrefAbbrev(" + gid + "): " + germplasm);
 	}
 
 	@Test
@@ -379,20 +304,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Integer gid = 1;
 		Debug.println(IntegrationTestBase.INDENT,
 			"testGetPreferredAbbrevByGID(" + gid + "): " + this.germplasmDataManager.getPreferredAbbrevByGID(gid));
-	}
-
-	@Test
-	public void testGetPreferredIdByGID() {
-		final Integer gid = 986634;
-		Debug.println(IntegrationTestBase.INDENT,
-			"testGetPreferredIdByGID(" + gid + "): " + this.germplasmDataManager.getPreferredIdByGID(gid));
-	}
-
-	@Test
-	public void testGetPreferredIdsByListId() {
-		final Integer listId = 2591;
-		Debug.println(IntegrationTestBase.INDENT,
-			"testGetPreferredIdsByListId(" + listId + "): " + this.germplasmDataManager.getPreferredIdsByListId(listId));
 	}
 
 	@Test
@@ -629,20 +540,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Debug.println(IntegrationTestBase.INDENT, "GetGermplasmByNameModes.SPACES_REMOVED_BOTH_SIDES:");
 		Debug.printObjects(IntegrationTestBase.INDENT, results);
 
-	}
-
-	@Test
-	public void testUpdateGermplasmName() {
-		final int nameId = 1; // Assumption: id=1 exists
-		final Name name = this.germplasmDataManager.getGermplasmNameByID(nameId);
-		if (name != null) {
-			final String nameBefore = name.toString();
-			name.setLocationId(this.locationManager.getLocationByID(1).getLocid()); // Assumption: location with
-			// id=1 exists
-			this.germplasmDataManager.updateGermplasmName(name);
-			Debug.println(IntegrationTestBase.INDENT,
-				"testUpdateGermplasmName(" + nameId + "): " + "\n\tBEFORE: " + nameBefore + "\n\tAFTER: " + name.toString());
-		}
 	}
 
 	@Test
