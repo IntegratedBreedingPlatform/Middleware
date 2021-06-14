@@ -45,18 +45,15 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -1203,11 +1200,11 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetGermplasmAttributeTypes() {
 		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
-		final List<CVTerm> cVTerms = this.dao.getGermplasmAttributeTypes(request);
-		Assert.assertEquals(1, cVTerms.size());
-		Assert.assertTrue(cVTerms.stream().allMatch(cVTerm -> cVTerm.getName().equalsIgnoreCase(NOTE_ATTRIBUTE.toUpperCase())));
-		Assert.assertEquals(NOTE_ATTRIBUTE, cVTerms.get(0).getName());
-		Assert.assertEquals("NOTES", cVTerms.get(0).getDefinition());
+		final List<Variable>  variables = this.dao.getGermplasmAttributeVariables(request, null);
+		Assert.assertEquals(1, variables.size());
+		Assert.assertTrue(variables.stream().allMatch(cVTerm -> cVTerm.getName().equalsIgnoreCase(NOTE_ATTRIBUTE.toUpperCase())));
+		Assert.assertEquals(NOTE_ATTRIBUTE, variables.get(0).getName());
+		Assert.assertEquals("NOTES", variables.get(0).getDefinition());
 	}
 
 	@Test
