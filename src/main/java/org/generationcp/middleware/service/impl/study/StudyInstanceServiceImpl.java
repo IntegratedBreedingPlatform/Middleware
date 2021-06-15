@@ -62,6 +62,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -534,14 +535,11 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final List<String> studyIds = new ArrayList<>();
 		final List<Integer> trialIds = new ArrayList<>();
 		final List<String> environmentVariableIds = new ArrayList<>();
-		final Map<Integer, DmsProject> trialIdEnvironmentDatasetMap = new HashMap<>();
+
 		studyImportRequestDTOS.stream().forEach(dto -> {
 			final Integer trialId = Integer.valueOf(dto.getTrialDbId());
 			if (!trialIds.contains(trialId)) {
 				trialIds.add(trialId);
-				final DmsProject environmentDataset =
-					this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
-				trialIdEnvironmentDatasetMap.put(trialId, environmentDataset);
 			}
 			if(!CollectionUtils.isEmpty(dto.getEnvironmentParameters())) {
 				environmentVariableIds
@@ -549,6 +547,11 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 						dto.getEnvironmentParameters().stream().map(EnvironmentParameter::getParameterPUI).collect(Collectors.toList()));
 			}
 		});
+
+		final List<DmsProject> environmentDatasets =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.SUMMARY_DATA.getId());
+		final Map<Integer, DmsProject> trialIdEnvironmentDatasetMap = environmentDatasets.stream()
+			.collect(Collectors.toMap(environmentDataset -> environmentDataset.getStudy().getProjectId(), Function.identity()));
 
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap =
 			this.daoFactory.getProjectPropertyDAO().getEnvironmentVariablesByStudyId(trialIds);
