@@ -19,6 +19,12 @@ public class GermplasmNameChangeDTO {
 	private Date modifiedDate;
 	private boolean preferred;
 
+	private boolean nameTypeChanged;
+	private boolean locationChanged;
+	private boolean creationDateChanged;
+	private boolean valueChanged;
+	private boolean preferredChanged;
+
 	public GermplasmNameChangeDTO() {
 	}
 
@@ -100,6 +106,46 @@ public class GermplasmNameChangeDTO {
 
 	public void setPreferred(final boolean preferred) {
 		this.preferred = preferred;
+	}
+
+	public boolean isNameTypeChanged() {
+		return nameTypeChanged;
+	}
+
+	public void setNameTypeChanged(final boolean nameTypeChanged) {
+		this.nameTypeChanged = nameTypeChanged;
+	}
+
+	public boolean isLocationChanged() {
+		return locationChanged;
+	}
+
+	public void setLocationChanged(final boolean locationChanged) {
+		this.locationChanged = locationChanged;
+	}
+
+	public boolean isCreationDateChanged() {
+		return creationDateChanged;
+	}
+
+	public void setCreationDateChanged(final boolean creationDateChanged) {
+		this.creationDateChanged = creationDateChanged;
+	}
+
+	public boolean isValueChanged() {
+		return valueChanged;
+	}
+
+	public void setValueChanged(final boolean valueChanged) {
+		this.valueChanged = valueChanged;
+	}
+
+	public boolean isPreferredChanged() {
+		return preferredChanged;
+	}
+
+	public void setPreferredChanged(final boolean preferredChanged) {
+		this.preferredChanged = preferredChanged;
 	}
 
 	@Override
