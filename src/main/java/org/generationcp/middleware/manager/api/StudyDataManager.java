@@ -657,9 +657,7 @@ public interface StudyDataManager {
 	Phenotype getPhenotypeById(int phenotypeId);
 
 	StudyMetadata getStudyMetadataForInstance(Integer instanceId);
-
-	Map<String, String> getGeolocationPropsAndValuesByGeolocation(Integer geolocationId, List<Integer> excludedVariableIds);
-
+	
 	Integer getProjectIdByStudyDbId(final Integer studyDbId);
 
 	/**
