@@ -578,11 +578,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			long observationsPerType = this.daoFactory.getExperimentDao().countByObservedVariable(variable.getId(), v.getId());
 			observations = (int) (observations + observationsPerType);
 		}
+
+		// Temporal condition to avoid delete variable when it exists in listdataprops.
+		boolean variableUsedInListdataProp = this.daoFactory.getListDataPropertyDAO().hasOntologyVariableInUse(variable.getName());
 		variable.setObservations(observations);
 		//it can be replaced by observations > 0
 		variable.setHasUsage(this.isVariableUsedInStudy(variable.getId()) || //
 			variable.getGermplasm() > 0 || //
-			variable.getBreedingMethods() > 0);
+			variable.getBreedingMethods() > 0 || variableUsedInListdataProp);
 
 	}
 

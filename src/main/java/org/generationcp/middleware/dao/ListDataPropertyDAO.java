@@ -85,4 +85,11 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 
 		return listInfo;
 	}
+
+	public boolean hasOntologyVariableInUse(final String columnName) {
+		final String sql = "SELECT * FROM listdataprops where column_name=:columnName GROUP by column_name";
+		final Query query = this.getSession().createSQLQuery(sql);
+		query.setParameter("columnName", columnName);
+		return query.list().size() > 0;
+	}
 }
