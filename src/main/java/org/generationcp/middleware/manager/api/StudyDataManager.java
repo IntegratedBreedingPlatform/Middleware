@@ -657,7 +657,7 @@ public interface StudyDataManager {
 	Phenotype getPhenotypeById(int phenotypeId);
 
 	StudyMetadata getStudyMetadataForInstance(Integer instanceId);
-	
+
 	Integer getProjectIdByStudyDbId(final Integer studyDbId);
 
 	/**
