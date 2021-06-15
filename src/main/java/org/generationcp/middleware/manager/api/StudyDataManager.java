@@ -740,23 +740,6 @@ public interface StudyDataManager {
 
 	boolean renameStudy(final String newStudyName, final int studyId, final String programUUID);
 
-	/**
-	 * @param studyId
-	 * @return
-	 */
-	List<UserDto> getUsersAssociatedToStudy(final Integer studyId);
-
-	/**
-	 * @param instanceId
-	 * @return
-	 */
-	List<UserDto> getUsersForEnvironment(final Integer instanceId);
-
-	List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(Integer geolocationId,
-		List<Integer> variableIds);
-
-	List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(Integer geolocationId, List<Integer> variableIds);
-
 	void deleteStudy(int studyId);
 
 }
