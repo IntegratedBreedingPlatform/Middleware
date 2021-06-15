@@ -28,12 +28,6 @@ public interface StudyService {
 	TrialObservationTable getTrialObservationTable(int studyIdentifier, Integer instanceDbId);
 
 	/**
-	 * @param geolocationId
-	 * @return StudyDetailsDto
-	 */
-	StudyDetailsDto getStudyDetailsByInstance(Integer geolocationId);
-
-	/**
 	 * @param ids     of the variables that i need to check data
 	 * @param studyId id for the study (Nursery / Trial)
 	 * @return the true if any id have data on the study
@@ -67,12 +61,6 @@ public interface StudyService {
 
 	Integer getEnvironmentDatasetId(int studyId);
 
-	List<StudyInstanceDto> getStudyInstancesWithMetadata(StudySearchFilter studySearchFilter, Pageable pageable);
-
-	List<StudyInstanceDto> getStudyInstances(StudySearchFilter studySearchFilter, Pageable pageable);
-
-	long countStudyInstances(StudySearchFilter studySearchFilter);
-
 	List<StudySummary> getStudies(StudySearchFilter studySearchFilter, Pageable pageable);
 
 	long countStudies(StudySearchFilter studySearchFilter);
@@ -82,6 +70,4 @@ public interface StudyService {
 	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
 
 	List<StudySummary> saveStudies(String crop, List<TrialImportRequestDTO> trialImportRequestDtoList, Integer userId);
-
-	List<StudyInstanceDto> saveStudyInstances(String crop, List<StudyImportRequestDTO> studyImportRequestDTOS, Integer userId);
 }
