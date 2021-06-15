@@ -19,10 +19,9 @@ public class AuditDAO {
 		this.session = session;
 	}
 
-	public List<GermplasmNameChangeDTO> getNameChangesByGidAndNameId(final Integer gid, final Integer nameId,
-		final Pageable pageable) {
-		final SQLQuery query = this.session.createSQLQuery(GermplasmNameChangesDAOQuery.getSelectBaseQuery());
-		GermplasmNameChangesDAOQuery.addParams(query, gid, nameId);
+	public List<GermplasmNameChangeDTO> getNameChangesByNameId(final Integer nameId, final Pageable pageable) {
+		final SQLQuery query = this.session.createSQLQuery(GermplasmNameChangesDAOQuery.getSelectQuery());
+		GermplasmNameChangesDAOQuery.addParams(query, nameId);
 
 		query.addScalar("revisionType", RevisionTypeResolver.INSTANCE);
 		query.addScalar("nameType");
@@ -41,9 +40,9 @@ public class AuditDAO {
 		return (List<GermplasmNameChangeDTO>) query.list();
 	}
 
-	public long countNameChangesByGidAndNameId(final Integer gid, final Integer nameId) {
-		final SQLQuery query = this.session.createSQLQuery(GermplasmNameChangesDAOQuery.getCountBaseQuery());
-		GermplasmNameChangesDAOQuery.addParams(query, gid, nameId);
+	public long countNameChangesByNameId(final Integer nameId) {
+		final SQLQuery query = this.session.createSQLQuery(GermplasmNameChangesDAOQuery.getCountQuery());
+		GermplasmNameChangesDAOQuery.addParams(query, nameId);
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 

@@ -23,14 +23,13 @@ public class AuditServiceImpl implements AuditService {
 	}
 
 	@Override
-	public List<GermplasmNameChangeDTO> getNameChangesByGidAndNameId(final Integer gid, final Integer nameId,
-		final Pageable pageable) {
-		return this.daoFactory.getAuditDAO().getNameChangesByGidAndNameId(gid, nameId, pageable);
+	public List<GermplasmNameChangeDTO> getNameChangesByNameId(final Integer nameId, final Pageable pageable) {
+		return this.daoFactory.getAuditDAO().getNameChangesByNameId(nameId, pageable);
 	}
 
 	@Override
-	public long countNameChangesByGidAndNameId(final Integer gid, final Integer nameId) {
-		return this.daoFactory.getAuditDAO().countNameChangesByGidAndNameId(gid, nameId);
+	public long countNameChangesByNameId(final Integer nameId) {
+		return this.daoFactory.getAuditDAO().countNameChangesByNameId(nameId);
 	}
 
 }

@@ -7,8 +7,8 @@ import java.util.List;
 
 public interface AuditService {
 
-	List<GermplasmNameChangeDTO> getNameChangesByGidAndNameId(Integer gid, Integer nameId, Pageable pageable);
+	List<GermplasmNameChangeDTO> getNameChangesByNameId(Integer nameId, Pageable pageable);
 
-	long countNameChangesByGidAndNameId(Integer gid, Integer nameId);
+	long countNameChangesByNameId(Integer nameId);
 
 }
