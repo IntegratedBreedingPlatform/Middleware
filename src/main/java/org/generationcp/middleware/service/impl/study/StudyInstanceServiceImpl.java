@@ -527,7 +527,6 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final List<Integer> trialIds = new ArrayList<>();
 		final List<String> environmentVariableIds = new ArrayList<>();
 		final Map<Integer, DmsProject> trialIdEnvironmentDatasetMap = new HashMap<>();
-		final Map<Integer, DmsProject> trialIdTrialDatasetMap = new HashMap<>();
 		studyImportRequestDTOS.stream().forEach(dto -> {
 			final Integer trialId = Integer.valueOf(dto.getTrialDbId());
 			if (!trialIds.contains(trialId)) {
@@ -535,10 +534,6 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				final DmsProject environmentDataset =
 					this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
 				trialIdEnvironmentDatasetMap.put(trialId, environmentDataset);
-
-				final DmsProject trialDataset =
-					this.daoFactory.getDmsProjectDAO().getById(trialId);
-				trialIdTrialDatasetMap.put(trialId, trialDataset);
 			}
 			if(!CollectionUtils.isEmpty(dto.getEnvironmentParameters())) {
 				environmentVariableIds
