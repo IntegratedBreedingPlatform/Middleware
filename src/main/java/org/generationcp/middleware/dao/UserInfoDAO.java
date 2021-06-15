@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.List;
-
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.hibernate.Criteria;
@@ -21,34 +19,13 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.List;
+
 /**
  * DAO class for {@link UserInfo}.
  *
  */
 public class UserInfoDAO extends GenericDAO<UserInfo, Integer> {
-
-	public boolean updateLoginCounter(UserInfo userInfo) {
-		
-		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
-		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-		// statement
-		this.getSession().flush();
-		
-		int loginCount = 0;
-		if (userInfo != null && userInfo.getLoginCount() != null) {
-			loginCount = userInfo.getLoginCount().intValue();
-		}
-		loginCount++;
-
-		String queryString = "UPDATE workbench_user_info SET login_count = :loginCount where user_id = :userId";
-		Session s = this.getSession();
-		Query q = s.createSQLQuery(queryString);
-		if (userInfo != null) {
-			q.setInteger("userId", userInfo.getUserId());
-		}
-		q.setInteger("loginCount", loginCount);
-		return q.executeUpdate() > 0;
-	}
 
 	public UserInfo getUserInfoByToken(String token) throws MiddlewareQueryException {
 		try {
