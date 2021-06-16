@@ -7,7 +7,6 @@ import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
-import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -18,7 +17,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -46,7 +44,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 
 import static org.junit.Assert.assertFalse;
@@ -484,16 +481,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertNotNull(study.getTrialDbId());
 		Assert.assertNotNull(study.getObservationUnitId());
 		Assert.assertEquals(1, study.getInstanceMetaData().size());
-		final InstanceMetadata study1Instance = study.getInstanceMetaData().get(0);
-		Assert.assertEquals("1", study1Instance.getInstanceNumber());
-		Assert.assertEquals(study.getTrialDbId(), study1Instance.getTrialDbId());
-		final Optional<Location> unspecifiedLocation = this.daoFactory.getLocationDAO().getUnspecifiedLocation();
-		if (unspecifiedLocation.isPresent()) {
-			final Integer locationId = unspecifiedLocation.get().getLocid();
-			Assert.assertEquals(locationId.toString(), study.getLocationId());
-			Assert.assertEquals(locationId, study1Instance.getLocationDbId());
-			Assert.assertEquals(unspecifiedLocation.get().getLname(), study1Instance.getLocationName());
-		}
+		Assert.assertTrue(CollectionUtils.isEmpty(study.getInstanceMetaData()));
 		if (!CollectionUtils.isEmpty(importRequestDTO.getExternalReferences())) {
 			Assert.assertNotNull(study.getExternalReferences());
 			Assert.assertEquals(importRequestDTO.getExternalReferences().size(), study.getExternalReferences().size());
