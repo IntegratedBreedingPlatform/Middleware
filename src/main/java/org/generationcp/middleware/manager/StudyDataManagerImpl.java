@@ -1035,11 +1035,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Phenotype getPhenotypeById(final int phenotypeId) {
-		return this.daoFactory.getPhenotypeDAO().getById(phenotypeId);
-	}
-
-	@Override
 	public StudyMetadata getStudyMetadataForInstance(final Integer instanceId) {
 		return this.daoFactory.getDmsProjectDAO().getStudyMetadataForInstanceId(instanceId);
 	}

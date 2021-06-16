@@ -36,7 +36,6 @@ import org.generationcp.middleware.domain.search.filter.StudyQueryFilter;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
-import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -440,7 +439,7 @@ public interface StudyDataManager {
 	 * Retrieves all the study details of the given study type from both central and local ordered by db instance then study name.
 	 *
 	 * @param studyType   Can be any of the types defined in {@link StudyType}
-	 * @param programUUID unique ID of the currenly selected program
+	 * @param programUUID unique ID of the currently selected program
 	 * @return The list of study details having the given study type
 	 */
 	List<StudyDetails> getAllStudyDetails(StudyTypeDto studyType, String programUUID);
@@ -468,7 +467,7 @@ public interface StudyDataManager {
 	List<FolderReference> getAllFolders();
 
 	/**
-	 * Count plots with plants selectedof dataset.
+	 * Count plots with plants selected of dataset.
 	 *
 	 * @param dataSetId  the data set id
 	 * @param variateIds the variate ids
@@ -534,10 +533,10 @@ public interface StudyDataManager {
 	/**
 	 * Save the Phenotype Outlier data
 	 *
-	 * @param phenotyleOutliers list of PhenotypeOutliers
+	 * @param phenotypeOutliers list of PhenotypeOutliers
 	 * @return none
 	 */
-	void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotyleOutliers);
+	void saveOrUpdatePhenotypeOutliers(List<PhenotypeOutlier> phenotypeOutliers);
 
 	/**
 	 * Determines if the data for the specified Trial contains at least 2 replicates with values
@@ -601,8 +600,6 @@ public interface StudyDataManager {
 	boolean checkIfAnyLocationIDsExistInExperiments(int studyId, int datasetTypeId, List<Integer> locationIds);
 
 	List<InstanceMetadata> getInstanceMetadata(int studyId);
-
-	Phenotype getPhenotypeById(int phenotypeId);
 
 	StudyMetadata getStudyMetadataForInstance(Integer instanceId);
 
