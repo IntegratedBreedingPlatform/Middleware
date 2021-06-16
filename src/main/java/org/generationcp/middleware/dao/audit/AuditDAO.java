@@ -20,7 +20,7 @@ public class AuditDAO {
 	}
 
 	public List<GermplasmNameChangeDTO> getNameChangesByNameId(final Integer nameId, final Pageable pageable) {
-		final SQLQuery query = this.session.createSQLQuery(GermplasmNameChangesDAOQuery.getSelectQuery(pageable));
+		final SQLQuery query = this.session.createSQLQuery(GermplasmNameChangesDAOQuery.getSelectQuery());
 		query.setParameter("nid", nameId);
 
 		query.addScalar("revisionType", RevisionTypeResolver.INSTANCE);
