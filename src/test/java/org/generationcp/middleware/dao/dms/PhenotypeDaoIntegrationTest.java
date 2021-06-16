@@ -32,7 +32,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -52,7 +51,6 @@ import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestD
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -96,9 +94,6 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	private CropType crop;
 	private Project commonTestProject;
 	private List<Germplasm> germplasm;
-
-	@Autowired
-	private StudyDataManager studyDataManager;
 
 	@Before
 	public void setUp() throws Exception {
@@ -231,7 +226,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 		//Save the experiment
-		this.studyDataManager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
@@ -247,7 +243,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		values.setGermplasmId(1);
 
 		//Save the experiment
-		this.studyDataManager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
@@ -473,7 +470,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
 		return this.createEnvironmentData(this.study, numberOfReps,
-			withPhenotype ? Collections.singletonList(this.trait.getCvTermId()) : Collections.<Integer>emptyList(), true);
+			withPhenotype ? Collections.singletonList(this.trait.getCvTermId()) : Collections.emptyList(), true);
 	}
 
 	private void createProjectProperties(final DmsProject project, final List<Integer> traitIds) {

@@ -112,8 +112,8 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		}
 
 		this.studyTDI =
-			new StudyTestDataInitializer(this.studyDataManager, this.ontologyManager, this.commonTestProject, this.germplasmDataManager,
-				this.locationManager);
+			new StudyTestDataInitializer(this.studyDataManager, this.ontologyManager, this.commonTestProject,
+				this.locationManager, this.sessionProvder);
 
 		// Create a study with environments
 		if (this.studyReference == null) {

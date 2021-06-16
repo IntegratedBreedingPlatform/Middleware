@@ -31,10 +31,8 @@ import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
-import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -234,28 +232,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public StudyReference addStudy(
-		final CropType crop, final int parentFolderId, final VariableTypeList variableTypeList, final StudyValues studyValues,
-		final String programUUID, final StudyTypeDto studyType, final String description,
-		final String startDate, final String endDate, final String objective, final String name, final String createdBy) {
-
-		try {
-			final DmsProject project = this.getStudySaver()
-				.saveStudy(crop, parentFolderId, variableTypeList, studyValues, true, programUUID, studyType, description,
-					startDate, endDate, objective, name, createdBy);
-
-			return new StudyReference(project.getProjectId(), project.getName(), project.getDescription(), programUUID, studyType);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered with addStudy(folderId=" + parentFolderId + ", variableTypeList=" + variableTypeList
-					+ ", studyValues=" + studyValues + "): " + e.getMessage(), e);
-		}
-
-	}
-
-	@Override
 	public DatasetReference addDataSet(
 		final int studyId, final VariableTypeList variableTypeList, final DatasetValues datasetValues,
 		final String programUUID, final int datasetTypeId) {
@@ -317,19 +293,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public void addExperiment(
-		final CropType crop, final int dataSetId, final ExperimentType experimentType, final ExperimentValues experimentValues) {
-
-		try {
-			this.getExperimentModelSaver().addExperiment(crop, dataSetId, experimentType, experimentValues);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in addExperiment " + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public void addOrUpdateExperiment(
 		final CropType crop, final int dataSetId, final ExperimentType experimentType,
 		final List<ExperimentValues> experimentValuesList) {
@@ -344,33 +307,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException("error in addOrUpdateExperiment " + e.getMessage(), e);
 		}
 
-	}
-
-	@Override
-	public int addTrialEnvironment(final VariableList variableList) {
-
-		try {
-
-			final Geolocation geolocation = this.getGeolocationSaver().saveGeolocation(variableList, null);
-			return geolocation.getLocationId();
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in addTrialEnvironment " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public int addStock(final int studyId, final VariableList variableList) {
-
-		try {
-
-			return this.getStockSaver().saveStock(studyId, variableList);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in addStock " + e.getMessage(), e);
-		}
 	}
 
 	@Override
