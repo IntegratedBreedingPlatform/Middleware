@@ -19,7 +19,7 @@ public class CategoricalValueValidator implements VariableValueValidator {
 			possibleValues = variable.getPossibleValues().stream().map(value -> value.getId().toString()).collect(
 				Collectors.toList());
 		} else {
-			possibleValues = variable.getPossibleValues().stream().map(ValueReference::getDescription).collect(
+			possibleValues = variable.getPossibleValues().stream().map(ValueReference::getName).collect(
 				Collectors.toList());
 		}
 		return StringUtils.isEmpty(variable.getValue()) || possibleValues.contains(variable.getValue().trim());

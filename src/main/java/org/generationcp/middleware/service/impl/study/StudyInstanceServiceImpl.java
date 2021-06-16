@@ -669,33 +669,25 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final Map<Integer, DmsProject> environmentDatasetMap) {
 		if(!CollectionUtils.isEmpty(requestDTO.getSeasons())) {
 			final Integer trialDbId = Integer.valueOf(requestDTO.getTrialDbId());
+			final String seasonValue = requestDTO.getSeasons().get(0);
 
-			final MeasurementVariable seasonVariable = new MeasurementVariable();
-			seasonVariable.setTermId(TermId.SEASON_VAR.getId());
-			seasonVariable.setPossibleValues(categoricalVariablesMap.get(TermId.SEASON_VAR.getId()));
-			seasonVariable.setDataTypeId(DataType.CATEGORICAL_VARIABLE.getId());
-			seasonVariable.setValue(requestDTO.getSeasons().get(0));
-
-			final DataType dataType = DataType.getById(seasonVariable.getDataTypeId());
-			final java.util.Optional<VariableValueValidator> seasonValidator =
-				this.variableDataValidatorFactory.getValidator(dataType);
-
-			if(!seasonValidator.isPresent() || seasonValidator.get().isValid(seasonVariable, false)) {
+			final List<String> possibleValues = categoricalVariablesMap.get(TermId.SEASON_VAR.getId()).stream().map(ValueReference::getName)
+				.collect(Collectors.toList());
+			if(possibleValues.contains(seasonValue)) {
 				//Add season variable if not present to the study
-				if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(seasonVariable.getTermId())) {
+				if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(TermId.SEASON_VAR.getId())) {
 					this.addProjectProperty(studyIdEnvironmentVariablesMap, environmentDatasetMap, trialDbId,
-						VariableType.ENVIRONMENT_DETAIL, seasonVariable.getTermId(), null);
+						VariableType.ENVIRONMENT_DETAIL, TermId.SEASON_VAR.getId(), null);
 				}
 
 				//Add season value for the environment
 				if(geolocation.getProperties() == null) {
 					geolocation.setProperties(new ArrayList<>());
 				}
-				final Map<String, Integer> seasonValuesMap = categoricalVariablesMap.get(seasonVariable.getTermId()).stream()
+				final Map<String, Integer> seasonValuesMap = categoricalVariablesMap.get(TermId.SEASON_VAR.getId()).stream()
 					.collect(Collectors.toMap(ValueReference::getDescription, ValueReference::getId));
-				LOG.error(categoricalVariablesMap.get(seasonVariable.getTermId()).get(0).toString());
 				final GeolocationProperty seasonProperty = new GeolocationProperty(geolocation,
-					String.valueOf(seasonValuesMap.get(seasonVariable.getValue())), 1, seasonVariable.getTermId());
+					String.valueOf(seasonValuesMap.get(seasonValue)), 1, TermId.SEASON_VAR.getId());
 				geolocation.getProperties().add(seasonProperty);
 			}
 		}
