@@ -480,7 +480,6 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		}
 		Assert.assertNotNull(study.getTrialDbId());
 		Assert.assertNotNull(study.getObservationUnitId());
-		Assert.assertEquals(1, study.getInstanceMetaData().size());
 		Assert.assertTrue(CollectionUtils.isEmpty(study.getInstanceMetaData()));
 		if (!CollectionUtils.isEmpty(importRequestDTO.getExternalReferences())) {
 			Assert.assertNotNull(study.getExternalReferences());
