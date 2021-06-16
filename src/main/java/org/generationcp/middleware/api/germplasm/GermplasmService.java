@@ -28,6 +28,10 @@ import java.util.Set;
 
 public interface GermplasmService {
 
+	Germplasm getGermplasmByGID(Integer gid);
+
+	Germplasm saveGermplasm(Germplasm germplasm);
+
 	List<Germplasm> getGermplasmByGUIDs(List<String> guids);
 
 	/**
@@ -49,7 +53,7 @@ public interface GermplasmService {
 	 * code attribute is not present. Never returns null.
 	 *
 	 * @param gids
-	 * @return Map<gids       ,               plotCodeValue>
+	 * @return Map<gids, plotCodeValue>
 	 */
 	Map<Integer, String> getPlotCodeValues(Set<Integer> gids);
 

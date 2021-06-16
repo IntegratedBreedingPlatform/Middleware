@@ -84,6 +84,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Value("${germplasm.edition.max.recursion}")
 	public int maxRecursiveQueries;
 
+
 	// This enum is used to define the required action given a germplasm pedigree change
 	private enum UpdateGroupSourceAction {
 		NONE,
@@ -120,6 +121,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 		this.sessionProvider = sessionProvider;
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.germplasmMethodValidator = new GermplasmMethodValidator();
+	}
+
+	@Override
+	public Germplasm getGermplasmByGID(final Integer gid) {
+		return this.daoFactory.getGermplasmDao().getById(gid);
+	}
+
+	@Override
+	public Germplasm saveGermplasm(final Germplasm germplasm) {
+		return this.daoFactory.getGermplasmDao().save(germplasm);
 	}
 
 	@Override
@@ -1383,7 +1394,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 
 	}
-
 
 	private void updateGroupSource(final Germplasm oldGermplasm, final Germplasm newGermplasm) {
 		final UpdateGroupSourceAction updateGroupSourceAction = this.getUpdateGroupSourceAction(oldGermplasm, newGermplasm);

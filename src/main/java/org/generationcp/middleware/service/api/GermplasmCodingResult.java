@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @AutoProperty
-public class GermplasmGroupNamingResult {
+public class GermplasmCodingResult {
 
 	private Integer gid;
 
