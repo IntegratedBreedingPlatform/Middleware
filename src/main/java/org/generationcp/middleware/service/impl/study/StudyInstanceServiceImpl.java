@@ -359,9 +359,12 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				List<Integer> variableIds = environmentConditions.stream().map(MeasurementVariable::getTermId)
 					.collect(Collectors.toList());
 				if (!variableIds.isEmpty()) {
-					environmentParameters.addAll(this.daoFactory.getPhenotypeDAO()
+					final List<MeasurementVariable> measurementVariables = this.daoFactory.getPhenotypeDAO()
 						.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(
-							Collections.singletonList(instanceId), variableIds).get(instanceId));
+							Collections.singletonList(instanceId), variableIds).get(instanceId);
+					if(!CollectionUtils.isEmpty(measurementVariables)) {
+						environmentParameters.addAll(measurementVariables);
+					}
 				}
 				final List<MeasurementVariable> environmentDetails = this.daoFactory.getDmsProjectDAO()
 					.getObservationSetVariables(environmentDataset.getProjectId(),
@@ -369,9 +372,10 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				variableIds = environmentDetails.stream().map(MeasurementVariable::getTermId)
 					.collect(Collectors.toList());
 				if (!variableIds.isEmpty()) {
-					environmentParameters.addAll(this.daoFactory.getGeolocationPropertyDao()
+					final List<MeasurementVariable> measurementVariables = this.daoFactory.getGeolocationPropertyDao()
 						.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(
-							Collections.singletonList(instanceId), variableIds).get(instanceId));
+							Collections.singletonList(instanceId), variableIds).get(instanceId);
+					environmentParameters.addAll(measurementVariables);
 				}
 
 				final List<MeasurementVariable> environmentVariables = new ArrayList<>(environmentConditions);
@@ -383,8 +387,12 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				variableIds = environmentVariables.stream().map(MeasurementVariable::getTermId)
 					.collect(Collectors.toList());
 				properties.put("studyObjective", studyMetadata.getStudyObjective() == null ? "" : studyMetadata.getStudyObjective());
-				properties.putAll(this.daoFactory.getGeolocationPropertyDao()
-					.getGeolocationPropsAndValuesByGeolocation(Collections.singletonList(instanceId), variableIds).get(instanceId));
+				final Map<String, String>  geolocationMap = this.daoFactory.getGeolocationPropertyDao()
+					.getGeolocationPropsAndValuesByGeolocation(Collections.singletonList(instanceId), variableIds).get(instanceId);
+				if(geolocationMap != null) {
+					properties.putAll(geolocationMap);
+				}
+
 				final Map<Integer, Map<String, String>> projectPropMap =
 					this.daoFactory.getProjectPropertyDAO().getProjectPropsAndValuesByStudyIds(
 						Collections.singletonList(studyMetadata.getNurseryOrTrialId()));
@@ -491,10 +499,10 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 					final List<MeasurementVariable> environmentVariables = studyEnvironmentVariablesMap.get(trialDbId);
 
 					final List<MeasurementVariable> environmentParameterVariables = new ArrayList<>();
-					if(environmentConditionsVariablesMap.get(studyDbId) != null) {
+					if(environmentConditionsVariablesMap.containsKey(studyDbId)) {
 						environmentParameterVariables.addAll(environmentConditionsVariablesMap.get(studyDbId));
 					}
-					if(environmentDetailsVariablesMap.get(studyDbId) != null){
+					if(environmentDetailsVariablesMap.containsKey(studyDbId)){
 						environmentParameterVariables.addAll(environmentDetailsVariablesMap.get(studyDbId));
 					}
 
@@ -504,7 +512,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 						.map(variable -> new EnvironmentParameter(variable)).collect(Collectors.toList());
 					studyInstanceDto.setEnvironmentParameters(environmentParameters);
 
-					if(additionalInfoMap.get(studyDbId) != null) {
+					if(additionalInfoMap.containsKey(studyDbId)) {
 						studyInstanceDto.getAdditionalInfo().putAll(additionalInfoMap.get(studyDbId));
 					}
 					if (studyAdditionalInfoMap.containsKey(trialDbId)) {
