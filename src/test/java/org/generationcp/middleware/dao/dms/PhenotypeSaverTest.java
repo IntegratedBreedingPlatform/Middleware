@@ -60,7 +60,8 @@ public class PhenotypeSaverTest extends IntegrationTestBase {
 		//Save the experiment
 		final CropType crop = new CropType();
 		crop.setUseUUID(true);
-		this.studyDataManager.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 
 		final Phenotype toBeSaved = new Phenotype();
