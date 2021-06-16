@@ -127,8 +127,8 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			.append("	WHERE  geo.nd_geolocation_id IN (:geolocationIds) AND geo.type_id NOT IN (:excludedIds) ");
 		try {
 			final Query query =
-				this.getSession().createSQLQuery(sql.toString()).addScalar("name").addScalar("value").setParameterList("geolocationIds", geolocationIds)
-					.setParameterList("excludedIds", excludedIds);
+				this.getSession().createSQLQuery(sql.toString()).addScalar("name").addScalar("value").addScalar("instanceId")
+					.setParameterList("geolocationIds", geolocationIds).setParameterList("excludedIds", excludedIds);
 			final List<Object> results = query.list();
 			for (final Object obj : results) {
 				final Object[] row = (Object[]) obj;
