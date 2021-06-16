@@ -107,21 +107,6 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		Assert.assertNotNull(lRecIDStockIDMap);
 	}
 
-
-
-
-	@Test
-	public void testGetSimilarStockIdsEmptyListParam() {
-		final boolean emptyListParamCondition = this.dao.getSimilarStockIds(new ArrayList<>()).isEmpty();
-		Assert.assertTrue("List of returned similar stock ids should be empty given empty list", emptyListParamCondition);
-	}
-
-	@Test
-	public void testGetSimilarStockIdsNullParam() {
-		final boolean nullParamCondition = this.dao.getSimilarStockIds(null).isEmpty();
-		Assert.assertTrue("List of returned similar stock ids should be empty given a null parameter", nullParamCondition);
-	}
-
 	private void initializeGermplasms(final int noOfEntries) {
 		final CropType cropType = new CropType();
 		cropType.setUseUUID(false);
