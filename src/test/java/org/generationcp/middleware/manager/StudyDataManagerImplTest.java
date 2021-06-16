@@ -61,6 +61,7 @@ import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerI
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
+import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -135,6 +136,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	private DaoFactory daoFactory;
 
+	private ExperimentModelSaver experimentModelSaver;
+
 	private static CrossExpansionProperties crossExpansionProperties;
 	private StudyReference studyReference;
 	private StudyTestDataInitializer studyTDI;
@@ -166,6 +169,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			this.crop = this.workbenchDataManager.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
 		}
 
+		if (this.experimentModelSaver == null) {
+			this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
+		}
+
 		if (this.germplasmTestDataGenerator == null) {
 			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataDM, new NameDAO(this.sessionProvder
 				.getSession()));
@@ -174,8 +181,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
 		StudyDataManagerImplTest.crossExpansionProperties = new CrossExpansionProperties(mockProperties);
 		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
-		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject, this.germplasmDataDM,
-			this.locationManager);
+		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject,
+			this.locationManager, this.sessionProvder);
 
 		this.studyReference = this.studyTDI.addTestStudy();
 
@@ -987,7 +994,8 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		values.setVariableList(factors);
 		values.setLocationId(this.manager.getExperimentModelSaver().createNewGeoLocation().getLocationId());
 		//Save the experiment
-		this.manager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+
 		final ExperimentModel experiment =
 			this.daoFactory.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Phenotype updatedPhenotype =
