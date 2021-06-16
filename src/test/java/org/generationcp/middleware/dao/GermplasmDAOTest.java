@@ -1133,7 +1133,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			Assert.assertThat(this.dao.countGermplasmDTOs(dto), is(nonDeletedGermplasmCount));
 			// 5000 is the count limit if the germplasm db size is equal to or more than that
 		} else {
-			Assert.assertThat(this.dao.buildCountGermplasmDTOsQuery(dto), is("SELECT LEAST(count(1), 5000) FROM germplsm "));
+			Assert.assertThat(this.dao.countGermplasmDTOs(dto), is(5000L));
 		}
 
 	}
