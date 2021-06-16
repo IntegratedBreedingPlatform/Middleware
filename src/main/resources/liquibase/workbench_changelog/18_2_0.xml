@@ -5,25 +5,29 @@
          <sqlCheck expectedResult="1">SELECT COUNT(*) FROM workbench_tool WHERE name = 'germplasm_import'</sqlCheck>
       </preConditions>
       <comment>Remove 'germplasm_import' tool</comment>
-      <sql dbms="mysql" splitStatements="true">UPDATE permission
-				SET workbench_sidebar_category_link_id = NULL
+      <sql dbms="mysql" splitStatements="true">
+		  UPDATE permission SET workbench_sidebar_category_link_id = NULL
 				WHERE workbench_sidebar_category_link_id = (SELECT sidebar_category_link_id
 															FROM workbench_sidebar_category_link
-															WHERE tool_name = 'germplasm_import')
-			DELETE FROM workbench_sidebar_category_link WHERE tool_name = 'germplasm_import'
-			DELETE FROM workbench_tool WHERE name = 'germplasm_import'</sql>
+															WHERE tool_name = 'germplasm_import');
+
+			DELETE FROM workbench_sidebar_category_link WHERE tool_name = 'germplasm_import';
+			DELETE FROM workbench_tool WHERE name = 'germplasm_import';
+	  </sql>
    </changeSet>
    <changeSet author="cuenyad" id="v18.2.0-2">
       <preConditions onFail="MARK_RAN">
          <sqlCheck expectedResult="1">SELECT COUNT(*) FROM workbench_tool WHERE name = 'list_manager'</sqlCheck>
       </preConditions>
       <comment>Remove old 'list_manager' tool</comment>
-      <sql dbms="mysql" splitStatements="true">UPDATE permission
-				SET workbench_sidebar_category_link_id = NULL
+      <sql dbms="mysql" splitStatements="true">
+		  UPDATE permission SET workbench_sidebar_category_link_id = NULL
 				WHERE workbench_sidebar_category_link_id = (SELECT sidebar_category_link_id
 															FROM workbench_sidebar_category_link
-															WHERE tool_name = 'list_manager')
-			DELETE FROM workbench_sidebar_category_link WHERE tool_name = 'list_manager'
-			DELETE FROM workbench_tool WHERE name = 'list_manager'</sql>
+															WHERE tool_name = 'list_manager');
+
+			DELETE FROM workbench_sidebar_category_link WHERE tool_name = 'list_manager';
+			DELETE FROM workbench_tool WHERE name = 'list_manager';
+	  </sql>
    </changeSet>
 </databaseChangeLog>
