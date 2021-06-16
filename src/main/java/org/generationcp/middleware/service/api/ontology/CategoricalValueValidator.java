@@ -12,14 +12,14 @@ import java.util.stream.Collectors;
 public class CategoricalValueValidator implements VariableValueValidator {
 
 	@Override
-	public boolean isValid(final MeasurementVariable variable, final boolean useCategoricalValueId) {
+	public boolean isValid(final MeasurementVariable variable, final boolean useCategoricalValueName) {
 		this.verifyCategoricalDataType(variable);
 		List<String> possibleValues;
-		if(useCategoricalValueId) {
-			possibleValues = variable.getPossibleValues().stream().map(value -> value.getId().toString()).collect(
+		if(useCategoricalValueName) {
+			possibleValues = variable.getPossibleValues().stream().map(ValueReference::getName).collect(
 				Collectors.toList());
 		} else {
-			possibleValues = variable.getPossibleValues().stream().map(ValueReference::getName).collect(
+			possibleValues = variable.getPossibleValues().stream().map(ValueReference::getDescription).collect(
 				Collectors.toList());
 		}
 		return StringUtils.isEmpty(variable.getValue()) || possibleValues.contains(variable.getValue().trim());
