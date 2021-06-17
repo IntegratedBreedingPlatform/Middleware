@@ -1,0 +1,27 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="aldrin" id="v18.2.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(*) FROM permission where name = 'CODE_GERMPLASM';
+            </sqlCheck>
+        </preConditions>
+        <comment>Granular permission for Code Germplasm for Program Role Type</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @manage_germplasm_id = (select permission_id from permission where name = 'MANAGE_GERMPLASM');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('CODE_GERMPLASM', 'Code Germplasm', @manage_germplasm_id, null);
+
+			SET @code_germplasm_id = (SELECT permission_id FROM permission where name = 'CODE_GERMPLASM');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @code_germplasm_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @code_germplasm_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @code_germplasm_id, '1');
+		</sql>
+	</changeSet>
+</databaseChangeLog>
