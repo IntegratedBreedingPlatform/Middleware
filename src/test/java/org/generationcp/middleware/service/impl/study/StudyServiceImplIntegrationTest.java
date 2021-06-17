@@ -9,7 +9,6 @@ import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -22,8 +21,6 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.pojos.oms.CVTermProperty;
-import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -345,12 +342,14 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final Map<String, String> settingsMap = Maps.newHashMap();
 		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.STUDY_DETAIL).getName(),
 			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "20210501");
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(),
+			"20210501");
 		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(),
 			RandomStringUtils.randomNumeric(10));
 		final List<String> possibleValues = Arrays
 			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
-		settingsMap.put(this.testDataInitializer.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(), possibleValues.get(0));
+		settingsMap.put(this.testDataInitializer.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(),
+			possibleValues.get(0));
 		importRequest1.setAdditionalInfo(settingsMap);
 		final TrialImportRequestDTO importRequest2 = new TrialImportRequestDTO();
 		importRequest2.setStartDate("2019-01-01");
@@ -390,7 +389,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		settingsMap.put(invalidVariableName, RandomStringUtils.randomAlphabetic(30));
 		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.STUDY_DETAIL).getName(),
 			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "20210501");
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(),
+			"20210501");
 		importRequest1.setAdditionalInfo(settingsMap);
 
 		final List<StudySummary> savedStudies =
@@ -416,7 +416,8 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final Map<String, String> settingsMap = Maps.newHashMap();
 		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(),
 			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "2021-05-01");
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(),
+			"2021-05-01");
 		final List<String> possibleValues = Arrays
 			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
 		settingsMap.put(this.testDataInitializer.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(),
@@ -441,18 +442,24 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
 
 		final Map<String, String> settingsMap = Maps.newHashMap();
-		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.SELECTION_METHOD).getName(),
-			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.ENVIRONMENT_DETAIL).getName(),
-			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.TREATMENT_FACTOR).getName(),
-			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.EXPERIMENTAL_DESIGN).getName(),
-			RandomStringUtils.randomNumeric(5));
+		settingsMap
+			.put(this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.SELECTION_METHOD).getName(),
+				RandomStringUtils.randomAlphabetic(30));
+		settingsMap
+			.put(this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.ENVIRONMENT_DETAIL).getName(),
+				RandomStringUtils.randomAlphabetic(30));
+		settingsMap
+			.put(this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.TREATMENT_FACTOR).getName(),
+				RandomStringUtils.randomAlphabetic(30));
+		settingsMap
+			.put(this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.EXPERIMENTAL_DESIGN).getName(),
+				RandomStringUtils.randomNumeric(5));
 		final List<String> possibleValues = Arrays
 			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
-		settingsMap.put(this.testDataInitializer.createCategoricalVariable(VariableType.GERMPLASM_DESCRIPTOR, possibleValues).getName(), possibleValues.get(1));
-		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.TRAIT).getName(), "20210501");
+		settingsMap.put(this.testDataInitializer.createCategoricalVariable(VariableType.GERMPLASM_DESCRIPTOR, possibleValues).getName(),
+			possibleValues.get(1));
+		settingsMap
+			.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.TRAIT).getName(), "20210501");
 
 		importRequest1.setAdditionalInfo(settingsMap);
 

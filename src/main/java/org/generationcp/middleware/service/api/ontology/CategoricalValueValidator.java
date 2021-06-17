@@ -14,7 +14,7 @@ public class CategoricalValueValidator implements VariableValueValidator {
 	@Override
 	public boolean isValid(final MeasurementVariable variable, final boolean useCategoricalValueName) {
 		this.verifyCategoricalDataType(variable);
-		List<String> possibleValues;
+		final List<String> possibleValues;
 		if(useCategoricalValueName) {
 			possibleValues = variable.getPossibleValues().stream().map(ValueReference::getName).collect(
 				Collectors.toList());

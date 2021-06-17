@@ -88,8 +88,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DmsProjectDao.class);
 
-	private static final Integer LOCATION_ID = TermId.LOCATION_ID.getId();
-
 	private static final String PROGRAM_UUID = "program_uuid";
 	private static final String PROJECT_ID = "projectId";
 	public static final String DELETED = "deleted";

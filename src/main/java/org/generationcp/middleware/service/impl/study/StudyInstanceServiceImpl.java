@@ -178,8 +178,10 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final boolean hasMeansDataset = this.studyService.studyHasGivenDatasetType(studyId, DatasetTypeEnum.MEANS_DATA.getId());
 		if (hasCrossesOrSelections || hasMeansDataset) {
 			for (final StudyInstance instance : instances) {
-				final Optional<Integer> instanceHasGivenDatasetType = this.getDatasetIdForInstanceIdAndDatasetType(instance.getInstanceId(), DatasetTypeEnum.MEANS_DATA);
-				if ((hasCrossesOrSelections && instance.isHasExperimentalDesign()) || (hasMeansDataset && instanceHasGivenDatasetType.isPresent())) {
+				final Optional<Integer> instanceHasGivenDatasetType =
+					this.getDatasetIdForInstanceIdAndDatasetType(instance.getInstanceId(), DatasetTypeEnum.MEANS_DATA);
+				if ((hasCrossesOrSelections && instance.isHasExperimentalDesign()) || (hasMeansDataset && instanceHasGivenDatasetType
+					.isPresent())) {
 					instance.setCanBeDeleted(false);
 				}
 			}
@@ -209,7 +211,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		// Delete geolocation and its properties
 		this.daoFactory.getGeolocationDao().deleteGeolocations(instanceIds);
 
-		this.deleteExperimentalDesignIfApplicable(studyId,plotDatasetId);
+		this.deleteExperimentalDesignIfApplicable(studyId, plotDatasetId);
 
 		// IF experimental design is not yet generated, re-number succeeding trial instances
 		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
@@ -286,7 +288,8 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 		// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 		this.datasetService
-			.updateDependentPhenotypesStatusByGeolocation(instanceObservationData.getInstanceId(), Arrays.asList(instanceObservationData.getVariableId()));
+			.updateDependentPhenotypesStatusByGeolocation(instanceObservationData.getInstanceId(),
+				Arrays.asList(instanceObservationData.getVariableId()));
 
 		return instanceObservationData;
 	}
@@ -300,7 +303,8 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotype(experimentModel.getNdExperimentId(), observationDataId);
 		if (phenotype != null) {
 			return Optional
-				.of(new InstanceObservationData(phenotype.getExperiment().getNdExperimentId(), observationDataId, phenotype.getObservableId(),
+				.of(new InstanceObservationData(phenotype.getExperiment().getNdExperimentId(), observationDataId,
+					phenotype.getObservableId(),
 					phenotype.getValue(), phenotype.getcValueId()));
 		}
 		return Optional.empty();
@@ -362,7 +366,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 					final List<MeasurementVariable> measurementVariables = this.daoFactory.getPhenotypeDAO()
 						.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(
 							Collections.singletonList(instanceId), variableIds).get(instanceId);
-					if(!CollectionUtils.isEmpty(measurementVariables)) {
+					if (!CollectionUtils.isEmpty(measurementVariables)) {
 						environmentParameters.addAll(measurementVariables);
 					}
 				}
@@ -387,9 +391,9 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				variableIds = environmentVariables.stream().map(MeasurementVariable::getTermId)
 					.collect(Collectors.toList());
 				properties.put("studyObjective", studyMetadata.getStudyObjective() == null ? "" : studyMetadata.getStudyObjective());
-				final Map<String, String>  geolocationMap = this.daoFactory.getGeolocationPropertyDao()
+				final Map<String, String> geolocationMap = this.daoFactory.getGeolocationPropertyDao()
 					.getGeolocationPropsAndValuesByGeolocation(Collections.singletonList(instanceId), variableIds).get(instanceId);
-				if(geolocationMap != null) {
+				if (geolocationMap != null) {
 					properties.putAll(geolocationMap);
 				}
 
@@ -426,13 +430,15 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 		// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 		this.datasetService
-			.updateDependentPhenotypesStatusByGeolocation(instanceDescriptorData.getInstanceId(), Arrays.asList(instanceDescriptorData.getVariableId()));
+			.updateDependentPhenotypesStatusByGeolocation(instanceDescriptorData.getInstanceId(),
+				Arrays.asList(instanceDescriptorData.getVariableId()));
 
 		return instanceDescriptorData;
 	}
 
 	@Override
-	public Optional<InstanceDescriptorData> getInstanceDescriptorData(final Integer instanceId, final Integer descriptorDataId, final Integer variableId) {
+	public Optional<InstanceDescriptorData> getInstanceDescriptorData(final Integer instanceId, final Integer descriptorDataId,
+		final Integer variableId) {
 
 		final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(instanceId);
 
@@ -470,8 +476,9 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 			if (!CollectionUtils.isEmpty(studyInstanceDtos)) {
 				final List<Integer> studyIds = new ArrayList<>(studyInstanceDtos.stream().map(o -> Integer.valueOf(o.getTrialDbId()))
 					.collect(Collectors.toSet()));
-				final List<Integer> studyInstanceIds = new ArrayList<>(studyInstanceDtos.stream().map(o -> Integer.valueOf(o.getStudyDbId()))
-					.collect(Collectors.toSet()));
+				final List<Integer> studyInstanceIds =
+					new ArrayList<>(studyInstanceDtos.stream().map(o -> Integer.valueOf(o.getStudyDbId()))
+						.collect(Collectors.toSet()));
 				final Map<Integer, List<ObservationLevel>> observationLevelsMap = this.daoFactory.getDmsProjectDAO()
 					.getObservationLevelsMap(studyIds);
 				final Map<Integer, Integer> studyEnvironmentDatasetIdMap = this.daoFactory.getDmsProjectDAO()
@@ -481,8 +488,9 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				final Map<Integer, Map<String, String>> studyAdditionalInfoMap = this.daoFactory.getProjectPropertyDAO()
 					.getProjectPropsAndValuesByStudyIds(studyIds);
 				final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
-					this.daoFactory.getStudyInstanceExternalReferenceDao().getExternalReferences(studyInstanceIds).stream().collect(groupingBy(
-						ExternalReferenceDTO::getEntityId));
+					this.daoFactory.getStudyInstanceExternalReferenceDao().getExternalReferences(studyInstanceIds).stream()
+						.collect(groupingBy(
+							ExternalReferenceDTO::getEntityId));
 
 				this.populateStudyEnvironmentVariablesMap(studyEnvironmentVariablesMap, studyInstanceDtos, studyEnvironmentDatasetIdMap);
 				final List<Integer> variableIds = studyEnvironmentVariablesMap.values().stream().flatMap(variables -> variables.stream())
@@ -499,10 +507,10 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 					final List<MeasurementVariable> environmentVariables = studyEnvironmentVariablesMap.get(trialDbId);
 
 					final List<MeasurementVariable> environmentParameterVariables = new ArrayList<>();
-					if(environmentConditionsVariablesMap.containsKey(studyDbId)) {
+					if (environmentConditionsVariablesMap.containsKey(studyDbId)) {
 						environmentParameterVariables.addAll(environmentConditionsVariablesMap.get(studyDbId));
 					}
-					if(environmentDetailsVariablesMap.containsKey(studyDbId)){
+					if (environmentDetailsVariablesMap.containsKey(studyDbId)) {
 						environmentParameterVariables.addAll(environmentDetailsVariablesMap.get(studyDbId));
 					}
 
@@ -512,7 +520,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 						.map(variable -> new EnvironmentParameter(variable)).collect(Collectors.toList());
 					studyInstanceDto.setEnvironmentParameters(environmentParameters);
 
-					if(additionalInfoMap.containsKey(studyDbId)) {
+					if (additionalInfoMap.containsKey(studyDbId)) {
 						studyInstanceDto.getAdditionalInfo().putAll(additionalInfoMap.get(studyDbId));
 					}
 					if (studyAdditionalInfoMap.containsKey(trialDbId)) {
@@ -549,7 +557,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 			if (!trialIds.contains(trialId)) {
 				trialIds.add(trialId);
 			}
-			if(!CollectionUtils.isEmpty(dto.getEnvironmentParameters())) {
+			if (!CollectionUtils.isEmpty(dto.getEnvironmentParameters())) {
 				environmentVariableIds
 					.addAll(
 						dto.getEnvironmentParameters().stream().map(EnvironmentParameter::getParameterPUI).collect(Collectors.toList()));
@@ -624,7 +632,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		}
 
 		//Update environment dataset to save added project properties
-		for(final Integer trialId: trialIds) {
+		for (final Integer trialId : trialIds) {
 			this.daoFactory.getDmsProjectDAO().update(trialIdEnvironmentDatasetMap.get(trialId));
 			this.sessionProvider.getSession().flush();
 		}
@@ -637,7 +645,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 	private void populateStudyEnvironmentVariablesMap(final Map<Integer, List<MeasurementVariable>> studyEnvironmentVariablesMap,
 		final List<StudyInstanceDto> studyInstanceDtos, final Map<Integer, Integer> studyEnvironmentDatasetIdMap) {
 
-		for(final StudyInstanceDto studyInstanceDto: studyInstanceDtos) {
+		for (final StudyInstanceDto studyInstanceDto : studyInstanceDtos) {
 			final Integer trialDbId = Integer.valueOf(studyInstanceDto.getTrialDbId());
 			final Integer environmentDatasetId = studyEnvironmentDatasetIdMap.get(trialDbId);
 			if (studyEnvironmentVariablesMap.get(trialDbId) == null) {
@@ -655,33 +663,37 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap) {
 		final Integer trialDbId = Integer.valueOf(requestDTO.getTrialDbId());
 
-		if(!studyIdEnvironmentVariablesMap.get(trialDbId).contains(TermId.EXPERIMENT_DESIGN_FACTOR.getId())) {
-			this.addProjectProperty(studyIdEnvironmentVariablesMap, trialIdEnvironmentDatasetMap, trialDbId, VariableType.ENVIRONMENT_DETAIL,
+		if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(TermId.EXPERIMENT_DESIGN_FACTOR.getId())) {
+			this.addProjectProperty(studyIdEnvironmentVariablesMap, trialIdEnvironmentDatasetMap, trialDbId,
+				VariableType.ENVIRONMENT_DETAIL,
 				TermId.EXPERIMENT_DESIGN_FACTOR.getId(), String.valueOf(TermId.EXTERNALLY_GENERATED.getId()));
 		}
 
 		final List<ProjectProperty> experimentalDesignProperty = trialIdEnvironmentDatasetMap.get(trialDbId).getProperties().stream()
-			.filter(projectProperty -> projectProperty.getVariableId() == TermId.EXPERIMENT_DESIGN_FACTOR.getId()).collect(Collectors.toList());
+			.filter(projectProperty -> projectProperty.getVariableId() == TermId.EXPERIMENT_DESIGN_FACTOR.getId())
+			.collect(Collectors.toList());
 
 		final String externallyGeneratedDesignId = String.valueOf(TermId.EXTERNALLY_GENERATED.getId());
-		if(experimentalDesignProperty.get(0).getValue().equals(externallyGeneratedDesignId)) {
+		if (experimentalDesignProperty.get(0).getValue().equals(externallyGeneratedDesignId)) {
 			final GeolocationProperty experimentalDesignGeolocProperty = new GeolocationProperty(geolocation,
 				externallyGeneratedDesignId, 1, TermId.EXPERIMENT_DESIGN_FACTOR.getId());
 			geolocation.getProperties().add(experimentalDesignGeolocProperty);
 		}
 
 	}
+
 	private void addSeasonVariableIfNecessary(final StudyImportRequestDTO requestDTO,
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap, final Geolocation geolocation,
 		final Map<Integer, List<ValueReference>> categoricalVariablesMap,
 		final Map<Integer, DmsProject> environmentDatasetMap) {
-		if(!CollectionUtils.isEmpty(requestDTO.getSeasons())) {
+		if (!CollectionUtils.isEmpty(requestDTO.getSeasons())) {
 			final Integer trialDbId = Integer.valueOf(requestDTO.getTrialDbId());
 			final String seasonValue = requestDTO.getSeasons().get(0);
 
-			final List<String> possibleValues = categoricalVariablesMap.get(TermId.SEASON_VAR.getId()).stream().map(ValueReference::getDescription)
-				.collect(Collectors.toList());
-			if(possibleValues.contains(seasonValue)) {
+			final List<String> possibleValues =
+				categoricalVariablesMap.get(TermId.SEASON_VAR.getId()).stream().map(ValueReference::getDescription)
+					.collect(Collectors.toList());
+			if (possibleValues.contains(seasonValue)) {
 				//Add season variable if not present to the study
 				if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(TermId.SEASON_VAR.getId())) {
 					this.addProjectProperty(studyIdEnvironmentVariablesMap, environmentDatasetMap, trialDbId,
@@ -689,7 +701,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				}
 
 				//Add season value for the environment
-				if(geolocation.getProperties() == null) {
+				if (geolocation.getProperties() == null) {
 					geolocation.setProperties(new ArrayList<>());
 				}
 				final Map<String, Integer> seasonValuesMap = categoricalVariablesMap.get(TermId.SEASON_VAR.getId()).stream()
@@ -719,8 +731,9 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final Geolocation geolocation, final ExperimentModel experimentModel) {
 
 		// The default value of an instance's location name is "Unspecified Location"
-		final Optional<Location> location = StringUtils.isEmpty(requestDTO.getLocationDbId()) ? this.daoFactory.getLocationDAO().getUnspecifiedLocation() :
-			Optional.of(this.daoFactory.getLocationDAO().getById(Integer.valueOf(requestDTO.getLocationDbId())));
+		final Optional<Location> location =
+			StringUtils.isEmpty(requestDTO.getLocationDbId()) ? this.daoFactory.getLocationDAO().getUnspecifiedLocation() :
+				Optional.of(this.daoFactory.getLocationDAO().getById(Integer.valueOf(requestDTO.getLocationDbId())));
 
 		final List<GeolocationProperty> properties = new ArrayList<>();
 		final List<Phenotype> phenotypes = new ArrayList<>();
@@ -776,7 +789,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final Map<Integer, List<ValueReference>> categoricalValuesMap) {
 		final Integer variableId = Integer.valueOf(environmentParameter.getParameterPUI());
 
-		if(categoricalValuesMap.containsKey(variableId)) {
+		if (categoricalValuesMap.containsKey(variableId)) {
 			final Map<String, Integer> possibleValuesMap = categoricalValuesMap.get(variableId).stream()
 				.collect(Collectors.toMap(ValueReference::getName, ValueReference::getId));
 			//The reference ID should be saved for categorical environment variables
@@ -785,7 +798,6 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 			return environmentParameter.getValue();
 		}
 	}
-
 
 	private void mapGeolocationMetaData(final Geolocation geolocation, final EnvironmentParameter environmentParameter) {
 		final Integer variableId = Integer.valueOf(environmentParameter.getParameterPUI());
@@ -799,6 +811,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 			geolocation.setAltitude(Double.valueOf(environmentParameter.getValue()));
 		}
 	}
+
 	private void addEnvironmentVariablesIfNecessary(final StudyImportRequestDTO requestDTO,
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap, final Map<Integer, MeasurementVariable> environmentVariablesMap,
 		final Map<Integer, DmsProject> trialIdEnvironmentDatasetMap) {
@@ -806,7 +819,8 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 			final Integer trialDbId = Integer.valueOf(requestDTO.getTrialDbId());
 			for (final EnvironmentParameter environmentParameter : requestDTO.getEnvironmentParameters()) {
 				final Integer variableId = Integer.valueOf(environmentParameter.getParameterPUI());
-				if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(variableId) && environmentVariablesMap.containsKey(variableId)) {
+				if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(variableId) && environmentVariablesMap
+					.containsKey(variableId)) {
 					final VariableType variableType = environmentVariablesMap.get(variableId).getVariableType();
 					this.addProjectProperty(studyIdEnvironmentVariablesMap, trialIdEnvironmentDatasetMap, trialDbId, variableType,
 						variableId, null);

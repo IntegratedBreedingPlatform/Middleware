@@ -81,7 +81,8 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 			this.createEnvironmentData(dataset, Arrays.asList(this.variable1.getCvTermId(), this.variable2.getCvTermId()));
 
 		final Map<String, String> propertiesMap = this.geolocationPropDao
-			.getGeolocationPropsAndValuesByGeolocation(Collections.singletonList(geolocationId), Collections.emptyList()).get(geolocationId);
+			.getGeolocationPropsAndValuesByGeolocation(Collections.singletonList(geolocationId), Collections.emptyList())
+			.get(geolocationId);
 		Assert.assertNotNull(propertiesMap);
 		Assert.assertEquals(2, propertiesMap.size());
 		Assert.assertNotNull(propertiesMap.get(this.variable1.getDefinition()));
@@ -98,14 +99,14 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 			this.createEnvironmentData(dataset, Arrays.asList(this.variable1.getCvTermId(), this.variable2.getCvTermId()));
 
 		// Verify that geolocation props exist before deletion
-		final Map<String, String> studyProperties =	this.geolocationPropDao
+		final Map<String, String> studyProperties = this.geolocationPropDao
 			.getGeolocationPropsAndValuesByGeolocation(Collections.singletonList(geolocationIdMain), Collections.emptyList())
-				.get(geolocationIdMain);
+			.get(geolocationIdMain);
 		Assert.assertNotNull(studyProperties);
 		Assert.assertFalse(studyProperties.isEmpty());
 		final Map<String, String> datasetProperties = this.geolocationPropDao
 			.getGeolocationPropsAndValuesByGeolocation(Collections.singletonList(geolocationIdDataset), Collections.emptyList())
-				.get(geolocationIdDataset);
+			.get(geolocationIdDataset);
 		Assert.assertNotNull(datasetProperties);
 		Assert.assertFalse(datasetProperties.isEmpty());
 	}

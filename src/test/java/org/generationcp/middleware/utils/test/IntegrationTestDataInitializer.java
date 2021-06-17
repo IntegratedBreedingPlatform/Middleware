@@ -495,7 +495,7 @@ public class IntegrationTestDataInitializer {
 			.save(new CVTermProperty(TermId.VARIABLE_TYPE.getId(), variableType.getName(), 1, variable.getCvTermId()));
 
 		for (final String value : possibleValues) {
-			final CVTerm categoricalValue =	this.createCVTerm(value, value, CvId.IBDB_TERMS.getId());
+			final CVTerm categoricalValue = this.createCVTerm(value, value, CvId.IBDB_TERMS.getId());
 			this.daoFactory.getCvTermRelationshipDao()
 				.save(new CVTermRelationship(TermId.HAS_VALUE.getId(), scale.getCvTermId(), categoricalValue.getCvTermId()));
 		}

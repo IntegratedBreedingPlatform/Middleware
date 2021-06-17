@@ -39,7 +39,6 @@ import org.generationcp.middleware.service.api.study.EnvironmentParameter;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
-import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
@@ -47,17 +46,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -157,7 +151,6 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 			this.instance3 = this.testDataInitializer.createTestGeolocation("3", 3);
 		}
 
-
 		// Null study end date means it's still active
 		this.testUser = this.testDataInitializer.createUserForTesting();
 		this.study = this.testDataInitializer
@@ -196,7 +189,6 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
 		Assert.assertEquals(this.study.getName() + " Environment Number 1", studyDetailsDto.getMetadata().getStudyName());
 	}
-
 
 	@Test
 	public void testCreateStudyInstances() {
@@ -503,7 +495,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		// Delete Instance 1,2,3
 		final Integer instance1InstanceId = instance1.getLocationId();
 		final Integer instance2InstanceId = instance2.getLocationId();
-		this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance1InstanceId,instance2InstanceId));
+		this.studyInstanceService.deleteStudyInstances(studyId, Arrays.asList(instance1InstanceId, instance2InstanceId));
 		this.sessionProvder.getSession().flush();
 
 		final List<StudyInstance> studyInstances =
@@ -799,8 +791,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 			.getCategoriesForCategoricalVariables(Collections.singletonList(TermId.SEASON_VAR.getId())).get(TermId.SEASON_VAR.getId());
 		dto.setSeasons(Collections.singletonList(categoricalValues.get(0).getDescription()));
 
-
-		final CVTerm numericVariable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ENVIRONMENT_DETAIL);
+		final CVTerm numericVariable =
+			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ENVIRONMENT_DETAIL);
 		final EnvironmentParameter numericEnvironmentParameter = new EnvironmentParameter();
 		numericEnvironmentParameter.setValue("1");
 		numericEnvironmentParameter.setParameterPUI(numericVariable.getCvTermId().toString());
@@ -841,7 +833,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		dto.setTrialDbId(String.valueOf(trial.getTrialDbId()));
 		dto.setLocationDbId("0");
 
-		final CVTerm numericVariable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL);
+		final CVTerm numericVariable =
+			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL);
 		final EnvironmentParameter numericEnviromentParameter = new EnvironmentParameter();
 		numericEnviromentParameter.setValue("1");
 		numericEnviromentParameter.setParameterPUI(numericVariable.getCvTermId().toString());
@@ -863,7 +856,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		dto.setTrialDbId(String.valueOf(trial.getTrialDbId()));
 		dto.setLocationDbId("0");
 
-		final CVTerm numericVariable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ENVIRONMENT_CONDITION);
+		final CVTerm numericVariable =
+			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ENVIRONMENT_CONDITION);
 		final EnvironmentParameter numericEnviromentParameter = new EnvironmentParameter();
 		numericEnviromentParameter.setValue("NON NUMERIC");
 		numericEnviromentParameter.setParameterPUI(numericVariable.getCvTermId().toString());

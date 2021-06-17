@@ -16,7 +16,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -183,7 +182,8 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 	public Map<Integer, List<Integer>> getEnvironmentVariablesByStudyId(final List<Integer> studyIds) {
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap = new HashMap<>();
-		final StringBuilder queryString = new StringBuilder("SELECT p_main.project_id AS projectId, pp.variable_id AS variableId FROM projectprop pp ");
+		final StringBuilder queryString =
+			new StringBuilder("SELECT p_main.project_id AS projectId, pp.variable_id AS variableId FROM projectprop pp ");
 		queryString.append("INNER JOIN project p_env ON pp.project_id = p_env.project_id ");
 		queryString.append("INNER JOIN project p_main ON p_main.project_id = p_env.study_id ");
 		queryString.append("WHERE p_main.project_id IN (:studyIds) AND p_env.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId());

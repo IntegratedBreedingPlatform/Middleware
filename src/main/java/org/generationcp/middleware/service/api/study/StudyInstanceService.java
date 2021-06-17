@@ -31,7 +31,8 @@ public interface StudyInstanceService {
 
 	InstanceDescriptorData updateInstanceDescriptorData(InstanceDescriptorData instanceDescriptorData);
 
-	Optional<InstanceDescriptorData> getInstanceDescriptorData(Integer instanceId, final Integer descriptorDataId, final Integer variableId);
+	Optional<InstanceDescriptorData> getInstanceDescriptorData(Integer instanceId, final Integer descriptorDataId,
+		final Integer variableId);
 
 	/**
 	 * Returns the Optional<Integer> (datasetId) of dataset to which the studyDbId (nd_geolocation_id) belongs to.

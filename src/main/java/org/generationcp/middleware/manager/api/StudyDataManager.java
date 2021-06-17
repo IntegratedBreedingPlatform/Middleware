@@ -27,7 +27,6 @@ import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -40,7 +39,6 @@ import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
-import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
 import java.util.List;
@@ -135,9 +133,9 @@ public interface StudyDataManager {
 	/**
 	 * Gets the experiments of the given instance/s.
 	 *
-	 * @param dataSetId the data set id
+	 * @param dataSetId       the data set id
 	 * @param instanceNumbers - instances to retrieve
-	 * @param repNumbers - repetition numbers to retrieve
+	 * @param repNumbers      - repetition numbers to retrieve
 	 * @return the experiments
 	 */
 	List<Experiment> getExperiments(final int dataSetId, final List<Integer> instanceNumbers, final List<Integer> repNumbers);
