@@ -748,12 +748,14 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 								if (GEOLOCATION_METADATA.contains(measurementVariable.getTermId())) {
 									this.mapGeolocationMetaData(geolocation, environmentParameter);
 								} else {
-									final GeolocationProperty property = new GeolocationProperty(geolocation, environmentParameter.getValue(), 1, measurementVariable.getTermId());
+									final GeolocationProperty property = new GeolocationProperty(geolocation,
+										this.getEnvironmentParameterValue(environmentParameter, categoricalValuesMap), 1,
+										measurementVariable.getTermId());
 									properties.add(property);
 								}
 							} else if (VariableType.ENVIRONMENT_CONDITION.getId().equals(measurementVariable.getVariableType().getId())) {
-								final Phenotype phenotype =
-									new Phenotype(measurementVariable.getTermId(), environmentParameter.getValue(), experimentModel);
+								final Phenotype phenotype = new Phenotype(measurementVariable.getTermId(),
+									this.getEnvironmentParameterValue(environmentParameter, categoricalValuesMap), experimentModel);
 								phenotype.setCreatedDate(new Date());
 								phenotype.setUpdatedDate(new Date());
 								phenotype.setName(String.valueOf(measurementVariable.getTermId()));
@@ -768,6 +770,20 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 		geolocation.setProperties(properties);
 		experimentModel.setPhenotypes(phenotypes);
+	}
+
+	private String getEnvironmentParameterValue(final EnvironmentParameter environmentParameter,
+		final Map<Integer, List<ValueReference>> categoricalValuesMap) {
+		final Integer variableId = Integer.valueOf(environmentParameter.getParameterPUI());
+
+		if(categoricalValuesMap.containsKey(variableId)) {
+			final Map<String, Integer> possibleValuesMap = categoricalValuesMap.get(variableId).stream()
+				.collect(Collectors.toMap(ValueReference::getName, ValueReference::getId));
+			//The reference ID should be saved for categorical environment variables
+			return String.valueOf(possibleValuesMap.get(environmentParameter.getValue()));
+		} else {
+			return environmentParameter.getValue();
+		}
 	}
 
 
