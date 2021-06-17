@@ -53,11 +53,6 @@ public class UserInfo implements Serializable {
 	public UserInfo() {
 	}
 
-	public UserInfo(int userId, int loginCount) {
-		this.userId = userId;
-		this.loginCount = loginCount;
-	}
-
 	public Integer getUserId() {
 		return this.userId;
 	}

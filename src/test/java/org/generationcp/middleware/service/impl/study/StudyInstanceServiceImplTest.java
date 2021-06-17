@@ -19,7 +19,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -50,7 +49,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 import java.util.UUID;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -69,9 +67,6 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	public static final String LOCATION_NAME = "LOCATION_NAME";
 
 	private IntegrationTestDataInitializer testDataInitializer;
-
-	@Autowired
-	private GermplasmDataManager germplasmDataManager;
 
 	@Autowired
 	private OntologyDataManager ontologyManager;
@@ -94,7 +89,6 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	@Resource
 	private ExperimentDesignService experimentDesignService;
 
-	private final Random random = new Random();
 	private DaoFactory daoFactory;
 	private StudyDataManagerImpl studyDataManager;
 	private StudyTestDataInitializer studyTestDataInitializer;
@@ -122,8 +116,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 
 		this.studyTestDataInitializer =
-			new StudyTestDataInitializer(this.studyDataManager, this.ontologyManager, this.commonTestProject, this.germplasmDataManager,
-				this.locationManager);
+			new StudyTestDataInitializer(this.studyDataManager, this.ontologyManager, this.commonTestProject,
+				this.locationManager, this.sessionProvder);
 
 		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.name());
 

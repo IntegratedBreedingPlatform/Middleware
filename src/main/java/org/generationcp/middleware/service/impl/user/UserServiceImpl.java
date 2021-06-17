@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.impl.user;
 
+import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
@@ -382,9 +383,8 @@ public class UserServiceImpl implements UserService {
 		try {
 			return this.workbenchDaoFactory.getUserInfoDAO().getUserInfoByUserId(userId);
 		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Cannot increment login count for user_id =" + userId + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Cannot get userInfo for user_id =" + userId + "): " + e.getMessage(), e);
 		}
-
 	}
 
 	@Override
@@ -421,16 +421,19 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public void incrementUserLogInCount(final int userId) {
-
 		try {
-
-			final UserInfo userdetails = this.workbenchDaoFactory.getUserInfoDAO().getUserInfoByUserId(userId);
-			if (userdetails != null) {
-				this.workbenchDaoFactory.getUserInfoDAO().updateLoginCounter(userdetails);
+			final UserInfoDAO userInfoDAO = this.workbenchDaoFactory.getUserInfoDAO();
+			UserInfo userInfo = userInfoDAO.getUserInfoByUserId(userId);
+			if (userInfo == null) {
+				// Edge case: fresh db, admin user
+				userInfo = new UserInfo();
+				userInfo.setUserId(userId);
+				userInfo.setLoginCount(1);
+			} else {
+				userInfo.setLoginCount(userInfo.getLoginCount() + 1);
 			}
-
+			userInfoDAO.insertOrUpdateUserInfo(userInfo);
 		} catch (final Exception e) {
-
 			throw new MiddlewareQueryException("Cannot increment login count for user_id =" + userId + "): " + e.getMessage(), e);
 		}
 	}
