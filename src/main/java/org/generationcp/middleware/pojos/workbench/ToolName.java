@@ -20,7 +20,6 @@ import java.util.List;
  *
  */
 public enum ToolName {
-	LIST_MANAGER("list_manager"),
 	BM_LIST_MANAGER_MAIN("bm_list_manager_main"),
 	BREEDING_VIEW("breeding_view"),
 	BV_SSA("breeding_view_wb"),
@@ -30,7 +29,6 @@ public enum ToolName {
 	FIELDBOOK_WEB("fieldbook_web"),
 	GDMS("gdms"),
 	GERMPLASM_BROWSER("germplasm_browser"),
-	GERMPLASM_IMPORT("germplasm_import"),
 	GERMPLASM_LIST_BROWSER("germplasm_list_browser"),
 	MAIN_HEAD_TO_HEAD_BROWSER("germplasm_mainheadtohead"),
 	MIGRATOR("migrator"),
