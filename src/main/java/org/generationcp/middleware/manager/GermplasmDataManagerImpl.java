@@ -40,7 +40,6 @@ import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite.FavoriteType;
-import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaSpecification;
@@ -929,7 +928,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	/**
 	 * Return the count of germplasm search results based on the following parameters:
 	 *
-	 * @param germplasmSearchParameter	- search filter
+	 * @param germplasmSearchParameter - search filter
 	 * @return
 	 */
 	@Override
@@ -1331,11 +1330,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public void save(final Germplasm germplasm) {
 		this.daoFactory.getGermplasmDao().save(germplasm);
-	}
-
-	@Override
-	public NamingConfiguration getNamingConfigurationByName(final String name) {
-		return this.daoFactory.getNamingConfigurationDAO().getByName(name);
 	}
 
 	@Override

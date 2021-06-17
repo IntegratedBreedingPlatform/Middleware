@@ -884,7 +884,7 @@ public class GermplasmGroupingServiceImplTest {
 	}
 
 	@Test
-	public void testGetDescendantGroupMembers() {
+	public void testGetDescendantGroupMembersGids() {
 		final Integer mgid = 11;
 		final Integer rootGid = 13;
 		final Germplasm derivative = new Germplasm();
@@ -897,9 +897,9 @@ public class GermplasmGroupingServiceImplTest {
 		maintenance.setMgid(0);
 		Mockito.when(this.germplasmDAO.getDescendants(rootGid, 'M')).thenReturn(Collections.singletonList(maintenance));
 
-		final List<Germplasm> descendantGroupMembers =  this.germplasmGroupingService.getDescendantGroupMembers(rootGid, mgid);
+		final List<Integer> descendantGroupMembers =  this.germplasmGroupingService.getDescendantGroupMembersGids(rootGid, mgid);
 		Assert.assertEquals(1, descendantGroupMembers.size());
-		Assert.assertEquals(derivative.getGid(), descendantGroupMembers.get(0).getGid());
+		Assert.assertTrue(descendantGroupMembers.contains(derivative.getGid()));
 	}
 
 	private Map<Integer, Integer> getGermplasmIdMethodIdMap(final List<Germplasm> germplasm) {
