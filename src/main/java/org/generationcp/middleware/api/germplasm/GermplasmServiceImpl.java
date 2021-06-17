@@ -124,16 +124,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public Germplasm getGermplasmByGID(final Integer gid) {
-		return this.daoFactory.getGermplasmDao().getById(gid);
-	}
-
-	@Override
-	public Germplasm saveGermplasm(final Germplasm germplasm) {
-		return this.daoFactory.getGermplasmDao().save(germplasm);
-	}
-
-	@Override
 	public List<Germplasm> getGermplasmByGUIDs(final List<String> guids) {
 		return this.daoFactory.getGermplasmDao().getGermplasmByGUIDs(guids);
 	}

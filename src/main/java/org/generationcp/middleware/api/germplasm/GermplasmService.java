@@ -28,10 +28,6 @@ import java.util.Set;
 
 public interface GermplasmService {
 
-	Germplasm getGermplasmByGID(Integer gid);
-
-	Germplasm saveGermplasm(Germplasm germplasm);
-
 	List<Germplasm> getGermplasmByGUIDs(List<String> guids);
 
 	/**
