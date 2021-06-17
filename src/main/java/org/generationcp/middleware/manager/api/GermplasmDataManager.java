@@ -1003,14 +1003,6 @@ public interface GermplasmDataManager {
 
 	void save(Germplasm germplasm);
 
-	/**
-	 * Get the NamingConfiguration by name
-	 *
-	 * @param name
-	 * @return
-	 */
-	NamingConfiguration getNamingConfigurationByName(String name);
-
 	Germplasm getUnknownGermplasmWithPreferredName();
 
 	List<Integer> addOrUpdateGermplasm(final List<Germplasm> germplasms, final Operation operation);

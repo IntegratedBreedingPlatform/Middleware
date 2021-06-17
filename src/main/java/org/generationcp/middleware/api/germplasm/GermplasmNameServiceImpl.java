@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.germplasm;
 
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
@@ -86,6 +88,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 	@Override
 	public Integer createName(final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid) {
+
 		if (germplasmNameRequestDto.isPreferredName()) {
 			final Name preferredName = this.getPreferredNameOfGermplasm(gid);
 			if (preferredName != null) {
@@ -107,5 +110,10 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		name.setReferenceId(0);
 		daoFactory.getNameDao().save(name);
 		return name.getNid();
+	}
+
+	@Override
+	public List<GermplasmNameDto> getGermplasmNamesByGids(final List<Integer> gids) {
+		return this.daoFactory.getNameDao().getGermplasmNamesByGids(gids);
 	}
 }
