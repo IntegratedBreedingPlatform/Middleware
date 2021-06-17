@@ -149,12 +149,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.daoFactory.getNameDao().getByGIDAndNval(gid, GermplasmDataManagerUtil.getNameToUseByMode(nval, mode));
 	}
 
-	@Override
-	public Integer updateGermplasmPrefName(final Integer gid, final String newPrefName) {
-		this.updateGermplasmPrefNameAbbrev(gid, newPrefName, "Name");
-		return gid;
-	}
-
 	private void updateGermplasmPrefNameAbbrev(final Integer gid, final String newPrefValue, final String nameOrAbbrev) {
 
 		try {
@@ -643,29 +637,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 
 		return field.getFldno();
-	}
-
-	@Override
-	public List<Integer> addUserDefinedFields(final List<UserDefinedField> fields) {
-
-		final List<Integer> isUdfldSaved = new ArrayList<>();
-		try {
-
-			for (final UserDefinedField field : fields) {
-
-				final UserDefinedField udflds = this.daoFactory.getUserDefinedFieldDAO().save(field);
-				isUdfldSaved.add(udflds.getFldno());
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedFields(fields=" + fields + "): "
-					+ e.getMessage(),
-				e);
-		}
-
-		return isUdfldSaved;
 	}
 
 	@Override

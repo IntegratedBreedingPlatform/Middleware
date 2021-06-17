@@ -29,7 +29,6 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
-import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.pojos.workbench.CropType;
 
 import java.util.List;
@@ -148,15 +147,6 @@ public interface GermplasmDataManager {
 	 * @return {@code Name} POJO of the matching {@code Name} object. Returns
 	 */
 	Name getNameByGIDAndNval(Integer gid, String nval, GetGermplasmByNameModes mode);
-
-	/**
-	 * Sets the specified Name as the specified Germplasm's new preferred Name.
-	 *
-	 * @param gid         - id of the Germplasm to be updated
-	 * @param newPrefName - new name to set as the preferred name
-	 * @return Returns the id of the updated {@code Germplasm} record
-	 */
-	Integer updateGermplasmPrefName(Integer gid, String newPrefName);
 
 	/**
 	 * Inserts a list of multiple {@code Name} objects into the database.
@@ -502,14 +492,6 @@ public interface GermplasmDataManager {
 	 * @return the id of the new UserDefinedField record added
 	 */
 	Integer addUserDefinedField(UserDefinedField field);
-
-	/**
-	 * Given a list of UserDefinedField objects, add new records for the given parameter.
-	 *
-	 * @param fields - the list of UserDefinedField objects
-	 * @return the list of ids of the new UserDefinedField records added
-	 */
-	List<Integer> addUserDefinedFields(List<UserDefinedField> fields);
 
 	/**
 	 * Given a Attribute object, add new record for the given parameter.
