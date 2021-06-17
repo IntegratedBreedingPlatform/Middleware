@@ -3,6 +3,9 @@ package org.generationcp.middleware.service.impl.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
+import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -11,9 +14,12 @@ import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
 import org.generationcp.middleware.domain.dms.InstanceObservationData;
 import org.generationcp.middleware.domain.dms.StudyReference;
+import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -29,10 +35,12 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.study.EnvironmentParameter;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
@@ -45,9 +53,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -89,6 +99,9 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 	@Resource
 	private ExperimentDesignService experimentDesignService;
+
+	@Resource
+	private StudyService studyService;
 
 	private DaoFactory daoFactory;
 	private StudyDataManagerImpl studyDataManager;
@@ -774,6 +787,120 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().clear();
 
 		assertNull(this.studyInstanceService.getStudyDetailsByInstance(geolocation.getLocationId()));
+	}
+
+	@Test
+	public void testSaveStudyInstance_AllInfoSaved() {
+		final StudySummary trial = this.createTrial();
+		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
+		dto.setTrialDbId(String.valueOf(trial.getTrialDbId()));
+		dto.setLocationDbId("0");
+		final List<ValueReference> categoricalValues = this.daoFactory.getCvTermRelationshipDao()
+			.getCategoriesForCategoricalVariables(Collections.singletonList(TermId.SEASON_VAR.getId())).get(TermId.SEASON_VAR.getId());
+		dto.setSeasons(Collections.singletonList(categoricalValues.get(0).getDescription()));
+
+
+		final CVTerm numericVariable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ENVIRONMENT_DETAIL);
+		final EnvironmentParameter numericEnviromentParameter = new EnvironmentParameter();
+		numericEnviromentParameter.setValue("1");
+		numericEnviromentParameter.setParameterPUI(numericVariable.getCvTermId().toString());
+
+		final List<String> possibleValues = Arrays
+			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
+		final CVTerm categoricalVariable = this.testDataInitializer
+			.createCategoricalVariable(VariableType.ENVIRONMENT_CONDITION, possibleValues);
+		final EnvironmentParameter categoricalEnvironmentParameter = new EnvironmentParameter();
+		categoricalEnvironmentParameter.setParameterPUI(categoricalVariable.getCvTermId().toString());
+		categoricalEnvironmentParameter.setValue(possibleValues.get(0));
+		dto.setEnvironmentParameters(Arrays.asList(numericEnviromentParameter, categoricalEnvironmentParameter));
+
+		final ExternalReferenceDTO externalReference = new ExternalReferenceDTO();
+		externalReference.setReferenceID(RandomStringUtils.randomAlphabetic(20));
+		externalReference.setReferenceSource(RandomStringUtils.randomAlphabetic(20));
+		dto.setExternalReferences(Collections.singletonList(externalReference));
+
+		final StudyInstanceDto savedInstance = this.studyInstanceService
+			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
+
+		Assert.assertEquals(dto.getTrialDbId(), savedInstance.getTrialDbId());
+		Assert.assertEquals(dto.getLocationDbId(), savedInstance.getLocationDbId());
+		Assert.assertEquals(2, savedInstance.getEnvironmentParameters().size());
+		Assert.assertEquals(1, savedInstance.getExternalReferences().size());
+		Assert.assertEquals(externalReference.getReferenceID(), savedInstance.getExternalReferences().get(0).getReferenceID());
+		Assert.assertEquals(externalReference.getReferenceSource(), savedInstance.getExternalReferences().get(0).getReferenceSource());
+		Assert.assertEquals(String.valueOf(TermId.EXTERNALLY_GENERATED.getId()), savedInstance.getExperimentalDesign().getPUI());
+	}
+
+	@Test
+	public void testSaveStudyInstances_WithValidVariableHavingInvalidVariableType() {
+		final StudySummary trial = this.createTrial();
+		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
+		dto.setTrialDbId(String.valueOf(trial.getTrialDbId()));
+		dto.setLocationDbId("0");
+
+		final CVTerm numericVariable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL);
+		final EnvironmentParameter numericEnviromentParameter = new EnvironmentParameter();
+		numericEnviromentParameter.setValue("1");
+		numericEnviromentParameter.setParameterPUI(numericVariable.getCvTermId().toString());
+		dto.setEnvironmentParameters(Collections.singletonList(numericEnviromentParameter));
+
+		final StudyInstanceDto savedInstance = this.studyInstanceService
+			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
+		Assert.assertEquals(dto.getTrialDbId(), savedInstance.getTrialDbId());
+		Assert.assertEquals(dto.getLocationDbId(), savedInstance.getLocationDbId());
+		Assert.assertTrue(CollectionUtils.isEmpty(savedInstance.getEnvironmentParameters()));
+	}
+
+	@Test
+	public void testSaveStudyInstances_WithValidVariableHavingInvalidVariableValue() {
+		final StudySummary trial = this.createTrial();
+		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
+		dto.setTrialDbId(String.valueOf(trial.getTrialDbId()));
+		dto.setLocationDbId("0");
+
+		final CVTerm numericVariable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ENVIRONMENT_CONDITION);
+		final EnvironmentParameter numericEnviromentParameter = new EnvironmentParameter();
+		numericEnviromentParameter.setValue("NON NUMERIC");
+		numericEnviromentParameter.setParameterPUI(numericVariable.getCvTermId().toString());
+		dto.setEnvironmentParameters(Collections.singletonList(numericEnviromentParameter));
+
+		final StudyInstanceDto savedInstance = this.studyInstanceService
+			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
+		Assert.assertEquals(dto.getTrialDbId(), savedInstance.getTrialDbId());
+		Assert.assertEquals(dto.getLocationDbId(), savedInstance.getLocationDbId());
+		Assert.assertTrue(CollectionUtils.isEmpty(savedInstance.getEnvironmentParameters()));
+	}
+
+	@Test
+	public void testSaveStudyInstances_WithInvalidVariable() {
+		final StudySummary trial = this.createTrial();
+		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
+		dto.setTrialDbId(String.valueOf(trial.getTrialDbId()));
+		dto.setLocationDbId("0");
+
+		final EnvironmentParameter numericEnviromentParameter = new EnvironmentParameter();
+		numericEnviromentParameter.setValue("1");
+		numericEnviromentParameter.setParameterPUI(RandomStringUtils.randomNumeric(100000000));
+		dto.setEnvironmentParameters(Collections.singletonList(numericEnviromentParameter));
+
+		final StudyInstanceDto savedInstance = this.studyInstanceService
+			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
+		Assert.assertEquals(dto.getTrialDbId(), savedInstance.getTrialDbId());
+		Assert.assertEquals(dto.getLocationDbId(), savedInstance.getLocationDbId());
+		Assert.assertTrue(CollectionUtils.isEmpty(savedInstance.getEnvironmentParameters()));
+	}
+
+	private StudySummary createTrial() {
+		final TrialImportRequestDTO dto = new TrialImportRequestDTO();
+		dto.setStartDate("2019-01-01");
+		dto.setEndDate("2020-12-31");
+		dto.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		dto.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		dto.setProgramDbId(this.commonTestProject.getUniqueID());
+
+		final List<StudySummary> savedStudies = this.studyService
+			.saveStudies(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid());
+		return savedStudies.get(0);
 	}
 
 	private void assertEnvironmentParameter(final List<MeasurementVariable> environmentParameters, final int expectedTermId,

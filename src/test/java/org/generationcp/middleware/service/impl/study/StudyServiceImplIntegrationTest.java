@@ -343,14 +343,14 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
 
 		final Map<String, String> settingsMap = Maps.newHashMap();
-		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.STUDY_DETAIL).getName(),
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.STUDY_DETAIL).getName(),
 			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "20210501");
-		settingsMap.put(this.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(),
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "20210501");
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(),
 			RandomStringUtils.randomNumeric(10));
 		final List<String> possibleValues = Arrays
 			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
-		settingsMap.put(this.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(), possibleValues.get(0));
+		settingsMap.put(this.testDataInitializer.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(), possibleValues.get(0));
 		importRequest1.setAdditionalInfo(settingsMap);
 		final TrialImportRequestDTO importRequest2 = new TrialImportRequestDTO();
 		importRequest2.setStartDate("2019-01-01");
@@ -388,9 +388,9 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final Map<String, String> settingsMap = Maps.newHashMap();
 		final String invalidVariableName = RandomStringUtils.randomAlphabetic(30);
 		settingsMap.put(invalidVariableName, RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.STUDY_DETAIL).getName(),
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.STUDY_DETAIL).getName(),
 			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "20210501");
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "20210501");
 		importRequest1.setAdditionalInfo(settingsMap);
 
 		final List<StudySummary> savedStudies =
@@ -414,12 +414,12 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
 
 		final Map<String, String> settingsMap = Maps.newHashMap();
-		settingsMap.put(this.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(),
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(),
 			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "2021-05-01");
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(), "2021-05-01");
 		final List<String> possibleValues = Arrays
 			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
-		settingsMap.put(this.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(),
+		settingsMap.put(this.testDataInitializer.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(),
 			RandomStringUtils.randomAlphabetic(30));
 		importRequest1.setAdditionalInfo(settingsMap);
 
@@ -441,18 +441,18 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
 
 		final Map<String, String> settingsMap = Maps.newHashMap();
-		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.SELECTION_METHOD).getName(),
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.SELECTION_METHOD).getName(),
 			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.ENVIRONMENT_DETAIL).getName(),
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.ENVIRONMENT_DETAIL).getName(),
 			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.TREATMENT_FACTOR).getName(),
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.CHARACTER_VARIABLE, VariableType.TREATMENT_FACTOR).getName(),
 			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.EXPERIMENTAL_DESIGN).getName(),
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.EXPERIMENTAL_DESIGN).getName(),
 			RandomStringUtils.randomNumeric(5));
 		final List<String> possibleValues = Arrays
 			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
-		settingsMap.put(this.createCategoricalVariable(VariableType.GERMPLASM_DESCRIPTOR, possibleValues).getName(), possibleValues.get(1));
-		settingsMap.put(this.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.TRAIT).getName(), "20210501");
+		settingsMap.put(this.testDataInitializer.createCategoricalVariable(VariableType.GERMPLASM_DESCRIPTOR, possibleValues).getName(), possibleValues.get(1));
+		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.TRAIT).getName(), "20210501");
 
 		importRequest1.setAdditionalInfo(settingsMap);
 
@@ -493,37 +493,6 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 				Assert.assertEquals(study.getTrialDbId().toString(), externalReference.getEntityId());
 			}
 		}
-	}
-
-	private CVTerm createVariableWithScale(final DataType dataType, final VariableType variableType) {
-		final CVTerm variable = this.testDataInitializer.createTrait(RandomStringUtils.randomAlphabetic(20));
-		final CVTerm scale = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
-		this.daoFactory.getCvTermRelationshipDao()
-			.save(new CVTermRelationship(TermId.HAS_SCALE.getId(), variable.getCvTermId(), scale.getCvTermId()));
-		this.daoFactory.getCvTermRelationshipDao()
-			.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), scale.getCvTermId(), dataType.getId()));
-		this.daoFactory.getCvTermPropertyDao()
-			.save(new CVTermProperty(TermId.VARIABLE_TYPE.getId(), variableType.getName(), 1, variable.getCvTermId()));
-		return variable;
-	}
-
-	private CVTerm createCategoricalVariable(final VariableType variableType, final List<String> possibleValues) {
-		final CVTerm variable = this.testDataInitializer.createTrait(RandomStringUtils.randomAlphabetic(20));
-		final CVTerm scale = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
-		this.daoFactory.getCvTermRelationshipDao()
-			.save(new CVTermRelationship(TermId.HAS_SCALE.getId(), variable.getCvTermId(), scale.getCvTermId()));
-		this.daoFactory.getCvTermRelationshipDao()
-			.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), scale.getCvTermId(), DataType.CATEGORICAL_VARIABLE
-				.getId()));
-		this.daoFactory.getCvTermPropertyDao()
-			.save(new CVTermProperty(TermId.VARIABLE_TYPE.getId(), variableType.getName(), 1, variable.getCvTermId()));
-		for (final String value : possibleValues) {
-			final CVTerm categoricalValue =
-				this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(10), value, CvId.IBDB_TERMS.getId());
-			this.daoFactory.getCvTermRelationshipDao()
-				.save(new CVTermRelationship(TermId.HAS_VALUE.getId(), scale.getCvTermId(), categoricalValue.getCvTermId()));
-		}
-		return variable;
 	}
 
 	private void createDeletedStudy() {
