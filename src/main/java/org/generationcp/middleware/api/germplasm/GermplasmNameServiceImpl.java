@@ -114,6 +114,6 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 	@Override
 	public List<GermplasmNameDto> getGermplasmNamesByGids(final List<Integer> gids) {
-		return this.daoFactory.getNameDao().getGermplasmNamesByGids(new ArrayList<>(gids));
+		return this.daoFactory.getNameDao().getGermplasmNamesByGids(gids);
 	}
 }
