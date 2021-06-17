@@ -357,7 +357,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	 * @return The id of the newly-created germplasm list
 	 */
 	@Override
-	public Integer saveGermplasmList(final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
+	public Integer saveGermplasmList(final String cropName, final List<Pair<Germplasm, GermplasmListData>> listDataItems, final GermplasmList germplasmList,
 			final boolean isApplyNewGroupToPreviousCrosses) {
 
 		final GermplasmListDAO germplasmListDao = this.daoFactory.getGermplasmListDAO();
@@ -383,7 +383,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			}
 
 			// For Management Group Settings Processing
-			this.germplasmGroupingService.processGroupInheritanceForCrosses(germplasmIdMethodIdMap, isApplyNewGroupToPreviousCrosses,
+			this.germplasmGroupingService.processGroupInheritanceForCrosses(cropName, germplasmIdMethodIdMap, isApplyNewGroupToPreviousCrosses,
 					this.crossExpansionProperties.getHybridBreedingMethods());
 
 		} catch (final Exception e) {

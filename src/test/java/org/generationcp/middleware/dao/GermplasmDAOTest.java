@@ -29,8 +29,8 @@ import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
@@ -1133,7 +1133,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			Assert.assertThat(this.dao.countGermplasmDTOs(dto), is(nonDeletedGermplasmCount));
 			// 5000 is the count limit if the germplasm db size is equal to or more than that
 		} else {
-			Assert.assertThat(this.dao.buildCountGermplasmDTOsQuery(dto), is(5000));
+			Assert.assertThat(this.dao.countGermplasmDTOs(dto), is(5000L));
 		}
 
 	}
