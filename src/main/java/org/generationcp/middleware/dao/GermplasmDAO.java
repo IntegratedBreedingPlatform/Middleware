@@ -619,6 +619,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
 		try {
 			final String query = "SELECT "
@@ -1159,6 +1160,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	 * @param gids
 	 */
 	public void resetGermplasmGroup(final List<Integer> gids) {
+		if (CollectionUtils.isEmpty(gids)) {
+			return;
+		}
 
 		try {
 

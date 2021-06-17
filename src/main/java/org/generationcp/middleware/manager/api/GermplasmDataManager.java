@@ -579,14 +579,6 @@ public interface GermplasmDataManager {
 	List<Germplasm> getGermplasms(List<Integer> gids);
 
 	/**
-	 * Given a List of GIDs, return the list of Germplasm without group assigned (mgid = 0 or mgid is null).
-	 *
-	 * @param gids the gids
-	 * @return the germplasms
-	 */
-	List<Germplasm> getGermplasmWithoutGroup(List<Integer> gids);
-
-	/**
 	 * Given a List of GIDs, return the list of all Germplasm together with their PreferredName.
 	 *
 	 * @param gids the gids
@@ -860,14 +852,6 @@ public interface GermplasmDataManager {
 	String getAttributeValue(Integer gid, Integer variableId);
 
 	void save(Germplasm germplasm);
-
-	/**
-	 * Get the NamingConfiguration by name
-	 *
-	 * @param name
-	 * @return
-	 */
-	NamingConfiguration getNamingConfigurationByName(String name);
 
 	Germplasm getUnknownGermplasmWithPreferredName();
 
