@@ -48,9 +48,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -74,11 +72,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public GermplasmDataManagerImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
 		this.daoFactory = new DaoFactory(sessionProvider);
-	}
-
-	@Override
-	public List<Germplasm> getAllGermplasm(final int start, final int numOfRows) {
-		return this.daoFactory.getGermplasmDao().getAll(start, numOfRows);
 	}
 
 	@Override
@@ -166,25 +159,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getSortedGermplasmWithPrefName(final List<Integer> gids) {
-		final List<Germplasm> result = new ArrayList<>();
-		for (final Iterator<Integer> iterator = gids.iterator(); iterator.hasNext(); ) {
-			final Integer gid = iterator.next();
-			result.add(this.getGermplasmWithPrefName(gid));
-		}
-		final Comparator<Germplasm> comparator = new Comparator<Germplasm>() {
-
-			@Override
-			public int compare(final Germplasm left, final Germplasm right) {
-				return left.getPreferredName().getNval().compareTo(right.getPreferredName().getNval());
-			}
-		};
-
-		Collections.sort(result, comparator);
-		return result;
-	}
-
-	@Override
 	public Germplasm getGermplasmWithPrefAbbrev(final Integer gid) {
 		return this.daoFactory.getGermplasmDao().getByGIDWithPrefAbbrev(gid);
 	}
@@ -197,11 +171,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Name> getNamesByGID(final Integer gid, final Integer status, final GermplasmNameType type) {
 		return this.daoFactory.getNameDao().getByGIDWithFilters(gid, status, type);
-	}
-
-	@Override
-	public List<Name> getByGIDWithListTypeFilters(final Integer gid, final Integer status, final List<Integer> type) {
-		return this.daoFactory.getNameDao().getByGIDWithListTypeFilters(gid, status, type);
 	}
 
 	@Override
@@ -253,12 +222,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public Integer updateGermplasmPrefName(final Integer gid, final String newPrefName) {
 		this.updateGermplasmPrefNameAbbrev(gid, newPrefName, "Name");
-		return gid;
-	}
-
-	@Override
-	public Integer updateGermplasmPrefAbbrev(final Integer gid, final String newPrefAbbrev) {
-		this.updateGermplasmPrefNameAbbrev(gid, newPrefAbbrev, "Abbreviation");
 		return gid;
 	}
 
@@ -319,11 +282,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		names.add(name);
 		final List<Integer> ids = this.addOrUpdateGermplasmName(names, Operation.UPDATE);
 		return !ids.isEmpty() ? ids.get(0) : null;
-	}
-
-	@Override
-	public List<Integer> updateGermplasmName(final List<Name> names) {
-		return this.addOrUpdateGermplasmName(names, Operation.UPDATE);
 	}
 
 	private List<Integer> addOrUpdateGermplasmName(final List<Name> names, final Operation operation) {
@@ -435,11 +393,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Method> getAllMethodsNotGenerative() {
 		return this.daoFactory.getMethodDAO().getAllMethodsNotGenerative();
-	}
-
-	@Override
-	public long countAllMethods() {
-		return this.countAll(this.daoFactory.getMethodDAO());
 	}
 
 	@Override
@@ -579,16 +532,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				"Error encountered while deleting Method: GermplasmDataMananger.deleteMethod(method=" + method + "): " + e.getMessage(),
 				e);
 		}
-	}
-
-	@Override
-	public UserDefinedField getUserDefinedFieldByID(final Integer id) {
-		return this.daoFactory.getUserDefinedFieldDAO().getById(id, false);
-	}
-
-	@Override
-	public UserDefinedField getUserDefinedFieldByLocalFieldNo(final Integer lfldno) {
-		return this.daoFactory.getUserDefinedFieldDAO().getByLocalFieldNo(lfldno);
 	}
 
 	/**
@@ -971,11 +914,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Map<Integer, Integer> getPreferredNameIdsByGIDs(final List<Integer> gids) {
-		return this.daoFactory.getNameDao().getPreferredNameIdsByGIDs(gids);
-	}
-
-	@Override
 	public Map<Integer, String> getLocationNamesByGids(final List<Integer> gids) {
 		return this.daoFactory.getLocationDAO().getLocationNamesMapByGIDs(gids);
 	}
@@ -1087,11 +1025,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public int countProgramFavorites(final FavoriteType type) {
-		return this.daoFactory.getProgramFavoriteDao().countProgramFavorites(type);
-	}
-
-	@Override
 	public List<ProgramFavorite> getProgramFavorites(final FavoriteType type, final int max, final String programUUID) {
 		return this.daoFactory.getProgramFavoriteDao().getProgramFavorites(type, max, programUUID);
 	}
@@ -1144,24 +1077,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			throw new MiddlewareQueryException(
 				"Error encountered while saving ProgramFavorite: GermplasmDataManager.deleteProgramFavorites(list=" + list + "): "
 					+ e.getMessage(),
-				e);
-		}
-
-	}
-
-	@Override
-	public void deleteProgramFavorite(final ProgramFavorite favorite) {
-
-		try {
-
-			final ProgramFavoriteDAO dao = this.daoFactory.getProgramFavoriteDao();
-			dao.makeTransient(favorite);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while deleting ProgramFavorite: GermplasmDataManager.deleteProgramFavorite(favorite=" + favorite
-					+ "): " + e.getMessage(),
 				e);
 		}
 
@@ -1279,11 +1194,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 
 		return new Name();
-	}
-
-	@Override
-	public Germplasm getGermplasmByLocalGid(final Integer lgid) {
-		return this.daoFactory.getGermplasmDao().getByLGid(lgid);
 	}
 
 	@Override
@@ -1412,24 +1322,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.daoFactory.getAttributeDAO().getAttributeTypes();
 	}
 
-	/**
-	 * @return List of all no bulking methods
-	 */
-	@Override
-	public List<Method> getAllNoBulkingMethods() {
-		return this.daoFactory.getMethodDAO().getAllNoBulkingMethods();
-	}
-
-	@Override
-	public List<Method> getNoBulkingMethodsByIdList(final List<Integer> ids) {
-		return this.daoFactory.getMethodDAO().getNoBulkingMethodsByIdList(ids);
-	}
-
-	@Override
-	public List<Method> getAllMethodsNotBulkingNotGenerative() {
-		return this.daoFactory.getMethodDAO().getAllMethodsNotBulkingNotGenerative();
-	}
-
 	@Override
 	public String getAttributeValue(final Integer gid, final String attributeName) {
 		final Attribute attribute = this.daoFactory.getAttributeDAO().getAttribute(gid, attributeName);
@@ -1470,11 +1362,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public boolean hasExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
 		final Optional<Integer> gid) {
 		return this.daoFactory.getGermplasmDao().hasExistingCrosses(femaleParent, maleParentIds, gid);
-	}
-
-	@Override
-	public List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(final String tableName, final Set<String> fieldTypes) {
-		return this.daoFactory.getUserDefinedFieldDAO().getByFieldTableNameAndType(tableName, fieldTypes);
 	}
 
 	public void setDaoFactory(final DaoFactory daoFactory) {

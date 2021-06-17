@@ -22,7 +22,6 @@ import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTree;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
-import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 import org.springframework.transaction.annotation.Transactional;
@@ -62,24 +61,6 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	@Override
 	public GermplasmPedigreeTree generatePedigreeTree(final Integer gid, final int level) {
 		return this.generatePedigreeTree(gid, level, false);
-	}
-
-	@Override
-	public Integer countPedigreeLevel(final Integer gid, final Boolean includeDerivativeLine) throws MaxPedigreeLevelReachedException {
-		return this.countPedigreeLevel(gid, includeDerivativeLine, false);
-	}
-
-	@Override
-	public Integer countPedigreeLevel(final Integer gid, final Boolean includeDerivativeLine, final boolean calculateFullPedigree)
-		throws MaxPedigreeLevelReachedException {
-		try {
-			PEDIGREE_COUNTER.set(1);
-			CALCULATE_FULL.set(calculateFullPedigree);
-			return this.getPedigreeLevelCount(gid, includeDerivativeLine);
-		} finally {
-			PEDIGREE_COUNTER.remove();
-			CALCULATE_FULL.remove();
-		}
 	}
 
 	public Integer getPedigreeLevelCount(final Integer gid, final Boolean includeDerivativeLine) {
@@ -348,117 +329,6 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	}
 
 	@Override
-	public GermplasmPedigreeTree getMaintenanceNeighborhood(final Integer gid, final int numberOfStepsBackward,
-		final int numberOfStepsForward) {
-
-		return this.getNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward, 'M');
-	}
-
-	@Override
-	public GermplasmPedigreeTree getDerivativeNeighborhood(final Integer gid, final int numberOfStepsBackward,
-		final int numberOfStepsForward) {
-
-		return this.getNeighborhood(gid, numberOfStepsBackward, numberOfStepsForward, 'D');
-	}
-
-	private GermplasmPedigreeTree getNeighborhood(final Integer gid, final int numberOfStepsBackward, final int numberOfStepsForward,
-		final char methodType) {
-		final GermplasmPedigreeTree neighborhood = new GermplasmPedigreeTree();
-
-		// get the root of the neighborhood
-		final Object[] traceResult = this.traceRoot(gid, numberOfStepsBackward, methodType);
-
-		if (traceResult != null && traceResult.length >= 2) {
-			final Germplasm root = (Germplasm) traceResult[0];
-			final Integer stepsLeft = (Integer) traceResult[1];
-
-			GermplasmPedigreeTreeNode rootNode = new GermplasmPedigreeTreeNode();
-			rootNode.setGermplasm(root);
-
-			// get the derived lines from the root until the whole neighborhood is created
-			final int treeLevel = numberOfStepsBackward - stepsLeft + numberOfStepsForward;
-			rootNode = this.getDerivedLines(rootNode, treeLevel, methodType);
-
-			neighborhood.setRoot(rootNode);
-
-			return neighborhood;
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Recursive function which gets the root of a derivative neighborhood by
-	 * tracing back through the source germplasms. The function stops when the
-	 * steps are exhausted or a germplasm created by a generative method is
-	 * encountered, whichever comes first.
-	 *
-	 * @param gid
-	 * @param steps
-	 * @return Object[] - first element is the Germplasm POJO, second is an
-	 * Integer which is the number of steps left to take
-	 */
-	private Object[] traceRoot(final Integer gid, final int steps, final char methodType) {
-		final Germplasm germplasm = this.germplasmDataManager.getGermplasmWithPrefName(gid);
-
-		if (germplasm == null) {
-			return new Object[0];
-		} else if (steps == 0 || germplasm.getGnpgs() != -1) {
-			return new Object[] {germplasm, Integer.valueOf(steps)};
-		} else {
-			int nextStep = steps;
-
-			//for MAN neighborhood, move the step count only if the ancestor is a MAN.
-			//otherwise, skip through the ancestor without changing the step count
-			if (methodType == 'M') {
-				final Method method = this.germplasmDataManager.getMethodByID(germplasm.getMethodId());
-				if (method != null && "MAN".equals(method.getMtype())) {
-					nextStep--;
-				}
-
-				//for DER neighborhood, always move the step count
-			} else {
-				nextStep--;
-			}
-
-			final Object[] returned = this.traceRoot(germplasm.getGpid2(), nextStep, methodType);
-			if (returned != null) {
-				return returned;
-			} else {
-				return new Object[] {germplasm, Integer.valueOf(steps)};
-			}
-		}
-	}
-
-	/**
-	 * Recursive function to get the derived lines given a Germplasm. This
-	 * constructs the derivative neighborhood.
-	 *
-	 * @param node
-	 * @param steps
-	 * @return
-	 */
-	private GermplasmPedigreeTreeNode getDerivedLines(final GermplasmPedigreeTreeNode node, final int steps, final char methodType) {
-		if (steps <= 0) {
-			return node;
-		} else {
-			final Integer gid = node.getGermplasm().getGid();
-			final List<Germplasm> derivedGermplasms = this.getChildren(gid, methodType);
-			for (final Germplasm g : derivedGermplasms) {
-				final GermplasmPedigreeTreeNode derivedNode = new GermplasmPedigreeTreeNode();
-				derivedNode.setGermplasm(g);
-				node.getLinkedNodes().add(this.getDerivedLines(derivedNode, steps - 1, methodType));
-			}
-
-			return node;
-		}
-	}
-
-	private List<Germplasm> getChildren(final Integer gid, final char methodType) {
-		return this.daoFactory.getGermplasmDao().getDescendants(gid, methodType);
-	}
-
-	@Override
 	public Germplasm getParentByGIDAndProgenitorNumber(final Integer gid, final Integer progenitorNumber) {
 		return this.daoFactory.getGermplasmDao().getProgenitorByGID(gid, progenitorNumber);
 	}
@@ -495,49 +365,6 @@ public class PedigreeDataManagerImpl extends DataManager implements PedigreeData
 	@Override
 	public long countDescendants(final Integer gid) {
 		return this.daoFactory.getGermplasmDao().countGermplasmDescendantByGID(gid);
-	}
-
-	@Override
-	public List<Germplasm> getManagementNeighbors(final Integer gid, final int start, final int numOfRows) {
-		return this.daoFactory.getGermplasmDao().getManagementNeighbors(gid, start, numOfRows);
-	}
-
-	@Override
-	public long countManagementNeighbors(final Integer gid) {
-		return this.daoFactory.getGermplasmDao().countManagementNeighbors(gid);
-	}
-
-	@Override
-	public long countGroupRelatives(final Integer gid) {
-		return this.daoFactory.getGermplasmDao().countGroupRelatives(gid);
-	}
-
-	@Override
-	public List<Germplasm> getGroupRelatives(final Integer gid, final int start, final int numRows) {
-		return this.daoFactory.getGermplasmDao().getGroupRelatives(gid, start, numRows);
-	}
-
-	@Override
-	public List<Germplasm> getGenerationHistory(final Integer gid) {
-		final List<Germplasm> toreturn = new ArrayList<>();
-
-		Germplasm currentGermplasm = this.germplasmDataManager.getGermplasmWithPrefName(gid);
-		if (currentGermplasm != null) {
-			toreturn.add(currentGermplasm);
-
-			while (currentGermplasm.getGnpgs() == -1) {
-				// trace back the sources
-				final Integer sourceId = currentGermplasm.getGpid2();
-				currentGermplasm = this.getGermplasmDataManager().getGermplasmWithPrefName(sourceId);
-
-				if (currentGermplasm != null) {
-					toreturn.add(currentGermplasm);
-				} else {
-					break;
-				}
-			}
-		}
-		return toreturn;
 	}
 
 	public GermplasmDataManager getGermplasmDataManager() {

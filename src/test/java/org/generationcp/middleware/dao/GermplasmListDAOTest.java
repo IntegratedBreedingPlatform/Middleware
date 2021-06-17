@@ -9,8 +9,15 @@ import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.*;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.api.LocationDataManager;
+import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.ListMetadata;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.Util;
@@ -20,7 +27,10 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class GermplasmListDAOTest extends IntegrationTestBase {
 
@@ -32,9 +42,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Autowired
 	private OntologyDataManager ontologyManager;
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private LocationDataManager locationManager;
@@ -100,8 +107,8 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		}
 
 		final StudyDataManagerImpl studyDataManager = new StudyDataManagerImpl(this.sessionProvder);
-		this.studyTDI = new StudyTestDataInitializer(studyDataManager, this.ontologyManager, this.commonTestProject, this.dataManager,
-				this.locationManager);
+		this.studyTDI = new StudyTestDataInitializer(studyDataManager, this.ontologyManager, this.commonTestProject,
+			this.locationManager, this.sessionProvder);
 
 		this.studyReference = this.studyTDI.addTestStudy("ABCD");
 
