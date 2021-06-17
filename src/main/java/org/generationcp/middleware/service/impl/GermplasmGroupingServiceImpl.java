@@ -93,12 +93,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		final List<GermplasmGroup> germplasmGroupList = new ArrayList<>();
 		for (final Germplasm founder : germplasmList) {
 			final GermplasmGroup germplasmGroup = new GermplasmGroup();
-
-			final Method method = this.daoFactory.getMethodDAO().getById(founder.getMethodId());
-			founder.setMethod(method);
-
 			germplasmGroup.setFounderGid(founder.getGid());
-			germplasmGroup.setGenerative(method.isGenerative());
+			germplasmGroup.setGenerative(founder.getMethod().isGenerative());
 			germplasmGroup.setGroupId(founder.getMgid());
 			this.daoFactory.getGermplasmDao().getManagementGroupMembers(founder.getMgid()).forEach(germplasmGroup::addGroupMember);
 			germplasmGroupList.add(germplasmGroup);

@@ -8,7 +8,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
-import org.generationcp.middleware.data.initializer.MethodTestDataInitializer;
 import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -143,7 +142,7 @@ public class GermplasmGroupingServiceImplTest {
 		final Method testMethod = new Method();
 		testMethod.setMtype("DER");
 		testMethod.setMid(new Random().nextInt(100));
-		this.germplasmToFix.setMethodId(testMethod.getMid());
+		this.germplasmToFix.setMethod(testMethod);
 		Mockito.doReturn(Collections.singletonList(this.germplasmToFix)).when(this.germplasmDAO).getByGIDList(ArgumentMatchers.anyList());
 		Mockito.doReturn(testMethod).when(this.methodDAO).getById(testMethod.getMid());
 	}
