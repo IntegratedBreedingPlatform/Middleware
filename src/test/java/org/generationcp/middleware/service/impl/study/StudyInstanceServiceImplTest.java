@@ -801,9 +801,9 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 
 		final CVTerm numericVariable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ENVIRONMENT_DETAIL);
-		final EnvironmentParameter numericEnviromentParameter = new EnvironmentParameter();
-		numericEnviromentParameter.setValue("1");
-		numericEnviromentParameter.setParameterPUI(numericVariable.getCvTermId().toString());
+		final EnvironmentParameter numericEnvironmentParameter = new EnvironmentParameter();
+		numericEnvironmentParameter.setValue("1");
+		numericEnvironmentParameter.setParameterPUI(numericVariable.getCvTermId().toString());
 
 		final List<String> possibleValues = Arrays
 			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
@@ -812,23 +812,26 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		final EnvironmentParameter categoricalEnvironmentParameter = new EnvironmentParameter();
 		categoricalEnvironmentParameter.setParameterPUI(categoricalVariable.getCvTermId().toString());
 		categoricalEnvironmentParameter.setValue(possibleValues.get(0));
-		dto.setEnvironmentParameters(Arrays.asList(numericEnviromentParameter, categoricalEnvironmentParameter));
+		dto.setEnvironmentParameters(Arrays.asList(numericEnvironmentParameter, categoricalEnvironmentParameter));
 
 		final ExternalReferenceDTO externalReference = new ExternalReferenceDTO();
 		externalReference.setReferenceID(RandomStringUtils.randomAlphabetic(20));
 		externalReference.setReferenceSource(RandomStringUtils.randomAlphabetic(20));
 		dto.setExternalReferences(Collections.singletonList(externalReference));
 
+		this.sessionProvder.getSession().flush();
+
 		final StudyInstanceDto savedInstance = this.studyInstanceService
 			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
 
 		Assert.assertEquals(dto.getTrialDbId(), savedInstance.getTrialDbId());
 		Assert.assertEquals(dto.getLocationDbId(), savedInstance.getLocationDbId());
-		Assert.assertEquals(2, savedInstance.getEnvironmentParameters().size());
+		Assert.assertEquals(3, savedInstance.getEnvironmentParameters().size());
 		Assert.assertEquals(1, savedInstance.getExternalReferences().size());
 		Assert.assertEquals(externalReference.getReferenceID(), savedInstance.getExternalReferences().get(0).getReferenceID());
 		Assert.assertEquals(externalReference.getReferenceSource(), savedInstance.getExternalReferences().get(0).getReferenceSource());
 		Assert.assertEquals(String.valueOf(TermId.EXTERNALLY_GENERATED.getId()), savedInstance.getExperimentalDesign().getPUI());
+		Assert.assertEquals(dto.getSeasons().get(0), savedInstance.getSeasons().get(0).getSeason());
 	}
 
 	@Test
@@ -843,6 +846,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		numericEnviromentParameter.setValue("1");
 		numericEnviromentParameter.setParameterPUI(numericVariable.getCvTermId().toString());
 		dto.setEnvironmentParameters(Collections.singletonList(numericEnviromentParameter));
+
+		this.sessionProvder.getSession().flush();
 
 		final StudyInstanceDto savedInstance = this.studyInstanceService
 			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
@@ -864,6 +869,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		numericEnviromentParameter.setParameterPUI(numericVariable.getCvTermId().toString());
 		dto.setEnvironmentParameters(Collections.singletonList(numericEnviromentParameter));
 
+		this.sessionProvder.getSession().flush();
+
 		final StudyInstanceDto savedInstance = this.studyInstanceService
 			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
 		Assert.assertEquals(dto.getTrialDbId(), savedInstance.getTrialDbId());
@@ -880,8 +887,10 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		final EnvironmentParameter numericEnviromentParameter = new EnvironmentParameter();
 		numericEnviromentParameter.setValue("1");
-		numericEnviromentParameter.setParameterPUI(RandomStringUtils.randomNumeric(100000000));
+		numericEnviromentParameter.setParameterPUI(RandomStringUtils.randomNumeric(3));
 		dto.setEnvironmentParameters(Collections.singletonList(numericEnviromentParameter));
+
+		this.sessionProvder.getSession().flush();
 
 		final StudyInstanceDto savedInstance = this.studyInstanceService
 			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
@@ -893,14 +902,11 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	private StudySummary createTrial() {
 		final TrialImportRequestDTO dto = new TrialImportRequestDTO();
 		dto.setStartDate("2019-01-01");
-		dto.setEndDate("2020-12-31");
 		dto.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
 		dto.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		dto.setProgramDbId(this.commonTestProject.getUniqueID());
 
-		final List<StudySummary> savedStudies = this.studyService
-			.saveStudies(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid());
-		return savedStudies.get(0);
+		return this.studyService.saveStudies(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
 	}
 
 	private void assertEnvironmentParameter(final List<MeasurementVariable> environmentParameters, final int expectedTermId,

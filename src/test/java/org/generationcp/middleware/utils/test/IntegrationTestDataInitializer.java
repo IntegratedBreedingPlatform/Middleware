@@ -457,10 +457,20 @@ public class IntegrationTestDataInitializer {
 		final CVTerm scale = this.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
 		this.daoFactory.getCvTermRelationshipDao()
 			.save(new CVTermRelationship(TermId.HAS_SCALE.getId(), variable.getCvTermId(), scale.getCvTermId()));
+
+		final CVTerm property = this.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.PROPERTIES.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_PROPERTY.getId(), variable.getCvTermId(), property.getCvTermId()));
+
+		final CVTerm method = this.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.METHODS.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_METHOD.getId(), variable.getCvTermId(), method.getCvTermId()));
+
 		this.daoFactory.getCvTermRelationshipDao()
 			.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), scale.getCvTermId(), dataType.getId()));
 		this.daoFactory.getCvTermPropertyDao()
 			.save(new CVTermProperty(TermId.VARIABLE_TYPE.getId(), variableType.getName(), 1, variable.getCvTermId()));
+
 		return variable;
 	}
 
@@ -469,17 +479,27 @@ public class IntegrationTestDataInitializer {
 		final CVTerm scale = this.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
 		this.daoFactory.getCvTermRelationshipDao()
 			.save(new CVTermRelationship(TermId.HAS_SCALE.getId(), variable.getCvTermId(), scale.getCvTermId()));
+
+		final CVTerm property = this.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.PROPERTIES.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_PROPERTY.getId(), variable.getCvTermId(), property.getCvTermId()));
+
+		final CVTerm method = this.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.METHODS.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_METHOD.getId(), variable.getCvTermId(), method.getCvTermId()));
+
 		this.daoFactory.getCvTermRelationshipDao()
 			.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), scale.getCvTermId(), DataType.CATEGORICAL_VARIABLE
 				.getId()));
 		this.daoFactory.getCvTermPropertyDao()
 			.save(new CVTermProperty(TermId.VARIABLE_TYPE.getId(), variableType.getName(), 1, variable.getCvTermId()));
+
 		for (final String value : possibleValues) {
-			final CVTerm categoricalValue =
-				this.createCVTerm(value, value, CvId.IBDB_TERMS.getId());
+			final CVTerm categoricalValue =	this.createCVTerm(value, value, CvId.IBDB_TERMS.getId());
 			this.daoFactory.getCvTermRelationshipDao()
 				.save(new CVTermRelationship(TermId.HAS_VALUE.getId(), scale.getCvTermId(), categoricalValue.getCvTermId()));
 		}
+
 		return variable;
 	}
 }

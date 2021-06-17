@@ -679,7 +679,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 			final Integer trialDbId = Integer.valueOf(requestDTO.getTrialDbId());
 			final String seasonValue = requestDTO.getSeasons().get(0);
 
-			final List<String> possibleValues = categoricalVariablesMap.get(TermId.SEASON_VAR.getId()).stream().map(ValueReference::getName)
+			final List<String> possibleValues = categoricalVariablesMap.get(TermId.SEASON_VAR.getId()).stream().map(ValueReference::getDescription)
 				.collect(Collectors.toList());
 			if(possibleValues.contains(seasonValue)) {
 				//Add season variable if not present to the study
@@ -806,7 +806,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 			final Integer trialDbId = Integer.valueOf(requestDTO.getTrialDbId());
 			for (final EnvironmentParameter environmentParameter : requestDTO.getEnvironmentParameters()) {
 				final Integer variableId = Integer.valueOf(environmentParameter.getParameterPUI());
-				if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(variableId)) {
+				if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(variableId) && environmentVariablesMap.containsKey(variableId)) {
 					final VariableType variableType = environmentVariablesMap.get(variableId).getVariableType();
 					this.addProjectProperty(studyIdEnvironmentVariablesMap, trialIdEnvironmentDatasetMap, trialDbId, variableType,
 						variableId, null);
