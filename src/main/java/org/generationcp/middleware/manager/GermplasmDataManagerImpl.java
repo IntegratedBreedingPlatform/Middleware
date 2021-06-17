@@ -892,11 +892,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmWithoutGroup(final List<Integer> gids) {
-		return this.daoFactory.getGermplasmDao().getGermplasmWithoutGroup(gids);
-	}
-
-	@Override
 	public Map<Integer, String> getPreferredNamesByGids(final List<Integer> gids) {
 		final Map<Integer, String> toreturn = new HashMap<>();
 

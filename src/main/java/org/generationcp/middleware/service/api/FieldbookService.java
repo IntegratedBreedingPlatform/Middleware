@@ -544,7 +544,7 @@ public interface FieldbookService {
 	 *
 	 * @return The id of the newly-created germplasm list
 	 */
-	Integer saveGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList,
+	Integer saveGermplasmList(String cropName, List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList,
 			boolean isApplyNewGroupToPreviousCrosses);
 
 	void saveStudyColumnOrdering(Integer studyId, List<Integer> orderedTermIds);
