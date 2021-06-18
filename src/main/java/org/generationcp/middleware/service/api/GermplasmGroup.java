@@ -1,44 +1,69 @@
 
 package org.generationcp.middleware.service.api;
 
+import org.generationcp.middleware.pojos.Germplasm;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.generationcp.middleware.pojos.Germplasm;
-
+@AutoProperty
 public class GermplasmGroup {
 
-	private Germplasm founder;
+	private Integer founderGid;
 	private Integer groupId;
-	private List<Germplasm> groupMembers = new ArrayList<>();
+	private boolean isGenerative;
+	private List<GermplasmGroupMember> groupMembers = new ArrayList<>();
 
-	public Germplasm getFounder() {
-		return founder;
+	public Integer getFounderGid() {
+		return founderGid;
 	}
 
-	public void setFounder(Germplasm founder) {
-		this.founder = founder;
+	public void setFounderGid(final Integer founderGid) {
+		this.founderGid = founderGid;
 	}
 
 	public Integer getGroupId() {
 		return this.groupId;
 	}
 
-	public void setGroupId(Integer groupId) {
+	public void setGroupId(final Integer groupId) {
 		this.groupId = groupId;
 	}
 
-	public List<Germplasm> getGroupMembers() {
+	public List<GermplasmGroupMember> getGroupMembers() {
 		return this.groupMembers;
 	}
 
-	public void setGroupMembers(List<Germplasm> groupMembers) {
+	public void setGroupMembers(final List<GermplasmGroupMember> groupMembers) {
 		this.groupMembers = groupMembers;
+	}
+
+	public void addGroupMember(final Germplasm germplasm) {
+		this.groupMembers.add(new GermplasmGroupMember(germplasm));
+	}
+
+	public boolean isGenerative() {
+		return isGenerative;
+	}
+
+	public void setGenerative(final boolean generative) {
+		isGenerative = generative;
 	}
 
 	@Override
 	public String toString() {
-		return new ToStringBuilder(this).append(this.founder).append(this.groupId).append(this.groupMembers).toString();
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
 	}
 }
