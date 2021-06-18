@@ -22,7 +22,6 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -33,11 +32,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * DAO class for {@link Attribute}.
- *
  */
 public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
@@ -192,7 +189,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 	}
 
 	public List<AttributeDTO> getAttributesByGUIDAndAttributeIds(
-			final String germplasmUUID, final List<String> attributeIds, final Pageable pageable) {
+		final String germplasmUUID, final List<String> attributeIds, final Pageable pageable) {
 
 		final List<AttributeDTO> attributes;
 		try {
