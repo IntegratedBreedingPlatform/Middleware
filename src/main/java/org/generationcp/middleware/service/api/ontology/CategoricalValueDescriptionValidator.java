@@ -10,7 +10,7 @@ public class CategoricalValueDescriptionValidator extends  CategoricalValueNameV
 
 	@Override
 	List<String> getPossibleValues(final MeasurementVariable variable) {
-		return variable.getPossibleValues().stream().map(ValueReference::getDisplayDescription).collect(
+		return variable.getPossibleValues().stream().map(ValueReference::getDescription).collect(
 			Collectors.toList());
 	}
 }
