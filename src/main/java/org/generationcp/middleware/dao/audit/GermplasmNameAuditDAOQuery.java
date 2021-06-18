@@ -1,6 +1,6 @@
 package org.generationcp.middleware.dao.audit;
 
-public class GermplasmNameChangesDAOQuery {
+public class GermplasmNameAuditDAOQuery {
 
 	private final static String BASE_QUERY = "SELECT %s " // use of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ "       FROM names_aud n_aud "
@@ -10,7 +10,7 @@ public class GermplasmNameChangesDAOQuery {
 		+ " WHERE n_aud.nid = :nid "
 		+ " %s"; // use of ORDER_EXPRESION -> It's not needed for the count query
 
-	private static final String SELECT_EXPRESION = "user_defined_field.fname AS nameType, "
+	private static final String SELECT_EXPRESION = "user_defined_field.fcode AS nameType, "
 		+ "  n_aud.nval AS value, "
 		+ "  loc.lname AS locationName, "
 		+ "  Str_to_date(n_aud.ndate, '%Y%m%d') AS creationDate, "
@@ -18,12 +18,8 @@ public class GermplasmNameChangesDAOQuery {
 		+ "  n_aud.rev_type AS revisionType, "
 		+ "  n_aud.created_date AS createdDate, "
 		+ "  n_aud.modified_date AS modifiedDate, "
-		+ "  (SELECT uname "
-		+ "   FROM workbench.users "
-		+ "   WHERE users.userid = n_aud.created_by) AS createdBy, "
-		+ "  (SELECT uname "
-		+ "   FROM workbench.users "
-		+ "   WHERE users.userid = n_aud.modified_by) AS modifiedBy, "
+		+ "  (SELECT uname FROM workbench.users WHERE users.userid = n_aud.created_by) AS createdBy, "
+		+ "  (SELECT uname FROM workbench.users WHERE users.userid = n_aud.modified_by) AS modifiedBy, "
 		+ "  IF(n_aud.ntype = coalesce(prev_n_aud.ntype, n_aud.ntype), false, true) as nameTypeChanged, "
 		+ "  IF(n_aud.nval = coalesce(prev_n_aud.nval, n_aud.nval), false, true) as valueChanged, "
 		+ "  IF(n_aud.nlocn = coalesce(prev_n_aud.nlocn, n_aud.nlocn), false, true) as locationChanged, "

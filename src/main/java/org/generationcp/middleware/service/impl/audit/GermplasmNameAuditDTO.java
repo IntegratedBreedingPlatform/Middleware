@@ -6,7 +6,7 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.Date;
 
 @AutoProperty
-public class GermplasmNameChangeDTO {
+public class GermplasmNameAuditDTO {
 
 	private RevisionType revisionType;
 	private String nameType;
@@ -25,7 +25,7 @@ public class GermplasmNameChangeDTO {
 	private boolean valueChanged;
 	private boolean preferredChanged;
 
-	public GermplasmNameChangeDTO() {
+	public GermplasmNameAuditDTO() {
 	}
 
 	public RevisionType getRevisionType() {
