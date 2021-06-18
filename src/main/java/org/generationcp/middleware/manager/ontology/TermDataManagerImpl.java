@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Transactional
 public class TermDataManagerImpl extends DataManager implements TermDataManager {
@@ -107,7 +108,7 @@ public class TermDataManagerImpl extends DataManager implements TermDataManager 
 	}
 
 	@Override
-	public List<String> getCategoriesInUse(final int scaleId) {
+	public Set<String> getCategoriesInUse(final int scaleId) {
 		return daoFactory.getCvTermRelationshipDao().getCategoriesInUse(scaleId);
 	}
 

@@ -29,8 +29,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link CVTermRelationship}.
@@ -251,9 +253,9 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		}
 	}
 
-	public List<String> getCategoriesInUse(final int scaleId) {
+	public Set<String> getCategoriesInUse(final int scaleId) {
 		try {
-			final List<String> allCategories = new ArrayList<>();
+			final Set<String> allCategories = new HashSet<>();
 			allCategories.addAll(this.getScaleCategoriesUsedInObservations(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedAsConditions(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedAsGermplasmDescriptors(scaleId));
@@ -279,8 +281,8 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 				+ " AND EXISTS ( "
 				+ "     SELECT 1    	 "
 				+ "     FROM atributs a "
-				+ "     WHERE a.cval_id = v.cvterm_id ) "
-				+ "");
+				+ "     WHERE a.atype = v.cvterm_id ) "
+				+ " group by v.name");
 		query.setParameter("scaleId", scaleId);
 		query.addScalar("category", CVTermRelationshipDao.STRING);
 		return query.list();

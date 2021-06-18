@@ -12,11 +12,12 @@
 
 package org.generationcp.middleware.manager.ontology.api;
 
-import java.util.List;
-
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
+
+import java.util.List;
+import java.util.Set;
 
 /**
  * This is the API for retrieving ontology scale data.
@@ -63,6 +64,6 @@ public interface TermDataManager {
 	 * @param scaleId
 	 * @return
 	 */
-	public List<String> getCategoriesInUse(int scaleId);
+	public Set<String> getCategoriesInUse(int scaleId);
 
 }
