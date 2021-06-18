@@ -180,21 +180,16 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		}
 	}
 
-	public Map<Integer, List<Integer>> getEnvironmentVariablesByStudyId(final List<Integer> studyIds) {
-		final List<Integer> environmentVariableTypeIds =
-			Arrays.asList(VariableType.ENVIRONMENT_CONDITION.getId(), VariableType.ENVIRONMENT_DETAIL.getId());
+	public Map<Integer, List<Integer>> getEnvironmentDatasetVariables(final List<Integer> studyIds) {
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap = new HashMap<>();
 		final StringBuilder queryString =
 			new StringBuilder("SELECT p_main.project_id AS projectId, pp.variable_id AS variableId FROM projectprop pp ");
-		queryString.append("	INNER JOIN project p_env ON pp.project_id = p_env.project_id ");
-		queryString.append("	INNER JOIN project p_main ON p_main.project_id = p_env.study_id ");
-		queryString
-			.append("	WHERE p_main.project_id IN (:studyIds) AND p_env.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId());
-		queryString.append("		AND pp.type_id IN (:environmentVariableTypeIds)");
+		queryString.append("INNER JOIN project p_env ON pp.project_id = p_env.project_id ");
+		queryString.append("INNER JOIN project p_main ON p_main.project_id = p_env.study_id ");
+		queryString.append("WHERE p_main.project_id IN (:studyIds) AND p_env.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId());
 
 		final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 		query.setParameterList("studyIds", studyIds);
-		query.setParameterList("environmentVariableTypeIds", environmentVariableTypeIds);
 		query.addScalar("projectId", IntegerType.INSTANCE);
 		query.addScalar("variableId", IntegerType.INSTANCE);
 		final List<Object[]> results = query.list();
