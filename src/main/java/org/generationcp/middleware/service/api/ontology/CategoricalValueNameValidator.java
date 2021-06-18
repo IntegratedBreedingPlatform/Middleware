@@ -9,20 +9,18 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class CategoricalValueValidator implements VariableValueValidator {
+public class CategoricalValueNameValidator implements VariableValueValidator {
 
 	@Override
-	public boolean isValid(final MeasurementVariable variable, final boolean useCategoricalValueName) {
+	public boolean isValid(final MeasurementVariable variable) {
 		this.verifyCategoricalDataType(variable);
-		final List<String> possibleValues;
-		if(useCategoricalValueName) {
-			possibleValues = variable.getPossibleValues().stream().map(ValueReference::getName).collect(
-				Collectors.toList());
-		} else {
-			possibleValues = variable.getPossibleValues().stream().map(ValueReference::getDescription).collect(
-				Collectors.toList());
-		}
+		final List<String> possibleValues = this.getPossibleValues(variable);
 		return StringUtils.isEmpty(variable.getValue()) || possibleValues.contains(variable.getValue().trim());
+	}
+
+	List<String> getPossibleValues(final MeasurementVariable variable) {
+		return variable.getPossibleValues().stream().map(ValueReference::getName).collect(
+			Collectors.toList());
 	}
 
 

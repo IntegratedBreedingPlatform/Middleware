@@ -545,7 +545,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 					if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
 						measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
 					}
-					if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable, false)) {
+					if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
 						final Integer rank = properties.size() + 1;
 						properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
 							measurementVariable.getValue(), rank, measurementVariable.getTermId(), entry.getKey()));

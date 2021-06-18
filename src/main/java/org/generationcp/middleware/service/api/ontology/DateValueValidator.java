@@ -16,7 +16,7 @@ public class DateValueValidator implements VariableValueValidator {
 	}
 
 	@Override
-	public boolean isValid(final MeasurementVariable variable, final boolean useCategoricalValueName) {
+	public boolean isValid(final MeasurementVariable variable) {
 		this.ensureDateDataType(variable.getDataTypeId());
 		return StringUtils.isEmpty(variable.getValue()) || this.dateValidator.isValid(variable.getValue().trim(), "yyyyMMdd");
 	}

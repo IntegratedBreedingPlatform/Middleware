@@ -33,6 +33,7 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.ontology.CategoricalValueNameValidator;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.study.EnvironmentParameter;
@@ -744,6 +745,8 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		properties.add(locationGeolocationProperty);
 
 		if (!CollectionUtils.isEmpty(requestDTO.getEnvironmentParameters())) {
+			// Use name of categorical value in validating inputs
+			variableDataValidatorFactory.registerDataTypeValidator(DataType.CATEGORICAL_VARIABLE, new CategoricalValueNameValidator());
 			for (final EnvironmentParameter environmentParameter : requestDTO.getEnvironmentParameters()) {
 				if (StringUtils.isNotEmpty(environmentParameter.getValue())) {
 					final MeasurementVariable measurementVariable =
@@ -756,7 +759,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 						if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
 							measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
 						}
-						if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable, true)) {
+						if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
 							if (VariableType.ENVIRONMENT_DETAIL.getId().equals(measurementVariable.getVariableType().getId())) {
 								if (GEOLOCATION_METADATA.contains(measurementVariable.getTermId())) {
 									this.mapGeolocationMetaData(geolocation, environmentParameter);

@@ -7,7 +7,7 @@ import org.generationcp.middleware.domain.ontology.DataType;
 public class CharacterValueValidator implements VariableValueValidator {
 
 	@Override
-	public boolean isValid(final MeasurementVariable variable, final boolean useCategoricalValueName) {
+	public boolean isValid(final MeasurementVariable variable) {
 		this.ensureCharacterDataType(variable.getDataTypeId());
 		return StringUtils.isEmpty(variable.getValue()) || variable.getValue().length() <= 255;
 	}
