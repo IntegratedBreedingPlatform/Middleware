@@ -2,9 +2,11 @@ package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
+import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
@@ -113,29 +115,19 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		// Retrieve existing study instances
 		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId);
 		final List<Integer> instanceNumbers =
-			geolocations.stream().mapToInt(o -> Integer.valueOf(o.getDescription())).boxed().collect(Collectors.toList());
+			geolocations.stream().mapToInt(o -> Integer.parseInt(o.getDescription())).boxed().collect(Collectors.toList());
 
 		final List<StudyInstance> studyInstances = new ArrayList<>();
 		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
 		int instancesGenerated = 0;
+		// The default value of an instance's location name is "Unspecified Location"
+		final Optional<Location> location = this.daoFactory.getLocationDAO().getUnspecifiedLocation();
 		while (instancesGenerated < numberOfInstancesToGenerate) {
-			// If design is generated, increment last instance number. Otherwise, attempt to find  "gap" instance number first (if any)
-			Integer instanceNumber = (!instanceNumbers.isEmpty() ? Collections.max(instanceNumbers) : 0) + 1;
-			if (!hasExperimentalDesign) {
-				instanceNumber = 1;
-				while (instanceNumbers.contains(instanceNumber)) {
-					instanceNumber++;
-				}
-			}
+			final Geolocation geolocation = this.createNextGeolocation(instanceNumbers, hasExperimentalDesign);
 
-			// The default value of an instance's location name is "Unspecified Location"
-			final Optional<Location> location = this.daoFactory.getLocationDAO().getUnspecifiedLocation();
-
-			final Geolocation geolocation = new Geolocation();
-			geolocation.setDescription(String.valueOf(instanceNumber));
 			final GeolocationProperty locationGeolocationProperty =
 				new GeolocationProperty(geolocation, String.valueOf(location.get().getLocid()), 1, TermId.LOCATION_ID.getId());
-			geolocation.setProperties(Arrays.asList(locationGeolocationProperty));
+			geolocation.setProperties(Lists.newArrayList(locationGeolocationProperty));
 			this.daoFactory.getGeolocationDao().save(geolocation);
 
 			final ExperimentModel experimentModel =
@@ -143,6 +135,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 			this.daoFactory.getExperimentDao().save(experimentModel);
 
+			final Integer instanceNumber = Integer.parseInt(geolocation.getDescription());
 			final StudyInstance studyInstance =
 				new StudyInstance(geolocation.getLocationId(), instanceNumber, false, false, false, true);
 			if (location.isPresent()) {
@@ -552,6 +545,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final List<String> studyIds = new ArrayList<>();
 		final List<Integer> trialIds = new ArrayList<>();
 		final List<String> environmentVariableIds = new ArrayList<>();
+		final List<Integer> locationDbIds = new ArrayList<>();
 
 		studyImportRequestDTOS.stream().forEach(dto -> {
 			final Integer trialId = Integer.valueOf(dto.getTrialDbId());
@@ -563,11 +557,13 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 					.addAll(
 						dto.getEnvironmentParameters().stream().map(EnvironmentParameter::getParameterPUI).collect(Collectors.toList()));
 			}
+			if (dto.getLocationDbId() != null) {
+				locationDbIds.add(Integer.parseInt(dto.getLocationDbId()));
+			}
 		});
 
-		final List<DmsProject> environmentDatasets =
-			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.SUMMARY_DATA.getId());
-		final Map<Integer, DmsProject> trialIdEnvironmentDatasetMap = environmentDatasets.stream()
+		final Map<Integer, DmsProject> trialIdEnvironmentDatasetMap =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.SUMMARY_DATA.getId()).stream()
 			.collect(Collectors.toMap(environmentDataset -> environmentDataset.getStudy().getProjectId(), Function.identity()));
 
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap =
@@ -587,40 +583,21 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final Map<Integer, List<ValueReference>> categoricalVariablesMap =
 			this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(categoricalVariableIds);
 
+		final Optional<Location> unspecifiedLocation = this.daoFactory.getLocationDAO().getUnspecifiedLocation();
+		final Map<Integer, Location> locationsMap = this.getLocationsMap(locationDbIds);
+
 		for (final StudyImportRequestDTO requestDTO : studyImportRequestDTOS) {
 			final Integer trialId = Integer.valueOf(requestDTO.getTrialDbId());
 			final Integer environmentDatasetId = trialIdEnvironmentDatasetMap.get(trialId).getProjectId();
 			this.addEnvironmentVariablesIfNecessary(requestDTO, studyIdEnvironmentVariablesMap, environmentVariablesMap,
 				trialIdEnvironmentDatasetMap);
 
-			// Retrieve existing study instances
-			final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(trialId);
-			final Geolocation geolocation;
-			if (geolocations.size() == 1 && this.daoFactory.getExperimentDao()
-				.getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), geolocations.get(0).getLocationId()) == null) {
-				geolocation = geolocations.get(0);
-			} else {
-				final List<Integer> instanceNumbers =
-					geolocations.stream().mapToInt(o -> Integer.valueOf(o.getDescription())).boxed().collect(Collectors.toList());
-				final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(trialId).isPresent();
-
-				// If design is generated, increment last instance number. Otherwise, attempt to find  "gap" instance number first (if any)
-				Integer instanceNumber = (!instanceNumbers.isEmpty() ? Collections.max(instanceNumbers) : 0) + 1;
-				if (!hasExperimentalDesign) {
-					instanceNumber = 1;
-					while (instanceNumbers.contains(instanceNumber)) {
-						instanceNumber++;
-					}
-				}
-
-				geolocation = new Geolocation();
-				geolocation.setDescription(String.valueOf(instanceNumber));
-			}
+			final Geolocation geolocation = this.resolveGeolocationForStudy(trialId);
 
 			final ExperimentModel experimentModel =
 				this.experimentModelGenerator
 					.generate(cropType, environmentDatasetId, Optional.of(geolocation), ExperimentType.TRIAL_ENVIRONMENT);
-			this.addEnvironmentVariableValues(requestDTO, environmentVariablesMap, categoricalVariablesMap, geolocation, experimentModel);
+			this.addEnvironmentVariableValues(requestDTO, environmentVariablesMap, categoricalVariablesMap, experimentModel, unspecifiedLocation, locationsMap);
 			this.addSeasonVariableIfNecessary(requestDTO, studyIdEnvironmentVariablesMap, geolocation, categoricalVariablesMap,
 				trialIdEnvironmentDatasetMap);
 			this.addExperimentalDesignIfNecessary(requestDTO, trialIdEnvironmentDatasetMap, geolocation, studyIdEnvironmentVariablesMap);
@@ -641,6 +618,46 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final StudySearchFilter filter = new StudySearchFilter();
 		filter.setStudyDbIds(studyIds);
 		return this.getStudyInstancesWithMetadata(filter, null);
+	}
+
+	private Map<Integer, Location> getLocationsMap(final List<Integer> locationDbIds) {
+		final LocationSearchRequest request = new LocationSearchRequest();
+		request.setLocationIds(locationDbIds);
+		final Map<Integer, Location> locationsMap = locationDbIds.isEmpty() ?
+			Collections.emptyMap() : this.daoFactory.getLocationDAO().filterLocations(request, null).stream()
+			.collect(Collectors.toMap(Location::getLocid, Function.identity()));
+		return locationsMap;
+	}
+
+	private Geolocation resolveGeolocationForStudy(final Integer trialId) {
+		// Retrieve existing study instances
+		final List<Geolocation> geolocations = this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(trialId);
+		final Geolocation geolocation;
+		if (geolocations.size() == 1 && this.daoFactory.getExperimentDao()
+			.getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), geolocations.get(0).getLocationId()) == null) {
+			geolocation = geolocations.get(0);
+		} else {
+			// If design is generated, increment last instance number. Otherwise, attempt to find  "gap" instance number first (if any)
+			final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(trialId).isPresent();
+			final List<Integer> instanceNumbers =
+				geolocations.stream().mapToInt(o -> Integer.parseInt(o.getDescription())).boxed().collect(Collectors.toList());
+			geolocation = this.createNextGeolocation(instanceNumbers, hasExperimentalDesign);
+		}
+		return geolocation;
+	}
+
+	private Geolocation createNextGeolocation(final List<Integer> instanceNumbers, final boolean hasExperimentalDesign) {
+		Integer instanceNumber = (!instanceNumbers.isEmpty() ? Collections.max(instanceNumbers) : 0) + 1;
+		if (!hasExperimentalDesign) {
+			instanceNumber = 1;
+			while (instanceNumbers.contains(instanceNumber)) {
+				instanceNumber++;
+			}
+		}
+
+		final Geolocation geolocation = new Geolocation();
+		geolocation.setDescription(String.valueOf(instanceNumber));
+		return geolocation;
 	}
 
 	private void populateStudyEnvironmentVariablesMap(final Map<Integer, List<MeasurementVariable>> studyEnvironmentVariablesMap,
@@ -729,19 +746,19 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 	private void addEnvironmentVariableValues(final StudyImportRequestDTO requestDTO,
 		final Map<Integer, MeasurementVariable> environmentVariablesMap, final Map<Integer, List<ValueReference>> categoricalValuesMap,
-		final Geolocation geolocation, final ExperimentModel experimentModel) {
+		final ExperimentModel experimentModel, final Optional<Location> unspecifiedLocation, final Map<Integer, Location> locationsMap) {
 
 		// The default value of an instance's location name is "Unspecified Location"
 		final Optional<Location> location =
-			StringUtils.isEmpty(requestDTO.getLocationDbId()) ? this.daoFactory.getLocationDAO().getUnspecifiedLocation() :
-				Optional.of(this.daoFactory.getLocationDAO().getById(Integer.valueOf(requestDTO.getLocationDbId())));
+			StringUtils.isEmpty(requestDTO.getLocationDbId()) ?  unspecifiedLocation :
+				Optional.of(locationsMap.get(Integer.parseInt(requestDTO.getLocationDbId())));
 
 		final List<GeolocationProperty> properties = new ArrayList<>();
 		final List<Phenotype> phenotypes = new ArrayList<>();
 
 		// Add location property
 		final GeolocationProperty locationGeolocationProperty =
-			new GeolocationProperty(geolocation, String.valueOf(location.get().getLocid()), 1, TermId.LOCATION_ID.getId());
+			new GeolocationProperty(experimentModel.getGeoLocation(), String.valueOf(location.get().getLocid()), 1, TermId.LOCATION_ID.getId());
 		properties.add(locationGeolocationProperty);
 
 		if (!CollectionUtils.isEmpty(requestDTO.getEnvironmentParameters())) {
@@ -762,9 +779,9 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 						if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
 							if (VariableType.ENVIRONMENT_DETAIL.getId().equals(measurementVariable.getVariableType().getId())) {
 								if (GEOLOCATION_METADATA.contains(measurementVariable.getTermId())) {
-									this.mapGeolocationMetaData(geolocation, environmentParameter);
+									this.mapGeolocationMetaData(experimentModel.getGeoLocation(), environmentParameter);
 								} else {
-									final GeolocationProperty property = new GeolocationProperty(geolocation,
+									final GeolocationProperty property = new GeolocationProperty(experimentModel.getGeoLocation(),
 										this.getEnvironmentParameterValue(environmentParameter, categoricalValuesMap), 1,
 										measurementVariable.getTermId());
 									properties.add(property);
@@ -784,7 +801,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 			}
 		}
 
-		geolocation.setProperties(properties);
+		experimentModel.getGeoLocation().setProperties(properties);
 		experimentModel.setPhenotypes(phenotypes);
 	}
 
