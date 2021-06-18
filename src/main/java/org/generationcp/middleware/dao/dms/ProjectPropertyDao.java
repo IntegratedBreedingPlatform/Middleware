@@ -180,7 +180,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		}
 	}
 
-	public Map<Integer, List<Integer>> getEnvironmentVariablesByStudyId(final List<Integer> studyIds) {
+	public Map<Integer, List<Integer>> getEnvironmentDatasetVariables(final List<Integer> studyIds) {
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap = new HashMap<>();
 		final StringBuilder queryString =
 			new StringBuilder("SELECT p_main.project_id AS projectId, pp.variable_id AS variableId FROM projectprop pp ");

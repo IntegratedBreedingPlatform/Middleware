@@ -567,7 +567,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 			.collect(Collectors.toMap(environmentDataset -> environmentDataset.getStudy().getProjectId(), Function.identity()));
 
 		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap =
-			this.daoFactory.getProjectPropertyDAO().getEnvironmentVariablesByStudyId(trialIds);
+			this.daoFactory.getProjectPropertyDAO().getEnvironmentDatasetVariables(trialIds);
 
 		final Map<Integer, MeasurementVariable> environmentVariablesMap = this.daoFactory.getCvTermDao()
 			.getVariablesByIdsAndVariableTypes(environmentVariableIds,

@@ -11,7 +11,7 @@
 			</not>
         </preConditions>
         <comment>
-            Create external_reference_study table
+            Create external_reference_instance table
         </comment>
 	   <createTable tableName="external_reference_instance">
 		   <column name="id" type="int" autoIncrement="true">
