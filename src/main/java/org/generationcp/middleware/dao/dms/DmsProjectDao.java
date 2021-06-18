@@ -1520,12 +1520,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	}
 
-	public List<DmsProject> getDatasetsByTypeForStudy(final int studyId, final int datasetTypeId) {
+	public List<DmsProject> getDatasetsByTypeForStudy(final List<Integer> studyIds, final int datasetTypeId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(DmsProject.class, "project");
 			criteria.createAlias("project.study", "study");
 			criteria.createAlias("project.datasetType", "dt");
-			criteria.add(Restrictions.eq("study.projectId", studyId));
+			criteria.add(Restrictions.in("study.projectId", studyIds));
 			criteria.add(Restrictions.eq("dt.datasetTypeId", datasetTypeId));
 			return criteria.list();
 		} catch (final HibernateException e) {
@@ -1534,6 +1534,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			DmsProjectDao.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
+	}
+
+	public List<DmsProject> getDatasetsByTypeForStudy(final int studyId, final int datasetTypeId) {
+		return this.getDatasetsByTypeForStudy(Collections.singletonList(studyId), datasetTypeId);
 	}
 
 	public List<Integer> getPersonIdsAssociatedToStudy(final Integer studyId) {
@@ -1904,15 +1908,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append(" FROM ");
 		sql.append("     nd_geolocation geoloc ");
 		sql.append("         INNER JOIN ");
-		sql.append("     nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id ");
+		sql.append("     nd_experiment study_exp ON study_exp.nd_geolocation_id = geoloc.nd_geolocation_id AND study_exp.type_id = "
+			+ TermId.STUDY_EXPERIMENT.getId());
+		sql.append("         LEFT JOIN ");
+		sql.append("     nd_experiment nde ON nde.nd_geolocation_id = geoloc.nd_geolocation_id AND nde.type_id = "
+			+ TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId());
 		sql.append("         INNER JOIN ");
-		sql.append("     project proj ON proj.project_id = nde.project_id ");
-		sql.append("         INNER JOIN ");
-		sql.append("     project pmain ON pmain.project_id = proj.study_id ");
-		sql.append("         INNER JOIN ");
-		sql.append(
-			"     nd_experiment study_exp ON study_exp.project_id = pmain.project_id AND study_exp.type_id = " + TermId.STUDY_EXPERIMENT
-				.getId());
+		sql.append("     project pmain ON pmain.project_id = study_exp.project_id ");
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append(
 			"     nd_geolocationprop geopropLocation ON geopropLocation.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropLocation.type_id = "
@@ -1920,9 +1922,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("         LEFT OUTER JOIN workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
 		sql.append("         LEFT JOIN workbench.users wu ON wu.userid = pmain.created_by ");
 		sql.append("         LEFT JOIN workbench.persons wper ON wper.personid = wu.personid ");
-		sql.append(" WHERE ");
-		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ");
-		sql.append(" 	 AND pmain.deleted = 0 ");//Exclude Deleted Studies
+		sql.append(" WHERE pmain.deleted = 0 ");//Exclude Deleted Studies
 	}
 
 	private void appendStudySearchFilter(final StringBuilder sql, final StudySearchFilter studySearchFilter) {

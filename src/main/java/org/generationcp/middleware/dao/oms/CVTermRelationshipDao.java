@@ -26,6 +26,7 @@ import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -388,29 +389,31 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 
 	public Map<Integer, List<ValueReference>> getCategoriesForCategoricalVariables(final List<Integer> variableIds) {
 		final Map<Integer, List<ValueReference>> map = new HashMap<>();
-		final SQLQuery query = this.getSession().createSQLQuery(
-			"SELECT var.subject_id as variableId, categ.cvterm_id as categoryId, categ.name, categ.definition "
-				+ " FROM cvterm categ "
-				+ " INNER JOIN cvterm_relationship scale_values ON scale_values.object_id = categ.cvterm_id AND scale_values.type_id = "
-				+ TermId.HAS_VALUE.getId()
-				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE
-				.getId()
-				+ " INNER JOIN cvterm_relationship dataType on dataType.subject_id = var.object_id "
-				+ "  AND dataType.type_id = " + TermId.HAS_TYPE.getId() + " AND dataType.object_id = " + DataType.CATEGORICAL_VARIABLE
-				.getId()
-				+ " WHERE var.subject_id IN (:variableIds) ");
-		query.setParameterList("variableIds", variableIds);
-		query.addScalar("variableId");
-		query.addScalar("categoryId");
-		query.addScalar("name");
-		query.addScalar("definition");
-		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-		final List<Map<String, Object>> results = query.list();
-		for (final Map<String, Object> result : results) {
-			final Integer variableId = (Integer) result.get("variableId");
-			map.putIfAbsent(variableId, new ArrayList<>());
-			map.get(variableId).add(
-				new ValueReference((Integer) result.get("categoryId"), (String) result.get("name"), (String) result.get("definition")));
+		if (!CollectionUtils.isEmpty(variableIds)) {
+			final SQLQuery query = this.getSession().createSQLQuery(
+				"SELECT var.subject_id as variableId, categ.cvterm_id as categoryId, categ.name, categ.definition "
+					+ " FROM cvterm categ "
+					+ " INNER JOIN cvterm_relationship scale_values ON scale_values.object_id = categ.cvterm_id AND scale_values.type_id = "
+					+ TermId.HAS_VALUE.getId()
+					+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE
+					.getId()
+					+ " INNER JOIN cvterm_relationship dataType on dataType.subject_id = var.object_id "
+					+ "  AND dataType.type_id = " + TermId.HAS_TYPE.getId() + " AND dataType.object_id = " + DataType.CATEGORICAL_VARIABLE
+					.getId()
+					+ " WHERE var.subject_id IN (:variableIds) ");
+			query.setParameterList("variableIds", variableIds);
+			query.addScalar("variableId");
+			query.addScalar("categoryId");
+			query.addScalar("name");
+			query.addScalar("definition");
+			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+			final List<Map<String, Object>> results = query.list();
+			for (final Map<String, Object> result : results) {
+				final Integer variableId = (Integer) result.get("variableId");
+				map.putIfAbsent(variableId, new ArrayList<>());
+				map.get(variableId).add(
+					new ValueReference((Integer) result.get("categoryId"), (String) result.get("name"), (String) result.get("definition")));
+			}
 		}
 		return map;
 	}

@@ -16,7 +16,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -29,6 +28,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -178,6 +178,27 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	public Map<Integer, List<Integer>> getEnvironmentDatasetVariables(final List<Integer> studyIds) {
+		final Map<Integer, List<Integer>> studyIdEnvironmentVariablesMap = new HashMap<>();
+		final StringBuilder queryString =
+			new StringBuilder("SELECT p_main.project_id AS projectId, pp.variable_id AS variableId FROM projectprop pp ");
+		queryString.append("INNER JOIN project p_env ON pp.project_id = p_env.project_id ");
+		queryString.append("INNER JOIN project p_main ON p_main.project_id = p_env.study_id ");
+		queryString.append("WHERE p_main.project_id IN (:studyIds) AND p_env.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId());
+
+		final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+		query.setParameterList("studyIds", studyIds);
+		query.addScalar("projectId", IntegerType.INSTANCE);
+		query.addScalar("variableId", IntegerType.INSTANCE);
+		final List<Object[]> results = query.list();
+		for (final Object[] row : results) {
+			final Integer studyId = (Integer) row[0];
+			studyIdEnvironmentVariablesMap.putIfAbsent(studyId, new ArrayList<>());
+			studyIdEnvironmentVariablesMap.get(studyId).add((Integer) row[1]);
+		}
+		return studyIdEnvironmentVariablesMap;
 	}
 
 	@SuppressWarnings("unchecked")
