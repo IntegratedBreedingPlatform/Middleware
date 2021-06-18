@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -123,5 +124,7 @@ public interface GermplasmService {
 	void updateGermplasmBasicDetails(Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
 
 	void updateGermplasmPedigree(Integer gid, ProgenitorsUpdateRequestDto progenitorsUpdateRequstDto);
+
+	public List<Variable> getGermplasmAttributeVariables(final List<Integer> gids, final String programUUID);
 
 }

@@ -1404,6 +1404,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	}
 
+	@Override
+	public List<Variable> getGermplasmAttributeVariables(final List<Integer> gids, final String programUUID) {
+		return this.daoFactory.getGermplasmDao().getGermplasmAttributeVariables(gids, programUUID);
+	}
+
 	private void updateGroupSource(final Germplasm oldGermplasm, final Germplasm newGermplasm) {
 		final UpdateGroupSourceAction updateGroupSourceAction = this.getUpdateGroupSourceAction(oldGermplasm, newGermplasm);
 		if (updateGroupSourceAction == UpdateGroupSourceAction.NONE) {

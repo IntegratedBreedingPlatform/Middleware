@@ -1,6 +1,5 @@
 package org.generationcp.middleware.api.germplasm.search;
 
-import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
@@ -33,11 +32,6 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 	@Override
 	public long countSearchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
 		return this.daoFactory.getGermplasmSearchDAO().countSearchGermplasm(germplasmSearchRequest, programUUID);
-	}
-
-	@Override
-	public List<Variable> getGermplasmAttributeVariables(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
-		return this.daoFactory.getGermplasmSearchDAO().getGermplasmAttributeVariables(germplasmSearchRequest, programUUID);
 	}
 
 	@Override

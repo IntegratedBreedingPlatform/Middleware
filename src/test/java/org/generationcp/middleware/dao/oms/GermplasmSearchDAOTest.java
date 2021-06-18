@@ -69,7 +69,6 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private static final String DERIVATIVE_NAME = "DERIVATIVE NAME";
 
 	private GermplasmSearchDAO dao;
-
 	private UserDefinedFieldDAO userDefinedFieldDao;
 	private GermplasmDAO germplasmDao;
 	private NameDAO nameDAO;
@@ -1197,15 +1196,6 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 	}
 
-	@Test
-	public void testGetGermplasmAttributeTypes() {
-		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
-		final List<Variable>  variables = this.dao.getGermplasmAttributeVariables(request, null);
-		Assert.assertEquals(1, variables.size());
-		Assert.assertTrue(variables.stream().allMatch(cVTerm -> cVTerm.getName().equalsIgnoreCase(NOTE_ATTRIBUTE.toUpperCase())));
-		Assert.assertEquals(NOTE_ATTRIBUTE, variables.get(0).getName());
-		Assert.assertEquals("NOTES", variables.get(0).getDefinition());
-	}
 
 	@Test
 	public void testGetGermplasmAttributeValues() {

@@ -18,12 +18,21 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.ontology.TermRelationshipId;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
@@ -1904,4 +1913,56 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
+
+	public List<Variable> getGermplasmAttributeVariables(final List<Integer> gids, final String programUUID) {
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery("select "
+				+ "v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, \n"
+				+ "vpo.alias p_alias, vpo.expected_min p_min_value, vpo.expected_max p_max_value" //
+				+ " FROM cvterm v INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
+				+ " and v.cvterm_id = cp.cvterm_id " //
+				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = " + TermRelationshipId.HAS_METHOD.getId() + ") vmr on vmr.vid = v.cvterm_id "
+				+ " left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = " + TermRelationshipId.HAS_PROPERTY.getId() + ") vpr on vpr.vid = v.cvterm_id "
+				+ " left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = " + TermRelationshipId.HAS_SCALE.getId() + ") vsr on vsr.vid = v.cvterm_id "
+				+ " left join variable_overrides vpo ON vpo.cvterm_id = v.cvterm_id AND vpo.program_uuid = :programUUID " //
+				+ " inner join atributs a  on a.atype = v.cvterm_id " //
+				+ " WHERE v.cv_id = " + CvId.VARIABLES.getId() + " "  //
+				+ "		and cp.value in (select name from cvterm where cvterm_id in (" //
+				+ VariableType.GERMPLASM_PASSPORT.getId() + "," //
+				+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ")"
+				+ ") " //
+				+ " and a.gid in (:gids)" //
+				+ " group by v.cvterm_id");
+			sqlQuery.setParameter("programUUID", programUUID);
+			sqlQuery.setParameterList("gids", gids);
+
+			final List queryResults = sqlQuery.list();
+			final List<Variable> variables = new ArrayList<>();
+			for (final Object row : queryResults) {
+				final Object[] items = (Object[]) row;
+				final Variable variable =
+					new Variable(new Term(Util.typeSafeObjectToInteger(items[0]), (String) items[1], (String) items[2]));
+				variable.setMethod(new Method(new Term(Util.typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5])));
+				variable.setProperty(new Property(new Term(Util.typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8])));
+				variable.setScale(new Scale(new Term(Util.typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11])));
+
+				// Alias, Expected Min Value, Expected Max Value
+				final String pAlias = (String) items[12];
+				final String pExpMin = (String) items[13];
+				final String pExpMax = (String) items[14];
+
+				variable.setAlias(pAlias);
+				variable.setMinValue(pExpMin);
+				variable.setMaxValue(pExpMax);
+
+				variables.add(variable);
+			}
+			return variables;
+		} catch (final HibernateException e) {
+			final String message =
+				"Error with getGermplasmAttributeTypes(gids=" + gids + ") : " + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }

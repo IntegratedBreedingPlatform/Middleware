@@ -87,11 +87,6 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public List<Variable> getGermplasmAttributeVariables(final LotsSearchDto searchDto, final String programUUID) {
-		return this.daoFactory.getLotDao().getGermplasmAttributeVariables(searchDto, programUUID);
-	}
-
-	@Override
 	public Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(final LotsSearchDto searchDto) {
 		return this.daoFactory.getLotDao().getGermplasmAttributeValues(searchDto);
 	}

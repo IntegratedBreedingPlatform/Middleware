@@ -1,6 +1,5 @@
 package org.generationcp.middleware.api.germplasm.search;
 
-import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.springframework.data.domain.Pageable;
 
@@ -13,8 +12,6 @@ public interface GermplasmSearchService {
 		final String programUUID);
 
 	long countSearchGermplasm(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
-
-	List<Variable> getGermplasmAttributeVariables(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
 	List<UserDefinedField> getGermplasmNameTypes(GermplasmSearchRequest germplasmSearchRequest);
 
