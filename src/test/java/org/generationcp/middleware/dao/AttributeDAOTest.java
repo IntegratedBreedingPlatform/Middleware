@@ -168,8 +168,8 @@ public class AttributeDAOTest extends IntegrationTestBase {
 			this.attributeDao.searchAttributes(passportAttribute.getFcode());
 
 		Assert.assertEquals(1, attributeDTOList.size());
-		Assert.assertEquals(passportAttribute.getFcode(), attributeDTOList.get(1).getCode());
-		Assert.assertEquals(passportAttribute.getFname(), attributeDTOList.get(1).getName());
+		Assert.assertEquals(passportAttribute.getFcode(), attributeDTOList.get(0).getCode());
+		Assert.assertEquals(passportAttribute.getFname(), attributeDTOList.get(0).getName());
 
 	}
 }
