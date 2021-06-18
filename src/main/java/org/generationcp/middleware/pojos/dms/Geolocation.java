@@ -11,8 +11,9 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import java.io.Serializable;
-import java.util.List;
+import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.pojos.InstanceExternalReference;
+import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;
@@ -22,20 +23,19 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.generationcp.middleware.domain.dms.VariableList;
-import org.hibernate.annotations.BatchSize;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *
  * The Geolocation table maps to the Location module of the logical data model. Information in this table corresponds to actual physical
  * locations where Field Trials are conducted.
- * 
- * @author Darla Ani
  *
+ * @author Darla Ani
  */
 @Entity
 @Table(name = "nd_geolocation")
@@ -44,7 +44,7 @@ public class Geolocation implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "nd_geolocation_id")
 	private Integer locationId;
@@ -74,11 +74,15 @@ public class Geolocation implements Serializable {
 	@BatchSize(size = 5000)
 	private List<GeolocationProperty> properties;
 
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "nd_geolocation_id")
+	private List<InstanceExternalReference> externalReferences = new ArrayList<>();
+
 	public Geolocation() {
 
 	}
 
-	public Geolocation(Integer id) {
+	public Geolocation(final Integer id) {
 		super();
 		this.locationId = id;
 	}
@@ -87,7 +91,7 @@ public class Geolocation implements Serializable {
 		return this.locationId;
 	}
 
-	public void setLocationId(Integer id) {
+	public void setLocationId(final Integer id) {
 		this.locationId = id;
 	}
 
@@ -95,7 +99,7 @@ public class Geolocation implements Serializable {
 		return this.description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -103,7 +107,7 @@ public class Geolocation implements Serializable {
 		return this.latitude;
 	}
 
-	public void setLatitude(Double latitude) {
+	public void setLatitude(final Double latitude) {
 		this.latitude = latitude;
 	}
 
@@ -111,7 +115,7 @@ public class Geolocation implements Serializable {
 		return this.longitude;
 	}
 
-	public void setLongitude(Double longitude) {
+	public void setLongitude(final Double longitude) {
 		this.longitude = longitude;
 	}
 
@@ -119,7 +123,7 @@ public class Geolocation implements Serializable {
 		return this.geodeticDatum;
 	}
 
-	public void setGeodeticDatum(String geodeticDatum) {
+	public void setGeodeticDatum(final String geodeticDatum) {
 		this.geodeticDatum = geodeticDatum;
 	}
 
@@ -127,7 +131,7 @@ public class Geolocation implements Serializable {
 		return this.altitude;
 	}
 
-	public void setAltitude(Double altitude) {
+	public void setAltitude(final Double altitude) {
 		this.altitude = altitude;
 	}
 
@@ -135,8 +139,16 @@ public class Geolocation implements Serializable {
 		return this.properties;
 	}
 
-	public void setProperties(List<GeolocationProperty> properties) {
+	public void setProperties(final List<GeolocationProperty> properties) {
 		this.properties = properties;
+	}
+
+	public List<InstanceExternalReference> getExternalReferences() {
+		return this.externalReferences;
+	}
+
+	public void setExternalReferences(final List<InstanceExternalReference> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	@Override
@@ -148,7 +160,7 @@ public class Geolocation implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -159,7 +171,7 @@ public class Geolocation implements Serializable {
 			return false;
 		}
 
-		Geolocation other = (Geolocation) obj;
+		final Geolocation other = (Geolocation) obj;
 		if (this.locationId == null) {
 			if (other.locationId != null) {
 				return false;
@@ -172,7 +184,7 @@ public class Geolocation implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Geolocation [locationId=");
 		builder.append(this.locationId);
 		builder.append(", description=");
@@ -195,7 +207,7 @@ public class Geolocation implements Serializable {
 	}
 
 	@Transient
-	public void setVariates(VariableList variates) {
+	public void setVariates(final VariableList variates) {
 		this.variates = variates;
 	}
 

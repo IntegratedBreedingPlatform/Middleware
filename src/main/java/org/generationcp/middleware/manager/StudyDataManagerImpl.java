@@ -34,7 +34,6 @@ import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.fieldbook.FieldMapDatasetInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
@@ -70,7 +69,6 @@ import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
-import org.generationcp.middleware.service.api.user.UserDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.pedigree.PedigreeFactory;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -96,7 +94,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
-	private static final Logger LOG = LoggerFactory.getLogger(StudyDataManagerImpl.class);
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
 	private DaoFactory daoFactory;
@@ -1040,11 +1037,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer studyId, final List<Integer> excludedIds) {
-		return this.daoFactory.getGeolocationPropertyDao().getGeolocationPropsAndValuesByGeolocation(studyId, excludedIds);
-	}
-
-	@Override
 	public Map<Integer, String> getExperimentSampleMap(final Integer studyDbId) {
 		return this.daoFactory.getSampleDao().getExperimentSampleMap(studyDbId);
 	}
@@ -1234,37 +1226,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			phenotypeMap.put(phenotype.getObservableId(), phenotype.getValue());
 		}
 		return phenotypeMap;
-	}
-
-	@Override
-	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) {
-		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToStudy(studyId);
-		if (!CollectionUtils.isEmpty(personIds)) {
-			return this.userService.getUsersByPersonIds(personIds);
-		}
-		return Collections.emptyList();
-	}
-
-	@Override
-	public List<UserDto> getUsersForEnvironment(final Integer instanceId) {
-		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToEnvironment(instanceId);
-		if (!CollectionUtils.isEmpty(personIds)) {
-			return this.userService.getUsersByPersonIds(personIds);
-		}
-		return Collections.emptyList();
-	}
-
-	@Override
-	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId,
-		final List<Integer> variableIds) {
-		return this.daoFactory.getPhenotypeDAO().getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
-	}
-
-	@Override
-	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId,
-		final List<Integer> variableIds) {
-		return this.daoFactory.getGeolocationPropertyDao()
-			.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(geolocationId, variableIds);
 	}
 
 	void setDataSetBuilder(final DataSetBuilder dataSetBuilder) {
