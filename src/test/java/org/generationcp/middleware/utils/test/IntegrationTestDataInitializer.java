@@ -23,6 +23,7 @@ import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -47,6 +48,8 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -447,5 +450,56 @@ public class IntegrationTestDataInitializer {
 		this.daoFactory.getGermplasmStudySourceDAO().save(germplasmStudySource);
 
 		return germplasmStudySource;
+	}
+
+	public CVTerm createVariableWithScale(final DataType dataType, final VariableType variableType) {
+		final CVTerm variable = this.createTrait(RandomStringUtils.randomAlphabetic(20));
+		final CVTerm scale = this.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_SCALE.getId(), variable.getCvTermId(), scale.getCvTermId()));
+
+		final CVTerm property = this.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.PROPERTIES.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_PROPERTY.getId(), variable.getCvTermId(), property.getCvTermId()));
+
+		final CVTerm method = this.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.METHODS.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_METHOD.getId(), variable.getCvTermId(), method.getCvTermId()));
+
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), scale.getCvTermId(), dataType.getId()));
+		this.daoFactory.getCvTermPropertyDao()
+			.save(new CVTermProperty(TermId.VARIABLE_TYPE.getId(), variableType.getName(), 1, variable.getCvTermId()));
+
+		return variable;
+	}
+
+	public CVTerm createCategoricalVariable(final VariableType variableType, final List<String> possibleValues) {
+		final CVTerm variable = this.createTrait(RandomStringUtils.randomAlphabetic(20));
+		final CVTerm scale = this.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_SCALE.getId(), variable.getCvTermId(), scale.getCvTermId()));
+
+		final CVTerm property = this.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.PROPERTIES.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_PROPERTY.getId(), variable.getCvTermId(), property.getCvTermId()));
+
+		final CVTerm method = this.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.METHODS.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_METHOD.getId(), variable.getCvTermId(), method.getCvTermId()));
+
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), scale.getCvTermId(), DataType.CATEGORICAL_VARIABLE
+				.getId()));
+		this.daoFactory.getCvTermPropertyDao()
+			.save(new CVTermProperty(TermId.VARIABLE_TYPE.getId(), variableType.getName(), 1, variable.getCvTermId()));
+
+		for (final String value : possibleValues) {
+			final CVTerm categoricalValue = this.createCVTerm(value, value, CvId.IBDB_TERMS.getId());
+			this.daoFactory.getCvTermRelationshipDao()
+				.save(new CVTermRelationship(TermId.HAS_VALUE.getId(), scale.getCvTermId(), categoricalValue.getCvTermId()));
+		}
+
+		return variable;
 	}
 }

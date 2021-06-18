@@ -6,9 +6,9 @@ import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
-import org.generationcp.middleware.dao.GermplasmExternalReferenceDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.GermplasmExternalReferenceDAO;
 import org.generationcp.middleware.dao.GermplasmListDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
@@ -26,6 +26,7 @@ import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.StudyExternalReferenceDao;
+import org.generationcp.middleware.dao.StudyInstanceExternalReferenceDao;
 import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
@@ -544,6 +545,12 @@ public class DaoFactory {
 		final StudyExternalReferenceDao studyExternalReferenceDAO = new StudyExternalReferenceDao();
 		studyExternalReferenceDAO.setSession(this.sessionProvider.getSession());
 		return studyExternalReferenceDAO;
+	}
+
+	public StudyInstanceExternalReferenceDao getStudyInstanceExternalReferenceDao() {
+		final StudyInstanceExternalReferenceDao studyInstanceExternalReferenceDao = new StudyInstanceExternalReferenceDao();
+		studyInstanceExternalReferenceDao.setSession(this.sessionProvider.getSession());
+		return studyInstanceExternalReferenceDao;
 	}
 
 	public AuditDAO getAuditDAO() {

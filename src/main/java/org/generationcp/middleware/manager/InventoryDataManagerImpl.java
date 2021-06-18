@@ -218,11 +218,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	@Override
-	public List<String> getSimilarStockIds(final List<String> stockIDs) {
-		return this.daoFactory.getTransactionDAO().getSimilarStockIds(stockIDs);
-	}
-
-	@Override
 	public Lot getLotById(final Integer id) {
 		return this.daoFactory.getLotDao().getById(id, false);
 	}

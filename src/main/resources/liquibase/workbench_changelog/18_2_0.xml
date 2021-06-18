@@ -67,7 +67,40 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v18.2.0-4">
+	<changeSet author="cuenyad" id="v18.2.0-3">
+      <preConditions onFail="MARK_RAN">
+         <sqlCheck expectedResult="1">SELECT COUNT(*) FROM workbench_tool WHERE name = 'germplasm_import'</sqlCheck>
+      </preConditions>
+      <comment>Remove 'germplasm_import' tool</comment>
+      <sql dbms="mysql" splitStatements="true">
+		  UPDATE permission SET workbench_sidebar_category_link_id = NULL
+				WHERE workbench_sidebar_category_link_id = (SELECT sidebar_category_link_id
+															FROM workbench_sidebar_category_link
+															WHERE tool_name = 'germplasm_import');
+
+			DELETE FROM workbench_sidebar_category_link WHERE tool_name = 'germplasm_import';
+			DELETE FROM workbench_tool WHERE name = 'germplasm_import';
+	  </sql>
+   </changeSet>
+
+   <changeSet author="cuenyad" id="v18.2.0-4">
+      <preConditions onFail="MARK_RAN">
+         <sqlCheck expectedResult="1">SELECT COUNT(*) FROM workbench_tool WHERE name = 'list_manager'</sqlCheck>
+      </preConditions>
+      <comment>Remove old 'list_manager' tool</comment>
+      <sql dbms="mysql" splitStatements="true">
+		  UPDATE permission SET workbench_sidebar_category_link_id = NULL
+				WHERE workbench_sidebar_category_link_id = (SELECT sidebar_category_link_id
+															FROM workbench_sidebar_category_link
+															WHERE tool_name = 'list_manager');
+
+			DELETE FROM workbench_sidebar_category_link WHERE tool_name = 'list_manager';
+			DELETE FROM workbench_tool WHERE name = 'list_manager';
+	  </sql>
+   </changeSet>
+
+
+	<changeSet author="lkovacic" id="v18.2.0-5">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM permission where name = 'VIEW_CHANGE_HISTORY'
@@ -87,5 +120,4 @@
 			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @view_change_history, '1');
 		</sql>
 	</changeSet>
-
 </databaseChangeLog>

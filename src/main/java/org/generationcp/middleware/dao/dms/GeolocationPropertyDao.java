@@ -15,7 +15,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
@@ -84,7 +83,8 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		this.deleteValues(datasetId, Collections.<Integer>emptyList(), variableIds);
 	}
 
-	public void deletePropertiesInDatasetInstances(final int datasetId, final List<Integer> instanceNumbers, final List<Integer> variableIds) {
+	public void deletePropertiesInDatasetInstances(final int datasetId, final List<Integer> instanceNumbers,
+		final List<Integer> variableIds) {
 		this.deleteValues(datasetId, instanceNumbers, variableIds);
 	}
 
@@ -95,10 +95,10 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		this.getSession().flush();
 
 		final StringBuilder sql1 = new StringBuilder().append("Delete ngp.* FROM nd_geolocationprop ngp "
-				+ "INNER JOIN nd_geolocation g on g.nd_geolocation_id = ngp.nd_geolocation_id "
-				+ "INNER JOIN nd_experiment e ON e.nd_geolocation_id = g.nd_geolocation_id "
-				+ "INNER JOIN project p ON p.project_id = e.project_id "
-				+ "WHERE (p.study_id = :datasetId OR p.project_id = :datasetId) AND ngp.type_id IN (:variableIds) ");
+			+ "INNER JOIN nd_geolocation g on g.nd_geolocation_id = ngp.nd_geolocation_id "
+			+ "INNER JOIN nd_experiment e ON e.nd_geolocation_id = g.nd_geolocation_id "
+			+ "INNER JOIN project p ON p.project_id = e.project_id "
+			+ "WHERE (p.study_id = :datasetId OR p.project_id = :datasetId) AND ngp.type_id IN (:variableIds) ");
 		if (!CollectionUtils.isEmpty(instanceNumbers)) {
 			sql1.append(" AND g.description IN (:instanceNumbers)");
 		}
@@ -112,37 +112,39 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		sqlQuery1.executeUpdate();
 	}
 
-	public Map<String, String> getGeolocationPropsAndValuesByGeolocation(final Integer geolocationId, final List<Integer> excludedVariableIds) {
-		Preconditions.checkNotNull(geolocationId);
-		final Map<String, String> geoProperties = new HashMap<>();
+	public Map<Integer, Map<String, String>> getGeolocationPropsAndValuesByGeolocation(final List<Integer> geolocationIds,
+		final List<Integer> excludedVariableIds) {
+		Preconditions.checkNotNull(geolocationIds);
+		final Map<Integer, Map<String, String>> geoProperties = new HashMap<>();
 		final List<Integer> excludedIds = new ArrayList<>(excludedVariableIds);
 		excludedIds.add(TermId.NO_OF_COLS_IN_REPS.getId());
 		excludedIds.add(TermId.LOCATION_ID.getId());
 		excludedIds.add(TermId.TRIAL_LOCATION.getId());
 
-		final StringBuilder sql =
-			new StringBuilder().append("SELECT  ").append("    cv.definition as name, geo.value as value ").append("FROM ")
-				.append("    nd_geolocationprop geo ").append("        INNER JOIN ")
-				.append("    cvterm cv ON (cv.cvterm_id = geo.type_id) ").append("WHERE ").append("    geo.nd_geolocation_id = :geolocationId ")
-				.append("        AND geo.type_id NOT IN (:excludedIds) ");
+		final StringBuilder sql = new StringBuilder()
+			.append("SELECT  cv.definition as name, geo.value as value, geo.nd_geolocation_id as instanceId")
+			.append(" 	FROM nd_geolocationprop geo ")
+			.append("   INNER JOIN cvterm cv ON (cv.cvterm_id = geo.type_id) ")
+			.append("	WHERE  geo.nd_geolocation_id IN (:geolocationIds) AND geo.type_id NOT IN (:excludedIds) ");
 		try {
 			final Query query =
-				this.getSession().createSQLQuery(sql.toString()).addScalar("name").addScalar("value").setParameter("geolocationId", geolocationId)
-					.setParameterList("excludedIds", excludedIds);
+				this.getSession().createSQLQuery(sql.toString()).addScalar("name").addScalar("value").addScalar("instanceId")
+					.setParameterList("geolocationIds", geolocationIds).setParameterList("excludedIds", excludedIds);
 			final List<Object> results = query.list();
 			for (final Object obj : results) {
 				final Object[] row = (Object[]) obj;
-				geoProperties.put((String) row[0], row[1] == null ? "" : (String) row[1]);
+				final Integer instanceId = (Integer) row[2];
+				geoProperties.putIfAbsent(instanceId, new HashMap<>());
+				geoProperties.get(instanceId).put((String) row[0], row[1] == null ? "" : (String) row[1]);
 			}
 			return geoProperties;
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getGeolocationPropsAndValuesByGeolocation() query from geolocationId: " + geolocationId
+			final String message = "Error with getGeolocationPropsAndValuesByGeolocation() query from geolocationIds: " + geolocationIds
 				+ " and excludedIds: " + excludedIds;
 			GeolocationPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
-
 
 	public Map<Integer, String> getGeoLocationPropertyByVariableId(final Integer datasetId, final Integer instanceDbId) {
 		Preconditions.checkNotNull(datasetId);
@@ -187,47 +189,52 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 	}
 
-
 	public List<GeolocationProperty> getByGeolocation(final Integer geolocationId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("geolocation.locationId", geolocationId));
 		return criteria.list();
 	}
 
-	public List<MeasurementVariable> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId, final List<Integer> variableIds) {
-		final List<MeasurementVariable> studyVariables = new ArrayList<>();
+	public Map<Integer, List<MeasurementVariable>> getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(
+		final List<Integer> geolocationIds, final List<Integer> variableIds) {
+		final Map<Integer, List<MeasurementVariable>> studyVariablesMap = new HashMap<>();
 		final List<Integer> standardEnvironmentFactors = Lists.newArrayList(
 			TermId.LOCATION_ID.getId(),
 			TermId.TRIAL_INSTANCE_FACTOR.getId(),
 			TermId.EXPERIMENT_DESIGN_FACTOR.getId());
-		try{
+		try {
 			final SQLQuery query =
-				this.getSession().createSQLQuery("SELECT ispcvt.name as name, ispcvt.definition as definition, cvt_scale.name AS scaleName, "
-					+ "		(CASE WHEN cvt_rel_catVar.subject_id IS NULL THEN gprop.value ELSE categoricalVar.name END) AS value, "
-					+ "		cvt_scale.cvterm_id AS scaleId, ispcvt.cvterm_id AS variableId "
-					+ "		FROM nd_geolocationprop gprop "
-					+ "		INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.cvterm_id in (:variableIds) "
-					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = ispcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
-					+ "		INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id "
-					+ "		INNER JOIN nd_geolocation gl ON gprop.nd_geolocation_id = gl.nd_geolocation_id "
-					+ "     LEFT JOIN cvterm_relationship cvt_rel_catVar on cvt_scale.cvterm_id = cvt_rel_catVar.subject_id and cvt_rel_catVar.type_id = " + TermId.HAS_TYPE.getId()
-					+ "			AND cvt_rel_catVar.object_id= " + TermId.CATEGORICAL_VARIABLE.getId()
-					+ "		LEFT JOIN cvterm categoricalVar ON categoricalVar.cvterm_id = gprop.value "
-					+ "	    WHERE gl.nd_geolocation_id = :geolocationId AND ispcvt.cvterm_id NOT IN (:standardEnvironmentFactors) ;");
+				this.getSession()
+					.createSQLQuery("SELECT ispcvt.name as name, ispcvt.definition as definition, cvt_scale.name AS scaleName, "
+						+ "		(CASE WHEN cvt_rel_catVar.subject_id IS NULL THEN gprop.value ELSE categoricalVar.name END) AS value, "
+						+ "		cvt_scale.cvterm_id AS scaleId, ispcvt.cvterm_id AS variableId, gprop.nd_geolocation_id AS instanceId "
+						+ "		FROM nd_geolocationprop gprop "
+						+ "		INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = gprop.type_id AND ispcvt.cvterm_id in (:variableIds) "
+						+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = ispcvt.cvterm_id AND cvt_rel.type_id = "
+						+ TermId.HAS_SCALE.getId()
+						+ "		INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id "
+						+ "		INNER JOIN nd_geolocation gl ON gprop.nd_geolocation_id = gl.nd_geolocation_id "
+						+ "     LEFT JOIN cvterm_relationship cvt_rel_catVar on cvt_scale.cvterm_id = cvt_rel_catVar.subject_id and cvt_rel_catVar.type_id = "
+						+ TermId.HAS_TYPE.getId()
+						+ "			AND cvt_rel_catVar.object_id= " + TermId.CATEGORICAL_VARIABLE.getId()
+						+ "		LEFT JOIN cvterm categoricalVar ON categoricalVar.cvterm_id = gprop.value "
+						+ "	    WHERE gl.nd_geolocation_id IN (:geolocationIds) AND ispcvt.cvterm_id NOT IN (:standardEnvironmentFactors) ;");
 			query.addScalar("name", new StringType());
 			query.addScalar("definition", new StringType());
 			query.addScalar("scaleName", new StringType());
 			query.addScalar("value", new StringType());
 			query.addScalar("scaleId", new IntegerType());
 			query.addScalar("variableId", new IntegerType());
+			query.addScalar("instanceId", new IntegerType());
 			query.setParameterList("variableIds", variableIds);
-			query.setParameter("geolocationId", geolocationId);
+			query.setParameterList("geolocationIds", geolocationIds);
 			query.setParameterList("standardEnvironmentFactors", standardEnvironmentFactors);
 
 			final List<Object> results = query.list();
-			for(final Object result: results) {
+			for (final Object result : results) {
 
 				final Object[] row = (Object[]) result;
+				final Integer instanceId = (row[6] instanceof Integer) ? (Integer) row[6] : 0;
 				final MeasurementVariable measurementVariable = new MeasurementVariable();
 				measurementVariable.setName((row[0] instanceof String) ? (String) row[0] : null);
 				measurementVariable.setDescription((row[1] instanceof String) ? (String) row[1] : null);
@@ -235,15 +242,17 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 				measurementVariable.setValue((row[3] instanceof String) ? (String) row[3] : null);
 				measurementVariable.setScaleId((row[4] instanceof Integer) ? (Integer) row[4] : null);
 				measurementVariable.setTermId((row[5] instanceof Integer) ? (Integer) row[5] : 0);
-				studyVariables.add(measurementVariable);
+				studyVariablesMap.putIfAbsent(instanceId, new ArrayList<>());
+				studyVariablesMap.get(instanceId).add(measurementVariable);
 			}
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationId: " + geolocationId
-				+ " and variableIds: " + variableIds;
+			final String message =
+				"Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationIds: " + geolocationIds
+					+ " and variableIds: " + variableIds;
 			GeolocationPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-		return studyVariables;
+		return studyVariablesMap;
 	}
 
 }

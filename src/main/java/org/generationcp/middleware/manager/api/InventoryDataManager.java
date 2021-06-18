@@ -185,8 +185,6 @@ public interface InventoryDataManager {
 	 */
 	void populateLotCountsIntoExistingList(GermplasmList germplasmList);
 
-	List<String> getSimilarStockIds(List<String> stockIDs);
-
 	Lot getLotById(Integer id);
 
 	/**

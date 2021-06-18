@@ -1362,21 +1362,21 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return criteria.list();
 	}
 
-	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId,
+	public Map<Integer, List<MeasurementVariable>> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(final List<Integer> geolocationIds,
 		final List<Integer> variableIds) {
-		final List<MeasurementVariable> studyVariables = new ArrayList<>();
+		final Map<Integer, List<MeasurementVariable>> studyVariablesMap = new HashMap<>();
 
 		try{
 			final SQLQuery query =
 				this.getSession().createSQLQuery("SELECT envcvt.name AS name, envcvt.definition AS definition, cvt_scale.name AS scaleName, "
 					+ "		(CASE WHEN cvt_rel_catVar.subject_id IS NULL THEN pheno.value ELSE categoricalVar.name END) AS value, "
-					+ "		cvt_scale.cvterm_id AS scaleId, envcvt.cvterm_id AS variableId "
+					+ "		cvt_scale.cvterm_id AS scaleId, envcvt.cvterm_id AS variableId, envnde.nd_geolocation_id AS instanceId "
 					+ "		from phenotype pheno "
 					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.cvterm_id IN (:variableIds) "
 					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
 					+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
 					+ "     INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id\n"
-					+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id = :geolocationId "
+					+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id IN (:geolocationIds) "
 					+ "     LEFT JOIN cvterm_relationship cvt_rel_catVar on cvt_scale.cvterm_id = cvt_rel_catVar.subject_id and cvt_rel_catVar.type_id = " + TermId.HAS_TYPE.getId()
 					+ "			AND cvt_rel_catVar.object_id= " + TermId.CATEGORICAL_VARIABLE.getId()
 					+ "		LEFT JOIN cvterm categoricalVar ON categoricalVar.cvterm_id = pheno.value");
@@ -1386,12 +1386,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			query.addScalar("value", new StringType());
 			query.addScalar("scaleId", new IntegerType());
 			query.addScalar("variableId", new IntegerType());
+			query.addScalar("instanceId", new IntegerType());
 			query.setParameterList("variableIds", variableIds);
-			query.setParameter("geolocationId", geolocationId);
+			query.setParameterList("geolocationIds", geolocationIds);
 
 			final List<Object> results = query.list();
 			for (final Object result : results) {
 				final Object[] row = (Object[]) result;
+				final Integer instanceId = (row[6] instanceof Integer) ? (Integer) row[6] : 0;
 				final MeasurementVariable measurementVariable = new MeasurementVariable();
 				measurementVariable.setName((row[0] instanceof String) ? (String) row[0] : null);
 				measurementVariable.setDescription((row[1] instanceof String) ? (String) row[1] : null);
@@ -1399,15 +1401,16 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				measurementVariable.setValue((row[3] instanceof String) ? (String) row[3] : null);
 				measurementVariable.setScaleId((row[4] instanceof Integer) ? (Integer) row[4] : null);
 				measurementVariable.setTermId((row[5] instanceof Integer) ? (Integer) row[5] : 0);
-				studyVariables.add(measurementVariable);
+				studyVariablesMap.putIfAbsent(instanceId, new ArrayList<>());
+				studyVariablesMap.get(instanceId).add(measurementVariable);
 			}
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationId: " + geolocationId
+			final String message = "Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationIds: " + geolocationIds
 				+ " and variableIds: " + variableIds;
 			PhenotypeDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-		return studyVariables;
+		return studyVariablesMap;
 	}
 
 	public boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId) {
