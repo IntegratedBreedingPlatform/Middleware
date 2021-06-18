@@ -30,6 +30,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,9 @@ import java.util.Map;
  *
  */
 public class AttributeDAO extends GenericDAO<Attribute, Integer> {
+
+	private static List<String> GERMPLASM_ATTRIBUTE_TYPES = Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(),
+		UDTableType.ATRIBUTS_PASSPORT.getType());
 
 	@SuppressWarnings("unchecked")
 	public List<Attribute> getByGID(final Integer gid) {
@@ -67,11 +71,12 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 				+ "   u.fname AS name" //
 				+ " FROM  udflds u " //
 				+ " WHERE u.ftable = '" + UDTableType.ATRIBUTS_ATTRIBUTE.getTable() + "'" //
-				+ "   and u.ftype = '" + UDTableType.ATRIBUTS_ATTRIBUTE.getType() + "'"
+				+ "   and u.ftype IN (:germplasmAttributeTypes)"
 				+ "   and (u.fname like :fname or u.fcode like :fcode)"
 				+ " LIMIT 100 ");
 			sqlQuery.setParameter("fname", '%' + query + '%');
 			sqlQuery.setParameter("fcode", '%' + query + '%');
+			sqlQuery.setParameterList("germplasmAttributeTypes", GERMPLASM_ATTRIBUTE_TYPES);
 			sqlQuery.addScalar("code");
 			sqlQuery.addScalar("id");
 			sqlQuery.addScalar("name");

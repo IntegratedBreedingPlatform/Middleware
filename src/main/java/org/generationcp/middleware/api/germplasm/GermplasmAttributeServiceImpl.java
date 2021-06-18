@@ -54,8 +54,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	public List<AttributeDTO> filterGermplasmAttributes(final Set<String> codes,
-		final Set<String> types){
+	public List<AttributeDTO> filterGermplasmAttributes(final Set<String> codes, final Set<String> types){
 		return   this.daoFactory.getUserDefinedFieldDAO().getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(), types, codes)
 			.stream()
 			.map(userDefinedField -> {
