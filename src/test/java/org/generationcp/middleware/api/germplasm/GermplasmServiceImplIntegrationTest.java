@@ -645,30 +645,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testImportGermplasmUpdates_Derivative_GermplasmHasExistingProgeny() {
-
-		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-
-		// Create Germplasm With Descendant
-		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
-		final Germplasm germplasmDescendant = this.createGermplasm(method, null, null, 0, 0, 0);
-		germplasmDescendant.setGpid1(germplasm.getGid());
-		germplasmDescendant.setGpid2(germplasm.getGid());
-		this.daoFactory.getGermplasmDao().saveOrUpdate(germplasmDescendant);
-
-		final GermplasmUpdateDTO germplasmUpdateDTO =
-			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
-
-		try {
-			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
-			fail("Method should throw an error");
-		} catch (final MiddlewareRequestException e) {
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.germplasm.has.progeny.error"));
-		}
-	}
-
-	@Test
 	public void testImportGermplasmUpdates_Derivative_ImmediateSourceShouldBelongToGroup() {
 
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
