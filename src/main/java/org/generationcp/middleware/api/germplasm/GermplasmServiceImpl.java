@@ -563,13 +563,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (breedingMethod.getMprgn() == 1) {
 			conflictErrors.put("germplasm.update.mutation.method.is.not.supported", new String[] {
 				String.valueOf(germplasm.getGid())});
-		} else if (gidsOfGermplasmWithDescendants.contains(germplasm.getGid())) {
+		} else if (femaleParentGid != null && maleParentGid != null && gidsOfGermplasmWithDescendants
+			.contains(germplasm.getGid())) {
 			// Prevent update if the germplasm has existing pedigree tree.
 			conflictErrors.put("germplasm.update.germplasm.has.progeny.error", new String[] {
 				String.valueOf(germplasm.getGid())});
-		} else {
-			final String femaleParentGidString = femaleParentGid == null ? null : String.valueOf(femaleParentGid);
-			final String maleParentGidString = maleParentGid == null ? null : String.valueOf(maleParentGid);
+		} else if (femaleParentGid != null && maleParentGid != null) {
+			final String femaleParentGidString = String.valueOf(femaleParentGid);
+			final String maleParentGidString = String.valueOf(maleParentGid);
 			germplasm.setGnpgs(this.calculateGnpgs(breedingMethod, femaleParentGidString, maleParentGidString, Lists.transform(otherProgenitors, Functions
 				.toStringFunction())));
 			this.setProgenitors(germplasm, breedingMethod, femaleParentGidString, maleParentGidString, progenitorsMapByGid, conflictErrors);
@@ -578,7 +579,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void saveOrUpdateReference(final Germplasm germplasm, final Optional<String> referenceOptional) {
-		if (referenceOptional.isPresent()) {
+		if (referenceOptional.isPresent() && !referenceOptional.get().isEmpty()) {
 			if (germplasm.getBibref() != null) {
 				final Bibref bibref = germplasm.getBibref();
 				bibref.setAnalyt(referenceOptional.get());
