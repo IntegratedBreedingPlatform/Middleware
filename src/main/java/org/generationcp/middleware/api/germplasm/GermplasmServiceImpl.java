@@ -554,9 +554,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (breedingMethod.getMprgn() == 1) {
 			conflictErrors.put("germplasm.update.mutation.method.is.not.supported", new String[] {
 				String.valueOf(germplasm.getGid())});
-		} else {
-			final String femaleParentGidString = femaleParentGid == null ? null : String.valueOf(femaleParentGid);
-			final String maleParentGidString = maleParentGid == null ? null : String.valueOf(maleParentGid);
+		} else if (femaleParentGid != null && maleParentGid != null) {
+			// Only update the progenitors if both male and female are available.
+			final String femaleParentGidString = String.valueOf(femaleParentGid);
+			final String maleParentGidString = String.valueOf(maleParentGid);
 			germplasm.setGnpgs(
 				this.calculateGnpgs(breedingMethod, femaleParentGidString, maleParentGidString, Lists.transform(otherProgenitors, Functions
 					.toStringFunction())));
