@@ -567,7 +567,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void saveOrUpdateReference(final Germplasm germplasm, final Optional<String> referenceOptional) {
-		if (referenceOptional.isPresent()) {
+		if (referenceOptional.isPresent() && !referenceOptional.get().isEmpty()) {
 			if (germplasm.getBibref() != null) {
 				final Bibref bibref = germplasm.getBibref();
 				bibref.setAnalyt(referenceOptional.get());
