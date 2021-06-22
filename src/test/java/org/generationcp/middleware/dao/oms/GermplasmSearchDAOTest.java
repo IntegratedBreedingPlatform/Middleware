@@ -1210,7 +1210,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetGermplasmNameTypes() {
 		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
-		final List<UserDefinedField> userDefinedFields = this.dao.getGermplasmNameTypes(request);
+		final List<UserDefinedField> userDefinedFields = this.dao.getGermplasmNameTypes(request, null);
 		Assert.assertEquals(2, userDefinedFields.size());
 		Assert.assertTrue(userDefinedFields.stream().allMatch(userDefinedField -> userDefinedField.getFtable().equals("NAMES")));
 		Assert.assertTrue(userDefinedFields.stream().anyMatch(userDefinedField -> userDefinedField.getFcode().equals("DRVNM")));

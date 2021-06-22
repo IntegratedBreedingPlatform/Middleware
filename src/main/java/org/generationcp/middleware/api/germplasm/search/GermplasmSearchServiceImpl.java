@@ -35,8 +35,8 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 	}
 
 	@Override
-	public List<UserDefinedField> getGermplasmNameTypes(final GermplasmSearchRequest germplasmSearchRequest) {
-		return this.daoFactory.getGermplasmSearchDAO().getGermplasmNameTypes(germplasmSearchRequest);
+	public List<UserDefinedField> getGermplasmNameTypes(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
+		return this.daoFactory.getGermplasmSearchDAO().getGermplasmNameTypes(germplasmSearchRequest, programUUID);
 	}
 
 	@Override

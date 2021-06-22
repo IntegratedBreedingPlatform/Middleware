@@ -13,7 +13,7 @@ public interface GermplasmSearchService {
 
 	long countSearchGermplasm(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
-	List<UserDefinedField> getGermplasmNameTypes(GermplasmSearchRequest germplasmSearchRequest);
+	List<UserDefinedField> getGermplasmNameTypes(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
 	Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(GermplasmSearchRequest germplasmSearchRequest);
 

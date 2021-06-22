@@ -1574,10 +1574,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			.list();
 	}
 
-	public List<UserDefinedField> getGermplasmNameTypes(final GermplasmSearchRequest germplasmSearchRequest) {
+	public List<UserDefinedField> getGermplasmNameTypes(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
 		try {
 
-			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
+			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, programUUID);
 			final String sql = "select distinct {u.*} from names n inner join udflds u "
 				+ " where n.ntype = u.fldno"
 				+ " and n.gid in (:gids)"
