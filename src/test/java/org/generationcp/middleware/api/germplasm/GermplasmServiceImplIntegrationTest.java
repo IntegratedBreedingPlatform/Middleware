@@ -899,7 +899,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, null);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, null);
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -921,7 +921,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(method), Optional.empty(), null);
 		germplasmUpdateDTO.setReference("");
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
