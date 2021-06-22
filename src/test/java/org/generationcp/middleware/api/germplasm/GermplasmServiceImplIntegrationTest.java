@@ -76,6 +76,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	public static final String NOLOC = "NOLOC";
 	public static final String CROP_NAME = "maize";
 
+	private static final String DEFAULT_BIBREF_FIELD = "-";
+
 	private DaoFactory daoFactory;
 
 	@Autowired
@@ -932,6 +934,53 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertEquals(-1, savedGermplasm.getGnpgs().intValue());
 		assertEquals(parentGermplasm.getGid(), savedGermplasm.getGpid1());
 		assertEquals(parentGermplasm.getGid(), savedGermplasm.getGpid2());
+	}
+
+	@Test
+	public void testImportGermplasmUpdates_FemaleAndMaleParentsAreNull() {
+
+		final Method method = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
+		final Germplasm femaleParent = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Germplasm maleParent = this.createGermplasm(method, null, null, 0, 0, 0);
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 2, femaleParent.getGid(), maleParent.getGid());
+
+		final GermplasmUpdateDTO germplasmUpdateDTO =
+			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(method), Optional.empty(), null);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, null);
+		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, null);
+
+		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+
+		final Germplasm savedGermplasm =
+			this.daoFactory.getGermplasmDao()
+				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
+
+		assertEquals(method.getMid(), savedGermplasm.getMethodId());
+		assertEquals(2, savedGermplasm.getGnpgs().intValue());
+		assertEquals(germplasm.getGpid1(), savedGermplasm.getGpid1());
+		assertEquals(germplasm.getGpid2(), savedGermplasm.getGpid2());
+	}
+
+	@Test
+	public void testImportGermplasmUpdates_ReferenceIsEmptyString() {
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Bibref reference = this.createReference(UUID.randomUUID().toString());
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0, reference);
+
+		final GermplasmUpdateDTO germplasmUpdateDTO =
+			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(method), Optional.empty(), null);
+		germplasmUpdateDTO.setReference("");
+
+		this.germplasmService.importGermplasmUpdates(1, Collections.singletonList(germplasmUpdateDTO));
+
+		final Germplasm savedGermplasm =
+			this.daoFactory.getGermplasmDao()
+				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
+
+		assertNotNull(savedGermplasm.getBibref());
+		assertThat(savedGermplasm.getBibref().getRefid(), is(reference.getRefid()));
+		assertThat(savedGermplasm.getBibref().getAnalyt(), is(reference.getAnalyt()));
+
 	}
 
 	@Test
@@ -2086,9 +2135,17 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
 		final Integer gpid1,
 		final Integer gpid2) {
+		return this.createGermplasm(method, germplasmUUID, location, gnpgs, gpid1, gpid2, null);
+	}
+
+	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
+		final Integer gpid1,
+		final Integer gpid2, final Bibref bibref) {
 		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2,
 			1, 0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
 			0, 0, null, null, method);
+
+		germplasm.setBibref(bibref);
 		if (StringUtils.isNotEmpty(germplasmUUID)) {
 			germplasm.setGermplasmUUID(germplasmUUID);
 		}
@@ -2151,6 +2208,15 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 0);
 		return germplasmUpdateDTO;
+	}
+
+	private Bibref createReference(final String reference) {
+		final Bibref bibref = new Bibref(null, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, reference, DEFAULT_BIBREF_FIELD,
+			DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD,
+			DEFAULT_BIBREF_FIELD,
+			DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD);
+		this.daoFactory.getBibrefDAO().save(bibref);
+		return bibref;
 	}
 
 }

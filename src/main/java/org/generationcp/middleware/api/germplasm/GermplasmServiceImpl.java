@@ -563,7 +563,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (breedingMethod.getMprgn() == 1) {
 			conflictErrors.put("germplasm.update.mutation.method.is.not.supported", new String[] {
 				String.valueOf(germplasm.getGid())});
-		} else if (breedingMethod.isGenerative() && femaleParentGid != null && maleParentGid != null && gidsOfGermplasmWithDescendants
+		} else if (femaleParentGid != null && maleParentGid != null && gidsOfGermplasmWithDescendants
 			.contains(germplasm.getGid())) {
 			// Prevent update if the germplasm has existing pedigree tree.
 			conflictErrors.put("germplasm.update.germplasm.has.progeny.error", new String[] {
