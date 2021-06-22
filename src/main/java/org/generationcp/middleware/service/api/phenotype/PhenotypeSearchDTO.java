@@ -27,6 +27,9 @@ public class PhenotypeSearchDTO {
 	@JsonView(BrapiView.BrapiV1_2.class)
 	private String observationLevel;
 
+	@JsonView(BrapiView.BrapiV2.class)
+	private String seedLotDbId;
+
 	@JsonView(BrapiView.BrapiV1_2.class)
 	private String observationLevels;
 
@@ -94,6 +97,7 @@ public class PhenotypeSearchDTO {
 
 
 	protected static class ObservationUnitXRef {
+
 		private String id;
 		private String source;
 
@@ -114,7 +118,9 @@ public class PhenotypeSearchDTO {
 		}
 	}
 
+
 	public static class Treatment {
+
 		private String factor;
 		private String modality;
 
@@ -413,6 +419,14 @@ public class PhenotypeSearchDTO {
 
 	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
 		this.externalReferences = externalReferences;
+	}
+
+	public String getSeedLotDbId() {
+		return this.seedLotDbId;
+	}
+
+	public void setSeedLotDbId(final String seedLotDbId) {
+		this.seedLotDbId = seedLotDbId;
 	}
 
 	@Override
