@@ -1,18 +1,32 @@
 package org.generationcp.middleware.api.brapi.v2.observationunit;
 
+import com.fasterxml.jackson.annotation.JsonView;
+import org.generationcp.middleware.service.api.BrapiView;
+import org.generationcp.middleware.service.api.study.ObservationLevel;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
+
 import java.util.List;
 import java.util.Map;
 
+@AutoProperty
 public class ObservationUnitPosition {
+
 	private String blockNumber;
 	private String entryNumber;
-	private List<String> entryType;
+	private String entryType;
 	private Map<String, Object> geoCoordinates;
 	private String positionCoordinateX;
 	private String positionCoordinateXType;
 	private String positionCoordinateY;
 	private String positionCoordinateYType;
 	private String replicate;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private ObservationLevel observationLevel;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<ObservationLevel> observationLevels;
 
 	public ObservationUnitPosition() {
 	}
@@ -33,11 +47,11 @@ public class ObservationUnitPosition {
 		this.entryNumber = entryNumber;
 	}
 
-	public List<String> getEntryType() {
+	public String getEntryType() {
 		return this.entryType;
 	}
 
-	public void setEntryType(final List<String> entryType) {
+	public void setEntryType(final String entryType) {
 		this.entryType = entryType;
 	}
 
@@ -87,5 +101,36 @@ public class ObservationUnitPosition {
 
 	public void setReplicate(final String replicate) {
 		this.replicate = replicate;
+	}
+
+	public ObservationLevel getObservationLevel() {
+		return this.observationLevel;
+	}
+
+	public void setObservationLevel(final ObservationLevel observationLevel) {
+		this.observationLevel = observationLevel;
+	}
+
+	public List<ObservationLevel> getObservationLevels() {
+		return this.observationLevels;
+	}
+
+	public void setObservationLevels(final List<ObservationLevel> observationLevels) {
+		this.observationLevels = observationLevels;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
 	}
 }

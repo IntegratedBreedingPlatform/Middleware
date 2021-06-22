@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.api.phenotype;
 
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.pojomatic.Pojomatic;
@@ -9,6 +10,7 @@ import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * TODO Rename to ObservationUnitDto
@@ -18,6 +20,11 @@ public class PhenotypeSearchDTO {
 
 	private String observationUnitDbId;
 	private String observationUnitName;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<ExternalReferenceDTO> externalReferences;
+
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String observationLevel;
 
 	@JsonView(BrapiView.BrapiV1_2.class)
@@ -40,6 +47,8 @@ public class PhenotypeSearchDTO {
 
 	@JsonView(BrapiView.BrapiV1_2.class)
 	private String y;
+
+	@JsonView(BrapiView.BrapiV1_3.class)
 	private String entryType;
 	private String entryNumber;
 
@@ -49,7 +58,7 @@ public class PhenotypeSearchDTO {
 	private String instanceNumber;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private String additionalInfo;
+	private Map<String, String> additionalInfo;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String locationDbId;
@@ -297,11 +306,11 @@ public class PhenotypeSearchDTO {
 		this.instanceNumber = instanceNumber;
 	}
 
-	public String getAdditionalInfo() {
+	public Map<String, String> getAdditionalInfo() {
 		return this.additionalInfo;
 	}
 
-	public void setAdditionalInfo(final String additionalInfo) {
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
 		this.additionalInfo = additionalInfo;
 	}
 
@@ -396,6 +405,14 @@ public class PhenotypeSearchDTO {
 
 	public void setPositionCoordinateY(final String positionCoordinateY) {
 		this.positionCoordinateY = positionCoordinateY;
+	}
+
+	public List<ExternalReferenceDTO> getExternalReferences() {
+		return this.externalReferences;
+	}
+
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	@Override
