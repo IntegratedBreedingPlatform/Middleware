@@ -336,10 +336,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 
 		final List<Germplasm> germplasmList = this.getGermplasmListByGIDorGermplasmUUID(germplasmUpdateDTOList);
-		final List<Integer> gidsOfGermplasmWithDescendants =
-			this.getGidsOfGermplasmWithDescendants(germplasmList.stream().map(Germplasm::getGid)
-			.collect(Collectors.toList())).stream().collect(
-			Collectors.toList());
 		final Map<String, Integer> nameCodesFieldNoMap = this.getNameTypesMapByCodes(germplasmUpdateDTOList);
 		final Set<String> attributeKeys = new HashSet<>();
 		germplasmUpdateDTOList.forEach(
@@ -374,7 +370,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.saveGermplasmUpdateDTO(attributeVariablesNameMap, nameCodesFieldNoMap,
 				germplasmUpdateDTOMap,
 				locationAbbreviationIdMap, codeBreedingMethodDTOMap, namesMap, attributesMap, germplasm,
-				progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors);
+				progenitorsMapByGid, conflictErrors);
 		}
 
 		if (!conflictErrors.isEmpty()) {
@@ -444,14 +440,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
 		final Map<String, Germplasm> progenitorsMapByGid,
-		final List<Integer> gidsOfGermplasmWithDescendants,
 		final Multimap<String, Object[]> conflictErrors) {
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
 			this.getGermplasmUpdateDTOByGidOrUUID(germplasm, germplasmUpdateDTOMap);
 		if (optionalGermplasmUpdateDTO.isPresent()) {
 			final GermplasmUpdateDTO germplasmUpdateDTO = optionalGermplasmUpdateDTO.get();
 			this.updateGermplasm(germplasm, germplasmUpdateDTO, locationAbbreviationIdMap, codeBreedingMethodDTOMap, progenitorsMapByGid,
-				gidsOfGermplasmWithDescendants,
 				conflictErrors);
 			this.saveAttributesAndNames(attributeVariablesMap, nameCodes, namesMap, attributesMap, germplasm,
 				conflictErrors,
@@ -510,7 +504,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Method> codeBreedingMethodDTOMap,
 		final Map<String, Germplasm> progenitorsMapByGid,
-		final List<Integer> gidsOfGermplasmWithDescendants,
 		final Multimap<String, Object[]> conflictErrors) {
 
 		final Optional<Method> breedingMethodOptional =
@@ -529,7 +522,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		this.saveOrUpdateReference(germplasm, referenceOptional);
 		this.updateBreedingMethodAndProgenitors(germplasmUpdateDTO, germplasm, breedingMethodOptional, progenitorsMapByGid,
-			gidsOfGermplasmWithDescendants,
 			conflictErrors);
 
 		this.daoFactory.getGermplasmDao().update(germplasm);
@@ -538,7 +530,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private void updateBreedingMethodAndProgenitors(final GermplasmUpdateDTO germplasmUpdateDTO, final Germplasm germplasm,
 		final Optional<Method> breedingMethodOptional,
 		final Map<String, Germplasm> progenitorsMapByGid,
-		final List<Integer> gidsOfGermplasmWithDescendants,
 		final Multimap<String, Object[]> conflictErrors) {
 
 		final Integer femaleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_1);
@@ -550,7 +541,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		if (!breedingMethodOptional.isPresent()) {
 			// If breeding method is not specified, update the progenitors based on existing method
-			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
+			this.updateProgenitors(germplasm, progenitorsMapByGid, conflictErrors, femaleParentGid,
 				maleParentGid,
 				germplasm.getMethod(), otherProgenitors);
 
@@ -564,7 +555,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasm.setMethodId(breedingMethod.getMid());
 
 			// Update the progenitors based on the new method
-			this.updateProgenitors(germplasm, progenitorsMapByGid, gidsOfGermplasmWithDescendants, conflictErrors, femaleParentGid,
+			this.updateProgenitors(germplasm, progenitorsMapByGid, conflictErrors, femaleParentGid,
 				maleParentGid,
 				breedingMethod, otherProgenitors);
 		}
@@ -572,18 +563,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void updateProgenitors(final Germplasm germplasm, final Map<String, Germplasm> progenitorsMapByGid,
-		final List<Integer> gidsOfGermplasmWithDescendants, final Multimap<String, Object[]> conflictErrors, final Integer femaleParentGid,
+		final Multimap<String, Object[]> conflictErrors, final Integer femaleParentGid,
 		final Integer maleParentGid, final Method breedingMethod, final List<Integer> otherProgenitors) {
 		if (breedingMethod.getMprgn() == 1) {
 			conflictErrors.put("germplasm.update.mutation.method.is.not.supported", new String[] {
 				String.valueOf(germplasm.getGid())});
-		} else if (gidsOfGermplasmWithDescendants.contains(germplasm.getGid())) {
-			// Prevent update if the germplasm has existing pedigree tree.
-			conflictErrors.put("germplasm.update.germplasm.has.progeny.error", new String[] {
-				String.valueOf(germplasm.getGid())});
-		} else {
-			final String femaleParentGidString = femaleParentGid == null ? null : String.valueOf(femaleParentGid);
-			final String maleParentGidString = maleParentGid == null ? null : String.valueOf(maleParentGid);
+		} else if (femaleParentGid != null && maleParentGid != null) {
+			// Only update the progenitors if both male and female are available.
+			final String femaleParentGidString = String.valueOf(femaleParentGid);
+			final String maleParentGidString = String.valueOf(maleParentGid);
 			germplasm.setGnpgs(
 				this.calculateGnpgs(breedingMethod, femaleParentGidString, maleParentGidString, Lists.transform(otherProgenitors, Functions
 					.toStringFunction())));
@@ -593,7 +581,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void saveOrUpdateReference(final Germplasm germplasm, final Optional<String> referenceOptional) {
-		if (referenceOptional.isPresent()) {
+		if (referenceOptional.isPresent() && !referenceOptional.get().isEmpty()) {
 			if (germplasm.getBibref() != null) {
 				final Bibref bibref = germplasm.getBibref();
 				bibref.setAnalyt(referenceOptional.get());
