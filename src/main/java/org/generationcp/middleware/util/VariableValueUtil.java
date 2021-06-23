@@ -5,11 +5,14 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.commons.validator.routines.DateValidator;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class VariableValueUtil {
 
@@ -24,6 +27,34 @@ public class VariableValueUtil {
 			return false;
 		}
 		return isValidValue(var, value, false, false);
+	}
+
+	public static String getExpectedRange(final Variable variable) {
+		switch (DataType.getByName(variable.getScale().getDataType().getName())) {
+			case CATEGORICAL_VARIABLE:
+				final List<TermSummary> categories = variable.getScale().getCategories();
+				final List<String> values =
+					categories.stream().map(org.generationcp.middleware.domain.oms.TermSummary::getName).collect(Collectors.toList());
+				return StringUtils.join(values, ";");
+
+			case NUMERIC_VARIABLE:
+				final StringBuilder range = new StringBuilder();
+				if (
+					(StringUtils.isNotBlank(variable.getMinValue()) //
+						|| StringUtils.isNotBlank(variable.getMaxValue()))) {
+					range.append(variable.getMinValue()).append("-");
+					range.append(variable.getMaxValue());
+
+				} else if (StringUtils.isNotBlank(variable.getScale().getMinValue()) //
+					|| StringUtils.isNotBlank(variable.getScale().getMaxValue())) {
+					range.append(variable.getScale().getMinValue()).append("-");
+					range.append(variable.getScale().getMaxValue());
+				}
+				return range.toString();
+
+			default:
+				return "";
+		}
 	}
 
 	//FIXME According with Mariano, observations should not accept invalid categories for a categorical scale
