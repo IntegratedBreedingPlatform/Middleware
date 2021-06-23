@@ -1596,10 +1596,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<Attribute> getGermplasmAttributeValues(final GermplasmSearchRequest germplasmSearchRequest) {
+	public List<Attribute> getGermplasmAttributeValues(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
 		try {
 
-			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
+			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, programUUID);
 			final String sql = "select distinct {a.*} from atributs a "
 				+ "where a.gid in (:gids)";
 
@@ -1618,10 +1618,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<Name> getGermplasmNameValues(final GermplasmSearchRequest germplasmSearchRequest) {
+	public List<Name> getGermplasmNameValues(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
 		try {
 
-			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, null);
+			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, programUUID);
 			final String sql = "select distinct {n.*} from names n "
 				+ "where n.gid in (:gids)  order by n.ntype, n.ndate asc";
 
