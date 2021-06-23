@@ -90,7 +90,6 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 		Assert.assertEquals(createdAttributeId, germplasmAttributeDto.getId());
 		Assert.assertEquals(ATTRIBUTE_VALUE, germplasmAttributeDto.getValue());
 		Assert.assertEquals(NOTE_ATTRIBUTE, germplasmAttributeDto.getVariableName());
-		//Assert.assertEquals(VariableType.GERMPLASM_ATTRIBUTE.getId(), germplasmAttributeDto.getAttributeType());
 		Assert.assertEquals(ATTRIBUTE_DATE, germplasmAttributeDto.getDate());
 		Assert.assertEquals(LOCATION_ID, germplasmAttributeDto.getLocationId());
 	}
