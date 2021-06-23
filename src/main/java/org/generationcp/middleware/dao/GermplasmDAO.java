@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
@@ -84,6 +83,26 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private static final String GRPLCE = "grplce";
 	private static final String DELETED = "deleted";
+
+	private static final String VARIABLE_ID = "vid";
+	private static final String VARIABLE_NAME ="vn";
+	private static final String VARIABLE_DEFINITION ="vd";
+
+	private static final String METHOD_ID ="mid";
+	private static final String METHOD_NAME ="mn";
+	private static final String METHOD_DEFINITION ="md";
+
+	private static final String PROPERTY_ID ="pid";
+	private static final String PROPERTY_NAME ="pn";
+	private static final String PROPERTY_DEFINITION ="pd";
+
+	private static final String SCALE_ID ="sid";
+	private static final String SCALE_NAME ="sn";
+	private static final String SCALE_DEFINITION ="sd";
+
+	private static final String VARIABLE_ALIAS ="p_alias";
+	private static final String VARIABLE_EXPECTED_MAX ="p_min_value";
+	private static final String VARIABLE_EXPECTED_MIX ="p_max_value";
 
 	private static final String DER_MAN = "'" + MethodType.DERIVATIVE.getCode() + "','" + MethodType.MAINTENANCE.getCode() + "'";
 
@@ -1935,21 +1954,36 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ " group by v.cvterm_id");
 			sqlQuery.setParameter("programUUID", programUUID);
 			sqlQuery.setParameterList("gids", gids);
+			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+			sqlQuery.addScalar(GermplasmDAO.VARIABLE_ID);
+			sqlQuery.addScalar(GermplasmDAO.VARIABLE_NAME);
+			sqlQuery.addScalar(GermplasmDAO.VARIABLE_DEFINITION);
+			sqlQuery.addScalar(GermplasmDAO.METHOD_ID);
+			sqlQuery.addScalar(GermplasmDAO.METHOD_NAME);
+			sqlQuery.addScalar(GermplasmDAO.METHOD_DEFINITION);
+			sqlQuery.addScalar(GermplasmDAO.PROPERTY_ID);
+			sqlQuery.addScalar(GermplasmDAO.PROPERTY_NAME);
+			sqlQuery.addScalar(GermplasmDAO.PROPERTY_DEFINITION);
+			sqlQuery.addScalar(GermplasmDAO.SCALE_ID);
+			sqlQuery.addScalar(GermplasmDAO.SCALE_NAME);
+			sqlQuery.addScalar(GermplasmDAO.SCALE_DEFINITION);
+			sqlQuery.addScalar(GermplasmDAO.VARIABLE_ALIAS);
+			sqlQuery.addScalar(GermplasmDAO.VARIABLE_EXPECTED_MAX);
+			sqlQuery.addScalar(GermplasmDAO.VARIABLE_EXPECTED_MIX);
 
-			final List queryResults = sqlQuery.list();
+			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) sqlQuery.list();
 			final List<Variable> variables = new ArrayList<>();
-			for (final Object row : queryResults) {
-				final Object[] items = (Object[]) row;
+			for (final Map<String, Object> item : queryResults) {
 				final Variable variable =
-					new Variable(new Term(Util.typeSafeObjectToInteger(items[0]), (String) items[1], (String) items[2]));
-				variable.setMethod(new Method(new Term(Util.typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5])));
-				variable.setProperty(new Property(new Term(Util.typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8])));
-				variable.setScale(new Scale(new Term(Util.typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11])));
+					new Variable(new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.VARIABLE_ID)), (String) item.get(GermplasmDAO.VARIABLE_NAME), (String) item.get(GermplasmDAO.VARIABLE_DEFINITION)));
+				variable.setMethod(new Method(new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.METHOD_ID)), (String) item.get(GermplasmDAO.METHOD_NAME), (String) item.get(GermplasmDAO.METHOD_DEFINITION))));
+				variable.setProperty(new Property(new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.PROPERTY_ID)), (String) item.get(GermplasmDAO.PROPERTY_NAME), (String) item.get(GermplasmDAO.PROPERTY_DEFINITION))));
+				variable.setScale(new Scale(new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.SCALE_ID)), (String) item.get(GermplasmDAO.SCALE_NAME), (String) item.get(GermplasmDAO.SCALE_DEFINITION))));
 
 				// Alias, Expected Min Value, Expected Max Value
-				final String pAlias = (String) items[12];
-				final String pExpMin = (String) items[13];
-				final String pExpMax = (String) items[14];
+				final String pAlias = (String) item.get(GermplasmDAO.VARIABLE_ALIAS);
+				final String pExpMin = (String) item.get(GermplasmDAO.VARIABLE_EXPECTED_MIX);
+				final String pExpMax = (String) item.get(GermplasmDAO.VARIABLE_EXPECTED_MAX);
 
 				variable.setAlias(pAlias);
 				variable.setMinValue(pExpMin);

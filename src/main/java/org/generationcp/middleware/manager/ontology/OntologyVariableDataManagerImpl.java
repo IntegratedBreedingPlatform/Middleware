@@ -47,6 +47,7 @@ import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +85,28 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			"Analysis and/or Analysis Summary variable type(s) should not be assigned together with any other variable type";
 	private static final String OBSERVATION_UNIT_VARIABLES_CANNOT_BE_TRAITS =
 			"Variables cannot be classified as both Observation Unit and Trait. Please check the variable types assigned and try again.";
-		
+
+	private static final String VARIABLE_ID = "vid";
+	private static final String VARIABLE_NAME ="vn";
+	private static final String VARIABLE_DEFINITION ="vd";
+
+	private static final String METHOD_ID ="mid";
+	private static final String METHOD_NAME ="mn";
+	private static final String METHOD_DEFINITION ="md";
+
+	private static final String PROPERTY_ID ="pid";
+	private static final String PROPERTY_NAME ="pn";
+	private static final String PROPERTY_DEFINITION ="pd";
+
+	private static final String SCALE_ID ="sid";
+	private static final String SCALE_NAME ="sn";
+	private static final String SCALE_DEFINITION ="sd";
+
+	private static final String VARIABLE_ALIAS ="p_alias";
+	private static final String VARIABLE_EXPECTED_MAX ="p_min_value";
+	private static final String VARIABLE_EXPECTED_MIX ="p_max_value";
+
+
 	@Autowired
 	private OntologyMethodDataManager methodManager;
 
@@ -1105,21 +1127,38 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			sqlQuery.setParameter("fname", '%' + query + '%');
 			sqlQuery.setParameter("name", '%' + query + '%');
 			sqlQuery.setParameter("alias", '%' + query + '%');
+			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_ID);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_NAME);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_DEFINITION);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.METHOD_ID);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.METHOD_NAME);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.METHOD_DEFINITION);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.PROPERTY_ID);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.PROPERTY_NAME);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.PROPERTY_DEFINITION);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.SCALE_ID);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.SCALE_NAME);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.SCALE_DEFINITION);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_ALIAS);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_EXPECTED_MAX);
+			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_EXPECTED_MIX);
 
-			final List queryResults = sqlQuery.list();
+			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) sqlQuery.list();
+
 			final List<Variable> variables = new ArrayList<>();
-			for (final Object row : queryResults) {
-				final Object[] items = (Object[]) row;
+			for (final Map<String, Object> item : queryResults) {
 				final Variable variable =
-					new Variable(new Term(Util.typeSafeObjectToInteger(items[0]), (String) items[1], (String) items[2]));
-				variable.setMethod(new Method(new Term(Util.typeSafeObjectToInteger(items[3]), (String) items[4], (String) items[5])));
-				variable.setProperty(new Property(new Term(Util.typeSafeObjectToInteger(items[6]), (String) items[7], (String) items[8])));
-				variable.setScale(new Scale(new Term(Util.typeSafeObjectToInteger(items[9]), (String) items[10], (String) items[11])));
+					new Variable(new Term(Util.typeSafeObjectToInteger(item.get(OntologyVariableDataManagerImpl.VARIABLE_ID)), (String) item.get(OntologyVariableDataManagerImpl.VARIABLE_NAME), (String) item.get(OntologyVariableDataManagerImpl.VARIABLE_DEFINITION)));
+				variable.setMethod(new Method(new Term(Util.typeSafeObjectToInteger(item.get(OntologyVariableDataManagerImpl.METHOD_ID)), (String) item.get(OntologyVariableDataManagerImpl.METHOD_NAME), (String) item.get(OntologyVariableDataManagerImpl.METHOD_DEFINITION))));
+				variable.setProperty(new Property(new Term(Util.typeSafeObjectToInteger(item.get(OntologyVariableDataManagerImpl.PROPERTY_ID)), (String) item.get(OntologyVariableDataManagerImpl.PROPERTY_NAME), (String) item.get(OntologyVariableDataManagerImpl.PROPERTY_DEFINITION))));
+				variable.setScale(new Scale(new Term(Util.typeSafeObjectToInteger(item.get(OntologyVariableDataManagerImpl.SCALE_ID)), (String) item.get(OntologyVariableDataManagerImpl.SCALE_NAME), (String) item.get(OntologyVariableDataManagerImpl.SCALE_DEFINITION))));
 
 				// Alias, Expected Min Value, Expected Max Value
-				final String pAlias = (String) items[12];
-				final String pExpMin = (String) items[13];
-				final String pExpMax = (String) items[14];
+				final String pAlias = (String) item.get(OntologyVariableDataManagerImpl.VARIABLE_ALIAS);
+				final String pExpMin = (String) item.get(OntologyVariableDataManagerImpl.VARIABLE_EXPECTED_MIX);
+				final String pExpMax = (String) item.get(OntologyVariableDataManagerImpl.VARIABLE_EXPECTED_MAX);
 
 				variable.setAlias(pAlias);
 				variable.setMinValue(pExpMin);
