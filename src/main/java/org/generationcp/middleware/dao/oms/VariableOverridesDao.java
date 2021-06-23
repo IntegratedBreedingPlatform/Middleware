@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.dao.oms;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -61,7 +62,7 @@ public class VariableOverridesDao extends GenericDAO<VariableOverrides, Integer>
 			return this.save(new VariableOverrides(null, variableId, programUuid, alias, minValue, maxValue));
 		}
 
-		overrides.setAlias(alias);
+		overrides.setAlias(StringUtils.isEmpty(alias) ? null : alias);
 		overrides.setExpectedMin(minValue);
 		overrides.setExpectedMax(maxValue);
 		return this.merge(overrides);
