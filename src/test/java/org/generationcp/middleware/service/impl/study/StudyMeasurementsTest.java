@@ -77,7 +77,7 @@ public class StudyMeasurementsTest {
 	private static final String ENTRY_TYPE = String
 			.valueOf(SystemDefinedEntryType.CHECK_ENTRY.getEntryTypeCategoricalId());
 	private static final List<String> STRING_COLUMNS = Lists.newArrayList("nd_experiment_id", "TRIAL_INSTANCE",
-			"ENTRY_TYPE", "GID", "DESIGNATION", "ENTRY_NO", "ENTRY_CODE", "REP_NO", "PLOT_NO", "BLOCK_NO", "ROW", "COL",
+			"ENTRY_TYPE", "GERMPLSM_UUID", "DESIGNATION", "ENTRY_NO", "ENTRY_CODE", "REP_NO", "PLOT_NO", "BLOCK_NO", "ROW", "COL",
 			"FIELDMAP COLUMN", "FIELDMAP RANGE", "SUM_OF_SAMPLES");
 	private final List<String> germplasmDescriptors = Lists.newArrayList(StudyMeasurementsTest.STOCK_ID);
 	private final List<String> designFactors = Lists.newArrayList(StudyMeasurementsTest.FACT1,

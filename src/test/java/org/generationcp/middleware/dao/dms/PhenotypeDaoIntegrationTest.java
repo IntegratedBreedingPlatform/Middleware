@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.dms;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
@@ -193,6 +194,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		for (int i = 0; i < NO_OF_GERMPLASM; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 			germplasm.setGid(null);
+			GermplasmGuidGenerator.generateGermplasmGuids(this.crop, Collections.singletonList(germplasm));
 			this.germplasmDao.save(germplasm);
 			this.germplasm.add(germplasm);
 		}
@@ -421,7 +423,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			Assert.assertNotNull(obsUnitId);
 			final ExperimentModel experimentModel = this.experiments.get(obsUnitId);
 			Assert.assertNotNull(experimentModel);
-			Assert.assertEquals(experimentModel.getStock().getGermplasm().getGid().toString(), result.getGermplasmDbId());
+			Assert.assertEquals(experimentModel.getStock().getGermplasm().getGermplasmUUID(), result.getGermplasmDbId());
 			Assert.assertEquals(experimentModel.getStock().getName(), result.getGermplasmName());
 			Assert.assertEquals(experimentModel.getStock().getUniqueName(), result.getEntryNumber());
 			Assert.assertEquals(experimentModel.getGeoLocation().getLocationId().toString(), result.getStudyDbId());
