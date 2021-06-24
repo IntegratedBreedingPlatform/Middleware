@@ -94,7 +94,7 @@
 			DROP TEMPORARY TABLE new_properties;
 
 			UPDATE udflds_attributes_bkp bkp INNER JOIN cvterm cvterm ON bkp.fname = cvterm.name
-			SET bkp.property_id = cvterm.cvterm_id WHERE cvterm.cv_id = 1010;
+			SET bkp.property_id = cvterm.cvterm_id WHERE cvterm.cv_id = 1010 AND cvterm.is_obsolete = 0;
 		</sql>
 	</changeSet>
 
@@ -135,7 +135,7 @@
 						SELECT 1040, cvterm_name, fname, null, 0, 0 FROM udflds_attributes_bkp;
 
 						UPDATE udflds_attributes_bkp bkp INNER JOIN cvterm cvterm ON bkp.cvterm_name = cvterm.name
-						SET bkp.cvterm_id = cvterm.cvterm_id WHERE cvterm.cv_id = 1040;
+						SET bkp.cvterm_id = cvterm.cvterm_id WHERE cvterm.cv_id = 1040 AND cvterm.is_obsolete = 0;
 
 						INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
 						SELECT 1200, cvterm_id, property_id FROM udflds_attributes_bkp;
