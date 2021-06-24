@@ -101,8 +101,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String SCALE_DEFINITION ="sd";
 
 	private static final String VARIABLE_ALIAS ="p_alias";
-	private static final String VARIABLE_EXPECTED_MAX ="p_min_value";
-	private static final String VARIABLE_EXPECTED_MIX ="p_max_value";
+	private static final String VARIABLE_EXPECTED_MAX ="p_max_value";
+	private static final String VARIABLE_EXPECTED_MIX ="p_min_value";
 
 	private static final String DER_MAN = "'" + MethodType.DERIVATIVE.getCode() + "','" + MethodType.MAINTENANCE.getCode() + "'";
 

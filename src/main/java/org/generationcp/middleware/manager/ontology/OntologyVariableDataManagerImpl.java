@@ -87,27 +87,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	private static final String OBSERVATION_UNIT_VARIABLES_CANNOT_BE_TRAITS =
 			"Variables cannot be classified as both Observation Unit and Trait. Please check the variable types assigned and try again.";
 
-	private static final String VARIABLE_ID = "vid";
-	private static final String VARIABLE_NAME ="vn";
-	private static final String VARIABLE_DEFINITION ="vd";
-
-	private static final String METHOD_ID ="mid";
-	private static final String METHOD_NAME ="mn";
-	private static final String METHOD_DEFINITION ="md";
-
-	private static final String PROPERTY_ID ="pid";
-	private static final String PROPERTY_NAME ="pn";
-	private static final String PROPERTY_DEFINITION ="pd";
-
-	private static final String SCALE_ID ="sid";
-	private static final String SCALE_NAME ="sn";
-	private static final String SCALE_DEFINITION ="sd";
-
-	private static final String VARIABLE_ALIAS ="p_alias";
-	private static final String VARIABLE_EXPECTED_MAX ="p_min_value";
-	private static final String VARIABLE_EXPECTED_MIX ="p_max_value";
-
-
 	@Autowired
 	private OntologyMethodDataManager methodManager;
 
@@ -1106,72 +1085,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	@Override
 	public List<Variable> searchAttributeVariables(final String query, final String programUUID) {
-		if (StringUtils.isBlank(query)) {
-			return Collections.EMPTY_LIST;
-		}
-		try {
-			final SQLQuery sqlQuery = this.getActiveSession().createSQLQuery("select "
-				+ "v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, \n"
-				+ "vpo.alias p_alias, vpo.expected_min p_min_value, vpo.expected_max p_max_value" //
-				+ " FROM cvterm v INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
-				+ " and v.cvterm_id = cp.cvterm_id " //
-				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
-				+ " left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
-				+ " left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
-				+ " left join variable_overrides vpo ON vpo.cvterm_id = v.cvterm_id AND vpo.program_uuid = :programUUID " //
-				+ " WHERE v.cv_id = " + CvId.VARIABLES.getId() + " "  //
-				+ "		and cp.value in (select name from cvterm where cvterm_id in (" //
-				+ VariableType.GERMPLASM_PASSPORT.getId() + "," //
-				+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ")) " //
-				+ "   AND (v.definition like :fname or v.name like :name or vpo.alias like :alias )" //
-				+ " LIMIT 100 ");
-			sqlQuery.setParameter("programUUID", programUUID);
-			sqlQuery.setParameter("fname", '%' + query + '%');
-			sqlQuery.setParameter("name", '%' + query + '%');
-			sqlQuery.setParameter("alias", '%' + query + '%');
-			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_ID);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_NAME);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_DEFINITION);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.METHOD_ID);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.METHOD_NAME);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.METHOD_DEFINITION);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.PROPERTY_ID);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.PROPERTY_NAME);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.PROPERTY_DEFINITION);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.SCALE_ID);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.SCALE_NAME);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.SCALE_DEFINITION);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_ALIAS);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_EXPECTED_MAX);
-			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_EXPECTED_MIX);
-
-			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) sqlQuery.list();
-
-			final List<Variable> variables = new ArrayList<>();
-			for (final Map<String, Object> item : queryResults) {
-				final Variable variable =
-					new Variable(new Term(Util.typeSafeObjectToInteger(item.get(OntologyVariableDataManagerImpl.VARIABLE_ID)), (String) item.get(OntologyVariableDataManagerImpl.VARIABLE_NAME), (String) item.get(OntologyVariableDataManagerImpl.VARIABLE_DEFINITION)));
-				variable.setMethod(new Method(new Term(Util.typeSafeObjectToInteger(item.get(OntologyVariableDataManagerImpl.METHOD_ID)), (String) item.get(OntologyVariableDataManagerImpl.METHOD_NAME), (String) item.get(OntologyVariableDataManagerImpl.METHOD_DEFINITION))));
-				variable.setProperty(new Property(new Term(Util.typeSafeObjectToInteger(item.get(OntologyVariableDataManagerImpl.PROPERTY_ID)), (String) item.get(OntologyVariableDataManagerImpl.PROPERTY_NAME), (String) item.get(OntologyVariableDataManagerImpl.PROPERTY_DEFINITION))));
-				variable.setScale(new Scale(new Term(Util.typeSafeObjectToInteger(item.get(OntologyVariableDataManagerImpl.SCALE_ID)), (String) item.get(OntologyVariableDataManagerImpl.SCALE_NAME), (String) item.get(OntologyVariableDataManagerImpl.SCALE_DEFINITION))));
-
-				// Alias, Expected Min Value, Expected Max Value
-				final String pAlias = (String) item.get(OntologyVariableDataManagerImpl.VARIABLE_ALIAS);
-				final String pExpMin = (String) item.get(OntologyVariableDataManagerImpl.VARIABLE_EXPECTED_MIX);
-				final String pExpMax = (String) item.get(OntologyVariableDataManagerImpl.VARIABLE_EXPECTED_MAX);
-
-				variable.setAlias(pAlias);
-				variable.setMinValue(pExpMin);
-				variable.setMaxValue(pExpMax);
-
-				variables.add(variable);
-			}
-
-			return variables;
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with searchAttributes(query=" + query + "): " + e.getMessage(), e);
-		}
+		return this.daoFactory.getCvTermDao().searchAttributeVariables(query, programUUID);
 	}
 }
