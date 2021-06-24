@@ -839,8 +839,6 @@ public interface GermplasmDataManager {
 
 	List<Integer> addOrUpdateGermplasm(List<Germplasm> germplasms, Operation operation);
 
-	List<Attribute> getAttributeByIds(List<Integer> ids);
-
 	List<String> getNamesByGidsAndPrefixes(List<Integer> gids, List<String> prefixes);
 
 	List<Germplasm> getExistingCrosses(Integer femaleParent, List<Integer> maleParentIds, Optional<Integer> gid);

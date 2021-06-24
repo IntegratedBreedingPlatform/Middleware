@@ -1175,11 +1175,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Attribute> getAttributeByIds(final List<Integer> ids) {
-		return this.daoFactory.getAttributeDAO().getByIDs(ids);
-	}
-
-	@Override
 	public List<Germplasm> getExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
 		final Optional<Integer> gid) {
 		return this.daoFactory.getGermplasmDao().getExistingCrosses(femaleParent, maleParentIds, gid);
