@@ -14,13 +14,13 @@ import java.util.List;
 
 class ObservationQuery {
 
-	public static final String DEFAULT_SORT_COLUMN = "PLOT_NO";
-	public static final String DEFAULT_SORT_ORDER = "asc";
-	public static final String PHENOTYPE_ID = "_PhenotypeId";
+	static final String DEFAULT_SORT_COLUMN = "PLOT_NO";
+	static final String DEFAULT_SORT_ORDER = "asc";
+	private static final String PHENOTYPE_ID = "_PhenotypeId";
 	public static final String STATUS = "_Status";
-	public static final String INSTANCE_NUMBER_CLAUSE = " AND gl.nd_geolocation_id = :instanceId  ";
-	public static final String GROUPING_CLAUSE = " GROUP BY nde.nd_experiment_id ";
-	public static final String OBSERVATIONS_FOR_SAMPLES = "SELECT  " + "    nde.nd_experiment_id as nd_experiment_id, "
+	private static final String INSTANCE_NUMBER_CLAUSE = " AND gl.nd_geolocation_id = :instanceId  ";
+	private static final String GROUPING_CLAUSE = " GROUP BY nde.nd_experiment_id ";
+	private static final String OBSERVATIONS_FOR_SAMPLES = "SELECT  " + "    nde.nd_experiment_id as nd_experiment_id, "
 		+ "    (select na.nval from names na where na.gid = s.dbxref_id and na.nstat = 1 limit 1) as preferred_name, " + "    ph.value"
 		+ " as value, s.dbxref_id as gid"
 		+ " FROM  " + "    project p  "
@@ -47,7 +47,7 @@ class ObservationQuery {
 	 * This query is used by BMSAPI and is very similar to {@link ObservationQuery#getObservationsMainQuery(List, List, List)}
 	 * which is used Trial and Nursery Manager
 	 */
-	public String getObservationQueryWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, final Integer instanceId) {
+	String getObservationQueryWithBlockRowCol(final List<MeasurementVariableDto> measurementVariables, final Integer instanceId) {
 		final String orderByMeasurementVariableId = getOrderByMeasurementVariableId(measurementVariables);
 		final String orderByText =
 			(null == measurementVariables || measurementVariables.isEmpty() ? "" : " ORDER BY " + orderByMeasurementVariableId);
