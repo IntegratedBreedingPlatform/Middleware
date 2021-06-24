@@ -56,13 +56,14 @@ public class VariableOverridesDao extends GenericDAO<VariableOverrides, Integer>
 	public VariableOverrides save(
 		final Integer variableId, final String programUuid, final String alias, final String minValue, final String maxValue) {
 
+		final String aliasValue = StringUtils.isEmpty(alias) ? null : alias;
 		final VariableOverrides overrides = this.getByVariableAndProgram(variableId, programUuid);
 		// check for uniqueness
 		if (overrides == null) {
-			return this.save(new VariableOverrides(null, variableId, programUuid, alias, minValue, maxValue));
+			return this.save(new VariableOverrides(null, variableId, programUuid, aliasValue, minValue, maxValue));
 		}
 
-		overrides.setAlias(StringUtils.isEmpty(alias) ? null : alias);
+		overrides.setAlias(aliasValue);
 		overrides.setExpectedMin(minValue);
 		overrides.setExpectedMax(maxValue);
 		return this.merge(overrides);
