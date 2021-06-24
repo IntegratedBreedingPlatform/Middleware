@@ -303,7 +303,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				}
 			}
 
-			String selectQueryProgramUUIDDependant;
+			final String selectQueryProgramUUIDDependant;
 			String leftJoinsProgramUUIDDependant = "";
 			if (variableFilter.getProgramUuid() == null) {
 				selectQueryProgramUUIDDependant = "'' p_alias, '' p_min_value, '' p_max_value, '' fid ";
@@ -583,7 +583,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public void fillVariableUsage(Variable variable) {
+	public void fillVariableUsage(final Variable variable) {
 
 		// setting variable studies
 		variable.setStudies(0);
@@ -596,13 +596,13 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		//setting variable observations, first observations will be null so set it to 0
 		Integer observations = 0;
-		for (VariableType v : variable.getVariableTypes()) {
-			long observationsPerType = this.daoFactory.getExperimentDao().countByObservedVariable(variable.getId(), v.getId());
+		for (final VariableType v : variable.getVariableTypes()) {
+			final long observationsPerType = this.daoFactory.getExperimentDao().countByObservedVariable(variable.getId(), v.getId());
 			observations = (int) (observations + observationsPerType);
 		}
 
 		// Temporal condition to avoid delete variable when it exists in listdataprops.
-		boolean variableUsedInListdataProp = this.daoFactory.getListDataPropertyDAO().hasOntologyVariableInUse(variable.getName());
+		final boolean variableUsedInListdataProp = this.daoFactory.getListDataPropertyDAO().hasOntologyVariableInUse(variable.getName());
 		variable.setObservations(observations);
 		//it can be replaced by observations > 0
 		variable.setHasUsage(this.isVariableUsedInStudy(variable.getId()) || //
@@ -1064,7 +1064,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	@Override
 	public Optional<DataType> getDataType(final Integer variableId) {
-		List<CVTermRelationship> relationships = daoFactory.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(Arrays.asList(variableId), TermId.HAS_SCALE.getId());
+		final List<CVTermRelationship> relationships =
+			daoFactory.getCvTermRelationshipDao().getBySubjectIdsAndTypeId(Arrays.asList(variableId), TermId.HAS_SCALE.getId());
 		if (!relationships.isEmpty()) {
 			final Integer scaleId = relationships.get(0).getObjectId();
 			return Optional.of(this.scaleManager.getScaleById(scaleId, false).getDataType());
@@ -1127,7 +1128,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			sqlQuery.setParameter("fname", '%' + query + '%');
 			sqlQuery.setParameter("name", '%' + query + '%');
 			sqlQuery.setParameter("alias", '%' + query + '%');
-			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_ID);
 			sqlQuery.addScalar(OntologyVariableDataManagerImpl.VARIABLE_NAME);
