@@ -57,17 +57,20 @@
 
 	<changeSet author="mderamos" id="v18.3.0-4">
         <preConditions onFail="MARK_RAN">
-			<indexExists tableName="location" indexName="labbr_UNIQUE"></indexExists>
+			<indexExists tableName="location" indexName="labbr_UNIQUE"/>
 		</preConditions>
 		<comment>Remove location abbr unique index if already existing</comment>
-		<dropIndex tableName="location" indexName="labbr_UNIQUE"></dropIndex>
+		<dropIndex tableName="location" indexName="labbr_UNIQUE"/>
 	</changeSet>
 
 	<changeSet author="mderamos" id="v18.3.0-5">
 		<preConditions onFail="CONTINUE">
-			<sqlCheck expectedResult="0">select count(*) from (SELECT count(*) from location where labbr is not null group by labbr having count(*) > 1) a </sqlCheck>
+			<and>
+				<not><indexExists tableName="location" indexName="UK_labbr"/></not>
+				<sqlCheck expectedResult="0">select count(*) from (SELECT count(*) from location where labbr is not null group by labbr having count(*) > 1) a </sqlCheck>
+			</and>
 		</preConditions>
 		<comment>Adding unique constraint to labbr column of location table </comment>
-	    <addUniqueConstraint columnNames="labbr" constraintName="labbr_UNIQUE" tableName="location"/>
+	    <addUniqueConstraint columnNames="labbr" constraintName="UK_labbr" tableName="location"/>
 	</changeSet>
 </databaseChangeLog>
