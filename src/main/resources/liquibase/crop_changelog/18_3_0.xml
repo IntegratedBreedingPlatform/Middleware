@@ -14,4 +14,14 @@
 		<dropTable tableName="ims_stock_transaction_bkp"/>
 	</changeSet>
 
+	<changeSet author="gelli" id="v18.3.0-2">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="listdata_project_bkp" />
+		</preConditions>
+		<comment>
+			Remove unused table listdata_project_bkp
+		</comment>
+		<dropTable tableName="listdata_project_bkp" />
+	</changeSet>
+
 </databaseChangeLog>
