@@ -11,9 +11,7 @@
 		<comment>
 			Drop unused table ims_stock_transaction_bkp if exists.
 		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			DROP TABLE ims_stock_transaction_bkp;
-		</sql>
+		<dropTable tableName="ims_stock_transaction_bkp"/>
 	</changeSet>
 
 </databaseChangeLog>
