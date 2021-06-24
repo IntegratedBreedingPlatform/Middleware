@@ -224,7 +224,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		try {
 			final SQLQuery query =
 				this.getSession().createSQLQuery(COUNT_ATTRIBUTE_WITH_VARIABLES);
-			query.setParameterList("variableId", variablesIds);
+			query.setParameterList("variableIds", variablesIds);
 
 			return ((BigInteger) query.uniqueResult()).longValue();
 
