@@ -171,12 +171,15 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
 		}
 
+		if(this.crop ==  null) {
+			this.crop = new CropType();
+			this.crop.setUseUUID(true);
+		}
+
 		if (this.germplasm == null) {
 			this.createGermplasm();
 		}
 
-		this.crop = new CropType();
-		this.crop.setUseUUID(true);
 		this.experiments = new HashMap<>();
 	}
 
