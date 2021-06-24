@@ -447,9 +447,9 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		dto4.setObservationVariableDbIds(Collections.singletonList(this.trait.getCvTermId().toString()));
 		Assert.assertEquals(NO_OF_GERMPLASM * 2, this.phenotypeDao.countPhenotypes(dto4));
 
-		// Search by GIDs
+		// Search by germplasm uuid
 		final PhenotypeSearchRequestDTO dto5 = new PhenotypeSearchRequestDTO();
-		dto5.setGermplasmDbIds(Arrays.asList(this.germplasm.get(0).getGid().toString(), this.germplasm.get(1).getGid().toString()));
+		dto5.setGermplasmDbIds(Arrays.asList(this.germplasm.get(0).getGermplasmUUID(), this.germplasm.get(1).getGermplasmUUID()));
 		// # of GIDs in filter x 2# of studies
 		Assert.assertEquals(2 * 2, this.phenotypeDao.countPhenotypes(dto5));
 
