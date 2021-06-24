@@ -234,7 +234,7 @@ public class StudyMeasurementsTest {
 		Mockito.verify(query).addScalar(StudyMeasurements.ENTRY_CODE);
 		Mockito.verify(query).addScalar(StudyMeasurements.ENTRY_NO);
 		Mockito.verify(query).addScalar(StudyMeasurements.DESIGNATION);
-		Mockito.verify(query).addScalar(StudyMeasurements.GID);
+		Mockito.verify(query).addScalar(StudyMeasurements.GERMPLSM_UUID);
 		Mockito.verify(query).addScalar(StudyMeasurements.ENTRY_TYPE);
 		Mockito.verify(query).addScalar(StudyMeasurements.TRIAL_INSTANCE);
 		Mockito.verify(query).addScalar(StudyMeasurements.ND_EXPERIMENT_ID);

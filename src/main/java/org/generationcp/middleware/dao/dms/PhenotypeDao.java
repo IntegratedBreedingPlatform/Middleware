@@ -1094,7 +1094,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 
 		if (requestDTO.getGermplasmDbIds() != null && !requestDTO.getGermplasmDbIds().isEmpty()) {
-			queryString.append(" AND s.dbxref_id in (:germplasmDbIds) ");
+			queryString.append(" AND g.germplsm_uuid in (:germplasmDbIds) ");
 		}
 
 		if (requestDTO.getProgramDbIds() != null && !requestDTO.getProgramDbIds().isEmpty()) {

@@ -73,7 +73,7 @@ class ObservationQuery {
 			+ " 	WHERE " //
 			+ "      isp.stock_id = s.stock_id " //
 			+ "      AND ispcvt.name = 'ENTRY_TYPE') AS ENTRY_TYPE, " //
-			+ "   s.dbxref_id AS GID, " //
+			+ "   g.germplsm_uuid AS GERMPLSM_UUID, " //
 			+ "   s.name AS DESIGNATION, " //
 			+ "   s.uniquename AS ENTRY_NO, " //
 			+ "   s.value AS ENTRY_CODE, " //
@@ -159,6 +159,7 @@ class ObservationQuery {
 			+ "    INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
 			+ "    INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 			+ "    INNER JOIN stock s ON s.stock_id = nde.stock_id " //
+			+ "    INNER JOIN germplsm g ON g.gid = s.dbxref_id "
 			+ "	   LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	   LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
 			+ "    LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = " //
@@ -235,7 +236,7 @@ class ObservationQuery {
 				sqlBuilder.append(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
 			}
 		}
-		
+
 		if (!designFactors.isEmpty()) {
 			final String designFactorClauseFormat =
 					"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '%s') '%s',  ";

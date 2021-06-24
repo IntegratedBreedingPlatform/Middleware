@@ -12,7 +12,7 @@ public class PhenotypeQuery {
 		+ "  CONCAT(dataset_type.name, plotNumber.value) AS observationUnitName, " //
 		+ "  dataset_type.name AS observationLevel, " //
 		+ "  NULL AS plantNumber, " // Until we have plant level observation
-		+ "  s.dbxref_id AS germplasmDbId, " //
+		+ "  g.germplsm_uuid AS germplasmDbId, " //
 		+ "  s.name AS germplasmName, " //
 		+ "  gl.description AS instanceNumber, " //
 		+ "  gl.nd_geolocation_id AS studyDbId, " //
@@ -38,6 +38,7 @@ public class PhenotypeQuery {
 		+ "  INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
 		+ "  INNER JOIN stock s ON s.stock_id = nde.stock_id " //
 		+ "  INNER JOIN project p ON p.project_id = dataset.study_id " //
+		+ "  INNER JOIN germplsm g ON g.gid = s.dbxref_id "
 		+ "  LEFT JOIN workbench.workbench_project wp ON p.program_uuid = wp.project_uuid " //
 		+ "  LEFT JOIN nd_experimentprop plotNumber ON plotNumber.nd_experiment_id = nde.nd_experiment_id AND plotNumber.type_id = " + TermId.PLOT_NO.getId() //
 		+ "  LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = " + TermId.FIELDMAP_RANGE.getId() //

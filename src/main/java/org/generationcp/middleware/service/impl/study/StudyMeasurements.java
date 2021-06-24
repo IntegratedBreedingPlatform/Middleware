@@ -33,7 +33,7 @@ public class StudyMeasurements {
 	public static final String ENTRY_CODE = "ENTRY_CODE";
 	public static final String ENTRY_NO = "ENTRY_NO";
 	public static final String DESIGNATION = "DESIGNATION";
-	public static final String GID = "GID";
+	public static final String GERMPLSM_UUID = "GERMPLSM_UUID";
 	public static final String ENTRY_TYPE = "ENTRY_TYPE";
 	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
 	public static final String ND_EXPERIMENT_ID = "nd_experiment_id";
@@ -213,7 +213,7 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar(StudyMeasurements.ND_EXPERIMENT_ID);
 		createSQLQuery.addScalar(StudyMeasurements.TRIAL_INSTANCE);
 		createSQLQuery.addScalar(StudyMeasurements.ENTRY_TYPE);
-		createSQLQuery.addScalar(StudyMeasurements.GID);
+		createSQLQuery.addScalar(StudyMeasurements.GERMPLSM_UUID);
 		createSQLQuery.addScalar(StudyMeasurements.DESIGNATION);
 		createSQLQuery.addScalar(StudyMeasurements.ENTRY_NO);
 		createSQLQuery.addScalar(StudyMeasurements.ENTRY_CODE);
