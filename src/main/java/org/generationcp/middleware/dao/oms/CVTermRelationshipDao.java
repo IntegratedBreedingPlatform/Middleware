@@ -282,7 +282,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 				+ " AND EXISTS ( "
 				+ "     SELECT 1    	 "
 				+ "     FROM atributs a "
-				+ "     WHERE a.atype = v.cvterm_id ) "
+				+ "     WHERE a.cval_id = v.cvterm_id ) "
 				+ " group by v.name");
 		query.setParameter("scaleId", scaleId);
 		query.addScalar("category", CVTermRelationshipDao.STRING);
