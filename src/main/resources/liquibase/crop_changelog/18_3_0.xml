@@ -70,12 +70,4 @@
 		<comment>Adding unique constraint to labbr column of location table </comment>
 	    <addUniqueConstraint columnNames="labbr" constraintName="labbr_UNIQUE" tableName="location"/>
 	</changeSet>
-
-	<changeSet author="mderamos" id="v18.3.0-6">
-		<preConditions onFail="CONTINUE">
-			<sqlCheck expectedResult="0">select count(*) from location where labbr is NULL </sqlCheck>
-		</preConditions>
-		<comment>Adding non-nullable constraint to labbr column of location table </comment>
-	    <addNotNullConstraint columnName="labbr" tableName="location" columnDataType="VARCHAR(8)"/>
-	</changeSet>
 </databaseChangeLog>
