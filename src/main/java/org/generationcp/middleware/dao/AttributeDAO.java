@@ -33,8 +33,8 @@ import java.util.List;
  */
 public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
-	private static final String COUNT_ATTRIBUTE_WITH_VARIABLE =
-		"SELECT COUNT(A.ATYPE) FROM ATRIBUTS A WHERE A.ATYPE= :variableId";
+	private static final String COUNT_ATTRIBUTE_WITH_VARIABLES =
+		"SELECT COUNT(A.ATYPE) FROM ATRIBUTS A WHERE A.ATYPE IN (:variableIds)";
 
 	@SuppressWarnings("unchecked")
 	public List<Attribute> getByGID(final Integer gid) {
@@ -220,26 +220,10 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return sql;
 	}
 
-	public long countByVariable(final int variableId){
-		try {
-			final SQLQuery query = this.getSession().createSQLQuery(AttributeDAO.COUNT_ATTRIBUTE_WITH_VARIABLE);
-			query.setParameter("variableId", variableId);
-
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (final HibernateException e) {
-			final String errorMessage = "Error at countByVariable=" + variableId + " in AttributeDAO: " + e.getMessage();
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-	}
-
 	public long countByVariables(final List<Integer> variablesIds){
 		try {
 			final SQLQuery query =
-				this.getSession().createSQLQuery("SELECT COUNT(ATYPE) "
-					+ "FROM ATRIBUTS A "
-					+ "WHERE ATYPE in (:variableId) order by ATYPE"
-				);
+				this.getSession().createSQLQuery(COUNT_ATTRIBUTE_WITH_VARIABLES);
 			query.setParameterList("variableId", variablesIds);
 
 			return ((BigInteger) query.uniqueResult()).longValue();

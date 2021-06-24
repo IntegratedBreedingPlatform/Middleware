@@ -4,6 +4,7 @@ package org.generationcp.middleware.manager.ontology;
 import com.google.common.base.Function;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.StringUtils;
@@ -590,7 +591,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		variable.setDatasets((int) this.daoFactory.getDmsProjectDAO().countByVariable(variable.getId()));
 
-		variable.setGermplasm((int) this.daoFactory.getAttributeDAO().countByVariable(variable.getId()));
+		variable.setGermplasm((int) this.daoFactory.getAttributeDAO().countByVariables(Lists.newArrayList(variable.getId())));
 
 		variable.setBreedingMethods((int) this.daoFactory.getMethodDAO().countByVariable(variable.getId()));
 
@@ -926,7 +927,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	public boolean isVariableUsedInGermplasm(final int variableId) {
-		return this.daoFactory.getAttributeDAO().countByVariable(variableId) > 0;
+		return this.daoFactory.getAttributeDAO().countByVariables(Lists.newArrayList(variableId)) > 0;
 	}
 
 	public boolean isVariableUsedInBreedingMethods(final int variableId) {
