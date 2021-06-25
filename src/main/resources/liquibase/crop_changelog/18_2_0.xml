@@ -65,7 +65,7 @@
 		</createIndex>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v18.2.0-3">
+	<changeSet author="lkovacic" id="v18.2.0-4">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<indexExists tableName="germplsm_aud" indexName="germplsm_aud_aid_index"></indexExists>
