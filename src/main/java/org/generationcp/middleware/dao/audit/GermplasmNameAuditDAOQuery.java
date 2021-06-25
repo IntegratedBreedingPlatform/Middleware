@@ -1,6 +1,6 @@
 package org.generationcp.middleware.dao.audit;
 
-public class GermplasmNameAuditDAOQuery {
+class GermplasmNameAuditDAOQuery {
 
 	private final static String BASE_QUERY = "SELECT %s " // use of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ "       FROM names_aud n_aud "

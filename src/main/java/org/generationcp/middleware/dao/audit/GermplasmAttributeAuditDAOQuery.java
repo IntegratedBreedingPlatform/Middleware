@@ -1,6 +1,6 @@
 package org.generationcp.middleware.dao.audit;
 
-public class GermplasmAttributeAuditDAOQuery {
+class GermplasmAttributeAuditDAOQuery {
 
 	private final static String BASE_QUERY = "SELECT %s " // use of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ "       FROM atributs_aud a_aud "
