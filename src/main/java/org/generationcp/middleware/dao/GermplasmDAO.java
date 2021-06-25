@@ -1920,8 +1920,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ " vsr.sn AS "  + GermplasmDAO.SCALE_NAME + ", "  //
 				+ " vsr.sd AS " + GermplasmDAO.SCALE_DEFINITION + ", "  //
 				+ " vpo.alias  AS " + GermplasmDAO.VARIABLE_ALIAS + ", "  //
-				+ " vpo.expected_min AS " + GermplasmDAO.VARIABLE_EXPECTED_MAX + ", "  //
-				+ " vpo.expected_max AS " + GermplasmDAO.VARIABLE_EXPECTED_MIN
+				+ " vpo.expected_min AS " + GermplasmDAO.VARIABLE_EXPECTED_MIN + ", "  //
+				+ " vpo.expected_max AS " + GermplasmDAO.VARIABLE_EXPECTED_MAX
 				+ " FROM cvterm v INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
 				+ " and v.cvterm_id = cp.cvterm_id " //
 				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = " + TermRelationshipId.HAS_METHOD.getId() + ") vmr on vmr.vid = v.cvterm_id "

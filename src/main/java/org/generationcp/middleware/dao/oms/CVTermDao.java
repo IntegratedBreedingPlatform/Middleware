@@ -1798,8 +1798,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				+ " vsr.sn AS "  + CVTermDao.SCALE_NAME + ", "  //
 				+ " vsr.sd AS " + CVTermDao.SCALE_DEFINITION + ", "  //
 				+ " vpo.alias  AS " + CVTermDao.VARIABLE_ALIAS + ", "  //
-				+ " vpo.expected_min AS " + CVTermDao.VARIABLE_EXPECTED_MAX + ", "  //
-				+ " vpo.expected_max AS " + CVTermDao.VARIABLE_EXPECTED_MIN
+				+ " vpo.expected_min AS " + CVTermDao.VARIABLE_EXPECTED_MIN + ", "  //
+				+ " vpo.expected_max AS " + CVTermDao.VARIABLE_EXPECTED_MAX
 				+ " FROM cvterm v INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
 				+ " and v.cvterm_id = cp.cvterm_id " //
 				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
