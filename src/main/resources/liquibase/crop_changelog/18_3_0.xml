@@ -73,4 +73,25 @@
 		<comment>Adding unique constraint to labbr column of location table </comment>
 	    <addUniqueConstraint columnNames="labbr" constraintName="uk_location_labbr" tableName="location"/>
 	</changeSet>
+
+	<changeSet author="gelli" id="v18.3.0-6">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="ims_stock_transaction_bkp"/>
+		</preConditions>
+		<comment>
+			Drop unused table ims_stock_transaction_bkp if exists.
+		</comment>
+		<dropTable tableName="ims_stock_transaction_bkp"/>
+	</changeSet>
+
+	<changeSet author="gelli" id="v18.3.0-7">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="listdata_project_bkp" />
+		</preConditions>
+		<comment>
+			Remove unused table listdata_project_bkp
+		</comment>
+		<dropTable tableName="listdata_project_bkp" />
+	</changeSet>
+
 </databaseChangeLog>
