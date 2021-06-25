@@ -15,6 +15,12 @@ import java.util.List;
 
 public class GermplasmAuditDAO {
 
+	static final String REVISION_TYPE_ALIAS = "revisionType";
+	static final String CREATED_BY_ALIAS = "createdBy";
+	static final String CREATED_DATE_ALIAS = "createdDate";
+	static final String MODIFIED_BY_ALIAS = "modifiedBy";
+	static final String MODIFIED_DATE_ALIAS = "modifiedDate";
+
 	private final Session session;
 
 	public GermplasmAuditDAO(final Session session) {
@@ -25,21 +31,17 @@ public class GermplasmAuditDAO {
 		final SQLQuery query = this.session.createSQLQuery(GermplasmNameAuditDAOQuery.getSelectQuery());
 		query.setParameter("nid", nameId);
 
-		query.addScalar("revisionType", RevisionTypeResolver.INSTANCE);
-		query.addScalar("nameType");
-		query.addScalar("locationName");
-		query.addScalar("creationDate");
-		query.addScalar("value");
-		query.addScalar("createdDate");
-		query.addScalar("modifiedDate");
-		query.addScalar("preferred", BooleanType.INSTANCE);
-		query.addScalar("createdBy");
-		query.addScalar("modifiedBy");
-		query.addScalar("nameTypeChanged", BooleanType.INSTANCE);
-		query.addScalar("locationChanged", BooleanType.INSTANCE);
-		query.addScalar("creationDateChanged", BooleanType.INSTANCE);
-		query.addScalar("valueChanged", BooleanType.INSTANCE);
-		query.addScalar("preferredChanged", BooleanType.INSTANCE);
+		this.addCommonScalars(query);
+		query.addScalar(GermplasmNameAuditDAOQuery.NAME_TYPE_ALIAS);
+		query.addScalar(GermplasmNameAuditDAOQuery.LOCATION_NAME_ALIAS);
+		query.addScalar(GermplasmNameAuditDAOQuery.CREATION_DATE_ALIAS);
+		query.addScalar(GermplasmNameAuditDAOQuery.VALUE_ALIAS);
+		query.addScalar(GermplasmNameAuditDAOQuery.PREFERRED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmNameAuditDAOQuery.NAME_TYPE_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmNameAuditDAOQuery.LOCATION_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmNameAuditDAOQuery.CREATION_DATE_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmNameAuditDAOQuery.VALUE_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmNameAuditDAOQuery.PREFERRED_CHANGED_ALIAS, BooleanType.INSTANCE);
 		query.setResultTransformer(Transformers.aliasToBean(GermplasmNameAuditDTO.class));
 
 		GenericDAO.addPaginationToSQLQuery(query, pageable);
@@ -57,19 +59,15 @@ public class GermplasmAuditDAO {
 		final SQLQuery query = this.session.createSQLQuery(GermplasmAttributeAuditDAOQuery.getSelectQuery());
 		query.setParameter("aid", attributeId);
 
-		query.addScalar("revisionType", RevisionTypeResolver.INSTANCE);
-		query.addScalar("attributeType");
-		query.addScalar("locationName");
-		query.addScalar("creationDate");
-		query.addScalar("value");
-		query.addScalar("createdDate");
-		query.addScalar("modifiedDate");
-		query.addScalar("createdBy");
-		query.addScalar("modifiedBy");
-		query.addScalar("attributeTypeChanged", BooleanType.INSTANCE);
-		query.addScalar("valueChanged", BooleanType.INSTANCE);
-		query.addScalar("locationChanged", BooleanType.INSTANCE);
-		query.addScalar("creationDateChanged", BooleanType.INSTANCE);
+		this.addCommonScalars(query);
+		query.addScalar(GermplasmAttributeAuditDAOQuery.ATTRIBUTE_TYPE_ALIAS);
+		query.addScalar(GermplasmAttributeAuditDAOQuery.LOCATION_NAME_ALIAS);
+		query.addScalar(GermplasmAttributeAuditDAOQuery.CREATION_DATE_ALIAS);
+		query.addScalar(GermplasmAttributeAuditDAOQuery.VALUE_ALIAS);
+		query.addScalar(GermplasmAttributeAuditDAOQuery.ATTRIBUTE_TYPE_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmAttributeAuditDAOQuery.VALUE_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmAttributeAuditDAOQuery.LOCATION_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmAttributeAuditDAOQuery.CREATION_DATE_CHANGED_ALIAS, BooleanType.INSTANCE);
 		query.setResultTransformer(Transformers.aliasToBean(GermplasmAttributeAuditDTO.class));
 
 		GenericDAO.addPaginationToSQLQuery(query, pageable);
@@ -87,15 +85,11 @@ public class GermplasmAuditDAO {
 		final SQLQuery query = this.session.createSQLQuery(GermplasmBasicDetailsAuditDAOQuery.getSelectQuery());
 		query.setParameter("gid", gid);
 
-		query.addScalar("revisionType", RevisionTypeResolver.INSTANCE);
-		query.addScalar("locationName");
-		query.addScalar("creationDate");
-		query.addScalar("createdDate");
-		query.addScalar("modifiedDate");
-		query.addScalar("createdBy");
-		query.addScalar("modifiedBy");
-		query.addScalar("locationChanged", BooleanType.INSTANCE);
-		query.addScalar("creationDateChanged", BooleanType.INSTANCE);
+		this.addCommonScalars(query);
+		query.addScalar(GermplasmBasicDetailsAuditDAOQuery.LOCATION_NAME_ALIAS);
+		query.addScalar(GermplasmBasicDetailsAuditDAOQuery.CREATION_DATE_ALIAS);
+		query.addScalar(GermplasmBasicDetailsAuditDAOQuery.LOCATION_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmBasicDetailsAuditDAOQuery.CREATION_DATE_CHANGED_ALIAS, BooleanType.INSTANCE);
 		query.setResultTransformer(Transformers.aliasToBean(GermplasmBasicDetailsAuditDTO.class));
 
 		GenericDAO.addPaginationToSQLQuery(query, pageable);
@@ -107,6 +101,14 @@ public class GermplasmAuditDAO {
 		final SQLQuery query = this.session.createSQLQuery(GermplasmBasicDetailsAuditDAOQuery.getCountQuery());
 		query.setParameter("gid", gid);
 		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
+	private void addCommonScalars(final SQLQuery query) {
+		query.addScalar(REVISION_TYPE_ALIAS, RevisionTypeResolver.INSTANCE);
+		query.addScalar(CREATED_BY_ALIAS);
+		query.addScalar(CREATED_DATE_ALIAS);
+		query.addScalar(MODIFIED_BY_ALIAS);
+		query.addScalar(MODIFIED_DATE_ALIAS);
 	}
 
 }

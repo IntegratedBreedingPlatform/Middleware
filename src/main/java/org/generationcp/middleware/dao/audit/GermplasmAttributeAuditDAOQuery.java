@@ -2,6 +2,16 @@ package org.generationcp.middleware.dao.audit;
 
 class GermplasmAttributeAuditDAOQuery {
 
+	static final String ATTRIBUTE_TYPE_ALIAS = "attributeType";
+	static final String VALUE_ALIAS = "value";
+	static final String LOCATION_NAME_ALIAS = "locationName";
+	static final String CREATION_DATE_ALIAS = "creationDate";
+
+	static final String ATTRIBUTE_TYPE_CHANGED_ALIAS = "attributeTypeChanged";
+	static final String VALUE_CHANGED_ALIAS = "valueChanged";
+	static final String LOCATION_CHANGED_ALIAS = "locationChanged";
+	static final String CREATION_DATE_CHANGED_ALIAS = "creationDateChanged";
+
 	private final static String BASE_QUERY = "SELECT %s " // use of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ "       FROM atributs_aud a_aud "
 		+ "    INNER JOIN udflds user_defined_field ON a_aud.atype = user_defined_field.fldno "
@@ -10,19 +20,19 @@ class GermplasmAttributeAuditDAOQuery {
 		+ " WHERE a_aud.aid = :aid "
 		+ " %s"; // use of ORDER_EXPRESION -> It's not needed for the count query
 
-	private static final String SELECT_EXPRESION = "user_defined_field.fcode AS attributeType, "
-		+ " a_aud.aval AS value, "
-		+ " loc.lname AS locationName, "
-		+ " cast(a_aud.adate as char) AS creationDate, "
-		+ " a_aud.rev_type AS revisionType, "
-		+ " a_aud.created_date AS createdDate, "
-		+ " a_aud.modified_date AS modifiedDate, "
-		+ " (SELECT uname FROM workbench.users WHERE users.userid = a_aud.created_by) AS createdBy, "
-		+ " (SELECT uname FROM workbench.users WHERE users.userid = a_aud.modified_by) AS modifiedBy, "
-		+ " IF(a_aud.atype = coalesce(prev_a_aud.atype, a_aud.atype), false, true) as attributeTypeChanged, "
-		+ " IF(a_aud.aval = coalesce(prev_a_aud.aval, a_aud.aval), false, true) as valueChanged, "
-		+ " IF(a_aud.alocn = coalesce(prev_a_aud.alocn, a_aud.alocn), false, true) as locationChanged, "
-		+ " IF(a_aud.adate = coalesce(prev_a_aud.adate, a_aud.adate), false, true) as creationDateChanged";
+	private static final String SELECT_EXPRESION = "user_defined_field.fcode AS " + ATTRIBUTE_TYPE_ALIAS + ", "
+		+ " a_aud.aval AS " + VALUE_ALIAS + ", "
+		+ " loc.lname AS " + LOCATION_NAME_ALIAS + ", "
+		+ " cast(a_aud.adate as char) AS " + CREATION_DATE_ALIAS + ", "
+		+ " a_aud.rev_type AS " + GermplasmAuditDAO.REVISION_TYPE_ALIAS + ", "
+		+ " a_aud.created_date AS " + GermplasmAuditDAO.CREATED_DATE_ALIAS + ", "
+		+ " a_aud.modified_date AS " + GermplasmAuditDAO.MODIFIED_DATE_ALIAS + ", "
+		+ " (SELECT uname FROM workbench.users WHERE users.userid = a_aud.created_by) AS " + GermplasmAuditDAO.CREATED_BY_ALIAS + ", "
+		+ " (SELECT uname FROM workbench.users WHERE users.userid = a_aud.modified_by) AS " + GermplasmAuditDAO.MODIFIED_BY_ALIAS + ", "
+		+ " IF(a_aud.atype = coalesce(prev_a_aud.atype, a_aud.atype), false, true) as " + ATTRIBUTE_TYPE_CHANGED_ALIAS + ", "
+		+ " IF(a_aud.aval = coalesce(prev_a_aud.aval, a_aud.aval), false, true) as " + VALUE_CHANGED_ALIAS + ", "
+		+ " IF(a_aud.alocn = coalesce(prev_a_aud.alocn, a_aud.alocn), false, true) as " + LOCATION_CHANGED_ALIAS + ", "
+		+ " IF(a_aud.adate = coalesce(prev_a_aud.adate, a_aud.adate), false, true) as " + CREATION_DATE_CHANGED_ALIAS;
 
 	/**
 	 * This is used to compare current values with previous ones and check if they have changed.
@@ -37,11 +47,11 @@ class GermplasmAttributeAuditDAOQuery {
 
 	private static final String ORDER_EXPRESION = " ORDER BY a_aud.aud_id DESC ";
 
-	public static String getSelectQuery() {
+	static String getSelectQuery() {
 		return String.format(BASE_QUERY, SELECT_EXPRESION, SELF_JOIN_QUERY, ORDER_EXPRESION);
 	}
 
-	public static String getCountQuery() {
+	static String getCountQuery() {
 		return String.format(BASE_QUERY, COUNT_EXPRESSION, "", "");
 	}
 
