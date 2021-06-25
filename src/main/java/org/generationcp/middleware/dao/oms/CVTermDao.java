@@ -32,7 +32,6 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.service.api.study.VariableDTO;
@@ -475,47 +474,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return terms;
 	}
 
-	public List<CVTerm> getValidCvTermsByIds(final List<Integer> ids, final int storedInId, final int dataTypeId) {
-		final List<CVTerm> terms = new ArrayList<>();
-
-		if (ids != null && !ids.isEmpty()) {
-			try {
-				final StringBuilder queryString = new StringBuilder()
-					.append("SELECT cvt.cvterm_id, cvt.name, cvt.definition ").append("FROM cvterm cvt ")
-					.append("INNER JOIN cvterm_relationship datatype ON datatype.subject_id = cvt.cvterm_id ")
-					.append(" AND datatype.type_id = ").append(TermId.HAS_TYPE.getId())
-					.append(" INNER JOIN cvterm_relationship stored_in ON datatype.subject_id = stored_in.subject_id ")
-					.append(" AND stored_in.type_id = ").append(TermId.STORED_IN.getId())
-					.append(" WHERE cvt.cvterm_id in (:ids)")
-					.append(" AND (stored_in.object_id <> :storedIn OR (stored_in.object_id = :storedIn ")
-					.append(" AND datatype.object_id = :datatype))");
-
-				final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-				query.setParameterList("ids", ids);
-				query.setParameter("storedIn", storedInId);
-				query.setParameter("datatype", dataTypeId);
-
-				final List<Object[]> list = query.list();
-
-				for (final Object[] row : list) {
-					final Integer id = (Integer) row[0];
-					final String name = (String) row[1];
-					final String definition = (String) row[2];
-
-					final CVTerm cvTerm = new CVTerm();
-					cvTerm.setCvTermId(id);
-					cvTerm.setName(name);
-					cvTerm.setDefinition(definition);
-					terms.add(cvTerm);
-				}
-			} catch (final HibernateException e) {
-				this.logAndThrowException(
-					"Error at getValidCvTermsByIds=" + ids + " query on CVTermDao: " + e.getMessage(), e);
-			}
-		}
-		return terms;
-	}
-
 	public List<CVTerm> getVariablesByType(final List<Integer> types) {
 		final List<CVTerm> terms = new ArrayList<>();
 
@@ -913,38 +871,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	}
 
-	public List<CVTerm> getIsAOfTermsByCvId(final CvId cvId, final int start, final int numOfRows) {
-		final List<CVTerm> terms = new ArrayList<>();
-
-		try {
-
-			final SQLQuery query = this.getSession().createSQLQuery(
-				"SELECT DISTINCT isA.cvterm_id, isA.name, isA.definition, isA.dbxref_id, isA.is_obsolete, isA.is_relationshiptype "
-					+ "FROM cvterm isA, cvterm_relationship rel, cvterm subj " + "WHERE subj.cv_id = :cvId "
-					+ "AND subj.cvterm_id = rel.subject_id " + "AND rel.object_id = isA.cvterm_id "
-					+ "AND rel.type_id = " + TermId.IS_A.getId() + " " + "ORDER BY isA.name, isA.cvterm_id ");
-			query.setParameter("cvId", cvId.getId());
-			this.setStartAndNumOfRows(query, start, numOfRows);
-			final List<Object[]> list = query.list();
-			for (final Object[] row : list) {
-				final Integer termId = (Integer) row[0];
-				final String name = (String) row[1];
-				final String definition = (String) row[2];
-				final Integer dbxrefId = (Integer) row[3];
-				final Integer isObsolete = (Integer) row[4];
-				final Integer isRelationshipType = (Integer) row[5];
-
-				terms.add(new CVTerm(termId, cvId.getId(), name, definition, dbxrefId, isObsolete, isRelationshipType));
-
-			}
-
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at getTermsByCvId() query on CVTermDao: " + e.getMessage(), e);
-		}
-
-		return terms;
-	}
-
 	public long countIsAOfTermsByCvId(final CvId cvId) {
 
 		try {
@@ -995,44 +921,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		} catch (final HibernateException e) {
 			this.logAndThrowException("Error at getTermOfProperty=" + termId + " query on CVTermDao: " + e.getMessage(),
 				e);
-		}
-
-		return term;
-	}
-
-	public CVTerm getTermOfClassOfProperty(final int termId, final int cvId, final int isATermId) {
-		CVTerm term = null;
-
-		try {
-			final StringBuilder sqlString = new StringBuilder().append("SELECT cvt.* ").append("FROM cvterm cvt ")
-				.append("INNER JOIN cvterm_relationship cvr on cvr.object_id = cvt.cvterm_id ")
-				.append("INNER JOIN cvterm v on cvr.subject_id = v.cvterm_id ")
-				.append("WHERE cvr.type_id = :isAtermId AND v.cv_id = :cvId AND v.cvterm_id = :termId");
-
-			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
-			query.setParameter("termId", termId);
-			query.setParameter("isAtermId", isATermId);
-			query.setParameter("cvId", cvId);
-
-			final List<Object[]> results = query.list();
-
-			if (!results.isEmpty()) {
-				final Object[] row = results.get(0);
-				final Integer cvtermId = (Integer) row[0];
-				final Integer cvtermCvId = (Integer) row[1];
-				final String cvtermName = (String) row[2];
-				final String cvtermDefinition = (String) row[3];
-				final Integer dbxrefId = (Integer) row[4];
-				final Integer isObsolete = (Integer) row[5];
-				final Integer isRelationshipType = (Integer) row[6];
-
-				term = new CVTerm(cvtermId, cvtermCvId, cvtermName, cvtermDefinition, dbxrefId, isObsolete,
-					isRelationshipType);
-			}
-
-		} catch (final HibernateException e) {
-			this.logAndThrowException(
-				"Error at getTermOfClassOfProperty=" + termId + " query on CVTermDao: " + e.getMessage(), e);
 		}
 
 		return term;
@@ -1591,13 +1479,11 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	 * Gets the list of all variables in the database filtered by variableTypes.
 	 *
 	 * @param variableTypes
-	 * @param cropName
 	 * @param pageSize
 	 * @param pageNumber
 	 * @return
 	 */
-	public List<VariableDTO> getAllVariables(final List<Integer> variableTypes,
-		final String cropName, final Integer pageSize, final Integer pageNumber) {
+	public List<VariableDTO> getAllVariables(final List<Integer> variableTypes, final Integer pageSize, final Integer pageNumber) {
 
 		final SQLQuery sqlQuery = this.createVariableQuery(null, variableTypes);
 		this.appendGetVariablesScalar(sqlQuery);
@@ -1853,7 +1739,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			}
 
 			scale.setDataType(this.convertDataTypeToVariableDtoScale((Integer) result.get(VARIABLE_DATA_TYPE_ID)));
-			scale.setDecimalPlaces(DataType.NUMERIC_VARIABLE.getId().equals((Integer) result.get(VARIABLE_DATA_TYPE_ID)) ? 4 : null);
+			scale.setDecimalPlaces(DataType.NUMERIC_VARIABLE.getId().equals(result.get(VARIABLE_DATA_TYPE_ID)) ? 4 : null);
 			final List<String> categories = result.get(VARIABLE_SCALE_CATEGORIES) != null ?
 				Arrays.asList(StringUtils.split(String.valueOf(result.get(VARIABLE_SCALE_CATEGORIES)), "|")) : new ArrayList<>();
 			scale.getValidValues().setCategories(categories);

@@ -1080,7 +1080,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Override
 	public List<VariableDTO> getAllVariables(final List<Integer> variableTypes,
 		final String cropname, final Integer pageSize, final Integer pageNumber) {
-		return this.daoFactory.getCvTermDao().getAllVariables(variableTypes, cropname, pageSize, pageNumber);
+		return this.daoFactory.getCvTermDao().getAllVariables(variableTypes, pageSize, pageNumber);
 	}
 
 	@Override
