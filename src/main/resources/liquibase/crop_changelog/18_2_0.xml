@@ -53,4 +53,16 @@
 		</createIndex>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="v18.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="atributs_aud" indexName="atributs_aud_aid_index"></indexExists>
+			</not>
+		</preConditions>
+		<comment>Add index for atributs_aud aid column</comment>
+		<createIndex indexName="atributs_aud_aid_index" tableName="atributs_aud" unique="false">
+			<column name="aid"></column>
+		</createIndex>
+	</changeSet>
+
 </databaseChangeLog>
