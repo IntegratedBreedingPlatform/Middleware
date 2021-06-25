@@ -48,7 +48,6 @@ import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
-import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -130,6 +129,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@SuppressWarnings("rawtypes")
 	@Override
 	//FIXME Move queries to DAOs https://ibplatform.atlassian.net/browse/IBP-4705
+	//IMPORTANT: This filter executes an UNION of:
+	//VariableIds and VariableTypes
+	//PropertyIds and PropertyClasses
+	//ScaleIds and DataTypes
+	//In any other case executes an AND
+	//DO NOT COMBINE BETWEEN THEM BECAUSE IT CAN RETRIEVE UNEXPECTED RESULTS
 	public List<Variable> getWithFilter(final VariableFilter variableFilter) {
 
 		final Map<Integer, Variable> map = new HashMap<>();
