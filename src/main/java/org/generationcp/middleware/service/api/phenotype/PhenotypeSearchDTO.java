@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.api.phenotype;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
+import org.generationcp.middleware.api.brapi.v2.observationunit.Treatment;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -102,27 +103,6 @@ public class PhenotypeSearchDTO {
 
 		public void setSource(final String source) {
 			this.source = source;
-		}
-	}
-
-	public static class Treatment {
-		private String factor;
-		private String modality;
-
-		public String getFactor() {
-			return this.factor;
-		}
-
-		public void setFactor(final String factor) {
-			this.factor = factor;
-		}
-
-		public String getModality() {
-			return this.modality;
-		}
-
-		public void setModality(final String modality) {
-			this.modality = modality;
 		}
 	}
 
