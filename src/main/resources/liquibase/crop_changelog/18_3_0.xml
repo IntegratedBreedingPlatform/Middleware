@@ -94,4 +94,14 @@
 		<dropTable tableName="listdata_project_bkp" />
 	</changeSet>
 
+	<changeSet author="gelli" id="v18.3.0-8">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="listnms_bkp" />
+		</preConditions>
+		<comment>
+			Remove unused table listnms_bkp
+		</comment>
+		<dropTable tableName="listnms_bkp" />
+	</changeSet>
+
 </databaseChangeLog>
