@@ -128,15 +128,10 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		"SELECT {g.*}, {n.*} " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
 			+ "WHERE g.mgid = :gid AND  g.deleted = 0  and g.grplce = 0 ORDER BY g.gid";
 
-	public static final String COUNT_MANAGEMENT_NEIGHBORS =
-		"SELECT COUNT(g.gid) " + "FROM germplsm g " + "WHERE g.mgid = :gid AND  g.deleted = 0  and g.grplce = 0";
 	public static final String GET_GROUP_RELATIVES =
 		"SELECT {g.*}, {n.*} " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "
 			+ "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 " + "WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid "
 			+ "AND g.gpid1 != 0 AND  g.deleted = 0  AND g.grplce = 0";
-	public static final String COUNT_GROUP_RELATIVES =
-		"SELECT COUNT(g.gid) " + "FROM germplsm g " + "JOIN germplsm g2 ON g.gpid1 = g2.gpid1 "
-			+ "WHERE g.gnpgs = -1 AND g.gid <> :gid AND g2.gid = :gid " + "AND g.gpid1 != 0 AND  g.deleted = 0  AND g.grplce = 0";
 
 	public static final String GET_DERIVATIVE_CHILDREN =
 		"SELECT {g.*}, {n.*} " + "FROM germplsm g LEFT JOIN names n ON g.gid = n.gid AND n.nstat = 1 "

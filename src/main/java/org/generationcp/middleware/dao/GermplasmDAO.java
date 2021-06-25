@@ -482,39 +482,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return toreturn;
 	}
 
-	public long countManagementNeighbors(final Integer gid) {
-		try {
-			if (gid != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(Germplasm.COUNT_MANAGEMENT_NEIGHBORS);
-				query.setParameter("gid", gid);
-				final BigInteger count = (BigInteger) query.uniqueResult();
-				return count.longValue();
-			}
-		} catch (final HibernateException e) {
-			final String errorMessage =
-				"Error with countManagementNeighbors(gid=" + gid + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
-			GermplasmDAO.LOG.error(errorMessage, e);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-		return 0;
-	}
-
-	public long countGroupRelatives(final Integer gid) {
-		try {
-			if (gid != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(Germplasm.COUNT_GROUP_RELATIVES);
-				query.setParameter("gid", gid);
-				final BigInteger count = (BigInteger) query.uniqueResult();
-				return count.longValue();
-			}
-		} catch (final HibernateException e) {
-			final String errorMessage = "Error with countGroupRelatives(gid=" + gid + GermplasmDAO.QUERY_FROM_GERMPLASM + e.getMessage();
-			GermplasmDAO.LOG.error(errorMessage, e);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-		return 0;
-	}
-
 	public List<Germplasm> getGroupRelatives(final Integer gid, final int start, final int numRows) {
 		final List<Germplasm> toreturn = new ArrayList<>();
 		try {
@@ -1856,7 +1823,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	private boolean isNewParentANodeDescendant(final Set<Integer> path, final Set<Integer> parents, final Integer node, int level,
-		int maxRecursiveQueries) {
+		final int maxRecursiveQueries) {
 
 		parents.remove(0);
 		parents.removeAll(path);
@@ -1890,7 +1857,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	private List<Integer> findDerivativeNodes(final List<Integer> parentNodes, int level, int maxRecursiveQueries) {
+	private List<Integer> findDerivativeNodes(final List<Integer> parentNodes, int level, final int maxRecursiveQueries) {
 		if (++level > maxRecursiveQueries) {
 			throw new MiddlewareRequestException("", "germplasm.update.germplasm.max.recursive.queries.reached", "");
 		}
