@@ -41,4 +41,15 @@ public class GermplasmAuditServiceImpl implements GermplasmAuditService {
 	public long countAttributeChangesByAttributeId(final Integer attributeId) {
 		return this.daoFactory.getGermplasmAuditDAO().countAttributeChangesByAttributeId(attributeId);
 	}
+
+	@Override
+	public List<GermplasmBasicDetailsAuditDTO> getBasicDetailsChangesByGid(final Integer gid, final Pageable pageable) {
+		return this.daoFactory.getGermplasmAuditDAO().getBasicDetailsChangesByGid(gid, pageable);
+	}
+
+	@Override
+	public long countBasicDetailsChangesByGid(final Integer gid) {
+		return this.daoFactory.getGermplasmAuditDAO().countBasicDetailsChangesByGid(gid);
+	}
+
 }

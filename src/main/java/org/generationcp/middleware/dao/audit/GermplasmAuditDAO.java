@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao.audit;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO;
+import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -79,6 +80,32 @@ public class GermplasmAuditDAO {
 	public long countAttributeChangesByAttributeId(final Integer nameId) {
 		final SQLQuery query = this.session.createSQLQuery(GermplasmAttributeAuditDAOQuery.getCountQuery());
 		query.setParameter("aid", nameId);
+		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
+	public List<GermplasmBasicDetailsAuditDTO> getBasicDetailsChangesByGid(final Integer gid, final Pageable pageable) {
+		final SQLQuery query = this.session.createSQLQuery(GermplasmBasicDetailsAuditDAOQuery.getSelectQuery());
+		query.setParameter("gid", gid);
+
+		query.addScalar("revisionType", RevisionTypeResolver.INSTANCE);
+		query.addScalar("locationName");
+		query.addScalar("creationDate");
+		query.addScalar("createdDate");
+		query.addScalar("modifiedDate");
+		query.addScalar("createdBy");
+		query.addScalar("modifiedBy");
+		query.addScalar("locationChanged", BooleanType.INSTANCE);
+		query.addScalar("creationDateChanged", BooleanType.INSTANCE);
+		query.setResultTransformer(Transformers.aliasToBean(GermplasmBasicDetailsAuditDTO.class));
+
+		GenericDAO.addPaginationToSQLQuery(query, pageable);
+
+		return (List<GermplasmBasicDetailsAuditDTO>) query.list();
+	}
+
+	public long countBasicDetailsChangesByGid(final Integer gid) {
+		final SQLQuery query = this.session.createSQLQuery(GermplasmBasicDetailsAuditDAOQuery.getCountQuery());
+		query.setParameter("gid", gid);
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
