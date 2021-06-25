@@ -109,7 +109,7 @@ public interface GermplasmService {
 
 	PedigreeDTO getPedigree(Integer gid, String notation, Boolean includeSiblings);
 
-	ProgenyDTO getProgeny(final Integer gid);
+	ProgenyDTO getProgeny(Integer gid);
 
 	List<AttributeDTO> getAttributesByGUID(String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
 
