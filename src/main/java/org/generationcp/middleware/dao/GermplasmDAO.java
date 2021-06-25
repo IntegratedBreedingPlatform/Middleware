@@ -1951,8 +1951,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			sqlQuery.addScalar(GermplasmDAO.SCALE_NAME);
 			sqlQuery.addScalar(GermplasmDAO.SCALE_DEFINITION);
 			sqlQuery.addScalar(GermplasmDAO.VARIABLE_ALIAS);
-			sqlQuery.addScalar(GermplasmDAO.VARIABLE_EXPECTED_MAX);
 			sqlQuery.addScalar(GermplasmDAO.VARIABLE_EXPECTED_MIN);
+			sqlQuery.addScalar(GermplasmDAO.VARIABLE_EXPECTED_MAX);
 
 			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) sqlQuery.list();
 			final List<Variable> variables = new ArrayList<>();

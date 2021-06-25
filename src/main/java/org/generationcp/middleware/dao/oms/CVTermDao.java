@@ -1833,8 +1833,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			sqlQuery.addScalar(CVTermDao.SCALE_NAME);
 			sqlQuery.addScalar(CVTermDao.SCALE_DEFINITION);
 			sqlQuery.addScalar(CVTermDao.VARIABLE_ALIAS);
-			sqlQuery.addScalar(CVTermDao.VARIABLE_EXPECTED_MAX);
 			sqlQuery.addScalar(CVTermDao.VARIABLE_EXPECTED_MIN);
+			sqlQuery.addScalar(CVTermDao.VARIABLE_EXPECTED_MAX);
 
 			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) sqlQuery.list();
 
