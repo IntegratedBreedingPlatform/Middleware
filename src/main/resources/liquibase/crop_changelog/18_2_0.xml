@@ -65,4 +65,16 @@
 		</createIndex>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="v18.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="germplsm_aud" indexName="germplsm_aud_aid_index"></indexExists>
+			</not>
+		</preConditions>
+		<comment>Add index for germplsm_aud gid column</comment>
+		<createIndex indexName="germplsm_aud_gid_index" tableName="germplsm_aud" unique="false">
+			<column name="gid"></column>
+		</createIndex>
+	</changeSet>
+
 </databaseChangeLog>
