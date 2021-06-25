@@ -3,15 +3,13 @@ package org.generationcp.middleware.service.impl.audit;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.util.Date;
-
 @AutoProperty
 public class GermplasmAttributeAuditDTO extends AbstractAuditDTO {
 
 	private String attributeType;
 	private String locationName;
 	private String value;
-	private Date creationDate;
+	private String creationDate;
 
 	private boolean attributeTypeChanged;
 	private boolean locationChanged;
@@ -45,11 +43,11 @@ public class GermplasmAttributeAuditDTO extends AbstractAuditDTO {
 		this.value = value;
 	}
 
-	public Date getCreationDate() {
+	public String getCreationDate() {
 		return creationDate;
 	}
 
-	public void setCreationDate(final Date creationDate) {
+	public void setCreationDate(final String creationDate) {
 		this.creationDate = creationDate;
 	}
 

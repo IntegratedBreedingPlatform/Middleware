@@ -13,7 +13,7 @@ class GermplasmNameAuditDAOQuery {
 	private static final String SELECT_EXPRESION = "user_defined_field.fcode AS nameType, "
 		+ "  n_aud.nval AS value, "
 		+ "  loc.lname AS locationName, "
-		+ "  Str_to_date(n_aud.ndate, '%Y%m%d') AS creationDate, "
+		+ "  cast(n_aud.ndate as char) AS creationDate, "
 		+ "  n_aud.nstat AS preferred, "
 		+ "  n_aud.rev_type AS revisionType, "
 		+ "  n_aud.created_date AS createdDate, "
