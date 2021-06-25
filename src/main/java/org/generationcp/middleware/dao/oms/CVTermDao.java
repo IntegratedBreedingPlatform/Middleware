@@ -1899,8 +1899,21 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			return Collections.EMPTY_LIST;
 		}
 		try { final SQLQuery sqlQuery = this.getSession().createSQLQuery("select "
-				+ " v.cvterm_id variableId, v.name variableName, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, \n"
-				+ " vpo.alias alias, vpo.expected_min expectedMin, vpo.expected_max expectedMax" //
+				+ " v.cvterm_id AS " + CVTermDao.VARIABLE_ID + ", "  //
+				+ " v.name AS " + CVTermDao.VARIABLE_NAME + ", "  //
+				+ " v.definition AS " + CVTermDao.VARIABLE_DEFINITION + ", "  //
+				+ " vmr.mid AS "  + CVTermDao.METHOD_ID + ", "  //
+				+ " vmr.mn AS "  + CVTermDao.METHOD_NAME + ", "  //
+				+ " vmr.md AS "  + CVTermDao.METHOD_DEFINITION + ", "  //
+				+ " vpr.pid AS "  + CVTermDao.PROPERTY_ID + ", "  //
+				+ " vpr.pn AS "  + CVTermDao.PROPERTY_NAME + ", "  //
+				+ " vpr.pd AS "  + CVTermDao.PROPERTY_DEFINITION + ", "  //
+				+ " vsr.sid AS "  + CVTermDao.SCALE_ID + ", "  //
+				+ " vsr.sn AS "  + CVTermDao.SCALE_NAME + ", "  //
+				+ " vsr.sd AS " + CVTermDao.SCALE_DEFINITION + ", "  //
+				+ " vpo.alias  AS " + CVTermDao.VARIABLE_ALIAS + ", "  //
+				+ " vpo.expected_min AS " + CVTermDao.VARIABLE_EXPECTED_MAX + ", "  //
+				+ " vpo.expected_max AS " + CVTermDao.VARIABLE_EXPECTED_MIN
 				+ " FROM cvterm v INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
 				+ " and v.cvterm_id = cp.cvterm_id " //
 				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
@@ -1908,10 +1921,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				+ " left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
 				+ " left join variable_overrides vpo ON vpo.cvterm_id = v.cvterm_id AND vpo.program_uuid = :programUUID " //
 				+ " WHERE v.cv_id = " + CvId.VARIABLES.getId() + " "  //
-				+ "		and cp.value in (select name from cvterm where cvterm_id in (" //
-				+ VariableType.GERMPLASM_PASSPORT.getId() + "," //
-				+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ")) " //
-				+ "   AND (v.definition like :fname or v.name like :name or vpo.alias like :alias )" //
+				+ "   AND cp.value in (select name from cvterm where cvterm_id in ( " //
+				+ 			VariableType.GERMPLASM_PASSPORT.getId() + "," //
+				+ 			VariableType.GERMPLASM_ATTRIBUTE.getId() + " ) ) " //
+				+ "   AND (v.definition like :" + CVTermDao.FNAME
+				+ " 		or v.name like :" + CVTermDao.NAME
+				+ " 		or vpo.alias like :" + CVTermDao.ALIAS + " ) "//
 				+ " LIMIT 100 ");
 			sqlQuery.setParameter(CVTermDao.PROGRAMUUID, programUUID);
 			sqlQuery.setParameter(CVTermDao.FNAME, '%' + query + '%');
