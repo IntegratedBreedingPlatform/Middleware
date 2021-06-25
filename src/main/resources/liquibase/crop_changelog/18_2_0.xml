@@ -77,4 +77,16 @@
 		</createIndex>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="v18.2.0-5">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="bibrefs_aud" indexName="bibrefs_aud_refid_index"></indexExists>
+			</not>
+		</preConditions>
+		<comment>Add index for bibrefs_aud refid column</comment>
+		<createIndex indexName="bibrefs_aud_refid_index" tableName="bibrefs_aud" unique="false">
+			<column name="refid"></column>
+		</createIndex>
+	</changeSet>
+
 </databaseChangeLog>

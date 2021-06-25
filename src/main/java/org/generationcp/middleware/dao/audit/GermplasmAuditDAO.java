@@ -4,6 +4,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
+import org.generationcp.middleware.service.impl.audit.GermplasmReferenceAuditDTO;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
@@ -100,6 +101,26 @@ public class GermplasmAuditDAO {
 	public long countBasicDetailsChangesByGid(final Integer gid) {
 		final SQLQuery query = this.session.createSQLQuery(GermplasmBasicDetailsAuditDAOQuery.getCountQuery());
 		query.setParameter("gid", gid);
+		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
+	public List<GermplasmReferenceAuditDTO> getReferenceChangesByReferenceId(final Integer referenceId, final Pageable pageable) {
+		final SQLQuery query = this.session.createSQLQuery(GermplasmReferenceAuditDAOQuery.getSelectQuery());
+		query.setParameter("refId", referenceId);
+
+		this.addCommonScalars(query);
+		query.addScalar(GermplasmReferenceAuditDAOQuery.VALUE_ALIAS);
+		query.addScalar(GermplasmReferenceAuditDAOQuery.VALUE_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.setResultTransformer(Transformers.aliasToBean(GermplasmReferenceAuditDTO.class));
+
+		GenericDAO.addPaginationToSQLQuery(query, pageable);
+
+		return (List<GermplasmReferenceAuditDTO>) query.list();
+	}
+
+	public long countReferenceChangesByReferenceId(final Integer referenceId) {
+		final SQLQuery query = this.session.createSQLQuery(GermplasmReferenceAuditDAOQuery.getCountQuery());
+		query.setParameter("refId", referenceId);
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
