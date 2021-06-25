@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
+import org.generationcp.middleware.api.brapi.v2.observationunit.Treatment;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -1050,7 +1051,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final String factor = (String) result[0];
 				final String modality = (String) result[1];
 				final Integer ndExperimentId = (Integer) result[2];
-				final PhenotypeSearchDTO.Treatment treatment = new PhenotypeSearchDTO.Treatment();
+				final Treatment treatment = new Treatment();
 				treatment.setFactor(factor);
 				treatment.setModality(modality);
 				final PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
