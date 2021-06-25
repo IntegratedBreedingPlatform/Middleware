@@ -125,6 +125,6 @@ public interface GermplasmService {
 
 	void updateGermplasmPedigree(Integer gid, ProgenitorsUpdateRequestDto progenitorsUpdateRequstDto);
 
-	public List<Variable> getGermplasmAttributeVariables(final List<Integer> gids, final String programUUID);
+	List<Variable> getGermplasmAttributeVariables(List<Integer> gids, String programUUID);
 
 }
