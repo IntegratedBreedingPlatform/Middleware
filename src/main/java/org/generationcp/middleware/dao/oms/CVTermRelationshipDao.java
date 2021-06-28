@@ -277,12 +277,12 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		final SQLQuery query = this.getSession().createSQLQuery(
 			"SELECT DISTINCT v.name category "
 				+ " FROM cvterm_relationship scale_values "
-				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id "
-				+ " WHERE scale_values.subject_id = :scaleId AND scale_values.type_id = " + TermId.HAS_VALUE.getId()
-				+ " AND EXISTS ( "
+				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id and scale_values.subject_id = :scaleId and scale_values.type_id = " + TermId.HAS_VALUE.getId()
+				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE.getId()
+				+ " WHERE EXISTS ( "
 				+ "     SELECT 1    	 "
 				+ "     FROM atributs a "
-				+ "     WHERE a.cval_id = v.cvterm_id ) ");
+				+ "     WHERE a.cval_id = v.cvterm_id and a.atype = var.subject_id ) ");
 		query.setParameter("scaleId", scaleId);
 		query.addScalar("category", CVTermRelationshipDao.STRING);
 		return query.list();
