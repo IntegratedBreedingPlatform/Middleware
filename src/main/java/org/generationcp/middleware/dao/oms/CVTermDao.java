@@ -1780,6 +1780,14 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 	}
 
+	/**
+	 * Return a list of variables with type GERMPLASM_PASSPORT, GERMPLASM_ATTRIBUTE that match definition, name or alias.
+	 * The programUUID is used to return the expected range and alias of the program if it exists.
+	 *
+	 * @param query used like condition to match definition, name or alias.
+	 * @param programUUID program's unique id
+	 * @return List of Variable or empty list if none found
+	 */
 	public List<Variable> searchAttributeVariables(final String query, final String programUUID) {
 		if (StringUtils.isBlank(query)) {
 			return Collections.EMPTY_LIST;
@@ -1861,7 +1869,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			return variables;
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with searchAttributes(query=" + query + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with searchAttributeVariables(query=" + query + "): " + e.getMessage(), e);
 		}
 	}
 

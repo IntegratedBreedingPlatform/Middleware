@@ -1904,6 +1904,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 
+	/**
+	 * Given a list of Germplasms return the Variables related with type GERMPLASM_PASSPORT, GERMPLASM_ATTRIBUTE.
+	 * The programUUID is used to return the expected range and alias of the program if it exists.
+	 *
+	 * @param List of gids
+	 * @param programUUID program's unique id
+	 * @return List of Variable or empty list if none found
+	 */
 	public List<Variable> getGermplasmAttributeVariables(final List<Integer> gids, final String programUUID) {
 		try {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery("select "
@@ -1978,7 +1986,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			return variables;
 		} catch (final HibernateException e) {
 			final String message =
-				"Error with getGermplasmAttributeTypes(gids=" + gids + ") : " + e.getMessage();
+				"Error with getGermplasmAttributeVariables(gids=" + gids + ") : " + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
