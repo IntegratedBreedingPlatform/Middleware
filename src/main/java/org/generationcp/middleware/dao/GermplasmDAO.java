@@ -1924,17 +1924,18 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ " vpo.expected_max AS " + GermplasmDAO.VARIABLE_EXPECTED_MAX
 				+ " FROM cvterm v INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
 				+ " and v.cvterm_id = cp.cvterm_id " //
+				+ " INNER JOIN cvterm varType on varType.name = cp.value AND varType.cvterm_id in (" //
+				+ 			VariableType.GERMPLASM_PASSPORT.getId() + "," //
+				+ 			VariableType.GERMPLASM_ATTRIBUTE.getId() + ") " //
 				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = " + TermRelationshipId.HAS_METHOD.getId() + ") vmr on vmr.vid = v.cvterm_id "
 				+ " left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = " + TermRelationshipId.HAS_PROPERTY.getId() + ") vpr on vpr.vid = v.cvterm_id "
 				+ " left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = " + TermRelationshipId.HAS_SCALE.getId() + ") vsr on vsr.vid = v.cvterm_id "
 				+ " left join variable_overrides vpo ON vpo.cvterm_id = v.cvterm_id AND vpo.program_uuid = :" + GermplasmDAO.PROGRAM_UUID //
 				+ " inner join atributs a  on a.atype = v.cvterm_id " //
-				+ " WHERE v.cv_id = " + CvId.VARIABLES.getId() + " "  //
-				+ "		and cp.value in (select name from cvterm where cvterm_id in (" //
-				+ 			VariableType.GERMPLASM_PASSPORT.getId() + "," //
-				+ 			VariableType.GERMPLASM_ATTRIBUTE.getId() + ") ) " //
-				+ " and a.gid in (:" + GermplasmDAO.GIDS + ")" //
+				+ " WHERE "
+				+ " a.gid in (:" + GermplasmDAO.GIDS + ")" //
 				+ " group by v.cvterm_id");
+
 			sqlQuery.setParameter(GermplasmDAO.PROGRAM_UUID, programUUID);
 			sqlQuery.setParameterList(GermplasmDAO.GIDS, gids);
 			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
