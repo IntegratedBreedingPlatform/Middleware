@@ -28,7 +28,7 @@ public enum UDTableType {
 	private String table;
 	private String type;
 
-	private UDTableType(String table, String type) {
+	UDTableType(final String table, final String type) {
 		this.table = table;
 		this.type = type;
 	}
@@ -37,7 +37,7 @@ public enum UDTableType {
 		return this.table;
 	}
 
-	public void setTable(String fTable) {
+	public void setTable(final String fTable) {
 		this.table = fTable;
 	}
 
@@ -45,7 +45,7 @@ public enum UDTableType {
 		return this.type;
 	}
 
-	public void setType(String fType) {
+	public void setType(final String fType) {
 		this.type = fType;
 	}
 
