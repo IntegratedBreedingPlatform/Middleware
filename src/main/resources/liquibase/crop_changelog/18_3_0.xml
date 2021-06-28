@@ -1,0 +1,107 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="corina" id="v18.3.0-1">
+        <preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) FROM location WHERE labbr='DEU' and locid=82;
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM location WHERE labbr='FRG';
+				</sqlCheck>
+			</and>
+        </preConditions>
+        <comment> Rename location abbreviation for West Germany (locid 82) to FRG. IBP-4308 </comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location SET labbr='FRG' WHERE labbr='DEU' AND locid=82;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v18.3.0-2">
+        <preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) FROM location WHERE labbr='ATF' and locid=275;
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM location WHERE labbr='TAAF';
+				</sqlCheck>
+			</and>
+        </preConditions>
+        <comment> Rename location abbreviation for French Southern Territories (locid 275) to TAAF. IBP-4308 </comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location SET labbr='TAAF',lname='French Southern and Antarctic Lands' WHERE labbr='ATF' AND locid=275;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v18.3.0-3">
+        <preConditions onFail="MARK_RAN">
+			<and>
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM location WHERE labbr='UMI' and locid=282;
+            </sqlCheck>
+			<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM location WHERE labbr='UMIP';
+			</sqlCheck>
+			</and>
+        </preConditions>
+        <comment> Rename location abbreviation for United States Minor Outlying Islands (locid 282) to UMIP. IBP-4308 </comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location SET labbr='UMIP' WHERE labbr='UMI' AND locid=282;
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v18.3.0-4">
+        <preConditions onFail="MARK_RAN">
+			<indexExists tableName="location" indexName="labbr_UNIQUE"/>
+		</preConditions>
+		<comment>Remove location abbr unique index if already existing</comment>
+		<dropIndex tableName="location" indexName="labbr_UNIQUE"/>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v18.3.0-5">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<not><indexExists tableName="location" indexName="uk_location_labbr"/></not>
+				<sqlCheck expectedResult="0">select count(*) from (SELECT count(*) from location where labbr is not null group by labbr having count(*) > 1) a </sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Adding unique constraint to labbr column of location table </comment>
+	    <addUniqueConstraint columnNames="labbr" constraintName="uk_location_labbr" tableName="location"/>
+	</changeSet>
+
+	<changeSet author="gelli" id="v18.3.0-6">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="ims_stock_transaction_bkp"/>
+		</preConditions>
+		<comment>
+			Drop unused table ims_stock_transaction_bkp if exists.
+		</comment>
+		<dropTable tableName="ims_stock_transaction_bkp"/>
+	</changeSet>
+
+	<changeSet author="gelli" id="v18.3.0-7">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="listdata_project_bkp" />
+		</preConditions>
+		<comment>
+			Remove unused table listdata_project_bkp
+		</comment>
+		<dropTable tableName="listdata_project_bkp" />
+	</changeSet>
+
+	<changeSet author="gelli" id="v18.3.0-8">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="listnms_bkp" />
+		</preConditions>
+		<comment>
+			Remove unused table listnms_bkp
+		</comment>
+		<dropTable tableName="listnms_bkp" />
+	</changeSet>
+
+</databaseChangeLog>
