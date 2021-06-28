@@ -1,7 +1,7 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.audit.GermplasmAuditDAO;
+import org.generationcp.middleware.dao.audit.germplasm.GermplasmAuditDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;

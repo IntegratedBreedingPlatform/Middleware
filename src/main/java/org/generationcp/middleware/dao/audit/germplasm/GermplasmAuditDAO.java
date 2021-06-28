@@ -6,6 +6,7 @@ import org.generationcp.middleware.dao.audit.RevisionTypeResolver;
 import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
+import org.generationcp.middleware.service.impl.audit.GermplasmProgenitorDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmReferenceAuditDTO;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -117,6 +118,32 @@ public class GermplasmAuditDAO {
 	public long countReferenceChangesByReferenceId(final Integer referenceId) {
 		final SQLQuery query = this.session.createSQLQuery(GermplasmReferenceAuditDAOQuery.getCountQuery());
 		query.setParameter("refId", referenceId);
+		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
+	public List<GermplasmProgenitorDetailsAuditDTO> getProgenitorDetailsByGid(final Integer gid, final Pageable pageable) {
+		final SQLQuery query = this.session.createSQLQuery(GermplasmProgenitorDetailsAuditDAOQuery.getSelectQuery());
+		query.setParameter("gid", gid);
+
+		this.addCommonScalars(query);
+		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.BREEDING_METHOD_NAME_ALIAS);
+		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.FEMALE_PARENT_ALIAS);
+		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.MALE_PARENT_ALIAS);
+		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.PROGENITORS_NUMBER_ALIAS);
+		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.BREEDING_METHOD_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.FEMALE_PARENT_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.MALE_PARENT_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.PROGENITORS_NUMBER_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.setResultTransformer(Transformers.aliasToBean(GermplasmProgenitorDetailsAuditDTO.class));
+
+		GenericDAO.addPaginationToSQLQuery(query, pageable);
+
+		return (List<GermplasmProgenitorDetailsAuditDTO>) query.list();
+	}
+
+	public long countProgenitorDetailsChangesByGid(final Integer gid) {
+		final SQLQuery query = this.session.createSQLQuery(GermplasmProgenitorDetailsAuditDAOQuery.getCountQuery());
+		query.setParameter("gid", gid);
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 

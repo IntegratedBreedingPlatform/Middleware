@@ -71,6 +71,16 @@ public class GermplasmAuditServiceImpl implements GermplasmAuditService {
 		return this.daoFactory.getGermplasmAuditDAO().countReferenceChangesByReferenceId(germplasm.getReferenceId());
 	}
 
+	@Override
+	public List<GermplasmProgenitorDetailsAuditDTO> getProgenitorDetailsChangesByGid(final Integer gid, final Pageable pageable) {
+		return this.daoFactory.getGermplasmAuditDAO().getProgenitorDetailsByGid(gid, pageable);
+	}
+
+	@Override
+	public long countProgenitorDetailsChangesByGid(final Integer gid) {
+		return this.daoFactory.getGermplasmAuditDAO().countProgenitorDetailsChangesByGid(gid);
+	}
+
 	private Germplasm getGermplasmByGid(final Integer gid) {
 		final List<Germplasm> germplasmByGIDs = this.germplasmService.getGermplasmByGIDs(Arrays.asList(gid));
 		return germplasmByGIDs.get(0);

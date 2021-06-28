@@ -20,7 +20,8 @@ class GermplasmBasicDetailsAuditDAOQuery {
 		+ "		LEFT JOIN germplsm_aud prev_g_aud ON prev_g_aud.aud_id = "
 		+ " 			(SELECT inn.aud_id FROM germplsm_aud inn WHERE inn.gid = :gid AND inn.aud_id < g_aud.aud_id ORDER BY inn.aud_id DESC LIMIT 1) "
 		+ " WHERE g_aud.gid = :gid "
-		+ " HAVING (creationDateChanged = true OR locationChanged = true OR g_aud.aud_id = (select MIN(aud_id) from germplsm_aud where gid = :gid)) "
+		+ " HAVING (" + CREATION_DATE_CHANGED_ALIAS + " OR " + LOCATION_CHANGED_ALIAS + " OR "
+		+ "				g_aud.aud_id = (SELECT MIN(aud_id) FROM germplsm_aud where gid = :gid)) "
 		+ " %s"; // use of ORDER_EXPRESION -> It's not needed for the count query
 
 	private static final String SELECT_EXPRESION = " cast(g_aud.gdate as char) AS " + CREATION_DATE_ALIAS + ", "
