@@ -1802,18 +1802,18 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				+ " vpo.expected_max AS " + CVTermDao.VARIABLE_EXPECTED_MAX
 				+ " FROM cvterm v INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
 				+ " and v.cvterm_id = cp.cvterm_id " //
+				+ " INNER JOIN cvterm varType on varType.name = cp.value AND varType.cvterm_id in (" //
+				+ 			VariableType.GERMPLASM_PASSPORT.getId() + "," //
+				+ 			VariableType.GERMPLASM_ATTRIBUTE.getId() + ") " //
 				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
 				+ " left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
 				+ " left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
 				+ " left join variable_overrides vpo ON vpo.cvterm_id = v.cvterm_id AND vpo.program_uuid = :programUUID " //
-				+ " WHERE v.cv_id = " + CvId.VARIABLES.getId() + " "  //
-				+ "   AND cp.value in (select name from cvterm where cvterm_id in ( " //
-				+ 			VariableType.GERMPLASM_PASSPORT.getId() + "," //
-				+ 			VariableType.GERMPLASM_ATTRIBUTE.getId() + " ) ) " //
-				+ "   AND (v.definition like :" + CVTermDao.FNAME
+				+ " WHERE (v.definition like :" + CVTermDao.FNAME
 				+ " 		or v.name like :" + CVTermDao.NAME
 				+ " 		or vpo.alias like :" + CVTermDao.ALIAS + " ) "//
 				+ " LIMIT 100 ");
+
 			sqlQuery.setParameter(CVTermDao.PROGRAMUUID, programUUID);
 			sqlQuery.setParameter(CVTermDao.FNAME, '%' + query + '%');
 			sqlQuery.setParameter(CVTermDao.NAME, '%' + query + '%');
