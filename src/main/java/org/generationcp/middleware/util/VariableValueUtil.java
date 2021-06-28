@@ -100,7 +100,7 @@ public class VariableValueUtil {
 				variable.getScale().getCategories().stream().filter(category -> value.equalsIgnoreCase(category.getName())).findFirst()
 					.map(category -> BigInteger.valueOf(category.getId()).intValue()).orElse(null);
 			if (categoricalValueId == null) {
-				throw new MiddlewareRequestException("", "germplasm.attribute.invalid.categorical.value", variable.getName());
+				throw new MiddlewareRequestException("", "measurement.variable.invalid.categorical.value", variable.getName());
 			}
 		}
 		return categoricalValueId;
