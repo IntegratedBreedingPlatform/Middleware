@@ -149,52 +149,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.daoFactory.getNameDao().getByGIDAndNval(gid, GermplasmDataManagerUtil.getNameToUseByMode(nval, mode));
 	}
 
-	private void updateGermplasmPrefNameAbbrev(final Integer gid, final String newPrefValue, final String nameOrAbbrev) {
-
-		try {
-			// begin update transaction
-
-			final NameDAO dao = this.daoFactory.getNameDao();
-
-			// check for a name record with germplasm = gid, and nval = newPrefName
-			final Name newPref = this.getNameByGIDAndNval(gid, newPrefValue, GetGermplasmByNameModes.NORMAL);
-			// if a name record with the specified nval exists,
-			if (newPref != null) {
-				// get germplasm's existing preferred name/abbreviation, set as
-				// alternative name, change nstat to 0
-				Name oldPref = null;
-				int newNstat = 0;
-				// nstat to be assigned to newPref: 1 for Name, 2 for Abbreviation
-				if ("Name".equals(nameOrAbbrev)) {
-					oldPref = this.getPreferredNameByGID(gid);
-					newNstat = 1;
-				} else if ("Abbreviation".equals(nameOrAbbrev)) {
-					oldPref = this.getPreferredAbbrevByGID(gid);
-					newNstat = 2;
-				}
-
-				if (oldPref != null) {
-					oldPref.setNstat(0);
-					dao.saveOrUpdate(oldPref);
-				}
-				// update specified name as the new preferred name/abbreviation then save the new name's status to the database
-				newPref.setNstat(newNstat);
-				dao.saveOrUpdate(newPref);
-			} else {
-				// throw exception if no Name record with specified value does not exist
-				throw new MiddlewareQueryException(
-					"Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue=" + newPrefValue
-						+ ", nameOrAbbrev=" + nameOrAbbrev + "): The specified Germplasm Name does not exist.",
-					new Throwable());
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue="
-				+ newPrefValue + ", nameOrAbbrev=" + nameOrAbbrev + "):  " + e.getMessage(), e);
-		}
-	}
-
 	@Override
 	public List<Integer> addGermplasmName(final List<Name> names) {
 		return this.addOrUpdateGermplasmName(names, Operation.ADD);
