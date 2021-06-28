@@ -106,6 +106,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	private static final String SCALE_DEFINITION ="sd";
 
 	private static final String PROGRAMUUID = "programUUID";
+	private static final String QUERY_PARAMETER ="query";
 	private static final String FNAME ="fname";
 	private static final String NAME ="name";
 	private static final String ALIAS ="alias";
@@ -1817,15 +1818,13 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				+ " left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
 				+ " left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
 				+ " left join variable_overrides vpo ON vpo.cvterm_id = v.cvterm_id AND vpo.program_uuid = :programUUID " //
-				+ " WHERE (v.definition like :" + CVTermDao.FNAME
-				+ " 		or v.name like :" + CVTermDao.NAME
-				+ " 		or vpo.alias like :" + CVTermDao.ALIAS + " ) "//
+				+ " WHERE ( v.definition like :" + CVTermDao.QUERY_PARAMETER
+				+ " 		   or v.name like :" + CVTermDao.QUERY_PARAMETER
+				+ " 		or vpo.alias like :" + CVTermDao.QUERY_PARAMETER + " ) "//
 				+ " LIMIT 100 ");
 
 			sqlQuery.setParameter(CVTermDao.PROGRAMUUID, programUUID);
-			sqlQuery.setParameter(CVTermDao.FNAME, '%' + query + '%');
-			sqlQuery.setParameter(CVTermDao.NAME, '%' + query + '%');
-			sqlQuery.setParameter(CVTermDao.ALIAS, '%' + query + '%');
+			sqlQuery.setParameter(CVTermDao.QUERY_PARAMETER, '%' + query + '%');
 
 			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 			sqlQuery.addScalar(CVTermDao.VARIABLE_ID);
