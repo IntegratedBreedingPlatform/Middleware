@@ -107,9 +107,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	private static final String PROGRAMUUID = "programUUID";
 	private static final String QUERY_PARAMETER ="query";
-	private static final String FNAME ="fname";
-	private static final String NAME ="name";
-	private static final String ALIAS ="alias";
 
 	public List<Integer> getTermsByNameOrSynonym(final String nameOrSynonym, final int cvId) {
 		final List<Integer> termIds = new ArrayList<>();
