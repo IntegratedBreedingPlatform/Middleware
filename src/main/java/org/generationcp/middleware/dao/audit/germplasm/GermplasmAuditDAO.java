@@ -1,6 +1,8 @@
-package org.generationcp.middleware.dao.audit;
+package org.generationcp.middleware.dao.audit.germplasm;
 
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.dao.audit.AuditConstants;
+import org.generationcp.middleware.dao.audit.RevisionTypeResolver;
 import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
@@ -15,12 +17,6 @@ import java.math.BigInteger;
 import java.util.List;
 
 public class GermplasmAuditDAO {
-
-	static final String REVISION_TYPE_ALIAS = "revisionType";
-	static final String CREATED_BY_ALIAS = "createdBy";
-	static final String CREATED_DATE_ALIAS = "createdDate";
-	static final String MODIFIED_BY_ALIAS = "modifiedBy";
-	static final String MODIFIED_DATE_ALIAS = "modifiedDate";
 
 	private final Session session;
 
@@ -125,11 +121,11 @@ public class GermplasmAuditDAO {
 	}
 
 	private void addCommonScalars(final SQLQuery query) {
-		query.addScalar(REVISION_TYPE_ALIAS, RevisionTypeResolver.INSTANCE);
-		query.addScalar(CREATED_BY_ALIAS);
-		query.addScalar(CREATED_DATE_ALIAS);
-		query.addScalar(MODIFIED_BY_ALIAS);
-		query.addScalar(MODIFIED_DATE_ALIAS);
+		query.addScalar(AuditConstants.REVISION_TYPE_ALIAS, RevisionTypeResolver.INSTANCE);
+		query.addScalar(AuditConstants.CREATED_BY_ALIAS);
+		query.addScalar(AuditConstants.CREATED_DATE_ALIAS);
+		query.addScalar(AuditConstants.MODIFIED_BY_ALIAS);
+		query.addScalar(AuditConstants.MODIFIED_DATE_ALIAS);
 	}
 
 }

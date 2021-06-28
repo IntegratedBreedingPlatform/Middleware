@@ -1,4 +1,6 @@
-package org.generationcp.middleware.dao.audit;
+package org.generationcp.middleware.dao.audit.germplasm;
+
+import org.generationcp.middleware.dao.audit.AuditConstants;
 
 class GermplasmAttributeAuditDAOQuery {
 
@@ -24,11 +26,11 @@ class GermplasmAttributeAuditDAOQuery {
 		+ " a_aud.aval AS " + VALUE_ALIAS + ", "
 		+ " loc.lname AS " + LOCATION_NAME_ALIAS + ", "
 		+ " cast(a_aud.adate as char) AS " + CREATION_DATE_ALIAS + ", "
-		+ " a_aud.rev_type AS " + GermplasmAuditDAO.REVISION_TYPE_ALIAS + ", "
-		+ " a_aud.created_date AS " + GermplasmAuditDAO.CREATED_DATE_ALIAS + ", "
-		+ " a_aud.modified_date AS " + GermplasmAuditDAO.MODIFIED_DATE_ALIAS + ", "
-		+ " (SELECT uname FROM workbench.users WHERE users.userid = a_aud.created_by) AS " + GermplasmAuditDAO.CREATED_BY_ALIAS + ", "
-		+ " (SELECT uname FROM workbench.users WHERE users.userid = a_aud.modified_by) AS " + GermplasmAuditDAO.MODIFIED_BY_ALIAS + ", "
+		+ " a_aud.rev_type AS " + AuditConstants.REVISION_TYPE_ALIAS + ", "
+		+ " a_aud.created_date AS " + AuditConstants.CREATED_DATE_ALIAS + ", "
+		+ " a_aud.modified_date AS " + AuditConstants.MODIFIED_DATE_ALIAS + ", "
+		+ " (SELECT uname FROM workbench.users WHERE users.userid = a_aud.created_by) AS " + AuditConstants.CREATED_BY_ALIAS + ", "
+		+ " (SELECT uname FROM workbench.users WHERE users.userid = a_aud.modified_by) AS " + AuditConstants.MODIFIED_BY_ALIAS + ", "
 		+ " IF(a_aud.atype = coalesce(prev_a_aud.atype, a_aud.atype), false, true) as " + ATTRIBUTE_TYPE_CHANGED_ALIAS + ", "
 		+ " IF(a_aud.aval = coalesce(prev_a_aud.aval, a_aud.aval), false, true) as " + VALUE_CHANGED_ALIAS + ", "
 		+ " IF(a_aud.alocn = coalesce(prev_a_aud.alocn, a_aud.alocn), false, true) as " + LOCATION_CHANGED_ALIAS + ", "

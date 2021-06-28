@@ -1,4 +1,6 @@
-package org.generationcp.middleware.dao.audit;
+package org.generationcp.middleware.dao.audit.germplasm;
+
+import org.generationcp.middleware.dao.audit.AuditConstants;
 
 class GermplasmBasicDetailsAuditDAOQuery {
 
@@ -23,11 +25,11 @@ class GermplasmBasicDetailsAuditDAOQuery {
 
 	private static final String SELECT_EXPRESION = " cast(g_aud.gdate as char) AS " + CREATION_DATE_ALIAS + ", "
 		+ " loc.lname AS " + LOCATION_NAME_ALIAS + ", "
-		+ " g_aud.rev_type AS " + GermplasmAuditDAO.REVISION_TYPE_ALIAS + ", "
-		+ " g_aud.created_date AS " + GermplasmAuditDAO.CREATED_DATE_ALIAS + ", "
-		+ " g_aud.modified_date AS " + GermplasmAuditDAO.MODIFIED_DATE_ALIAS + ", "
-		+ " (SELECT uname FROM workbench.users WHERE users.userid = g_aud.created_by) AS " + GermplasmAuditDAO.CREATED_BY_ALIAS + ", "
-		+ " (SELECT uname FROM workbench.users WHERE users.userid = g_aud.modified_by) AS " + GermplasmAuditDAO.MODIFIED_BY_ALIAS + ", ";
+		+ " g_aud.rev_type AS " + AuditConstants.REVISION_TYPE_ALIAS + ", "
+		+ " g_aud.created_date AS " + AuditConstants.CREATED_DATE_ALIAS + ", "
+		+ " g_aud.modified_date AS " + AuditConstants.MODIFIED_DATE_ALIAS + ", "
+		+ " (SELECT uname FROM workbench.users WHERE users.userid = g_aud.created_by) AS " + AuditConstants.CREATED_BY_ALIAS + ", "
+		+ " (SELECT uname FROM workbench.users WHERE users.userid = g_aud.modified_by) AS " + AuditConstants.MODIFIED_BY_ALIAS + ", ";
 
 	private static final String SELECT_COUNT_EXPRESSION = " SELECT COUNT(1) FROM (%s) as rowCount";
 

@@ -1,4 +1,6 @@
-package org.generationcp.middleware.dao.audit;
+package org.generationcp.middleware.dao.audit.germplasm;
+
+import org.generationcp.middleware.dao.audit.AuditConstants;
 
 class GermplasmReferenceAuditDAOQuery {
 
@@ -12,11 +14,11 @@ class GermplasmReferenceAuditDAOQuery {
 		+ " %s"; // use of ORDER_EXPRESION -> It's not needed for the count query
 
 	private static final String SELECT_EXPRESION = " r_aud.analyt AS " + VALUE_ALIAS + ", "
-		+ "  r_aud.rev_type AS " + GermplasmAuditDAO.REVISION_TYPE_ALIAS + ", "
-		+ "  r_aud.created_date AS " + GermplasmAuditDAO.CREATED_DATE_ALIAS + ", "
-		+ "  r_aud.modified_date AS " + GermplasmAuditDAO.MODIFIED_DATE_ALIAS + ", "
-		+ "  (SELECT uname FROM workbench.users WHERE users.userid = r_aud.created_by) AS " + GermplasmAuditDAO.CREATED_BY_ALIAS + ", "
-		+ "  (SELECT uname FROM workbench.users WHERE users.userid = r_aud.modified_by) AS " + GermplasmAuditDAO.MODIFIED_BY_ALIAS + ", "
+		+ "  r_aud.rev_type AS " + AuditConstants.REVISION_TYPE_ALIAS + ", "
+		+ "  r_aud.created_date AS " + AuditConstants.CREATED_DATE_ALIAS + ", "
+		+ "  r_aud.modified_date AS " + AuditConstants.MODIFIED_DATE_ALIAS + ", "
+		+ "  (SELECT uname FROM workbench.users WHERE users.userid = r_aud.created_by) AS " + AuditConstants.CREATED_BY_ALIAS + ", "
+		+ "  (SELECT uname FROM workbench.users WHERE users.userid = r_aud.modified_by) AS " + AuditConstants.MODIFIED_BY_ALIAS + ", "
 		+ "  IF(r_aud.analyt = coalesce(prev_r_aud.analyt, r_aud.analyt), false, true) AS " + VALUE_CHANGED_ALIAS;
 
 	/**

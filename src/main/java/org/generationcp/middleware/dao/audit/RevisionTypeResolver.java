@@ -7,9 +7,9 @@ import org.hibernate.type.EnumType;
 import java.sql.Types;
 import java.util.Properties;
 
-class RevisionTypeResolver {
+public class RevisionTypeResolver {
 
-	static final CustomType INSTANCE = getResolver();
+	public static final CustomType INSTANCE = getResolver();
 
 	private static CustomType getResolver() {
 		Properties parameters = new Properties();
