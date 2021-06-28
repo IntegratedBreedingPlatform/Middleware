@@ -212,7 +212,7 @@ public class SampleDetailsDTO implements Serializable {
 		if (observationUnitNumber instanceof Number) {
 			this.observationUnitNumber = (Integer) observationUnitNumber;
 		} else if (observationUnitNumber instanceof String) {
-            this.observationUnitNumber = Integer.valueOf((String) observationUnitNumber);
+			this.observationUnitNumber = Integer.valueOf((String) observationUnitNumber);
 		} else {
 			throw new MiddlewareException("Invalid observationUnitNumber: " + observationUnitNumber);
 		}

@@ -34,16 +34,17 @@ class ObservationQuery {
 		+ " and cvterm_variable.cvterm_id = :selectionVariableId " + " GROUP BY nde.nd_experiment_id";
 
 	String getAllObservationsQuery(final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
-			final List<String> designFactors, final String sortBy, final String sortOrder) {
+		final List<String> designFactors, final String sortBy, final String sortOrder) {
 		//FIXME remove inner join with max phenotype_id when BMS-5055 is solved
-		return this.getObservationsMainQuery(selectionMethodsAndTraits, germplasmDescriptors, designFactors) + this.getInstanceNumberClause() + this
+		return this.getObservationsMainQuery(selectionMethodsAndTraits, germplasmDescriptors, designFactors) + this
+			.getInstanceNumberClause() + this
 			.getGroupingClause()
-				+ this.getOrderingClause(sortBy, sortOrder);
+			+ this.getOrderingClause(sortBy, sortOrder);
 	}
 
 	/**
 	 * TODO BMS-4061 Merge with {@link ObservationQuery#getObservationsMainQuery(List, List, List)}
-	 *
+	 * <p>
 	 * This query is used by BMSAPI and is very similar to {@link ObservationQuery#getObservationsMainQuery(List, List, List)}
 	 * which is used Trial and Nursery Manager
 	 */
@@ -108,32 +109,44 @@ class ObservationQuery {
 			+ "		WHERE ndep.nd_experiment_id = nde.nd_experiment_id " //
 			+ "		AND ispcvt.name = 'BLOCK_NO') AS BLOCK_NO, " //
 			+ "	  (SELECT "
-			+ "		(CASE WHEN (SELECT COUNT(*) FROM nd_experimentprop prop INNER JOIN cvterm_relationship crelprop ON crelprop.subject_id = prop.type_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2170 WHERE prop.nd_experiment_id = nde.nd_experiment_id ) > 1 " //2170 = Row in Layout
+			+ "		(CASE WHEN (SELECT COUNT(*) FROM nd_experimentprop prop INNER JOIN cvterm_relationship crelprop ON crelprop.subject_id = prop.type_id AND crelprop.type_id = "
+			+ TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2170 WHERE prop.nd_experiment_id = nde.nd_experiment_id ) > 1 "
+			//2170 = Row in Layout
 			+ "		 THEN 'TBD' "
 			+ "		 ELSE (SELECT  ("
 			+ "				CASE WHEN scaletype.object_id = " + TermId.CATEGORICAL_VARIABLE.getId() //Identify if variable is categorical
-			+ "				THEN (SELECT val.name from cvterm val WHERE val.cvterm_id = ndep.value) "//Using the name of the cvterm instead of the definition same as displayed in observation table
+			+ "				THEN (SELECT val.name from cvterm val WHERE val.cvterm_id = ndep.value) "
+			//Using the name of the cvterm instead of the definition same as displayed in observation table
 			+ "				ELSE ndep.value END"
 			+ "				)"
 			+ "			   FROM  nd_experimentprop ndep " //
 			+ "     	   INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id " //
-			+ "			   INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = ispcvt.cvterm_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2170 "//2170 = Row in Layout
-			+ "     	   LEFT JOIN (SELECT scale.object_id as object_id, relation.subject_id as subject_id FROM cvterm_relationship relation INNER JOIN cvterm_relationship scale ON scale.subject_id = relation.object_id AND scale.type_id = "+TermId.HAS_TYPE.getId()+" WHERE relation.type_id = "+TermId.HAS_SCALE.getId()+" ) scaletype ON scaletype.subject_id = ispcvt.cvterm_id "
+			+ "			   INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = ispcvt.cvterm_id AND crelprop.type_id = "
+			+ TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2170 "//2170 = Row in Layout
+			+ "     	   LEFT JOIN (SELECT scale.object_id as object_id, relation.subject_id as subject_id FROM cvterm_relationship relation INNER JOIN cvterm_relationship scale ON scale.subject_id = relation.object_id AND scale.type_id = "
+			+ TermId.HAS_TYPE.getId() + " WHERE relation.type_id = " + TermId.HAS_SCALE.getId()
+			+ " ) scaletype ON scaletype.subject_id = ispcvt.cvterm_id "
 			+ "     	   WHERE ndep.nd_experiment_id = nde.nd_experiment_id ) END"
 			+ "		) "
 			+ "	  ) ROW,"//
 			+ "	  (SELECT "
-			+ "		(CASE WHEN (SELECT COUNT(*) FROM nd_experimentprop prop INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = prop.type_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2180  WHERE prop.nd_experiment_id = nde.nd_experiment_id ) > 1 "//2180 = Column in layout
+			+ "		(CASE WHEN (SELECT COUNT(*) FROM nd_experimentprop prop INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = prop.type_id AND crelprop.type_id = "
+			+ TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id=2180  WHERE prop.nd_experiment_id = nde.nd_experiment_id ) > 1 "
+			//2180 = Column in layout
 			+ "		THEN 'TBD' "
 			+ "		ELSE (SELECT  ("
 			+ "				CASE WHEN scaletype.object_id = " + TermId.CATEGORICAL_VARIABLE.getId() //Identify if variable is categorical
-			+ "				THEN (SELECT val.name from cvterm val WHERE val.cvterm_id = ndep.value) "//Using the name of the cvterm instead of the definition same as displayed in observation table
+			+ "				THEN (SELECT val.name from cvterm val WHERE val.cvterm_id = ndep.value) "
+			//Using the name of the cvterm instead of the definition same as displayed in observation table
 			+ "				ELSE ndep.value END"
 			+ "				)"
 			+ "			FROM    nd_experimentprop ndep" //
 			+ "   		INNER JOIN  cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id " //
-			+ "	  		INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = ispcvt.cvterm_id AND crelprop.type_id = " + TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id = 2180"//2180 = Column in layout
-			+ "   		LEFT JOIN (SELECT scale.object_id as object_id, relation.subject_id as subject_id FROM cvterm_relationship relation INNER JOIN cvterm_relationship scale ON scale.subject_id = relation.object_id AND scale.type_id = "+TermId.HAS_TYPE.getId()+" WHERE relation.type_id = "+TermId.HAS_SCALE.getId()+" ) scaletype ON scaletype.subject_id = ispcvt.cvterm_id "
+			+ "	  		INNER JOIN  cvterm_relationship crelprop ON crelprop.subject_id = ispcvt.cvterm_id AND crelprop.type_id = "
+			+ TermId.HAS_PROPERTY.getId() + " AND crelprop.object_id = 2180"//2180 = Column in layout
+			+ "   		LEFT JOIN (SELECT scale.object_id as object_id, relation.subject_id as subject_id FROM cvterm_relationship relation INNER JOIN cvterm_relationship scale ON scale.subject_id = relation.object_id AND scale.type_id = "
+			+ TermId.HAS_TYPE.getId() + " WHERE relation.type_id = " + TermId.HAS_SCALE.getId()
+			+ " ) scaletype ON scaletype.subject_id = ispcvt.cvterm_id "
 			+ "   		WHERE ndep.nd_experiment_id = nde.nd_experiment_id) END"
 			+ "		)"
 			+ "	   ) COL," //
@@ -153,7 +166,7 @@ class ObservationQuery {
 			+ " AND gp.nd_geolocation_id = gl.nd_geolocation_id) AS LocationAbbreviation, " //
 			+ "FieldMapCol.value AS FieldMapColumn, " //
 			+ "FieldMapRow.value AS FieldMapRow, " //
-			+ 	getColumnNamesFromTraitNames(measurementVariables) //
+			+ getColumnNamesFromTraitNames(measurementVariables) //
 			+ " FROM Project p " //
 			+ "    INNER JOIN project proj ON proj.project_id =  p.study_id " //
 			+ "    INNER JOIN nd_experiment nde ON nde.project_id = p.project_id " //
@@ -162,16 +175,19 @@ class ObservationQuery {
 			+ "    INNER JOIN germplsm g ON g.gid = s.dbxref_id "
 			+ "	   LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id " //
 			+ "	   LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id " //
-			+ "    LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = " //
+			+ "    LEFT JOIN nd_experimentprop FieldMapRow ON FieldMapRow.nd_experiment_id = nde.nd_experiment_id AND FieldMapRow.type_id = "
+			//
 			+ TermId.RANGE_NO.getId() //
-			+ "    LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = " //
+			+ "    LEFT JOIN nd_experimentprop FieldMapCol ON FieldMapCol.nd_experiment_id = nde.nd_experiment_id AND FieldMapCol.type_id = "
+			//
 			+ TermId.COLUMN_NO.getId() //
 			+ whereText + " GROUP BY nde.nd_experiment_id " + orderByText;
 	}
 
-	String getSingleObservationQuery(final List<MeasurementVariableDto> traits, final List<String> germplasmDescriptors, final List<String> designFactors) {
+	String getSingleObservationQuery(final List<MeasurementVariableDto> traits, final List<String> germplasmDescriptors,
+		final List<String> designFactors) {
 		return this.getObservationsMainQuery(traits, germplasmDescriptors, designFactors) + " AND nde.nd_experiment_id = :experiment_id "
-				+ this.getGroupingClause();
+			+ this.getGroupingClause();
 	}
 
 	private static String getColumnNamesFromTraitNames(final List<MeasurementVariableDto> measurementVariables) {
@@ -194,24 +210,33 @@ class ObservationQuery {
 		return columnNames.toString();
 	}
 
-	String getObservationsMainQuery(final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors, final List<String> designFactors) {
+	String getObservationsMainQuery(final List<MeasurementVariableDto> selectionMethodsAndTraits, final List<String> germplasmDescriptors,
+		final List<String> designFactors) {
 		final StringBuilder sqlBuilder = new StringBuilder();
 
 		sqlBuilder.append("SELECT  ")
 			.append("    nde.nd_experiment_id, ")
 			.append("    gl.description AS TRIAL_INSTANCE, ")
-			.append("    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,  ")
+			.append(
+				"    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,  ")
 			.append("    s.dbxref_id AS GID, ")
 			.append("    s.name DESIGNATION, ")
 			.append("    s.uniquename ENTRY_NO, ")
 			.append("    s.value as ENTRY_CODE, ")
-			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO,  ")
-			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO,  ")
-			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO,  ")
-			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'ROW') ROW,  ")
-			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'COL') COL,  ")
-			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN',  ")
-			.append("    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  ")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'REP_NO') REP_NO,  ")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'PLOT_NO') PLOT_NO,  ")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') BLOCK_NO,  ")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'ROW') ROW,  ")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'COL') COL,  ")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'FIELDMAP COLUMN') 'FIELDMAP COLUMN',  ")
+			.append(
+				"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = nde.nd_experiment_id AND ispcvt.name = 'FIELDMAP RANGE') 'FIELDMAP RANGE',  ")
 			.append("    (SELECT coalesce(nullif(count(sp.sample_id), 0), '-') FROM sample AS sp "
 				+ "INNER JOIN nd_experiment sp_nde ON sp.nd_experiment_id = sp_nde.nd_experiment_id WHERE sp_nde.nd_experiment_id = nde.nd_experiment_id OR sp_nde.parent_id = nde.nd_experiment_id) 'SUM_OF_SAMPLES',  ")
 			.append("    nde.obs_unit_id as OBS_UNIT_ID,  ");
@@ -231,7 +256,7 @@ class ObservationQuery {
 
 		if (!germplasmDescriptors.isEmpty()) {
 			final String germplasmDescriptorClauseFormat =
-					"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') '%s',  ";
+				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND spropcvt.name = '%s') '%s',  ";
 			for (final String gpFactor : germplasmDescriptors) {
 				sqlBuilder.append(String.format(germplasmDescriptorClauseFormat, gpFactor, gpFactor));
 			}
@@ -239,7 +264,7 @@ class ObservationQuery {
 
 		if (!designFactors.isEmpty()) {
 			final String designFactorClauseFormat =
-					"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '%s') '%s',  ";
+				"    (SELECT xprop.value FROM nd_experimentprop xprop INNER JOIN cvterm xpropcvt ON xpropcvt.cvterm_id = xprop.type_id WHERE xprop.nd_experiment_id = nde.nd_experiment_id AND xpropcvt.name = '%s') '%s',  ";
 			for (final String designFactor : designFactors) {
 				sqlBuilder.append(String.format(designFactorClauseFormat, designFactor, designFactor));
 			}

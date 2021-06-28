@@ -72,7 +72,6 @@ import static org.hamcrest.core.Is.is;
 
 public class GermplasmDAOTest extends IntegrationTestBase {
 
-	private static final Integer CREATED_BY = new Random().nextInt();
 	private static final String DUMMY_STOCK_ID = "USER-1-1";
 	private static final Integer TEST_PROJECT_ID = 1;
 
@@ -784,7 +783,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final String displayName = RandomStringUtils.randomAlphanumeric(255);
 		germplasm.getPreferredName().setNval(displayName);
-		final Integer germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
 		request.setPreferredName(displayName);
