@@ -140,6 +140,7 @@ public class SampleServiceImpl implements SampleService {
 		final StockModel stock = experiment.getStock();
 		final String entryNo = stock.getUniqueName();
 		final Integer gid = (stock.getGermplasm() != null) ? stock.getGermplasm().getGid() : null;
+		final String germplasmUUID = (stock.getGermplasm() != null) ? stock.getGermplasm().getGermplasmUUID() : null;
 
 		samplesDetailsDto = new SampleDetailsDTO(studyId, obsUnitId, sample.getSampleBusinessKey());
 		samplesDetailsDto.setTakenBy(takenBy);
@@ -147,6 +148,8 @@ public class SampleServiceImpl implements SampleService {
 		samplesDetailsDto.setStudyName(studyName);
 		samplesDetailsDto.setEntryNo(Integer.valueOf(entryNo));
 		samplesDetailsDto.setGid(gid);
+		samplesDetailsDto.setGermplasmUUID(germplasmUUID);
+
 		samplesDetailsDto.setSampleName(sample.getSampleName());
 		samplesDetailsDto.setDesignation(stock.getName());
 
@@ -225,7 +228,7 @@ public class SampleServiceImpl implements SampleService {
 		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
 		sampleDTOS.forEach(sampleDTO -> sampleDTO.setTakenBy(userIDFullNameMap.get(sampleDTO.getTakenByUserId())));
 	}
-	
+
 	protected void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}

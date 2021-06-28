@@ -33,6 +33,7 @@ public class SampleDetailsDTO implements Serializable {
 	private Integer entryNo;
 	private Integer plotNo;
 	private Integer gid;
+	private String germplasmUUID;
 	private String seedingDate;
 	private String harvestDate;
 	private String sampleName;
@@ -202,7 +203,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public Integer getObservationUnitNumber() {
-		return observationUnitNumber;
+		return this.observationUnitNumber;
 	}
 
 	// TODO move PLOT_NO to nd_exp observation_unit_no
@@ -288,7 +289,7 @@ public class SampleDetailsDTO implements Serializable {
 	}
 
 	public Integer getSampleNumber() {
-		return sampleNumber;
+		return this.sampleNumber;
 	}
 
 	public void setSampleNumber(final Integer sampleNumber) {
@@ -301,5 +302,13 @@ public class SampleDetailsDTO implements Serializable {
 
 	public void setTakenByUserId(final Integer takenByUserId) {
 		this.takenByUserId = takenByUserId;
+	}
+
+	public String getGermplasmUUID() {
+		return this.germplasmUUID;
+	}
+
+	public void setGermplasmUUID(final String germplasmUUID) {
+		this.germplasmUUID = germplasmUUID;
 	}
 }
