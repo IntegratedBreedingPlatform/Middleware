@@ -7,11 +7,14 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Transactional
@@ -49,5 +52,16 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			LOG.error(message, e);
 			throw new MiddlewareException(message);
 		}
+	}
+
+	@Override
+	public List<ObservationUnitDto> searchObservationUnits(final Integer pageSize, final Integer pageNumber,
+		final ObservationUnitSearchRequestDTO requestDTO) {
+		return this.daoFactory.getPhenotypeDAO().searchObservationUnits(pageSize, pageNumber, requestDTO);
+	}
+
+	@Override
+	public long countObservationUnits(final ObservationUnitSearchRequestDTO requestDTO) {
+		return this.daoFactory.getPhenotypeDAO().countObservationUnits(requestDTO);
 	}
 }

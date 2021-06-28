@@ -33,9 +33,9 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
@@ -913,11 +913,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return !query.list().isEmpty();
 	}
 
-	public List<PhenotypeSearchDTO> searchPhenotypes(
-		final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO) {
+	public List<ObservationUnitDto> searchObservationUnits(
+		final Integer pageSize, final Integer pageNumber, final ObservationUnitSearchRequestDTO requestDTO) {
 		final StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
 
-		addPhenotypeSearchFilter(requestDTO, queryString);
+		addObservationUnitSearchFilter(requestDTO, queryString);
 
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
 
@@ -926,7 +926,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			sqlQuery.setMaxResults(pageSize);
 		}
 
-		addPhenotypeSearchQueryParams(requestDTO, sqlQuery);
+		addObservationUnitSearchQueryParams(requestDTO, sqlQuery);
 
 		sqlQuery.addScalar("nd_experiment_id").addScalar("observationUnitDbId", new StringType()).addScalar("observationUnitName")
 			.addScalar("observationLevel").addScalar("plantNumber", new IntegerType()).addScalar("germplasmDbId", new StringType())
@@ -941,13 +941,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		// TODO get map with AliasToEntityMapResultTransformer.INSTANCE
 		final List<Object[]> results = sqlQuery.list();
 
-		final Map<Integer, PhenotypeSearchDTO> observationUnitsByNdExpId = new LinkedHashMap<>();
+		final Map<Integer, ObservationUnitDto> observationUnitsByNdExpId = new LinkedHashMap<>();
 
 		if (results != null && !results.isEmpty()) {
 
 			// Process ObservationUnits (Measurement row)
 			for (final Object[] row : results) {
-				final PhenotypeSearchDTO observationUnit = new PhenotypeSearchDTO();
+				final ObservationUnitDto observationUnit = new ObservationUnitDto();
 
 				final Integer ndExperimentId = (Integer) row[0];
 				observationUnit.setObservationUnitDbId((String) row[1]); // OBS_UNIT_ID
@@ -1037,7 +1037,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				// TODO
 				observation.setCollector(StringUtils.EMPTY);
 
-				final PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
+				final ObservationUnitDto observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
 				observationUnit.getObservations().add(observation);
 			}
 
@@ -1054,7 +1054,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final Treatment treatment = new Treatment();
 				treatment.setFactor(factor);
 				treatment.setModality(modality);
-				final PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
+				final ObservationUnitDto observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
 				observationUnit.getTreatments().add(treatment);
 			}
 		}
@@ -1062,7 +1062,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return new ArrayList<>(observationUnitsByNdExpId.values());
 	}
 
-	private static void addPhenotypeSearchFilter(final PhenotypeSearchRequestDTO requestDTO, final StringBuilder queryString) {
+	private static void addObservationUnitSearchFilter(final ObservationUnitSearchRequestDTO requestDTO, final StringBuilder queryString) {
 		final List<String> cvTermIds = requestDTO.getObservationVariableDbIds();
 
 		if (cvTermIds != null && !cvTermIds.isEmpty()) {
@@ -1111,7 +1111,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 	}
 
-	private static void addPhenotypeSearchQueryParams(final PhenotypeSearchRequestDTO requestDTO, final SQLQuery sqlQuery) {
+	private static void addObservationUnitSearchQueryParams(final ObservationUnitSearchRequestDTO requestDTO, final SQLQuery sqlQuery) {
 
 		final List<String> cvTermIds = requestDTO.getObservationVariableDbIds();
 
@@ -1155,12 +1155,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 	}
 
-	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
+	public long countObservationUnits(final ObservationUnitSearchRequestDTO requestDTO) {
 		final StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
 
-		addPhenotypeSearchFilter(requestDTO, queryString);
+		addObservationUnitSearchFilter(requestDTO, queryString);
 		final SQLQuery query = this.getSession().createSQLQuery("SELECT COUNT(1) FROM (" + queryString + ") T");
-		addPhenotypeSearchQueryParams(requestDTO, query);
+		addObservationUnitSearchQueryParams(requestDTO, query);
 
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}

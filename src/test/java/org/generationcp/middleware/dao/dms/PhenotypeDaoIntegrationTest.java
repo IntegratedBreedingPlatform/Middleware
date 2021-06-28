@@ -45,9 +45,9 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -370,7 +370,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchPhenotypes() {
+	public void testSearchObservationUnits() {
 		// Create 2 studies
 		final String uniqueID = this.commonTestProject.getUniqueID();
 		final DmsProject plot =
@@ -399,12 +399,12 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		this.createEnvironmentData(plot2, 1, traitIds, true);
 		this.sessionProvder.getSession().flush();
 
-		final PhenotypeSearchRequestDTO dto = new PhenotypeSearchRequestDTO();
+		final ObservationUnitSearchRequestDTO dto = new ObservationUnitSearchRequestDTO();
 		dto.setProgramDbIds(Collections.singletonList(uniqueID));
-		final List<PhenotypeSearchDTO> results = this.phenotypeDao.searchPhenotypes(1000, 1, dto);
+		final List<ObservationUnitDto> results = this.phenotypeDao.searchObservationUnits(1000, 1, dto);
 		Assert.assertNotNull(results);
 		Assert.assertEquals(NO_OF_GERMPLASM * 2, results.size());
-		for (final PhenotypeSearchDTO result : results) {
+		for (final ObservationUnitDto result : results) {
 			Assert.assertEquals(2, result.getObservations().size());
 			for (final PhenotypeSearchObservationDTO observation : result.getObservations()) {
 				final boolean isFirstTrait = observation.getObservationVariableDbId().equals(this.trait.getCvTermId().toString());
@@ -428,31 +428,31 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		}
 
 		// Search by Study ID
-		final PhenotypeSearchRequestDTO dto2 = new PhenotypeSearchRequestDTO();
+		final ObservationUnitSearchRequestDTO dto2 = new ObservationUnitSearchRequestDTO();
 		dto2.setTrialDbIds(Collections.singletonList(study2.getProjectId().toString()));
-		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countPhenotypes(dto2));
+		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countObservationUnits(dto2));
 
 		// Search by Geolocation ID
-		final PhenotypeSearchRequestDTO dto3 = new PhenotypeSearchRequestDTO();
+		final ObservationUnitSearchRequestDTO dto3 = new ObservationUnitSearchRequestDTO();
 		dto3.setStudyDbIds(Collections.singletonList(environment1.toString()));
-		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countPhenotypes(dto3));
+		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countObservationUnits(dto3));
 
 		// Search by Trait
-		final PhenotypeSearchRequestDTO dto4 = new PhenotypeSearchRequestDTO();
+		final ObservationUnitSearchRequestDTO dto4 = new ObservationUnitSearchRequestDTO();
 		dto4.setObservationVariableDbIds(Collections.singletonList(this.trait.getCvTermId().toString()));
-		Assert.assertEquals(NO_OF_GERMPLASM * 2, this.phenotypeDao.countPhenotypes(dto4));
+		Assert.assertEquals(NO_OF_GERMPLASM * 2, this.phenotypeDao.countObservationUnits(dto4));
 
 		// Search by GIDs
-		final PhenotypeSearchRequestDTO dto5 = new PhenotypeSearchRequestDTO();
+		final ObservationUnitSearchRequestDTO dto5 = new ObservationUnitSearchRequestDTO();
 		dto5.setGermplasmDbIds(Arrays.asList(this.germplasm.get(0).getGid().toString(), this.germplasm.get(1).getGid().toString()));
 		// # of GIDs in filter x 2# of studies
-		Assert.assertEquals(2 * 2, this.phenotypeDao.countPhenotypes(dto5));
+		Assert.assertEquals(2 * 2, this.phenotypeDao.countObservationUnits(dto5));
 
 		// Search by Dataset Type, just for current program
-		final PhenotypeSearchRequestDTO dto6 = new PhenotypeSearchRequestDTO();
+		final ObservationUnitSearchRequestDTO dto6 = new ObservationUnitSearchRequestDTO();
 		dto6.setProgramDbIds(Collections.singletonList(uniqueID));
 		dto6.setObservationLevel(PLOT);
-		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countPhenotypes(dto6));
+		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countObservationUnits(dto6));
 	}
 
 

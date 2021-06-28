@@ -1,6 +1,6 @@
 package org.generationcp.middleware.api.brapi.v2.observationunit;
 
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 import org.springframework.validation.ObjectError;
@@ -12,7 +12,7 @@ public class ObservationUnitImportResponse {
 
 	private String status;
 	private List<ObjectError> errors;
-	private List<PhenotypeSearchDTO> observationUnits;
+	private List<ObservationUnitDto> observationUnits;
 
 	public ObservationUnitImportResponse() {
 
@@ -34,11 +34,11 @@ public class ObservationUnitImportResponse {
 		this.errors = errors;
 	}
 
-	public List<PhenotypeSearchDTO> getObservationUnits() {
+	public List<ObservationUnitDto> getObservationUnits() {
 		return this.observationUnits;
 	}
 
-	public void setStudyInstanceDtos(final List<PhenotypeSearchDTO> phenotypeSearchDTOS) {
+	public void setStudyInstanceDtos(final List<ObservationUnitDto> phenotypeSearchDTOS) {
 		this.observationUnits = phenotypeSearchDTOS;
 	}
 

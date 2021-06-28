@@ -41,8 +41,8 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -329,17 +329,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId) {
 		return this.daoFactory.getPhenotypeDAO().hasMeasurementDataEntered(ids, studyId);
-	}
-
-	@Override
-	public List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber,
-		final PhenotypeSearchRequestDTO requestDTO) {
-		return this.daoFactory.getPhenotypeDAO().searchPhenotypes(pageSize, pageNumber, requestDTO);
-	}
-
-	@Override
-	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
-		return this.daoFactory.getPhenotypeDAO().countPhenotypes(requestDTO);
 	}
 
 	@Override

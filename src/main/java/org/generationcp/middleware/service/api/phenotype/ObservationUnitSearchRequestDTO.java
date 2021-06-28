@@ -3,7 +3,7 @@ package org.generationcp.middleware.service.api.phenotype;
 import java.io.Serializable;
 import java.util.List;
 
-public class PhenotypeSearchRequestDTO implements Serializable {
+public class ObservationUnitSearchRequestDTO implements Serializable {
 
 	private List<String> germplasmDbIds;
 	private List<String> locationDbIds;
