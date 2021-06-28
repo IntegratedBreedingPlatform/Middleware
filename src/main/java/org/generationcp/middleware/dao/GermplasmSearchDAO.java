@@ -57,8 +57,6 @@ import java.util.stream.Collectors;
  */
 public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
-	private static final String ATRIBUTS = "ATRIBUTS";
-
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmSearchDAO.class);
 
 	// Prevent silly searches from resulting in GIANT IN clauses in search query (which reuses this function).
