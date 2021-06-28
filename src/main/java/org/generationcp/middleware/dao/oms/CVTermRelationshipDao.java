@@ -265,7 +265,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 			allCategories.addAll(this.getScaleCategoriesUsedInAttributes(scaleId));
 			return allCategories;
 		} catch (final HibernateException e) {
-			final String message = "Error in getCategoriesUsedInStudies in CVTermRelationshipDao: "
+			final String message = "Error in getCategoriesInUse in CVTermRelationshipDao: "
 				+ e.getMessage();
 			CVTermRelationshipDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
