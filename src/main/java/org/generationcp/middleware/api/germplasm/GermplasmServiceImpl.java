@@ -1565,4 +1565,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final OntologyVariableDataManager ontologyVariableDataManager) {
 		this.ontologyVariableDataManager = ontologyVariableDataManager;
 	}
+
+	public void setGermplasmAttributeService(final GermplasmAttributeService germplasmAttributeService) {
+		this.germplasmAttributeService = germplasmAttributeService;
+	}
 }
