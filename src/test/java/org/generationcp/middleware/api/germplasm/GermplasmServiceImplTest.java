@@ -98,6 +98,9 @@ public class GermplasmServiceImplTest {
 	@Mock
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
+	@Mock
+	private GermplasmAttributeService germplasmAttributeService;
+
 	@Captor
 	private ArgumentCaptor<List<Integer>> integerListArgumentCaptor;
 
@@ -134,29 +137,29 @@ public class GermplasmServiceImplTest {
 	public void testGetPlotCodeValue() {
 		final GermplasmServiceImpl unitToTest = new GermplasmServiceImpl(Mockito.mock(HibernateSessionProvider.class));
 
-		// We want to mock away calls to other methods in same unit.
-		final GermplasmServiceImpl partiallyMockedUnit = Mockito.spy(unitToTest);
+		//		// We want to mock away calls to other methods in same unit.
+		//		final GermplasmServiceImpl partiallyMockedUnit = Mockito.spy(unitToTest);
 
 		// First set up data such that no plot code attribute is associated.
-		Mockito.doReturn(null).when(partiallyMockedUnit).getPlotCodeField();
+		Mockito.doReturn(null).when(unitToTest).getPlotCodeField();
 		final List<Attribute> attributes = new ArrayList<>();
-		Mockito.doReturn(attributes).when(partiallyMockedUnit).getAttributesByGID(ArgumentMatchers.anyInt());
+		Mockito.doReturn(attributes).when(germplasmAttributeService).getAttributesByGID(ArgumentMatchers.anyInt());
 
-		final String plotCode1 = partiallyMockedUnit.getPlotCodeValue(GID);
+		final String plotCode1 = unitToTest.getPlotCodeValue(GID);
 		assertThat("getPlotCodeValue() should never return null.", plotCode1, is(notNullValue()));
 		assertThat("Expected `Unknown` returned when there is no plot code attribute present.", "Unknown", is(plotCode1));
 		// Now setup data so that gid has plot code attribute associated with it.
 		final Term plotCodeVariable = Mockito.mock(Term.class);
 		Mockito.when(plotCodeVariable.getName()).thenReturn(GermplasmServiceImpl.PLOT_CODE);
 
-		Mockito.when(partiallyMockedUnit.getPlotCodeField()).thenReturn(plotCodeVariable);
+		Mockito.when(unitToTest.getPlotCodeField()).thenReturn(plotCodeVariable);
 		final Attribute plotCodeAttr = new Attribute();
 		plotCodeAttr.setTypeId(plotCodeVariable.getId());
 		plotCodeAttr.setAval("The PlotCode Value");
 		attributes.add(plotCodeAttr);
-		Mockito.when(partiallyMockedUnit.getAttributesByGID(GID)).thenReturn(attributes);
+		Mockito.when(germplasmAttributeService.getAttributesByGID(GID)).thenReturn(attributes);
 
-		final String plotCode2 = partiallyMockedUnit.getPlotCodeValue(GID);
+		final String plotCode2 = unitToTest.getPlotCodeValue(GID);
 		assertThat("getPlotCodeValue() should never return null.", plotCode2, is(notNullValue()));
 		assertThat("Expected value of plot code attribute returned when plot code attribute is present.", plotCodeAttr.getAval(),
 			is(equalTo(plotCode2)));

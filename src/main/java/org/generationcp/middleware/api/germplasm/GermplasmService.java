@@ -1,6 +1,5 @@
 package org.generationcp.middleware.api.germplasm;
 
-import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
@@ -16,9 +15,7 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
-import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.springframework.data.domain.Pageable;
 
@@ -53,14 +50,6 @@ public interface GermplasmService {
 	 * @return Map<gids, plotCodeValue>
 	 */
 	Map<Integer, String> getPlotCodeValues(Set<Integer> gids);
-
-	/**
-	 * Returns all the attributes of the Germplasm identified by the given id.
-	 *
-	 * @param gid - id of the Germplasm
-	 * @return a {@link List} of {@link Attribute}
-	 */
-	List<Attribute> getAttributesByGID(Integer gid);
 
 	/**
 	 * @return the term that represents "plot code"
@@ -111,10 +100,6 @@ public interface GermplasmService {
 
 	ProgenyDTO getProgeny(Integer gid);
 
-	List<AttributeDTO> getAttributesByGUID(String germplasmUUID, List<String> attributeDbIds, Pageable pageable);
-
-	long countAttributesByGUID(String germplasmUUID, List<String> attributeDbIds);
-
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
 
 	GermplasmDto getGermplasmDtoById(Integer gid);
@@ -124,7 +109,5 @@ public interface GermplasmService {
 	void updateGermplasmBasicDetails(Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
 
 	void updateGermplasmPedigree(Integer gid, ProgenitorsUpdateRequestDto progenitorsUpdateRequstDto);
-
-	List<Variable> getGermplasmAttributeVariables(List<Integer> gids, String programUUID);
 
 }

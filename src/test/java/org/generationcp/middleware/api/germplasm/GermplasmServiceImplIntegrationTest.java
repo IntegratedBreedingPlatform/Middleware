@@ -321,29 +321,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAttributesByGID() {
-		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
-
-		assertThat(this.germplasmService.getAttributesByGID(germplasm.getGid()), hasSize(0));
-
-		final Attribute attribute = new Attribute();
-		attribute.setGermplasmId(germplasm.getGid());
-		attribute.setTypeId(attributeId);
-		attribute.setAval(RandomStringUtils.randomAlphanumeric(50));
-		attribute.setAdate(germplasm.getGdate());
-
-		this.daoFactory.getAttributeDAO().save(attribute);
-
-		final List<Attribute> attributes = this.germplasmService.getAttributesByGID(germplasm.getGid());
-		assertThat(attributes, hasSize(1));
-		final Attribute actualAttribute = attributes.get(0);
-		assertNotNull(actualAttribute);
-		assertThat(actualAttribute.getAid(), is(attribute.getAid()));
-		assertThat(actualAttribute.getGermplasmId(), is(germplasm.getGid()));
-	}
-
-	@Test
 	public void test_getPlotCodeValue_OK() {
 		final String plotCodeValue = UUID.randomUUID().toString();
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);

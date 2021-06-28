@@ -69,43 +69,22 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Attribute> getAttributeValuesByTypeAndGIDList(final Integer attributeType, final List<Integer> gidList) {
+	public List<Attribute> getAttributeValuesByTypeAndGIDList(final Integer variableId, final List<Integer> gidList) {
 		List<Attribute> returnList = new ArrayList<>();
 		if (gidList != null && !gidList.isEmpty()) {
 			try {
-				final String sql = "SELECT {a.*}" + " FROM atributs a" + " WHERE a.atype=:attributeType" + " AND a.gid in (:gidList)";
+				final String sql = "SELECT {a.*}" + " FROM atributs a" + " WHERE a.atype=:variableId" + " AND a.gid in (:gidList)";
 				final SQLQuery query = this.getSession().createSQLQuery(sql);
 				query.addEntity("a", Attribute.class);
-				query.setParameter("attributeType", attributeType);
+				query.setParameter("variableId", variableId);
 				query.setParameterList("gidList", gidList);
 				returnList = query.list();
 			} catch (final HibernateException e) {
-				throw new MiddlewareQueryException("Error with getAttributeValuesByTypeAndGIDList(attributeType=" + attributeType
+				throw new MiddlewareQueryException("Error with getAttributeValuesByTypeAndGIDList(variableId=" + variableId
 					+ ", gidList=" + gidList + "): " + e.getMessage(), e);
 			}
 		}
 		return returnList;
-	}
-
-	public Attribute getAttributeByGidAndVariableId(final Integer gid, final Integer variableId) {
-		Attribute attribute = null;
-		try {
-			final String sql = "SELECT {a.*} FROM atributs a "
-				+ " WHERE a.gid = :gid AND a.atype = :variableId";
-			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			query.addEntity("a", Attribute.class);
-			query.setParameter("gid", gid);
-			query.setParameter("variableId", variableId);
-			final List<Attribute> attributes = query.list();
-			if (!attributes.isEmpty()) {
-				attribute = attributes.get(0);
-			}
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error with getAttributeByGidAndVariableId(gid=" + gid + ", " + variableId + "): " + e.getMessage(), e);
-		}
-		return attribute;
 	}
 
 	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId, final String programUUID) {

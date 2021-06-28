@@ -1151,11 +1151,12 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public String getAttributeValue(final Integer gid, final Integer variableId) {
-		final Attribute attribute = this.daoFactory.getAttributeDAO().getAttributeByGidAndVariableId(gid, variableId);
-		if (attribute == null) {
+		final List<Attribute> attributes =
+			this.daoFactory.getAttributeDAO().getAttributeValuesByTypeAndGIDList(variableId, Collections.singletonList(gid));
+		if (attributes.isEmpty()) {
 			return "";
 		} else {
-			return attribute.getAval();
+			return attributes.get(0).getAval();
 		}
 	}
 

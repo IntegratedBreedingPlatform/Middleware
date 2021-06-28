@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasm;
 
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -9,6 +10,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.util.VariableValueUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -58,6 +60,27 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	public void deleteGermplasmAttribute(final Integer attributeId) {
 		final Attribute attribute = this.daoFactory.getAttributeDAO().getById(attributeId);
 		this.daoFactory.getAttributeDAO().makeTransient(attribute);
+	}
+
+	@Override
+	public List<Attribute> getAttributesByGID(final Integer gid) {
+		return this.daoFactory.getAttributeDAO().getByGID(gid);
+	}
+
+	@Override
+	public List<AttributeDTO> getAttributesByGUID(
+		final String germplasmUUID, final List<String> attributeDbIds, final Pageable pageable) {
+		return this.daoFactory.getAttributeDAO().getAttributesByGUIDAndAttributeIds(germplasmUUID, attributeDbIds, pageable);
+	}
+
+	@Override
+	public long countAttributesByGUID(final String gemrplasmUUID, final List<String> attributeDbIds) {
+		return this.daoFactory.getAttributeDAO().countAttributesByGUID(gemrplasmUUID, attributeDbIds);
+	}
+
+	@Override
+	public List<Variable> getGermplasmAttributeVariables(final List<Integer> gids, final String programUUID) {
+		return this.daoFactory.getGermplasmDao().getGermplasmAttributeVariables(gids, programUUID);
 	}
 
 }
