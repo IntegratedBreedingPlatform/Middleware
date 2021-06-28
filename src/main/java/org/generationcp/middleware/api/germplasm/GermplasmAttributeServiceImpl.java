@@ -11,9 +11,11 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.util.VariableValueUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Transactional
 public class GermplasmAttributeServiceImpl implements GermplasmAttributeService {
 
 	private final DaoFactory daoFactory;
