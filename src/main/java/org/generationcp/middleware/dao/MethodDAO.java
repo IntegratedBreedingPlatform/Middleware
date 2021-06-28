@@ -49,7 +49,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(MethodDAO.class);
 
 	private static final String COUNT_BREEDING_METHODS_WITH_VARIABLE =
-		" SELECT count(*) FROM methods where "
+		" SELECT count(1) FROM methods where "
 			+ "\t    prefix like CONCAT('%[ATTRSC.',:variableId,']%') "
 			+ "\t or prefix like CONCAT('%[ATTRFP.',:variableId,']%') "
 			+ "\t or prefix like CONCAT('%[ATTRMP.',:variableId,']%') "
@@ -618,11 +618,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 	public long countByVariable(final int variableId){
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(MethodDAO.COUNT_BREEDING_METHODS_WITH_VARIABLE);
-			query.setParameter("variableId", variableId);
-			query.setParameter("variableId", variableId);
-			query.setParameter("variableId", variableId);
-			query.setParameter("variableId", variableId);
-			query.setParameter("variableId", variableId);
 			query.setParameter("variableId", variableId);
 
 
