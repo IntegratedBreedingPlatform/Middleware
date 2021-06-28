@@ -10,6 +10,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.criterion.Restrictions;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -86,10 +87,10 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 		return listInfo;
 	}
 
-	public boolean hasOntologyVariableInUse(final String columnName) {
-		final String sql = "SELECT * FROM listdataprops where column_name=:columnName GROUP by column_name";
+	public boolean isOntologyVariableInUse(final String columnName) {
+		final String sql = "select count(1) from listdataprops where column_name=:columnName";
 		final Query query = this.getSession().createSQLQuery(sql);
 		query.setParameter("columnName", columnName);
-		return query.list().size() > 0;
+		return ((BigInteger) query.uniqueResult()).longValue() > 0;
 	}
 }

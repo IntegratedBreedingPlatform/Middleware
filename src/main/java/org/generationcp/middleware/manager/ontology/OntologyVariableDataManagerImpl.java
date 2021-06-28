@@ -587,7 +587,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		}
 
 		// Temporal condition to avoid delete variable when it exists in listdataprops.
-		final boolean variableUsedInListdataProp = this.daoFactory.getListDataPropertyDAO().hasOntologyVariableInUse(variable.getName());
+		final boolean variableUsedInListdataProp = this.daoFactory.getListDataPropertyDAO().isOntologyVariableInUse(variable.getName());
 		variable.setObservations(observations);
 		//it can be replaced by observations > 0
 		variable.setHasUsage(this.isVariableUsedInStudy(variable.getId()) || //
