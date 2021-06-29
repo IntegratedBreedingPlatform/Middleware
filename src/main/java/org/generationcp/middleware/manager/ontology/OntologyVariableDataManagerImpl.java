@@ -586,13 +586,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			observations = (int) (observations + observationsPerType);
 		}
 
-		// Temporal condition to avoid delete variable when it exists in listdataprops.
-		final boolean variableUsedInListdataProp = this.daoFactory.getListDataPropertyDAO().isOntologyVariableInUse(variable.getName());
 		variable.setObservations(observations);
-		//it can be replaced by observations > 0
-		variable.setHasUsage(this.isVariableUsedInStudy(variable.getId()) || //
-			variable.getGermplasm() > 0 || //
-			variable.getBreedingMethods() > 0 || variableUsedInListdataProp);
+		variable.setHasUsage(this.hasUsage (variable.getId()));
 
 	}
 
@@ -823,9 +818,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		this.checkTermIsVariable(term);
 
 		// check usage
-		final Boolean isUsed = this.isVariableUsedInStudy(variableId) || //
-			this.isVariableUsedInGermplasm(variableId) || //
-			this.isVariableUsedInBreedingMethods(variableId);
+		final Boolean isUsed = this.hasUsage(variableId);
 
 		if (isUsed) {
 			throw new MiddlewareException(OntologyVariableDataManagerImpl.CAN_NOT_DELETE_USED_VARIABLE);
@@ -908,10 +901,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		final SQLQuery query = this.getActiveSession().createSQLQuery(variableUsageCount);
 		query.setParameter("variableId", variableId);
 		return !query.list().isEmpty();
-	}
-
-	public boolean isVariableUsedInGermplasm(final int variableId) {
-		return this.daoFactory.getAttributeDAO().countByVariables(Lists.newArrayList(variableId)) > 0;
 	}
 
 	public boolean isVariableUsedInBreedingMethods(final int variableId) {
@@ -1091,5 +1080,23 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@Override
 	public List<Variable> searchAttributeVariables(final String query, final String programUUID) {
 		return this.daoFactory.getCvTermDao().searchAttributeVariables(query, programUUID);
+	}
+
+	/***
+	 * Method to centralize the validation if the variable is used anywhere
+	 * (studies, germplasm, breeding methods, listdataprops)
+	 *
+	 * @param variableId
+	 * @return boolean
+	 */
+	@Override
+	public boolean hasUsage(final int variableId) {
+		// Temporal condition to avoid delete variable when it exists in listdataprops.
+		final boolean variableUsedInListdataProp = this.daoFactory.getListDataPropertyDAO().isOntologyVariableInUse(variableId);
+
+		return variableUsedInListdataProp ||
+			this.isVariableUsedInStudy(variableId) ||
+			this.areVariablesUsedInAttributes(Lists.newArrayList(variableId)) ||
+			this.isVariableUsedInBreedingMethods(variableId);
 	}
 }
