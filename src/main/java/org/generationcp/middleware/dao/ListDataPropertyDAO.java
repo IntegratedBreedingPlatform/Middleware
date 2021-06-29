@@ -87,10 +87,10 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 		return listInfo;
 	}
 
-	public boolean isOntologyVariableInUse(final String columnName) {
-		final String sql = "select count(1) from listdataprops where column_name=:columnName";
+	public boolean isOntologyVariableInUse(final Integer variableId) {
+		final String sql = "select count(1) from listdataprops ldp inner join cvterm cv on ldp.column_name = cv.name and cv.cvterm_id = :variableId";
 		final Query query = this.getSession().createSQLQuery(sql);
-		query.setParameter("columnName", columnName);
+		query.setParameter("variableId", variableId);
 		return ((BigInteger) query.uniqueResult()).longValue() > 0;
 	}
 }
