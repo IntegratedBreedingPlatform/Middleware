@@ -133,4 +133,8 @@ public enum VariableType {
 		return Arrays.asList(ANALYSIS, ANALYSIS_SUMMARY);
 	}
 
+	public static List<VariableType> getAttributeVariableTypes() {
+		return Arrays.asList(GERMPLASM_ATTRIBUTE, GERMPLASM_PASSPORT);
+	}
+
 }
