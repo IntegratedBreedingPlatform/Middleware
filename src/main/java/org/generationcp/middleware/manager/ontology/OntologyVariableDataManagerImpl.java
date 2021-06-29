@@ -907,6 +907,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		return this.daoFactory.getMethodDAO().countByVariable(variableId) > 0;
 	}
 
+	@Override
+	public boolean hasVariableAttributeGermplasmDeleted(final int variableId) {
+		return this.daoFactory.getAttributeDAO().countByVariableWithGermplasmsDeleted(variableId) > 0;
+	}
+
 	private void updateVariableSynonym(final CVTerm term, final String newVariableName) {
 		final String oldVariableName = term.getName().trim();
 		final String newName = newVariableName.trim();

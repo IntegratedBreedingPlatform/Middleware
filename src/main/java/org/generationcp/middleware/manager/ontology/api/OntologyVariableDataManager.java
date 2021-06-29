@@ -127,4 +127,6 @@ public interface OntologyVariableDataManager {
 	List<Variable> searchAttributeVariables(String query, String programUUID);
 
 	boolean hasUsage(int variableId);
+
+	public boolean hasVariableAttributeGermplasmDeleted(final int variableId);
 }

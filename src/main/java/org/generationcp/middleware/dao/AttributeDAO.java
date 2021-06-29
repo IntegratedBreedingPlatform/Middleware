@@ -36,6 +36,9 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 	private static final String COUNT_ATTRIBUTE_WITH_VARIABLES =
 		"SELECT COUNT(A.ATYPE) FROM ATRIBUTS A INNER JOIN GERMPLSM G ON G.GID = A.GID AND G.DELETED = 0 WHERE A.ATYPE IN (:variableIds)";
 
+	private static final String COUNT_ATTRIBUTE_WITH_GERMPLASM_DELETED =
+		"SELECT COUNT(A.ATYPE) FROM ATRIBUTS A INNER JOIN GERMPLSM G ON G.GID = A.GID AND G.DELETED = 1 WHERE A.ATYPE = :variableId";
+
 	@SuppressWarnings("unchecked")
 	public List<Attribute> getByGID(final Integer gid) {
 		List<Attribute> toReturn = new ArrayList<>();
@@ -209,6 +212,20 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
 		} catch (final HibernateException e) {
 			final String errorMessage = "Error at countByVariables=" + variablesIds + " in AttributeDAO: " + e.getMessage();
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
+	public long countByVariableWithGermplasmsDeleted(final Integer variablesId){
+		try {
+			final SQLQuery query =
+				this.getSession().createSQLQuery(COUNT_ATTRIBUTE_WITH_GERMPLASM_DELETED);
+			query.setParameter("variableId", variablesId);
+
+			return ((BigInteger) query.uniqueResult()).longValue();
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error at countByVariableWithGermplasmsDeleted=" + variablesId + " in AttributeDAO: " + e.getMessage();
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
