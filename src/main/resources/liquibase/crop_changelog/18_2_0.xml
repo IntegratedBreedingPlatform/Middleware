@@ -89,4 +89,16 @@
 		</createIndex>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="v18.2.0-6">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="progntrs_aud" indexName="progntrs_aud_refid_index"></indexExists>
+			</not>
+		</preConditions>
+		<comment>Add index for progntrs_aud gid column</comment>
+		<createIndex indexName="progntrs_aud_gid_index" tableName="progntrs_aud" unique="false">
+			<column name="gid"></column>
+		</createIndex>
+	</changeSet>
+
 </databaseChangeLog>
