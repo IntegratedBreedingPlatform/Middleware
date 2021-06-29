@@ -716,16 +716,16 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		final Map<String, Integer> typesMap = new HashMap<>();
 		if (!nonStandardColumns.isEmpty()) {
 			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT if(vo.alias is null,cv.name ,vo.alias) AS name, cv.cvterm_id "
+				.createSQLQuery(" SELECT IFNULL(vo.alias, cv.name) as name, cv.cvterm_id "
 					+ " FROM cvterm cv INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id " //
 					+ " LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID " //
-					+ " WHERE cp.value in (select name from cvterm where cvterm_id in ("
+					+ " INNER JOIN cvterm vartype on vartype.name = cp.value and vartype.cvterm_id in ( "
 					+ VariableType.GERMPLASM_PASSPORT.getId() + ","
-					+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ")) " //
-					+ "and cv.name IN (:fieldList) or vo.alias IN (:fieldList)");
+					+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ") " //
+					+ "WHERE cv.name IN (:fieldList) or vo.alias IN (:fieldList)");
 			query.setParameter("programUUID", programUUID);
 			query.setParameterList("fieldList", addedColumnsPropertyIds);
-			query.setParameterList("fieldList", addedColumnsPropertyIds);
+
 			final List<Object[]> results = query.list();
 
 			for (final Object[] row : results) {
@@ -1384,10 +1384,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 					+ " INNER JOIN cvterm cv on a.atype = cv.cvterm_id \n"
 					+ " INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id "
 					+ " LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID " //
-					+ " WHERE cp.value in (select name from cvterm where cvterm_id in ("
+					+ " INNER JOIN cvterm vartype on vartype.name = cp.value and vartype.cvterm_id in ("
 					+ VariableType.GERMPLASM_PASSPORT.getId() + ","
-					+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ")) " //
-						+ " AND ( cv.name = :attributeKey%s  or vo.alias = :attributeKey%s ) and a.aval like :attributeValue%<s )",
+					+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ") " //
+						+ " WHERE ( cv.name = :attributeKey%s  or vo.alias = :attributeKey%s ) and a.aval like :attributeValue%<s )",
 					entry.getKey(), entry.getKey()));
 				if (iterator.hasNext()) {
 					queryBuilder.append(" and ");
