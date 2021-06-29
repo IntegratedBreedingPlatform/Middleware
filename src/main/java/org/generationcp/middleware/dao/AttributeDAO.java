@@ -34,7 +34,7 @@ import java.util.List;
 public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
 	private static final String COUNT_ATTRIBUTE_WITH_VARIABLES =
-		"SELECT COUNT(A.ATYPE) FROM ATRIBUTS A WHERE A.ATYPE IN (:variableIds)";
+		"SELECT COUNT(A.ATYPE) FROM ATRIBUTS A INNER JOIN GERMPLSM G ON G.GID = A.GID AND G.DELETED = 0 WHERE A.ATYPE IN (:variableIds)";
 
 	@SuppressWarnings("unchecked")
 	public List<Attribute> getByGID(final Integer gid) {
