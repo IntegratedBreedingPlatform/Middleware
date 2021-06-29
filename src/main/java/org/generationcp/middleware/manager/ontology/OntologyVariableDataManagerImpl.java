@@ -1083,7 +1083,11 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	/***
+	 * Method to centralize the validation if the variable is used anywhere
+	 * (studies, germplasm, breeding methods, listdataprops)
 	 *
+	 * @param variableId
+	 * @return boolean
 	 */
 	@Override
 	public boolean hasUsage(final int variableId) {
