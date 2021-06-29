@@ -12,4 +12,8 @@ public enum RevisionType {
 		this.value = value;
 	}
 
+	public int getValue() {
+		return this.value;
+	}
+
 }
