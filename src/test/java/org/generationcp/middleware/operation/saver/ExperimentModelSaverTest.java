@@ -13,7 +13,7 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImplTest;
+import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +25,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 	private ExperimentModelSaver experimentModelSaver;
 	private ExperimentDao experimentDao;
 	private PhenotypeDao phenotypeDao;
-	
+
 	@Before
 	public void setUp() throws Exception {
 		this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
@@ -131,7 +131,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		this.experimentModelSaver.addOrUpdateExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Assert.assertNotNull(experiment.getObsUnitId());
-		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
+		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorTest.UUID_REGEX));
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
 	}
@@ -152,7 +152,7 @@ public class ExperimentModelSaverTest extends IntegrationTestBase {
 		this.experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Assert.assertNotNull(experiment.getObsUnitId());
-		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
+		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorTest.UUID_REGEX));
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
 	}

@@ -49,7 +49,6 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
-import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImpl;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,7 +170,7 @@ public class DatasetServiceImpl implements DatasetService {
 			transactionsSearchDto.setPlantingStudyIds(Arrays.asList(studyId));
 			if (this.daoFactory.getTransactionDAO().countSearchTransactions(transactionsSearchDto) > 0) {
 				final Optional<MeasurementVariable>
-					designation = factorColumns.stream().filter(measurementVariable -> 
+					designation = factorColumns.stream().filter(measurementVariable ->
 					measurementVariable.getTermId() == TermId.DESIG.getId()).findFirst();
 				// Set the variable name of this virtual Column to STOCK_ID, to match the stock of planting inventory
 				factorColumns.add(factorColumns.indexOf(designation.get()) + 1,
@@ -324,12 +323,11 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getExperimentDao().getObservationUnits(plotDataset.getProjectId(), instanceIds);
 		final DmsProject dmsProject = this.daoFactory.getDmsProjectDAO().getById(studyId);
 		final CropType crop = this.workbenchDataManager.getProjectByUuid(dmsProject.getProgramUUID()).getCropType();
-		final ObservationUnitIDGenerator observationUnitIdGenerator = new ObservationUnitIDGeneratorImpl();
 		for (final ExperimentModel plotObservationUnit : plotObservationUnits) {
 			for (int i = 1; i <= numberOfSubObservationUnits; i++) {
 				final ExperimentModel experimentModel = new ExperimentModel(plotObservationUnit.getGeoLocation(),
 					plotObservationUnit.getTypeId(), subObservationDataset, plotObservationUnit.getStock(), plotObservationUnit, i);
-				observationUnitIdGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
+				ObservationUnitIDGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
 				this.daoFactory.getExperimentDao().save(experimentModel);
 			}
 		}

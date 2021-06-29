@@ -38,7 +38,7 @@ public class ObservationUnitImportResponse {
 		return this.observationUnits;
 	}
 
-	public void setStudyInstanceDtos(final List<ObservationUnitDto> phenotypeSearchDTOS) {
+	public void setObservationUnits(final List<ObservationUnitDto> phenotypeSearchDTOS) {
 		this.observationUnits = phenotypeSearchDTOS;
 	}
 

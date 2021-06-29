@@ -1,5 +1,4 @@
 package org.generationcp.middleware.api.brapi.v2.observationunit;
-
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 
@@ -27,4 +26,7 @@ public interface ObservationUnitService {
 	 * @return Number of observation units
 	 */
 	long countObservationUnits(ObservationUnitSearchRequestDTO requestDTO);
+
+	List<ObservationUnitDto> importObservationUnits(String crop, List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos, Integer userId);
+
 }

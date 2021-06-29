@@ -987,7 +987,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
 				observationUnitPosition.setBlockNumber(observationUnit.getBlockNumber());
 				observationUnitPosition.setEntryNumber(observationUnit.getEntryNumber());
-				observationUnitPosition.setEntryType(Lists.newArrayList(observationUnit.getEntryType()));
+				observationUnitPosition.setEntryType(observationUnit.getEntryType());
 				observationUnitPosition.setPositionCoordinateX(x);
 				if (x != null) {
 					observationUnitPosition.setPositionCoordinateXType("GRID_COL");

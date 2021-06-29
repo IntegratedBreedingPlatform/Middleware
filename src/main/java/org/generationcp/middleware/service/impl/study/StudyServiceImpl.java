@@ -563,6 +563,32 @@ public class StudyServiceImpl extends Service implements StudyService {
 				new ProjectProperty(dataset, VariableType.ENVIRONMENT_DETAIL.getId(), null, 4, TermId.LOCATION_ID.getId(),
 					"LOCATION_NAME");
 			properties.add(locationNameProp);
+		} else {
+			final ProjectProperty entryTypeProp =
+				new ProjectProperty(dataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, 4, TermId.ENTRY_TYPE.getId(),
+					"ENTRY_TYPE");
+			properties.add(entryTypeProp);
+
+			final ProjectProperty gidProp =
+				new ProjectProperty(dataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, 5, TermId.GID.getId(),
+					"GID");
+			properties.add(gidProp);
+
+			final ProjectProperty designationProp =
+				new ProjectProperty(dataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, 6, TermId.DESIG.getId(),
+					"DESIGNATION");
+			properties.add(designationProp);
+
+			final ProjectProperty entryNoProp =
+				new ProjectProperty(dataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, 7, TermId.ENTRY_NO.getId(),
+					"ENTRY_NO");
+			properties.add(entryNoProp);
+
+			final ProjectProperty obsUnitIdProp =
+				new ProjectProperty(dataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, 8, TermId.OBS_UNIT_ID.getId(),
+					"OBS_UNIT_ID");
+			properties.add(obsUnitIdProp);
+
 		}
 		dataset.setProperties(properties);
 	}

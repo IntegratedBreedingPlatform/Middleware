@@ -1,12 +1,12 @@
 package org.generationcp.middleware.api.brapi.v2.observationunit;
 
-import java.util.List;
 import java.util.Map;
 
 public class ObservationUnitPosition {
+
 	private String blockNumber;
 	private String entryNumber;
-	private List<String> entryType;
+	private String entryType;
 	private Map<String, Object> geoCoordinates;
 	private String positionCoordinateX;
 	private String positionCoordinateXType;
@@ -33,11 +33,11 @@ public class ObservationUnitPosition {
 		this.entryNumber = entryNumber;
 	}
 
-	public List<String> getEntryType() {
+	public String getEntryType() {
 		return this.entryType;
 	}
 
-	public void setEntryType(final List<String> entryType) {
+	public void setEntryType(final String entryType) {
 		this.entryType = entryType;
 	}
 

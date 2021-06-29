@@ -43,7 +43,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
-import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImplTest;
+import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorTest;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -1016,7 +1016,7 @@ public class DatasetServiceImplTest {
 				Assert.assertEquals(plotExperiment.getStock(), subObsUnit.getStock());
 				Assert.assertEquals(plotExperiment.getTypeId(), subObsUnit.getTypeId());
 				Assert.assertNotNull(subObsUnit.getObsUnitId());
-				Assert.assertFalse(subObsUnit.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
+				Assert.assertFalse(subObsUnit.getObsUnitId().matches(ObservationUnitIDGeneratorTest.UUID_REGEX));
 			}
 		}
 	}

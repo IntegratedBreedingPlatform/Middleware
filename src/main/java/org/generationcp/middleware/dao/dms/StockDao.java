@@ -54,6 +54,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link StockModel}.
@@ -361,6 +363,35 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 
 		return stockModels;
+	}
+
+	@SuppressWarnings("unchecked")
+	public Map<Integer, List<StockModel>> getStockMapByStudyIds(final List<Integer> studyIds)  {
+		try {
+
+			final Map<Integer, List<StockModel>> stockMap = new HashMap<>();
+			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
+			criteria.add(Restrictions.in("project.projectId", studyIds));
+			criteria.addOrder(new org.hibernate.criterion.Order("uniquename", true) {
+				@Override
+				public String toSqlString(final Criteria criteria, final CriteriaQuery criteriaQuery) throws HibernateException {
+					return "CAST(uniquename AS UNSIGNED)";
+				}
+			});
+
+			final List<StockModel> stocks = criteria.list();
+			for(final StockModel stockModel: stocks) {
+				stockMap.putIfAbsent(stockModel.getProject().getProjectId(), new ArrayList<>());
+				stockMap.get(stockModel.getProject().getProjectId()).add(stockModel);
+			}
+
+			return stockMap;
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error in getStockMapByStudyIds=" + studyIds + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
 	}
 
 	public Map<Integer, StudyEntryDto> getPlotEntriesMap(final Integer studyId, final Set<Integer> plotNos) {
