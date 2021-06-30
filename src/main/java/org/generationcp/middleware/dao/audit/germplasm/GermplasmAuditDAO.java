@@ -156,6 +156,7 @@ public class GermplasmAuditDAO {
 
 		this.addCommonScalars(query);
 		query.addScalar(GermplasmOtherProgenitorsAuditDAOQuery.PROGENITOR_GID_ALIAS);
+		query.addScalar(GermplasmOtherProgenitorsAuditDAOQuery.PROGENITORS_NUMBER_ALIAS, IntegerType.INSTANCE);
 		query.setResultTransformer(Transformers.aliasToBean(GermplasmOtherProgenitorsAuditDTO.class));
 
 		GenericDAO.addPaginationToSQLQuery(query, pageable);

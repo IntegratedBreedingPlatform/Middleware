@@ -17,6 +17,9 @@ class GermplasmAttributeAuditDAOQuery {
 	private final static String BASE_QUERY = "SELECT %s " // use of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ "       FROM atributs_aud a_aud "
 		+ "    INNER JOIN udflds user_defined_field ON a_aud.atype = user_defined_field.fldno "
+		// TODO: cvterm.cvterm_id
+		+ "    INNER JOIN udflds user_defined_field ON a_aud.atype = user_defined_field.fldno "
+		// TODO: cvtermprop.cvterm_id AND type_id = 1800 AND value = 'GERMPLASM_' -> check in variable type
 		+ "    INNER JOIN location loc ON a_aud.alocn = loc.locid "
 		+ "	   %s" // use of SELF_JOIN_QUERY -> It's not needed for the count query
 		+ " WHERE a_aud.aid = :aid "

@@ -7,6 +7,7 @@ import org.pojomatic.annotations.AutoProperty;
 public class GermplasmOtherProgenitorsAuditDTO extends AbstractAuditDTO {
 
 	private Integer progenitorGid;
+	private Integer progenitorsNumber;
 
 	public GermplasmOtherProgenitorsAuditDTO() {
 	}
@@ -17,6 +18,14 @@ public class GermplasmOtherProgenitorsAuditDTO extends AbstractAuditDTO {
 
 	public void setProgenitorGid(final Integer progenitorGid) {
 		this.progenitorGid = progenitorGid;
+	}
+
+	public Integer getProgenitorsNumber() {
+		return progenitorsNumber;
+	}
+
+	public void setProgenitorsNumber(final Integer progenitorsNumber) {
+		this.progenitorsNumber = progenitorsNumber;
 	}
 
 	@Override

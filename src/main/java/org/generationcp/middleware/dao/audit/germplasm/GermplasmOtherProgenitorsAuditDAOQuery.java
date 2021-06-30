@@ -5,6 +5,7 @@ import org.generationcp.middleware.dao.audit.AuditConstants;
 class GermplasmOtherProgenitorsAuditDAOQuery {
 
 	static final String PROGENITOR_GID_ALIAS = "progenitorGid";
+	static final String PROGENITORS_NUMBER_ALIAS = "progenitorsNumber";
 
 	private final static String BASE_QUERY = "SELECT %s " // use of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ "       FROM progntrs_aud p_aud "
@@ -12,6 +13,7 @@ class GermplasmOtherProgenitorsAuditDAOQuery {
 		+ " %s"; // use of ORDER_EXPRESION -> It's not needed for the count query
 
 	private static final String SELECT_EXPRESION = "p_aud.pid AS " + PROGENITOR_GID_ALIAS + ", "
+		+ " p_aud.pno AS " + PROGENITORS_NUMBER_ALIAS + ", "
 		+ " p_aud.rev_type AS " + AuditConstants.REVISION_TYPE_ALIAS + ", "
 		+ " p_aud.created_date AS " + AuditConstants.CREATED_DATE_ALIAS + ", "
 		+ " p_aud.modified_date AS " + AuditConstants.MODIFIED_DATE_ALIAS + ", "
@@ -20,7 +22,7 @@ class GermplasmOtherProgenitorsAuditDAOQuery {
 
 	private static final String COUNT_EXPRESSION = " COUNT(1) ";
 
-	private static final String ORDER_EXPRESION = " ORDER BY p_aud.aud_id DESC ";
+	private static final String ORDER_EXPRESION = " ORDER BY p_aud.aud_id DESC, p_aud.pno DESC ";
 
 	static String getSelectQuery() {
 		return String.format(BASE_QUERY, SELECT_EXPRESION, ORDER_EXPRESION);
