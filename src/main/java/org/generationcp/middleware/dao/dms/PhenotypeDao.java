@@ -985,8 +985,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setLocationName(observationUnit.getStudyLocation());
 				observationUnit.setObservationUnitPUI("");
 				final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
-				observationUnitPosition.setBlockNumber(observationUnit.getBlockNumber());
-				observationUnitPosition.setEntryNumber(observationUnit.getEntryNumber());
 				observationUnitPosition.setEntryType(observationUnit.getEntryType());
 				observationUnitPosition.setPositionCoordinateX(x);
 				if (x != null) {
@@ -1006,7 +1004,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 						LOG.error("couldn't parse json_props column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(), e);
 					}
 				}
-				observationUnitPosition.setReplicate(observationUnit.getReplicate());
 				observationUnit.setObservationUnitPosition(observationUnitPosition);
 
 				observationUnit.setProgramDbId((String) row[22]);

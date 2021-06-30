@@ -1,20 +1,21 @@
 package org.generationcp.middleware.api.brapi.v2.observationunit;
 
-import java.util.List;
-import java.util.Map;
+import org.generationcp.middleware.api.location.Coordinate;
 
-public class ObservationUnitPosition {
+import java.util.List;
+
+public class ObservationUnitPositionImportRequestDto {
 
 	private String entryType;
-	private Map<String, Object> geoCoordinates;
-	private ObservationLevelRelationship observationLevel;
+	private Coordinate geoCoordinates;
+	private String observationLevel;
 	private List<ObservationLevelRelationship> observationLevelRelationships;
 	private String positionCoordinateX;
 	private String positionCoordinateXType;
 	private String positionCoordinateY;
 	private String positionCoordinateYType;
 
-	public ObservationUnitPosition() {
+	public ObservationUnitPositionImportRequestDto() {
 	}
 
 	public String getEntryType() {
@@ -25,19 +26,19 @@ public class ObservationUnitPosition {
 		this.entryType = entryType;
 	}
 
-	public Map<String, Object> getGeoCoordinates() {
+	public Coordinate getGeoCoordinates() {
 		return this.geoCoordinates;
 	}
 
-	public void setGeoCoordinates(final Map<String, Object> geoCoordinates) {
+	public void setGeoCoordinates(final Coordinate geoCoordinates) {
 		this.geoCoordinates = geoCoordinates;
 	}
 
-	public ObservationLevelRelationship getObservationLevel() {
+	public String getObservationLevel() {
 		return observationLevel;
 	}
 
-	public void setObservationLevel(final ObservationLevelRelationship observationLevel) {
+	public void setObservationLevel(final String observationLevel) {
 		this.observationLevel = observationLevel;
 	}
 

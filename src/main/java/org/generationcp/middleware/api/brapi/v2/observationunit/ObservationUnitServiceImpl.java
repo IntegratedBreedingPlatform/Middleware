@@ -118,7 +118,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			final Integer studyDbId = Integer.valueOf(dto.getStudyDbId());
 			final Map<String, Integer> entryTypes =
 				this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), dto.getProgramDbId()).getEnumerations()
-					.stream().collect(Collectors.toMap(Enumeration::getDescription, Enumeration::getId));
+					.stream().collect(Collectors.toMap(enumeration -> enumeration.getDescription().toUpperCase(), Enumeration::getId));
 			if (!stockMap.containsKey(trialDbId) || !trialIdGermplasmUUIDMap.get(trialDbId).contains(dto.getGermplasmDbId())) {
 				final StockModel stockModel =
 					this.createStockModel(germplasmDTOMap.get(dto.getGermplasmDbId()), stockMap, dto, trialDbId, entryTypes);
@@ -184,7 +184,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final Set<StockProperty> properties = new HashSet<>();
 		final StockProperty stockProperty = new StockProperty();
 		stockProperty.setStock(stockModel);
-		stockProperty.setValue(entryTypes.get(dto.getObservationUnitPosition().getEntryType()).toString());
+		stockProperty.setValue(entryTypes.get(dto.getObservationUnitPosition().getEntryType().toUpperCase()).toString());
 		stockProperty.setTypeId(TermId.ENTRY_TYPE.getId());
 		properties.add(stockProperty);
 		stockModel.setProperties(properties);
