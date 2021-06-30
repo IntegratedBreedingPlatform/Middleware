@@ -13,6 +13,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
+import org.hibernate.type.IntegerType;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
@@ -128,9 +129,10 @@ public class GermplasmAuditDAO {
 
 		this.addCommonScalars(query);
 		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.BREEDING_METHOD_NAME_ALIAS);
+		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.BREEDING_METHOD_TYPE_ALIAS);
 		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.FEMALE_PARENT_ALIAS);
 		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.MALE_PARENT_ALIAS);
-		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.PROGENITORS_NUMBER_ALIAS);
+		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.PROGENITORS_NUMBER_ALIAS, IntegerType.INSTANCE);
 		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.BREEDING_METHOD_CHANGED_ALIAS, BooleanType.INSTANCE);
 		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.FEMALE_PARENT_CHANGED_ALIAS, BooleanType.INSTANCE);
 		query.addScalar(GermplasmProgenitorDetailsAuditDAOQuery.MALE_PARENT_CHANGED_ALIAS, BooleanType.INSTANCE);

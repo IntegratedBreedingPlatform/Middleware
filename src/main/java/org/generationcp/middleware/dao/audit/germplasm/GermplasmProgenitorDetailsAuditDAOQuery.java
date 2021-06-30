@@ -5,6 +5,7 @@ import org.generationcp.middleware.dao.audit.AuditConstants;
 class GermplasmProgenitorDetailsAuditDAOQuery {
 
 	static final String BREEDING_METHOD_NAME_ALIAS = "breedingMethodName";
+	static final String BREEDING_METHOD_TYPE_ALIAS = "breedingMethodType";
 	static final String FEMALE_PARENT_ALIAS = "femaleParent";
 	static final String MALE_PARENT_ALIAS = "maleParent";
 	static final String PROGENITORS_NUMBER_ALIAS = "progenitorsNumber";
@@ -31,9 +32,10 @@ class GermplasmProgenitorDetailsAuditDAOQuery {
 		+ " %s"; // use of ORDER_EXPRESION -> It's not needed for the count query
 
 	private static final String SELECT_EXPRESION = " method.mname AS " + BREEDING_METHOD_NAME_ALIAS + ", "
+		+ " method.mtype AS " + BREEDING_METHOD_TYPE_ALIAS + ", "
 		+ " g_aud.gpid1 AS " + FEMALE_PARENT_ALIAS + ", "
 		+ " g_aud.gpid2 AS " + MALE_PARENT_ALIAS + ", "
-		+ " g_aud.gnpgs AS " + PROGENITORS_NUMBER_ALIAS + ", "
+		+ " ABS(g_aud.gnpgs) AS " + PROGENITORS_NUMBER_ALIAS + ", "
 		+ " g_aud.rev_type AS " + AuditConstants.REVISION_TYPE_ALIAS + ", "
 		+ " g_aud.created_date AS " + AuditConstants.CREATED_DATE_ALIAS + ", "
 		+ " g_aud.modified_date AS " + AuditConstants.MODIFIED_DATE_ALIAS + ", "

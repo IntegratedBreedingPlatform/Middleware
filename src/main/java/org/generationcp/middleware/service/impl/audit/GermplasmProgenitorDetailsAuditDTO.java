@@ -7,6 +7,7 @@ import org.pojomatic.annotations.AutoProperty;
 public class GermplasmProgenitorDetailsAuditDTO extends AbstractAuditDTO {
 
 	private String breedingMethodName;
+	private String breedingMethodType;
 	private Integer femaleParent;
 	private Integer maleParent;
 	private Integer progenitorsNumber;
@@ -25,6 +26,14 @@ public class GermplasmProgenitorDetailsAuditDTO extends AbstractAuditDTO {
 
 	public void setBreedingMethodName(final String breedingMethodName) {
 		this.breedingMethodName = breedingMethodName;
+	}
+
+	public String getBreedingMethodType() {
+		return breedingMethodType;
+	}
+
+	public void setBreedingMethodType(final String breedingMethodType) {
+		this.breedingMethodType = breedingMethodType;
 	}
 
 	public Integer getFemaleParent() {
