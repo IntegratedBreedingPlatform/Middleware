@@ -29,7 +29,6 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
-import org.generationcp.middleware.pojos.naming.NamingConfiguration;
 import org.generationcp.middleware.pojos.workbench.CropType;
 
 import java.util.List;
@@ -65,26 +64,6 @@ public interface GermplasmDataManager {
 	long countGermplasmByName(String name, Operation op);
 
 	/**
-	 * Returns the germplasm records that were created at the locations with names matching the given parameter.
-	 *
-	 * @param name      - search string for the name of the locations
-	 * @param start     - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param op        - can be EQUAL like LIKE
-	 * @return List of Germplasm POJOs
-	 */
-	List<Germplasm> getGermplasmByLocationName(String name, int start, int numOfRows, Operation op);
-
-	/**
-	 * Returns the number of germplasm records that were created at the locations with names matching the given parameter.
-	 *
-	 * @param name - search string for the name of the locations
-	 * @param op   - can be EQUAL like LIKE
-	 * @return Number of Germplasms
-	 */
-	long countGermplasmByLocationName(String name, Operation op);
-
-	/**
 	 * Please use LocationDataManager.getAllCountry().
 	 * <p>
 	 * Returns all country records.
@@ -94,26 +73,6 @@ public interface GermplasmDataManager {
 	 */
 	@Deprecated
 	List<Country> getAllCountry();
-
-	/**
-	 * Returns the germplasm records that were created by the methods with names matching the given parameter.
-	 *
-	 * @param name      - search string for the name of the methods
-	 * @param start     - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
-	 * @param op        - can be EQUAL or LIKE
-	 * @return List of Germplasm POJOS
-	 */
-	List<Germplasm> getGermplasmByMethodName(String name, int start, int numOfRows, Operation op);
-
-	/**
-	 * Returns the number of germplasm records that were created by methods with names matching the given parameter.
-	 *
-	 * @param name - search string for the name of the methods
-	 * @param op   - can be equal or like
-	 * @return number of germplasm records
-	 */
-	long countGermplasmByMethodName(String name, Operation op);
 
 	/**
 	 * Returns the germplasm record identified by the given id.
@@ -130,15 +89,6 @@ public interface GermplasmDataManager {
 	 * @return the Germplasm POJO representing the record
 	 */
 	Germplasm getGermplasmWithPrefName(Integer gid);
-
-	/**
-	 * Given a gid, return the Germplasm POJO representing the record identified by the id with its preferred name and preferred
-	 * abbreviation.
-	 *
-	 * @param gid - the id of the germplasm record to be retrieved
-	 * @return the Germplasm POJO representing the record
-	 */
-	Germplasm getGermplasmWithPrefAbbrev(Integer gid);
 
 	/**
 	 * Returns the Name record identified by the given id.
@@ -181,22 +131,6 @@ public interface GermplasmDataManager {
 	Name getPreferredAbbrevByGID(Integer gid);
 
 	/**
-	 * Returns the preferred ID of the Germplasm identified by the gid parameter.
-	 *
-	 * @param gid - id of the Germplasm
-	 * @return {@code Name} POJO of the Germplasm's preferred ID. Returns {@code null} when no preferred ID is found.
-	 */
-	Name getPreferredIdByGID(Integer gid);
-
-	/**
-	 * Returns a list of preferred IDs of the Germplasms associated with the Germplasm List identified by the listId parameter.
-	 *
-	 * @param listId - id of the Germplasm List
-	 * @return {@code Name} A list of POJOs of the Germplasms' preferred IDs. Returns an empty list when no preferred ID is found.
-	 */
-	List<Name> getPreferredIdsByListId(Integer listId);
-
-	/**
 	 * Returns the value (NVAL field) of preferred name of the Germplasm identified by the gid parameter.
 	 *
 	 * @param gid - id of the Germplasm
@@ -215,55 +149,12 @@ public interface GermplasmDataManager {
 	Name getNameByGIDAndNval(Integer gid, String nval, GetGermplasmByNameModes mode);
 
 	/**
-	 * Sets the specified Name as the specified Germplasm's new preferred Name.
-	 *
-	 * @param gid         - id of the Germplasm to be updated
-	 * @param newPrefName - new name to set as the preferred name
-	 * @return Returns the id of the updated {@code Germplasm} record
-	 */
-	Integer updateGermplasmPrefName(Integer gid, String newPrefName);
-
-	/**
 	 * Inserts a list of multiple {@code Name} objects into the database.
 	 *
 	 * @param names - A list of {@code Name} objects to be persisted to the database. {@code Name} objects must be valid.
 	 * @return Returns the id of the newly-added Germplasm {@code Name}s.
 	 */
 	List<Integer> addGermplasmName(List<Name> names);
-
-	/**
-	 * Updates a single {@code Name} object in the database.
-	 *
-	 * @param name - The {@code Name} object to be updated in the database. Must be a valid {@code Name} object.
-	 * @return Returns the id of the updated Germplasm {@code Name}.
-	 */
-	Integer updateGermplasmName(Name name);
-
-	/**
-	 * Returns all the available attribute types
-	 *
-	 * @return List of UserDefinedField POJOs that contains all the attribute types
-	 */
-	List<UserDefinedField> getAllAttributesTypes();
-
-	/**
-	 * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasm.GermplasmService#getAttributesByGID(Integer)}
-	 *
-	 * Returns all the attributes of the Germplasm identified by the given id.
-	 *
-	 * @param gid - id of the Germplasm
-	 * @return List of Atributs POJOs
-	 */
-	@Deprecated
-	List<Attribute> getAttributesByGID(Integer gid);
-
-	/**
-	 * Returns all the list of attribute types identified by the given list of gids.
-	 *
-	 * @param gidList - list of GIDs
-	 * @return List of UserDefinedField POJOs that contains the attribute types and names for the given GIDs.
-	 */
-	List<UserDefinedField> getAttributeTypesByGIDList(List<Integer> gidList);
 
 	/**
 	 * Returns a Map of GIDs to the attribute values given an attribute type and a list of GIDs.
@@ -471,18 +362,6 @@ public interface GermplasmDataManager {
 	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndFTypeAndFName(String tableName, String fieldType, String fieldName);
 
 	/**
-	 * Please use LocationDataManager.getCountryById().
-	 * <p>
-	 * Returns the country record identified by the given id.
-	 *
-	 * @param id - id of the country record
-	 * @return the Country POJO representing the record
-	 * @deprecated
-	 */
-	@Deprecated
-	Country getCountryById(Integer id);
-
-	/**
 	 * Please use LocationDataManager.getLocationById().
 	 * <p>
 	 * Returns the location record identified by the given id.
@@ -589,7 +468,7 @@ public interface GermplasmDataManager {
 	 * @param preferredName the preferred name
 	 * @return the id of the {@code Germplasm} record added
 	 */
-	Integer addGermplasm(Germplasm germplasm, Name preferredName, final CropType cropType);
+	Integer addGermplasm(Germplasm germplasm, Name preferredName, CropType cropType);
 
 	/**
 	 * Given a map of valid Germplasm and Name objects, add new records for the given parameters.
@@ -615,14 +494,6 @@ public interface GermplasmDataManager {
 	Integer addUserDefinedField(UserDefinedField field);
 
 	/**
-	 * Given a list of UserDefinedField objects, add new records for the given parameter.
-	 *
-	 * @param fields - the list of UserDefinedField objects
-	 * @return the list of ids of the new UserDefinedField records added
-	 */
-	List<Integer> addUserDefinedFields(List<UserDefinedField> fields);
-
-	/**
 	 * Given a Attribute object, add new record for the given parameter.
 	 *
 	 * @param attr - the Attribute object
@@ -646,19 +517,6 @@ public interface GermplasmDataManager {
 	 * @return List of GidNidElement based on the specified list of germplasm names
 	 */
 	List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(List<String> germplasmNames, GetGermplasmByNameModes mode);
-
-	/**
-	 * Please use LocationDataManager.getAllBreedingLocations().
-	 * <p>
-	 * Get all breeding locations.
-	 * <p>
-	 * Return a List of Locations which represent the breeding locations stored in the location table of IBDB.
-	 *
-	 * @return the all breeding locations
-	 * @deprecated
-	 */
-	@Deprecated
-	List<Location> getAllBreedingLocations();
 
 	/**
 	 * Returns the String representation of next available sequence number for Germplasm Names with given prefix
@@ -883,24 +741,6 @@ public interface GermplasmDataManager {
 	Map<Integer, GermplasmPedigreeTreeNode> getDirectParentsForStudy(int studyId);
 
 	/**
-	 * * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasm.GermplasmService#getPlotCodeField()}
-	 *
-	 * @return the UDFLD table record that represents "plot code": ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE. If no record matching
-	 * these critria is found, an empty record with fldno=0 is returned. Never returns null.
-	 */
-	@Deprecated
-	UserDefinedField getPlotCodeField();
-
-	/**
-	 * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasm.GermplasmService#getPlotCodeValue(Integer)}
-	 *
-	 * Returns value of the plot code (seed source) where the germplasm was created, identified by the given gid. Returns "Unknown" if plot
-	 * code attribute is not present. Never returns null.
-	 */
-	@Deprecated
-	String getPlotCodeValue(Integer gid);
-
-	/**
 	 * Enables us to query the udflds table
 	 *
 	 * @param table the ftable value
@@ -908,7 +748,7 @@ public interface GermplasmDataManager {
 	 * @param code  we are looking for
 	 * @return
 	 */
-	UserDefinedField getUserDefinedFieldByTableTypeAndCode(final String table, final String type, final String code);
+	UserDefinedField getUserDefinedFieldByTableTypeAndCode(String table, String type, String code);
 
 	/**
 	 * Return the count of germplasm search results based on the following parameters:
@@ -976,7 +816,7 @@ public interface GermplasmDataManager {
 	 * @param gids the gids
 	 * @return the preferred names by gids
 	 */
-	Map<Integer, String> getGroupSourcePreferredNamesByGids(final List<Integer> gids);
+	Map<Integer, String> getGroupSourcePreferredNamesByGids(List<Integer> gids);
 
 	/**
 	 * Given a List of GIDs, return a Map of GIDs to PreferredName.
@@ -984,22 +824,20 @@ public interface GermplasmDataManager {
 	 * @param gids the gids
 	 * @return the preferred names by gids
 	 */
-	Map<Integer, String> getImmediateSourcePreferredNamesByGids(final List<Integer> gids);
+	Map<Integer, String> getImmediateSourcePreferredNamesByGids(List<Integer> gids);
 
 	/**
 	 * @param gid
-	 * @param attributeName
-	 * @return Attribute value that matches with attribute name and gid
+	 * @param variableId
+	 * @return Attribute value that matches with variableId and gid
 	 */
-	String getAttributeValue(final Integer gid, final String attributeName);
+	String getAttributeValue(Integer gid, Integer variableId);
 
 	void save(Germplasm germplasm);
 
 	Germplasm getUnknownGermplasmWithPreferredName();
 
-	List<Integer> addOrUpdateGermplasm(final List<Germplasm> germplasms, final Operation operation);
-
-	List<Attribute> getAttributeByIds(List<Integer> ids);
+	List<Integer> addOrUpdateGermplasm(List<Germplasm> germplasms, Operation operation);
 
 	List<String> getNamesByGidsAndPrefixes(List<Integer> gids, List<String> prefixes);
 

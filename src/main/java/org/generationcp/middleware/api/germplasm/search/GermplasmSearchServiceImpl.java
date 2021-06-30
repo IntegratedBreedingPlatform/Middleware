@@ -35,18 +35,13 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 	}
 
 	@Override
-	public List<UserDefinedField> getGermplasmAttributeTypes(final GermplasmSearchRequest germplasmSearchRequest) {
-		return this.daoFactory.getGermplasmSearchDAO().getGermplasmAttributeTypes(germplasmSearchRequest);
+	public List<UserDefinedField> getGermplasmNameTypes(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
+		return this.daoFactory.getGermplasmSearchDAO().getGermplasmNameTypes(germplasmSearchRequest, programUUID);
 	}
 
 	@Override
-	public List<UserDefinedField> getGermplasmNameTypes(final GermplasmSearchRequest germplasmSearchRequest) {
-		return this.daoFactory.getGermplasmSearchDAO().getGermplasmNameTypes(germplasmSearchRequest);
-	}
-
-	@Override
-	public Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(final GermplasmSearchRequest germplasmSearchRequest) {
-		final List<Attribute> attributes = this.daoFactory.getGermplasmSearchDAO().getGermplasmAttributeValues(germplasmSearchRequest);
+	public Map<Integer, Map<Integer, String>> getGermplasmSearchAttributeValues(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
+		final List<Attribute> attributes = this.daoFactory.getGermplasmSearchDAO().getGermplasmSearchAttributeValues(germplasmSearchRequest, programUUID);
 
 		final HashMap<Integer, Map<Integer, String>> attributeMapByGid = new HashMap<>();
 		for (final Attribute attribute : attributes) {
@@ -61,8 +56,8 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 	}
 
 	@Override
-	public Map<Integer, Map<Integer, String>> getGermplasmNameValues(final GermplasmSearchRequest germplasmSearchRequest) {
-		final List<Name> names = this.daoFactory.getGermplasmSearchDAO().getGermplasmNameValues(germplasmSearchRequest);
+	public Map<Integer, Map<Integer, String>> getGermplasmSearchNameValues(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
+		final List<Name> names = this.daoFactory.getGermplasmSearchDAO().getGermplasmSearchNameValues(germplasmSearchRequest, programUUID);
 
 		final HashMap<Integer, Map<Integer, String>> nameMapByGid = new HashMap<>();
 		for (final Name name : names) {
