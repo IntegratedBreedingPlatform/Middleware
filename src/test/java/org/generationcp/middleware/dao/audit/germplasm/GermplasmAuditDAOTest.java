@@ -5,7 +5,12 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
+import org.generationcp.middleware.dao.oms.CVTermDao;
+import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -14,6 +19,8 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
@@ -58,6 +65,8 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 	private LocationDAO locationDAO;
 	private UserDefinedFieldDAO userDefinedFieldDAO;
 	private MethodDAO methodDAO;
+	private CVTermDao cvTermDao;
+	private CvTermPropertyDao cvTermPropertyDao;
 
 	@Before
 	public void setUp() throws Exception {
@@ -70,6 +79,12 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 
 		this.methodDAO = new MethodDAO();
 		this.methodDAO.setSession(this.sessionProvder.getSession());
+
+		this.cvTermDao = new CVTermDao();
+		this.cvTermDao.setSession(this.sessionProvder.getSession());
+
+		this.cvTermPropertyDao = new CvTermPropertyDao();
+		this.cvTermPropertyDao.setSession(this.sessionProvder.getSession());
 	}
 
 	@Test
@@ -131,15 +146,16 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void shouldGetAndCountAttributeChangesByAttributeId() {
-		final String nameType1 = "nameType1";
-		final String nameCode1 = "nameCode1";
-		final String nameValue1 = "nameValue1";
-		final UserDefinedField name1 = this.createUserDefinedField(nameType1, nameCode1);
 
-		final String nameType2 = "nameType2";
-		final String nameCode2 = "nameCode2";
-		final String nameValue2 = "nameValue2";
-		final UserDefinedField name2 = this.createUserDefinedField(nameType2, nameCode2);
+		final String attrType1 = "nameType1";
+		final String attrName1 = "nameCode1";
+		final String attrValue1 = "nameValue1";
+		final CVTerm attribute1 = this.createAttribute(attrType1, attrName1);
+
+		final String attrType2 = "nameType2";
+		final String attrName2 = "nameCode2";
+		final String attrValue2 = "nameValue2";
+		final CVTerm attribute2 = this.createAttribute(attrType2, attrName2);
 
 		final Location location1 = this.createLocation("Location 1");
 		final Location location2 = this.createLocation("Location 2");
@@ -148,15 +164,15 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 		final Integer creationDate2 = 20200707;
 
 		List<Map<String, Object>> queriesParams = Arrays.asList(
-			this.createAttributeAuditQueryParams(RevisionType.CREATION, name1.getFldno(), nameValue1, location1.getLocid(), creationDate1),
+			this.createAttributeAuditQueryParams(RevisionType.CREATION, attribute1.getCvTermId(), attrValue1, location1.getLocid(), creationDate1),
 			// Change name type
-			this.createAttributeAuditQueryParams(RevisionType.EDITION, name2.getFldno(), nameValue1, location1.getLocid(), creationDate1),
+			this.createAttributeAuditQueryParams(RevisionType.EDITION, attribute2.getCvTermId(), attrValue1, location1.getLocid(), creationDate1),
 			// Change name value
-			this.createAttributeAuditQueryParams(RevisionType.EDITION, name2.getFldno(), nameValue2, location1.getLocid(), creationDate1),
+			this.createAttributeAuditQueryParams(RevisionType.EDITION, attribute2.getCvTermId(), attrValue2, location1.getLocid(), creationDate1),
 			// Change location
-			this.createAttributeAuditQueryParams(RevisionType.EDITION, name2.getFldno(), nameValue2, location2.getLocid(), creationDate1),
+			this.createAttributeAuditQueryParams(RevisionType.EDITION, attribute2.getCvTermId(), attrValue2, location2.getLocid(), creationDate1),
 			// Change creation date
-			this.createAttributeAuditQueryParams(RevisionType.EDITION, name2.getFldno(), nameValue2, location2.getLocid(), creationDate2)
+			this.createAttributeAuditQueryParams(RevisionType.EDITION, attribute2.getCvTermId(), attrValue2, location2.getLocid(), creationDate2)
 		);
 		this.insertAuditRows(ATTRIBUTES_AUDIT_TABLE, queriesParams);
 
@@ -167,18 +183,18 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 		assertThat(changes, hasSize(5));
 		// creation date should have changed
 		this.assertAttributeAuditChanges(changes.get(0), RevisionType.EDITION, creationDate2, true,
-			location2.getLname(), false, nameValue2, false);
+			location2.getLname(), false, attrValue2, false);
 		// location should have changed
 		this.assertAttributeAuditChanges(changes.get(1), RevisionType.EDITION, creationDate1, false,
-			location2.getLname(), true, nameValue2, false);
+			location2.getLname(), true, attrValue2, false);
 		// name value should have changed
 		this.assertAttributeAuditChanges(changes.get(2), RevisionType.EDITION, creationDate1, false,
-			location1.getLname(), false, nameValue2, true);
+			location1.getLname(), false, attrValue2, true);
 		// name type should have changed
 		this.assertAttributeAuditChanges(changes.get(3), RevisionType.EDITION, creationDate1, false,
-			location1.getLname(), false, nameValue1, false);
+			location1.getLname(), false, attrValue1, false);
 		this.assertAttributeAuditChanges(changes.get(4), RevisionType.CREATION, creationDate1, false,
-			location1.getLname(), false, nameValue1, false);
+			location1.getLname(), false, attrValue1, false);
 	}
 
 	@Test
@@ -306,6 +322,16 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 			1, 1, 20180909, null);
 		this.userDefinedFieldDAO.save(userDefinedField);
 		return userDefinedField;
+	}
+
+	private CVTerm createAttribute(final String type, final String name) {
+		CVTerm cvTerm = new CVTerm(null, CvId.VARIABLES.getId(), name, type, null, 0, 0);
+		this.cvTermDao.save(cvTerm);
+
+		this.cvTermPropertyDao.save(
+			new CVTermProperty(TermId.VARIABLE_TYPE.getId(), VariableType.GERMPLASM_ATTRIBUTE.getName(), 0, cvTerm.getCvTermId()));
+
+		return cvTerm;
 	}
 
 	private Location createLocation(final String name) {
