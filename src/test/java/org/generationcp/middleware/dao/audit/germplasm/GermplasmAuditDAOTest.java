@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
+import org.generationcp.middleware.service.impl.audit.GermplasmOtherProgenitorsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmProgenitorDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmReferenceAuditDTO;
 import org.generationcp.middleware.service.impl.audit.RevisionType;
@@ -273,6 +274,23 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 			false, 0, false, 1, false);
 	}
 
+	@Test
+	public void shouldGetAndCountOtherProgenitorsByGid() {
+		List<Map<String, Object>> queriesParams = Arrays.asList(
+			this.createOtherProgenitorsAuditQueryParams(RevisionType.CREATION, 3, 1),
+			this.createOtherProgenitorsAuditQueryParams(RevisionType.CREATION, 4, 2)
+		);
+		this.insertAuditRows(PROGENITORS_AUDIT_TABLE, queriesParams);
+
+		assertThat(this.germplasmAuditDAO.countOtherProgenitorsChangesByGid(GID), is(2L));
+
+		final List<GermplasmOtherProgenitorsAuditDTO> changes =
+			this.germplasmAuditDAO.getOtherProgenitorsByGid(GID, new PageRequest(0, 50));
+		assertThat(changes, hasSize(2));
+		this.assertProgenitorDetailsAuditChanges(changes.get(0), RevisionType.CREATION, 2, 4);
+		this.assertProgenitorDetailsAuditChanges(changes.get(1), RevisionType.CREATION, 1, 3);
+	}
+
 	private Method createBreedingMethod(final String name, final String type) {
 		final Method method =
 			new Method(null, type, "S", "UGM", name, "description", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
@@ -483,17 +501,28 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 	}
 
 	// Other progenitors
-//	private Map<String, Object> createOtherProgenitorsAuditQueryParams(final RevisionType revisionType, final Integer progenitorNumber,
-//		final String progenitorGid) {
-//		final Map<String, Object> queryParams = new LinkedHashMap<>();
-//		queryParams.put("gid", GID);
-//		queryParams.put("pno", progenitorNumber);
-//		queryParams.put("pid", progenitorGid);
-//		queryParams.put("id", new Random().nextInt());
-//		this.addCommonsQueryParams(queryParams, revisionType);
-//
-//		return queryParams;
-//	}
+	private Map<String, Object> createOtherProgenitorsAuditQueryParams(final RevisionType revisionType, final Integer progenitorNumber,
+		final Integer progenitorGid) {
+		final Map<String, Object> queryParams = new LinkedHashMap<>();
+		queryParams.put("gid", GID);
+		queryParams.put("pno", progenitorNumber);
+		queryParams.put("pid", progenitorGid);
+		queryParams.put("id", new Random().nextInt());
+		this.addCommonsQueryParams(queryParams, revisionType);
+
+		return queryParams;
+	}
+
+	private void assertProgenitorDetailsAuditChanges(final GermplasmOtherProgenitorsAuditDTO change,
+		final RevisionType revisionType, final Integer progenitorGid, final Integer progenitorsNumber) {
+		assertThat(change.getRevisionType(), is(revisionType));
+		assertThat(change.getProgenitorGid(), is(progenitorGid));
+		assertThat(change.getProgenitorsNumber(), is(progenitorsNumber));
+		assertNotNull(change.getCreatedDate());
+		assertNotNull(change.getModifiedDate());
+		assertThat(change.getCreatedBy(), is(ADMIN_NAME));
+		assertThat(change.getModifiedBy(), is(ADMIN_NAME));
+	}
 
 	private Map<String, Object> createGermplasmQueryParams(final Integer locationId, final Integer creationDate, final Integer methodId,
 		final Integer femaleParentGID, final Integer maleParentGID, final Integer progenitorsNumber) {
