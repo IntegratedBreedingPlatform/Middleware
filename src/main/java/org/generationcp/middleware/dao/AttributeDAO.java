@@ -216,7 +216,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		}
 	}
 
-	public long countByVariableWithGermplasmsDeleted(final Integer variablesId){
+	public long countByVariablesUsedInHistoricalGermplasm(final Integer variablesId) {
 		try {
 			final SQLQuery query =
 				this.getSession().createSQLQuery(COUNT_ATTRIBUTE_WITH_GERMPLASM_DELETED);
@@ -225,7 +225,8 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error at countByVariableWithGermplasmsDeleted=" + variablesId + " in AttributeDAO: " + e.getMessage();
+			final String errorMessage =
+				"Error at countByVariablesUsedInHistoricalGermplasm=" + variablesId + " in AttributeDAO: " + e.getMessage();
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
