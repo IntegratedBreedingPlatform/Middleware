@@ -1593,7 +1593,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<Attribute> getGermplasmAttributeValues(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
+	public List<Attribute> getGermplasmSearchAttributeValues(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
 		try {
 
 			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, programUUID);
@@ -1609,13 +1609,13 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message =
-				"Error with getGermplasmAttributeValues(GermplasmSearchRequest=" + germplasmSearchRequest + ") : " + e.getMessage();
+				"Error with getGermplasmSearchAttributeValues(GermplasmSearchRequest=" + germplasmSearchRequest + ") : " + e.getMessage();
 			GermplasmSearchDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	public List<Name> getGermplasmNameValues(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
+	public List<Name> getGermplasmSearchNameValues(final GermplasmSearchRequest germplasmSearchRequest, final String programUUID) {
 		try {
 
 			final List<Integer> gids = this.retrieveSearchGids(germplasmSearchRequest, null, programUUID);
@@ -1630,7 +1630,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			return names;
 		} catch (final HibernateException e) {
 			final String message =
-				"Error with getGermplasmNameValues(GermplasmSearchRequest=" + germplasmSearchRequest + ") : " + e.getMessage();
+				"Error with getGermplasmSearchNameValues(GermplasmSearchRequest=" + germplasmSearchRequest + ") : " + e.getMessage();
 			GermplasmSearchDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

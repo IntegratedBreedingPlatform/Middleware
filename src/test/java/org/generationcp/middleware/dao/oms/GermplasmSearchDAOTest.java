@@ -1200,7 +1200,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetGermplasmAttributeValues() {
 		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
-		final List<Attribute> attributes = this.dao.getGermplasmAttributeValues(request, null);
+		final List<Attribute> attributes = this.dao.getGermplasmSearchAttributeValues(request, null);
 		Assert.assertEquals(1, attributes.size());
 		Assert.assertEquals(attributes.get(0).getGermplasmId(), this.germplasmGID);
 		Assert.assertEquals(attributes.get(0).getAval(), this.attributeValue);
@@ -1221,7 +1221,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetGermplasmNameValues() {
 		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
-		final List<Name> names = this.dao.getGermplasmNameValues(request, null);
+		final List<Name> names = this.dao.getGermplasmSearchNameValues(request, null);
 		Assert.assertEquals(3, names.size());
 		Assert.assertTrue(names.contains(this.preferredName));
 		Assert.assertTrue(names.contains(this.preferredId));

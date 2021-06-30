@@ -15,7 +15,7 @@ public interface GermplasmSearchService {
 
 	List<UserDefinedField> getGermplasmNameTypes(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
-	Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
+	Map<Integer, Map<Integer, String>> getGermplasmSearchAttributeValues(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
-	Map<Integer, Map<Integer, String>> getGermplasmNameValues(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
+	Map<Integer, Map<Integer, String>> getGermplasmSearchNameValues(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 }
