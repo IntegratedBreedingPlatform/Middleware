@@ -20,7 +20,6 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -447,25 +446,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error at countSearchLots() query on LotDAO: " + e.getMessage(), e);
-		}
-	}
-
-	public List<UserDefinedField> getGermplasmAttributeTypes(final LotsSearchDto searchDto) {
-		try {
-			final StringBuilder lotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
-			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
-
-			final String sql = "select distinct {u.*} from atributs a inner join udflds u "
-				+ " 	inner join (" + lotsQuery + ") lots on lots.gid = a.gid"
-				+ " where a.atype = u.fldno"
-				+ " order by u.fname";
-
-			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), searchDto);
-			query.addEntity("u", UserDefinedField.class);
-			return query.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error at getGermplasmAttributeTypes() in LotDAO: " + e.getMessage(), e);
 		}
 	}
 

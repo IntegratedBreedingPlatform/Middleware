@@ -14,15 +14,15 @@ import java.util.Map;
 @AutoProperty
 public class GermplasmImportRequest {
 
-	public static final String CROPNM = "CROPNM";
-	public static final String ORIGIN = "SORIG";
-	public static final String INSTCODE = "INSTCODE";
-	public static final String INSTNAME = "ORIGININST";
-	public static final String PLOTCODE = "PLOTCODE";
-	public static final String SPECIES = "SPNAM";
-	public static final String SPECIES_AUTH = "SPAUTH";
-	public static final String SUBTAX = "SUBTAX";
-	public static final String SUBTAX_AUTH = "STAUTH";
+	public static final String CROPNM = "CROPNM_AP_text";
+	public static final String ORIGIN = "SORIG_AP_text";
+	public static final String INSTCODE = "INSTCODE_AP_text";
+	public static final String INSTNAME = "ORIGININST_AP_text";
+	public static final String PLOTCODE = "PLOTCODE_AP_text";
+	public static final String SPECIES = "SPNAM_AP_text";
+	public static final String SPECIES_AUTH = "SPAUTH_AP_text";
+	public static final String SUBTAX = "SUBTAX_AP_text";
+	public static final String SUBTAX_AUTH = "STAUTH_AP_text";
 	public static final String ACCNO = "ACCNO";
 	public static final String PED = "PED";
 	public static final String GENUS = "GENUS";

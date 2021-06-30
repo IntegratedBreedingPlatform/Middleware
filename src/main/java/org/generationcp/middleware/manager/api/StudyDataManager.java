@@ -138,7 +138,7 @@ public interface StudyDataManager {
 	 * @param repNumbers      - repetition numbers to retrieve
 	 * @return the experiments
 	 */
-	List<Experiment> getExperiments(final int dataSetId, final List<Integer> instanceNumbers, final List<Integer> repNumbers);
+	List<Experiment> getExperiments(int dataSetId, List<Integer> instanceNumbers, List<Integer> repNumbers);
 
 	/**
 	 * Gets the treatment factor variables of the study
@@ -146,7 +146,7 @@ public interface StudyDataManager {
 	 * @param dataSetId
 	 * @return
 	 */
-	VariableTypeList getTreatmentFactorVariableTypes(final int dataSetId);
+	VariableTypeList getTreatmentFactorVariableTypes(int dataSetId);
 
 	/**
 	 * Get the number of experiments in a dataset. Retrieves from central if the given ID is positive, otherwise retrieves from local.
@@ -211,7 +211,7 @@ public interface StudyDataManager {
 	 *                         ExperimentType.SUMMARY
 	 * @param experimentValues The values to set
 	 */
-	void addOrUpdateExperiment(final CropType crop, int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValues);
+	void addOrUpdateExperiment(CropType crop, int dataSetId, ExperimentType experimentType, List<ExperimentValues> experimentValues);
 
 	/**
 	 * Returns a list of datasets based on the given type. Retrieves from central if the given ID is positive, otherwise retrieves from
@@ -352,7 +352,7 @@ public interface StudyDataManager {
 	 * @param objective
 	 * @return ID of the folder created
 	 */
-	int addSubFolder(int parentFolderId, String name, String description, String programUUID, final String objective);
+	int addSubFolder(int parentFolderId, String name, String description, String programUUID, String objective);
 
 	/**
 	 * Rename sub folder.
@@ -601,7 +601,7 @@ public interface StudyDataManager {
 
 	StudyMetadata getStudyMetadataForInstance(Integer instanceId);
 
-	Integer getProjectIdByStudyDbId(final Integer studyDbId);
+	Integer getProjectIdByStudyDbId(Integer studyDbId);
 
 	/**
 	 * Retrieves a map with the values of SAMPLES by ExperimentId Key.
@@ -609,13 +609,13 @@ public interface StudyDataManager {
 	 * @param studyDbId
 	 * @return
 	 */
-	Map<Integer, String> getExperimentSampleMap(final Integer studyDbId);
+	Map<Integer, String> getExperimentSampleMap(Integer studyDbId);
 
 	/**
 	 * @param studyId
 	 * @return a map of experiments ids with a list of it sampled plants
 	 */
-	Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(final Integer studyId);
+	Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(Integer studyId);
 
 	/**
 	 * Detect the usage of the specified variable in any programs except for the specified programUUID.
@@ -625,10 +625,9 @@ public interface StudyDataManager {
 	 * @param programUUID
 	 * @return
 	 */
-	boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(
-		final String variableId, final String variableValue, final String programUUID);
+	boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String variableId, String variableValue, String programUUID);
 
-	Map<String, Integer> getInstanceGeolocationIdsMap(final Integer studyId);
+	Map<String, Integer> getInstanceGeolocationIdsMap(Integer studyId);
 
 	List<StudyTypeDto> getAllStudyTypes();
 
@@ -638,11 +637,11 @@ public interface StudyDataManager {
 
 	List<StudyTypeDto> getAllVisibleStudyTypes();
 
-	String getProjectStartDateByProjectId(final int projectId);
+	String getProjectStartDateByProjectId(int projectId);
 
-	boolean isLocationIdVariable(final int studyId, final String variableName);
+	boolean isLocationIdVariable(int studyId, String variableName);
 
-	BiMap<String, String> createInstanceLocationIdToNameMapFromStudy(final int studyId);
+	BiMap<String, String> createInstanceLocationIdToNameMapFromStudy(int studyId);
 
 	StudyTypeDto getStudyTypeByStudyId(Integer studyIdentifier);
 
@@ -663,11 +662,11 @@ public interface StudyDataManager {
 	 */
 	List<Reference> getChildrenOfFolderByStudyType(int folderId, String programUUID, Integer studyTypeId);
 
-	StudyReference getStudyReference(final Integer studyId);
+	StudyReference getStudyReference(Integer studyId);
 
-	void updateStudyLockedStatus(final Integer studyId, final Boolean isLocked);
+	void updateStudyLockedStatus(Integer studyId, Boolean isLocked);
 
-	boolean areAllInstancesExistInDataset(final Integer datasetId, final Set<Integer> instanceIds);
+	boolean areAllInstancesExistInDataset(Integer datasetId, Set<Integer> instanceIds);
 
 	String getBlockId(int datasetId, Integer trialInstance);
 
@@ -675,11 +674,11 @@ public interface StudyDataManager {
 
 	Map<Integer, String> getGeolocationByInstanceId(Integer datasetId, Integer instanceDbId);
 
-	Boolean instancesExist(final Set<Integer> instanceIds);
+	Boolean instancesExist(Set<Integer> instanceIds);
 
-	Map<Integer, String> getPhenotypeByVariableId(final Integer datasetId, final Integer instanceDbId);
+	Map<Integer, String> getPhenotypeByVariableId(Integer datasetId, Integer instanceDbId);
 
-	boolean renameStudy(final String newStudyName, final int studyId, final String programUUID);
+	boolean renameStudy(String newStudyName, int studyId, String programUUID);
 
 	void deleteStudy(int studyId);
 

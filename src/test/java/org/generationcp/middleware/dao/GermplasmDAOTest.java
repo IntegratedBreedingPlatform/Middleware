@@ -16,14 +16,19 @@ import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
+import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -39,6 +44,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -62,8 +68,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -71,14 +77,15 @@ import static org.hamcrest.core.Is.is;
 
 public class GermplasmDAOTest extends IntegrationTestBase {
 
-	private static final Integer CREATED_BY = new Random().nextInt();
 	private static final String DUMMY_STOCK_ID = "USER-1-1";
 	private static final Integer TEST_PROJECT_ID = 1;
+	private static final String NOTE_ATTRIBUTE = "NOTE_AA_text";
 
 	private static final Integer GROUP_ID = 10;
 
 	private boolean testDataSetup = false;
 
+	private CVTermDao cvTermDao;
 	private GermplasmDAO dao;
 	private LotDAO lotDAO;
 	private TransactionDAO transactionDAO;
@@ -135,6 +142,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 			this.stockDao = new StockDao();
 			this.stockDao.setSession(this.sessionProvder.getSession());
+
+			this.cvTermDao = new CVTermDao();
+			this.cvTermDao.setSession(this.sessionProvder.getSession());
 
 			this.germplasmExternalReferenceDAO = new GermplasmExternalReferenceDAO();
 			this.germplasmExternalReferenceDAO.setSession(this.sessionProvder.getSession());
@@ -724,15 +734,15 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Map<String, String> fields = new HashMap<>();
 
 		// atributs
-		fields.put("PLOTCODE", "");
-		fields.put("SPNAM", "");
-		fields.put("SPAUTH", "");
-		fields.put("SUBTAX", "");
-		fields.put("STAUTH", "");
-		fields.put("INSTCODE", "");
-		fields.put("ORIGININST", "");
-		fields.put("CROPNM", "");
-		fields.put("SORIG", "");
+		fields.put("PLOTCODE_AP_text", "");
+		fields.put("SPNAM_AP_text", "");
+		fields.put("SPAUTH_AP_text", "");
+		fields.put("SUBTAX_AP_text", "");
+		fields.put("STAUTH_AP_text", "");
+		fields.put("INSTCODE_AP_text", "");
+		fields.put("ORIGININST_AP_text", "");
+		fields.put("CROPNM_AP_text", "");
+		fields.put("SORIG_AP_text", "");
 
 		for (final Map.Entry<String, String> attributEntry : fields.entrySet()) {
 			final Attribute attribute = this.saveAttribute(germplasm, attributEntry.getKey());
@@ -763,17 +773,17 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertThat(germplasmDTO.getAccessionNumber(), is(displayName));
 		Assert.assertThat(germplasmDTO.getGermplasmName(), is(displayName));
 		Assert.assertThat(germplasmDTO.getPedigree(), nullValue());
-		Assert.assertThat(germplasmDTO.getGermplasmSeedSource(), is(fields.get("PLOTCODE")));
-		Assert.assertThat(germplasmDTO.getInstituteCode(), is(fields.get("INSTCODE")));
-		Assert.assertThat(germplasmDTO.getInstituteName(), is(fields.get("ORIGININST")));
-		Assert.assertThat(germplasmDTO.getCommonCropName(), is(fields.get("CROPNM")));
-		Assert.assertThat(germplasmDTO.getGermplasmOrigin(), is(fields.get("SORIG")));
+		Assert.assertThat(germplasmDTO.getGermplasmSeedSource(), is(fields.get("PLOTCODE_AP_text")));
+		Assert.assertThat(germplasmDTO.getInstituteCode(), is(fields.get("INSTCODE_AP_text")));
+		Assert.assertThat(germplasmDTO.getInstituteName(), is(fields.get("ORIGININST_AP_text")));
+		Assert.assertThat(germplasmDTO.getCommonCropName(), is(fields.get("CROPNM_AP_text")));
+		Assert.assertThat(germplasmDTO.getGermplasmOrigin(), is(fields.get("SORIG_AP_text")));
 		Assert.assertThat(germplasmDTO.getBiologicalStatusOfAccessionCode(), nullValue());
 		Assert.assertThat(germplasmDTO.getGenus(), is(names.get("GENUS")));
-		Assert.assertThat(germplasmDTO.getSpecies(), is(fields.get("SPNAM")));
-		Assert.assertThat(germplasmDTO.getSpeciesAuthority(), is(fields.get("SPAUTH")));
-		Assert.assertThat(germplasmDTO.getSubtaxa(), is(fields.get("SUBTAX")));
-		Assert.assertThat(germplasmDTO.getSubtaxaAuthority(), is(fields.get("STAUTH")));
+		Assert.assertThat(germplasmDTO.getSpecies(), is(fields.get("SPNAM_AP_text")));
+		Assert.assertThat(germplasmDTO.getSpeciesAuthority(), is(fields.get("SPAUTH_AP_text")));
+		Assert.assertThat(germplasmDTO.getSubtaxa(), is(fields.get("SUBTAX_AP_text")));
+		Assert.assertThat(germplasmDTO.getSubtaxaAuthority(), is(fields.get("STAUTH_AP_text")));
 		Assert.assertThat(new SimpleDateFormat("yyyy-MM-dd").format(germplasmDTO.getAcquisitionDate()), is("2015-01-01"));
 	}
 
@@ -1223,17 +1233,17 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	private Attribute saveAttribute(final Germplasm germplasm, final String attributeType) {
-		UserDefinedField attributeField =
-			this.userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", attributeType);
+		CVTerm cvTerm =
+			this.cvTermDao.getByNameAndCvId(attributeType, CvId.VARIABLES.getId());
 
-		if (attributeField == null) {
-			attributeField = new UserDefinedField(null, "ATRIBUTS", "ATTRIBUTE", attributeType, "", "", "", 0, 0, 0, 0);
-			this.germplasmDataDM.addUserDefinedField(attributeField);
+		if (cvTerm == null) {
+			cvTerm = new CVTerm(null, CvId.VARIABLES.getId(), attributeType, attributeType, null, 0, 0);
+			this.cvTermDao.save(cvTerm);
 		}
 
 		final Attribute attribute = new Attribute();
 		attribute.setGermplasmId(germplasm.getGid());
-		attribute.setTypeId(attributeField.getFldno());
+		attribute.setTypeId(cvTerm.getCvTermId());
 		attribute.setAval(RandomStringUtils.randomAlphanumeric(50));
 		attribute.setAdate(germplasm.getGdate());
 
@@ -1267,4 +1277,30 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName(), this.cropType);
 	}
 
+
+	@Test
+	public void testGetGermplasmAttributeVariables() {
+		final Germplasm germplasm =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+
+		final Map<String, String> fields = new HashMap<>();
+		// atributs
+		fields.put("NOTE_AA_text", "");
+		for (final Map.Entry<String, String> attributEntry : fields.entrySet()) {
+			final Attribute attribute = this.saveAttribute(germplasm, attributEntry.getKey());
+		}
+
+		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
+		request.setGermplasmDbIds(Lists.newArrayList(germplasm.getGermplasmUUID()));
+		final List<GermplasmDTO> result = this.dao.getGermplasmDTOList(request, null);
+
+		final Set<String> gids = result.stream().map(GermplasmDTO::getGid).collect(Collectors.toSet());
+		final List<Integer> gidsList = gids.stream().map(s -> Integer.valueOf(s)).collect(Collectors.toList());
+		final List<Variable>  variables = this.dao.getGermplasmAttributeVariables(gidsList, null);
+		Assert.assertEquals(1, variables.size());
+		Assert.assertTrue(variables.stream().allMatch(cVTerm -> cVTerm.getName().equalsIgnoreCase(NOTE_ATTRIBUTE.toUpperCase())));
+		Assert.assertEquals(NOTE_ATTRIBUTE, variables.get(0).getName());
+		Assert.assertEquals("NOTES", variables.get(0).getDefinition());
+	}
 }

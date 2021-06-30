@@ -22,8 +22,12 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportD
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportRequestDto;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportResponseDto;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -40,6 +44,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
@@ -76,16 +81,21 @@ import static org.junit.Assert.fail;
 public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 	public static final String DRVNM = "DRVNM";
-	public static final String NOTE = "NOTE";
+	public static final String NOTE = "NOTE_AA_text";
 	public static final String NOLOC = "NOLOC";
 	public static final String CROP_NAME = "maize";
 
 	private static final String DEFAULT_BIBREF_FIELD = "-";
 
+	private final String programUUID = RandomStringUtils.randomAlphabetic(16);
+
 	private DaoFactory daoFactory;
 
 	@Autowired
 	private GermplasmService germplasmService;
+
+	@Autowired
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	private Integer noLocationId, variableTypeId, attributeId, clientId, userId;
 	private String creationDate, name, germplasmUUID, reference, note;
@@ -99,7 +109,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.derivativeMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		this.generativeMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
 		this.variableTypeId = this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode("NAMES", "NAME", DRVNM).getFldno();
-		this.attributeId = this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", NOTE).getFldno();
+		this.attributeId = this.daoFactory.getCvTermDao().getByNameAndCvId(NOTE, CvId.VARIABLES.getId()).getCvTermId();
 		this.creationDate = "20201212";
 		this.name = RandomStringUtils.randomAlphabetic(10);
 		this.germplasmUUID = RandomStringUtils.randomAlphabetic(10);
@@ -124,16 +134,13 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final UserDefinedField newNameCode =
 			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
 				UDTableType.NAMES_NAME.getType(), DRVNM);
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
 
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
 				Optional.of(newLocation), creationDate);
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -156,7 +163,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertEquals("Name for " + germplasm.getGid(), savedName.getNval());
 
 		final Attribute savedAttribute = attributes.get(0);
-		assertEquals(newAttributeCode.getFldno(), savedAttribute.getTypeId());
+		assertEquals(attributeId, savedAttribute.getTypeId());
 		assertEquals(newLocation.getLocid(), savedAttribute.getLocationId());
 		assertEquals(creationDate, savedAttribute.getAdate().intValue());
 		assertEquals("Note for " + germplasm.getGid(), savedAttribute.getAval());
@@ -173,9 +180,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final UserDefinedField newNameCode =
 			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
 				UDTableType.NAMES_NAME.getType(), DRVNM);
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
 
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
@@ -183,14 +187,15 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "",
+			.save(new Attribute(null, germplasm.getGid(), attributeId, "", null,
 				germplasm.getLocationId(),
 				0, germplasm.getGdate()));
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
 				Optional.of(newLocation), creationDate);
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
+		this.sessionProvder.getSession().flush();
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -213,7 +218,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertEquals("Name for " + germplasm.getGid(), savedName.getNval());
 
 		final Attribute savedAttribute = attributes.get(0);
-		assertEquals(newAttributeCode.getFldno(), savedAttribute.getTypeId());
+		assertEquals(attributeId, savedAttribute.getTypeId());
 		assertEquals(newLocation.getLocid(), savedAttribute.getLocationId());
 		assertEquals(creationDate, savedAttribute.getAdate().intValue());
 		assertEquals("Note for " + germplasm.getGid(), savedAttribute.getAval());
@@ -241,7 +246,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				Optional.of(newLocation), creationDate);
 
 		try {
-			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.preferred.name.duplicate.names"));
 		}
@@ -263,7 +268,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.setPreferredNameType("Some Non Existing Code");
 
 		try {
-			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.preferred.name.doesnt.exist"));
 		}
@@ -271,7 +276,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testImportGermplasmUpdates_DuplicateNamesAndAttributes() {
+	public void testImportGermplasmUpdates_DuplicateNames() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
@@ -280,16 +285,13 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final UserDefinedField newNameCode =
 			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(),
 				UDTableType.NAMES_NAME.getType(), DRVNM);
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
 
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
 				Optional.of(newLocation), creationDate);
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		// Create duplicate names and attributes
 		this.daoFactory.getNameDao().save(new Name(null, germplasm, newNameCode.getFldno(), 0,
@@ -297,20 +299,10 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(new Name(null, germplasm, newNameCode.getFldno(), 0,
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
-		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "",
-				germplasm.getLocationId(),
-				0, germplasm.getGdate()));
-		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "",
-				germplasm.getLocationId(),
-				0, germplasm.getGdate()));
-
 		try {
-			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.duplicate.names"));
-			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.duplicate.attributes"));
 		}
 
 	}
@@ -329,58 +321,16 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAttributesByGID() {
-		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
-
-		assertThat(this.germplasmService.getAttributesByGID(germplasm.getGid()), hasSize(0));
-
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
-
-		final Attribute attribute = new Attribute();
-		attribute.setGermplasmId(germplasm.getGid());
-		attribute.setTypeId(newAttributeCode.getFldno());
-		attribute.setAval(RandomStringUtils.randomAlphanumeric(50));
-		attribute.setAdate(germplasm.getGdate());
-
-		this.daoFactory.getAttributeDAO().save(attribute);
-
-		final List<Attribute> attributes = this.germplasmService.getAttributesByGID(germplasm.getGid());
-		assertThat(attributes, hasSize(1));
-		final Attribute actualAttribute = attributes.get(0);
-		assertNotNull(actualAttribute);
-		assertThat(actualAttribute.getAid(), is(attribute.getAid()));
-		assertThat(actualAttribute.getGermplasmId(), is(germplasm.getGid()));
-	}
-
-	@Test
-	public void test_getPlotCodeField_OK() {
-		final UserDefinedField plotCodeField = this.germplasmService.getPlotCodeField();
-		// Should never return null no matter whether the plot code UDFLD is present in the target database or not.
-		assertThat("GermplasmDataManager.getPlotCodeField() should never return null.", plotCodeField, is(notNullValue()));
-		if (plotCodeField.getFldno() != 0) {
-			// Non-zero fldno is a case where the UDFLD table has a record matching ftable=ATRIBUTS, ftype=PASSPORT, fcode=PLOTCODE
-			// Usually the id of this record is 1552. Not asserting as we dont want tests to depend on primary key values to be exact.
-
-			assertThat(plotCodeField.getFtable(), is(UDTableType.ATRIBUTS_PASSPORT.getTable()));
-			assertThat(plotCodeField.getFtype(), is(UDTableType.ATRIBUTS_PASSPORT.getType()));
-			assertThat(plotCodeField.getFcode(), is("PLOTCODE"));
-		}
-	}
-
-	@Test
 	public void test_getPlotCodeValue_OK() {
 		final String plotCodeValue = UUID.randomUUID().toString();
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 
-		final UserDefinedField plotCodeAttr =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_PASSPORT.getTable(),
-				UDTableType.ATRIBUTS_PASSPORT.getType(), GermplasmServiceImpl.PLOT_CODE);
+		final CVTerm plotCodeVariable =
+			daoFactory.getCvTermDao().getByNameAndCvId("PLOTCODE_AP_text", CvId.VARIABLES.getId());
+
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), plotCodeAttr.getFldno(), plotCodeValue,
+			.save(new Attribute(null, germplasm.getGid(), plotCodeVariable.getCvTermId(), plotCodeValue, null,
 				germplasm.getLocationId(),
 				0, germplasm.getGdate()));
 
@@ -395,12 +345,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final Germplasm germplasmWithoutPlotCode = this.createGermplasm(this.generativeMethod, null, null, 0, 0, 0);
 		final Germplasm germplasmWithPlotCode = this.createGermplasm(this.generativeMethod, null, null, 0, 0, 0);
 
-		final UserDefinedField plotCodeAttr =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_PASSPORT.getTable(),
-				UDTableType.ATRIBUTS_PASSPORT.getType(), GermplasmServiceImpl.PLOT_CODE);
+		final CVTerm plotCodeVariable =
+			daoFactory.getCvTermDao().getByNameAndCvId("PLOTCODE_AP_text", CvId.VARIABLES.getId());
+
 		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasmWithPlotCode.getGid(), plotCodeAttr.getFldno(),
-				plotCodeValue,
+			.save(new Attribute(null, germplasmWithPlotCode.getGid(), plotCodeVariable.getCvTermId(),
+				plotCodeValue, null,
 				germplasmWithPlotCode.getLocationId(),
 				0, germplasmWithPlotCode.getGdate()));
 
@@ -428,7 +378,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -453,7 +403,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
 
 		try {
-			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.breeding.method.mismatch"));
@@ -474,7 +424,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
 
 		try {
-			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.number.of.progenitors.mismatch"));
@@ -494,7 +444,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
 
 		try {
-			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.mutation.method.is.not.supported"));
@@ -519,7 +469,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -552,7 +502,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
 		germplasmUpdateDTO.getProgenitors().put("PROGENITOR 3", germplasmOtherProgenitors.getGid());
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -585,7 +535,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -616,7 +566,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 0);
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -631,7 +581,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmMale.getGid());
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -670,7 +620,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmDescendant.getGid());
 
 		try {
-			this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+			this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 			fail("Method should throw an error");
 		} catch (final MiddlewareRequestException e) {
 			Assert.assertTrue(
@@ -703,7 +653,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmWithDescendants.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmDescendant2.getGid());
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -730,7 +680,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, germplasmFemale.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, 0);
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -763,7 +713,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmDescendant.getGid());
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -794,7 +744,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmParent.getGid());
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -824,7 +774,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, 0);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, germplasmParent.getGid());
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -846,7 +796,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod), Optional.empty(), null);
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -873,7 +823,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, parentGermplasm.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, parentGermplasm.getGid());
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -901,7 +851,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, parentGermplasm.getGid());
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, parentGermplasm.getGid());
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -926,7 +876,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_1, null);
 		germplasmUpdateDTO.getProgenitors().put(GermplasmServiceImpl.PROGENITOR_2, null);
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -948,7 +898,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(method), Optional.empty(), null);
 		germplasmUpdateDTO.setReference("");
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
@@ -972,7 +922,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, programUUID, germplasmImportRequestDto);
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
 		assertThat(response.get(this.clientId).getGids().size(), is(1));
@@ -1016,7 +966,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, programUUID, germplasmImportRequestDto);
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
 		assertThat(response.get(this.clientId).getGids().size(), is(1));
@@ -1066,7 +1016,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setSkipIfExists(true);
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, programUUID, germplasmImportRequestDto);
 
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.FOUND));
@@ -1088,7 +1038,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setSkipIfExists(true);
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, programUUID, germplasmImportRequestDto);
 
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
@@ -1113,7 +1063,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setSkipIfExists(false);
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, programUUID, germplasmImportRequestDto);
 
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
@@ -1153,7 +1103,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setSkipIfExists(false);
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, programUUID, germplasmImportRequestDto);
 
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
@@ -1191,7 +1141,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
 		germplasmImportRequestDto.setSkipIfExists(false);
 
-		this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
+		this.germplasmService.importGermplasm(CROP_NAME, programUUID, germplasmImportRequestDto);
 	}
 
 	@Test
@@ -1215,7 +1165,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setSkipIfExists(true);
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, programUUID, germplasmImportRequestDto);
 
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
@@ -1254,7 +1204,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmImportRequestDto.setSkipIfExists(true);
 
 		final Map<Integer, GermplasmImportResponseDto> response =
-			this.germplasmService.importGermplasm(CROP_NAME, germplasmImportRequestDto);
+			this.germplasmService.importGermplasm(CROP_NAME, programUUID, germplasmImportRequestDto);
 
 		assertThat(response.size(), is(1));
 		assertThat(response.get(this.clientId).getStatus(), equalTo(GermplasmImportResponseDto.Status.CREATED));
@@ -1587,6 +1537,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			.getByCodes(UDTableType.NAMES_NAME.getTable(),
 				Collections.singleton(UDTableType.NAMES_NAME.getType()), new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_NAMETYPES))
 			.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+
 		final Map<Integer, String> germplasmNames = this.daoFactory.getNameDao().getNamesByGids(Collections.singletonList(gid)).stream()
 			.collect(Collectors.toMap(Name::getTypeId, Name::getNval));
 		if (existingNameTypes.containsKey(GermplasmImportRequest.ACCNO)) {
@@ -1611,11 +1562,13 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 					.getSynonym(), equalTo(request.getPedigree()));
 		}
 
-		final Map<String, Integer> existingAttrTypes = this.daoFactory.getUserDefinedFieldDAO()
-			.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()))
-				, new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES))
-			.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+		final VariableFilter variableFilter = new VariableFilter();
+		GermplasmServiceImpl.ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
+		GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES.forEach(variableFilter::addName);
+
+		final Map<String, Integer> existingAttrTypes = this.ontologyVariableDataManager.getWithFilter(variableFilter)
+			.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
+
 		final Map<Integer, String> germplasmAttributes =
 			this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Collections.singletonList(gid)).stream()
 				.collect(Collectors.toMap(Attribute::getTypeId, Attribute::getAval));
@@ -1733,11 +1686,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 					.getSynonym(), equalTo(request.getPedigree()));
 		}
 
-		final Map<String, Integer> existingAttrTypes = this.daoFactory.getUserDefinedFieldDAO()
-			.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()))
-				, new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES))
-			.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+		final VariableFilter variableFilter = new VariableFilter();
+		GermplasmServiceImpl.ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
+		GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES.forEach(variableFilter::addName);
+
+		final Map<String, Integer> existingAttrTypes = this.ontologyVariableDataManager.getWithFilter(variableFilter)
+			.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
 		final Map<Integer, String> germplasmAttributes =
 			this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Collections.singletonList(gid)).stream()
 				.collect(Collectors.toMap(Attribute::getTypeId, Attribute::getAval));
@@ -1847,11 +1801,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 					.getSynonym(), equalTo(request.getPedigree()));
 		}
 
-		final Map<String, Integer> existingAttrTypes = this.daoFactory.getUserDefinedFieldDAO()
-			.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()))
-				, new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES))
-			.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+		final VariableFilter variableFilter = new VariableFilter();
+		GermplasmServiceImpl.ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
+		GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES.forEach(variableFilter::addName);
+
+		final Map<String, Integer> existingAttrTypes = this.ontologyVariableDataManager.getWithFilter(variableFilter)
+			.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
 		final Map<Integer, String> germplasmAttributes =
 			this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Collections.singletonList(gid)).stream()
 				.collect(Collectors.toMap(Attribute::getTypeId, Attribute::getAval));
@@ -1975,11 +1930,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 					.getSynonym(), equalTo(request2.getPedigree()));
 		}
 
-		final Map<String, Integer> existingAttrTypes = this.daoFactory.getUserDefinedFieldDAO()
-			.getByCodes(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				new HashSet<>(Arrays.asList(UDTableType.ATRIBUTS_ATTRIBUTE.getType(), UDTableType.ATRIBUTS_PASSPORT.getType()))
-				, new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES))
-			.stream().collect(Collectors.toMap(UserDefinedField::getFcode, UserDefinedField::getFldno));
+		final VariableFilter variableFilter = new VariableFilter();
+		GermplasmServiceImpl.ATTRIBUTE_TYPES.forEach(variableFilter::addVariableType);
+		GermplasmImportRequest.BRAPI_SPECIFIABLE_ATTRTYPES.forEach(variableFilter::addName);
+
+		final Map<String, Integer> existingAttrTypes = this.ontologyVariableDataManager.getWithFilter(variableFilter)
+			.stream().collect(Collectors.toMap(Variable::getName, Variable::getId));
 		final Map<Integer, String> germplasmAttributes =
 			this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Collections.singletonList(gid)).stream()
 				.collect(Collectors.toMap(Attribute::getTypeId, Attribute::getAval));
@@ -2346,7 +2302,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
 				Optional.of(newLocation), creationDate);
 
-		this.germplasmService.importGermplasmUpdates(Collections.singletonList(germplasmUpdateDTO));
+		this.germplasmService.importGermplasmUpdates(programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		this.sessionProvder.getSession().flush();
 		this.sessionProvder.getSession().clear();
@@ -2486,11 +2442,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private Attribute createAttribute(final Germplasm germplasm) {
-		final UserDefinedField newAttributeCode =
-			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode(UDTableType.ATRIBUTS_ATTRIBUTE.getTable(),
-				UDTableType.ATRIBUTS_ATTRIBUTE.getType(), NOTE);
 
-		final Attribute attribute = new Attribute(null, germplasm.getGid(), newAttributeCode.getFldno(), "",
+		final Attribute attribute = new Attribute(null, germplasm.getGid(), attributeId, "", null,
 			germplasm.getLocationId(),
 			0, germplasm.getGdate());
 		this.daoFactory.getAttributeDAO()

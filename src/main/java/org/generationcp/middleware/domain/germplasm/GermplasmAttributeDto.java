@@ -9,7 +9,11 @@ public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
 
 	private Integer id;
 
-	private String attributeDescription;
+	private String variableName;
+
+	private String variableDescription;
+
+	private String variableTypeName;
 
 	private String locationName;
 
@@ -24,12 +28,12 @@ public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
 		this.id = id;
 	}
 
-	public String getAttributeDescription() {
-		return this.attributeDescription;
+	public String getVariableDescription() {
+		return this.variableDescription;
 	}
 
-	public void setAttributeDescription(final String attributeDescription) {
-		this.attributeDescription = attributeDescription;
+	public void setVariableDescription(final String variableDescription) {
+		this.variableDescription = variableDescription;
 	}
 
 	public String getLocationName() {
@@ -38,6 +42,22 @@ public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
 
 	public void setLocationName(final String locationName) {
 		this.locationName = locationName;
+	}
+
+	public String getVariableTypeName() {
+		return this.variableTypeName;
+	}
+
+	public void setVariableTypeName(final String variableTypeName) {
+		this.variableTypeName = variableTypeName;
+	}
+
+		public String getVariableName() {
+		return this.variableName;
+	}
+
+	public void setVariableName(final String variableName) {
+		this.variableName = variableName;
 	}
 
 	@Override
