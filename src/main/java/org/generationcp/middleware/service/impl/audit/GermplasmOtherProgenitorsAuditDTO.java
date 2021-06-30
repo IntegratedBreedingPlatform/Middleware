@@ -4,11 +4,11 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class GermplasmProgenitorsAuditDTO extends AbstractAuditDTO {
+public class GermplasmOtherProgenitorsAuditDTO extends AbstractAuditDTO {
 
 	private Integer progenitorGid;
 
-	public GermplasmProgenitorsAuditDTO() {
+	public GermplasmOtherProgenitorsAuditDTO() {
 	}
 
 	public Integer getProgenitorGid() {

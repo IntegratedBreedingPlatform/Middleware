@@ -4,7 +4,7 @@ import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO
 import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmProgenitorDetailsAuditDTO;
-import org.generationcp.middleware.service.impl.audit.GermplasmProgenitorsAuditDTO;
+import org.generationcp.middleware.service.impl.audit.GermplasmOtherProgenitorsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmReferenceAuditDTO;
 import org.springframework.data.domain.Pageable;
 
@@ -32,8 +32,8 @@ public interface GermplasmAuditService {
 
 	long countProgenitorDetailsChangesByGid(Integer gid);
 
-	List<GermplasmProgenitorsAuditDTO> getProgenitorsByGid(Integer gid, Pageable pageable);
+	List<GermplasmOtherProgenitorsAuditDTO> getOtherProgenitorsByGid(Integer gid, Pageable pageable);
 
-	long countProgenitorsChangesByGid(Integer gid);
+	long countOtherProgenitorsChangesByGid(Integer gid);
 
 }

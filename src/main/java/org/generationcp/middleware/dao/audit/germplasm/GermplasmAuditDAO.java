@@ -7,7 +7,7 @@ import org.generationcp.middleware.service.impl.audit.GermplasmAttributeAuditDTO
 import org.generationcp.middleware.service.impl.audit.GermplasmBasicDetailsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmNameAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmProgenitorDetailsAuditDTO;
-import org.generationcp.middleware.service.impl.audit.GermplasmProgenitorsAuditDTO;
+import org.generationcp.middleware.service.impl.audit.GermplasmOtherProgenitorsAuditDTO;
 import org.generationcp.middleware.service.impl.audit.GermplasmReferenceAuditDTO;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -148,21 +148,21 @@ public class GermplasmAuditDAO {
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
-	public List<GermplasmProgenitorsAuditDTO> getProgenitorsByGid(final Integer gid, final Pageable pageable) {
-		final SQLQuery query = this.session.createSQLQuery(GermplasmProgenitorsAuditDAOQuery.getSelectQuery());
+	public List<GermplasmOtherProgenitorsAuditDTO> getOtherProgenitorsByGid(final Integer gid, final Pageable pageable) {
+		final SQLQuery query = this.session.createSQLQuery(GermplasmOtherProgenitorsAuditDAOQuery.getSelectQuery());
 		query.setParameter("gid", gid);
 
 		this.addCommonScalars(query);
-		query.addScalar(GermplasmProgenitorsAuditDAOQuery.PROGENITOR_GID_ALIAS);
-		query.setResultTransformer(Transformers.aliasToBean(GermplasmProgenitorsAuditDTO.class));
+		query.addScalar(GermplasmOtherProgenitorsAuditDAOQuery.PROGENITOR_GID_ALIAS);
+		query.setResultTransformer(Transformers.aliasToBean(GermplasmOtherProgenitorsAuditDTO.class));
 
 		GenericDAO.addPaginationToSQLQuery(query, pageable);
 
-		return (List<GermplasmProgenitorsAuditDTO>) query.list();
+		return (List<GermplasmOtherProgenitorsAuditDTO>) query.list();
 	}
 
-	public long countProgenitorsChangesByGid(final Integer gid) {
-		final SQLQuery query = this.session.createSQLQuery(GermplasmProgenitorsAuditDAOQuery.getCountQuery());
+	public long countOtherProgenitorsChangesByGid(final Integer gid) {
+		final SQLQuery query = this.session.createSQLQuery(GermplasmOtherProgenitorsAuditDAOQuery.getCountQuery());
 		query.setParameter("gid", gid);
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}

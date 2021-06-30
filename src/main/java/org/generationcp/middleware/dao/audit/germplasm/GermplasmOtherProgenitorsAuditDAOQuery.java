@@ -2,7 +2,7 @@ package org.generationcp.middleware.dao.audit.germplasm;
 
 import org.generationcp.middleware.dao.audit.AuditConstants;
 
-class GermplasmProgenitorsAuditDAOQuery {
+class GermplasmOtherProgenitorsAuditDAOQuery {
 
 	static final String PROGENITOR_GID_ALIAS = "progenitorGid";
 
