@@ -17,6 +17,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.util.uid.UIDGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -65,7 +66,7 @@ public class ObservationUnitIDGeneratorImplTest {
 		final String obsUnitId = experiment.getObsUnitId();
 		assertNotNull(obsUnitId);
 		assertFalse(obsUnitId.matches(UUID_REGEX));
-		assertEquals(this.crop.getPlotCodePrefix() + ObservationUnitIDGeneratorImpl.MID_STRING, obsUnitId.substring(0, CROP_PREFIX_LENGTH + 1));
+		assertEquals(this.crop.getPlotCodePrefix() + UIDGenerator.UID_ROOT.OBSERVATION_UNIT.getRoot(), obsUnitId.substring(0, CROP_PREFIX_LENGTH + 1));
 		final String suffix = obsUnitId.substring(CROP_PREFIX_LENGTH + 1, obsUnitId.length());
 		assertTrue(suffix.matches(SUFFIX_REGEX));
 	}

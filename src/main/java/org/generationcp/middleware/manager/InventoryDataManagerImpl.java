@@ -12,9 +12,7 @@
 package org.generationcp.middleware.manager;
 
 import com.google.common.base.Function;
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
@@ -30,9 +28,9 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.generationcp.middleware.util.uid.UIDGenerator;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
@@ -40,7 +38,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.UUID;
 
 /**
  * Implementation of the InventoryDataManager interface. Most of the functions in this class only use the connection to the local instance,
@@ -52,7 +49,7 @@ import java.util.UUID;
 @Transactional
 public class InventoryDataManagerImpl extends DataManager implements InventoryDataManager {
 
-	public static final String MID_STRING = "L";
+	private static final UIDGenerator.UID_ROOT UID_ROOT = UIDGenerator.UID_ROOT.LOT;
 	public static final int SUFFIX_LENGTH = 8;
 
 	@Resource
@@ -272,20 +269,18 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 
 	@Override
 	public void generateLotIds(final CropType crop, final List<Lot> lots) {
-		Preconditions.checkNotNull(crop);
-		Preconditions.checkState(!CollectionUtils.isEmpty(lots));
+		UIDGenerator.<Lot>generate(crop, lots, UID_ROOT, SUFFIX_LENGTH,
+			new UIDGenerator.UIDAdapter<Lot>() {
 
-		final boolean doUseUUID = crop.isUseUUID();
-		for (final Lot lot : lots) {
-			if (lot.getLotUuId() == null) {
-				if (doUseUUID) {
-					lot.setLotUuId(UUID.randomUUID().toString());
-				} else {
-					final String cropPrefix = crop.getPlotCodePrefix();
-					lot.setLotUuId(cropPrefix + MID_STRING
-						+ RandomStringUtils.randomAlphanumeric(SUFFIX_LENGTH));
+				@Override
+				public String getUID(final Lot entry) {
+					return entry.getLotUuId();
 				}
-			}
-		}
+
+				@Override
+				public void setUID(final Lot entry, final String uid) {
+					entry.setLotUuId(uid);
+				}
+			});
 	}
 }
