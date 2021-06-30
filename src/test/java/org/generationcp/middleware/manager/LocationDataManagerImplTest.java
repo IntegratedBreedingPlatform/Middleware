@@ -322,7 +322,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 		final Location location1 = new Location();
 		location1.setCntryid(1);
-		location1.setLabbr(RandomStringUtils.randomAlphabetic(3).toUpperCase());
+		location1.setLabbr(RandomStringUtils.randomAlphabetic(4).toUpperCase());
 		location1.setLname("TEST-LOCATION-2");
 		location1.setLrplce(1);
 		location1.setLtype(1);
@@ -334,7 +334,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 		final Location location2 = new Location();
 		location2.setCntryid(1);
-		location2.setLabbr(RandomStringUtils.randomAlphabetic(3).toUpperCase());
+		location2.setLabbr(RandomStringUtils.randomAlphabetic(4).toUpperCase());
 		location2.setLname("TEST-LOCATION-3");
 		location2.setLrplce(1);
 		location2.setLtype(1);
@@ -511,7 +511,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		location.setProgramUUID(programUUID);
 		location.setLrplce(0);
 		location.setLname("TEST-LOCATION" + id);
-		location.setLabbr(RandomStringUtils.randomAlphabetic(3).toUpperCase());
+		location.setLabbr(RandomStringUtils.randomAlphabetic(4).toUpperCase());
 		location.setLtype(1);
 		location.setCntryid(1);
 		location.setLrplce(1);
