@@ -1,6 +1,8 @@
 package org.generationcp.middleware.dao.audit.germplasm;
 
 import org.generationcp.middleware.dao.audit.AuditConstants;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 
 class GermplasmAttributeAuditDAOQuery {
 
@@ -16,16 +18,15 @@ class GermplasmAttributeAuditDAOQuery {
 
 	private final static String BASE_QUERY = "SELECT %s " // use of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ "       FROM atributs_aud a_aud "
-		+ "    INNER JOIN udflds user_defined_field ON a_aud.atype = user_defined_field.fldno "
-		// TODO: cvterm.cvterm_id
-		+ "    INNER JOIN udflds user_defined_field ON a_aud.atype = user_defined_field.fldno "
-		// TODO: cvtermprop.cvterm_id AND type_id = 1800 AND value = 'GERMPLASM_' -> check in variable type
+		+ "    INNER JOIN cvterm ON a_aud.atype = cvterm.cvterm_id "
+		+ "    INNER JOIN cvtermprop ON cvterm.cvterm_id = cvtermprop.cvterm_id AND cvtermprop.type_id = " + TermId.VARIABLE_TYPE.getId()
+		+ " 		AND (cvtermprop.value = '" + VariableType.GERMPLASM_ATTRIBUTE.getName() + "' OR cvtermprop.value = '" + VariableType.GERMPLASM_PASSPORT.getName() + "')"
 		+ "    INNER JOIN location loc ON a_aud.alocn = loc.locid "
 		+ "	   %s" // use of SELF_JOIN_QUERY -> It's not needed for the count query
 		+ " WHERE a_aud.aid = :aid "
 		+ " %s"; // use of ORDER_EXPRESION -> It's not needed for the count query
 
-	private static final String SELECT_EXPRESION = "user_defined_field.fcode AS " + ATTRIBUTE_TYPE_ALIAS + ", "
+	private static final String SELECT_EXPRESION = "cvterm.name AS " + ATTRIBUTE_TYPE_ALIAS + ", "
 		+ " a_aud.aval AS " + VALUE_ALIAS + ", "
 		+ " loc.lname AS " + LOCATION_NAME_ALIAS + ", "
 		+ " cast(a_aud.adate as char) AS " + CREATION_DATE_ALIAS + ", "
