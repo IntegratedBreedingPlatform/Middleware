@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -197,8 +198,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final Map<String, MeasurementVariable> variableNamesMap, final Map<String, MeasurementVariable> variableSynonymsMap,
 		final Map<Integer, List<ValueReference>> categoricalVariablesMap) {
 		final List<ExperimentProperty> properties = new ArrayList<>();
-		if(!CollectionUtils.isEmpty(dto.getObservationUnitPosition().getObservationLevelRelationships())) {
-			for (ObservationLevelRelationship levelRelationship : dto.getObservationUnitPosition().getObservationLevelRelationships()) {
+		final ObservationUnitPositionImportRequestDto position = dto.getObservationUnitPosition();
+		if (!CollectionUtils.isEmpty(position.getObservationLevelRelationships())) {
+			for (ObservationLevelRelationship levelRelationship : position.getObservationLevelRelationships()) {
 				final String variableName = levelRelationship.getLevelName().toUpperCase();
 				final MeasurementVariable measurementVariable =
 					variableNamesMap.containsKey(variableName) ? variableNamesMap.get(variableName) : variableSynonymsMap.get(variableName);
@@ -211,41 +213,71 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 						measurementVariable.setPossibleValues(categoricalVariablesMap.get(measurementVariable.getTermId()));
 					}
 					if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
-						final ExperimentProperty experimentProperty = new ExperimentProperty();
-						experimentProperty.setExperiment(experiment);
-						experimentProperty.setRank(1);
-						experimentProperty.setValue(levelRelationship.getLevelCode());
-						experimentProperty.setTypeId(measurementVariable.getTermId());
-						properties.add(experimentProperty);
+						properties.add(this.createExperimentProperty(experiment, 1, levelRelationship.getLevelCode(),
+							measurementVariable.getTermId()));
 					}
 				}
 			}
 		}
+
+		if (!StringUtils.isEmpty(position.getPositionCoordinateX()) && !StringUtils.isEmpty(position.getPositionCoordinateY())) {
+			properties.add(this.createExperimentProperty(experiment, 0, position.getPositionCoordinateX(), TermId.RANGE_NO.getId()));
+			properties.add(this.createExperimentProperty(experiment, 0, position.getPositionCoordinateY(), TermId.COLUMN_NO.getId()));
+		}
 		experiment.setProperties(properties);
+
+	}
+
+	private ExperimentProperty createExperimentProperty(final ExperimentModel experimentModel, final Integer rank, final String value,
+		final Integer typeId) {
+		final ExperimentProperty experimentProperty = new ExperimentProperty();
+		experimentProperty.setExperiment(experimentModel);
+		experimentProperty.setRank(1);
+		experimentProperty.setValue(value);
+		experimentProperty.setTypeId(typeId);
+		return experimentProperty;
 
 	}
 
 	private void addExperimentVariablesIfNecessary(final ObservationUnitImportRequestDto dto,
 		final Map<Integer, List<Integer>> plotExperimentVariablesMap, final Map<Integer, DmsProject> trialIdPlotDatasetMap,
 		final Map<String, MeasurementVariable> variableNamesMap, final Map<String, MeasurementVariable> variableSynonymsMap) {
-		if(!CollectionUtils.isEmpty(dto.getObservationUnitPosition().getObservationLevelRelationships())) {
-			for (ObservationLevelRelationship levelRelationship : dto.getObservationUnitPosition().getObservationLevelRelationships()) {
-				final Integer trialDbId = Integer.valueOf(dto.getTrialDbId());
+		final ObservationUnitPositionImportRequestDto position = dto.getObservationUnitPosition();
+		final Integer trialDbId = Integer.valueOf(dto.getTrialDbId());
+		if (!CollectionUtils.isEmpty(position.getObservationLevelRelationships())) {
+			for (ObservationLevelRelationship levelRelationship : position.getObservationLevelRelationships()) {
 				final String variableName = levelRelationship.getLevelName().toUpperCase();
 				final MeasurementVariable measurementVariable =
 					variableNamesMap.containsKey(variableName) ? variableNamesMap.get(variableName) : variableSynonymsMap.get(variableName);
 				if (measurementVariable != null && !plotExperimentVariablesMap.get(trialDbId).contains(measurementVariable.getTermId())) {
-					final ProjectProperty projectProperty = new ProjectProperty();
-					projectProperty.setProject(trialIdPlotDatasetMap.get(trialDbId));
-					projectProperty.setRank(plotExperimentVariablesMap.get(trialDbId).size());
-					projectProperty.setTypeId(VariableType.EXPERIMENTAL_DESIGN.getId());
-					projectProperty.setVariableId(measurementVariable.getTermId());
-					projectProperty.setAlias(variableName);
-					trialIdPlotDatasetMap.get(trialDbId).addProperty(projectProperty);
-					plotExperimentVariablesMap.get(trialDbId).add(measurementVariable.getTermId());
+					this.addProjectProperty(measurementVariable.getTermId(), variableName, trialDbId, plotExperimentVariablesMap,
+						trialIdPlotDatasetMap);
 				}
 			}
 		}
+
+		if (!StringUtils.isEmpty(position.getPositionCoordinateX()) && !StringUtils.isEmpty(position.getPositionCoordinateY())) {
+			if (!plotExperimentVariablesMap.get(trialDbId).contains(TermId.RANGE_NO.getId())) {
+				this.addProjectProperty(TermId.RANGE_NO.getId(), "FIELDMAP RANGE", trialDbId, plotExperimentVariablesMap,
+					trialIdPlotDatasetMap);
+			}
+			if (!plotExperimentVariablesMap.get(trialDbId).contains(TermId.COLUMN_NO.getId())) {
+				this.addProjectProperty(TermId.COLUMN_NO.getId(), "FIELDMAP COLUMN", trialDbId, plotExperimentVariablesMap,
+					trialIdPlotDatasetMap);
+			}
+		}
+	}
+
+	private void addProjectProperty(final Integer termId, final String variableName, final Integer trialDbId,
+		final Map<Integer, List<Integer>> plotExperimentVariablesMap, final Map<Integer, DmsProject> trialIdPlotDatasetMap) {
+		final ProjectProperty projectProperty = new ProjectProperty();
+		projectProperty.setProject(trialIdPlotDatasetMap.get(trialDbId));
+		projectProperty.setRank(plotExperimentVariablesMap.get(trialDbId).size());
+		projectProperty.setTypeId(VariableType.EXPERIMENTAL_DESIGN.getId());
+		projectProperty.setVariableId(termId);
+		projectProperty.setAlias(variableName);
+		trialIdPlotDatasetMap.get(trialDbId).addProperty(projectProperty);
+		plotExperimentVariablesMap.get(trialDbId).add(termId);
 	}
 
 	private Map<Integer, List<Integer>> populatePlotExperimentVariablesMap(final Map<Integer, DmsProject> plotDatasetMap) {
