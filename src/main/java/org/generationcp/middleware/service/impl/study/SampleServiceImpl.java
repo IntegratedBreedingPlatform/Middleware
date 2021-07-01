@@ -1,7 +1,6 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.base.Function;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +25,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Nullable;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -140,6 +138,7 @@ public class SampleServiceImpl implements SampleService {
 		final StockModel stock = experiment.getStock();
 		final String entryNo = stock.getUniqueName();
 		final Integer gid = (stock.getGermplasm() != null) ? stock.getGermplasm().getGid() : null;
+		final String germplasmUUID = (stock.getGermplasm() != null) ? stock.getGermplasm().getGermplasmUUID() : null;
 
 		samplesDetailsDto = new SampleDetailsDTO(studyId, obsUnitId, sample.getSampleBusinessKey());
 		samplesDetailsDto.setTakenBy(takenBy);
@@ -147,6 +146,8 @@ public class SampleServiceImpl implements SampleService {
 		samplesDetailsDto.setStudyName(studyName);
 		samplesDetailsDto.setEntryNo(Integer.valueOf(entryNo));
 		samplesDetailsDto.setGid(gid);
+		samplesDetailsDto.setGermplasmUUID(germplasmUUID);
+
 		samplesDetailsDto.setSampleName(sample.getSampleName());
 		samplesDetailsDto.setDesignation(stock.getName());
 
@@ -225,7 +226,7 @@ public class SampleServiceImpl implements SampleService {
 		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
 		sampleDTOS.forEach(sampleDTO -> sampleDTO.setTakenBy(userIDFullNameMap.get(sampleDTO.getTakenByUserId())));
 	}
-	
+
 	protected void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
 		this.workbenchDataManager = workbenchDataManager;
 	}

@@ -129,7 +129,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
 			+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
 
-
 	public List<NumericTraitInfo> getNumericTraitInfoList(final List<Integer> environmentIds, final List<Integer> numericVariableIds) {
 		final List<NumericTraitInfo> numericTraitInfoList = new ArrayList<>();
 		try {
@@ -1001,7 +1000,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 						final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
 						observationUnitPosition.setGeoCoordinates((Map<String, Object>) jsonProp.get("geoCoordinates"));
 					} catch (final IOException e) {
-						LOG.error("couldn't parse json_props column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(), e);
+						LOG.error("couldn't parse json_props column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(),
+							e);
 					}
 				}
 				observationUnit.setObservationUnitPosition(observationUnitPosition);
@@ -1092,7 +1092,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 
 		if (requestDTO.getGermplasmDbIds() != null && !requestDTO.getGermplasmDbIds().isEmpty()) {
-			queryString.append(" AND s.dbxref_id in (:germplasmDbIds) ");
+			queryString.append(" AND g.germplsm_uuid in (:germplasmDbIds) ");
 		}
 
 		if (requestDTO.getProgramDbIds() != null && !requestDTO.getProgramDbIds().isEmpty()) {
@@ -1360,24 +1360,28 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return criteria.list();
 	}
 
-	public Map<Integer, List<MeasurementVariable>> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(final List<Integer> geolocationIds,
+	public Map<Integer, List<MeasurementVariable>> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(
+		final List<Integer> geolocationIds,
 		final List<Integer> variableIds) {
 		final Map<Integer, List<MeasurementVariable>> studyVariablesMap = new HashMap<>();
 
-		try{
+		try {
 			final SQLQuery query =
-				this.getSession().createSQLQuery("SELECT envcvt.name AS name, envcvt.definition AS definition, cvt_scale.name AS scaleName, "
-					+ "		(CASE WHEN cvt_rel_catVar.subject_id IS NULL THEN pheno.value ELSE categoricalVar.name END) AS value, "
-					+ "		cvt_scale.cvterm_id AS scaleId, envcvt.cvterm_id AS variableId, envnde.nd_geolocation_id AS instanceId "
-					+ "		from phenotype pheno "
-					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.cvterm_id IN (:variableIds) "
-					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
-					+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
-					+ "     INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id\n"
-					+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id IN (:geolocationIds) "
-					+ "     LEFT JOIN cvterm_relationship cvt_rel_catVar on cvt_scale.cvterm_id = cvt_rel_catVar.subject_id and cvt_rel_catVar.type_id = " + TermId.HAS_TYPE.getId()
-					+ "			AND cvt_rel_catVar.object_id= " + TermId.CATEGORICAL_VARIABLE.getId()
-					+ "		LEFT JOIN cvterm categoricalVar ON categoricalVar.cvterm_id = pheno.value");
+				this.getSession()
+					.createSQLQuery("SELECT envcvt.name AS name, envcvt.definition AS definition, cvt_scale.name AS scaleName, "
+						+ "		(CASE WHEN cvt_rel_catVar.subject_id IS NULL THEN pheno.value ELSE categoricalVar.name END) AS value, "
+						+ "		cvt_scale.cvterm_id AS scaleId, envcvt.cvterm_id AS variableId, envnde.nd_geolocation_id AS instanceId "
+						+ "		from phenotype pheno "
+						+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.cvterm_id IN (:variableIds) "
+						+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = "
+						+ TermId.HAS_SCALE.getId()
+						+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
+						+ "     INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id\n"
+						+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id IN (:geolocationIds) "
+						+ "     LEFT JOIN cvterm_relationship cvt_rel_catVar on cvt_scale.cvterm_id = cvt_rel_catVar.subject_id and cvt_rel_catVar.type_id = "
+						+ TermId.HAS_TYPE.getId()
+						+ "			AND cvt_rel_catVar.object_id= " + TermId.CATEGORICAL_VARIABLE.getId()
+						+ "		LEFT JOIN cvterm categoricalVar ON categoricalVar.cvterm_id = pheno.value");
 			query.addScalar("name", new StringType());
 			query.addScalar("definition", new StringType());
 			query.addScalar("scaleName", new StringType());
@@ -1403,8 +1407,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				studyVariablesMap.get(instanceId).add(measurementVariable);
 			}
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationIds: " + geolocationIds
-				+ " and variableIds: " + variableIds;
+			final String message =
+				"Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationIds: " + geolocationIds
+					+ " and variableIds: " + variableIds;
 			PhenotypeDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
