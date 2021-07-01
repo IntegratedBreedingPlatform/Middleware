@@ -17,6 +17,7 @@ import java.util.List;
 import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableOverridesDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
@@ -106,7 +107,7 @@ public interface OntologyVariableDataManager {
 
 	public VariableOverrides getVariableOverridesByVariableIdAndProgram(final Integer variableId, final String programUuid);
 
-	public List<VariableOverrides> getVariableOverridesByAliasAndProgram(final String alias, final String programUuid);
+	public List<VariableOverridesDto> getVariableOverridesByAliasAndProgram(final String alias, final String programUuid);
 
 	public List<VariableType> getVariableTypes(Integer variableId);
 

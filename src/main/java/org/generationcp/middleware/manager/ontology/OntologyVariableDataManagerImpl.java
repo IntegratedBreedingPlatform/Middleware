@@ -21,6 +21,7 @@ import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableOverridesDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -1032,7 +1033,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public List<VariableOverrides> getVariableOverridesByAliasAndProgram(final String alias, final String programUuid) {
+	public List<VariableOverridesDto> getVariableOverridesByAliasAndProgram(final String alias, final String programUuid) {
 		try {
 			return this.daoFactory.getVariableProgramOverridesDao().getByAliasAndProgram(alias, programUuid);
 		} catch (final Exception e) {
