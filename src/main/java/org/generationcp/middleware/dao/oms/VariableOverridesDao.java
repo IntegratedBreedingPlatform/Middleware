@@ -53,6 +53,20 @@ public class VariableOverridesDao extends GenericDAO<VariableOverrides, Integer>
 		}
 	}
 
+	public List<VariableOverrides> getByAliasAndProgram(final String alias, final String programUuid) {
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("alias", alias));
+			criteria.add(Restrictions.eq("programUuid", programUuid));
+			return (List<VariableOverrides>) criteria.list();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getByAliasAndProgram=" + alias + " query on VariableOverridesDao: "
+				+ e.getMessage(), e);
+		}
+	}
+
 	public VariableOverrides save(
 		final Integer variableId, final String programUuid, final String alias, final String minValue, final String maxValue) {
 

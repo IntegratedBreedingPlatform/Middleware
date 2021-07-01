@@ -1032,6 +1032,15 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
+	public List<VariableOverrides> getVariableOverridesByAliasAndProgram(final String alias, final String programUuid) {
+		try {
+			return this.daoFactory.getVariableProgramOverridesDao().getByAliasAndProgram(alias, programUuid);
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException("Error at getVariableOverridesByAliasAndProgram:" + e.getMessage(), e);
+		}
+	}
+
+	@Override
 	public List<VariableType> getVariableTypes(final Integer variableId) {
 		final List<VariableType> variableTypes = new ArrayList<>();
 		final List<CVTermProperty> properties = daoFactory.getCvTermPropertyDao().getByCvTermAndType(variableId, TermId.VARIABLE_TYPE.getId());
