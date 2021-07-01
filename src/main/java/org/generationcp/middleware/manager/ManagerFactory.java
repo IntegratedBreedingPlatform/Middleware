@@ -13,6 +13,8 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
+import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
+import org.generationcp.middleware.api.germplasm.GermplasmAttributeServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
@@ -360,6 +362,10 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmService getGermplasmService() {
 		return new GermplasmServiceImpl(this.sessionProvider);
+	}
+
+	public GermplasmAttributeService getGermplasmAttributeService() {
+		return new GermplasmAttributeServiceImpl(this.sessionProvider);
 	}
 
 	public GermplasmListService getGermplasmListService() {

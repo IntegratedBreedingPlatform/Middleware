@@ -85,57 +85,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getGermplasmByLocationName(final String name, final int start, final int numOfRows, final Operation op) {
-		List<Germplasm> germplasms = new ArrayList<>();
-		final GermplasmDAO dao = this.daoFactory.getGermplasmDao();
-		if (op == Operation.EQUAL) {
-			germplasms = dao.getByLocationNameUsingEqual(name, start, numOfRows);
-		} else if (op == Operation.LIKE) {
-			germplasms = dao.getByLocationNameUsingLike(name, start, numOfRows);
-		}
-		return germplasms;
-	}
-
-	@Override
-	@Deprecated
-	public long countGermplasmByLocationName(final String name, final Operation op) {
-		long count = 0;
-		final GermplasmDAO dao = this.daoFactory.getGermplasmDao();
-		if (op == Operation.EQUAL) {
-			count = dao.countByLocationNameUsingEqual(name);
-		} else if (op == Operation.LIKE) {
-			count = dao.countByLocationNameUsingLike(name);
-		}
-		return count;
-	}
-
-	@Override
-	@Deprecated
-	public List<Germplasm> getGermplasmByMethodName(final String name, final int start, final int numOfRows, final Operation op) {
-		List<Germplasm> germplasms = new ArrayList<>();
-		final GermplasmDAO dao = this.daoFactory.getGermplasmDao();
-		if (op == Operation.EQUAL) {
-			germplasms = dao.getByMethodNameUsingEqual(name, start, numOfRows);
-		} else if (op == Operation.LIKE) {
-			germplasms = dao.getByMethodNameUsingLike(name, start, numOfRows);
-		}
-		return germplasms;
-	}
-
-	@Override
-	@Deprecated
-	public long countGermplasmByMethodName(final String name, final Operation op) {
-		long count = 0;
-		final GermplasmDAO dao = this.daoFactory.getGermplasmDao();
-		if (op == Operation.EQUAL) {
-			count = dao.countByMethodNameUsingEqual(name);
-		} else if (op == Operation.LIKE) {
-			count = dao.countByMethodNameUsingLike(name);
-		}
-		return count;
-	}
-
-	@Override
 	public Germplasm getGermplasmByGID(final Integer gid) {
 		Integer updatedGid = gid;
 		Germplasm germplasm;
@@ -156,11 +105,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 			germplasm.setPreferredName(preferredName);
 		}
 		return germplasm;
-	}
-
-	@Override
-	public Germplasm getGermplasmWithPrefAbbrev(final Integer gid) {
-		return this.daoFactory.getGermplasmDao().getByGIDWithPrefAbbrev(gid);
 	}
 
 	@Override
@@ -201,87 +145,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Name getPreferredIdByGID(final Integer gid) {
-		final List<Name> names = this.daoFactory.getNameDao().getByGIDWithFilters(gid, 8, null);
-		if (!names.isEmpty()) {
-			return names.get(0);
-		}
-		return null;
-	}
-
-	@Override
-	public List<Name> getPreferredIdsByListId(final Integer listId) {
-		return this.daoFactory.getNameDao().getPreferredIdsByListId(listId);
-	}
-
-	@Override
 	public Name getNameByGIDAndNval(final Integer gid, final String nval, final GetGermplasmByNameModes mode) {
 		return this.daoFactory.getNameDao().getByGIDAndNval(gid, GermplasmDataManagerUtil.getNameToUseByMode(nval, mode));
 	}
 
 	@Override
-	public Integer updateGermplasmPrefName(final Integer gid, final String newPrefName) {
-		this.updateGermplasmPrefNameAbbrev(gid, newPrefName, "Name");
-		return gid;
-	}
-
-	private void updateGermplasmPrefNameAbbrev(final Integer gid, final String newPrefValue, final String nameOrAbbrev) {
-
-		try {
-			// begin update transaction
-
-			final NameDAO dao = this.daoFactory.getNameDao();
-
-			// check for a name record with germplasm = gid, and nval = newPrefName
-			final Name newPref = this.getNameByGIDAndNval(gid, newPrefValue, GetGermplasmByNameModes.NORMAL);
-			// if a name record with the specified nval exists,
-			if (newPref != null) {
-				// get germplasm's existing preferred name/abbreviation, set as
-				// alternative name, change nstat to 0
-				Name oldPref = null;
-				int newNstat = 0;
-				// nstat to be assigned to newPref: 1 for Name, 2 for Abbreviation
-				if ("Name".equals(nameOrAbbrev)) {
-					oldPref = this.getPreferredNameByGID(gid);
-					newNstat = 1;
-				} else if ("Abbreviation".equals(nameOrAbbrev)) {
-					oldPref = this.getPreferredAbbrevByGID(gid);
-					newNstat = 2;
-				}
-
-				if (oldPref != null) {
-					oldPref.setNstat(0);
-					dao.saveOrUpdate(oldPref);
-				}
-				// update specified name as the new preferred name/abbreviation then save the new name's status to the database
-				newPref.setNstat(newNstat);
-				dao.saveOrUpdate(newPref);
-			} else {
-				// throw exception if no Name record with specified value does not exist
-				throw new MiddlewareQueryException(
-					"Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue=" + newPrefValue
-						+ ", nameOrAbbrev=" + nameOrAbbrev + "): The specified Germplasm Name does not exist.",
-					new Throwable());
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("Error in GermplasmpDataManager.updateGermplasmPrefNameAbbrev(gid=" + gid + ", newPrefValue="
-				+ newPrefValue + ", nameOrAbbrev=" + nameOrAbbrev + "):  " + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public List<Integer> addGermplasmName(final List<Name> names) {
 		return this.addOrUpdateGermplasmName(names, Operation.ADD);
-	}
-
-	@Override
-	public Integer updateGermplasmName(final Name name) {
-		final List<Name> names = new ArrayList<>();
-		names.add(name);
-		final List<Integer> ids = this.addOrUpdateGermplasmName(names, Operation.UPDATE);
-		return !ids.isEmpty() ? ids.get(0) : null;
 	}
 
 	private List<Integer> addOrUpdateGermplasmName(final List<Name> names, final Operation operation) {
@@ -300,16 +170,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 				+ names + ", operation=" + operation + "): " + e.getMessage(), e);
 		}
 		return idNamesSaved;
-	}
-
-	@Override
-	public List<Attribute> getAttributesByGID(final Integer gid) {
-		return this.daoFactory.getAttributeDAO().getByGID(gid);
-	}
-
-	@Override
-	public List<UserDefinedField> getAttributeTypesByGIDList(final List<Integer> gidList) {
-		return this.daoFactory.getUserDefinedFieldDAO().getAttributeTypesByGIDList(gidList);
 	}
 
 	@Override
@@ -539,15 +399,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	 */
 	@Override
 	@Deprecated
-	public Country getCountryById(final Integer id) {
-		return this.daoFactory.getCountryDao().getById(id, false);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	@Override
-	@Deprecated
 	public Location getLocationByID(final Integer id) {
 		return this.daoFactory.getLocationDAO().getById(id, false);
 	}
@@ -743,29 +594,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Integer> addUserDefinedFields(final List<UserDefinedField> fields) {
-
-		final List<Integer> isUdfldSaved = new ArrayList<>();
-		try {
-
-			for (final UserDefinedField field : fields) {
-
-				final UserDefinedField udflds = this.daoFactory.getUserDefinedFieldDAO().save(field);
-				isUdfldSaved.add(udflds.getFldno());
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while saving UserDefinedField: GermplasmDataManager.addUserDefinedFields(fields=" + fields + "): "
-					+ e.getMessage(),
-				e);
-		}
-
-		return isUdfldSaved;
-	}
-
-	@Override
 	public Integer addAttribute(final Attribute attr) {
 
 		Integer isAttrSaved = 0;
@@ -836,15 +664,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public List<Method> getMethodsByGroupIncludesGgroup(final String group) {
 		return this.daoFactory.getMethodDAO().getByGroupIncludesGgroup(group);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	@Override
-	@Deprecated
-	public List<Location> getAllBreedingLocations() {
-		return this.daoFactory.getLocationDAO().getAllBreedingLocations();
 	}
 
 	@Override
@@ -1191,34 +1010,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return new Name();
 	}
 
-	@Override
-	public UserDefinedField getPlotCodeField() {
-		final List<UserDefinedField> udfldAttributes = this.getUserDefinedFieldByFieldTableNameAndType("ATRIBUTS", "PASSPORT");
-		// Defaulting to a UDFLD with fldno = 0 - this prevents NPEs and DB constraint violations.
-		UserDefinedField plotCodeUdfld = new UserDefinedField(0);
-		for (final UserDefinedField userDefinedField : udfldAttributes) {
-			if ("PLOTCODE".equals(userDefinedField.getFcode())) {
-				plotCodeUdfld = userDefinedField;
-				break;
-			}
-		}
-		return plotCodeUdfld;
-	}
-
-	@Override
-	public String getPlotCodeValue(final Integer gid) {
-		String plotCode = "Unknown";
-		final List<Attribute> attributes = this.getAttributesByGID(gid);
-		final UserDefinedField plotCodeAttribute = this.getPlotCodeField();
-		for (final Attribute attr : attributes) {
-			if (attr.getTypeId().equals(plotCodeAttribute.getFldno())) {
-				plotCode = attr.getAval();
-				break;
-			}
-		}
-		return plotCode;
-	}
-
 	/**
 	 * (non-Javadoc)
 	 */
@@ -1313,17 +1104,16 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<UserDefinedField> getAllAttributesTypes() {
-		return this.daoFactory.getAttributeDAO().getAttributeTypes();
-	}
-
-	@Override
-	public String getAttributeValue(final Integer gid, final String attributeName) {
-		final Attribute attribute = this.daoFactory.getAttributeDAO().getAttribute(gid, attributeName);
-		if (attribute == null) {
+	public String getAttributeValue(final Integer gid, final Integer variableId) {
+		List<Attribute> attributes = new ArrayList<>();
+		if (gid != null) {
+			attributes =
+				this.daoFactory.getAttributeDAO().getAttributeValuesByTypeAndGIDList(variableId, Collections.singletonList(gid));
+		}
+		if (attributes.isEmpty()) {
 			return "";
 		} else {
-			return attribute.getAval();
+			return attributes.get(0).getAval();
 		}
 	}
 
@@ -1340,11 +1130,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		preferredName.setNval(Name.UNKNOWN);
 		germplasm.setPreferredName(preferredName);
 		return germplasm;
-	}
-
-	@Override
-	public List<Attribute> getAttributeByIds(final List<Integer> ids) {
-		return this.daoFactory.getAttributeDAO().getByIDs(ids);
 	}
 
 	@Override

@@ -1175,7 +1175,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				final Object categoryId = result.get(OBS_SET_CATEGORY_ID);
 				if (categoryId != null) {
 					if (measurementVariable.getPossibleValues() == null || measurementVariable.getPossibleValues().isEmpty()) {
-						measurementVariable.setPossibleValues(new ArrayList<ValueReference>());
+						measurementVariable.setPossibleValues(new ArrayList<>());
 					}
 					final ValueReference valueReference = //
 						new ValueReference(

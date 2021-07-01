@@ -33,9 +33,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	
@@ -171,14 +174,14 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	@Test
 	public void testGetScaleCategoriesUsedInStudies() {
 		this.createStudyData();
-		final List<String> usedCategories = this.cvtermRelationshipDao.getCategoriesUsedInStudies(this.scale.getCvTermId());
+		final Set<String> usedCategories = this.cvtermRelationshipDao.getCategoriesInUse(this.scale.getCvTermId());
+		final Iterator<String> itr = usedCategories.iterator();
+
 		assertEquals(6, usedCategories.size());
-		assertEquals(this.categories.get(0).getName(), usedCategories.get(0));
-		assertEquals(this.categories.get(1).getName(), usedCategories.get(1));
-		assertEquals(this.categories.get(2).getName(), usedCategories.get(2));
-		assertEquals(this.categories.get(3).getName(), usedCategories.get(3));
-		assertEquals(this.categories.get(4).getName(), usedCategories.get(4));
-		assertEquals(this.categories.get(5).getName(), usedCategories.get(5));
+		while (itr.hasNext()) {
+			String categoricalName =itr.next();
+			assertTrue(this.categories.stream().anyMatch(cvTerm ->  cvTerm.getName().equals(categoricalName)));
+		}
 	}
 
 	private void createStudyData() {
