@@ -5,7 +5,11 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.dms.Enumeration;
+import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -16,17 +20,22 @@ import org.generationcp.middleware.pojos.ExperimentExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.OntologyService;
+import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
+import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -49,6 +58,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	@Resource
 	private OntologyService ontologyService;
+
+	@Resource
+	private VariableDataValidatorFactory variableDataValidatorFactory;
 
 	private final HibernateSessionProvider sessionProvider;
 	private final DaoFactory daoFactory;
@@ -105,17 +117,45 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			.stream().collect(Collectors.toMap(GermplasmDTO::getGermplasmDbId, Function.identity()));
 
 		final List<Integer> trialIds = requestDtos.stream().map(r -> Integer.valueOf(r.getTrialDbId())).collect(Collectors.toList());
+		final List<String> variableNames = new ArrayList<>();
+		requestDtos.stream().forEach(dto -> {
+			if (!CollectionUtils.isEmpty(dto.getObservationUnitPosition().getObservationLevelRelationships())) {
+				variableNames.addAll(dto.getObservationUnitPosition().getObservationLevelRelationships().stream()
+					.map(ObservationLevelRelationship::getLevelName).collect(Collectors.toList()));
+			}
+		});
+
 		final Map<Integer, List<StockModel>> stockMap = this.daoFactory.getStockDao().getStockMapByStudyIds(trialIds);
 		final Map<Integer, List<String>> trialIdGermplasmUUIDMap = this.convertToGermplasmUUIDs(stockMap);
 
 		final Map<Integer, DmsProject> trialIdPlotDatasetMap =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.PLOT_DATA.getId()).stream()
 				.collect(Collectors.toMap(plotDataset -> plotDataset.getStudy().getProjectId(), Function.identity()));
+		final Map<Integer, List<Integer>> plotExperimentVariablesMap = this.populatePlotExperimentVariablesMap(trialIdPlotDatasetMap);
+
+		final Map<String, MeasurementVariable> variableNamesMap =
+			this.daoFactory.getCvTermDao().getVariablesByNamesAndVariableType(variableNames, VariableType.EXPERIMENTAL_DESIGN);
+		final Map<String, MeasurementVariable> variableSynonymsMap =
+			this.daoFactory.getCvTermDao().getVariablesBySynonymsAndVariableType(variableNames, VariableType.EXPERIMENTAL_DESIGN);
+		final List<Integer> categoricalVariableIds = new ArrayList<>();
+		categoricalVariableIds.addAll(
+			variableNamesMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+				.map(MeasurementVariable::getTermId).collect(
+				Collectors.toList()));
+		categoricalVariableIds.addAll(
+			variableSynonymsMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+				.map(MeasurementVariable::getTermId).collect(
+				Collectors.toList()));
+		final Map<Integer, List<ValueReference>> categoricalVariablesMap =
+			this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(categoricalVariableIds);
 
 		final List<String> observationUnitDbIds = new ArrayList<>();
 		for (final ObservationUnitImportRequestDto dto : requestDtos) {
 			final Integer trialDbId = Integer.valueOf(dto.getTrialDbId());
 			final Integer studyDbId = Integer.valueOf(dto.getStudyDbId());
+
+			this.addExperimentVariablesIfNecessary(dto, plotExperimentVariablesMap, trialIdPlotDatasetMap, variableNamesMap,
+				variableSynonymsMap);
 			final Map<String, Integer> entryTypes =
 				this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), dto.getProgramDbId()).getEnumerations()
 					.stream().collect(Collectors.toMap(enumeration -> enumeration.getDescription().toUpperCase(), Enumeration::getId));
@@ -134,6 +174,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 			experimentModel.setStock(this.findStock(stockMap.get(trialDbId), dto.getGermplasmDbId()));
 			ObservationUnitIDGenerator.generateObservationUnitIds(cropType, Collections.singletonList(experimentModel));
+			this.addExperimentProperties(experimentModel, dto, variableNamesMap, variableSynonymsMap, categoricalVariablesMap);
 			this.setExperimentExternalReferences(dto, experimentModel);
 			this.daoFactory.getExperimentDao().save(experimentModel);
 
@@ -141,13 +182,86 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 			observationUnitDbIds.add(experimentModel.getObsUnitId());
 		}
+
+		//Update environment dataset to save added project properties
+		for (final Integer trialId : trialIds) {
+			this.daoFactory.getDmsProjectDAO().update(trialIdPlotDatasetMap.get(trialId));
+			this.sessionProvider.getSession().flush();
+		}
 		final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
 		searchRequestDTO.setObservationUnitDbIds(observationUnitDbIds);
 		return this.searchObservationUnits(null, null, searchRequestDTO);
 	}
 
+	private void addExperimentProperties(final ExperimentModel experiment, final ObservationUnitImportRequestDto dto,
+		final Map<String, MeasurementVariable> variableNamesMap, final Map<String, MeasurementVariable> variableSynonymsMap,
+		final Map<Integer, List<ValueReference>> categoricalVariablesMap) {
+		final List<ExperimentProperty> properties = new ArrayList<>();
+		if(!CollectionUtils.isEmpty(dto.getObservationUnitPosition().getObservationLevelRelationships())) {
+			for (ObservationLevelRelationship levelRelationship : dto.getObservationUnitPosition().getObservationLevelRelationships()) {
+				final String variableName = levelRelationship.getLevelName().toUpperCase();
+				final MeasurementVariable measurementVariable =
+					variableNamesMap.containsKey(variableName) ? variableNamesMap.get(variableName) : variableSynonymsMap.get(variableName);
+				if (measurementVariable != null) {
+					measurementVariable.setValue(levelRelationship.getLevelCode());
+					final DataType dataType = DataType.getById(measurementVariable.getDataTypeId());
+					final java.util.Optional<VariableValueValidator> dataValidator =
+						this.variableDataValidatorFactory.getValidator(dataType);
+					if (categoricalVariablesMap.containsKey(measurementVariable.getTermId())) {
+						measurementVariable.setPossibleValues(categoricalVariablesMap.get(measurementVariable.getTermId()));
+					}
+					if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
+						final ExperimentProperty experimentProperty = new ExperimentProperty();
+						experimentProperty.setExperiment(experiment);
+						experimentProperty.setRank(1);
+						experimentProperty.setValue(levelRelationship.getLevelCode());
+						experimentProperty.setTypeId(measurementVariable.getTermId());
+						properties.add(experimentProperty);
+					}
+				}
+			}
+		}
+		experiment.setProperties(properties);
+
+	}
+
+	private void addExperimentVariablesIfNecessary(final ObservationUnitImportRequestDto dto,
+		final Map<Integer, List<Integer>> plotExperimentVariablesMap, final Map<Integer, DmsProject> trialIdPlotDatasetMap,
+		final Map<String, MeasurementVariable> variableNamesMap, final Map<String, MeasurementVariable> variableSynonymsMap) {
+		if(!CollectionUtils.isEmpty(dto.getObservationUnitPosition().getObservationLevelRelationships())) {
+			for (ObservationLevelRelationship levelRelationship : dto.getObservationUnitPosition().getObservationLevelRelationships()) {
+				final Integer trialDbId = Integer.valueOf(dto.getTrialDbId());
+				final String variableName = levelRelationship.getLevelName().toUpperCase();
+				final MeasurementVariable measurementVariable =
+					variableNamesMap.containsKey(variableName) ? variableNamesMap.get(variableName) : variableSynonymsMap.get(variableName);
+				if (measurementVariable != null && !plotExperimentVariablesMap.get(trialDbId).contains(measurementVariable.getTermId())) {
+					final ProjectProperty projectProperty = new ProjectProperty();
+					projectProperty.setProject(trialIdPlotDatasetMap.get(trialDbId));
+					projectProperty.setRank(plotExperimentVariablesMap.get(trialDbId).size());
+					projectProperty.setTypeId(VariableType.EXPERIMENTAL_DESIGN.getId());
+					projectProperty.setVariableId(measurementVariable.getTermId());
+					projectProperty.setAlias(variableName);
+					trialIdPlotDatasetMap.get(trialDbId).addProperty(projectProperty);
+					plotExperimentVariablesMap.get(trialDbId).add(measurementVariable.getTermId());
+				}
+			}
+		}
+	}
+
+	private Map<Integer, List<Integer>> populatePlotExperimentVariablesMap(final Map<Integer, DmsProject> plotDatasetMap) {
+		final Map<Integer, List<Integer>> plotExperimentVariablesMap = new HashMap<>();
+		for (Map.Entry plotDatasetEntry : plotDatasetMap.entrySet()) {
+			final Integer key = (Integer) plotDatasetEntry.getKey();
+			final DmsProject plotDataset = (DmsProject) plotDatasetEntry.getValue();
+			plotExperimentVariablesMap.put(key,
+				plotDataset.getProperties().stream().filter(p -> p.getTypeId().equals(VariableType.EXPERIMENTAL_DESIGN.getId()))
+					.map(ProjectProperty::getVariableId).collect(Collectors.toList()));
+		}
+		return plotExperimentVariablesMap;
+	}
+
 	private StockModel findStock(final List<StockModel> stocks, final String germplasmDbId) {
-		for(final StockModel stock: stocks) {
+		for (final StockModel stock : stocks) {
 			if (stock.getGermplasm().getGermplasmUUID().equals(germplasmDbId)) {
 				return stock;
 			}
