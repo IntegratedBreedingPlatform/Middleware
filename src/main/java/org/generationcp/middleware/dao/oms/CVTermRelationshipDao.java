@@ -30,8 +30,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link CVTermRelationship}.
@@ -252,22 +254,38 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		}
 	}
 
-	public List<String> getCategoriesUsedInStudies(final int scaleId) {
+	public Set<String> getCategoriesInUse(final int scaleId) {
 		try {
-			final List<String> allCategories = new ArrayList<>();
+			final Set<String> allCategories = new HashSet<>();
 			allCategories.addAll(this.getScaleCategoriesUsedInObservations(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedAsConditions(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedAsGermplasmDescriptors(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedAsTrialDesignFactors(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedAsEnvironmentFactors(scaleId));
+			allCategories.addAll(this.getScaleCategoriesUsedInAttributes(scaleId));
 			return allCategories;
 		} catch (final HibernateException e) {
-			final String message = "Error in getCategoriesUsedInStudies in CVTermRelationshipDao: "
+			final String message = "Error in getCategoriesInUse in CVTermRelationshipDao: "
 				+ e.getMessage();
 			CVTermRelationshipDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 
 		}
+	}
+
+	public List<String> getScaleCategoriesUsedInAttributes(final int scaleId) {
+		final SQLQuery query = this.getSession().createSQLQuery(
+			"SELECT DISTINCT v.name category "
+				+ " FROM cvterm_relationship scale_values "
+				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id and scale_values.subject_id = :scaleId and scale_values.type_id = " + TermId.HAS_VALUE.getId()
+				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE.getId()
+				+ " WHERE EXISTS ( "
+				+ "     SELECT 1    	 "
+				+ "     FROM atributs a "
+				+ "     WHERE a.cval_id = v.cvterm_id and a.atype = var.subject_id ) ");
+		query.setParameter("scaleId", scaleId);
+		query.addScalar("category", CVTermRelationshipDao.STRING);
+		return query.list();
 	}
 
 	@SuppressWarnings("unchecked")

@@ -1,13 +1,13 @@
 
 package org.generationcp.middleware.domain.dms;
 
+import org.generationcp.middleware.domain.oms.TermId;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.generationcp.middleware.domain.oms.TermId;
 
 /**
  * The different phenotypic types used in standard variable. For factor type, these are used: STUDY, DATASET, TRIAL_ENVIRONMENT, GERMPLASM,
@@ -36,7 +36,7 @@ public enum PhenotypicType {
 	VARIATE(Arrays.asList(TermId.OBSERVATION_VARIATE.getId(), TermId.CATEGORICAL_VARIATE.getId()), Arrays.asList("STUDY", "PLOT", "TRIAL"),
 			"VARIATE"),
 
-	UNASSIGNED(new ArrayList<Integer>(), new ArrayList<String>(), "UNASSIGNED");
+	UNASSIGNED(new ArrayList<>(), new ArrayList<>(), "UNASSIGNED");
 
 	private List<Integer> typeStorages;
 	private List<String> labelList;
@@ -52,8 +52,8 @@ public enum PhenotypicType {
 			}
 		}
 	}
-	
-	private PhenotypicType(List<Integer> typeStorages, List<String> labelList, String group) {
+
+	PhenotypicType(List<Integer> typeStorages, List<String> labelList, String group) {
 		this.typeStorages = typeStorages;
 		this.labelList = labelList;
 		this.group = group;
@@ -105,23 +105,6 @@ public enum PhenotypicType {
 				if (id.equals(termId)) {
 					return type;
 				}
-			}
-		}
-		return null;
-	}
-
-	public static List<Integer> getAllTypeStorages() {
-		List<Integer> storages = new ArrayList<Integer>();
-		for (PhenotypicType type : PhenotypicType.values()) {
-			storages.addAll(type.getTypeStorages());
-		}
-		return storages;
-	}
-
-	public static PhenotypicType getPhenotypicTypeByGroup(String group) {
-		for (PhenotypicType type : PhenotypicType.values()) {
-			if (type.getGroup().equals(group)) {
-				return type;
 			}
 		}
 		return null;

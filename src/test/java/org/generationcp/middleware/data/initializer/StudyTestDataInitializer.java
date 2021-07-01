@@ -325,7 +325,7 @@ public class StudyTestDataInitializer {
 	public Integer addTestLocation(final String locationName) {
 		final Location location = new Location();
 		location.setCntryid(1);
-		location.setLabbr("");
+		location.setLabbr(RandomStringUtils.randomAlphabetic(4).toUpperCase());
 		location.setLname(locationName);
 		location.setLrplce(1);
 		location.setLtype(1);

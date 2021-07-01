@@ -24,7 +24,6 @@ import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
@@ -85,11 +84,6 @@ public class LotServiceImpl implements LotService {
 	@Override
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
 		return this.daoFactory.getLotDao().countSearchLots(lotsSearchDto);
-	}
-
-	@Override
-	public List<UserDefinedField> getGermplasmAttributeTypes(final LotsSearchDto searchDto) {
-		return this.daoFactory.getLotDao().getGermplasmAttributeTypes(searchDto);
 	}
 
 	@Override
