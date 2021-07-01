@@ -16,8 +16,7 @@ import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
+import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -793,7 +792,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final String displayName = RandomStringUtils.randomAlphanumeric(255);
 		germplasm.getPreferredName().setNval(displayName);
-		final Integer germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
 		request.setPreferredName(displayName);
@@ -851,7 +850,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testCountGermplasmDTOs_FilterByParentDbId() {
 		final Germplasm femaleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(femaleParent));
 		final Germplasm maleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(maleParent));
 		this.dao.save(femaleParent);
 		this.dao.save(maleParent);
 
@@ -864,13 +865,13 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		// Set female parent
 		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
-		request.setParentDbId(femaleParent.getGid().toString());
+		request.setParentDbId(femaleParent.getGermplasmUUID());
 		final Long count = this.dao.countGermplasmDTOs(request);
 		Assert.assertThat(count.intValue(), is(1));
 
 		// Set male parent
 		final GermplasmSearchRequestDto request2 = new GermplasmSearchRequestDto();
-		request2.setParentDbId(maleParent.getGid().toString());
+		request2.setParentDbId(maleParent.getGermplasmUUID());
 		final Long count2 = this.dao.countGermplasmDTOs(request2);
 		Assert.assertThat(count2.intValue(), is(1));
 	}
@@ -883,6 +884,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(maleParent);
 
 		final Germplasm cross = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(cross));
 		cross.setGpid1(femaleParent.getGid());
 		cross.setGpid2(maleParent.getGid());
 		cross.setGnpgs(2);
@@ -890,7 +892,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(cross);
 
 		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
-		request.setProgenyDbId(cross.getGid().toString());
+		request.setProgenyDbId(cross.getGermplasmUUID());
 		final Long count = this.dao.countGermplasmDTOs(request);
 		Assert.assertThat(count.intValue(), is(2));
 	}

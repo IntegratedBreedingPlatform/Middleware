@@ -21,7 +21,7 @@ public class StudySearchFilter {
 	private String trialName;
 	private String contactDbId;
 	private List<String> studyDbIds = new ArrayList<>();
-	private Integer germplasmDbId;
+	private String germplasmDbId;
 	private Integer observationVariableDbId;
 	private Boolean active;
 	private Date searchDateRangeStart;
@@ -143,15 +143,15 @@ public class StudySearchFilter {
 		this.searchDateRangeEnd = searchDateRangeEnd;
 	}
 
-	public Integer getGermplasmDbId() {
+	public String getGermplasmDbId() {
 		return this.germplasmDbId;
 	}
 
-	public void setGermplasmDbId(final Integer germplasmDbId) {
+	public void setGermplasmDbId(final String germplasmDbId) {
 		this.germplasmDbId = germplasmDbId;
 	}
 
-	public void setGermplasmDbid(final Integer germplasmDbId) {
+	public void setGermplasmDbid(final String germplasmDbId) {
 		this.germplasmDbId = germplasmDbId;
 	}
 

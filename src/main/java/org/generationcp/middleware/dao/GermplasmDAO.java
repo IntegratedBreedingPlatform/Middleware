@@ -618,7 +618,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
 		try {
 			final String query = "SELECT "
@@ -1251,15 +1250,18 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getParentDbId())) {
-			paramBuilder.append(" AND (g.gpid1 = :parentDbId OR g.gpid2 = :parentDbId) AND g.gnpgs >= 2");
+			paramBuilder.append(" AND (g.gpid1 = (select parent.gid from germplsm parent where parent.germplsm_uuid = :parentDbId) "
+				+ "OR g.gpid2 = (select parent.gid from germplsm parent where parent.germplsm_uuid = :parentDbId) "
+				+ "OR g.gid = (Select p.gid from progntrs p INNER JOIN germplsm parent ON p.pid = parent.gid "
+				+ " WHERE parent.germplsm_uuid = :parentDbId )) AND g.gnpgs >= 2");
 		}
 
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getProgenyDbId())) {
-			paramBuilder.append(" AND ( g.gid = ( "
-				+ "SELECT gpid1 from germplsm child "
-				+ "WHERE child.gid = :progenyDbId AND child.gnpgs >= 2 ) OR g. gid = ( "
-				+ "SELECT gpid2 from germplsm child "
-				+ "WHERE child.gid = :progenyDbId AND child.gnpgs >= 2 ) )");
+			paramBuilder
+				.append(" AND ( g.gid = (SELECT gpid1 from germplsm child WHERE child.germplsm_uuid = :progenyDbId AND child.gnpgs >= 2) "
+					+ "OR g. gid = (SELECT gpid2 from germplsm child WHERE child.germplsm_uuid = :progenyDbId AND child.gnpgs >= 2) "
+					+ "OR g.gid = (Select p.pid from progntrs p INNER JOIN germplsm child ON p.gid = child.gid "
+					+ "WHERE child.germplsm_uuid = :progenyDbId )) ");
 		}
 
 		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getExternalReferenceId())) {
