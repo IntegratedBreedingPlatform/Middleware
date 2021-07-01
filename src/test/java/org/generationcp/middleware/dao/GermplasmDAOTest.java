@@ -17,8 +17,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;

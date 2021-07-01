@@ -451,7 +451,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		// Search by germplasm uuid
 		final PhenotypeSearchRequestDTO dto5 = new PhenotypeSearchRequestDTO();
 		dto5.setGermplasmDbIds(Arrays.asList(this.germplasm.get(0).getGermplasmUUID(), this.germplasm.get(1).getGermplasmUUID()));
-		// # of GIDs in filter x 2# of studies
+		// # of GUUIDs in filter x 2# of studies
 		Assert.assertEquals(2 * 2, this.phenotypeDao.countPhenotypes(dto5));
 
 		// Search by Dataset Type, just for current program
