@@ -1954,7 +1954,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			sql.append(" AND nde.obs_unit_id = :studyPUI ");
 		}
 		if (studySearchFilter.getGermplasmDbId() != null) {
-			sql.append(" AND exists (SELECT 1 from stock where dbxref_id = :germplasmDbId AND project_id = pmain.project_id) ");
+			sql.append(" AND exists (SELECT 1 from germplsm g "
+				+ " INNER JOIN stock s ON s.dbxref_id = g.gid"
+				+ " where g.germplsm_uuid = :germplasmDbId AND s.project_id = pmain.project_id) ");
 		}
 		if (studySearchFilter.getObservationVariableDbId() != null) {
 			sql.append(" AND exists (SELECT 1 from projectprop where variable_id = :observationVariableDbId");

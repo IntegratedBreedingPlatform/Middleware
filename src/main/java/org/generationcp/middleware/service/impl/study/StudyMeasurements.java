@@ -1,10 +1,6 @@
 
 package org.generationcp.middleware.service.impl.study;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.service.api.study.MeasurementDto;
@@ -15,14 +11,18 @@ import org.hibernate.Session;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 public class StudyMeasurements {
 
 	public static final String PROJECT_NAME = "PROJECT_NAME";
-	public static final String LOCATION_DB_ID = "locationDbId";
-	public static final String ND_GEOLOCATION_ID = "nd_geolocation_id";
-	public static final String FIELD_MAP_ROW = "FieldMapRow";
-	public static final String FIELD_MAP_COLUMN = "FieldMapColumn";
-	public static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
+	static final String LOCATION_DB_ID = "locationDbId";
+	static final String ND_GEOLOCATION_ID = "nd_geolocation_id";
+	static final String FIELD_MAP_ROW = "FieldMapRow";
+	static final String FIELD_MAP_COLUMN = "FieldMapColumn";
+	static final String LOCATION_ABBREVIATION = "LocationAbbreviation";
 	public static final String LOCATION_NAME = "LocationName";
 	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 	public static final String COL = "COL";
@@ -33,10 +33,10 @@ public class StudyMeasurements {
 	public static final String ENTRY_CODE = "ENTRY_CODE";
 	public static final String ENTRY_NO = "ENTRY_NO";
 	public static final String DESIGNATION = "DESIGNATION";
-	public static final String GID = "GID";
+	static final String GERMPLSM_UUID = "GERMPLSM_UUID";
 	public static final String ENTRY_TYPE = "ENTRY_TYPE";
 	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
-	public static final String ND_EXPERIMENT_ID = "nd_experiment_id";
+	static final String ND_EXPERIMENT_ID = "nd_experiment_id";
 
 	public static final String STUDY_ID = "studyId";
 
@@ -177,7 +177,7 @@ public class StudyMeasurements {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier,
+	List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier,
 			final List<MeasurementVariableDto> measurementVariables, final Integer instanceId) {
 		final String generateQuery = this.measurementQuery.getObservationQueryWithBlockRowCol(measurementVariables,
 				instanceId);
@@ -213,7 +213,7 @@ public class StudyMeasurements {
 		createSQLQuery.addScalar(StudyMeasurements.ND_EXPERIMENT_ID);
 		createSQLQuery.addScalar(StudyMeasurements.TRIAL_INSTANCE);
 		createSQLQuery.addScalar(StudyMeasurements.ENTRY_TYPE);
-		createSQLQuery.addScalar(StudyMeasurements.GID);
+		createSQLQuery.addScalar(StudyMeasurements.GERMPLSM_UUID);
 		createSQLQuery.addScalar(StudyMeasurements.DESIGNATION);
 		createSQLQuery.addScalar(StudyMeasurements.ENTRY_NO);
 		createSQLQuery.addScalar(StudyMeasurements.ENTRY_CODE);
