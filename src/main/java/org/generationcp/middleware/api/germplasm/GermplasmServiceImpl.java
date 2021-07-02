@@ -87,6 +87,7 @@ import static java.util.stream.Collectors.groupingBy;
 @Transactional
 public class GermplasmServiceImpl implements GermplasmService {
 
+	public static final String PUI = "PUI";
 	@Value("${germplasm.edition.max.recursion}")
 	public int maxRecursiveQueries;
 
@@ -202,8 +203,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		final Map<String, Germplasm> progenitorsMap = this.loadProgenitors(germplasmImportRequestDto);
 		final List<GermplasmDto> germplasmMatches = this.loadGermplasmMatches(germplasmImportRequestDto);
-		final Map<String, List<Integer>> gidMatchByUUID =
-			germplasmMatches.stream().collect(Collectors.toMap(GermplasmDto::getGermplasmUUID, g -> Collections.singletonList(g.getGid())));
+		final Map<String, List<Integer>> gidMatchByPUI =
+			germplasmMatches.stream().collect(Collectors.toMap(GermplasmDto::getGermplasmPUI, g -> Collections.singletonList(g.getGid())));
 		final Map<String, List<Integer>> gidsMatchesByName = new HashMap<>();
 		germplasmMatches.forEach(g ->
 			g.getNames().forEach(n -> {
@@ -218,10 +219,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 		for (final GermplasmImportDTO germplasmDto : germplasmDtoList) {
 
 			if (germplasmImportRequestDto.isSkipIfExists()) {
-				if (gidMatchByUUID.containsKey(germplasmDto.getGermplasmUUID())) {
+				if (gidMatchByPUI.containsKey(germplasmDto.getGermplasmPUI())) {
 					results.put(germplasmDto.getClientId(),
 						new GermplasmImportResponseDto(GermplasmImportResponseDto.Status.FOUND,
-							gidMatchByUUID.get(germplasmDto.getGermplasmUUID())));
+							gidMatchByPUI.get(germplasmDto.getGermplasmPUI())));
 					continue;
 				}
 				final Set<Integer> gidSet = new HashSet<>();
@@ -256,12 +257,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasm.setLocationId(locationsMapByAbbr.get(germplasmDto.getLocationAbbr().toUpperCase()));
 			germplasm.setDeleted(Boolean.FALSE);
 			germplasm.setGdate(Integer.valueOf(germplasmDto.getCreationDate()));
-
-			if (StringUtils.isEmpty(germplasmDto.getGermplasmUUID())) {
-				GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(germplasm));
-			} else {
-				germplasm.setGermplasmUUID(germplasmDto.getGermplasmUUID());
-			}
+			GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(germplasm));
 
 			if (!StringUtils.isEmpty(germplasmDto.getReference())) {
 				final Bibref bibref =
@@ -277,6 +273,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 			this.daoFactory.getGermplasmDao().save(germplasm);
 
+			if (!StringUtils.isEmpty(germplasmDto.getGermplasmPUI())) {
+				germplasmDto.getNames().put(GermplasmServiceImpl.PUI, germplasmDto.getGermplasmPUI());
+			}
 			germplasmDto.getNames().forEach((k, v) -> {
 				final Name name = new Name(null, germplasm, nameTypesMapByName.get(k.toUpperCase()),
 					(k.equalsIgnoreCase(germplasmDto.getPreferredName())) ? 1 : 0, v, germplasm.getLocationId(),
@@ -733,6 +732,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private Map<String, Integer> getNameTypesMapByName(final List<GermplasmImportDTO> germplasmDtos) {
 		final Set<String> nameTypes = new HashSet<>();
+		nameTypes.add(GermplasmServiceImpl.PUI);
 		germplasmDtos.forEach(g -> nameTypes.addAll(g.getNames().keySet()));
 		final List<UserDefinedField> nameTypesUdfldList = this.daoFactory.getUserDefinedFieldDAO()
 			.getByCodes(UDTableType.NAMES_NAME.getTable(), Collections.singleton(UDTableType.NAMES_NAME.getType()), nameTypes);
@@ -813,14 +813,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private List<GermplasmDto> loadGermplasmMatches(final GermplasmImportRequestDto germplasmImportRequestDto) {
 		if (germplasmImportRequestDto.isSkipIfExists()) {
-			final List<String> guids =
-				germplasmImportRequestDto.getGermplasmList().stream().filter(g -> StringUtils.isNotEmpty(g.getGermplasmUUID()))
-					.map(GermplasmImportDTO::getGermplasmUUID).collect(Collectors.toList());
+			final List<String> germplasmPUIs =
+				germplasmImportRequestDto.getGermplasmList().stream().filter(g -> StringUtils.isNotEmpty(g.getGermplasmPUI()))
+					.map(GermplasmImportDTO::getGermplasmPUI).collect(Collectors.toList());
 			final Set<String> names = new HashSet<>();
 			germplasmImportRequestDto.getGermplasmList().forEach(g -> names.addAll(g.getNames().values()));
 			final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 			germplasmMatchRequestDto.setNames(new ArrayList<>(names));
-			germplasmMatchRequestDto.setGermplasmUUIDs(guids);
+			germplasmMatchRequestDto.setGermplasmPUIs(germplasmPUIs);
 			return this.findGermplasmMatches(germplasmMatchRequestDto, null);
 		} else {
 			return new ArrayList<>();

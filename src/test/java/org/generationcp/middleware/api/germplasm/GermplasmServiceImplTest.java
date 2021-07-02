@@ -108,7 +108,7 @@ public class GermplasmServiceImplTest {
 
 	private final String methodAbbreviation = RandomStringUtils.randomAlphabetic(3);
 
-	private final String germplasmUUID = RandomStringUtils.randomAlphabetic(36);
+	private final String germplasmPUI = RandomStringUtils.randomAlphabetic(36);
 
 	private final String cropName = "maize";
 
@@ -317,7 +317,7 @@ public class GermplasmServiceImplTest {
 		germplasmImportDTO.setLocationAbbr(this.locationAbbreviation);
 		germplasmImportDTO.setCreationDate("20201212");
 		germplasmImportDTO.setReference("Reference");
-		germplasmImportDTO.setGermplasmUUID(this.germplasmUUID);
+		germplasmImportDTO.setGermplasmPUI(this.germplasmPUI);
 		return germplasmImportDTO;
 	}
 
@@ -339,7 +339,7 @@ public class GermplasmServiceImplTest {
 
 	private GermplasmDto createGermplasmDto() {
 		final GermplasmDto germplasmDto = new GermplasmDto();
-		germplasmDto.setGermplasmUUID(this.germplasmUUID);
+		germplasmDto.setGermplasmPUI(this.germplasmPUI);
 		germplasmDto.setGid(1);
 		final GermplasmNameDto germplasmNameDto = new GermplasmNameDto();
 		germplasmNameDto.setName("name");

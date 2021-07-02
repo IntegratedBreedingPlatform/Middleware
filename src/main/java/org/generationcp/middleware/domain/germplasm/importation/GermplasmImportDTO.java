@@ -14,7 +14,7 @@ public class GermplasmImportDTO {
 
 	private Integer clientId;
 
-	private String germplasmUUID;
+	private String germplasmPUI;
 
 	private String locationAbbr;
 
@@ -37,13 +37,13 @@ public class GermplasmImportDTO {
 	public GermplasmImportDTO() {
 	}
 
-	public GermplasmImportDTO(final Integer clientId, final String germplasmUUID, final String locationAbbr,
+	public GermplasmImportDTO(final Integer clientId, final String germplasmPUI, final String locationAbbr,
 		final String breedingMethodAbbr,
 		final String reference,
 		final String preferredName, final Map<String, String> names, final Map<String, String> attributes, final String creationDate,
 		final String progenitor1, final String progenitor2) {
 		this.clientId = clientId;
-		this.germplasmUUID = germplasmUUID;
+		this.germplasmPUI = germplasmPUI;
 		this.locationAbbr = locationAbbr;
 		this.breedingMethodAbbr = breedingMethodAbbr;
 		this.reference = reference;
@@ -79,12 +79,12 @@ public class GermplasmImportDTO {
 		this.breedingMethodAbbr = breedingMethodAbbr;
 	}
 
-	public String getGermplasmUUID() {
-		return germplasmUUID;
+	public String getGermplasmPUI() {
+		return this.germplasmPUI;
 	}
 
-	public void setGermplasmUUID(final String germplasmUUID) {
-		this.germplasmUUID = germplasmUUID;
+	public void setGermplasmPUI(final String germplasmPUI) {
+		this.germplasmPUI = germplasmPUI;
 	}
 
 	public String getReference() {

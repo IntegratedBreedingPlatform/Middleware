@@ -120,6 +120,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		+ "    g.gid as gid, " //
 		+ "    g.germplsm_uuid as germplasmUUID, " //
 		+ "    n.nval as preferredName, " //
+		+ "    pui.nval as germplasmPUI, "
 		+ "    cast(g.gdate as char) as creationDate, " //
 		+ "    r.analyt as reference, " //
 		+ "    l.locid as breedingLocationId, " //
@@ -140,6 +141,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		+ "    location l on l.locid = g.glocn " //
 		+ "        left join " //
 		+ "    names n on n.gid = g.gid and n.nstat = 1 " //
+		+ " 		left join ("
+		+ " 	select p.gid, p.nval from names INNER JOIN udflds u ON u.fldno = p.ntype AND u.ftable = 'NAMES' and u.ftype='NAME' and u.fcode = 'PUI') pui on pui.gid = g.gid "
 		+ "        left join " //
 		+ "    bibrefs r on g.gref = r.refid ";
 
@@ -1566,17 +1569,17 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private void addGermplasmMatchesFilter(final SqlQueryParamBuilder sqlQueryParamBuilder,
 		final GermplasmMatchRequestDto germplasmMatchRequestDto) {
 		sqlQueryParamBuilder.append(" where g.deleted = 0 ");
-		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmUUIDs()) && !CollectionUtils
+		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs()) && !CollectionUtils
 			.isEmpty(germplasmMatchRequestDto.getNames())) {
 			sqlQueryParamBuilder.append(" and (").append(" g.gid in (select gid from names n where n.nval in (:nameList) and n.nstat <> 9)")
 				.append(" or ")
-				.append(" g.germplsm_uuid in (:guidList) ").append(") ");
-			sqlQueryParamBuilder.setParameterList("guidList", germplasmMatchRequestDto.getGermplasmUUIDs());
+				.append(" pui.nval in (:puiList) ").append(") ");
+			sqlQueryParamBuilder.setParameterList("puiList", germplasmMatchRequestDto.getGermplasmPUIs());
 			sqlQueryParamBuilder.setParameterList("nameList", germplasmMatchRequestDto.getNames());
 		} else {
-			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmUUIDs())) {
-				sqlQueryParamBuilder.append(" and ").append(" g.germplsm_uuid in (:guidList) ");
-				sqlQueryParamBuilder.setParameterList("guidList", germplasmMatchRequestDto.getGermplasmUUIDs());
+			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs())) {
+				sqlQueryParamBuilder.append(" and ").append(" pui.nval in (:puiList) ");
+				sqlQueryParamBuilder.setParameterList("puiList", germplasmMatchRequestDto.getGermplasmPUIs());
 			}
 			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getNames())) {
 				sqlQueryParamBuilder.append(" and ")
