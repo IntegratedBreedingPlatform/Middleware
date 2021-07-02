@@ -26,6 +26,8 @@ public class StudySearchFilter {
 	private Boolean active;
 	private Date searchDateRangeStart;
 	private Date searchDateRangeEnd;
+	private String externalReferenceSource;
+	private String externalReferenceID;
 
 	public StudySearchFilter() {
 
@@ -161,6 +163,22 @@ public class StudySearchFilter {
 
 	public void setObservationVariableDbId(final Integer observationVariableDbId) {
 		this.observationVariableDbId = observationVariableDbId;
+	}
+
+	public String getExternalReferenceSource() {
+		return this.externalReferenceSource;
+	}
+
+	public void setExternalReferenceSource(final String externalReferenceSource) {
+		this.externalReferenceSource = externalReferenceSource;
+	}
+
+	public String getExternalReferenceID() {
+		return this.externalReferenceID;
+	}
+
+	public void setExternalReferenceID(final String externalReferenceID) {
+		this.externalReferenceID = externalReferenceID;
 	}
 
 	@Override
