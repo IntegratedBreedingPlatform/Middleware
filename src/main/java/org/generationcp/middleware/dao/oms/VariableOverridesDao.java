@@ -59,7 +59,7 @@ public class VariableOverridesDao extends GenericDAO<VariableOverrides, Integer>
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("alias", alias));
+			criteria.add(Restrictions.eq("alias", alias).ignoreCase());
 			criteria.add(Restrictions.eq("programUuid", programUuid));
 			final List<VariableOverrides> variableOverridesList = (List<VariableOverrides>) criteria.list();
 
