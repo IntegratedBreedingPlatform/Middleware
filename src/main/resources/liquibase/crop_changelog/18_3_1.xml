@@ -209,7 +209,6 @@
 		</sql>
 	</changeSet>
 	
-
 	<changeSet author="mderamos" id="v18.3.1-10">
         <preConditions onFail="MARK_RAN">
 			<indexExists tableName="location" indexName="labbr_UNIQUE"/>
