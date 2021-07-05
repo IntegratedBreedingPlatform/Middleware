@@ -12,6 +12,7 @@
 package org.generationcp.middleware.pojos.dms;
 
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 
@@ -39,6 +40,7 @@ import java.io.Serializable;
 @Entity
 @Table(name = "nd_experimentprop", uniqueConstraints = {@UniqueConstraint(columnNames = {"nd_experiment_id", "type_id", "rank"})})
 @Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="nd_experimentprop")
+@BatchSize(size = 5000)
 public class ExperimentProperty implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -119,14 +121,10 @@ public class ExperimentProperty implements Serializable {
 
 		final ExperimentProperty other = (ExperimentProperty) obj;
 		if (this.ndExperimentpropId == null) {
-			if (other.ndExperimentpropId != null) {
-				return false;
-			}
-		} else if (!this.ndExperimentpropId.equals(other.ndExperimentpropId)) {
-			return false;
-		}
+			return other.ndExperimentpropId == null;
+		} else
+			return this.ndExperimentpropId.equals(other.ndExperimentpropId);
 
-		return true;
 	}
 
 	public Integer getNdExperimentpropId() {
