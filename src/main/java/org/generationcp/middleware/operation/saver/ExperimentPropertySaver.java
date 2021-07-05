@@ -22,7 +22,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.hibernate.SQLQuery;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -31,11 +30,9 @@ import java.util.Map;
 
 public class ExperimentPropertySaver extends Saver {
 
-	private StringBuilder batchExperimentPropInsertSql = new StringBuilder();
+	private final DaoFactory daoFactory;
 
-	private DaoFactory daoFactory;
-
-	public ExperimentPropertySaver(HibernateSessionProvider sessionProviderForLocal) {
+	public ExperimentPropertySaver(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
@@ -57,80 +54,30 @@ public class ExperimentPropertySaver extends Saver {
 	 * @param projectPropCreatedMap map of project property created or not
 	 * @throws MiddlewareQueryException
 	 */
-	public void saveInBatchOrUpdateProperty(ExperimentModel experiment, TermId propertyType, String value, Map<Integer, List<ExperimentProperty>> experimentPropertyMap, Map<String, Boolean> projectPropCreatedMap) throws MiddlewareQueryException {
+	public void saveInBatchOrUpdateProperty(final ExperimentModel experiment, final TermId propertyType, final String value,
+		final Map<Integer, List<ExperimentProperty>> experimentPropertyMap, final Map<String, Boolean> projectPropCreatedMap)
+		throws MiddlewareQueryException {
 		ExperimentProperty experimentProperty = this.getExperimentProperty(experiment, propertyType.getId(), experimentPropertyMap);
 		if (experimentProperty == null) {
-			String projectPropKey = String.valueOf(experiment.getProject().getProjectId()+"-"+ propertyType);
+			final String projectPropKey = experiment.getProject().getProjectId() + "-" + propertyType;
 			if(projectPropCreatedMap.get(projectPropKey) == null){
 				this.getProjectPropertySaver().createProjectPropertyIfNecessary(experiment.getProject(), propertyType, PhenotypicType.TRIAL_DESIGN);
 				projectPropCreatedMap.put(projectPropKey, true);
 			}
-			createBatchInsertForExperimentProp(experiment.getNdExperimentId(), propertyType.getId(), 0, value);
+			experimentProperty = new ExperimentProperty(experiment, value, 0, propertyType.getId());
 		}
 		else{
 			experimentProperty.setValue(value);
-			this.daoFactory.getExperimentPropertyDao().saveOrUpdate(experimentProperty);
 		}
-
-	}
-
-	/**
-	 * This method will create batch insert script for saving large number of experiment properties as one insert statement
-	 * instead of saving them one by one.
-	 *
-	 * @param experimentId experimentId for which new experiment prop to be save
-	 * @param typeId typeId of experiment prop
-	 * @param rank rank of experiment prop
-	 * @param value value of experiment prop
-	 */
-	private void createBatchInsertForExperimentProp(final int experimentId, final int typeId, final int rank, final String value){
-		if(batchExperimentPropInsertSql.length() == 0){
-			batchExperimentPropInsertSql = new StringBuilder();
-			batchExperimentPropInsertSql.append("insert into  nd_experimentprop (nd_experiment_id, type_id, value , rank) values ");
-			batchExperimentPropInsertSql.append("( ");
-			batchExperimentPropInsertSql.append(experimentId).append(" , ");
-			batchExperimentPropInsertSql.append(typeId).append(" , ");
-			batchExperimentPropInsertSql.append(value).append(" , ");
-			batchExperimentPropInsertSql.append(rank);
-			batchExperimentPropInsertSql.append(") ");
-			return;
-		}
-		batchExperimentPropInsertSql.append(", ( ");
-		batchExperimentPropInsertSql.append(experimentId).append(" , ");
-		batchExperimentPropInsertSql.append(typeId).append(" , ");
-		batchExperimentPropInsertSql.append(value).append(" , ");
-		batchExperimentPropInsertSql.append(rank);
-		batchExperimentPropInsertSql.append(") ");
-	}
-
-	public void saveOrUpdateProperty(ExperimentModel experiment, int propertyType, String value) throws MiddlewareQueryException {
-		ExperimentProperty experimentProperty = this.getExperimentProperty(experiment, propertyType);
-		if (experimentProperty == null) {
-			experimentProperty = new ExperimentProperty();
-			experimentProperty.setTypeId(propertyType);
-			experimentProperty.setRank(0);
-			experimentProperty.setExperiment(experiment);
-		}
-		experimentProperty.setValue(value);
 		this.daoFactory.getExperimentPropertyDao().saveOrUpdate(experimentProperty);
 	}
 
-	private ExperimentProperty getExperimentProperty(ExperimentModel experiment, int typeId) {
-		if (experiment != null && experiment.getProperties() != null) {
-			for (ExperimentProperty property : experiment.getProperties()) {
-				if (property.getTypeId().equals(typeId)) {
-					return property;
-				}
-			}
-		}
-		return null;
-	}
-
-	private ExperimentProperty getExperimentProperty(ExperimentModel experiment, int typeId, Map<Integer, List<ExperimentProperty>> experimentPropertyMap) {
-		List<ExperimentProperty> properties = experimentPropertyMap.get(experiment.getNdExperimentId());
+	private ExperimentProperty getExperimentProperty(final ExperimentModel experiment, final int typeId,
+		final Map<Integer, List<ExperimentProperty>> experimentPropertyMap) {
+		final List<ExperimentProperty> properties = experimentPropertyMap.get(experiment.getNdExperimentId());
 
 		if (experiment != null && properties != null) {
-			for (ExperimentProperty property : properties) {
+			for (final ExperimentProperty property : properties) {
 				if (property.getTypeId().equals(typeId)) {
 					return property;
 				}
@@ -139,27 +86,26 @@ public class ExperimentPropertySaver extends Saver {
 		return null;
 	}
 
-
-	public void saveFieldmapProperties(List<FieldMapInfo> infos) throws MiddlewareQueryException {
+	public void saveFieldmapProperties(final List<FieldMapInfo> infos) throws MiddlewareQueryException {
 
 		// create list of all experimentIds that will be used later to load all experiment and its properties at one go
-		List<Integer> experimentIds = createExperimentIdsList(infos);
+		final List<Integer> experimentIds = createExperimentIdsList(infos);
 
 		// create experimentId wise experiment entity map
-		Map<Integer, ExperimentModel> experimentMap = createExperimentIdWiseMap(experimentIds);
+		final Map<Integer, ExperimentModel> experimentMap = createExperimentIdWiseMap(experimentIds);
 
 		// create experimentId wise experiment properties map
-		Map<Integer, List<ExperimentProperty>> experimentPropertyMap = createExperimentIdWisePropertiesMap(experimentIds);
+		final Map<Integer, List<ExperimentProperty>> experimentPropertyMap = createExperimentIdWisePropertiesMap(experimentIds);
 
-		Map<String, Boolean> projectPropCreatedMap = new HashMap<>();
+		final Map<String, Boolean> projectPropCreatedMap = new HashMap<>();
 
-		for (FieldMapInfo info : infos) {
-			for (FieldMapDatasetInfo dataset : info.getDatasets()) {
-				for (FieldMapTrialInstanceInfo tInfo : dataset.getTrialInstances()) {
+		for (final FieldMapInfo info : infos) {
+			for (final FieldMapDatasetInfo dataset : info.getDatasets()) {
+				for (final FieldMapTrialInstanceInfo tInfo : dataset.getTrialInstances()) {
 					if (tInfo.getFieldMapLabels() != null) {
-						for (FieldMapLabel label : tInfo.getFieldMapLabels()) {
+						for (final FieldMapLabel label : tInfo.getFieldMapLabels()) {
 							if (label.getColumn() != null && label.getRange() != null) {
-								ExperimentModel experiment = experimentMap.get(label.getExperimentId());
+								final ExperimentModel experiment = experimentMap.get(label.getExperimentId());
 								this.saveInBatchOrUpdateProperty(experiment, TermId.COLUMN_NO, String.valueOf(label.getColumn()), experimentPropertyMap, projectPropCreatedMap);
 								this.saveInBatchOrUpdateProperty(experiment, TermId.RANGE_NO, String.valueOf(label.getRange()), experimentPropertyMap, projectPropCreatedMap);
 							}
@@ -169,22 +115,16 @@ public class ExperimentPropertySaver extends Saver {
 			}
 		}
 
-		if(batchExperimentPropInsertSql.length() != 0){
-			batchExperimentPropInsertSql.append(";");
-			SQLQuery sqlQuery = this.getActiveSession().createSQLQuery(batchExperimentPropInsertSql.toString());
-			sqlQuery.executeUpdate();
-		}
-
 	}
 
 	private List<Integer> createExperimentIdsList(final List<FieldMapInfo> infos){
-		List<Integer> experimentIds = new ArrayList<>();
+		final List<Integer> experimentIds = new ArrayList<>();
 
-		for (FieldMapInfo info : infos) {
-			for (FieldMapDatasetInfo dataset : info.getDatasets()) {
-				for (FieldMapTrialInstanceInfo tInfo : dataset.getTrialInstances()) {
+		for (final FieldMapInfo info : infos) {
+			for (final FieldMapDatasetInfo dataset : info.getDatasets()) {
+				for (final FieldMapTrialInstanceInfo tInfo : dataset.getTrialInstances()) {
 					if (tInfo.getFieldMapLabels() != null) {
-						for (FieldMapLabel label : tInfo.getFieldMapLabels()) {
+						for (final FieldMapLabel label : tInfo.getFieldMapLabels()) {
 							if (label.getColumn() != null && label.getRange() != null) {
 								experimentIds.add(label.getExperimentId());
 							}
@@ -203,10 +143,10 @@ public class ExperimentPropertySaver extends Saver {
 	 * @return Map<Integer, ExperimentModel> experimentId wise experimentModal entity
 	 */
 	private Map<Integer, ExperimentModel> createExperimentIdWiseMap(final List<Integer> experimentIds){
-		Map<Integer, ExperimentModel> experimentMap = new HashMap<>();
-		List<ExperimentModel> experiments = this.daoFactory.getExperimentDao().filterByColumnValues("ndExperimentId", experimentIds);
+		final Map<Integer, ExperimentModel> experimentMap = new HashMap<>();
+		final List<ExperimentModel> experiments = this.daoFactory.getExperimentDao().filterByColumnValues("ndExperimentId", experimentIds);
 		if(experiments != null){
-			for(ExperimentModel experimentModel : experiments){
+			for (final ExperimentModel experimentModel : experiments) {
 				experimentMap.put(experimentModel.getNdExperimentId(), experimentModel);
 			}
 		}
@@ -220,13 +160,13 @@ public class ExperimentPropertySaver extends Saver {
 	 * @return Map<Integer, List<ExperimentProperty>> experimentId wise experiment properties
 	 */
 	private Map<Integer, List<ExperimentProperty>> createExperimentIdWisePropertiesMap(final List<Integer> experimentIds){
-		List<ExperimentProperty> experimentProperties =
+		final List<ExperimentProperty> experimentProperties =
 			this.daoFactory.getExperimentPropertyDao().filterByColumnValues("experiment.ndExperimentId", experimentIds);
-		Map<Integer, List<ExperimentProperty>> experimentPropertyMap = new HashMap<>();
+		final Map<Integer, List<ExperimentProperty>> experimentPropertyMap = new HashMap<>();
 
 		if(experimentProperties != null){
-			for(ExperimentProperty experimentProperty : experimentProperties){
-				Integer experimentId = experimentProperty.getExperiment().getNdExperimentId();
+			for (final ExperimentProperty experimentProperty : experimentProperties) {
+				final Integer experimentId = experimentProperty.getExperiment().getNdExperimentId();
 				if(experimentPropertyMap.get(experimentId) == null){
 					experimentPropertyMap.put(experimentId, new ArrayList<ExperimentProperty>());
 				}
