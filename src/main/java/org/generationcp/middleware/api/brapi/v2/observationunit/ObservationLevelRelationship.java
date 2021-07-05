@@ -9,6 +9,12 @@ public class ObservationLevelRelationship {
 	public ObservationLevelRelationship() {
 	}
 
+	public ObservationLevelRelationship(final String levelCode, final String levelName, final Integer levelOrder) {
+		this.levelCode = levelCode;
+		this.levelName = levelName;
+		this.levelOrder = levelOrder;
+	}
+
 	public String getLevelCode() {
 		return levelCode;
 	}

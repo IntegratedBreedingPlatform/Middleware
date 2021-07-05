@@ -949,6 +949,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final ObservationUnitDto observationUnit = new ObservationUnitDto();
 
 				final Integer ndExperimentId = (Integer) row[0];
+				observationUnit.setExperimentId(ndExperimentId);
 				observationUnit.setObservationUnitDbId((String) row[1]); // OBS_UNIT_ID
 				observationUnit.setObservationUnitName((String) row[2]);
 				observationUnit.setObservationLevel((String) row[3]);
@@ -979,7 +980,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setEntryType((String) row[20]);
 				observationUnit.setEntryNumber((String) row[21]);
 
-				observationUnit.setAdditionalInfo("");
+				observationUnit.setAdditionalInfo(new HashMap<>());
 				observationUnit.setLocationDbId(observationUnit.getStudyLocationDbId());
 				observationUnit.setLocationName(observationUnit.getStudyLocation());
 				observationUnit.setObservationUnitPUI("");
@@ -995,6 +996,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					observationUnitPosition.setPositionCoordinateYType("GRID_ROW");
 				}
 				final String jsonProps = (String) row[25];
+				LOG.error("NULL JSONPROPS: " +  (jsonProps == null));
 				if (jsonProps != null) {
 					try {
 						final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);

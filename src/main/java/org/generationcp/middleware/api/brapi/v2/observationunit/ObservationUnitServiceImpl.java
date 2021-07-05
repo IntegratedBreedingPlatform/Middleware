@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.brapi.v2.observationunit;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -50,6 +51,8 @@ import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.groupingBy;
+
 @Transactional
 public class ObservationUnitServiceImpl implements ObservationUnitService {
 
@@ -86,11 +89,10 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		}
 
 		try {
-			final ObjectMapper mapper = new ObjectMapper();
 			final String props = experimentModel.getJsonProps() != null ? experimentModel.getJsonProps() : "{}";
-			final Map<String, Object> propsMap = mapper.readValue(props, HashMap.class);
+			final Map<String, Object> propsMap = this.jacksonMapper.readValue(props, HashMap.class);
 			propsMap.put("geoCoordinates", requestDTO.getObservationUnitPosition().getGeoCoordinates());
-			experimentModel.setJsonProps(mapper.writeValueAsString(propsMap));
+			experimentModel.setJsonProps(this.jacksonMapper.writeValueAsString(propsMap));
 			experimentDao.save(experimentModel);
 		} catch (final Exception e) {
 			final String message = "couldn't parse prop column for observationUnitDbId=" + observationUnitDbId;
@@ -102,7 +104,24 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	@Override
 	public List<ObservationUnitDto> searchObservationUnits(final Integer pageSize, final Integer pageNumber,
 		final ObservationUnitSearchRequestDTO requestDTO) {
-		return this.daoFactory.getPhenotypeDAO().searchObservationUnits(pageSize, pageNumber, requestDTO);
+		final List<ObservationUnitDto> dtos = this.daoFactory.getPhenotypeDAO().searchObservationUnits(pageSize, pageNumber, requestDTO);
+
+		final List<Integer> experimentIds = dtos.stream().map(o -> Integer.valueOf(o.getExperimentId())).collect(Collectors.toList());
+
+		final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
+			this.daoFactory.getStudyInstanceExternalReferenceDao().getExternalReferences(experimentIds).stream()
+				.collect(groupingBy(
+					ExternalReferenceDTO::getEntityId));
+
+		final Map<Integer, List<ObservationLevelRelationship>> obsevationRelationshipsMap =
+			this.daoFactory.getExperimentPropertyDao().getObservationLevelRelationshipMap(experimentIds);
+
+		for(final ObservationUnitDto dto: dtos){
+			dto.setExternalReferences(externalReferencesMap.get(dto.getExperimentId().toString()));
+			dto.getObservationUnitPosition().setObservationLevelRelationships(obsevationRelationshipsMap.get(dto.getExperimentId()));
+		}
+
+		return dtos;
 	}
 
 	@Override
@@ -202,7 +221,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	private void setJsonProps(final ExperimentModel model, final ObservationUnitImportRequestDto dto) {
 		if(dto.getObservationUnitPosition().getGeoCoordinates() != null) {
 			try {
-				model.setJsonProps(this.jacksonMapper.writeValueAsString(dto.getObservationUnitPosition().getGeoCoordinates()));
+				final Map<String, Object> propsMap = new HashMap<>();
+				propsMap.put("geoCoordinates", dto.getObservationUnitPosition().getGeoCoordinates());
+				model.setJsonProps(this.jacksonMapper.writeValueAsString(propsMap));
 			} catch (JsonProcessingException e) {
 				// Just ignore if there's an issue with mapping
 				model.setJsonProps(null);
@@ -214,7 +235,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final Map<String, MeasurementVariable> variableNamesMap, final Map<String, MeasurementVariable> variableSynonymsMap,
 		final Map<Integer, List<ValueReference>> categoricalVariablesMap) {
 		final List<ExperimentProperty> properties = new ArrayList<>();
-		final ObservationUnitPositionImportRequestDto position = dto.getObservationUnitPosition();
+		final ObservationUnitPosition position = dto.getObservationUnitPosition();
 		if (!CollectionUtils.isEmpty(position.getObservationLevelRelationships())) {
 			for (ObservationLevelRelationship levelRelationship : position.getObservationLevelRelationships()) {
 				final String variableName = levelRelationship.getLevelName().toUpperCase();
@@ -258,7 +279,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	private void addExperimentVariablesIfNecessary(final ObservationUnitImportRequestDto dto,
 		final Map<Integer, List<Integer>> plotExperimentVariablesMap, final Map<Integer, DmsProject> trialIdPlotDatasetMap,
 		final Map<String, MeasurementVariable> variableNamesMap, final Map<String, MeasurementVariable> variableSynonymsMap) {
-		final ObservationUnitPositionImportRequestDto position = dto.getObservationUnitPosition();
+		final ObservationUnitPosition position = dto.getObservationUnitPosition();
 		final Integer trialDbId = Integer.valueOf(dto.getTrialDbId());
 		if (!CollectionUtils.isEmpty(position.getObservationLevelRelationships())) {
 			for (ObservationLevelRelationship levelRelationship : position.getObservationLevelRelationships()) {

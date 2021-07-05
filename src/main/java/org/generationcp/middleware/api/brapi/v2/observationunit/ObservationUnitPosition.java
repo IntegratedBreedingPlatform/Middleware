@@ -7,7 +7,7 @@ public class ObservationUnitPosition {
 
 	private String entryType;
 	private Map<String, Object> geoCoordinates;
-	private ObservationLevelRelationship observationLevel;
+	private String observationLevel;
 	private List<ObservationLevelRelationship> observationLevelRelationships;
 	private String positionCoordinateX;
 	private String positionCoordinateXType;
@@ -33,11 +33,11 @@ public class ObservationUnitPosition {
 		this.geoCoordinates = geoCoordinates;
 	}
 
-	public ObservationLevelRelationship getObservationLevel() {
+	public String getObservationLevel() {
 		return observationLevel;
 	}
 
-	public void setObservationLevel(final ObservationLevelRelationship observationLevel) {
+	public void setObservationLevel(final String observationLevel) {
 		this.observationLevel = observationLevel;
 	}
 

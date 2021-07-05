@@ -18,7 +18,7 @@ public class ObservationUnitImportRequestDto {
 	private String locationName;
 	private String observationUnitName;
 	private String observationUnitPUI;
-	private ObservationUnitPositionImportRequestDto observationUnitPosition;
+	private ObservationUnitPosition observationUnitPosition;
 	private String programDbId;
 	private String programName;
 	private String seedLotDbId;
@@ -92,11 +92,11 @@ public class ObservationUnitImportRequestDto {
 		this.observationUnitPUI = observationUnitPUI;
 	}
 
-	public ObservationUnitPositionImportRequestDto getObservationUnitPosition() {
+	public ObservationUnitPosition getObservationUnitPosition() {
 		return observationUnitPosition;
 	}
 
-	public void setObservationUnitPosition(final ObservationUnitPositionImportRequestDto observationUnitPosition) {
+	public void setObservationUnitPosition(final ObservationUnitPosition observationUnitPosition) {
 		this.observationUnitPosition = observationUnitPosition;
 	}
 

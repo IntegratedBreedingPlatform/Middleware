@@ -12,6 +12,8 @@ public class ObservationLevel {
 
 	private Integer levelOrder;
 
+
+
 	public ObservationLevel(final Integer levelOrder, final String levelName){
 		this.levelOrder = levelOrder;
 		this.levelName = levelName;
