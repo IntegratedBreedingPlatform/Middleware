@@ -12,9 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -62,7 +60,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 		final Name name = daoFactory.getNameDao().getById(nameId);
 		if (!StringUtils.isBlank(germplasmNameRequestDto.getNameTypeCode())) {
-			final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
+			final Set<String> codes = Collections.singleton(germplasmNameRequestDto.getNameTypeCode());
 			final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = germplasmService.filterGermplasmNameTypes(codes);
 			name.setTypeId(germplasmNameTypeDTOs.get(0).getId());
 
@@ -97,7 +95,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 			}
 		}
 
-		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
+		final Set<String> codes = Collections.singleton(germplasmNameRequestDto.getNameTypeCode());
 		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = germplasmService.filterGermplasmNameTypes(codes);
 
 		final Name name = new Name();
@@ -115,5 +113,10 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	@Override
 	public List<GermplasmNameDto> getGermplasmNamesByGids(final List<Integer> gids) {
 		return this.daoFactory.getNameDao().getGermplasmNamesByGids(gids);
+	}
+
+	@Override
+	public List<String> getExistingGermplasmPUIs(final List<String> germplasmPUIs) {
+		return this.daoFactory.getNameDao().getExistingGermplasmPUIs(germplasmPUIs);
 	}
 }
