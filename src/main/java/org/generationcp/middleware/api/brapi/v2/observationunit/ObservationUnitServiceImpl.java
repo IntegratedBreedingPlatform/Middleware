@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.brapi.v2.observationunit;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
@@ -54,6 +55,8 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ObservationUnitServiceImpl.class);
 
+	private ObjectMapper jacksonMapper;
+
 	@Resource
 	private GermplasmService germplasmService;
 
@@ -69,6 +72,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	public ObservationUnitServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 		this.daoFactory = new DaoFactory(this.sessionProvider);
+		this.jacksonMapper = new ObjectMapper();
 	}
 
 	@Override
@@ -174,6 +178,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			experimentModel.setGeoLocation(new Geolocation(studyDbId));
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 			experimentModel.setStock(this.findStock(stockMap.get(trialDbId), dto.getGermplasmDbId()));
+			this.setJsonProps(experimentModel, dto);
 			ObservationUnitIDGenerator.generateObservationUnitIds(cropType, Collections.singletonList(experimentModel));
 			this.addExperimentProperties(experimentModel, dto, variableNamesMap, variableSynonymsMap, categoricalVariablesMap);
 			this.setExperimentExternalReferences(dto, experimentModel);
@@ -192,6 +197,17 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
 		searchRequestDTO.setObservationUnitDbIds(observationUnitDbIds);
 		return this.searchObservationUnits(null, null, searchRequestDTO);
+	}
+
+	private void setJsonProps(final ExperimentModel model, final ObservationUnitImportRequestDto dto) {
+		if(dto.getObservationUnitPosition().getGeoCoordinates() != null) {
+			try {
+				model.setJsonProps(this.jacksonMapper.writeValueAsString(dto.getObservationUnitPosition().getGeoCoordinates()));
+			} catch (JsonProcessingException e) {
+				// Just ignore if there's an issue with mapping
+				model.setJsonProps(null);
+			}
+		}
 	}
 
 	private void addExperimentProperties(final ExperimentModel experiment, final ObservationUnitImportRequestDto dto,
