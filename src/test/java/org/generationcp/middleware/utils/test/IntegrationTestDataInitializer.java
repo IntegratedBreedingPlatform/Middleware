@@ -38,6 +38,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
+import org.generationcp.middleware.pojos.StudyExternalReference;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -128,6 +129,16 @@ public class IntegrationTestDataInitializer {
 		this.dmsProjectDao.save(dmsProject);
 		this.dmsProjectDao.refresh(dmsProject);
 		return dmsProject;
+	}
+
+	public StudyExternalReference createStudyExternalReference(final DmsProject study, final String referenceId,
+		final String referenceSource) {
+		final StudyExternalReference studyExternalReference = new StudyExternalReference();
+		studyExternalReference.setStudy(study);
+		studyExternalReference.setReferenceId(referenceId);
+		studyExternalReference.setSource(referenceSource);
+		this.daoFactory.getStudyExternalReferenceDAO().save(studyExternalReference);
+		return studyExternalReference;
 	}
 
 	public DmsProject createStudy(final String name, final String description, final int studyTypeId) {
