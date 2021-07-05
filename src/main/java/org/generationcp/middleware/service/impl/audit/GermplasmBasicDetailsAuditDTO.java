@@ -8,9 +8,11 @@ public class GermplasmBasicDetailsAuditDTO extends AbstractAuditDTO {
 
 	private String locationName;
 	private String creationDate;
+	private Integer groupId;
 
 	private boolean locationChanged;
 	private boolean creationDateChanged;
+	private boolean groupIdChanged;
 
 	public GermplasmBasicDetailsAuditDTO() {
 	}
@@ -31,6 +33,14 @@ public class GermplasmBasicDetailsAuditDTO extends AbstractAuditDTO {
 		this.creationDate = creationDate;
 	}
 
+	public Integer getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(final Integer groupId) {
+		this.groupId = groupId;
+	}
+
 	public boolean isLocationChanged() {
 		return locationChanged;
 	}
@@ -45,6 +55,14 @@ public class GermplasmBasicDetailsAuditDTO extends AbstractAuditDTO {
 
 	public void setCreationDateChanged(final boolean creationDateChanged) {
 		this.creationDateChanged = creationDateChanged;
+	}
+
+	public boolean isGroupIdChanged() {
+		return groupIdChanged;
+	}
+
+	public void setGroupIdChanged(final boolean groupIdChanged) {
+		this.groupIdChanged = groupIdChanged;
 	}
 
 	@Override

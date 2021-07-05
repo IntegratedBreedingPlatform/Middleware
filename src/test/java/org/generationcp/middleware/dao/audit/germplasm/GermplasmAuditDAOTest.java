@@ -208,29 +208,34 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 		final Integer method2 = new Random().nextInt();
 
 		List<Map<String, Object>> queriesParams = Arrays.asList(
-			this.creatGermplasmBasicDetailsAuditQueryParams(RevisionType.CREATION, location1.getLocid(), creationDate1, method1),
+			this.creatGermplasmBasicDetailsAuditQueryParams(RevisionType.CREATION, location1.getLocid(), creationDate1, method1, 0),
 			// Change breeding method
-			this.creatGermplasmBasicDetailsAuditQueryParams(RevisionType.EDITION, location2.getLocid(), creationDate1, method2),
+			this.creatGermplasmBasicDetailsAuditQueryParams(RevisionType.EDITION, location2.getLocid(), creationDate1, method2, 0),
 			// Change location
-			this.creatGermplasmBasicDetailsAuditQueryParams(RevisionType.EDITION, location2.getLocid(), creationDate1, method2),
+			this.creatGermplasmBasicDetailsAuditQueryParams(RevisionType.EDITION, location2.getLocid(), creationDate1, method2, 0),
 			// Change creation date
-			this.creatGermplasmBasicDetailsAuditQueryParams(RevisionType.EDITION, location2.getLocid(), creationDate2, method2)
+			this.creatGermplasmBasicDetailsAuditQueryParams(RevisionType.EDITION, location2.getLocid(), creationDate2, method2, 0),
+			// Change group id
+			this.creatGermplasmBasicDetailsAuditQueryParams(RevisionType.EDITION, location2.getLocid(), creationDate2, method2, 1)
 		);
 		this.insertAuditRows(GERMPLASMS_AUDIT_TABLE, queriesParams);
 
-		assertThat(this.germplasmAuditDAO.countBasicDetailsChangesByGid(GID), is(3L));
+		assertThat(this.germplasmAuditDAO.countBasicDetailsChangesByGid(GID), is(4L));
 
 		final List<GermplasmBasicDetailsAuditDTO> changes =
 			this.germplasmAuditDAO.getBasicDetailsChangesByGid(GID, new PageRequest(0, 50));
-		assertThat(changes, hasSize(3));
+		assertThat(changes, hasSize(4));
+		// groupId should have changed
+		this.assertGermplasmBasicDetailsAuditChanges(changes.get(0), RevisionType.EDITION, creationDate2, false,
+			location2.getLname(), false, 1, true);
 		// creation date should have changed
-		this.assertGermplasmBasicDetailsAuditChanges(changes.get(0), RevisionType.EDITION, creationDate2, true,
-			location2.getLname(), false);
+		this.assertGermplasmBasicDetailsAuditChanges(changes.get(1), RevisionType.EDITION, creationDate2, true,
+			location2.getLname(), false, 0, false);
 		// location should have changed
-		this.assertGermplasmBasicDetailsAuditChanges(changes.get(1), RevisionType.EDITION, creationDate1, false,
-			location2.getLname(), true);
-		this.assertGermplasmBasicDetailsAuditChanges(changes.get(2), RevisionType.CREATION, creationDate1, false,
-			location1.getLname(), false);
+		this.assertGermplasmBasicDetailsAuditChanges(changes.get(2), RevisionType.EDITION, creationDate1, false,
+			location2.getLname(), true, 0, false);
+		this.assertGermplasmBasicDetailsAuditChanges(changes.get(3), RevisionType.CREATION, creationDate1, false,
+			location1.getLname(), false, 0, false);
 	}
 
 	@Test
@@ -433,11 +438,11 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 
 	// Germplasm basic details audit
 	private Map<String, Object> creatGermplasmBasicDetailsAuditQueryParams(final RevisionType revisionType,
-		final Integer locationId, final Integer creationDate, final Integer methodId) {
+		final Integer locationId, final Integer creationDate, final Integer methodId, final Integer groupId) {
 
 		final Map<String, Object> queryParams =
 			this.createGermplasmQueryParams(locationId, creationDate, methodId, new Random().nextInt(),
-				new Random().nextInt(), new Random().nextInt());
+				new Random().nextInt(), new Random().nextInt(), groupId);
 		this.addCommonsQueryParams(queryParams, revisionType);
 
 		return queryParams;
@@ -446,12 +451,15 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 	private void assertGermplasmBasicDetailsAuditChanges(final GermplasmBasicDetailsAuditDTO change,
 		final RevisionType revisionType,
 		final Integer creationDate, final boolean creationDateChanged,
-		final String locationName, final boolean locationChanged) {
+		final String locationName, final boolean locationChanged,
+		final Integer groupId, final boolean groupIdChanged) {
 		assertThat(change.getRevisionType(), is(revisionType));
 		assertThat(change.getCreationDate(), is(creationDate.toString()));
 		assertThat(change.isCreationDateChanged(), is(creationDateChanged));
 		assertThat(change.getLocationName(), is(locationName));
 		assertThat(change.isLocationChanged(), is(locationChanged));
+		assertThat(change.getGroupId(), is(groupId));
+		assertThat(change.isGroupIdChanged(), is(groupIdChanged));
 		assertNotNull(change.getCreatedDate());
 		assertNotNull(change.getModifiedDate());
 		assertThat(change.getCreatedBy(), is(ADMIN_NAME));
@@ -498,7 +506,7 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 	private Map<String, Object> createProgenitorDetailsAuditQueryParams(final RevisionType revisionType, final Integer methodId,
 		final Integer femaleParentGID, final Integer maleParentGID, final Integer progenitorsNumber) {
 		final Map<String, Object> queryParams =
-			this.createGermplasmQueryParams(new Random().nextInt(), 20200101, methodId, femaleParentGID, maleParentGID, progenitorsNumber);
+			this.createGermplasmQueryParams(new Random().nextInt(), 20200101, methodId, femaleParentGID, maleParentGID, progenitorsNumber, 0);
 		this.addCommonsQueryParams(queryParams, revisionType);
 
 		return queryParams;
@@ -551,7 +559,7 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 	}
 
 	private Map<String, Object> createGermplasmQueryParams(final Integer locationId, final Integer creationDate, final Integer methodId,
-		final Integer femaleParentGID, final Integer maleParentGID, final Integer progenitorsNumber) {
+		final Integer femaleParentGID, final Integer maleParentGID, final Integer progenitorsNumber, final Integer groupId) {
 		final Map<String, Object> queryParams = new LinkedHashMap<>();
 		queryParams.put("gid", GID);
 		queryParams.put("methn", methodId);
@@ -563,7 +571,7 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 		queryParams.put("gdate", creationDate);
 		queryParams.put("gref", new Random().nextInt());
 		queryParams.put("grplce", new Random().nextInt());
-		queryParams.put("mgid", new Random().nextInt());
+		queryParams.put("mgid", groupId);
 		queryParams.put("cid", new Random().nextInt());
 		queryParams.put("sid", new Random().nextInt());
 		queryParams.put("gchange", new Random().nextInt());

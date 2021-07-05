@@ -88,8 +88,10 @@ public class GermplasmAuditDAO {
 		this.addCommonScalars(query);
 		query.addScalar(GermplasmBasicDetailsAuditDAOQuery.LOCATION_NAME_ALIAS);
 		query.addScalar(GermplasmBasicDetailsAuditDAOQuery.CREATION_DATE_ALIAS);
+		query.addScalar(GermplasmBasicDetailsAuditDAOQuery.GROUP_ID_ALIAS);
 		query.addScalar(GermplasmBasicDetailsAuditDAOQuery.LOCATION_CHANGED_ALIAS, BooleanType.INSTANCE);
 		query.addScalar(GermplasmBasicDetailsAuditDAOQuery.CREATION_DATE_CHANGED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmBasicDetailsAuditDAOQuery.GROUP_ID_CHANGED_ALIAS, BooleanType.INSTANCE);
 		query.setResultTransformer(Transformers.aliasToBean(GermplasmBasicDetailsAuditDTO.class));
 
 		GenericDAO.addPaginationToSQLQuery(query, pageable);
