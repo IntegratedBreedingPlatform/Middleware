@@ -10,12 +10,12 @@
                 SELECT count(*) FROM permission where name = 'VIEW_GERMPLASM_CHANGE_HISTORY'
             </sqlCheck>
         </preConditions>
-        <comment>Add Manage Germplasm "View Germplasm change history" permission</comment>
+        <comment>Add Manage Germplasm "View change history" permission</comment>
 		<sql dbms="mysql" splitStatements="true">
 			set @manage_germplasm_id = (select permission_id from permission where name = 'MANAGE_GERMPLASM');
 
 			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
-			values ('VIEW_GERMPLASM_CHANGE_HISTORY', 'View Germplasm change history', @manage_germplasm_id, null);
+			values ('VIEW_GERMPLASM_CHANGE_HISTORY', 'View change history', @manage_germplasm_id, null);
 
 			SET @view_change_history = (SELECT permission_id FROM permission where name = 'VIEW_GERMPLASM_CHANGE_HISTORY');
 
