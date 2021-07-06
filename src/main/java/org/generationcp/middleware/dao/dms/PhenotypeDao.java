@@ -995,7 +995,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					observationUnitPosition.setPositionCoordinateYType("GRID_ROW");
 				}
 				final String jsonProps = (String) row[25];
-				LOG.error("NULL JSONPROPS: " +  (jsonProps == null));
 				if (jsonProps != null) {
 					try {
 						final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
