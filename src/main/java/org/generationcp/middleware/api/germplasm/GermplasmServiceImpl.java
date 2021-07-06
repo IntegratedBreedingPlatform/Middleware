@@ -1030,7 +1030,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				if (typeId != null) {
 					final Name name = new Name(null, germplasm, typeId,
 						0, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
-					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
+					if (GermplasmImportRequest.LNAME_NAME_TYPE.equals(synonym.getType())) {
 						name.setNstat(1);
 					}
 					this.daoFactory.getNameDao().save(name);
@@ -1136,7 +1136,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				} else {
 					final Name name = new Name(null, germplasm, typeId,
 						0, synonym.getSynonym(), germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
-					if (GermplasmImportRequest.LNAME.equals(synonym.getType())) {
+					if (GermplasmImportRequest.LNAME_NAME_TYPE.equals(synonym.getType())) {
 						name.setNstat(1);
 					}
 					nameDao.save(name);

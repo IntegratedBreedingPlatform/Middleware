@@ -142,7 +142,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		+ "        left join " //
 		+ "    names n on n.gid = g.gid and n.nstat = 1 " //
 		+ " 		left join ("
-		+ " 	select p.gid, p.nval from names INNER JOIN udflds u ON u.fldno = p.ntype AND u.ftable = 'NAMES' and u.ftype='NAME' and u.fcode = 'PUI') pui on pui.gid = g.gid "
+		+ " 	select p.gid, p.nval from names p INNER JOIN udflds u ON u.fldno = p.ntype AND u.ftable = 'NAMES' and u.ftype='NAME' and u.fcode = 'PUI') pui on pui.gid = g.gid "
 		+ "        left join " //
 		+ "    bibrefs r on g.gref = r.refid ";
 
@@ -624,7 +624,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
 		try {
 			final String query = "SELECT "
-				+ "   g.germplsm_uuid as germplasmDbId," // use gid as germplasmDbId
+				+ "   g.germplsm_uuid as germplasmDbId,"
 				+ "   (select n.nval from names n where n.gid = g.gid AND n.nstat = 1) as defaultDisplayName," //
 				+ "   CONCAT(m.mcode, '|', m.mname, '|', m.mtype) AS crossingPlan," //
 				+ "   year(str_to_date(g.gdate, '%Y%m%d')) as crossingYear," //
@@ -1203,6 +1203,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			paramBuilder.setParameterList("germplasmGenus", germplasmSearchRequestDTO.getGermplasmGenus());
 		}
 
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmPUIs())) {
+			paramBuilder.setParameterList("germplasmPUIs", germplasmSearchRequestDTO.getGermplasmPUIs());
+		}
+
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmNames())) {
 			paramBuilder.setParameterList("germplasmNames", germplasmSearchRequestDTO.getGermplasmNames());
 		}
@@ -1285,7 +1289,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getAccessionNumbers())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT n.gid  ");
 			paramBuilder.append(" FROM names n ");
-			paramBuilder.append(" INNER JOIN udflds u on n.ntype = u.fldno AND u.fcode = '" + GermplasmImportRequest.ACCNO + "'");
+			paramBuilder.append(" INNER JOIN udflds u on n.ntype = u.fldno AND u.fcode = '" + GermplasmImportRequest.ACCNO_NAME_TYPE + "'");
 			paramBuilder.append(" WHERE n.nval IN (:accessionNumbers)  ) ");
 		}
 
@@ -1293,7 +1297,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			paramBuilder.append(" AND g.gid IN ( SELECT a.gid  ");
 			paramBuilder.append(" FROM atributs a");
 			paramBuilder.append(
-				" INNER JOIN cvterm c on a.atype = c.cvterm_id AND c.name = '" + GermplasmImportRequest.CROPNM + "' and c.cv_id = "
+				" INNER JOIN cvterm c on a.atype = c.cvterm_id AND c.name = '" + GermplasmImportRequest.CROPNM_ATTR + "' and c.cv_id = "
 					+ CvId.VARIABLES.getId());
 			paramBuilder.append(" WHERE a.aval IN (:commonCropNames)  ) ");
 		}
@@ -1301,15 +1305,22 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmGenus())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT n.gid  ");
 			paramBuilder.append(" FROM names n ");
-			paramBuilder.append(" INNER JOIN udflds u on n.ntype = u.fldno AND u.fcode = '" + GermplasmImportRequest.GENUS + "'");
+			paramBuilder.append(" INNER JOIN udflds u on n.ntype = u.fldno AND u.fcode = '" + GermplasmImportRequest.GENUS_NAME_TYPE + "'");
 			paramBuilder.append(" WHERE n.nval IN (:germplasmGenus)  ) ");
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmPUIs())) {
+			paramBuilder.append(" AND g.gid IN ( SELECT n.gid  ");
+			paramBuilder.append(" FROM names n ");
+			paramBuilder.append(" INNER JOIN udflds u on n.ntype = u.fldno AND u.fcode = '" + GermplasmImportRequest.PUI_NAME_TYPE + "'");
+			paramBuilder.append(" WHERE n.nval IN (:germplasmPUIs)  ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT a.gid  ");
 			paramBuilder.append(" FROM atributs a");
 			paramBuilder.append(
-				" INNER JOIN cvterm c on a.atype = c.cvterm_id AND c.name = '" + GermplasmImportRequest.SPECIES + "' and c.cv_id = "
+				" INNER JOIN cvterm c on a.atype = c.cvterm_id AND c.name = '" + GermplasmImportRequest.SPECIES_ATTR + "' and c.cv_id = "
 					+ CvId.VARIABLES.getId());
 			paramBuilder.append(" WHERE a.aval IN (:germplasmSpecies)  ) ");
 		}
@@ -1329,12 +1340,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			// If there is any match, build the list of  GermplasmDTO based on the matched GIDs
 			if (!CollectionUtils.isEmpty(gids)) {
 				final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.buildGetGermplasmQuery());
-				sqlQuery.addScalar("germplasmDbId").addScalar("gid").addScalar("accessionNumber").addScalar("acquisitionDate")
-					.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmSeedSource")
-					.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority")
-					.addScalar("instituteCode").addScalar("instituteName").addScalar("germplasmOrigin").addScalar("commonCropName")
-					.addScalar("breedingMethodDbId")
-					.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
+				this.addScalarsForGermplasmDTO(sqlQuery).setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
 				sqlQuery.setParameterList("gids", gids);
 				return sqlQuery.list();
 			}
@@ -1356,6 +1362,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			+ "   loc.labbr AS countryOfOriginCode, " //
 			+ "   max(if(n.nstat = 1, n.nval, null)) as germplasmName, " //
 			+ "  max(if(ntype.fcode = 'GENUS', n.nval, null)) as genus," //
+			+ "  max(if(ntype.fcode = 'PUI', n.nval, null)) as germplasmPUI," //
 			+ "   max(if(atype.name = 'PLOTCODE_AP_text', a.aval, null)) as germplasmSeedSource,  "
 			+ "   max(if(atype.name = 'SPNAM_AP_text', a.aval, null)) as species, "
 			+ "   max(if(atype.name = 'SPAUTH_AP_text', a.aval, null)) as speciesAUthority, "
@@ -1459,11 +1466,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.getGermplasmForStudyQuery());
 			sqlQuery.setParameter("studyDbId", studyDbId);
 
-			sqlQuery.addScalar("germplasmDbId").addScalar("gid").addScalar("accessionNumber").addScalar("acquisitionDate")
-				.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmSeedSource")
-				.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority")
-				.addScalar("instituteCode").addScalar("instituteName").addScalar("germplasmOrigin").addScalar("commonCropName")
-				.addScalar("breedingMethodDbId").addScalar("entryNumber") //
+			addScalarsForGermplasmDTO(sqlQuery).addScalar("entryNumber") //
 				.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
 
 			addPaginationToSQLQuery(sqlQuery, pageable);
@@ -1474,6 +1477,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	private SQLQuery addScalarsForGermplasmDTO(final SQLQuery sqlQuery) {
+		return sqlQuery.addScalar("germplasmDbId").addScalar("gid").addScalar("accessionNumber").addScalar("acquisitionDate")
+			.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmPUI").addScalar("germplasmSeedSource")
+			.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority")
+			.addScalar("instituteCode").addScalar("instituteName").addScalar("germplasmOrigin").addScalar("commonCropName")
+			.addScalar("breedingMethodDbId");
 	}
 
 	public List<Germplasm> getExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
