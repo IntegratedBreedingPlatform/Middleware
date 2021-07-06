@@ -95,7 +95,8 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		this.studyInstanceDto = this.studyInstanceService
 			.saveStudyInstances(this.crop.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
 
-		this.germplasm = GermplasmTestDataInitializer.createGermplasm(null);
+		this.germplasm = GermplasmTestDataInitializer.createGermplasm(1);
+		this.germplasm.setGid(null);
 		GermplasmGuidGenerator.generateGermplasmGuids(this.crop, Collections.singletonList(this.germplasm));
 		this.daoFactory.getGermplasmDao().save(germplasm);
 
