@@ -34,6 +34,7 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.pojos.GermplasmStudySourceType;
+import org.generationcp.middleware.pojos.InstanceExternalReference;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
@@ -345,6 +346,14 @@ public class IntegrationTestDataInitializer {
 		this.geolocationPropertyDao.save(geolocationProperty);
 		this.geolocationPropertyDao.refresh(geolocationProperty);
 
+	}
+
+	public void addInstanceExternalReferenceSource(final Geolocation geolocation, final String externalReferenceId, final String externalReferenceSource) {
+		final InstanceExternalReference instanceExternalReference = new InstanceExternalReference();
+		instanceExternalReference.setInstance(geolocation);
+		instanceExternalReference.setReferenceId(externalReferenceId);
+		instanceExternalReference.setSource(externalReferenceSource);
+		this.daoFactory.getStudyInstanceExternalReferenceDao().save(instanceExternalReference);
 	}
 
 	public void addExperimentProp(final ExperimentModel experimentModel, final int typeId, final String value, final int rank) {

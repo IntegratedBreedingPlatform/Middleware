@@ -520,9 +520,14 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final DmsProject summary =
 			this.createDataset(studyName + " - Summary Dataset", workbenchProject.getUniqueID(), DatasetTypeEnum.SUMMARY_DATA.getId(),
 				study, study);
+		final String externalReferenceId = RandomStringUtils.randomAlphabetic(10);
+		final String externalReferenceSource = RandomStringUtils.randomAlphabetic(10);
 
 		final Geolocation instance1 = this.testDataInitializer.createInstance(summary, locationId, 1);
 		this.testDataInitializer.addGeolocationProp(instance1, TermId.SEASON_VAR.getId(), String.valueOf(TermId.SEASON_DRY.getId()), 1);
+		this.testDataInitializer.addInstanceExternalReferenceSource(instance1, externalReferenceId, externalReferenceSource);
+
+		this.sessionProvder.getSession().flush();
 
 		final StudySearchFilter studySearchFilter = new StudySearchFilter();
 		studySearchFilter.setTrialDbIds(Collections.singletonList(study.getProjectId().toString()));
@@ -530,6 +535,8 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		studySearchFilter.setLocationDbId(locationId);
 		studySearchFilter.setStudyTypeDbId(String.valueOf(STUDY_TYPE_ID));
 		studySearchFilter.setSeasonDbId(String.valueOf(TermId.SEASON_DRY.getId()));
+		studySearchFilter.setExternalReferenceSource(externalReferenceSource);
+		studySearchFilter.setExternalReferenceID(externalReferenceId);
 		studySearchFilter.setActive(false);
 
 		final Long count = (Long) this.dmsProjectDao.countStudyInstances(studySearchFilter);
