@@ -1034,11 +1034,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	@Override
 	public List<VariableOverridesDto> getVariableOverridesByAliasAndProgram(final String alias, final String programUuid) {
-		try {
-			return this.daoFactory.getVariableProgramOverridesDao().getByAliasAndProgram(alias, programUuid);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Error at getVariableOverridesByAliasAndProgram:" + e.getMessage(), e);
-		}
+		return this.daoFactory.getVariableProgramOverridesDao().getByAliasAndProgram(alias, programUuid);
 	}
 
 	@Override
