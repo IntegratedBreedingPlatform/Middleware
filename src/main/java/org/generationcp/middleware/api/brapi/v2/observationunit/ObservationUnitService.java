@@ -27,6 +27,6 @@ public interface ObservationUnitService {
 	 */
 	long countObservationUnits(ObservationUnitSearchRequestDTO requestDTO);
 
-	List<ObservationUnitDto> importObservationUnits(String crop, List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos, Integer userId);
+	List<ObservationUnitDto> importObservationUnits(String crop, List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos);
 
 }

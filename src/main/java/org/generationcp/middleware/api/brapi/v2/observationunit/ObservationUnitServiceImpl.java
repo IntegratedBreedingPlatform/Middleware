@@ -129,8 +129,8 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		return this.daoFactory.getPhenotypeDAO().countObservationUnits(requestDTO);
 	}
 
-	public List<ObservationUnitDto> importObservationUnits(final String crop,
-		final List<ObservationUnitImportRequestDto> requestDtos, final Integer userId) {
+	@Override
+	public List<ObservationUnitDto> importObservationUnits(final String crop, final List<ObservationUnitImportRequestDto> requestDtos) {
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(crop);
 
 		final List<String> germplasmDbIds =
