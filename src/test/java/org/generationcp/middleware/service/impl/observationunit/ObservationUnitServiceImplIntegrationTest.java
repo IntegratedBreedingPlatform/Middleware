@@ -122,7 +122,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		final ObservationLevelRelationship relationship = new ObservationLevelRelationship();
 		final CVTerm plotNoTerm = this.daoFactory.getCvTermDao().getById(TermId.PLOT_NO.getId());
 		relationship.setLevelCode("1");
-		relationship.setLevelName(plotNoTerm.getDefinition());
+		relationship.setLevelName(plotNoTerm.getName());
 		observationUnitPosition.setObservationLevelRelationships(Collections.singletonList(relationship));
 
 		final Map<String, Object> geoCoodinates = new HashMap<>();
