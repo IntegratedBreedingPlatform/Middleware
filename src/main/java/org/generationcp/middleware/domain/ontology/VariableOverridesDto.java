@@ -1,8 +1,9 @@
 package org.generationcp.middleware.domain.ontology;
 
-import org.apache.commons.lang.builder.EqualsBuilder;
-import org.apache.commons.lang.builder.HashCodeBuilder;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
+@AutoProperty
 public class VariableOverridesDto {
 
 	private static final long serialVersionUID = 1L;
@@ -77,31 +78,19 @@ public class VariableOverridesDto {
 	}
 
 	@Override
-	public boolean equals(final Object o) {
-		if (this == o) {
-			return true;
-		}
-
-		if (o == null || this.getClass() != o.getClass()) {
-			return false;
-		}
-
-		final VariableOverridesDto variableOverrides = (VariableOverridesDto) o;
-
-		return new EqualsBuilder() //
-			.append(this.id, variableOverrides.id) //
-			.append(this.variableId, variableOverrides.getVariableId()) //
-			.append(this.programUuid, variableOverrides.getProgramUuid()) //
-			.append(this.alias, variableOverrides.getAlias()) //
-			.append(this.expectedMax, variableOverrides.getExpectedMax()) //
-			.append(this.expectedMin, variableOverrides.getExpectedMin()) //
-			.isEquals(); //
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
 	}
 
 	@Override
-	public int hashCode() {
-		return new HashCodeBuilder(17, 37).append(this.id).append(this.variableId).append(this.programUuid).append(this.alias) //
-			.append(this.expectedMax).append(this.expectedMin).toHashCode();
+	public String toString() {
+		return Pojomatic.toString(this);
 	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
 
 }
