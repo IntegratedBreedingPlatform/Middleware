@@ -984,6 +984,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setLocationName(observationUnit.getStudyLocation());
 				observationUnit.setObservationUnitPUI("");
 				final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
+				observationUnitPosition.setObservationLevel((String) row[3]);
 				observationUnitPosition.setEntryType(observationUnit.getEntryType());
 				observationUnitPosition.setPositionCoordinateX(x);
 				if (x != null) {
