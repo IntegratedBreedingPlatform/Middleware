@@ -29,6 +29,7 @@ import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
+import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,6 +59,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
+	private IntegrationTestDataInitializer testDataInitializer;
 	private CropType crop;
 	private Project commonTestProject;
 	private WorkbenchUser testUser;
@@ -75,6 +77,8 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 			this.crop = this.workbenchDataManager.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
 		}
+		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
+		this.testUser = this.testDataInitializer.createUserForTesting();
 
 		final TrialImportRequestDTO importRequest1 = new TrialImportRequestDTO();
 		importRequest1.setStartDate("2019-01-01");
