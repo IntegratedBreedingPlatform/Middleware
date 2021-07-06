@@ -109,7 +109,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final List<Integer> experimentIds = dtos.stream().map(o -> Integer.valueOf(o.getExperimentId())).collect(Collectors.toList());
 
 		final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
-			this.daoFactory.getStudyInstanceExternalReferenceDao().getExternalReferences(experimentIds).stream()
+			this.daoFactory.getExperimentExternalReferenceDao().getExternalReferences(experimentIds).stream()
 				.collect(groupingBy(
 					ExternalReferenceDTO::getEntityId));
 
