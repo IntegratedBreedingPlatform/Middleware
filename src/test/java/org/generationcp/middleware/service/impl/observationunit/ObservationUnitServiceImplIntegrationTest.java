@@ -1,6 +1,5 @@
 package org.generationcp.middleware.service.impl.observationunit;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
@@ -12,12 +11,12 @@ import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitS
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
-import org.generationcp.middleware.api.location.Coordinate;
-import org.generationcp.middleware.api.location.Geometry;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -34,6 +33,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.Arrays;
@@ -109,11 +109,11 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		dto.setTrialDbId(this.studySummary.getTrialDbId().toString());
 		dto.setStudyDbId(this.studyInstanceDto.getStudyDbId());
 		dto.setProgramDbId(this.commonTestProject.getUniqueID());
+		dto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
 		final ExternalReferenceDTO externalReference = new ExternalReferenceDTO();
 		externalReference.setReferenceID(RandomStringUtils.randomAlphabetic(20));
 		externalReference.setReferenceSource(RandomStringUtils.randomAlphabetic(20));
 		dto.setExternalReferences(Collections.singletonList(externalReference));
-		dto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
 
 		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
 		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
@@ -143,10 +143,118 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		Assert.assertEquals(dto.getProgramDbId(), observationUnitDto.getProgramDbId());
 		Assert.assertEquals(dto.getTrialDbId(), observationUnitDto.getTrialDbId());
 		Assert.assertEquals(dto.getStudyDbId(), observationUnitDto.getStudyDbId());
-		Assert.assertTrue(observationUnitPosition.getEntryType().equalsIgnoreCase(observationUnitDto.getObservationUnitPosition().getEntryType()));
-		Assert.assertEquals(observationUnitPosition.getPositionCoordinateX(), observationUnitDto.getObservationUnitPosition().getPositionCoordinateX());
-		Assert.assertEquals(observationUnitPosition.getPositionCoordinateY(), observationUnitDto.getObservationUnitPosition().getPositionCoordinateY());
+		Assert.assertEquals(dto.getGermplasmDbId(), observationUnitDto.getGermplasmDbId());
+		Assert.assertTrue(
+			observationUnitPosition.getEntryType().equalsIgnoreCase(observationUnitDto.getObservationUnitPosition().getEntryType()));
+		Assert.assertEquals(observationUnitPosition.getPositionCoordinateX(),
+			observationUnitDto.getObservationUnitPosition().getPositionCoordinateX());
+		Assert.assertEquals(observationUnitPosition.getPositionCoordinateY(),
+			observationUnitDto.getObservationUnitPosition().getPositionCoordinateY());
 		Assert.assertEquals(1, observationUnitDto.getObservationUnitPosition().getObservationLevelRelationships().size());
+		Assert.assertNotNull(observationUnitDto.getObservationUnitPosition().getGeoCoordinates());
+		Assert.assertEquals(1, observationUnitDto.getExternalReferences().size());
+		Assert.assertEquals(externalReference.getReferenceID(), observationUnitDto.getExternalReferences().get(0).getReferenceID());
+		Assert.assertEquals(externalReference.getReferenceSource(), observationUnitDto.getExternalReferences().get(0).getReferenceSource());
+	}
+
+	@Test
+	public void testImportObservationUnits_WithValidVariableHavingInvalidVariableType() {
+		final ObservationUnitImportRequestDto dto = new ObservationUnitImportRequestDto();
+		dto.setTrialDbId(this.studySummary.getTrialDbId().toString());
+		dto.setStudyDbId(this.studyInstanceDto.getStudyDbId());
+		dto.setProgramDbId(this.commonTestProject.getUniqueID());
+		dto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
+
+		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
+		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
+
+		final CVTerm numericVariable =
+			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL);
+		final ObservationLevelRelationship relationship = new ObservationLevelRelationship();
+		relationship.setLevelCode("1");
+		relationship.setLevelName(numericVariable.getName());
+		observationUnitPosition.setObservationLevelRelationships(Collections.singletonList(relationship));
+
+		dto.setObservationUnitPosition(observationUnitPosition);
+
+		final List<ObservationUnitDto> observationUnitDtoList =
+			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Collections.singletonList(dto));
+
+		Assert.assertEquals(1, observationUnitDtoList.size());
+		final ObservationUnitDto observationUnitDto = observationUnitDtoList.get(0);
+		Assert.assertEquals(dto.getProgramDbId(), observationUnitDto.getProgramDbId());
+		Assert.assertEquals(dto.getTrialDbId(), observationUnitDto.getTrialDbId());
+		Assert.assertEquals(dto.getStudyDbId(), observationUnitDto.getStudyDbId());
+		Assert.assertEquals(dto.getGermplasmDbId(), observationUnitDto.getGermplasmDbId());
+		Assert.assertTrue(
+			observationUnitPosition.getEntryType().equalsIgnoreCase(observationUnitDto.getObservationUnitPosition().getEntryType()));
+		Assert.assertTrue(CollectionUtils.isEmpty(observationUnitDto.getObservationUnitPosition().getObservationLevelRelationships()));
+	}
+
+	@Test
+	public void testImportObservationUnits_WithValidVariableHavingInvalidVariableValue() {
+		final ObservationUnitImportRequestDto dto = new ObservationUnitImportRequestDto();
+		dto.setTrialDbId(this.studySummary.getTrialDbId().toString());
+		dto.setStudyDbId(this.studyInstanceDto.getStudyDbId());
+		dto.setProgramDbId(this.commonTestProject.getUniqueID());
+		dto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
+
+		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
+		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
+
+		final CVTerm numericVariable =
+			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL);
+		final ObservationLevelRelationship relationship = new ObservationLevelRelationship();
+		relationship.setLevelCode("NON NUMERIC VALUE");
+		relationship.setLevelName(numericVariable.getName());
+		observationUnitPosition.setObservationLevelRelationships(Collections.singletonList(relationship));
+
+		dto.setObservationUnitPosition(observationUnitPosition);
+
+		final List<ObservationUnitDto> observationUnitDtoList =
+			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Collections.singletonList(dto));
+
+		Assert.assertEquals(1, observationUnitDtoList.size());
+		final ObservationUnitDto observationUnitDto = observationUnitDtoList.get(0);
+		Assert.assertEquals(dto.getProgramDbId(), observationUnitDto.getProgramDbId());
+		Assert.assertEquals(dto.getTrialDbId(), observationUnitDto.getTrialDbId());
+		Assert.assertEquals(dto.getStudyDbId(), observationUnitDto.getStudyDbId());
+		Assert.assertEquals(dto.getGermplasmDbId(), observationUnitDto.getGermplasmDbId());
+		Assert.assertTrue(
+			observationUnitPosition.getEntryType().equalsIgnoreCase(observationUnitDto.getObservationUnitPosition().getEntryType()));
+		Assert.assertTrue(CollectionUtils.isEmpty(observationUnitDto.getObservationUnitPosition().getObservationLevelRelationships()));
+	}
+
+	@Test
+	public void testImportObservationUnits_WithValidVariableHavingInvalidVariable() {
+		final ObservationUnitImportRequestDto dto = new ObservationUnitImportRequestDto();
+		dto.setTrialDbId(this.studySummary.getTrialDbId().toString());
+		dto.setStudyDbId(this.studyInstanceDto.getStudyDbId());
+		dto.setProgramDbId(this.commonTestProject.getUniqueID());
+		dto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
+
+		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
+		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
+
+		final ObservationLevelRelationship relationship = new ObservationLevelRelationship();
+		relationship.setLevelCode("NON NUMERIC VALUE");
+		relationship.setLevelName(RandomStringUtils.randomAlphabetic(20));
+		observationUnitPosition.setObservationLevelRelationships(Collections.singletonList(relationship));
+
+		dto.setObservationUnitPosition(observationUnitPosition);
+
+		final List<ObservationUnitDto> observationUnitDtoList =
+			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Collections.singletonList(dto));
+
+		Assert.assertEquals(1, observationUnitDtoList.size());
+		final ObservationUnitDto observationUnitDto = observationUnitDtoList.get(0);
+		Assert.assertEquals(dto.getProgramDbId(), observationUnitDto.getProgramDbId());
+		Assert.assertEquals(dto.getTrialDbId(), observationUnitDto.getTrialDbId());
+		Assert.assertEquals(dto.getStudyDbId(), observationUnitDto.getStudyDbId());
+		Assert.assertEquals(dto.getGermplasmDbId(), observationUnitDto.getGermplasmDbId());
+		Assert.assertTrue(
+			observationUnitPosition.getEntryType().equalsIgnoreCase(observationUnitDto.getObservationUnitPosition().getEntryType()));
+		Assert.assertTrue(CollectionUtils.isEmpty(observationUnitDto.getObservationUnitPosition().getObservationLevelRelationships()));
 	}
 
 }
