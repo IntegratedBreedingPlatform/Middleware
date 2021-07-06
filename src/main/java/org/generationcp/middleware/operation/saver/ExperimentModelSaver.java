@@ -35,9 +35,9 @@ import java.util.List;
 @Transactional
 public class ExperimentModelSaver {
 
-	private DaoFactory daoFactory;
-	private PhenotypeSaver phenotypeSaver;
-	private GeolocationSaver geolocationSaver;
+	private final DaoFactory daoFactory;
+	private final PhenotypeSaver phenotypeSaver;
+	private final GeolocationSaver geolocationSaver;
 
 	public ExperimentModelSaver(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);

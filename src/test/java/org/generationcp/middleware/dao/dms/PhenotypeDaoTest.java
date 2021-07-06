@@ -76,7 +76,7 @@ public class PhenotypeDaoTest {
 		this.dao.getObservationForTraitOnGermplasms(traitIds, germplasmIds, environmentIds);
 
 		final String expectedSql = this.getObservationsForTraitMainQuery() + " AND s.dbxref_id IN (:germplasmIds) "
-				+ "ORDER BY p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value ";
+			+ "ORDER BY p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
@@ -94,7 +94,7 @@ public class PhenotypeDaoTest {
 		this.dao.getObservationForTraits(traitIds, environmentIds, start, numOfRows);
 
 		final String expectedSql = this.getObservationsForTraitMainQuery()
-				+ "ORDER BY p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value ";
+			+ "ORDER BY p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
@@ -112,10 +112,10 @@ public class PhenotypeDaoTest {
 		final long count = this.dao.countObservationForTraits(traitIds, environmentIds);
 
 		final String expectedSql = "SELECT COUNT(*) " + "FROM nd_experiment e "
-				+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
-				+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id "
-				+ "WHERE e.nd_geolocation_id IN (:environmentIds) "
-				+ "AND p.observable_id IN (:traitIds) ";
+			+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
+			+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id "
+			+ "WHERE e.nd_geolocation_id IN (:environmentIds) "
+			+ "AND p.observable_id IN (:traitIds) ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
@@ -131,12 +131,12 @@ public class PhenotypeDaoTest {
 		this.dao.getNumericTraitInfoList(environmentIds, traitIds);
 
 		final String expectedSql = "SELECT p.observable_id, " + "COUNT(DISTINCT e.nd_geolocation_id) AS location_count, "
-				+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
-				+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count , "
-				+ "IF (MIN(p.value * 1) IS NULL, 0, MIN(p.value * 1))  AS min_value, "
-				+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value " + "FROM phenotype p "
-				+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-				+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
+			+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
+			+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count , "
+			+ "IF (MIN(p.value * 1) IS NULL, 0, MIN(p.value * 1))  AS min_value, "
+			+ "IF (MAX(p.value * 1) IS NULL, 0, MAX(p.value * 1)) AS max_value " + "FROM phenotype p "
+			+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
+			+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
 			+ "    AND p.observable_id IN (:numericVariableIds) "
 			+ "    AND p.value IS NOT NULL "
 			+ "GROUP by p.observable_id ";
@@ -154,10 +154,10 @@ public class PhenotypeDaoTest {
 		this.dao.getTraitInfoCounts(environmentIds, traitIds);
 
 		final String expectedSql = "SELECT p.observable_id, " + "COUNT(DISTINCT e.nd_geolocation_id) AS location_count, "
-				+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
-				+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
-				+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-				+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
+			+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
+			+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
+			+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
+			+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
 			+ "    AND p.observable_id IN (:variableIds) "
 			+ "	   AND p.value IS NOT NULL "
 			+ "GROUP by p.observable_id ";
@@ -174,12 +174,12 @@ public class PhenotypeDaoTest {
 		this.dao.getTraitInfoCounts(environmentIds);
 
 		final String expectedSql = "SELECT p.observable_id, " + "COUNT(DISTINCT e.nd_geolocation_id) AS location_count, "
-				+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
-				+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
-				+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
-				+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
+			+ "COUNT(DISTINCT s.dbxref_id) AS germplasm_count, "
+			+ "COUNT(DISTINCT e.nd_experiment_id) AS observation_count " + "FROM phenotype p "
+			+ "    INNER JOIN nd_experiment e ON e.nd_experiment_id = p.nd_experiment_id "
+			+ "    INNER JOIN stock s ON e.stock_id = s.stock_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
 			+ "	   AND p.value IS NOT NULL "
-				+ "GROUP by p.observable_id ";
+			+ "GROUP by p.observable_id ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
@@ -195,9 +195,9 @@ public class PhenotypeDaoTest {
 
 		Mockito.verify(this.session).flush();
 		final String updateSql = "UPDATE phenotype pheno "
-				+ "SET pheno.value = '" + value + "'"
-				+ " WHERE pheno.nd_experiment_id = " + projectId
-				+ " AND pheno.observable_id = " + cvTermId;
+			+ "SET pheno.value = '" + value + "'"
+			+ " WHERE pheno.nd_experiment_id = " + projectId
+			+ " AND pheno.observable_id = " + cvTermId;
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(updateSql, sqlCaptor.getValue());
@@ -254,23 +254,23 @@ public class PhenotypeDaoTest {
 
 	private String getContainsAtLeast2CommonEntriesQuery(final Integer projectId, final Integer locationId, final String germplasmGroupBy) {
 		return " SELECT phenotype.observable_id,count(phenotype.observable_id) "
-		+ " FROM nd_experiment nd_exp "
-		+ " INNER JOIN stock ON nd_exp.stock_id = stock.stock_id "
-		+ " LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id  where nd_exp.project_id = "
-		+ projectId + " and nd_exp.nd_geolocation_id = " + locationId
-		+ " and ((phenotype.value <> '' and phenotype.value is not null) or "
-		+ " (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null))  group by nd_exp.nd_geolocation_id, "
-		+ germplasmGroupBy + " , phenotype.observable_id "
-		+ " having count(phenotype.observable_id) >= 2 LIMIT 1 ";
+			+ " FROM nd_experiment nd_exp "
+			+ " INNER JOIN stock ON nd_exp.stock_id = stock.stock_id "
+			+ " LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id  where nd_exp.project_id = "
+			+ projectId + " and nd_exp.nd_geolocation_id = " + locationId
+			+ " and ((phenotype.value <> '' and phenotype.value is not null) or "
+			+ " (phenotype.cvalue_id <> '' and phenotype.cvalue_id is not null))  group by nd_exp.nd_geolocation_id, "
+			+ germplasmGroupBy + " , phenotype.observable_id "
+			+ " having count(phenotype.observable_id) >= 2 LIMIT 1 ";
 	}
+
 	private String getObservationsForTraitMainQuery() {
 		return "SELECT p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value "
-				+ "FROM nd_experiment e "
-				+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
-				+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
+			+ "FROM nd_experiment e "
+			+ "INNER JOIN stock s ON e.stock_id = s.stock_id "
+			+ "INNER JOIN phenotype p ON e.nd_experiment_id = p.nd_experiment_id " + "WHERE e.nd_geolocation_id IN (:environmentIds) "
 			+ "AND p.observable_id IN (:traitIds) "
 			+ "AND p.value IS NOT NULL ";
 	}
-
 
 }

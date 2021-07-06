@@ -612,7 +612,8 @@ public class DatasetServiceImplTest {
 		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
 		Mockito.verify(this.dmsProjectDao).getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
-		Mockito.verify(this.obsUnitsSearchDao).getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class), Mockito.any(PageRequest.class));
+		Mockito.verify(this.obsUnitsSearchDao)
+			.getObservationUnitTable(Mockito.any(ObservationUnitsSearchDTO.class), Mockito.any(PageRequest.class));
 
 	}
 

@@ -3,7 +3,6 @@ package org.generationcp.middleware.dao;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ExperimentExternalReference;
-import org.generationcp.middleware.pojos.InstanceExternalReference;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.AliasToBeanResultTransformer;

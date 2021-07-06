@@ -29,7 +29,7 @@ public class ObservationUnitImportRequestDto {
 	private String trialName;
 
 	public Map<String, String> getAdditionalInfo() {
-		return additionalInfo;
+		return this.additionalInfo;
 	}
 
 	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
@@ -37,7 +37,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public List<ExternalReferenceDTO> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
 	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
@@ -45,7 +45,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public String getGermplasmDbId() {
-		return germplasmDbId;
+		return this.germplasmDbId;
 	}
 
 	public void setGermplasmDbId(final String germplasmDbId) {
@@ -53,7 +53,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public String getGermplasmName() {
-		return germplasmName;
+		return this.germplasmName;
 	}
 
 	public void setGermplasmName(final String germplasmName) {
@@ -61,7 +61,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public String getLocationDbId() {
-		return locationDbId;
+		return this.locationDbId;
 	}
 
 	public void setLocationDbId(final String locationDbId) {
@@ -69,7 +69,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public String getLocationName() {
-		return locationName;
+		return this.locationName;
 	}
 
 	public void setLocationName(final String locationName) {
@@ -77,7 +77,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public String getObservationUnitName() {
-		return observationUnitName;
+		return this.observationUnitName;
 	}
 
 	public void setObservationUnitName(final String observationUnitName) {
@@ -85,7 +85,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public String getObservationUnitPUI() {
-		return observationUnitPUI;
+		return this.observationUnitPUI;
 	}
 
 	public void setObservationUnitPUI(final String observationUnitPUI) {
@@ -93,7 +93,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public ObservationUnitPosition getObservationUnitPosition() {
-		return observationUnitPosition;
+		return this.observationUnitPosition;
 	}
 
 	public void setObservationUnitPosition(final ObservationUnitPosition observationUnitPosition) {
@@ -101,7 +101,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public String getProgramDbId() {
-		return programDbId;
+		return this.programDbId;
 	}
 
 	public void setProgramDbId(final String programDbId) {
@@ -109,7 +109,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public String getProgramName() {
-		return programName;
+		return this.programName;
 	}
 
 	public void setProgramName(final String programName) {
@@ -117,7 +117,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public String getSeedLotDbId() {
-		return seedLotDbId;
+		return this.seedLotDbId;
 	}
 
 	public void setSeedLotDbId(final String seedLotDbId) {
@@ -125,7 +125,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public String getStudyDbId() {
-		return studyDbId;
+		return this.studyDbId;
 	}
 
 	public void setStudyDbId(final String studyDbId) {
@@ -133,7 +133,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public String getStudyName() {
-		return studyName;
+		return this.studyName;
 	}
 
 	public void setStudyName(final String studyName) {
@@ -141,7 +141,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public List<Treatment> getTreatments() {
-		return treatments;
+		return this.treatments;
 	}
 
 	public void setTreatments(final List<Treatment> treatments) {
@@ -149,7 +149,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public String getTrialDbId() {
-		return trialDbId;
+		return this.trialDbId;
 	}
 
 	public void setTrialDbId(final String trialDbId) {
@@ -157,7 +157,7 @@ public class ObservationUnitImportRequestDto {
 	}
 
 	public String getTrialName() {
-		return trialName;
+		return this.trialName;
 	}
 
 	public void setTrialName(final String trialName) {

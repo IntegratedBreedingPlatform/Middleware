@@ -16,7 +16,7 @@ public class ObservationLevelRelationship {
 	}
 
 	public String getLevelCode() {
-		return levelCode;
+		return this.levelCode;
 	}
 
 	public void setLevelCode(final String levelCode) {
@@ -24,7 +24,7 @@ public class ObservationLevelRelationship {
 	}
 
 	public String getLevelName() {
-		return levelName;
+		return this.levelName;
 	}
 
 	public void setLevelName(final String levelName) {
@@ -32,7 +32,7 @@ public class ObservationLevelRelationship {
 	}
 
 	public Integer getLevelOrder() {
-		return levelOrder;
+		return this.levelOrder;
 	}
 
 	public void setLevelOrder(final Integer levelOrder) {

@@ -418,7 +418,7 @@ public class ObservationUnitDto {
 	}
 
 	public String getSeedLotDbId() {
-		return seedLotDbId;
+		return this.seedLotDbId;
 	}
 
 	public void setSeedLotDbId(final String seedLotDbId) {
@@ -426,7 +426,7 @@ public class ObservationUnitDto {
 	}
 
 	public Integer getExperimentId() {
-		return experimentId;
+		return this.experimentId;
 	}
 
 	public void setExperimentId(final Integer experimentId) {

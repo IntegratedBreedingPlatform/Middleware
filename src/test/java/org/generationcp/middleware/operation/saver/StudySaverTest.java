@@ -14,7 +14,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class StudySaverTest extends IntegrationTestBase {
-	private static final String CROP_PREFIX =  RandomStringUtils.randomAlphanumeric(5);
+
+	private static final String CROP_PREFIX = RandomStringUtils.randomAlphanumeric(5);
 
 	private StudySaver studySaver;
 	private ExperimentModelSaver experimentModelSaver;

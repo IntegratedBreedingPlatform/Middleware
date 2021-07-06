@@ -4,8 +4,6 @@ package org.generationcp.middleware.service.api.study;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
-import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;

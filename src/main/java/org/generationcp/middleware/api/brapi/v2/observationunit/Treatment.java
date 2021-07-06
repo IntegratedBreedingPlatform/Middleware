@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.brapi.v2.observationunit;
 
 public class Treatment {
+
 	private String factor;
 	private String modality;
 

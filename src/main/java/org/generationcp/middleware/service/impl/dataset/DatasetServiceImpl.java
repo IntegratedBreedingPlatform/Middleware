@@ -155,7 +155,8 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getObservationSetColumns(final Integer studyId, final Integer observationSetId, final Boolean draftMode) {
+	public List<MeasurementVariable> getObservationSetColumns(final Integer studyId, final Integer observationSetId,
+		final Boolean draftMode) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
 		final List<MeasurementVariable> factorColumns;
 		final DatasetDTO datasetDTO = this.getDataset(observationSetId);
@@ -166,7 +167,7 @@ public class DatasetServiceImpl implements DatasetService {
 				.getObservationSetVariables(observationSetId, PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
 			//STOCK ID
 			final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
-			transactionsSearchDto.setTransactionStatus(Arrays.asList(0,1));
+			transactionsSearchDto.setTransactionStatus(Arrays.asList(0, 1));
 			transactionsSearchDto.setPlantingStudyIds(Arrays.asList(studyId));
 			if (this.daoFactory.getTransactionDAO().countSearchTransactions(transactionsSearchDto) > 0) {
 				final Optional<MeasurementVariable>
@@ -214,7 +215,7 @@ public class DatasetServiceImpl implements DatasetService {
 		if (this.daoFactory.getSampleDao().countByDatasetId(observationSetId) > 0) {
 			// Set the the variable name of this virtual Sample Column to SUM_OF_SAMPLES, to match
 			// the Sample field name in observation query.
-			factorColumns.add(this.addTermIdColumn(TermId.SAMPLES,null,SUM_OF_SAMPLES, true));
+			factorColumns.add(this.addTermIdColumn(TermId.SAMPLES, null, SUM_OF_SAMPLES, true));
 		}
 
 		// Other edge cases
@@ -231,7 +232,8 @@ public class DatasetServiceImpl implements DatasetService {
 		return factorColumns;
 	}
 
-	private MeasurementVariable addTermIdColumn(final TermId TermId, final VariableType VariableType, final String name, final boolean factor) {
+	private MeasurementVariable addTermIdColumn(final TermId TermId, final VariableType VariableType, final String name,
+		final boolean factor) {
 		final MeasurementVariable MeasurementVariable = new MeasurementVariable();
 		MeasurementVariable.setName(StringUtils.isBlank(name) ? TermId.name() : name);
 		MeasurementVariable.setAlias(TermId.name());

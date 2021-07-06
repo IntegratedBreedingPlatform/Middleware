@@ -34,7 +34,7 @@ public class ObservationUnitPosition {
 	}
 
 	public String getObservationLevel() {
-		return observationLevel;
+		return this.observationLevel;
 	}
 
 	public void setObservationLevel(final String observationLevel) {
@@ -42,7 +42,7 @@ public class ObservationUnitPosition {
 	}
 
 	public List<ObservationLevelRelationship> getObservationLevelRelationships() {
-		return observationLevelRelationships;
+		return this.observationLevelRelationships;
 	}
 
 	public void setObservationLevelRelationships(

@@ -58,7 +58,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ObservationUnitServiceImpl.class);
 
-	private ObjectMapper jacksonMapper;
+	private final ObjectMapper jacksonMapper;
 
 	@Resource
 	private GermplasmService germplasmService;
@@ -116,7 +116,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final Map<Integer, List<ObservationLevelRelationship>> obsevationRelationshipsMap =
 			this.daoFactory.getExperimentPropertyDao().getObservationLevelRelationshipMap(experimentIds);
 
-		for(final ObservationUnitDto dto: dtos){
+		for (final ObservationUnitDto dto : dtos) {
 			dto.setExternalReferences(externalReferencesMap.get(dto.getExperimentId().toString()));
 			dto.getObservationUnitPosition().setObservationLevelRelationships(obsevationRelationshipsMap.get(dto.getExperimentId()));
 		}
@@ -219,12 +219,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	}
 
 	private void setJsonProps(final ExperimentModel model, final ObservationUnitImportRequestDto dto) {
-		if(dto.getObservationUnitPosition().getGeoCoordinates() != null) {
+		if (dto.getObservationUnitPosition().getGeoCoordinates() != null) {
 			try {
 				final Map<String, Object> propsMap = new HashMap<>();
 				propsMap.put("geoCoordinates", dto.getObservationUnitPosition().getGeoCoordinates());
 				model.setJsonProps(this.jacksonMapper.writeValueAsString(propsMap));
-			} catch (JsonProcessingException e) {
+			} catch (final JsonProcessingException e) {
 				// Just ignore if there's an issue with mapping
 				model.setJsonProps(null);
 			}
@@ -237,7 +237,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final List<ExperimentProperty> properties = new ArrayList<>();
 		final ObservationUnitPosition position = dto.getObservationUnitPosition();
 		if (!CollectionUtils.isEmpty(position.getObservationLevelRelationships())) {
-			for (ObservationLevelRelationship levelRelationship : position.getObservationLevelRelationships()) {
+			for (final ObservationLevelRelationship levelRelationship : position.getObservationLevelRelationships()) {
 				final String variableName = levelRelationship.getLevelName().toUpperCase();
 				final MeasurementVariable measurementVariable =
 					variableNamesMap.containsKey(variableName) ? variableNamesMap.get(variableName) : variableSynonymsMap.get(variableName);
@@ -282,7 +282,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final ObservationUnitPosition position = dto.getObservationUnitPosition();
 		final Integer trialDbId = Integer.valueOf(dto.getTrialDbId());
 		if (!CollectionUtils.isEmpty(position.getObservationLevelRelationships())) {
-			for (ObservationLevelRelationship levelRelationship : position.getObservationLevelRelationships()) {
+			for (final ObservationLevelRelationship levelRelationship : position.getObservationLevelRelationships()) {
 				final String variableName = levelRelationship.getLevelName().toUpperCase();
 				final MeasurementVariable measurementVariable =
 					variableNamesMap.containsKey(variableName) ? variableNamesMap.get(variableName) : variableSynonymsMap.get(variableName);
@@ -319,7 +319,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	private Map<Integer, List<Integer>> populatePlotExperimentVariablesMap(final Map<Integer, DmsProject> plotDatasetMap) {
 		final Map<Integer, List<Integer>> plotExperimentVariablesMap = new HashMap<>();
-		for (Map.Entry plotDatasetEntry : plotDatasetMap.entrySet()) {
+		for (final Map.Entry plotDatasetEntry : plotDatasetMap.entrySet()) {
 			final Integer key = (Integer) plotDatasetEntry.getKey();
 			final DmsProject plotDataset = (DmsProject) plotDatasetEntry.getValue();
 			plotExperimentVariablesMap.put(key,
@@ -340,7 +340,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	private Map<Integer, List<String>> convertToGermplasmUUIDs(final Map<Integer, List<StockModel>> stockMap) {
 		final Map<Integer, List<String>> trialIdGermplasmUUIDMap = new HashMap<>();
-		for (Map.Entry mapElement : stockMap.entrySet()) {
+		for (final Map.Entry mapElement : stockMap.entrySet()) {
 			final Integer key = (Integer) mapElement.getKey();
 			final List<StockModel> stocks = (List<StockModel>) mapElement.getValue();
 			trialIdGermplasmUUIDMap.put(key, stocks.stream().map(s -> s.getGermplasm().getGermplasmUUID()).collect(Collectors.toList()));
@@ -351,9 +351,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	private StockModel createStockModel(final GermplasmDTO germplasmDTO, final Map<Integer, List<StockModel>> stockMap,
 		final ObservationUnitImportRequestDto dto, final Integer trialDbId, final Map<String, Integer> entryTypes) {
 		final StockModel stockModel = new StockModel();
-		final Integer entryNo = !stockMap.containsKey(trialDbId) ? 1 : stockMap.get(trialDbId).size() + 1;
-		stockModel.setUniqueName(entryNo.toString());
-		stockModel.setValue(entryNo.toString());
+		final int entryNo = !stockMap.containsKey(trialDbId) ? 1 : stockMap.get(trialDbId).size() + 1;
+		stockModel.setUniqueName(Integer.toString(entryNo));
+		stockModel.setValue(Integer.toString(entryNo));
 		stockModel.setName(germplasmDTO.getGermplasmName());
 		stockModel.setProject(new DmsProject(Integer.valueOf(dto.getTrialDbId())));
 		stockModel.setIsObsolete(false);

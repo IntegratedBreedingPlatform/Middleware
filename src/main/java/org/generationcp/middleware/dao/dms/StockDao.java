@@ -34,7 +34,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.CriteriaQuery;
-import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
@@ -54,12 +53,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link StockModel}.
- *
  */
 public class StockDao extends GenericDAO<StockModel, Integer> {
 
@@ -68,12 +64,13 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(StockDao.class);
 	private static final String IN_STOCK_DAO = " in StockDao: ";
-	private static final Map<String, String> factorsFilterMap = new HashMap(){{
+	private static final Map<String, String> factorsFilterMap = new HashMap() {{
 		this.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
 		this.put(String.valueOf(TermId.DESIG.getId()), "s.name");
 		this.put(String.valueOf(TermId.ENTRY_NO.getId()), "uniquename");
-		this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), "EXISTS (SELECT 1 FROM ims_lot l1 WHERE l1.eid = s.dbxref_id and l1.status = " +
-			LotStatus.ACTIVE.getIntValue() + " HAVING COUNT(l1.lotid)");
+		this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()),
+			"EXISTS (SELECT 1 FROM ims_lot l1 WHERE l1.eid = s.dbxref_id and l1.status = " +
+				LotStatus.ACTIVE.getIntValue() + " HAVING COUNT(l1.lotid)");
 		this.put(String.valueOf(TermId.GID_UNIT.getId()), "EXISTS("
 			+ "select l1.eid, IF(COUNT(DISTINCT IFNULL(l1.scaleid, 'null')) = 1, IFNULL(c1.name, '-'), 'Mixed') as unit1 "
 			+ "             from  stock s1"
@@ -85,7 +82,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	static final String DBXREF_ID = "dbxrefId";
 
 	@SuppressWarnings("unchecked")
-	public List<Integer> getStockIdsByProperty(final String columnName, final String value)  {
+	public List<Integer> getStockIdsByProperty(final String columnName, final String value) {
 		final List<Integer> stockIds;
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -106,13 +103,13 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockIds;
 	}
 
-	public long countStudiesByGid(final int gid)  {
+	public long countStudiesByGid(final int gid) {
 
 		try {
 			final SQLQuery query = this.getSession()
-					.createSQLQuery("select count(distinct p.project_id) " + "FROM stock s "
-							+ "INNER JOIN project p ON s.project_id = p.project_id " + "WHERE s.dbxref_id = " + gid
-							+ " AND p.deleted = 0");
+				.createSQLQuery("select count(distinct p.project_id) " + "FROM stock s "
+					+ "INNER JOIN project p ON s.project_id = p.project_id " + "WHERE s.dbxref_id = " + gid
+					+ " AND p.deleted = 0");
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
@@ -143,15 +140,15 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		try {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("select distinct p.project_id, p.name, p.description, "
-				+ "st.study_type_id, st.label, st.name as studyTypeName, st.visible, st.cvterm_id, p.program_uuid, p.locked, "
-				+ "p.created_by "
-				+ "FROM stock s "
-				+ "INNER JOIN project p ON s.project_id = p.project_id "
-				+ "INNER JOIN study_type st ON p.study_type_id = st.study_type_id "
-				+ " WHERE s.dbxref_id = " + gid + " AND p.deleted = 0");
+					+ "st.study_type_id, st.label, st.name as studyTypeName, st.visible, st.cvterm_id, p.program_uuid, p.locked, "
+					+ "p.created_by "
+					+ "FROM stock s "
+					+ "INNER JOIN project p ON s.project_id = p.project_id "
+					+ "INNER JOIN study_type st ON p.study_type_id = st.study_type_id "
+					+ " WHERE s.dbxref_id = " + gid + " AND p.deleted = 0");
 			query.addScalar("project_id").addScalar("name").addScalar("description").addScalar("study_type_id").addScalar("label")
-					.addScalar("studyTypeName").addScalar("visible").addScalar("cvterm_id").addScalar("program_uuid").addScalar("locked")
-					.addScalar("created_by");
+				.addScalar("studyTypeName").addScalar("visible").addScalar("cvterm_id").addScalar("program_uuid").addScalar("locked")
+				.addScalar("created_by");
 
 			final List<Object[]> results = query.list();
 			for (final Object[] row : results) {
@@ -169,7 +166,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 				final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvtermId, visible);
 				studyReferences.add(new StudyReference((Integer) row[0], (String) row[1], (String) row[2], programUUID, studyTypeDto,
-						isLocked, Integer.valueOf(ownerId)));
+					isLocked, Integer.valueOf(ownerId)));
 			}
 
 		} catch (final HibernateException e) {
@@ -186,6 +183,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			criteria.add(Restrictions.eq("project.projectId", studyId));
 			// Return by ascending order of entry number. We need to perform cast first on uniquename since it's stored as string
 			criteria.addOrder(new org.hibernate.criterion.Order("uniquename", true) {
+
 				@Override
 				public String toSqlString(final Criteria criteria, final CriteriaQuery criteriaQuery) throws HibernateException {
 					return "CAST(uniquename AS UNSIGNED)";
@@ -211,7 +209,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
-	public long countFilteredStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter){
+	public long countFilteredStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter) {
 		try {
 			final StringBuilder sqlQuery = new StringBuilder("select COUNT(DISTINCT S.stock_id) as totalStudyEntries ");
 			sqlQuery.append(" FROM stock s "
@@ -230,7 +228,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 			return (Integer) query.uniqueResult();
 		} catch (final HibernateException e) {
-			final String errorMessage = "Unexpected error in executing totalStudyEntries(studyId = %s)" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
+			final String errorMessage =
+				"Unexpected error in executing totalStudyEntries(studyId = %s)" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -319,7 +318,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return ((Long) criteria.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error with countStocksByStudyAndEntryTypeIds(studyId=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
+			final String errorMessage =
+				"Error with countStocksByStudyAndEntryTypeIds(studyId=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -329,10 +329,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		try {
 
 			final String sql = "select count(distinct e.stock_id) "
-					+ "from nd_experiment e, phenotype p "
-					+ "where e.nd_experiment_id = p.nd_experiment_id  "
-					+ "  and e.nd_geolocation_id = " + trialEnvironmentId + "  and p.observable_id = " + variateStdVarId
-					+ "  and e.project_id = " + datasetId;
+				+ "from nd_experiment e, phenotype p "
+				+ "where e.nd_experiment_id = p.nd_experiment_id  "
+				+ "  and e.nd_geolocation_id = " + trialEnvironmentId + "  and p.observable_id = " + variateStdVarId
+				+ "  and e.project_id = " + datasetId;
 			final Query query = this.getSession().createSQLQuery(sql);
 
 			return ((BigInteger) query.uniqueResult()).longValue();
@@ -345,7 +345,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, StockModel> getStocksByIds(final List<Integer> ids)  {
+	public Map<Integer, StockModel> getStocksByIds(final List<Integer> ids) {
 		final Map<Integer, StockModel> stockModels = new HashMap<>();
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
@@ -366,13 +366,14 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, List<StockModel>> getStockMapByStudyIds(final List<Integer> studyIds)  {
+	public Map<Integer, List<StockModel>> getStockMapByStudyIds(final List<Integer> studyIds) {
 		try {
 
 			final Map<Integer, List<StockModel>> stockMap = new HashMap<>();
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
 			criteria.add(Restrictions.in("project.projectId", studyIds));
 			criteria.addOrder(new org.hibernate.criterion.Order("uniquename", true) {
+
 				@Override
 				public String toSqlString(final Criteria criteria, final CriteriaQuery criteriaQuery) throws HibernateException {
 					return "CAST(uniquename AS UNSIGNED)";
@@ -380,7 +381,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			});
 
 			final List<StockModel> stocks = criteria.list();
-			for(final StockModel stockModel: stocks) {
+			for (final StockModel stockModel : stocks) {
 				stockMap.putIfAbsent(stockModel.getProject().getProjectId(), new ArrayList<>());
 				stockMap.get(stockModel.getProject().getProjectId()).add(stockModel);
 			}
@@ -397,14 +398,15 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	public Map<Integer, StudyEntryDto> getPlotEntriesMap(final Integer studyId, final Set<Integer> plotNos) {
 		try {
 
-			final String queryString = "select distinct(nd_ep.value) AS position, s.stock_id AS entryId, s.name AS designation, s.dbxref_id AS germplasmId "
-				+ " FROM nd_experiment e "
-				+ " INNER JOIN nd_experimentprop nd_ep ON e.nd_experiment_id = nd_ep.nd_experiment_id AND nd_ep.type_id IN (:PLOT_NO_TERM_IDS)"
-				+ " INNER JOIN stock s ON s.stock_id = e.stock_id "
-				+ " INNER JOIN project p ON e.project_id = p.project_id "
-				+ " WHERE p.dataset_type_id = :DATASET_TYPE "
-				+ " AND p.study_id = :STUDY_ID "
-				+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id ";
+			final String queryString =
+				"select distinct(nd_ep.value) AS position, s.stock_id AS entryId, s.name AS designation, s.dbxref_id AS germplasmId "
+					+ " FROM nd_experiment e "
+					+ " INNER JOIN nd_experimentprop nd_ep ON e.nd_experiment_id = nd_ep.nd_experiment_id AND nd_ep.type_id IN (:PLOT_NO_TERM_IDS)"
+					+ " INNER JOIN stock s ON s.stock_id = e.stock_id "
+					+ " INNER JOIN project p ON e.project_id = p.project_id "
+					+ " WHERE p.dataset_type_id = :DATASET_TYPE "
+					+ " AND p.study_id = :STUDY_ID "
+					+ " AND nd_ep.nd_experiment_id = e.nd_experiment_id ";
 
 			final StringBuilder sb = new StringBuilder(queryString);
 			if (!CollectionUtils.isEmpty(plotNos)) {
@@ -417,12 +419,11 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			}
 			query.setParameter("DATASET_TYPE", DatasetTypeEnum.PLOT_DATA.getId());
 			query.setParameterList("PLOT_NO_TERM_IDS",
-				new Integer[] { TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId() });
+				new Integer[] {TermId.PLOT_NO.getId(), TermId.PLOT_NNO.getId()});
 			query.addScalar("position", new IntegerType());
 			query.addScalar("entryId", new IntegerType());
 			query.addScalar("designation", new StringType());
 			query.addScalar("germplasmId", new IntegerType());
-
 
 			final Map<Integer, StudyEntryDto> map = new HashMap<>();
 			final List<Object[]> results = query.list();
@@ -446,18 +447,21 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	public void replaceExperimentStocks(final Integer oldStockId, final Integer newStockId) {
 		try {
-			final Query query = this.getSession().createQuery("UPDATE ExperimentModel SET stock.stockId = :newStockId WHERE stock.stockId = :oldStockId");
+			final Query query =
+				this.getSession().createQuery("UPDATE ExperimentModel SET stock.stockId = :newStockId WHERE stock.stockId = :oldStockId");
 			query.setParameter("oldStockId", oldStockId);
 			query.setParameter("newStockId", newStockId);
 			query.executeUpdate();
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error in replaceExperimentStocks for oldStockId=" + oldStockId + ", newStockId=" + newStockId + StockDao.IN_STOCK_DAO + e.getMessage();
+			final String errorMessage =
+				"Error in replaceExperimentStocks for oldStockId=" + oldStockId + ", newStockId=" + newStockId + StockDao.IN_STOCK_DAO + e
+					.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
 
-	public List<Integer> getGermplasmUsedInStudies(final List<Integer> gids)  {
+	public List<Integer> getGermplasmUsedInStudies(final List<Integer> gids) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
 			criteria.createAlias("project", "project");
@@ -474,7 +478,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	public Integer getNextEntryNumber(final Integer studyId) {
 		try {
-			final String queryString = "SELECT IFNULL(MAX(Convert(s.uniquename, SIGNED)), 0) + 1 FROM stock s where s.project_id = :studyId";
+			final String queryString =
+				"SELECT IFNULL(MAX(Convert(s.uniquename, SIGNED)), 0) + 1 FROM stock s where s.project_id = :studyId";
 			final SQLQuery query = this.getSession().createSQLQuery(queryString);
 			query.setParameter("studyId", studyId);
 			return ((BigInteger) query.uniqueResult()).intValue();
@@ -493,9 +498,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "  s.name AS designation, "
 				+ "  s.value AS entryCode, "
 				+ "  COUNT(DISTINCT (l.lotid)) AS lotCount, "
-				+ "  IF(COUNT(DISTINCT IFNULL(l.scaleid, 'null')) = 1, IFNULL((SELECT SUM(CASE WHEN imt.trnstat = "+ TransactionStatus.CONFIRMED.getIntValue()
+				+ "  IF(COUNT(DISTINCT IFNULL(l.scaleid, 'null')) = 1, IFNULL((SELECT SUM(CASE WHEN imt.trnstat = "
+				+ TransactionStatus.CONFIRMED.getIntValue()
 				+ "  OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue()
-				+  " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) "
+				+ " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) "
 				+ "  FROM ims_transaction imt INNER JOIN ims_lot lo ON lo.lotid = imt.lotid WHERE lo.eid = l.eid),0), 'Mixed') AS availableBalance, "
 				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, IFNULL(c.name,'-'), 'Mixed') AS unit ");
 
@@ -544,7 +550,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			query.setParameter("studyId", studyEntrySearchDto.getStudyId());
 			this.addQueryParamsToStudyEntries(query, studyEntrySearchDto.getFilter());
 
-
 			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
 			GenericDAO.addPaginationToSQLQuery(query, pageable);
 
@@ -584,7 +589,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			return studyEntryDtos;
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error at getStudyEntries=" + studyEntrySearchDto.getStudyId() + StockDao.IN_STOCK_DAO + e.getMessage();
+			final String errorMessage =
+				"Error at getStudyEntries=" + studyEntrySearchDto.getStudyId() + StockDao.IN_STOCK_DAO + e.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -686,7 +692,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmStudyDto.class));
 			return sqlQuery.list();
-		}catch (final HibernateException e) {
+		} catch (final HibernateException e) {
 			final String errorMessage = "Error at getGermplasmStudyDtos(gid=" + gid + ")" + StockDao.IN_STOCK_DAO + e.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);

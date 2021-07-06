@@ -1,4 +1,5 @@
 package org.generationcp.middleware.api.brapi.v2.observationunit;
+
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 

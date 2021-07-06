@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import org.apache.commons.collections.CollectionUtils;
-import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
 
