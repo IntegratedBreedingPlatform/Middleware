@@ -118,7 +118,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
 		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
 		observationUnitPosition.setPositionCoordinateX("1");
-		observationUnitPosition.setPositionCoordinateX("2");
+		observationUnitPosition.setPositionCoordinateY("2");
 		final ObservationLevelRelationship relationship = new ObservationLevelRelationship();
 		final CVTerm plotNoTerm = this.daoFactory.getCvTermDao().getById(TermId.PLOT_NO.getId());
 		relationship.setLevelCode("1");
