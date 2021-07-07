@@ -67,7 +67,7 @@
 		</sql>
 	</changeSet>
 
-	   <changeSet author="cuenyad" id="v18.2.0-3">
+	<changeSet author="cuenyad" id="v18.2.0-3">
       <preConditions onFail="MARK_RAN">
          <sqlCheck expectedResult="1">SELECT COUNT(*) FROM workbench_tool WHERE name = 'germplasm_import'</sqlCheck>
       </preConditions>
@@ -98,4 +98,5 @@
 			DELETE FROM workbench_tool WHERE name = 'list_manager';
 	  </sql>
    </changeSet>
+
 </databaseChangeLog>

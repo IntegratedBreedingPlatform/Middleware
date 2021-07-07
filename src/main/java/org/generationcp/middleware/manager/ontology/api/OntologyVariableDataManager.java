@@ -17,6 +17,7 @@ import java.util.List;
 import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableOverridesDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
@@ -88,7 +89,7 @@ public interface OntologyVariableDataManager {
 	 * @param variableId variableId for which to retrieve usage flag
 	 * @return boolean return true if variable is used else false
 	 */
-  	boolean isVariableUsedInStudy(final int variableId);
+  	boolean isVariableUsedInStudy(int variableId);
 
 	/**
 	 * This function will give boolean flag if variable is used in any breeding Methods or not
@@ -104,7 +105,9 @@ public interface OntologyVariableDataManager {
 
 	public List<VariableOverrides> getVariableOverridesByVariableIds(List<Integer> variableIds);
 
-	public VariableOverrides getVariableOverridesByVariableIdAndProgram(final Integer variableId, final String programUuid);
+	public VariableOverrides getVariableOverridesByVariableIdAndProgram(Integer variableId, String programUuid);
+
+	public List<VariableOverridesDto> getVariableOverridesByAliasAndProgram(String alias, String programUuid);
 
 	public List<VariableType> getVariableTypes(Integer variableId);
 
@@ -114,10 +117,10 @@ public interface OntologyVariableDataManager {
 
 	void fillVariableUsage(Variable variable);
 
-	List<VariableDTO> getVariablesByDatasetId(final Integer datasetId, final List<Integer> variableTypes,
-		final Integer pageSize, final Integer pageNumber);
+	List<VariableDTO> getVariablesByDatasetId(Integer datasetId, List<Integer> variableTypes,
+		Integer pageSize, Integer pageNumber);
 
-	long countVariablesByDatasetId(Integer datasetId, final List<Integer> variableTypes);
+	long countVariablesByDatasetId(Integer datasetId, List<Integer> variableTypes);
 
 	List<VariableDTO> getAllVariables(List<Integer> variableTypes,
 		String cropname, Integer pageSize, Integer pageNumber);
@@ -128,5 +131,5 @@ public interface OntologyVariableDataManager {
 
 	boolean hasUsage(int variableId);
 
-	public boolean hasVariableAttributeGermplasmDeleted(final int variableId);
+	public boolean hasVariableAttributeGermplasmDeleted(int variableId);
 }
