@@ -47,19 +47,21 @@ import java.util.List;
  * POJO for users table in Workbench Database.
  * It differs from users in crop dbs as there are no
  * users_roles and role table and therefore relation in crop DBs
- *
  */
-@NamedQueries({@NamedQuery(name = "getUserByNameUsingEqual", query = "SELECT s FROM WorkbenchUser s WHERE s.name = :name"),
-		@NamedQuery(name = "getUserByNameUsingLike", query = "SELECT s FROM WorkbenchUser s WHERE s.name LIKE :name"),
-		@NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name = :name"),
-		@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name LIKE :name"),
-		@NamedQuery(name = "getByFullName", query = "SELECT u FROM WorkbenchUser u, Person p WHERE u.status = 0 AND u.person.id = p.id AND "
-			+ "(CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)"),
-		@NamedQuery(name = "countByFullName", query = "SELECT COUNT(u) FROM WorkbenchUser u, Person p WHERE u.status = 0 AND u.person.id = p.id AND "
-		+ "(CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
+@NamedQueries({
+	@NamedQuery(name = "getUserByNameUsingEqual", query = "SELECT s FROM WorkbenchUser s WHERE s.name = :name"),
+	@NamedQuery(name = "getUserByNameUsingLike", query = "SELECT s FROM WorkbenchUser s WHERE s.name LIKE :name"),
+	@NamedQuery(name = "countUserByNameUsingEqual", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name = :name"),
+	@NamedQuery(name = "countUserByNameUsingLike", query = "SELECT COUNT(s) FROM WorkbenchUser s WHERE s.name LIKE :name"),
+	@NamedQuery(name = "getByFullName", query = "SELECT u FROM WorkbenchUser u, Person p WHERE u.status = 0 AND u.person.id = p.id AND "
+		+ "(CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)"),
+	@NamedQuery(name = "countByFullName", query =
+		"SELECT COUNT(u) FROM WorkbenchUser u, Person p WHERE u.status = 0 AND u.person.id = p.id AND "
+			+ "(CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
 
 })
-@NamedNativeQueries({@NamedNativeQuery(name = "getAllActiveUsersSorted", query = "SELECT u.* FROM users u, persons p "
+@NamedNativeQueries({
+	@NamedNativeQuery(name = "getAllActiveUsersSorted", query = "SELECT u.* FROM users u, persons p "
 		+ "WHERE u.personid = p.personid AND  u.ustatus = 0 ORDER BY fname, lname", resultClass = WorkbenchUser.class)})
 @Entity
 @Table(name = "users")
@@ -168,7 +170,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 	private Boolean isnew = false;
 
 	@OneToOne(fetch = FetchType.EAGER)
-	@JoinColumn(name="personid")
+	@JoinColumn(name = "personid")
 	@NotFound(action = NotFoundAction.IGNORE)
 	private Person person;
 
@@ -189,8 +191,9 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		this.userid = userid;
 	}
 
-	public WorkbenchUser(final Integer userid, final Integer instalid, final Integer status, final Integer access, final Integer type, final String name, final String password,
-			final Person person, final Integer adate, final Integer cdate) {
+	public WorkbenchUser(final Integer userid, final Integer instalid, final Integer status, final Integer access, final Integer type,
+		final String name, final String password,
+		final Person person, final Integer adate, final Integer cdate) {
 		super();
 		this.userid = userid;
 		this.instalid = instalid;
@@ -488,7 +491,8 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		}
 		if (this.hasInstanceRole() || (this.hasCropRole(cropName) && !this.hasProgramRoles(cropName)) || this.getRoles().stream()
 			.anyMatch(
-				ur -> ur.getRole().getRoleType().getId().equals(RoleType.PROGRAM.getId()) && ur.getCropType().getCropName().equalsIgnoreCase(cropName)
+				ur -> ur.getRole().getRoleType().getId().equals(RoleType.PROGRAM.getId()) && ur.getCropType().getCropName()
+					.equalsIgnoreCase(cropName)
 					&& ur.getWorkbenchProject().getProjectId().equals((programId)))) {
 			return true;
 		} else {
