@@ -96,12 +96,6 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		}
 	}
 
-	public UserDefinedField getByLocalFieldNo(final Integer lfldno) {
-		final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
-		criteria.add(Restrictions.eq("lfldno", lfldno));
-		return (UserDefinedField) criteria.uniqueResult();
-	}
-
 	public UserDefinedField getByTableTypeAndCode(final String table, final String type, final String code) {
 		try {
 			if (StringUtils.isNotBlank(table) && StringUtils.isNotBlank(type) && StringUtils.isNotBlank(code)) {
@@ -123,25 +117,6 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 		return null;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<UserDefinedField> getAttributeTypesByGIDList(final List<Integer> gidList) {
-		List<UserDefinedField> returnList = new ArrayList<>();
-		if (gidList != null && !gidList.isEmpty()) {
-			try {
-				final String sql = "SELECT DISTINCT {u.*}" + " FROM atributs a" + " INNER JOIN udflds u" + " WHERE a.atype=u.fldno"
-					+ " AND a.gid in (:gidList)" + " ORDER BY u.fname";
-				final SQLQuery query = this.getSession().createSQLQuery(sql);
-				query.addEntity("u", UserDefinedField.class);
-				query.setParameterList("gidList", gidList);
-				returnList = query.list();
-
-			} catch (final HibernateException e) {
-				throw new MiddlewareQueryException("Error with getAttributesByGIDList(gidList=" + gidList + "): " + e.getMessage(), e);
-			}
-		}
-		return returnList;
 	}
 
 	@SuppressWarnings("unchecked")

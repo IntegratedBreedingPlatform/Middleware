@@ -1,6 +1,7 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.AttributeDAO;
+import org.generationcp.middleware.dao.audit.germplasm.GermplasmAuditDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
@@ -551,6 +552,10 @@ public class DaoFactory {
 		final StudyInstanceExternalReferenceDao studyInstanceExternalReferenceDao = new StudyInstanceExternalReferenceDao();
 		studyInstanceExternalReferenceDao.setSession(this.sessionProvider.getSession());
 		return studyInstanceExternalReferenceDao;
+	}
+
+	public GermplasmAuditDAO getGermplasmAuditDAO() {
+		return new GermplasmAuditDAO(this.sessionProvider.getSession());
 	}
 
 	public FileDAO getFileDAO() {

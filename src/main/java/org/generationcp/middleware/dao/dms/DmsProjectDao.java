@@ -1175,7 +1175,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				final Object categoryId = result.get(OBS_SET_CATEGORY_ID);
 				if (categoryId != null) {
 					if (measurementVariable.getPossibleValues() == null || measurementVariable.getPossibleValues().isEmpty()) {
-						measurementVariable.setPossibleValues(new ArrayList<ValueReference>());
+						measurementVariable.setPossibleValues(new ArrayList<>());
 					}
 					final ValueReference valueReference = //
 						new ValueReference(
@@ -1954,7 +1954,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			sql.append(" AND nde.obs_unit_id = :studyPUI ");
 		}
 		if (studySearchFilter.getGermplasmDbId() != null) {
-			sql.append(" AND exists (SELECT 1 from stock where dbxref_id = :germplasmDbId AND project_id = pmain.project_id) ");
+			sql.append(" AND exists (SELECT 1 from germplsm g "
+				+ " INNER JOIN stock s ON s.dbxref_id = g.gid"
+				+ " where g.germplsm_uuid = :germplasmDbId AND s.project_id = pmain.project_id) ");
 		}
 		if (studySearchFilter.getObservationVariableDbId() != null) {
 			sql.append(" AND exists (SELECT 1 from projectprop where variable_id = :observationVariableDbId");

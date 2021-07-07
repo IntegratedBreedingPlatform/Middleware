@@ -1,0 +1,561 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="corina" id="v18.3.0-1">
+        <preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) FROM location WHERE labbr='DEU' and locid=82;
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM location WHERE labbr='FRG';
+				</sqlCheck>
+			</and>
+        </preConditions>
+        <comment> Rename location abbreviation for West Germany (locid 82) to FRG. IBP-4308 </comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location SET labbr='FRG' WHERE labbr='DEU' AND locid=82;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v18.3.0-2">
+        <preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) FROM location WHERE labbr='ATF' and locid=275;
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM location WHERE labbr='TAAF';
+				</sqlCheck>
+			</and>
+        </preConditions>
+        <comment> Rename location abbreviation for French Southern Territories (locid 275) to TAAF. IBP-4308 </comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location SET labbr='TAAF',lname='French Southern and Antarctic Lands' WHERE labbr='ATF' AND locid=275;
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v18.3.0-3">
+        <preConditions onFail="MARK_RAN">
+			<and>
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM location WHERE labbr='UMI' and locid=282;
+            </sqlCheck>
+			<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM location WHERE labbr='UMIP';
+			</sqlCheck>
+			</and>
+        </preConditions>
+        <comment> Rename location abbreviation for United States Minor Outlying Islands (locid 282) to UMIP. IBP-4308 </comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE location SET labbr='UMIP' WHERE labbr='UMI' AND locid=282;
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v18.3.0-4">
+        <preConditions onFail="MARK_RAN">
+			<indexExists tableName="location" indexName="labbr_UNIQUE"/>
+		</preConditions>
+		<comment>Remove location abbr unique index if already existing</comment>
+		<dropIndex tableName="location" indexName="labbr_UNIQUE"/>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v18.3.0-5">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<not><indexExists tableName="location" indexName="uk_location_labbr"/></not>
+				<sqlCheck expectedResult="0">select count(*) from (SELECT count(*) from location where labbr is not null group by labbr having count(*) > 1) a </sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Adding unique constraint to labbr column of location table </comment>
+	    <addUniqueConstraint columnNames="labbr" constraintName="uk_location_labbr" tableName="location"/>
+	</changeSet>
+
+	<changeSet author="gelli" id="v18.3.0-6">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="ims_stock_transaction_bkp"/>
+		</preConditions>
+		<comment>
+			Drop unused table ims_stock_transaction_bkp if exists.
+		</comment>
+		<dropTable tableName="ims_stock_transaction_bkp"/>
+	</changeSet>
+
+	<changeSet author="gelli" id="v18.3.0-7">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="listdata_project_bkp" />
+		</preConditions>
+		<comment>
+			Remove unused table listdata_project_bkp
+		</comment>
+		<dropTable tableName="listdata_project_bkp" />
+	</changeSet>
+
+	<changeSet author="gelli" id="v18.3.0-8">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="listnms_bkp" />
+		</preConditions>
+		<comment>
+			Remove unused table listnms_bkp
+		</comment>
+		<dropTable tableName="listnms_bkp" />
+	</changeSet>
+
+    <changeSet author="clarysabel" id="v18.3.0-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1813;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Germplasm Passport' variable type</comment>
+        <sql>
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (1813, 1041, 'Germplasm Passport', 'Basic information used for the general management of the accession', null, 0, 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-10">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1814;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Germplasm Attribute' variable type</comment>
+        <sql>
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (1814, 1041, 'Germplasm Attribute', 'Variables which assessment may also require complex biochemical or molecular characterization methods', null, 0, 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-11">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 4031;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Assigned Attribute' method</comment>
+        <sql>
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (4031, 1020, 'Assigned Attribute', 'Standard method for assigned attribute', null, 0, 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-12">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 4032;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Assigned Passport Descriptor' method</comment>
+        <sql>
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (4032, 1020, 'Assigned Passport Descriptor', 'Standard method for assigned passport descriptor', null, 0, 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-13">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="udflds_attributes_bkp"></tableExists></not>
+		</preConditions>
+		<comment>Create properties and insert values in udflds_attributes_bkp in preparation for the attributes migration</comment>
+		<sql>
+			CREATE TABLE udflds_attributes_bkp (
+			  fldno            int,
+			  ftable           varchar(24),
+			  ftype            varchar(12),
+			  fcode            varchar(50),
+			  fname            varchar(50),
+			  ffmt             varchar(255),
+			  fdesc            varchar(255),
+			  lfldno           int,
+			  fuid             int,
+			  fdate            int,
+			  scaleid          int,
+			  cvterm_name      varchar(200),
+			  property_id      int,
+			  method_id        int,
+			  variable_type_id int,
+			  cvterm_id        int
+			);
+
+			INSERT INTO udflds_attributes_bkp (fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid, cvterm_name, method_id, variable_type_id)
+			SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid, CONCAT(REPLACE(fcode, ' ', ''), '_A', SUBSTRING(ftype, 1, 1), '_text'), IF(ftype = 'PASSPORT', 4032, 4031), IF(ftype = 'PASSPORT', 1813, 1814)
+			FROM udflds WHERE ftable = 'ATRIBUTS' AND ftype IN ('ATTRIBUTE', 'PASSPORT', 'METHOD', 'CHARACTERIZATION', 'USE');
+
+			CREATE TEMPORARY TABLE new_properties
+			SELECT DISTINCT bkp.fname name
+			FROM udflds_attributes_bkp bkp
+			WHERE NOT EXISTS(SELECT name
+							 FROM cvterm
+							 WHERE cv_id = 1010 AND name = bkp.fname AND is_obsolete = 0);
+
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			SELECT 1010, name, name, null, 0, 0 FROM new_properties;
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			SELECT 1225, cvt.cvterm_id, 1380 from new_properties tmp INNER JOIN cvterm cvt ON (cvt.cv_id = 1010 AND
+			cvt.name = tmp.name AND cvt.is_obsolete = 0);
+
+			DROP TEMPORARY TABLE new_properties;
+
+			UPDATE udflds_attributes_bkp bkp INNER JOIN cvterm cvterm ON bkp.fname = cvterm.name
+			SET bkp.property_id = cvterm.cvterm_id WHERE cvterm.cv_id = 1010 AND cvterm.is_obsolete = 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-14">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="udflds_attributes_bkp"></tableExists>
+				<sqlCheck expectedResult="0">
+					SELECT
+					COUNT(*)
+					FROM
+					information_schema.routines
+					WHERE
+					routine_schema = DATABASE()
+					AND specific_name = 'migrate_attr_udflds_to_ontology';
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Create store procedure 'migrate_attr_udflds_to_ontology' to migrate attributes to the ontology</comment>
+		<sql splitStatements="false">
+			<![CDATA[
+				CREATE PROCEDURE migrate_attr_udflds_to_ontology()
+
+				  BEGIN
+				    DECLARE errno INT;
+
+				    DECLARE EXIT HANDLER FOR SQLEXCEPTION
+					BEGIN
+						GET CURRENT DIAGNOSTICS CONDITION 1 errno = MYSQL_ERRNO;
+						ROLLBACK;
+						SIGNAL SQLSTATE '45000'
+						SET MESSAGE_TEXT = 'An error has occurred. Please verify udflds_attributes_bkp and cvterm for duplicated names ', MYSQL_ERRNO = errno;
+					END;
+
+				  	START TRANSACTION;
+				  	    -- Creating ontology variables
+						INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+						SELECT 1040, cvterm_name, fname, null, 0, 0 FROM udflds_attributes_bkp;
+
+						UPDATE udflds_attributes_bkp bkp INNER JOIN cvterm cvterm ON bkp.cvterm_name = cvterm.name
+						SET bkp.cvterm_id = cvterm.cvterm_id WHERE cvterm.cv_id = 1040 AND cvterm.is_obsolete = 0;
+
+						INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+						SELECT 1200, cvterm_id, property_id FROM udflds_attributes_bkp;
+
+						INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+						SELECT 1210, cvterm_id, method_id FROM udflds_attributes_bkp;
+
+						INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+						SELECT 1220, cvterm_id, 6020 FROM udflds_attributes_bkp;
+
+						INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+						SELECT bkp.cvterm_id, 1800, cvterm.name, 0
+						FROM udflds_attributes_bkp bkp
+							   INNER JOIN cvterm cvterm ON bkp.variable_type_id = cvterm.cvterm_id;
+
+						-- Removing atributs from udflds
+						DELETE FROM udflds WHERE ftable = 'ATRIBUTS' AND ftype IN ('ATTRIBUTE', 'PASSPORT', 'METHOD', 'CHARACTERIZATION', 'USE');
+
+				  	COMMIT;
+				  END;
+			]]>
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-15">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'migrate_attr_udflds_to_ontology';
+			</sqlCheck>
+		</preConditions>
+		<comment>Run migrate_attr_udflds_to_ontology procedure</comment>
+		<sql dbms="mysql" splitStatements="false">
+			call migrate_attr_udflds_to_ontology();
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-16">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'migrate_attr_udflds_to_ontology';
+			</sqlCheck>
+		</preConditions>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE migrate_attr_udflds_to_ontology;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-17">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="udflds_attributes_bkp"></tableExists>
+				<not>
+					<tableExists tableName="atributs_invalid_atype_bkp"></tableExists>
+				</not>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) > 0
+					FROM udflds_attributes_bkp
+					WHERE
+					cvterm_id is not null;
+				</sqlCheck>
+				<not>
+					<foreignKeyConstraintExists foreignKeyName="fk_atributs_atype_cvterm"></foreignKeyConstraintExists>
+				</not>
+			</and>
+		</preConditions>
+		<comment>Connect attributes with the new ontology variables</comment>
+		<sql dbms="mysql">
+				ALTER TABLE atributs
+				  CHANGE atype old_atype_bkp int(11);
+
+				ALTER TABLE atributs
+				  ADD COLUMN atype int(11) DEFAULT NULL AFTER gid;
+
+				UPDATE atributs INNER JOIN udflds_attributes_bkp bkp ON bkp.fldno = old_atype_bkp
+				SET atype = bkp.cvterm_id WHERE 1 = 1;
+
+				CREATE TABLE atributs_invalid_atype_bkp AS
+				SELECT * FROM atributs WHERE atributs.atype IS NULL;
+				DELETE FROM atributs WHERE atributs.atype IS NULL;
+
+				ALTER TABLE atributs DROP COLUMN old_atype_bkp;
+				ALTER TABLE atributs MODIFY atype int(11) NOT NULL;
+
+				ALTER TABLE atributs
+				ADD CONSTRAINT fk_atributs_atype_cvterm FOREIGN KEY (atype) REFERENCES cvterm(cvterm_id);
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-18">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="udflds_attributes_bkp"></tableExists>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) > 0
+					FROM udflds_attributes_bkp
+					WHERE
+					cvterm_id is not null;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					select count(*) > 0 from listdataprops l inner join udflds_attributes_bkp bkp on bkp.fcode = l.column_name;
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Replace old attributes names in listdataprops with the new variable names</comment>
+		<sql dbms="mysql">
+			ALTER TABLE listdataprops
+			  ADD COLUMN column_name_tmp varchar(50) DEFAULT NULL;
+
+			UPDATE listdataprops INNER JOIN udflds_attributes_bkp bkp ON bkp.fcode = column_name
+			SET column_name_tmp = bkp.cvterm_name WHERE 1 = 1;
+
+			UPDATE listdataprops SET column_name = UPPER(column_name_tmp) WHERE column_name_tmp IS NOT NULL;
+
+			ALTER TABLE listdataprops DROP COLUMN column_name_tmp;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-19">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="udflds_attributes_bkp"></tableExists>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) > 0
+					FROM udflds_attributes_bkp
+					WHERE
+					cvterm_id is not null;
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT
+					COUNT(*)
+					FROM
+					information_schema.routines
+					WHERE
+					routine_schema = DATABASE()
+					AND specific_name = 'replace_attr_process_code_in_methods';
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Create store procedure replace_attr_process_code_in_methods</comment>
+		<sql dbms="mysql" splitStatements="false">
+			<![CDATA[
+
+				CREATE PROCEDURE replace_attr_process_code_in_methods()
+
+				BEGIN
+
+				  DECLARE done INT DEFAULT FALSE;
+				  DECLARE attrsc_old, attrmp_old, attrfp_old VARCHAR(255);
+				  DECLARE attrsc_new, attrmp_new, attrfp_new VARCHAR(255);
+
+				  DECLARE cur_replace_tmp CURSOR FOR
+					SELECT * FROM codes_to_replace_tmp t WHERE EXISTS (
+						SELECT 1 FROM methods where prefix like CONCAT('%',t.ATTRSC_OLD,'%') or prefix like CONCAT('%',t.ATTRFP_OLD,'%')
+						or prefix like CONCAT('%',t.ATTRMP_OLD,'%') or suffix like CONCAT('%',t.ATTRSC_OLD,'%') or suffix like CONCAT('%',t.ATTRFP_OLD,'%')
+						or suffix like CONCAT('%',t.ATTRMP_OLD,'%')
+					);
+
+				  DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
+
+				  CREATE TEMPORARY TABLE codes_to_replace_tmp
+					SELECT CONCAT('[ATTRSC.', fcode, ']') as ATTRSC_OLD,
+						   CONCAT('[ATTRFP.', fcode, ']') as ATTRFP_OLD,
+						   CONCAT('[ATTRMP.', fcode, ']') as ATTRMP_OLD,
+						   CONCAT('[ATTRSC.', cvterm_id, ']') as ATTRSC_NEW,
+						   CONCAT('[ATTRFP.', cvterm_id, ']') as ATTRFP_NEW,
+						   CONCAT('[ATTRMP.', cvterm_id, ']') as ATTRMP_NEW
+					FROM udflds_attributes_bkp where ftype = 'ATTRIBUTE';
+
+				  OPEN cur_replace_tmp;
+
+				  read_loop: LOOP FETCH cur_replace_tmp
+					INTO attrsc_old, attrfp_old, attrmp_old, attrsc_new, attrfp_new, attrmp_new;
+
+					  IF done THEN LEAVE read_loop;
+					  END IF;
+
+					  UPDATE methods SET prefix = REPLACE(prefix, attrsc_old, attrsc_new) where prefix like CONCAT('%', attrsc_old,'%');
+					  UPDATE methods SET prefix = REPLACE(prefix, attrfp_old, attrfp_new) where prefix like CONCAT('%', attrfp_old,'%');
+					  UPDATE methods SET prefix = REPLACE(prefix, attrmp_old, attrmp_new) where prefix like CONCAT('%', attrmp_old,'%');
+					  UPDATE methods SET suffix = REPLACE(suffix, attrsc_old, attrsc_new) where suffix like CONCAT('%', attrsc_old,'%');
+					  UPDATE methods SET suffix = REPLACE(suffix, attrfp_old, attrfp_new) where suffix like CONCAT('%', attrfp_old,'%');
+					  UPDATE methods SET suffix = REPLACE(suffix, attrmp_old, attrmp_new) where suffix like CONCAT('%', attrmp_old,'%');
+
+				  END LOOP read_loop;
+
+				  CLOSE cur_replace_tmp;
+
+				  DROP TEMPORARY TABLE codes_to_replace_tmp;
+			 	END;
+			]]>
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-20">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'replace_attr_process_code_in_methods';
+			</sqlCheck>
+		</preConditions>
+		<comment>Run replace_attr_process_code_in_methods procedure</comment>
+		<sql dbms="mysql" splitStatements="false">
+			call replace_attr_process_code_in_methods();
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-21">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT
+				COUNT(*)
+				FROM
+				information_schema.routines
+				WHERE
+				routine_schema = DATABASE()
+				AND specific_name = 'replace_attr_process_code_in_methods';
+			</sqlCheck>
+		</preConditions>
+		<comment>Drop procedure replace_attr_process_code_in_methods</comment>
+		<sql dbms="mysql" splitStatements="false">
+			DROP PROCEDURE replace_attr_process_code_in_methods;
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-22">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="atributs" columnName="cval_id"></columnExists></not>
+		</preConditions>
+		<comment>Create cval_id column in atributs table</comment>
+		<addColumn tableName="atributs">
+			<column name="cval_id" afterColumn="aval" type="int">
+				<constraints nullable="true" foreignKeyName="fk_atributs_cval_id_cvterm" referencedTableName="cvterm" referencedColumnNames="cvterm_id"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v18.3.0-23">
+		<preConditions onFail="MARK_RAN">
+			<not><columnExists tableName="atributs_aud" columnName="cval_id"></columnExists></not>
+		</preConditions>
+		<comment>Create cval_id column in atributs_aud table</comment>
+		<addColumn tableName="atributs_aud"><column name="cval_id" afterColumn="aval" type="int"></column></addColumn>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.3.0-24">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="names_aud" indexName="names_aud_nid_index"></indexExists>
+			</not>
+		</preConditions>
+		<comment>Add index for names_aud nid column</comment>
+		<createIndex indexName="names_aud_nid_index" tableName="names_aud" unique="false">
+			<column name="nid"></column>
+		</createIndex>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.3.0-25">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="atributs_aud" indexName="atributs_aud_aid_index"></indexExists>
+			</not>
+		</preConditions>
+		<comment>Add index for atributs_aud aid column</comment>
+		<createIndex indexName="atributs_aud_aid_index" tableName="atributs_aud" unique="false">
+			<column name="aid"></column>
+		</createIndex>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.3.0-26">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="germplsm_aud" indexName="germplsm_aud_gid_index"></indexExists>
+			</not>
+		</preConditions>
+		<comment>Add index for germplsm_aud gid column</comment>
+		<createIndex indexName="germplsm_aud_gid_index" tableName="germplsm_aud" unique="false">
+			<column name="gid"></column>
+		</createIndex>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.3.0-27">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="bibrefs_aud" indexName="bibrefs_aud_refid_index"></indexExists>
+			</not>
+		</preConditions>
+		<comment>Add index for bibrefs_aud refid column</comment>
+		<createIndex indexName="bibrefs_aud_refid_index" tableName="bibrefs_aud" unique="false">
+			<column name="refid"></column>
+		</createIndex>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.3.0-28">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<indexExists tableName="progntrs_aud" indexName="progntrs_aud_gid_index"></indexExists>
+			</not>
+		</preConditions>
+		<comment>Add index for progntrs_aud gid column</comment>
+		<createIndex indexName="progntrs_aud_gid_index" tableName="progntrs_aud" unique="false">
+			<column name="gid"></column>
+		</createIndex>
+	</changeSet>
+
+	
+</databaseChangeLog>

@@ -9,6 +9,8 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
@@ -17,6 +19,8 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -116,6 +120,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Autowired
 	private GermplasmListManager germplasmListManager;
+
+	@Autowired
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	public GermplasmListServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -571,10 +578,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				}
 
 				// Check if any of the columns are attribute types
-				final Integer attributeTypeId = attributeTypesMap.get(property);
-				if (!Objects.isNull(attributeTypeId)) {
+				final Integer attributeVariableId = attributeTypesMap.get(property);
+				if (!Objects.isNull(attributeVariableId)) {
 					this.addListDataProperties(property,
-						() -> this.germplasmDataManager.getAttributeValuesByTypeAndGIDList(attributeTypeId, gids),
+						() -> this.germplasmDataManager.getAttributeValuesByTypeAndGIDList(attributeVariableId, gids),
 						listDataIndexedByGid);
 					return;
 				}
@@ -699,9 +706,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	private Map<String, Integer> getAllAttributeTypesMap() {
-		return this.germplasmDataManager.getAllAttributesTypes()
-			.stream()
-			.collect(Collectors.toMap(userDefinedField -> userDefinedField.getFcode().toUpperCase(), UserDefinedField::getFldno));
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addVariableType(VariableType.GERMPLASM_ATTRIBUTE);
+		variableFilter.addVariableType(VariableType.GERMPLASM_PASSPORT);
+		return this.ontologyVariableDataManager.getWithFilter(variableFilter).stream()
+			.collect(Collectors.toMap(v -> v.getName().toUpperCase(),
+				Variable::getId));
 	}
 
 	private Map<String, Integer> getAllNameTypesMap() {

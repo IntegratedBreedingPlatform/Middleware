@@ -172,23 +172,6 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return new ArrayList<>();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Name> getPreferredIdsByListId(final Integer listId) {
-		try {
-			if (listId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFERRED_IDS_BY_LIST_ID);
-				query.setParameter("listId", listId);
-				query.addEntity("n", Name.class);
-				return query.list();
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with getPreferredIdsByListId(listId=" + listId + ") query from Name " + e.getMessage();
-			NameDAO.LOG.error(message);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return new ArrayList<>();
-	}
-
 	public Name getNameByNameId(final Integer nId) {
 		try {
 			if (nId != null) {
@@ -299,31 +282,6 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			final String message = "Error with getPreferredNamesByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
-		}
-
-		return toreturn;
-	}
-
-	public Map<Integer, Integer> getPreferredNameIdsByGIDs(final List<Integer> gids) {
-		final Map<Integer, Integer> toreturn = new HashMap<>();
-		for (final Integer gid : gids) {
-			toreturn.put(gid, null);
-		}
-
-		try {
-			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFERRED_NAME_IDS_BY_GIDS);
-			query.setParameterList("gids", gids);
-
-			final List<Object> results = query.list();
-			for (final Object result : results) {
-				final Object[] resultArray = (Object[]) result;
-				final Integer gid = (Integer) resultArray[0];
-				final Integer preferredId = (Integer) resultArray[1];
-				toreturn.put(gid, preferredId);
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getPreferredNameIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage(),
-				e);
 		}
 
 		return toreturn;
