@@ -120,9 +120,10 @@
         <!-- Derived variables -->
         <mapping class="org.generationcp.middleware.pojos.derived_variables.Formula"/>
 
+        <!-- Other -->
         <mapping class="org.generationcp.middleware.pojos.search.SearchRequest"/>
-
         <mapping class="org.generationcp.middleware.pojos.GermplasmStudySource"/>
+        <mapping class="org.generationcp.middleware.pojos.file.FileMetadata"/>
 
     </session-factory>
 </hibernate-configuration>
