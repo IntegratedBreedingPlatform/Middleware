@@ -9,12 +9,13 @@
  *
  *******************************************************************************/
 
-package org.generationcp.middleware.dao;
+package org.generationcp.middleware.dao.germplasmlist;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;

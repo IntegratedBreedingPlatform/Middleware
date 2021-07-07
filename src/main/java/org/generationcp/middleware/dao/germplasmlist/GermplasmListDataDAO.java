@@ -9,7 +9,7 @@
  *
  *******************************************************************************/
 
-package org.generationcp.middleware.dao;
+package org.generationcp.middleware.dao.germplasmlist;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;

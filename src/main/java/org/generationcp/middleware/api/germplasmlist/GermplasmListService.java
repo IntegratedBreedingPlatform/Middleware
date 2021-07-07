@@ -1,6 +1,8 @@
 package org.generationcp.middleware.api.germplasmlist;
 
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -48,5 +50,10 @@ public interface GermplasmListService {
 	List<GermplasmListDto> getGermplasmLists(Integer gid);
 
 	void performGermplasmListEntriesDeletion(List<Integer> gids);
+
+	List<GermplasmListSearchResponse> searchGermplasmList(GermplasmListSearchRequest germplasmListSearchRequest, Pageable pageable,
+		final String programUUID);
+
+	long countSearchGermplasmList(GermplasmListSearchRequest germplasmSearchRequest, String programUUID);
 
 }

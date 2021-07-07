@@ -6,8 +6,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -408,6 +410,18 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			this.deleteGermplasmListData(germplasmListDataToBeDeleted);
 			this.updateGermplasmListData(germplasmListDataToBeUpdated);
 		}
+	}
+
+	@Override
+	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest germplasmListSearchRequest,
+		final Pageable pageable,
+		final String programUUID) {
+		return null;
+	}
+
+	@Override
+	public long countSearchGermplasmList(final GermplasmListSearchRequest germplasmSearchRequest, final String programUUID) {
+		return 0;
 	}
 
 	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {

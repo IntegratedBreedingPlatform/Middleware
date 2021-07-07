@@ -3,7 +3,7 @@ package org.generationcp.middleware.dao.ims;
 
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
