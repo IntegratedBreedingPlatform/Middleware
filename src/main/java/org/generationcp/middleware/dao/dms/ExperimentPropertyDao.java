@@ -500,7 +500,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		try {
 			final StringBuilder sql =
 				new StringBuilder().append("SELECT e.nd_experiment_id AS experimentId, e.value AS value, var.name AS name ")
-					.append("	FROM ibdbv2_maize_merged.nd_experimentprop e ")
+					.append("	FROM nd_experimentprop e ")
 					.append("	INNER JOIN cvterm var on e.type_id = var.cvterm_id ")
 					.append("	WHERE e.nd_experiment_id IN (:experimentIds)")
 					.append("		AND e.type_id NOT IN (" + TermId.COLUMN_NO.getId() + ", " + TermId.RANGE_NO.getId() + ")");
