@@ -449,7 +449,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		}
 		for (final UserRole userRole : this.roles) {
 			if (userRole.getRole().getRoleType().getId().equals(RoleType.CROP.getId()) && userRole.getCropType().getCropName()
-				.equals(crop)) {
+				.equalsIgnoreCase(crop)) {
 				return true;
 			}
 		}
@@ -462,7 +462,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		}
 		for (final UserRole userRole : this.roles) {
 			if (userRole.getRole().getRoleType().getId().equals(RoleType.CROP.getId()) && userRole.getCropType().getCropName()
-				.equals(crop)) {
+				.equalsIgnoreCase(crop)) {
 				return userRole;
 			}
 		}
@@ -475,7 +475,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		}
 		for (final UserRole userRole : this.roles) {
 			if (userRole.getRole().getRoleType().getId().equals(RoleType.PROGRAM.getId()) && userRole.getCropType().getCropName()
-				.equals(crop)) {
+				.equalsIgnoreCase(crop)) {
 				return true;
 			}
 		}
@@ -488,7 +488,7 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		}
 		if (this.hasInstanceRole() || (this.hasCropRole(cropName) && !this.hasProgramRoles(cropName)) || this.getRoles().stream()
 			.anyMatch(
-				ur -> ur.getRole().getRoleType().getId().equals(RoleType.PROGRAM.getId()) && ur.getCropType().getCropName().equals(cropName)
+				ur -> ur.getRole().getRoleType().getId().equals(RoleType.PROGRAM.getId()) && ur.getCropType().getCropName().equalsIgnoreCase(cropName)
 					&& ur.getWorkbenchProject().getProjectId().equals((programId)))) {
 			return true;
 		} else {
