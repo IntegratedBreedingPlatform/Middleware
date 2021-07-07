@@ -72,6 +72,30 @@ public class ExperimentPropertySaver extends Saver {
 		this.daoFactory.getExperimentPropertyDao().saveOrUpdate(experimentProperty);
 	}
 
+	public void saveOrUpdateProperty(final ExperimentModel experiment, final int propertyType, final String value)
+		throws MiddlewareQueryException {
+		ExperimentProperty experimentProperty = this.getExperimentProperty(experiment, propertyType);
+		if (experimentProperty == null) {
+			experimentProperty = new ExperimentProperty();
+			experimentProperty.setTypeId(propertyType);
+			experimentProperty.setRank(0);
+			experimentProperty.setExperiment(experiment);
+		}
+		experimentProperty.setValue(value);
+		this.daoFactory.getExperimentPropertyDao().saveOrUpdate(experimentProperty);
+	}
+
+	private ExperimentProperty getExperimentProperty(final ExperimentModel experiment, final int typeId) {
+		if (experiment != null && experiment.getProperties() != null) {
+			for (final ExperimentProperty property : experiment.getProperties()) {
+				if (property.getTypeId().equals(typeId)) {
+					return property;
+				}
+			}
+		}
+		return null;
+	}
+
 	private ExperimentProperty getExperimentProperty(final ExperimentModel experiment, final int typeId,
 		final Map<Integer, List<ExperimentProperty>> experimentPropertyMap) {
 		final List<ExperimentProperty> properties = experimentPropertyMap.get(experiment.getNdExperimentId());
