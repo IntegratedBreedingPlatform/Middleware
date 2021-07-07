@@ -21,6 +21,9 @@ public class ContactDto {
 
 	private String instituteName = StringUtils.EMPTY;
 
+	public ContactDto() {
+	}
+
 	public ContactDto(final String contactDbId, final String name, final String email, final String type) {
 		this.contactDbId = contactDbId;
 		this.name = name;
