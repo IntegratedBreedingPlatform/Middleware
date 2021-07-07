@@ -105,20 +105,21 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	public List<ObservationUnitDto> searchObservationUnits(final Integer pageSize, final Integer pageNumber,
 		final ObservationUnitSearchRequestDTO requestDTO) {
 		final List<ObservationUnitDto> dtos = this.daoFactory.getPhenotypeDAO().searchObservationUnits(pageSize, pageNumber, requestDTO);
+		if(!CollectionUtils.isEmpty(dtos)) {
+			final List<Integer> experimentIds = dtos.stream().map(o -> Integer.valueOf(o.getExperimentId())).collect(Collectors.toList());
 
-		final List<Integer> experimentIds = dtos.stream().map(o -> Integer.valueOf(o.getExperimentId())).collect(Collectors.toList());
+			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
+				this.daoFactory.getExperimentExternalReferenceDao().getExternalReferences(experimentIds).stream()
+					.collect(groupingBy(
+						ExternalReferenceDTO::getEntityId));
 
-		final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
-			this.daoFactory.getExperimentExternalReferenceDao().getExternalReferences(experimentIds).stream()
-				.collect(groupingBy(
-					ExternalReferenceDTO::getEntityId));
+			final Map<Integer, List<ObservationLevelRelationship>> obsevationRelationshipsMap =
+				this.daoFactory.getExperimentPropertyDao().getObservationLevelRelationshipMap(experimentIds);
 
-		final Map<Integer, List<ObservationLevelRelationship>> obsevationRelationshipsMap =
-			this.daoFactory.getExperimentPropertyDao().getObservationLevelRelationshipMap(experimentIds);
-
-		for (final ObservationUnitDto dto : dtos) {
-			dto.setExternalReferences(externalReferencesMap.get(dto.getExperimentId().toString()));
-			dto.getObservationUnitPosition().setObservationLevelRelationships(obsevationRelationshipsMap.get(dto.getExperimentId()));
+			for (final ObservationUnitDto dto : dtos) {
+				dto.setExternalReferences(externalReferencesMap.get(dto.getExperimentId().toString()));
+				dto.getObservationUnitPosition().setObservationLevelRelationships(obsevationRelationshipsMap.get(dto.getExperimentId()));
+			}
 		}
 
 		return dtos;

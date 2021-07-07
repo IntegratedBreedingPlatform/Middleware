@@ -13,7 +13,7 @@ import java.util.List;
 
 public class ExperimentExternalReferenceDao extends GenericDAO<ExperimentExternalReference, Integer> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(StudyExternalReferenceDao.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ExperimentExternalReferenceDao.class);
 
 	public List<ExternalReferenceDTO> getExternalReferences(final List<Integer> experimentIds) {
 
