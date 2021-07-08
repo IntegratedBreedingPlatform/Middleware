@@ -28,6 +28,6 @@ public interface ObservationUnitService {
 	 */
 	long countObservationUnits(ObservationUnitSearchRequestDTO requestDTO);
 
-	List<ObservationUnitDto> importObservationUnits(String crop, List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos);
+	List<String> importObservationUnits(String crop, List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos);
 
 }

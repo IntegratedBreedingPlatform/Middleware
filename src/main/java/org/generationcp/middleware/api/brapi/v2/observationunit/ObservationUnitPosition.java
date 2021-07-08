@@ -14,9 +14,6 @@ public class ObservationUnitPosition {
 	private String positionCoordinateY;
 	private String positionCoordinateYType;
 
-	public ObservationUnitPosition() {
-	}
-
 	public String getEntryType() {
 		return this.entryType;
 	}

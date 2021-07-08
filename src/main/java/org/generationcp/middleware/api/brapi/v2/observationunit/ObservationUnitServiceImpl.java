@@ -131,7 +131,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	}
 
 	@Override
-	public List<ObservationUnitDto> importObservationUnits(final String crop, final List<ObservationUnitImportRequestDto> requestDtos) {
+	public List<String> importObservationUnits(final String crop, final List<ObservationUnitImportRequestDto> requestDtos) {
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(crop);
 
 		final List<String> germplasmDbIds =
@@ -204,19 +204,16 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			this.setExperimentExternalReferences(dto, experimentModel);
 			this.daoFactory.getExperimentDao().save(experimentModel);
 
-			this.sessionProvider.getSession().flush();
-
 			observationUnitDbIds.add(experimentModel.getObsUnitId());
 		}
 
 		//Update environment dataset to save added project properties
 		for (final Integer trialId : trialIds) {
 			this.daoFactory.getDmsProjectDAO().update(trialIdPlotDatasetMap.get(trialId));
-			this.sessionProvider.getSession().flush();
 		}
-		final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
-		searchRequestDTO.setObservationUnitDbIds(observationUnitDbIds);
-		return this.searchObservationUnits(null, null, searchRequestDTO);
+
+
+		return observationUnitDbIds;
 	}
 
 	private void setJsonProps(final ExperimentModel model, final ObservationUnitImportRequestDto dto) {
