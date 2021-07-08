@@ -14,13 +14,6 @@ public class GermplasmNameTypeRequestDTO {
 
 	}
 
-	public GermplasmNameTypeRequestDTO(final String code, final String name, final String description) {
-		this.code = code;
-		this.name = name;
-		this.setDescription(description);
-
-	}
-
 	public String getDescription() {
 		return this.description;
 	}

@@ -1,14 +1,16 @@
 package org.generationcp.middleware.api.nametype;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class GermplasmNameTypeDTO {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class GermplasmNameTypeDTO extends GermplasmNameTypeRequestDTO {
 
 	private Integer id;
-	private String code;
-	private String name;
+	private Integer date;
+	private String userName;
 
 	public GermplasmNameTypeDTO() {
 
@@ -16,8 +18,17 @@ public class GermplasmNameTypeDTO {
 
 	public GermplasmNameTypeDTO(final Integer id, final String code, final String name) {
 		this.id = id;
-		this.code = code;
-		this.name = name;
+		this.setCode(code);
+		this.setName(name);
+	}
+
+	public GermplasmNameTypeDTO(final Integer id, final String code, final String name, final String description, final String userName, final Integer date) {
+		this.setId(id);
+		this.setCode(code);
+		this.setName(name);
+		this.setDescription(description);
+		this.setUserName(userName);
+		this.setDate(date);
 	}
 
 	public Integer getId() {
@@ -28,20 +39,20 @@ public class GermplasmNameTypeDTO {
 		this.id = id;
 	}
 
-	public String getCode() {
-		return code;
+	public Integer getDate() {
+		return date;
 	}
 
-	public void setCode(final String code) {
-		this.code = code;
+	public void setDate(final Integer date) {
+		this.date = date;
 	}
 
-	public String getName() {
-		return name;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setName(final String name) {
-		this.name = name;
+	public void setUserName(final String userName) {
+		this.userName = userName;
 	}
 
 	@Override

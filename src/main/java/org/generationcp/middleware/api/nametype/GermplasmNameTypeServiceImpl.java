@@ -5,11 +5,14 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -17,6 +20,9 @@ import java.util.stream.Collectors;
 public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
 	private final DaoFactory daoFactory;
+
+	@Autowired
+	protected UserService userService;
 
 	public GermplasmNameTypeServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -56,9 +62,15 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
 	@Override
 	public List<GermplasmNameTypeDTO> getNameTypes(final Pageable pageable) {
+		final Map<Integer, String> userMap = this.userService.getAllUserIDFullNameMap();
+
 		final List<UserDefinedField> userDefinedFields = daoFactory.getUserDefinedFieldDAO().getNameTypes(pageable);
 		if(!userDefinedFields.isEmpty()){
-			return userDefinedFields.stream().map(userDefinedField ->  new GermplasmNameTypeDTO(userDefinedField.getFldno(),userDefinedField.getFcode(),userDefinedField.getFname())).collect(
+			return userDefinedFields.stream().map(
+				userDefinedField ->
+					new GermplasmNameTypeDTO(userDefinedField.getFldno(), userDefinedField.getFcode(),
+					userDefinedField.getFname(), userDefinedField.getFdesc(), userMap.get(userDefinedField.getFuid()), userDefinedField.getFdate())
+			).collect(
 				Collectors.toList());
 		}
 		return Collections.emptyList();
