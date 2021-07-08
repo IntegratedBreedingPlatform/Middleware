@@ -76,6 +76,8 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 	protected static final List<Integer> GEOLOCATION_METADATA =
 		Arrays.asList(TermId.LATITUDE.getId(), TermId.LONGITUDE.getId(), TermId.GEODETIC_DATUM.getId(), TermId.ALTITUDE.getId());
+	private static final String EXPT_DESIGN = "EXPT_DESIGN";
+	private static final String CROP_SEASON_CODE = "Crop_season_Code";
 
 	@Resource
 	private StudyService studyService;
@@ -684,7 +686,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(TermId.EXPERIMENT_DESIGN_FACTOR.getId())) {
 			this.addProjectProperty(studyIdEnvironmentVariablesMap, trialIdEnvironmentDatasetMap, trialDbId,
 				VariableType.ENVIRONMENT_DETAIL,
-				TermId.EXPERIMENT_DESIGN_FACTOR.getId(), String.valueOf(TermId.EXTERNALLY_GENERATED.getId()), "EXPT_DESIGN");
+				TermId.EXPERIMENT_DESIGN_FACTOR.getId(), String.valueOf(TermId.EXTERNALLY_GENERATED.getId()), EXPT_DESIGN);
 		}
 
 		final List<ProjectProperty> experimentalDesignProperty = trialIdEnvironmentDatasetMap.get(trialDbId).getProperties().stream()
@@ -715,7 +717,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				//Add season variable if not present to the study
 				if (!studyIdEnvironmentVariablesMap.get(trialDbId).contains(TermId.SEASON_VAR.getId())) {
 					this.addProjectProperty(studyIdEnvironmentVariablesMap, environmentDatasetMap, trialDbId,
-						VariableType.ENVIRONMENT_DETAIL, TermId.SEASON_VAR.getId(), null, "Crop_season_Code");
+						VariableType.ENVIRONMENT_DETAIL, TermId.SEASON_VAR.getId(), null, CROP_SEASON_CODE);
 				}
 
 				//Add season value for the environment
