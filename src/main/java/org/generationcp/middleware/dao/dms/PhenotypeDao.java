@@ -52,6 +52,7 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -1063,11 +1064,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	private static void addObservationUnitSearchFilter(final ObservationUnitSearchRequestDTO requestDTO, final StringBuilder queryString) {
 		final List<String> cvTermIds = requestDTO.getObservationVariableDbIds();
 
-		if (cvTermIds != null && !cvTermIds.isEmpty()) {
+		if (!CollectionUtils.isEmpty(cvTermIds)) {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATION_FILTER);
 		}
 
-		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getStudyDbIds())) {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
 		}
 
@@ -1088,24 +1089,34 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				+ "               AND ph.created_date <= :observationTimeStampRangeEnd) ");
 		}
 
-		if (requestDTO.getLocationDbIds() != null && !requestDTO.getLocationDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getLocationDbIds())) {
 			queryString.append(" AND l.locid in (:locationDbIds) ");
 		}
 
-		if (requestDTO.getGermplasmDbIds() != null && !requestDTO.getGermplasmDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
 			queryString.append(" AND g.germplsm_uuid in (:germplasmDbIds) ");
 		}
 
-		if (requestDTO.getProgramDbIds() != null && !requestDTO.getProgramDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getProgramDbIds())) {
 			queryString.append(" AND p.program_uuid IN (:programDbIds) ");
 		}
 
-		if (requestDTO.getTrialDbIds() != null && !requestDTO.getTrialDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getTrialDbIds())) {
 			queryString.append(" AND p.project_id IN (:trialDbIds) ");
 		}
 
-		if (requestDTO.getObservationUnitDbIds() != null && !requestDTO.getObservationUnitDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getObservationUnitDbIds())) {
 			queryString.append(" AND nde.obs_unit_id IN (:observationUnitDbIds) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
+			queryString.append(" AND EXISTS (SELECT * FROM external_reference_experiment exref ");
+			queryString.append(" WHERE nde.nd_experiment_id = exref.nd_experiment_id AND exref.reference_id IN (:referenceIds)) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
+			queryString.append(" AND EXISTS (SELECT * FROM external_reference_experiment exref ");
+			queryString.append(" WHERE nde.nd_experiment_id = exref.nd_experiment_id AND exref.reference_source IN (:referenceSources)) ");
 		}
 	}
 
@@ -1113,11 +1124,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		final List<String> cvTermIds = requestDTO.getObservationVariableDbIds();
 
-		if (cvTermIds != null && !cvTermIds.isEmpty()) {
+		if (!CollectionUtils.isEmpty(cvTermIds)) {
 			sqlQuery.setParameterList(CV_TERM_IDS, cvTermIds);
 		}
 
-		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getStudyDbIds())) {
 			sqlQuery.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
 		}
 
@@ -1133,23 +1144,32 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			sqlQuery.setParameter("observationTimeStampRangeEnd", requestDTO.getObservationTimeStampRangeEnd());
 		}
 
-		if (requestDTO.getLocationDbIds() != null && !requestDTO.getLocationDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getLocationDbIds())) {
 			sqlQuery.setParameterList("locationDbIds", requestDTO.getLocationDbIds());
 		}
 
-		if (requestDTO.getGermplasmDbIds() != null && !requestDTO.getGermplasmDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
 			sqlQuery.setParameterList("germplasmDbIds", requestDTO.getGermplasmDbIds());
 		}
-		if (requestDTO.getProgramDbIds() != null && !requestDTO.getProgramDbIds().isEmpty()) {
+
+		if (!CollectionUtils.isEmpty(requestDTO.getProgramDbIds())) {
 			sqlQuery.setParameterList("programDbIds", requestDTO.getProgramDbIds());
 		}
 
-		if (requestDTO.getTrialDbIds() != null && !requestDTO.getTrialDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getTrialDbIds())) {
 			sqlQuery.setParameterList("trialDbIds", requestDTO.getTrialDbIds());
 		}
 
-		if (requestDTO.getObservationUnitDbIds() != null && !requestDTO.getObservationUnitDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getObservationUnitDbIds())) {
 			sqlQuery.setParameterList("observationUnitDbIds", requestDTO.getObservationUnitDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
+			sqlQuery.setParameterList("referenceIds", requestDTO.getExternalReferenceIDs());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
+			sqlQuery.setParameterList("referenceSources", requestDTO.getExternalReferenceSources());
 		}
 	}
 

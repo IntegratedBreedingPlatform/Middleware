@@ -17,6 +17,8 @@ public class ObservationUnitSearchRequestDTO implements Serializable {
 	private List<String> programDbIds;
 	private List<String> trialDbIds;
 	private List<String> observationUnitDbIds;
+	private List<String> externalReferenceIDs;
+	private List<String> externalReferenceSources;
 
 	public List<String> getObservationUnitDbIds() {
 		return this.observationUnitDbIds;
@@ -112,5 +114,21 @@ public class ObservationUnitSearchRequestDTO implements Serializable {
 
 	public void setTrialDbIds(final List<String> trialDbIds) {
 		this.trialDbIds = trialDbIds;
+	}
+
+	public List<String> getExternalReferenceIDs() {
+		return externalReferenceIDs;
+	}
+
+	public void setExternalReferenceIDs(final List<String> externalReferenceIDs) {
+		this.externalReferenceIDs = externalReferenceIDs;
+	}
+
+	public List<String> getExternalReferenceSources() {
+		return externalReferenceSources;
+	}
+
+	public void setExternalReferenceSources(final List<String> externalReferenceSources) {
+		this.externalReferenceSources = externalReferenceSources;
 	}
 }
