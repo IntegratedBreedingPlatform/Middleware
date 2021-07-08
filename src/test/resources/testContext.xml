@@ -313,4 +313,8 @@
         <constructor-arg name="sessionProvider" ref="workbenchSessionProvider"/>
     </bean>
 
+	<bean id="GermplasmNameTypeService" class="org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 </beans>
