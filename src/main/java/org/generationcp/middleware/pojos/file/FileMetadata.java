@@ -2,6 +2,7 @@ package org.generationcp.middleware.pojos.file;
 
 import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.generationcp.middleware.pojos.AbstractEntity;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
@@ -49,6 +50,10 @@ public class FileMetadata extends AbstractEntity {
 
 	@Column(name = "file_timestamp")
 	private Date fileTimestamp;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "nd_experiment_id")
+	private ExperimentModel experimentModel;
 
 	public Integer getFileId() {
 		return this.fileId;
@@ -144,5 +149,13 @@ public class FileMetadata extends AbstractEntity {
 
 	public void setFileTimestamp(final Date modifiedDate) {
 		this.fileTimestamp = modifiedDate;
+	}
+
+	public ExperimentModel getExperimentModel() {
+		return this.experimentModel;
+	}
+
+	public void setExperimentModel(final ExperimentModel experimentModel) {
+		this.experimentModel = experimentModel;
 	}
 }

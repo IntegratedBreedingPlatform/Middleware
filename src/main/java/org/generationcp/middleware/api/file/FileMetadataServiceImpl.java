@@ -48,9 +48,17 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 	@Override
 	public Image save(final ImageNewRequest imageNewRequest) {
+		final String observationUnitDbId = imageNewRequest.getObservationUnitDbId();
+		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitDbId);
+
+		if (experimentModel == null) {
+			throw new MiddlewareRequestException("", "filemetadata.observationunit.not.found", new String[] {observationUnitDbId});
+		}
+
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
 		final FileMetadata fileMetadata = new FileMetadata();
 		fileMetadataMapper.map(fileMetadata, imageNewRequest);
+		fileMetadata.setExperimentModel(experimentModel);
 
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(ContextHolder.getCurrentCrop());
 		FileUIDGenerator.generate(cropType, singletonList(fileMetadata));

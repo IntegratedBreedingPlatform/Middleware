@@ -18,6 +18,8 @@ public class FileMetadataDTO {
 	private Map<String, Object> imageLocation;
 	private String mimeType;
 	private Date fileTimestamp;
+	private String observationUnitId;
+	private Integer ndExperimentId;
 
 	public Integer getFileId() {
 		return this.fileId;
@@ -121,5 +123,21 @@ public class FileMetadataDTO {
 
 	public void setFileTimestamp(final Date fileTimestamp) {
 		this.fileTimestamp = fileTimestamp;
+	}
+
+	public String getObservationUnitId() {
+		return this.observationUnitId;
+	}
+
+	public void setObservationUnitId(final String observationUnitId) {
+		this.observationUnitId = observationUnitId;
+	}
+
+	public Integer getNdExperimentId() {
+		return this.ndExperimentId;
+	}
+
+	public void setNdExperimentId(final Integer ndExperimentId) {
+		this.ndExperimentId = ndExperimentId;
 	}
 }

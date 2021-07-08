@@ -583,7 +583,10 @@
 				created_by int null,
 				modified_by int null,
 				created_date timestamp default CURRENT_TIMESTAMP null,
-				modified_date timestamp null
+				modified_date timestamp null,
+				nd_experiment_id int null,
+				constraint file_metadata_nd_experiment_nd_experiment_id_fk
+					foreign key (nd_experiment_id) references ibdbv2_maize_merged.nd_experiment (nd_experiment_id)
 			);
 		</sql>
 	</changeSet>

@@ -2,9 +2,11 @@ package org.generationcp.middleware.api.file;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Preconditions;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +48,9 @@ public class FileMetadataMapper {
 		image.setImageWidth(fileMetadata.getImageWidth());
 		image.setMimeType(fileMetadata.getMimeType());
 		image.setImageFileSize(fileMetadata.getImageSize());
+		final ExperimentModel experimentModel = fileMetadata.getExperimentModel();
+		Preconditions.checkNotNull(experimentModel, "Image is not linked to any observationUnit");
+		image.setObservationUnitDbId(experimentModel.getObsUnitId());
 
 		final ObjectMapper objectMapper = new ObjectMapper();
 		try {
@@ -71,6 +76,11 @@ public class FileMetadataMapper {
 		fileMetadataDTO.setMimeType(fileMetadata.getMimeType());
 		fileMetadataDTO.setPath(fileMetadata.getPath());
 		fileMetadataDTO.setImageSize(fileMetadata.getImageSize());
+		final ExperimentModel experimentModel = fileMetadata.getExperimentModel();
+		if (experimentModel != null) {
+			fileMetadataDTO.setObservationUnitId(experimentModel.getObsUnitId());
+			fileMetadataDTO.setNdExperimentId(experimentModel.getNdExperimentId());
+		}
 
 		final ObjectMapper objectMapper = new ObjectMapper();
 		try {
@@ -98,6 +108,7 @@ public class FileMetadataMapper {
 		image.setImageFileSize(dto.getImageSize());
 		image.setImageLocation(dto.getImageLocation());
 		image.setImageDbId(dto.getFileUUID());
+		image.setObservationUnitDbId(dto.getObservationUnitId());
 		return image;
 	}
 }
