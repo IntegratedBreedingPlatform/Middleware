@@ -366,10 +366,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, List<StockModel>> getStockMapByStudyIds(final List<Integer> studyIds) {
+	public Map<Integer, Map<String, StockModel>> getStocksByStudyIds(final List<Integer> studyIds) {
 		try {
 
-			final Map<Integer, List<StockModel>> stockMap = new HashMap<>();
+			final Map<Integer, Map<String, StockModel>> stockMap = new HashMap<>();
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
 			criteria.add(Restrictions.in("project.projectId", studyIds));
 			criteria.addOrder(new org.hibernate.criterion.Order("uniquename", true) {
@@ -382,8 +382,9 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 			final List<StockModel> stocks = criteria.list();
 			for (final StockModel stockModel : stocks) {
-				stockMap.putIfAbsent(stockModel.getProject().getProjectId(), new ArrayList<>());
-				stockMap.get(stockModel.getProject().getProjectId()).add(stockModel);
+				final Integer projectId = stockModel.getProject().getProjectId();
+				stockMap.putIfAbsent(projectId, new HashMap<>());
+				stockMap.get(projectId).put(stockModel.getGermplasm().getGermplasmUUID(), stockModel);
 			}
 
 			return stockMap;

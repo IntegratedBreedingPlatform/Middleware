@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -135,8 +136,13 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		observationUnitPosition.setGeoCoordinates(geoCoodinates);
 		dto.setObservationUnitPosition(observationUnitPosition);
 
-		final List<ObservationUnitDto> observationUnitDtoList =
+		final List<String> observationDbIds =
 			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Collections.singletonList(dto));
+
+		final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
+		searchRequestDTO.setObservationUnitDbIds(observationDbIds);
+		final List<ObservationUnitDto> observationUnitDtoList =
+			this.observationUnitService.searchObservationUnits(null, null, searchRequestDTO);
 
 		Assert.assertEquals(1, observationUnitDtoList.size());
 		final ObservationUnitDto observationUnitDto = observationUnitDtoList.get(0);
@@ -177,8 +183,13 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 
 		dto.setObservationUnitPosition(observationUnitPosition);
 
-		final List<ObservationUnitDto> observationUnitDtoList =
+		final List<String> observationDbIds =
 			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Collections.singletonList(dto));
+
+		final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
+		searchRequestDTO.setObservationUnitDbIds(observationDbIds);
+		final List<ObservationUnitDto> observationUnitDtoList =
+			this.observationUnitService.searchObservationUnits(null, null, searchRequestDTO);
 
 		Assert.assertEquals(1, observationUnitDtoList.size());
 		final ObservationUnitDto observationUnitDto = observationUnitDtoList.get(0);
@@ -211,8 +222,13 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 
 		dto.setObservationUnitPosition(observationUnitPosition);
 
-		final List<ObservationUnitDto> observationUnitDtoList =
+		final List<String> observationDbIds =
 			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Collections.singletonList(dto));
+
+		final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
+		searchRequestDTO.setObservationUnitDbIds(observationDbIds);
+		final List<ObservationUnitDto> observationUnitDtoList =
+			this.observationUnitService.searchObservationUnits(null, null, searchRequestDTO);
 
 		Assert.assertEquals(1, observationUnitDtoList.size());
 		final ObservationUnitDto observationUnitDto = observationUnitDtoList.get(0);
@@ -243,8 +259,13 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 
 		dto.setObservationUnitPosition(observationUnitPosition);
 
-		final List<ObservationUnitDto> observationUnitDtoList =
+		final List<String> observationDbIds =
 			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Collections.singletonList(dto));
+
+		final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
+		searchRequestDTO.setObservationUnitDbIds(observationDbIds);
+		final List<ObservationUnitDto> observationUnitDtoList =
+			this.observationUnitService.searchObservationUnits(null, null, searchRequestDTO);
 
 		Assert.assertEquals(1, observationUnitDtoList.size());
 		final ObservationUnitDto observationUnitDto = observationUnitDtoList.get(0);
