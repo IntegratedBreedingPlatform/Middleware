@@ -186,6 +186,8 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		final List<String> observationDbIds =
 			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Collections.singletonList(dto));
 
+		this.sessionProvder.getSession().flush();
+
 		final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
 		searchRequestDTO.setObservationUnitDbIds(observationDbIds);
 		final List<ObservationUnitDto> observationUnitDtoList =
@@ -225,6 +227,8 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		final List<String> observationDbIds =
 			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Collections.singletonList(dto));
 
+		this.sessionProvder.getSession().flush();
+
 		final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
 		searchRequestDTO.setObservationUnitDbIds(observationDbIds);
 		final List<ObservationUnitDto> observationUnitDtoList =
@@ -261,6 +265,8 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 
 		final List<String> observationDbIds =
 			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Collections.singletonList(dto));
+
+		this.sessionProvder.getSession().flush();
 
 		final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
 		searchRequestDTO.setObservationUnitDbIds(observationDbIds);
