@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.file;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
+import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -14,9 +15,11 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.util.uid.FileUIDGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +44,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	private static final String FILE_PATH_SLASH = "/";
 
 	private final DaoFactory daoFactory;
+	
+	@Autowired
+	private DatasetService datasetService;
 
 	public FileMetadataServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -63,25 +69,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(ContextHolder.getCurrentCrop());
 		FileUIDGenerator.generate(cropType, singletonList(fileMetadata));
 
-		// TODO observationVariableDbId not available for images (https://github.com/plantbreeding/API/issues/477)
-		//  assuming only one file variable per study, to get by obsUnitId
-		final String observationUnitDbId = imageNewRequest.getObservationUnitDbId();
-		final DatasetDTO dataset = this.daoFactory.getDmsProjectDAO().getDatasetByObsUnitDbId(observationUnitDbId);
-		final List<MeasurementVariable> fileTypeVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(
-			dataset.getDatasetId(),
-			singletonList(VariableType.TRAIT.getId())
-		).stream().filter(variable -> variable.getDataTypeId() == DataType.FILE_VARIABLE.getId()).collect(toList());
+		final Integer termId = this.getFirstFileVariable(observationUnitDbId);
 
-		if (fileTypeVariables == null || fileTypeVariables.isEmpty()) {
-			throw new MiddlewareRequestException("", "filemetadata.variable.not.found", new String[] {observationUnitDbId});
-		}
-
-		if (fileTypeVariables.size() > 1) {
-			throw new MiddlewareRequestException("", "filemetadata.brapi.multiple.file.variables");
-		}
-
-		final Integer termId = fileTypeVariables.get(0).getTermId();
-
+		// assigned path, to be saved later using file storage
 		final String path = this.getFilePathForObservations(observationUnitDbId, termId, imageNewRequest.getImageFileName());
 		fileMetadata.setPath(path);
 
@@ -136,4 +126,40 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 			+ FILE_PATH_SLASH + fileName;
 	}
 
+	@Override
+	public void saveFilenameToObservation(final FileMetadataDTO fileMetadataDTO) {
+		final Integer termId = this.getFirstFileVariable(fileMetadataDTO.getObservationUnitId());
+
+		final ObservationDto observation = new ObservationDto();
+		observation.setDraftMode(true); // file observations are automatically accepted
+		observation.setValue(fileMetadataDTO.getName());
+		observation.setObservationUnitId(fileMetadataDTO.getNdExperimentId());
+		observation.setVariableId(termId);
+		this.datasetService.createObservation(observation);
+	}
+
+	/**
+	 * TODO observationVariableDbId not available for images (https://github.com/plantbreeding/API/issues/477)
+	 *  assuming only one file variable per study, to get by obsUnitId
+	 *
+	 * @return termid
+	 */
+	private Integer getFirstFileVariable(final String observationUnitDbId) {
+		final DatasetDTO dataset = this.daoFactory.getDmsProjectDAO().getDatasetByObsUnitDbId(observationUnitDbId);
+		final List<MeasurementVariable> fileTypeVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(
+			dataset.getDatasetId(),
+			singletonList(VariableType.TRAIT.getId())
+		).stream().filter(variable -> variable.getDataTypeId() == DataType.FILE_VARIABLE.getId()).collect(toList());
+
+		if (fileTypeVariables == null || fileTypeVariables.isEmpty()) {
+			throw new MiddlewareRequestException("", "filemetadata.variable.not.found", new String[] {observationUnitDbId});
+		}
+
+		if (fileTypeVariables.size() > 1) {
+			throw new MiddlewareRequestException("", "filemetadata.brapi.multiple.file.variables");
+		}
+
+		final Integer termId = fileTypeVariables.get(0).getTermId();
+		return termId;
+	}
 }
