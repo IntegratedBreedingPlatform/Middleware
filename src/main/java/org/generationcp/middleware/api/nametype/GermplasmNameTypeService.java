@@ -8,4 +8,7 @@ public interface GermplasmNameTypeService {
 	List<GermplasmNameTypeDTO> searchNameTypes(String name);
 
 	Optional<GermplasmNameTypeDTO> getNameTypeByCode(final String code);
+
+	Integer createNameType(GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO);
+
 }
