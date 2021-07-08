@@ -21,10 +21,12 @@ import org.hibernate.NonUniqueResultException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -162,6 +164,50 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error with searchNameTypes(query=" + query + "): " + e.getMessage(), e);
+		}
+	}
+
+	public long countNameTypes() {
+		final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
+		criteria.setProjection(Projections.rowCount());
+		criteria.add(Restrictions.eq("ftable", UDTableType.NAMES_NAME.getTable()));
+		criteria.add(Restrictions.eq("ftype", UDTableType.NAMES_NAME.getType()));
+		criteria.addOrder(Order.asc("fname"));
+		return (Long) criteria.uniqueResult();
+	}
+
+	public List<UserDefinedField> getNameTypes(final Pageable pageable) {
+		try {
+
+			final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
+			criteria.add(Restrictions.eq("ftable", UDTableType.NAMES_NAME.getTable()));
+			criteria.add(Restrictions.eq("ftype", UDTableType.NAMES_NAME.getType()));
+			
+			if (pageable != null && pageable.getSort() != null) {
+				addOrder(criteria, pageable);
+			} else {
+				criteria.addOrder(Order.asc("fname"));
+			}
+
+			addPagination(criteria, pageable);
+			return criteria.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with getNameTypes(Pageable=" + pageable + " ) query from UserDefinedField: " + e.getMessage(), e);
+		}
+	}
+
+	public List<UserDefinedField> getByName(final String table, final Set<String> types, final String name) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
+			criteria.add(Restrictions.eq("ftable", table));
+			criteria.add(Restrictions.in("ftype", types));
+			criteria.add(Restrictions.eq("fname", name));
+			criteria.addOrder(Order.asc("fname"));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with getByName(name=" + table + " types= " + types + " ) query from UserDefinedField: " + e.getMessage(), e);
 		}
 	}
 

@@ -6,9 +6,13 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.util.Util;
+import org.springframework.data.domain.Pageable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
@@ -49,4 +53,50 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 		daoFactory.getUserDefinedFieldDAO().save(userDefinedField);
 		return userDefinedField.getFldno();
 	}
+
+	@Override
+	public List<GermplasmNameTypeDTO> getNameTypes(final Pageable pageable) {
+		final List<UserDefinedField> userDefinedFields = daoFactory.getUserDefinedFieldDAO().getNameTypes(pageable);
+		if(!userDefinedFields.isEmpty()){
+			return userDefinedFields.stream().map(userDefinedField ->  new GermplasmNameTypeDTO(userDefinedField.getFldno(),userDefinedField.getFcode(),userDefinedField.getFname())).collect(
+				Collectors.toList());
+		}
+		return Collections.emptyList();
+	}
+
+	@Override
+	public long countNameTypes() {
+		return daoFactory.getUserDefinedFieldDAO().countNameTypes();
+	}
+
+	@Override
+	public List<GermplasmNameTypeDTO> filterGermplasmNameTypes(final Set<String> codes) {
+		return this.daoFactory.getUserDefinedFieldDAO().getByCodes(UDTableType.NAMES_NAME.getTable(),
+			Collections.singleton(UDTableType.NAMES_NAME.getType()), codes)
+			.stream()
+			.map(userDefinedField -> {
+				final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
+				germplasmNameTypeDTO.setId(userDefinedField.getFldno());
+				germplasmNameTypeDTO.setName(userDefinedField.getFname());
+				germplasmNameTypeDTO.setCode(userDefinedField.getFcode());
+				return germplasmNameTypeDTO;
+			})
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	public List<GermplasmNameTypeDTO> filterGermplasmNameTypesByName(final String name) {
+		return this.daoFactory.getUserDefinedFieldDAO().getByName(UDTableType.NAMES_NAME.getTable(),
+			Collections.singleton(UDTableType.NAMES_NAME.getType()), name)
+			.stream()
+			.map(userDefinedField -> {
+				final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
+				germplasmNameTypeDTO.setId(userDefinedField.getFldno());
+				germplasmNameTypeDTO.setName(userDefinedField.getFname());
+				germplasmNameTypeDTO.setCode(userDefinedField.getFcode());
+				return germplasmNameTypeDTO;
+			})
+			.collect(Collectors.toList());
+	}
+
 }
