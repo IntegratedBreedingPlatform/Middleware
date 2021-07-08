@@ -366,10 +366,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, Map<String, StockModel>> getStocksByStudyIds(final List<Integer> studyIds) {
+	public Map<Integer, List<StockModel>> getStocksByStudyIds(final List<Integer> studyIds) {
 		try {
 
-			final Map<Integer, Map<String, StockModel>> stockMap = new HashMap<>();
+			final Map<Integer, List<StockModel>> stockMap = new HashMap<>();
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
 			criteria.add(Restrictions.in("project.projectId", studyIds));
 			criteria.addOrder(new org.hibernate.criterion.Order("uniquename", true) {
@@ -383,14 +383,14 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			final List<StockModel> stocks = criteria.list();
 			for (final StockModel stockModel : stocks) {
 				final Integer projectId = stockModel.getProject().getProjectId();
-				stockMap.putIfAbsent(projectId, new HashMap<>());
-				stockMap.get(projectId).put(stockModel.getGermplasm().getGermplasmUUID(), stockModel);
+				stockMap.putIfAbsent(projectId, new ArrayList<>());
+				stockMap.get(projectId).add(stockModel);
 			}
 
 			return stockMap;
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error in getStockMapByStudyIds=" + studyIds + StockDao.IN_STOCK_DAO + e.getMessage();
+			final String errorMessage = "Error in getStocksByStudyIds=" + studyIds + StockDao.IN_STOCK_DAO + e.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}

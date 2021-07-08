@@ -517,7 +517,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 				final Object[] row = (Object[]) result;
 				final Integer experimentId = (Integer) row[0];
 				final ObservationLevelRelationship observationLevelRelationship =
-					new ObservationLevelRelationship((String) row[2], (String) row[1], null);
+					new ObservationLevelRelationship((String) row[1], (String) row[2], null);
 				observationLevelRelationshipMap.putIfAbsent(experimentId, new ArrayList<>());
 				observationLevelRelationshipMap.get(experimentId).add(observationLevelRelationship);
 			}

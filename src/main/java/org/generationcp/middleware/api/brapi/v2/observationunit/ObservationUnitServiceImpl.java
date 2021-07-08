@@ -105,7 +105,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	public List<ObservationUnitDto> searchObservationUnits(final Integer pageSize, final Integer pageNumber,
 		final ObservationUnitSearchRequestDTO requestDTO) {
 		final List<ObservationUnitDto> dtos = this.daoFactory.getPhenotypeDAO().searchObservationUnits(pageSize, pageNumber, requestDTO);
-		if(!CollectionUtils.isEmpty(dtos)) {
+		if (!CollectionUtils.isEmpty(dtos)) {
 			final List<Integer> experimentIds = dtos.stream().map(o -> Integer.valueOf(o.getExperimentId())).collect(Collectors.toList());
 
 			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
@@ -150,7 +150,15 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			}
 		});
 
-		final Map<Integer, Map<String, StockModel>> stockMap = this.daoFactory.getStockDao().getStocksByStudyIds(trialIds);
+		final Map<Integer, List<StockModel>> stocks = this.daoFactory.getStockDao().getStocksByStudyIds(trialIds);
+		final Map<Integer, Map<String, StockModel>> stockMap = new HashMap<>();
+
+		for (final Integer trialDbId : trialIds) {
+			if (stocks.containsKey(trialDbId)) {
+				stockMap.put(trialDbId, stocks.get(trialDbId).stream()
+					.collect(Collectors.toMap(s -> s.getGermplasm().getGermplasmUUID(), Function.identity(), (s1, s2) -> s1)));
+			}
+		}
 
 		final Map<Integer, DmsProject> trialIdPlotDatasetMap =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.PLOT_DATA.getId()).stream()
@@ -213,7 +221,6 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		for (final Integer trialId : trialIds) {
 			this.daoFactory.getDmsProjectDAO().update(trialIdPlotDatasetMap.get(trialId));
 		}
-
 
 		return observationUnitDbIds;
 	}
@@ -350,8 +357,8 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final StockProperty stockProperty = new StockProperty();
 		stockProperty.setStock(stockModel);
 		Integer entryType = entryTypes.get(dto.getObservationUnitPosition().getEntryType().toUpperCase());
-		if(entryType == null) {
-			if(!entryTypesMap.containsKey(dto.getProgramDbId())) {
+		if (entryType == null) {
+			if (!entryTypesMap.containsKey(dto.getProgramDbId())) {
 				entryTypesMap.put(dto.getProgramDbId(),
 					this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), dto.getProgramDbId()).getEnumerations()
 						.stream().collect(Collectors.toMap(enumeration -> enumeration.getDescription().toUpperCase(), Enumeration::getId)));
