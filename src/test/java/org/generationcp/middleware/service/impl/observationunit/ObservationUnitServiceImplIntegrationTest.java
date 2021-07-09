@@ -14,7 +14,6 @@ import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -121,9 +120,8 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		observationUnitPosition.setPositionCoordinateX("1");
 		observationUnitPosition.setPositionCoordinateY("2");
 		final ObservationLevelRelationship relationship = new ObservationLevelRelationship();
-		final CVTerm plotNoTerm = this.daoFactory.getCvTermDao().getById(TermId.PLOT_NO.getId());
 		relationship.setLevelCode("1");
-		relationship.setLevelName(plotNoTerm.getName());
+		relationship.setLevelName("PLOT");
 		observationUnitPosition.setObservationLevelRelationships(Collections.singletonList(relationship));
 
 		final Map<String, Object> geoCoodinates = new HashMap<>();
