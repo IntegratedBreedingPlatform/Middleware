@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -95,10 +96,13 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		this.studyInstanceDto = this.studyInstanceService
 			.saveStudyInstances(this.crop.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
 
-		this.germplasm = GermplasmTestDataInitializer.createGermplasm(1);
-		this.germplasm.setGid(null);
+
+		this.germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		GermplasmGuidGenerator.generateGermplasmGuids(this.crop, Collections.singletonList(this.germplasm));
 		this.daoFactory.getGermplasmDao().save(this.germplasm);
+		final Name preferredName = this.germplasm.getPreferredName();
+		preferredName.setGermplasm(germplasm);
+		this.daoFactory.getNameDao().save(preferredName);
 
 		this.sessionProvder.getSession().flush();
 	}
