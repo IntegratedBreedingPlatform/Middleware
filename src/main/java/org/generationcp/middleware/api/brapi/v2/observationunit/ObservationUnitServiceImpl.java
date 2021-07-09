@@ -122,11 +122,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 			final List<ObservationLevelRelationship> relationships =
 				this.daoFactory.getExperimentPropertyDao().getObservationLevelRelationships(experimentIds);
-			LOG.error("RSIZE: " + relationships.size());
 			this.renameObservationLevelNamesToBeDisplayed(relationships);
 			final Map<Integer, List<ObservationLevelRelationship>> observationRelationshipsMap = relationships.stream().collect(groupingBy(
 					ObservationLevelRelationship::getExperimentId));
-			LOG.error("MAPSIZE: " + observationRelationshipsMap.size());
 
 			for (final ObservationUnitDto dto : dtos) {
 				dto.setExternalReferences(externalReferencesMap.get(dto.getExperimentId().toString()));
