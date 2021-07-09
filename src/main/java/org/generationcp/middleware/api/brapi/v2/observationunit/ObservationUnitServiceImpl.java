@@ -142,7 +142,6 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		return this.daoFactory.getPhenotypeDAO().countObservationUnits(requestDTO);
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public List<String> importObservationUnits(final String crop, final List<ObservationUnitImportRequestDto> requestDtos) {
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(crop);

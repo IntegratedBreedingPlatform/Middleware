@@ -17,10 +17,8 @@ import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -61,9 +59,6 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
-	@Autowired
-	private GermplasmDataManager germplasmDataDM;
-
 	private IntegrationTestDataInitializer testDataInitializer;
 	private CropType crop;
 	private Project commonTestProject;
@@ -100,10 +95,11 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		this.studyInstanceDto = this.studyInstanceService
 			.saveStudyInstances(this.crop.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
 
-
-		this.germplasm =
-			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.crop);
+		
+		this.germplasm = GermplasmTestDataInitializer.createGermplasm(1);
+		this.germplasm.setGid(null);
+		GermplasmGuidGenerator.generateGermplasmGuids(this.crop, Collections.singletonList(this.germplasm));
+		this.daoFactory.getGermplasmDao().save(this.germplasm);
 
 		this.sessionProvder.getSession().flush();
 	}
