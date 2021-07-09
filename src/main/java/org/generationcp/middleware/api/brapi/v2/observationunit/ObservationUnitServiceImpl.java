@@ -36,7 +36,6 @@ import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -109,7 +108,6 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		}
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public List<ObservationUnitDto> searchObservationUnits(final Integer pageSize, final Integer pageNumber,
 		final ObservationUnitSearchRequestDTO requestDTO) {
@@ -125,7 +123,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 				this.daoFactory.getExperimentPropertyDao().getObservationLevelRelationships(experimentIds);
 			this.renameObservationLevelNamesToBeDisplayed(relationships);
 			final Map<Integer, List<ObservationLevelRelationship>> observationRelationshipsMap = relationships.stream().collect(groupingBy(
-					ObservationLevelRelationship::getExperimentId));
+				ObservationLevelRelationship::getExperimentId));
 
 			for (final ObservationUnitDto dto : dtos) {
 				dto.setExternalReferences(externalReferencesMap.get(dto.getExperimentId().toString()));
