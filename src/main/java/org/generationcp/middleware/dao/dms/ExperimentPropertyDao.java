@@ -495,8 +495,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		}
 	}
 
-	public Map<Integer, List<ObservationLevelRelationship>> getObservationLevelRelationshipMap(final List<Integer> experimentIds) {
-		final Map<Integer, List<ObservationLevelRelationship>> observationLevelRelationshipMap = new HashMap<>();
+	public List<ObservationLevelRelationship> getObservationLevelRelationships(final List<Integer> experimentIds) {
+		final List<ObservationLevelRelationship> observationLevelRelationships = new ArrayList<>();
 		try {
 			final StringBuilder sql =
 				new StringBuilder().append("SELECT e.nd_experiment_id AS experimentId, e.value AS value, var.name AS name ")
@@ -515,16 +515,14 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			for (final Object result : results) {
 
 				final Object[] row = (Object[]) result;
-				final Integer experimentId = (Integer) row[0];
 				final ObservationLevelRelationship observationLevelRelationship =
-					new ObservationLevelRelationship((String) row[1], (String) row[2], null);
-				observationLevelRelationshipMap.putIfAbsent(experimentId, new ArrayList<>());
-				observationLevelRelationshipMap.get(experimentId).add(observationLevelRelationship);
+					new ObservationLevelRelationship((Integer) row[0], (String) row[1], (String) row[2], null);
+				observationLevelRelationships.add(observationLevelRelationship);
 			}
 
-			return observationLevelRelationshipMap;
+			return observationLevelRelationships;
 		} catch (final HibernateException e) {
-			final String message = "Error at getObservationLevelsMap=" + experimentIds + " at ExperimentPropertyDao: " + e.getMessage();
+			final String message = "Error at getObservationLevelRelationships=" + experimentIds + " at ExperimentPropertyDao: " + e.getMessage();
 			ExperimentPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

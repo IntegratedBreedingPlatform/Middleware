@@ -59,6 +59,13 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ObservationUnitServiceImpl.class);
 
+	private static final String PLOT_NO = "PLOT_NO";
+	private static final String REP_NO = "REP_NO";
+	private static final String BLOCK_NO = "BLOCK_NO";
+	private static final String PLOT = "PLOT";
+	private static final String REP = "REP";
+	private static final String BLOCK = "BLOCK";
+
 	private final ObjectMapper jacksonMapper;
 
 	@Resource
@@ -107,19 +114,23 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final ObservationUnitSearchRequestDTO requestDTO) {
 		final List<ObservationUnitDto> dtos = this.daoFactory.getPhenotypeDAO().searchObservationUnits(pageSize, pageNumber, requestDTO);
 		if (!CollectionUtils.isEmpty(dtos)) {
-			final List<Integer> experimentIds = dtos.stream().map(o -> Integer.valueOf(o.getExperimentId())).collect(Collectors.toList());
+			final List<Integer> experimentIds = dtos.stream().map(ObservationUnitDto::getExperimentId).collect(Collectors.toList());
 
 			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
 				this.daoFactory.getExperimentExternalReferenceDao().getExternalReferences(experimentIds).stream()
-					.collect(groupingBy(
-						ExternalReferenceDTO::getEntityId));
+					.collect(groupingBy(ExternalReferenceDTO::getEntityId));
 
-			final Map<Integer, List<ObservationLevelRelationship>> obsevationRelationshipsMap =
-				this.daoFactory.getExperimentPropertyDao().getObservationLevelRelationshipMap(experimentIds);
+			final List<ObservationLevelRelationship> relationships =
+				this.daoFactory.getExperimentPropertyDao().getObservationLevelRelationships(experimentIds);
+			LOG.error("RSIZE: " + relationships.size());
+			this.renameObservationLevelNamesToBeDisplayed(relationships);
+			final Map<Integer, List<ObservationLevelRelationship>> observationRelationshipsMap = relationships.stream().collect(groupingBy(
+					ObservationLevelRelationship::getExperimentId));
+			LOG.error("MAPSIZE: " + observationRelationshipsMap.size());
 
 			for (final ObservationUnitDto dto : dtos) {
 				dto.setExternalReferences(externalReferencesMap.get(dto.getExperimentId().toString()));
-				dto.getObservationUnitPosition().setObservationLevelRelationships(obsevationRelationshipsMap.get(dto.getExperimentId()));
+				dto.getObservationUnitPosition().setObservationLevelRelationships(observationRelationshipsMap.get(dto.getExperimentId()));
 			}
 		}
 
@@ -135,6 +146,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	@Override
 	public List<String> importObservationUnits(final String crop, final List<ObservationUnitImportRequestDto> requestDtos) {
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(crop);
+
+		requestDtos
+			.forEach(dto -> this.renameObservationLevelNamesToBeSaved(dto.getObservationUnitPosition().getObservationLevelRelationships()));
 
 		final List<String> germplasmDbIds =
 			requestDtos.stream().map(ObservationUnitImportRequestDto::getGermplasmDbId).collect(Collectors.toList());
@@ -174,12 +188,10 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final List<Integer> categoricalVariableIds = new ArrayList<>();
 		categoricalVariableIds.addAll(
 			variableNamesMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
-				.map(MeasurementVariable::getTermId).collect(
-				Collectors.toList()));
+				.map(MeasurementVariable::getTermId).collect(Collectors.toList()));
 		categoricalVariableIds.addAll(
 			variableSynonymsMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
-				.map(MeasurementVariable::getTermId).collect(
-				Collectors.toList()));
+				.map(MeasurementVariable::getTermId).collect(Collectors.toList()));
 		final Map<Integer, List<ValueReference>> categoricalVariablesMap =
 			this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(categoricalVariableIds);
 
@@ -247,22 +259,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final ObservationUnitPosition position = dto.getObservationUnitPosition();
 		if (!CollectionUtils.isEmpty(position.getObservationLevelRelationships())) {
 			for (final ObservationLevelRelationship levelRelationship : position.getObservationLevelRelationships()) {
-				final String variableName = levelRelationship.getLevelName().toUpperCase();
-				final MeasurementVariable measurementVariable =
-					variableNamesMap.containsKey(variableName) ? variableNamesMap.get(variableName) : variableSynonymsMap.get(variableName);
-				if (measurementVariable != null) {
-					measurementVariable.setValue(levelRelationship.getLevelCode());
-					final DataType dataType = DataType.getById(measurementVariable.getDataTypeId());
-					final java.util.Optional<VariableValueValidator> dataValidator =
-						this.variableDataValidatorFactory.getValidator(dataType);
-					if (categoricalVariablesMap.containsKey(measurementVariable.getTermId())) {
-						measurementVariable.setPossibleValues(categoricalVariablesMap.get(measurementVariable.getTermId()));
-					}
-					if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
-						properties.add(this.createExperimentProperty(experiment, 1, levelRelationship.getLevelCode(),
-							measurementVariable.getTermId()));
-					}
-				}
+				this.addProperty(experiment, variableNamesMap, variableSynonymsMap, categoricalVariablesMap, properties, levelRelationship);
 			}
 		}
 
@@ -274,11 +271,32 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	}
 
+	private void addProperty(final ExperimentModel experiment, final Map<String, MeasurementVariable> variableNamesMap,
+		final Map<String, MeasurementVariable> variableSynonymsMap, final Map<Integer, List<ValueReference>> categoricalVariablesMap,
+		final List<ExperimentProperty> properties, final ObservationLevelRelationship levelRelationship) {
+		final String variableName = levelRelationship.getLevelName().toUpperCase();
+		final MeasurementVariable measurementVariable =
+			variableNamesMap.containsKey(variableName) ? variableNamesMap.get(variableName) : variableSynonymsMap.get(variableName);
+		if (measurementVariable != null) {
+			measurementVariable.setValue(levelRelationship.getLevelCode());
+			final DataType dataType = DataType.getById(measurementVariable.getDataTypeId());
+			final java.util.Optional<VariableValueValidator> dataValidator =
+				this.variableDataValidatorFactory.getValidator(dataType);
+			if (categoricalVariablesMap.containsKey(measurementVariable.getTermId())) {
+				measurementVariable.setPossibleValues(categoricalVariablesMap.get(measurementVariable.getTermId()));
+			}
+			if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
+				properties.add(this.createExperimentProperty(experiment, 1, levelRelationship.getLevelCode(),
+					measurementVariable.getTermId()));
+			}
+		}
+	}
+
 	private ExperimentProperty createExperimentProperty(final ExperimentModel experimentModel, final Integer rank, final String value,
 		final Integer typeId) {
 		final ExperimentProperty experimentProperty = new ExperimentProperty();
 		experimentProperty.setExperiment(experimentModel);
-		experimentProperty.setRank(1);
+		experimentProperty.setRank(rank);
 		experimentProperty.setValue(value);
 		experimentProperty.setTypeId(typeId);
 		return experimentProperty;
@@ -384,6 +402,37 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 				references.add(externalReference);
 			});
 			experimentModel.setExternalReferences(references);
+		}
+	}
+
+	private void renameObservationLevelNamesToBeSaved(final List<ObservationLevelRelationship> relationships) {
+		if (!CollectionUtils.isEmpty(relationships)) {
+			//Convert observation level relationship names to their equivalent in BMS database
+			for (final ObservationLevelRelationship relationship : relationships) {
+				if (PLOT.equalsIgnoreCase(relationship.getLevelName())) {
+					relationship.setLevelName(PLOT_NO);
+				} else if (REP.equalsIgnoreCase(relationship.getLevelName())) {
+					relationship.setLevelName(REP_NO);
+				} else if (BLOCK.equalsIgnoreCase(relationship.getLevelName())) {
+					relationship.setLevelName(BLOCK_NO);
+				}
+			}
+		}
+	}
+
+	private void renameObservationLevelNamesToBeDisplayed(final List<ObservationLevelRelationship> relationships) {
+		if (!CollectionUtils.isEmpty(relationships)) {
+			//Convert observation level relationship names to the accepted values for BRAPI.
+			//Reference: https://app.swaggerhub.com/apis/PlantBreedingAPI/BrAPI-Phenotyping/2.0#/ObservationUnitHierarchyLevel
+			for (final ObservationLevelRelationship relationship : relationships) {
+				if (PLOT_NO.equalsIgnoreCase(relationship.getLevelName())) {
+					relationship.setLevelName(PLOT);
+				} else if (REP_NO.equalsIgnoreCase(relationship.getLevelName())) {
+					relationship.setLevelName(REP);
+				} else if (BLOCK_NO.equalsIgnoreCase(relationship.getLevelName())) {
+					relationship.setLevelName(BLOCK);
+				}
+			}
 		}
 	}
 }

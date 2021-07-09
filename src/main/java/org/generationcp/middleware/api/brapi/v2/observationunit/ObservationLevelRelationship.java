@@ -1,7 +1,11 @@
 package org.generationcp.middleware.api.brapi.v2.observationunit;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class ObservationLevelRelationship {
 
+	@JsonIgnore
+	private Integer experimentId;
 	private String levelCode;
 	private String levelName;
 	private Integer levelOrder;
@@ -9,10 +13,19 @@ public class ObservationLevelRelationship {
 	public ObservationLevelRelationship() {
 	}
 
-	public ObservationLevelRelationship(final String levelCode, final String levelName, final Integer levelOrder) {
+	public ObservationLevelRelationship(final Integer experimentId, final String levelCode, final String levelName, final Integer levelOrder) {
+		this.experimentId = experimentId;
 		this.levelCode = levelCode;
 		this.levelName = levelName;
 		this.levelOrder = levelOrder;
+	}
+
+	public Integer getExperimentId() {
+		return this.experimentId;
+	}
+
+	public void setExperimentId(final Integer experimentId) {
+		this.experimentId = experimentId;
 	}
 
 	public String getLevelCode() {
