@@ -109,6 +109,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		}
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public List<ObservationUnitDto> searchObservationUnits(final Integer pageSize, final Integer pageNumber,
 		final ObservationUnitSearchRequestDTO requestDTO) {
@@ -122,11 +123,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 			final List<ObservationLevelRelationship> relationships =
 				this.daoFactory.getExperimentPropertyDao().getObservationLevelRelationships(experimentIds);
-			LOG.error("RSIZE: " + relationships.size());
 			this.renameObservationLevelNamesToBeDisplayed(relationships);
 			final Map<Integer, List<ObservationLevelRelationship>> observationRelationshipsMap = relationships.stream().collect(groupingBy(
 					ObservationLevelRelationship::getExperimentId));
-			LOG.error("MAPSIZE: " + observationRelationshipsMap.size());
 
 			for (final ObservationUnitDto dto : dtos) {
 				dto.setExternalReferences(externalReferencesMap.get(dto.getExperimentId().toString()));
@@ -142,7 +141,6 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		return this.daoFactory.getPhenotypeDAO().countObservationUnits(requestDTO);
 	}
 
-	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public List<String> importObservationUnits(final String crop, final List<ObservationUnitImportRequestDto> requestDtos) {
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(crop);
