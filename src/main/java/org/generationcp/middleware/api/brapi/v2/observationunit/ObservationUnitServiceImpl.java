@@ -36,6 +36,7 @@ import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -130,6 +131,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		return this.daoFactory.getPhenotypeDAO().countObservationUnits(requestDTO);
 	}
 
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
 	@Override
 	public List<String> importObservationUnits(final String crop, final List<ObservationUnitImportRequestDto> requestDtos) {
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(crop);
