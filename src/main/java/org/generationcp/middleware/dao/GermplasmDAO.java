@@ -618,21 +618,21 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
+	public PedigreeDTO getPedigree(final Integer gid, final String notation, final Boolean includeSiblings) {
 		try {
 			final String query = "SELECT "
 				+ "   g.germplsm_uuid as germplasmDbId," // use gid as germplasmDbId
 				+ "   (select n.nval from names n where n.gid = g.gid AND n.nstat = 1) as defaultDisplayName," //
 				+ "   CONCAT(m.mcode, '|', m.mname, '|', m.mtype) AS crossingPlan," //
 				+ "   year(str_to_date(g.gdate, '%Y%m%d')) as crossingYear," //
-				+ "   femaleParent.gid as parent1DbId," //
+				+ "   femaleParent.germplsm_uuid as parent1DbId," //
 				+ "   femaleParentName.nval as parent1Name," //
 				// If germplasmDbId is a cross (gnpgs > 0), the parents' type should be FEMALE and MALE
 				// If germplasmDbId is advanced (gnpgs < 0), the parents type should be POPULATION and SELF
 				+ "   CASE WHEN femaleParent.gid is not null AND g.gnpgs > 0 THEN '" + ParentType.FEMALE.name() + "' "
 				+ "	  WHEN femaleParent.gid is not null AND g.gnpgs < 0 THEN '" + ParentType.POPULATION.name()
 				+ "' ELSE NULL END as parent1Type," //
-				+ "   maleParent.gid as parent2DbId," //
+				+ "   maleParent.germplsm_uuid as parent2DbId," //
 				+ "   maleParentName.nval as parent2Name," //
 				+ "   CASE WHEN maleParent.gid is not null AND g.gnpgs > 0 THEN '" + ParentType.MALE.name() + "' "
 				+ "	  WHEN maleParent.gid is not null AND g.gnpgs < 0  THEN '" + ParentType.SELF.name()
@@ -649,7 +649,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				.addScalar("germplasmDbId").addScalar("defaultDisplayName").addScalar("crossingPlan")
 				.addScalar("crossingYear", new IntegerType()).addScalar("parent1DbId").addScalar("parent1Name").addScalar("parent1Type")
 				.addScalar("parent2DbId").addScalar("parent2Name").addScalar("parent2Type")
-				.setParameter("gid", germplasmDbId) //
+				.setParameter("gid", gid) //
 				.setResultTransformer(Transformers.aliasToBean(PedigreeDTO.class)) //
 				.uniqueResult();
 
@@ -670,7 +670,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			final List<PedigreeDTO.Sibling> siblings = this.getSession().createSQLQuery(siblingsQuery) //
 				.addScalar("germplasmDbId").addScalar("defaultDisplayName")
-				.setParameter("gid", germplasmDbId)
+				.setParameter("gid", gid)
 				.setResultTransformer(Transformers.aliasToBean(PedigreeDTO.Sibling.class)) //
 				.list();
 
