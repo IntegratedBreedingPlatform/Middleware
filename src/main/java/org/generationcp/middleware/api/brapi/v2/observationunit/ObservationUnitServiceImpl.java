@@ -154,6 +154,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			requestDtos.stream().map(ObservationUnitImportRequestDto::getGermplasmDbId).collect(Collectors.toList());
 		final GermplasmSearchRequestDto germplasmSearchRequestDto = new GermplasmSearchRequestDto();
 		germplasmSearchRequestDto.setGermplasmDbIds(germplasmDbIds);
+		LOG.error("EMPTY:" + CollectionUtils.isEmpty(this.germplasmService.searchFilteredGermplasm(germplasmSearchRequestDto, null)));
 		final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmService.searchFilteredGermplasm(germplasmSearchRequestDto, null)
 			.stream().collect(Collectors.toMap(GermplasmDTO::getGermplasmDbId, Function.identity()));
 
