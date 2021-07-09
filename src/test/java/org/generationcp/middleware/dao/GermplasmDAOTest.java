@@ -1279,7 +1279,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName(), this.cropType);
 	}
 
-
 	@Test
 	public void testGetGermplasmAttributeVariables() {
 		final Germplasm germplasm =
@@ -1299,7 +1298,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final Set<String> gids = result.stream().map(GermplasmDTO::getGid).collect(Collectors.toSet());
 		final List<Integer> gidsList = gids.stream().map(s -> Integer.valueOf(s)).collect(Collectors.toList());
-		final List<Variable>  variables = this.dao.getGermplasmAttributeVariables(gidsList, null);
+		final List<Variable> variables = this.dao.getGermplasmAttributeVariables(gidsList, null);
 		Assert.assertEquals(1, variables.size());
 		Assert.assertTrue(variables.stream().allMatch(cVTerm -> cVTerm.getName().equalsIgnoreCase(NOTE_ATTRIBUTE.toUpperCase())));
 		Assert.assertEquals(NOTE_ATTRIBUTE, variables.get(0).getName());
