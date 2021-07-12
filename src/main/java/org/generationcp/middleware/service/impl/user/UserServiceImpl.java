@@ -247,6 +247,7 @@ public class UserServiceImpl implements UserService {
 		this.workbenchDaoFactory.getPersonDAO().saveOrUpdate(user.getPerson());
 	}
 
+
 	@Override
 	public boolean isUsernameExists(final String userName) {
 		return this.workbenchDaoFactory.getWorkbenchUserDAO().isUsernameExists(userName);
@@ -486,7 +487,12 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final Pageable pageable) {
-		return null;
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getProgramMembers(programUUID, pageable);
+	}
+
+	@Override
+	public long countAllProgramMembers(final String programUUID) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().countAllProgramMembers(programUUID);
 	}
 
 	private UserRole buildNewUserRole(final WorkbenchUser user, final UserRoleDto userRoleDto) {

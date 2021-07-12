@@ -299,6 +299,8 @@ public interface UserService {
 
 	List<Integer> getActiveUserIDsWithAccessToTheProgram(Long projectId);
 
-	List<ProgramMemberDto> getProgramMembers(final String programUUID, final Pageable pageable);
+	List<ProgramMemberDto> getProgramMembers(String programUUID, Pageable pageable);
+
+	long countAllProgramMembers(String programUUID);
 
 }

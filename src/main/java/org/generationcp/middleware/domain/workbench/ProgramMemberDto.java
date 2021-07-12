@@ -12,7 +12,20 @@ public class ProgramMemberDto {
 	private String firstName;
 	private String lastName;
 	private String email;
-	private RoleDto roleInProgram;
+	private RoleDto role;
+
+	public ProgramMemberDto() {
+	}
+
+	public ProgramMemberDto(final Integer userId, final String username, final String firstName, final String lastName, final String email,
+		final RoleDto role) {
+		this.userId = userId;
+		this.username = username;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.email = email;
+		this.role = role;
+	}
 
 	public Integer getUserId() {
 		return userId;
@@ -54,12 +67,12 @@ public class ProgramMemberDto {
 		this.email = email;
 	}
 
-	public RoleDto getRoleInProgram() {
-		return roleInProgram;
+	public RoleDto getRole() {
+		return role;
 	}
 
-	public void setRoleInProgram(final RoleDto roleInProgram) {
-		this.roleInProgram = roleInProgram;
+	public void setRole(final RoleDto role) {
+		this.role = role;
 	}
 
 	@Override
