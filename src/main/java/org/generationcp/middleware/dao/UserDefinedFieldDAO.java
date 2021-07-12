@@ -192,8 +192,9 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			addPagination(criteria, pageable);
 			return criteria.list();
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error with getNameTypes(Pageable=" + pageable + " ) query from UserDefinedField: " + e.getMessage(), e);
+			final String message = "Error executing UserDefinedFieldDAO.getNameTypes(pageable={}) : {}";
+			UserDefinedFieldDAO.LOG.error(message, pageable,  e.getMessage());
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
@@ -206,8 +207,9 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 			criteria.addOrder(Order.asc("fname"));
 			return criteria.list();
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error with getByName(name=" + table + " types= " + types + " ) query from UserDefinedField: " + e.getMessage(), e);
+			final String message = "Error executing UserDefinedFieldDAO.getByName(fTable={}, fType={}, fname={}) : {}";
+			UserDefinedFieldDAO.LOG.error(message, table, types, name, e.getMessage());
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
