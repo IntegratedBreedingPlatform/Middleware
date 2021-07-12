@@ -1,5 +1,5 @@
 
-package org.generationcp.middleware.dao;
+package org.generationcp.middleware.dao.germplasmlist;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -9,8 +9,7 @@ import java.util.Map;
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.manager.Operation;

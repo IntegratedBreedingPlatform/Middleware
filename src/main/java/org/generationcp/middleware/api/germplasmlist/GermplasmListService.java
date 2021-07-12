@@ -52,7 +52,7 @@ public interface GermplasmListService {
 	void performGermplasmListEntriesDeletion(List<Integer> gids);
 
 	List<GermplasmListSearchResponse> searchGermplasmList(GermplasmListSearchRequest germplasmListSearchRequest, Pageable pageable,
-		final String programUUID);
+		String programUUID);
 
 	long countSearchGermplasmList(GermplasmListSearchRequest germplasmSearchRequest, String programUUID);
 

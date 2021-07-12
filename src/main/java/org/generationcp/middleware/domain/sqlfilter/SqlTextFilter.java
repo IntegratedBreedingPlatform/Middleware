@@ -24,4 +24,9 @@ public class SqlTextFilter {
 	public void setType(final Type type) {
 		this.type = type;
 	}
+
+	public boolean isEmpty() {
+		return this.value == null && this.type == null;
+	}
+
 }

@@ -15,6 +15,8 @@ import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -23,6 +25,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListMetadata;
+import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -45,6 +48,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 
 import javax.annotation.Nullable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -785,6 +789,41 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message);
 		}
+	}
+
+	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest germplasmListSearchRequest,
+		final Pageable pageable, final String programUUID) {
+
+		final SQLQueryBuilder queryBuilder = GermplasmListSearchDAOQuery.getSelectQuery(germplasmListSearchRequest, pageable);
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		queryBuilder.addParamsToQuery(query);
+
+		query.setParameter("programUUID", programUUID);
+
+		query.addScalar(GermplasmListSearchDAOQuery.LIST_ID_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.LIST_NAME_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.PARENT_FOLDER_NAME_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.DESCRIPTION_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.LIST_OWNER_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.LIST_TYPE_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.NUMBER_OF_ENTRIES_ALIAS, IntegerType.INSTANCE);
+		query.addScalar(GermplasmListSearchDAOQuery.STATUS_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.NOTES_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.LIST_DATE_ALIAS);
+		query.setResultTransformer(Transformers.aliasToBean(GermplasmListSearchResponse.class));
+
+		GenericDAO.addPaginationToSQLQuery(query, pageable);
+
+		return (List<GermplasmListSearchResponse>) query.list();
+	}
+
+	public long countSearchGermplasmList(final GermplasmListSearchRequest germplasmListSearchRequest, final String programUUID) {
+		final SQLQueryBuilder queryBuilder = GermplasmListSearchDAOQuery.getCountQuery(germplasmListSearchRequest);
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		queryBuilder.addParamsToQuery(query);
+
+		query.setParameter("programUUID", programUUID);
+		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
 }

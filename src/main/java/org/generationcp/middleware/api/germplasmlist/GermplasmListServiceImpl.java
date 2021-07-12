@@ -416,12 +416,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest germplasmListSearchRequest,
 		final Pageable pageable,
 		final String programUUID) {
-		return null;
+		return this.daoFactory.getGermplasmListDAO().searchGermplasmList(germplasmListSearchRequest, pageable, programUUID);
 	}
 
 	@Override
 	public long countSearchGermplasmList(final GermplasmListSearchRequest germplasmSearchRequest, final String programUUID) {
-		return 0;
+		return this.daoFactory.getGermplasmListDAO().countSearchGermplasmList(germplasmSearchRequest, programUUID);
 	}
 
 	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {

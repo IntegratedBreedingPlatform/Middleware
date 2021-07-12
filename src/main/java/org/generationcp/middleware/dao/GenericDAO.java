@@ -325,7 +325,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 	}
 
-	protected static String getOperator(final SqlTextFilter.Type filterType) {
+	public static String getOperator(final SqlTextFilter.Type filterType) {
 		if (SqlTextFilter.Type.EXACTMATCH.equals(filterType)) {
 			return "=";
 		} else {
@@ -333,7 +333,7 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 	}
 
-	protected static String getParameter(final SqlTextFilter.Type type, final String value) {
+	public static String getParameter(final SqlTextFilter.Type type, final String value) {
 		if (type == null) {
 			return value;
 		}
