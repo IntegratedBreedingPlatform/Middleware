@@ -1,6 +1,6 @@
 package org.generationcp.middleware.domain.workbench;
 
-import org.generationcp.middleware.service.api.user.UserRoleDto;
+import org.generationcp.middleware.service.api.user.RoleDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -12,7 +12,7 @@ public class ProgramMemberDto {
 	private String firstName;
 	private String lastName;
 	private String email;
-	private UserRoleDto roleInProgram;
+	private RoleDto roleInProgram;
 
 	public Integer getUserId() {
 		return userId;
@@ -54,11 +54,11 @@ public class ProgramMemberDto {
 		this.email = email;
 	}
 
-	public UserRoleDto getRoleInProgram() {
+	public RoleDto getRoleInProgram() {
 		return roleInProgram;
 	}
 
-	public void setRoleInProgram(final UserRoleDto roleInProgram) {
+	public void setRoleInProgram(final RoleDto roleInProgram) {
 		this.roleInProgram = roleInProgram;
 	}
 
