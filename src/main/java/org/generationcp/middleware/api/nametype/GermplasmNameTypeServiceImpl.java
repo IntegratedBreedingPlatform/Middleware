@@ -113,4 +113,17 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 			.collect(Collectors.toList());
 	}
 
+	@Override
+	public List<GermplasmNameTypeDTO> getNameTypesByGIDList(final List<Integer> gidList) {
+		return this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gidList).stream()
+			.map(userDefinedField -> {
+				final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
+				germplasmNameTypeDTO.setId(userDefinedField.getFldno());
+				germplasmNameTypeDTO.setName(userDefinedField.getFname());
+				germplasmNameTypeDTO.setCode(userDefinedField.getFcode());
+				return germplasmNameTypeDTO;
+			})
+			.collect(Collectors.toList());
+	}
+
 }
