@@ -91,6 +91,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 				germplasmNameTypeDTO.setId(userDefinedField.getFldno());
 				germplasmNameTypeDTO.setName(userDefinedField.getFname());
 				germplasmNameTypeDTO.setCode(userDefinedField.getFcode());
+				germplasmNameTypeDTO.setDescription(userDefinedField.getFdesc());
 				return germplasmNameTypeDTO;
 			})
 			.collect(Collectors.toList());
