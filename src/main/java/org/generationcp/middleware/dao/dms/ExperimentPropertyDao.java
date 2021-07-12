@@ -46,7 +46,7 @@ import java.util.Set;
 public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentPropertyDao.class);
-	private static final List<Integer> OBSERVATION_LEVEL_RELATIONSSHIP_IDS =
+	private static final List<Integer> OBSERVATION_LEVEL_RELATIONSHIP_IDS =
 		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId());
 
 	@SuppressWarnings("unchecked")
@@ -511,7 +511,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			query.setParameterList("experimentIds", experimentIds);
-			query.setParameterList("observationLevelRelationshipIds", OBSERVATION_LEVEL_RELATIONSSHIP_IDS);
+			query.setParameterList("observationLevelRelationshipIds", OBSERVATION_LEVEL_RELATIONSHIP_IDS);
 			query.addScalar("experimentId");
 			query.addScalar("value");
 			query.addScalar("name");
