@@ -190,8 +190,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Integer updateUser(final UserDto userDto) {
 		final Integer currentDate = Util.getCurrentDateAsIntegerValue();
-		WorkbenchUser user = null;
-		Integer idUserSaved = null;
+		final WorkbenchUser user;
+		final Integer idUserSaved;
 
 		try {
 			user = this.getUserById(userDto.getUserId());
@@ -298,16 +298,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Person getPersonById(final int id) {
 		return this.workbenchDaoFactory.getPersonDAO().getById(id, false);
-	}
-
-	@Override
-	public Person getPersonByEmail(final String email) {
-		return this.workbenchDaoFactory.getPersonDAO().getPersonByEmail(email);
-	}
-
-	@Override
-	public Person getPersonByEmailAndName(final String email, final String firstName, final String lastName) {
-		return this.workbenchDaoFactory.getPersonDAO().getPersonByEmailAndName(email, firstName, lastName);
 	}
 
 	@Override
@@ -479,11 +469,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void removeCropPerson(final CropPerson cropPerson) {
 		this.workbenchDaoFactory.getCropPersonDAO().makeTransient(cropPerson);
-	}
-
-	@Override
-	public CropPerson getCropPerson(final String cropName, final Integer personId) {
-		return this.workbenchDaoFactory.getCropPersonDAO().getByCropNameAndPersonId(cropName, personId);
 	}
 
 	@Override

@@ -153,14 +153,6 @@ public interface UserService {
 	Person getPersonById(int id);
 
 	/**
-	 * @param email
-	 * @return
-	 */
-	Person getPersonByEmail(String email);
-
-	Person getPersonByEmailAndName(String email, String firstName, String lastName);
-
-	/**
 	 * Returns the user's person name given the user id
 	 * @param userId
 	 * @return
@@ -303,8 +295,6 @@ public interface UserService {
 	void saveCropPerson(CropPerson cropPerson);
 
 	void removeCropPerson(CropPerson cropPerson);
-
-	CropPerson getCropPerson(String cropName, Integer personId);
 
 	Map<Integer, String> getPersonNamesByPersonIds(List<Integer> personIds);
 
