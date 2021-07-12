@@ -21,7 +21,7 @@ public class GermplasmNameTypeServiceImplIntegrationTest extends IntegrationTest
 	private DaoFactory daoFactory;
 
 	@Autowired
-	GermplasmNameTypeService germplasmNameTypeService;
+	private GermplasmNameTypeService germplasmNameTypeService;
 
 	@Before
 	public void setUp() throws Exception {
