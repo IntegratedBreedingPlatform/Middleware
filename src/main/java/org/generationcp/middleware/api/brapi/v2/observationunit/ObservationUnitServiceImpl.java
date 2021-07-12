@@ -260,8 +260,8 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		}
 
 		if (!StringUtils.isEmpty(position.getPositionCoordinateX()) && !StringUtils.isEmpty(position.getPositionCoordinateY())) {
-			properties.add(this.createExperimentProperty(experiment, 0, position.getPositionCoordinateX(), TermId.RANGE_NO.getId()));
-			properties.add(this.createExperimentProperty(experiment, 0, position.getPositionCoordinateY(), TermId.COLUMN_NO.getId()));
+			properties.add(this.createExperimentProperty(experiment, 0, position.getPositionCoordinateX(), TermId.ROW.getId()));
+			properties.add(this.createExperimentProperty(experiment, 0, position.getPositionCoordinateY(), TermId.COL.getId()));
 		}
 		experiment.setProperties(properties);
 
@@ -317,12 +317,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		}
 
 		if (!StringUtils.isEmpty(position.getPositionCoordinateX()) && !StringUtils.isEmpty(position.getPositionCoordinateY())) {
-			if (!plotExperimentVariablesMap.get(trialDbId).contains(TermId.RANGE_NO.getId())) {
-				this.addProjectProperty(TermId.RANGE_NO.getId(), "FIELDMAP RANGE", trialDbId, plotExperimentVariablesMap,
+			if (!plotExperimentVariablesMap.get(trialDbId).contains(TermId.ROW.getId())) {
+				this.addProjectProperty(TermId.ROW.getId(), "ROW", trialDbId, plotExperimentVariablesMap,
 					trialIdPlotDatasetMap);
 			}
-			if (!plotExperimentVariablesMap.get(trialDbId).contains(TermId.COLUMN_NO.getId())) {
-				this.addProjectProperty(TermId.COLUMN_NO.getId(), "FIELDMAP COLUMN", trialDbId, plotExperimentVariablesMap,
+			if (!plotExperimentVariablesMap.get(trialDbId).contains(TermId.COL.getId())) {
+				this.addProjectProperty(TermId.COL.getId(), "COL", trialDbId, plotExperimentVariablesMap,
 					trialIdPlotDatasetMap);
 			}
 		}
