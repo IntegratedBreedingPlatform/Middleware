@@ -72,7 +72,7 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 	 * This is HOTFIX (band-aid fix) for v18.0.2 for showing the ADD program button from dashboard (IBP-4800)
 	 * for those with permissions while the crop and program context is not yet available.
 	 * It will return the CROP_MANAGEMENT, MANAGE_PROGRAMS, ADD_PROGRAM permissions if the user has a role on any crop
-	 * which has those permissions
+	 * which has those permissions and has no program restriction (a program role for that crop)
 	 */
 	private static final String SQL_ADD_PROGRAM_PERMISSIONS = "select " //
 		+ "p.permission_id as id, " //
@@ -84,9 +84,19 @@ public class PermissionDAO extends GenericDAO<Permission, Integer> {
 		+ "inner join role_permission rp on p.permission_id = rp.permission_id " //
 		+ "inner join role r on rp.role_id = r.id " //
 		+ "inner join users_roles ur on r.id = ur.role_id " //
-		+ "where  (r.role_type_id = " + RoleType.CROP.getId() + " and p.name in ('" + PermissionsEnum.CROP_MANAGEMENT.toString()
-		+ "', '" + PermissionsEnum.MANAGE_PROGRAMS.toString() + "', '" +  PermissionsEnum.ADD_PROGRAM.toString() + "')) "
-		+ "and ur.userid = :userId and r.active = 1";
+		+ "where  (r.role_type_id = " + RoleType.CROP.getId() //
+		+ " and not exists( " //
+		+ "      select 1  " //
+		+ "      from workbench_project p1 " //
+		+ "               inner join users_roles ur1 on ur1.workbench_project_id = p1.project_id " //
+		+ "               inner join role r1 on ur1.role_id = r1.id " //
+		+ "      where r1.role_type_id =  " + RoleType.PROGRAM.getId()  //
+		+ "        and ur1.crop_name = ur.crop_name and ur1.userid = ur.userid " //
+		+ " ) " //
+		+ " and p.name in ('" + PermissionsEnum.CROP_MANAGEMENT.toString()  //
+		+ "', '" + PermissionsEnum.MANAGE_PROGRAMS.toString()  //
+		+ "', '" + PermissionsEnum.ADD_PROGRAM.toString() + "')) " //
+		+ " and ur.userid = :userId and r.active = 1";
 
 	private static final String PERMISSION_CHILDREN = "select " //
 		+ "p.permission_id as id, " //
