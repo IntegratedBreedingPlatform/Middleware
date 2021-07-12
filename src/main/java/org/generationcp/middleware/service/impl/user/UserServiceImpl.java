@@ -4,6 +4,7 @@ import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
+import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -24,6 +25,7 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -494,6 +496,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<WorkbenchUser> getUsersWithRole(final int roleId) {
 		return this.workbenchDaoFactory.getUserRoleDao().getUsersByRoleId(roleId);
+	}
+
+	@Override
+	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final Pageable pageable) {
+		return null;
 	}
 
 	private UserRole buildNewUserRole(final WorkbenchUser user, final UserRoleDto userRoleDto) {

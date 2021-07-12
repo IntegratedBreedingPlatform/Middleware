@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.user;
 
+import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropPerson;
@@ -8,6 +9,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -303,5 +305,7 @@ public interface UserService {
 	List<WorkbenchUser> getUsersWithRole(int id);
 
 	List<Integer> getActiveUserIDsWithAccessToTheProgram(Long projectId);
+
+	List<ProgramMemberDto> getProgramMembers(final String programUUID, final Pageable pageable);
 
 }
