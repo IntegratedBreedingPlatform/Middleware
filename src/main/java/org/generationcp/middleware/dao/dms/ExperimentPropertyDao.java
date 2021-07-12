@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -45,6 +46,8 @@ import java.util.Set;
 public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentPropertyDao.class);
+	private static final List<Integer> OBSERVATION_LEVEL_RELATIONSSHIP_IDS =
+		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId());
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByPropertyTypeAndValue(final Integer typeId, final String value) {
@@ -503,10 +506,12 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					.append("	FROM nd_experimentprop e ")
 					.append("	INNER JOIN cvterm var on e.type_id = var.cvterm_id ")
 					.append("	WHERE e.nd_experiment_id IN (:experimentIds)")
+					.append("		AND e.type_id IN (:observationLevelRelationshipIds)")
 					.append("		AND e.type_id NOT IN (" + TermId.COLUMN_NO.getId() + ", " + TermId.RANGE_NO.getId() + ")");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
 			query.setParameterList("experimentIds", experimentIds);
+			query.setParameterList("observationLevelRelationshipIds", OBSERVATION_LEVEL_RELATIONSSHIP_IDS);
 			query.addScalar("experimentId");
 			query.addScalar("value");
 			query.addScalar("name");
@@ -522,7 +527,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 			return observationLevelRelationships;
 		} catch (final HibernateException e) {
-			final String message = "Error at getObservationLevelRelationships=" + experimentIds + " at ExperimentPropertyDao: " + e.getMessage();
+			final String message =
+				"Error at getObservationLevelRelationships=" + experimentIds + " at ExperimentPropertyDao: " + e.getMessage();
 			ExperimentPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

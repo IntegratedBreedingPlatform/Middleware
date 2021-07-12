@@ -987,13 +987,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
 				observationUnitPosition.setObservationLevel((String) row[3]);
 				observationUnitPosition.setEntryType(observationUnit.getEntryType());
-				observationUnitPosition.setPositionCoordinateX(x);
-				if (x != null) {
+				observationUnitPosition.setPositionCoordinateX(row[11] != null ? (String) row[11] : null);
+				if (observationUnitPosition.getPositionCoordinateX() != null) {
 					observationUnitPosition.setPositionCoordinateXType("GRID_COL");
 				}
 
-				observationUnitPosition.setPositionCoordinateY(y);
-				if (y != null) {
+				observationUnitPosition.setPositionCoordinateY(row[12] != null ? (String) row[12] : null);
+				if (observationUnitPosition.getPositionCoordinateY() != null) {
 					observationUnitPosition.setPositionCoordinateYType("GRID_ROW");
 				}
 				final String jsonProps = (String) row[25];

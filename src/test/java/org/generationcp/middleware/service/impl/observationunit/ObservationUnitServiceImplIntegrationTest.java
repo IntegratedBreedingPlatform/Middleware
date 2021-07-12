@@ -119,10 +119,16 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
 		observationUnitPosition.setPositionCoordinateX("1");
 		observationUnitPosition.setPositionCoordinateY("2");
-		final ObservationLevelRelationship relationship = new ObservationLevelRelationship();
-		relationship.setLevelCode("1");
-		relationship.setLevelName("PLOT");
-		observationUnitPosition.setObservationLevelRelationships(Collections.singletonList(relationship));
+		final ObservationLevelRelationship plotRelationship = new ObservationLevelRelationship();
+		plotRelationship.setLevelCode("1");
+		plotRelationship.setLevelName("PLOT");
+		final ObservationLevelRelationship repRelationship = new ObservationLevelRelationship();
+		repRelationship.setLevelCode("1");
+		repRelationship.setLevelName("REP");
+		final ObservationLevelRelationship blockRelationship = new ObservationLevelRelationship();
+		blockRelationship.setLevelCode("1");
+		blockRelationship.setLevelName("BLOCK");
+		observationUnitPosition.setObservationLevelRelationships(Arrays.asList(plotRelationship, repRelationship, blockRelationship));
 
 		final Map<String, Object> geoCoodinates = new HashMap<>();
 		geoCoodinates.put("type", "Feature");
@@ -154,7 +160,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 			observationUnitDto.getObservationUnitPosition().getPositionCoordinateX());
 		Assert.assertEquals(observationUnitPosition.getPositionCoordinateY(),
 			observationUnitDto.getObservationUnitPosition().getPositionCoordinateY());
-		Assert.assertEquals(1, observationUnitDto.getObservationUnitPosition().getObservationLevelRelationships().size());
+		Assert.assertEquals(3, observationUnitDto.getObservationUnitPosition().getObservationLevelRelationships().size());
 		Assert.assertNotNull(observationUnitDto.getObservationUnitPosition().getGeoCoordinates());
 		Assert.assertEquals(1, observationUnitDto.getExternalReferences().size());
 		Assert.assertEquals(externalReference.getReferenceID(), observationUnitDto.getExternalReferences().get(0).getReferenceID());
