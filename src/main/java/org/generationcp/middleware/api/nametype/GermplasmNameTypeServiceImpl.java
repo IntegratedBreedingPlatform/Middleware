@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
 	private final DaoFactory daoFactory;
+	private static final String DEFAULT_FFMT_FIELD = "-";
 
 	@Autowired
 	protected UserService userService;
@@ -50,7 +51,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 		userDefinedField.setFtype(UDTableType.NAMES_NAME.getType());
 		userDefinedField.setFcode(germplasmNameTypeRequestDTO.getCode().toUpperCase());
 		userDefinedField.setFname(germplasmNameTypeRequestDTO.getName());
-		userDefinedField.setFfmt("-");
+		userDefinedField.setFfmt(GermplasmNameTypeServiceImpl.DEFAULT_FFMT_FIELD);
 		userDefinedField.setFdesc(germplasmNameTypeRequestDTO.getDescription());
 		userDefinedField.setLfldno(0);
 		userDefinedField.setFuid(ContextHolder.getLoggedInUserId());
