@@ -260,8 +260,8 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		}
 
 		if (!StringUtils.isEmpty(position.getPositionCoordinateX()) && !StringUtils.isEmpty(position.getPositionCoordinateY())) {
-			properties.add(this.createExperimentProperty(experiment, 0, position.getPositionCoordinateX(), TermId.ROW.getId()));
-			properties.add(this.createExperimentProperty(experiment, 0, position.getPositionCoordinateY(), TermId.COL.getId()));
+			properties.add(this.createExperimentProperty(experiment, 0, position.getPositionCoordinateX(), TermId.COL.getId()));
+			properties.add(this.createExperimentProperty(experiment, 0, position.getPositionCoordinateY(), TermId.ROW.getId()));
 		}
 		experiment.setProperties(properties);
 

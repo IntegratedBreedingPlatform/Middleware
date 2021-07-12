@@ -962,8 +962,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setStudyName((String) row[9]);
 				observationUnit.setProgramName((String) row[10]);
 
-				String x = row[16] != null ? (String) row[16] : null; // ROW
-				String y = row[17] != null ? (String) row[17] : null; // COL
+				String x = row[16] != null ? (String) row[16] : null; // COL
+				String y = row[17] != null ? (String) row[17] : null; // ROW
 				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
 					x = row[11] != null ? (String) row[11] : null; // fieldMapRow
 					y = row[12] != null ? (String) row[12] : null; // fieldMapCol
