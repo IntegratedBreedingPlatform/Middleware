@@ -167,7 +167,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		}
 	}
 
-	public long countNameTypes() {
+	public long countAllNameTypes() {
 		final Criteria criteria = this.getSession().createCriteria(UserDefinedField.class);
 		criteria.setProjection(Projections.rowCount());
 		criteria.add(Restrictions.eq("ftable", UDTableType.NAMES_NAME.getTable()));

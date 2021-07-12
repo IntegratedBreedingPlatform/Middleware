@@ -16,7 +16,7 @@ public interface GermplasmNameTypeService {
 
 	List<GermplasmNameTypeDTO> getNameTypes(Pageable pageable);
 
-	long countNameTypes();
+	long countAllNameTypes();
 
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
 

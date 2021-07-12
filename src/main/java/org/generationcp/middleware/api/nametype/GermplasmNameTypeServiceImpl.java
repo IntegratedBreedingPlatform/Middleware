@@ -77,8 +77,8 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
-	public long countNameTypes() {
-		return daoFactory.getUserDefinedFieldDAO().countNameTypes();
+	public long countAllNameTypes() {
+		return daoFactory.getUserDefinedFieldDAO().countAllNameTypes();
 	}
 
 	@Override
