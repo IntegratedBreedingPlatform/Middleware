@@ -108,6 +108,6 @@ public interface GermplasmService {
 
 	void updateGermplasmBasicDetails(Integer gid, GermplasmBasicDetailsDto germplasmBasicDetailsDto);
 
-	void updateGermplasmPedigree(Integer gid, ProgenitorsUpdateRequestDto progenitorsUpdateRequstDto);
+	void updateGermplasmPedigree(Integer gid, ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto);
 
 }
