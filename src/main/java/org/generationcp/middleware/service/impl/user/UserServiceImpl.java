@@ -248,20 +248,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void deleteUser(final WorkbenchUser user) {
-
-		try {
-
-			this.workbenchDaoFactory.getWorkbenchUserDAO().makeTransient(user);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while deleting User: userService.deleteUser(user=" + user + "):  " + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public boolean isUsernameExists(final String userName) {
 		return this.workbenchDaoFactory.getWorkbenchUserDAO().isUsernameExists(userName);
 	}

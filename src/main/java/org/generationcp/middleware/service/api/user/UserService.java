@@ -114,13 +114,6 @@ public interface UserService {
 	void updateUser(WorkbenchUser user);
 
 	/**
-	 * Deletes a user.
-	 *
-	 * @param user - the Workbench User to delete
-	 */
-	void deleteUser(WorkbenchUser user);
-
-	/**
 	 * Checks if a username exists.
 	 *
 	 * @param userName - the user name to check
