@@ -1551,4 +1551,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public void setGermplasmAttributeService(final GermplasmAttributeService germplasmAttributeService) {
 		this.germplasmAttributeService = germplasmAttributeService;
 	}
+
+	public void setGermplasmNameTypeService(final GermplasmNameTypeService germplasmNameTypeService) {
+		this.germplasmNameTypeService = germplasmNameTypeService;
+	}
 }
