@@ -13,6 +13,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
@@ -51,8 +52,6 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
-import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -128,6 +127,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private GermplasmAttributeService germplasmAttributeService;
+
+	@Autowired
+	private GermplasmNameTypeService germplasmNameTypeService;
 
 	private final GermplasmMethodValidator germplasmMethodValidator;
 
@@ -725,18 +727,15 @@ public class GermplasmServiceImpl implements GermplasmService {
 			.addAll(
 				germplasmUpdateDTOList.stream().map(GermplasmUpdateDTO::getPreferredNameType).filter(Objects::nonNull)
 					.collect(Collectors.toSet()));
-		return this.daoFactory.getUserDefinedFieldDAO()
-			.getByCodes(UDTableType.NAMES_NAME.getTable(),
-				Collections.singleton(UDTableType.NAMES_NAME.getType()), namesCode).stream().collect(Collectors.toMap(
-				UserDefinedField::getFcode, UserDefinedField::getFldno));
+		return this.germplasmNameTypeService.filterGermplasmNameTypes(namesCode).stream().collect(Collectors.toMap(
+			GermplasmNameTypeDTO::getCode, GermplasmNameTypeDTO::getId));
 	}
 
 	private Map<String, Integer> getNameTypesMapByName(final List<GermplasmImportDTO> germplasmDtos) {
 		final Set<String> nameTypes = new HashSet<>();
 		germplasmDtos.forEach(g -> nameTypes.addAll(g.getNames().keySet()));
-		final List<UserDefinedField> nameTypesUdfldList = this.daoFactory.getUserDefinedFieldDAO()
-			.getByCodes(UDTableType.NAMES_NAME.getTable(), Collections.singleton(UDTableType.NAMES_NAME.getType()), nameTypes);
-		return nameTypesUdfldList.stream().collect(Collectors.toMap(u -> u.getFcode().toUpperCase(), UserDefinedField::getFldno));
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOS = this.germplasmNameTypeService.filterGermplasmNameTypes(nameTypes);
+		return germplasmNameTypeDTOS.stream().collect(Collectors.toMap(germplasmNameTypeDTO -> germplasmNameTypeDTO.getCode().toUpperCase(), GermplasmNameTypeDTO::getId));
 	}
 
 	private Map<String, Variable> getAttributesMap(final String programUUID, final Set<String> variableNamesOrAlias) {
@@ -974,10 +973,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Set<String> namesCode = new HashSet<>(GermplasmImportRequest.BRAPI_SPECIFIABLE_NAMETYPES);
 		germplasmImportRequestList.forEach(
 			g -> namesCode.addAll(g.getSynonyms().stream().map(s -> s.getType().toUpperCase()).collect(Collectors.toList())));
-		return this.daoFactory.getUserDefinedFieldDAO()
-			.getByCodes(UDTableType.NAMES_NAME.getTable(),
-				Collections.singleton(UDTableType.NAMES_NAME.getType()), namesCode).stream().collect(Collectors.toMap(
-				UserDefinedField::getFcode, UserDefinedField::getFldno));
+		return this.germplasmNameTypeService.filterGermplasmNameTypes(namesCode).stream().collect(Collectors.toMap(
+			GermplasmNameTypeDTO::getCode, GermplasmNameTypeDTO::getId));
 	}
 
 	@Override
@@ -1477,26 +1474,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	@Override
-	public List<GermplasmNameTypeDTO> filterGermplasmNameTypes(final Set<String> codes) {
-		return this.daoFactory.getUserDefinedFieldDAO().getByCodes(UDTableType.NAMES_NAME.getTable(),
-			Collections.singleton(UDTableType.NAMES_NAME.getType()), codes)
-			.stream()
-			.map(userDefinedField -> {
-				final GermplasmNameTypeDTO germplasmNameTypeDTO = new GermplasmNameTypeDTO();
-				germplasmNameTypeDTO.setId(userDefinedField.getFldno());
-				germplasmNameTypeDTO.setName(userDefinedField.getFname());
-				germplasmNameTypeDTO.setCode(userDefinedField.getFcode());
-				return germplasmNameTypeDTO;
-			})
-			.collect(Collectors.toList());
-	}
-
 	private void populateSynonymsAndAttributes(final List<GermplasmDTO> germplasmDTOList) {
 		final List<Integer> gids = germplasmDTOList.stream().map(germplasmDTO -> Integer.valueOf(germplasmDTO.getGid()))
 			.collect(Collectors.toList());
-		final Map<Integer, String> nameTypesMap = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids).stream()
-			.collect(Collectors.toMap(UserDefinedField::getFldno, UserDefinedField::getFcode));
+		final Map<Integer, String> nameTypesMap = this.germplasmNameTypeService.getNameTypesByGIDList(gids).stream()
+			.collect(Collectors.toMap(GermplasmNameTypeDTO::getId, GermplasmNameTypeDTO::getCode));
 		final Map<Integer, List<Name>> gidNamesMap =
 			this.daoFactory.getNameDao().getNamesByGidsAndNTypeIdsInMap(new ArrayList<>(gids), Collections.emptyList());
 		final Map<Integer, Map<String, String>> gidAttributesMap = this.getAttributesNameAndValuesMapForGids(new ArrayList<>(gids));
@@ -1568,5 +1550,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	public void setGermplasmAttributeService(final GermplasmAttributeService germplasmAttributeService) {
 		this.germplasmAttributeService = germplasmAttributeService;
+	}
+
+	public void setGermplasmNameTypeService(final GermplasmNameTypeService germplasmNameTypeService) {
+		this.germplasmNameTypeService = germplasmNameTypeService;
 	}
 }
