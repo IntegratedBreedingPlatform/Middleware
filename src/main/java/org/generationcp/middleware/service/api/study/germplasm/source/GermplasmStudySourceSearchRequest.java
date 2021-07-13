@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.study.germplasm.source;
 
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -8,7 +9,7 @@ import java.util.Collections;
 import java.util.List;
 
 @AutoProperty
-public class GermplasmStudySourceSearchRequest {
+public class GermplasmStudySourceSearchRequest extends SearchRequestDto {
 
 	private int studyId;
 
