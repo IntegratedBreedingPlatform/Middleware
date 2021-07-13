@@ -23,5 +23,5 @@ public interface GermplasmNameTypeService {
 
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypesByName(String name);
 
-	public List<GermplasmNameTypeDTO> getNameTypesByGIDList(final List<Integer> gidList);
+	List<GermplasmNameTypeDTO> getNameTypesByGIDList(List<Integer> gidList);
 }
