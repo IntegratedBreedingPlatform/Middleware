@@ -79,15 +79,15 @@
 	<bean id="germplasmGroupingService" class="org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
-	
+
 	<bean id="dummyCrossExpansionProps" class="java.util.Properties">
 	</bean>
-	
+
 	<bean id="crossExpansionProperties"
 		class="org.generationcp.middleware.util.CrossExpansionProperties">
 		<constructor-arg ref="dummyCrossExpansionProps" />
 	</bean>
-	
+
     <bean id="oldPedigreeService" class="org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl">
         <constructor-arg ref="cropSessionProvider"/>
         <constructor-arg value="maize"/>
@@ -174,7 +174,7 @@
     <bean id="ontologyService" class="org.generationcp.middleware.service.OntologyServiceImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="formulaService" class="org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
@@ -270,6 +270,10 @@
     </bean>
 
 	<bean id="studyInstanceService" class="org.generationcp.middleware.service.impl.study.StudyInstanceServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
+	<bean id="observationUnitService" class="org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 

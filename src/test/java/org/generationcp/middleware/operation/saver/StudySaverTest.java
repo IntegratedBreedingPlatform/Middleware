@@ -3,19 +3,19 @@ package org.generationcp.middleware.operation.saver;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
-import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.StudyValues;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImplTest;
+import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorTest;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 public class StudySaverTest extends IntegrationTestBase {
-	private static final String CROP_PREFIX =  RandomStringUtils.randomAlphanumeric(5);
+
+	private static final String CROP_PREFIX = RandomStringUtils.randomAlphanumeric(5);
 
 	private StudySaver studySaver;
 	private ExperimentModelSaver experimentModelSaver;
@@ -43,7 +43,7 @@ public class StudySaverTest extends IntegrationTestBase {
 		this.studySaver.saveStudyExperiment(crop, 1, values);
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Assert.assertNotNull(experiment.getObsUnitId());
-		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorImplTest.UUID_REGEX));
+		Assert.assertFalse(experiment.getObsUnitId().matches(ObservationUnitIDGeneratorTest.UUID_REGEX));
 		Assert.assertEquals(TermId.STUDY_INFORMATION.getId(), experiment.getTypeId().intValue());
 	}
 

@@ -1,38 +1,64 @@
 package org.generationcp.middleware.service.api.phenotype;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
+import org.generationcp.middleware.api.brapi.v2.observationunit.Treatment;
 import org.generationcp.middleware.service.api.BrapiView;
+import org.generationcp.middleware.util.serializer.ObservationSerializer;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-/**
- * TODO Rename to ObservationUnitDto
- */
 @AutoProperty
-public class PhenotypeSearchDTO {
+public class ObservationUnitDto {
+
+	@JsonIgnore
+	private Integer experimentId;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private Map<String, String> additionalInfo;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private List<ExternalReferenceDTO> externalReferences;
 
 	private String observationUnitDbId;
 	private String observationUnitName;
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String observationLevel;
 
 	@JsonView(BrapiView.BrapiV1_2.class)
 	private String observationLevels;
 
+	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
 	private String plotNumber;
+
+	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
 	private String plantNumber;
+
+	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
 	private String blockNumber;
+
+	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
 	private String replicate;
 	private String germplasmDbId;
 	private String germplasmName;
 	private String studyDbId;
 	private String studyName;
+
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String studyLocationDbId;
+
+	@JsonView(BrapiView.BrapiV1_2.class)
 	private String studyLocation;
+
+	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV2.class})
 	private String programName;
 
 	@JsonView(BrapiView.BrapiV1_2.class)
@@ -40,16 +66,18 @@ public class PhenotypeSearchDTO {
 
 	@JsonView(BrapiView.BrapiV1_2.class)
 	private String y;
+
+	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
 	private String entryType;
+
+	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
 	private String entryNumber;
 
+	@JsonSerialize(using = ObservationSerializer.class)
 	private List<PhenotypeSearchObservationDTO> observations;
 
 	@JsonView(BrapiView.BrapiV1_2.class)
 	private String instanceNumber;
-
-	@JsonView(BrapiView.BrapiV2.class)
-	private String additionalInfo;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String locationDbId;
@@ -69,10 +97,14 @@ public class PhenotypeSearchDTO {
 	@JsonView(BrapiView.BrapiV1_3.class)
 	private String positionCoordinateY;
 
+	@JsonView(BrapiView.BrapiV1_3.class)
 	private List<ObservationUnitXRef> observationUnitXRef;
 
 	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String programDbId;
+
+	@JsonView(BrapiView.BrapiV2.class)
+	private String seedLotDbId;
 
 	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private List<Treatment> treatments;
@@ -102,27 +134,6 @@ public class PhenotypeSearchDTO {
 
 		public void setSource(final String source) {
 			this.source = source;
-		}
-	}
-
-	public static class Treatment {
-		private String factor;
-		private String modality;
-
-		public String getFactor() {
-			return this.factor;
-		}
-
-		public void setFactor(final String factor) {
-			this.factor = factor;
-		}
-
-		public String getModality() {
-			return this.modality;
-		}
-
-		public void setModality(final String modality) {
-			this.modality = modality;
 		}
 	}
 
@@ -297,11 +308,11 @@ public class PhenotypeSearchDTO {
 		this.instanceNumber = instanceNumber;
 	}
 
-	public String getAdditionalInfo() {
+	public Map<String, String> getAdditionalInfo() {
 		return this.additionalInfo;
 	}
 
-	public void setAdditionalInfo(final String additionalInfo) {
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
 		this.additionalInfo = additionalInfo;
 	}
 
@@ -396,6 +407,30 @@ public class PhenotypeSearchDTO {
 
 	public void setPositionCoordinateY(final String positionCoordinateY) {
 		this.positionCoordinateY = positionCoordinateY;
+	}
+
+	public List<ExternalReferenceDTO> getExternalReferences() {
+		return this.externalReferences;
+	}
+
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
+		this.externalReferences = externalReferences;
+	}
+
+	public String getSeedLotDbId() {
+		return this.seedLotDbId;
+	}
+
+	public void setSeedLotDbId(final String seedLotDbId) {
+		this.seedLotDbId = seedLotDbId;
+	}
+
+	public Integer getExperimentId() {
+		return this.experimentId;
+	}
+
+	public void setExperimentId(final Integer experimentId) {
+		this.experimentId = experimentId;
 	}
 
 	@Override

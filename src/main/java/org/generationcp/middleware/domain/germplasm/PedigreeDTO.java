@@ -36,10 +36,10 @@ public class PedigreeDTO {
 	private String crossingPlan;
 	private Integer crossingYear;
 	private String familyCode;
-	private Integer parent1DbId;
+	private String parent1DbId;
 	private String parent1Name;
 	private String parent1Type;
-	private Integer parent2DbId;
+	private String parent2DbId;
 	private String parent2Name;
 	private String parent2Type;
 	private List<Sibling> siblings;
@@ -92,11 +92,11 @@ public class PedigreeDTO {
 		this.familyCode = familyCode;
 	}
 
-	public Integer getParent1DbId() {
+	public String getParent1DbId() {
 		return parent1DbId;
 	}
 
-	public void setParent1DbId(final Integer parent1DbId) {
+	public void setParent1DbId(final String parent1DbId) {
 		this.parent1DbId = parent1DbId;
 	}
 
@@ -116,11 +116,11 @@ public class PedigreeDTO {
 		this.parent1Type = parent1Type;
 	}
 
-	public Integer getParent2DbId() {
+	public String getParent2DbId() {
 		return parent2DbId;
 	}
 
-	public void setParent2DbId(final Integer parent2DbId) {
+	public void setParent2DbId(final String parent2DbId) {
 		this.parent2DbId = parent2DbId;
 	}
 
