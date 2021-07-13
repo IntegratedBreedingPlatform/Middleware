@@ -41,8 +41,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.StudyService;
@@ -332,17 +330,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<PhenotypeSearchDTO> searchPhenotypes(final Integer pageSize, final Integer pageNumber,
-		final PhenotypeSearchRequestDTO requestDTO) {
-		return this.daoFactory.getPhenotypeDAO().searchPhenotypes(pageSize, pageNumber, requestDTO);
-	}
-
-	@Override
-	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
-		return this.daoFactory.getPhenotypeDAO().countPhenotypes(requestDTO);
-	}
-
-	@Override
 	public List<StudySummary> getStudies(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 		final List<StudySummary> studies = this.daoFactory.getDmsProjectDAO().getStudies(studySearchFilter, pageable);
 		if (!CollectionUtils.isEmpty(studies)) {
@@ -574,6 +561,32 @@ public class StudyServiceImpl extends Service implements StudyService {
 				new ProjectProperty(dataset, VariableType.ENVIRONMENT_DETAIL.getId(), null, 4, TermId.LOCATION_ID.getId(),
 					"LOCATION_NAME");
 			properties.add(locationNameProp);
+		} else {
+			final ProjectProperty entryTypeProp =
+				new ProjectProperty(dataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, 4, TermId.ENTRY_TYPE.getId(),
+					"ENTRY_TYPE");
+			properties.add(entryTypeProp);
+
+			final ProjectProperty gidProp =
+				new ProjectProperty(dataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, 5, TermId.GID.getId(),
+					"GID");
+			properties.add(gidProp);
+
+			final ProjectProperty designationProp =
+				new ProjectProperty(dataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, 6, TermId.DESIG.getId(),
+					"DESIGNATION");
+			properties.add(designationProp);
+
+			final ProjectProperty entryNoProp =
+				new ProjectProperty(dataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, 7, TermId.ENTRY_NO.getId(),
+					"ENTRY_NO");
+			properties.add(entryNoProp);
+
+			final ProjectProperty obsUnitIdProp =
+				new ProjectProperty(dataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, 8, TermId.OBS_UNIT_ID.getId(),
+					"OBS_UNIT_ID");
+			properties.add(obsUnitIdProp);
+
 		}
 		dataset.setProperties(properties);
 	}

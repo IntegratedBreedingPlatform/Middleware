@@ -307,6 +307,25 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		statement.executeUpdate();
 
 
+		// Delete external references of experiments
+		queryString = "DELETE eref FROM external_reference_experiment eref "
+			+ "  INNER JOIN nd_experiment e ON e.nd_experiment_id = eref.nd_experiment_id "
+			+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id "
+			+ "  WHERE e.project_id IN (:datasetIds) ";
+		sb = new StringBuilder(queryString);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			sb.append(" AND g.description IN (:instanceNumbers)");
+		}
+		statement =
+			this.getSession()
+				.createSQLQuery(sb.toString());
+		statement.setParameterList("datasetIds", datasetIds);
+		if (!CollectionUtils.isEmpty(instanceNumbers)) {
+			statement.setParameterList("instanceNumbers", instanceNumbers);
+		}
+		statement.executeUpdate();
+
+
 		// Delete experiments
 		queryString = "DELETE e, eprop " + "FROM nd_experiment e "
 			+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"

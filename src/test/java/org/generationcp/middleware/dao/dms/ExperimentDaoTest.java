@@ -240,12 +240,12 @@ public class ExperimentDaoTest {
 				+ "  INNER JOIN nd_geolocation g on g.nd_geolocation_id = e.nd_geolocation_id"
 				+ "  LEFT JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id " + "  WHERE e.project_id IN (:datasetIds) ";
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
-		Mockito.verify(this.mockSession, Mockito.times(3)).createSQLQuery(sqlCaptor.capture());
+		Mockito.verify(this.mockSession, Mockito.times(4)).createSQLQuery(sqlCaptor.capture());
 		final List<String> queries = sqlCaptor.getAllValues();
 		Assert.assertEquals(deletePhenotypeSql, queries.get(0));
-		Assert.assertEquals(deleteExperimentSql, queries.get(2));
-		Mockito.verify(this.mockQuery, Mockito.times(3)).setParameterList("datasetIds", Collections.singletonList(dataset));
-		Mockito.verify(this.mockQuery, Mockito.times(3)).executeUpdate();
+		Assert.assertEquals(deleteExperimentSql, queries.get(3));
+		Mockito.verify(this.mockQuery, Mockito.times(4)).setParameterList("datasetIds", Collections.singletonList(dataset));
+		Mockito.verify(this.mockQuery, Mockito.times(4)).executeUpdate();
 	}
 
 	@Test
@@ -295,7 +295,7 @@ public class ExperimentDaoTest {
 		Mockito.verify(query).setMaxResults(numOfRows);
 		Mockito.verify(query).setFirstResult(start);
 	}
-	
+
 	@Test
 	public void testGetExperiments_NoFiltering() {
 		final Query query = Mockito.mock(Query.class);
