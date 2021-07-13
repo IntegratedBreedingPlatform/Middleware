@@ -340,6 +340,7 @@ public class GermplasmImportRequest {
 		namesMap.put(GENUS_NAME_TYPE, this.getGenus());
 		namesMap.put(PED_NAME_TYPE, this.getPedigree());
 		namesMap.put(LNAME_NAME_TYPE, this.getDefaultDisplayName());
+		namesMap.put(PUI_NAME_TYPE, this.getGermplasmPUI());
 		return namesMap;
 	}
 

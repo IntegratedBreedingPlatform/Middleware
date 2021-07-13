@@ -469,7 +469,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		if (germplasmPUIList != null && !germplasmPUIList.isEmpty()) {
 			try {
 				final String sql = "SELECT n.nval from names n "
-					+ "INNER JOIN germplasm g ON g.gid = n.gid AND g.deleted = 0 AND g.grplce = 0 "
+					+ "INNER JOIN germplsm g ON g.gid = n.gid AND g.deleted = 0 AND g.grplce = 0 "
 					+ "INNER JOIN udflds u on u.fldno = n.ntype AND u.ftable = 'NAMES' and u.ftype = 'NAME' and u.fcode = 'PUI' "
 					+ "WHERE n.nval in (:germplasmPUIList)";
 				final SQLQuery query = this.getSession().createSQLQuery(sql);
