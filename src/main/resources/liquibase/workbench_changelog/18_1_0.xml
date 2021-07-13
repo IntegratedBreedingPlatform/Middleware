@@ -1,39 +1,24 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 	<changeSet author="lkovacic" id="v18.1.0-1">
         <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT COUNT(*) FROM permission WHERE
-					(name = 'MG_MANAGE_INVENTORY' AND parent_id =
-					(SELECT permission_id FROM permission WHERE name = 'MANAGE_GERMPLASM'));
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) FROM workbench_tool WHERE name = 'backup_restore';
             </sqlCheck>
         </preConditions>
-        <comment>Update MG_MANAGE_INVENTORY permission</comment>
+        <comment>Remove 'backup_restore' tool</comment>
 		<sql dbms="mysql" splitStatements="true">
-				UPDATE permission
-				SET parent_id = (SELECT p1.permission_id
-								 FROM (SELECT permission_id
-									   FROM permission
-									   WHERE name = 'MANAGE_GERMPLASM') AS p1)
-				WHERE name = 'MG_MANAGE_INVENTORY';
-		</sql>
-	</changeSet>
-
-	<changeSet author="lkovacic" id="v18.1.0-2">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="0">
-                SELECT COUNT(*) FROM permission WHERE name IN ('MG_MANAGE_INVENTORY', 'MG_CREATE_LOTS') AND workbench_sidebar_category_link_id IS NULL;
-            </sqlCheck>
-        </preConditions>
-        <comment>Update sidebar link for MG_MANAGE_INVENTORY and MG_CREATE_LOTS permission</comment>
-		<sql dbms="mysql" splitStatements="true">
-				UPDATE permission
+			UPDATE permission
 				SET workbench_sidebar_category_link_id = NULL
-				WHERE name IN ('MG_MANAGE_INVENTORY', 'MG_CREATE_LOTS');
+				WHERE workbench_sidebar_category_link_id = (SELECT sidebar_category_link_id
+															FROM workbench_sidebar_category_link
+															WHERE tool_name = 'backup_restore');
+			DELETE FROM workbench_sidebar_category_link WHERE tool_name = 'backup_restore';
+			DELETE FROM workbench_tool WHERE name = 'backup_restore';
 		</sql>
 	</changeSet>
 

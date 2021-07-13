@@ -38,27 +38,6 @@ public class Measurements {
 	}
 
 	/**
-	 * @param observations list of observations to save
-	 */
-	void saveMeasurements(final List<MeasurementRow> observations) {
-		// Changing the fulsh mode will have huge performance implications.
-		// Please be careful when doing this. The current stratergy below
-		// facilitates batch inserts.
-		final FlushMode originalFlushMode = this.session.getFlushMode();
-		try {
-			Preconditions.checkNotNull(observations, "Observation list passed in must cannot be null ");
-			this.session.setFlushMode(FlushMode.MANUAL);
-			this.saveMeasurementData(observations);
-			this.saveOutliers(observations);
-			this.session.flush();
-		} finally {
-			if (this.session != null) {
-				this.session.setFlushMode(originalFlushMode);
-			}
-		}
-	}
-
-	/**
 	 * Saves the old value of the measurements that are marked as "missing" to the Phenotype_Outlier table.
 	 * 
 	 * @param observations

@@ -1,11 +1,15 @@
 package org.generationcp.middleware.service.api.study;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.apache.commons.lang.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.user.ContactDto;
+import org.generationcp.middleware.util.serializer.DatePropertySerializer;
+import org.generationcp.middleware.util.serializer.SeasonPropertySerializer;
+import org.generationcp.middleware.util.serializer.StringToBooleanSerializer;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -28,7 +32,7 @@ public class StudyInstanceDto {
 	private String culturalPractices;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private List<String> dataLinks = new ArrayList<>();
+	private List<DataLink> dataLinks = new ArrayList<>();
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private List<EnvironmentParameter> environmentParameters;
@@ -37,7 +41,7 @@ public class StudyInstanceDto {
 	private ExperimentalDesign experimentalDesign;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private List<String> externalReferences;
+	private List<ExternalReferenceDTO> externalReferences;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String growthFacility;
@@ -52,7 +56,7 @@ public class StudyInstanceDto {
 	private String observationUnitsDescription = StringUtils.EMPTY;
 
 	@JsonView(BrapiView.BrapiV2.class)
-	private String studyCode  = StringUtils.EMPTY;
+	private String studyCode = StringUtils.EMPTY;
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String studyDescription;
@@ -63,16 +67,24 @@ public class StudyInstanceDto {
 	@JsonView(BrapiView.BrapiV2.class)
 	private List<ObservationLevel> observationLevels;
 
+	// Use custom serializer to convert string to boolean if active view is for 2.0
+	@JsonSerialize(using = StringToBooleanSerializer.class)
 	private String active;
 
 	private String commonCropName;
 
 	private String documentationURL;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	// Use custom serializer to format date according to view
+	// V1.2-3 - yyyy-MM-dd
+	// V2.0 - yyyy-MM-dd'T'HH:mm:ss.SSS'Z
+	@JsonSerialize(using = DatePropertySerializer.class)
 	private Date startDate;
 
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	// User custom serializer to format date according to view
+	// V1.2-3 - yyyy-MM-dd
+	// V2.0 - yyyy-MM-dd'T'HH:mm:ss.SSS'Z
+	@JsonSerialize(using = DatePropertySerializer.class)
 	private Date endDate;
 
 	private String studyDbId;
@@ -85,6 +97,7 @@ public class StudyInstanceDto {
 
 	private String studyTypeName;
 
+	@JsonSerialize(using = SeasonPropertySerializer.class)
 	private List<SeasonDto> seasons;
 
 	private String locationDbId;
@@ -309,7 +322,7 @@ public class StudyInstanceDto {
 	}
 
 	public Map<String, String> getAdditionalInfo() {
-		return additionalInfo;
+		return this.additionalInfo;
 	}
 
 	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
@@ -317,7 +330,7 @@ public class StudyInstanceDto {
 	}
 
 	public List<ContactDto> getContacts() {
-		return contacts;
+		return this.contacts;
 	}
 
 	public void setContacts(final List<ContactDto> contacts) {
@@ -325,23 +338,23 @@ public class StudyInstanceDto {
 	}
 
 	public String getCulturalPractices() {
-		return culturalPractices;
+		return this.culturalPractices;
 	}
 
 	public void setCulturalPractices(final String culturalPractices) {
 		this.culturalPractices = culturalPractices;
 	}
 
-	public List<String> getDataLinks() {
-		return dataLinks;
+	public List<DataLink> getDataLinks() {
+		return this.dataLinks;
 	}
 
-	public void setDataLinks(final List<String> dataLinks) {
+	public void setDataLinks(final List<DataLink> dataLinks) {
 		this.dataLinks = dataLinks;
 	}
 
 	public List<EnvironmentParameter> getEnvironmentParameters() {
-		return environmentParameters;
+		return this.environmentParameters;
 	}
 
 	public void setEnvironmentParameters(final List<EnvironmentParameter> environmentParameters) {
@@ -349,23 +362,23 @@ public class StudyInstanceDto {
 	}
 
 	public ExperimentalDesign getExperimentalDesign() {
-		return experimentalDesign;
+		return this.experimentalDesign;
 	}
 
 	public void setExperimentalDesign(final ExperimentalDesign experimentalDesign) {
 		this.experimentalDesign = experimentalDesign;
 	}
 
-	public List<String> getExternalReferences() {
-		return externalReferences;
+	public List<ExternalReferenceDTO> getExternalReferences() {
+		return this.externalReferences;
 	}
 
-	public void setExternalReferences(final List<String> externalReferences) {
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
 		this.externalReferences = externalReferences;
 	}
 
 	public String getGrowthFacility() {
-		return growthFacility;
+		return this.growthFacility;
 	}
 
 	public void setGrowthFacility(final String growthFacility) {
@@ -373,7 +386,7 @@ public class StudyInstanceDto {
 	}
 
 	public Map<String, String> getLastUpdate() {
-		return lastUpdate;
+		return this.lastUpdate;
 	}
 
 	public void setLastUpdate(final Map<String, String> lastUpdate) {
@@ -381,7 +394,7 @@ public class StudyInstanceDto {
 	}
 
 	public String getLicense() {
-		return license;
+		return this.license;
 	}
 
 	public void setLicense(final String license) {
@@ -389,7 +402,7 @@ public class StudyInstanceDto {
 	}
 
 	public String getObservationUnitsDescription() {
-		return observationUnitsDescription;
+		return this.observationUnitsDescription;
 	}
 
 	public void setObservationUnitsDescription(final String observationUnitsDescription) {
@@ -397,7 +410,7 @@ public class StudyInstanceDto {
 	}
 
 	public String getStudyCode() {
-		return studyCode;
+		return this.studyCode;
 	}
 
 	public void setStudyCode(final String studyCode) {
@@ -405,7 +418,7 @@ public class StudyInstanceDto {
 	}
 
 	public String getStudyDescription() {
-		return studyDescription;
+		return this.studyDescription;
 	}
 
 	public void setStudyDescription(final String studyDescription) {
@@ -413,7 +426,7 @@ public class StudyInstanceDto {
 	}
 
 	public String getStudyPUI() {
-		return studyPUI;
+		return this.studyPUI;
 	}
 
 	public void setStudyPUI(final String studyPUI) {
@@ -421,7 +434,7 @@ public class StudyInstanceDto {
 	}
 
 	public List<ObservationLevel> getObservationLevels() {
-		return observationLevels;
+		return this.observationLevels;
 	}
 
 	public void setObservationLevels(final List<ObservationLevel> observationLevels) {

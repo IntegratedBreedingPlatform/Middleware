@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.dms;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
@@ -32,7 +33,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DatasetType;
@@ -46,13 +46,12 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -97,9 +96,6 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	private Project commonTestProject;
 	private List<Germplasm> germplasm;
 
-	@Autowired
-	private StudyDataManager studyDataManager;
-
 	@Before
 	public void setUp() throws Exception {
 
@@ -114,8 +110,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmDao == null) {
-			this.germplasmDao = new GermplasmDAO();
-			this.germplasmDao.setSession(this.sessionProvder.getSession());
+			this.germplasmDao = new GermplasmDAO(this.sessionProvder.getSession());
 		}
 
 		if (this.experimentDao == null) {
@@ -138,7 +133,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.cvTermDao.setSession(this.sessionProvder.getSession());
 		}
 
-		if(this.cvTermPropertyDao == null) {
+		if (this.cvTermPropertyDao == null) {
 			this.cvTermPropertyDao = new CvTermPropertyDao();
 			this.cvTermPropertyDao.setSession(this.sessionProvder.getSession());
 		}
@@ -176,12 +171,15 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.experimentModelSaver = new ExperimentModelSaver(this.sessionProvder);
 		}
 
+		if (this.crop == null) {
+			this.crop = new CropType();
+			this.crop.setUseUUID(true);
+		}
+
 		if (this.germplasm == null) {
 			this.createGermplasm();
 		}
 
-		this.crop = new CropType();
-		this.crop.setUseUUID(true);
 		this.experiments = new HashMap<>();
 	}
 
@@ -199,6 +197,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		for (int i = 0; i < NO_OF_GERMPLASM; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 			germplasm.setGid(null);
+			GermplasmGuidGenerator.generateGermplasmGuids(this.crop, Collections.singletonList(germplasm));
 			this.germplasmDao.save(germplasm);
 			this.germplasm.add(germplasm);
 		}
@@ -232,7 +231,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		values.setLocationId(this.experimentModelSaver.createNewGeoLocation().getLocationId());
 		values.setGermplasmId(1);
 		//Save the experiment
-		this.studyDataManager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		this.experimentModelSaver.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		final Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
@@ -248,7 +248,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		values.setGermplasmId(1);
 
 		//Save the experiment
-		this.studyDataManager.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		this.experimentModelSaver.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+
 		final ExperimentModel experiment = this.experimentDao.getExperimentByProjectIdAndLocation(1, values.getLocationId());
 		Phenotype phenotype = this.phenotypeDao.getPhenotypeByExperimentIdAndObservableId(experiment.getNdExperimentId(), 1001);
 		Assert.assertEquals("999", phenotype.getValue());
@@ -262,7 +263,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	public void testCountPhenotypesForDatasetWhenNoPhenotypes() {
 		this.createEnvironmentData(1, false);
 		Assert.assertEquals(0,
-			this.phenotypeDao.countPhenotypesForDataset(this.study.getProjectId(),Collections.singletonList(this.trait.getCvTermId())));
+			this.phenotypeDao.countPhenotypesForDataset(this.study.getProjectId(), Collections.singletonList(this.trait.getCvTermId())));
 	}
 
 	@Test
@@ -270,7 +271,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final int numberOfReps = 2;
 		this.createEnvironmentData(numberOfReps, true);
 		Assert.assertEquals(NO_OF_GERMPLASM * numberOfReps,
-			this.phenotypeDao.countPhenotypesForDataset(this.study.getProjectId(),Collections.singletonList(this.trait.getCvTermId())));
+			this.phenotypeDao.countPhenotypesForDataset(this.study.getProjectId(), Collections.singletonList(this.trait.getCvTermId())));
 	}
 
 	@Test
@@ -292,7 +293,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	public void testDeletePhenotypesByProjectIdAndTraitIds() {
 		final int numberOfReps = 2;
 		this.createEnvironmentData(numberOfReps, true);
-		final List<Integer> traitIds =Collections.singletonList(this.trait.getCvTermId());
+		final List<Integer> traitIds = Collections.singletonList(this.trait.getCvTermId());
 		final Integer projectId = this.study.getProjectId();
 		Assert.assertEquals(NO_OF_GERMPLASM * numberOfReps, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
 
@@ -303,7 +304,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testDeletePhenotypesByProjectIdAndLocationId() {
 		final Integer locationId = this.createEnvironmentData(1, true);
-		final List<Integer> traitIds =Collections.singletonList(this.trait.getCvTermId());
+		final List<Integer> traitIds = Collections.singletonList(this.trait.getCvTermId());
 		final Integer projectId = this.study.getProjectId();
 		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countPhenotypesForDataset(projectId, traitIds));
 
@@ -346,8 +347,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		this.createEnvironmentData(1, true);
 		final Integer experimentId = this.phenotypes.get(0).getExperiment().getNdExperimentId();
 		final Integer phenotypeId = this.phenotypes.get(0).getPhenotypeId();
-		Assert.assertNotNull(this.phenotypeDao.getPhenotype(experimentId,  phenotypeId));
-		Assert.assertNull(this.phenotypeDao.getPhenotype(experimentId + 1,  phenotypeId));
+		Assert.assertNotNull(this.phenotypeDao.getPhenotype(experimentId, phenotypeId));
+		Assert.assertNull(this.phenotypeDao.getPhenotype(experimentId + 1, phenotypeId));
 	}
 
 	@Test
@@ -374,7 +375,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchPhenotypes() {
+	public void testSearchObservationUnits() {
 		// Create 2 studies
 		final String uniqueID = this.commonTestProject.getUniqueID();
 		final DmsProject plot =
@@ -403,64 +404,65 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		this.createEnvironmentData(plot2, 1, traitIds, true);
 		this.sessionProvder.getSession().flush();
 
-		final PhenotypeSearchRequestDTO dto = new PhenotypeSearchRequestDTO();
+		final ObservationUnitSearchRequestDTO dto = new ObservationUnitSearchRequestDTO();
 		dto.setProgramDbIds(Collections.singletonList(uniqueID));
-		final List<PhenotypeSearchDTO> results = this.phenotypeDao.searchPhenotypes(1000, 1, dto);
+		final List<ObservationUnitDto> results = this.phenotypeDao.searchObservationUnits(1000, 1, dto);
 		Assert.assertNotNull(results);
 		Assert.assertEquals(NO_OF_GERMPLASM * 2, results.size());
-		for (final PhenotypeSearchDTO result : results) {
+		for (final ObservationUnitDto result : results) {
 			Assert.assertEquals(2, result.getObservations().size());
 			for (final PhenotypeSearchObservationDTO observation : result.getObservations()) {
 				final boolean isFirstTrait = observation.getObservationVariableDbId().equals(this.trait.getCvTermId().toString());
-				Assert.assertEquals(isFirstTrait? this.trait.getCvTermId() : trait2.getCvTermId(), Integer.valueOf(observation.getObservationVariableDbId()));
-				Assert.assertEquals(isFirstTrait? this.trait.getName() : trait2.getName(), observation.getObservationVariableName());
+				Assert.assertEquals(isFirstTrait ? this.trait.getCvTermId() : trait2.getCvTermId(),
+					Integer.valueOf(observation.getObservationVariableDbId()));
+				Assert.assertEquals(isFirstTrait ? this.trait.getName() : trait2.getName(), observation.getObservationVariableName());
 				Assert.assertNotNull(observation.getObservationDbId());
 				Assert.assertNotNull(observation.getObservationTimeStamp());
 				Assert.assertNotNull(observation.getValue());
 			}
 			final boolean isFirstStudy = result.getStudyName().equals(this.study.getName() + "_1");
-			Assert.assertEquals(isFirstStudy? this.study.getName() + "_1": study2.getName() + "_1", result.getStudyName());
+			Assert.assertEquals(isFirstStudy ? this.study.getName() + "_1" : study2.getName() + "_1", result.getStudyName());
 			Assert.assertNull(result.getPlantNumber());
 			final String obsUnitId = result.getObservationUnitDbId();
 			Assert.assertNotNull(obsUnitId);
 			final ExperimentModel experimentModel = this.experiments.get(obsUnitId);
 			Assert.assertNotNull(experimentModel);
-			Assert.assertEquals(experimentModel.getStock().getGermplasm().getGid().toString(), result.getGermplasmDbId());
+			Assert.assertEquals(experimentModel.getStock().getGermplasm().getGermplasmUUID(), result.getGermplasmDbId());
 			Assert.assertEquals(experimentModel.getStock().getName(), result.getGermplasmName());
 			Assert.assertEquals(experimentModel.getStock().getUniqueName(), result.getEntryNumber());
 			Assert.assertEquals(experimentModel.getGeoLocation().getLocationId().toString(), result.getStudyDbId());
 		}
 
 		// Search by Study ID
-		final PhenotypeSearchRequestDTO dto2 = new PhenotypeSearchRequestDTO();
+		final ObservationUnitSearchRequestDTO dto2 = new ObservationUnitSearchRequestDTO();
 		dto2.setTrialDbIds(Collections.singletonList(study2.getProjectId().toString()));
-		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countPhenotypes(dto2));
+		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countObservationUnits(dto2));
 
 		// Search by Geolocation ID
-		final PhenotypeSearchRequestDTO dto3 = new PhenotypeSearchRequestDTO();
+		final ObservationUnitSearchRequestDTO dto3 = new ObservationUnitSearchRequestDTO();
 		dto3.setStudyDbIds(Collections.singletonList(environment1.toString()));
-		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countPhenotypes(dto3));
+		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countObservationUnits(dto3));
 
 		// Search by Trait
-		final PhenotypeSearchRequestDTO dto4 = new PhenotypeSearchRequestDTO();
+		final ObservationUnitSearchRequestDTO dto4 = new ObservationUnitSearchRequestDTO();
 		dto4.setObservationVariableDbIds(Collections.singletonList(this.trait.getCvTermId().toString()));
-		Assert.assertEquals(NO_OF_GERMPLASM * 2, this.phenotypeDao.countPhenotypes(dto4));
+		Assert.assertEquals(NO_OF_GERMPLASM * 2, this.phenotypeDao.countObservationUnits(dto4));
 
-		// Search by GIDs
-		final PhenotypeSearchRequestDTO dto5 = new PhenotypeSearchRequestDTO();
-		dto5.setGermplasmDbIds(Arrays.asList(this.germplasm.get(0).getGid().toString(), this.germplasm.get(1).getGid().toString()));
-		// # of GIDs in filter x 2# of studies
-		Assert.assertEquals(2 * 2, this.phenotypeDao.countPhenotypes(dto5));
+		// Search by germplasm uuid
+		final ObservationUnitSearchRequestDTO dto5 = new ObservationUnitSearchRequestDTO();
+		dto5.setGermplasmDbIds(Arrays.asList(this.germplasm.get(0).getGermplasmUUID(), this.germplasm.get(1).getGermplasmUUID()));
+		// # of GUUIDs in filter x 2# of studies
+		Assert.assertEquals(2 * 2, this.phenotypeDao.countObservationUnits(dto5));
 
 		// Search by Dataset Type, just for current program
-		final PhenotypeSearchRequestDTO dto6 = new PhenotypeSearchRequestDTO();
+		final ObservationUnitSearchRequestDTO dto6 = new ObservationUnitSearchRequestDTO();
 		dto6.setProgramDbIds(Collections.singletonList(uniqueID));
 		dto6.setObservationLevel(PLOT);
-		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countPhenotypes(dto6));
+		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countObservationUnits(dto6));
 	}
 
-
-	private DmsProject createDataset(final String name, final String programUUID, final int datasetType, final DmsProject parent, final DmsProject study) {
+	private DmsProject createDataset(final String name, final String programUUID, final int datasetType, final DmsProject parent,
+		final DmsProject study) {
 		final DmsProject dataset = new DmsProject();
 		dataset.setName(name);
 		dataset.setDescription(name);
@@ -474,7 +476,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 	private Integer createEnvironmentData(final Integer numberOfReps, final boolean withPhenotype) {
 		return this.createEnvironmentData(this.study, numberOfReps,
-			withPhenotype ? Collections.singletonList(this.trait.getCvTermId()) : Collections.<Integer>emptyList(), true);
+			withPhenotype ? Collections.singletonList(this.trait.getCvTermId()) : Collections.emptyList(), true);
 	}
 
 	private void createProjectProperties(final DmsProject project, final List<Integer> traitIds) {

@@ -9,6 +9,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
@@ -106,12 +107,13 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, new NameDAO(this.sessionProvder
+				.getSession()));
 		}
 
 		this.studyTDI =
-			new StudyTestDataInitializer(this.studyDataManager, this.ontologyManager, this.commonTestProject, this.germplasmDataManager,
-				this.locationManager);
+			new StudyTestDataInitializer(this.studyDataManager, this.ontologyManager, this.commonTestProject,
+				this.locationManager, this.sessionProvder);
 
 		// Create a study with environments
 		if (this.studyReference == null) {

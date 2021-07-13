@@ -19,6 +19,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.springframework.transaction.annotation.Isolation;
 
 import java.util.List;
 import java.util.Map;
@@ -258,6 +259,16 @@ public interface GermplasmListManager {
 	List<Integer> addGermplasmListData(List<GermplasmListData> germplasmListDatas);
 
 	/**
+	 * This method has {@link Isolation#READ_UNCOMMITTED} as isolation level in order to fix an issue (IBP-4537) for foreign key constraint failing.
+	 * Do not use it unless it's really necessary.
+	 *
+	 *
+	 * @param germplasmListDatas
+	 * @return a {@link List} of {@link GermplasmListData#getId()}
+	 */
+	List<Integer> addGermplasmListDataWithReadUncommittedIsolation(List<GermplasmListData> germplasmListDatas);
+
+	/**
 	 * Updates the database with the {@code GermplasmListData} objects specified.
 	 *
 	 * @param germplasmListDatas - A list of {@code GermplasmListData} objects to be updated in the database. Must be valid
@@ -282,15 +293,6 @@ public interface GermplasmListManager {
 	 * @return Returns the number of {@code GermplasmListData} records deleted from the database.
 	 */
 	int deleteGermplasmListDataByListId(Integer listId);
-
-	/**
-	 * Removes the specified {@code GermplasmListData} object from the database.
-	 *
-	 * @param germplasmListData - The {@code GermplasmListData} object to be removed from the database. Must be a valid
-	 *                          {@code GermplasmListData} object.
-	 * @return Returns the number of {@code GermplasmListData} objects deleted from the database.
-	 */
-	int deleteGermplasmListData(GermplasmListData germplasmListData);
 
 	/**
 	 * Removes the specified {@code GermplasmListData} objects from the database.
@@ -412,10 +414,9 @@ public interface GermplasmListManager {
 	 * Given a List of valid Germplasm objects, deleteGermplasms the corresponding records in the database.
 	 *
 	 * @param germplasms a list germplasm ID that need to delete
-	 * @param listId     for which we want the corresponding germplasms list
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
-	List<Integer> deleteGermplasms(final List<Integer> germplasms, final Integer listId);
+	List<Integer> deleteGermplasms(final List<Integer> germplasms);
 
 	void populateGermplasmListCreatedByName(List<GermplasmList> germplasmLists);
 

@@ -11,17 +11,21 @@
 
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 /**
  * POJO for progntrs table.
@@ -30,7 +34,7 @@ import javax.persistence.Table;
  */
 @Entity
 @Table(name = "progntrs")
-public class Progenitor implements Serializable {
+public class Progenitor extends AbstractEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -39,9 +43,9 @@ public class Progenitor implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "id")
 	private Integer id;
-	
-	@ManyToOne(targetEntity = Germplasm.class)
-	@JoinColumn(name = "gid", nullable = true)
+
+	@ManyToOne
+	@JoinColumn(name = "gid", nullable = false)
 	private Germplasm germplasm;
 	
 	@Basic(optional = false)
@@ -52,17 +56,18 @@ public class Progenitor implements Serializable {
 	@Column(name = "pid")
 	private Integer progenitorGid;
 
-	public Progenitor() {
-		super();
-	}
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
+	@OneToOne(fetch = FetchType.LAZY)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "pid", insertable = false, updatable = false)
+	private Germplasm progenitorGermplasm;
 
-	public Progenitor(Integer id) {
-		super();
-		this.id = id;
+	public Progenitor() {
 	}
 
 	public Progenitor(final Germplasm germplasm, final Integer progenitorNumber, final Integer progenitorGid) {
-		super();
 		this.germplasm = germplasm;
 		this.progenitorNumber = progenitorNumber;
 		this.progenitorGid = progenitorGid;
@@ -139,6 +144,14 @@ public class Progenitor implements Serializable {
 	public String toString() {
 		return "Progenitor [id=" + id + ", gid=" + germplasm.getGid() + ", progenitorNumber=" + progenitorNumber + ", progenitorGid="
 				+ progenitorGid + "]";
+	}
+
+	public Germplasm getProgenitorGermplasm() {
+		return this.progenitorGermplasm;
+	}
+
+	public void setProgenitorGermplasm(final Germplasm progenitorGermplasm) {
+		this.progenitorGermplasm = progenitorGermplasm;
 	}
 
 

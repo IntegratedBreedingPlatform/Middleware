@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware;
 
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -75,10 +76,6 @@ public class DataSetupTest extends IntegrationTestBase {
 
     private static final String PROP_BREEDING_METHOD = "Breeding Method";
     private static final String PROP_INSTITUTE = "Institute";
-    private static final String PROP_STUDY = "Study";
-    private static final String PROP_START_DATE = "Start Date";
-    private static final String PROP_END_DATE = "End Date";
-    private static final String PROP_OBJECTIVE = "Study Objective";
 
     private static final String CHAR = "C";
     private static final String NUMERIC = "N";
@@ -117,7 +114,8 @@ public class DataSetupTest extends IntegrationTestBase {
     @Before
     public void setUp() {
         if (this.germplasmTestDataGenerator == null) {
-            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager);
+            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager, new NameDAO(this.sessionProvder
+                .getSession()));
         }
     }
 

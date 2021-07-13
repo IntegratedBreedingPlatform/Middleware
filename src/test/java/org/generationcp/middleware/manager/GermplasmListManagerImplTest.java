@@ -16,6 +16,7 @@ import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -163,7 +164,8 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.manager.addGermplasmListData(listData);
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.dataManager);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.dataManager, new NameDAO(this.sessionProvder
+				.getSession()));
 		}
 
 	}
@@ -426,34 +428,30 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testDeleteSelecteGermplasms() {
-		final List<Germplasm> germplasms = this.germplasmTestDataGenerator.createGermplasmsList(10, "Germ");
-		final List<Integer> gidsNews = (List<Integer>) CollectionUtils.collect(germplasms, TransformerUtils.invokerTransformer("getGid"));
+	public void testDeleteSelectedGermplasm() {
+		final List<Germplasm> germplasm = this.germplasmTestDataGenerator.createGermplasmsList(10, "Germ");
+		final List<Integer> gids = (List<Integer>) CollectionUtils.collect(germplasm, TransformerUtils.invokerTransformer("getGid"));
 
 		final GermplasmList list1 =
 			(this.createGermplasmListTestData());
 		this.saveGermplasmList(list1);
 
-		for (final Germplasm result : germplasms) {
+		for (final Germplasm result : germplasm) {
 			final GermplasmListData listData1 =
 				new GermplasmListData(null, list1, result.getGid(), 1, "EntryCode", "SeedSource", "Germplasm Name 5", "GroupName", 0,
 					99995);
 			this.manager.addGermplasmListData(listData1);
 		}
 
-		assertThat(germplasms, is(equalTo(this.dataManager.getGermplasms(gidsNews))));
+		assertThat(germplasm, is(equalTo(this.dataManager.getGermplasms(gids))));
 
-		this.manager.deleteGermplasms(gidsNews, list1.getId());
+		this.manager.deleteGermplasms(gids);
 		this.sessionProvder.getSession().clear();
 
-		final List<Germplasm> germplasmDeleted = this.dataManager.getGermplasms(gidsNews);
-		assertThat(germplasmDeleted, is(empty()));
-
-		final List<GermplasmListData> germplasmListDataByGID = this.manager.getGermplasmListDataByListId(list1.getId());
-		for (final GermplasmListData result : germplasmListDataByGID) {
-
-			assertThat(null, is(equalTo(result)));
-		}
+		final List<Germplasm> germplasmDeleted = this.dataManager.getGermplasms(gids);
+		Assert.assertTrue(CollectionUtils.isEmpty(germplasmDeleted));
+		final List<GermplasmListData> germplasmListData = this.manager.getGermplasmListDataByListId(list1.getId());
+		Assert.assertTrue(CollectionUtils.isEmpty(germplasmListData));
 	}
 
 	private Integer saveGermplasmList(final GermplasmList list) {

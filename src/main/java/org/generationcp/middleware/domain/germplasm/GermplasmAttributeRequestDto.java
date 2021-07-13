@@ -6,11 +6,9 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class GermplasmAttributeRequestDto {
 
+	private Integer variableId;
+
 	private String value;
-
-	private String attributeCode;
-
-	private String attributeType;
 
 	private String date;
 
@@ -20,13 +18,20 @@ public class GermplasmAttributeRequestDto {
 
 	}
 
-	public GermplasmAttributeRequestDto(final String value, final String attributeCode, final String attributeType, final String date,
+	public GermplasmAttributeRequestDto(final Integer variableId, final String value, final String date,
 		final Integer locationId) {
+		this.variableId = variableId;
 		this.value = value;
-		this.attributeCode = attributeCode;
-		this.attributeType = attributeType;
 		this.date = date;
 		this.locationId = locationId;
+	}
+
+	public Integer getVariableId() {
+		return this.variableId;
+	}
+
+	public void setVariableId(final Integer variableId) {
+		this.variableId = variableId;
 	}
 
 	public String getValue() {
@@ -35,22 +40,6 @@ public class GermplasmAttributeRequestDto {
 
 	public void setValue(final String value) {
 		this.value = value;
-	}
-
-	public String getAttributeCode() {
-		return this.attributeCode;
-	}
-
-	public void setAttributeCode(final String attributeCode) {
-		this.attributeCode = attributeCode;
-	}
-
-	public String getAttributeType() {
-		return this.attributeType;
-	}
-
-	public void setAttributeType(final String attributeType) {
-		this.attributeType = attributeType;
 	}
 
 	public String getDate() {

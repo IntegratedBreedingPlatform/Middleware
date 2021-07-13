@@ -66,20 +66,6 @@ public interface FieldbookService {
 	List<Location> getAllBreedingLocations();
 
 	/**
-	 * Gets all breeding type locations (crop specific and program specific locations).
-	 *
-	 * @return the all breeding locations
-	 */
-	List<Location> getAllBreedingLocationsByProgramUUID(String programUUID);
-
-	/**
-	 * Gets the all seed locations.
-	 *
-	 * @return the all seed locations
-	 */
-	List<Location> getAllSeedLocations();
-
-	/**
 	 * Gets the all breeding methods.
 	 *
 	 * @param filterOutGenerative
@@ -87,26 +73,6 @@ public interface FieldbookService {
 	 * @return All breeding methods
 	 */
 	List<Method> getAllBreedingMethods(boolean filterOutGenerative);
-
-	/**
-	 * Gets the breeding methods of generative type.
-	 *
-	 * @param programUUID
-	 *            the filter out generative
-	 * @return All breeding methods
-	 */
-	List<Method> getAllGenerativeMethods(final String programUUID);
-
-	/**
-	 * Gets the favorite breeding methods.
-	 *
-	 * @param methodIds
-	 *            the method ids
-	 * @param filterOutGenerative
-	 *            the filter out generative
-	 * @return the favorite breeding methods
-	 */
-	List<Method> getFavoriteBreedingMethods(List<Integer> methodIds, boolean filterOutGenerative);
 
 	/**
 	 * Save or update Field Map Properties like row, column, block, total rows,
@@ -224,15 +190,6 @@ public interface FieldbookService {
 	Method getBreedingMethodById(int mid);
 
 	/**
-	 * Used for retrieving the germplasm given a germplasm id.
-	 *
-	 * @param gid
-	 *            the gid
-	 * @return the germplasm by gid
-	 */
-	Germplasm getGermplasmByGID(int gid);
-
-	/**
 	 * Get germplasm list by name.
 	 *
 	 * @param name
@@ -265,20 +222,6 @@ public interface FieldbookService {
 	 * @return the count
 	 */
 	int countPlotsWithRecordedVariatesInDataset(int nurseryId, List<Integer> variateIds);
-
-	/**
-	 * Filter standard variables by mode.
-	 *
-	 * @param storedInIds
-	 *            the stored in ids
-	 * @param propertyIds
-	 *            the property ids
-	 * @param isRemoveProperties
-	 *            the is remove properties
-	 * @return the list
-	 */
-	List<StandardVariableReference> filterStandardVariablesByMode(List<Integer> storedInIds, List<Integer> propertyIds,
-			boolean isRemoveProperties);
 
 	/**
 	 * Gets the nursery variable settings.
@@ -442,26 +385,6 @@ public interface FieldbookService {
 	String getOwnerListName(Integer userId);
 
 	/**
-	 * Get study details.
-	 *
-	 * @param studyId
-	 *            the study id
-	 * @return the study details
-	 */
-	StudyDetails getStudyDetails(int studyId);
-
-	/**
-	 * Get the block id of a particular trial instance in a dataset.
-	 *
-	 * @param datasetId
-	 *            the dataset id
-	 * @param trialInstance
-	 *            the trial instance
-	 * @return the block id
-	 */
-	String getBlockId(int datasetId, Integer trialInstance);
-
-	/**
 	 * Gets the folder name by id.
 	 *
 	 * @param folderId
@@ -500,54 +423,6 @@ public interface FieldbookService {
 	 * @return the germplasm ids by name
 	 */
 	List<Integer> getGermplasmIdsByName(String name);
-
-	/**
-	 * Add Germplasm Name.
-	 *
-	 * @param nameValue
-	 *            the name value
-	 * @param gid
-	 *            the gid
-	 * @param userId
-	 *            the user id
-	 * @param nameTypeId
-	 *            the name type id
-	 * @param locationId
-	 *            the location id
-	 * @param date
-	 *            the date
-	 * @return the integer
-	 */
-	Integer addGermplasmName(String nameValue, int gid, int userId, int nameTypeId, int locationId, Integer date);
-
-	/**
-	 * Adds a new Germplasm.
-	 *
-	 * @param nameValue
-	 *            the name value
-	 * @param userId
-	 *            the user id
-	 * @return the integer
-	 */
-	Integer addGermplasm(String nameValue, int userId, CropType cropType);
-
-	/**
-	 * Adds the germplasm.
-	 *
-	 * @param germplasm
-	 *            the germplasm
-	 * @param name
-	 *            the name
-	 * @return the integer
-	 */
-	Integer addGermplasm(Germplasm germplasm, Name name, CropType cropType);
-
-	/**
-	 *
-	 * @param germplasmTriples
-	 * @return
-	 */
-	List<Integer> addGermplasm(List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples, CropType cropType);
 
 	/**
 	 * Get an id from the project table that matches the name (regardless if
@@ -657,25 +532,6 @@ public interface FieldbookService {
 	List<Integer> getFavoriteProjectLocationIds(String programUUID);
 
 	/**
-	 * Gets the favorite project methods.
-	 *
-	 * @param programUUID
-	 *            - unique id of program
-	 * @return the favorite project methods
-	 */
-	List<Integer> getFavoriteProjectMethods(String programUUID);
-
-	/**
-	 * Returns germplasm lists by project id.
-	 *
-	 * @param projectId
-	 * @param type
-	 *            list type
-	 * @return List of GermplasmList objects under the given project id and type
-	 */
-	List<GermplasmList> getGermplasmListsByProjectId(int projectId, GermplasmListType type);
-
-	/**
 	 * Saves germplasm list crosses types. ListData items are always added to
 	 * the database, before saving the germplasm list.
 	 *
@@ -688,7 +544,7 @@ public interface FieldbookService {
 	 *
 	 * @return The id of the newly-created germplasm list
 	 */
-	Integer saveGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList,
+	Integer saveGermplasmList(String cropName, List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList,
 			boolean isApplyNewGroupToPreviousCrosses);
 
 	void saveStudyColumnOrdering(Integer studyId, List<Integer> orderedTermIds);
@@ -705,53 +561,11 @@ public interface FieldbookService {
 	 **/
 	StandardVariable getStandardVariableByName(String name, String programUUID);
 
-	List<StandardVariableReference> filterStandardVariablesByIsAIds(List<StandardVariableReference> standardReferences,
-			List<Integer> isAIds);
-
 	Location getLocationByName(String locationName, Operation op);
-
-	/**
-	 * Updates germplasm list crosses types. ListData items are always updated
-	 * in the database, before saving the germplasm list.
-	 *
-	 * @param listDataItems
-	 *            the list data to add - the key of the Map is the germplasm
-	 *            associated to the germplasm list data value
-	 * @param germplasmList
-	 *            the germplasm list to add
-	 *
-	 * @return The id of the newly-created germplasm list
-	 */
-	Integer updateGermplasmList(List<Pair<Germplasm, GermplasmListData>> listDataItems, GermplasmList germplasmList);
 
 	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
 
-	List<Method> getFavoriteMethods(List<Integer> methodIds, Boolean filterOutGenerative);
-
 	List<Location> getLocationsByProgramUUID(String programUUID);
-
-	/**
-	 *
-	 * @param filterOutGenerative
-	 * @return all no-bulking methods filtering by type = 'GEN' when filterOutGenerative is true
-	 */
-	List<Method> getAllNoBulkingMethods(boolean filterOutGenerative);
-
-	/**
-	 * Gets the favorite project methods.
-	 *
-	 * @param programUUID
-	 *            - unique id of program
-	 * @return the no bulking favorite project methods
-	 */
-	List<Method> getFavoriteProjectNoBulkingMethods(final String programUUID);
-
-	/**
-	 *
-	 * @param programUUID
-	 * @return All generative and no bulking method
-	 */
-	List<Method> getAllGenerativeNoBulkingMethods(final String programUUID);
 
 	Workbook getStudyDataSet(int studyID);
 

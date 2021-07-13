@@ -132,11 +132,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<Location> getLocationsByType(final Integer type) {
-		return this.daoFactory.getLocationDAO().getByType(type);
-	}
-
-	@Override
 	public List<Location> getLocationsByType(final Integer type, final String programUUID) {
 		return this.daoFactory.getLocationDAO().getByType(type, programUUID);
 	}

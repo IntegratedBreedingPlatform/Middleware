@@ -84,7 +84,7 @@ public class ProjectProperty implements Serializable {
 	public ProjectProperty() {
 	}
 
-	public ProjectProperty(DmsProject project, Integer typeId, String value, Integer rank, Integer variableId, String alias) {
+	public ProjectProperty(final DmsProject project, final Integer typeId, final String value, final Integer rank, final Integer variableId, final String alias) {
 		this.project = project;
 		this.typeId = typeId;
 		this.value = value;
@@ -97,7 +97,7 @@ public class ProjectProperty implements Serializable {
 		return this.projectPropertyId;
 	}
 
-	public void setProjectPropertyId(Integer id) {
+	public void setProjectPropertyId(final Integer id) {
 		this.projectPropertyId = id;
 	}
 
@@ -105,7 +105,7 @@ public class ProjectProperty implements Serializable {
 		return this.project;
 	}
 
-	public void setProject(DmsProject project) {
+	public void setProject(final DmsProject project) {
 		this.project = project;
 	}
 
@@ -113,7 +113,7 @@ public class ProjectProperty implements Serializable {
 		return this.typeId;
 	}
 
-	public void setTypeId(Integer type) {
+	public void setTypeId(final Integer type) {
 		this.typeId = type;
 	}
 
@@ -121,7 +121,7 @@ public class ProjectProperty implements Serializable {
 		return this.value;
 	}
 
-	public void setValue(String value) {
+	public void setValue(final String value) {
 		this.value = value;
 	}
 
@@ -129,28 +129,28 @@ public class ProjectProperty implements Serializable {
 		return this.rank;
 	}
 
-	public void setRank(Integer rank) {
+	public void setRank(final Integer rank) {
 		this.rank = rank;
 	}
 
 	public Integer getVariableId() {
-		return variableId;
+		return this.variableId;
 	}
 
-	public void setVariableId(Integer variableId) {
+	public void setVariableId(final Integer variableId) {
 		this.variableId = variableId;
 	}
 
 	public String getAlias() {
-		return alias;
+		return this.alias;
 	}
 
-	public void setAlias(String alias) {
+	public void setAlias(final String alias) {
 		this.alias = alias;
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(final String description) {
@@ -166,7 +166,7 @@ public class ProjectProperty implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -176,7 +176,7 @@ public class ProjectProperty implements Serializable {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		ProjectProperty other = (ProjectProperty) obj;
+		final ProjectProperty other = (ProjectProperty) obj;
 		if (this.projectPropertyId == null) {
 			if (other.projectPropertyId != null) {
 				return false;
@@ -189,7 +189,7 @@ public class ProjectProperty implements Serializable {
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("ProjectProperty [projectPropertyId=");
 		builder.append(this.projectPropertyId);
 		builder.append(", project=");

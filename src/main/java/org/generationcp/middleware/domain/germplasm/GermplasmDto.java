@@ -18,6 +18,10 @@ public class GermplasmDto {
 
 	private String creationDate;
 
+	private String createdBy;
+
+	private Integer createdByUserId;
+
 	private String reference;
 
 	private Integer breedingLocationId;
@@ -35,6 +39,8 @@ public class GermplasmDto {
 	private Integer gpid1;
 
 	private Integer gpid2;
+
+	private Integer numberOfProgenitors;
 
 	private List<Integer> otherProgenitors;
 
@@ -82,6 +88,22 @@ public class GermplasmDto {
 
 	public void setCreationDate(final String creationDate) {
 		this.creationDate = creationDate;
+	}
+
+	public String getCreatedBy() {
+		return this.createdBy;
+	}
+
+	public void setCreatedBy(final String createdBy) {
+		this.createdBy = createdBy;
+	}
+
+	public Integer getCreatedByUserId() {
+		return this.createdByUserId;
+	}
+
+	public void setCreatedByUserId(final Integer createdByUserId) {
+		this.createdByUserId = createdByUserId;
 	}
 
 	public String getReference() {
@@ -164,6 +186,14 @@ public class GermplasmDto {
 		this.gpid2 = gpid2;
 	}
 
+	public Integer getNumberOfProgenitors() {
+		return this.numberOfProgenitors;
+	}
+
+	public void setNumberOfProgenitors(final Integer numberOfProgenitors) {
+		this.numberOfProgenitors = numberOfProgenitors;
+	}
+
 	public List<Integer> getOtherProgenitors() {
 		return this.otherProgenitors;
 	}
@@ -194,4 +224,5 @@ public class GermplasmDto {
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
+
 }

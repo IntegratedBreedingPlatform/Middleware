@@ -1,27 +1,27 @@
 
 package org.generationcp.middleware.data.initializer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
-
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.util.Util;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class GermplasmTestDataInitializer {
 
 	public static final String PREFERRED_NAME = "IBP-VARIETY";
 
 	public static Germplasm createGermplasmWithPreferredName() {
-		final Name name = new Name(null, null, 1, 1, 1, GermplasmTestDataInitializer.PREFERRED_NAME, 0, 0, 0);
-		final Germplasm germplasm = new Germplasm(null, 1, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+		final Name name = new Name(null, null, 1, 1, GermplasmTestDataInitializer.PREFERRED_NAME, 0, 0, 0);
+		final Germplasm germplasm = new Germplasm(null, 1, 0, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
 		return germplasm;
 	}
 
 	public static Germplasm createGermplasmWithPreferredName(final String preferredName) {
-		final Name name = new Name(null, null, 1, 1, 1, preferredName, 0, 0, 0);
-		final Germplasm germplasm = new Germplasm(null, 1, 0, 0, 0, 1, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+		final Name name = new Name(null, null, 1, 1, preferredName, 0, 0, 0);
+		final Germplasm germplasm = new Germplasm(null, 1, 0, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
 		return germplasm;
 	}
 
@@ -37,7 +37,6 @@ public class GermplasmTestDataInitializer {
 		germplasm.setLocationId(Integer.valueOf(1));
 		germplasm.setMethodId(Integer.valueOf(1));
 		germplasm.setMgid(Integer.valueOf(0));
-		germplasm.setUserId(Integer.valueOf(1));
 		germplasm.setReferenceId(Integer.valueOf(1));
 		germplasm.setLgid(Integer.valueOf(0));
 		germplasm.setMethodName("MethodName");
@@ -59,7 +58,6 @@ public class GermplasmTestDataInitializer {
 		germplasm.setLocationId(locationId);
 		germplasm.setMethodId(methodId);
 		germplasm.setMgid(mgId);
-		germplasm.setUserId(userId);
 		germplasm.setReferenceId(referenceId);
 		germplasm.setMethodName(methodName);
 		germplasm.setLocationName(locationName);
@@ -74,13 +72,12 @@ public class GermplasmTestDataInitializer {
 
 	public static Name createGermplasmName(final int gid, final String germplasmName) {
 		final Name name = new Name();
-		name.setGermplasmId(gid);
+		name.setGermplasm(new Germplasm(gid));
 		name.setNval(germplasmName);
 		name.setLocationId(Integer.valueOf(1));
 		name.setNdate(Integer.valueOf(20160101));
 		name.setReferenceId(Integer.valueOf(1));
 		name.setTypeId(Integer.valueOf(1));
-		name.setUserId(Integer.valueOf(1));
 		name.setNstat(Integer.valueOf(1));
 
 		return name;

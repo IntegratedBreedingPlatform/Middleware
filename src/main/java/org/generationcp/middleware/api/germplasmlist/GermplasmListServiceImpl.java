@@ -9,6 +9,8 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
@@ -17,6 +19,8 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -31,6 +35,7 @@ import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -39,6 +44,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -115,6 +121,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Autowired
 	private GermplasmListManager germplasmListManager;
 
+	@Autowired
+	private OntologyVariableDataManager ontologyVariableDataManager;
+
 	public GermplasmListServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
@@ -127,7 +136,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
 		final Map<Integer, String> preferredNamesMap = this.germplasmDataManager.getPreferredNamesByGids(gids);
 		final Map<Integer, List<Name>> namesByGid = this.daoFactory.getNameDao().getNamesByGids(gids)
-			.stream().collect(groupingBy(Name::getGermplasmId));
+			.stream().collect(groupingBy(n -> n.getGermplasm().getGid()));
 
 		final Integer currentUserId = loggedInUser.getUserid();
 		final GermplasmList parent = request.getParentFolderId() != null ?
@@ -185,7 +194,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-				"Error encountered while saving Germplasm List Data: GermplasmListManager.addOrUpdateGermplasmListData(data="
+				"Error encountered while saving Germplasm List Data: GermplasmListServiceImpl.addGermplasmListData(data="
 					+ data + "): " + e.getMessage(),
 				e);
 		}
@@ -293,6 +302,16 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public long countMyLists(final String programUUID, final Integer userId) {
+		return this.daoFactory.getGermplasmListDAO().countMyLists(programUUID, userId);
+	}
+
+	@Override
+	public List<MyListsDTO> getMyLists(final String programUUID, final Pageable pageable, final Integer userId) {
+		return this.daoFactory.getGermplasmListDAO().getMyLists(programUUID, pageable, userId);
+	}
+
+	@Override
 	public Integer createGermplasmListFolder(final Integer userId, final String folderName, final Integer parentId,
 		final String programUUID) {
 
@@ -356,6 +375,66 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public List<GermplasmListDto> getGermplasmLists(final Integer gid) {
 		return this.daoFactory.getGermplasmListDAO().getGermplasmListDtos(gid);
+	}
+
+	@Override
+	public void performGermplasmListEntriesDeletion(final List<Integer> gids) {
+		final List<Integer> germplasmListIds = this.daoFactory.getGermplasmListDAO().getListIdsByGIDs(gids);
+		if(org.apache.commons.collections.CollectionUtils.isNotEmpty(germplasmListIds)) {
+			final Map<Integer, List<GermplasmListData>> germplasmListDataMap = this.daoFactory.getGermplasmListDataDAO()
+				.getGermplasmDataListMapByListIds(germplasmListIds);
+			final List<GermplasmListData> germplasmListDataToBeDeleted = new ArrayList<>();
+			final List<GermplasmListData> germplasmListDataToBeUpdated = new ArrayList<>();
+			for (final Integer listId : germplasmListIds) {
+				final Iterator<GermplasmListData> iterator = germplasmListDataMap.get(listId).iterator();
+				while (iterator.hasNext()) {
+					final GermplasmListData germplasmListData = iterator.next();
+					if (germplasmListData.getGermplasm() != null && gids.contains(germplasmListData.getGermplasm().getGid())) {
+						iterator.remove();
+						germplasmListDataToBeDeleted.add(germplasmListData);
+					}
+				}
+
+				// Change entry IDs on listData
+				final List<GermplasmListData> listData = germplasmListDataMap.get(listId);
+				Integer entryId = 1;
+				for (final GermplasmListData germplasmListData : listData) {
+					germplasmListData.setEntryId(entryId);
+					entryId++;
+				}
+				germplasmListDataToBeUpdated.addAll(listData);
+			}
+
+			this.deleteGermplasmListData(germplasmListDataToBeDeleted);
+			this.updateGermplasmListData(germplasmListDataToBeUpdated);
+		}
+	}
+
+	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {
+		try {
+			for (final GermplasmListData data : germplasmListData) {
+				this.daoFactory.getGermplasmListDataDAO().update(data);
+			}
+		} catch (final Exception e) {
+
+			throw new MiddlewareQueryException(
+				"Error encountered while saving Germplasm List Data: GermplasmListServiceImpl.updateGermplasmListData(germplasmListData="
+					+ germplasmListData + "): " + e.getMessage(),
+				e);
+		}
+	}
+
+	private void deleteGermplasmListData(final List<GermplasmListData> germplasmListData) {
+		try {
+			for (final GermplasmListData data : germplasmListData) {
+				this.daoFactory.getGermplasmListDataDAO().makeTransient(data);
+			}
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+				"Error encountered while deleting Germplasm List Data: GermplasmListServiceImpl.deleteGermplasmListData(germplasmListData="
+					+ germplasmListData + "): " + e.getMessage(),
+				e);
+		}
 	}
 
 	private void addListDataProperties(final List<GermplasmListData> savedGermplasmListData, final Set<String> propertyNames) {
@@ -499,10 +578,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				}
 
 				// Check if any of the columns are attribute types
-				final Integer attributeTypeId = attributeTypesMap.get(property);
-				if (!Objects.isNull(attributeTypeId)) {
+				final Integer attributeVariableId = attributeTypesMap.get(property);
+				if (!Objects.isNull(attributeVariableId)) {
 					this.addListDataProperties(property,
-						() -> this.germplasmDataManager.getAttributeValuesByTypeAndGIDList(attributeTypeId, gids),
+						() -> this.germplasmDataManager.getAttributeValuesByTypeAndGIDList(attributeVariableId, gids),
 						listDataIndexedByGid);
 					return;
 				}
@@ -627,9 +706,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	private Map<String, Integer> getAllAttributeTypesMap() {
-		return this.germplasmDataManager.getAllAttributesTypes()
-			.stream()
-			.collect(Collectors.toMap(userDefinedField -> userDefinedField.getFcode().toUpperCase(), UserDefinedField::getFldno));
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addVariableType(VariableType.GERMPLASM_ATTRIBUTE);
+		variableFilter.addVariableType(VariableType.GERMPLASM_PASSPORT);
+		return this.ontologyVariableDataManager.getWithFilter(variableFilter).stream()
+			.collect(Collectors.toMap(v -> v.getName().toUpperCase(),
+				Variable::getId));
 	}
 
 	private Map<String, Integer> getAllNameTypesMap() {

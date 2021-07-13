@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
+import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -21,6 +22,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListMetadata;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -33,16 +35,17 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
+import org.hibernate.sql.JoinType;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -56,18 +59,15 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	private static final String PROGRAM_UUID = "programUUID";
 	private static final String NAME = "name";
 	private static final String PARENT = "parent";
+	private static final String TYPE = "type";
 
 	private static final String STATUS = "status";
 
 	public static final Integer STATUS_DELETED = 9;
 
-	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDAO.class);
+	static final Integer LOCKED_LIST_STATUS = 101;
 
-	public static final String GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST = " SELECT \n" + "   ld.gid, \n"
-			+ "   group_concat(l.listname) \n" + " FROM listnms l \n"
-			+ "   INNER JOIN listdata ld ON l.listid = ld.listid \n" + "   INNER JOIN germplsm g ON ld.gid = g.gid"
-			+ " WHERE ld.gid IN (:gids) \n" + "       AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED + " \n"
-			+ " GROUP BY ld.gid \n" + " HAVING count(1) > 1";
+	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDAO.class);
 
 	private static final String GET_GERMPLASM_LIST_TYPES = "SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid "
 			+ "FROM udflds " + "WHERE ftable = 'LISTNMS' AND ftype = 'LISTTYPE' ";
@@ -138,7 +138,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			queryString.append("SELECT l.listid AS listId, ");
 			queryString.append("l.listname AS listName, ");
 			queryString.append("CAST(l.listdate AS CHAR(255)) AS creationDate, ");
-			queryString.append("l.listdesc AS description ");
+			queryString.append("l.listdesc AS description, ");
+			queryString.append("l.program_uuid AS programUUID ");
 			queryString.append("FROM listnms l ");
 			queryString.append("INNER JOIN listdata ld ON ld.listid = l.listid ");
 			queryString.append("WHERE ld.gid = :gid AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED);
@@ -148,6 +149,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			sqlQuery.addScalar("listName");
 			sqlQuery.addScalar("creationDate");
 			sqlQuery.addScalar("description");
+			sqlQuery.addScalar("programUUID");
 			sqlQuery.setParameter("gid", gid);
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmListDto.class));
 			return sqlQuery.list();
@@ -521,25 +523,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return queryString;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getByProjectIdAndType(final int projectId, final GermplasmListType type) {
-		final List<GermplasmList> list = new ArrayList<>();
-		try {
-			final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
-			criteria.add(Restrictions.eq("projectId", projectId));
-			criteria.add(Restrictions.eq("type", type.name()));
-			criteria.add(Restrictions.ne(GermplasmListDAO.STATUS, GermplasmListDAO.STATUS_DELETED));
-
-			return criteria.list();
-
-		} catch (final HibernateException e) {
-			final String errorMessage = "Error with getByProjectId(projectId=" + projectId
-					+ ") query from GermplasmList: " + e.getMessage();
-			GermplasmListDAO.LOG.error(errorMessage);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-	}
-
 	// returns all the list of the program regardless of the type and status
 	@SuppressWarnings("unchecked")
 	public List<GermplasmList> getListsByProgram(final String programUUID) {
@@ -623,6 +606,22 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		});
 	}
 
+	public List<Integer> getListIdsByGIDs(final List<Integer> gids) {
+		try {
+			final StringBuilder queryString = new StringBuilder();
+			queryString.append("SELECT l.listid FROM listnms l ");
+			queryString.append("INNER JOIN listdata ld ON ld.listid = l.listid ");
+			queryString.append("WHERE ld.gid IN(:gids) AND l.liststatus != :status");
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("gids", gids);
+			query.setParameter("status", STATUS_DELETED);
+			return query.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with getListIdsByGIDs(gids=" + gids.toString() + ") query from GermplasmListDAO: " + e.getMessage(), e);
+		}
+	}
+
 	public int deleteGermplasmListByListIdPhysically(final Integer listId) {
 		final Query query = this.getSession().getNamedQuery(GermplasmList.DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY);
 		query.setInteger(GermplasmList.GERMPLASM_LIST_LIST_ID_COLUMN, listId);
@@ -630,37 +629,18 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	/**
-	 * Verify if the gids are used in more than one list
-	 *
-	 * @param gids
-	 *            gids to check
-	 * @return Map with GID as key and CSV of list where it is used
-	 */
-	public Map<Integer, String> getGermplasmUsedInMoreThanOneList(final List<Integer> gids) {
-		final Map<Integer, String> resultMap = new HashMap<>();
-
-		final SQLQuery query = this.getSession()
-				.createSQLQuery(GermplasmListDAO.GET_GERMPLASM_USED_IN_MORE_THAN_ONE_LIST);
-		query.setParameterList("gids", gids);
-
-		final List<Object[]> results = query.list();
-		for (final Object[] result : results) {
-			resultMap.put((Integer) result[0], (String) result[1]);
-		}
-		return resultMap;
-	}
 
 	/**
-	 * Get germplasm that exist on one or more list.
+	 * Get germplasm that exist locked lists
 	 *
 	 * @param gids
 	 */
-	public List<Integer> getGermplasmUsedInOneOrMoreList(final List<Integer> gids) {
+	public List<Integer> getGermplasmUsedInLockedList(final List<Integer> gids) {
 		final SQLQuery query = this.getSession()
 			.createSQLQuery(" SELECT ld.gid as gid "
 				+ " FROM listnms l"
 				+ " INNER JOIN listdata ld ON l.listid = ld.listid INNER JOIN germplsm g ON ld.gid = g.gid"
-				+ " WHERE ld.gid IN (:gids) AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED
+				+ " WHERE ld.gid IN (:gids) AND l.liststatus = " + GermplasmListDAO.LOCKED_LIST_STATUS
 				+ " GROUP BY ld.gid \n" + " HAVING count(1) >= 1");
 		query.addScalar("gid", new IntegerType());
 		query.setParameterList("gids", gids);
@@ -743,6 +723,67 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 
 		return (GermplasmList) criteria.uniqueResult();
+	}
+
+	public long countMyLists(final String programUUID, final Integer userId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
+				.add(Restrictions.eq("userId", userId));
+
+			criteria.add(Restrictions.ne(STATUS, STATUS_DELETED));
+			criteria.add(Restrictions.ne(TYPE, GermplasmList.FOLDER_TYPE));
+			criteria.add(Restrictions.eq(PROGRAM_UUID, programUUID));
+			criteria.setProjection(Projections.rowCount());
+			return (long) criteria.uniqueResult();
+		} catch (final Exception e) {
+			final String message = "Error with countMyLists(programUUID=" + programUUID + ", userId= " + userId + " ): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
+	}
+
+	/**
+	 * @return lists owned by user (possibly along with statistical information in the future)
+	 */
+	public List<MyListsDTO> getMyLists(final String programUUID, final Pageable pageable, final Integer userId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
+				.add(Restrictions.eq("userId", userId));
+			criteria.add(Restrictions.ne(STATUS, STATUS_DELETED));
+			criteria.add(Restrictions.ne(TYPE, GermplasmList.FOLDER_TYPE));
+			criteria.add(Restrictions.eq(PROGRAM_UUID, programUUID));
+			// FIXME sort by parent (null) => "Program lists"
+			criteria.createAlias("parent", "parent", JoinType.LEFT_OUTER_JOIN);
+			addOrder(criteria, pageable);
+			addPagination(criteria, pageable);
+
+			final List<GermplasmList> list = criteria.list();
+
+			if (list.isEmpty()) {
+				return Collections.emptyList();
+			}
+
+			final List<MyListsDTO> mylists = new ArrayList<>();
+			for (final GermplasmList germplasmList : list) {
+				final MyListsDTO mylist = new MyListsDTO();
+				mylist.setListId(germplasmList.getId());
+				mylist.setName(germplasmList.getName());
+				mylist.setDate(Util.tryConvertDate(String.valueOf(germplasmList.getDate()),
+					Util.DATE_AS_NUMBER_FORMAT, Util.FRONTEND_DATE_FORMAT));
+				final GermplasmList parent = germplasmList.getParent();
+				if (parent != null) {
+					mylist.setFolder(parent.getName());
+				}
+				mylist.setType(germplasmList.getType());
+				mylists.add(mylist);
+			}
+
+			return mylists;
+		} catch (final Exception e) {
+			final String message = "Error with getMyLists(programUUID=" + programUUID + ", userId= " + userId + " ): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
 	}
 
 }

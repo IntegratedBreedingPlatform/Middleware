@@ -33,8 +33,8 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
-import org.hibernate.type.LongType;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.LongType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -47,6 +47,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * DAO class for {@link Location}.
@@ -993,7 +994,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
-	public List<org.generationcp.middleware.api.location.Location> getLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
+	public List<org.generationcp.middleware.api.location.Location> getLocations(final LocationSearchRequest locationSearchRequest,
+		final Pageable pageable) {
 
 		final SQLQuery sqlQuery =
 			this.getSession().createSQLQuery(this.createGetLocationsQuery(locationSearchRequest));
@@ -1014,10 +1016,22 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		final List<Map<String, Object>> results = sqlQuery.list();
 		final List<org.generationcp.middleware.api.location.Location> locations = new ArrayList<>();
 		for (final Map<String, Object> result : results) {
-			final Geometry geometry = new Geometry(
-				Arrays.asList((Double) result.get("latitude"), (Double)result.get("longitude"), (Double)result.get("altitude")),
-				"Point");
-			final Coordinate coordinate = new Coordinate(geometry, "Feature");
+
+			Coordinate coordinate = null;
+			final Double longitude = (Double) result.get("longitude");
+			final Double latitude = (Double) result.get("latitude");
+			final Double altitude = (Double) result.get("altitude");
+			if (longitude != null && latitude != null) {
+				final List<Double> coordinatesList = new ArrayList<>();
+				coordinatesList.add(longitude);
+				coordinatesList.add(latitude);
+				if (altitude != null) {
+					// Only add altitude if available.
+					coordinatesList.add(altitude);
+				}
+				final Geometry geometry = new Geometry(coordinatesList, "Point");
+				coordinate = new Coordinate(geometry, "Feature");
+			}
 
 			final org.generationcp.middleware.api.location.Location location = new org.generationcp.middleware.api.location.Location()
 				.withLocationDbId(String.valueOf(result.get("locationDbId"))).withLocationType(String.valueOf(result.get("locationType")))
@@ -1064,10 +1078,10 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	}
 
 	private void addLocationSearchFilterParameters(final SQLQuery sqlQuery, final LocationSearchRequest locationSearchRequest) {
-		if(!StringUtils.isEmpty(locationSearchRequest.getLocationTypeName())) {
+		if (!StringUtils.isEmpty(locationSearchRequest.getLocationTypeName())) {
 			sqlQuery.setParameter("locationType", locationSearchRequest.getLocationTypeName());
 		}
-		if(!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
+		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
 			sqlQuery.setParameterList("locationId", locationSearchRequest.getLocationIds());
 		}
 
@@ -1090,10 +1104,10 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	private void appendLocationSearchFilter(final StringBuilder queryString, final LocationSearchRequest locationSearchRequest) {
 		queryString.append("WHERE 1=1 ");
-		if(!StringUtils.isEmpty(locationSearchRequest.getLocationTypeName())) {
+		if (!StringUtils.isEmpty(locationSearchRequest.getLocationTypeName())) {
 			queryString.append("AND ud.fname = :locationType ");
 		}
-		if(!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
+		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
 			queryString.append("AND l.locid IN (:locationId) ");
 		}
 
@@ -1130,5 +1144,13 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				this.getLogExceptionMessage("getDefaultLocationByType", "type", String.valueOf(type), e.getMessage(), "Location"),
 				e);
 		}
+	}
+
+	public Optional<Location> getUnspecifiedLocation() {
+		final List<Location> locations = this.getByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
+		if (!locations.isEmpty()) {
+			return Optional.of(locations.get(0));
+		}
+		return Optional.empty();
 	}
 }

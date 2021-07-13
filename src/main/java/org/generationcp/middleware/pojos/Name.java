@@ -11,12 +11,18 @@
 
 package org.generationcp.middleware.pojos;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 
@@ -27,7 +33,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "names")
-public class Name implements Serializable {
+public class Name extends AbstractEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -64,9 +70,10 @@ public class Name implements Serializable {
 	@Column(name = "nid")
 	private Integer nid;
 
-	@Basic(optional = false)
-	@Column(name = "gid")
-	private Integer germplasmId;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@NotFound(action = NotFoundAction.IGNORE)
+	@JoinColumn(name = "gid", updatable = false)
+	private Germplasm germplasm;
 
 	@Basic(optional = false)
 	@Column(name = "ntype")
@@ -75,10 +82,6 @@ public class Name implements Serializable {
 	@Basic(optional = false)
 	@Column(name = "nstat")
 	private Integer nstat;
-
-	@Basic(optional = false)
-	@Column(name = "nuid")
-	private Integer userId;
 
 	@Basic(optional = false)
 	@Column(name = "nval")
@@ -94,22 +97,23 @@ public class Name implements Serializable {
 	@Column(name = "nref")
 	private Integer referenceId;
 
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
 	public Name() {
 	}
 
+	@Deprecated
 	public Name(final Integer nid) {
-		super();
 		this.nid = nid;
 	}
 
-	public Name(final Integer nid, final Integer germplasmId, final Integer typeId, final Integer nstat, final Integer userId,
-			final String nval, final Integer locationId, final Integer ndate, final Integer referenceId) {
-		super();
+	public Name(final Integer nid, final Germplasm germplasm, final Integer typeId, final Integer nstat,
+		final String nval, final Integer locationId, final Integer ndate, final Integer referenceId) {
 		this.nid = nid;
-		this.germplasmId = germplasmId;
+		this.germplasm = germplasm;
 		this.typeId = typeId;
 		this.nstat = nstat;
-		this.userId = userId;
 		this.nval = nval;
 		this.locationId = locationId;
 		this.ndate = ndate;
@@ -148,12 +152,12 @@ public class Name implements Serializable {
 		this.ndate = ndate;
 	}
 
-	public Integer getGermplasmId() {
-		return this.germplasmId;
+	public Germplasm getGermplasm() {
+		return germplasm;
 	}
 
-	public void setGermplasmId(final Integer germplasmId) {
-		this.germplasmId = germplasmId;
+	public void setGermplasm(final Germplasm germplasm) {
+		this.germplasm = germplasm;
 	}
 
 	public Integer getTypeId() {
@@ -162,14 +166,6 @@ public class Name implements Serializable {
 
 	public void setTypeId(final Integer typeId) {
 		this.typeId = typeId;
-	}
-
-	public Integer getUserId() {
-		return this.userId;
-	}
-
-	public void setUserId(final Integer userId) {
-		this.userId = userId;
 	}
 
 	public Integer getLocationId() {
@@ -214,14 +210,14 @@ public class Name implements Serializable {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Name [nid=");
 		builder.append(this.nid);
-		builder.append(", germplasmId=");
-		builder.append(this.germplasmId);
+		builder.append(", germplasm=");
+		builder.append(this.germplasm);
 		builder.append(", typeId=");
 		builder.append(this.typeId);
 		builder.append(", nstat=");
 		builder.append(this.nstat);
-		builder.append(", userId=");
-		builder.append(this.userId);
+		builder.append(", createdBy=");
+		builder.append(super.getCreatedBy());
 		builder.append(", nval=");
 		builder.append(this.nval);
 		builder.append(", locationId=");

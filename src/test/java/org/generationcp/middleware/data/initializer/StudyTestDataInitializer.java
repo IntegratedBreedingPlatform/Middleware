@@ -18,13 +18,18 @@ import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
+import org.generationcp.middleware.operation.saver.GeolocationSaver;
+import org.generationcp.middleware.operation.saver.StockSaver;
+import org.generationcp.middleware.operation.saver.StudySaver;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -54,20 +59,18 @@ public class StudyTestDataInitializer {
 	private final StudyDataManagerImpl studyDataManager;
 	private final OntologyDataManager ontologyManager;
 	private final Project commonTestProject;
-	private final GermplasmDataManager germplasmDataDM;
 	private final LocationDataManager locationDataManager;
-	private Integer gid;
-	private Integer stockId;
 	private Integer geolocationId;
+	private final HibernateSessionProvider sessionProvider;
 
 	public StudyTestDataInitializer(
 		final StudyDataManagerImpl studyDataManagerImpl, final OntologyDataManager ontologyDataManager,
-		final Project testProject, final GermplasmDataManager germplasmDataDM, final LocationDataManager locationDataManager) {
+		final Project testProject, final LocationDataManager locationDataManager, final HibernateSessionProvider provider) {
 		this.studyDataManager = studyDataManagerImpl;
 		this.ontologyManager = ontologyDataManager;
 		this.commonTestProject = testProject;
-		this.germplasmDataDM = germplasmDataDM;
 		this.locationDataManager = locationDataManager;
+		this.sessionProvider = provider;
 	}
 
 	public StudyReference addTestStudy() throws Exception {
@@ -100,13 +103,17 @@ public class StudyTestDataInitializer {
 		final Integer userId = 1;
 
 		final CropType crop = new CropType();
+
+		final DmsProject project = new StudySaver(this.sessionProvider)
+			.saveStudy(crop, StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, true, uniqueId, studyType, description,
+				startDate, endDate, objective, studyName, String.valueOf(userId));
+
 		final StudyReference addedStudy =
-			this.studyDataManager.addStudy(crop, StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, uniqueId,
-				studyType, description, startDate, endDate, objective, studyName, String.valueOf(userId));
+			new StudyReference(project.getProjectId(), project.getName(), project.getDescription(), uniqueId, studyType);
+
 		addedStudy.setOwnerId(userId);
 		return addedStudy;
 	}
-
 
 	public StudyReference addTestStudy(
 		final String studyName, final StudyTypeDto studyType, final String seasonId, final String locationId,
@@ -126,11 +133,16 @@ public class StudyTestDataInitializer {
 		final StudyValues studyValues = this.createStudyValues(variableList);
 		final Integer userId = 1;
 
-		final StudyReference addedStudy = this.studyDataManager
-			.addStudy(new CropType(), StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues,
-				this.commonTestProject.getUniqueID(), studyType, StudyTestDataInitializer.STUDY_DESCRIPTION + "_" + studyName, startDate,
-				StudyTestDataInitializer
+		final DmsProject project = new StudySaver(this.sessionProvider)
+			.saveStudy(new CropType(), StudyTestDataInitializer.PARENT_FOLDER_ID, typeList, studyValues, true,
+				this.commonTestProject.getUniqueID(), studyType, StudyTestDataInitializer.STUDY_DESCRIPTION + "_" + studyName,
+				startDate, StudyTestDataInitializer
 					.END_DATE, StudyTestDataInitializer.OBJECTIVE, studyName, String.valueOf(userId));
+
+		final StudyReference addedStudy =
+			new StudyReference(project.getProjectId(), project.getName(), project.getDescription(), this.commonTestProject.getUniqueID(),
+				studyType);
+
 		addedStudy.setOwnerId(userId);
 		return addedStudy;
 	}
@@ -141,7 +153,11 @@ public class StudyTestDataInitializer {
 		studyValues.setVariableList(variableList);
 
 		final VariableList locationVariableList = this.createEnvironment("Description", "1.0", "2.0", "data", "3.0", "RCBD");
-		this.geolocationId = this.studyDataManager.addTrialEnvironment(locationVariableList);
+
+		final GeolocationSaver geolocationSaver = new GeolocationSaver(this.sessionProvider);
+		final Geolocation geolocation = geolocationSaver.saveGeolocation(locationVariableList, null);
+
+		this.geolocationId = geolocation.getLocationId();
 		studyValues.setLocationId(this.geolocationId);
 
 		return studyValues;
@@ -280,11 +296,15 @@ public class StudyTestDataInitializer {
 		throws Exception {
 		final VariableList
 			locationVariableList = this.createEnvironmentWithLocationAndSeason(String.valueOf(trialInstance), "SOME SITE NAME", locationId, seasonId);
-		final int geolocationId = this.studyDataManager.addTrialEnvironment(locationVariableList);
+		final GeolocationSaver geolocationSaver = new GeolocationSaver(this.sessionProvider);
+		final Geolocation geolocation = geolocationSaver.saveGeolocation(locationVariableList, null);
 
+		this.geolocationId = geolocation.getLocationId();
 		final ExperimentValues experimentValue = new ExperimentValues();
 		experimentValue.setLocationId(geolocationId);
-		this.studyDataManager.addExperiment(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT, experimentValue);
+
+		final ExperimentModelSaver experimentModelSaver = new ExperimentModelSaver(this.sessionProvider);
+		experimentModelSaver.addExperiment(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT, experimentValue);
 
 		return geolocationId;
 	}
@@ -302,14 +322,10 @@ public class StudyTestDataInitializer {
 		return vtype;
 	}
 
-	public Integer getGid() {
-		return this.gid;
-	}
-
 	public Integer addTestLocation(final String locationName) {
 		final Location location = new Location();
 		location.setCntryid(1);
-		location.setLabbr("");
+		location.setLabbr(RandomStringUtils.randomAlphabetic(4).toUpperCase());
 		location.setLname(locationName);
 		location.setLrplce(1);
 		location.setLtype(1);
@@ -336,10 +352,16 @@ public class StudyTestDataInitializer {
 			stockModel.setGermplasm(new Germplasm(gid));
 			stockModel.setProject(new DmsProject(studyId));
 
-			final int entryId = this.studyDataManager.addStock(studyId, this.createGermplasm(String.valueOf(entryNumber), gid.toString(), StudyTestDataInitializer.GERMPLASM_PREFIX + gid, RandomStringUtils.randomAlphanumeric(5), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), RandomStringUtils.randomAlphanumeric(5)));
+			final VariableList variableList =
+				this.createGermplasm(String.valueOf(entryNumber), gid.toString(), StudyTestDataInitializer.GERMPLASM_PREFIX + gid,
+					RandomStringUtils.randomAlphanumeric(5), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
+					RandomStringUtils.randomAlphanumeric(5));
+			final StockSaver stockSaver = new StockSaver(this.sessionProvider);
+			final int entryId = stockSaver.saveStock(studyId, variableList);
 			entryIds.add(entryId);
 			entryNumber++;
 		}
 		return entryIds;
 	}
+
 }

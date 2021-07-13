@@ -1,0 +1,5 @@
+Manifest-Version: 1.0
+Implementation-Title: Vaadin Bootstrap
+Implementation-Version: 1.0.0
+Vaadin-Package-Version: 1
+Class-Path:

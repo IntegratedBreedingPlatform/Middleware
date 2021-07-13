@@ -329,7 +329,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		final int traitCount = (int) dao.countAllVariables(Lists
 			.newArrayList(VariableType.TRAIT.getId()));
 		final List<VariableDTO> variablesDTOs = dao.getAllVariables(Lists
-			.newArrayList(VariableType.TRAIT.getId()), MAIZE, traitCount, 1);
+			.newArrayList(VariableType.TRAIT.getId()), traitCount, 1);
 		Assert.assertEquals(traitCount, variablesDTOs.size());
 	}
 

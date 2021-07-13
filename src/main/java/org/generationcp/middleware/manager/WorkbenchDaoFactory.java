@@ -20,6 +20,8 @@ import org.generationcp.middleware.dao.UserRoleDao;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
 import org.generationcp.middleware.dao.WorkbenchUserDAO;
+import org.generationcp.middleware.dao.releasenote.ReleaseNoteDAO;
+import org.generationcp.middleware.dao.releasenote.ReleaseNoteUserDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public class WorkbenchDaoFactory {
@@ -173,5 +175,13 @@ public class WorkbenchDaoFactory {
 		final RCallParameterDAO rCallParameterDAO = new RCallParameterDAO();
 		rCallParameterDAO.setSession(this.sessionProvider.getSession());
 		return rCallParameterDAO;
+	}
+
+	public ReleaseNoteDAO getReleaseNoteDAO() {
+		return new ReleaseNoteDAO(this.sessionProvider.getSession());
+	}
+
+	public ReleaseNoteUserDAO getReleaseNoteUserDAO() {
+		return new ReleaseNoteUserDAO(this.sessionProvider.getSession());
 	}
 }

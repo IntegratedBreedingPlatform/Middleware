@@ -50,8 +50,6 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 	private static final String STUDY = "STUDY";
 	private static final String ENTRY = "ENTRY";
 	private static final String PLOT = "PLOT";
-	private static final String PROP_STUDY = "Study";
-	private static final String PROP_STUDY_TITLE = "Study Description";
 
 	private static final String DBCV = "DBCV";
 	private static final String DBID = "DBID";
@@ -76,8 +74,7 @@ public class WorkbookBuilderIntegrationTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() {
-		this.germplasmDao = new GermplasmDAO();
-		this.germplasmDao.setSession(this.sessionProvder.getSession());
+		this.germplasmDao = new GermplasmDAO(this.sessionProvder.getSession());
 	}
 
 	private void setUpNursery() {

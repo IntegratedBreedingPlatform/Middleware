@@ -35,9 +35,12 @@ import java.util.UUID;
 @Transactional
 public abstract class IntegrationTestBase {
 
+	public static final String ADMIN_NAME = "admin";
+
 	private static final Logger LOG = LoggerFactory.getLogger(IntegrationTestBase.class);
-	public static final int INDENT = 3;
 	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
+
+	public static final int INDENT = 3;
 
 	@Autowired
 	@Qualifier(value = "cropSessionProvider")
@@ -66,6 +69,8 @@ public abstract class IntegrationTestBase {
 	public void beforeEachTest() {
 		LOG.info("+++++ Test : " + this.getClass().getSimpleName() + "." + this.name.getMethodName() + "() started +++++\n");
 		this.startTime = System.nanoTime();
+
+		ContextHolder.setLoggedInUserId(this.findAdminUser());
 	}
 
 	@After
@@ -76,7 +81,7 @@ public abstract class IntegrationTestBase {
 	}
 
 	protected Integer findAdminUser() {
-		final WorkbenchUser user = this.userService.getUserByName("admin", 0, 1, Operation.EQUAL).get(0);
+		final WorkbenchUser user = this.userService.getUserByName(ADMIN_NAME, 0, 1, Operation.EQUAL).get(0);
 		return user.getUserid();
 	}
 

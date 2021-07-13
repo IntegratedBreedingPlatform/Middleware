@@ -1,0 +1,206 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_atributs_aud_insert" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_atributs_aud_insert.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_atributs_aud_insert' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_atributs_aud_update" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_atributs_aud_update.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_atributs_aud_update' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_atributs_aud_delete" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_atributs_aud_delete.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_atributs_aud_delete' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_bibrefs_aud_insert" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_bibrefs_aud_insert.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_bibrefs_aud_insert' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_bibrefs_aud_update" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_bibrefs_aud_update.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_bibrefs_aud_update' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_bibrefs_aud_delete" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_bibrefs_aud_delete.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_bibrefs_aud_delete' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_external_reference_germplasm_aud_insert" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_external_reference_germplasm_aud_insert.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_external_reference_germplasm_aud_insert' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_external_reference_germplasm_aud_update" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_external_reference_germplasm_aud_update.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_external_reference_germplasm_aud_update' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_external_reference_germplasm_aud_delete" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_external_reference_germplasm_aud_delete.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_external_reference_germplasm_aud_delete' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_germplsm_aud_insert" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_germplsm_aud_insert.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_germplsm_aud_insert' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_germplsm_aud_update" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_germplsm_aud_update.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_germplsm_aud_update' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_germplsm_aud_delete" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_germplsm_aud_delete.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_germplsm_aud_delete' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_names_aud_insert" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_names_aud_insert.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_names_aud_insert' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_names_aud_update" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_names_aud_update.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_names_aud_update' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_names_aud_delete" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_names_aud_delete.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_names_aud_delete' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_progntrs_aud_insert" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_progntrs_aud_insert.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_progntrs_aud_insert' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_progntrs_aud_update" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_progntrs_aud_update.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_progntrs_aud_update' trigger</comment>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.1.0-trigger_progntrs_aud_delete" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_progntrs_aud_delete.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_progntrs_aud_delete' trigger</comment>
+	</changeSet>
+
+
+</databaseChangeLog>

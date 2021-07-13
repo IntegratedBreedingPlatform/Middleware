@@ -21,6 +21,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
@@ -39,7 +40,6 @@ import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link Name}.
- *
  */
 public class NameDAO extends GenericDAO<Name, Integer> {
 
@@ -63,10 +63,14 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		+ "where " //
 		+ "    n.nstat <> 9 and n.gid in (:gids)";
 
+	public NameDAO(final Session session) {
+		super(session);
+	}
+
 	public List<Name> getByGIDWithFilters(final Integer gid, final Integer status, final GermplasmNameType type) {
 		if (type != null) {
 			return this.getByGIDWithListTypeFilters(gid, status,
-					Collections.<Integer>singletonList(Integer.valueOf(type.getUserDefinedFieldID())));
+				Collections.<Integer>singletonList(Integer.valueOf(type.getUserDefinedFieldID())));
 		}
 		return this.getByGIDWithListTypeFilters(gid, status, null);
 	}
@@ -74,9 +78,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	/**
 	 * Get the names associated with a GID
 	 *
-	 * @param gid the gid for which we are getting names
+	 * @param gid    the gid for which we are getting names
 	 * @param status the status of the gid. Note if status is null or 0 we will omit deleted values i.e. status will be set to 9
-	 * @param type a list of name types to retrieve. Note if type is null or empty it will be omited from the query
+	 * @param type   a list of name types to retrieve. Note if type is null or empty it will be omited from the query
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
@@ -120,7 +124,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error with getByGIDWithFilters(gid=" + gid + ", status=" + status + ", type=" + type
-					+ ") query from Name " + e.getMessage();
+				+ ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -132,7 +136,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		try {
 			if (gid != null) {
 				final Criteria crit = this.getSession().createCriteria(Name.class);
-				crit.add(Restrictions.eq("germplasmId", gid));
+				crit.createAlias("germplasm", "germplasm");
+				crit.add(Restrictions.eq("germplasm.gid", gid));
 				crit.add(Restrictions.eq("nval", nval));
 				final List<Name> names = crit.list();
 				if (names.isEmpty()) {
@@ -167,23 +172,6 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return new ArrayList<>();
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Name> getPreferredIdsByListId(final Integer listId) {
-		try {
-			if (listId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFERRED_IDS_BY_LIST_ID);
-				query.setParameter("listId", listId);
-				query.addEntity("n", Name.class);
-				return query.list();
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with getPreferredIdsByListId(listId=" + listId + ") query from Name " + e.getMessage();
-			NameDAO.LOG.error(message);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return new ArrayList<>();
-	}
-
 	public Name getNameByNameId(final Integer nId) {
 		try {
 			if (nId != null) {
@@ -207,7 +195,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	 */
 	@SuppressWarnings("rawtypes")
 	public List<GermplasmNameDetails> getGermplasmNameDetailsByNames(final List<String> germplasmNames,
-			final GetGermplasmByNameModes mode) {
+		final GetGermplasmByNameModes mode) {
 		final List<GermplasmNameDetails> toReturn = new ArrayList<>();
 
 		try {
@@ -219,7 +207,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 				if (mode == GetGermplasmByNameModes.SPACES_REMOVED_BOTH_SIDES) {
 					query = this.getSession().createSQLQuery(
-							"SELECT gid, nid, REPLACE(nval, ' ', '') " + "FROM names " + "WHERE nval IN (:germplasmNameList)");
+						"SELECT gid, nid, REPLACE(nval, ' ', '') " + "FROM names " + "WHERE nval IN (:germplasmNameList)");
 				}
 
 				query.setParameterList("germplasmNameList", germplasmNames);
@@ -238,7 +226,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			}
 		} catch (final HibernateException e) {
 			final String message =
-					"Error with getGermplasmNameDetailsByNames(germplasmNames=" + germplasmNames + ") query from Name " + e.getMessage();
+				"Error with getGermplasmNameDetailsByNames(germplasmNames=" + germplasmNames + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -299,31 +287,6 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return toreturn;
 	}
 
-	public Map<Integer, Integer> getPreferredNameIdsByGIDs(final List<Integer> gids) {
-		final Map<Integer, Integer> toreturn = new HashMap<>();
-		for (final Integer gid : gids) {
-			toreturn.put(gid, null);
-		}
-
-		try {
-			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFERRED_NAME_IDS_BY_GIDS);
-			query.setParameterList("gids", gids);
-
-			final List<Object> results = query.list();
-			for (final Object result : results) {
-				final Object[] resultArray = (Object[]) result;
-				final Integer gid = (Integer) resultArray[0];
-				final Integer preferredId = (Integer) resultArray[1];
-				toreturn.put(gid, preferredId);
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getPreferredNameIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage(),
-					e);
-		}
-
-		return toreturn;
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<Name> getNamesByGids(final List<Integer> gids) {
 		List<Name> toReturn = new ArrayList<>();
@@ -334,7 +297,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Name.class);
-			criteria.add(Restrictions.in("germplasmId", gids));
+			criteria.createAlias("germplasm", "germplasm");
+			criteria.add(Restrictions.in("germplasm.gid", gids));
 
 			toReturn = criteria.list();
 		} catch (final HibernateException e) {
@@ -375,18 +339,19 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Name.class);
-			criteria.add(Restrictions.in("germplasmId", gids));
+			criteria.createAlias("germplasm", "germplasm");
+			criteria.add(Restrictions.in("germplasm.gid", gids));
 			if (!CollectionUtils.isEmpty(ntypeIds)) {
 				criteria.add(Restrictions.in("typeId", ntypeIds));
 			}
 
-
 			final List<Name> list = criteria.list();
 
-			return list.stream().collect(Collectors.groupingBy(Name::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
+			return list.stream().collect(Collectors.groupingBy(n -> n.getGermplasm().getGid(), LinkedHashMap::new, Collectors.toList()));
 
 		} catch (final HibernateException e) {
-			final String message = "Error with getNamesByGidsAndNTypeIdsInMap(gids=" + gids + ", typeIds=" + ntypeIds+ ") query from Name " + e.getMessage();
+			final String message =
+				"Error with getNamesByGidsAndNTypeIdsInMap(gids=" + gids + ", typeIds=" + ntypeIds + ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -462,7 +427,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			sql.append("SELECT nval FROM names WHERE gid IN (:gids) ")
 				.append(" AND ( ");
 
-			final List<String> formattedPrefixes = prefixes.stream().map(prefix -> " nval LIKE '" + prefix + "%'").collect(Collectors.toList());
+			final List<String> formattedPrefixes =
+				prefixes.stream().map(prefix -> " nval LIKE '" + prefix + "%'").collect(Collectors.toList());
 			sql.append(String.join(" OR ", formattedPrefixes));
 			sql.append(" ) ");
 
@@ -472,7 +438,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error with getNamesByGidsAndPrefixes(gids=" + gids + ", prefixes=" + prefixes
-				+") query from Name " + e.getMessage();
+				+ ") query from Name " + e.getMessage();
 			NameDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -492,7 +458,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				returnList = query.list();
 			} catch (final HibernateException e) {
 				throw new MiddlewareQueryException(
-						"Error with getNamesByTypeAndGIDList(nameType=" + nameType + ", gidList=" + gidList + "): " + e.getMessage(), e);
+					"Error with getNamesByTypeAndGIDList(nameType=" + nameType + ", gidList=" + gidList + "): " + e.getMessage(), e);
 			}
 		}
 		return returnList;

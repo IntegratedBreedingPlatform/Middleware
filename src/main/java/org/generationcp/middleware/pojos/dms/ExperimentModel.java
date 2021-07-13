@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.pojos.dms;
 
+import org.generationcp.middleware.pojos.ExperimentExternalReference;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -30,24 +31,24 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
+
 /**
- *
  * http://gmod.org/wiki/Chado_Natural_Diversity_Module#Table:_nd_experiment
- *
+ * <p>
  * This is the core table for the natural diversity module, representing each individual assay that is undertaken (nb this is usually *not*
  * an entire experiment). Each nd_experiment should give rise to a single genotype or phenotype and be described via 1 (or more) protocols.
  * Collections of assays that relate to each other should be linked to the same record in the project table.
- *
+ * <p>
  * Experiment.type is a cvterm that will define which records are expected for other tables. Any CV may be used but it was designed with
  * terms such as: [phenotype_assay, genotype_assay, field_collection, cross_experiment] in mind.
  *
  * @author Joyce Avestro
- *
  */
 @Entity
 @Table(name = "nd_experiment")
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="nd_experiment")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "nd_experiment")
 //OneToOne relationship to this entity from ExperimentProject requires batching annotation to be on entity unlike OneToMany which can be on the field.
 @BatchSize(size = 5000)
 public class ExperimentModel implements Serializable {
@@ -105,6 +106,10 @@ public class ExperimentModel implements Serializable {
 	@Column(name = "observation_unit_no")
 	private Integer observationUnitNo;
 
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "nd_experiment_id")
+	private List<ExperimentExternalReference> externalReferences = new ArrayList<>();
+
 	public ExperimentModel() {
 	}
 
@@ -121,7 +126,7 @@ public class ExperimentModel implements Serializable {
 	}
 
 	public ExperimentModel(final Geolocation geoLocation, final Integer typeId, final DmsProject project, final StockModel stock,
-			final ExperimentModel parent, final Integer observationUnitNo) {
+		final ExperimentModel parent, final Integer observationUnitNo) {
 		this.geoLocation = geoLocation;
 		this.typeId = typeId;
 		this.project = project;
@@ -159,7 +164,7 @@ public class ExperimentModel implements Serializable {
 	}
 
 	public String getJsonProps() {
-		return jsonProps;
+		return this.jsonProps;
 	}
 
 	public void setJsonProps(final String props) {
@@ -177,11 +182,11 @@ public class ExperimentModel implements Serializable {
 	public void setProject(final DmsProject project) {
 		this.project = project;
 	}
-	
+
 	public StockModel getStock() {
 		return this.stock;
 	}
-	
+
 	public void setStock(final StockModel stock) {
 		this.stock = stock;
 	}
@@ -216,6 +221,14 @@ public class ExperimentModel implements Serializable {
 
 	public void setObservationUnitNo(final Integer observationUnitNo) {
 		this.observationUnitNo = observationUnitNo;
+	}
+
+	public List<ExperimentExternalReference> getExternalReferences() {
+		return this.externalReferences;
+	}
+
+	public void setExternalReferences(final List<ExperimentExternalReference> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	@Override
@@ -267,16 +280,16 @@ public class ExperimentModel implements Serializable {
 	@Override
 	public String toString() {
 		return "ExperimentModel{" +
-			"ndExperimentId=" + ndExperimentId +
-			", geoLocation=" + geoLocation +
-			", typeId=" + typeId +
-			", obsUnitId='" + obsUnitId + '\'' +
-			", properties=" + properties +
-			", project=" + project +
-			", stock=" + stock +
-			", phenotypes=" + phenotypes +
-			", parent=" + parent +
-			", observationUnitNo=" + observationUnitNo +
+			"ndExperimentId=" + this.ndExperimentId +
+			", geoLocation=" + this.geoLocation +
+			", typeId=" + this.typeId +
+			", obsUnitId='" + this.obsUnitId + '\'' +
+			", properties=" + this.properties +
+			", project=" + this.project +
+			", stock=" + this.stock +
+			", phenotypes=" + this.phenotypes +
+			", parent=" + this.parent +
+			", observationUnitNo=" + this.observationUnitNo +
 			'}';
 	}
 }

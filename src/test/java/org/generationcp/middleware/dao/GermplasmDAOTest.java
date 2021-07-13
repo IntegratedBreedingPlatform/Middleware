@@ -16,20 +16,25 @@ import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
+import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
@@ -38,6 +43,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
@@ -62,6 +68,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
@@ -71,11 +78,13 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	private static final String DUMMY_STOCK_ID = "USER-1-1";
 	private static final Integer TEST_PROJECT_ID = 1;
+	private static final String NOTE_ATTRIBUTE = "NOTE_AA_text";
 
 	private static final Integer GROUP_ID = 10;
 
 	private boolean testDataSetup = false;
 
+	private CVTermDao cvTermDao;
 	private GermplasmDAO dao;
 	private LotDAO lotDAO;
 	private TransactionDAO transactionDAO;
@@ -85,6 +94,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	private UserDefinedFieldDAO userDefinedFieldDao;
 	private ProgenitorDAO progenitorDao;
 	private StockDao stockDao;
+	private GermplasmExternalReferenceDAO germplasmExternalReferenceDAO;
 	private DataSetupTest dataSetupTest;
 	private CropType cropType;
 
@@ -108,8 +118,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		if (this.dao == null) {
-			this.dao = new GermplasmDAO();
-			this.dao.setSession(this.sessionProvder.getSession());
+			this.dao = new GermplasmDAO(this.sessionProvder.getSession());
 
 			this.lotDAO = new LotDAO();
 			this.lotDAO.setSession(this.sessionProvder.getSession());
@@ -123,17 +132,21 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			this.locationDAO = new LocationDAO();
 			this.locationDAO.setSession(this.sessionProvder.getSession());
 
-			this.nameDAO = new NameDAO();
-			this.nameDAO.setSession(this.sessionProvder.getSession());
+			this.nameDAO = new NameDAO(this.sessionProvder.getSession());
 
-			this.userDefinedFieldDao = new UserDefinedFieldDAO();
-			this.userDefinedFieldDao.setSession(this.sessionProvder.getSession());
+			this.userDefinedFieldDao = new UserDefinedFieldDAO(this.sessionProvder.getSession());
 
 			this.progenitorDao = new ProgenitorDAO();
 			this.progenitorDao.setSession(this.sessionProvder.getSession());
 
 			this.stockDao = new StockDao();
 			this.stockDao.setSession(this.sessionProvder.getSession());
+
+			this.cvTermDao = new CVTermDao();
+			this.cvTermDao.setSession(this.sessionProvder.getSession());
+
+			this.germplasmExternalReferenceDAO = new GermplasmExternalReferenceDAO();
+			this.germplasmExternalReferenceDAO.setSession(this.sessionProvder.getSession());
 
 			this.dataSetupTest = new DataSetupTest();
 			this.dataSetupTest.setDataImportService(this.dataImportService);
@@ -170,9 +183,23 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(childDerivativeGermplsm, childDerivativeGermplsm.getPreferredName(), this.cropType);
 
-		final List<Germplasm> results = this.dao.getChildren(parentGermplsm.getGid(), 'D');
+		final List<Germplasm> results = this.dao.getDescendants(parentGermplsm.getGid(), 'D');
 		Assert.assertNotNull(results);
 		Assert.assertEquals(childDerivativeGermplsm.getGid(), results.get(0).getGid());
+	}
+
+	@Test
+	public void testCountGermplasmDerivativeProgeny() {
+		final Germplasm parentGermplsm =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 1, -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDataDM.addGermplasm(parentGermplsm, parentGermplsm.getPreferredName(), this.cropType);
+
+		final Germplasm childDerivativeGermplsm = GermplasmTestDataInitializer
+			.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDataDM.addGermplasm(childDerivativeGermplsm, childDerivativeGermplsm.getPreferredName(), this.cropType);
+
+		final long germplasmDerivativeProgenyCount = this.dao.countGermplasmDerivativeProgeny(parentGermplsm.getGid());
+		Assert.assertEquals((long) 1, germplasmDerivativeProgenyCount);
 	}
 
 	@Test
@@ -189,7 +216,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		this.germplasmDataDM.addGermplasm(maintenanceChildrenGermplsm, maintenanceChildrenGermplsm.getPreferredName(), this.cropType);
 
-		final List<Germplasm> results = this.dao.getChildren(parentGermplsm.getGid(), 'M');
+		final List<Germplasm> results = this.dao.getDescendants(parentGermplsm.getGid(), 'M');
 		Assert.assertNotNull(results);
 		Assert.assertNotNull(results);
 		Assert.assertEquals(maintenanceChildrenGermplsm.getGid(), results.get(0).getGid());
@@ -344,9 +371,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final PedigreeDTO maintenancePedigree = this.dao.getPedigree(advance2.getGid(), null, true);
 
 		Assert.assertThat(generativePedigree.getGermplasmDbId(), is(cross.getGermplasmUUID()));
-		Assert.assertThat(generativePedigree.getParent1DbId(), is(femaleParent.getGid()));
+		Assert.assertThat(generativePedigree.getParent1DbId(), is(femaleParent.getGermplasmUUID()));
 		Assert.assertThat(generativePedigree.getParent1Type(), is(ParentType.FEMALE.name()));
-		Assert.assertThat(generativePedigree.getParent2DbId(), is(maleParent.getGid()));
+		Assert.assertThat(generativePedigree.getParent2DbId(), is(maleParent.getGermplasmUUID()));
 		Assert.assertThat(generativePedigree.getParent2Type(), is(ParentType.MALE.name()));
 		Assert.assertThat(generativePedigree.getCrossingPlan(),
 			is(generativeMethod.getMcode() + "|" + generativeMethod.getMname() + "|" + generativeMethod.getMtype()));
@@ -356,9 +383,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertThat(generativePedigree.getSiblings(), nullValue());
 
 		Assert.assertThat(derivativePedigree.getGermplasmDbId(), is(advance.getGermplasmUUID()));
-		Assert.assertThat(derivativePedigree.getParent1DbId(), is(cross.getGid()));
+		Assert.assertThat(derivativePedigree.getParent1DbId(), is(cross.getGermplasmUUID()));
 		Assert.assertThat(derivativePedigree.getParent1Type(), is(ParentType.POPULATION.name()));
-		Assert.assertThat(derivativePedigree.getParent2DbId(), is(cross.getGid()));
+		Assert.assertThat(derivativePedigree.getParent2DbId(), is(cross.getGermplasmUUID()));
 		Assert.assertThat(derivativePedigree.getParent2Type(), is(ParentType.SELF.name()));
 		Assert.assertThat(derivativePedigree.getCrossingPlan(),
 			is(derivativeMethod.getMcode() + "|" + derivativeMethod.getMname() + "|" + derivativeMethod.getMtype()));
@@ -366,9 +393,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertThat(derivativePedigree.getSiblings().get(0).getGermplasmDbId(), is(advance2.getGermplasmUUID()));
 
 		Assert.assertThat(maintenancePedigree.getGermplasmDbId(), is(advance2.getGermplasmUUID()));
-		Assert.assertThat(maintenancePedigree.getParent1DbId(), is(cross.getGid()));
+		Assert.assertThat(maintenancePedigree.getParent1DbId(), is(cross.getGermplasmUUID()));
 		Assert.assertThat(maintenancePedigree.getParent1Type(), is(ParentType.POPULATION.name()));
-		Assert.assertThat(maintenancePedigree.getParent2DbId(), is(cross.getGid()));
+		Assert.assertThat(maintenancePedigree.getParent2DbId(), is(cross.getGermplasmUUID()));
 		Assert.assertThat(maintenancePedigree.getParent2Type(), is(ParentType.SELF.name()));
 		Assert.assertThat(maintenancePedigree.getCrossingPlan(),
 			is(maintenanceMethod.getMcode() + "|" + maintenanceMethod.getMname() + "|" + maintenanceMethod.getMtype()));
@@ -384,7 +411,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(maleParent);
 
 		final Name maleParentPreferredName = maleParent.getPreferredName();
-		maleParentPreferredName.setGermplasmId(maleParent.getGid());
+		maleParentPreferredName.setGermplasm(maleParent);
 		this.nameDAO.save(maleParentPreferredName);
 
 		final Germplasm cross = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
@@ -395,7 +422,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(cross);
 
 		final Name crossPreferredName = cross.getPreferredName();
-		crossPreferredName.setGermplasmId(cross.getGid());
+		crossPreferredName.setGermplasm(cross);
 		this.nameDAO.save(crossPreferredName);
 
 		final Germplasm advance = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
@@ -430,7 +457,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		germplasm.setGnpgs(-1);
 		germplasm.setGpid1(0);
 		germplasm.setGpid2(0);
-		germplasm.setUserId(1);
 		germplasm.setLgid(0);
 		germplasm.setLocationId(1);
 		germplasm.setGdate(20160101);
@@ -444,7 +470,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Name name1 = new Name();
 		name1.setTypeId(5);
 		name1.setNstat(1);
-		name1.setUserId(1);
 		name1.setNval("Name1");
 		name1.setLocationId(1);
 		name1.setNdate(20160101);
@@ -453,7 +478,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Name name2 = new Name();
 		name2.setTypeId(5);
 		name2.setNstat(1);
-		name2.setUserId(1);
 		name2.setNval("Name2");
 		name2.setLocationId(1);
 		name2.setNdate(20160101);
@@ -464,7 +488,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		// Name collection mapping is uni-directional OneToMany right now, so the other side of the relationship has to be managed manually.
 		for (final Name name : germplasm.getNames()) {
-			name.setGermplasmId(germplasm.getGid());
+			name.setGermplasm(germplasm);
 		}
 
 		// In real app flush will happen automatically on tx commit. We don't commit tx in tests, so flush manually.
@@ -473,7 +497,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		for (final Name name : germplasm.getNames()) {
 			// No explicit save of name entity anywhere but should still be saved through cascade on flush.
 			Assert.assertNotNull(name.getNid());
-			Assert.assertEquals(germplasm.getGid(), name.getGermplasmId());
+			Assert.assertEquals(germplasm.getGid(), name.getGermplasm().getGid());
 		}
 	}
 
@@ -693,6 +717,11 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(0, germplasm1.getMgid().intValue());
 		Assert.assertEquals(0, germplasm2.getMgid().intValue());
 
+		Assert.assertThat(germplasm1.getModifiedBy(), is(this.findAdminUser()));
+		Assert.assertNotNull(germplasm1.getModifiedDate());
+
+		Assert.assertThat(germplasm2.getModifiedBy(), is(this.findAdminUser()));
+		Assert.assertNotNull(germplasm2.getModifiedDate());
 	}
 
 	@Test
@@ -704,15 +733,15 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Map<String, String> fields = new HashMap<>();
 
 		// atributs
-		fields.put("PLOTCODE", "");
-		fields.put("SPNAM", "");
-		fields.put("SPAUTH", "");
-		fields.put("SUBTAX", "");
-		fields.put("STAUTH", "");
-		fields.put("INSTCODE", "");
-		fields.put("ORIGININST", "");
-		fields.put("CROPNM", "");
-		fields.put("SORIG", "");
+		fields.put("PLOTCODE_AP_text", "");
+		fields.put("SPNAM_AP_text", "");
+		fields.put("SPAUTH_AP_text", "");
+		fields.put("SUBTAX_AP_text", "");
+		fields.put("STAUTH_AP_text", "");
+		fields.put("INSTCODE_AP_text", "");
+		fields.put("ORIGININST_AP_text", "");
+		fields.put("CROPNM_AP_text", "");
+		fields.put("SORIG_AP_text", "");
 
 		for (final Map.Entry<String, String> attributEntry : fields.entrySet()) {
 			final Attribute attribute = this.saveAttribute(germplasm, attributEntry.getKey());
@@ -743,17 +772,17 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertThat(germplasmDTO.getAccessionNumber(), is(displayName));
 		Assert.assertThat(germplasmDTO.getGermplasmName(), is(displayName));
 		Assert.assertThat(germplasmDTO.getPedigree(), nullValue());
-		Assert.assertThat(germplasmDTO.getGermplasmSeedSource(), is(fields.get("PLOTCODE")));
-		Assert.assertThat(germplasmDTO.getInstituteCode(), is(fields.get("INSTCODE")));
-		Assert.assertThat(germplasmDTO.getInstituteName(), is(fields.get("ORIGININST")));
-		Assert.assertThat(germplasmDTO.getCommonCropName(), is(fields.get("CROPNM")));
-		Assert.assertThat(germplasmDTO.getGermplasmOrigin(), is(fields.get("SORIG")));
+		Assert.assertThat(germplasmDTO.getGermplasmSeedSource(), is(fields.get("PLOTCODE_AP_text")));
+		Assert.assertThat(germplasmDTO.getInstituteCode(), is(fields.get("INSTCODE_AP_text")));
+		Assert.assertThat(germplasmDTO.getInstituteName(), is(fields.get("ORIGININST_AP_text")));
+		Assert.assertThat(germplasmDTO.getCommonCropName(), is(fields.get("CROPNM_AP_text")));
+		Assert.assertThat(germplasmDTO.getGermplasmOrigin(), is(fields.get("SORIG_AP_text")));
 		Assert.assertThat(germplasmDTO.getBiologicalStatusOfAccessionCode(), nullValue());
 		Assert.assertThat(germplasmDTO.getGenus(), is(names.get("GENUS")));
-		Assert.assertThat(germplasmDTO.getSpecies(), is(fields.get("SPNAM")));
-		Assert.assertThat(germplasmDTO.getSpeciesAuthority(), is(fields.get("SPAUTH")));
-		Assert.assertThat(germplasmDTO.getSubtaxa(), is(fields.get("SUBTAX")));
-		Assert.assertThat(germplasmDTO.getSubtaxaAuthority(), is(fields.get("STAUTH")));
+		Assert.assertThat(germplasmDTO.getSpecies(), is(fields.get("SPNAM_AP_text")));
+		Assert.assertThat(germplasmDTO.getSpeciesAuthority(), is(fields.get("SPAUTH_AP_text")));
+		Assert.assertThat(germplasmDTO.getSubtaxa(), is(fields.get("SUBTAX_AP_text")));
+		Assert.assertThat(germplasmDTO.getSubtaxaAuthority(), is(fields.get("STAUTH_AP_text")));
 		Assert.assertThat(new SimpleDateFormat("yyyy-MM-dd").format(germplasmDTO.getAcquisitionDate()), is("2015-01-01"));
 	}
 
@@ -763,7 +792,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final String displayName = RandomStringUtils.randomAlphanumeric(255);
 		germplasm.getPreferredName().setNval(displayName);
-		final Integer germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
 		request.setPreferredName(displayName);
@@ -779,7 +808,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Long count = this.dao.countGermplasmDTOs(request);
 		Assert.assertThat(count.intValue(), is(names.size()));
 	}
-
 
 	@Test
 	public void testCountGermplasmDTOs_FilterByAccessionNumbers() {
@@ -817,6 +845,90 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		request.setCommonCropNames(attributes);
 		final Long count = this.dao.countGermplasmDTOs(request);
 		Assert.assertThat(count.intValue(), is(attributes.size()));
+	}
+
+	@Test
+	public void testCountGermplasmDTOs_FilterByParentDbId() {
+		final Germplasm femaleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(femaleParent));
+		final Germplasm maleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(maleParent));
+		this.dao.save(femaleParent);
+		this.dao.save(maleParent);
+
+		final Germplasm cross = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		cross.setGpid1(femaleParent.getGid());
+		cross.setGpid2(maleParent.getGid());
+		cross.setGnpgs(2);
+		cross.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
+		this.dao.save(cross);
+
+		// Set female parent
+		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
+		request.setParentDbId(femaleParent.getGermplasmUUID());
+		final Long count = this.dao.countGermplasmDTOs(request);
+		Assert.assertThat(count.intValue(), is(1));
+
+		// Set male parent
+		final GermplasmSearchRequestDto request2 = new GermplasmSearchRequestDto();
+		request2.setParentDbId(maleParent.getGermplasmUUID());
+		final Long count2 = this.dao.countGermplasmDTOs(request2);
+		Assert.assertThat(count2.intValue(), is(1));
+	}
+
+	@Test
+	public void testCountGermplasmDTOs_FilterByProgeny() {
+		final Germplasm femaleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		final Germplasm maleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		this.dao.save(femaleParent);
+		this.dao.save(maleParent);
+
+		final Germplasm cross = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(cross));
+		cross.setGpid1(femaleParent.getGid());
+		cross.setGpid2(maleParent.getGid());
+		cross.setGnpgs(2);
+		cross.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
+		this.dao.save(cross);
+
+		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
+		request.setProgenyDbId(cross.getGermplasmUUID());
+		final Long count = this.dao.countGermplasmDTOs(request);
+		Assert.assertThat(count.intValue(), is(2));
+	}
+
+	@Test
+	public void testCountGermplasmDTOs_FilterByExternalReferenceId() {
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		this.dao.save(germplasm);
+
+		final GermplasmExternalReference germplasmExternalReference = new GermplasmExternalReference();
+		germplasmExternalReference.setGermplasm(germplasm);
+		germplasmExternalReference.setSource(RandomStringUtils.randomAlphabetic(200));
+		germplasmExternalReference.setReferenceId(RandomStringUtils.randomAlphabetic(500));
+		this.germplasmExternalReferenceDAO.save(germplasmExternalReference);
+
+		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
+		request.setExternalReferenceId(germplasmExternalReference.getReferenceId());
+		final Long count = this.dao.countGermplasmDTOs(request);
+		Assert.assertThat(count.intValue(), is(1));
+	}
+
+	@Test
+	public void testCountGermplasmDTOs_FilterByExternalReferenceSource() {
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		this.dao.save(germplasm);
+
+		final GermplasmExternalReference germplasmExternalReference = new GermplasmExternalReference();
+		germplasmExternalReference.setGermplasm(germplasm);
+		germplasmExternalReference.setSource(RandomStringUtils.randomAlphabetic(200));
+		germplasmExternalReference.setReferenceId(RandomStringUtils.randomAlphabetic(500));
+		this.germplasmExternalReferenceDAO.save(germplasmExternalReference);
+
+		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
+		request.setExternalReferenceSource(germplasmExternalReference.getSource());
+		final Long count = this.dao.countGermplasmDTOs(request);
+		Assert.assertThat(count.intValue(), is(1));
 	}
 
 	@Test
@@ -1004,6 +1116,84 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertTrue(existingCrosses.isEmpty());
 	}
 
+	@Test
+	public void testBuildCountGermplasmDTOsQuery_NoFilterSpecified() {
+		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
+		Assert.assertThat(this.dao.buildCountGermplasmDTOsQuery(dto), is("SELECT LEAST(count(1), 5000) FROM germplsm "));
+	}
+
+	@Test
+	public void testBuildCountGermplasmDTOsQuery_WithFilterSpecified() {
+		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
+		dto.setGermplasmDbIds(Collections.singletonList(RandomStringUtils.randomAlphanumeric(10)));
+		Assert.assertThat(this.dao.buildCountGermplasmDTOsQuery(dto),
+			is("SELECT COUNT(1) FROM (  SELECT g.gid  FROM germplsm g  WHERE g.deleted = 0 AND g.grplce = 0  AND g.germplsm_uuid IN (:germplasmDbIds) ) as T "));
+	}
+
+	@Test
+	public void testCountGermplasmDTOs_UnfilteredSearch() {
+		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
+		final long allCount = this.dao.countAll();
+		if (allCount < 5000) {
+			// Save a deleted germplasm
+			final Germplasm deletedGermplasm =
+				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			deletedGermplasm.setDeleted(true);
+			this.dao.save(deletedGermplasm);
+
+			final long nonDeletedGermplasmCount = this.dao.countNonDeletedGermplasm();
+			Assert.assertThat(this.dao.countGermplasmDTOs(dto), is(nonDeletedGermplasmCount));
+			// 5000 is the count limit if the germplasm db size is equal to or more than that
+		} else {
+			Assert.assertThat(this.dao.countGermplasmDTOs(dto), is(5000L));
+		}
+
+	}
+
+	@Test
+	public void testUpdateGroupSource() {
+		final Method derivativeMethod = this.methodDAO.getByCode(Collections.singletonList("UDM")).get(0);
+
+		final Germplasm femaleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		final Germplasm maleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		this.dao.save(femaleParent);
+		this.dao.save(maleParent);
+
+		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		germplasm.setGpid1(femaleParent.getGid());
+		germplasm.setGpid2(maleParent.getGid());
+		germplasm.setGnpgs(2);
+		germplasm.setMethodId(derivativeMethod.getMid());
+		germplasm.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
+		this.dao.save(germplasm);
+
+		final Germplasm actualGermplasm = this.dao.getById(germplasm.getGid());
+		Assert.assertThat(actualGermplasm.getCreatedBy(), is(this.findAdminUser()));
+		Assert.assertNotNull(actualGermplasm.getCreatedDate());
+		Assert.assertNull(actualGermplasm.getModifiedDate());
+		Assert.assertNull(actualGermplasm.getModifiedBy());
+
+		Assert.assertThat(actualGermplasm.getGpid1(), is(femaleParent.getGid()));
+		Assert.assertThat(actualGermplasm.getGpid2(), is(maleParent.getGid()));
+
+		final Germplasm newFemaleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		newFemaleParent.setMethodId(derivativeMethod.getMid());
+		this.dao.save(newFemaleParent);
+
+		this.dao.updateGroupSource(femaleParent.getGid(), newFemaleParent.getGid());
+
+		this.sessionProvder.getSession().flush();
+		this.sessionProvder.getSession().clear();
+
+		this.sessionProvder.getSession().refresh(germplasm);
+
+		final Germplasm updatedGermplasm = this.dao.getById(germplasm.getGid());
+		Assert.assertThat(updatedGermplasm.getGpid1(), is(newFemaleParent.getGid()));
+		Assert.assertThat(updatedGermplasm.getGpid2(), is(maleParent.getGid()));
+		Assert.assertThat(updatedGermplasm.getModifiedBy(), is(this.findAdminUser()));
+		Assert.assertNotNull(updatedGermplasm.getModifiedDate());
+	}
+
 	private Name saveGermplasmName(final Integer germplasmGID, final String nameType) {
 		UserDefinedField attributeField =
 			this.userDefinedFieldDao.getByTableTypeAndCode("NAMES", "NAME", nameType);
@@ -1016,7 +1206,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Name name = GermplasmTestDataInitializer.createGermplasmName(germplasmGID, RandomStringUtils.randomAlphanumeric(50));
 		name.setTypeId(attributeField.getFldno());
 		name.setNstat(0); // TODO Review
-		this.germplasmDataDM.addGermplasmName(name);
+		this.nameDAO.save(name);
 		return name;
 	}
 
@@ -1045,19 +1235,18 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	private Attribute saveAttribute(final Germplasm germplasm, final String attributeType) {
-		UserDefinedField attributeField =
-			this.userDefinedFieldDao.getByTableTypeAndCode("ATRIBUTS", "ATTRIBUTE", attributeType);
+		CVTerm cvTerm =
+			this.cvTermDao.getByNameAndCvId(attributeType, CvId.VARIABLES.getId());
 
-		if (attributeField == null) {
-			attributeField = new UserDefinedField(null, "ATRIBUTS", "ATTRIBUTE", attributeType, "", "", "", 0, 0, 0, 0);
-			this.germplasmDataDM.addUserDefinedField(attributeField);
+		if (cvTerm == null) {
+			cvTerm = new CVTerm(null, CvId.VARIABLES.getId(), attributeType, attributeType, null, 0, 0);
+			this.cvTermDao.save(cvTerm);
 		}
 
 		final Attribute attribute = new Attribute();
 		attribute.setGermplasmId(germplasm.getGid());
-		attribute.setTypeId(attributeField.getFldno());
+		attribute.setTypeId(cvTerm.getCvTermId());
 		attribute.setAval(RandomStringUtils.randomAlphanumeric(50));
-		attribute.setUserId(0);
 		attribute.setAdate(germplasm.getGdate());
 
 		this.germplasmDataDM.addGermplasmAttribute(attribute);
@@ -1090,6 +1279,29 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName(), this.cropType);
 	}
 
+	@Test
+	public void testGetGermplasmAttributeVariables() {
+		final Germplasm germplasm =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
+		final Map<String, String> fields = new HashMap<>();
+		// atributs
+		fields.put("NOTE_AA_text", "");
+		for (final Map.Entry<String, String> attributEntry : fields.entrySet()) {
+			final Attribute attribute = this.saveAttribute(germplasm, attributEntry.getKey());
+		}
 
+		final GermplasmSearchRequestDto request = new GermplasmSearchRequestDto();
+		request.setGermplasmDbIds(Lists.newArrayList(germplasm.getGermplasmUUID()));
+		final List<GermplasmDTO> result = this.dao.getGermplasmDTOList(request, null);
+
+		final Set<String> gids = result.stream().map(GermplasmDTO::getGid).collect(Collectors.toSet());
+		final List<Integer> gidsList = gids.stream().map(s -> Integer.valueOf(s)).collect(Collectors.toList());
+		final List<Variable> variables = this.dao.getGermplasmAttributeVariables(gidsList, null);
+		Assert.assertEquals(1, variables.size());
+		Assert.assertTrue(variables.stream().allMatch(cVTerm -> cVTerm.getName().equalsIgnoreCase(NOTE_ATTRIBUTE.toUpperCase())));
+		Assert.assertEquals(NOTE_ATTRIBUTE, variables.get(0).getName());
+		Assert.assertEquals("NOTES", variables.get(0).getDefinition());
+	}
 }

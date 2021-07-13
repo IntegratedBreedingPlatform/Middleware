@@ -77,16 +77,17 @@
     </bean>
 
 	<bean id="germplasmGroupingService" class="org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
-	
+
 	<bean id="dummyCrossExpansionProps" class="java.util.Properties">
 	</bean>
-	
+
 	<bean id="crossExpansionProperties"
 		class="org.generationcp.middleware.util.CrossExpansionProperties">
 		<constructor-arg ref="dummyCrossExpansionProps" />
 	</bean>
-	
+
     <bean id="oldPedigreeService" class="org.generationcp.middleware.service.pedigree.PedigreeDefaultServiceImpl">
         <constructor-arg ref="cropSessionProvider"/>
         <constructor-arg value="maize"/>
@@ -173,7 +174,7 @@
     <bean id="ontologyService" class="org.generationcp.middleware.service.OntologyServiceImpl">
         <property name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
-    
+
     <bean id="formulaService" class="org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
@@ -250,6 +251,12 @@
         <aop:scoped-proxy />
     </bean>
 
+	<bean id="variableDataValidatorFactory" factory-bean="managerFactory"
+		  factory-method="getVariableDataValidatorFactory">
+        <aop:scoped-proxy />
+    </bean>
+
+
 	<bean id="transactionService" class="org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
@@ -263,6 +270,10 @@
     </bean>
 
 	<bean id="studyInstanceService" class="org.generationcp.middleware.service.impl.study.StudyInstanceServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
+	<bean id="observationUnitService" class="org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
@@ -290,6 +301,10 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
+	<bean id="germplasmPedigreeService" class="org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 	<bean id="locationService" class="org.generationcp.middleware.api.location.LocationServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
@@ -297,4 +312,9 @@
 		<bean id="germplasmNameService" class="org.generationcp.middleware.api.germplasm.GermplasmNameServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
+
+	<bean id="releaseNoteService" class="org.generationcp.middleware.service.impl.releasenote.ReleaseNoteServiceImpl">
+        <constructor-arg name="sessionProvider" ref="workbenchSessionProvider"/>
+    </bean>
+
 </beans>

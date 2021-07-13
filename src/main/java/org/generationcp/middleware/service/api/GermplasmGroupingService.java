@@ -15,16 +15,16 @@ public interface GermplasmGroupingService {
 	 * refer to this transition as line becoming "fixed".
 	 * <p>
 	 * At the database level, this equates to assigning an mgid for the
-	 * germplasm and its descendents based on certain rules.
+	 * germplasm and their descendents based on certain rules.
 	 *
-	 * @param germplasm             The germplasm to "fix".
+	 * @param gids            GIDs to "fix".
 	 * @param includeDescendants    Whether to include descendants in the new group being created.
 	 * @param preserveExistingGroup flag to indicate whether existing group (mgid) should be
 	 *                              preserved.
 	 * @return {@link GermplasmGroup} summary of the result of the grouping
 	 * process.
 	 */
-	GermplasmGroup markFixed(Germplasm germplasm, boolean includeDescendants, boolean preserveExistingGroup);
+	List<GermplasmGroup> markFixed(List<Integer> gids, boolean includeDescendants, boolean preserveExistingGroup);
 
 	/**
 	 * Unfix a list of germplasm (line).
@@ -35,9 +35,9 @@ public interface GermplasmGroupingService {
 	 * At the database level, this will reset the mgid of a germplasm to zero.
 	 *
 	 * @param gids - List of gids
-	 * @return
+	 * @return list of gids which removed from whichever group they've been assigned to
 	 */
-	void unfixLines(Set<Integer> gids);
+	List<Integer> unfixLines(List<Integer> gids);
 
 	/**
 	 * Service to apply group (MGID) inheritance to newly created crosses.
@@ -50,7 +50,7 @@ public interface GermplasmGroupingService {
 	 *                                       breeding method of the germplasm is one of the hybris methods
 	 *                                       specified in this set. Must not be null.
 	 */
-	void processGroupInheritanceForCrosses(Map<Integer, Integer> germplasmIdMethodIdMap, boolean applyNewGroupToPreviousCrosses,
+	void processGroupInheritanceForCrosses(String cropName, Map<Integer, Integer> germplasmIdMethodIdMap, boolean applyNewGroupToPreviousCrosses,
 			Set<Integer> hybridMethods);
 
 	/**
@@ -65,11 +65,11 @@ public interface GermplasmGroupingService {
 	 * Get all group members where the given germplasm is a founder. For the
 	 * founder gid = mgid.
 	 */
-	GermplasmGroup getGroupMembers(Germplasm founder);
-
-	List<Germplasm> getGroupMembers(Integer gid);
+	List<GermplasmGroup> getGroupMembers(List<Integer> gids);
 
 	GermplasmPedigreeTree getDescendantTree(Germplasm germplasm);
+
+	List<Integer> getDescendantGroupMembersGids(Integer gid, Integer mgid);
 
 	void copyCodedNames(Germplasm germplasm, Germplasm sourceGermplasm);
 }

@@ -1,8 +1,7 @@
 package org.generationcp.middleware.manager;
 
-import java.util.List;
-
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
@@ -14,6 +13,8 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 
 public class PedigreeDataManagerImplTest extends IntegrationTestBase {
@@ -36,22 +37,28 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 	private Germplasm femaleParent;
 
 	private Germplasm maleParent;
+
+	private NameDAO nameDAO;
 	
 	@Before
 	public void setup() {
+		if (this.nameDAO == null) {
+			this.nameDAO = new NameDAO(this.sessionProvder.getSession());
+		}
+
 		if (this.maternalGrandParent1 == null){
 			this.maternalGrandParent1 = GermplasmTestDataInitializer.createGermplasm(1);
 			this.germplasmManager.save(this.maternalGrandParent1);
-			this.maternalGrandParent1.getPreferredName().setGermplasmId(this.maternalGrandParent1.getGid());
-			this.germplasmManager.addGermplasmName(this.maternalGrandParent1.getPreferredName());
+			this.maternalGrandParent1.getPreferredName().setGermplasm(this.maternalGrandParent1);
+			this.nameDAO.save(this.maternalGrandParent1.getPreferredName());
 
 		}
 
 		if (this.maternalGrandParent2 == null){
 			this.maternalGrandParent2 = GermplasmTestDataInitializer.createGermplasm(1);
 			this.germplasmManager.save(this.maternalGrandParent2);
-			this.maternalGrandParent2.getPreferredName().setGermplasmId(this.maternalGrandParent2.getGid());
-			this.germplasmManager.addGermplasmName(this.maternalGrandParent2.getPreferredName());
+			this.maternalGrandParent2.getPreferredName().setGermplasm(this.maternalGrandParent2);
+			this.nameDAO.save(this.maternalGrandParent2.getPreferredName());
 		}
 
 		if (this.femaleParent == null){
@@ -59,16 +66,16 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 			this.femaleParent.setGpid1(this.maternalGrandParent1.getGid());
 			this.femaleParent.setGpid2(this.maternalGrandParent2.getGid());
 			this.germplasmManager.save(this.femaleParent);
-			this.femaleParent.getPreferredName().setGermplasmId(this.femaleParent.getGid());
-			this.germplasmManager.addGermplasmName(this.femaleParent.getPreferredName());
+			this.femaleParent.getPreferredName().setGermplasm(this.femaleParent);
+			this.nameDAO.save(this.femaleParent.getPreferredName());
 
 		}
 
 		if (this.maleParent == null){
 			this.maleParent = GermplasmTestDataInitializer.createGermplasm(1);
 			this.germplasmManager.save(this.maleParent);
-			this.maleParent.getPreferredName().setGermplasmId(this.maleParent.getGid());
-			this.germplasmManager.addGermplasmName(this.maleParent.getPreferredName());
+			this.maleParent.getPreferredName().setGermplasm(this.maleParent);
+			this.nameDAO.save(this.maleParent.getPreferredName());
 
 		}
 		if (this.crossWithUnknownParent == null) {
@@ -113,12 +120,17 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.crossWithUnknownParent, tree.getRoot().getGermplasm());
 		final List<GermplasmPedigreeTreeNode> nodes = tree.getRoot().getLinkedNodes();
 		Assert.assertEquals(1, nodes.size());
-		final Germplasm femaleGermplasm = nodes.get(0).getGermplasm();
- 		Assert.assertEquals(this.crossWithUnknownParent.getGpid1(), femaleGermplasm.getGid());
+
+		final GermplasmPedigreeTreeNode uknownNode = nodes.get(0);
+		final Germplasm unknownGermplasm = uknownNode.getGermplasm();
+
+		final Germplasm femaleGermplasm = uknownNode.getLinkedNodes().get(0).getGermplasm();
+		Assert.assertEquals(true, unknownGermplasm.getGid().equals(0));
 		Assert.assertEquals(this.femaleParent.getGid(), femaleGermplasm.getGid());
 		Assert.assertEquals(this.femaleParent.getPreferredName().getNval(), femaleGermplasm.getPreferredName().getNval());
 
-		final List<GermplasmPedigreeTreeNode> grandparentNodes = nodes.get(0).getLinkedNodes();
+		final GermplasmPedigreeTreeNode grandParentsTreeNode = uknownNode.getLinkedNodes().get(0); //Female Node
+		final List<GermplasmPedigreeTreeNode> grandparentNodes = grandParentsTreeNode.getLinkedNodes();
 		Assert.assertEquals(2, grandparentNodes.size());
 		final Germplasm maternalGP1 = grandparentNodes.get(0).getGermplasm();
 		Assert.assertEquals(this.maternalGrandParent1.getGid(), maternalGP1.getGid());
@@ -180,19 +192,23 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 	public void tesUpdateProgenitor() {
 		this.germplasmWithPolyCrosses = GermplasmTestDataInitializer.createGermplasm(1);
 		this.germplasmManager.save(this.germplasmWithPolyCrosses);
+		this.sessionProvder.getSession().flush();
 		final Integer gid = this.germplasmWithPolyCrosses.getGid();
 
 		// Change gpid2
 		Germplasm newGermplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		this.germplasmManager.save(newGermplasm);
+		this.sessionProvder.getSession().flush();
 		Integer newProgenitorId = newGermplasm.getGid();
 		Assert.assertNotEquals(0, this.germplasmWithPolyCrosses.getGpid2().intValue());
 		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 2);
+		this.sessionProvder.getSession().flush();
 		Assert.assertEquals(newProgenitorId, this.germplasmManager.getGermplasmByGID(gid).getGpid2());
-		
+
 		// New progenitor record should be created
 		final Integer progenitorGid = this.crossWithUnknownParent.getGid();
 		this.pedigreeManager.updateProgenitor(gid, progenitorGid, 3);
+		this.sessionProvder.getSession().flush();
 		List<Germplasm> progenitors = this.germplasmManager.getProgenitorsByGIDWithPrefName(gid);
 		Assert.assertEquals(1, progenitors.size());
 		Assert.assertEquals(progenitorGid, progenitors.get(0).getGid());
@@ -201,8 +217,11 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		// Update existing progenitor record
 		newGermplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		this.germplasmManager.save(newGermplasm);
+		this.sessionProvder.getSession().flush();
 		newProgenitorId = newGermplasm.getGid();
 		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 3);
+		this.sessionProvder.getSession().flush();
+
 		progenitors = this.germplasmManager.getProgenitorsByGIDWithPrefName(gid);
 		Assert.assertEquals(1, progenitors.size());
 		Assert.assertEquals(newProgenitorId, progenitors.get(0).getGid());

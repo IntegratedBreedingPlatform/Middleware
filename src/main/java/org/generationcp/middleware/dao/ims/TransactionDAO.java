@@ -179,17 +179,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	}
 
-	public List<String> getSimilarStockIds(final List<String> stockIds) {
-		if (null == stockIds || stockIds.isEmpty()) {
-			return new ArrayList<>();
-		}
-
-		final String sql = "SELECT stock_id" + " FROM ims_lot" + " WHERE stock_id IN (:STOCK_ID_LIST)";
-		final Query query = this.getSession().createSQLQuery(sql).setParameterList("STOCK_ID_LIST", stockIds);
-
-		return query.list();
-	}
-
 	// Used in Lot Details component
 	public List<TransactionReportRow> getTransactionDetailsForLot(final Integer lotId) {
 
@@ -453,6 +442,14 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			if (!CollectionUtils.isEmpty(transactionsSearchDto.getGermplasmUUIDs())) {
 				paramBuilder.append(" and g.germplsm_uuid IN (:guids)");
 				paramBuilder.setParameterList("guids", transactionsSearchDto.getGermplasmUUIDs());
+			}
+
+			if (!CollectionUtils.isEmpty(transactionsSearchDto.getObservationUnitIds())) {
+				paramBuilder.append(" and exists (select 1 "
+					+ " from nd_experiment nde "
+					+ "		inner join ims_experiment_transaction ims_et on nde.nd_experiment_id = ims_et.nd_experiment_id "
+					+ " where nde.obs_unit_id in (:observationUnitIds) and ims_et.trnid = tr.trnid)");
+				paramBuilder.setParameterList("observationUnitIds", transactionsSearchDto.getObservationUnitIds());
 			}
 		}
 	}

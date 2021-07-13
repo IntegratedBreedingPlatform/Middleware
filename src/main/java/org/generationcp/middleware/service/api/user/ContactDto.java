@@ -2,13 +2,14 @@ package org.generationcp.middleware.service.api.user;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.apache.commons.lang.StringUtils;
+import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ContactDto {
 
-	private Integer contactDbId;
+	private String contactDbId;
 
 	private String name;
 
@@ -20,18 +21,18 @@ public class ContactDto {
 
 	private String instituteName = StringUtils.EMPTY;
 
-	public ContactDto(final Integer contactDbId, final String name, final String email, final String type) {
+	public ContactDto(final String contactDbId, final String name, final String email, final String type) {
 		this.contactDbId = contactDbId;
 		this.name = name;
 		this.email = email;
 		this.type = type;
 	}
 
-	public Integer getContactDbId() {
+	public String getContactDbId() {
 		return this.contactDbId;
 	}
 
-	public void setContactDbId(final Integer contactDbId) {
+	public void setContactDbId(final String contactDbId) {
 		this.contactDbId = contactDbId;
 	}
 
@@ -60,7 +61,7 @@ public class ContactDto {
 	}
 
 	public String getOrcid() {
-		return orcid;
+		return this.orcid;
 	}
 
 	public void setOrcid(final String orcid) {
@@ -68,10 +69,25 @@ public class ContactDto {
 	}
 
 	public String getInstituteName() {
-		return instituteName;
+		return this.instituteName;
 	}
 
 	public void setInstituteName(final String instituteName) {
 		this.instituteName = instituteName;
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
 	}
 }

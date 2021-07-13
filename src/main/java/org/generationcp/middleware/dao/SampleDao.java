@@ -94,6 +94,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 
 		final List<SampleDetailsBean> results = criteria
+			// FIXME IBP-3834
 			.setFirstResult(start)
 			.setMaxResults(pageSize)
 			.list();

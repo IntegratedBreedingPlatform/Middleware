@@ -80,7 +80,7 @@ public class GermplasmNameServiceImplIntegrationTest extends IntegrationTestBase
 	}
 
 	private Integer createName(final Integer gid, final GermplasmNameRequestDto germplasmNameRequestDto) {
-		return this.germplasmNameService.createName(this.findAdminUser(), germplasmNameRequestDto, gid);
+		return this.germplasmNameService.createName(germplasmNameRequestDto, gid);
 	}
 
 	private GermplasmNameRequestDto createGermplasmNameRequestDto(final Boolean preferred) {
@@ -94,8 +94,7 @@ public class GermplasmNameServiceImplIntegrationTest extends IntegrationTestBase
 	}
 
 	private Germplasm createGermplasm() {
-		final Germplasm germplasm = new Germplasm(null, 1, -1, 0, 0,
-			this.findAdminUser(), 0, 0, 0, 0,
+		final Germplasm germplasm = new Germplasm(null, 1, -1, 0, 0, 0, 0, 0, 0,
 			0, 0, null, null, null);
 		this.daoFactory.getGermplasmDao().save(germplasm);
 		return germplasm;

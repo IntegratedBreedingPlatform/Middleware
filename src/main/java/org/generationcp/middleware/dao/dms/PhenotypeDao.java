@@ -12,9 +12,9 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
+import org.generationcp.middleware.api.brapi.v2.observationunit.Treatment;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.TrialEnvironment;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -32,9 +32,9 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchDTO;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
+import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchRequestDTO;
 import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.generationcp.middleware.util.Debug;
 import org.hibernate.Criteria;
@@ -52,6 +52,7 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
 import java.math.BigInteger;
@@ -127,7 +128,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
 			+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
 			+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
-
 
 	public List<NumericTraitInfo> getNumericTraitInfoList(final List<Integer> environmentIds, final List<Integer> numericVariableIds) {
 		final List<NumericTraitInfo> numericTraitInfoList = new ArrayList<>();
@@ -912,11 +912,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return !query.list().isEmpty();
 	}
 
-	public List<PhenotypeSearchDTO> searchPhenotypes(
-		final Integer pageSize, final Integer pageNumber, final PhenotypeSearchRequestDTO requestDTO) {
+	public List<ObservationUnitDto> searchObservationUnits(
+		final Integer pageSize, final Integer pageNumber, final ObservationUnitSearchRequestDTO requestDTO) {
 		final StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
 
-		addPhenotypeSearchFilter(requestDTO, queryString);
+		addObservationUnitSearchFilter(requestDTO, queryString);
 
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
 
@@ -925,7 +925,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			sqlQuery.setMaxResults(pageSize);
 		}
 
-		addPhenotypeSearchQueryParams(requestDTO, sqlQuery);
+		addObservationUnitSearchQueryParams(requestDTO, sqlQuery);
 
 		sqlQuery.addScalar("nd_experiment_id").addScalar("observationUnitDbId", new StringType()).addScalar("observationUnitName")
 			.addScalar("observationLevel").addScalar("plantNumber", new IntegerType()).addScalar("germplasmDbId", new StringType())
@@ -940,15 +940,16 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		// TODO get map with AliasToEntityMapResultTransformer.INSTANCE
 		final List<Object[]> results = sqlQuery.list();
 
-		final Map<Integer, PhenotypeSearchDTO> observationUnitsByNdExpId = new LinkedHashMap<>();
+		final Map<Integer, ObservationUnitDto> observationUnitsByNdExpId = new LinkedHashMap<>();
 
 		if (results != null && !results.isEmpty()) {
 
 			// Process ObservationUnits (Measurement row)
 			for (final Object[] row : results) {
-				final PhenotypeSearchDTO observationUnit = new PhenotypeSearchDTO();
+				final ObservationUnitDto observationUnit = new ObservationUnitDto();
 
 				final Integer ndExperimentId = (Integer) row[0];
+				observationUnit.setExperimentId(ndExperimentId);
 				observationUnit.setObservationUnitDbId((String) row[1]); // OBS_UNIT_ID
 				observationUnit.setObservationUnitName((String) row[2]);
 				observationUnit.setObservationLevel((String) row[3]);
@@ -961,11 +962,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setStudyName((String) row[9]);
 				observationUnit.setProgramName((String) row[10]);
 
-				String x = row[16] != null ? (String) row[16] : null; // ROW
-				String y = row[17] != null ? (String) row[17] : null; // COL
+				String x = row[16] != null ? (String) row[16] : null; // COL
+				String y = row[17] != null ? (String) row[17] : null; // ROW
 				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
-					x = row[11] != null ? (String) row[11] : "1"; // fieldMapRow
-					y = row[12] != null ? (String) row[12] : "1"; // fieldMapCol
+					x = row[11] != null ? (String) row[11] : null; // fieldMapRow
+					y = row[12] != null ? (String) row[12] : null; // fieldMapCol
 				}
 				observationUnit.setX(x);
 				observationUnit.setY(y);
@@ -979,21 +980,20 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setEntryType((String) row[20]);
 				observationUnit.setEntryNumber((String) row[21]);
 
-				observationUnit.setAdditionalInfo("");
+				observationUnit.setAdditionalInfo(new HashMap<>());
 				observationUnit.setLocationDbId(observationUnit.getStudyLocationDbId());
 				observationUnit.setLocationName(observationUnit.getStudyLocation());
 				observationUnit.setObservationUnitPUI("");
 				final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
-				observationUnitPosition.setBlockNumber(observationUnit.getBlockNumber());
-				observationUnitPosition.setEntryNumber(observationUnit.getEntryNumber());
-				observationUnitPosition.setEntryType(Lists.newArrayList(observationUnit.getEntryType()));
-				observationUnitPosition.setPositionCoordinateX(x);
-				if (x != null) {
+				observationUnitPosition.setObservationLevel((String) row[3]);
+				observationUnitPosition.setEntryType(observationUnit.getEntryType());
+				observationUnitPosition.setPositionCoordinateX(row[16] != null ? (String) row[16] : null);
+				if (observationUnitPosition.getPositionCoordinateX() != null) {
 					observationUnitPosition.setPositionCoordinateXType("GRID_COL");
 				}
 
-				observationUnitPosition.setPositionCoordinateY(y);
-				if (y != null) {
+				observationUnitPosition.setPositionCoordinateY(row[17] != null ? (String) row[17] : null);
+				if (observationUnitPosition.getPositionCoordinateY() != null) {
 					observationUnitPosition.setPositionCoordinateYType("GRID_ROW");
 				}
 				final String jsonProps = (String) row[25];
@@ -1002,10 +1002,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 						final HashMap jsonProp = new ObjectMapper().readValue(jsonProps, HashMap.class);
 						observationUnitPosition.setGeoCoordinates((Map<String, Object>) jsonProp.get("geoCoordinates"));
 					} catch (final IOException e) {
-						LOG.error("couldn't parse json_props column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(), e);
+						LOG.error("couldn't parse json_props column for observationUnitDbId=" + observationUnit.getObservationUnitDbId(),
+							e);
 					}
 				}
-				observationUnitPosition.setReplicate(observationUnit.getReplicate());
 				observationUnit.setObservationUnitPosition(observationUnitPosition);
 
 				observationUnit.setProgramDbId((String) row[22]);
@@ -1036,7 +1036,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				// TODO
 				observation.setCollector(StringUtils.EMPTY);
 
-				final PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
+				final ObservationUnitDto observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
 				observationUnit.getObservations().add(observation);
 			}
 
@@ -1050,10 +1050,10 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final String factor = (String) result[0];
 				final String modality = (String) result[1];
 				final Integer ndExperimentId = (Integer) result[2];
-				final PhenotypeSearchDTO.Treatment treatment = new PhenotypeSearchDTO.Treatment();
+				final Treatment treatment = new Treatment();
 				treatment.setFactor(factor);
 				treatment.setModality(modality);
-				final PhenotypeSearchDTO observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
+				final ObservationUnitDto observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
 				observationUnit.getTreatments().add(treatment);
 			}
 		}
@@ -1061,14 +1061,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return new ArrayList<>(observationUnitsByNdExpId.values());
 	}
 
-	private static void addPhenotypeSearchFilter(final PhenotypeSearchRequestDTO requestDTO, final StringBuilder queryString) {
+	private static void addObservationUnitSearchFilter(final ObservationUnitSearchRequestDTO requestDTO, final StringBuilder queryString) {
 		final List<String> cvTermIds = requestDTO.getObservationVariableDbIds();
 
-		if (cvTermIds != null && !cvTermIds.isEmpty()) {
+		if (!CollectionUtils.isEmpty(cvTermIds)) {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATION_FILTER);
 		}
 
-		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getStudyDbIds())) {
 			queryString.append(PhenotypeQuery.PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER);
 		}
 
@@ -1089,36 +1089,46 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				+ "               AND ph.created_date <= :observationTimeStampRangeEnd) ");
 		}
 
-		if (requestDTO.getLocationDbIds() != null && !requestDTO.getLocationDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getLocationDbIds())) {
 			queryString.append(" AND l.locid in (:locationDbIds) ");
 		}
 
-		if (requestDTO.getGermplasmDbIds() != null && !requestDTO.getGermplasmDbIds().isEmpty()) {
-			queryString.append(" AND s.dbxref_id in (:germplasmDbIds) ");
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
+			queryString.append(" AND g.germplsm_uuid in (:germplasmDbIds) ");
 		}
 
-		if (requestDTO.getProgramDbIds() != null && !requestDTO.getProgramDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getProgramDbIds())) {
 			queryString.append(" AND p.program_uuid IN (:programDbIds) ");
 		}
 
-		if (requestDTO.getTrialDbIds() != null && !requestDTO.getTrialDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getTrialDbIds())) {
 			queryString.append(" AND p.project_id IN (:trialDbIds) ");
 		}
 
-		if (requestDTO.getObservationUnitDbIds() != null && !requestDTO.getObservationUnitDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getObservationUnitDbIds())) {
 			queryString.append(" AND nde.obs_unit_id IN (:observationUnitDbIds) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
+			queryString.append(" AND EXISTS (SELECT * FROM external_reference_experiment exref ");
+			queryString.append(" WHERE nde.nd_experiment_id = exref.nd_experiment_id AND exref.reference_id IN (:referenceIds)) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
+			queryString.append(" AND EXISTS (SELECT * FROM external_reference_experiment exref ");
+			queryString.append(" WHERE nde.nd_experiment_id = exref.nd_experiment_id AND exref.reference_source IN (:referenceSources)) ");
 		}
 	}
 
-	private static void addPhenotypeSearchQueryParams(final PhenotypeSearchRequestDTO requestDTO, final SQLQuery sqlQuery) {
+	private static void addObservationUnitSearchQueryParams(final ObservationUnitSearchRequestDTO requestDTO, final SQLQuery sqlQuery) {
 
 		final List<String> cvTermIds = requestDTO.getObservationVariableDbIds();
 
-		if (cvTermIds != null && !cvTermIds.isEmpty()) {
+		if (!CollectionUtils.isEmpty(cvTermIds)) {
 			sqlQuery.setParameterList(CV_TERM_IDS, cvTermIds);
 		}
 
-		if (requestDTO.getStudyDbIds() != null && !requestDTO.getStudyDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getStudyDbIds())) {
 			sqlQuery.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
 		}
 
@@ -1134,32 +1144,41 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			sqlQuery.setParameter("observationTimeStampRangeEnd", requestDTO.getObservationTimeStampRangeEnd());
 		}
 
-		if (requestDTO.getLocationDbIds() != null && !requestDTO.getLocationDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getLocationDbIds())) {
 			sqlQuery.setParameterList("locationDbIds", requestDTO.getLocationDbIds());
 		}
 
-		if (requestDTO.getGermplasmDbIds() != null && !requestDTO.getGermplasmDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
 			sqlQuery.setParameterList("germplasmDbIds", requestDTO.getGermplasmDbIds());
 		}
-		if (requestDTO.getProgramDbIds() != null && !requestDTO.getProgramDbIds().isEmpty()) {
+
+		if (!CollectionUtils.isEmpty(requestDTO.getProgramDbIds())) {
 			sqlQuery.setParameterList("programDbIds", requestDTO.getProgramDbIds());
 		}
 
-		if (requestDTO.getTrialDbIds() != null && !requestDTO.getTrialDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getTrialDbIds())) {
 			sqlQuery.setParameterList("trialDbIds", requestDTO.getTrialDbIds());
 		}
 
-		if (requestDTO.getObservationUnitDbIds() != null && !requestDTO.getObservationUnitDbIds().isEmpty()) {
+		if (!CollectionUtils.isEmpty(requestDTO.getObservationUnitDbIds())) {
 			sqlQuery.setParameterList("observationUnitDbIds", requestDTO.getObservationUnitDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
+			sqlQuery.setParameterList("referenceIds", requestDTO.getExternalReferenceIDs());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
+			sqlQuery.setParameterList("referenceSources", requestDTO.getExternalReferenceSources());
 		}
 	}
 
-	public long countPhenotypes(final PhenotypeSearchRequestDTO requestDTO) {
+	public long countObservationUnits(final ObservationUnitSearchRequestDTO requestDTO) {
 		final StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
 
-		addPhenotypeSearchFilter(requestDTO, queryString);
+		addObservationUnitSearchFilter(requestDTO, queryString);
 		final SQLQuery query = this.getSession().createSQLQuery("SELECT COUNT(1) FROM (" + queryString + ") T");
-		addPhenotypeSearchQueryParams(requestDTO, query);
+		addObservationUnitSearchQueryParams(requestDTO, query);
 
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
@@ -1362,36 +1381,42 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return criteria.list();
 	}
 
-	public List<MeasurementVariable> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(final Integer geolocationId,
+	public Map<Integer, List<MeasurementVariable>> getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(
+		final List<Integer> geolocationIds,
 		final List<Integer> variableIds) {
-		final List<MeasurementVariable> studyVariables = new ArrayList<>();
+		final Map<Integer, List<MeasurementVariable>> studyVariablesMap = new HashMap<>();
 
-		try{
+		try {
 			final SQLQuery query =
-				this.getSession().createSQLQuery("SELECT envcvt.name AS name, envcvt.definition AS definition, cvt_scale.name AS scaleName, "
-					+ "		(CASE WHEN cvt_rel_catVar.subject_id IS NULL THEN pheno.value ELSE categoricalVar.name END) AS value, "
-					+ "		cvt_scale.cvterm_id AS scaleId, envcvt.cvterm_id AS variableId "
-					+ "		from phenotype pheno "
-					+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.cvterm_id IN (:variableIds) "
-					+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = " + TermId.HAS_SCALE.getId()
-					+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
-					+ "     INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id\n"
-					+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id = :geolocationId "
-					+ "     LEFT JOIN cvterm_relationship cvt_rel_catVar on cvt_scale.cvterm_id = cvt_rel_catVar.subject_id and cvt_rel_catVar.type_id = " + TermId.HAS_TYPE.getId()
-					+ "			AND cvt_rel_catVar.object_id= " + TermId.CATEGORICAL_VARIABLE.getId()
-					+ "		LEFT JOIN cvterm categoricalVar ON categoricalVar.cvterm_id = pheno.value");
+				this.getSession()
+					.createSQLQuery("SELECT envcvt.name AS name, envcvt.definition AS definition, cvt_scale.name AS scaleName, "
+						+ "		(CASE WHEN cvt_rel_catVar.subject_id IS NULL THEN pheno.value ELSE categoricalVar.name END) AS value, "
+						+ "		cvt_scale.cvterm_id AS scaleId, envcvt.cvterm_id AS variableId, envnde.nd_geolocation_id AS instanceId "
+						+ "		from phenotype pheno "
+						+ "		INNER JOIN cvterm envcvt ON envcvt.cvterm_id = pheno.observable_id AND envcvt.cvterm_id IN (:variableIds) "
+						+ "		INNER JOIN cvterm_relationship cvt_rel ON cvt_rel.subject_id = envcvt.cvterm_id AND cvt_rel.type_id = "
+						+ TermId.HAS_SCALE.getId()
+						+ "     INNER JOIN cvterm cvt_scale ON cvt_scale.cvterm_id = cvt_rel.object_id\n"
+						+ "     INNER JOIN nd_experiment envnde ON  pheno.nd_experiment_id = envnde.nd_experiment_id\n"
+						+ "		INNER JOIN nd_geolocation gl ON envnde.nd_geolocation_id = gl.nd_geolocation_id AND gl.nd_geolocation_id IN (:geolocationIds) "
+						+ "     LEFT JOIN cvterm_relationship cvt_rel_catVar on cvt_scale.cvterm_id = cvt_rel_catVar.subject_id and cvt_rel_catVar.type_id = "
+						+ TermId.HAS_TYPE.getId()
+						+ "			AND cvt_rel_catVar.object_id= " + TermId.CATEGORICAL_VARIABLE.getId()
+						+ "		LEFT JOIN cvterm categoricalVar ON categoricalVar.cvterm_id = pheno.value");
 			query.addScalar("name", new StringType());
 			query.addScalar("definition", new StringType());
 			query.addScalar("scaleName", new StringType());
 			query.addScalar("value", new StringType());
 			query.addScalar("scaleId", new IntegerType());
 			query.addScalar("variableId", new IntegerType());
+			query.addScalar("instanceId", new IntegerType());
 			query.setParameterList("variableIds", variableIds);
-			query.setParameter("geolocationId", geolocationId);
+			query.setParameterList("geolocationIds", geolocationIds);
 
 			final List<Object> results = query.list();
 			for (final Object result : results) {
 				final Object[] row = (Object[]) result;
+				final Integer instanceId = (row[6] instanceof Integer) ? (Integer) row[6] : 0;
 				final MeasurementVariable measurementVariable = new MeasurementVariable();
 				measurementVariable.setName((row[0] instanceof String) ? (String) row[0] : null);
 				measurementVariable.setDescription((row[1] instanceof String) ? (String) row[1] : null);
@@ -1399,15 +1424,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				measurementVariable.setValue((row[3] instanceof String) ? (String) row[3] : null);
 				measurementVariable.setScaleId((row[4] instanceof Integer) ? (Integer) row[4] : null);
 				measurementVariable.setTermId((row[5] instanceof Integer) ? (Integer) row[5] : 0);
-				studyVariables.add(measurementVariable);
+				studyVariablesMap.putIfAbsent(instanceId, new ArrayList<>());
+				studyVariablesMap.get(instanceId).add(measurementVariable);
 			}
 		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationId: " + geolocationId
-				+ " and variableIds: " + variableIds;
+			final String message =
+				"Error with getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds() query from geolocationIds: " + geolocationIds
+					+ " and variableIds: " + variableIds;
 			PhenotypeDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-		return studyVariables;
+		return studyVariablesMap;
 	}
 
 	public boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId) {

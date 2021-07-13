@@ -98,8 +98,7 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmDao == null) {
-			this.germplasmDao = new GermplasmDAO();
-			this.germplasmDao.setSession(this.sessionProvder.getSession());
+			this.germplasmDao = new GermplasmDAO(this.sessionProvder.getSession());
 		}
 
 		if (this.experimentDao == null) {

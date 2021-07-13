@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
-
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -22,6 +20,7 @@ import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
+import java.io.Serializable;
 
 
 /**
@@ -30,10 +29,10 @@ import javax.persistence.Table;
  * @author klmanansala
  */
 @NamedQueries({@NamedQuery(name = "getAttributesByGID",
-		query = "FROM Attribute a WHERE a.germplasmId = :gid AND a.typeId <> 9999 AND a.typeId <> 999")})
+	query = "FROM Attribute a WHERE a.germplasmId = :gid ")})
 @Entity
 @Table(name = "atributs")
-public class Attribute implements Serializable {
+public class Attribute extends AbstractEntity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -54,12 +53,11 @@ public class Attribute implements Serializable {
 	private Integer typeId;
 
 	@Basic(optional = false)
-	@Column(name = "auid")
-	private Integer userId;
-
-	@Basic(optional = false)
 	@Column(name = "aval")
 	private String aval;
+
+	@Column(name = "cval_id")
+	private Integer cValueId;
 
 	@Column(name = "alocn")
 	private Integer locationId;
@@ -70,22 +68,23 @@ public class Attribute implements Serializable {
 	@Column(name = "adate")
 	private Integer adate;
 
+	/**
+	 * Don't use it. This constructor is required by hibernate.
+	 */
 	public Attribute() {
 	}
 
 	public Attribute(Integer aid) {
-		super();
 		this.aid = aid;
 	}
 
-	public Attribute(Integer aid, Integer germplasmId, Integer typeId, Integer userId, String aval, Integer locationId,
-			Integer referenceId, Integer adate) {
-		super();
+	public Attribute(Integer aid, Integer germplasmId, Integer typeId, String aval, Integer cValueId, Integer locationId,
+		Integer referenceId, Integer adate) {
 		this.aid = aid;
 		this.germplasmId = germplasmId;
 		this.typeId = typeId;
-		this.userId = userId;
 		this.aval = aval;
+		this.cValueId = cValueId;
 		this.locationId = locationId;
 		this.referenceId = referenceId;
 		this.adate = adate;
@@ -113,14 +112,6 @@ public class Attribute implements Serializable {
 
 	public void setTypeId(Integer typeId) {
 		this.typeId = typeId;
-	}
-
-	public Integer getUserId() {
-		return this.userId;
-	}
-
-	public void setUserId(Integer userId) {
-		this.userId = userId;
 	}
 
 	public Integer getLocationId() {
@@ -155,6 +146,14 @@ public class Attribute implements Serializable {
 		this.adate = adate;
 	}
 
+	public Integer getcValueId() {
+		return cValueId;
+	}
+
+	public void setcValueId(final Integer cValueId) {
+		this.cValueId = cValueId;
+	}
+
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
@@ -164,10 +163,12 @@ public class Attribute implements Serializable {
 		builder.append(this.germplasmId);
 		builder.append(", typeId=");
 		builder.append(this.typeId);
-		builder.append(", userId=");
-		builder.append(this.userId);
+		builder.append(", createdBy=");
+		builder.append(super.getCreatedBy());
 		builder.append(", aval=");
 		builder.append(this.aval);
+		builder.append(", cValueId=");
+		builder.append(this.cValueId);
 		builder.append(", locationId=");
 		builder.append(this.locationId);
 		builder.append(", referenceId=");

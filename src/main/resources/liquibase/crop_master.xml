@@ -4,6 +4,9 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
+	<!-- We drop all existing audit triggers in order to improve performance for migrations and also avoid undesired audit insertions -->
+	<include file="crop_changelog/triggers/drop_triggers.xml" relativeToChangelogFile="true"/>
+
 	<include file="crop_changelog/4_0_0_BETA_08.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/4_0_0_BETA_09.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/4_0_0_BETA_10.xml" relativeToChangelogFile="true"/>
@@ -69,5 +72,14 @@
 	<include file="crop_changelog/17_1_0.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/17_2_0.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/17_3_0.xml" relativeToChangelogFile="true"/>
+	<include file="crop_changelog/17_4_0.xml" relativeToChangelogFile="true"/>
+	<include file="crop_changelog/18_1_0.xml" relativeToChangelogFile="true"/>
+	<include file="crop_changelog/18_2_0.xml" relativeToChangelogFile="true"/>
+	<include file="crop_changelog/18_3_0.xml" relativeToChangelogFile="true"/>
+
+	<!-- The following change sets must be executed at last in order to ensure that all crop change sets has already been executed at this moment -->
+	<include file="crop_changelog/functions/functions.xml" relativeToChangelogFile="true"/>
+	<include file="crop_changelog/procedures/procedures.xml" relativeToChangelogFile="true"/>
+	<include file="crop_changelog/triggers/triggers.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
