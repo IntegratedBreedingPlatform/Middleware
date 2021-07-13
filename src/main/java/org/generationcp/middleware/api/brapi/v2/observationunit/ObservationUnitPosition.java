@@ -4,40 +4,21 @@ import java.util.List;
 import java.util.Map;
 
 public class ObservationUnitPosition {
-	private String blockNumber;
-	private String entryNumber;
-	private List<String> entryType;
+
+	private String entryType;
 	private Map<String, Object> geoCoordinates;
+	private String observationLevel;
+	private List<ObservationLevelRelationship> observationLevelRelationships;
 	private String positionCoordinateX;
 	private String positionCoordinateXType;
 	private String positionCoordinateY;
 	private String positionCoordinateYType;
-	private String replicate;
 
-	public ObservationUnitPosition() {
-	}
-
-	public String getBlockNumber() {
-		return this.blockNumber;
-	}
-
-	public void setBlockNumber(final String blockNumber) {
-		this.blockNumber = blockNumber;
-	}
-
-	public String getEntryNumber() {
-		return this.entryNumber;
-	}
-
-	public void setEntryNumber(final String entryNumber) {
-		this.entryNumber = entryNumber;
-	}
-
-	public List<String> getEntryType() {
+	public String getEntryType() {
 		return this.entryType;
 	}
 
-	public void setEntryType(final List<String> entryType) {
+	public void setEntryType(final String entryType) {
 		this.entryType = entryType;
 	}
 
@@ -47,6 +28,23 @@ public class ObservationUnitPosition {
 
 	public void setGeoCoordinates(final Map<String, Object> geoCoordinates) {
 		this.geoCoordinates = geoCoordinates;
+	}
+
+	public String getObservationLevel() {
+		return this.observationLevel;
+	}
+
+	public void setObservationLevel(final String observationLevel) {
+		this.observationLevel = observationLevel;
+	}
+
+	public List<ObservationLevelRelationship> getObservationLevelRelationships() {
+		return this.observationLevelRelationships;
+	}
+
+	public void setObservationLevelRelationships(
+		final List<ObservationLevelRelationship> observationLevelRelationships) {
+		this.observationLevelRelationships = observationLevelRelationships;
 	}
 
 	public String getPositionCoordinateX() {
@@ -79,13 +77,5 @@ public class ObservationUnitPosition {
 
 	public void setPositionCoordinateYType(final String positionCoordinateYType) {
 		this.positionCoordinateYType = positionCoordinateYType;
-	}
-
-	public String getReplicate() {
-		return this.replicate;
-	}
-
-	public void setReplicate(final String replicate) {
-		this.replicate = replicate;
 	}
 }

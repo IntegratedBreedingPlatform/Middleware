@@ -1,7 +1,6 @@
 package org.generationcp.middleware.service.api.study;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
@@ -12,7 +11,7 @@ public class ObservationLevel {
 
 	private Integer levelOrder;
 
-	public ObservationLevel(final Integer levelOrder, final String levelName){
+	public ObservationLevel(final Integer levelOrder, final String levelName) {
 		this.levelOrder = levelOrder;
 		this.levelName = levelName;
 	}
@@ -32,6 +31,5 @@ public class ObservationLevel {
 	public void setLevelOrder(final Integer levelOrder) {
 		this.levelOrder = levelOrder;
 	}
-
 
 }

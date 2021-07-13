@@ -12,7 +12,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
-import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImpl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -58,8 +57,7 @@ public class ExperimentModelGenerator {
 		final Geolocation location = geolocation.isPresent() ? geolocation.get() : this.geolocationGenerator.createGeoLocation();
 		experimentModel.setGeoLocation(location);
 
-		final ObservationUnitIDGenerator observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl();
-		observationUnitIDGenerator.generateObservationUnitIds(crop, Collections.singletonList(experimentModel));
+		ObservationUnitIDGenerator.generateObservationUnitIds(crop, Collections.singletonList(experimentModel));
 
 		return experimentModel;
 	}

@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.pojos.dms;
 
+import org.generationcp.middleware.pojos.ExperimentExternalReference;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
@@ -30,6 +31,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -103,6 +105,10 @@ public class ExperimentModel implements Serializable {
 
 	@Column(name = "observation_unit_no")
 	private Integer observationUnitNo;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "nd_experiment_id")
+	private List<ExperimentExternalReference> externalReferences = new ArrayList<>();
 
 	public ExperimentModel() {
 	}
@@ -215,6 +221,14 @@ public class ExperimentModel implements Serializable {
 
 	public void setObservationUnitNo(final Integer observationUnitNo) {
 		this.observationUnitNo = observationUnitNo;
+	}
+
+	public List<ExperimentExternalReference> getExternalReferences() {
+		return this.externalReferences;
+	}
+
+	public void setExternalReferences(final List<ExperimentExternalReference> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	@Override

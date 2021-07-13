@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.germplasm;
 
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -25,7 +26,10 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	private final DaoFactory daoFactory;
 
 	@Autowired
-	GermplasmService germplasmService;
+	private GermplasmService germplasmService;
+
+	@Autowired
+	private GermplasmNameTypeService germplasmNameTypeService;
 
 	public GermplasmNameServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -63,7 +67,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		final Name name = daoFactory.getNameDao().getById(nameId);
 		if (!StringUtils.isBlank(germplasmNameRequestDto.getNameTypeCode())) {
 			final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
-			final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = germplasmService.filterGermplasmNameTypes(codes);
+			final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = germplasmNameTypeService.filterGermplasmNameTypes(codes);
 			name.setTypeId(germplasmNameTypeDTOs.get(0).getId());
 
 		}
@@ -98,7 +102,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		}
 
 		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
-		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = germplasmService.filterGermplasmNameTypes(codes);
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = germplasmNameTypeService.filterGermplasmNameTypes(codes);
 
 		final Name name = new Name();
 		name.setGermplasm(new Germplasm(gid));

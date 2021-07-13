@@ -100,8 +100,6 @@ public interface GermplasmService {
 
 	ProgenyDTO getProgeny(Integer gid);
 
-	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
-
 	GermplasmDto getGermplasmDtoById(Integer gid);
 
 	ProgenitorsDetailsDto getGermplasmProgenitorDetails(Integer gid);
