@@ -4,6 +4,7 @@ package org.generationcp.middleware.dao.oms;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableOverridesDto;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -14,6 +15,7 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,6 +51,27 @@ public class VariableOverridesDao extends GenericDAO<VariableOverrides, Integer>
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error at getByVariableAndProgram=" + variableId + " query on VariableOverridesDao: "
+				+ e.getMessage(), e);
+		}
+	}
+
+	public List<VariableOverridesDto> getByAliasAndProgram(final String alias, final String programUuid) {
+
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("alias", alias).ignoreCase());
+			criteria.add(Restrictions.eq("programUuid", programUuid));
+			final List<VariableOverrides> variableOverridesList = (List<VariableOverrides>) criteria.list();
+
+			final List<VariableOverridesDto> variableOverridesDtoList = new ArrayList<>();
+			variableOverridesList.forEach(variableOverrides -> variableOverridesDtoList.add(
+				new VariableOverridesDto(variableOverrides.getId(), variableOverrides.getVariableId(), variableOverrides.getProgramUuid(),
+					variableOverrides.getAlias(), variableOverrides.getExpectedMin(), variableOverrides.getExpectedMax())));
+
+			return variableOverridesDtoList;
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getByAliasAndProgram=" + alias + " query on VariableOverridesDao: "
 				+ e.getMessage(), e);
 		}
 	}
