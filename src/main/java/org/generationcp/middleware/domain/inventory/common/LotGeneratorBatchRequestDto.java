@@ -6,10 +6,10 @@ public class LotGeneratorBatchRequestDto {
 
 	private LotGeneratorInputDto lotGeneratorInput;
 	/**
-	 * searchRequestId for {@link org.generationcp.middleware.domain.search_request.GidSearchDto}
+	 * searchRequestId for {@link org.generationcp.middleware.domain.inventory.common.SearchTypeComposeDto}
 	 * or list of gids
 	 */
-	private SearchCompositeDto<Integer, Integer> searchComposite;
+	private SearchCompositeDto<SearchTypeComposeDto, Integer> searchComposite;
 
 	public LotGeneratorInputDto getLotGeneratorInput() {
 		return this.lotGeneratorInput;
@@ -19,12 +19,12 @@ public class LotGeneratorBatchRequestDto {
 		this.lotGeneratorInput = lotGeneratorInput;
 	}
 
-	public SearchCompositeDto<Integer, Integer> getSearchComposite() {
+	public SearchCompositeDto<SearchTypeComposeDto, Integer> getSearchComposite() {
 		return this.searchComposite;
 	}
 
 	public void setSearchComposite(
-		final SearchCompositeDto<Integer, Integer> searchComposite) {
+		final SearchCompositeDto<SearchTypeComposeDto, Integer> searchComposite) {
 		this.searchComposite = searchComposite;
 	}
 }
