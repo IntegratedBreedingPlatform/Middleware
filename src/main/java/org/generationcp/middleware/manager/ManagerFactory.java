@@ -21,6 +21,8 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchServiceImpl;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListServiceImpl;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -362,6 +364,10 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmService getGermplasmService() {
 		return new GermplasmServiceImpl(this.sessionProvider);
+	}
+
+	public GermplasmNameTypeService getGermplasmNameTypeService() {
+		return new GermplasmNameTypeServiceImpl(this.sessionProvider);
 	}
 
 	public GermplasmAttributeService getGermplasmAttributeService() {
