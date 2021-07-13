@@ -18,10 +18,10 @@ public class ObservationSerializer extends JsonSerializer<List<PhenotypeSearchOb
 		throws IOException {
 
 		if (serializers.getActiveView() != null && CollectionUtils.isNotEmpty(value)) {
-			if (BrapiView.BrapiV1_2.class.equals(serializers.getActiveView())) {
-				gen.writeObject(value);
-			} else {
+			if (BrapiView.BrapiV2.class.equals(serializers.getActiveView())) {
 				gen.writeObject(value.stream().map(PhenotypeSearchObservationDTO::getObservationDbId).collect(Collectors.toList()));
+			} else {
+				gen.writeObject(value);
 			}
 		} else {
 			gen.writeObject(value);
