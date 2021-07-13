@@ -40,9 +40,18 @@ public class ProgramMembersQuery {
 		+ "                                      users_roles ur1 ON ur1.workbench_project_id = p1.project_id " //
 		+ "                                             INNER JOIN role r1 ON ur1.role_id = r1.id " //
 		+ "                                      where r1.role_type_id = " + RoleType.PROGRAM.getId() //
-		+ "                                        AND ur1.crop_name = cp.crop_name AND ur1.userid = u.userid) "
+		+ "                                        AND ur1.crop_name = cp.crop_name AND ur1.userid = u.userid)"
+		+ " 									 AND NOT EXISTS(select ur1.id "
+		+ "                   					  from workbench.users_roles ur1 "
+		+ "                          			  inner join role r2 on ur1.role_id = r2.id "
+		+ "                   					 where r2.role_type_id = " + RoleType.INSTANCE.getId() + " and ur1.userid = u.userid) ) "
 		//
-		+ "    || (r.role_type_id= " + RoleType.PROGRAM.getId() + " and wp.project_uuid = :programUUID))) and " //
+		+ "    || (r.role_type_id= " + RoleType.PROGRAM.getId() + " and wp.project_uuid = :programUUID and "
+		+ "										not exists(select ur1.id " //
+		+ "                                     from workbench.users_roles ur1 " //
+		+ "                                     inner join role r2 on ur1.role_id = r2.id " //
+		+ "                                      where r2.role_type_id = " + RoleType.INSTANCE.getId()
+		+ " and ur1.userid = u.userid))) and " //
 		+ "  u.ustatus = 0 and cp.crop_name = (select wpi.crop_type from workbench_project wpi where wpi.project_uuid = :programUUID) "
 		+ " %s"; // use of ORDER_EXPRESION -> It's not needed for the count query
 
