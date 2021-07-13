@@ -49,7 +49,7 @@ public class GermplasmNameTypeServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	@Test
-	public void testGetNameTypes_Pagination() {
+	public void testGetNameTypes_Pagination_Ok() {
 		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmNameTypeService.getNameTypes(new PageRequest(0, 10));
 		Assert.assertThat(10, equalTo(germplasmNameTypeDTOs.size()));
 	}
