@@ -1583,8 +1583,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 			germplasmPUISynonym;
 		if (!StringUtils.isEmpty(germplasmPUI) ) {
 			final List<String> existingGermplasmPUIs = this.daoFactory.getNameDao().getExistingGermplasmPUIs(Collections.singletonList(germplasmPUI));
-			if (!CollectionUtils.isEmpty(existingGermplasmPUIs) && (puiName == null || germplasmPUI.equals(puiName.getNval()))) {
-				throw new MiddlewareRequestException("", "brapi.import.germplasm.pui.exists", StringUtils.join(existingGermplasmPUIs, ","));
+			if (!CollectionUtils.isEmpty(existingGermplasmPUIs) && (puiName == null || !germplasmPUI.equals(puiName.getNval()))) {
+				throw new MiddlewareRequestException("", "brapi.update.germplasm.pui.exists", StringUtils.join(existingGermplasmPUIs, ","));
 			}
 		}
 	}
