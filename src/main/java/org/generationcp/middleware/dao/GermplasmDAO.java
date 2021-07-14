@@ -85,28 +85,27 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private static final String DELETED = "deleted";
 
 	private static final String VARIABLE_ID = "vid";
-	private static final String VARIABLE_NAME ="vn";
-	private static final String VARIABLE_DEFINITION ="vd";
+	private static final String VARIABLE_NAME = "vn";
+	private static final String VARIABLE_DEFINITION = "vd";
 
-	private static final String METHOD_ID ="mid";
-	private static final String METHOD_NAME ="mn";
-	private static final String METHOD_DEFINITION ="md";
+	private static final String METHOD_ID = "mid";
+	private static final String METHOD_NAME = "mn";
+	private static final String METHOD_DEFINITION = "md";
 
-	private static final String PROPERTY_ID ="pid";
-	private static final String PROPERTY_NAME ="pn";
-	private static final String PROPERTY_DEFINITION ="pd";
+	private static final String PROPERTY_ID = "pid";
+	private static final String PROPERTY_NAME = "pn";
+	private static final String PROPERTY_DEFINITION = "pd";
 
-	private static final String SCALE_ID ="sid";
-	private static final String SCALE_NAME ="sn";
-	private static final String SCALE_DEFINITION ="sd";
+	private static final String SCALE_ID = "sid";
+	private static final String SCALE_NAME = "sn";
+	private static final String SCALE_DEFINITION = "sd";
 
-	private static final String VARIABLE_ALIAS ="p_alias";
-	private static final String VARIABLE_EXPECTED_MAX ="p_max_value";
-	private static final String VARIABLE_EXPECTED_MIN ="p_min_value";
+	private static final String VARIABLE_ALIAS = "p_alias";
+	private static final String VARIABLE_EXPECTED_MAX = "p_max_value";
+	private static final String VARIABLE_EXPECTED_MIN = "p_min_value";
 
 	private static final String PROGRAM_UUID = "programUUID";
 	private static final String GIDS = "gids";
-
 
 	private static final String DER_MAN = "'" + MethodType.DERIVATIVE.getCode() + "','" + MethodType.MAINTENANCE.getCode() + "'";
 
@@ -621,21 +620,21 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public PedigreeDTO getPedigree(final Integer germplasmDbId, final String notation, final Boolean includeSiblings) {
+	public PedigreeDTO getPedigree(final Integer gid, final String notation, final Boolean includeSiblings) {
 		try {
 			final String query = "SELECT "
 				+ "   g.germplsm_uuid as germplasmDbId,"
 				+ "   (select n.nval from names n where n.gid = g.gid AND n.nstat = 1) as defaultDisplayName," //
 				+ "   CONCAT(m.mcode, '|', m.mname, '|', m.mtype) AS crossingPlan," //
 				+ "   year(str_to_date(g.gdate, '%Y%m%d')) as crossingYear," //
-				+ "   femaleParent.gid as parent1DbId," //
+				+ "   femaleParent.germplsm_uuid as parent1DbId," //
 				+ "   femaleParentName.nval as parent1Name," //
 				// If germplasmDbId is a cross (gnpgs > 0), the parents' type should be FEMALE and MALE
 				// If germplasmDbId is advanced (gnpgs < 0), the parents type should be POPULATION and SELF
 				+ "   CASE WHEN femaleParent.gid is not null AND g.gnpgs > 0 THEN '" + ParentType.FEMALE.name() + "' "
 				+ "	  WHEN femaleParent.gid is not null AND g.gnpgs < 0 THEN '" + ParentType.POPULATION.name()
 				+ "' ELSE NULL END as parent1Type," //
-				+ "   maleParent.gid as parent2DbId," //
+				+ "   maleParent.germplsm_uuid as parent2DbId," //
 				+ "   maleParentName.nval as parent2Name," //
 				+ "   CASE WHEN maleParent.gid is not null AND g.gnpgs > 0 THEN '" + ParentType.MALE.name() + "' "
 				+ "	  WHEN maleParent.gid is not null AND g.gnpgs < 0  THEN '" + ParentType.SELF.name()
@@ -652,7 +651,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				.addScalar("germplasmDbId").addScalar("defaultDisplayName").addScalar("crossingPlan")
 				.addScalar("crossingYear", new IntegerType()).addScalar("parent1DbId").addScalar("parent1Name").addScalar("parent1Type")
 				.addScalar("parent2DbId").addScalar("parent2Name").addScalar("parent2Type")
-				.setParameter("gid", germplasmDbId) //
+				.setParameter("gid", gid) //
 				.setResultTransformer(Transformers.aliasToBean(PedigreeDTO.class)) //
 				.uniqueResult();
 
@@ -673,7 +672,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 			final List<PedigreeDTO.Sibling> siblings = this.getSession().createSQLQuery(siblingsQuery) //
 				.addScalar("germplasmDbId").addScalar("defaultDisplayName")
-				.setParameter("gid", germplasmDbId)
+				.setParameter("gid", gid)
 				.setResultTransformer(Transformers.aliasToBean(PedigreeDTO.Sibling.class)) //
 				.list();
 
@@ -1919,12 +1918,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-
 	/**
 	 * Given a list of Germplasms return the Variables related with type GERMPLASM_PASSPORT, GERMPLASM_ATTRIBUTE.
 	 * The programUUID is used to return the expected range and alias of the program if it exists.
 	 *
-	 * @param List of gids
+	 * @param List        of gids
 	 * @param programUUID program's unique id
 	 * @return List of Variable or empty list if none found
 	 */
@@ -1934,14 +1932,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ " v.cvterm_id AS " + GermplasmDAO.VARIABLE_ID + ", "  //
 				+ " v.name AS " + GermplasmDAO.VARIABLE_NAME + ", "  //
 				+ " v.definition AS " + GermplasmDAO.VARIABLE_DEFINITION + ", "  //
-				+ " vmr.mid AS "  + GermplasmDAO.METHOD_ID + ", "  //
-				+ " vmr.mn AS "  + GermplasmDAO.METHOD_NAME + ", "  //
-				+ " vmr.md AS "  + GermplasmDAO.METHOD_DEFINITION + ", "  //
-				+ " vpr.pid AS "  + GermplasmDAO.PROPERTY_ID + ", "  //
-				+ " vpr.pn AS "  + GermplasmDAO.PROPERTY_NAME + ", "  //
-				+ " vpr.pd AS "  + GermplasmDAO.PROPERTY_DEFINITION + ", "  //
-				+ " vsr.sid AS "  + GermplasmDAO.SCALE_ID + ", "  //
-				+ " vsr.sn AS "  + GermplasmDAO.SCALE_NAME + ", "  //
+				+ " vmr.mid AS " + GermplasmDAO.METHOD_ID + ", "  //
+				+ " vmr.mn AS " + GermplasmDAO.METHOD_NAME + ", "  //
+				+ " vmr.md AS " + GermplasmDAO.METHOD_DEFINITION + ", "  //
+				+ " vpr.pid AS " + GermplasmDAO.PROPERTY_ID + ", "  //
+				+ " vpr.pn AS " + GermplasmDAO.PROPERTY_NAME + ", "  //
+				+ " vpr.pd AS " + GermplasmDAO.PROPERTY_DEFINITION + ", "  //
+				+ " vsr.sid AS " + GermplasmDAO.SCALE_ID + ", "  //
+				+ " vsr.sn AS " + GermplasmDAO.SCALE_NAME + ", "  //
 				+ " vsr.sd AS " + GermplasmDAO.SCALE_DEFINITION + ", "  //
 				+ " vpo.alias  AS " + GermplasmDAO.VARIABLE_ALIAS + ", "  //
 				+ " vpo.expected_min AS " + GermplasmDAO.VARIABLE_EXPECTED_MIN + ", "  //
@@ -1949,11 +1947,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				+ " FROM cvterm v INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
 				+ " and v.cvterm_id = cp.cvterm_id " //
 				+ " INNER JOIN cvterm varType on varType.name = cp.value AND varType.cvterm_id in (" //
-				+ 			VariableType.GERMPLASM_PASSPORT.getId() + "," //
-				+ 			VariableType.GERMPLASM_ATTRIBUTE.getId() + ") " //
-				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = " + TermRelationshipId.HAS_METHOD.getId() + ") vmr on vmr.vid = v.cvterm_id "
-				+ " left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = " + TermRelationshipId.HAS_PROPERTY.getId() + ") vpr on vpr.vid = v.cvterm_id "
-				+ " left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = " + TermRelationshipId.HAS_SCALE.getId() + ") vsr on vsr.vid = v.cvterm_id "
+				+ VariableType.GERMPLASM_PASSPORT.getId() + "," //
+				+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ") " //
+				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = "
+				+ TermRelationshipId.HAS_METHOD.getId() + ") vmr on vmr.vid = v.cvterm_id "
+				+ " left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = "
+				+ TermRelationshipId.HAS_PROPERTY.getId() + ") vpr on vpr.vid = v.cvterm_id "
+				+ " left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = "
+				+ TermRelationshipId.HAS_SCALE.getId() + ") vsr on vsr.vid = v.cvterm_id "
 				+ " left join variable_overrides vpo ON vpo.cvterm_id = v.cvterm_id AND vpo.program_uuid = :" + GermplasmDAO.PROGRAM_UUID //
 				+ " inner join atributs a  on a.atype = v.cvterm_id " //
 				+ " WHERE "
@@ -1983,10 +1984,16 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final List<Variable> variables = new ArrayList<>();
 			for (final Map<String, Object> item : queryResults) {
 				final Variable variable =
-					new Variable(new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.VARIABLE_ID)), (String) item.get(GermplasmDAO.VARIABLE_NAME), (String) item.get(GermplasmDAO.VARIABLE_DEFINITION)));
-				variable.setMethod(new Method(new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.METHOD_ID)), (String) item.get(GermplasmDAO.METHOD_NAME), (String) item.get(GermplasmDAO.METHOD_DEFINITION))));
-				variable.setProperty(new Property(new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.PROPERTY_ID)), (String) item.get(GermplasmDAO.PROPERTY_NAME), (String) item.get(GermplasmDAO.PROPERTY_DEFINITION))));
-				variable.setScale(new Scale(new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.SCALE_ID)), (String) item.get(GermplasmDAO.SCALE_NAME), (String) item.get(GermplasmDAO.SCALE_DEFINITION))));
+					new Variable(new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.VARIABLE_ID)),
+						(String) item.get(GermplasmDAO.VARIABLE_NAME), (String) item.get(GermplasmDAO.VARIABLE_DEFINITION)));
+				variable.setMethod(new Method(
+					new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.METHOD_ID)), (String) item.get(GermplasmDAO.METHOD_NAME),
+						(String) item.get(GermplasmDAO.METHOD_DEFINITION))));
+				variable.setProperty(new Property(new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.PROPERTY_ID)),
+					(String) item.get(GermplasmDAO.PROPERTY_NAME), (String) item.get(GermplasmDAO.PROPERTY_DEFINITION))));
+				variable.setScale(new Scale(
+					new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.SCALE_ID)), (String) item.get(GermplasmDAO.SCALE_NAME),
+						(String) item.get(GermplasmDAO.SCALE_DEFINITION))));
 
 				// Alias, Expected Min Value, Expected Max Value
 				final String pAlias = (String) item.get(GermplasmDAO.VARIABLE_ALIAS);

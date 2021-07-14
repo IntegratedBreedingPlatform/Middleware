@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.germplasm;
 
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -12,7 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -23,7 +25,10 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	private final DaoFactory daoFactory;
 
 	@Autowired
-	GermplasmService germplasmService;
+	private GermplasmService germplasmService;
+
+	@Autowired
+	private GermplasmNameTypeService germplasmNameTypeService;
 
 	public GermplasmNameServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -60,8 +65,8 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 		final Name name = daoFactory.getNameDao().getById(nameId);
 		if (!StringUtils.isBlank(germplasmNameRequestDto.getNameTypeCode())) {
-			final Set<String> codes = Collections.singleton(germplasmNameRequestDto.getNameTypeCode());
-			final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = germplasmService.filterGermplasmNameTypes(codes);
+		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = germplasmNameTypeService.filterGermplasmNameTypes(codes);
 			name.setTypeId(germplasmNameTypeDTOs.get(0).getId());
 
 		}
@@ -95,8 +100,8 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 			}
 		}
 
-		final Set<String> codes = Collections.singleton(germplasmNameRequestDto.getNameTypeCode());
-		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = germplasmService.filterGermplasmNameTypes(codes);
+		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = germplasmNameTypeService.filterGermplasmNameTypes(codes);
 
 		final Name name = new Name();
 		name.setGermplasm(new Germplasm(gid));

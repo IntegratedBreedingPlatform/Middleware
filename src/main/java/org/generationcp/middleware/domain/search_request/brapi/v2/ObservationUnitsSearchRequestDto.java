@@ -19,6 +19,8 @@ public class ObservationUnitsSearchRequestDto extends SearchRequestDto {
 	private List<String> studyDbIds;
 	private List<String> trialDbIds;
 	private String observationLevel;
+	private List<String> externalReferenceIDs;
+	private List<String> externalReferenceSources;
 
 	public ObservationUnitsSearchRequestDto() {
 		this.locationDbIds = Lists.newArrayList();
@@ -27,6 +29,8 @@ public class ObservationUnitsSearchRequestDto extends SearchRequestDto {
 		this.programDbIds = Lists.newArrayList();
 		this.studyDbIds = Lists.newArrayList();
 		this.trialDbIds = Lists.newArrayList();
+		this.externalReferenceIDs = Lists.newArrayList();
+		this.externalReferenceSources = Lists.newArrayList();
 	}
 
 	public List<String> getGermplasmDbIds() {
@@ -83,6 +87,22 @@ public class ObservationUnitsSearchRequestDto extends SearchRequestDto {
 
 	public void setObservationLevel(final String observationLevel) {
 		this.observationLevel = observationLevel;
+	}
+
+	public List<String> getExternalReferenceIDs() {
+		return externalReferenceIDs;
+	}
+
+	public void setExternalReferenceIDs(final List<String> externalReferenceIDs) {
+		this.externalReferenceIDs = externalReferenceIDs;
+	}
+
+	public List<String> getExternalReferenceSources() {
+		return externalReferenceSources;
+	}
+
+	public void setExternalReferenceSources(final List<String> externalReferenceSources) {
+		this.externalReferenceSources = externalReferenceSources;
 	}
 
 	@Override
