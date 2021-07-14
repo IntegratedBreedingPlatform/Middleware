@@ -1,4 +1,4 @@
-package org.generationcp.middleware.dao;
+package org.generationcp.middleware.dao.workbench;
 
 import com.google.common.base.Joiner;
 import org.generationcp.middleware.domain.workbench.RoleType;
@@ -53,7 +53,7 @@ public class ProgramMembersQuery {
 		+ "                                      where r2.role_type_id = " + RoleType.INSTANCE.getId()
 		+ " and ur1.userid = u.userid))) and " //
 		+ "  u.ustatus = 0 and cp.crop_name = (select wpi.crop_type from workbench_project wpi where wpi.project_uuid = :programUUID) "
-		+ " %s"; // use of ORDER_EXPRESION -> It's not needed for the count query
+		+ " %s"; // use of ORDER_EXPRESSION -> It's not needed for the count query
 
 	private static final String PROGRAM_MEMBERS_SELECT_CLAUSE =
 		" distinct u.userid as " + USER_ID + ",  u.uname as " + USERNAME + ", p.fname as " + FIRST_NAME + ", " //
@@ -61,7 +61,7 @@ public class ProgramMembersQuery {
 			+ "r.id as " + ROLE_ID + ", r.name as " + ROLE_NAME + ", r.description as " + ROLE_DESCRIPTION + ", rt.name as " //
 			+ ROLE_TYPE_NAME + ", r.active as " + ROLE_ACTIVE;
 
-	private static final String DEFAULT_SORT_EXPRESION = " order by rt.role_type_id asc, r.name asc ";
+	private static final String DEFAULT_SORT_EXPRESSION = " order by rt.role_type_id asc, r.name asc ";
 
 	private static final String COUNT_EXPRESSION = " COUNT(1) ";
 
@@ -77,15 +77,15 @@ public class ProgramMembersQuery {
 			}
 			return query.toString();
 		} else {
-			return DEFAULT_SORT_EXPRESION;
+			return DEFAULT_SORT_EXPRESSION;
 		}
 	}
 
-	static String getSelectQuery(final Pageable pageable) {
+	public static String getSelectQuery(final Pageable pageable) {
 		return String.format(PROGRAM_MEMBERS_BASE_QUERY, PROGRAM_MEMBERS_SELECT_CLAUSE, getSortClause(pageable));
 	}
 
-	static String getCountQuery() {
+	public static String getCountQuery() {
 		return String.format(PROGRAM_MEMBERS_BASE_QUERY, COUNT_EXPRESSION, "");
 	}
 

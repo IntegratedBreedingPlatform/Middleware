@@ -495,6 +495,18 @@ public class UserServiceImpl implements UserService {
 		return this.workbenchDaoFactory.getWorkbenchUserDAO().countAllProgramMembers(programUUID);
 	}
 
+	@Override
+	public List<UserDto> getProgramMembersEligibleUsers(final String programUUID, final Pageable pageable) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO()
+			.getAllProgramEligibleUsers(programUUID, pageable);
+	}
+
+	@Override
+	public long countProgramMembersEligibleUsers(final String programUUID) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO()
+			.countAllProgramEligibleUsers(programUUID);
+	}
+
 	private UserRole buildNewUserRole(final WorkbenchUser user, final UserRoleDto userRoleDto) {
 		final Role role = new Role(userRoleDto.getRole().getId());
 

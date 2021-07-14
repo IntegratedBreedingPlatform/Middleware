@@ -303,4 +303,8 @@ public interface UserService {
 
 	long countAllProgramMembers(String programUUID);
 
+	List<UserDto> getProgramMembersEligibleUsers(String programUUID, Pageable pageable);
+
+	long countProgramMembersEligibleUsers(String programUUID);
+
 }
