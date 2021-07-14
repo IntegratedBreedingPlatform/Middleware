@@ -77,7 +77,8 @@ public class SampleServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals("20190101", sampleDetailsDTO.getSeedingDate());
 		Assert.assertEquals("Wet", sampleDetailsDTO.getSeason());
 		Assert.assertEquals(101, sampleDetailsDTO.getLocationDbId().intValue());
-
+		Assert.assertEquals(samples.get(0).getPlateId(), sampleDetailsDTO.getPlateId());
+		Assert.assertEquals(samples.get(0).getSampleName(), sampleDetailsDTO.getSampleNumber().toString());
 	}
 
 }
