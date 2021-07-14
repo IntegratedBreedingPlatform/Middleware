@@ -147,6 +147,8 @@ public class SampleServiceImpl implements SampleService {
 		samplesDetailsDto.setEntryNo(Integer.valueOf(entryNo));
 		samplesDetailsDto.setGid(gid);
 		samplesDetailsDto.setGermplasmUUID(germplasmUUID);
+		samplesDetailsDto.setPlateId(sample.getPlateId());
+		samplesDetailsDto.setSampleNumber(sample.getSampleNumber());
 
 		samplesDetailsDto.setSampleName(sample.getSampleName());
 		samplesDetailsDto.setDesignation(stock.getName());
