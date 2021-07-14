@@ -83,7 +83,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	public static final String DRVNM = "DRVNM";
 	public static final String NOTE = "NOTE_AA_text";
 	public static final String NOLOC = "NOLOC";
-	public static final String CROP_NAME = "rice";
+	public static final String CROP_NAME = "maize";
 
 	private static final String DEFAULT_BIBREF_FIELD = "-";
 
