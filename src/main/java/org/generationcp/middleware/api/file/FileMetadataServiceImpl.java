@@ -22,11 +22,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Transactional
 @Service
@@ -131,7 +133,6 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		final Integer termId = this.getFirstFileVariable(fileMetadataDTO.getObservationUnitId());
 
 		final ObservationDto observation = new ObservationDto();
-		observation.setDraftMode(true); // file observations are automatically accepted
 		observation.setValue(fileMetadataDTO.getName());
 		observation.setObservationUnitId(fileMetadataDTO.getNdExperimentId());
 		observation.setVariableId(termId);
@@ -151,7 +152,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 			singletonList(VariableType.TRAIT.getId())
 		).stream().filter(variable -> variable.getDataTypeId() == DataType.FILE_VARIABLE.getId()).collect(toList());
 
-		if (fileTypeVariables == null || fileTypeVariables.isEmpty()) {
+		if (isEmpty(fileTypeVariables)) {
 			throw new MiddlewareRequestException("", "filemetadata.variable.not.found", new String[] {observationUnitDbId});
 		}
 
