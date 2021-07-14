@@ -13,6 +13,7 @@
         <mapping class="org.generationcp.middleware.pojos.GermplasmExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.StudyExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.InstanceExternalReference"/>
+        <mapping class="org.generationcp.middleware.pojos.ExperimentExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.Location"/>
         <mapping class="org.generationcp.middleware.pojos.LocationDetails"/>
         <mapping class="org.generationcp.middleware.pojos.Locdes"/>

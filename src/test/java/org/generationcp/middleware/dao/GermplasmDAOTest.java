@@ -371,9 +371,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final PedigreeDTO maintenancePedigree = this.dao.getPedigree(advance2.getGid(), null, true);
 
 		Assert.assertThat(generativePedigree.getGermplasmDbId(), is(cross.getGermplasmUUID()));
-		Assert.assertThat(generativePedigree.getParent1DbId(), is(femaleParent.getGid()));
+		Assert.assertThat(generativePedigree.getParent1DbId(), is(femaleParent.getGermplasmUUID()));
 		Assert.assertThat(generativePedigree.getParent1Type(), is(ParentType.FEMALE.name()));
-		Assert.assertThat(generativePedigree.getParent2DbId(), is(maleParent.getGid()));
+		Assert.assertThat(generativePedigree.getParent2DbId(), is(maleParent.getGermplasmUUID()));
 		Assert.assertThat(generativePedigree.getParent2Type(), is(ParentType.MALE.name()));
 		Assert.assertThat(generativePedigree.getCrossingPlan(),
 			is(generativeMethod.getMcode() + "|" + generativeMethod.getMname() + "|" + generativeMethod.getMtype()));
@@ -383,9 +383,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertThat(generativePedigree.getSiblings(), nullValue());
 
 		Assert.assertThat(derivativePedigree.getGermplasmDbId(), is(advance.getGermplasmUUID()));
-		Assert.assertThat(derivativePedigree.getParent1DbId(), is(cross.getGid()));
+		Assert.assertThat(derivativePedigree.getParent1DbId(), is(cross.getGermplasmUUID()));
 		Assert.assertThat(derivativePedigree.getParent1Type(), is(ParentType.POPULATION.name()));
-		Assert.assertThat(derivativePedigree.getParent2DbId(), is(cross.getGid()));
+		Assert.assertThat(derivativePedigree.getParent2DbId(), is(cross.getGermplasmUUID()));
 		Assert.assertThat(derivativePedigree.getParent2Type(), is(ParentType.SELF.name()));
 		Assert.assertThat(derivativePedigree.getCrossingPlan(),
 			is(derivativeMethod.getMcode() + "|" + derivativeMethod.getMname() + "|" + derivativeMethod.getMtype()));
@@ -393,9 +393,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertThat(derivativePedigree.getSiblings().get(0).getGermplasmDbId(), is(advance2.getGermplasmUUID()));
 
 		Assert.assertThat(maintenancePedigree.getGermplasmDbId(), is(advance2.getGermplasmUUID()));
-		Assert.assertThat(maintenancePedigree.getParent1DbId(), is(cross.getGid()));
+		Assert.assertThat(maintenancePedigree.getParent1DbId(), is(cross.getGermplasmUUID()));
 		Assert.assertThat(maintenancePedigree.getParent1Type(), is(ParentType.POPULATION.name()));
-		Assert.assertThat(maintenancePedigree.getParent2DbId(), is(cross.getGid()));
+		Assert.assertThat(maintenancePedigree.getParent2DbId(), is(cross.getGermplasmUUID()));
 		Assert.assertThat(maintenancePedigree.getParent2Type(), is(ParentType.SELF.name()));
 		Assert.assertThat(maintenancePedigree.getCrossingPlan(),
 			is(maintenanceMethod.getMcode() + "|" + maintenanceMethod.getMname() + "|" + maintenanceMethod.getMtype()));
@@ -1279,7 +1279,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName(), this.cropType);
 	}
 
-
 	@Test
 	public void testGetGermplasmAttributeVariables() {
 		final Germplasm germplasm =
@@ -1299,7 +1298,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final Set<String> gids = result.stream().map(GermplasmDTO::getGid).collect(Collectors.toSet());
 		final List<Integer> gidsList = gids.stream().map(s -> Integer.valueOf(s)).collect(Collectors.toList());
-		final List<Variable>  variables = this.dao.getGermplasmAttributeVariables(gidsList, null);
+		final List<Variable> variables = this.dao.getGermplasmAttributeVariables(gidsList, null);
 		Assert.assertEquals(1, variables.size());
 		Assert.assertTrue(variables.stream().allMatch(cVTerm -> cVTerm.getName().equalsIgnoreCase(NOTE_ATTRIBUTE.toUpperCase())));
 		Assert.assertEquals(NOTE_ATTRIBUTE, variables.get(0).getName());

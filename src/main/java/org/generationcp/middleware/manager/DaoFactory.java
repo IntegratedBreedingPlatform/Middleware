@@ -6,6 +6,7 @@ import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
+import org.generationcp.middleware.dao.ExperimentExternalReferenceDao;
 import org.generationcp.middleware.dao.FileDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -552,6 +553,12 @@ public class DaoFactory {
 		final StudyInstanceExternalReferenceDao studyInstanceExternalReferenceDao = new StudyInstanceExternalReferenceDao();
 		studyInstanceExternalReferenceDao.setSession(this.sessionProvider.getSession());
 		return studyInstanceExternalReferenceDao;
+	}
+
+	public ExperimentExternalReferenceDao getExperimentExternalReferenceDao() {
+		final ExperimentExternalReferenceDao experimentExternalReferenceDao = new ExperimentExternalReferenceDao();
+		experimentExternalReferenceDao.setSession(this.sessionProvider.getSession());
+		return experimentExternalReferenceDao;
 	}
 
 	public GermplasmAuditDAO getGermplasmAuditDAO() {
