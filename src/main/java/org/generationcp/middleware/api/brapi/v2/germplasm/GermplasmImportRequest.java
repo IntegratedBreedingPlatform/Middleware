@@ -6,9 +6,12 @@ import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @AutoProperty
@@ -342,6 +345,19 @@ public class GermplasmImportRequest {
 		namesMap.put(LNAME_NAME_TYPE, this.getDefaultDisplayName());
 		namesMap.put(PUI_NAME_TYPE, this.getGermplasmPUI());
 		return namesMap;
+	}
+
+	public boolean isGermplasmPUIInList(final Collection<String> puiList){
+		if (!puiList.contains(this.getGermplasmPUI())) {
+			final Optional<String> germplasmPUIFromNames = this.getGermplasmPUIFromSynonyms();
+			return puiList.contains(germplasmPUIFromNames.orElse(""));
+		}
+		return true;
+	}
+
+	public Optional<String> getGermplasmPUIFromSynonyms() {
+		return this.synonyms.stream().filter(s -> GermplasmImportRequest.PUI_NAME_TYPE.equalsIgnoreCase(s.getType()))
+			.map(Synonym::getSynonym).collect(Collectors.toList()).stream().findFirst();
 	}
 
 }
