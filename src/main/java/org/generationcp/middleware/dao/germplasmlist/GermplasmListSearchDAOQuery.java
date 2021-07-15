@@ -123,7 +123,10 @@ public class GermplasmListSearchDAOQuery {
 
 		if (!StringUtils.isEmpty(request.getParentFolderName())) {
 			sqlQueryBuilder.setParameter("parentFolderName", "%" + request.getParentFolderName() + "%");
-			sqlQueryBuilder.append(" AND inn.listname LIKE :parentFolderName ");
+			sqlQueryBuilder.append(" AND (inn.listname LIKE :parentFolderName "
+				+ " 	OR (list.lhierarchy IS NULL AND list.program_uuid IS NOT NULL AND '" + PROGRAM_LISTS + "' LIKE :parentFolderName)"
+				+ " 	OR (list.lhierarchy IS NULL AND list.program_uuid IS NULL AND '" + CROP_LISTS + "' LIKE :parentFolderName)"
+				+ " )");
 		}
 
 		if (!StringUtils.isEmpty(request.getDescription())) {
