@@ -27,6 +27,7 @@ import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
+import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Transactional
@@ -73,7 +74,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		final Integer termId = this.getFirstFileVariable(observationUnitDbId);
 
 		// assigned path, to be saved later using file storage
-		final String path = this.getFilePathForObservations(observationUnitDbId, termId, imageNewRequest.getImageFileName());
+		final String path = this.getFilePath(observationUnitDbId, termId, imageNewRequest.getImageFileName());
 		fileMetadata.setPath(path);
 
 		this.daoFactory.getFileMetadataDAO().save(fileMetadata);
@@ -116,13 +117,16 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		return fileMetadataMapper.mapToDTO(fileMetadata);
 	}
 
+	/**
+	 * Resolve predetermined path based on params (e.g, for observations, germplasm, etc)
+	 */
 	@Override
-	public String getFilePathForObservations(final String observationUnitDbId, final Integer termId, final String fileName) {
-		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitDbId);
+	public String getFilePath(final String observationUnitId, final Integer termId, final String fileName) {
+		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId);
 		final DmsProject study = experimentModel.getProject().getStudy();
 		return FILE_PATH_PREFIX_PROGRAMUUID + study.getProgramUUID()
 			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_STUDYID + study.getProjectId()
-			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_OBSUNITUUID + observationUnitDbId
+			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_OBSUNITUUID + observationUnitId
 			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_TERMID + termId
 			+ FILE_PATH_SLASH + fileName;
 	}

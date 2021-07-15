@@ -13,7 +13,7 @@ public interface FileMetadataService {
 
 	FileMetadataDTO getFileMetadataByUUID(String fileUUID);
 
-	String getFilePathForObservations(String observationUnitDbId, Integer termId, String fileName);
+	String getFilePath(String observationUnitDbId, Integer termId, String fileName);
 
 	void saveFilenameToObservation(FileMetadataDTO fileMetadataDTO);
 
