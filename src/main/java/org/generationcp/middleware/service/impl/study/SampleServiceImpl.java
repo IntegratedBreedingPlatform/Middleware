@@ -9,7 +9,6 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -39,9 +38,6 @@ public class SampleServiceImpl implements SampleService {
 	private static final String SAMPLE_KEY_PREFIX = "S";
 
 	private final HibernateSessionProvider sessionProvider;
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private UserService userService;
@@ -227,10 +223,6 @@ public class SampleServiceImpl implements SampleService {
 		final List<Integer> userIds = sampleDTOS.stream().map(sampleDTO -> sampleDTO.getTakenByUserId()).collect(Collectors.toList());
 		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
 		sampleDTOS.forEach(sampleDTO -> sampleDTO.setTakenBy(userIDFullNameMap.get(sampleDTO.getTakenByUserId())));
-	}
-
-	protected void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
 	}
 
 }
