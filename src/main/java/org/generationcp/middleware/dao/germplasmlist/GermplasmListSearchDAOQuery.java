@@ -18,6 +18,10 @@ import java.util.stream.StreamSupport;
 
 public class GermplasmListSearchDAOQuery {
 
+	// TODO: move this constants
+	private static final String PROGRAM_LISTS = "Program lists";
+	private static final String CROP_LISTS = "Crop lists";
+
 	enum SortColumn {
 
 		LIST_NAME(LIST_NAME_ALIAS),
@@ -64,7 +68,9 @@ public class GermplasmListSearchDAOQuery {
 
 	private final static String SELECT_EXPRESSION = "list.listId AS " + LIST_ID_ALIAS + ", "
 		+ " list.listname AS " + LIST_NAME_ALIAS + ", "
-		+ " inn.listname AS " + PARENT_FOLDER_NAME_ALIAS + ", "
+		+ " IF (list.lhierarchy IS NULL, "
+		+ "			IF(list.program_uuid IS NULL, '" + CROP_LISTS + "', '" + PROGRAM_LISTS + "'), "
+		+ "			inn.listname) AS " + PARENT_FOLDER_NAME_ALIAS + ", "
 		+ " list.listdesc AS " + DESCRIPTION_ALIAS + ", "
 		+ " user.uname AS " + LIST_OWNER_ALIAS + ", "
 		+ " list.listtype AS " + LIST_TYPE_ALIAS + ", "
