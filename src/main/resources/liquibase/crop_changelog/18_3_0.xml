@@ -610,7 +610,7 @@
 				name varchar(255) null,
 				description varchar(255) null,
 				copyright varchar(255) null,
-				image_size int null comment 'in bytes',
+				size int null comment 'in bytes',
 				image_height int null comment 'in pixels',
 				image_width int null comment 'in pixels',
 				image_location text null comment 'geojson',
@@ -622,9 +622,12 @@
 				created_date timestamp default CURRENT_TIMESTAMP null,
 				modified_date timestamp null,
 				nd_experiment_id int null,
-				constraint file_metadata_nd_experiment_nd_experiment_id_fk
+				constraint uk_file_uuid
+					unique (file_uuid),
+				constraint fk_nd_experiment_nd_experiment_id
 					foreign key (nd_experiment_id) references ibdbv2_maize_merged.nd_experiment (nd_experiment_id)
 			);
+
 		</sql>
 	</changeSet>
 

@@ -22,7 +22,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.List;
 
@@ -65,7 +64,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
 		final FileMetadata fileMetadata = new FileMetadata();
-		fileMetadataMapper.map(fileMetadata, imageNewRequest);
+		fileMetadataMapper.map(imageNewRequest, fileMetadata);
 		fileMetadata.setExperimentModel(experimentModel);
 
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(ContextHolder.getCurrentCrop());
@@ -77,7 +76,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		final String path = this.getFilePathForObservations(observationUnitDbId, termId, imageNewRequest.getImageFileName());
 		fileMetadata.setPath(path);
 
-		this.daoFactory.getFileDAO().save(fileMetadata);
+		this.daoFactory.getFileMetadataDAO().save(fileMetadata);
 
 		final Image response = fileMetadataMapper.map(fileMetadata);
 		return response;
@@ -85,21 +84,21 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 	@Override
 	public Image update(final String imageDbId, final ImageNewRequest imageNewRequest) {
-		final FileMetadata fileMetadata = this.daoFactory.getFileDAO().getByFileUUID(imageDbId);
+		final FileMetadata fileMetadata = this.daoFactory.getFileMetadataDAO().getByFileUUID(imageDbId);
 		if (fileMetadata == null) {
 			throw new MiddlewareRequestException("", "filemetadata.record.not.found", new String[] {imageDbId});
 		}
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
-		fileMetadataMapper.map(fileMetadata, imageNewRequest);
+		fileMetadataMapper.map(imageNewRequest, fileMetadata);
 
-		this.daoFactory.getFileDAO().update(fileMetadata);
+		this.daoFactory.getFileMetadataDAO().update(fileMetadata);
 
 		return fileMetadataMapper.map(fileMetadata);
 	}
 
 	@Override
 	public Image getImage(final String imageDbId) {
-		final FileMetadata fileMetadata = this.daoFactory.getFileDAO().getByFileUUID(imageDbId);
+		final FileMetadata fileMetadata = this.daoFactory.getFileMetadataDAO().getByFileUUID(imageDbId);
 		if (fileMetadata == null) {
 			throw new MiddlewareRequestException("", "filemetadata.record.not.found", new String[] {imageDbId});
 		}
@@ -109,7 +108,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 	@Override
 	public FileMetadataDTO getFileMetadataByUUID(final String fileUUID) {
-		final FileMetadata fileMetadata = this.daoFactory.getFileDAO().getByFileUUID(fileUUID);
+		final FileMetadata fileMetadata = this.daoFactory.getFileMetadataDAO().getByFileUUID(fileUUID);
 		if (fileMetadata == null) {
 			throw new MiddlewareRequestException("", "filemetadata.record.not.found", new String[] {"fileUUID=" + fileUUID});
 		}

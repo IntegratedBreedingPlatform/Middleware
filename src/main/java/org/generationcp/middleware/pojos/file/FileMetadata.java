@@ -1,11 +1,9 @@
 package org.generationcp.middleware.pojos.file;
 
-import org.generationcp.middleware.api.file.FileMetadataDTO;
 import org.generationcp.middleware.pojos.AbstractEntity;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
 import java.util.Date;
 
 @Entity
@@ -33,8 +31,8 @@ public class FileMetadata extends AbstractEntity {
 	@Column(name = "copyright")
 	private String copyright;
 
-	@Column(name = "image_size")
-	private Integer imageSize;
+	@Column(name = "size")
+	private Integer size;
 
 	@Column(name = "image_height")
 	private Integer imageHeight;
@@ -103,12 +101,12 @@ public class FileMetadata extends AbstractEntity {
 		this.copyright = copyright;
 	}
 
-	public Integer getImageSize() {
-		return this.imageSize;
+	public Integer getSize() {
+		return this.size;
 	}
 
-	public void setImageSize(final Integer imageSize) {
-		this.imageSize = imageSize;
+	public void setSize(final Integer imageSize) {
+		this.size = imageSize;
 	}
 
 	public Integer getImageHeight() {

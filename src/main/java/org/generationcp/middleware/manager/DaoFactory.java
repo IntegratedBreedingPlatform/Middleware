@@ -7,7 +7,7 @@ import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.ExperimentExternalReferenceDao;
-import org.generationcp.middleware.dao.FileDAO;
+import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmExternalReferenceDAO;
@@ -565,10 +565,10 @@ public class DaoFactory {
 		return new GermplasmAuditDAO(this.sessionProvider.getSession());
 	}
 
-	public FileDAO getFileDAO() {
-		final FileDAO fileDAO = new FileDAO();
-		fileDAO.setSession(this.sessionProvider.getSession());
-		return fileDAO;
+	public FileMetadataDAO getFileMetadataDAO() {
+		final FileMetadataDAO fileMetadataDAO = new FileMetadataDAO();
+		fileMetadataDAO.setSession(this.sessionProvider.getSession());
+		return fileMetadataDAO;
 	}
 
 }

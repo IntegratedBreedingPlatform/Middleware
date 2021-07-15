@@ -6,6 +6,7 @@ import com.google.common.base.Preconditions;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
 import org.generationcp.middleware.exceptions.MiddlewareException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.slf4j.Logger;
@@ -18,23 +19,21 @@ public class FileMetadataMapper {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FileMetadataMapper.class);
 
-	public void map(final FileMetadata fileMetadata, final ImageNewRequest imageNewRequest) {
-		fileMetadata.setCopyright(imageNewRequest.getCopyright());
-		fileMetadata.setName(imageNewRequest.getImageName());
-		fileMetadata.setDescription(imageNewRequest.getDescription());
-		fileMetadata.setFileTimestamp(imageNewRequest.getImageTimeStamp());
-		fileMetadata.setImageHeight(imageNewRequest.getImageHeight());
-		fileMetadata.setImageWidth(imageNewRequest.getImageWidth());
-		fileMetadata.setMimeType(imageNewRequest.getMimeType());
-		fileMetadata.setImageSize(imageNewRequest.getImageFileSize());
+	public void map(final ImageNewRequest from, final FileMetadata to) {
+		to.setCopyright(from.getCopyright());
+		to.setName(from.getImageName());
+		to.setDescription(from.getDescription());
+		to.setFileTimestamp(from.getImageTimeStamp());
+		to.setImageHeight(from.getImageHeight());
+		to.setImageWidth(from.getImageWidth());
+		to.setMimeType(from.getMimeType());
+		to.setSize(from.getImageFileSize());
 
 		final ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			fileMetadata.setImageLocation(objectMapper.writeValueAsString(imageNewRequest.getImageLocation()));
+			to.setImageLocation(objectMapper.writeValueAsString(from.getImageLocation()));
 		} catch (final JsonProcessingException e) {
-			final String message = "couldn't parse imageLocation";
-			LOG.error(message, e);
-			throw new MiddlewareException(message);
+			throw new MiddlewareRequestException("", "filemetadata.brapi.location.parse.error");
 		}
 	}
 
@@ -47,7 +46,7 @@ public class FileMetadataMapper {
 		image.setImageHeight(fileMetadata.getImageHeight());
 		image.setImageWidth(fileMetadata.getImageWidth());
 		image.setMimeType(fileMetadata.getMimeType());
-		image.setImageFileSize(fileMetadata.getImageSize());
+		image.setImageFileSize(fileMetadata.getSize());
 		final ExperimentModel experimentModel = fileMetadata.getExperimentModel();
 		Preconditions.checkNotNull(experimentModel, "Image is not linked to any observationUnit");
 		image.setObservationUnitDbId(experimentModel.getObsUnitId());
@@ -56,9 +55,7 @@ public class FileMetadataMapper {
 		try {
 			image.setImageLocation(objectMapper.readValue(fileMetadata.getImageLocation(), HashMap.class));
 		} catch (final IOException e) {
-			final String message = "couldn't parse imageLocation";
-			LOG.error(message, e);
-			throw new MiddlewareException(message);
+			throw new MiddlewareRequestException("", "filemetadata.brapi.location.parse.error");
 		}
 
 		image.setImageDbId(fileMetadata.getFileUUID());
@@ -75,7 +72,7 @@ public class FileMetadataMapper {
 		fileMetadataDTO.setImageWidth(fileMetadata.getImageWidth());
 		fileMetadataDTO.setMimeType(fileMetadata.getMimeType());
 		fileMetadataDTO.setPath(fileMetadata.getPath());
-		fileMetadataDTO.setImageSize(fileMetadata.getImageSize());
+		fileMetadataDTO.setSize(fileMetadata.getSize());
 		final ExperimentModel experimentModel = fileMetadata.getExperimentModel();
 		if (experimentModel != null) {
 			fileMetadataDTO.setObservationUnitId(experimentModel.getObsUnitId());
@@ -86,9 +83,7 @@ public class FileMetadataMapper {
 		try {
 			fileMetadataDTO.setImageLocation(objectMapper.readValue(fileMetadata.getImageLocation(), HashMap.class));
 		} catch (final IOException e) {
-			final String message = "couldn't parse imageLocation";
-			LOG.error(message, e);
-			throw new MiddlewareException(message);
+			throw new MiddlewareRequestException("", "filemetadata.brapi.location.parse.error");
 		}
 
 		fileMetadataDTO.setFileUUID(fileMetadata.getFileUUID());
@@ -105,7 +100,7 @@ public class FileMetadataMapper {
 		image.setImageHeight(dto.getImageHeight());
 		image.setImageWidth(dto.getImageWidth());
 		image.setMimeType(dto.getMimeType());
-		image.setImageFileSize(dto.getImageSize());
+		image.setImageFileSize(dto.getSize());
 		image.setImageLocation(dto.getImageLocation());
 		image.setImageDbId(dto.getFileUUID());
 		image.setObservationUnitDbId(dto.getObservationUnitId());

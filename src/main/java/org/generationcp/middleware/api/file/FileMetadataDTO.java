@@ -12,7 +12,7 @@ public class FileMetadataDTO {
 	private String path;
 	private String url;
 	private String copyright;
-	private Integer imageSize;
+	private Integer size;
 	private Integer imageHeight;
 	private Integer imageWidth;
 	private Map<String, Object> imageLocation;
@@ -77,12 +77,12 @@ public class FileMetadataDTO {
 		this.copyright = copyright;
 	}
 
-	public Integer getImageSize() {
-		return this.imageSize;
+	public Integer getSize() {
+		return this.size;
 	}
 
-	public void setImageSize(final Integer imageSize) {
-		this.imageSize = imageSize;
+	public void setSize(final Integer size) {
+		this.size = size;
 	}
 
 	public Integer getImageHeight() {
