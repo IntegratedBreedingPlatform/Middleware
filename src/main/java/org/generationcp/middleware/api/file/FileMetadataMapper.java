@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.Map;
 
 public class FileMetadataMapper {
 
@@ -31,7 +32,10 @@ public class FileMetadataMapper {
 
 		final ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			to.setImageLocation(objectMapper.writeValueAsString(from.getImageLocation()));
+			final Map<String, Object> imageLocation = from.getImageLocation();
+			if (imageLocation != null) {
+				to.setImageLocation(objectMapper.writeValueAsString(imageLocation));
+			}
 		} catch (final JsonProcessingException e) {
 			throw new MiddlewareRequestException("", "filemetadata.brapi.location.parse.error");
 		}
@@ -105,5 +109,26 @@ public class FileMetadataMapper {
 		image.setImageDbId(dto.getFileUUID());
 		image.setObservationUnitDbId(dto.getObservationUnitId());
 		return image;
+	}
+
+	public void map(final FileMetadataDTO from, final FileMetadata to) {
+		to.setCopyright(from.getCopyright());
+		to.setName(from.getName());
+		to.setDescription(from.getDescription());
+		to.setFileTimestamp(from.getFileTimestamp());
+		to.setImageHeight(from.getImageHeight());
+		to.setImageWidth(from.getImageWidth());
+		to.setMimeType(from.getMimeType());
+		to.setSize(from.getSize());
+
+		final ObjectMapper objectMapper = new ObjectMapper();
+		try {
+			final Map<String, Object> imageLocation = from.getImageLocation();
+			if (imageLocation != null) {
+				to.setImageLocation(objectMapper.writeValueAsString(imageLocation));
+			}
+		} catch (final JsonProcessingException e) {
+			throw new MiddlewareRequestException("", "filemetadata.brapi.location.parse.error");
+		}
 	}
 }

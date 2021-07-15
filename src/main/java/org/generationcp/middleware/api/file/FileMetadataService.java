@@ -16,4 +16,6 @@ public interface FileMetadataService {
 	String getFilePathForObservations(String observationUnitDbId, Integer termId, String fileName);
 
 	void saveFilenameToObservation(FileMetadataDTO fileMetadataDTO);
+
+	String save(FileMetadataDTO fileMetadataDTO, String observationUnitId);
 }

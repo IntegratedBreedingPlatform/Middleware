@@ -138,6 +138,22 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		this.datasetService.createObservation(observation);
 	}
 
+	@Override
+	public String save(final FileMetadataDTO fileMetadataDTO, final String observationUnitId) {
+		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId);
+		final FileMetadata fileMetadata = new FileMetadata();
+		fileMetadata.setExperimentModel(experimentModel);
+
+		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(ContextHolder.getCurrentCrop());
+		FileUIDGenerator.generate(cropType, singletonList(fileMetadata));
+
+		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
+		fileMetadataMapper.map(fileMetadataDTO, fileMetadata);
+
+		final FileMetadata entity = this.daoFactory.getFileMetadataDAO().save(fileMetadata);
+		return entity.getFileUUID();
+	}
+
 	/**
 	 * TODO observationVariableDbId not available for images (https://github.com/plantbreeding/API/issues/477)
 	 *  assuming only one file variable per study, to get by obsUnitId
