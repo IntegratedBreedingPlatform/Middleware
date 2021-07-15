@@ -141,7 +141,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		+ "        left join " //
 		+ "    names n on n.gid = g.gid and n.nstat = 1 " //
 		+ " 		left join ("
-		+ " 	select p.gid, p.nval from names p INNER JOIN udflds u ON u.fldno = p.ntype AND u.ftable = 'NAMES' and u.ftype='NAME' and u.fcode = 'PUI') pui on pui.gid = g.gid "
+		+ " 	select p.gid, p.nval from names p INNER JOIN udflds u ON u.fldno = p.ntype AND u.ftable = 'NAMES' and u.ftype='NAME' and u.fcode = 'PUI' and p.nstat <> 9) pui on pui.gid = g.gid "
 		+ "        left join " //
 		+ "    bibrefs r on g.gref = r.refid ";
 
@@ -1546,7 +1546,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	private void addScalarsToFindGermplasmMatchesQuery(final SQLQuery sqlQuery) {
-		sqlQuery.addScalar("gid").addScalar("germplasmUUID").addScalar("preferredName").addScalar("creationDate").addScalar("reference")
+		sqlQuery.addScalar("gid").addScalar("germplasmUUID").addScalar("preferredName").addScalar("germplasmPUI").addScalar("creationDate").addScalar("reference")
 			.addScalar("breedingLocationId")
 			.addScalar("breedingLocation").addScalar("breedingMethodId").addScalar("breedingMethod")
 			.addScalar("isGroupedLine", new BooleanType())

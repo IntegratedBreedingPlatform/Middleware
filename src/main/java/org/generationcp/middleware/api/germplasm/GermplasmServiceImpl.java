@@ -194,17 +194,19 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, Method> methodsMapByAbbr = this.getBreedingMethodsMapByAbbr(germplasmDtoList);
 		final Map<String, Integer> locationsMapByAbbr = this.getLocationsMapByAbbr(germplasmDtoList);
 		final Set<String> attributesKeys = new HashSet<>();
+		final List<String> germplasmPUIs = new ArrayList<>();
 		germplasmDtoList.forEach(g -> {
 			if (g.getAttributes() != null && !g.getAttributes().isEmpty()) {
 				attributesKeys.addAll(g.getAttributes().keySet());
 			}
+			germplasmPUIs.addAll(g.collectGermplasmPUIs());
 		});
 		final Map<String, Variable> attributesMapByName = this.getAttributesMap(programUUID, attributesKeys);
 		final Map<String, Integer> nameTypesMapByName = this.getNameTypesMapByName(germplasmDtoList);
 		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
 
 		final Map<String, Germplasm> progenitorsMap = this.loadProgenitors(germplasmImportRequestDto);
-		final List<GermplasmDto> germplasmMatches = this.loadGermplasmMatches(germplasmImportRequestDto);
+		final List<GermplasmDto> germplasmMatches = this.loadGermplasmMatches(germplasmImportRequestDto, germplasmPUIs);
 		final Map<String, List<Integer>> gidMatchByPUI =
 			germplasmMatches.stream().collect(Collectors.toMap(GermplasmDto::getGermplasmPUI, g -> Collections.singletonList(g.getGid())));
 		final Map<String, List<Integer>> gidsMatchesByName = new HashMap<>();
@@ -217,6 +219,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				}
 			})
 		);
+		final List<String> existingGermplasmPUIs = this.daoFactory.getNameDao().getExistingGermplasmPUIs(germplasmPUIs);
 
 		for (final GermplasmImportDTO germplasmDto : germplasmDtoList) {
 
@@ -238,6 +241,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 						new GermplasmImportResponseDto(GermplasmImportResponseDto.Status.FOUND, new ArrayList<>(gidSet)));
 					continue;
 				}
+			} else if (germplasmDto.isGermplasmPUIExisting(existingGermplasmPUIs)){
+				throw new MiddlewareRequestException("", "import.germplasm.pui.exists",
+					!StringUtils.isEmpty(germplasmDto.getGermplasmPUI()) ? germplasmDto.getGermplasmPUI() :
+						germplasmDto.getGermplasmPUIFromNames().orElse(""));
 			}
 
 			final Germplasm germplasm = new Germplasm();
@@ -810,11 +817,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private List<GermplasmDto> loadGermplasmMatches(final GermplasmImportRequestDto germplasmImportRequestDto) {
+	private List<GermplasmDto> loadGermplasmMatches(final GermplasmImportRequestDto germplasmImportRequestDto, final List<String> germplasmPUIs) {
 		if (germplasmImportRequestDto.isSkipIfExists()) {
-			final List<String> germplasmPUIs =
-				germplasmImportRequestDto.getGermplasmList().stream().filter(g -> StringUtils.isNotEmpty(g.getGermplasmPUI()))
-					.map(GermplasmImportDTO::getGermplasmPUI).collect(Collectors.toList());
 			final Set<String> names = new HashSet<>();
 			germplasmImportRequestDto.getGermplasmList().forEach(g -> names.addAll(g.getNames().values()));
 			final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();

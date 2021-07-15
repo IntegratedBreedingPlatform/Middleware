@@ -1,10 +1,12 @@
 package org.generationcp.middleware.domain.germplasm.importation;
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -174,6 +176,16 @@ public class GermplasmImportDTO {
 	public Optional<String> getGermplasmPUIFromNames() {
 		return this.names.entrySet().stream().filter(s -> GermplasmImportRequest.PUI_NAME_TYPE.equalsIgnoreCase(s.getKey()))
 			.map(Map.Entry::getValue).collect(Collectors.toList()).stream().findFirst();
+	}
+
+	public List<String> collectGermplasmPUIs() {
+		final List<String> puisList = new ArrayList<>();
+		if (!StringUtils.isEmpty(this.getGermplasmPUI())) {
+			puisList.add(this.getGermplasmPUI());
+		}
+		final Optional<String> puiFromNames = this.getGermplasmPUIFromNames();
+		puiFromNames.ifPresent(puisList::add);
+		return puisList;
 	}
 
 }
