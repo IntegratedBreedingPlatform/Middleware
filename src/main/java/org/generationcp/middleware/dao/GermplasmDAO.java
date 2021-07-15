@@ -572,7 +572,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			generativeChildrenCriteria.add(Restrictions.eq(GermplasmDAO.DELETED, Boolean.FALSE));
 
 			final List<Germplasm> children =
-				new ArrayList<Germplasm>(generativeChildrenCriteria.getExecutableCriteria(this.getSession()).list());
+				new ArrayList<>(generativeChildrenCriteria.getExecutableCriteria(this.getSession()).list());
 
 			// Find additional children via progenitor linkage
 			final DetachedCriteria otherChildrenCriteria = DetachedCriteria.forClass(Progenitor.class);
@@ -1112,7 +1112,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 				for (final Integer parent : parents) {
 					if (!resultMap.containsKey(parent) && gids.contains(parent)) {
-						resultMap.put(parent, new HashSet<Integer>());
+						resultMap.put(parent, new HashSet<>());
 					} else if (gids.contains(parent)) {
 						resultMap.get(parent).add(offspring);
 					}
@@ -1465,7 +1465,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.getGermplasmForStudyQuery());
 			sqlQuery.setParameter("studyDbId", studyDbId);
 
-			addScalarsForGermplasmDTO(sqlQuery).addScalar("entryNumber") //
+			this.addScalarsForGermplasmDTO(sqlQuery).addScalar("entryNumber") //
 				.setResultTransformer(new AliasToBeanResultTransformer(GermplasmDTO.class));
 
 			addPaginationToSQLQuery(sqlQuery, pageable);
@@ -1834,7 +1834,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public boolean isNewParentANodeDescendant(final Set<Integer> newParents, final Integer node, final int maxRecursiveQueries) {
-		return isNewParentANodeDescendant(new HashSet<>(), newParents, node, 0, maxRecursiveQueries);
+		return this.isNewParentANodeDescendant(new HashSet<>(), newParents, node, 0, maxRecursiveQueries);
 	}
 
 	private boolean isNewParentANodeDescendant(final Set<Integer> path, final Set<Integer> parents, final Integer node, int level,
@@ -1864,7 +1864,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				newParents.add((Integer) r[0]);
 				newParents.add((Integer) r[1]);
 			}
-			return isNewParentANodeDescendant(path, newParents, node, level, maxRecursiveQueries);
+			return this.isNewParentANodeDescendant(path, newParents, node, level, maxRecursiveQueries);
 		} catch (final HibernateException e) {
 			final String message = "Error with isNewParentANodeDescendant" + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);

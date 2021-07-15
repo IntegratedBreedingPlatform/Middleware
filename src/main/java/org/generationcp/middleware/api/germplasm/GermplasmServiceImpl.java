@@ -106,7 +106,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public static final String PROGENITOR_1 = "PROGENITOR 1";
 	public static final String PROGENITOR_2 = "PROGENITOR 2";
 	private static final String DEFAULT_METHOD = "UDM";
-	public static final List<VariableType> ATTRIBUTE_TYPES =
+	protected static final List<VariableType> ATTRIBUTE_TYPES =
 		Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE, VariableType.GERMPLASM_PASSPORT);
 
 	private final DaoFactory daoFactory;
@@ -155,7 +155,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public String getPlotCodeValue(final Integer gid) {
 		final Term plotCodeVariable = this.getPlotCodeField();
-		final Optional<Attribute> plotCode = germplasmAttributeService.getAttributesByGID(gid)
+		final Optional<Attribute> plotCode = this.germplasmAttributeService.getAttributesByGID(gid)
 			.stream()
 			.filter(attribute -> attribute.getTypeId().equals(plotCodeVariable.getId()))
 			.findFirst();
@@ -247,70 +247,80 @@ public class GermplasmServiceImpl implements GermplasmService {
 						germplasmDto.getGermplasmPUIFromNames().orElse(""));
 			}
 
-			final Germplasm germplasm = new Germplasm();
-
-			final Method method = methodsMapByAbbr.get(germplasmDto.getBreedingMethodAbbr().toUpperCase());
-			germplasm.setMethodId(method.getMid());
-
-			germplasm.setGnpgs(this.calculateGnpgs(method, germplasmDto.getProgenitor1(), germplasmDto.getProgenitor2(), null));
-			final Multimap<String, Object[]> progenitorsErrors = ArrayListMultimap.create();
-			this.setProgenitors(germplasm, method, germplasmDto.getProgenitor1(), germplasmDto.getProgenitor2(), progenitorsMap,
-				progenitorsErrors);
-			if (!progenitorsErrors.isEmpty()) {
-				final Map.Entry<String, Object[]> error = progenitorsErrors.entries().iterator().next();
-				throw new MiddlewareRequestException("", error.getKey(), error.getValue());
-			}
-			germplasm.setGrplce(0);
-			germplasm.setMgid(0);
-			germplasm.setLgid(0);
-			germplasm.setLocationId(locationsMapByAbbr.get(germplasmDto.getLocationAbbr().toUpperCase()));
-			germplasm.setDeleted(Boolean.FALSE);
-			germplasm.setGdate(Integer.valueOf(germplasmDto.getCreationDate()));
-			GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(germplasm));
-
-			if (!StringUtils.isEmpty(germplasmDto.getReference())) {
-				final Bibref bibref =
-					new Bibref(null, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, germplasmDto.getReference(), DEFAULT_BIBREF_FIELD,
-						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD,
-						DEFAULT_BIBREF_FIELD,
-						DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD);
-				this.daoFactory.getBibrefDAO().save(bibref);
-				germplasm.setReferenceId(bibref.getRefid());
-			} else {
-				germplasm.setReferenceId(0);
-			}
-
-			this.daoFactory.getGermplasmDao().save(germplasm);
-
-			if (!StringUtils.isEmpty(germplasmDto.getGermplasmPUI())) {
-				germplasmDto.getNames().put(GermplasmServiceImpl.PUI, germplasmDto.getGermplasmPUI());
-			}
-			germplasmDto.getNames().forEach((k, v) -> {
-				final Name name = new Name(null, germplasm, nameTypesMapByName.get(k.toUpperCase()),
-					(k.equalsIgnoreCase(germplasmDto.getPreferredName())) ? 1 : 0, v, germplasm.getLocationId(),
-					Util.getCurrentDateAsIntegerValue(), 0);
-				this.daoFactory.getNameDao().save(name);
-			});
-
-			if (germplasmDto.getAttributes() != null) {
-				germplasmDto.getAttributes().forEach((k, v) -> {
-					final Variable variable = attributesMapByName.get(k.toUpperCase());
-					final boolean isValidValue = VariableValueUtil.isValidAttributeValue(variable, v);
-					if (isValidValue) {
-						final Integer cValueId = VariableValueUtil.resolveCategoricalValueId(variable, v);
-						final Attribute attribute =
-							new Attribute(null, germplasm.getGid(), variable.getId(), v, cValueId,
-								germplasm.getLocationId(),
-								0, Util.getCurrentDateAsIntegerValue());
-						this.daoFactory.getAttributeDAO().save(attribute);
-					}
-				});
-			}
+			final Germplasm germplasm =
+				this.saveGermplasmFromGermplasmImportDto(methodsMapByAbbr, locationsMapByAbbr, attributesMapByName, nameTypesMapByName, cropType,
+					progenitorsMap, germplasmDto);
 			results.put(germplasmDto.getClientId(),
 				new GermplasmImportResponseDto(GermplasmImportResponseDto.Status.CREATED, Collections.singletonList(germplasm.getGid())));
 		}
 
 		return results;
+	}
+
+	private Germplasm saveGermplasmFromGermplasmImportDto(final Map<String, Method> methodsMapByAbbr,
+		final Map<String, Integer> locationsMapByAbbr, final Map<String, Variable> attributesMapByName,
+		final Map<String, Integer> nameTypesMapByName, final CropType cropType, final Map<String, Germplasm> progenitorsMap,
+		final GermplasmImportDTO germplasmDto) {
+		final Germplasm germplasm = new Germplasm();
+
+		final Method method = methodsMapByAbbr.get(germplasmDto.getBreedingMethodAbbr().toUpperCase());
+		germplasm.setMethodId(method.getMid());
+
+		germplasm.setGnpgs(this.calculateGnpgs(method, germplasmDto.getProgenitor1(), germplasmDto.getProgenitor2(), null));
+		final Multimap<String, Object[]> progenitorsErrors = ArrayListMultimap.create();
+		this.setProgenitors(germplasm, method, germplasmDto.getProgenitor1(), germplasmDto.getProgenitor2(), progenitorsMap,
+			progenitorsErrors);
+		if (!progenitorsErrors.isEmpty()) {
+			final Map.Entry<String, Object[]> error = progenitorsErrors.entries().iterator().next();
+			throw new MiddlewareRequestException("", error.getKey(), error.getValue());
+		}
+		germplasm.setGrplce(0);
+		germplasm.setMgid(0);
+		germplasm.setLgid(0);
+		germplasm.setLocationId(locationsMapByAbbr.get(germplasmDto.getLocationAbbr().toUpperCase()));
+		germplasm.setDeleted(Boolean.FALSE);
+		germplasm.setGdate(Integer.valueOf(germplasmDto.getCreationDate()));
+		GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(germplasm));
+
+		if (!StringUtils.isEmpty(germplasmDto.getReference())) {
+			final Bibref bibref =
+				new Bibref(null, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, germplasmDto.getReference(), DEFAULT_BIBREF_FIELD,
+					DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD,
+					DEFAULT_BIBREF_FIELD,
+					DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD, DEFAULT_BIBREF_FIELD);
+			this.daoFactory.getBibrefDAO().save(bibref);
+			germplasm.setReferenceId(bibref.getRefid());
+		} else {
+			germplasm.setReferenceId(0);
+		}
+
+		this.daoFactory.getGermplasmDao().save(germplasm);
+
+		if (!StringUtils.isEmpty(germplasmDto.getGermplasmPUI())) {
+			germplasmDto.getNames().put(GermplasmServiceImpl.PUI, germplasmDto.getGermplasmPUI());
+		}
+		germplasmDto.getNames().forEach((k, v) -> {
+			final Name name = new Name(null, germplasm, nameTypesMapByName.get(k.toUpperCase()),
+				(k.equalsIgnoreCase(germplasmDto.getPreferredName())) ? 1 : 0, v, germplasm.getLocationId(),
+				Util.getCurrentDateAsIntegerValue(), 0);
+			this.daoFactory.getNameDao().save(name);
+		});
+
+		if (germplasmDto.getAttributes() != null) {
+			germplasmDto.getAttributes().forEach((k, v) -> {
+				final Variable variable = attributesMapByName.get(k.toUpperCase());
+				final boolean isValidValue = VariableValueUtil.isValidAttributeValue(variable, v);
+				if (isValidValue) {
+					final Integer cValueId = VariableValueUtil.resolveCategoricalValueId(variable, v);
+					final Attribute attribute =
+						new Attribute(null, germplasm.getGid(), variable.getId(), v, cValueId,
+							germplasm.getLocationId(),
+							0, Util.getCurrentDateAsIntegerValue());
+					this.daoFactory.getAttributeDAO().save(attribute);
+				}
+			});
+		}
+		return germplasm;
 	}
 
 	@Override
@@ -712,7 +722,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private Map<String, Germplasm> getGermplasmProgenitorsMapByGids(final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 		final Set<Integer> progenitorGids =
 			germplasmUpdateDTOList.stream().map(dto -> dto.getProgenitors().values()).flatMap(Collection::stream)
-				.filter(value -> value != null).collect(Collectors.toSet());
+				.filter(Objects::nonNull).collect(Collectors.toSet());
 		return this.daoFactory.getGermplasmDao().getByGIDsOrUUIDListWithMethodAndBibref(progenitorGids, Collections.emptySet()).stream()
 			.collect(Collectors.toMap(g -> String.valueOf(g.getGid()), Function.identity()));
 	}
@@ -909,7 +919,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 			progenitorErrors
 				.put("import.germplasm.invalid.derivative.group.source",
 					new String[] {String.valueOf(germplasm.getGid()), String.valueOf(progenitor1Germplasm.getGid())});
-			return;
 		}
 	}
 
@@ -1372,7 +1381,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				gpids.add(germplasm.getGpid2());
 
 				final boolean isNewParentANodeChildren =
-					this.daoFactory.getGermplasmDao().isNewParentANodeDescendant(gpids, germplasm.getGid(), maxRecursiveQueries);
+					this.daoFactory.getGermplasmDao().isNewParentANodeDescendant(gpids, germplasm.getGid(), this.maxRecursiveQueries);
 				if (isNewParentANodeChildren) {
 					throw new MiddlewareRequestException("", "germplasm.update.germplasm.new.parents.are.children", "");
 				}
@@ -1397,7 +1406,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		if (updateGroupSourceAction == UpdateGroupSourceAction.RECURSIVE) {
 			this.daoFactory.getGermplasmDao()
-				.updateGroupSourceTraversingProgeny(newGermplasm.getGid(), newGroupSource, maxRecursiveQueries);
+				.updateGroupSourceTraversingProgeny(newGermplasm.getGid(), newGroupSource, this.maxRecursiveQueries);
 		}
 	}
 
