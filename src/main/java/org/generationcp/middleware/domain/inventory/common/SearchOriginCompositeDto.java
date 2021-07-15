@@ -46,31 +46,6 @@ public class SearchOriginCompositeDto {
 	}
 
 	public enum SearchOrigin {
-		MANAGE_STUDY("ManageStudy"), GERMPLASM_SEARCH("GermplasmSearch");
-
-		private String code;
-
-		SearchOrigin(final String code) {
-			this.setCode(code);
-		}
-
-		@JsonValue
-		public String getCode() {
-			return code;
-		}
-
-		public void setCode(String code) {
-			this.code = code;
-		}
-
-		public static SearchOrigin getEnumByCode(final String code) {
-			for (final SearchOrigin e : SearchOrigin.values()) {
-				if (code.equals(e.getCode())) {
-					return e;
-				}
-			}
-			return null;
-		}
-
+		MANAGE_STUDY, GERMPLASM_SEARCH;
 	}
 }
