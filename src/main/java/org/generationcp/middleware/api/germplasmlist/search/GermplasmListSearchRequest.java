@@ -17,7 +17,7 @@ public class GermplasmListSearchRequest extends SearchRequestDto {
 	private String description;
 	private String ownerName;
 	private List<String> listTypes;
-	private Boolean isLocked;
+	private Boolean locked;
 	private String notes;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date listDateFrom;
@@ -65,11 +65,11 @@ public class GermplasmListSearchRequest extends SearchRequestDto {
 	}
 
 	public Boolean getLocked() {
-		return isLocked;
+		return locked;
 	}
 
 	public void setLocked(final Boolean locked) {
-		isLocked = locked;
+		this.locked = locked;
 	}
 
 	public String getNotes() {

@@ -1,0 +1,39 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v19.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			  <sqlCheck expectedResult="0">
+                SELECT count(*) FROM workbench_tool WHERE name = 'search_germplasm_list'
+            </sqlCheck>
+        </preConditions>
+		<comment>
+			Add Germplasm List Search sidebar item.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			INSERT INTO workbench_tool (`name`, `group_name`, `title`, `version`, `tool_type`, `path`, `parameter`, `user_tool`)
+			VALUES ('search_germplasm_list', 'search_germplasm_list', 'Search Germplasm Lists', '18.3', 'WEB', '/ibpworkbench/controller/jhipster#germplasm-list', '', 0);
+
+			INSERT INTO workbench_sidebar_category_link (`tool_name`, `sidebar_category_id`, `sidebar_link_name`, `sidebar_link_title`, `rank`)
+			VALUES ('search_germplasm_list', 3, 'search_germplasm_list', 'Germplasm Lists Beta', 3);
+
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM');
+			SET @workbench_sidebar_category_link_id =  (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'search_germplasm_list');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`, `workbench_sidebar_category_link_id`)
+			VALUES ('SEARCH_GERMPLASM_LIST', 'Search Germplasm List', @permission_id , @workbench_sidebar_category_link_id);
+
+			SET @search_germplasm_list_permission_id = (SELECT permission_id FROM permission where name = 'SEARCH_GERMPLASM_LIST');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @search_germplasm_list_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @search_germplasm_list_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @search_germplasm_list_permission_id, '1');
+
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
