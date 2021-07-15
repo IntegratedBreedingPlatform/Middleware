@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.brapi.v2.germplasm;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.lang3.StringUtils;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -358,6 +359,16 @@ public class GermplasmImportRequest {
 	public Optional<String> getGermplasmPUIFromSynonyms() {
 		return this.synonyms.stream().filter(s -> GermplasmImportRequest.PUI_NAME_TYPE.equalsIgnoreCase(s.getType()))
 			.map(Synonym::getSynonym).collect(Collectors.toList()).stream().findFirst();
+	}
+
+	public List<String> collectGermplasmPUIs() {
+		final List<String> puisList = new ArrayList<>();
+		if (!StringUtils.isEmpty(this.getGermplasmPUI())) {
+			puisList.add(this.getGermplasmPUI());
+		}
+		final Optional<String> germplasmPUIFromSynonym = this.getGermplasmPUIFromSynonyms();
+		germplasmPUIFromSynonym.ifPresent(puisList::add);
+		return puisList;
 	}
 
 }
