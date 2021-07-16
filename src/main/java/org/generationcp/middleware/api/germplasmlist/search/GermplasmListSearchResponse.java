@@ -3,6 +3,8 @@ package org.generationcp.middleware.api.germplasmlist.search;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.Date;
+
 @AutoProperty
 public class GermplasmListSearchResponse {
 
@@ -15,7 +17,7 @@ public class GermplasmListSearchResponse {
 	private Integer numberOfEntries;
 	private String status;
 	private String notes;
-	private String listDate;
+	private Date listDate;
 
 	public Integer getListId() {
 		return listId;
@@ -89,11 +91,11 @@ public class GermplasmListSearchResponse {
 		this.notes = notes;
 	}
 
-	public String getListDate() {
+	public Date getListDate() {
 		return listDate;
 	}
 
-	public void setListDate(final String listDate) {
+	public void setListDate(final Date listDate) {
 		this.listDate = listDate;
 	}
 

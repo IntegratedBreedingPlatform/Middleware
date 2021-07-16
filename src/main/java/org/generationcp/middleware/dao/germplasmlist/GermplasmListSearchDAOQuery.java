@@ -78,7 +78,7 @@ public class GermplasmListSearchDAOQuery {
 		+ " (SELECT count(1) FROM listdata l WHERE l.listid = list.listid) AS " + NUMBER_OF_ENTRIES_ALIAS + ", "
 		+ " IF (list.liststatus = " + GermplasmList.Status.LOCKED_LIST.getCode() + ", 'LOCKED', 'UNLOCKED') AS " + STATUS_ALIAS + ", "
 		+ " list.notes AS " + NOTES_ALIAS + ", "
-		+ " cast(list.listdate as char) AS " + LIST_DATE_ALIAS;
+		+ " STR_TO_DATE (convert(list.listdate,char), '%Y%m%d') AS " + LIST_DATE_ALIAS;
 
 	private final static String SELF_JOIN_QUERY = " LEFT JOIN listnms inn ON list.lhierarchy = inn.listid ";
 	private final static String WORKBENCH_USER_JOIN_QUERY = " INNER JOIN workbench.users user ON user.userid = list.listuid ";
