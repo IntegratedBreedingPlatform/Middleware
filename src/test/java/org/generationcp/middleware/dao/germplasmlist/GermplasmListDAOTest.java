@@ -24,8 +24,6 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.util.Util;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -326,10 +324,10 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 				null));
 
 		final GermplasmListSearchRequest germplasmListSearchRequest = new GermplasmListSearchRequest();
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest, PROGRAM_UUID), is(1L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest), is(1L));
 
 		final List<GermplasmListSearchResponse> response =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest, new PageRequest(0, 50), PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest, new PageRequest(0, 50));
 		assertThat(response, hasSize(1));
 		final GermplasmListSearchResponse germplasmListSearchResponse = response.get(0);
 		assertThat(germplasmListSearchResponse.getListId(), is(list.getId()));
@@ -362,10 +360,10 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest1.setListNameFilter(this.createSQLTextFilter("New List 1", SqlTextFilter.Type.EXACTMATCH));
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1, PROGRAM_UUID), is(1L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(1L));
 
 		final List<GermplasmListSearchResponse> response1 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, new PageRequest(0, 50), PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, new PageRequest(0, 50));
 		assertThat(response1, hasSize(1));
 		assertThat(response1.get(0).getListId(), is(list1.getId()));
 
@@ -373,12 +371,12 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest2.setListNameFilter(this.createSQLTextFilter("new list", SqlTextFilter.Type.CONTAINS));
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2, PROGRAM_UUID), is(2L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(2L));
 
 		//Sort by list name ascending
 		final Pageable pageRequest1 = this.createPageRequest(Sort.Direction.ASC, "LIST_NAME");
 		final List<GermplasmListSearchResponse> response2 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, pageRequest1, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, pageRequest1);
 		assertThat(response2, hasSize(2));
 		assertThat(response2.get(0).getListId(), is(list1.getId()));
 		assertThat(response2.get(1).getListId(), is(list2.getId()));
@@ -386,7 +384,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		//Sort by list name descending
 		final Pageable pageRequest2 = this.createPageRequest(Sort.Direction.DESC, "LIST_NAME");
 		final List<GermplasmListSearchResponse> response3 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, pageRequest2, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, pageRequest2);
 		assertThat(response3, hasSize(2));
 		assertThat(response3.get(0).getListId(), is(list2.getId()));
 		assertThat(response3.get(1).getListId(), is(list1.getId()));
@@ -395,10 +393,10 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest4 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest4.setListNameFilter(this.createSQLTextFilter("new", SqlTextFilter.Type.STARTSWITH));
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest4, PROGRAM_UUID), is(1L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest4), is(1L));
 
 		final List<GermplasmListSearchResponse> response4 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest4, new PageRequest(0, 50), PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest4, new PageRequest(0, 50));
 		assertThat(response4, hasSize(1));
 		assertThat(response4.get(0).getListId(), is(list1.getId()));
 
@@ -406,10 +404,10 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest5 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest5.setListNameFilter(this.createSQLTextFilter("list", SqlTextFilter.Type.ENDSWITH));
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest5, PROGRAM_UUID), is(1L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest5), is(1L));
 
 		final List<GermplasmListSearchResponse> response5 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest5, new PageRequest(0, 50), PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest5, new PageRequest(0, 50));
 		assertThat(response5, hasSize(1));
 		assertThat(response5.get(0).getListId(), is(list2.getId()));
 
@@ -417,8 +415,8 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest6 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest6.setListNameFilter(this.createSQLTextFilter("other", SqlTextFilter.Type.ENDSWITH));
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest6, PROGRAM_UUID), is(0L));
-		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest6, new PageRequest(0, 50), PROGRAM_UUID),
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest6), is(0L));
+		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest6, new PageRequest(0, 50)),
 			hasSize(0));
 	}
 
@@ -456,10 +454,10 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest1.setParentFolderName("is a parent");
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1, PROGRAM_UUID), is(1L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(1L));
 
 		final List<GermplasmListSearchResponse> response1 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, new PageRequest(0, 50), PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, new PageRequest(0, 50));
 		assertThat(response1, hasSize(1));
 		assertThat(response1.get(0).getListId(), is(list1.getId()));
 
@@ -467,18 +465,18 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest2.setParentFolderName("parent folder");
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2, PROGRAM_UUID), is(2L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(2L));
 
 		final Pageable pageRequest1 = this.createPageRequest(Sort.Direction.ASC, "PARENT_FOLDER_NAME");
 		final List<GermplasmListSearchResponse> response2 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, pageRequest1, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, pageRequest1);
 		assertThat(response2, hasSize(2));
 		assertThat(response2.get(0).getListId(), is(list2.getId()));
 		assertThat(response2.get(1).getListId(), is(list1.getId()));
 
 		final Pageable pageRequest2 = this.createPageRequest(Sort.Direction.DESC, "PARENT_FOLDER_NAME");
 		final List<GermplasmListSearchResponse> response3 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, pageRequest2, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, pageRequest2);
 		assertThat(response3, hasSize(2));
 		assertThat(response3.get(0).getListId(), is(list1.getId()));
 		assertThat(response3.get(1).getListId(), is(list2.getId()));
@@ -487,8 +485,8 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest4 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest4.setParentFolderName("other");
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest4, PROGRAM_UUID), is(0L));
-		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest4, new PageRequest(0, 50), PROGRAM_UUID),
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest4), is(0L));
+		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest4, new PageRequest(0, 50)),
 			hasSize(0));
 	}
 
@@ -510,18 +508,18 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest1.setDescription("description");
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1, PROGRAM_UUID), is(2L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(2L));
 
 		final Pageable pageRequest1 = this.createPageRequest(Sort.Direction.ASC, "DESCRIPTION");
 		final List<GermplasmListSearchResponse> response1 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, pageRequest1, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, pageRequest1);
 		assertThat(response1, hasSize(2));
 		assertThat(response1.get(0).getListId(), is(list1.getId()));
 		assertThat(response1.get(1).getListId(), is(list2.getId()));
 
 		final Pageable pageRequest2 = this.createPageRequest(Sort.Direction.DESC, "DESCRIPTION");
 		final List<GermplasmListSearchResponse> response2 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, pageRequest2, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, pageRequest2);
 		assertThat(response2, hasSize(2));
 		assertThat(response2.get(0).getListId(), is(list2.getId()));
 		assertThat(response2.get(1).getListId(), is(list1.getId()));
@@ -530,8 +528,8 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest2.setOwnerName("other");
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2, PROGRAM_UUID), is(0L));
-		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, new PageRequest(0, 50), PROGRAM_UUID),
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(0L));
+		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, new PageRequest(0, 50)),
 			hasSize(0));
 	}
 
@@ -547,10 +545,10 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest1.setOwnerName("min");
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1, PROGRAM_UUID), is(1L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(1L));
 
 		final List<GermplasmListSearchResponse> response1 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, new PageRequest(0, 50), PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, new PageRequest(0, 50));
 		assertThat(response1, hasSize(1));
 		assertThat(response1.get(0).getListId(), is(list1.getId()));
 
@@ -558,8 +556,8 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest2.setOwnerName("other");
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2, PROGRAM_UUID), is(0L));
-		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, new PageRequest(0, 50), PROGRAM_UUID),
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(0L));
+		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, new PageRequest(0, 50)),
 			hasSize(0));
 	}
 
@@ -582,18 +580,18 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest1.setListTypes(Arrays.asList(TEST_GERMPLASM_LIST_TYPE_LST, "HARVEST"));
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1, PROGRAM_UUID), is(2L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(2L));
 
 		final Pageable pageRequest1 = this.createPageRequest(Sort.Direction.ASC, "LIST_TYPE");
 		final List<GermplasmListSearchResponse> response1 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, pageRequest1, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, pageRequest1);
 		assertThat(response1, hasSize(2));
 		assertThat(response1.get(0).getListId(), is(list2.getId()));
 		assertThat(response1.get(1).getListId(), is(list1.getId()));
 
 		final Pageable pageRequest2 = this.createPageRequest(Sort.Direction.DESC, "LIST_TYPE");
 		final List<GermplasmListSearchResponse> response2 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, pageRequest2, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, pageRequest2);
 		assertThat(response2, hasSize(2));
 		assertThat(response2.get(0).getListId(), is(list1.getId()));
 		assertThat(response2.get(1).getListId(), is(list2.getId()));
@@ -602,8 +600,8 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest2.setListTypes(Arrays.asList("other"));
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2, PROGRAM_UUID), is(0L));
-		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, new PageRequest(0, 50), PROGRAM_UUID),
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(0L));
+		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, new PageRequest(0, 50)),
 			hasSize(0));
 	}
 
@@ -627,10 +625,10 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest1.setLocked(true);
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1, PROGRAM_UUID), is(1L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(1L));
 
 		final List<GermplasmListSearchResponse> response1 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, new PageRequest(0, 50), PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, new PageRequest(0, 50));
 		assertThat(response1, hasSize(1));
 		assertThat(response1.get(0).getListId(), is(list1.getId()));
 
@@ -638,27 +636,27 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest2.setLocked(false);
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2, PROGRAM_UUID), is(1L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(1L));
 
 		final List<GermplasmListSearchResponse> response2 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, new PageRequest(0, 50), PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, new PageRequest(0, 50));
 		assertThat(response2, hasSize(1));
 		assertThat(response2.get(0).getListId(), is(list2.getId()));
 
 		// Sort by status
 		final GermplasmListSearchRequest germplasmListSearchRequest3 = new GermplasmListSearchRequest();
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest3, PROGRAM_UUID), is(2L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest3), is(2L));
 
 		final Pageable pageRequest1 = this.createPageRequest(Sort.Direction.ASC, "STATUS");
 		final List<GermplasmListSearchResponse> response3 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest3, pageRequest1, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest3, pageRequest1);
 		assertThat(response3, hasSize(2));
 		assertThat(response3.get(0).getListId(), is(list1.getId()));
 		assertThat(response3.get(1).getListId(), is(list2.getId()));
 
 		final Pageable pageRequest2 = this.createPageRequest(Sort.Direction.DESC, "STATUS");
 		final List<GermplasmListSearchResponse> response4 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest3, pageRequest2, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest3, pageRequest2);
 		assertThat(response4, hasSize(2));
 		assertThat(response4.get(0).getListId(), is(list2.getId()));
 		assertThat(response4.get(1).getListId(), is(list1.getId()));
@@ -683,18 +681,18 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest1.setNotes("new");
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1, PROGRAM_UUID), is(2L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(2L));
 
 		final Pageable pageRequest1 = this.createPageRequest(Sort.Direction.ASC, "NOTES");
 		final List<GermplasmListSearchResponse> response2 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, pageRequest1, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, pageRequest1);
 		assertThat(response2, hasSize(2));
 		assertThat(response2.get(0).getListId(), is(list2.getId()));
 		assertThat(response2.get(1).getListId(), is(list1.getId()));
 
 		final Pageable pageRequest2 = this.createPageRequest(Sort.Direction.DESC, "NOTES");
 		final List<GermplasmListSearchResponse> response3 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, pageRequest2, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, pageRequest2);
 		assertThat(response3, hasSize(2));
 		assertThat(response3.get(0).getListId(), is(list1.getId()));
 		assertThat(response3.get(1).getListId(), is(list2.getId()));
@@ -703,8 +701,8 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest2.setOwnerName("other");
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2, PROGRAM_UUID), is(0L));
-		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, new PageRequest(0, 50), PROGRAM_UUID),
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(0L));
+		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, new PageRequest(0, 50)),
 			hasSize(0));
 	}
 
@@ -720,10 +718,10 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest1.setListDateFrom(Date.from(LocalDate.of(2014, 11, 3).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1, PROGRAM_UUID), is(1L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(1L));
 
 		final List<GermplasmListSearchResponse> response1 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, new PageRequest(0, 50), PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, new PageRequest(0, 50));
 		assertThat(response1, hasSize(1));
 		assertThat(response1.get(0).getListId(), is(list1.getId()));
 
@@ -731,18 +729,18 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest2.setListDateFrom(Date.from(LocalDate.of(2014, 11, 4).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2, PROGRAM_UUID), is(0L));
-		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, new PageRequest(0, 50), PROGRAM_UUID),
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(0L));
+		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, new PageRequest(0, 50)),
 			hasSize(0));
 
 		// Filter by only date to
 		final GermplasmListSearchRequest germplasmListSearchRequest3 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest3.setListDateTo(Date.from(LocalDate.of(2014, 11, 3).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest3, PROGRAM_UUID), is(1L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest3), is(1L));
 
 		final List<GermplasmListSearchResponse> response3 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest3, new PageRequest(0, 50), PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest3, new PageRequest(0, 50));
 		assertThat(response3, hasSize(1));
 		assertThat(response3.get(0).getListId(), is(list1.getId()));
 
@@ -750,8 +748,8 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final GermplasmListSearchRequest germplasmListSearchRequest4 = new GermplasmListSearchRequest();
 		germplasmListSearchRequest4.setListDateTo(Date.from(LocalDate.of(2014, 11, 2).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest4, PROGRAM_UUID), is(0L));
-		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest4, new PageRequest(0, 50), PROGRAM_UUID),
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest4), is(0L));
+		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest4, new PageRequest(0, 50)),
 			hasSize(0));
 
 
@@ -766,18 +764,18 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		germplasmListSearchRequest5.setListDateFrom(Date.from(LocalDate.of(2014, 11, 2).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 		germplasmListSearchRequest5.setListDateTo(Date.from(LocalDate.of(2016, 11, 4).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest5, PROGRAM_UUID), is(2L));
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest5), is(2L));
 
 		final Pageable pageRequest1 = this.createPageRequest(Sort.Direction.ASC, "LIST_DATE");
 		final List<GermplasmListSearchResponse> response5 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest5, pageRequest1, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest5, pageRequest1);
 		assertThat(response5, hasSize(2));
 		assertThat(response5.get(0).getListId(), is(list1.getId()));
 		assertThat(response5.get(1).getListId(), is(list2.getId()));
 
 		final Pageable pageRequest2 = this.createPageRequest(Sort.Direction.DESC, "LIST_DATE");
 		final List<GermplasmListSearchResponse> response6 =
-			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest5, pageRequest2, PROGRAM_UUID);
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest5, pageRequest2);
 		assertThat(response6, hasSize(2));
 		assertThat(response6.get(0).getListId(), is(list2.getId()));
 		assertThat(response6.get(1).getListId(), is(list1.getId()));
@@ -787,8 +785,8 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		germplasmListSearchRequest6.setListDateFrom(Date.from(LocalDate.of(2014, 11, 4).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 		germplasmListSearchRequest6.setListDateTo(Date.from(LocalDate.of(2014, 11, 5).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
-		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest6, PROGRAM_UUID), is(0L));
-		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest6, new PageRequest(0, 50), PROGRAM_UUID),
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest6), is(0L));
+		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest6, new PageRequest(0, 50)),
 			hasSize(0));
 	}
 

@@ -792,13 +792,11 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest germplasmListSearchRequest,
-		final Pageable pageable, final String programUUID) {
+		final Pageable pageable) {
 
 		final SQLQueryBuilder queryBuilder = GermplasmListSearchDAOQuery.getSelectQuery(germplasmListSearchRequest, pageable);
 		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
 		queryBuilder.addParamsToQuery(query);
-
-		query.setParameter("programUUID", programUUID);
 
 		query.addScalar(GermplasmListSearchDAOQuery.LIST_ID_ALIAS);
 		query.addScalar(GermplasmListSearchDAOQuery.LIST_NAME_ALIAS);
@@ -817,12 +815,11 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return (List<GermplasmListSearchResponse>) query.list();
 	}
 
-	public long countSearchGermplasmList(final GermplasmListSearchRequest germplasmListSearchRequest, final String programUUID) {
+	public long countSearchGermplasmList(final GermplasmListSearchRequest germplasmListSearchRequest) {
 		final SQLQueryBuilder queryBuilder = GermplasmListSearchDAOQuery.getCountQuery(germplasmListSearchRequest);
 		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
 		queryBuilder.addParamsToQuery(query);
 
-		query.setParameter("programUUID", programUUID);
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
