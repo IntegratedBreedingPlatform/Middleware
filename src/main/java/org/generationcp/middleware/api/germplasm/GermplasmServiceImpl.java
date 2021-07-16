@@ -380,7 +380,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				.getAttributeValuesGIDList(gids);
 		final Map<Integer, List<Attribute>> attributesMap =
 			attributes.stream().collect(groupingBy(Attribute::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
-
+		// TODO enforce PUI Uniqueness
 		for (final Germplasm germplasm : germplasmList) {
 			this.saveGermplasmUpdateDTO(attributeVariablesNameMap, nameCodesFieldNoMap,
 				germplasmUpdateDTOMap,
@@ -1570,15 +1570,10 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void enforcePUIUniqueness(final GermplasmUpdateRequest germplasmUpdateRequest, final Name puiName) {
-		final Optional<Synonym> synonymOptional =
-			germplasmUpdateRequest.getSynonyms().stream().filter(s -> PUI.equalsIgnoreCase(s.getType())).findFirst();
-		final String germplasmPUISynonym = synonymOptional
-			.isPresent() ? synonymOptional.get().getSynonym() : "";
-		final String germplasmPUI = !StringUtils.isEmpty(germplasmUpdateRequest.getGermplasmPUI())? germplasmUpdateRequest.getGermplasmPUI() :
-			germplasmPUISynonym;
-		if (!StringUtils.isEmpty(germplasmPUI) ) {
-			final List<String> existingGermplasmPUIs = this.daoFactory.getNameDao().getExistingGermplasmPUIs(Collections.singletonList(germplasmPUI));
-			if (!CollectionUtils.isEmpty(existingGermplasmPUIs) && (puiName == null || !germplasmPUI.equals(puiName.getNval()))) {
+		final List<String> puisList = germplasmUpdateRequest.collectGermplasmPUIs();
+		if (!CollectionUtils.isEmpty(puisList) ) {
+			final List<String> existingGermplasmPUIs = this.daoFactory.getNameDao().getExistingGermplasmPUIs(puisList);
+			if (!CollectionUtils.isEmpty(existingGermplasmPUIs) && (puiName == null || !puisList.get(0).equals(puiName.getNval()))) {
 				throw new MiddlewareRequestException("", "brapi.update.germplasm.pui.exists", StringUtils.join(existingGermplasmPUIs, ","));
 			}
 		}
