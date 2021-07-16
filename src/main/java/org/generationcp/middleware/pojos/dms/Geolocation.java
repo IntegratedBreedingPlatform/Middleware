@@ -74,8 +74,7 @@ public class Geolocation implements Serializable {
 	@BatchSize(size = 5000)
 	private List<GeolocationProperty> properties;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "nd_geolocation_id")
+	@OneToMany(mappedBy = "instance", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	private List<InstanceExternalReference> externalReferences = new ArrayList<>();
 
 	public Geolocation() {
