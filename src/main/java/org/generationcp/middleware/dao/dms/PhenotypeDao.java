@@ -79,6 +79,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	private static final String TRAIT_IDS = "traitIds";
 
+	/**
+	 * Workaround for KSU Field-book BrAPI v1 interface expecting some value in observationUnit import
+	 * https://github.com/PhenoApps/Field-Book/issues/280
+	 */
+	private static final String XY_DEFAULT = "1";
+
 	private static final Logger LOG = LoggerFactory.getLogger(PhenotypeDao.class);
 
 	private static final String GET_OBSERVATIONS = "SELECT p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value "
@@ -965,8 +971,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				String x = row[16] != null ? (String) row[16] : null; // COL
 				String y = row[17] != null ? (String) row[17] : null; // ROW
 				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
-					x = row[11] != null ? (String) row[11] : null; // fieldMapRow
-					y = row[12] != null ? (String) row[12] : null; // fieldMapCol
+					x = row[11] != null ? (String) row[11] : XY_DEFAULT; // fieldMapRow
+					y = row[12] != null ? (String) row[12] : XY_DEFAULT; // fieldMapCol
 				}
 				observationUnit.setX(x);
 				observationUnit.setY(y);
