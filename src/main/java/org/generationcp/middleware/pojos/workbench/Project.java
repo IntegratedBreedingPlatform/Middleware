@@ -11,9 +11,10 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
-import java.io.Serializable;
-import java.util.Date;
-import java.util.Set;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -24,11 +25,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Method;
+import java.io.Serializable;
+import java.util.Date;
+import java.util.Set;
 
 /**
  * POJO for workbench_project table.
@@ -39,8 +38,6 @@ import org.generationcp.middleware.pojos.Method;
 public class Project implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	public static final String ID_NAME = "projectId";
 
 	@Id
 	@Basic(optional = false)
@@ -198,7 +195,7 @@ public class Project implements Serializable {
 		if (obj == this) {
 			return true;
 		}
-		if (!Project.class.isInstance(obj)) {
+		if (!(obj instanceof Project)) {
 			return false;
 		}
 
