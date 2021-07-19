@@ -337,18 +337,18 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final List<Germplasm> germplasmList = this.getGermplasmListByGIDorGermplasmUUID(germplasmUpdateDTOList);
 		final Map<String, Integer> nameCodesFieldNoMap = this.getNameTypesMapByCodes(germplasmUpdateDTOList);
 		final Set<String> attributeKeys = new HashSet<>();
-		germplasmUpdateDTOList.forEach(
-			g -> attributeKeys.addAll(g.getAttributes().keySet().stream().map(String::toUpperCase).collect(Collectors.toList())));
+		final List<String> germplasmPUIs = new ArrayList<>();
+		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap = new HashMap<>();
+		germplasmUpdateDTOList.forEach(g -> {
+			germplasmUpdateDTOMap
+				.put(StringUtils.isNotEmpty(g.getGermplasmUUID()) ? g.getGermplasmUUID() :
+						String.valueOf(g.getGid()), g);
+			attributeKeys.addAll(g.getAttributes().keySet().stream().map(String::toUpperCase).collect(Collectors.toList()));
+			germplasmPUIs.addAll(
+				g.getNames().entrySet().stream().filter(n -> PUI.equals(n.getKey())).map(Map.Entry::getValue).collect(Collectors.toList()));
+		});
 		final Map<String, Variable> attributeVariablesNameMap = this.getAttributesMap(programUUID, attributeKeys);
 		final Map<String, Germplasm> progenitorsMapByGid = this.getGermplasmProgenitorsMapByGids(germplasmUpdateDTOList);
-
-		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap = new HashMap<>();
-		for (final GermplasmUpdateDTO germplasmUpdateDTO : germplasmUpdateDTOList) {
-			germplasmUpdateDTOMap
-				.put(StringUtils.isNotEmpty(germplasmUpdateDTO.getGermplasmUUID()) ? germplasmUpdateDTO.getGermplasmUUID() :
-						String.valueOf(germplasmUpdateDTO.getGid()),
-					germplasmUpdateDTO);
-		}
 
 		// Retrieve location and method IDs in one go
 		final Map<String, Integer> locationAbbreviationIdMap = this.getLocationAbbreviationIdMap(germplasmUpdateDTOList);
@@ -359,6 +359,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final List<Integer> gids = germplasmList.stream().map(Germplasm::getGid).collect(Collectors.toList());
 		final Map<Integer, List<Name>> namesMap =
 			this.daoFactory.getNameDao().getNamesByGidsInMap(gids);
+		final List<String> existingGermplasmPUIs = this.daoFactory.getNameDao().getExistingGermplasmPUIs(germplasmPUIs);
 		final List<Attribute> attributes =
 			this.daoFactory.getAttributeDAO()
 				.getAttributeValuesGIDList(gids);
@@ -369,7 +370,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.saveGermplasmUpdateDTO(attributeVariablesNameMap, nameCodesFieldNoMap,
 				germplasmUpdateDTOMap,
 				locationAbbreviationIdMap, codeBreedingMethodDTOMap, namesMap, attributesMap, germplasm,
-				progenitorsMapByGid, conflictErrors);
+				progenitorsMapByGid, existingGermplasmPUIs, conflictErrors);
 		}
 
 		if (!conflictErrors.isEmpty()) {
@@ -418,7 +419,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, GermplasmUpdateDTO> germplasmUpdateDTOMap, final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
-		final Map<String, Germplasm> progenitorsMapByGid,
+		final Map<String, Germplasm> progenitorsMapByGid, final List<String> existingGermplasmPUIs,
 		final Multimap<String, Object[]> conflictErrors) {
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
 			this.getGermplasmUpdateDTOByGidOrUUID(germplasm, germplasmUpdateDTOMap);
@@ -426,20 +427,20 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final GermplasmUpdateDTO germplasmUpdateDTO = optionalGermplasmUpdateDTO.get();
 			this.updateGermplasm(germplasm, germplasmUpdateDTO, locationAbbreviationIdMap, codeBreedingMethodDTOMap, progenitorsMapByGid,
 				conflictErrors);
-			this.saveAttributesAndNames(attributeVariablesMap, nameCodes, namesMap, attributesMap, germplasm,
-				conflictErrors,
-				germplasmUpdateDTO);
+			this.saveAttributesAndNames(attributeVariablesMap, nameCodes, namesMap, attributesMap, existingGermplasmPUIs, germplasm,
+				conflictErrors, germplasmUpdateDTO);
 			this.updatePreferredName(nameCodes, namesMap, germplasm, germplasmUpdateDTO, conflictErrors);
 		}
 	}
 
 	private void saveAttributesAndNames(final Map<String, Variable> attributeVariablesMap,
 		final Map<String, Integer> nameCodes, final Map<Integer, List<Name>> namesMap, final Map<Integer, List<Attribute>> attributesMap,
-		final Germplasm germplasm, final Multimap<String, Object[]> conflictErrors, final GermplasmUpdateDTO germplasmUpdateDTO) {
+		final List<String> existingGermplasmPUIs, final Germplasm germplasm, final Multimap<String, Object[]> conflictErrors,
+		final GermplasmUpdateDTO germplasmUpdateDTO) {
 		for (final Map.Entry<String, String> codeValuesEntry : germplasmUpdateDTO.getNames().entrySet()) {
 			final String code = codeValuesEntry.getKey();
 			final String value = codeValuesEntry.getValue();
-			this.saveOrUpdateName(nameCodes, namesMap, germplasm, code, value,
+			this.saveOrUpdateName(nameCodes, namesMap, germplasm, code, value, existingGermplasmPUIs,
 				conflictErrors);
 		}
 		for (final Map.Entry<String, String> codeValuesEntry : germplasmUpdateDTO.getAttributes().entrySet()) {
@@ -579,8 +580,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void saveOrUpdateName(final Map<String, Integer> nameCodes,
-		final Map<Integer, List<Name>> namesMap, final Germplasm germplasm,
-		final String code, final String value, final Multimap<String, Object[]> conflictErrors) {
+		final Map<Integer, List<Name>> namesMap, final Germplasm germplasm, final String code, final String value,
+		final List<String> existingGermplasmPUIs, final Multimap<String, Object[]> conflictErrors) {
 
 		// Check first if the code to save is a valid Name
 		if (nameCodes.containsKey(code) && liquibase.util.StringUtils.isNotEmpty(value)) {
@@ -593,22 +594,36 @@ public class GermplasmServiceImpl implements GermplasmService {
 			if (namesByType.size() > 1) {
 				conflictErrors.put("germplasm.update.duplicate.names", new String[] {
 					code, String.valueOf(germplasm.getGid())});
-			} else if (namesByType.size() == 1) {
-				// Update if name is existing
-				final Name name = namesByType.get(0);
-				name.setLocationId(germplasm.getLocationId());
-				name.setNdate(germplasm.getGdate());
-				name.setNval(value);
-				this.daoFactory.getNameDao().update(name);
-			} else {
-				// Create new record if name not yet exists
-				final Name name = new Name(null, germplasm, nameTypeId, 0,
-					value, germplasm.getLocationId(), germplasm.getGdate(), 0);
-				this.daoFactory.getNameDao().save(name);
-				germplasmNames.add(name);
-				namesMap.putIfAbsent(germplasm.getGid(), germplasmNames);
+
+			} else if (this.isPuiUniquenessEnforced(code, value, germplasm.getGid(), namesByType, existingGermplasmPUIs, conflictErrors)) {
+				if (namesByType.size() == 1) {
+					// Update if name is existing
+					final Name name = namesByType.get(0);
+					name.setLocationId(germplasm.getLocationId());
+					name.setNdate(germplasm.getGdate());
+					name.setNval(value);
+					this.daoFactory.getNameDao().update(name);
+				} else {
+					// Create new record if name not yet exists
+					final Name name = new Name(null, germplasm, nameTypeId, 0,
+						value, germplasm.getLocationId(), germplasm.getGdate(), 0);
+					this.daoFactory.getNameDao().save(name);
+					germplasmNames.add(name);
+					namesMap.putIfAbsent(germplasm.getGid(), germplasmNames);
+				}
 			}
+
 		}
+	}
+
+	private boolean isPuiUniquenessEnforced(final String nameType, final String value, final Integer gid, final List<Name> namesByType,
+		final List<String> existingGermplasmPUIs,
+		final Multimap<String, Object[]> conflictErrors) {
+		if (PUI.equalsIgnoreCase(nameType) && existingGermplasmPUIs.contains(value) && (CollectionUtils.isEmpty(namesByType) || !namesByType.get(0).getNval().equalsIgnoreCase(value))) {
+			conflictErrors.put("germplasm.update.germplasm.pui.exists", new String[] {value, String.valueOf(gid)});
+			return false;
+		}
+		return true;
 	}
 
 	private void saveOrUpdateAttribute(final Map<String, Variable> attributeVariables,

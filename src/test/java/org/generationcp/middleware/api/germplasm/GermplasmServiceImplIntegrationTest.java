@@ -62,6 +62,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -144,27 +145,38 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
 				Optional.of(newLocation), creationDate);
+		final String germplasmPUI = RandomStringUtils.randomAlphabetic(40);
+		germplasmUpdateDTO.getNames().put(GermplasmServiceImpl.PUI, germplasmPUI);
 		this.germplasmService.importGermplasmUpdates(this.programUUID, Collections.singletonList(germplasmUpdateDTO));
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
-		final List<Name> names = this.daoFactory.getNameDao().getNamesByGids(Arrays.asList(germplasm.getGid()));
+
+		final Map<Integer, Name> namesMap = this.daoFactory.getNameDao().getNamesByGids(Arrays.asList(germplasm.getGid())).stream().collect(Collectors.toMap(Name::getTypeId, Function
+			.identity()));
 		final List<Attribute> attributes = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Arrays.asList(germplasm.getGid()));
 
 		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
 		assertEquals(newLocation.getLocid(), savedGermplasm.getLocationId());
 		assertEquals(creationDate, savedGermplasm.getGdate().intValue());
 		assertNotNull(savedGermplasm.getReferenceId());
-		assertFalse(names.isEmpty());
+		assertFalse(namesMap.isEmpty());
 		assertFalse(attributes.isEmpty());
 
-		final Name savedName = names.get(0);
-		assertEquals(newNameCode.getFldno(), savedName.getTypeId());
-		assertEquals(1, savedName.getNstat().intValue());
-		assertEquals(newLocation.getLocid(), savedName.getLocationId());
-		assertEquals(creationDate, savedName.getNdate().intValue());
-		assertEquals("Name for " + germplasm.getGid(), savedName.getNval());
+		final Name savedDerivativeName = namesMap.get(newNameCode.getFldno());
+		assertEquals(newNameCode.getFldno(), savedDerivativeName.getTypeId());
+		assertEquals(1, savedDerivativeName.getNstat().intValue());
+		assertEquals(newLocation.getLocid(), savedDerivativeName.getLocationId());
+		assertEquals(creationDate, savedDerivativeName.getNdate().intValue());
+		assertEquals("Name for " + germplasm.getGid(), savedDerivativeName.getNval());
+
+		final Name saveGermplasmPUI = namesMap.get(this.puiNameTypeId);
+		assertEquals(this.puiNameTypeId, saveGermplasmPUI.getTypeId());
+		assertEquals(0, saveGermplasmPUI.getNstat().intValue());
+		assertEquals(newLocation.getLocid(), saveGermplasmPUI.getLocationId());
+		assertEquals(creationDate, saveGermplasmPUI.getNdate().intValue());
+		assertEquals(germplasmPUI, saveGermplasmPUI.getNval());
 
 		final Attribute savedAttribute = attributes.get(0);
 		assertEquals(this.attributeId, savedAttribute.getTypeId());
@@ -187,7 +199,10 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0, null);
 
+		// Save previous values for DRVNM and PUI names
 		this.daoFactory.getNameDao().save(new Name(null, germplasm, newNameCode.getFldno(), 0,
+			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
+		this.daoFactory.getNameDao().save(new Name(null, germplasm, this.puiNameTypeId, 0,
 			"", germplasm.getLocationId(), germplasm.getGdate(), 0));
 
 		this.daoFactory.getAttributeDAO()
@@ -195,31 +210,41 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				germplasm.getLocationId(),
 				0, germplasm.getGdate()));
 
+		final String newGermplasmPUI = RandomStringUtils.randomAlphabetic(40);
 		final GermplasmUpdateDTO germplasmUpdateDTO =
 			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
 				Optional.of(newLocation), creationDate);
+		germplasmUpdateDTO.getNames().put(GermplasmServiceImpl.PUI, newGermplasmPUI);
 		this.germplasmService.importGermplasmUpdates(this.programUUID, Collections.singletonList(germplasmUpdateDTO));
 		this.sessionProvder.getSession().flush();
 
 		final Germplasm savedGermplasm =
 			this.daoFactory.getGermplasmDao()
 				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
-		final List<Name> names = this.daoFactory.getNameDao().getNamesByGids(Arrays.asList(germplasm.getGid()));
+		final Map<Integer, Name> namesMap = this.daoFactory.getNameDao().getNamesByGids(Arrays.asList(germplasm.getGid())).stream().collect(Collectors.toMap(Name::getTypeId, Function
+			.identity()));
 		final List<Attribute> attributes = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(Arrays.asList(germplasm.getGid()));
 
 		assertEquals(newMethod.getMid(), savedGermplasm.getMethodId());
 		assertEquals(newLocation.getLocid(), savedGermplasm.getLocationId());
 		assertEquals(creationDate, savedGermplasm.getGdate().intValue());
 		assertNotNull(savedGermplasm.getReferenceId());
-		assertFalse(names.isEmpty());
+		assertFalse(namesMap.isEmpty());
 		assertFalse(attributes.isEmpty());
 
-		final Name savedName = names.get(0);
-		assertEquals(newNameCode.getFldno(), savedName.getTypeId());
-		assertEquals(1, savedName.getNstat().intValue());
-		assertEquals(newLocation.getLocid(), savedName.getLocationId());
-		assertEquals(creationDate, savedName.getNdate().intValue());
-		assertEquals("Name for " + germplasm.getGid(), savedName.getNval());
+		final Name savedDerivativeName = namesMap.get(newNameCode.getFldno());
+		assertEquals(newNameCode.getFldno(), savedDerivativeName.getTypeId());
+		assertEquals(1, savedDerivativeName.getNstat().intValue());
+		assertEquals(newLocation.getLocid(), savedDerivativeName.getLocationId());
+		assertEquals(creationDate, savedDerivativeName.getNdate().intValue());
+		assertEquals("Name for " + germplasm.getGid(), savedDerivativeName.getNval());
+
+		final Name saveGermplasmPUI = namesMap.get(this.puiNameTypeId);
+		assertEquals(this.puiNameTypeId, saveGermplasmPUI.getTypeId());
+		assertEquals(0, saveGermplasmPUI.getNstat().intValue());
+		assertEquals(newLocation.getLocid(), saveGermplasmPUI.getLocationId());
+		assertEquals(creationDate, saveGermplasmPUI.getNdate().intValue());
+		assertEquals(newGermplasmPUI, saveGermplasmPUI.getNval());
 
 		final Attribute savedAttribute = attributes.get(0);
 		assertEquals(this.attributeId, savedAttribute.getTypeId());
@@ -230,7 +255,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testImportGermplasmUpdates_PreferredNameHasDuplicates() {
+	public void testImportGermplasmUpdates_ThrowException_PreferredNameHasDuplicates() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final int creationDate = 20200101;
@@ -258,7 +283,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testImportGermplasmUpdates_PreferredNameDoesntExist() {
+	public void testImportGermplasmUpdates_ThrowException_PreferredNameDoesntExist() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final int creationDate = 20200101;
@@ -279,8 +304,9 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 	}
 
+
 	@Test
-	public void testImportGermplasmUpdates_DuplicateNames() {
+	public void testImportGermplasmUpdates_ThrowException_DuplicateNames() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
@@ -310,6 +336,65 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		}
 
 	}
+
+	@Test
+	public void testImportGermplasmUpdates_ThrowException_PUIAlreadyExists() {
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Method newMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+
+		final int creationDate = 20200101;
+		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
+
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0, null);
+		final Germplasm germplasm2 = this.createGermplasm(method, null, null, 0, 0, 0, this.germplasmPUI);
+
+		final GermplasmUpdateDTO germplasmUpdateDTO =
+			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.of(newMethod),
+				Optional.of(newLocation), creationDate);
+		germplasmUpdateDTO.getNames().put(GermplasmServiceImpl.PUI, this.germplasmPUI);
+
+		try {
+			this.germplasmService.importGermplasmUpdates(this.programUUID, Collections.singletonList(germplasmUpdateDTO));
+		} catch (final MiddlewareRequestException e) {
+			Assert.assertTrue(e.getErrorCodeParamsMultiMap().containsKey("germplasm.update.germplasm.pui.exists"));
+		}
+
+	}
+
+	@Test
+	public void testImportGermplasmUpdates_ShouldBeOk_WhenUsingSamePUI() {
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final int creationDate = 20200101;
+		final Location newLocation = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList(NOLOC)).get(0);
+
+		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0, this.germplasmPUI);
+
+		final GermplasmUpdateDTO germplasmUpdateDTO =
+			this.createGermplasmUpdateDto(germplasm.getGid(), germplasm.getGermplasmUUID(), Optional.empty(),
+				Optional.of(newLocation), creationDate);
+		germplasmUpdateDTO.getNames().put(GermplasmServiceImpl.PUI, this.germplasmPUI);
+
+		this.germplasmService.importGermplasmUpdates(this.programUUID, Collections.singletonList(germplasmUpdateDTO));
+
+		this.sessionProvder.getSession().flush();
+
+		final Germplasm savedGermplasm =
+			this.daoFactory.getGermplasmDao()
+				.getByGIDsOrUUIDListWithMethodAndBibref(Collections.singleton(germplasm.getGid()), new HashSet<>()).get(0);
+		final Map<Integer, Name> namesMap = this.daoFactory.getNameDao().getNamesByGids(Arrays.asList(germplasm.getGid())).stream().collect(Collectors.toMap(Name::getTypeId, Function
+			.identity()));
+		assertFalse(namesMap.isEmpty());
+
+		final Name saveGermplasmPUI = namesMap.get(this.puiNameTypeId);
+		assertEquals(this.puiNameTypeId, saveGermplasmPUI.getTypeId());
+		assertEquals(0, saveGermplasmPUI.getNstat().intValue());
+		assertEquals(newLocation.getLocid(), saveGermplasmPUI.getLocationId());
+		assertEquals(creationDate, saveGermplasmPUI.getNdate().intValue());
+		assertEquals(this.germplasmPUI, saveGermplasmPUI.getNval());
+	}
+
+
+
 
 	@Test
 	public void testGetGermplasmByGIDs() {
