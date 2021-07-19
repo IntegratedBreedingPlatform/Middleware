@@ -12,7 +12,7 @@ import java.util.List;
 public class GermplasmImportRequestDto {
 
 	public enum PedigreeConnectionType {
-		NONE, GID, PUI
+		NONE, GID, GUID
 	}
 
 	public GermplasmImportRequestDto() {

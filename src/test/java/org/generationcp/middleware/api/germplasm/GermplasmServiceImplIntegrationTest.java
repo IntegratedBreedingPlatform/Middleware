@@ -7,11 +7,7 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
-import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
-import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
-import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
@@ -25,15 +21,12 @@ import org.generationcp.middleware.domain.germplasm.importation.GermplasmImportR
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
@@ -47,7 +40,6 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -1152,7 +1144,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				, "0", progenitor2GUID);
 
 		final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
-		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.PUI);
+		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GUID);
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
 		germplasmImportRequestDto.setSkipIfExists(false);
 
@@ -1193,7 +1185,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				, progenitor1GUID, progenitor2GUID);
 
 		final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
-		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.PUI);
+		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GUID);
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
 		germplasmImportRequestDto.setSkipIfExists(false);
 
@@ -1242,7 +1234,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				, progenitor1GUID, progenitor2GUID);
 
 		final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
-		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.PUI);
+		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GUID);
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
 		germplasmImportRequestDto.setSkipIfExists(false);
 
@@ -1265,7 +1257,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				, progenitor2FemaleParentGUID, progenitor2GUID);
 
 		final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
-		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.PUI);
+		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GUID);
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
 		germplasmImportRequestDto.setSkipIfExists(true);
 
@@ -1305,7 +1297,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				, "0", progenitor2GUID);
 
 		final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
-		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.PUI);
+		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GUID);
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
 		germplasmImportRequestDto.setSkipIfExists(true);
 
@@ -1339,7 +1331,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				, null, null);
 
 		final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
-		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.PUI);
+		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GUID);
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
 		germplasmImportRequestDto.setSkipIfExists(false);
 
@@ -1364,7 +1356,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				, null, null);
 
 		final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
-		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.PUI);
+		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GUID);
 		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
 		germplasmImportRequestDto.setSkipIfExists(false);
 
