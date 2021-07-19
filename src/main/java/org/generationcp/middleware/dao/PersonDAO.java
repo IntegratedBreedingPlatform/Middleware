@@ -31,7 +31,6 @@ import java.util.Map;
 
 /**
  * DAO class for {@link Person}.
- *
  */
 public class PersonDAO extends GenericDAO<Person, Integer> {
 
@@ -39,11 +38,9 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 
 	public boolean isPersonExists(final String firstName, final String lastName) throws MiddlewareQueryException {
 		try {
-			final StringBuilder sql = new StringBuilder();
-			sql.append("SELECT COUNT(1) FROM persons p ").append("WHERE UPPER(p.fname) = :firstName ")
-					.append("AND UPPER(p.lname) = :lastName");
-
-			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			final String sql = "SELECT COUNT(1) FROM persons p " + "WHERE UPPER(p.fname) = :firstName "
+				+ "AND UPPER(p.lname) = :lastName";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameter("firstName", firstName);
 			query.setParameter("lastName", lastName);
 
@@ -51,17 +48,18 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 
 			return count.longValue() > 0;
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with isPersonExists(firstName=" + firstName + ", lastName=" + lastName
-					+ ") query from Person: " + e.getMessage(), e);
+			final String message =
+				"Error with isPersonExists(firstName=" + firstName + ", lastName=" + lastName
+					+ ") query from Person: " + e.getMessage();
+			PersonDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return false;
 	}
 
 	public boolean isPersonWithEmailExists(final String email) throws MiddlewareQueryException {
 		try {
-			final StringBuilder sql = new StringBuilder();
-			sql.append("SELECT COUNT(1) FROM persons p ").append("WHERE UPPER(p.pemail) = :email");
-			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			final String sql = "SELECT COUNT(1) FROM persons p WHERE UPPER(p.pemail) = :email";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameter("email", email);
 
 			final BigInteger count = (BigInteger) query.uniqueResult();
@@ -69,66 +67,34 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 			return count.longValue() > 0;
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with isPersonWithEmailExists(email=" + email + ") query from Person: " + e.getMessage(), e);
+			final String message =
+				"Error with isPersonWithEmailExists(email=" + email + ") query from Person: " + e.getMessage();
+			PersonDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-
-		return false;
-	}
-
-	public Person getPersonByEmail(final String email) throws MiddlewareQueryException {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Person.class);
-
-			criteria.add(Restrictions.eq("email", email));
-
-			return (Person) criteria.uniqueResult();
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getPersonByEmail(email=" + email + ") query from Person: " + e.getMessage(), e);
-		}
-
-		return null;
-	}
-
-	public Person getPersonByEmailAndName(final String email, final String firstName, final String lastName)
-			throws MiddlewareQueryException {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Person.class);
-
-			criteria.add(Restrictions.eq("email", email)).add(Restrictions.eq("firstName", firstName))
-					.add(Restrictions.eq("lastName", lastName));
-
-			final Object result = criteria.uniqueResult();
-			if (result != null) {
-				return (Person) result;
-			}
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getPersonByEmail(email=" + email + ") query from Person: " + e.getMessage(), e);
-		}
-
-		return null;
 	}
 
 	public boolean isPersonWithUsernameAndEmailExists(final String username, final String email) throws MiddlewareQueryException {
 		try {
-			final StringBuilder sql = new StringBuilder();
-			sql.append("SELECT COUNT(1) FROM USERS users join PERSONS persons on users.personid = persons.personid ")
-					.append("WHERE users.uname = :username and persons.pemail = :email");
-			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			final String sql = "SELECT COUNT(1) FROM USERS users join PERSONS persons on users.personid = persons.personid "
+				+ "WHERE users.uname = :username and persons.pemail = :email";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameter("email", email);
 			query.setParameter("username", username);
 
 			return ((BigInteger) query.uniqueResult()).longValue() > 0;
 
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with isPersonWithEmailExists(email=" + email + ") query from Person: " + e.getMessage(), e);
+			final String message =
+				"Error with isPersonWithEmailExists(email=" + email + ") query from Person: " + e.getMessage();
+			PersonDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-
-		return false;
 	}
 
 	@SuppressWarnings("unchecked")
 	public Map<Integer, String> getPersonNamesByPersonIds(final List<Integer> personIds) throws MiddlewareQueryException {
-		final Map<Integer, String> map = new HashMap<Integer, String>();
+		final Map<Integer, String> map = new HashMap<>();
 		try {
 			final List<Person> persons = this.getSession().createCriteria(Person.class).add(Restrictions.in("id", personIds)).list();
 			if (persons != null && !persons.isEmpty()) {
@@ -136,11 +102,13 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 					map.put(person.getId(), person.getDisplayName());
 				}
 			}
-
+			return map;
 		} catch (final HibernateException e) {
-			this.logAndThrowException(String.format("Error with getPersonNamesByPersonIds(id=[%s])", StringUtils.join(personIds, ",")), e);
+			final String message =
+				String.format("Error with getPersonNamesByPersonIds(id=[%s])", StringUtils.join(personIds, ","));
+			PersonDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return map;
 	}
 
 	public List<Person> getPersonsByCrop(final CropType cropType) {

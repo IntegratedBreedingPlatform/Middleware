@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.user;
 
+import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropPerson;
@@ -8,6 +9,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.UserInfo;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -112,13 +114,6 @@ public interface UserService {
 	void updateUser(WorkbenchUser user);
 
 	/**
-	 * Deletes a user.
-	 *
-	 * @param user - the Workbench User to delete
-	 */
-	void deleteUser(WorkbenchUser user);
-
-	/**
 	 * Checks if a username exists.
 	 *
 	 * @param userName - the user name to check
@@ -151,14 +146,6 @@ public interface UserService {
 	 * @return the person matching the given id
 	 */
 	Person getPersonById(int id);
-
-	/**
-	 * @param email
-	 * @return
-	 */
-	Person getPersonByEmail(String email);
-
-	Person getPersonByEmailAndName(String email, String firstName, String lastName);
 
 	/**
 	 * Returns the user's person name given the user id
@@ -304,8 +291,6 @@ public interface UserService {
 
 	void removeCropPerson(CropPerson cropPerson);
 
-	CropPerson getCropPerson(String cropName, Integer personId);
-
 	Map<Integer, String> getPersonNamesByPersonIds(List<Integer> personIds);
 
 	WorkbenchUser getUserWithAuthorities(final String userName, final String cropName, final String programUuid);
@@ -313,5 +298,13 @@ public interface UserService {
 	List<WorkbenchUser> getUsersWithRole(int id);
 
 	List<Integer> getActiveUserIDsWithAccessToTheProgram(Long projectId);
+
+	List<ProgramMemberDto> getProgramMembers(String programUUID, Pageable pageable);
+
+	long countAllProgramMembers(String programUUID);
+
+	List<UserDto> getProgramMembersEligibleUsers(String programUUID, Pageable pageable);
+
+	long countProgramMembersEligibleUsers(String programUUID);
 
 }
