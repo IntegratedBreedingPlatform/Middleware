@@ -5,22 +5,11 @@ import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto
 public class LotGeneratorBatchRequestDto {
 
 	private LotGeneratorInputDto lotGeneratorInput;
-
-	private String studyId;
-
-	public String getStudyId() {
-		return this.studyId;
-	}
-
-	public void setStudyId(final String studyId) {
-		this.studyId = studyId;
-	}
-
 	/**
-	 * searchRequestId for {@link org.generationcp.middleware.domain.search_request.GidSearchDto}
+	 * searchRequestId for {@link SearchOriginCompositeDto}
 	 * or list of gids
 	 */
-	private SearchCompositeDto<Integer, Integer> searchComposite;
+	private SearchCompositeDto<SearchOriginCompositeDto, Integer> searchComposite;
 
 	public LotGeneratorInputDto getLotGeneratorInput() {
 		return this.lotGeneratorInput;
@@ -30,12 +19,12 @@ public class LotGeneratorBatchRequestDto {
 		this.lotGeneratorInput = lotGeneratorInput;
 	}
 
-	public SearchCompositeDto<Integer, Integer> getSearchComposite() {
+	public SearchCompositeDto<SearchOriginCompositeDto, Integer> getSearchComposite() {
 		return this.searchComposite;
 	}
 
 	public void setSearchComposite(
-		final SearchCompositeDto<Integer, Integer> searchComposite) {
+		final SearchCompositeDto<SearchOriginCompositeDto, Integer> searchComposite) {
 		this.searchComposite = searchComposite;
 	}
 }
