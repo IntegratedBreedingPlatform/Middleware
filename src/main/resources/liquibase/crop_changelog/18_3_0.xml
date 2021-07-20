@@ -594,4 +594,41 @@
        </createTable>
     </changeSet>
 
+	<changeSet author="nahuel" id="v18.3.0-30" >
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="file_metadata"/>
+			</not>
+		</preConditions>
+		<comment>Create file_metadata</comment>
+        <sql dbms="mysql" splitStatements="true">
+			create table file_metadata
+			(
+				file_id int auto_increment
+					primary key,
+				file_uuid varchar(36) not null,
+				name varchar(255) null,
+				description varchar(255) null,
+				copyright varchar(255) null,
+				size int null comment 'in bytes',
+				image_height int null comment 'in pixels',
+				image_width int null comment 'in pixels',
+				image_location text null comment 'geojson',
+				path varchar(2000) null,
+				mime_type varchar(255) null,
+				file_timestamp timestamp null,
+				created_by int null,
+				modified_by int null,
+				created_date timestamp default CURRENT_TIMESTAMP null,
+				modified_date timestamp null,
+				nd_experiment_id int null,
+				constraint uk_file_uuid
+					unique (file_uuid),
+				constraint fk_nd_experiment_nd_experiment_id
+					foreign key (nd_experiment_id) references ibdbv2_maize_merged.nd_experiment (nd_experiment_id)
+			);
+
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
