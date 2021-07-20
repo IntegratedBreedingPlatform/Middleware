@@ -54,7 +54,7 @@ public class ObservationUnitIDGeneratorTest {
 		final String obsUnitId = experiment.getObsUnitId();
 		assertNotNull(obsUnitId);
 		assertFalse(obsUnitId.matches(UUID_REGEX));
-		assertEquals(this.crop.getPlotCodePrefix() + ObservationUnitIDGenerator.MID_STRING, obsUnitId.substring(0, CROP_PREFIX_LENGTH + 1));
+		assertEquals(this.crop.getPlotCodePrefix() + ObservationUnitIDGenerator.UID_ROOT.getRoot(), obsUnitId.substring(0, CROP_PREFIX_LENGTH + 1));
 		final String suffix = obsUnitId.substring(CROP_PREFIX_LENGTH + 1, obsUnitId.length());
 		assertTrue(suffix.matches(SUFFIX_REGEX));
 	}
