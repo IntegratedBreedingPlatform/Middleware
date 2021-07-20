@@ -2,12 +2,24 @@ package org.generationcp.middleware.pojos.file;
 
 import org.generationcp.middleware.pojos.AbstractEntity;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import java.util.Date;
 
 @Entity
 @Table(name = "file_metadata")
+@AutoProperty
 public class FileMetadata extends AbstractEntity {
 
 	@Id
@@ -156,4 +168,20 @@ public class FileMetadata extends AbstractEntity {
 	public void setExperimentModel(final ExperimentModel experimentModel) {
 		this.experimentModel = experimentModel;
 	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
+
 }
