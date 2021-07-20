@@ -1,9 +1,9 @@
 package org.generationcp.middleware.pojos.file;
 
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.generationcp.middleware.pojos.AbstractEntity;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.pojomatic.Pojomatic;
-import org.pojomatic.annotations.AutoProperty;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -19,7 +19,6 @@ import java.util.Date;
 
 @Entity
 @Table(name = "file_metadata")
-@AutoProperty
 public class FileMetadata extends AbstractEntity {
 
 	@Id
@@ -170,18 +169,8 @@ public class FileMetadata extends AbstractEntity {
 	}
 
 	@Override
-	public int hashCode() {
-		return Pojomatic.hashCode(this);
-	}
-
-	@Override
 	public String toString() {
-		return Pojomatic.toString(this);
-	}
-
-	@Override
-	public boolean equals(final Object o) {
-		return Pojomatic.equals(this, o);
+		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
 	}
 
 }
