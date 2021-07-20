@@ -14,7 +14,6 @@ public class ImageNewRequest {
 	private String copyright;
 	private String description;
 	private List<String> descriptiveOntologyTerms;
-	private String imageDbId;
 	private String imageFileName;
 	private Integer imageFileSize;
 	private Integer imageHeight;
@@ -64,14 +63,6 @@ public class ImageNewRequest {
 
 	public void setDescriptiveOntologyTerms(final List<String> descriptiveOntologyTerms) {
 		this.descriptiveOntologyTerms = descriptiveOntologyTerms;
-	}
-
-	public String getImageDbId() {
-		return this.imageDbId;
-	}
-
-	public void setImageDbId(final String imageDbId) {
-		this.imageDbId = imageDbId;
 	}
 
 	public String getImageFileName() {
