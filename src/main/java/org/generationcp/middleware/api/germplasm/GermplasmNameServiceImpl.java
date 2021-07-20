@@ -25,9 +25,6 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	private final DaoFactory daoFactory;
 
 	@Autowired
-	private GermplasmService germplasmService;
-
-	@Autowired
 	private GermplasmNameTypeService germplasmNameTypeService;
 
 	public GermplasmNameServiceImpl(final HibernateSessionProvider sessionProvider) {

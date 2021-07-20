@@ -22,7 +22,7 @@ public class GermplasmMatchRequestDto {
 	}
 
 	public List<String> getNames() {
-		return names;
+		return this.names;
 	}
 
 	public void setNames(final List<String> names) {

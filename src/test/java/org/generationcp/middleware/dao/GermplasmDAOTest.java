@@ -850,9 +850,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Test
 	public void testCountGermplasmDTOs_FilterByParentDbId() {
 		final Germplasm femaleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
-		GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(femaleParent));
+		GermplasmGuidGenerator.generateGermplasmGuids(this.cropType, Collections.singletonList(femaleParent));
 		final Germplasm maleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
-		GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(maleParent));
+		GermplasmGuidGenerator.generateGermplasmGuids(this.cropType, Collections.singletonList(maleParent));
 		this.dao.save(femaleParent);
 		this.dao.save(maleParent);
 
@@ -884,7 +884,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.dao.save(maleParent);
 
 		final Germplasm cross = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
-		GermplasmGuidGenerator.generateGermplasmGuids(cropType, Collections.singletonList(cross));
+		GermplasmGuidGenerator.generateGermplasmGuids(this.cropType, Collections.singletonList(cross));
 		cross.setGpid1(femaleParent.getGid());
 		cross.setGpid2(maleParent.getGid());
 		cross.setGnpgs(2);

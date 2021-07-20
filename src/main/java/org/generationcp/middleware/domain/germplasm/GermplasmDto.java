@@ -213,7 +213,7 @@ public class GermplasmDto {
 	}
 
 	public String getGermplasmPUI() {
-		return germplasmPUI;
+		return this.germplasmPUI;
 	}
 
 	public void setGermplasmPUI(final String germplasmPUI) {

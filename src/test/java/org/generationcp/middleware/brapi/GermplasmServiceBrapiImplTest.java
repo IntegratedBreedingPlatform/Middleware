@@ -11,7 +11,6 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
-import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -65,8 +64,8 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
-	private Integer noLocationId, variableTypeId, attributeId, userId, puiNameTypeId;
-	private String creationDate, name, germplasmPUI, germplasmUUID, reference, note;
+	private Integer noLocationId, userId, puiNameTypeId;
+	private String creationDate, germplasmPUI, germplasmUUID;
 	private Method derivativeMethod, generativeMethod;
 
 	@Before
@@ -75,14 +74,9 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 		this.noLocationId = this.daoFactory.getLocationDAO().getByAbbreviations(Arrays.asList(NOLOC)).get(0).getLocid();
 		this.derivativeMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		this.generativeMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
-		this.variableTypeId = this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode("NAMES", "NAME", DRVNM).getFldno();
-		this.attributeId = this.daoFactory.getCvTermDao().getByNameAndCvId(NOTE, CvId.VARIABLES.getId()).getCvTermId();
 		this.creationDate = "20201212";
-		this.name = RandomStringUtils.randomAlphabetic(10);
 		this.germplasmPUI = RandomStringUtils.randomAlphabetic(20);
 		this.germplasmUUID = RandomStringUtils.randomAlphabetic(10);
-		this.reference = RandomStringUtils.randomAlphabetic(20);
-		this.note = RandomStringUtils.randomAlphabetic(10);
 		this.userId = this.findAdminUser();
 		this.puiNameTypeId = this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode("NAMES", "NAME", "PUI").getFldno();
 
