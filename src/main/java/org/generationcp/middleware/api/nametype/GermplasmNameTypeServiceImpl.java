@@ -46,6 +46,15 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
+	public Optional<GermplasmNameTypeDTO> getNameTypeById(final Integer id) {
+		final UserDefinedField nameType = this.daoFactory.getUserDefinedFieldDAO().getById(id);
+		if (nameType != null) {
+			return Optional.of(new GermplasmNameTypeDTO(nameType.getFldno(), nameType.getFcode(), nameType.getFname()));
+		}
+		return Optional.empty();
+	}
+
+	@Override
 	public Integer createNameType(final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
 		final UserDefinedField userDefinedField = new UserDefinedField();
 		userDefinedField.setFtable(UDTableType.NAMES_NAME.getTable());
