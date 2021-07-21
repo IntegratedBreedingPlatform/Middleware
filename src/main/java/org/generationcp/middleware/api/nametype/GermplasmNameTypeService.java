@@ -24,4 +24,8 @@ public interface GermplasmNameTypeService {
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypesByName(String name);
 
 	List<GermplasmNameTypeDTO> getNameTypesByGIDList(List<Integer> gidList);
+
+	void updateNameType(GermplasmNameTypeRequestDTO GermplasmNameTypeRequestDTO, Integer nameTypeId);
+
+	void deleteNameType(Integer nameTypeId);
 }

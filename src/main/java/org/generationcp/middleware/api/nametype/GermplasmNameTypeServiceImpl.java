@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.nametype;
 
+import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -57,7 +58,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 		userDefinedField.setFuid(ContextHolder.getLoggedInUserId());
 		userDefinedField.setFdate(Util.getCurrentDateAsIntegerValue());
 		userDefinedField.setScaleid(0);
-		daoFactory.getUserDefinedFieldDAO().save(userDefinedField);
+		this.daoFactory.getUserDefinedFieldDAO().save(userDefinedField);
 		return userDefinedField.getFldno();
 	}
 
@@ -65,7 +66,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	public List<GermplasmNameTypeDTO> getNameTypes(final Pageable pageable) {
 		final Map<Integer, String> userMap = this.userService.getAllUserIDFullNameMap();
 
-		final List<UserDefinedField> userDefinedFields = daoFactory.getUserDefinedFieldDAO().getNameTypes(pageable);
+		final List<UserDefinedField> userDefinedFields = this.daoFactory.getUserDefinedFieldDAO().getNameTypes(pageable);
 		if(!userDefinedFields.isEmpty()){
 			return userDefinedFields.stream().map(
 				userDefinedField ->
@@ -79,7 +80,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
 	@Override
 	public long countAllNameTypes() {
-		return daoFactory.getUserDefinedFieldDAO().countAllNameTypes();
+		return this.daoFactory.getUserDefinedFieldDAO().countAllNameTypes();
 	}
 
 	@Override
@@ -124,6 +125,29 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 				return germplasmNameTypeDTO;
 			})
 			.collect(Collectors.toList());
+	}
+
+	@Override
+	public void updateNameType(final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO, final Integer nameTypeId) {
+		final UserDefinedField userDefinedField = this.daoFactory.getUserDefinedFieldDAO().getById(nameTypeId);
+
+		if (!StringUtils.isBlank(germplasmNameTypeRequestDTO.getCode())) {
+			userDefinedField.setFcode(germplasmNameTypeRequestDTO.getCode());
+		}
+		if (!StringUtils.isBlank(germplasmNameTypeRequestDTO.getName())) {
+			userDefinedField.setFname(germplasmNameTypeRequestDTO.getName());
+		}
+		if (!StringUtils.isBlank(germplasmNameTypeRequestDTO.getDescription())) {
+			userDefinedField.setFdesc(germplasmNameTypeRequestDTO.getDescription());
+		}
+
+		this.daoFactory.getUserDefinedFieldDAO().save(userDefinedField);
+	}
+
+	@Override
+	public void deleteNameType(final Integer nameTypeId) {
+		final UserDefinedField userDefinedField = this.daoFactory.getUserDefinedFieldDAO().getById(nameTypeId);
+		this.daoFactory.getUserDefinedFieldDAO().makeTransient(userDefinedField);
 	}
 
 }
