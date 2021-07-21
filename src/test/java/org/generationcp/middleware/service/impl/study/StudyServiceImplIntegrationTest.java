@@ -16,6 +16,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.StudyExternalReference;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -154,6 +155,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject newStudy = this.testDataInitializer
 			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
 				"20200101", "20201231");
+
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
@@ -204,6 +206,64 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		// Expecting environments of retrieved study to also be filtered by location
 		Assert.assertEquals(1, study1.getInstanceMetaData().size());
 		Assert.assertEquals(String.valueOf(location1), study1.getInstanceMetaData().get(0).getLocationDbId().toString());
+	}
+
+	@Test
+	public void testGetStudies_FilterByStudyExternalReference() {
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				"20200101", "20201231");
+		final StudyExternalReference studyExternalReference = this.testDataInitializer
+			.createStudyExternalReference(newStudy, RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10));
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		studySearchFilter.setExternalReferenceSource(studyExternalReference.getSource());
+		studySearchFilter.setExternalReferenceID(studyExternalReference.getReferenceId());
+
+		final List<StudySummary> studies =
+			this.studyService.getStudies(
+				studySearchFilter, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
+		Assert.assertEquals(1, studies.size());
+		final StudySummary study2 = studies.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), study2.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), study2.getName());
+	}
+
+	@Test
+	public void testCountStudies_FilterByStudyExternalReference() {
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				"20200101", "20201231");
+		final StudyExternalReference studyExternalReference = this.testDataInitializer
+			.createStudyExternalReference(newStudy, RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10));
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		studySearchFilter.setExternalReferenceSource(studyExternalReference.getSource());
+		studySearchFilter.setExternalReferenceID(studyExternalReference.getReferenceId());
+
+		Assert.assertEquals(1, this.studyService.countStudies(studySearchFilter));
 	}
 
 	@Test

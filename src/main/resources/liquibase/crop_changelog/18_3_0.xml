@@ -625,7 +625,7 @@
 				constraint uk_file_uuid
 					unique (file_uuid),
 				constraint fk_nd_experiment_nd_experiment_id
-					foreign key (nd_experiment_id) references ibdbv2_maize_merged.nd_experiment (nd_experiment_id)
+					foreign key (nd_experiment_id) references nd_experiment (nd_experiment_id)
 			);
 
 		</sql>
