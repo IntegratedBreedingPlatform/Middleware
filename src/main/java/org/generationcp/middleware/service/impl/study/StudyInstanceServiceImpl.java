@@ -374,7 +374,9 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 					final List<MeasurementVariable> measurementVariables = this.daoFactory.getGeolocationPropertyDao()
 						.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(
 							Collections.singletonList(instanceId), variableIds).get(instanceId);
-					environmentParameters.addAll(measurementVariables);
+					if (!CollectionUtils.isEmpty(measurementVariables)) {
+						environmentParameters.addAll(measurementVariables);
+					}
 				}
 
 				final List<MeasurementVariable> environmentVariables = new ArrayList<>(environmentConditions);

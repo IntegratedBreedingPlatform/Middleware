@@ -34,10 +34,12 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.pojos.GermplasmStudySourceType;
+import org.generationcp.middleware.pojos.InstanceExternalReference;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
+import org.generationcp.middleware.pojos.StudyExternalReference;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -128,6 +130,16 @@ public class IntegrationTestDataInitializer {
 		this.dmsProjectDao.save(dmsProject);
 		this.dmsProjectDao.refresh(dmsProject);
 		return dmsProject;
+	}
+
+	public StudyExternalReference createStudyExternalReference(final DmsProject study, final String referenceId,
+		final String referenceSource) {
+		final StudyExternalReference studyExternalReference = new StudyExternalReference();
+		studyExternalReference.setStudy(study);
+		studyExternalReference.setReferenceId(referenceId);
+		studyExternalReference.setSource(referenceSource);
+		this.daoFactory.getStudyExternalReferenceDAO().save(studyExternalReference);
+		return studyExternalReference;
 	}
 
 	public DmsProject createStudy(final String name, final String description, final int studyTypeId) {
@@ -334,6 +346,14 @@ public class IntegrationTestDataInitializer {
 		this.geolocationPropertyDao.save(geolocationProperty);
 		this.geolocationPropertyDao.refresh(geolocationProperty);
 
+	}
+
+	public void addInstanceExternalReferenceSource(final Geolocation geolocation, final String externalReferenceId, final String externalReferenceSource) {
+		final InstanceExternalReference instanceExternalReference = new InstanceExternalReference();
+		instanceExternalReference.setInstance(geolocation);
+		instanceExternalReference.setReferenceId(externalReferenceId);
+		instanceExternalReference.setSource(externalReferenceSource);
+		this.daoFactory.getStudyInstanceExternalReferenceDao().save(instanceExternalReference);
 	}
 
 	public void addExperimentProp(final ExperimentModel experimentModel, final int typeId, final String value, final int rank) {

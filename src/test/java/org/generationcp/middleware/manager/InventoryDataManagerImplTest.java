@@ -3,6 +3,7 @@ package org.generationcp.middleware.manager;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.util.uid.UIDGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -59,7 +60,7 @@ public class InventoryDataManagerImplTest {
 		final String lotId = lot.getLotUuId();
 		assertNotNull(lotId);
 		assertFalse(lotId.matches(UUID_REGEX));
-		assertEquals(this.crop.getPlotCodePrefix() + InventoryDataManagerImpl.MID_STRING, lotId.substring(0, CROP_PREFIX_LENGTH + 1));
+		assertEquals(this.crop.getPlotCodePrefix() + UIDGenerator.UID_ROOT.LOT.getRoot(), lotId.substring(0, CROP_PREFIX_LENGTH + 1));
 		final String suffix = lotId.substring(CROP_PREFIX_LENGTH + 1);
 		assertTrue(suffix.matches(SUFFIX_REGEX));
 	}

@@ -1777,6 +1777,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				Util.formatDateAsStringValue(studySearchFilter.getSearchDateRangeEnd(), Util.DATE_AS_NUMBER_FORMAT));
 		}
 
+		if (!StringUtils.isEmpty(studySearchFilter.getExternalReferenceSource())) {
+			sqlQuery.setParameter("referenceSource", studySearchFilter.getExternalReferenceSource());
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getExternalReferenceID())) {
+			sqlQuery.setParameter("referenceId", studySearchFilter.getExternalReferenceID());
+		}
+
 	}
 
 	private String createCountStudyInstanceQueryString(final StudySearchFilter studySearchFilter) {
@@ -1899,6 +1906,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("         LEFT JOIN workbench.persons wper ON wper.personid = wu.personid");
 		sql.append("         LEFT OUTER JOIN ");
 		sql.append("     cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value");
+		sql.append("         LEFT JOIN external_reference_instance er ON er.nd_geolocation_id = geoloc.nd_geolocation_id ");
 		sql.append(" WHERE ");
 		sql.append("     nde.type_id = " + TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId() + " ");
 		sql.append("     AND pmain.deleted = 0 ");//Exclude Deleted Studies
@@ -1922,6 +1930,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("         LEFT OUTER JOIN workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
 		sql.append("         LEFT JOIN workbench.users wu ON wu.userid = pmain.created_by ");
 		sql.append("         LEFT JOIN workbench.persons wper ON wper.personid = wu.personid ");
+		sql.append("         LEFT JOIN external_reference_study er ON er.study_id = pmain.project_id ");
 		sql.append(" WHERE pmain.deleted = 0 ");//Exclude Deleted Studies
 	}
 
@@ -1982,6 +1991,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 		} else if (studySearchFilter.getSearchDateRangeEnd() != null) {
 			sql.append(" AND :searchTrialDateEnd >= pmain.start_date");
+		}
+
+		if (!StringUtils.isEmpty(studySearchFilter.getExternalReferenceID())) {
+			sql.append(" AND er.reference_id = :referenceId ");
+		}
+		if (!StringUtils.isEmpty(studySearchFilter.getExternalReferenceSource())) {
+			sql.append(" AND er.reference_source = :referenceSource ");
 		}
 	}
 
