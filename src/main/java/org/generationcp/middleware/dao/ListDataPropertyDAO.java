@@ -93,4 +93,15 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 		query.setParameter("variableId", variableId);
 		return ((BigInteger) query.uniqueResult()).longValue() > 0;
 	}
+
+	public boolean isNameTypeInUse(final String nameType) {
+		try {
+			final String sql = "select count(1) from listdataprops ldp inner join cvterm cv on ldp.column_name = :nameType";
+			final Query query = this.getSession().createSQLQuery(sql);
+			query.setParameter("nameType", nameType);
+			return ((BigInteger) query.uniqueResult()).longValue() > 0;
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with isNameTypeInUse method for nameType : " + nameType + e.getMessage(), e);
+		}
+	}
 }
