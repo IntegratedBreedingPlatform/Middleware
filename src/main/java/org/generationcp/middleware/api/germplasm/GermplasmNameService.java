@@ -17,4 +17,6 @@ public interface GermplasmNameService {
 	Integer createName(GermplasmNameRequestDto germplasmNameRequestDto, Integer gid);
 
 	List<GermplasmNameDto> getGermplasmNamesByGids(List<Integer> gids);
+
+	List<Name> getGermplasmNamesByNameTypeId(Integer nameTypeId);
 }
