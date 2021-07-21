@@ -464,6 +464,20 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return returnList;
 	}
 
+	public List<Name> getNamesByNameTypeId(final Integer nameTypeId) {
+		List<Name> returnList = new ArrayList<>();
+			try {
+				final String sql = "SELECT {n.*}" + " FROM names n" + " WHERE n.ntype = :nameType";
+				final SQLQuery query = this.getSession().createSQLQuery(sql);
+				query.addEntity("n", Name.class);
+				query.setParameter("nameType", nameTypeId);
+				returnList = query.list();
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException("Error with getNamesByNameTypeId(nameTypeId=" + nameTypeId + "): " + e.getMessage(), e);
+			}
+		return returnList;
+	}
+
 	public List<GermplasmNameDto> getGermplasmNamesByGids(final List<Integer> gids) {
 		final StringBuilder queryBuilder =
 			new StringBuilder(SELECT_GERMPLASM_NAMES);
