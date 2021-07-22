@@ -4,6 +4,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.generationcp.middleware.pojos.AbstractEntity;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -63,6 +64,10 @@ public class FileMetadata extends AbstractEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "nd_experiment_id")
 	private ExperimentModel experimentModel;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "phenotype_id")
+	private Phenotype phenotype;
 
 	public Integer getFileId() {
 		return this.fileId;
@@ -166,6 +171,14 @@ public class FileMetadata extends AbstractEntity {
 
 	public void setExperimentModel(final ExperimentModel experimentModel) {
 		this.experimentModel = experimentModel;
+	}
+
+	public Phenotype getPhenotype() {
+		return this.phenotype;
+	}
+
+	public void setPhenotype(final Phenotype phenotype) {
+		this.phenotype = phenotype;
 	}
 
 	@Override
