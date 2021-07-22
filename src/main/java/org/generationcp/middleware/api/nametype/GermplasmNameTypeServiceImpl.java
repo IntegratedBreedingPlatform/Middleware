@@ -59,7 +59,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 		final UserDefinedField userDefinedField = new UserDefinedField();
 		userDefinedField.setFtable(UDTableType.NAMES_NAME.getTable());
 		userDefinedField.setFtype(UDTableType.NAMES_NAME.getType());
-		userDefinedField.setFcode(germplasmNameTypeRequestDTO.getCode().toUpperCase());
+		userDefinedField.setFcode(germplasmNameTypeRequestDTO.getCode());
 		userDefinedField.setFname(germplasmNameTypeRequestDTO.getName());
 		userDefinedField.setFfmt(GermplasmNameTypeServiceImpl.DEFAULT_FFMT_FIELD);
 		userDefinedField.setFdesc(germplasmNameTypeRequestDTO.getDescription());
