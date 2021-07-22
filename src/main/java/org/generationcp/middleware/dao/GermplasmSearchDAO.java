@@ -811,7 +811,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			// FIXME IBP-4320
 			+ "  FORCE INDEX (ims_lot_idx01)"  //
 			+ "  ON gl.eid = g.gid AND gl.etype = 'GERMPLSM' AND gl.status = 0 \n" //
-			+ " LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> 9 \n" //
+			" LEFT JOIN ims_transaction gt"  //
+			+ "  FORCE INDEX (ims_transaction_idx01) " //
+			+ "  ON gt.lotid = gl.lotid AND gt.trnstat <> 9 \n" //
 			+ " LEFT JOIN cvterm scale ON scale.cvterm_id = gl.scaleid \n" //
 			+ " LEFT JOIN methods m ON m.mid = g.methn \n" //
 			+ " LEFT JOIN location l ON l.locid = g.glocn \n" //
