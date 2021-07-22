@@ -1,0 +1,43 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="nahuel" id="v18.4.0-1" >
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="file_metadata" columnName="phenotype_id"/>
+			</not>
+		</preConditions>
+		<comment>Add fk to phenotype in file_metadata</comment>
+        <sql dbms="mysql" splitStatements="true">
+			alter table file_metadata
+				add phenotype_id int null;
+
+			alter table file_metadata
+				add constraint fk_file_metadata_phenotype_phenotype_id
+					foreign key (phenotype_id) references phenotype (phenotype_id);
+
+			# Intermediate solution to avoid having to drop the existing testing data created till now
+			# Completes existing file_metadata.phenotype_id fk whenever possible
+			# Some of the first phenotypes records created with filename may not even have a file_metadata record
+			# and those won't be fixed here
+			update file_metadata f1 inner join (
+				select f.file_id, p.phenotype_id
+				from phenotype p
+						 inner join file_metadata f on p.nd_experiment_id = f.nd_experiment_id
+					and f.name = p.value
+					# exclude scenarios of same file name and different variables (data should be fixed manually)
+				where not exists(
+					select 1
+					from phenotype p2
+					where p2.nd_experiment_id = f.nd_experiment_id and f.name = p.value
+					group by p2.value
+					having count(1) > 1)
+			) f2 on f1.file_id = f2.file_id
+			set f1.phenotype_id = f2.phenotype_id
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
