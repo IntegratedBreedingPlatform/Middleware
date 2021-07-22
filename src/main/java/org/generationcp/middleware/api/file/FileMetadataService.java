@@ -3,6 +3,8 @@ package org.generationcp.middleware.api.file;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
 
+import java.util.List;
+
 public interface FileMetadataService {
 
 	Image save(ImageNewRequest imageNewRequest);
@@ -18,4 +20,6 @@ public interface FileMetadataService {
 	void saveFilenameToObservation(FileMetadataDTO fileMetadataDTO);
 
 	String save(FileMetadataDTO fileMetadataDTO, String observationUnitId);
+
+	List<FileMetadataDTO> list(Integer observationId);
 }
