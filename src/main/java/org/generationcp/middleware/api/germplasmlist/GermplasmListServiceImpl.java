@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.constant.ColumnLabels;
@@ -413,14 +415,26 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest germplasmListSearchRequest,
+	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest request,
 		final Pageable pageable) {
-		return this.daoFactory.getGermplasmListDAO().searchGermplasmList(germplasmListSearchRequest, pageable);
+		return this.daoFactory.getGermplasmListDAO().searchGermplasmList(request, pageable);
 	}
 
 	@Override
-	public long countSearchGermplasmList(final GermplasmListSearchRequest germplasmSearchRequest) {
-		return this.daoFactory.getGermplasmListDAO().countSearchGermplasmList(germplasmSearchRequest);
+	public long countSearchGermplasmList(final GermplasmListSearchRequest request) {
+		return this.daoFactory.getGermplasmListDAO().countSearchGermplasmList(request);
+	}
+
+	@Override
+	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId,
+		final GermplasmListDataSearchRequest request,
+		final Pageable pageable) {
+		return this.daoFactory.getGermplasmListDataDAO().searchGermplasmListData(listId, request, pageable);
+	}
+
+	@Override
+	public long countSearchGermplasmListData(final Integer listId, final GermplasmListDataSearchRequest request) {
+		return this.daoFactory.getGermplasmListDataDAO().countSearchGermplasmListData(listId, request);
 	}
 
 	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {

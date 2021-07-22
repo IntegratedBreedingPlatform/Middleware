@@ -11,18 +11,16 @@
 
 package org.generationcp.middleware.dao.germplasmlist;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Preconditions;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -30,8 +28,14 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
+import org.springframework.data.domain.Pageable;
 
-import com.google.common.base.Preconditions;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link GermplasmListData}.
@@ -61,7 +65,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 	private static final String GERMPLASM_DELETED_COLUMN = GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS + ".deleted";
 
-	private static final Integer STATUS_DELETED = 9;
+	public static final Integer STATUS_DELETED = 9;
 	public static final Integer STATUS_ACTIVE = 0;
 	public static final String SOURCE_UNKNOWN = "Unknown";
 
@@ -290,4 +294,31 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		return (result != null && result.size() > 0 ? (GermplasmListData) result.get(0) : null);
 
 	}
+
+	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId,
+		final GermplasmListDataSearchRequest germplasmListDataSearchRequest, final Pageable pageable) {
+
+		final SQLQueryBuilder queryBuilder = GermplasmListDataSearchDAOQuery.getSelectQuery(germplasmListDataSearchRequest, pageable);
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		query.setParameter("listId", listId);
+		queryBuilder.addParamsToQuery(query);
+
+		query.addScalar(GermplasmListDataSearchDAOQuery.LIST_DATA_ID_ALIAS);
+		query.addScalar(GermplasmListDataSearchDAOQuery.ENTRY_NUMBER_ALIAS);
+		query.setResultTransformer(Transformers.aliasToBean(GermplasmListDataSearchResponse.class));
+
+		GenericDAO.addPaginationToSQLQuery(query, pageable);
+
+		return (List<GermplasmListDataSearchResponse>) query.list();
+	}
+
+	public long countSearchGermplasmListData(final Integer listId, final GermplasmListDataSearchRequest germplasmListDataSearchRequest) {
+		final SQLQueryBuilder queryBuilder = GermplasmListDataSearchDAOQuery.getCountQuery(germplasmListDataSearchRequest);
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		query.setParameter("listId", listId);
+		queryBuilder.addParamsToQuery(query);
+
+		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
 }

@@ -40,7 +40,7 @@ public class GermplasmListSearchDAOQuery {
 			this.value = value;
 		}
 
-		public static SortColumn getByValue(final String value) {
+		static SortColumn getByValue(final String value) {
 			return Arrays.stream(SortColumn.values())
 				.filter(e -> e.name().equals(value))
 				.findFirst()
@@ -88,7 +88,7 @@ public class GermplasmListSearchDAOQuery {
 		final String baseQuery = String.format(BASE_QUERY, SELECT_EXPRESSION, SELF_JOIN_QUERY + WORKBENCH_USER_JOIN_QUERY);
 		final SQLQueryBuilder sqlQueryBuilder = new SQLQueryBuilder(baseQuery);
 		addFilters(sqlQueryBuilder, request);
-		addOrder(sqlQueryBuilder, pageable);
+		DAOQueryUtils.addOrder(input -> SortColumn.getByValue(input).value, sqlQueryBuilder, pageable);
 		return sqlQueryBuilder;
 	}
 
@@ -165,19 +165,6 @@ public class GermplasmListSearchDAOQuery {
 			sqlQueryBuilder.setParameter("listDateTo", DATE_FORMAT.format(request.getListDateTo()));
 		}
 
-	}
-
-	private static String addOrder(final SQLQueryBuilder sqlQueryBuilder, final Pageable pageable) {
-		if (pageable != null && pageable.getSort() != null) {
-			final String orderClause = StreamSupport.stream(pageable.getSort().spliterator(), false)
-				.map(order -> String.format(" %s %s ", SortColumn.getByValue(order.getProperty()).value, order.getDirection()))
-				.collect(Collectors.joining(", "));
-			if (!StringUtils.isEmpty(orderClause)) {
-				sqlQueryBuilder.append(" ORDER BY ").append(orderClause);
-			}
-		}
-
-		return null;
 	}
 
 }
