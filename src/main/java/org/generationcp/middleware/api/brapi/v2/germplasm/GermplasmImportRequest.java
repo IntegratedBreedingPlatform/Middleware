@@ -8,6 +8,7 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,10 +33,12 @@ public class GermplasmImportRequest {
 	public static final String GENUS_NAME_TYPE = "GENUS";
 	public static final String PUI_NAME_TYPE = "PUI";
 	public static final String LNAME_NAME_TYPE = "LNAME";
-	public static final List<String> BRAPI_SPECIFIABLE_NAMETYPES = Arrays.asList(ACCNO_NAME_TYPE, PED_NAME_TYPE, GENUS_NAME_TYPE, LNAME_NAME_TYPE, PUI_NAME_TYPE);
+	public static final List<String> BRAPI_SPECIFIABLE_NAMETYPES = Collections
+		.unmodifiableList(Arrays.asList(ACCNO_NAME_TYPE, PED_NAME_TYPE, GENUS_NAME_TYPE, LNAME_NAME_TYPE, PUI_NAME_TYPE));
 	public static final List<String> BRAPI_SPECIFIABLE_ATTRTYPES =
-		Arrays.asList(CROPNM_ATTR, ORIGIN_ATTR, INSTCODE_ATTR, INSTNAME_ATTR, PLOTCODE_ATTR, SPECIES_ATTR, SPECIES_AUTH_ATTR, SUBTAX_ATTR,
-			SUBTAX_AUTH_ATTR);
+		Collections.unmodifiableList(Arrays
+			.asList(CROPNM_ATTR, ORIGIN_ATTR, INSTCODE_ATTR, INSTNAME_ATTR, PLOTCODE_ATTR, SPECIES_ATTR, SPECIES_AUTH_ATTR, SUBTAX_ATTR,
+				SUBTAX_AUTH_ATTR));
 
 	private String accessionNumber;
 	private String acquisitionDate;

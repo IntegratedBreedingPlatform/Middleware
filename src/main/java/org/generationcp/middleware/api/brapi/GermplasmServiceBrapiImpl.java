@@ -429,13 +429,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 	}
 
 	private void enforcePUIUniqueness(final List<GermplasmImportRequest> germplasmImportRequestList) {
-		final List<String> puisList = new ArrayList<>();
-		germplasmImportRequestList.forEach(i -> {
-			if (!StringUtils.isEmpty(i.getGermplasmPUI())) {
-				puisList.add(i.getGermplasmPUI());
-			}
-			puisList.addAll(i.getSynonyms().stream().filter(s-> GermplasmImportRequest.PUI_NAME_TYPE.equalsIgnoreCase(s.getType())).map(Synonym::getSynonym).collect(Collectors.toList()));
-		});
+		final List<String> puisList = germplasmImportRequestList.stream().map(GermplasmImportRequest::collectGermplasmPUIs).flatMap(List::stream).collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(puisList)) {
 			final List<String> existingGermplasmPUIs = this.daoFactory.getNameDao().getExistingGermplasmPUIs(puisList);
 			if (!CollectionUtils.isEmpty(existingGermplasmPUIs)) {
