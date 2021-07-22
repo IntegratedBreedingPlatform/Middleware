@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.file.FileMetadata;
@@ -66,33 +65,31 @@ public class FileMetadataMapper {
 		return image;
 	}
 
-	public FileMetadataDTO mapToDTO(final FileMetadata fileMetadata) {
-		final FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
-		fileMetadataDTO.setCopyright(fileMetadata.getCopyright());
-		fileMetadataDTO.setName(fileMetadata.getName());
-		fileMetadataDTO.setDescription(fileMetadata.getDescription());
-		fileMetadataDTO.setFileTimestamp(fileMetadata.getFileTimestamp());
-		fileMetadataDTO.setImageHeight(fileMetadata.getImageHeight());
-		fileMetadataDTO.setImageWidth(fileMetadata.getImageWidth());
-		fileMetadataDTO.setMimeType(fileMetadata.getMimeType());
-		fileMetadataDTO.setPath(fileMetadata.getPath());
-		fileMetadataDTO.setSize(fileMetadata.getSize());
-		final ExperimentModel experimentModel = fileMetadata.getExperimentModel();
+	public void map(final FileMetadata from, final FileMetadataDTO to) {
+		to.setCopyright(from.getCopyright());
+		to.setName(from.getName());
+		to.setDescription(from.getDescription());
+		to.setFileTimestamp(from.getFileTimestamp());
+		to.setImageHeight(from.getImageHeight());
+		to.setImageWidth(from.getImageWidth());
+		to.setMimeType(from.getMimeType());
+		to.setPath(from.getPath());
+		to.setSize(from.getSize());
+		final ExperimentModel experimentModel = from.getExperimentModel();
 		if (experimentModel != null) {
-			fileMetadataDTO.setObservationUnitId(experimentModel.getObsUnitId());
-			fileMetadataDTO.setNdExperimentId(experimentModel.getNdExperimentId());
+			to.setObservationUnitId(experimentModel.getObsUnitId());
+			to.setNdExperimentId(experimentModel.getNdExperimentId());
 		}
 
 		final ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			fileMetadataDTO.setImageLocation(objectMapper.readValue(fileMetadata.getImageLocation(), HashMap.class));
+			to.setImageLocation(objectMapper.readValue(from.getImageLocation(), HashMap.class));
 		} catch (final IOException e) {
 			throw new MiddlewareRequestException("", "filemetadata.brapi.location.parse.error");
 		}
 
-		fileMetadataDTO.setFileUUID(fileMetadata.getFileUUID());
-		fileMetadataDTO.setFileId(fileMetadata.getFileId());
-		return fileMetadataDTO;
+		to.setFileUUID(from.getFileUUID());
+		to.setFileId(from.getFileId());
 	}
 
 	public Image map(final FileMetadataDTO dto) {
@@ -119,6 +116,7 @@ public class FileMetadataMapper {
 		to.setImageHeight(from.getImageHeight());
 		to.setImageWidth(from.getImageWidth());
 		to.setMimeType(from.getMimeType());
+		to.setPath(from.getPath());
 		to.setSize(from.getSize());
 
 		final ObjectMapper objectMapper = new ObjectMapper();

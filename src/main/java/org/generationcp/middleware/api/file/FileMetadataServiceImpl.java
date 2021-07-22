@@ -27,7 +27,6 @@ import java.util.List;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Transactional
@@ -114,7 +113,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 			throw new MiddlewareRequestException("", "filemetadata.record.not.found", new String[] {"fileUUID=" + fileUUID});
 		}
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
-		return fileMetadataMapper.mapToDTO(fileMetadata);
+		final FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
+		fileMetadataMapper.map(fileMetadata, fileMetadataDTO);
+		return fileMetadataDTO;
 	}
 
 	/**
