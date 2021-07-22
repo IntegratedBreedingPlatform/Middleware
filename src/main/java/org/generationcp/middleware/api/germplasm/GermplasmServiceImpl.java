@@ -567,7 +567,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			// Prevent update if the germplasm has existing pedigree tree.
 			conflictErrors.put("germplasm.update.germplasm.has.progeny.error", new String[] {
 				String.valueOf(germplasm.getGid())});
-			
+
 		} else if (femaleParentGid != null && maleParentGid != null) {
 			final String femaleParentGidString = String.valueOf(femaleParentGid);
 			final String maleParentGidString = String.valueOf(maleParentGid);
@@ -580,7 +580,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void saveOrUpdateReference(final Germplasm germplasm, final Optional<String> referenceOptional) {
-		if (referenceOptional.isPresent()) {
+		if (referenceOptional.isPresent() && !referenceOptional.get().isEmpty()) {
 			if (germplasm.getBibref() != null) {
 				final Bibref bibref = germplasm.getBibref();
 				bibref.setAnalyt(referenceOptional.get());
