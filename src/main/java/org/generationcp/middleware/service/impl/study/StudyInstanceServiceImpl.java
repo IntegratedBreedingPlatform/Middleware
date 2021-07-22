@@ -345,7 +345,6 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 				final List<UserDto> users = new ArrayList<>();
 				users.addAll(this.getUsersForEnvironment(studyMetadata.getStudyDbId()));
-				users.addAll(this.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
 				studyDetailsDto.setContacts(users);
 
 				final DmsProject environmentDataset =
@@ -941,14 +940,6 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 	public List<UserDto> getUsersForEnvironment(final Integer instanceId) {
 		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToEnvironment(instanceId);
-		if (!CollectionUtils.isEmpty(personIds)) {
-			return this.userService.getUsersByPersonIds(personIds);
-		}
-		return Collections.emptyList();
-	}
-
-	public List<UserDto> getUsersAssociatedToStudy(final Integer studyId) {
-		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToStudy(studyId);
 		if (!CollectionUtils.isEmpty(personIds)) {
 			return this.userService.getUsersByPersonIds(personIds);
 		}

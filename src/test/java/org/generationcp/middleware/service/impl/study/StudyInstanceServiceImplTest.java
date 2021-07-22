@@ -176,13 +176,15 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
 		this.testDataInitializer
+			.addGeolocationProp(geolocation, TermId.COOPERATOOR_ID.getId(), String.valueOf(user.getPerson().getId()), 1);
+		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
 		this.testDataInitializer
 			.addProjectProp(this.study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, String.valueOf(user.getPerson().getId()), 6);
 
 		final StudyDetailsDto studyDetailsDto = this.studyInstanceService.getStudyDetailsByInstance(geolocation.getLocationId());
 
-		assertFalse(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
+		Assert.assertEquals(1, studyDetailsDto.getContacts().size());
 		Assert.assertEquals(user.getUserid(), studyDetailsDto.getContacts().get(0).getUserId());
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
