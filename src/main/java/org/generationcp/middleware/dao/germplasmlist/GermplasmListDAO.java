@@ -42,6 +42,7 @@ import org.hibernate.criterion.Subqueries;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.BooleanType;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -146,10 +147,10 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT l.listid AS listId, ");
 			queryString.append("l.listname AS listName, ");
-			queryString.append("STR_TO_DATE (convert(l.listdate,char), '%Y%m%d') AS1  creationDate, ");
+			queryString.append("STR_TO_DATE (convert(l.listdate,char), '%Y%m%d') AS  creationDate, ");
 			queryString.append("l.listdesc AS description, ");
 			queryString.append("l.program_uuid AS programUUID, ");
-			queryString.append("IF (l.liststatus = " + GermplasmList.Status.LOCKED_LIST.getCode() + ", 'LOCKED', 'UNLOCKED') AS status ");
+			queryString.append("IF (l.liststatus = " + GermplasmList.Status.LOCKED_LIST.getCode() + ", true, false) AS locked ");
 			queryString.append("FROM listnms l ");
 			queryString.append("INNER JOIN listdata ld ON ld.listid = l.listid ");
 			queryString.append("WHERE ld.gid = :gid AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED);
@@ -160,7 +161,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			sqlQuery.addScalar("creationDate");
 			sqlQuery.addScalar("description");
 			sqlQuery.addScalar("programUUID");
-			sqlQuery.addScalar("status");
+			sqlQuery.addScalar("locked", BooleanType.INSTANCE);
 			sqlQuery.setParameter("gid", gid);
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmListDto.class));
 			return sqlQuery.list();
@@ -811,7 +812,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		query.addScalar(GermplasmListSearchDAOQuery.LIST_OWNER_ALIAS);
 		query.addScalar(GermplasmListSearchDAOQuery.LIST_TYPE_ALIAS);
 		query.addScalar(GermplasmListSearchDAOQuery.NUMBER_OF_ENTRIES_ALIAS, IntegerType.INSTANCE);
-		query.addScalar(GermplasmListSearchDAOQuery.STATUS_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.LOCKED_ALIAS, BooleanType.INSTANCE);
 		query.addScalar(GermplasmListSearchDAOQuery.NOTES_ALIAS);
 		query.addScalar(GermplasmListSearchDAOQuery.CREATION_DATE_ALIAS);
 		query.setResultTransformer(Transformers.aliasToBean(GermplasmListSearchResponse.class));

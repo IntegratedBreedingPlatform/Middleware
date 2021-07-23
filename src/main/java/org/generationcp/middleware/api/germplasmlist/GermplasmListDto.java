@@ -13,7 +13,7 @@ public class GermplasmListDto {
 	private Date creationDate;
 	private String description;
 	private String programUUID;
-	private String status;
+	private boolean locked;
 
 	public GermplasmListDto() {
 
@@ -59,12 +59,12 @@ public class GermplasmListDto {
 		this.programUUID = programUUID;
 	}
 
-	public String getStatus() {
-		return status;
+	public boolean isLocked() {
+		return locked;
 	}
 
-	public void setStatus(final String status) {
-		this.status = status;
+	public void setLocked(final boolean locked) {
+		this.locked = locked;
 	}
 
 	@Override

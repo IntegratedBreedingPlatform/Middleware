@@ -28,7 +28,7 @@ public class GermplasmListSearchDAOQuery {
 		LIST_OWNER(LIST_OWNER_ALIAS),
 		LIST_TYPE(LIST_TYPE_ALIAS),
 		NUMBER_OF_ENTRIES(NUMBER_OF_ENTRIES_ALIAS),
-		STATUS(STATUS_ALIAS),
+		LOCKED(LOCKED_ALIAS),
 		NOTES(NOTES_ALIAS),
 		CREATION_DATE(CREATION_DATE_ALIAS);
 
@@ -55,7 +55,7 @@ public class GermplasmListSearchDAOQuery {
 	static final String LIST_OWNER_ALIAS = "listOwner";
 	static final String LIST_TYPE_ALIAS = "listType";
 	static final String NUMBER_OF_ENTRIES_ALIAS = "numberOfEntries";
-	static final String STATUS_ALIAS = "status";
+	static final String LOCKED_ALIAS = "locked";
 	static final String NOTES_ALIAS = "notes";
 	static final String CREATION_DATE_ALIAS = "creationDate";
 	static final String PROGRAM_UUID_ALIAS = "programUUID";
@@ -74,7 +74,7 @@ public class GermplasmListSearchDAOQuery {
 		+ " user.uname AS " + LIST_OWNER_ALIAS + ", "
 		+ " list.listtype AS " + LIST_TYPE_ALIAS + ", "
 		+ " (SELECT count(1) FROM listdata l WHERE l.listid = list.listid) AS " + NUMBER_OF_ENTRIES_ALIAS + ", "
-		+ " IF (list.liststatus = " + GermplasmList.Status.LOCKED_LIST.getCode() + ", 'LOCKED', 'UNLOCKED') AS " + STATUS_ALIAS + ", "
+		+ " IF (list.liststatus = " + GermplasmList.Status.LOCKED_LIST.getCode() + ", true, false) AS " + LOCKED_ALIAS + ", "
 		+ " list.notes AS " + NOTES_ALIAS + ", "
 		+ " STR_TO_DATE (convert(list.listdate,char), '%Y%m%d') AS " + CREATION_DATE_ALIAS + ", "
 		+ " list.program_uuid AS " + PROGRAM_UUID_ALIAS;

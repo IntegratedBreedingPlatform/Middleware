@@ -46,6 +46,7 @@ import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 
 public class GermplasmListDAOTest extends IntegrationTestBase {
@@ -328,7 +329,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		assertThat(germplasmListSearchResponse.getListOwner(), is(ADMIN_NAME));
 		assertThat(germplasmListSearchResponse.getListType(), is(list.getType()));
 		assertThat(germplasmListSearchResponse.getNumberOfEntries(), is(2));
-		assertThat(germplasmListSearchResponse.getStatus(), is("UNLOCKED"));
+		assertFalse(germplasmListSearchResponse.isLocked());
 		assertThat(germplasmListSearchResponse.getNotes(), is(list.getNotes()));
 		assertThat(germplasmListSearchResponse.getCreationDate(), is(this.convertLongToDate(list.getDate())));
 	}
@@ -624,7 +625,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void getAndCountSearchGermplasmList_filterAndSortByStatus() {
+	public void getAndCountSearchGermplasmList_filterAndSortByLocked() {
 		// Create a parent folder
 		final GermplasmList parentFolder = this.createFolder();
 
@@ -671,19 +672,19 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		germplasmListSearchRequest3.setParentFolderName(PARENT_FOLDER_NAME);
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest3), is(2L));
 
-		final Pageable pageRequest1 = this.createPageRequest(Sort.Direction.ASC, "STATUS");
+		final Pageable pageRequest1 = this.createPageRequest(Sort.Direction.ASC, "LOCKED");
 		final List<GermplasmListSearchResponse> response3 =
 			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest3, pageRequest1);
 		assertThat(response3, hasSize(2));
-		assertThat(response3.get(0).getListId(), is(list1.getId()));
-		assertThat(response3.get(1).getListId(), is(list2.getId()));
+		assertThat(response3.get(0).getListId(), is(list2.getId()));
+		assertThat(response3.get(1).getListId(), is(list1.getId()));
 
-		final Pageable pageRequest2 = this.createPageRequest(Sort.Direction.DESC, "STATUS");
+		final Pageable pageRequest2 = this.createPageRequest(Sort.Direction.DESC, "LOCKED");
 		final List<GermplasmListSearchResponse> response4 =
 			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest3, pageRequest2);
 		assertThat(response4, hasSize(2));
-		assertThat(response4.get(0).getListId(), is(list2.getId()));
-		assertThat(response4.get(1).getListId(), is(list1.getId()));
+		assertThat(response4.get(0).getListId(), is(list1.getId()));
+		assertThat(response4.get(1).getListId(), is(list2.getId()));
 
 	}
 
