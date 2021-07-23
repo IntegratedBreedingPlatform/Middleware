@@ -13,8 +13,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 public class GermplasmListSearchDAOQuery {
 
@@ -32,7 +30,7 @@ public class GermplasmListSearchDAOQuery {
 		NUMBER_OF_ENTRIES(NUMBER_OF_ENTRIES_ALIAS),
 		STATUS(STATUS_ALIAS),
 		NOTES(NOTES_ALIAS),
-		LIST_DATE(LIST_DATE_ALIAS);
+		CREATION_DATE(CREATION_DATE_ALIAS);
 
 		private String value;
 
@@ -59,7 +57,8 @@ public class GermplasmListSearchDAOQuery {
 	static final String NUMBER_OF_ENTRIES_ALIAS = "numberOfEntries";
 	static final String STATUS_ALIAS = "status";
 	static final String NOTES_ALIAS = "notes";
-	static final String LIST_DATE_ALIAS = "listDate";
+	static final String CREATION_DATE_ALIAS = "creationDate";
+	static final String PROGRAM_UUID_ALIAS = "programUUID";
 
 	private final static String BASE_QUERY = "SELECT %s " // usage of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ " FROM listnms list "
@@ -77,7 +76,10 @@ public class GermplasmListSearchDAOQuery {
 		+ " (SELECT count(1) FROM listdata l WHERE l.listid = list.listid) AS " + NUMBER_OF_ENTRIES_ALIAS + ", "
 		+ " IF (list.liststatus = " + GermplasmList.Status.LOCKED_LIST.getCode() + ", 'LOCKED', 'UNLOCKED') AS " + STATUS_ALIAS + ", "
 		+ " list.notes AS " + NOTES_ALIAS + ", "
-		+ " STR_TO_DATE (convert(list.listdate,char), '%Y%m%d') AS " + LIST_DATE_ALIAS;
+		+ " CAST(list.listdate AS CHAR(255)) AS " + CREATION_DATE_ALIAS + ", "
+		// TODO: we need to validate if we return this field as Date
+//		+ " STR_TO_DATE (convert(list.listdate,char), '%Y%m%d') AS " + CREATION_DATE_ALIAS + ", "
+		+ " list.program_uuid AS " + PROGRAM_UUID_ALIAS;
 
 	private final static String SELF_JOIN_QUERY = " LEFT JOIN listnms inn ON list.lhierarchy = inn.listid ";
 	private final static String WORKBENCH_USER_JOIN_QUERY = " INNER JOIN workbench.users user ON user.userid = list.listuid ";

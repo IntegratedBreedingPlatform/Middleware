@@ -68,8 +68,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	private static final String STATUS = "status";
 
+	// TODO: instead use GermplasmList.Status
+	@Deprecated
 	public static final Integer STATUS_DELETED = 9;
 
+	// TODO: instead use GermplasmList.Status
+	@Deprecated
 	static final Integer LOCKED_LIST_STATUS = 101;
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDAO.class);
@@ -144,7 +148,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			queryString.append("l.listname AS listName, ");
 			queryString.append("CAST(l.listdate AS CHAR(255)) AS creationDate, ");
 			queryString.append("l.listdesc AS description, ");
-			queryString.append("l.program_uuid AS programUUID ");
+			queryString.append("l.program_uuid AS programUUID, ");
+			queryString.append("IF (l.liststatus = " + GermplasmList.Status.LOCKED_LIST.getCode() + ", 'LOCKED', 'UNLOCKED') AS status ");
 			queryString.append("FROM listnms l ");
 			queryString.append("INNER JOIN listdata ld ON ld.listid = l.listid ");
 			queryString.append("WHERE ld.gid = :gid AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED);
@@ -155,6 +160,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			sqlQuery.addScalar("creationDate");
 			sqlQuery.addScalar("description");
 			sqlQuery.addScalar("programUUID");
+			sqlQuery.addScalar("status");
 			sqlQuery.setParameter("gid", gid);
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmListDto.class));
 			return sqlQuery.list();
@@ -807,7 +813,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		query.addScalar(GermplasmListSearchDAOQuery.NUMBER_OF_ENTRIES_ALIAS, IntegerType.INSTANCE);
 		query.addScalar(GermplasmListSearchDAOQuery.STATUS_ALIAS);
 		query.addScalar(GermplasmListSearchDAOQuery.NOTES_ALIAS);
-		query.addScalar(GermplasmListSearchDAOQuery.LIST_DATE_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.CREATION_DATE_ALIAS);
 		query.setResultTransformer(Transformers.aliasToBean(GermplasmListSearchResponse.class));
 
 		GenericDAO.addPaginationToSQLQuery(query, pageable);

@@ -40,6 +40,7 @@ public class GermplasmList implements Serializable {
 	public static final String DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY = "deleteGermplasmListByListIdPhysically";
 	public static final String GERMPLASM_LIST_LIST_ID_COLUMN = "listid";
 
+	// TODO: move out of this class
 	// TODO db: use proper bit-value?
 	public enum Status {
 		LIST(1), // 0001

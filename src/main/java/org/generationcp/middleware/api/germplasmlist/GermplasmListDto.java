@@ -7,14 +7,11 @@ import org.pojomatic.annotations.AutoProperty;
 public class GermplasmListDto {
 
 	private Integer listId;
-
 	private String listName;
-
 	private String creationDate;
-
 	private String description;
-
 	private String programUUID;
+	private String status;
 
 	public GermplasmListDto() {
 
@@ -58,6 +55,14 @@ public class GermplasmListDto {
 
 	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(final String status) {
+		this.status = status;
 	}
 
 	@Override
