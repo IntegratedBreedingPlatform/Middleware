@@ -33,22 +33,36 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
 public class GermplasmListDAOTest extends IntegrationTestBase {
+
+	private static final String TEST_GERMPLASM_LIST_NAME = "TestGermplasmListName";
+	private static final String TEST_GERMPLASM_LIST_DESC = "TestGermplasmListDesc";
+	private static final long TEST_GERMPLASM_LIST_DATE = 20141103;
+	private static final String TEST_GERMPLASM_LIST_TYPE_LST = "LST";
+	private static final String TEST_GERMPLASM_LIST_TYPE_FOLDER = "FOLDER";
+	private static final String TEST_LIST_DESCRIPTION = "Test List Description";
+	private static final String TEST_LIST_NOTES = "Test List Notes";
+	private static final String PARENT_FOLDER_NAME = "Integration Test";
+
+	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
+	private static final List<String> EXCLUDED_GERMPLASM_LIST_TYPES = new ArrayList<>();
+	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 	@Autowired
 	private GermplasmListManager manager;
@@ -67,17 +81,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	private GermplasmListDAO germplasmListDAO;
 	private GermplasmListDataDAO germplasmListDataDAO;
-
-	private static final String TEST_GERMPLASM_LIST_NAME = "TestGermplasmListName";
-	private static final String TEST_GERMPLASM_LIST_DESC = "TestGermplasmListDesc";
-	private static final long TEST_GERMPLASM_LIST_DATE = 20141103;
-	private static final String TEST_GERMPLASM_LIST_TYPE_LST = "LST";
-	private static final String TEST_GERMPLASM_LIST_TYPE_FOLDER = "FOLDER";
-	private static final String TEST_LIST_DESCRIPTION = "Test List Description";
-	private static final String TEST_LIST_NOTES = "Test List Notes";
-
-	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
-	private static final List<String> EXCLUDED_GERMPLASM_LIST_TYPES = new ArrayList<>();
 
 	private GermplasmList list;
 	private Germplasm germplasm;
@@ -289,16 +292,12 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void getAndCountSearchGermplasmList_norFiltersOrSortApplied() {
+	public void getAndCountSearchGermplasmList_OK() {
 		final Germplasm germplasm1 = this.createGermplasm();
 		final Germplasm germplasm2 = this.createGermplasm();
 
-		// Create a folder
-		final GermplasmList parentFolder = this.saveGermplasmList(
-			GermplasmListTestDataInitializer.createGermplasmListTestData("Parent Folder", TEST_LIST_DESCRIPTION,
-				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
-				this.findAdminUser(), GermplasmList.Status.FOLDER.getCode(), PROGRAM_UUID,
-				null));
+		// Create a parent folder
+		final GermplasmList parentFolder = this.createFolder();
 
 		// Create a list with two entries and a parent folder
 		final GermplasmList list = this.saveGermplasmList(
@@ -313,17 +312,10 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("TestList2", TEST_LIST_DESCRIPTION,
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
-				this.findAdminUser(), GermplasmList.Status.DELETED.getCode(), PROGRAM_UUID,
-				null));
-
-		// Create a list in another program
-		this.saveGermplasmList(
-			GermplasmListTestDataInitializer.createGermplasmListTestData("TestList3", TEST_LIST_DESCRIPTION,
-				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
-				this.findAdminUser(), GermplasmList.Status.LIST.getCode(), UUID.randomUUID().toString(),
-				null));
+				this.findAdminUser(), GermplasmList.Status.DELETED.getCode(), PROGRAM_UUID, null, parentFolder, null));
 
 		final GermplasmListSearchRequest germplasmListSearchRequest = new GermplasmListSearchRequest();
+		germplasmListSearchRequest.setParentFolderName(PARENT_FOLDER_NAME);
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest), is(1L));
 
 		final List<GermplasmListSearchResponse> response =
@@ -339,25 +331,29 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		assertThat(germplasmListSearchResponse.getNumberOfEntries(), is(2));
 		assertThat(germplasmListSearchResponse.getStatus(), is("UNLOCKED"));
 		assertThat(germplasmListSearchResponse.getNotes(), is(list.getNotes()));
-		assertThat(germplasmListSearchResponse.getListDate(), is(String.valueOf(list.getDate())));
+		assertThat(germplasmListSearchResponse.getListDate(), is(this.convertLongToDate(list.getDate())));
 	}
 
 	@Test
 	public void getAndCountSearchGermplasmList_filterAndSortByListName() {
+		// Create a parent folder
+		final GermplasmList parentFolder = this.createFolder();
+
 		final GermplasmList list1 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 1", TEST_LIST_DESCRIPTION,
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.LIST.getCode(), PROGRAM_UUID,
-				null, null, TEST_LIST_NOTES));
+				null, parentFolder, TEST_LIST_NOTES));
 
 		final GermplasmList list2 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("This is a new list", TEST_LIST_DESCRIPTION,
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.LIST.getCode(), PROGRAM_UUID,
-				null, null, TEST_LIST_NOTES));
+				null, parentFolder, TEST_LIST_NOTES));
 
 		// Filter by name with exact match
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest1.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest1.setListNameFilter(this.createSQLTextFilter("New List 1", SqlTextFilter.Type.EXACTMATCH));
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(1L));
@@ -369,6 +365,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Filter by name containing
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest2.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest2.setListNameFilter(this.createSQLTextFilter("new list", SqlTextFilter.Type.CONTAINS));
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(2L));
@@ -391,6 +388,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Filter by name starts with
 		final GermplasmListSearchRequest germplasmListSearchRequest4 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest4.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest4.setListNameFilter(this.createSQLTextFilter("new", SqlTextFilter.Type.STARTSWITH));
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest4), is(1L));
@@ -402,6 +400,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Filter by name ends with
 		final GermplasmListSearchRequest germplasmListSearchRequest5 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest5.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest5.setListNameFilter(this.createSQLTextFilter("list", SqlTextFilter.Type.ENDSWITH));
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest5), is(1L));
@@ -422,19 +421,22 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void getAndCountSearchGermplasmList_filterAndSortByParentFolderName() {
+		// Create a parent folder
+		final GermplasmList parentFolder = this.createFolder();
+
 		// Create a folder
 		final GermplasmList parentFolder1 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("This is a parent Folder", TEST_LIST_DESCRIPTION,
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.FOLDER.getCode(), PROGRAM_UUID,
-				null));
+				null, parentFolder, null));
 
 		// Create a folder
 		final GermplasmList parentFolder2 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("Parent Folder", TEST_LIST_DESCRIPTION,
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.FOLDER.getCode(), PROGRAM_UUID,
-				null));
+				null, parentFolder, null));
 
 		//Create list using parentFolder1
 		final GermplasmList list1 = this.saveGermplasmList(
@@ -452,6 +454,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Filter by parent folder name
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest1.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest1.setParentFolderName("is a parent");
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(1L));
@@ -463,6 +466,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Filter by parent folder name
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest2.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest2.setParentFolderName("parent folder");
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(2L));
@@ -492,20 +496,24 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void getAndCountSearchGermplasmList_filterAndSortByDescription() {
+		// Create a parent folder
+		final GermplasmList parentFolder = this.createFolder();
+
 		final GermplasmList list1 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 1", "Description 1",
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.LIST.getCode(), PROGRAM_UUID,
-				null, null, TEST_LIST_NOTES));
+				null, parentFolder, TEST_LIST_NOTES));
 
 		final GermplasmList list2 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 2", "Some description",
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.LIST.getCode(), PROGRAM_UUID,
-				null, null, TEST_LIST_NOTES));
+				null, parentFolder, TEST_LIST_NOTES));
 
 		// Filter by description
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest1.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest1.setDescription("description");
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(2L));
@@ -526,6 +534,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Filter by description
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest2.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest2.setOwnerName("other");
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(0L));
@@ -535,14 +544,18 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void getAndCountSearchGermplasmList_filterByOwnerFolderName() {
+		// Create a parent folder
+		final GermplasmList parentFolder = this.createFolder();
+
 		final GermplasmList list1 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 1", TEST_LIST_DESCRIPTION,
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.LIST.getCode(), PROGRAM_UUID,
-				null, null, TEST_LIST_NOTES));
+				null, parentFolder, TEST_LIST_NOTES));
 
 		// Filter by owner name
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest1.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest1.setOwnerName("min");
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(1L));
@@ -554,6 +567,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Filter by owner name
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest2.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest2.setOwnerName("other");
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(0L));
@@ -563,21 +577,25 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void getAndCountSearchGermplasmList_filterAndSortByListTypeIds() {
+		// Create a parent folder
+		final GermplasmList parentFolder = this.createFolder();
+
 		//Create a list
 		final GermplasmList list1 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 1", TEST_LIST_DESCRIPTION,
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.LOCKED_LIST.getCode(), PROGRAM_UUID,
-				null, null, TEST_LIST_NOTES));
+				null, parentFolder, TEST_LIST_NOTES));
 
 		final GermplasmList list2 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 1", TEST_LIST_DESCRIPTION,
 				TEST_GERMPLASM_LIST_DATE, "HARVEST",
 				this.findAdminUser(), GermplasmList.Status.LOCKED_LIST.getCode(), PROGRAM_UUID,
-				null, null, TEST_LIST_NOTES));
+				null, parentFolder, TEST_LIST_NOTES));
 
 		// Filter by list type
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest1.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest1.setListTypes(Arrays.asList(TEST_GERMPLASM_LIST_TYPE_LST, "HARVEST"));
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(2L));
@@ -598,6 +616,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Filter by list type
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest2.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest2.setListTypes(Arrays.asList("other"));
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(0L));
@@ -607,22 +626,26 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void getAndCountSearchGermplasmList_filterAndSortByStatus() {
+		// Create a parent folder
+		final GermplasmList parentFolder = this.createFolder();
+
 		//Create a locked list
 		final GermplasmList list1 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 1", TEST_LIST_DESCRIPTION,
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.LOCKED_LIST.getCode(), PROGRAM_UUID,
-				null, null, TEST_LIST_NOTES));
+				null, parentFolder, TEST_LIST_NOTES));
 
 		//Create an unlocked list
 		final GermplasmList list2 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 3", TEST_LIST_DESCRIPTION,
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.LIST.getCode(), PROGRAM_UUID,
-				null, null, TEST_LIST_NOTES));
+				null, parentFolder, TEST_LIST_NOTES));
 
 		// Filter by locked list
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest1.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest1.setLocked(true);
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(1L));
@@ -634,6 +657,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Filter by unlocked list
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest2.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest2.setLocked(false);
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(1L));
@@ -645,6 +669,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Sort by status
 		final GermplasmListSearchRequest germplasmListSearchRequest3 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest3.setParentFolderName(PARENT_FOLDER_NAME);
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest3), is(2L));
 
 		final Pageable pageRequest1 = this.createPageRequest(Sort.Direction.ASC, "STATUS");
@@ -665,20 +690,24 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void getAndCountSearchGermplasmList_filterAndSortByNotes() {
+		// Create a parent folder
+		final GermplasmList parentFolder = this.createFolder();
+
 		final GermplasmList list1 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 1", TEST_LIST_DESCRIPTION,
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.LIST.getCode(), PROGRAM_UUID,
-				null, null, "this is a new note"));
+				null, parentFolder, "this is a new note"));
 
 		final GermplasmList list2 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 1", TEST_LIST_DESCRIPTION,
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.LIST.getCode(), PROGRAM_UUID,
-				null, null, "New note 2"));
+				null, parentFolder, "New note 2"));
 
 		// Filter by notes
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest1.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest1.setNotes("new");
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(2L));
@@ -699,6 +728,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Filter by notes
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest2.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest2.setOwnerName("other");
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(0L));
@@ -708,14 +738,18 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void getAndCountSearchGermplasmList_filterAndSortByDate() {
+		// Create a parent folder
+		final GermplasmList parentFolder = this.createFolder();
+
 		final GermplasmList list1 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 1", TEST_LIST_DESCRIPTION,
 				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.LIST.getCode(), PROGRAM_UUID,
-				null, null, "this is a new note"));
+				null, parentFolder, "this is a new note"));
 
 		// Filter by only date from
 		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest1.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest1.setListDateFrom(Date.from(LocalDate.of(2014, 11, 3).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(1L));
@@ -727,6 +761,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Filter by only date from
 		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest2.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest2.setListDateFrom(Date.from(LocalDate.of(2014, 11, 4).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(0L));
@@ -735,6 +770,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Filter by only date to
 		final GermplasmListSearchRequest germplasmListSearchRequest3 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest3.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest3.setListDateTo(Date.from(LocalDate.of(2014, 11, 3).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest3), is(1L));
@@ -746,6 +782,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		// Filter by only date to
 		final GermplasmListSearchRequest germplasmListSearchRequest4 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest4.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest4.setListDateTo(Date.from(LocalDate.of(2014, 11, 2).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
 		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest4), is(0L));
@@ -757,10 +794,11 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 1", TEST_LIST_DESCRIPTION,
 				20151103, TEST_GERMPLASM_LIST_TYPE_LST,
 				this.findAdminUser(), GermplasmList.Status.LIST.getCode(), PROGRAM_UUID,
-				null, null, "this is a new note"));
+				null, parentFolder, "this is a new note"));
 
 		// Filter by date from and to
 		final GermplasmListSearchRequest germplasmListSearchRequest5 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest5.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest5.setListDateFrom(Date.from(LocalDate.of(2014, 11, 2).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 		germplasmListSearchRequest5.setListDateTo(Date.from(LocalDate.of(2016, 11, 4).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
@@ -782,6 +820,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		//  Filter by date from and to
 		final GermplasmListSearchRequest germplasmListSearchRequest6 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest6.setParentFolderName(PARENT_FOLDER_NAME);
 		germplasmListSearchRequest6.setListDateFrom(Date.from(LocalDate.of(2014, 11, 4).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 		germplasmListSearchRequest6.setListDateTo(Date.from(LocalDate.of(2014, 11, 5).atStartOfDay(ZoneId.systemDefault()).toInstant()));
 
@@ -797,6 +836,14 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 				name);
 		this.dataManager.addGermplasm(germplasm, name, this.cropType);
 		return germplasm;
+	}
+
+	private GermplasmList createFolder() {
+		return this.saveGermplasmList(
+			GermplasmListTestDataInitializer.createGermplasmListTestData(PARENT_FOLDER_NAME, TEST_LIST_DESCRIPTION,
+				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
+				this.findAdminUser(), GermplasmList.Status.FOLDER.getCode(), PROGRAM_UUID,
+				null));
 	}
 
 	private GermplasmListData createGermplasmListData(final GermplasmList germplasmList, final Germplasm germplasm) {
@@ -815,6 +862,10 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	private Pageable createPageRequest(final Sort.Direction direction, final String property) {
 		return new PageRequest(0, 50, new Sort(new Sort.Order(direction, property)));
+	}
+
+	private Date convertLongToDate(long date) {
+		return Date.valueOf(LocalDate.parse(String.valueOf(date), DateTimeFormatter.ofPattern("yyyyMMdd")));
 	}
 
 }
