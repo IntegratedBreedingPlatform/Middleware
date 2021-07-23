@@ -146,7 +146,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT l.listid AS listId, ");
 			queryString.append("l.listname AS listName, ");
-			queryString.append("CAST(l.listdate AS CHAR(255)) AS creationDate, ");
+			queryString.append("STR_TO_DATE (convert(l.listdate,char), '%Y%m%d') AS1  creationDate, ");
 			queryString.append("l.listdesc AS description, ");
 			queryString.append("l.program_uuid AS programUUID, ");
 			queryString.append("IF (l.liststatus = " + GermplasmList.Status.LOCKED_LIST.getCode() + ", 'LOCKED', 'UNLOCKED') AS status ");

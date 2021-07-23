@@ -4,8 +4,6 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
-import java.util.Date;
-
 @AutoProperty
 public class GermplasmListSearchResponse extends GermplasmListDto {
 

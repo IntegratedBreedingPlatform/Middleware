@@ -36,6 +36,7 @@ import org.springframework.util.CollectionUtils;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -60,6 +61,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	private static final String PROGRAM_UUID = UUID.randomUUID().toString();
 	private static final List<String> EXCLUDED_GERMPLASM_LIST_TYPES = new ArrayList<>();
+	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 	@Autowired
 	private GermplasmListManager manager;
@@ -328,7 +330,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		assertThat(germplasmListSearchResponse.getNumberOfEntries(), is(2));
 		assertThat(germplasmListSearchResponse.getStatus(), is("UNLOCKED"));
 		assertThat(germplasmListSearchResponse.getNotes(), is(list.getNotes()));
-		assertThat(germplasmListSearchResponse.getCreationDate(), is(list.getDate().toString()));
+		assertThat(germplasmListSearchResponse.getCreationDate(), is(this.convertLongToDate(list.getDate())));
 	}
 
 	@Test
@@ -859,6 +861,10 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	private Pageable createPageRequest(final Sort.Direction direction, final String property) {
 		return new PageRequest(0, 50, new Sort(new Sort.Order(direction, property)));
+	}
+
+	private Date convertLongToDate(long date) {
+		return Date.valueOf(LocalDate.parse(String.valueOf(date), DateTimeFormatter.ofPattern("yyyyMMdd")));
 	}
 
 }

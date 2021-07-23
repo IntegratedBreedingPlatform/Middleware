@@ -3,12 +3,14 @@ package org.generationcp.middleware.api.germplasmlist;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.Date;
+
 @AutoProperty
 public class GermplasmListDto {
 
 	private Integer listId;
 	private String listName;
-	private String creationDate;
+	private Date creationDate;
 	private String description;
 	private String programUUID;
 	private String status;
@@ -33,11 +35,11 @@ public class GermplasmListDto {
 		this.listName = listName;
 	}
 
-	public String getCreationDate() {
+	public Date getCreationDate() {
 		return this.creationDate;
 	}
 
-	public void setCreationDate(final String creationDate) {
+	public void setCreationDate(final Date creationDate) {
 		this.creationDate = creationDate;
 	}
 

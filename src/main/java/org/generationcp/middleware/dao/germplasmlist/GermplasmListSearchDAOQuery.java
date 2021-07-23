@@ -76,9 +76,7 @@ public class GermplasmListSearchDAOQuery {
 		+ " (SELECT count(1) FROM listdata l WHERE l.listid = list.listid) AS " + NUMBER_OF_ENTRIES_ALIAS + ", "
 		+ " IF (list.liststatus = " + GermplasmList.Status.LOCKED_LIST.getCode() + ", 'LOCKED', 'UNLOCKED') AS " + STATUS_ALIAS + ", "
 		+ " list.notes AS " + NOTES_ALIAS + ", "
-		+ " CAST(list.listdate AS CHAR(255)) AS " + CREATION_DATE_ALIAS + ", "
-		// TODO: we need to validate if we return this field as Date
-//		+ " STR_TO_DATE (convert(list.listdate,char), '%Y%m%d') AS " + CREATION_DATE_ALIAS + ", "
+		+ " STR_TO_DATE (convert(list.listdate,char), '%Y%m%d') AS " + CREATION_DATE_ALIAS + ", "
 		+ " list.program_uuid AS " + PROGRAM_UUID_ALIAS;
 
 	private final static String SELF_JOIN_QUERY = " LEFT JOIN listnms inn ON list.lhierarchy = inn.listid ";
