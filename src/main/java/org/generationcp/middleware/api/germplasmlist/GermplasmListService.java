@@ -61,4 +61,12 @@ public interface GermplasmListService {
 
 	long countSearchGermplasmListData(Integer listId, GermplasmListDataSearchRequest request);
 
+	/**
+	 * Lock the list if it's unlocked and vice versa.
+	 *
+	 * @param listId
+	 * @return {@link boolean} true if it's locked or false it's unlocked
+	 */
+	boolean toggleGermplasmListStatus(Integer listId);
+
 }

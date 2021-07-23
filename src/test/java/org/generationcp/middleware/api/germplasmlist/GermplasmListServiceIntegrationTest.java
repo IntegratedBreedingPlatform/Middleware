@@ -330,6 +330,16 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(germplasmListDtos.size() + 1, updatedGermplasmListDtos.size());
 	}
 
+	@Test
+	public void shouldToggleGermplasmListStatus() {
+		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List ",
+			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, GermplasmList.Status.LIST.getCode());
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+
+		assertTrue(this.germplasmListService.toggleGermplasmListStatus(germplasmList.getId()));
+		assertFalse(this.germplasmListService.toggleGermplasmListStatus(germplasmList.getId()));
+	}
+
 	private Germplasm createGermplasm(final Method method) {
 		final Germplasm germplasm = new Germplasm(null, method.getMid(), 0, 0, 0,
 			0, 0, 0, 0,

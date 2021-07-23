@@ -439,4 +439,12 @@ public class GermplasmList implements Serializable {
 		return ISO8601DateParser.parseToDate(this.date);
 	}
 
+	public void lockList() {
+		this.status = Status.LOCKED_LIST.getCode();
+	}
+
+	public void unlock() {
+		this.status = Status.LIST.getCode();
+	}
+
 }

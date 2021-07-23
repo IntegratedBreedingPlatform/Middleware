@@ -437,6 +437,18 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.daoFactory.getGermplasmListDataDAO().countSearchGermplasmListData(listId, request);
 	}
 
+	@Override
+	public boolean toggleGermplasmListStatus(final Integer listId) {
+		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
+		if (germplasmList.isLockedList()) {
+			germplasmList.unlock();
+		} else {
+			germplasmList.lockList();
+		}
+		this.daoFactory.getGermplasmListDAO().save(germplasmList);
+		return germplasmList.isLockedList();
+	}
+
 	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {
 		try {
 			for (final GermplasmListData data : germplasmListData) {
