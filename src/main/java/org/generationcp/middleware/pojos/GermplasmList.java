@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.pojos;
 
+import org.generationcp.middleware.util.ISO8601DateParser;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.SQLDelete;
@@ -18,6 +19,7 @@ import org.hibernate.annotations.SQLDelete;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -432,4 +434,9 @@ public class GermplasmList implements Serializable {
 	public void setCreatedBy(final String createdBy) {
 		this.createdBy = createdBy;
 	}
+
+	public Date parseDate() {
+		return ISO8601DateParser.parseToDate(this.date);
+	}
+
 }

@@ -865,7 +865,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	}
 
 	private Date convertLongToDate(long date) {
-		return Date.valueOf(LocalDate.parse(String.valueOf(date), DateTimeFormatter.ofPattern("yyyyMMdd")));
+		return Date.valueOf(LocalDate.parse(String.valueOf(date), DATE_FORMATTER));
 	}
 
 }

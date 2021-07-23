@@ -95,9 +95,9 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 			Method method = map.get(property.getCvTermId());
 
 			if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
-				method.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+				method.setDateCreated(ISO8601DateParser.tryParseToDateTime(property.getValue()));
 			} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
-				method.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+				method.setDateLastModified(ISO8601DateParser.tryParseToDateTime(property.getValue()));
 			}
 		}
 

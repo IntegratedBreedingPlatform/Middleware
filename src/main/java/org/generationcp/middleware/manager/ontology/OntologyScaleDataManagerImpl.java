@@ -149,9 +149,9 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 				} else if (Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())) {
 					scale.setMaxValue(property.getValue());
 				} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
-					scale.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+					scale.setDateCreated(ISO8601DateParser.tryParseToDateTime(property.getValue()));
 				} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
-					scale.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+					scale.setDateLastModified(ISO8601DateParser.tryParseToDateTime(property.getValue()));
 				}
 			}
 
