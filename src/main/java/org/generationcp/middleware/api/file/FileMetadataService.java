@@ -17,9 +17,15 @@ public interface FileMetadataService {
 
 	String getFilePath(String observationUnitDbId, Integer termId, String fileName);
 
-	void saveFilenameToObservation(FileMetadataDTO fileMetadataDTO);
+	/**
+	 *
+	 * @param fileMetadataDTO extract the filename from this object
+	 * @param termId use this termid for the observation. If null, the first available variable in the study for
+	 * {@link FileMetadataDTO#observationUnitUUID} will be used.
+	 */
+	void linkToObservation(FileMetadataDTO fileMetadataDTO, Integer termId);
 
-	String save(FileMetadataDTO fileMetadataDTO, String observationUnitId);
+	FileMetadataDTO save(FileMetadataDTO fileMetadataDTO, String observationUnitUUID);
 
 	List<FileMetadataDTO> list(Integer observationId);
 }

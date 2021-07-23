@@ -13,6 +13,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -133,19 +134,27 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public void saveFilenameToObservation(final FileMetadataDTO fileMetadataDTO) {
-		final Integer termId = this.getFirstFileVariable(fileMetadataDTO.getObservationUnitId());
+	public void linkToObservation(final FileMetadataDTO fileMetadataDTO, Integer termId) {
+		if (termId == null) {
+			termId = this.getFirstFileVariable(fileMetadataDTO.getObservationUnitUUID());
+		}
 
-		final ObservationDto observation = new ObservationDto();
+		ObservationDto observation = new ObservationDto();
 		observation.setValue(fileMetadataDTO.getName());
 		observation.setObservationUnitId(fileMetadataDTO.getNdExperimentId());
 		observation.setVariableId(termId);
-		this.datasetService.createObservation(observation);
+
+		observation = this.datasetService.createObservation(observation);
+
+		final FileMetadata fileMetadata = this.daoFactory.getFileMetadataDAO().getByFileUUID(fileMetadataDTO.getFileUUID());
+		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(observation.getObservationId());
+		fileMetadata.setPhenotype(phenotype);
+		this.daoFactory.getFileMetadataDAO().saveOrUpdate(fileMetadata);
 	}
 
 	@Override
-	public String save(final FileMetadataDTO fileMetadataDTO, final String observationUnitId) {
-		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId);
+	public FileMetadataDTO save(final FileMetadataDTO fileMetadataDTO, final String observationUnitUUID) {
+		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitUUID);
 		final FileMetadata fileMetadata = new FileMetadata();
 		fileMetadata.setExperimentModel(experimentModel);
 
@@ -156,7 +165,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		fileMetadataMapper.map(fileMetadataDTO, fileMetadata);
 
 		final FileMetadata entity = this.daoFactory.getFileMetadataDAO().save(fileMetadata);
-		return entity.getFileUUID();
+		final FileMetadataDTO fileMetadataDTOSaved = new FileMetadataDTO();
+		fileMetadataMapper.map(entity, fileMetadataDTOSaved);
+		return fileMetadataDTOSaved;
 	}
 
 	@Override

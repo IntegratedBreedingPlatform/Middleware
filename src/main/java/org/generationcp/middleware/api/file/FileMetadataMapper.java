@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +57,10 @@ public class FileMetadataMapper {
 
 		final ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			image.setImageLocation(objectMapper.readValue(fileMetadata.getImageLocation(), HashMap.class));
+			final String imageLocation = fileMetadata.getImageLocation();
+			if (imageLocation != null) {
+				image.setImageLocation(objectMapper.readValue(imageLocation, HashMap.class));
+			}
 		} catch (final IOException e) {
 			throw new MiddlewareRequestException("", "filemetadata.brapi.location.parse.error");
 		}
@@ -77,13 +81,20 @@ public class FileMetadataMapper {
 		to.setSize(from.getSize());
 		final ExperimentModel experimentModel = from.getExperimentModel();
 		if (experimentModel != null) {
-			to.setObservationUnitId(experimentModel.getObsUnitId());
+			to.setObservationUnitUUID(experimentModel.getObsUnitId());
 			to.setNdExperimentId(experimentModel.getNdExperimentId());
+		}
+		final Phenotype phenotype = from.getPhenotype();
+		if (phenotype != null) {
+			to.setObservationId(phenotype.getPhenotypeId());
 		}
 
 		final ObjectMapper objectMapper = new ObjectMapper();
 		try {
-			to.setImageLocation(objectMapper.readValue(from.getImageLocation(), HashMap.class));
+			final String imageLocation = from.getImageLocation();
+			if (imageLocation != null) {
+				to.setImageLocation(objectMapper.readValue(imageLocation, HashMap.class));
+			}
 		} catch (final IOException e) {
 			throw new MiddlewareRequestException("", "filemetadata.brapi.location.parse.error");
 		}
@@ -104,7 +115,7 @@ public class FileMetadataMapper {
 		image.setImageFileSize(dto.getSize());
 		image.setImageLocation(dto.getImageLocation());
 		image.setImageDbId(dto.getFileUUID());
-		image.setObservationUnitDbId(dto.getObservationUnitId());
+		image.setObservationUnitDbId(dto.getObservationUnitUUID());
 		return image;
 	}
 
