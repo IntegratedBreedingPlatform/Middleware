@@ -282,29 +282,6 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void test_createGermplasm_ThrowsException_WhenGermplasmPUISynonymExistsAlready() {
-		final Germplasm germplasm = this.createGermplasm(this.generativeMethod, this.germplasmPUI, null, 0, 0, 0, this.germplasmPUI);
-
-		final String creationDate = "2020-10-24";
-		final GermplasmImportRequest request = new GermplasmImportRequest(RandomStringUtils.randomAlphabetic(20), creationDate,
-			this.derivativeMethod.getMid().toString(), RandomStringUtils.randomAlphabetic(20), "UKN",
-			RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
-		request.getSynonyms().add(new Synonym(this.germplasmPUI, GermplasmImportRequest.PUI_NAME_TYPE));
-		final List<GermplasmImportRequest> germplasmImportRequestList = Collections.singletonList(request);
-		try {
-			this.germplasmServiceBrapi.createGermplasm(ContextHolder.getCurrentCrop(), germplasmImportRequestList);
-			Assert.fail("Expected to throw exception for existing PUI but did not.");
-		} catch (final MiddlewareRequestException exception) {
-			assertTrue(exception.getErrorCodeParamsMultiMap().containsKey("brapi.import.germplasm.pui.exists"));
-		}
-	}
-
-	@Test
 	public void test_updateGermplasm_Ok() {
 		final Method method = this.createBreedingMethod("GEN", 2);
 		final Germplasm germplasm = this.createGermplasm(method, this.germplasmUUID, null, 2, 0, 0, this.germplasmPUI);
@@ -517,58 +494,6 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 		}
 
 
-	}
-
-	@Test
-	public void test_updateGermplasm_PUIAlreadyExists() {
-		final Method method = this.createBreedingMethod("GEN", 2);
-		final Germplasm germplasm = this.createGermplasm(method, this.germplasmUUID, null, 2, 0, 0, this.germplasmPUI);
-		// Create another germplasm with given PUI
-		final String pui2 = RandomStringUtils.randomAlphabetic(40);
-		final Germplasm germplasm2 = this.createGermplasm(method, null, null, 2, 0, 0, pui2);
-
-		final String creationDate = "2020-10-24";
-		final GermplasmUpdateRequest request = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), creationDate, null,
-			RandomStringUtils.randomAlphabetic(20), "UKN",
-			RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
-		request.setGermplasmPUI(pui2);
-		try {
-			this.germplasmServiceBrapi.updateGermplasm(this.germplasmUUID, request);
-			Assert.fail("Expected to throw exception that germplasm PUI already exists but did not");
-		} catch (final MiddlewareRequestException exception) {
-			assertTrue(exception.getErrorCodeParamsMultiMap().containsKey("brapi.update.germplasm.pui.exists"));
-		}
-	}
-
-	@Test
-	public void test_updateGermplasm_PUISynonymAlreadyExists() {
-		final Method method = this.createBreedingMethod("GEN", 2);
-		final Germplasm germplasm = this.createGermplasm(method, this.germplasmUUID, null, 2, 0, 0, this.germplasmPUI);
-		// Create another germplasm with given PUI
-		final String pui2 = RandomStringUtils.randomAlphabetic(40);
-		final Germplasm germplasm2 = this.createGermplasm(method, null, null, 2, 0, 0, pui2);
-
-		final String creationDate = "2020-10-24";
-		final GermplasmUpdateRequest request = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), creationDate, null,
-			RandomStringUtils.randomAlphabetic(20), "UKN",
-			RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20),
-			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
-		request.getSynonyms().add(new Synonym(pui2, "PUI"));
-		try {
-			this.germplasmServiceBrapi.updateGermplasm(this.germplasmUUID, request);
-			Assert.fail("Expected to throw exception that germplasm PUI already exists but did not");
-		} catch (final MiddlewareRequestException exception) {
-			assertTrue(exception.getErrorCodeParamsMultiMap().containsKey("brapi.update.germplasm.pui.exists"));
-		}
 	}
 
 	@Test(expected = MiddlewareRequestException.class)

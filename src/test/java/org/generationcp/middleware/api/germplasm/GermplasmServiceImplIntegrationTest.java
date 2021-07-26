@@ -1321,54 +1321,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void test_importGermplasm_ThrowsException_WhenGermplasmPUIExistsAlready() {
-
-		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, this.germplasmUUID, null, -1, 0, 0, this.germplasmPUI);
-
-		final GermplasmImportDTO germplasmImportDto =
-			new GermplasmImportDTO(this.clientId, this.germplasmPUI, NOLOC, this.derivativeMethod.getMcode(),
-				this.reference, DRVNM, this.names, this.attributes, this.creationDate
-				, null, null);
-
-		final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
-		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GUID);
-		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
-		germplasmImportRequestDto.setSkipIfExists(false);
-
-		try {
-			this.germplasmService.importGermplasm(ContextHolder.getCurrentCrop(), this.programUUID, germplasmImportRequestDto);
-			Assert.fail("Expected to throw exception for existing PUI but did not.");
-		} catch (final MiddlewareRequestException exception) {
-			assertTrue(exception.getErrorCodeParamsMultiMap().containsKey("import.germplasm.pui.exists"));
-		}
-	}
-
-	@Test
-	public void test_importGermplasm_ThrowsException_WhenGermplasmPUIInNamesExistsAlready() {
-
-		final Germplasm germplasm = this.createGermplasm(this.derivativeMethod, this.germplasmPUI, null, -1, 0, 0, this.germplasmPUI);
-
-
-		this.names.put(GermplasmImportRequest.PUI_NAME_TYPE, this.germplasmPUI);
-		final GermplasmImportDTO germplasmImportDto =
-			new GermplasmImportDTO(this.clientId, null, NOLOC, this.derivativeMethod.getMcode(),
-				this.reference, DRVNM, this.names, this.attributes, this.creationDate
-				, null, null);
-
-		final GermplasmImportRequestDto germplasmImportRequestDto = new GermplasmImportRequestDto();
-		germplasmImportRequestDto.setConnectUsing(GermplasmImportRequestDto.PedigreeConnectionType.GUID);
-		germplasmImportRequestDto.setGermplasmList(Collections.singletonList(germplasmImportDto));
-		germplasmImportRequestDto.setSkipIfExists(false);
-
-		try {
-			this.germplasmService.importGermplasm(ContextHolder.getCurrentCrop(), this.programUUID, germplasmImportRequestDto);
-			Assert.fail("Expected to throw exception for existing PUI but did not.");
-		} catch (final MiddlewareRequestException exception) {
-			assertTrue(exception.getErrorCodeParamsMultiMap().containsKey("import.germplasm.pui.exists"));
-		}
-	}
-
-	@Test
 	public void test_getGermplasmDtoById_Ok() {
 
 		final Germplasm progenitor1FemaleParent =
