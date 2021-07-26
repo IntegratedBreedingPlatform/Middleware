@@ -111,6 +111,8 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 			}
 			unknownDerivativeMethod = unknownDerivativeMethods.get(0);
 		}
+		// Raise an error if any of the germplasmPUIs already exist
+		this.enforcePUIUniqueness(germplasmImportRequestList);
 
 		final List<String> createdGermplasmUUIDs = new ArrayList<>();
 		for (final GermplasmImportRequest germplasmDto : germplasmImportRequestList) {
@@ -195,6 +197,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 		if (CollectionUtils.isEmpty(germplasmByGUIDs)) {
 			throw new MiddlewareRequestException("", "germplasm.invalid.guid");
 		}
+		// Validate that PUI, if specified, is not yet used
 		final Germplasm germplasm = germplasmByGUIDs.get(0);
 		final NameDAO nameDao = this.daoFactory.getNameDao();
 		final Map<Integer, Name> existingNamesByType =
@@ -202,6 +205,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 				.collect(Collectors.toMap(Name::getTypeId,
 					Function.identity()));
 		final Map<String, Integer> nameTypesMap = this.getNameTypesMapByNameTypeCode(Collections.singletonList(germplasmUpdateRequest));
+		this.enforcePUIUniqueness(germplasmUpdateRequest, existingNamesByType.get(nameTypesMap.get(GermplasmImportRequest.PUI_NAME_TYPE)));
 
 		// Update breeding method if it is present
 		if (!StringUtils.isEmpty(germplasmUpdateRequest.getBreedingMethodDbId())) {
@@ -422,6 +426,26 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 			}
 		}
 
+	}
+
+	private void enforcePUIUniqueness(final List<GermplasmImportRequest> germplasmImportRequestList) {
+		final List<String> puisList = germplasmImportRequestList.stream().map(GermplasmImportRequest::collectGermplasmPUIs).flatMap(List::stream).collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(puisList)) {
+			final List<String> existingGermplasmPUIs = this.daoFactory.getNameDao().getExistingGermplasmPUIs(puisList);
+			if (!CollectionUtils.isEmpty(existingGermplasmPUIs)) {
+				throw new MiddlewareRequestException("", "brapi.import.germplasm.pui.exists", StringUtils.join(existingGermplasmPUIs, ","));
+			}
+		}
+	}
+
+	private void enforcePUIUniqueness(final GermplasmUpdateRequest germplasmUpdateRequest, final Name puiName) {
+		final List<String> puisList = germplasmUpdateRequest.collectGermplasmPUIs();
+		if (!CollectionUtils.isEmpty(puisList) ) {
+			final List<String> existingGermplasmPUIs = this.daoFactory.getNameDao().getExistingGermplasmPUIs(puisList);
+			if (!CollectionUtils.isEmpty(existingGermplasmPUIs) && (puiName == null || !puisList.get(0).equals(puiName.getNval()))) {
+				throw new MiddlewareRequestException("", "brapi.update.germplasm.pui.exists", StringUtils.join(existingGermplasmPUIs, ","));
+			}
+		}
 	}
 
 	private Map<Integer, Map<String, String>> getAttributesNameAndValuesMapForGids(final List<Integer> gidList) {
