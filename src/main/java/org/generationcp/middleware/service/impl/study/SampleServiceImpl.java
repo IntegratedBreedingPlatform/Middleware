@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRequestDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Sample;
@@ -18,6 +19,7 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -216,6 +218,16 @@ public class SampleServiceImpl implements SampleService {
 	@Override
 	public Boolean studyEntryHasSamples(final Integer studyId, final Integer entryId) {
 		return this.daoFactory.getSampleDao().studyEntryHasSamples(studyId, entryId);
+	}
+
+	@Override
+	public List<SampleObservationDto> getSampleObservations(final SampleSearchRequestDTO requestDTO, final Pageable pageable) {
+		return new ArrayList<>();
+	}
+
+	@Override
+	public long countSampleObservations(SampleSearchRequestDTO sampleSearchRequestDTO) {
+		return new Long(0);
 	}
 
 	void populateTakenBy(final List<SampleDTO> sampleDTOS) {
