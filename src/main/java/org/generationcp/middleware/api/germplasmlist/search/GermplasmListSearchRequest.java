@@ -17,6 +17,8 @@ public class GermplasmListSearchRequest extends SearchRequestDto {
 	private String description;
 	private String ownerName;
 	private List<String> listTypes;
+	private Integer numberOfEntriesFrom;
+	private Integer numberOfEntriesTo;
 	private Boolean locked;
 	private String notes;
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
@@ -58,6 +60,22 @@ public class GermplasmListSearchRequest extends SearchRequestDto {
 
 	public List<String> getListTypes() {
 		return listTypes;
+	}
+
+	public Integer getNumberOfEntriesFrom() {
+		return numberOfEntriesFrom;
+	}
+
+	public void setNumberOfEntriesFrom(final Integer numberOfEntriesFrom) {
+		this.numberOfEntriesFrom = numberOfEntriesFrom;
+	}
+
+	public Integer getNumberOfEntriesTo() {
+		return numberOfEntriesTo;
+	}
+
+	public void setNumberOfEntriesTo(final Integer numberOfEntriesTo) {
+		this.numberOfEntriesTo = numberOfEntriesTo;
 	}
 
 	public void setListTypes(final List<String> listTypes) {

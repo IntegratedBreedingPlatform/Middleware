@@ -685,7 +685,98 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		assertThat(response4, hasSize(2));
 		assertThat(response4.get(0).getListId(), is(list1.getId()));
 		assertThat(response4.get(1).getListId(), is(list2.getId()));
+	}
 
+	@Test
+	public void getAndCountSearchGermplasmList_filterAndSortByEntryNumbers() {
+		final Germplasm germplasm1 = this.createGermplasm();
+		final Germplasm germplasm2 = this.createGermplasm();
+		final Germplasm germplasm3 = this.createGermplasm();
+		final Germplasm germplasm4 = this.createGermplasm();
+
+		// Create a parent folder
+		final GermplasmList parentFolder = this.createFolder();
+
+		// Create a list with two entries
+		final GermplasmList list1 = this.saveGermplasmList(
+			GermplasmListTestDataInitializer.createGermplasmListTestData(TEST_GERMPLASM_LIST_NAME, TEST_LIST_DESCRIPTION,
+				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
+				this.findAdminUser(), GermplasmList.Status.LIST.getCode(), PROGRAM_UUID,
+				null, parentFolder, TEST_LIST_NOTES));
+		this.createGermplasmListData(list1, germplasm1);
+		this.createGermplasmListData(list1, germplasm2);
+
+		// Create a list with four entries
+		final GermplasmList list2 = this.saveGermplasmList(
+			GermplasmListTestDataInitializer.createGermplasmListTestData(TEST_GERMPLASM_LIST_NAME, TEST_LIST_DESCRIPTION,
+				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_LST,
+				this.findAdminUser(), GermplasmList.Status.LIST.getCode(), PROGRAM_UUID,
+				null, parentFolder, TEST_LIST_NOTES));
+		this.createGermplasmListData(list2, germplasm1);
+		this.createGermplasmListData(list2, germplasm2);
+		this.createGermplasmListData(list2, germplasm3);
+		this.createGermplasmListData(list2, germplasm4);
+
+		//Filter by only entry numbers from
+		final GermplasmListSearchRequest germplasmListSearchRequest1 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest1.setParentFolderName(PARENT_FOLDER_NAME);
+		germplasmListSearchRequest1.setNumberOfEntriesFrom(3);
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(1L));
+
+		final Pageable pageRequest1 = this.createPageRequest(Sort.Direction.ASC, "NUMBER_OF_ENTRIES");
+		final List<GermplasmListSearchResponse> response1 =
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, pageRequest1);
+		assertThat(response1, hasSize(1));
+		assertThat(response1.get(0).getListId(), is(list2.getId()));
+
+		germplasmListSearchRequest1.setNumberOfEntriesFrom(5);
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest1), is(0L));
+		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest1, new PageRequest(0, 50)),
+			hasSize(0));
+
+		//Filter by only entry numbers to
+		final GermplasmListSearchRequest germplasmListSearchRequest2 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest2.setParentFolderName(PARENT_FOLDER_NAME);
+		germplasmListSearchRequest2.setNumberOfEntriesTo(3);
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(1L));
+
+		final Pageable pageRequest2 = this.createPageRequest(Sort.Direction.ASC, "NUMBER_OF_ENTRIES");
+		final List<GermplasmListSearchResponse> response3 =
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, pageRequest2);
+		assertThat(response3, hasSize(1));
+		assertThat(response3.get(0).getListId(), is(list1.getId()));
+
+		germplasmListSearchRequest2.setNumberOfEntriesTo(1);
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest2), is(0L));
+		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest2, new PageRequest(0, 50)),
+			hasSize(0));
+
+		//Filter by entry numbers from and to
+		final GermplasmListSearchRequest germplasmListSearchRequest3 = new GermplasmListSearchRequest();
+		germplasmListSearchRequest3.setParentFolderName(PARENT_FOLDER_NAME);
+		germplasmListSearchRequest3.setNumberOfEntriesFrom(2);
+		germplasmListSearchRequest3.setNumberOfEntriesTo(4);
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest3), is(2L));
+
+		final Pageable pageRequest3 = this.createPageRequest(Sort.Direction.ASC, "NUMBER_OF_ENTRIES");
+		final List<GermplasmListSearchResponse> response4 =
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest3, pageRequest3);
+		assertThat(response4, hasSize(2));
+		assertThat(response4.get(0).getListId(), is(list1.getId()));
+		assertThat(response4.get(1).getListId(), is(list2.getId()));
+
+		final Pageable pageRequest4 = this.createPageRequest(Sort.Direction.DESC, "NUMBER_OF_ENTRIES");
+		final List<GermplasmListSearchResponse> response5 =
+			this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest3, pageRequest4);
+		assertThat(response5, hasSize(2));
+		assertThat(response5.get(0).getListId(), is(list2.getId()));
+		assertThat(response5.get(1).getListId(), is(list1.getId()));
+
+		germplasmListSearchRequest3.setNumberOfEntriesFrom(5);
+		germplasmListSearchRequest3.setNumberOfEntriesTo(10);
+		assertThat(this.germplasmListDAO.countSearchGermplasmList(germplasmListSearchRequest3), is(0L));
+		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest3, new PageRequest(0, 50)),
+			hasSize(0));
 	}
 
 	@Test

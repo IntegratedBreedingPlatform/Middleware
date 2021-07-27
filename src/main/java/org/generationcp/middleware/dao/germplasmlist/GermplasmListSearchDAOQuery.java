@@ -65,7 +65,10 @@ public class GermplasmListSearchDAOQuery {
 		+ " %s " // usage of SELECT_JOINS
 		+ " WHERE list.liststatus NOT IN ('" + GermplasmList.Status.FOLDER.getCode() + "', '" + GermplasmList.Status.DELETED.getCode() + "') ";
 
-	private final static String SELECT_EXPRESSION = "list.listId AS " + LIST_ID_ALIAS + ", "
+	private final static String SELECT_NUMBER_OF_ENTRIES_EXPRESSION = " (SELECT count(1) FROM listdata l WHERE l.listid = list.listid) AS " + NUMBER_OF_ENTRIES_ALIAS;
+
+	private final static String SELECT_EXPRESSION = SELECT_NUMBER_OF_ENTRIES_EXPRESSION + ", "
+		+ "list.listId AS " + LIST_ID_ALIAS + ", "
 		+ " list.listname AS " + LIST_NAME_ALIAS + ", "
 		+ " IF (list.lhierarchy IS NULL, "
 		+ "			IF(list.program_uuid IS NULL, '" + CROP_LISTS + "', '" + PROGRAM_LISTS + "'), "
@@ -73,7 +76,6 @@ public class GermplasmListSearchDAOQuery {
 		+ " list.listdesc AS " + DESCRIPTION_ALIAS + ", "
 		+ " user.uname AS " + LIST_OWNER_ALIAS + ", "
 		+ " list.listtype AS " + LIST_TYPE_ALIAS + ", "
-		+ " (SELECT count(1) FROM listdata l WHERE l.listid = list.listid) AS " + NUMBER_OF_ENTRIES_ALIAS + ", "
 		+ " IF (list.liststatus = " + GermplasmList.Status.LOCKED_LIST.getCode() + ", true, false) AS " + LOCKED_ALIAS + ", "
 		+ " list.notes AS " + NOTES_ALIAS + ", "
 		+ " STR_TO_DATE (convert(list.listdate,char), '%Y%m%d') AS " + CREATION_DATE_ALIAS + ", "
@@ -88,12 +90,26 @@ public class GermplasmListSearchDAOQuery {
 		final String baseQuery = String.format(BASE_QUERY, SELECT_EXPRESSION, SELF_JOIN_QUERY + WORKBENCH_USER_JOIN_QUERY);
 		final SQLQueryBuilder sqlQueryBuilder = new SQLQueryBuilder(baseQuery);
 		addFilters(sqlQueryBuilder, request);
+		if (hasGroupByClause(request)) {
+			addGroupBy(sqlQueryBuilder, request);
+		}
 		DAOQueryUtils.addOrder(input -> SortColumn.getByValue(input).value, sqlQueryBuilder, pageable);
 		return sqlQueryBuilder;
 	}
 
 	static SQLQueryBuilder getCountQuery(final GermplasmListSearchRequest request) {
 		final String countQueryJoins = getCountQueryJoins(request);
+
+		if (hasGroupByClause(request)) {
+			final String selectExpression = COUNT_EXPRESSION + ", " + SELECT_NUMBER_OF_ENTRIES_EXPRESSION;
+			final String baseQuery = String.format(BASE_QUERY, selectExpression, countQueryJoins);
+			final SQLQueryBuilder sqlQueryBuilder = new SQLQueryBuilder("SELECT " + COUNT_EXPRESSION + "FROM (" + baseQuery);
+			addFilters(sqlQueryBuilder, request);
+			addGroupBy(sqlQueryBuilder, request);
+			sqlQueryBuilder.append(") AS count");
+			return sqlQueryBuilder;
+		}
+
 		final String baseQuery = String.format(BASE_QUERY, COUNT_EXPRESSION, countQueryJoins);
 		final SQLQueryBuilder sqlQueryBuilder = new SQLQueryBuilder(baseQuery);
 		addFilters(sqlQueryBuilder, request);
@@ -156,15 +172,37 @@ public class GermplasmListSearchDAOQuery {
 		}
 
 		if (request.getListDateFrom() != null) {
-			sqlQueryBuilder.append(" and list.listdate >= :listDateFrom ");
+			sqlQueryBuilder.append(" AND list.listdate >= :listDateFrom ");
 			sqlQueryBuilder.setParameter("listDateFrom", DATE_FORMAT.format(request.getListDateFrom()));
 		}
 
 		if (request.getListDateTo() != null) {
-			sqlQueryBuilder.append(" and list.listdate <= :listDateTo ");
+			sqlQueryBuilder.append(" AND list.listdate <= :listDateTo ");
 			sqlQueryBuilder.setParameter("listDateTo", DATE_FORMAT.format(request.getListDateTo()));
 		}
 
+	}
+
+	private static void addGroupBy(final SQLQueryBuilder sqlQueryBuilder, final GermplasmListSearchRequest request) {
+		sqlQueryBuilder.append(" GROUP BY list.listid, ").append(NUMBER_OF_ENTRIES_ALIAS).append(" HAVING ");
+
+		if (request.getNumberOfEntriesFrom() != null) {
+			sqlQueryBuilder.append(NUMBER_OF_ENTRIES_ALIAS).append(" >= :numberOfEntriesFrom ");
+			sqlQueryBuilder.setParameter("numberOfEntriesFrom", request.getNumberOfEntriesFrom());
+		}
+
+		if (request.getNumberOfEntriesFrom() != null && request.getNumberOfEntriesTo() != null) {
+			sqlQueryBuilder.append(" AND ");
+		}
+
+		if (request.getNumberOfEntriesTo() != null) {
+			sqlQueryBuilder.append(NUMBER_OF_ENTRIES_ALIAS).append(" <= :numberOfEntriesTo ");
+			sqlQueryBuilder.setParameter("numberOfEntriesTo", request.getNumberOfEntriesTo());
+		}
+	}
+
+	private static boolean hasGroupByClause(final GermplasmListSearchRequest request) {
+		return request.getNumberOfEntriesFrom() != null || request.getNumberOfEntriesTo() != null;
 	}
 
 }
