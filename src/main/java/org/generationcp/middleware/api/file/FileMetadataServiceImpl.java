@@ -108,7 +108,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public FileMetadataDTO getFileMetadataByUUID(final String fileUUID) {
+	public FileMetadataDTO getByFileUUID(final String fileUUID) {
 		final FileMetadata fileMetadata = this.daoFactory.getFileMetadataDAO().getByFileUUID(fileUUID);
 		if (fileMetadata == null) {
 			throw new MiddlewareRequestException("", "filemetadata.record.not.found", new String[] {"fileUUID=" + fileUUID});
@@ -180,6 +180,14 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 			fileMetadataMapper.map(fileMetadata, fileMetadataDTO);
 			return fileMetadataDTO;
 		}).collect(toList());
+	}
+
+	@Override
+	public void delete(final String fileUUID) {
+		final FileMetadata fileMetadata = this.daoFactory.getFileMetadataDAO().getByFileUUID(fileUUID);
+		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(fileMetadata.getPhenotype().getPhenotypeId());
+		this.daoFactory.getFileMetadataDAO().makeTransient(fileMetadata);
+		this.daoFactory.getPhenotypeDAO().makeTransient(phenotype);
 	}
 
 	/**

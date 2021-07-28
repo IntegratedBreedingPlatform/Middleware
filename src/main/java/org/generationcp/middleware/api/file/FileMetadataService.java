@@ -13,7 +13,7 @@ public interface FileMetadataService {
 
 	Image getImage(String imageDbId);
 
-	FileMetadataDTO getFileMetadataByUUID(String fileUUID);
+	FileMetadataDTO getByFileUUID(String fileUUID);
 
 	String getFilePath(String observationUnitDbId, Integer termId, String fileName);
 
@@ -22,10 +22,13 @@ public interface FileMetadataService {
 	 * @param fileMetadataDTO extract the filename from this object
 	 * @param termId use this termid for the observation. If null, the first available variable in the study for
 	 * {@link FileMetadataDTO#observationUnitUUID} will be used.
+	 *                  FIXME use descriptiveOntologyTerm https://github.com/PhenoApps/Field-Book/issues/286
 	 */
 	void linkToObservation(FileMetadataDTO fileMetadataDTO, Integer termId);
 
 	FileMetadataDTO save(FileMetadataDTO fileMetadataDTO, String observationUnitUUID);
 
 	List<FileMetadataDTO> list(Integer observationId);
+
+	void delete(String fileUUID);
 }
