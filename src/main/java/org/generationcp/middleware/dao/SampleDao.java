@@ -338,18 +338,6 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return samplesMap;
 	}
 
-	public Sample getBySampleBk(final String sampleBk) {
-		final Sample sample;
-		try {
-			sample = (Sample) this.getSession().createCriteria(Sample.class, SAMPLE).add(Restrictions.eq(SAMPLE_BUSINESS_KEY, sampleBk))
-				.uniqueResult();
-		} catch (final HibernateException he) {
-			throw new MiddlewareException(
-				"Unexpected error in executing getBySampleBk(sampleBusinessKey = " + sampleBk + ") query: " + he.getMessage(), he);
-		}
-		return sample;
-	}
-
 	@SuppressWarnings("unchecked")
 	public Map<Integer, Integer> getGIDsBySampleIds(final Set<Integer> sampleIds) {
 		final Map<Integer, Integer> map = new HashMap<>();
@@ -460,8 +448,10 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 	public List<SampleObservationDto> getSampleObservationDtos(final SampleSearchRequestDTO requestDTO, final Pageable pageable) {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createSamplesQueryString(requestDTO, pageable));
-		sqlQuery.setFirstResult(pageable.getPageSize() * (pageable.getPageNumber()-1));
-		sqlQuery.setMaxResults(pageable.getPageSize());
+		if(pageable != null) {
+			sqlQuery.setFirstResult(pageable.getPageSize() * (pageable.getPageNumber() - 1));
+			sqlQuery.setMaxResults(pageable.getPageSize());
+		}
 		this.addSampleSearchParameters(sqlQuery, requestDTO);
 
 		sqlQuery.addScalar("germplasmDbId", StringType.INSTANCE);

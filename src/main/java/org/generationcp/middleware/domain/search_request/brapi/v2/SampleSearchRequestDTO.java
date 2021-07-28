@@ -16,6 +16,10 @@ public class SampleSearchRequestDTO {
     private String externalReferenceID;
     private String externalReferenceSource;
 
+    public SampleSearchRequestDTO() {
+
+    }
+
     public SampleSearchRequestDTO(final String sampleDbId, final String observationUnitDbId, final String plateDbId, final String germplasmDbId, final String studyDbId, final String externalReferenceID, final String externalReferenceSource) {
         this.sampleDbId = sampleDbId;
         this.observationUnitDbId = observationUnitDbId;
