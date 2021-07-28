@@ -18,5 +18,7 @@ public interface GermplasmNameService {
 
 	List<GermplasmNameDto> getGermplasmNamesByGids(List<Integer> gids);
 
+	List<String> getExistingGermplasmPUIs(List<String> germplasmPUIs);
+
 	List<Name> getGermplasmNamesByNameTypeId(Integer nameTypeId);
 }
