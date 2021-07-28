@@ -12,6 +12,14 @@ public class AddProgramMemberRequestDto {
 
 	private Set<Integer> userIds;
 
+	public AddProgramMemberRequestDto() {
+	}
+
+	public AddProgramMemberRequestDto(final Integer roleId, final Set<Integer> userIds) {
+		this.roleId = roleId;
+		this.userIds = userIds;
+	}
+
 	public Integer getRoleId() {
 		return roleId;
 	}
