@@ -17,6 +17,8 @@ public interface LotService {
 
 	List<ExtendedLotDto> searchLots(LotsSearchDto lotsSearchDto, Pageable pageable);
 
+	List<ExtendedLotDto> searchLots(LotsSearchDto lotsSearchDto, Pageable pageable, boolean applyResultsLimit);
+
 	long countSearchLots(LotsSearchDto lotsSearchDto);
 
 	Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(LotsSearchDto searchDto);

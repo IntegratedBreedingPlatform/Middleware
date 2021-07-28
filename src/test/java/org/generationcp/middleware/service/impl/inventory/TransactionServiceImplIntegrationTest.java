@@ -114,7 +114,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingWithdrawalId);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
-		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
+		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, null).get(0);
 		Assert.assertTrue(transaction.getQuantity().equals(-20D));
 		Assert.assertTrue(lotDto.getAvailableBalance().equals(0D));
 	}
@@ -127,7 +127,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingDepositId);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
-		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
+		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, null).get(0);
 		Assert.assertTrue(transaction.getQuantity().equals(2D));
 		Assert.assertTrue(lotDto.getAvailableBalance().equals(18D));
 	}
@@ -140,7 +140,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingDepositId);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
-		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
+		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, null).get(0);
 		Assert.assertTrue(transaction.getQuantity().equals(5D));
 		Assert.assertTrue(lotDto.getAvailableBalance().equals(18D));
 	}

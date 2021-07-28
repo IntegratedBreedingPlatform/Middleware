@@ -36,6 +36,7 @@ import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +59,9 @@ public class LotServiceImpl implements LotService {
 
 	private DaoFactory daoFactory;
 
+	@Value("${export.max.total.results}")
+	public int maxTotalResults;
+
 	@Autowired
 	private InventoryDataManager inventoryDataManager;
 
@@ -78,7 +82,13 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
-		return this.daoFactory.getLotDao().searchLots(lotsSearchDto, pageable);
+		return this.searchLots(lotsSearchDto, pageable, false);
+	}
+
+	@Override
+	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable, final boolean applyResultsLimit) {
+		final Integer maxTotalResults = applyResultsLimit ? this.maxTotalResults : null;
+		return this.daoFactory.getLotDao().searchLots(lotsSearchDto, pageable, maxTotalResults);
 	}
 
 	@Override
@@ -278,7 +288,7 @@ public class LotServiceImpl implements LotService {
 
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(lotIds);
-		final List<ExtendedLotDto> lotsToBeCancelled = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> lotsToBeCancelled = this.searchLots(lotsSearchDto, null);
 		final List<ExtendedLotDto> lotsWithAvailableBalance = lotsToBeCancelled.stream().filter(x -> x.getAvailableBalance() > 0).collect(
 			Collectors.toList());
 
