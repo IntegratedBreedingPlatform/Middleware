@@ -14,6 +14,7 @@ public class GermplasmListDto {
 	private String description;
 	private String programUUID;
 	private boolean locked;
+	private Integer ownerId;
 
 	public GermplasmListDto() {
 
@@ -65,6 +66,14 @@ public class GermplasmListDto {
 
 	public void setLocked(final boolean locked) {
 		this.locked = locked;
+	}
+
+	public Integer getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(final Integer ownerId) {
+		this.ownerId = ownerId;
 	}
 
 	@Override
