@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.api.sample;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.BrapiView;
@@ -16,6 +17,9 @@ import java.util.Map;
 public class SampleObservationDto implements Serializable {
 
     private static final long serialVersionUID = 2340381705850740790L;
+
+    @JsonIgnore
+    private Integer sampleId;
 
     @JsonView(BrapiView.BrapiV2.class)
     private Map<String, String> additionalInfo;
@@ -59,6 +63,10 @@ public class SampleObservationDto implements Serializable {
 
     private String sampleType;
     private String studyDbId;
+
+    @JsonIgnore
+    private Integer takenById;
+
     private String takenBy;
     private String tissueType;
 
@@ -300,6 +308,23 @@ public class SampleObservationDto implements Serializable {
     public void setWell(String well) {
         this.well = well;
     }
+
+    public Integer getTakenById() {
+        return takenById;
+    }
+
+    public void setTakenById(Integer takenById) {
+        this.takenById = takenById;
+    }
+
+    public Integer getSampleId() {
+        return sampleId;
+    }
+
+    public void setSampleId(Integer sampleId) {
+        this.sampleId = sampleId;
+    }
+
 
     @Override
     public int hashCode() {

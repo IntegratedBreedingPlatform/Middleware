@@ -4,6 +4,7 @@ import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
@@ -25,6 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -33,6 +35,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Repository
 @Transactional
@@ -223,12 +227,27 @@ public class SampleServiceImpl implements SampleService {
 
 	@Override
 	public List<SampleObservationDto> getSampleObservations(final SampleSearchRequestDTO requestDTO, final Pageable pageable) {
-		return new ArrayList<>();
+		final List<SampleObservationDto> sampleObservationDtos = this.daoFactory.getSampleDao().getSampleObservationDtos(requestDTO, pageable);
+		if (!CollectionUtils.isEmpty(sampleObservationDtos)) {
+			final List<Integer> sampleIds = new ArrayList<>(sampleObservationDtos.stream().map(s -> s.getSampleId())
+					.collect(Collectors.toSet()));
+			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
+					this.daoFactory.getSampleExternalReferenceDAO().getExternalReferences(sampleIds).stream()
+							.collect(groupingBy(
+									ExternalReferenceDTO::getEntityId));
+			final List<Integer> userIds = sampleObservationDtos.stream().map(s -> s.getTakenById()).collect(Collectors.toList());
+			final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
+			for(final SampleObservationDto sample: sampleObservationDtos) {
+				sample.setExternalReferences(externalReferencesMap.get(sample.getSampleId()));
+				sample.setTakenBy(userIDFullNameMap.get(sample.getTakenById()));
+			}
+		}
+		return sampleObservationDtos;
 	}
 
 	@Override
 	public long countSampleObservations(SampleSearchRequestDTO sampleSearchRequestDTO) {
-		return new Long(0);
+		return this.daoFactory.getSampleDao().countSampleObservationDtos(sampleSearchRequestDTO);
 	}
 
 	void populateTakenBy(final List<SampleDTO> sampleDTOS) {

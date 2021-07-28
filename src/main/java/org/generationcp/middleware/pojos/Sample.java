@@ -85,7 +85,8 @@ public class Sample implements Serializable {
 	@Column(name = "sample_no")
 	private Integer sampleNumber;
 
-	@OneToMany(mappedBy = "sample_id", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "sample_id")
 	private List<SampleExternalReference> externalReferences = new ArrayList<>();
 
 	public Sample() {
