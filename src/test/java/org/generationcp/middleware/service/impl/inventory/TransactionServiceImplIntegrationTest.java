@@ -66,8 +66,9 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() {
-		this.transactionService = new TransactionServiceImpl(this.sessionProvder);
 		this.lotService = new LotServiceImpl(this.sessionProvder);
+		this.transactionService = new TransactionServiceImpl(this.sessionProvder);
+		this.transactionService.setLotService(this.lotService);
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.createGermplasmStudySource();
 		userId = findAdminUser();

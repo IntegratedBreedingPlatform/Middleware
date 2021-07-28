@@ -284,4 +284,9 @@ public class TransactionServiceImpl implements TransactionService {
 			}
 		}
 	}
+
+	public void setLotService(final LotService lotService) {
+		this.lotService = lotService;
+	}
+
 }

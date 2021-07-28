@@ -262,4 +262,8 @@ public class PlantingServiceImpl implements PlantingService {
 	public void setDatasetService(final DatasetService datasetService) {
 		this.datasetService = datasetService;
 	}
+
+	public void setLotService(final LotService lotService) {
+		this.lotService = lotService;
+	}
 }
