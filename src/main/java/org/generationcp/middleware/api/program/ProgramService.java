@@ -19,12 +19,6 @@ public interface ProgramService {
 
 	void addProgramMembers(WorkbenchUser createdBy, String programUUID, AddProgramMemberRequestDto addProgramMemberRequestDto);
 
-	/**
-	 * Deletes the Project_User_Info entries of the removed program members
-	 *
-	 * @param workbenchUserIds - the user ids of the removed program members
-	 * @param programUUID      - the programUUID id
-	 */
-	void removeUsersFromProgram(List<Integer> workbenchUserIds, String programUUID);
+	void removeProgramMembers(List<Integer> workbenchUserIds, String programUUID);
 
 }
