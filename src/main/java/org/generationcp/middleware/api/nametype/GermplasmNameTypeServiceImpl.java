@@ -155,6 +155,9 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 			userDefinedField.setFdesc(germplasmNameTypeRequestDTO.getDescription());
 		}
 
+		userDefinedField.setFuid(ContextHolder.getLoggedInUserId());
+		userDefinedField.setFdate(Util.getCurrentDateAsIntegerValue());
+
 		this.daoFactory.getUserDefinedFieldDAO().save(userDefinedField);
 	}
 
