@@ -50,9 +50,11 @@ public class RoleDAO extends GenericDAO<Role, Integer> {
 
 	}
 
-	public Role getRoleById (final Integer id) {
+	public Role getRoleById(final Integer id) {
 		final Role role = getById(id);
-		Hibernate.initialize(role.getUserRoles());
+		if (role != null) {
+			Hibernate.initialize(role.getUserRoles());
+		}
 		return role;
 	}
 
