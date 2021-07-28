@@ -22,7 +22,7 @@ public class FileMetadataMapper {
 
 	public void map(final ImageNewRequest from, final FileMetadata to) {
 		to.setCopyright(from.getCopyright());
-		to.setName(from.getImageName());
+		to.setName(from.getImageFileName());
 		to.setDescription(from.getDescription());
 		to.setFileTimestamp(from.getImageTimeStamp());
 		to.setImageHeight(from.getImageHeight());
@@ -44,7 +44,7 @@ public class FileMetadataMapper {
 	public Image map(final FileMetadata fileMetadata) {
 		final Image image = new Image();
 		image.setCopyright(fileMetadata.getCopyright());
-		image.setImageName(fileMetadata.getName());
+		image.setImageFileName(fileMetadata.getName());
 		image.setDescription(fileMetadata.getDescription());
 		image.setImageTimeStamp(fileMetadata.getFileTimestamp());
 		image.setImageHeight(fileMetadata.getImageHeight());
@@ -106,7 +106,7 @@ public class FileMetadataMapper {
 	public Image map(final FileMetadataDTO dto) {
 		final Image image = new Image();
 		image.setCopyright(dto.getCopyright());
-		image.setImageName(dto.getName());
+		image.setImageFileName(dto.getName());
 		image.setDescription(dto.getDescription());
 		image.setImageTimeStamp(dto.getFileTimestamp());
 		image.setImageHeight(dto.getImageHeight());
