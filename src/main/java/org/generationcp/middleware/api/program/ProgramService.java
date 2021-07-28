@@ -19,6 +19,6 @@ public interface ProgramService {
 
 	void addProgramMembers(WorkbenchUser createdBy, String programUUID, AddProgramMemberRequestDto addProgramMemberRequestDto);
 
-	void removeProgramMembers(List<Integer> workbenchUserIds, String programUUID);
+	void removeProgramMembers(String programUUID, List<Integer> userIds);
 
 }

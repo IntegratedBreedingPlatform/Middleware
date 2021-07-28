@@ -90,9 +90,9 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public void removeProgramMembers(final List<Integer> workbenchUserIds, final String programUUID) {
+	public void removeProgramMembers(final String programUUID, final List<Integer> userIds) {
 		final Long projectId = this.daoFactory.getProjectDAO().getByUuid(programUUID).getProjectId();
-		this.daoFactory.getUserRoleDao().removeUsersFromProgram(workbenchUserIds, projectId);
+		this.daoFactory.getUserRoleDao().removeUsersFromProgram(userIds, projectId);
 	}
 
 }
