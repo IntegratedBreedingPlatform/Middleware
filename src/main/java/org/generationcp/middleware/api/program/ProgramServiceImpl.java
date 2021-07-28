@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.program;
 
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
@@ -74,17 +75,18 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public void addProgramMembers(final WorkbenchUser createdBy, final String programUUID,
+	public void addProgramMembers(final String programUUID,
 		final AddProgramMemberRequestDto addProgramMemberRequestDto) {
 		final Project project = this.daoFactory.getProjectDAO().getByUuid(programUUID);
 		final Map<Integer, WorkbenchUser> userMap =
 			this.daoFactory.getWorkbenchUserDAO().getUsers(new ArrayList<>(addProgramMemberRequestDto.getUserIds())).stream().collect(
 				Collectors.toMap(WorkbenchUser::getUserid, Function.identity()));
 		final Role role = this.daoFactory.getRoleDao().getRoleById(addProgramMemberRequestDto.getRoleId());
+		final WorkbenchUser loggedInUser = this.daoFactory.getWorkbenchUserDAO().getById(ContextHolder.getLoggedInUserId());
 		addProgramMemberRequestDto.getUserIds().forEach(u -> {
 			final UserRole userRole = new UserRole(userMap.get(u), role, project.getCropType(), project);
 			userRole.setCreatedDate(new Date());
-			userRole.setCreatedBy(createdBy);
+			userRole.setCreatedBy(loggedInUser);
 			this.daoFactory.getUserRoleDao().save(userRole);
 		});
 	}
