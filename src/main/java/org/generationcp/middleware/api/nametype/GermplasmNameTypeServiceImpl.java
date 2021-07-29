@@ -142,7 +142,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
-	public void updateNameType(final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO, final Integer nameTypeId) {
+	public void updateNameType(final Integer nameTypeId, final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
 		final UserDefinedField userDefinedField = this.daoFactory.getUserDefinedFieldDAO().getById(nameTypeId);
 
 		if (!StringUtils.isBlank(germplasmNameTypeRequestDTO.getCode())) {

@@ -34,7 +34,7 @@ public class GermplasmNameTypeServiceImplIntegrationTest extends IntegrationTest
 		final Integer nameTypeId = this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO);
 
 		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameTypeRequestDTO.getCode()));
-		this.verifyAssertGermplasmNameTypeRequestDTO(germplasmNameTypeRequestDTO, nameTypeId, codes);
+		this.verifyAssertGermplasmNameTypeRequestDTO(nameTypeId, germplasmNameTypeRequestDTO, codes);
 	}
 
 	@Test
@@ -43,7 +43,7 @@ public class GermplasmNameTypeServiceImplIntegrationTest extends IntegrationTest
 		final Integer nameTypeId = this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO);
 		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameTypeRequestDTO.getCode()));
 
-		this.verifyAssertGermplasmNameTypeRequestDTO(germplasmNameTypeRequestDTO, nameTypeId, codes);
+		this.verifyAssertGermplasmNameTypeRequestDTO(nameTypeId, germplasmNameTypeRequestDTO, codes);
 
 		germplasmNameTypeRequestDTO.setCode("TEST1" + RandomStringUtils.randomAlphabetic(10));
 		germplasmNameTypeRequestDTO.setName("TEST1" + RandomStringUtils.randomAlphabetic(10));
@@ -51,8 +51,8 @@ public class GermplasmNameTypeServiceImplIntegrationTest extends IntegrationTest
 		codes.clear();
 		codes.add(germplasmNameTypeRequestDTO.getCode());
 
-		this.germplasmNameTypeService.updateNameType(germplasmNameTypeRequestDTO, nameTypeId);
-		this.verifyAssertGermplasmNameTypeRequestDTO(germplasmNameTypeRequestDTO, nameTypeId, codes);
+		this.germplasmNameTypeService.updateNameType(nameTypeId, germplasmNameTypeRequestDTO);
+		this.verifyAssertGermplasmNameTypeRequestDTO(nameTypeId, germplasmNameTypeRequestDTO, codes);
 
 	}
 
@@ -76,8 +76,8 @@ public class GermplasmNameTypeServiceImplIntegrationTest extends IntegrationTest
 		Assert.assertThat(10, equalTo(germplasmNameTypeDTOs.size()));
 	}
 
-	private void verifyAssertGermplasmNameTypeRequestDTO(final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO,
-		final Integer nameTypeId, final Set<String> codes) {
+	private void verifyAssertGermplasmNameTypeRequestDTO(final Integer nameTypeId, final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO,
+		final Set<String> codes) {
 		final List<GermplasmNameTypeDTO> nameTypeRequestDTOs = this.germplasmNameTypeService.filterGermplasmNameTypes(codes);
 		Assert.assertThat(1, equalTo(nameTypeRequestDTOs.size()));
 		Assert.assertThat(nameTypeId, equalTo(nameTypeRequestDTOs.get(0).getId()));

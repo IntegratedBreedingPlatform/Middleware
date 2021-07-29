@@ -28,7 +28,7 @@ public interface GermplasmNameTypeService {
 
 	boolean isNameTypeUsedInListDataProp(String nameType);
 
-	void updateNameType(GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO, Integer nameTypeId);
+	void updateNameType(Integer nameTypeId, GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO);
 
 	void deleteNameType(Integer nameTypeId);
 }
