@@ -137,7 +137,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
-	public boolean existNameTypeUsedInListDataProp(final String nameType) {
+	public boolean isNameTypeUsedInListDataProp(final String nameType) {
 		return this.daoFactory.getListDataPropertyDAO().isNameTypeInUse(nameType);
 	}
 
