@@ -503,7 +503,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(3, projectProperties.size());
 		Assert.assertTrue(projectProperties.stream().filter(pp -> pp.getAlias().equals(numericVariable.getName())).findAny().isPresent());
 		Assert.assertTrue(projectProperties.stream().filter(pp -> pp.getAlias().equals(dateTimeVariable.getName())).findAny().isPresent());
-		Assert.assertTrue(projectProperties.stream().filter(pp -> pp.getAlias().equals(dateTimeVariable.getName())).findAny().isPresent());
+		Assert.assertTrue(projectProperties.stream().filter(pp -> pp.getAlias().equals(categoricalVariable.getName())).findAny().isPresent());
 
 	}
 
