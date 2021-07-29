@@ -18,6 +18,10 @@ import static org.hamcrest.CoreMatchers.equalTo;
 
 public class GermplasmNameTypeServiceImplIntegrationTest extends IntegrationTestBase {
 
+	private static final String CODE = "CODE" + RandomStringUtils.randomAlphabetic(10);
+	private static final String NAME = "NAME" + RandomStringUtils.randomAlphabetic(10);
+	private static final String DESCRIPTION = "DESCRIPTION" + RandomStringUtils.randomAlphabetic(10);
+
 	private DaoFactory daoFactory;
 
 	@Autowired
@@ -30,7 +34,10 @@ public class GermplasmNameTypeServiceImplIntegrationTest extends IntegrationTest
 
 	@Test
 	public void testCreateNameType_Ok() {
-		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
+		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO(
+			GermplasmNameTypeServiceImplIntegrationTest.CODE, GermplasmNameTypeServiceImplIntegrationTest.NAME, //
+			GermplasmNameTypeServiceImplIntegrationTest.DESCRIPTION); //
+
 		final Integer nameTypeId = this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO);
 
 		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameTypeRequestDTO.getCode()));
@@ -39,26 +46,33 @@ public class GermplasmNameTypeServiceImplIntegrationTest extends IntegrationTest
 
 	@Test
 	public void testUpdateNameType_Ok() {
-		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
+		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO(
+			GermplasmNameTypeServiceImplIntegrationTest.CODE, GermplasmNameTypeServiceImplIntegrationTest.NAME, //
+			GermplasmNameTypeServiceImplIntegrationTest.DESCRIPTION); //
+
 		final Integer nameTypeId = this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO);
 		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameTypeRequestDTO.getCode()));
 
 		this.verifyAssertGermplasmNameTypeRequestDTO(nameTypeId, germplasmNameTypeRequestDTO, codes);
 
-		germplasmNameTypeRequestDTO.setCode("TEST1" + RandomStringUtils.randomAlphabetic(10));
-		germplasmNameTypeRequestDTO.setName("TEST1" + RandomStringUtils.randomAlphabetic(10));
-		germplasmNameTypeRequestDTO.setDescription("Test Description1" + RandomStringUtils.randomAlphabetic(10));
-		codes.clear();
-		codes.add(germplasmNameTypeRequestDTO.getCode());
+		final GermplasmNameTypeRequestDTO nameTypeUpdate = this.buildGermplasmNameTypeRequestDTO(
+			"TEST1" + RandomStringUtils.randomAlphabetic(10), "TEST1" + RandomStringUtils.randomAlphabetic(10), //
+			"Test Description1" + RandomStringUtils.randomAlphabetic(10));
 
-		this.germplasmNameTypeService.updateNameType(nameTypeId, germplasmNameTypeRequestDTO);
-		this.verifyAssertGermplasmNameTypeRequestDTO(nameTypeId, germplasmNameTypeRequestDTO, codes);
+		codes.clear();
+		codes.add(nameTypeUpdate.getCode());
+
+		this.germplasmNameTypeService.updateNameType(nameTypeId, nameTypeUpdate);
+		this.verifyAssertGermplasmNameTypeRequestDTO(nameTypeId, nameTypeUpdate, codes);
 
 	}
 
 	@Test
 	public void testDeleteNameType_Ok() {
-		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO();
+		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO(
+			GermplasmNameTypeServiceImplIntegrationTest.CODE, GermplasmNameTypeServiceImplIntegrationTest.NAME, //
+			GermplasmNameTypeServiceImplIntegrationTest.DESCRIPTION); //
+
 		final Integer nameTypeId = this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO);
 		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameTypeRequestDTO.getCode()));
 
@@ -86,11 +100,11 @@ public class GermplasmNameTypeServiceImplIntegrationTest extends IntegrationTest
 		Assert.assertThat(germplasmNameTypeRequestDTO.getDescription(), equalTo(nameTypeRequestDTOs.get(0).getDescription()));
 	}
 
-	private GermplasmNameTypeRequestDTO buildGermplasmNameTypeRequestDTO() {
+	private GermplasmNameTypeRequestDTO buildGermplasmNameTypeRequestDTO(final String code, final String name, final String description) {
 		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = new GermplasmNameTypeRequestDTO();
-		germplasmNameTypeRequestDTO.setCode("TEST" + RandomStringUtils.randomAlphabetic(10));
-		germplasmNameTypeRequestDTO.setName("TEST" + RandomStringUtils.randomAlphabetic(10));
-		germplasmNameTypeRequestDTO.setDescription("Test Description" + RandomStringUtils.randomAlphabetic(10));
+		germplasmNameTypeRequestDTO.setCode(code);
+		germplasmNameTypeRequestDTO.setName(name);
+		germplasmNameTypeRequestDTO.setDescription(description);
 		return germplasmNameTypeRequestDTO;
 	}
 }
