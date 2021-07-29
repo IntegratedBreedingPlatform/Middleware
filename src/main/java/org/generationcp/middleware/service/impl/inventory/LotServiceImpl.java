@@ -82,13 +82,12 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
-		return this.searchLots(lotsSearchDto, pageable, false);
+		return this.daoFactory.getLotDao().searchLots(lotsSearchDto, pageable, null);
 	}
 
 	@Override
-	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable, final boolean applyResultsLimit) {
-		final Integer maxTotalResults = applyResultsLimit ? this.maxTotalResults : null;
-		return this.daoFactory.getLotDao().searchLots(lotsSearchDto, pageable, maxTotalResults);
+	public List<ExtendedLotDto> searchLotsApplyExportResultsLimit(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
+		return this.daoFactory.getLotDao().searchLots(lotsSearchDto, pageable, this.maxTotalResults);
 	}
 
 	@Override

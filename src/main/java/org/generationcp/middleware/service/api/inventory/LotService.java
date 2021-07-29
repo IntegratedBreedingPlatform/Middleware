@@ -17,7 +17,7 @@ public interface LotService {
 
 	List<ExtendedLotDto> searchLots(LotsSearchDto lotsSearchDto, Pageable pageable);
 
-	List<ExtendedLotDto> searchLots(LotsSearchDto lotsSearchDto, Pageable pageable, boolean applyResultsLimit);
+	List<ExtendedLotDto> searchLotsApplyExportResultsLimit(LotsSearchDto lotsSearchDto, Pageable pageable);
 
 	long countSearchLots(LotsSearchDto lotsSearchDto);
 
