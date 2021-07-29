@@ -206,122 +206,122 @@ public class SampleObservationDto implements Serializable {
     }
 
     public Map<String, String> getAdditionalInfo() {
-        return additionalInfo;
+        return this.additionalInfo;
     }
 
-    public void setAdditionalInfo(Map<String, String> additionalInfo) {
+    public void setAdditionalInfo(final Map<String, String> additionalInfo) {
         this.additionalInfo = additionalInfo;
     }
 
     public Integer getColumn() {
-        return column;
+        return this.column;
     }
 
-    public void setColumn(Integer column) {
+    public void setColumn(final Integer column) {
         this.column = column;
     }
 
     public List<ExternalReferenceDTO> getExternalReferences() {
-        return externalReferences;
+        return this.externalReferences;
     }
 
-    public void setExternalReferences(List<ExternalReferenceDTO> externalReferences) {
+    public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
         this.externalReferences = externalReferences;
     }
 
     public String getPlateName() {
-        return plateName;
+        return this.plateName;
     }
 
-    public void setPlateName(String plateName) {
+    public void setPlateName(final String plateName) {
         this.plateName = plateName;
     }
 
     public String getProgramDbId() {
-        return programDbId;
+        return this.programDbId;
     }
 
-    public void setProgramDbId(String programDbId) {
+    public void setProgramDbId(final String programDbId) {
         this.programDbId = programDbId;
     }
 
     public String getRow() {
-        return row;
+        return this.row;
     }
 
-    public void setRow(String row) {
+    public void setRow(final String row) {
         this.row = row;
     }
 
     public String getSampleBarcode() {
-        return sampleBarcode;
+        return this.sampleBarcode;
     }
 
-    public void setSampleBarcode(String sampleBarcode) {
+    public void setSampleBarcode(final String sampleBarcode) {
         this.sampleBarcode = sampleBarcode;
     }
 
     public String getSampleDescription() {
-        return sampleDescription;
+        return this.sampleDescription;
     }
 
-    public void setSampleDescription(String sampleDescription) {
+    public void setSampleDescription(final String sampleDescription) {
         this.sampleDescription = sampleDescription;
     }
 
     public String getSampleGroupDbId() {
-        return sampleGroupDbId;
+        return this.sampleGroupDbId;
     }
 
-    public void setSampleGroupDbId(String sampleGroupDbId) {
+    public void setSampleGroupDbId(final String sampleGroupDbId) {
         this.sampleGroupDbId = sampleGroupDbId;
     }
 
     public String getSampleName() {
-        return sampleName;
+        return this.sampleName;
     }
 
-    public void setSampleName(String sampleName) {
+    public void setSampleName(final String sampleName) {
         this.sampleName = sampleName;
     }
 
     public String getSamplePUI() {
-        return samplePUI;
+        return this.samplePUI;
     }
 
-    public void setSamplePUI(String samplePUI) {
+    public void setSamplePUI(final String samplePUI) {
         this.samplePUI = samplePUI;
     }
 
     public String getTrialDbId() {
-        return trialDbId;
+        return this.trialDbId;
     }
 
-    public void setTrialDbId(String trialDbId) {
+    public void setTrialDbId(final String trialDbId) {
         this.trialDbId = trialDbId;
     }
 
     public String getWell() {
-        return well;
+        return this.well;
     }
 
-    public void setWell(String well) {
+    public void setWell(final String well) {
         this.well = well;
     }
 
     public Integer getTakenById() {
-        return takenById;
+        return this.takenById;
     }
 
-    public void setTakenById(Integer takenById) {
+    public void setTakenById(final Integer takenById) {
         this.takenById = takenById;
     }
 
     public Integer getSampleId() {
-        return sampleId;
+        return this.sampleId;
     }
 
-    public void setSampleId(Integer sampleId) {
+    public void setSampleId(final Integer sampleId) {
         this.sampleId = sampleId;
     }
 

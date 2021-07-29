@@ -3,22 +3,14 @@ package org.generationcp.middleware.service.impl.study;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
-import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRequestDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
-import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -30,7 +22,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -140,16 +131,16 @@ public class SampleServiceImpl implements SampleService {
 	public List<SampleObservationDto> getSampleObservations(final SampleSearchRequestDTO requestDTO, final Pageable pageable) {
 		final List<SampleObservationDto> sampleObservationDtos = this.daoFactory.getSampleDao().getSampleObservationDtos(requestDTO, pageable);
 		if (!CollectionUtils.isEmpty(sampleObservationDtos)) {
-			final List<Integer> sampleIds = new ArrayList<>(sampleObservationDtos.stream().map(s -> s.getSampleId())
+			final List<Integer> sampleIds = new ArrayList<>(sampleObservationDtos.stream().map(SampleObservationDto::getSampleId)
 					.collect(Collectors.toSet()));
 			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
 					this.daoFactory.getSampleExternalReferenceDAO().getExternalReferences(sampleIds).stream()
 							.collect(groupingBy(
 									ExternalReferenceDTO::getEntityId));
-			final List<Integer> userIds = sampleObservationDtos.stream().map(s -> s.getTakenById()).collect(Collectors.toList());
+			final List<Integer> userIds = sampleObservationDtos.stream().map(SampleObservationDto::getTakenById).collect(Collectors.toList());
 			final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
 			for(final SampleObservationDto sample: sampleObservationDtos) {
-				sample.setExternalReferences(externalReferencesMap.get(sample.getSampleId()));
+				sample.setExternalReferences(externalReferencesMap.get(sample.getSampleId().toString()));
 				sample.setTakenBy(userIDFullNameMap.get(sample.getTakenById()));
 			}
 		}
@@ -157,13 +148,13 @@ public class SampleServiceImpl implements SampleService {
 	}
 
 	@Override
-	public long countSampleObservations(SampleSearchRequestDTO sampleSearchRequestDTO) {
+	public long countSampleObservations(final SampleSearchRequestDTO sampleSearchRequestDTO) {
 		return this.daoFactory.getSampleDao().countSampleObservationDtos(sampleSearchRequestDTO);
 	}
 
 	void populateTakenBy(final List<SampleDTO> sampleDTOS) {
 		// Populate takenBy with full name of user from workbench database.
-		final List<Integer> userIds = sampleDTOS.stream().map(sampleDTO -> sampleDTO.getTakenByUserId()).collect(Collectors.toList());
+		final List<Integer> userIds = sampleDTOS.stream().map(SampleDTO::getTakenByUserId).collect(Collectors.toList());
 		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
 		sampleDTOS.forEach(sampleDTO -> sampleDTO.setTakenBy(userIDFullNameMap.get(sampleDTO.getTakenByUserId())));
 	}
