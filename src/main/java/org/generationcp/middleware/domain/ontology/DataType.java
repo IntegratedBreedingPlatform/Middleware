@@ -8,6 +8,7 @@ public enum DataType {
 
 	CATEGORICAL_VARIABLE(1130, "Categorical", false, "C"),
 	NUMERIC_VARIABLE(1110, "Numeric", false, "N"),
+	NUMERIC_DBID_VARIABLE(1118, "Numeric DBID Variable", true, "N"),
 	DATE_TIME_VARIABLE(1117, "Date", false, "D"),
 	CHARACTER_VARIABLE(1120, "Character", false, "T"),
 	FILE_VARIABLE(1121, "File", false, "F"),
