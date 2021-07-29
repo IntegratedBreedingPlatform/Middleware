@@ -325,9 +325,7 @@
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
-	<bean id="personValidator" class="org.generationcp.middleware.service.api.ontology.PersonValidator">
-		<constructor-arg name="sessionProvider" ref="workbenchSessionProvider"/>
-	</bean>
+	<bean id="personValidator" class="org.generationcp.middleware.service.api.ontology.PersonValidator"/>
 
 	<bean id="breedingMethodValidator" class="org.generationcp.middleware.service.api.ontology.BreedingMethodValidator" />
 
