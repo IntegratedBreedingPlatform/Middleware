@@ -2,7 +2,7 @@ package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.InstanceExternalReference;
+import org.generationcp.middleware.pojos.SampleExternalReference;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.AliasToBeanResultTransformer;
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class SampleExternalReferenceDAO extends GenericDAO<InstanceExternalReference, Integer>  {
+public class SampleExternalReferenceDAO extends GenericDAO<SampleExternalReference, Integer>  {
 
     private static final Logger LOG = LoggerFactory.getLogger(SampleExternalReferenceDAO.class);
 
