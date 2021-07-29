@@ -457,8 +457,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				query.setParameterList("gidList", gidList);
 				returnList = query.list();
 			} catch (final HibernateException e) {
-				throw new MiddlewareQueryException(
-					"Error with getNamesByTypeAndGIDList(nameType=" + nameType + ", gidList=" + gidList + "): " + e.getMessage(), e);
+				final String message = "Error with getNamesByTypeAndGIDList(nameType=" + nameType + ", gidList=" + gidList + "): " + e.getMessage();
+				NameDAO.LOG.error(message);
+				throw new MiddlewareQueryException(message, e);
 			}
 		}
 		return returnList;
@@ -476,8 +477,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				query.setParameterList("germplasmPUIList", germplasmPUIList);
 				returnList = query.list();
 			} catch (final HibernateException e) {
-				throw new MiddlewareQueryException(
-					"Error with getExistingGermplasmPUIs(germplasmPUIList=" + germplasmPUIList + "): " + e.getMessage(), e);
+				final String message = "Error with getExistingGermplasmPUIs(germplasmPUIList=" + germplasmPUIList + "): " + e.getMessage();
+				NameDAO.LOG.error(message);
+				throw new MiddlewareQueryException(message, e);
 			}
 		}
 		return returnList;
@@ -493,7 +495,9 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				query.setParameter("nameType", nameTypeId);
 				returnList = query.list();
 			} catch (final HibernateException e) {
-				throw new MiddlewareQueryException("Error with getNamesByNameTypeId(nameTypeId=" + nameTypeId + "): " + e.getMessage(), e);
+				final String message = "Error with getNamesByNameTypeId(nameTypeId=" + nameTypeId + "): " + e.getMessage();
+				NameDAO.LOG.error(message);
+				throw new MiddlewareQueryException(message, e);
 			}
 		return returnList;
 	}
