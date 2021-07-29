@@ -3,12 +3,9 @@ package org.generationcp.middleware.service.api.ontology;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.EnumMap;
 import java.util.Optional;
 
 public class VariableDataValidatorFactoryImpl implements VariableDataValidatorFactory {
-
-	private final EnumMap<DataType, VariableValueValidator> dataTypeValidatorMap = new EnumMap<>(DataType.class);
 
 	@Autowired
 	private PersonValidator personValidator;
@@ -21,11 +18,7 @@ public class VariableDataValidatorFactoryImpl implements VariableDataValidatorFa
 
 	@Override
 	public Optional<VariableValueValidator> getValidator(final DataType dataType) {
-		// Look for validator in custom or prioritized registered validators
-		if (this.dataTypeValidatorMap.containsKey(dataType)) {
-			return Optional.of(this.dataTypeValidatorMap.get(dataType));
-
-		} else if (DataType.PERSON.getId().equals(dataType.getId())) {
+		if (DataType.PERSON.getId().equals(dataType.getId())) {
 			return Optional.of(this.personValidator);
 
 		} else if (DataType.BREEDING_METHOD.getId().equals(dataType.getId()) ) {
@@ -49,8 +42,4 @@ public class VariableDataValidatorFactoryImpl implements VariableDataValidatorFa
 		return Optional.empty();
 	}
 
-	@Override
-	public void registerDataTypeValidator(final DataType dataType, final VariableValueValidator validator) {
-		this.dataTypeValidatorMap.put(dataType, validator);
-	}
 }

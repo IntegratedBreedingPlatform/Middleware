@@ -1,11 +1,9 @@
 package org.generationcp.middleware.service.impl.ontology;
 
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.service.api.ontology.BreedingMethodValidator;
 import org.generationcp.middleware.service.api.ontology.CategoricalValueDescriptionValidator;
-import org.generationcp.middleware.service.api.ontology.CategoricalValueNameValidator;
 import org.generationcp.middleware.service.api.ontology.CharacterValueValidator;
 import org.generationcp.middleware.service.api.ontology.DateValueValidator;
 import org.generationcp.middleware.service.api.ontology.LocationValidator;
@@ -85,29 +83,8 @@ public class VariableDataValidatorFactoryImplTest extends IntegrationTestBase {
 		Assert.assertFalse(this.variableDataValidatorFactory.getValidator(DataType.STUDY).isPresent());
 		Assert.assertFalse(this.variableDataValidatorFactory.getValidator(DataType.DATASET).isPresent());
 		Assert.assertFalse(this.variableDataValidatorFactory.getValidator(DataType.GERMPLASM_LIST).isPresent());
+		Assert.assertFalse(this.variableDataValidatorFactory.getValidator(DataType.FILE_VARIABLE).isPresent());
 	}
-
-	@Test
-	public void testRegisterValidator_ShouldOverrideDefaultValidator(){
-		final TestFileValidator newValidator = new TestFileValidator();
-		this.variableDataValidatorFactory.registerDataTypeValidator(DataType.FILE_VARIABLE, newValidator);
-
-		final Optional<VariableValueValidator> validator = this.variableDataValidatorFactory.getValidator(DataType.FILE_VARIABLE);
-		Assert.assertTrue(validator.isPresent());
-		Assert.assertEquals(newValidator, validator.get());
-	}
-
-
-	private static class TestFileValidator implements VariableValueValidator {
-
-		@Override
-		public boolean isValid(final MeasurementVariable variable) {
-			return false;
-		}
-	}
-
-
-
 
 
 }

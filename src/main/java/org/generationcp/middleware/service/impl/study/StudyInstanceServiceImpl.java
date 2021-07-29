@@ -769,7 +769,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 		if (!CollectionUtils.isEmpty(requestDTO.getEnvironmentParameters())) {
 			// Use name of categorical value in validating inputs
-			this.variableDataValidatorFactory.registerDataTypeValidator(DataType.CATEGORICAL_VARIABLE, new CategoricalValueNameValidator());
+			final CategoricalValueNameValidator categoricalValueNameValidator = new CategoricalValueNameValidator();
 			for (final EnvironmentParameter environmentParameter : requestDTO.getEnvironmentParameters()) {
 				if (StringUtils.isNotEmpty(environmentParameter.getValue())) {
 					final MeasurementVariable measurementVariable =
@@ -777,7 +777,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 					if (measurementVariable != null) {
 						measurementVariable.setValue(environmentParameter.getValue());
 						final DataType dataType = DataType.getById(measurementVariable.getDataTypeId());
-						final java.util.Optional<VariableValueValidator> dataValidator =
+						final java.util.Optional<VariableValueValidator> dataValidator = DataType.CATEGORICAL_VARIABLE.equals(dataType) ? Optional.of(categoricalValueNameValidator) :
 							this.variableDataValidatorFactory.getValidator(dataType);
 						if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
 							measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
