@@ -313,7 +313,7 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
-		<bean id="germplasmNameService" class="org.generationcp.middleware.api.germplasm.GermplasmNameServiceImpl">
+	<bean id="germplasmNameService" class="org.generationcp.middleware.api.germplasm.GermplasmNameServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
@@ -323,6 +323,18 @@
 
 	<bean id="GermplasmNameTypeService" class="org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
+	<bean id="personValidator" class="org.generationcp.middleware.service.api.ontology.PersonValidator">
+		<constructor-arg name="sessionProvider" ref="workbenchSessionProvider"/>
+	</bean>
+
+	<bean id="breedingMethodValidator" class="org.generationcp.middleware.service.api.ontology.BreedingMethodValidator" />
+
+	<bean id="locationValidator" class="org.generationcp.middleware.service.api.ontology.LocationValidator" />
+
+	<bean id="breedingMethodService" class="org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
 </beans>
