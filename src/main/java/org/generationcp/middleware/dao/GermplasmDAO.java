@@ -1354,14 +1354,15 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	private String getSelectClauseForFilterGermplasm() {
-		return "SELECT g.germplsm_uuid AS germplasmDbId, convert(g.gid, char) as gid, " //
-			+ "  g.gpid1, g.gpid2, g.gnpgs, " //
-			+ "  max(if(ntype.fcode = 'ACCNO', n.nval, null)) as accessionNumber, " //
-			+ "   STR_TO_DATE (convert(g.gdate,char), '%Y%m%d') AS acquisitionDate," //
-			+ "   loc.labbr AS countryOfOriginCode, " //
-			+ "   max(if(n.nstat = 1, n.nval, null)) as germplasmName, " //
-			+ "  max(if(ntype.fcode = 'GENUS', n.nval, null)) as genus," //
-			+ "  max(if(ntype.fcode = 'PUI', n.nval, null)) as germplasmPUI," //
+		return "SELECT g.germplsm_uuid AS germplasmDbId, convert(g.gid, char) as gid, "
+			+ "  g.gpid1, g.gpid2, g.gnpgs, "
+			+ "  max(if(ntype.fcode = 'ACCNO', n.nval, null)) as accessionNumber, "
+			+ "   STR_TO_DATE (convert(g.gdate,char), '%Y%m%d') AS acquisitionDate,"
+			+ "   loc.labbr AS countryOfOriginCode, "
+			+ "  ne.json_props AS germplasmOrigin, "
+			+ "   max(if(n.nstat = 1, n.nval, null)) as germplasmName, "
+			+ "  max(if(ntype.fcode = 'GENUS', n.nval, null)) as genus,"
+			+ "  max(if(ntype.fcode = 'PUI', n.nval, null)) as germplasmPUI,"
 			+ "   max(if(atype.name = 'PLOTCODE_AP_text', a.aval, null)) as germplasmSeedSource,  "
 			+ "   max(if(atype.name = 'SPNAM_AP_text', a.aval, null)) as species, "
 			+ "   max(if(atype.name = 'SPAUTH_AP_text', a.aval, null)) as speciesAUthority, "
@@ -1369,7 +1370,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			+ "   max(if(atype.name = 'STAUTH_AP_text', a.aval, null)) as subtaxaAuthority, "
 			+ "   max(if(atype.name = 'INSTCODE_AP_text', a.aval, null)) as instituteCode, "
 			+ "   max(if(atype.name = 'ORIGININST_AP_text', a.aval, null)) as instituteName, "
-			+ "   max(if(atype.name = 'SORIG_AP_text', a.aval, null)) as germplasmOrigin, "
 			+ "   max(if(atype.name = 'CROPNM_AP_text', a.aval, null)) as commonCropName, "
 			+ "   convert(g.methn, char) as breedingMethodDbId ";
 	}
@@ -1380,7 +1380,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			+ "  	LEFT JOIN atributs a ON a.gid = g.gid "
 			+ "  	LEFT JOIN cvterm atype ON atype.cvterm_id = a.atype "
 			+ "  	LEFT join names n ON n.gid = g.gid and n.nstat != 9 "
-			+ "  	LEFT JOIN udflds ntype ON ntype.fldno = n.ntype ";
+			+ "  	LEFT JOIN udflds ntype ON ntype.fldno = n.ntype "
+			+ "     LEFT JOIN germplasm_study_source source ON source.gid = g.gid "
+			+ "     LEFT JOIN nd_experiment ne on source.nd_experiment_id = ne.nd_experiment_id ";
 	}
 
 	private String buildFilterGermplasmQuery(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
