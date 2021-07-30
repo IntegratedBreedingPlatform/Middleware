@@ -232,6 +232,18 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return false;
 	}
 
+	public List<WorkbenchUser> getUsers(final List<Integer> userIds) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
+			criteria.add(Restrictions.in("userid", userIds));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String message = "Error with getUsers(userIds=" + userIds + ") query from User: " + e.getMessage();
+			WorkbenchUserDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 	public Map<Integer, String> getUserIDFullNameMap(final List<Integer> userIds) {
 		final Map<Integer, String> idNamesMap = new HashMap<>();
 		try {
