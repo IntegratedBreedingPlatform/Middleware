@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
 	private final DaoFactory daoFactory;
-	private static final String DEFAULT_FFMT_FIELD = "-";
+	private static final String DEFAULT_FIELD = "-";
 
 	@Autowired
 	protected UserService userService;
@@ -56,13 +56,17 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
 	@Override
 	public Integer createNameType(final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
+		final String fDesc =
+			StringUtils.isBlank(germplasmNameTypeRequestDTO.getDescription()) ? GermplasmNameTypeServiceImpl.DEFAULT_FIELD :
+				germplasmNameTypeRequestDTO.getDescription();
+
 		final UserDefinedField userDefinedField = new UserDefinedField();
 		userDefinedField.setFtable(UDTableType.NAMES_NAME.getTable());
 		userDefinedField.setFtype(UDTableType.NAMES_NAME.getType());
 		userDefinedField.setFcode(germplasmNameTypeRequestDTO.getCode());
 		userDefinedField.setFname(germplasmNameTypeRequestDTO.getName());
-		userDefinedField.setFfmt(GermplasmNameTypeServiceImpl.DEFAULT_FFMT_FIELD);
-		userDefinedField.setFdesc(germplasmNameTypeRequestDTO.getDescription());
+		userDefinedField.setFfmt(GermplasmNameTypeServiceImpl.DEFAULT_FIELD);
+		userDefinedField.setFdesc(fDesc);
 		userDefinedField.setLfldno(0);
 		userDefinedField.setFuid(ContextHolder.getLoggedInUserId());
 		userDefinedField.setFdate(Util.getCurrentDateAsIntegerValue());
