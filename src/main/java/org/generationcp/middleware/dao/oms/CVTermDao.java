@@ -144,7 +144,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			if (!namesUppercase.isEmpty()) {
 
 				final StringBuilder sqlString =
-					new StringBuilder().append("SELECT UPPER(cvt.name) AS name, cvt.cvterm_id AS termId, dataType.object_id As dataTypeId")
+					new StringBuilder().append("SELECT UPPER(cvt.name) AS name, cvt.cvterm_id AS termId, dataType.object_id As dataTypeId, hasScale.object_id as scaleId ")
 						.append(" FROM cvterm cvt ")
 						.append(" INNER JOIN cvterm_relationship hasScale ON hasScale.subject_id = cvt.cvterm_id AND hasScale.type_id = "
 							+ TermId.HAS_SCALE.getId() + " ")
@@ -163,6 +163,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				query.addScalar("name", StringType.INSTANCE);
 				query.addScalar("termId", IntegerType.INSTANCE);
 				query.addScalar("dataTypeId", IntegerType.INSTANCE);
+				query.addScalar("scaleId", IntegerType.INSTANCE);
 				query.setResultTransformer(Transformers.aliasToBean(MeasurementVariable.class));
 				final List<MeasurementVariable> results = query.list();
 
