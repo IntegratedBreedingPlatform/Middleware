@@ -37,4 +37,38 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="darla" id="v18.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT 1 FROM CVTERM_RELATIONSHIP WHERE SUBJECT_ID = 6015 AND TYPE_ID = 1105;
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1) FROM CVTERM_RELATIONSHIP WHERE SUBJECT_ID = 6015 AND TYPE_ID = 1105 AND OBJECT_ID = 1136;
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Update data type of BMETH_CODE (cvterm ID: 6015) to Breeding Method (cvterm ID: 1136)</comment>
+		<sql dbms="mysql" splitStatements="false">
+			UPDATE CVTERM_RELATIONSHIP SET OBJECT_ID = 1136 WHERE SUBJECT_ID = 6015 AND TYPE_ID = 1105;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v18.4.0-4">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT 1 FROM CVTERM_RELATIONSHIP WHERE SUBJECT_ID = 6016 AND TYPE_ID = 1105;
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1) FROM CVTERM_RELATIONSHIP WHERE SUBJECT_ID = 6016 AND TYPE_ID = 1105 AND OBJECT_ID = 1132;
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Update data type of LOC_ABBR (cvterm ID: 6016) to Location (cvterm ID: 1132)</comment>
+		<sql dbms="mysql" splitStatements="false">
+			UPDATE CVTERM_RELATIONSHIP SET OBJECT_ID = 1132 WHERE SUBJECT_ID = 6016 AND TYPE_ID = 1105;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
