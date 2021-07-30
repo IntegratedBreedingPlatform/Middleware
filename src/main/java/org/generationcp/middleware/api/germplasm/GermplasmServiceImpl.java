@@ -733,8 +733,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 			.addAll(
 				germplasmUpdateDTOList.stream().map(GermplasmUpdateDTO::getPreferredNameType).filter(Objects::nonNull)
 					.collect(Collectors.toSet()));
-		return this.germplasmNameTypeService.filterGermplasmNameTypes(namesCode).stream().collect(Collectors.toMap(
-			GermplasmNameTypeDTO::getCode, GermplasmNameTypeDTO::getId));
+		return this.germplasmNameTypeService.filterGermplasmNameTypes(namesCode).stream().collect(Collectors.toMap(nameType ->
+			nameType.getCode().toUpperCase(), GermplasmNameTypeDTO::getId));
 	}
 
 	private Map<String, Integer> getNameTypesMapByName(final List<GermplasmImportDTO> germplasmDtos) {
