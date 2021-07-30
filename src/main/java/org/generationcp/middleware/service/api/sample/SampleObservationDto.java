@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.api.sample;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.pojomatic.Pojomatic;
@@ -58,6 +59,7 @@ public class SampleObservationDto implements Serializable {
     @JsonView(BrapiView.BrapiV2.class)
     private String samplePUI;
 
+    @JsonSerialize(as = Date.class)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private Date sampleTimestamp;
 
