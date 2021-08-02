@@ -13,9 +13,10 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			.uniqueResult();
 	}
 
-	public List<FileMetadata> findByObservationId(final Integer observationId) {
+	public List<FileMetadata> findByObservationUnitUUID(final String observationUnitUUID) {
 		return this.getSession().createCriteria(this.getPersistentClass())
-			.add(Restrictions.eq("phenotype.phenotypeId", observationId))
+			.createAlias("experimentModel", "experimentModel")
+			.add(Restrictions.eq("experimentModel.obsUnitId", observationUnitUUID))
 			.list();
 	}
 }

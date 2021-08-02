@@ -39,7 +39,6 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	private static final String FILE_PATH_PREFIX_PROGRAMUUID = "programuuid-";
 	private static final String FILE_PATH_PREFIX_STUDYID = "studyid-";
 	private static final String FILE_PATH_PREFIX_OBSUNITUUID = "obsunituuid-";
-	private static final String FILE_PATH_PREFIX_TERMID = "termid-";
 	/**
 	 * AWS S3 uses forward slash to identify folders
 	 */
@@ -71,10 +70,8 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(ContextHolder.getCurrentCrop());
 		FileUIDGenerator.generate(cropType, singletonList(fileMetadata));
 
-		final Integer termId = this.getFirstFileVariable(observationUnitDbId);
-
 		// assigned path, to be saved later using file storage
-		final String path = this.getFilePath(observationUnitDbId, termId, imageNewRequest.getImageFileName());
+		final String path = this.getFilePath(observationUnitDbId, imageNewRequest.getImageFileName());
 		fileMetadata.setPath(path);
 
 		this.daoFactory.getFileMetadataDAO().save(fileMetadata);
@@ -123,33 +120,13 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	 * Resolve predetermined path based on params (e.g, for observations, germplasm, etc)
 	 */
 	@Override
-	public String getFilePath(final String observationUnitId, final Integer termId, final String fileName) {
+	public String getFilePath(final String observationUnitId, final String fileName) {
 		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId);
 		final DmsProject study = experimentModel.getProject().getStudy();
 		return FILE_PATH_PREFIX_PROGRAMUUID + study.getProgramUUID()
 			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_STUDYID + study.getProjectId()
 			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_OBSUNITUUID + observationUnitId
-			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_TERMID + termId
 			+ FILE_PATH_SLASH + fileName;
-	}
-
-	@Override
-	public void linkToObservation(final FileMetadataDTO fileMetadataDTO, Integer termId) {
-		if (termId == null) {
-			termId = this.getFirstFileVariable(fileMetadataDTO.getObservationUnitUUID());
-		}
-
-		ObservationDto observation = new ObservationDto();
-		observation.setValue(fileMetadataDTO.getName());
-		observation.setObservationUnitId(fileMetadataDTO.getNdExperimentId());
-		observation.setVariableId(termId);
-
-		observation = this.datasetService.createObservation(observation);
-
-		final FileMetadata fileMetadata = this.daoFactory.getFileMetadataDAO().getByFileUUID(fileMetadataDTO.getFileUUID());
-		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(observation.getObservationId());
-		fileMetadata.setPhenotype(phenotype);
-		this.daoFactory.getFileMetadataDAO().saveOrUpdate(fileMetadata);
 	}
 
 	@Override
@@ -171,8 +148,8 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public List<FileMetadataDTO> list(final Integer observationId) {
-		final List<FileMetadata> fileMetadataList = this.daoFactory.getFileMetadataDAO().findByObservationId(observationId);
+	public List<FileMetadataDTO> list(final String observationUnitUUID) {
+		final List<FileMetadata> fileMetadataList = this.daoFactory.getFileMetadataDAO().findByObservationUnitUUID(observationUnitUUID);
 
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
 		return fileMetadataList.stream().map(fileMetadata -> {
@@ -185,33 +162,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	@Override
 	public void delete(final String fileUUID) {
 		final FileMetadata fileMetadata = this.daoFactory.getFileMetadataDAO().getByFileUUID(fileUUID);
-		final Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getById(fileMetadata.getPhenotype().getPhenotypeId());
 		this.daoFactory.getFileMetadataDAO().makeTransient(fileMetadata);
-		this.daoFactory.getPhenotypeDAO().makeTransient(phenotype);
 	}
 
-	/**
-	 * TODO observationVariableDbId not available for images (https://github.com/plantbreeding/API/issues/477)
-	 *  assuming only one file variable per study, to get by obsUnitId
-	 *
-	 * @return termid
-	 */
-	private Integer getFirstFileVariable(final String observationUnitDbId) {
-		final DatasetDTO dataset = this.daoFactory.getDmsProjectDAO().getDatasetByObsUnitDbId(observationUnitDbId);
-		final List<MeasurementVariable> fileTypeVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(
-			dataset.getDatasetId(),
-			singletonList(VariableType.TRAIT.getId())
-		).stream().filter(variable -> variable.getDataTypeId() == DataType.FILE_VARIABLE.getId()).collect(toList());
-
-		if (isEmpty(fileTypeVariables)) {
-			throw new MiddlewareRequestException("", "filemetadata.variable.not.found", new String[] {observationUnitDbId});
-		}
-
-		if (fileTypeVariables.size() > 1) {
-			throw new MiddlewareRequestException("", "filemetadata.brapi.multiple.file.variables");
-		}
-
-		final Integer termId = fileTypeVariables.get(0).getTermId();
-		return termId;
-	}
 }

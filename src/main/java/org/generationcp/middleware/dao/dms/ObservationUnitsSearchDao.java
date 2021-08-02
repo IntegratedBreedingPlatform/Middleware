@@ -41,6 +41,7 @@ import java.util.Set;
 public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ObservationUnitsSearchDao.class);
+
 	private static final String SUM_OF_SAMPLES_ID = "-2";
 	private static final String OBSERVATION_UNIT_ID = "observationUnitId";
 	protected static final String LOCATION_ID = "LOCATION_ID";
@@ -63,6 +64,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	protected static final String SUM_OF_SAMPLES = "SUM_OF_SAMPLES";
 	protected static final String STOCK_ID = "STOCK_ID";
 	private static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
+	private static final String FILE_COUNT = "FILE_COUNT";
+
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 	private static final String ENVIRONMENT_COLUMN_NAME_SUFFIX = "_ENVIRONMENT";
 	private static final List<String> EXP_PROPS_VAR_TYPES =
@@ -135,6 +138,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "			inner join ims_transaction tr on tr.trnid = ndt.trnid and ndt.type = " + ExperimentTransactionType.PLANTING.getId() + " and tr.trntype = " + TransactionType.WITHDRAWAL.getId()
 			+ "			inner join ims_lot lot on lot.lotid = tr.lotid \n"
 			+ "        WHERE ndt.nd_experiment_id = nde.nd_experiment_id), '-') ) AS 'STOCK_ID'");
+		mainVariablesMap.put(FILE_COUNT,  //
+			"(select count(1) from file_metadata fm where fm.nd_experiment_id = nde.nd_experiment_id) as '" + FILE_COUNT + "'");
 
 	}
 
@@ -474,6 +479,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		createSQLQuery.addScalar(ObservationUnitsSearchDao.OBS_UNIT_ID, new StringType());
 		createSQLQuery.addScalar(ObservationUnitsSearchDao.SUM_OF_SAMPLES);
 		createSQLQuery.addScalar(ObservationUnitsSearchDao.STOCK_ID, new StringType());
+		createSQLQuery.addScalar(ObservationUnitsSearchDao.FILE_COUNT, new IntegerType());
 	}
 
 	private String getObservationUnitTableQuery(
@@ -1055,6 +1061,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		observationUnitRow.setAction(((Integer) row.get(OBSERVATION_UNIT_ID)).toString());
 		observationUnitRow.setObsUnitId((String) row.get(OBS_UNIT_ID));
 		observationUnitRow.setSamplesCount((String) row.get(SUM_OF_SAMPLES));
+		observationUnitRow.setFileCount((Integer) row.get(FILE_COUNT));
+
 		final Integer gid = (Integer) row.get(GID);
 		observationUnitRow.setGid(gid);
 		observationVariables.put(GID, new ObservationUnitData(gid.toString()));
