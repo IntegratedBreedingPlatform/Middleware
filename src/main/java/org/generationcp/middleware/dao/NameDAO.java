@@ -485,21 +485,18 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return returnList;
 	}
 
-
-	public List<Name> getNamesByNameTypeId(final Integer nameTypeId) {
-		List<Name> returnList = new ArrayList<>();
-			try {
-				final String sql = "SELECT {n.*}" + " FROM names n" + " WHERE n.ntype = :nameType";
-				final SQLQuery query = this.getSession().createSQLQuery(sql);
-				query.addEntity("n", Name.class);
-				query.setParameter("nameType", nameTypeId);
-				returnList = query.list();
-			} catch (final HibernateException e) {
-				final String message = "Error with getNamesByNameTypeId(nameTypeId=" + nameTypeId + "): " + e.getMessage();
-				NameDAO.LOG.error(message);
-				throw new MiddlewareQueryException(message, e);
-			}
-		return returnList;
+	public boolean isNameTypeInUse(final Integer nameTypeId) {
+		try {
+			final String sql = "SELECT count(1) FROM names n  WHERE n.ntype = :nameType";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.addEntity("n", Name.class);
+			query.setParameter("nameType", nameTypeId);
+			return ((BigInteger) query.uniqueResult()).longValue() > 0;
+		} catch (final HibernateException e) {
+			final String message = "Error with isNameTypeInUse(nameTypeId=" + nameTypeId + "): " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 
 	public List<GermplasmNameDto> getGermplasmNamesByGids(final List<Integer> gids) {

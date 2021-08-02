@@ -127,7 +127,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
-	public List<Name> getGermplasmNamesByNameTypeId(final Integer nameTypeId) {
-		return this.daoFactory.getNameDao().getNamesByNameTypeId(nameTypeId);
+	public boolean isNameTypeUsedAsGermplasmName(final Integer nameTypeId){
+		return this.daoFactory.getNameDao().isNameTypeInUse(nameTypeId);
 	}
 }
