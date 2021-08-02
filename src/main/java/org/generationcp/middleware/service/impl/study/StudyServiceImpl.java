@@ -5,39 +5,27 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Ordering;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.Service;
-import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
-import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
-
-	private StudyMeasurements studyMeasurements;
 
 	@Resource
 	private StudyDataManager studyDataManager;
@@ -55,9 +43,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	public StudyServiceImpl(final HibernateSessionProvider sessionProvider) {
 		super(sessionProvider);
-		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
-		this.studyDataManager = new StudyDataManagerImpl(sessionProvider);
-
 		final CacheLoader<StudyKey, String> studyKeyCacheBuilder = new CacheLoader<StudyKey, String>() {
 
 			@Override
@@ -140,150 +125,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
-		return this.getTrialObservationTable(studyIdentifier, null);
-	}
-
-	@Override
-	public TrialObservationTable getTrialObservationTable(final int studyIdentifier, final Integer instanceDbId) {
-		final List<MeasurementVariableDto> traits =
-			this.daoFactory.getProjectPropertyDAO().getVariables(studyIdentifier, VariableType.TRAIT.getId());
-
-		final List<MeasurementVariableDto> measurementVariables = Ordering.from(new Comparator<MeasurementVariableDto>() {
-
-			@Override
-			public int compare(final MeasurementVariableDto o1, final MeasurementVariableDto o2) {
-				return o1.getId() - o2.getId();
-			}
-		}).immutableSortedCopy(traits);
-
-		final List<Object[]> results =
-			this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, measurementVariables, instanceDbId);
-
-		final List<Integer> observationVariableDbIds = new ArrayList<>();
-
-		final List<String> observationVariableNames = new ArrayList<>();
-
-		for (final Iterator<MeasurementVariableDto> iterator = measurementVariables.iterator(); iterator.hasNext(); ) {
-			final MeasurementVariableDto measurementVariableDto = iterator.next();
-			observationVariableDbIds.add(measurementVariableDto.getId());
-			observationVariableNames.add(measurementVariableDto.getName());
-		}
-
-		final List<List<String>> data = Lists.newArrayList();
-
-		final String year = this.getYearFromStudy(studyIdentifier);
-
-		if (!CollectionUtils.isEmpty(results)) {
-
-			for (final Object[] row : results) {
-				final List<String> entry = Lists.newArrayList();
-
-				entry.add(year);
-
-				final int lastFixedColumn = 19;
-
-				// studyDbId = nd_geolocation_id
-				entry.add(String.valueOf(row[17]));
-
-				final String locationName = (String) row[13];
-				final String locationAbbreviation = (String) row[14];
-
-				// studyName
-				final String studyName = row[lastFixedColumn] + " Environment Number " + row[1];
-				entry.add(studyName);
-
-				// locationDbId
-				entry.add(String.valueOf(row[18]));
-
-				// locationName
-				if (StringUtils.isNotBlank(locationAbbreviation)) {
-					entry.add(locationAbbreviation);
-				} else if (StringUtils.isNotBlank(locationName)) {
-					entry.add(locationName);
-				} else {
-					entry.add(studyName);
-				}
-
-				// gid
-				entry.add(String.valueOf(row[3]));
-
-				// germplasm Name/designation
-				entry.add(String.valueOf(row[4]));
-
-				// observation Db Id = nd_experiment_id
-				entry.add(String.valueOf(row[0]));
-
-				// PlotNumber
-				entry.add((String) row[8]);
-
-				// replication number
-				entry.add((String) row[7]);
-
-				// blockNumber
-				entry.add((String) row[9]);
-
-				// Timestamp
-				entry.add("UnknownTimestamp");
-
-				// entry type
-				entry.add(String.valueOf(row[2]));
-
-				/**
-				 *
-				 * x (Col) \\\\\\\\\\\\\\\\\\\\ \...|....|....|....\ \...|....|....|....\ \------------------\ y (Row) \...|....|....|....\
-				 * \...|....|....|....\ \------------------\ \...|....|....|....\ \...|....|....|....\ \\\\\\\\\\\\\\\\\\\\
-				 *
-				 *
-				 */
-				Object x = row[11]; // COL
-				Object y = row[10]; // ROW
-
-				// If there is no row and col design,
-				// get fieldmap row and col
-				if (x == null || y == null) {
-					x = row[15];
-					y = row[16];
-				}
-
-				// X = col
-				entry.add(String.valueOf(x));
-
-				// Y = row
-				entry.add(String.valueOf(y));
-
-				// obsUnitId
-				entry.add(String.valueOf(row[12]));
-
-				// phenotypic values
-				int columnOffset = 1;
-				for (int i = 0; i < traits.size(); i++) {
-					final Object rowValue = row[lastFixedColumn + columnOffset];
-
-					if (rowValue != null) {
-						entry.add(String.valueOf(rowValue));
-					} else {
-						entry.add(null);
-					}
-
-					// get every other column skipping over PhenotypeId column
-					columnOffset += 2;
-				}
-				data.add(entry);
-			}
-		}
-
-		final TrialObservationTable dto = new TrialObservationTable().setStudyDbId(instanceDbId != null ? instanceDbId : studyIdentifier)
-			.setObservationVariableDbIds(observationVariableDbIds).setObservationVariableNames(observationVariableNames).setData(data);
-
-		dto.setHeaderRow(Lists.newArrayList("year", "studyDbId", "studyName", "locationDbId", "locationName", "germplasmDbId",
-			"germplasmName", "observationUnitDbId", "plotNumber", "replicate", "blockNumber", "observationTimestamp", "entryType", "X",
-			"Y", "obsUnitId"));
-
-		return dto;
-	}
-
-	@Override
 	public boolean hasMeasurementDataEntered(final List<Integer> ids, final int studyId) {
 		return this.daoFactory.getPhenotypeDAO().hasMeasurementDataEntered(ids, studyId);
 	}
@@ -304,17 +145,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 		this.studyDataManager = studyDataManager;
 	}
 
-	String getYearFromStudy(final int studyIdentifier) {
-		final String startDate = this.studyDataManager.getProjectStartDateByProjectId(studyIdentifier);
-		if (startDate != null) {
-			return startDate.substring(0, 4);
-		}
-		return startDate;
-	}
-
-	public void setStudyMeasurements(final StudyMeasurements studyMeasurements) {
-		this.studyMeasurements = studyMeasurements;
-	}
 
 	public void setDaoFactory(final DaoFactory daoFactory) {
 		this.daoFactory = daoFactory;

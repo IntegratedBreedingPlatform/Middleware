@@ -492,7 +492,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 			.createStudy("StudyDeleted", "StudyDeleted-Description", 6, this.commonTestProject.getUniqueID(),
 				this.testUser.getUserid().toString(), null, null);
 		deletedStudy.setDeleted(true);
-		final DmsProject environmentDatasetDeleted =
+		final DmsProject environmentDatasetDeleted =`
 			this.testDataInitializer
 				.createDmsProject("Environment Dataset Deleted", "Environment Dataset-Description Deleted", deletedStudy, deletedStudy,
 					DatasetTypeEnum.SUMMARY_DATA);
@@ -501,5 +501,6 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDatasetDeleted, "2", location1);
 		this.testDataInitializer.createTestExperiment(deletedStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
 	}
+
 
 }
