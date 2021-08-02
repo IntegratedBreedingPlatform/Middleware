@@ -25,8 +25,6 @@ import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Criteria;
@@ -40,7 +38,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Implementation of the WorkbenchDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
@@ -53,8 +50,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	private HibernateSessionProvider sessionProvider;
 
 	private WorkbenchDaoFactory workbenchDaoFactory;
-
-	private Project currentlastOpenedProject;
 
 	public WorkbenchDataManagerImpl() {
 		super();
@@ -72,11 +67,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<Project> getProjects() {
 		return this.workbenchDaoFactory.getProjectDAO().getAll();
-	}
-
-	@Override
-	public List<Project> getProjects(final int start, final int numOfRows) {
-		return this.workbenchDaoFactory.getProjectDAO().getAll(start, numOfRows);
 	}
 
 	@Override
@@ -104,30 +94,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 				"Cannot save Project: WorkbenchDataManager.saveOrUpdateProject(project=" + project + "): " + e.getMessage(), e);
 		}
 
-		return project;
-	}
-
-	@Override
-	public Project addProject(final Project project) {
-
-		try {
-			project.setUniqueID(UUID.randomUUID().toString());
-			this.workbenchDaoFactory.getProjectDAO().save(project);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Cannot save Project: WorkbenchDataManager.addProject(project=" + project + "): " + e.getMessage(), e);
-		}
-		return project;
-	}
-
-	@Override
-	public Project mergeProject(final Project project) {
-		try {
-			this.workbenchDaoFactory.getProjectDAO().merge(project);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Cannot save Project: WorkbenchDataManager.updateProject(project=" + project + "): " + e.getMessage(), e);
-		}
 		return project;
 	}
 
@@ -331,43 +297,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<WorkbenchSidebarCategory> getAllWorkbenchSidebarCategory() {
-		return this.workbenchDaoFactory.getWorkbenchSidebarCategoryDAO().getAll();
-	}
-
-	@Override
-	public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinks() {
-		return this.workbenchDaoFactory.getWorkbenchSidebarCategoryLinkDAO().getAll();
-	}
-
-	@Override
-	public List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(final WorkbenchSidebarCategory category) {
-		return this.workbenchDaoFactory.getWorkbenchSidebarCategoryLinkDAO()
-			.getAllWorkbenchSidebarLinksByCategoryId(category, 0, Integer.MAX_VALUE);
-	}
-
-	@Override
 	public Project getLastOpenedProjectAnyUser() {
 		return this.workbenchDaoFactory.getProjectDAO().getLastOpenedProjectAnyUser();
-	}
-
-	@Override
-	public Boolean isLastOpenedProjectChanged() {
-
-		final Project project = this.workbenchDaoFactory.getProjectDAO().getLastOpenedProjectAnyUser();
-
-		if (this.currentlastOpenedProject == null) {
-			this.currentlastOpenedProject = project;
-			return false;
-		}
-
-		if (this.currentlastOpenedProject.getProjectId().equals(project.getProjectId())) {
-			return false;
-		} else {
-			this.currentlastOpenedProject = project;
-			return true;
-		}
-
 	}
 
 	@Override
@@ -437,27 +368,10 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public void deleteStandardPreset(final int standardPresetId) {
-		try {
-			final StandardPreset preset = this.workbenchDaoFactory.getStandardPresetDAO().getById(standardPresetId);
-			this.getCurrentSession().delete(preset);
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Cannot delete preset: WorkbenchDataManager.deleteStandardPreset(standardPresetId=" + standardPresetId + "): " + e
-					.getMessage(), e);
-		}
-	}
-
-	@Override
 	public void close() {
 		if (this.sessionProvider != null) {
 			this.sessionProvider.close();
 		}
-	}
-
-	@Override
-	public StandardPreset getStandardPresetById(final Integer presetId) {
-		return this.workbenchDaoFactory.getStandardPresetDAO().getById(presetId);
 	}
 
 	@Override
@@ -478,11 +392,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public RoleType getRoleType(final Integer id) {
 		return this.workbenchDaoFactory.getRoleTypeDAO().getById(id);
-	}
-
-	@Override
-	public WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksByCategoryId(final Integer workbenchSidebarCategoryLink) {
-		return this.workbenchDaoFactory.getWorkbenchSidebarCategoryLinkDao().getById(workbenchSidebarCategoryLink);
 	}
 
 	@Override

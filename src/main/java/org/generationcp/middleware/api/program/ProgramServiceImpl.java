@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.program;
 
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -18,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -96,5 +98,19 @@ public class ProgramServiceImpl implements ProgramService {
 		final Long projectId = this.daoFactory.getProjectDAO().getByUuid(programUUID).getProjectId();
 		this.daoFactory.getUserRoleDao().removeUsersFromProgram(userIds, projectId);
 	}
+
+	@Override
+	public Project addProject(final Project project) {
+
+		try {
+			project.setUniqueID(UUID.randomUUID().toString());
+			this.daoFactory.getProjectDAO().save(project);
+		} catch (final Exception e) {
+			throw new MiddlewareQueryException(
+				"Cannot save Project: WorkbenchDataManager.addProject(project=" + project + "): " + e.getMessage(), e);
+		}
+		return project;
+	}
+
 
 }

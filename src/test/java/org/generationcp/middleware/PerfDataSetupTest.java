@@ -1,12 +1,7 @@
 
 package org.generationcp.middleware;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
-
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -31,6 +26,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.transaction.TransactionConfiguration;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Random;
+
 @Ignore("This is just for setting up some performance level data volumes. Not intended to run regularly on CI.")
 @TransactionConfiguration(defaultRollback = false)
 public class PerfDataSetupTest extends IntegrationTestBase {
@@ -40,6 +41,9 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private ProgramService programService;
 
 	@Autowired
 	private GermplasmDataManager germplasmManager;
@@ -118,7 +122,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 		program.setStartDate(new Date(System.currentTimeMillis()));
 		program.setCropType(cropType);
 		program.setLastOpenDate(new Date(System.currentTimeMillis()));
-		this.workbenchDataManager.addProject(program);
+		this.programService.addProject(program);
 
 		// FIXME (BMS-4631) replace this with adding to workbench_project_user_info
 		// this.workbenchDataManager.addProjectUserRole(projectUserRoles);
@@ -153,7 +157,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 			final int numberOfEntries = new Random().nextInt(PerfDataSetupTest.MAX_NUMBER_OF_ENTRIES_PER_LIST);
 
 			for (int entryNumber = 1; entryNumber <= numberOfEntries; entryNumber++) {
-				int randomGidIndex = new Random().nextInt(gids.length);
+				final int randomGidIndex = new Random().nextInt(gids.length);
 				germplasmListData.add(new GermplasmListData(null, germplasmList, gids[randomGidIndex], entryNumber, "EntryCode"
 						+ entryNumber, PerfDataSetupTest.GERMPLSM_PREFIX + entryNumber + " Source", PerfDataSetupTest.GERMPLSM_PREFIX
 						+ entryNumber, PerfDataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));

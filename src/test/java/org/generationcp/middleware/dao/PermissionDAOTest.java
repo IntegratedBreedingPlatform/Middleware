@@ -3,6 +3,7 @@ package org.generationcp.middleware.dao;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -20,7 +21,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static org.apache.commons.lang.math.RandomUtils.nextInt;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -39,6 +39,9 @@ public class PermissionDAOTest extends IntegrationTestBase {
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	@Autowired
+	private ProgramService programService;
+
+	@Autowired
 	private UserService userService;
 	
 	private PermissionDAO permissionDAO;
@@ -52,7 +55,6 @@ public class PermissionDAOTest extends IntegrationTestBase {
 	private Project project2;
 	private Permission cropPermission;
 	private Permission programPermission;
-	private Permission manageProgramsPermission;
 
 	@Before
 	public void setUp() throws Exception {
@@ -112,12 +114,12 @@ public class PermissionDAOTest extends IntegrationTestBase {
 
 		if (this.project1 == null) {
 			this.project1 = this.workbenchTestDataUtil.createTestProjectData();
-			this.workbenchDataManager.addProject(this.project1);
+			this.programService.addProject(this.project1);
 		}
 
 		if (this.project2 == null) {
 			this.project2 = this.workbenchTestDataUtil.createTestProjectData();
-			this.workbenchDataManager.addProject(this.project2);
+			this.programService.addProject(this.project2);
 		}
 	}
 
@@ -140,8 +142,8 @@ public class PermissionDAOTest extends IntegrationTestBase {
 			.getPermissions(admin.getUserid(), null, null);
 
 		assertThat("should have all permissions", permissions, hasItems(
-			Matchers.<PermissionDto>hasProperty("id", is(this.cropPermission.getPermissionId())),
-			Matchers.<PermissionDto>hasProperty("id", is(this.programPermission.getPermissionId()))
+			Matchers.hasProperty("id", is(this.cropPermission.getPermissionId())),
+			Matchers.hasProperty("id", is(this.programPermission.getPermissionId()))
 		));
 	}
 
@@ -166,7 +168,7 @@ public class PermissionDAOTest extends IntegrationTestBase {
 
 		assertThat(permissions, hasSize(1));
 		assertThat("should have crop permissions", permissions, hasItems(
-			Matchers.<PermissionDto>hasProperty("id", is(this.cropPermission.getPermissionId()))
+			Matchers.hasProperty("id", is(this.cropPermission.getPermissionId()))
 		));
 	}
 
@@ -197,8 +199,8 @@ public class PermissionDAOTest extends IntegrationTestBase {
 			.getPermissions(programAdmin.getUserid(), this.cropType.getCropName(), this.project1.getProjectId().intValue());
 
 		assertThat("should have both crop and program permissions", permissions, hasItems(
-			Matchers.<PermissionDto>hasProperty("id", is(this.cropPermission.getPermissionId())),
-			Matchers.<PermissionDto>hasProperty("id", is(this.programPermission.getPermissionId()))
+			Matchers.hasProperty("id", is(this.cropPermission.getPermissionId())),
+			Matchers.hasProperty("id", is(this.programPermission.getPermissionId()))
 		));
 
 		final List<PermissionDto> permissionsForProject2 = this.permissionDAO

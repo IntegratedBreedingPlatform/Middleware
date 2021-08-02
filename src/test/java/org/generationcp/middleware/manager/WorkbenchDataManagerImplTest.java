@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -46,6 +47,9 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
+	@Autowired
+	private ProgramService programService;
+
 	private Project commonTestProject;
 	private WorkbenchUser testUser1;
 	private WorkbenchDaoFactory workbenchDaoFactory;
@@ -69,7 +73,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testAddProject() {
 		final Project project = this.workbenchTestDataUtil.createTestProjectData();
-		this.workbenchDataManager.addProject(project);
+		this.programService.addProject(project);
 		Assert.assertNotNull("Expected id of a newly saved record in workbench_project.", project.getProjectId());
 
 		final Project readProject = this.workbenchDataManager.getProjectById(project.getProjectId());
@@ -266,7 +270,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		final Project project = this.commonTestProject;
 
-		this.workbenchDataManager.addProject(project);
+		this.programService.addProject(project);
 
 		programSearchRequest.setCommonCropName(project.getCropType().getCropName());
 		programSearchRequest.setProgramName(project.getProjectName());

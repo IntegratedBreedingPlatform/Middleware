@@ -13,18 +13,16 @@ import static java.util.stream.Collectors.toSet;
 /**
  * Summary information about breeding program.
  */
-public class ProgramDTO {
+public class ProgramDTO extends ProgramBasicDetailsDto {
 
 	//TODO Modify id data type, it may impact site admin
 	private String id;
 	//TODO rename to programUUID
 	private String uniqueID;
-	private String name;
 	private String createdBy;
 	private Set<String> members = new HashSet<>();
 	//TODO Rename to cropName
 	private String crop;
-	private String startDate;
 	private String lastOpenDate;
 
 	public ProgramDTO() {
@@ -32,9 +30,9 @@ public class ProgramDTO {
 
 	public ProgramDTO(
 		final String id, final String uniqueID, final String name, final String crop) {
+		setName(name);
 		this.id = id;
 		this.uniqueID = uniqueID;
-		this.name = name;
 		this.crop = crop;
 	}
 
@@ -74,14 +72,6 @@ public class ProgramDTO {
 		this.uniqueID = uniqueID;
 	}
 
-	public String getName() {
-		return this.name;
-	}
-
-	public void setName(final String name) {
-		this.name = name;
-	}
-
 	public String getCreatedBy() {
 		return this.createdBy;
 	}
@@ -105,15 +95,6 @@ public class ProgramDTO {
 	public void setCrop(final String crop) {
 		this.crop = crop;
 	}
-
-	public String getStartDate() {
-		return this.startDate;
-	}
-
-	public void setStartDate(final String startDate) {
-		this.startDate = startDate;
-	}
-
 
 	public String getLastOpenDate() {
 		return this.lastOpenDate;

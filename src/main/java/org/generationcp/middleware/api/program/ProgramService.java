@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.program;
 
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -19,5 +20,7 @@ public interface ProgramService {
 	void addProgramMembers(String programUUID, AddProgramMemberRequestDto addProgramMemberRequestDto);
 
 	void removeProgramMembers(String programUUID, List<Integer> userIds);
+
+	Project addProject(Project project);
 
 }
