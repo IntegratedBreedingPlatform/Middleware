@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.api.sample;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class SampleObservationDto implements Serializable {
 
     private static final long serialVersionUID = 2340381705850740790L;
