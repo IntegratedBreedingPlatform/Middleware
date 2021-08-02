@@ -448,7 +448,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	public List<SampleObservationDto> getSampleObservationDtos(final SampleSearchRequestDTO requestDTO, final Pageable pageable) {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createSamplesQueryString(requestDTO, pageable));
 		if(pageable != null) {
-			sqlQuery.setFirstResult(pageable.getPageSize() * (pageable.getPageNumber() - 1));
+			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
 			sqlQuery.setMaxResults(pageable.getPageSize());
 		}
 		this.addSampleSearchParameters(sqlQuery, requestDTO);
@@ -465,6 +465,8 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		sqlQuery.addScalar("plateIndex", IntegerType.INSTANCE);
 		sqlQuery.addScalar("plotDbId", StringType.INSTANCE);
 		sqlQuery.addScalar("sampleName", StringType.INSTANCE);
+		sqlQuery.addScalar("well", StringType.INSTANCE);
+		sqlQuery.addScalar("programDbId", StringType.INSTANCE);
 		sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(SampleObservationDto.class));
 		return sqlQuery.list();
 	}
@@ -507,7 +509,9 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		sql.append("s.sample_bk AS sampleDbId, ");
 		sql.append("s.sample_no AS plateIndex, ");
 		sql.append("eprop.value AS plotDbId, ");
-		sql.append("s.sample_name AS sampleName ");
+		sql.append("s.sample_name AS sampleName, ");
+		sql.append("s.well AS well, ");
+		sql.append("pmain.program_uuid AS programDbId ");
 		this.appendSamplesFromQuery(sql);
 		this.appendSampleSeachFilters(sql, requestDTO);
 		return sql.toString();
