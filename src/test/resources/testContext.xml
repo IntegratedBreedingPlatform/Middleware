@@ -301,6 +301,10 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
+	<bean id="trialServiceBrapi" class="org.generationcp.middleware.api.brapi.TrialServiceBrapiImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 	<bean id="germplasmAttributeService" class="org.generationcp.middleware.api.germplasm.GermplasmAttributeServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>

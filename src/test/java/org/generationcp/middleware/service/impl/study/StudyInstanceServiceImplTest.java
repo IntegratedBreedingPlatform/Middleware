@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
@@ -95,7 +96,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	private ExperimentDesignService experimentDesignService;
 
 	@Resource
-	private StudyService studyService;
+	private TrialServiceBrapi trialServiceBrapi;
 
 	private DaoFactory daoFactory;
 	private StudyDataManagerImpl studyDataManager;
@@ -900,7 +901,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		dto.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		dto.setProgramDbId(this.commonTestProject.getUniqueID());
 
-		return this.studyService.saveStudies(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
+		return this.trialServiceBrapi.saveStudies(this.cropType.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
 	}
 
 	private void assertEnvironmentParameter(final List<MeasurementVariable> environmentParameters, final int expectedTermId,
