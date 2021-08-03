@@ -21,6 +21,8 @@ public interface ProgramService {
 
 	void removeProgramMembers(String programUUID, List<Integer> userIds);
 
+	ProgramDTO addProject(String crop, ProgramBasicDetailsDto programBasicDetailsDto);
+
 	Project addProject(Project project);
 
 }

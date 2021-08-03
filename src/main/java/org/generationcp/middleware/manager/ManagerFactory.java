@@ -23,6 +23,8 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListServiceImpl;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl;
+import org.generationcp.middleware.api.program.ProgramFavoriteService;
+import org.generationcp.middleware.api.program.ProgramFavoriteServiceImpl;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -385,4 +387,9 @@ public class ManagerFactory implements Serializable {
 	public VariableDataValidatorFactory getVariableDataValidatorFactory() {
 		return new VariableDataValidatorFactoryImpl();
 	}
+
+	public ProgramFavoriteService getProgramFavoriteService() {
+		return new ProgramFavoriteServiceImpl(this.sessionProvider);
+	}
+
 }

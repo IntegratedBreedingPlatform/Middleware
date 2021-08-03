@@ -185,12 +185,6 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Project> getProjectsByCrop(final CropType cropType) throws MiddlewareQueryException {
-		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("cropType", cropType));
-		return criteria.list();
-	}
-
 	public List<Project> getProjectsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest)
 		throws MiddlewareException {
 		final List<Project> projects = new ArrayList<>();

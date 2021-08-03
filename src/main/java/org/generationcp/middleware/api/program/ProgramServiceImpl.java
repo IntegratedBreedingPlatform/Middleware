@@ -2,7 +2,6 @@ package org.generationcp.middleware.api.program;
 
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -11,6 +10,7 @@ import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
+import org.generationcp.middleware.util.Util;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -100,17 +100,26 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public Project addProject(final Project project) {
-
-		try {
-			project.setUniqueID(UUID.randomUUID().toString());
-			this.daoFactory.getProjectDAO().save(project);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Cannot save Project: WorkbenchDataManager.addProject(project=" + project + "): " + e.getMessage(), e);
-		}
-		return project;
+	public ProgramDTO addProject(final String crop, final ProgramBasicDetailsDto programBasicDetailsDto) {
+		final Project project = new Project();
+		project.setUniqueID(UUID.randomUUID().toString());
+		project.setProjectName(programBasicDetailsDto.getName());
+		project.setUserId(ContextHolder.getLoggedInUserId());
+		project.setCropType(this.daoFactory.getCropTypeDAO().getByName(crop));
+		project.setLastOpenDate(null);
+		project.setStartDate(Util.tryParseDate(programBasicDetailsDto.getStartDate(), Util.FRONTEND_DATE_FORMAT));
+		this.daoFactory.getProjectDAO().save(project);
+		final ProgramDTO programDTO = new ProgramDTO(project);
+		final WorkbenchUser loggedInUser = this.daoFactory.getWorkbenchUserDAO().getById(ContextHolder.getLoggedInUserId());
+		programDTO.setCreatedBy(loggedInUser.getName());
+		return programDTO;
 	}
 
+	@Override
+	public Project addProject(final Project project) {
+		project.setUniqueID(UUID.randomUUID().toString());
+		this.daoFactory.getProjectDAO().save(project);
+		return project;
+	}
 
 }

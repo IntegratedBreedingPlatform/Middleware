@@ -127,6 +127,10 @@
         <constructor-arg ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="programFavoriteService" class="org.generationcp.middleware.api.program.ProgramFavoriteServiceImpl">
+        <constructor-arg ref="cropSessionProvider"/>
+    </bean>
+
     <bean id="presetService" class="org.generationcp.middleware.manager.PresetServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
