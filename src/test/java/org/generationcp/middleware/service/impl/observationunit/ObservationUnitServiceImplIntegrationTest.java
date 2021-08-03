@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.observationunit;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
@@ -48,7 +49,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 	private TrialServiceBrapi trialServiceBrapi;
 
 	@Resource
-	private StudyInstanceService studyInstanceService;
+	private StudyServiceBrapi studyServiceBrapi;
 
 	@Resource
 	private ObservationUnitService observationUnitService;
@@ -92,7 +93,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 
 		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
 		dto.setTrialDbId(String.valueOf(this.studySummary.getTrialDbId()));
-		this.studyInstanceDto = this.studyInstanceService
+		this.studyInstanceDto = this.studyServiceBrapi
 			.saveStudyInstances(this.crop.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
 
 		this.germplasm = GermplasmTestDataInitializer.createGermplasm(1);
