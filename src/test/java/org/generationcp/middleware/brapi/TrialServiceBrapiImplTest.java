@@ -59,8 +59,6 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() {
-//		this.daoFactory = new DaoFactory(this.sessionProvder);
-
 		this.workbenchTestDataUtil.setUpWorkbench();
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
@@ -69,6 +67,22 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.testUser = this.testDataInitializer.createUserForTesting();
+		this.study = this.testDataInitializer
+			.createStudy("Study1", "Study-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				"20180205", null);
+
+		final DmsProject plot = this.testDataInitializer
+			.createDmsProject("Plot Dataset", "Plot Dataset-Description", this.study, this.study, DatasetTypeEnum.PLOT_DATA);
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Environment Dataset", "Environment Dataset-Description", this.study, this.study,
+					DatasetTypeEnum.SUMMARY_DATA);
+		final Random random = new Random();
+		final int location1 = random.nextInt();
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", location1);
+		this.studyExperiment =
+			this.testDataInitializer.createTestExperiment(this.study, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+		this.sessionProvder.getSession().flush();
 	}
 
 	@Test

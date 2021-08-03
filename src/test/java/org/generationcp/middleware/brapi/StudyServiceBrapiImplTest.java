@@ -39,6 +39,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -84,6 +85,14 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		this.study = this.testDataInitializer
 			.createStudy("Study1", "Study-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
 				"20180205", null);
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Environment Dataset", "Environment Dataset-Description", this.study, this.study,
+					DatasetTypeEnum.SUMMARY_DATA);
+		final Random random = new Random();
+		final int location1 = random.nextInt();
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", location1);
+		this.testDataInitializer.createTestExperiment(this.study, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
 	}
 
 	@Test
@@ -223,7 +232,7 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void getStudyDetailsByInstanceWithEnvConditionAndDetails_OK() {
+	public void testGetStudyDetailsByInstanceWithEnvConditionAndDetails_OK() {
 		final int locationId = 101;
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);

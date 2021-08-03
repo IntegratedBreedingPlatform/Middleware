@@ -30,7 +30,6 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
@@ -40,6 +39,7 @@ import org.generationcp.middleware.service.impl.study.StudyMeasurements;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.generationcp.middleware.util.Util;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -56,8 +56,9 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
+@Service
 @Transactional
-public class TrialServiceBrapiImpl extends Service implements TrialServiceBrapi {
+public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 
 	public static final String ENVIRONMENT = "-ENVIRONMENT";
 	public static final String PLOT = "-PLOTDATA";
@@ -71,17 +72,19 @@ public class TrialServiceBrapiImpl extends Service implements TrialServiceBrapi 
 	@Resource
 	private StudyDataManager studyDataManager;
 
-	private final DaoFactory daoFactory;
-	private final StudyMeasurements studyMeasurements;
+	private HibernateSessionProvider sessionProvider;
+	private DaoFactory daoFactory;
+	private StudyMeasurements studyMeasurements;
 
 
-
+	public TrialServiceBrapiImpl() {
+		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
+	}
 	public TrialServiceBrapiImpl(final HibernateSessionProvider sessionProvider) {
-		super(sessionProvider);
 		this.daoFactory = new DaoFactory(sessionProvider);
+		this.sessionProvider = sessionProvider;
 		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
 	}
-
 
 	@Override
 	public TrialObservationTable getTrialObservationTable(final int studyIdentifier) {
@@ -498,5 +501,12 @@ public class TrialServiceBrapiImpl extends Service implements TrialServiceBrapi 
 		return startDate;
 	}
 
+	// Setters used for tests only
+	public void setSessionProvider(final HibernateSessionProvider sessionProvider) {
+		this.sessionProvider = sessionProvider;
+	}
 
+	public void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
 }

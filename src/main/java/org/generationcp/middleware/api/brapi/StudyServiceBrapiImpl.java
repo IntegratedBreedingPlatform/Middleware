@@ -24,7 +24,6 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.ontology.CategoricalValueNameValidator;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
@@ -40,6 +39,7 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.study.StudyInstanceServiceImpl;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -57,8 +57,9 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
+@Service
 @Transactional
-public class StudyServiceBrapiImpl extends Service implements StudyServiceBrapi {
+public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 	private static final String EXPT_DESIGN = "EXPT_DESIGN";
 	private static final String CROP_SEASON_CODE = "Crop_season_Code";
@@ -76,10 +77,12 @@ public class StudyServiceBrapiImpl extends Service implements StudyServiceBrapi 
 	private UserService userService;
 
 	private final DaoFactory daoFactory;
+	private final HibernateSessionProvider sessionProvider;
+
 
 	public StudyServiceBrapiImpl(final HibernateSessionProvider sessionProvider) {
-		super(sessionProvider);
 		this.daoFactory = new DaoFactory(sessionProvider);
+		this.sessionProvider = sessionProvider;
 	}
 
 	@Override
