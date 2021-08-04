@@ -5,9 +5,12 @@ import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.domain.dms.SampleDetailsBean;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDTO;
+import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRequestDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Sample;
+import org.generationcp.middleware.service.api.sample.SampleObservationDto;
+import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -16,11 +19,14 @@ import org.hibernate.criterion.DetachedCriteria;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.DateType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.springframework.data.domain.Pageable;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -35,27 +41,26 @@ import java.util.Set;
 public class SampleDao extends GenericDAO<Sample, Integer> {
 
 	protected static final String SQL_SAMPLES_AND_EXPERIMENTS =
-		"SELECT  nde.nd_experiment_id, (SELECT COALESCE(NULLIF(COUNT(sp.sample_id), 0), '-')\n FROM \n"
-			+ "            						sample AS sp \n" + "        WHERE\n"
-			+ "            						nde.nd_experiment_id = sp.nd_experiment_id) 'SAMPLES'"
-			+ "		FROM project p "
-			+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id\n"
-			+ "		WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
+		"SELECT  nde.nd_experiment_id, (SELECT COALESCE(NULLIF(COUNT(sp.sample_id), 0), '-') FROM "
+			+ " sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id) 'SAMPLES'"
+			+ " FROM project p "
+			+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
+			+ " WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 			+ " GROUP BY nde.nd_experiment_id";
 
 	public static final String SQL_STUDY_HAS_SAMPLES = "SELECT COUNT(sp.sample_id) AS Sample "
-		+ "		FROM project p "
-		+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
-		+ "		INNER JOIN sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id "
-		+ "		WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
+		+ " FROM project p "
+		+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
+		+ " INNER JOIN sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id "
+		+ " WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 		+ " GROUP BY sp.nd_experiment_id";
 
 	public static final String SQL_STUDY_ENTRY_HAS_SAMPLES = "SELECT COUNT(sp.sample_id) AS Sample "
-			+ "		FROM project p "
-			+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
-			+ "		INNER JOIN sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id "
-			+ "		WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
-			+ "		      AND nde.stock_id = :entryId \n"
+			+ " FROM project p "
+			+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
+			+ " INNER JOIN sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id "
+			+ " WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
+			+ " 	AND nde.stock_id = :entryId "
 			+ " GROUP BY sp.nd_experiment_id";
 
 	private static final String MAX_SEQUENCE_NUMBER_QUERY = "SELECT st.dbxref_id as gid," + " max(IF(           convert("
@@ -331,18 +336,6 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		return samplesMap;
 	}
 
-	public Sample getBySampleBk(final String sampleBk) {
-		final Sample sample;
-		try {
-			sample = (Sample) this.getSession().createCriteria(Sample.class, SAMPLE).add(Restrictions.eq(SAMPLE_BUSINESS_KEY, sampleBk))
-				.uniqueResult();
-		} catch (final HibernateException he) {
-			throw new MiddlewareException(
-				"Unexpected error in executing getBySampleBk(sampleBusinessKey = " + sampleBk + ") query: " + he.getMessage(), he);
-		}
-		return sample;
-	}
-
 	@SuppressWarnings("unchecked")
 	public Map<Integer, Integer> getGIDsBySampleIds(final Set<Integer> sampleIds) {
 		final Map<Integer, Integer> map = new HashMap<>();
@@ -435,6 +428,129 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		createSQLQuery.addScalar("max_sequence_no", new IntegerType());
 		createSQLQuery.setParameterList("gids", gids);
 		return this.mapResultsToSampleSequence(createSQLQuery.list());
+	}
+
+	public long countSampleObservationDtos(final SampleSearchRequestDTO requestDTO) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createCountSamplesQueryString(requestDTO));
+		this.addSampleSearchParameters(sqlQuery, requestDTO);
+		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+	}
+
+	private String createCountSamplesQueryString(final SampleSearchRequestDTO requestDTO) {
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT s.sample_bk) ");
+		this.appendSamplesFromQuery(sql);
+		this.appendSampleSeachFilters(sql, requestDTO);
+		return sql.toString();
+	}
+
+
+	public List<SampleObservationDto> getSampleObservationDtos(final SampleSearchRequestDTO requestDTO, final Pageable pageable) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createSamplesQueryString(requestDTO));
+		if(pageable != null) {
+			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
+			sqlQuery.setMaxResults(pageable.getPageSize());
+		}
+		this.addSampleSearchParameters(sqlQuery, requestDTO);
+
+		sqlQuery.addScalar("germplasmDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("observationUnitDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("plateDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("sampleId", IntegerType.INSTANCE);
+		sqlQuery.addScalar("sampleTimestamp", DateType.INSTANCE);
+		sqlQuery.addScalar("takenById", IntegerType.INSTANCE);
+		sqlQuery.addScalar("studyDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("trialDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("sampleDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("plateIndex", IntegerType.INSTANCE);
+		sqlQuery.addScalar("plotDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("sampleName", StringType.INSTANCE);
+		sqlQuery.addScalar("well", StringType.INSTANCE);
+		sqlQuery.addScalar("programDbId", StringType.INSTANCE);
+		sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(SampleObservationDto.class));
+		return sqlQuery.list();
+	}
+
+	private void addSampleSearchParameters(final SQLQuery sqlQuery, final SampleSearchRequestDTO requestDTO) {
+		if(!StringUtil.isEmpty(requestDTO.getSampleDbId())) {
+			sqlQuery.setParameter("sampleDbId", requestDTO.getSampleDbId());
+		}
+		if(!StringUtil.isEmpty(requestDTO.getObservationUnitDbId())) {
+			sqlQuery.setParameter("observationUnitDbId", requestDTO.getObservationUnitDbId());
+		}
+		if(!StringUtil.isEmpty(requestDTO.getPlateDbId())) {
+			sqlQuery.setParameter("plateDbId", requestDTO.getPlateDbId());
+		}
+		if(!StringUtil.isEmpty(requestDTO.getGermplasmDbId())) {
+			sqlQuery.setParameter("germplasmDbId", requestDTO.getGermplasmDbId());
+		}
+		if(!StringUtil.isEmpty(requestDTO.getStudyDbId())) {
+			sqlQuery.setParameter("studyDbId", requestDTO.getStudyDbId());
+		}
+		if(!StringUtil.isEmpty(requestDTO.getExternalReferenceID())) {
+			sqlQuery.setParameter("referenceId", requestDTO.getExternalReferenceID());
+		}
+		if(!StringUtil.isEmpty(requestDTO.getExternalReferenceSource())) {
+			sqlQuery.setParameter("referenceSource", requestDTO.getExternalReferenceSource());
+		}
+	}
+
+	private String createSamplesQueryString(final SampleSearchRequestDTO requestDTO) {
+		final StringBuilder sql = new StringBuilder();
+		sql.append("SELECT g.germplsm_uuid AS germplasmDbId, ");
+		sql.append("s.sample_id AS sampleId, ");
+		sql.append("e.obs_unit_id AS observationUnitDbId, ");
+		sql.append("s.plate_id AS plateDbId, ");
+		sql.append("pmain.program_uuid AS programDbId, ");
+		sql.append("s.sampling_date as sampleTimestamp, ");
+		sql.append("s.taken_by as takenById, ");
+		sql.append("e.nd_geolocation_id AS studyDbId, ");
+		sql.append("pmain.project_id AS trialDbId, ");
+		sql.append("s.sample_bk AS sampleDbId, ");
+		sql.append("s.sample_no AS plateIndex, ");
+		sql.append("eprop.value AS plotDbId, ");
+		sql.append("s.sample_name AS sampleName, ");
+		sql.append("s.well AS well, ");
+		sql.append("pmain.program_uuid AS programDbId ");
+		this.appendSamplesFromQuery(sql);
+		this.appendSampleSeachFilters(sql, requestDTO);
+		return sql.toString();
+	}
+
+	private void appendSamplesFromQuery(final StringBuilder sql) {
+		sql.append("FROM sample s ");
+		sql.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = s.nd_experiment_id ");
+		sql.append(" INNER JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id AND eprop.type_id = " + TermId.PLOT_NO.getId());
+		sql.append(" INNER JOIN stock stock ON stock.stock_id = e.stock_id ");
+		sql.append(" INNER JOIN germplsm g ON g.gid = stock.dbxref_id ");
+		sql.append(" INNER JOIN project pmain ON pmain.project_id = stock.project_id ");
+		sql.append(" WHERE 1=1 ");
+	}
+
+	private void appendSampleSeachFilters(final StringBuilder sql, final SampleSearchRequestDTO requestDTO) {
+		if(!StringUtil.isEmpty(requestDTO.getSampleDbId())) {
+			sql.append(" AND s.sample_bk = :sampleDbId");
+		}
+		if(!StringUtil.isEmpty(requestDTO.getObservationUnitDbId())) {
+			sql.append(" AND e.obs_unit_id = :observationUnitDbId");
+		}
+		if(!StringUtil.isEmpty(requestDTO.getPlateDbId())) {
+			sql.append(" AND s.plate_id = :plateDbId");
+		}
+		if(!StringUtil.isEmpty(requestDTO.getGermplasmDbId())) {
+			sql.append(" AND g.germplsm_uuid = :germplasmDbId");
+		}
+		if(!StringUtil.isEmpty(requestDTO.getStudyDbId())) {
+			sql.append(" AND e.nd_geolocation_id = :studyDbId");
+		}
+		if (!StringUtil.isEmpty(requestDTO.getExternalReferenceID())) {
+			sql.append(" AND EXISTS (SELECT * FROM external_reference_sample sref ");
+			sql.append(" WHERE s.sample_id = sref.sample_id AND sref.reference_id = :referenceId) ");
+		}
+
+		if (!StringUtil.isEmpty(requestDTO.getExternalReferenceSource())) {
+			sql.append(" AND EXISTS (SELECT * FROM external_reference_sample sref ");
+			sql.append(" WHERE s.sample_id = sref.sample_id AND sref.reference_source = :referenceSource) ");
+		}
 	}
 
 	private Map<Integer, Integer> mapResultsToSampleSequence(final List<Object[]> results) {
