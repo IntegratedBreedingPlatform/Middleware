@@ -75,12 +75,17 @@ public class LocationServiceImpl implements LocationService {
 		return this.daoFactory.getLocationDAO().getLocations(locationSearchRequest, pageable);
 	}
 
+	@Override
+	public void deleteProgramLocations(final String programUUID) {
+		this.daoFactory.getLocationDAO().deleteAllProgramLocations(programUUID);
+	}
+
 	/**
 	 * Return true if proceed with searching by filter when
 	 * 1) filtering by favorites and at least one favorite exists OR
 	 * 2) not filtering by favorites.
 	 *
-	 * If filtering by favorites but none exists, do not procced with filtered search from LocationDAO
+	 * If filtering by favorites but none exists, do not proceed with filtered search from LocationDAO
 	 *
 	 * @param locationSearchRequest
 	 * @return

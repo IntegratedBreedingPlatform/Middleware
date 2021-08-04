@@ -6,4 +6,6 @@ public interface ProgramFavoriteService {
 
 	void addProgramFavorite(String programUUID, ProgramFavorite.FavoriteType favoriteType, Integer entityId);
 
+	void deleteAllProgramFavorites(String programUUID);
+
 }

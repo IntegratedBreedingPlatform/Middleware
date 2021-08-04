@@ -140,4 +140,13 @@ public class ProgramServiceImpl implements ProgramService {
 			return Optional.empty();
 		}
 	}
+
+	@Override
+	public void deleteProjectAndDependencies(final String programUUID) {
+		this.daoFactory.getProjectActivityDAO().deleteAllProjectActivities(programUUID);
+		this.daoFactory.getProjectUserInfoDAO().deleteAllProjectUserInfo(programUUID);
+		this.daoFactory.getUserRoleDao().deleteProgramRolesAssociations(programUUID);
+		this.daoFactory.getProjectDAO().deleteProjectByUUID(programUUID);
+	}
+
 }

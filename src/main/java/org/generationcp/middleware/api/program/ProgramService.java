@@ -28,4 +28,6 @@ public interface ProgramService {
 
 	Optional<ProgramDTO> getProject(String cropName, String programName);
 
+	void deleteProjectAndDependencies(String programUUID);
+
 }

@@ -42,7 +42,7 @@ public class UserRoleDao extends GenericDAO<UserRole, Long> {
 		+"  and ur.userid = :userId and r.active =1 "; //
 
 	public List<UserRole> getByProgramId(final Long programId) {
-		List<UserRole> toReturn;
+		final List<UserRole> toReturn;
 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(UserRole.class);
@@ -128,5 +128,20 @@ public class UserRoleDao extends GenericDAO<UserRole, Long> {
 			throw new MiddlewareQueryException("Error in getCropsWithAddProgramPermissionForCropRoles(userId=" + userId + ")", e);
 		}
 		return cropTypes;
+	}
+
+	public void deleteProgramRolesAssociations(final String programUUID) {
+		try {
+			final String sql = "DELETE ur FROM users_roles ur INNER JOIN workbench_project p ON p.project_id = ur.workbench_project_id "
+				+ " WHERE p.project_uuid = :programUUID";
+			final SQLQuery statement = this.getSession().createSQLQuery(sql);
+			statement.setParameter("programUUID", programUUID);
+			statement.executeUpdate();
+		} catch (final Exception e) {
+			final String message = "Cannot execute deleteProgramRolesAssociations (programUUID=" + programUUID
+				+ "): " + e.getMessage();
+			UserRoleDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 }

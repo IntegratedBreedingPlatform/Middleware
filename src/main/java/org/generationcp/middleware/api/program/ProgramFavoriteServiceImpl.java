@@ -25,4 +25,9 @@ public class ProgramFavoriteServiceImpl implements ProgramFavoriteService {
 		this.daoFactory.getProgramFavoriteDao().save(favorite);
 	}
 
+	@Override
+	public void deleteAllProgramFavorites(final String programUUID) {
+		this.daoFactory.getProgramFavoriteDao().deleteAllProgramFavorites(programUUID);
+	}
+
 }

@@ -49,4 +49,6 @@ public interface GermplasmListService {
 
 	void performGermplasmListEntriesDeletion(List<Integer> gids);
 
+	void deleteProgramGermplasmLists(String programUUID);
+
 }

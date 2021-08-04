@@ -47,4 +47,13 @@ public interface StudyService {
 	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
 
 	List<StudySummary> saveStudies(String crop, List<TrialImportRequestDTO> trialImportRequestDtoList, Integer userId);
+
+	/**
+	 * Soft-delete all program studies
+	 *
+	 * @param programUUID Program UUID of the studies to be deleted
+	 */
+	void deleteProgramStudies(String programUUID);
+
+	void deleteStudy(int studyId);
 }

@@ -299,25 +299,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getByStatus(final Integer status, final int start, final int numOfRows) {
-		try {
-			if (status != null) {
-				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
-				criteria.add(Restrictions.eq(GermplasmListDAO.STATUS, status));
-				criteria.add(Restrictions.ne(GermplasmListDAO.STATUS, GermplasmListDAO.STATUS_DELETED));
-				criteria.setFirstResult(start);
-				criteria.setMaxResults(numOfRows);
-				return criteria.list();
-			}
-		} catch (final HibernateException e) {
-			final String errorMessage = "Error with getByStatus(status=" + status + ") query from GermplasmList: " + e.getMessage();
-			GermplasmListDAO.LOG.error(errorMessage);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-		return new ArrayList<>();
-	}
-
 	public long countByStatus(final Integer status) {
 		try {
 			if (status != null) {
@@ -585,7 +566,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	public Map<Integer, ListMetadata> getGermplasmFolderMetadata(final List<Integer> folderIds) {
 
 		if (folderIds.isEmpty()) {
-			return Collections.<Integer, ListMetadata> emptyMap();
+			return Collections.emptyMap();
 		}
 
 		final String folderMetaDataQuery = "SELECT parent.listid AS listId, COUNT(child.listid) AS numberOfChildren FROM listnms parent "
@@ -781,6 +762,19 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			return mylists;
 		} catch (final Exception e) {
 			final String message = "Error with getMyLists(programUUID=" + programUUID + ", userId= " + userId + " ): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
+	}
+
+	public void markProgramGermplasmListsAsDeleted(final String programUUID) {
+		try {
+			final String sql = "UPDATE listnms SET status = " + STATUS_DELETED + " where program_uuid = :programUUID";
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+			sqlQuery.setParameter("programUUID", programUUID);
+			sqlQuery.executeUpdate();
+		} catch (final Exception e) {
+			final String message = "Error with markProgramGermplasmListsAsDeleted(programUUID=" + programUUID + " ): " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message);
 		}
