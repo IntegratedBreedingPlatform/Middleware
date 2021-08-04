@@ -178,7 +178,7 @@ public class DataSetupTest extends IntegrationTestBase {
         program.setStartDate(new Date(System.currentTimeMillis()));
         program.setCropType(cropType);
         program.setLastOpenDate(new Date(System.currentTimeMillis()));
-		this.programService.addProject(program);
+        this.programService.addProgram(program);
 
         // FIXME (BMS-4631) replace this with adding to workbench_project_user_info
 //		this.workbenchDataManager.addProjectUserRole(projectUserRoles);

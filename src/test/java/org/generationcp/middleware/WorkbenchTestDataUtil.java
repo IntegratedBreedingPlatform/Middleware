@@ -145,7 +145,7 @@ public class WorkbenchTestDataUtil {
 		this.userService.addUser(this.testUser2);
 
 		this.commonTestProject.setUserId(this.testUser1.getUserid());
-		this.programService.addProject(this.commonTestProject);
+		this.programService.addProgram(this.commonTestProject);
 
 		this.testProjectActivity1 = this.createTestProjectActivityData(this.commonTestProject, this.testUser1);
 		this.workbenchDataManager.addProjectActivity(this.testProjectActivity1);

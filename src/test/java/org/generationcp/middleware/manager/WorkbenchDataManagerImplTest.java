@@ -73,7 +73,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testAddProject() {
 		final Project project = this.workbenchTestDataUtil.createTestProjectData();
-		this.programService.addProject(project);
+		this.programService.addProgram(project);
 		Assert.assertNotNull("Expected id of a newly saved record in workbench_project.", project.getProjectId());
 
 		final Project readProject = this.workbenchDataManager.getProjectById(project.getProjectId());
@@ -270,7 +270,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		final Project project = this.commonTestProject;
 
-		this.programService.addProject(project);
+		this.programService.addProgram(project);
 
 		programSearchRequest.setCommonCropName(project.getCropType().getCropName());
 		programSearchRequest.setProgramName(project.getProjectName());

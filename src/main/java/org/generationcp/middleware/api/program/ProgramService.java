@@ -22,12 +22,12 @@ public interface ProgramService {
 
 	void removeProgramMembers(String programUUID, List<Integer> userIds);
 
-	ProgramDTO addProject(String crop, ProgramBasicDetailsDto programBasicDetailsDto);
+	ProgramDTO addProgram(String crop, ProgramBasicDetailsDto programBasicDetailsDto);
 
-	Project addProject(Project project);
+	Project addProgram(Project project);
 
-	Optional<ProgramDTO> getProject(String cropName, String programName);
+	Optional<ProgramDTO> getProgram(String cropName, String programName);
 
-	void deleteProjectAndDependencies(String programUUID);
+	void deleteProgramAndDependencies(String programUUID);
 
 }

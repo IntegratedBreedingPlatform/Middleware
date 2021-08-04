@@ -114,12 +114,12 @@ public class PermissionDAOTest extends IntegrationTestBase {
 
 		if (this.project1 == null) {
 			this.project1 = this.workbenchTestDataUtil.createTestProjectData();
-			this.programService.addProject(this.project1);
+			this.programService.addProgram(this.project1);
 		}
 
 		if (this.project2 == null) {
 			this.project2 = this.workbenchTestDataUtil.createTestProjectData();
-			this.programService.addProject(this.project2);
+			this.programService.addProgram(this.project2);
 		}
 	}
 

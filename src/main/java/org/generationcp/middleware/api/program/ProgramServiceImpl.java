@@ -102,7 +102,7 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public ProgramDTO addProject(final String crop, final ProgramBasicDetailsDto programBasicDetailsDto) {
+	public ProgramDTO addProgram(final String crop, final ProgramBasicDetailsDto programBasicDetailsDto) {
 		final Project project = new Project();
 		project.setUniqueID(UUID.randomUUID().toString());
 		project.setProjectName(programBasicDetailsDto.getName());
@@ -118,14 +118,14 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public Project addProject(final Project project) {
+	public Project addProgram(final Project project) {
 		project.setUniqueID(UUID.randomUUID().toString());
 		this.daoFactory.getProjectDAO().save(project);
 		return project;
 	}
 
 	@Override
-	public Optional<ProgramDTO> getProject(final String cropName, final String programName) {
+	public Optional<ProgramDTO> getProgram(final String cropName, final String programName) {
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(cropName);
 		if (cropType == null) {
 			return Optional.empty();
@@ -142,7 +142,7 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public void deleteProjectAndDependencies(final String programUUID) {
+	public void deleteProgramAndDependencies(final String programUUID) {
 		this.daoFactory.getProjectActivityDAO().deleteAllProjectActivities(programUUID);
 		this.daoFactory.getProjectUserInfoDAO().deleteAllProjectUserInfo(programUUID);
 		this.daoFactory.getUserRoleDao().deleteProgramRolesAssociations(programUUID);

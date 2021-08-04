@@ -467,7 +467,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetProjectUserInfoByProjectIdAndUserId() {
 		final Project project = this.workbenchTestDataUtil.createTestProjectData();
-		this.programService.addProject(project);
+		this.programService.addProgram(project);
 		final WorkbenchUser user1 = this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
 
 		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, user1);
