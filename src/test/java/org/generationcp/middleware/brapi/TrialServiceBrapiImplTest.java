@@ -1,10 +1,12 @@
 package org.generationcp.middleware.brapi;
 
 import com.google.common.collect.Maps;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
+import org.generationcp.middleware.api.brapi.TrialServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.domain.dms.StudySummary;
@@ -21,6 +23,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
+import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
@@ -31,12 +34,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 
 public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
@@ -134,7 +139,10 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", location1);
 		final ExperimentModel newStudyExperiment =
 			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
-
+		// Add contact name variable
+		final String contactName = RandomStringUtils.randomAlphabetic(20);
+		this.testDataInitializer.addProjectProp(newStudy, TrialServiceBrapiImpl.CONTACT_NAME_ID, "CONTACT_NAME", VariableType.STUDY_DETAIL,
+			contactName, 1);
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.sessionProvder.getSession().flush();
 
@@ -151,10 +159,9 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.study.getDescription(), study1.getDescription());
 		Assert.assertEquals(this.study.getProgramUUID(), study1.getProgramDbId());
 		Assert.assertEquals(this.studyExperiment.getObsUnitId(), study1.getObservationUnitId());
-		Assert.assertEquals(1, study1.getContacts().size());
+		Assert.assertEquals(0, study1.getContacts().size());
 		Assert.assertTrue(study1.isActive());
-		// Workbench person details cannot be retrieved properly from this service
-		Assert.assertEquals("Creator", study1.getContacts().get(0).getType());
+
 		final StudySummary study2 = studies.get(0);
 		Assert.assertEquals(newStudy.getProjectId(), study2.getTrialDbId());
 		Assert.assertEquals(newStudy.getName(), study2.getName());
@@ -163,7 +170,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(newStudyExperiment.getObsUnitId(), study2.getObservationUnitId());
 		Assert.assertEquals(1, study2.getInstanceMetaData().size());
 		Assert.assertEquals(1, study2.getContacts().size());
-		Assert.assertEquals("Creator", study2.getContacts().get(0).getType());
+		Assert.assertEquals(contactName, study2.getContacts().get(0).getName());
 		Assert.assertFalse(study2.isActive());
 
 		studySearchFilter.setLocationDbId(String.valueOf(location1));
@@ -269,9 +276,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.study.getDescription(), study1.getDescription());
 		Assert.assertEquals(this.study.getProgramUUID(), study1.getProgramDbId());
 		Assert.assertEquals(this.studyExperiment.getObsUnitId(), study1.getObservationUnitId());
-		Assert.assertEquals(1, study1.getContacts().size());
-		// Workbench person details cannot be retrieved properly from this service
-		Assert.assertEquals("Creator", study1.getContacts().get(0).getType());
+		Assert.assertEquals(0, study1.getContacts().size());
 		final StudySummary study2 = studies.get(0);
 		Assert.assertEquals(newStudy.getProjectId(), study2.getTrialDbId());
 		Assert.assertEquals(newStudy.getName(), study2.getName());
@@ -279,8 +284,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(newStudy.getProgramUUID(), study2.getProgramDbId());
 		Assert.assertEquals(newStudyExperiment.getObsUnitId(), study2.getObservationUnitId());
 		Assert.assertEquals(1, study2.getInstanceMetaData().size());
-		Assert.assertEquals(1, study2.getContacts().size());
-		Assert.assertEquals("Creator", study2.getContacts().get(0).getType());
+		Assert.assertEquals(0, study2.getContacts().size());
 
 		// Expecting only one study to be retrieved when filtered by location
 		studySearchFilter.setLocationDbId(String.valueOf(location1));
@@ -350,6 +354,11 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		settingsMap.put(this.testDataInitializer.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(),
 			possibleValues.get(0));
 		importRequest1.setAdditionalInfo(settingsMap);
+
+		final ContactDto contact1 = new ContactDto(null, RandomStringUtils.randomAlphabetic(20),
+			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), StringUtils.EMPTY,
+			RandomStringUtils.randomAlphabetic(20));
+		importRequest1.setContacts(Collections.singletonList(contact1));
 		final TrialImportRequestDTO importRequest2 = new TrialImportRequestDTO();
 		importRequest2.setStartDate("2019-01-01");
 		importRequest2.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
@@ -365,13 +374,21 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(2, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
-		this.verifyStudySummary(importRequest2, savedStudies.get(1));
+		Assert.assertNotNull(study1.getContacts());
+		Assert.assertEquals(1, study1.getContacts().size());
+		Assert.assertEquals(contact1, study1.getContacts().get(0));
+		Assert.assertNull(study1.getContacts().get(0).getContactDbId());
+		Assert.assertTrue(StringUtils.isEmpty(study1.getContacts().get(0).getOrcid()));
 		// Verify study settings, only first study imported study details
-		Assert.assertNotNull(study1.getAdditionalInfo());
-		Assert.assertEquals(importRequest1.getAdditionalInfo().size(), study1.getAdditionalInfo().size());
-		for (final String key : importRequest1.getAdditionalInfo().keySet()) {
+		Assert.assertFalse(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
+		Assert.assertEquals(4, study1.getAdditionalInfo().size());
+		for (final String key : study1.getAdditionalInfo().keySet()) {
 			Assert.assertEquals(importRequest1.getAdditionalInfo().get(key), study1.getAdditionalInfo().get(key));
 		}
+
+		final StudySummary study2 = savedStudies.get(1);
+		this.verifyStudySummary(importRequest2, study2);
+		Assert.assertTrue(CollectionUtils.isEmpty(study2.getContacts()));
 	}
 
 	@Test

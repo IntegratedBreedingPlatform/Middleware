@@ -35,6 +35,7 @@ import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
+import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.service.impl.study.StudyMeasurements;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.generationcp.middleware.util.Util;
@@ -47,10 +48,10 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -62,6 +63,17 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 
 	public static final String ENVIRONMENT = "-ENVIRONMENT";
 	public static final String PLOT = "-PLOTDATA";
+	private static final String CONTACT_NAME = "CONTACT_NAME";
+	private static final String CONTACT_ORG = "CONTACT_ORG";
+	private static final String CONTACT_TYPE = "CONTACT_TYPE";
+	private static final String CONTACT_EMAIL = "CONTACT_EMAIL";
+	private static final List<String> CONTACT_VARIABLE_NAMES = Collections.unmodifiableList(Arrays.asList(CONTACT_EMAIL, CONTACT_NAME, CONTACT_ORG, CONTACT_TYPE));
+	public static final int CONTACT_NAME_ID = 8116;
+	public static final int CONTACT_EMAIL_ID = 8117;
+	public static final int CONTACT_ORG_ID = 8118;
+	public static final int CONTACT_TYPE_ID = 8119;
+	private static final List<Integer> CONTACT_VARIABLE_IDS = Collections.unmodifiableList(Arrays.asList(CONTACT_NAME_ID, CONTACT_EMAIL_ID,
+		CONTACT_ORG_ID, CONTACT_TYPE_ID));
 
 	@Resource
 	private VariableDataValidatorFactory variableDataValidatorFactory;
@@ -96,13 +108,8 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		final List<MeasurementVariableDto> traits =
 			this.daoFactory.getProjectPropertyDAO().getVariables(studyIdentifier, VariableType.TRAIT.getId());
 
-		final List<MeasurementVariableDto> measurementVariables = Ordering.from(new Comparator<MeasurementVariableDto>() {
-
-			@Override
-			public int compare(final MeasurementVariableDto o1, final MeasurementVariableDto o2) {
-				return o1.getId() - o2.getId();
-			}
-		}).immutableSortedCopy(traits);
+		final List<MeasurementVariableDto> measurementVariables = Ordering.from((MeasurementVariableDto o1, MeasurementVariableDto o2) ->
+			o1.getId() - o2.getId()).immutableSortedCopy(traits);
 
 		final List<Object[]> results =
 			this.studyMeasurements.getAllStudyDetailsAsTable(studyIdentifier, measurementVariables, instanceDbId);
@@ -272,26 +279,12 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		final StudyType studyTypeByName = this.daoFactory.getStudyTypeDao().getStudyTypeByName(StudyTypeDto.TRIAL_NAME);
 		final DatasetType envDatasetType = this.daoFactory.getDatasetTypeDao().getById(DatasetTypeEnum.SUMMARY_DATA.getId());
 		final DatasetType plotDatasetType = this.daoFactory.getDatasetTypeDao().getById(DatasetTypeEnum.PLOT_DATA.getId());
-		final List<String> studyDetailVariableNames = new ArrayList<>();
-		trialImportRequestDtoList.stream().forEach(dto ->
-				studyDetailVariableNames
-					.addAll(dto.getAdditionalInfo().keySet().stream().map(String::toUpperCase).collect(Collectors.toList()))
-		);
+		final List<String> studyDetailVariableNames = this.collectVariableNames(trialImportRequestDtoList);
 		final Map<String, MeasurementVariable> variableNamesMap =
 			this.daoFactory.getCvTermDao().getVariablesByNamesAndVariableType(studyDetailVariableNames, VariableType.STUDY_DETAIL);
 		final Map<String, MeasurementVariable> variableSynonymsMap =
 			this.daoFactory.getCvTermDao().getVariablesBySynonymsAndVariableType(studyDetailVariableNames, VariableType.STUDY_DETAIL);
-		final List<Integer> categoricalVariableIds = new ArrayList<>();
-		categoricalVariableIds.addAll(
-			variableNamesMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
-				.map(MeasurementVariable::getTermId).collect(
-				Collectors.toList()));
-		categoricalVariableIds.addAll(
-			variableSynonymsMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
-				.map(MeasurementVariable::getTermId).collect(
-				Collectors.toList()));
-		final Map<Integer, List<ValueReference>> categoricalVariablesMap =
-			this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(categoricalVariableIds);
+		final Map<Integer, List<ValueReference>> categoricalVariablesMap = this.collectCategoricalVariables(variableNamesMap, variableSynonymsMap);
 
 		for (final TrialImportRequestDTO trialImportRequestDto : trialImportRequestDtoList) {
 			final DmsProject study = this.createStudy(userId, studyTypeByName, trialImportRequestDto);
@@ -311,6 +304,30 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		final StudySearchFilter filter = new StudySearchFilter();
 		filter.setTrialDbIds(studyIds);
 		return this.getStudies(filter, null);
+	}
+
+	private Map<Integer, List<ValueReference>> collectCategoricalVariables(final Map<String, MeasurementVariable> variableNamesMap,
+		final Map<String, MeasurementVariable> variableSynonymsMap) {
+		final List<Integer> categoricalVariableIds = new ArrayList<>();
+		categoricalVariableIds.addAll(
+			variableNamesMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+				.map(MeasurementVariable::getTermId).collect(
+				Collectors.toList()));
+		categoricalVariableIds.addAll(
+			variableSynonymsMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+				.map(MeasurementVariable::getTermId).collect(
+				Collectors.toList()));
+		return this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(categoricalVariableIds);
+	}
+
+	private List<String> collectVariableNames(final List<TrialImportRequestDTO> trialImportRequestDtoList) {
+		final List<String> studyDetailVariableNames = new ArrayList<>();
+		trialImportRequestDtoList.stream().forEach(dto ->
+			studyDetailVariableNames
+				.addAll(dto.getAdditionalInfo().keySet().stream().map(String::toUpperCase).collect(Collectors.toList()))
+		);
+		studyDetailVariableNames.addAll(CONTACT_VARIABLE_NAMES);
+		return studyDetailVariableNames;
 	}
 
 	private DmsProject createStudy(final Integer userId, final StudyType studyTypeByName,
@@ -371,31 +388,45 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 	private void setStudySettings(final TrialImportRequestDTO trialImportRequestDto, final DmsProject study,
 		final Map<String, MeasurementVariable> variableNamesMap, final Map<String, MeasurementVariable> variableSynonymsMap,
 		final Map<Integer, List<ValueReference>> categoricalValuesMap) {
-		if (!CollectionUtils.isEmpty(trialImportRequestDto.getAdditionalInfo())) {
-			final List<ProjectProperty> properties = new ArrayList<>();
-			trialImportRequestDto.getAdditionalInfo().entrySet().forEach(entry -> {
-				final String variableName = entry.getKey().toUpperCase();
-				// Lookup variable by name first, then synonym
-				final MeasurementVariable measurementVariable =
-					variableNamesMap.containsKey(variableName) ? variableNamesMap.get(variableName) : variableSynonymsMap.get(variableName);
-				if (measurementVariable != null) {
-					measurementVariable.setValue(entry.getValue());
-					final DataType dataType = DataType.getById(measurementVariable.getDataTypeId());
-					final java.util.Optional<VariableValueValidator> dataValidator =
-						this.variableDataValidatorFactory.getValidator(dataType);
-					if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
-						measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
-					}
-					if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
-						final Integer rank = properties.size() + 1;
-						properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
-							measurementVariable.getValue(), rank, measurementVariable.getTermId(), entry.getKey()));
-					}
+		// Set contacts to study settings map
+		this.setContactsAsStudySettings(trialImportRequestDto);
+		final List<ProjectProperty> properties = new ArrayList<>();
+		trialImportRequestDto.getAdditionalInfo().entrySet().forEach(entry -> {
+			final String variableName = entry.getKey().toUpperCase();
+			// Lookup variable by name first, then synonym
+			final MeasurementVariable measurementVariable =
+				variableNamesMap.containsKey(variableName) ? variableNamesMap.get(variableName) : variableSynonymsMap.get(variableName);
+			if (measurementVariable != null) {
+				measurementVariable.setValue(entry.getValue());
+				final DataType dataType = DataType.getById(measurementVariable.getDataTypeId());
+				final java.util.Optional<VariableValueValidator> dataValidator =
+					this.variableDataValidatorFactory.getValidator(dataType);
+				if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
+					measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
 				}
-			});
-			study.setProperties(properties);
-		}
+				if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
+					final Integer rank = properties.size() + 1;
+					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
+						measurementVariable.getValue(), rank, measurementVariable.getTermId(), entry.getKey()));
+				}
+			}
+		});
+		study.setProperties(properties);
 
+	}
+
+	private void setContactsAsStudySettings(final TrialImportRequestDTO trialImportRequestDTO) {
+		if (!CollectionUtils.isEmpty(trialImportRequestDTO.getContacts())) {
+			// Limitation of BMS ontology, is we can only store add variable once as study setting so we can only save one set of contact variables
+			final Optional<ContactDto>
+				contactDto = trialImportRequestDTO.getContacts().stream().filter(c->StringUtils.isNotEmpty(c.getName())).findFirst();
+			if (contactDto.isPresent()) {
+				trialImportRequestDTO.getAdditionalInfo().put(CONTACT_NAME, contactDto.get().getName());
+				trialImportRequestDTO.getAdditionalInfo().put(CONTACT_EMAIL, contactDto.get().getEmail());
+				trialImportRequestDTO.getAdditionalInfo().put(CONTACT_ORG, contactDto.get().getInstituteName());
+				trialImportRequestDTO.getAdditionalInfo().put(CONTACT_TYPE, contactDto.get().getType());
+			}
+		}
 	}
 
 	private void addDatasetVariables(final DmsProject dataset, final boolean isEnvironmentDataset) {
@@ -474,22 +505,47 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		final StudySummary studySummary, final Integer studyId) {
 		final Map<String, String> additionalProps = Maps.newHashMap();
 		if (!CollectionUtils.isEmpty(propsMap.get(studyId))) {
+			final ContactDto contactDto = new ContactDto();
 			propsMap.get(studyId).stream().forEach(prop -> {
 				final Integer variableId = prop.getVariableId();
-				String value = prop.getValue();
-				if (categoricalVariablesMap.containsKey(variableId) && StringUtils.isNotBlank(value) && NumberUtils.isDigits(value)) {
-					final Integer categoricalId = Integer.parseInt(value);
-					final Map<Integer, ValueReference> categoricalValues = categoricalVariablesMap.get(variableId).stream()
-						.collect(Collectors.toMap(ValueReference::getId, Function.identity()));
-					if (categoricalValues.containsKey(categoricalId)) {
-						value = categoricalValues.get(categoricalId).getDescription();
-					}
-				}
-				if (!StringUtils.isEmpty(value)) {
-					additionalProps.put(prop.getAlias(), value);
+				final String value = prop.getValue();
+				if (CONTACT_VARIABLE_IDS.contains(variableId)) {
+					this.setContactDtoField(contactDto, variableId, value);
+				} else {
+					this.processStudySetting(categoricalVariablesMap, additionalProps, prop, variableId, value);
 				}
 			});
+			if (contactDto.atLeastOneContactDetailProvided()) {
+				studySummary.setContacts(Collections.singletonList(contactDto));
+			}
 			studySummary.setAdditionalInfo(additionalProps);
+		}
+	}
+
+	private void processStudySetting(final Map<Integer, List<ValueReference>> categoricalVariablesMap,
+		final Map<String, String> additionalProps, final ProjectProperty prop, final Integer variableId, String value) {
+		if (categoricalVariablesMap.containsKey(variableId) && StringUtils.isNotBlank(value) && NumberUtils.isDigits(value)) {
+			final Integer categoricalId = Integer.parseInt(value);
+			final Map<Integer, ValueReference> categoricalValues = categoricalVariablesMap.get(variableId).stream()
+				.collect(Collectors.toMap(ValueReference::getId, Function.identity()));
+			if (categoricalValues.containsKey(categoricalId)) {
+				value = categoricalValues.get(categoricalId).getDescription();
+			}
+		}
+		if (!StringUtils.isEmpty(value)) {
+			additionalProps.put(prop.getAlias(), value);
+		}
+	}
+
+	private void setContactDtoField(final ContactDto contactDto, final Integer variableId, final String value) {
+		if (CONTACT_NAME_ID == variableId) {
+			contactDto.setName(value);
+		} else if (CONTACT_EMAIL_ID == variableId) {
+			contactDto.setEmail(value);
+		} else if (CONTACT_ORG_ID == variableId) {
+			contactDto.setInstituteName(value);
+		} else if (CONTACT_TYPE_ID == variableId) {
+			contactDto.setType(value);
 		}
 	}
 

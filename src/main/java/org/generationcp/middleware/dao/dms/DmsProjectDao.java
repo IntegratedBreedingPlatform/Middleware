@@ -1620,9 +1620,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sqlQuery.addScalar("locationName");
 		sqlQuery.addScalar("programDbId");
 		sqlQuery.addScalar("programName");
-		sqlQuery.addScalar("contactDbId");
-		sqlQuery.addScalar("contactName");
-		sqlQuery.addScalar("email");
 		sqlQuery.addScalar("experimentalDesign");
 		sqlQuery.addScalar("experimentalDesignId");
 		sqlQuery.addScalar("lastUpdate");
@@ -1653,8 +1650,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studyInstanceDto.setLocationName(String.valueOf(result.get("locationName")));
 			studyInstanceDto.setProgramDbId(String.valueOf(result.get("programDbId")));
 			studyInstanceDto.setProgramName(String.valueOf(result.get("programName")));
-			studyInstanceDto.setContacts(Collections.singletonList(new ContactDto(String.valueOf(result.get("contactDbId")),
-				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
+
 			if (result.get("experimentalDesignId") != null) {
 				studyInstanceDto.setExperimentalDesign(new ExperimentalDesign(
 					String.valueOf(result.get("experimentalDesignId")), String.valueOf(result.get("experimentalDesign"))));
@@ -1698,9 +1694,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sqlQuery.addScalar("programDbId");
 		sqlQuery.addScalar("programName");
 		sqlQuery.addScalar("locationDbId");
-		sqlQuery.addScalar("contactDbId");
-		sqlQuery.addScalar("contactName");
-		sqlQuery.addScalar("email");
 
 		this.addStudySearchFilterParameters(sqlQuery, studySearchFilter);
 
@@ -1722,8 +1715,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			studySummary.setProgramName(String.valueOf(result.get("programName")));
 			studySummary.setLocationId(String.valueOf(result.get("locationDbId")));
 			studySummary.setActive(((Integer) result.get("active")) == 1);
-			studySummary.setContacts(Collections.singletonList(new ContactDto(String.valueOf(result.get("contactDbId")),
-				(String) result.get("contactName"), (String) result.get("email"), "Creator")));
 			studyList.add(studySummary);
 		}
 		return studyList;
@@ -1763,9 +1754,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		if (studySearchFilter.getObservationVariableDbId() != null) {
 			sqlQuery.setParameter("observationVariableDbId", studySearchFilter.getObservationVariableDbId());
-		}
-		if (!StringUtils.isEmpty(studySearchFilter.getContactDbId())) {
-			sqlQuery.setParameter("contactDbId", studySearchFilter.getContactDbId());
 		}
 		// Search Date Range
 		if (studySearchFilter.getSearchDateRangeStart() != null) {
@@ -1812,9 +1800,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		sql.append("     location.lname AS locationName, ");
 		sql.append("     wp.project_name AS programName, ");
 		sql.append("     wp.project_uuid AS programDbId, ");
-		sql.append("     wper.personid AS contactDbid, ");
-		sql.append("     CONCAT(wper.fname, ' ', wper.lname) AS contactName, ");
-		sql.append("     wper.pemail AS email, ");
 		sql.append("     cvtermExptDesign.definition AS experimentalDesign, ");
 		sql.append("     geopropExperimentalDesign.value AS experimentalDesignId, ");
 		sql.append("     pmain.study_update AS lastUpdate, ");
@@ -1854,14 +1839,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		// Get the MIN or MAX depending on sort parameter and direction
 		if (pageable != null && pageable.getSort() != null && pageable.getSort().getOrderFor("locationDbId") != null
 			&& Sort.Direction.DESC.equals(pageable.getSort().getOrderFor("locationDbId").getDirection())) {
-			sql.append("     MAX(geopropLocation.value) as locationDbId, ");
+			sql.append("     MAX(geopropLocation.value) as locationDbId ");
 		} else {
-			sql.append("     MIN(geopropLocation.value) as locationDbId, ");
+			sql.append("     MIN(geopropLocation.value) as locationDbId ");
 		}
 
-		sql.append("     wper.personid AS contactDbid, ");
-		sql.append("     CONCAT(fname, ' ', lname) AS contactName, ");
-		sql.append("     wper.pemail AS email ");
 		this.appendStudySummaryFromQuery(sql);
 		this.appendStudySearchFilter(sql, studySearchFilter);
 		sql.append(" GROUP BY pmain.project_id ");
@@ -1928,8 +1910,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			"     nd_geolocationprop geopropLocation ON geopropLocation.nd_geolocation_id = geoloc.nd_geolocation_id AND geopropLocation.type_id = "
 				+ TermId.LOCATION_ID.getId());
 		sql.append("         LEFT OUTER JOIN workbench.workbench_project wp ON wp.project_uuid = pmain.program_uuid");
-		sql.append("         LEFT JOIN workbench.users wu ON wu.userid = pmain.created_by ");
-		sql.append("         LEFT JOIN workbench.persons wper ON wper.personid = wu.personid ");
 		sql.append("         LEFT JOIN external_reference_study er ON er.study_id = pmain.project_id ");
 		sql.append(" WHERE pmain.deleted = 0 ");//Exclude Deleted Studies
 	}
@@ -1972,9 +1952,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			sql.append(" AND project_id = plot.project_id");
 			sql.append(" AND type_id in (" + VariableType.TRAIT.getId() + ", " + VariableType.SELECTION_METHOD.getId() + "))");
 		}
-		if (!StringUtils.isEmpty(studySearchFilter.getContactDbId())) {
-			sql.append(" AND wper.personid = :contactDbId ");
-		}
+
 		if (studySearchFilter.getActive() != null) {
 			if (BooleanUtils.isTrue(studySearchFilter.getActive())) {
 				sql.append(

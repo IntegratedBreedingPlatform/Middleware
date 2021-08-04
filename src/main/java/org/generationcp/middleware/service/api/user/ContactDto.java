@@ -24,6 +24,16 @@ public class ContactDto {
 	public ContactDto() {
 	}
 
+	public ContactDto(final String contactDbId, final String name, final String email, final String type, final String orcid,
+		final String instituteName) {
+		this.contactDbId = contactDbId;
+		this.name = name;
+		this.email = email;
+		this.type = type;
+		this.orcid = orcid;
+		this.instituteName = instituteName;
+	}
+
 	public ContactDto(final String contactDbId, final String name, final String email, final String type) {
 		this.contactDbId = contactDbId;
 		this.name = name;
@@ -92,5 +102,9 @@ public class ContactDto {
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
+	}
+
+	public boolean atLeastOneContactDetailProvided() {
+		return StringUtils.isNotEmpty(this.getName()) || StringUtils.isNotEmpty(this.getEmail()) || StringUtils.isNotEmpty(this.getInstituteName()) || StringUtils.isNotEmpty(this.getType());
 	}
 }
