@@ -41,27 +41,26 @@ import java.util.Set;
 public class SampleDao extends GenericDAO<Sample, Integer> {
 
 	protected static final String SQL_SAMPLES_AND_EXPERIMENTS =
-		"SELECT  nde.nd_experiment_id, (SELECT COALESCE(NULLIF(COUNT(sp.sample_id), 0), '-')\n FROM \n"
-			+ "            						sample AS sp \n" + "        WHERE\n"
-			+ "            						nde.nd_experiment_id = sp.nd_experiment_id) 'SAMPLES'"
-			+ "		FROM project p "
-			+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id\n"
-			+ "		WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
+		"SELECT  nde.nd_experiment_id, (SELECT COALESCE(NULLIF(COUNT(sp.sample_id), 0), '-') FROM "
+			+ " sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id) 'SAMPLES'"
+			+ " FROM project p "
+			+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
+			+ " WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 			+ " GROUP BY nde.nd_experiment_id";
 
 	public static final String SQL_STUDY_HAS_SAMPLES = "SELECT COUNT(sp.sample_id) AS Sample "
-		+ "		FROM project p "
-		+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
-		+ "		INNER JOIN sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id "
-		+ "		WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
+		+ " FROM project p "
+		+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
+		+ " INNER JOIN sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id "
+		+ " WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 		+ " GROUP BY sp.nd_experiment_id";
 
 	public static final String SQL_STUDY_ENTRY_HAS_SAMPLES = "SELECT COUNT(sp.sample_id) AS Sample "
-			+ "		FROM project p "
-			+ "		INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
-			+ "		INNER JOIN sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id "
-			+ "		WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + "\n"
-			+ "		      AND nde.stock_id = :entryId \n"
+			+ " FROM project p "
+			+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
+			+ " INNER JOIN sample AS sp ON nde.nd_experiment_id = sp.nd_experiment_id "
+			+ " WHERE p.study_id = :studyId and p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
+			+ " 	AND nde.stock_id = :entryId "
 			+ " GROUP BY sp.nd_experiment_id";
 
 	private static final String MAX_SEQUENCE_NUMBER_QUERY = "SELECT st.dbxref_id as gid," + " max(IF(           convert("
@@ -446,7 +445,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 
 	public List<SampleObservationDto> getSampleObservationDtos(final SampleSearchRequestDTO requestDTO, final Pageable pageable) {
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createSamplesQueryString(requestDTO, pageable));
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createSamplesQueryString(requestDTO));
 		if(pageable != null) {
 			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
 			sqlQuery.setMaxResults(pageable.getPageSize());
@@ -495,7 +494,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 	}
 
-	private String createSamplesQueryString(final SampleSearchRequestDTO requestDTO, final Pageable pageable) {
+	private String createSamplesQueryString(final SampleSearchRequestDTO requestDTO) {
 		final StringBuilder sql = new StringBuilder();
 		sql.append("SELECT g.germplsm_uuid AS germplasmDbId, ");
 		sql.append("s.sample_id AS sampleId, ");
@@ -519,12 +518,12 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 	private void appendSamplesFromQuery(final StringBuilder sql) {
 		sql.append("FROM sample s ");
-		sql.append("	INNER JOIN nd_experiment e ON e.nd_experiment_id = s.nd_experiment_id ");
-		sql.append("	INNER JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id AND eprop.type_id = " + TermId.PLOT_NO.getId());
-		sql.append("	INNER JOIN stock stock ON stock.stock_id = e.stock_id ");
-		sql.append("	INNER JOIN germplsm g ON g.gid = stock.dbxref_id ");
-		sql.append("	INNER JOIN project pmain ON pmain.project_id = stock.project_id ");
-		sql.append("	WHERE 1=1 ");
+		sql.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = s.nd_experiment_id ");
+		sql.append(" INNER JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id AND eprop.type_id = " + TermId.PLOT_NO.getId());
+		sql.append(" INNER JOIN stock stock ON stock.stock_id = e.stock_id ");
+		sql.append(" INNER JOIN germplsm g ON g.gid = stock.dbxref_id ");
+		sql.append(" INNER JOIN project pmain ON pmain.project_id = stock.project_id ");
+		sql.append(" WHERE 1=1 ");
 	}
 
 	private void appendSampleSeachFilters(final StringBuilder sql, final SampleSearchRequestDTO requestDTO) {
