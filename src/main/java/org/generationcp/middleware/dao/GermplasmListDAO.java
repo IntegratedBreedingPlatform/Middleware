@@ -769,7 +769,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public void markProgramGermplasmListsAsDeleted(final String programUUID) {
 		try {
-			final String sql = "UPDATE listnms SET status = " + STATUS_DELETED + " where program_uuid = :programUUID";
+			final String sql = "UPDATE listnms SET liststatus = " + STATUS_DELETED + " where program_uuid = :programUUID";
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
 			sqlQuery.setParameter("programUUID", programUUID);
 			sqlQuery.executeUpdate();
