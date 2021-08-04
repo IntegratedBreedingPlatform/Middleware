@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 public class GermplasmImportRequest {
 
 	public static final String CROPNM_ATTR = "CROPNM_AP_text";
-	public static final String ORIGIN_ATTR = "SORIG_AP_text";
 	public static final String INSTCODE_ATTR = "INSTCODE_AP_text";
 	public static final String INSTNAME_ATTR = "ORIGININST_AP_text";
 	public static final String PLOTCODE_ATTR = "PLOTCODE_AP_text";
@@ -37,7 +36,7 @@ public class GermplasmImportRequest {
 		.unmodifiableList(Arrays.asList(ACCNO_NAME_TYPE, PED_NAME_TYPE, GENUS_NAME_TYPE, LNAME_NAME_TYPE, PUI_NAME_TYPE));
 	public static final List<String> BRAPI_SPECIFIABLE_ATTRTYPES =
 		Collections.unmodifiableList(Arrays
-			.asList(CROPNM_ATTR, ORIGIN_ATTR, INSTCODE_ATTR, INSTNAME_ATTR, PLOTCODE_ATTR, SPECIES_ATTR, SPECIES_AUTH_ATTR, SUBTAX_ATTR,
+			.asList(CROPNM_ATTR, INSTCODE_ATTR, INSTNAME_ATTR, PLOTCODE_ATTR, SPECIES_ATTR, SPECIES_AUTH_ATTR, SUBTAX_ATTR,
 				SUBTAX_AUTH_ATTR));
 
 	private String accessionNumber;
@@ -330,7 +329,6 @@ public class GermplasmImportRequest {
 	public Map<String, String> getCustomAttributeFieldsMap() {
 		final Map<String, String> attrMap = new HashMap<>();
 		attrMap.put(CROPNM_ATTR, this.getCommonCropName());
-		attrMap.put(ORIGIN_ATTR, this.getGermplasmOrigin());
 		attrMap.put(INSTCODE_ATTR, this.getInstituteCode());
 		attrMap.put(INSTNAME_ATTR, this.getInstituteName());
 		attrMap.put(PLOTCODE_ATTR, this.getSeedSource());
