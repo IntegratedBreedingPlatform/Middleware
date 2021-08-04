@@ -17,9 +17,9 @@ public interface FileMetadataService {
 
 	String getFilePath(String observationUnitDbId, String fileName);
 
-	FileMetadataDTO save(FileMetadataDTO fileMetadataDTO, String observationUnitUUID);
+	FileMetadataDTO save(FileMetadataDTO fileMetadataDTO, String observationUnitUUID, Integer termId);
 
-	List<FileMetadataDTO> list(String observationUnitUUID);
+	List<FileMetadataDTO> list(String observationUnitUUID, String programUUID);
 
 	void delete(String fileUUID);
 }

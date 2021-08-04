@@ -4,7 +4,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.generationcp.middleware.pojos.AbstractEntity;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -14,9 +14,14 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "file_metadata")
@@ -65,9 +70,12 @@ public class FileMetadata extends AbstractEntity {
 	@JoinColumn(name = "nd_experiment_id")
 	private ExperimentModel experimentModel;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "phenotype_id")
-	private Phenotype phenotype;
+	@OneToMany
+	@JoinTable(
+		name = "file_metadata_cvterm",
+		joinColumns = @JoinColumn(name = "file_metadata_id"),
+		inverseJoinColumns = @JoinColumn(name = "cvterm_id"))
+	private List<CVTerm> variables = new ArrayList<>();
 
 	public Integer getFileId() {
 		return this.fileId;
@@ -173,12 +181,15 @@ public class FileMetadata extends AbstractEntity {
 		this.experimentModel = experimentModel;
 	}
 
-	public Phenotype getPhenotype() {
-		return this.phenotype;
+	public List<CVTerm> getVariables() {
+		if (this.variables == null) {
+			this.variables = new ArrayList<>();
+		}
+		return this.variables;
 	}
 
-	public void setPhenotype(final Phenotype phenotype) {
-		this.phenotype = phenotype;
+	public void setVariables(final List<CVTerm> variables) {
+		this.variables = variables;
 	}
 
 	@Override

@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,10 +82,6 @@ public class FileMetadataMapper {
 		if (experimentModel != null) {
 			to.setObservationUnitUUID(experimentModel.getObsUnitId());
 			to.setNdExperimentId(experimentModel.getNdExperimentId());
-		}
-		final Phenotype phenotype = from.getPhenotype();
-		if (phenotype != null) {
-			to.setObservationId(phenotype.getPhenotypeId());
 		}
 
 		final ObjectMapper objectMapper = new ObjectMapper();

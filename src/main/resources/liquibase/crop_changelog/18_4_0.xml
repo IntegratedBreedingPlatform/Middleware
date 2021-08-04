@@ -7,36 +7,24 @@
 	<changeSet author="nahuel" id="v18.4.0-1" >
 		<preConditions onFail="MARK_RAN">
 			<not>
-				<columnExists tableName="file_metadata" columnName="phenotype_id"/>
+				<tableExists tableName="file_metadata_cvterm"/>
 			</not>
 		</preConditions>
-		<comment>Add fk to phenotype in file_metadata</comment>
+		<comment>Create file_metadata_cvterm: cvterms to formally describe an image or file</comment>
         <sql dbms="mysql" splitStatements="true">
-			alter table file_metadata
-				add phenotype_id int null;
+			create table file_metadata_cvterm
+			(
+				file_metadata_id int null,
+				cvterm_id int null,
+				constraint pk_file_metadata_cvterm
+					primary key (file_metadata_id, cvterm_id),
+				constraint fk_file_metadata_cvterm_cvterm_cvterm_id
+					foreign key (cvterm_id) references cvterm (cvterm_id),
+				constraint fk_file_metadata_cvterm_file_metadata_file_id
+					foreign key (file_metadata_id) references file_metadata (file_id)
+			)
+				comment 'cvterms to formally describe an image or file';
 
-			alter table file_metadata
-				add constraint fk_file_metadata_phenotype_phenotype_id
-					foreign key (phenotype_id) references phenotype (phenotype_id);
-
-			# Intermediate solution to avoid having to drop the existing testing data created till now
-			# Completes existing file_metadata.phenotype_id fk whenever possible
-			# Some of the first phenotypes records created with filename may not even have a file_metadata record
-			# and those won't be fixed here
-			update file_metadata f1 inner join (
-				select f.file_id, p.phenotype_id
-				from phenotype p
-						 inner join file_metadata f on p.nd_experiment_id = f.nd_experiment_id
-					and f.name = p.value
-					# exclude scenarios of same file name and different variables (data should be fixed manually)
-				where not exists(
-					select 1
-					from phenotype p2
-					where p2.nd_experiment_id = f.nd_experiment_id and f.name = p.value
-					group by p2.value
-					having count(1) > 1)
-			) f2 on f1.file_id = f2.file_id
-			set f1.phenotype_id = f2.phenotype_id
 		</sql>
 	</changeSet>
 
