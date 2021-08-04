@@ -4,6 +4,7 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -19,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -122,4 +124,20 @@ public class ProgramServiceImpl implements ProgramService {
 		return project;
 	}
 
+	@Override
+	public Optional<ProgramDTO> getProject(final String cropName, final String programName) {
+		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(cropName);
+		if (cropType == null) {
+			return Optional.empty();
+		}
+		final Project project = this.daoFactory.getProjectDAO().getProjectByNameAndCrop(programName, cropType);
+		if (project != null) {
+			final WorkbenchUser loggedInUser = this.daoFactory.getWorkbenchUserDAO().getById(ContextHolder.getLoggedInUserId());
+			final ProgramDTO programDTO = new ProgramDTO(project);
+			programDTO.setCreatedBy(loggedInUser.getName());
+			return Optional.of(programDTO);
+		} else {
+			return Optional.empty();
+		}
+	}
 }

@@ -6,6 +6,7 @@ import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ProgramService {
 
@@ -24,5 +25,7 @@ public interface ProgramService {
 	ProgramDTO addProject(String crop, ProgramBasicDetailsDto programBasicDetailsDto);
 
 	Project addProject(Project project);
+
+	Optional<ProgramDTO> getProject(String cropName, String programName);
 
 }
