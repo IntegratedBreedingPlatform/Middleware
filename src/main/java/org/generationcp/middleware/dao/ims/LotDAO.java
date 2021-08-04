@@ -387,7 +387,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 	}
 
-	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable) {
+	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable, final Integer maxTotalResults) {
 		try {
 			final StringBuilder searchLotQuerySql = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(searchLotQuerySql), lotsSearchDto);
@@ -422,6 +422,10 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("germplasmUUID");
 
 			query.setResultTransformer(Transformers.aliasToBean(ExtendedLotDto.class));
+
+			if (maxTotalResults != null) {
+				query.setMaxResults(maxTotalResults);
+			}
 
 			GenericDAO.addPaginationToSQLQuery(query, pageable);
 

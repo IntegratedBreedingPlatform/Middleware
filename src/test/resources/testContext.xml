@@ -343,5 +343,9 @@
 	<bean id="breedingMethodService" class="org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
+	
+	<bean id="lotService" class="org.generationcp.middleware.service.impl.inventory.LotServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
 
 </beans>
