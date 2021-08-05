@@ -461,30 +461,13 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Override
 	public void deleteProgramStudies(final String programUUID) {
-		//FIXME Performance can be improved using a criteria to retrieve all DMSProject instead of Integer values
-		final List<Integer> projectIds = this.daoFactory.getDmsProjectDAO().getAllProgramStudiesAndFolders(programUUID);
-		for (final Integer projectId : projectIds) {
-			this.deleteStudy(projectId);
-		}
+		final List<Integer> studyAndFolderIds = this.daoFactory.getDmsProjectDAO().getAllProgramStudiesAndFolders(programUUID);
+		this.daoFactory.getDmsProjectDAO().markProjectsAndChildrenAsDeleted(studyAndFolderIds);
 	}
 
 	@Override
 	public void deleteStudy(final int studyId) {
-		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
-		if (null != study) {
-			final String timestamp = Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS");
-			study.setDeleted(true);
-			study.setName(study.getName() + "#" + timestamp);
-			this.daoFactory.getDmsProjectDAO().save(study);
-			final List<DmsProject> datasets = this.daoFactory.getDmsProjectDAO().getDatasetsByParent(study.getProjectId());
-			if (!CollectionUtils.isEmpty(datasets)) {
-				for (final DmsProject dataset : datasets) {
-					dataset.setName(dataset.getName() + "#" + timestamp);
-					dataset.setDeleted(true);
-					this.daoFactory.getDmsProjectDAO().save(dataset);
-				}
-			}
-		}
+		this.daoFactory.getDmsProjectDAO().markProjectsAndChildrenAsDeleted(Arrays.asList(studyId));
 	}
 
 	private DmsProject createStudy(final Integer userId, final StudyType studyTypeByName,

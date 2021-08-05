@@ -2037,4 +2037,20 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return count.intValue() == datasetIds.size();
 	}
 
+	public void markProjectsAndChildrenAsDeleted(final List<Integer> projectIds) {
+		try {
+			final String timestamp = Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS");
+			//FIXME we need to include subobs datasets.
+			final String sql =
+				"UPDATE project p SET p.deleted = 1, p.name = CONCAT(p.name, '#', :timestamp) WHERE p.project_id IN (:projectIds) OR p.parent_project_id IN (:projectIds)";
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+			sqlQuery.setParameter("timestamp", timestamp);
+			sqlQuery.setParameterList("projectIds", projectIds);
+			sqlQuery.executeUpdate();
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with markProjectsAndChildrenAsDeleted() query from projectIds: " + projectIds;
+			DmsProjectDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }
