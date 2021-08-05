@@ -207,12 +207,6 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 				equalTo(request.getSeedSource()));
 			assertThat(germplasmDTO.getAdditionalInfo().get(GermplasmImportRequest.PLOTCODE_ATTR), equalTo(request.getSeedSource()));
 		}
-		if (existingAttrTypes.containsKey(GermplasmImportRequest.ORIGIN_ATTR)) {
-			assertThat(germplasmDTO.getGermplasmOrigin(), equalTo(request.getGermplasmOrigin()));
-			assertThat(germplasmAttributes.get(existingAttrTypes.get(GermplasmImportRequest.ORIGIN_ATTR)),
-				equalTo(request.getGermplasmOrigin()));
-			assertThat(germplasmDTO.getAdditionalInfo().get(GermplasmImportRequest.ORIGIN_ATTR), equalTo(request.getGermplasmOrigin()));
-		}
 		if (existingAttrTypes.containsKey(GermplasmImportRequest.CROPNM_ATTR)) {
 			assertThat(germplasmDTO.getCommonCropName(), equalTo(request.getCommonCropName()));
 			assertThat(germplasmAttributes.get(existingAttrTypes.get(GermplasmImportRequest.CROPNM_ATTR)),

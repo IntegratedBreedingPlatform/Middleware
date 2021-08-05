@@ -18,6 +18,7 @@ import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.inventory.PlantingService;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class PlantingServiceImpl implements PlantingService {
 
 	@Autowired
 	private DatasetService datasetService;
+
+	@Autowired
+	private LotService lotService;
 
 	public PlantingServiceImpl() {
 	}
@@ -97,7 +101,7 @@ public class PlantingServiceImpl implements PlantingService {
 		lotsSearchDto.setGids(new ArrayList<>(entriesByGid.keySet()));
 		lotsSearchDto.setStatus(0); // active
 		lotsSearchDto.setMinAvailableBalance(Double.MIN_VALUE);
-		final List<ExtendedLotDto> extendedLotDtos = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
 		if (!Util.isEmpty(extendedLotDtos)) {
 			for (final ExtendedLotDto lot : extendedLotDtos) {
 				final List<PlantingPreparationDTO.PlantingPreparationEntryDTO> entries = entriesByGid.get(lot.getGid());
@@ -193,7 +197,7 @@ public class PlantingServiceImpl implements PlantingService {
 			final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 			lotsSearchDto.setLotIds(Collections.singletonList(lotEntryNumber.getLotId()));
 
-			final ExtendedLotDto lot = daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
+			final ExtendedLotDto lot = this.lotService.searchLots(lotsSearchDto, null).get(0);
 
 			//Find instructions for the unit
 			final PlantingRequestDto.WithdrawalInstruction withdrawalInstruction =
@@ -257,5 +261,9 @@ public class PlantingServiceImpl implements PlantingService {
 
 	public void setDatasetService(final DatasetService datasetService) {
 		this.datasetService = datasetService;
+	}
+
+	public void setLotService(final LotService lotService) {
+		this.lotService = lotService;
 	}
 }
