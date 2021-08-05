@@ -19,7 +19,7 @@ public interface FileMetadataService {
 
 	FileMetadataDTO save(FileMetadataDTO fileMetadataDTO, String observationUnitUUID, Integer termId);
 
-	List<FileMetadataDTO> list(String observationUnitUUID, String programUUID);
+	List<FileMetadataDTO> list(String observationUnitUUID, String programUUID, String variableName, String fileName);
 
 	void delete(String fileUUID);
 }

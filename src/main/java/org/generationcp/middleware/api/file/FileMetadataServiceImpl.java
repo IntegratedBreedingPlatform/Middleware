@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.file;
 
+import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
@@ -174,8 +175,15 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public List<FileMetadataDTO> list(final String observationUnitUUID, final String programUUID) {
-		final List<FileMetadata> fileMetadataList = this.daoFactory.getFileMetadataDAO().findByObservationUnitUUID(observationUnitUUID);
+	public List<FileMetadataDTO> list(
+		final String observationUnitUUID,
+		final String programUUID,
+		final String variableName,
+		final String fileName
+	) {
+
+		final List<FileMetadata> fileMetadataList = this.daoFactory.getFileMetadataDAO().list(
+			programUUID, observationUnitUUID, variableName, fileName);
 
 		// collect variables
 		final VariableFilter variableFilter = new VariableFilter();
