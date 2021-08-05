@@ -57,5 +57,5 @@ public interface StudyInstanceService {
 	 * @param geolocationId
 	 * @return StudyDetailsDto
 	 */
-	StudyDetailsDto getStudyDetailsByInstance(Integer geolocationId);
+	Optional<StudyDetailsDto> getStudyDetailsByInstance(Integer geolocationId);
 }

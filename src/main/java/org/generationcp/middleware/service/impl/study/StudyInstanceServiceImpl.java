@@ -333,7 +333,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 	}
 
 	@Override
-	public StudyDetailsDto getStudyDetailsByInstance(final Integer instanceId) {
+	public Optional<StudyDetailsDto> getStudyDetailsByInstance(final Integer instanceId) {
 		final StudyMetadata studyMetadata = this.daoFactory.getDmsProjectDAO().getStudyMetadataForInstanceId(instanceId);
 		if (studyMetadata != null) {
 			final StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
@@ -396,9 +396,9 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				properties.putAll(projectPropMap.get(studyMetadata.getNurseryOrTrialId()));
 			}
 			studyDetailsDto.setAdditionalInfo(properties);
-			return studyDetailsDto;
+			return Optional.of(studyDetailsDto);
 		}
-		return null;
+		return Optional.empty();
 
 	}
 

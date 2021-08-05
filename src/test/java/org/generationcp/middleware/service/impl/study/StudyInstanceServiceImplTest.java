@@ -182,8 +182,9 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		this.testDataInitializer
 			.addProjectProp(this.study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, String.valueOf(user.getPerson().getId()), 6);
 
-		final StudyDetailsDto studyDetailsDto = this.studyInstanceService.getStudyDetailsByInstance(geolocation.getLocationId());
-
+		final Optional<StudyDetailsDto> studyDetailsDtoOptional = this.studyInstanceService.getStudyDetailsByInstance(geolocation.getLocationId());
+		Assert.assertTrue(studyDetailsDtoOptional.isPresent());
+		final StudyDetailsDto studyDetailsDto = studyDetailsDtoOptional.get();
 		Assert.assertEquals(1, studyDetailsDto.getContacts().size());
 		Assert.assertEquals(user.getUserid(), studyDetailsDto.getContacts().get(0).getUserId());
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
@@ -289,8 +290,9 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 		this.sessionProvder.getSession().clear();
 
-		final StudyDetailsDto studyDetailsDto = this.studyInstanceService.getStudyDetailsByInstance(geolocation.getLocationId());
-
+		final Optional<StudyDetailsDto> studyDetailsDtoOptional = this.studyInstanceService.getStudyDetailsByInstance(geolocation.getLocationId());
+		Assert.assertTrue(studyDetailsDtoOptional.isPresent());
+		final StudyDetailsDto studyDetailsDto = studyDetailsDtoOptional.get();
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
 		Assert.assertEquals(this.study.getProjectId(), studyDetailsDto.getMetadata().getTrialDbId());
@@ -766,7 +768,9 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
 		this.sessionProvder.getSession().flush();
-		final StudyDetailsDto studyDetailsDto = this.studyInstanceService.getStudyDetailsByInstance(geolocation.getLocationId());
+		final Optional<StudyDetailsDto> studyDetailsDtoOptional = this.studyInstanceService.getStudyDetailsByInstance(geolocation.getLocationId());
+		Assert.assertTrue(studyDetailsDtoOptional.isPresent());
+		final StudyDetailsDto studyDetailsDto = studyDetailsDtoOptional.get();
 		Assert.assertTrue(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
@@ -780,7 +784,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 		this.sessionProvder.getSession().clear();
 
-		assertNull(this.studyInstanceService.getStudyDetailsByInstance(geolocation.getLocationId()));
+		assertFalse(this.studyInstanceService.getStudyDetailsByInstance(geolocation.getLocationId()).isPresent());
 	}
 
 	@Test
