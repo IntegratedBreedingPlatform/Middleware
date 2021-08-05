@@ -1986,13 +1986,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	private static void addVariableWithFilterParams(final SqlQueryParamBuilder paramBuilder, final VariableFilter variableFilter) {
+
+		paramBuilder.setParameter(PROGRAMUUID, variableFilter.getProgramUuid());
+
 		if (!isEmpty(variableFilter.getVariableIds())) {
 			paramBuilder.append(" and variable.cvterm_id in (:variableIds) ");
 			paramBuilder.setParameterList("variableIds", variableFilter.getVariableIds());
-		}
-		final String programUUID = variableFilter.getProgramUuid();
-		if (!isBlank(programUUID)) {
-			paramBuilder.setParameter(PROGRAMUUID, programUUID);
 		}
 	}
 

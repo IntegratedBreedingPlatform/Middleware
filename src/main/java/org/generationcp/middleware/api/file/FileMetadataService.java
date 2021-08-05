@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.file;
 
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -19,7 +20,10 @@ public interface FileMetadataService {
 
 	FileMetadataDTO save(FileMetadataDTO fileMetadataDTO, String observationUnitUUID, Integer termId);
 
-	List<FileMetadataDTO> list(String observationUnitUUID, String programUUID, String variableName, String fileName);
+	List<FileMetadataDTO> search(FileMetadataFilterRequest filterRequest, String programUUID,
+		final Pageable pageable);
+
+	long countSearch(FileMetadataFilterRequest filterRequest, String programUUID, Pageable pageable);
 
 	void delete(String fileUUID);
 }

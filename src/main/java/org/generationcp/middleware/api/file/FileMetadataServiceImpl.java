@@ -1,6 +1,5 @@
 package org.generationcp.middleware.api.file;
 
-import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
@@ -20,6 +19,7 @@ import org.generationcp.middleware.util.uid.FileUIDGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -175,15 +175,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public List<FileMetadataDTO> list(
-		final String observationUnitUUID,
-		final String programUUID,
-		final String variableName,
-		final String fileName
-	) {
+	public List<FileMetadataDTO> search(final FileMetadataFilterRequest filterRequest, final String programUUID, final Pageable pageable) {
 
-		final List<FileMetadata> fileMetadataList = this.daoFactory.getFileMetadataDAO().list(
-			programUUID, observationUnitUUID, variableName, fileName);
+		final List<FileMetadata> fileMetadataList = this.daoFactory.getFileMetadataDAO().search(filterRequest, programUUID, pageable);
 
 		// collect variables
 		final VariableFilter variableFilter = new VariableFilter();
@@ -205,6 +199,11 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 			return fileMetadataDTO;
 		}).collect(toList());
+	}
+
+	@Override
+	public long countSearch(final FileMetadataFilterRequest filterRequest, final String programUUID, final Pageable pageable) {
+		return this.daoFactory.getFileMetadataDAO().countSearch(filterRequest, programUUID, pageable);
 	}
 
 	@Override
