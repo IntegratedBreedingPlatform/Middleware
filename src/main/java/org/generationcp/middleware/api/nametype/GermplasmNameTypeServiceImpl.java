@@ -162,7 +162,7 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 		userDefinedField.setFuid(ContextHolder.getLoggedInUserId());
 		userDefinedField.setFdate(Util.getCurrentDateAsIntegerValue());
 
-		this.daoFactory.getUserDefinedFieldDAO().save(userDefinedField);
+		this.daoFactory.getUserDefinedFieldDAO().update(userDefinedField);
 	}
 
 	@Override
