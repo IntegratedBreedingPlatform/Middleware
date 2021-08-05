@@ -12,7 +12,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.InstanceExternalReference;
@@ -86,78 +85,73 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 	}
 
 	@Override
-	public StudyDetailsDto getStudyDetailsByInstance(final Integer instanceId) {
-		try {
+	public Optional<StudyDetailsDto> getStudyDetailsByInstance(final Integer instanceId) {
 			final StudyMetadata studyMetadata = this.daoFactory.getDmsProjectDAO().getStudyMetadataForInstanceId(instanceId);
-			if (studyMetadata != null) {
-				final StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
-				studyDetailsDto.setMetadata(studyMetadata);
+		if (studyMetadata != null) {
+			final StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
+			studyDetailsDto.setMetadata(studyMetadata);
 
-				final List<UserDto> users = new ArrayList<>();
-				users.addAll(this.getUsersForEnvironment(studyMetadata.getStudyDbId()));
-				users.addAll(this.getUsersAssociatedToStudy(studyMetadata.getNurseryOrTrialId()));
-				studyDetailsDto.setContacts(users);
+			final List<UserDto> users = new ArrayList<>();
+			users.addAll(this.getUsersForEnvironment(studyMetadata.getStudyDbId()));
+			studyDetailsDto.setContacts(users);
 
-				final DmsProject environmentDataset =
-					this.daoFactory.getDmsProjectDAO()
-						.getDatasetsByTypeForStudy(studyMetadata.getTrialDbId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
-				final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
-					.getObservationSetVariables(environmentDataset.getProjectId(),
-						Lists.newArrayList(VariableType.ENVIRONMENT_CONDITION.getId()));
-				final List<MeasurementVariable> environmentParameters = new ArrayList<>();
-				List<Integer> variableIds = environmentConditions.stream().map(MeasurementVariable::getTermId)
-					.collect(Collectors.toList());
-				if (!variableIds.isEmpty()) {
-					final List<MeasurementVariable> measurementVariables = this.daoFactory.getPhenotypeDAO()
-						.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(
-							Collections.singletonList(instanceId), variableIds).get(instanceId);
-					if (!CollectionUtils.isEmpty(measurementVariables)) {
-						environmentParameters.addAll(measurementVariables);
-					}
+			final DmsProject environmentDataset =
+				this.daoFactory.getDmsProjectDAO()
+					.getDatasetsByTypeForStudy(studyMetadata.getTrialDbId(), DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
+			final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
+				.getObservationSetVariables(environmentDataset.getProjectId(),
+					Lists.newArrayList(VariableType.ENVIRONMENT_CONDITION.getId()));
+			final List<MeasurementVariable> environmentParameters = new ArrayList<>();
+			List<Integer> variableIds = environmentConditions.stream().map(MeasurementVariable::getTermId)
+				.collect(Collectors.toList());
+			if (!variableIds.isEmpty()) {
+				final List<MeasurementVariable> measurementVariables = this.daoFactory.getPhenotypeDAO()
+					.getEnvironmentConditionVariablesByGeoLocationIdAndVariableIds(
+						Collections.singletonList(instanceId), variableIds).get(instanceId);
+				if (!CollectionUtils.isEmpty(measurementVariables)) {
+					environmentParameters.addAll(measurementVariables);
 				}
-				final List<MeasurementVariable> environmentDetails = this.daoFactory.getDmsProjectDAO()
-					.getObservationSetVariables(environmentDataset.getProjectId(),
-						Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
-				variableIds = environmentDetails.stream().map(MeasurementVariable::getTermId)
-					.collect(Collectors.toList());
-				if (!variableIds.isEmpty()) {
-					final List<MeasurementVariable> measurementVariables = this.daoFactory.getGeolocationPropertyDao()
-						.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(
-							Collections.singletonList(instanceId), variableIds).get(instanceId);
-					if (!CollectionUtils.isEmpty(measurementVariables)) {
-						environmentParameters.addAll(measurementVariables);
-					}
-				}
-
-				final List<MeasurementVariable> environmentVariables = new ArrayList<>(environmentConditions);
-				environmentVariables.addAll(environmentDetails);
-				environmentParameters.addAll(this.createGeolocationVariables(environmentVariables, instanceId));
-				studyDetailsDto.setEnvironmentParameters(environmentParameters);
-
-				final Map<String, String> properties = new HashMap<>();
-				variableIds = environmentVariables.stream().map(MeasurementVariable::getTermId)
-					.collect(Collectors.toList());
-				properties.put("studyObjective", studyMetadata.getStudyObjective() == null ? "" : studyMetadata.getStudyObjective());
-				final Map<String, String> geolocationMap = this.daoFactory.getGeolocationPropertyDao()
-					.getGeolocationPropsAndValuesByGeolocation(Collections.singletonList(instanceId), variableIds).get(instanceId);
-				if (geolocationMap != null) {
-					properties.putAll(geolocationMap);
-				}
-
-				final Map<Integer, Map<String, String>> projectPropMap =
-					this.daoFactory.getProjectPropertyDAO().getProjectPropsAndValuesByStudyIds(
-						Collections.singletonList(studyMetadata.getNurseryOrTrialId()));
-				if (projectPropMap.containsKey(studyMetadata.getNurseryOrTrialId())) {
-					properties.putAll(projectPropMap.get(studyMetadata.getNurseryOrTrialId()));
-				}
-				studyDetailsDto.setAdditionalInfo(properties);
-				return studyDetailsDto;
 			}
-			return null;
-		} catch (final MiddlewareQueryException e) {
-			final String message = "Error with getStudyDetailsForGeolocation() query with instanceId: " + instanceId;
-			throw new MiddlewareQueryException(message, e);
+			final List<MeasurementVariable> environmentDetails = this.daoFactory.getDmsProjectDAO()
+				.getObservationSetVariables(environmentDataset.getProjectId(),
+					Lists.newArrayList(VariableType.ENVIRONMENT_DETAIL.getId()));
+			variableIds = environmentDetails.stream().map(MeasurementVariable::getTermId)
+				.collect(Collectors.toList());
+			if (!variableIds.isEmpty()) {
+				final List<MeasurementVariable> measurementVariables = this.daoFactory.getGeolocationPropertyDao()
+					.getEnvironmentDetailVariablesByGeoLocationIdAndVariableIds(
+						Collections.singletonList(instanceId), variableIds).get(instanceId);
+				if (!CollectionUtils.isEmpty(measurementVariables)) {
+					environmentParameters.addAll(measurementVariables);
+				}
+			}
+
+			final List<MeasurementVariable> environmentVariables = new ArrayList<>(environmentConditions);
+			environmentVariables.addAll(environmentDetails);
+			environmentParameters.addAll(this.createGeolocationVariables(environmentVariables, instanceId));
+			studyDetailsDto.setEnvironmentParameters(environmentParameters);
+
+			final Map<String, String> properties = new HashMap<>();
+			variableIds = environmentVariables.stream().map(MeasurementVariable::getTermId)
+				.collect(Collectors.toList());
+			properties.put("studyObjective", studyMetadata.getStudyObjective() == null ? "" : studyMetadata.getStudyObjective());
+			final Map<String, String> geolocationMap = this.daoFactory.getGeolocationPropertyDao()
+				.getGeolocationPropsAndValuesByGeolocation(Collections.singletonList(instanceId), variableIds).get(instanceId);
+			if (geolocationMap != null) {
+				properties.putAll(geolocationMap);
+			}
+
+			final Map<Integer, Map<String, String>> projectPropMap =
+				this.daoFactory.getProjectPropertyDAO().getProjectPropsAndValuesByStudyIds(
+					Collections.singletonList(studyMetadata.getNurseryOrTrialId()));
+			if (projectPropMap.containsKey(studyMetadata.getNurseryOrTrialId())) {
+				properties.putAll(projectPropMap.get(studyMetadata.getNurseryOrTrialId()));
+			}
+			studyDetailsDto.setAdditionalInfo(properties);
+			return Optional.of(studyDetailsDto);
 		}
+		return Optional.empty();
+
 	}
 
 	@Override
@@ -599,14 +593,6 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 	private List<UserDto> getUsersForEnvironment(final Integer instanceId) {
 		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToEnvironment(instanceId);
-		if (!CollectionUtils.isEmpty(personIds)) {
-			return this.userService.getUsersByPersonIds(personIds);
-		}
-		return Collections.emptyList();
-	}
-
-	private List<UserDto> getUsersAssociatedToStudy(final Integer studyId) {
-		final List<Integer> personIds = this.daoFactory.getDmsProjectDAO().getPersonIdsAssociatedToStudy(studyId);
 		if (!CollectionUtils.isEmpty(personIds)) {
 			return this.userService.getUsersByPersonIds(personIds);
 		}

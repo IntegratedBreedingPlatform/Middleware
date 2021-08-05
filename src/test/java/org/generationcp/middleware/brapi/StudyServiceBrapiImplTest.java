@@ -45,7 +45,6 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -217,13 +216,16 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", locationId);
 		this.testDataInitializer
+			.addGeolocationProp(geolocation, TermId.COOPERATOOR_ID.getId(), String.valueOf(user.getPerson().getId()), 1);
+		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
 		this.testDataInitializer
 			.addProjectProp(this.study, TermId.PI_ID.getId(), "", VariableType.STUDY_DETAIL, String.valueOf(user.getPerson().getId()), 6);
 
-		final StudyDetailsDto studyDetailsDto = this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId());
-
-		assertFalse(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
+		final Optional<StudyDetailsDto> studyDetailsDtoOptional = this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId());
+		Assert.assertTrue(studyDetailsDtoOptional.isPresent());
+		final StudyDetailsDto studyDetailsDto = studyDetailsDtoOptional.get();
+		Assert.assertEquals(1, studyDetailsDto.getContacts().size());
 		Assert.assertEquals(user.getUserid(), studyDetailsDto.getContacts().get(0).getUserId());
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
@@ -286,7 +288,9 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 		this.sessionProvder.getSession().clear();
 
-		final StudyDetailsDto studyDetailsDto = this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId());
+		final Optional<StudyDetailsDto> studyDetailsDtoOptional = this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId());
+		Assert.assertTrue(studyDetailsDtoOptional.isPresent());
+		final StudyDetailsDto studyDetailsDto = studyDetailsDtoOptional.get();
 
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
@@ -314,7 +318,9 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		this.testDataInitializer
 			.createTestExperiment(environmentDataset, geolocation, TermId.TRIAL_ENVIRONMENT_EXPERIMENT.getId(), "0", null);
 		this.sessionProvder.getSession().flush();
-		final StudyDetailsDto studyDetailsDto = this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId());
+		final Optional<StudyDetailsDto> studyDetailsDtoOptional = this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId());
+		Assert.assertTrue(studyDetailsDtoOptional.isPresent());
+		final StudyDetailsDto studyDetailsDto = studyDetailsDtoOptional.get();
 		Assert.assertTrue(CollectionUtils.isEmpty(studyDetailsDto.getContacts()));
 		Assert.assertEquals(locationId, studyDetailsDto.getMetadata().getLocationId().intValue());
 		Assert.assertEquals(geolocation.getLocationId(), studyDetailsDto.getMetadata().getStudyDbId());
@@ -328,7 +334,7 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 		this.sessionProvder.getSession().clear();
 
-		assertNull(this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId()));
+		assertFalse(this.studyServiceBrapi.getStudyDetailsByInstance(geolocation.getLocationId()).isPresent());
 	}
 
 	private void assertEnvironmentParameter(final List<MeasurementVariable> environmentParameters, final int expectedTermId,

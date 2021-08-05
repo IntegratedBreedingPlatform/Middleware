@@ -404,10 +404,15 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 				if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
 					measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
 				}
+				final Integer rank = properties.size() + 1;
 				if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
-					final Integer rank = properties.size() + 1;
+					// Add the study setting with value if the value provided is valid.
 					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
 						measurementVariable.getValue(), rank, measurementVariable.getTermId(), entry.getKey()));
+				} else {
+					// Add the study setting with an empty value if the value provided is not valid.
+					properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
+						"", rank, measurementVariable.getTermId(), entry.getKey()));
 				}
 			}
 		});

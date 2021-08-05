@@ -1,6 +1,7 @@
 package org.generationcp.middleware.brapi;
 
 import com.google.common.collect.Maps;
+import gherkin.lexer.Da;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -14,11 +15,14 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.StudyExternalReference;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -54,6 +58,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
+	private DaoFactory daoFactory;
 	private IntegrationTestDataInitializer testDataInitializer;
 	private Project commonTestProject;
 	private CropType crop;
@@ -64,6 +69,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() {
+		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.workbenchTestDataUtil.setUpWorkbench();
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
@@ -429,15 +435,19 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
 
-		final Map<String, String> settingsMap = Maps.newHashMap();
-		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(),
-			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(),
-			"2021-05-01");
+		final CVTerm numericVariable =
+			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL);
+		final CVTerm dateTimeVariable =
+			this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL);
 		final List<String> possibleValues = Arrays
 			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
-		settingsMap.put(this.testDataInitializer.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(),
-			RandomStringUtils.randomAlphabetic(30));
+		final CVTerm categoricalVariable = this.testDataInitializer.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues);
+
+
+		final Map<String, String> settingsMap = Maps.newHashMap();
+		settingsMap.put(numericVariable.getName(), RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(dateTimeVariable.getName(), "2021-05-01");
+		settingsMap.put(categoricalVariable.getName(), RandomStringUtils.randomAlphabetic(30));
 		importRequest1.setAdditionalInfo(settingsMap);
 
 		final List<StudySummary> savedStudies =
@@ -445,7 +455,13 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(1, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
-		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
+		final List<ProjectProperty> projectProperties = this.daoFactory.getProjectPropertyDAO().getByProjectId(study1.getTrialDbId());
+
+		// Verify that study settings are saved even if their values are invalid.
+		Assert.assertEquals(3, projectProperties.size());
+		Assert.assertTrue(projectProperties.stream().filter(pp -> pp.getAlias().equals(numericVariable.getName())).findAny().isPresent());
+		Assert.assertTrue(projectProperties.stream().filter(pp -> pp.getAlias().equals(dateTimeVariable.getName())).findAny().isPresent());
+		Assert.assertTrue(projectProperties.stream().filter(pp -> pp.getAlias().equals(categoricalVariable.getName())).findAny().isPresent());
 	}
 
 	@Test

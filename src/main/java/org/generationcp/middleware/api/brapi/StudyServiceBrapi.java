@@ -7,10 +7,11 @@ import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface StudyServiceBrapi {
 
-	StudyDetailsDto getStudyDetailsByInstance(Integer instanceId);
+	Optional<StudyDetailsDto> getStudyDetailsByInstance(Integer instanceId);
 
 	List<StudyInstanceDto> getStudyInstancesWithMetadata(StudySearchFilter studySearchFilter, Pageable pageable);
 

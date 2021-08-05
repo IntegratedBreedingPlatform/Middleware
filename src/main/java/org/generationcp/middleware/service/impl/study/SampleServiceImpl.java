@@ -3,33 +3,31 @@ package org.generationcp.middleware.service.impl.study;
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.domain.sample.SampleDTO;
-import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRequestDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
-import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.ExperimentProperty;
-import org.generationcp.middleware.pojos.dms.GeolocationProperty;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
-import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Repository
 @Transactional
@@ -101,12 +99,6 @@ public class SampleServiceImpl implements SampleService {
 		return this.daoFactory.getSampleDao().countFilter(ndExperimentId, listId);
 	}
 
-	public SampleDetailsDTO getSampleObservation(final String sampleId) {
-		final Sample sample = this.daoFactory.getSampleDao().getBySampleBk(sampleId);
-
-		return this.getSampleDetailsDTO(sample);
-	}
-
 	@Override
 	public Map<String, SampleDTO> getSamplesBySampleUID(final Set<String> sampleUIDs) {
 		final List<SampleDTO> sampleDTOs = this.daoFactory.getSampleDao().getBySampleBks(sampleUIDs);
@@ -116,89 +108,6 @@ public class SampleServiceImpl implements SampleService {
 				return from.getSampleBusinessKey();
 			}
 		});
-	}
-
-	private SampleDetailsDTO getSampleDetailsDTO(final Sample sample) {
-		final SampleDetailsDTO samplesDetailsDto;
-		if (sample == null) {
-			return new SampleDetailsDTO();
-		}
-
-		final ExperimentModel experiment = sample.getExperiment();
-		final DmsProject study = experiment.getProject().getStudy();
-		final Integer studyId = study.getProjectId();
-		final String takenBy =
-			(sample.getTakenBy() != null) ? this.userService.getUserById(sample.getTakenBy()).getPerson().getDisplayName() : null;
-		final String obsUnitId = experiment.getObsUnitId();
-		final String studyName = study.getName();
-		final StockModel stock = experiment.getStock();
-		final String entryNo = stock.getUniqueName();
-		final Integer gid = (stock.getGermplasm() != null) ? stock.getGermplasm().getGid() : null;
-		final String germplasmUUID = (stock.getGermplasm() != null) ? stock.getGermplasm().getGermplasmUUID() : null;
-
-		samplesDetailsDto = new SampleDetailsDTO(studyId, obsUnitId, sample.getSampleBusinessKey());
-		samplesDetailsDto.setTakenBy(takenBy);
-		samplesDetailsDto.setSampleDate(sample.getSamplingDate());
-		samplesDetailsDto.setStudyName(studyName);
-		samplesDetailsDto.setEntryNo(Integer.valueOf(entryNo));
-		samplesDetailsDto.setGid(gid);
-		samplesDetailsDto.setGermplasmUUID(germplasmUUID);
-		samplesDetailsDto.setPlateId(sample.getPlateId());
-		samplesDetailsDto.setSampleNumber(sample.getSampleNumber());
-
-		samplesDetailsDto.setSampleName(sample.getSampleName());
-		samplesDetailsDto.setDesignation(stock.getName());
-
-		this.fillPlotNoByExperimentProperty(experiment.getProperties(), samplesDetailsDto);
-		this.fillProjectProperties(study.getProperties(), samplesDetailsDto);
-		this.fillLocationByGeoLocationProperties(experiment.getGeoLocation().getProperties(), samplesDetailsDto);
-
-		return samplesDetailsDto;
-	}
-
-	private void fillLocationByGeoLocationProperties(final List<GeolocationProperty> geolocationProperties,
-		final SampleDetailsDTO samplesDetailsDto) {
-		for (final GeolocationProperty properties : geolocationProperties) {
-			if (properties.getTypeId().equals(TermId.TRIAL_LOCATION.getId()) && StringUtils.isNotBlank(properties.getValue())) {
-				samplesDetailsDto.setLocationName(properties.getValue());
-			} else if (properties.getTypeId().equals(TermId.LOCATION_ID.getId()) && StringUtils.isNotBlank(properties.getValue())) {
-				samplesDetailsDto.setLocationDbId(Integer.valueOf(properties.getValue()));
-			}
-		}
-	}
-
-	private void fillProjectProperties(final List<ProjectProperty> projectProperties, final SampleDetailsDTO samplesDetailsDto) {
-
-		for (final ProjectProperty projectProperty : projectProperties) {
-			//SEEDING_DATE
-			final String value = projectProperty.getValue();
-			if (StringUtils.isBlank(value)) {
-				continue;
-			}
-			if (projectProperty.getVariableId().equals(TermId.SEEDING_DATE.getId())) {
-				final String plantingDate = value;
-				samplesDetailsDto.setSeedingDate(plantingDate);
-			}
-			//CROP SEASON
-			if (projectProperty.getVariableId().equals(TermId.SEASON_VAR_TEXT.getId())) {
-				final String season = value;
-				samplesDetailsDto.setSeason(season);
-			}
-		}
-	}
-
-	private void fillPlotNoByExperimentProperty(final List<ExperimentProperty> experimentProperty,
-		final SampleDetailsDTO sampleDetailsDTO) {
-		boolean foundPlotNumber = false;
-		final Iterator<ExperimentProperty> experimentPropertyIterator = experimentProperty.iterator();
-		while (experimentPropertyIterator.hasNext() && !foundPlotNumber) {
-			final ExperimentProperty properties = experimentPropertyIterator.next();
-			if (properties.getTypeId().equals(TermId.PLOT_NO.getId())) {
-				final Integer plotNumber = Integer.valueOf(properties.getValue());
-				sampleDetailsDTO.setPlotNo(plotNumber);
-				foundPlotNumber = true;
-			}
-		}
 	}
 
 	@Override
@@ -218,9 +127,34 @@ public class SampleServiceImpl implements SampleService {
 		return this.daoFactory.getSampleDao().studyEntryHasSamples(studyId, entryId);
 	}
 
+	@Override
+	public List<SampleObservationDto> getSampleObservations(final SampleSearchRequestDTO requestDTO, final Pageable pageable) {
+		final List<SampleObservationDto> sampleObservationDtos = this.daoFactory.getSampleDao().getSampleObservationDtos(requestDTO, pageable);
+		if (!CollectionUtils.isEmpty(sampleObservationDtos)) {
+			final List<Integer> sampleIds = new ArrayList<>(sampleObservationDtos.stream().map(SampleObservationDto::getSampleId)
+					.collect(Collectors.toSet()));
+			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
+					this.daoFactory.getSampleExternalReferenceDAO().getExternalReferences(sampleIds).stream()
+							.collect(groupingBy(
+									ExternalReferenceDTO::getEntityId));
+			final List<Integer> userIds = sampleObservationDtos.stream().map(SampleObservationDto::getTakenById).collect(Collectors.toList());
+			final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
+			for(final SampleObservationDto sample: sampleObservationDtos) {
+				sample.setExternalReferences(externalReferencesMap.get(sample.getSampleId().toString()));
+				sample.setTakenBy(userIDFullNameMap.get(sample.getTakenById()));
+			}
+		}
+		return sampleObservationDtos;
+	}
+
+	@Override
+	public long countSampleObservations(final SampleSearchRequestDTO sampleSearchRequestDTO) {
+		return this.daoFactory.getSampleDao().countSampleObservationDtos(sampleSearchRequestDTO);
+	}
+
 	void populateTakenBy(final List<SampleDTO> sampleDTOS) {
 		// Populate takenBy with full name of user from workbench database.
-		final List<Integer> userIds = sampleDTOS.stream().map(sampleDTO -> sampleDTO.getTakenByUserId()).collect(Collectors.toList());
+		final List<Integer> userIds = sampleDTOS.stream().map(SampleDTO::getTakenByUserId).collect(Collectors.toList());
 		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
 		sampleDTOS.forEach(sampleDTO -> sampleDTO.setTakenBy(userIDFullNameMap.get(sampleDTO.getTakenByUserId())));
 	}

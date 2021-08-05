@@ -37,7 +37,44 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="darla" id="v18.4.0-3">
+	<changeSet author="mderamos" id="v18.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="external_reference_sample"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create external_reference_sample table
+		</comment>
+		<createTable tableName="external_reference_sample">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="sample_id" type="int">
+				<constraints nullable="false" foreignKeyName="fk_external_reference_sample" references="sample(sample_id)"/>
+			</column>
+			<column name="reference_id" type="varchar(2000)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="reference_source" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_by" type="int" defaultValue="0">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_date" type="timestamp">
+				<constraints nullable="true"/>
+			</column>
+			<column name="modified_by" type="int">
+				<constraints nullable="true" />
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet author="darla" id="v18.4.0-4">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="1">
@@ -54,7 +91,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="darla" id="v18.4.0-4">
+	<changeSet author="darla" id="v18.4.0-5">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="1">
@@ -71,7 +108,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="darla" id="v18.4.0-5">
+	<changeSet author="darla" id="v18.4.0-6">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1911;</sqlCheck>
 		</preConditions>
@@ -85,7 +122,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="darla" id="v18.4.0-6">
+	<changeSet author="darla" id="v18.4.0-7">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1912;</sqlCheck>
 		</preConditions>
@@ -99,7 +136,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="darla" id="v18.4.0-7">
+	<changeSet author="darla" id="v18.4.0-8">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1913;</sqlCheck>
 		</preConditions>
@@ -113,7 +150,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="darla" id="v18.4.0-8">
+	<changeSet author="darla" id="v18.4.0-9">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1914;</sqlCheck>
 		</preConditions>
@@ -127,7 +164,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="darla" id="v18.4.0-9">
+	<changeSet author="darla" id="v18.4.0-10">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8116;</sqlCheck>
@@ -151,7 +188,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="darla" id="v18.4.0-10">
+	<changeSet author="darla" id="v18.4.0-11">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8117;</sqlCheck>
@@ -175,7 +212,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="darla" id="v18.4.0-11">
+	<changeSet author="darla" id="v18.4.0-12">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8118;</sqlCheck>
@@ -199,7 +236,7 @@
         </sql>
     </changeSet>
 
-	<changeSet author="darla" id="v18.4.0-12">
+	<changeSet author="darla" id="v18.4.0-13">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8119;</sqlCheck>
@@ -222,5 +259,6 @@
 			(8119, 1800,'Study Detail', 0);
         </sql>
     </changeSet>
+
 
 </databaseChangeLog>

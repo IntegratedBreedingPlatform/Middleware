@@ -81,36 +81,38 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final List<StudyInstance> studyInstances = new ArrayList<>();
 		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
 		int instancesGenerated = 0;
-		// The default value of an instance's location name is "Unspecified Location"
-		final Optional<Location> location = this.daoFactory.getLocationDAO().getUnspecifiedLocation();
-		while (instancesGenerated < numberOfInstancesToGenerate) {
-			final Geolocation geolocation = this.createNextGeolocation(instanceNumbers, hasExperimentalDesign);
+		// The default value of an instance's locationOptional name is "Unspecified Location"
+		final Optional<Location> locationOptional = this.daoFactory.getLocationDAO().getUnspecifiedLocation();
 
-			final GeolocationProperty locationGeolocationProperty =
-				new GeolocationProperty(geolocation, String.valueOf(location.get().getLocid()), 1, TermId.LOCATION_ID.getId());
-			geolocation.setProperties(Lists.newArrayList(locationGeolocationProperty));
-			this.daoFactory.getGeolocationDao().save(geolocation);
+		if (locationOptional.isPresent()) {
+			while (instancesGenerated < numberOfInstancesToGenerate) {
+				final Geolocation geolocation = this.createNextGeolocation(instanceNumbers, hasExperimentalDesign);
 
-			final ExperimentModel experimentModel =
-				this.experimentModelGenerator.generate(crop, datasetId, Optional.of(geolocation), ExperimentType.TRIAL_ENVIRONMENT);
+				final GeolocationProperty locationGeolocationProperty =
+					new GeolocationProperty(geolocation, String.valueOf(locationOptional.get().getLocid()), 1, TermId.LOCATION_ID.getId());
+				geolocation.setProperties(Lists.newArrayList(locationGeolocationProperty));
+				this.daoFactory.getGeolocationDao().save(geolocation);
 
-			this.daoFactory.getExperimentDao().save(experimentModel);
+				final ExperimentModel experimentModel =
+					this.experimentModelGenerator.generate(crop, datasetId, Optional.of(geolocation), ExperimentType.TRIAL_ENVIRONMENT);
 
-			final Integer instanceNumber = Integer.parseInt(geolocation.getDescription());
-			final StudyInstance studyInstance =
-				new StudyInstance(geolocation.getLocationId(), instanceNumber, false, false, false, true);
-			if (location.isPresent()) {
-				studyInstance.setLocationId(location.get().getLocid());
-				studyInstance.setLocationName(location.get().getLname());
-				studyInstance.setLocationAbbreviation(location.get().getLabbr());
+				this.daoFactory.getExperimentDao().save(experimentModel);
+
+				final int instanceNumber = Integer.parseInt(geolocation.getDescription());
+				final StudyInstance studyInstance =
+					new StudyInstance(geolocation.getLocationId(), instanceNumber, false, false, false, true);
+
+				studyInstance.setLocationId(locationOptional.get().getLocid());
+				studyInstance.setLocationName(locationOptional.get().getLname());
+				studyInstance.setLocationAbbreviation(locationOptional.get().getLabbr());
 				studyInstance.setInstanceId(geolocation.getLocationId());
 				studyInstance.setLocationDescriptorDataId(locationGeolocationProperty.getGeolocationPropertyId());
 				studyInstance.setExperimentId(experimentModel.getNdExperimentId());
-			}
 
-			instanceNumbers.add(instanceNumber);
-			studyInstances.add(studyInstance);
-			instancesGenerated++;
+				instanceNumbers.add(instanceNumber);
+				studyInstances.add(studyInstance);
+				instancesGenerated++;
+			}
 		}
 
 		return studyInstances;
