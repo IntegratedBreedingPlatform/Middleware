@@ -9,7 +9,7 @@ import org.pojomatic.annotations.AutoProperty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ContactDto {
 
-	private String contactDbId;
+	private String contactDbId = StringUtils.EMPTY;
 
 	private String name;
 
