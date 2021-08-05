@@ -25,6 +25,9 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	private final DaoFactory daoFactory;
 
 	@Autowired
+	private GermplasmService germplasmService;
+
+	@Autowired
 	private GermplasmNameTypeService germplasmNameTypeService;
 
 	public GermplasmNameServiceImpl(final HibernateSessionProvider sessionProvider) {
@@ -62,8 +65,8 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 
 		final Name name = this.daoFactory.getNameDao().getById(nameId);
 		if (!StringUtils.isBlank(germplasmNameRequestDto.getNameTypeCode())) {
-		final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
-		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmNameTypeService.filterGermplasmNameTypes(codes);
+			final Set<String> codes = new HashSet<>(Arrays.asList(germplasmNameRequestDto.getNameTypeCode()));
+			final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmNameTypeService.filterGermplasmNameTypes(codes);
 			name.setTypeId(germplasmNameTypeDTOs.get(0).getId());
 
 		}
@@ -81,7 +84,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		}
 
 		if (germplasmNameRequestDto.isPreferredName() != null) {
-			name.setNstat(germplasmNameRequestDto.isPreferredName() ? 1 : 0);
+			name.setNstat(Boolean.TRUE.equals(germplasmNameRequestDto.isPreferredName()) ? 1 : 0);
 		}
 		this.daoFactory.getNameDao().save(name);
 	}
@@ -89,7 +92,7 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	@Override
 	public Integer createName(final GermplasmNameRequestDto germplasmNameRequestDto, final Integer gid) {
 
-		if (germplasmNameRequestDto.isPreferredName()) {
+		if (Boolean.TRUE.equals(germplasmNameRequestDto.isPreferredName())) {
 			final Name preferredName = this.getPreferredNameOfGermplasm(gid);
 			if (preferredName != null) {
 				preferredName.setNstat(0);
@@ -101,12 +104,13 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmNameTypeService.filterGermplasmNameTypes(codes);
 
 		final Name name = new Name();
-		name.setGermplasm(new Germplasm(gid));
+		name.setGermplasm(new Germplasm());
+		name.getGermplasm().setGid(gid);
 		name.setTypeId(germplasmNameTypeDTOs.get(0).getId());
 		name.setNval(germplasmNameRequestDto.getName());
 		name.setNdate(Integer.valueOf(germplasmNameRequestDto.getDate()));
 		name.setLocationId(germplasmNameRequestDto.getLocationId());
-		name.setNstat(germplasmNameRequestDto.isPreferredName() ? 1 : 0);
+		name.setNstat(Boolean.TRUE.equals(germplasmNameRequestDto.isPreferredName()) ? 1 : 0);
 		name.setReferenceId(0);
 		this.daoFactory.getNameDao().save(name);
 		return name.getNid();
@@ -120,5 +124,10 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	@Override
 	public List<String> getExistingGermplasmPUIs(final List<String> germplasmPUIs) {
 		return this.daoFactory.getNameDao().getExistingGermplasmPUIs(germplasmPUIs);
+	}
+
+	@Override
+	public boolean isNameTypeUsedAsGermplasmName(final Integer nameTypeId){
+		return this.daoFactory.getNameDao().isNameTypeInUse(nameTypeId);
 	}
 }
