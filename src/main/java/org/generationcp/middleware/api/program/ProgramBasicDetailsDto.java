@@ -33,6 +33,10 @@ public class ProgramBasicDetailsDto {
 		this.startDate = startDate;
 	}
 
+	public boolean allAttributesNull() {
+		return this.getName() == null && this.getStartDate() == null;
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);

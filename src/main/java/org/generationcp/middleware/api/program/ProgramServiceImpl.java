@@ -149,4 +149,15 @@ public class ProgramServiceImpl implements ProgramService {
 		this.daoFactory.getProjectDAO().deleteProjectByUUID(programUUID);
 	}
 
+	@Override
+	public void editProgram(final String programUUID, final ProgramBasicDetailsDto programBasicDetailsDto) {
+		final Project project = this.daoFactory.getProjectDAO().getByUuid(programUUID);
+		if (programBasicDetailsDto.getName() != null) {
+			project.setProjectName(programBasicDetailsDto.getName());
+		}
+		if (programBasicDetailsDto.getStartDate() != null) {
+			project.setStartDate(Util.tryParseDate(programBasicDetailsDto.getStartDate(), Util.FRONTEND_DATE_FORMAT));
+		}
+		this.daoFactory.getProjectDAO().update(project);
+	}
 }

@@ -30,4 +30,5 @@ public interface ProgramService {
 
 	void deleteProgramAndDependencies(String programUUID);
 
+	void editProgram(String programUUID, ProgramBasicDetailsDto programBasicDetailsDto);
 }
