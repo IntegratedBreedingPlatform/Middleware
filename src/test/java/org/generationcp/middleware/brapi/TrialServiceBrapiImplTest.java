@@ -361,7 +361,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 			possibleValues.get(0));
 		importRequest1.setAdditionalInfo(settingsMap);
 
-		final ContactDto contact1 = new ContactDto(null, RandomStringUtils.randomAlphabetic(20),
+		final ContactDto contact1 = new ContactDto(StringUtils.EMPTY, RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), StringUtils.EMPTY,
 			RandomStringUtils.randomAlphabetic(20));
 		importRequest1.setContacts(Collections.singletonList(contact1));
@@ -383,7 +383,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertNotNull(study1.getContacts());
 		Assert.assertEquals(1, study1.getContacts().size());
 		Assert.assertEquals(contact1, study1.getContacts().get(0));
-		Assert.assertNull(study1.getContacts().get(0).getContactDbId());
+		Assert.assertTrue(StringUtils.isEmpty(study1.getContacts().get(0).getContactDbId()));
 		Assert.assertTrue(StringUtils.isEmpty(study1.getContacts().get(0).getOrcid()));
 		// Verify study settings, only first study imported study details
 		Assert.assertFalse(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
