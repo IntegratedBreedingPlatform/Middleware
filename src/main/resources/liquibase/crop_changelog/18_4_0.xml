@@ -184,7 +184,8 @@
 
 			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
 			VALUES
-			(8116, 1800, 'Study Detail', 0);
+			(8116, 1800, 'Study Detail', 0),
+			(8116, 1800, 'Environment Detail', 1);
         </sql>
     </changeSet>
 
@@ -208,7 +209,8 @@
 
 			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
 			VALUES
-			(8117, 1800,'Study Detail', 0);
+			(8117, 1800,'Study Detail', 0),
+			(8117, 1800, 'Environment Detail', 1);
         </sql>
     </changeSet>
 
@@ -232,7 +234,8 @@
 
 			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
 			VALUES
-			(8118, 1800,'Study Detail', 0);
+			(8118, 1800,'Study Detail', 0),
+			(8118, 1800, 'Environment Detail', 1);
         </sql>
     </changeSet>
 
@@ -256,7 +259,8 @@
 
 			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
 			VALUES
-			(8119, 1800,'Study Detail', 0);
+			(8119, 1800,'Study Detail', 0),
+			(8119, 1800, 'Environment Detail', 1);
         </sql>
     </changeSet>
 
