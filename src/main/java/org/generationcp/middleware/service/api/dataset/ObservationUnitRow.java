@@ -31,6 +31,8 @@ public class ObservationUnitRow {
 
 	private Integer fileCount;
 
+	private String[] fileVariableIds;
+
 	private String stockId;
 
 	public ObservationUnitRow() {
@@ -108,6 +110,14 @@ public class ObservationUnitRow {
 
 	public void setFileCount(final Integer fileCount) {
 		this.fileCount = fileCount;
+	}
+
+	public String[] getFileVariableIds() {
+		return this.fileVariableIds;
+	}
+
+	public void setFileVariableIds(final String[] fileVariableIds) {
+		this.fileVariableIds = fileVariableIds;
 	}
 
 	public Integer getTrialInstance() {

@@ -65,6 +65,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	protected static final String STOCK_ID = "STOCK_ID";
 	private static final String OBSERVATION_UNIT_NO = "OBSERVATION_UNIT_NO";
 	private static final String FILE_COUNT = "FILE_COUNT";
+	private static final String FILE_TERM_IDS = "FILE_TERM_IDS";
 
 	private static final Map<String, String> factorsFilterMap = new HashMap<>();
 	private static final String ENVIRONMENT_COLUMN_NAME_SUFFIX = "_ENVIRONMENT";
@@ -140,6 +141,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "        WHERE ndt.nd_experiment_id = nde.nd_experiment_id), '-') ) AS 'STOCK_ID'");
 		mainVariablesMap.put(FILE_COUNT,  //
 			"(select count(1) from file_metadata fm where fm.nd_experiment_id = nde.nd_experiment_id) as '" + FILE_COUNT + "'");
+		mainVariablesMap.put(FILE_TERM_IDS, "(select group_concat(fcvt.cvterm_id separator ',') from file_metadata fm "
+			+ " inner join file_metadata_cvterm fcvt on fm.file_id = fcvt.file_metadata_id"
+			+ " where fm.nd_experiment_id = nde.nd_experiment_id) as '" + FILE_TERM_IDS + "'");
 
 	}
 
@@ -480,6 +484,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		createSQLQuery.addScalar(ObservationUnitsSearchDao.SUM_OF_SAMPLES);
 		createSQLQuery.addScalar(ObservationUnitsSearchDao.STOCK_ID, new StringType());
 		createSQLQuery.addScalar(ObservationUnitsSearchDao.FILE_COUNT, new IntegerType());
+		createSQLQuery.addScalar(ObservationUnitsSearchDao.FILE_TERM_IDS, new StringType());
 	}
 
 	private String getObservationUnitTableQuery(
@@ -1062,6 +1067,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		observationUnitRow.setObsUnitId((String) row.get(OBS_UNIT_ID));
 		observationUnitRow.setSamplesCount((String) row.get(SUM_OF_SAMPLES));
 		observationUnitRow.setFileCount((Integer) row.get(FILE_COUNT));
+		final Object fileTermIds = row.get(FILE_TERM_IDS);
+		observationUnitRow.setFileVariableIds(fileTermIds != null ? ((String) fileTermIds).split(",") : new String[]{});
 
 		final Integer gid = (Integer) row.get(GID);
 		observationUnitRow.setGid(gid);
