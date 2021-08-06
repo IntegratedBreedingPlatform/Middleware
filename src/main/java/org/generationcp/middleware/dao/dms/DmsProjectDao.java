@@ -2040,9 +2040,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	public void markProjectsAndChildrenAsDeleted(final List<Integer> projectIds) {
 		try {
 			final String timestamp = Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS");
-			//FIXME we need to include subobs datasets.
 			final String sql =
-				"UPDATE project p SET p.deleted = 1, p.name = CONCAT(p.name, '#', :timestamp) WHERE p.project_id IN (:projectIds) OR p.parent_project_id IN (:projectIds)";
+				"UPDATE project p SET p.deleted = 1, p.name = CONCAT(p.name, '#', :timestamp) WHERE "
+					+ "p.project_id IN (:projectIds) OR p.study_id IN (:projectIds)";
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
 			sqlQuery.setParameter("timestamp", timestamp);
 			sqlQuery.setParameterList("projectIds", projectIds);
