@@ -38,6 +38,10 @@ public class GermplasmNameTypeRequestDTO {
 		this.name = name;
 	}
 
+	public boolean allAttributesNull() {
+		return this.code == null && this.name == null && this.description == null;
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
