@@ -36,6 +36,7 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.user.ContactDto;
+import org.generationcp.middleware.service.api.user.ContactVariable;
 import org.generationcp.middleware.service.impl.study.StudyMeasurements;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.generationcp.middleware.util.Util;
@@ -63,17 +64,8 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 
 	public static final String ENVIRONMENT = "-ENVIRONMENT";
 	public static final String PLOT = "-PLOTDATA";
-	private static final String CONTACT_NAME = "CONTACT_NAME";
-	private static final String CONTACT_ORG = "CONTACT_ORG";
-	private static final String CONTACT_TYPE = "CONTACT_TYPE";
-	private static final String CONTACT_EMAIL = "CONTACT_EMAIL";
-	private static final List<String> CONTACT_VARIABLE_NAMES = Collections.unmodifiableList(Arrays.asList(CONTACT_EMAIL, CONTACT_NAME, CONTACT_ORG, CONTACT_TYPE));
-	public static final int CONTACT_NAME_ID = 8116;
-	public static final int CONTACT_EMAIL_ID = 8117;
-	public static final int CONTACT_ORG_ID = 8118;
-	public static final int CONTACT_TYPE_ID = 8119;
-	private static final List<Integer> CONTACT_VARIABLE_IDS = Collections.unmodifiableList(Arrays.asList(CONTACT_NAME_ID, CONTACT_EMAIL_ID,
-		CONTACT_ORG_ID, CONTACT_TYPE_ID));
+	private static final List<Integer> CONTACT_VARIABLE_IDS = ContactVariable.getIds();
+	private static final List<String> CONTACT_VARIABLE_NAMES = ContactVariable.getNames();
 
 	@Resource
 	private VariableDataValidatorFactory variableDataValidatorFactory;
@@ -426,10 +418,10 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 			final Optional<ContactDto>
 				contactDto = trialImportRequestDTO.getContacts().stream().filter(c->StringUtils.isNotEmpty(c.getName())).findFirst();
 			if (contactDto.isPresent()) {
-				trialImportRequestDTO.getAdditionalInfo().put(CONTACT_NAME, contactDto.get().getName());
-				trialImportRequestDTO.getAdditionalInfo().put(CONTACT_EMAIL, contactDto.get().getEmail());
-				trialImportRequestDTO.getAdditionalInfo().put(CONTACT_ORG, contactDto.get().getInstituteName());
-				trialImportRequestDTO.getAdditionalInfo().put(CONTACT_TYPE, contactDto.get().getType());
+				trialImportRequestDTO.getAdditionalInfo().put(ContactVariable.CONTACT_NAME.getName(), contactDto.get().getName());
+				trialImportRequestDTO.getAdditionalInfo().put(ContactVariable.CONTACT_EMAIL.getName(), contactDto.get().getEmail());
+				trialImportRequestDTO.getAdditionalInfo().put(ContactVariable.CONTACT_ORG.getName(), contactDto.get().getInstituteName());
+				trialImportRequestDTO.getAdditionalInfo().put(ContactVariable.CONTACT_TYPE.getName(), contactDto.get().getType());
 			}
 		}
 	}
@@ -515,7 +507,7 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 				final Integer variableId = prop.getVariableId();
 				final String value = prop.getValue();
 				if (CONTACT_VARIABLE_IDS.contains(variableId)) {
-					this.setContactDtoField(contactDto, variableId, value);
+					contactDto.setFieldFromVariable(variableId, value);
 				} else {
 					this.processStudySetting(categoricalVariablesMap, additionalProps, prop, variableId, value);
 				}
@@ -539,18 +531,6 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		}
 		if (!StringUtils.isEmpty(value)) {
 			additionalProps.put(prop.getAlias(), value);
-		}
-	}
-
-	private void setContactDtoField(final ContactDto contactDto, final Integer variableId, final String value) {
-		if (CONTACT_NAME_ID == variableId) {
-			contactDto.setName(value);
-		} else if (CONTACT_EMAIL_ID == variableId) {
-			contactDto.setEmail(value);
-		} else if (CONTACT_ORG_ID == variableId) {
-			contactDto.setInstituteName(value);
-		} else if (CONTACT_TYPE_ID == variableId) {
-			contactDto.setType(value);
 		}
 	}
 

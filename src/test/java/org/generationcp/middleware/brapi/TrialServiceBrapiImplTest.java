@@ -28,6 +28,7 @@ import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
 import org.generationcp.middleware.service.api.user.ContactDto;
+import org.generationcp.middleware.service.api.user.ContactVariable;
 import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
@@ -147,7 +148,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
 		// Add contact name variable
 		final String contactName = RandomStringUtils.randomAlphabetic(20);
-		this.testDataInitializer.addProjectProp(newStudy, TrialServiceBrapiImpl.CONTACT_NAME_ID, "CONTACT_NAME", VariableType.STUDY_DETAIL,
+		this.testDataInitializer.addProjectProp(newStudy, ContactVariable.CONTACT_NAME.getId(), "CONTACT_NAME", VariableType.STUDY_DETAIL,
 			contactName, 1);
 		// Flushing to force Hibernate to synchronize with the underlying database
 		this.sessionProvder.getSession().flush();

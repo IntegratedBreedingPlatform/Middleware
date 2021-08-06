@@ -107,4 +107,16 @@ public class ContactDto {
 	public boolean atLeastOneContactDetailProvided() {
 		return StringUtils.isNotEmpty(this.getName()) || StringUtils.isNotEmpty(this.getEmail()) || StringUtils.isNotEmpty(this.getInstituteName()) || StringUtils.isNotEmpty(this.getType());
 	}
+
+	public void setFieldFromVariable(final Integer variableId, final String value) {
+		if (ContactVariable.CONTACT_NAME.getId().equals(variableId)) {
+			this.setName(value);
+		} else if (ContactVariable.CONTACT_EMAIL.getId().equals(variableId)) {
+			this.setEmail(value);
+		} else if (ContactVariable.CONTACT_ORG.getId().equals(variableId)) {
+			this.setInstituteName(value);
+		} else if (ContactVariable.CONTACT_TYPE.getId().equals(variableId)) {
+			this.setType(value);
+		}
+	}
 }
