@@ -239,16 +239,11 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
 				this.daoFactory.getStudyExternalReferenceDAO().getExternalReferences(studyIds).stream().collect(groupingBy(
 					ExternalReferenceDTO::getEntityId));
-			final List<Integer> locationIds = studySearchFilter.getLocationDbId() != null ?
-				Collections.singletonList(Integer.parseInt(studySearchFilter.getLocationDbId())) :
-				Collections.emptyList();
-			final Map<Integer, List<InstanceMetadata>> trialInstancesMap =
-				this.daoFactory.getGeolocationDao().getInstanceMetadata(studyIds, locationIds).stream().collect(groupingBy(
-					InstanceMetadata::getTrialDbId));
-
+			final Map<Integer, List<InstanceMetadata>> trialInstancesMap = this.retrieveTrialInstancesMap(studySearchFilter, studyIds);
+			final Map<Integer, MeasurementVariable> studySettingsVariablesMap = this.getVariablesMap(propsMap);
 			for (final StudySummary studySummary : studies) {
 				final Integer studyId = studySummary.getTrialDbId();
-				this.retrieveStudySettings(propsMap, categoricalValuesMap, studySummary, studyId);
+				this.retrieveStudySettings(propsMap, studySettingsVariablesMap, categoricalValuesMap, studySummary, studyId);
 				studySummary.setExternalReferences(externalReferencesMap.get(studyId.toString()));
 				studySummary
 					.setInstanceMetaData(trialInstancesMap.get(studyId));
@@ -256,6 +251,16 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 			}
 		}
 		return studies;
+	}
+
+	private Map<Integer, List<InstanceMetadata>> retrieveTrialInstancesMap(final StudySearchFilter studySearchFilter,
+		final List<Integer> studyIds) {
+		final List<Integer> locationIds = studySearchFilter.getLocationDbId() != null ?
+			Collections.singletonList(Integer.parseInt(studySearchFilter.getLocationDbId())) :
+			Collections.emptyList();
+		return
+			this.daoFactory.getGeolocationDao().getInstanceMetadata(studyIds, locationIds).stream().collect(groupingBy(
+				InstanceMetadata::getTrialDbId));
 	}
 
 	@Override
@@ -497,7 +502,17 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		return this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(studySettingVariableIds);
 	}
 
+	private Map<Integer, MeasurementVariable> getVariablesMap(final Map<Integer, List<ProjectProperty>> propsMap) {
+		final List<String> studySettingVariableIds = new ArrayList<>();
+		propsMap.values().stream().forEach(propList ->
+			studySettingVariableIds.addAll(propList.stream().map(p -> String.valueOf(p.getVariableId())).collect(Collectors.toList()))
+		);
+		return this.daoFactory.getCvTermDao()
+			.getVariablesByIdsAndVariableTypes(studySettingVariableIds, Collections.singletonList(VariableType.STUDY_DETAIL.getName()));
+	}
+
 	private void retrieveStudySettings(final Map<Integer, List<ProjectProperty>> propsMap,
+		final Map<Integer, MeasurementVariable> studySettingsVariablesMap,
 		final Map<Integer, List<ValueReference>> categoricalVariablesMap,
 		final StudySummary studySummary, final Integer studyId) {
 		final Map<String, String> additionalProps = Maps.newHashMap();
@@ -509,7 +524,7 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 				if (CONTACT_VARIABLE_IDS.contains(variableId)) {
 					contactDto.setFieldFromVariable(variableId, value);
 				} else {
-					this.processStudySetting(categoricalVariablesMap, additionalProps, prop, variableId, value);
+					this.processStudySetting(studySettingsVariablesMap, categoricalVariablesMap, additionalProps, variableId, value);
 				}
 			});
 			if (contactDto.atLeastOneContactDetailProvided()) {
@@ -519,8 +534,9 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		}
 	}
 
-	private void processStudySetting(final Map<Integer, List<ValueReference>> categoricalVariablesMap,
-		final Map<String, String> additionalProps, final ProjectProperty prop, final Integer variableId, String value) {
+	private void processStudySetting(final Map<Integer, MeasurementVariable> studySettingsVariablesMap,
+		final Map<Integer, List<ValueReference>> categoricalVariablesMap,
+		final Map<String, String> additionalProps, final Integer variableId, String value) {
 		if (categoricalVariablesMap.containsKey(variableId) && StringUtils.isNotBlank(value) && NumberUtils.isDigits(value)) {
 			final Integer categoricalId = Integer.parseInt(value);
 			final Map<Integer, ValueReference> categoricalValues = categoricalVariablesMap.get(variableId).stream()
@@ -529,8 +545,9 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 				value = categoricalValues.get(categoricalId).getDescription();
 			}
 		}
-		if (!StringUtils.isEmpty(value)) {
-			additionalProps.put(prop.getAlias(), value);
+
+		if (studySettingsVariablesMap.containsKey(variableId) && !StringUtils.isEmpty(value)) {
+			additionalProps.put(studySettingsVariablesMap.get(variableId).getName(), value);
 		}
 	}
 

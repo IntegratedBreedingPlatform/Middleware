@@ -185,7 +185,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			if (!ids.isEmpty()) {
 
 				final StringBuilder sqlString = new StringBuilder()
-					.append("SELECT variableType.value AS variableTypeName, cvt.cvterm_id AS termId, dataType.object_id As dataTypeId")
+					.append("SELECT variableType.value AS variableTypeName, cvt.name AS variableName, cvt.cvterm_id AS termId, dataType.object_id As dataTypeId")
 					.append(" FROM cvterm cvt ")
 					.append(" INNER JOIN cvterm_relationship hasScale ON hasScale.subject_id = cvt.cvterm_id AND hasScale.type_id = "
 						+ TermId.HAS_SCALE.getId() + " ")
@@ -202,6 +202,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				query.setParameterList("variableTypes", variableTypes);
 
 				query.addScalar("variableTypeName", StringType.INSTANCE);
+				query.addScalar("variableName", StringType.INSTANCE);
 				query.addScalar("termId", IntegerType.INSTANCE);
 				query.addScalar("dataTypeId", IntegerType.INSTANCE);
 				final List<Object[]> results = query.list();
@@ -210,8 +211,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					final MeasurementVariable measurementVariable = new MeasurementVariable();
 					final VariableType variableType = VariableType.getByName((String) row[0]);
 					measurementVariable.setVariableType(variableType);
-					measurementVariable.setTermId((Integer) row[1]);
-					measurementVariable.setDataTypeId((Integer) row[2]);
+					measurementVariable.setName((String) row[1]);
+					measurementVariable.setTermId((Integer) row[2]);
+					measurementVariable.setDataTypeId((Integer) row[3]);
 					stdVarMap.put(measurementVariable.getTermId(), measurementVariable);
 				}
 
