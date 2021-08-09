@@ -1,6 +1,5 @@
 package org.generationcp.middleware.api.nametype;
 
-import org.generationcp.middleware.pojos.UserDefinedField;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -13,6 +12,8 @@ public interface GermplasmNameTypeService {
 
 	Optional<GermplasmNameTypeDTO> getNameTypeByCode(String code);
 
+	Optional<GermplasmNameTypeDTO> getNameTypeById(Integer id);
+
 	Integer createNameType(GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO);
 
 	List<GermplasmNameTypeDTO> getNameTypes(Pageable pageable);
@@ -24,4 +25,10 @@ public interface GermplasmNameTypeService {
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypesByName(String name);
 
 	List<GermplasmNameTypeDTO> getNameTypesByGIDList(List<Integer> gidList);
+
+	boolean isNameTypeUsedInListDataProp(String nameType);
+
+	void updateNameType(Integer nameTypeId, GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO);
+
+	void deleteNameType(Integer nameTypeId);
 }

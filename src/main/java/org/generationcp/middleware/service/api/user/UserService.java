@@ -24,6 +24,8 @@ public interface UserService {
 	 */
 	WorkbenchUser getUserById(final Integer userId);
 
+	List<WorkbenchUser> getUsersByIds(List<Integer> userIds);
+
 	/**
 	 * Gets the user by name.
 	 *
@@ -128,14 +130,6 @@ public interface UserService {
 	 * @return
 	 */
 	boolean isSuperAdminUser(Integer userId);
-
-	/**
-	 * Deletes the Project_User_Info entries of the removed program members
-	 *
-	 * @param workbenchUserIds - the user ids of the removed program members
-	 * @param projectId        - the project id
-	 */
-	void removeUsersFromProgram(List<Integer> workbenchUserIds, Long projectId);
 
 	List<UserDto> getUsersByPersonIds(final List<Integer> personIds);
 

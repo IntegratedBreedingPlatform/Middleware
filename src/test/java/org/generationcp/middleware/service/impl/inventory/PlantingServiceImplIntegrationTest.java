@@ -103,9 +103,10 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 	@Before
 	public void setUp() {
 		this.transactionService = new TransactionServiceImpl(this.sessionProvder);
-		this.plantingService = new PlantingServiceImpl(this.sessionProvder);
-		plantingService.setDatasetService(datasetService);
 		this.lotService = new LotServiceImpl(this.sessionProvder);
+		this.plantingService = new PlantingServiceImpl(this.sessionProvder);
+		this.plantingService.setDatasetService(datasetService);
+		this.plantingService.setLotService(lotService);
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.lotService.setTransactionService(transactionService);
 

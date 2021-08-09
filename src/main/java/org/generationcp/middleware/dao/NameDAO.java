@@ -457,11 +457,45 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 				query.setParameterList("gidList", gidList);
 				returnList = query.list();
 			} catch (final HibernateException e) {
-				throw new MiddlewareQueryException(
-					"Error with getNamesByTypeAndGIDList(nameType=" + nameType + ", gidList=" + gidList + "): " + e.getMessage(), e);
+				final String message = "Error with getNamesByTypeAndGIDList(nameType=" + nameType + ", gidList=" + gidList + "): " + e.getMessage();
+				NameDAO.LOG.error(message);
+				throw new MiddlewareQueryException(message, e);
 			}
 		}
 		return returnList;
+	}
+
+	public List<String> getExistingGermplasmPUIs(final List<String> germplasmPUIList) {
+		List<String> returnList = new ArrayList<>();
+		if (germplasmPUIList != null && !germplasmPUIList.isEmpty()) {
+			try {
+				final String sql = "SELECT n.nval from names n "
+					+ "INNER JOIN germplsm g ON g.gid = n.gid AND g.deleted = 0 AND g.grplce = 0 "
+					+ "INNER JOIN udflds u on u.fldno = n.ntype AND u.ftable = 'NAMES' and u.ftype = 'NAME' and u.fcode = 'PUI' "
+					+ "WHERE n.nval in (:germplasmPUIList)";
+				final SQLQuery query = this.getSession().createSQLQuery(sql);
+				query.setParameterList("germplasmPUIList", germplasmPUIList);
+				returnList = query.list();
+			} catch (final HibernateException e) {
+				final String message = "Error with getExistingGermplasmPUIs(germplasmPUIList=" + germplasmPUIList + "): " + e.getMessage();
+				NameDAO.LOG.error(message);
+				throw new MiddlewareQueryException(message, e);
+			}
+		}
+		return returnList;
+	}
+
+	public boolean isNameTypeInUse(final Integer nameTypeId) {
+		try {
+			final String sql = "SELECT count(1) FROM names WHERE ntype = :nameType";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("nameType", nameTypeId);
+			return ((BigInteger) query.uniqueResult()).longValue() > 0;
+		} catch (final HibernateException e) {
+			final String message = "Error with isNameTypeInUse(nameTypeId=" + nameTypeId + "): " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 
 	public List<GermplasmNameDto> getGermplasmNamesByGids(final List<Integer> gids) {

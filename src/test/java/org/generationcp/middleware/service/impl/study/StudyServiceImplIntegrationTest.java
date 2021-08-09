@@ -16,9 +16,11 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.StudyExternalReference;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -154,6 +156,7 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		final DmsProject newStudy = this.testDataInitializer
 			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
 				"20200101", "20201231");
+
 		final DmsProject environmentDataset =
 			this.testDataInitializer
 				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
@@ -204,6 +207,64 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		// Expecting environments of retrieved study to also be filtered by location
 		Assert.assertEquals(1, study1.getInstanceMetaData().size());
 		Assert.assertEquals(String.valueOf(location1), study1.getInstanceMetaData().get(0).getLocationDbId().toString());
+	}
+
+	@Test
+	public void testGetStudies_FilterByStudyExternalReference() {
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				"20200101", "20201231");
+		final StudyExternalReference studyExternalReference = this.testDataInitializer
+			.createStudyExternalReference(newStudy, RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10));
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		studySearchFilter.setExternalReferenceSource(studyExternalReference.getSource());
+		studySearchFilter.setExternalReferenceID(studyExternalReference.getReferenceId());
+
+		final List<StudySummary> studies =
+			this.studyService.getStudies(
+				studySearchFilter, new PageRequest(0, 10, new Sort(Sort.Direction.fromString("desc"), "trialName")));
+		Assert.assertEquals(1, studies.size());
+		final StudySummary study2 = studies.get(0);
+		Assert.assertEquals(newStudy.getProjectId(), study2.getTrialDbId());
+		Assert.assertEquals(newStudy.getName(), study2.getName());
+	}
+
+	@Test
+	public void testCountStudies_FilterByStudyExternalReference() {
+		// Add new completed study assigned new location ID
+		final DmsProject newStudy = this.testDataInitializer
+			.createStudy("Study2", "Study2-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),
+				"20200101", "20201231");
+		final StudyExternalReference studyExternalReference = this.testDataInitializer
+			.createStudyExternalReference(newStudy, RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10));
+		final DmsProject environmentDataset =
+			this.testDataInitializer
+				.createDmsProject("Environment Dataset", "Environment Dataset-Description", newStudy, newStudy,
+					DatasetTypeEnum.SUMMARY_DATA);
+		final Geolocation geolocation = this.testDataInitializer.createInstance(environmentDataset, "1", new Random().nextInt());
+		final ExperimentModel newStudyExperiment =
+			this.testDataInitializer.createTestExperiment(newStudy, geolocation, TermId.STUDY_EXPERIMENT.getId(), null, null);
+
+		// Flushing to force Hibernate to synchronize with the underlying database
+		this.sessionProvder.getSession().flush();
+
+		final StudySearchFilter studySearchFilter = new StudySearchFilter();
+		studySearchFilter.setExternalReferenceSource(studyExternalReference.getSource());
+		studySearchFilter.setExternalReferenceID(studyExternalReference.getReferenceId());
+
+		Assert.assertEquals(1, this.studyService.countStudies(studySearchFilter));
 	}
 
 	@Test
@@ -413,14 +474,21 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
 
-		final Map<String, String> settingsMap = Maps.newHashMap();
-		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL).getName(),
-			RandomStringUtils.randomAlphabetic(30));
-		settingsMap.put(this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL).getName(),
-			"2021-05-01");
+		final CVTerm numericVariable =
+			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL);
+		final CVTerm dateTimeVariable =
+			this.testDataInitializer.createVariableWithScale(DataType.DATE_TIME_VARIABLE, VariableType.STUDY_DETAIL);
 		final List<String> possibleValues = Arrays
 			.asList(RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20));
-		settingsMap.put(this.testDataInitializer.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues).getName(),
+		final CVTerm categoricalVariable = this.testDataInitializer.createCategoricalVariable(VariableType.STUDY_DETAIL, possibleValues);
+
+		// Create study settings with invalid values.
+		final Map<String, String> settingsMap = Maps.newHashMap();
+		settingsMap.put(numericVariable.getName(),
+			RandomStringUtils.randomAlphabetic(30));
+		settingsMap.put(dateTimeVariable.getName(),
+			"2021-05-01");
+		settingsMap.put(categoricalVariable.getName(),
 			RandomStringUtils.randomAlphabetic(30));
 		importRequest1.setAdditionalInfo(settingsMap);
 
@@ -429,7 +497,14 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(1, savedStudies.size());
 		final StudySummary study1 = savedStudies.get(0);
 		this.verifyStudySummary(importRequest1, study1);
-		Assert.assertTrue(CollectionUtils.isEmpty(study1.getAdditionalInfo()));
+		final List<ProjectProperty> projectProperties = this.daoFactory.getProjectPropertyDAO().getByProjectId(study1.getTrialDbId());
+
+		// Verify that study settings are saved even if their values are invalid.
+		Assert.assertEquals(3, projectProperties.size());
+		Assert.assertTrue(projectProperties.stream().filter(pp -> pp.getAlias().equals(numericVariable.getName())).findAny().isPresent());
+		Assert.assertTrue(projectProperties.stream().filter(pp -> pp.getAlias().equals(dateTimeVariable.getName())).findAny().isPresent());
+		Assert.assertTrue(projectProperties.stream().filter(pp -> pp.getAlias().equals(categoricalVariable.getName())).findAny().isPresent());
+
 	}
 
 	@Test

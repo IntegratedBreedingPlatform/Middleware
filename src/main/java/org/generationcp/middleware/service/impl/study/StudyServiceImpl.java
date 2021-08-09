@@ -48,8 +48,6 @@ import org.generationcp.middleware.service.api.study.TrialObservationTable;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
 import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.generationcp.middleware.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -72,7 +70,6 @@ import static java.util.stream.Collectors.groupingBy;
 @Transactional
 public class StudyServiceImpl extends Service implements StudyService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(StudyServiceImpl.class);
 	public static final String ENVIRONMENT = "-ENVIRONMENT";
 	public static final String PLOT = "-PLOTDATA";
 	private StudyMeasurements studyMeasurements;
@@ -360,10 +357,8 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	private Map<Integer, List<ValueReference>> getCategoricalValuesMap(final Map<Integer, List<ProjectProperty>> propsMap) {
 		final List<Integer> studySettingVariableIds = new ArrayList<>();
-		propsMap.values().stream().forEach(propList -> {
-				studySettingVariableIds.addAll(propList.stream().map(ProjectProperty::getVariableId).collect(Collectors.toList()));
-			}
-		);
+		propsMap.values().stream().forEach(
+			propList -> studySettingVariableIds.addAll(propList.stream().map(ProjectProperty::getVariableId).collect(Collectors.toList())));
 		return this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(studySettingVariableIds);
 	}
 
@@ -417,10 +412,9 @@ public class StudyServiceImpl extends Service implements StudyService {
 		final DatasetType envDatasetType = this.daoFactory.getDatasetTypeDao().getById(DatasetTypeEnum.SUMMARY_DATA.getId());
 		final DatasetType plotDatasetType = this.daoFactory.getDatasetTypeDao().getById(DatasetTypeEnum.PLOT_DATA.getId());
 		final List<String> studyDetailVariableNames = new ArrayList<>();
-		trialImportRequestDtoList.stream().forEach(dto -> {
-				studyDetailVariableNames
-					.addAll(dto.getAdditionalInfo().keySet().stream().map(String::toUpperCase).collect(Collectors.toList()));
-			}
+		trialImportRequestDtoList.stream().forEach(dto -> studyDetailVariableNames
+			.addAll(dto.getAdditionalInfo().keySet().stream().map(String::toUpperCase).collect(Collectors.toList()))
+
 		);
 		final Map<String, MeasurementVariable> variableNamesMap =
 			this.daoFactory.getCvTermDao().getVariablesByNamesAndVariableType(studyDetailVariableNames, VariableType.STUDY_DETAIL);
@@ -428,11 +422,13 @@ public class StudyServiceImpl extends Service implements StudyService {
 			this.daoFactory.getCvTermDao().getVariablesBySynonymsAndVariableType(studyDetailVariableNames, VariableType.STUDY_DETAIL);
 		final List<Integer> categoricalVariableIds = new ArrayList<>();
 		categoricalVariableIds.addAll(
-			variableNamesMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+			variableNamesMap.values().stream()
+				.filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(
 				Collectors.toList()));
 		categoricalVariableIds.addAll(
-			variableSynonymsMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+			variableSynonymsMap.values().stream()
+				.filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(
 				Collectors.toList()));
 		final Map<Integer, List<ValueReference>> categoricalVariablesMap =
@@ -445,11 +441,10 @@ public class StudyServiceImpl extends Service implements StudyService {
 			this.daoFactory.getDmsProjectDAO().save(study);
 
 			// Save environment and plot datasets
-			final DmsProject envDataset =
-				this.saveDataset(study, StudyServiceImpl.ENVIRONMENT, envDatasetType, true);
+			this.saveDataset(study, StudyServiceImpl.ENVIRONMENT, envDatasetType, true);
 			this.saveDataset(study, StudyServiceImpl.PLOT, plotDatasetType, false);
 
-			this.saveTrialInstance(study, envDataset, cropType);
+			this.saveTrialInstance(study, cropType);
 			studyIds.add(study.getProjectId().toString());
 		}
 		// Unless the session is flushed, the latest changes are not reflected in DTOs returned by method
@@ -532,10 +527,15 @@ public class StudyServiceImpl extends Service implements StudyService {
 					if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
 						measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
 					}
+					final Integer rank = properties.size() + 1;
 					if (!dataValidator.isPresent() || dataValidator.get().isValid(measurementVariable)) {
-						final Integer rank = properties.size() + 1;
+						// Add the study setting with value if the value provided is valid.
 						properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
 							measurementVariable.getValue(), rank, measurementVariable.getTermId(), entry.getKey()));
+					} else {
+						// Add the study setting with an empty value if the value provided is not valid.
+						properties.add(new ProjectProperty(study, VariableType.STUDY_DETAIL.getId(),
+							"", rank, measurementVariable.getTermId(), entry.getKey()));
 					}
 				}
 			});
@@ -591,7 +591,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		dataset.setProperties(properties);
 	}
 
-	private void saveTrialInstance(final DmsProject study, final DmsProject environmentDataset, final CropType crop) {
+	private void saveTrialInstance(final DmsProject study, final CropType crop) {
 		// The default value of an instance's location name is "Unspecified Location"
 		final java.util.Optional<Location> location = this.daoFactory.getLocationDAO().getUnspecifiedLocation();
 		final Geolocation geolocation = new Geolocation();
