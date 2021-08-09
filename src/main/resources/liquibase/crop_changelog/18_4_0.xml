@@ -74,4 +74,69 @@
 		</createTable>
 	</changeSet>
 
+	<changeSet author="nahuel" id="v18.4.0-4" >
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="file_metadata_cvterm"/>
+			</not>
+		</preConditions>
+		<comment>Create file_metadata_cvterm: cvterms to formally describe an image or file</comment>
+        <sql dbms="mysql" splitStatements="true">
+			create table file_metadata_cvterm
+			(
+				file_metadata_id int null,
+				cvterm_id int null,
+				constraint pk_file_metadata_cvterm
+					primary key (file_metadata_id, cvterm_id),
+				constraint fk_file_metadata_cvterm_cvterm_cvterm_id
+					foreign key (cvterm_id) references cvterm (cvterm_id),
+				constraint fk_file_metadata_cvterm_file_metadata_file_id
+					foreign key (file_metadata_id) references file_metadata (file_id)
+			)
+				comment 'cvterms to formally describe an image or file';
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v18.4.0-5" >
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				select count(1) from cvterm where cvterm_id = 1121;
+			</sqlCheck>
+		</preConditions>
+		<comment>file datatype cleanup: delete filename phenotypes, convert file scales to character and delete file datatype</comment>
+        <sql dbms="mysql" splitStatements="true">
+			# delete filename rows from phenotype
+			delete from phenotype
+			where phenotype_id in (
+				select T.phenotype_id
+				from (
+					select p.phenotype_id
+					from phenotype p
+							 inner join cvterm variable on p.observable_id = variable.cvterm_id
+							 inner join cvterm_relationship cvtrscale ON variable.cvterm_id = cvtrscale.subject_id
+						and cvtrscale.type_id = 1220 # has scale
+							 inner join cvterm scale on cvtrscale.object_id = scale.cvterm_id
+							 inner join cvterm_relationship cvtrdatatype on scale.cvterm_id = cvtrdatatype.subject_id
+						and cvtrdatatype.type_id = 1105 # has type
+						and cvtrdatatype.object_id = 1121 # file data type
+				) T
+			);
+			# migrate existing file scales to character
+			update cvterm_relationship cr
+			set cr.object_id = 1120 # Character
+			where cr.cvterm_relationship_id in (
+				select T.cvterm_relationship_id from (
+					select cr1.cvterm_relationship_id
+					from cvterm_relationship cr1
+					where cr1.type_id = 1105 # has type
+						and cr1.object_id = 1121 # file data type
+				) T
+			);
+			# Delete file data type
+			delete from cvterm where cvterm_id = 1121;
+
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

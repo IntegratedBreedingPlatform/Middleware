@@ -130,6 +130,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@SuppressWarnings("rawtypes")
 	@Override
 	//FIXME Move queries to DAOs https://ibplatform.atlassian.net/browse/IBP-4705
+	//  possible candidate: org.generationcp.middleware.dao.oms.CVTermDao.getVariablesWithFilter
 	//IMPORTANT: This filter executes an UNION of:
 	//VariableIds and VariableTypes
 	//PropertyIds and PropertyClasses
