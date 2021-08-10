@@ -1338,6 +1338,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "            where exp.nd_geolocation_id = geoloc.nd_geolocation_id) > 0 \n"
 				// or inventory
 				+ "        or hasInventory.nd_geolocation_id is not null \n"
+				// or has files
+				+ "        or (select count(1) \n"
+				+ "            from file_metadata f \n"
+				+ "              inner join nd_experiment exp on f.nd_experiment_id = exp.nd_experiment_id \n"
+				+ "              inner join project pr on pr.project_id = exp.project_id \n"
+				+ "                         and exp.type_id = " + TermId.PLOT_EXPERIMENT.getId()
+				+ "            where exp.nd_geolocation_id = geoloc.nd_geolocation_id ) > 0 \n"
 				// then canBeDeleted = false
 				+ "             then 0 \n"
 				+ "         else 1 end as canBeDeleted, "

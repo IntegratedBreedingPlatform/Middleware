@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao.oms;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -32,9 +33,12 @@ import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.service.api.study.VariableDTO;
+import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -48,6 +52,7 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -59,6 +64,9 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 /**
  * DAO class for {@link CVTerm}.
  */
@@ -68,6 +76,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	private static final Logger LOG = LoggerFactory.getLogger(CVTermDao.class);
 	public static final String SHOULD_NOT_OBSOLETE = "is_obsolete = 0";
 
+	// scalars
 	protected static final String VARIABLE_ID = "variableId";
 	protected static final String VARIABLE_NAME = "variableName";
 	protected static final String VARIABLE_ALIAS = "alias";
@@ -89,6 +98,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	protected static final String VARIABLE_CREATION_DATE = "variableCreationDate";
 	protected static final String VARIABLE_TRAIT_CLASS = "traitClass";
 	protected static final String VARIABLE_FORMULA_DEFINITION = "formulaDefinition";
+	// parameters
 	public static final String VARIABLE_TYPE_NAMES = "variableTypeNames";
 
 	private static final String VARIABLE_DEFINITION ="vd";
@@ -1790,7 +1800,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	 * @return List of Variable or empty list if none found
 	 */
 	public List<Variable> searchAttributeVariables(final String query, final String programUUID) {
-		if (StringUtils.isBlank(query)) {
+		if (isBlank(query)) {
 			return Collections.EMPTY_LIST;
 		}
 		try { final SQLQuery sqlQuery = this.getSession().createSQLQuery("select "
@@ -1869,6 +1879,122 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error with searchAttributeVariables(query=" + query + "): " + e.getMessage(), e);
+		}
+	}
+
+	/***
+	 * Continues
+	 * {@link OntologyVariableDataManagerImpl#getWithFilter(org.generationcp.middleware.manager.ontology.daoElements.VariableFilter)}
+	 * TODO
+	 *  - complete migration (filters, scale details, etc)
+	 *  - https://ibplatform.atlassian.net/browse/IBP-4705
+	 */
+	public List<Variable> getVariablesWithFilter(final VariableFilter variableFilter) {
+		try {
+			final String programUUID = variableFilter.getProgramUuid();
+
+			final StringBuilder queryBuilder = new StringBuilder("select "
+				+ " variable.cvterm_id as " + VARIABLE_ID + ", "  //
+				+ " variable.name as " + VARIABLE_NAME + ", "  //
+				+ " variable.definition as " + VARIABLE_DEFINITION + ", "  //
+				+ " method.mid as " + METHOD_ID + ", "  //
+				+ " method.mn as " + METHOD_NAME + ", "  //
+				+ " method.md as " + METHOD_DEFINITION + ", "  //
+				+ " property.pid as " + PROPERTY_ID + ", "  //
+				+ " property.pn as " + PROPERTY_NAME + ", "  //
+				+ " property.pd as " + PROPERTY_DEFINITION + ", "  //
+				+ " scale.sid as " + SCALE_ID + ", "  //
+				+ " scale.sn as " + SCALE_NAME + ", "  //
+				+ " scale.sd as " + SCALE_DEFINITION + ", "  //
+				+ " vo.alias  as " + VARIABLE_ALIAS + ", "  //
+				+ " vo.expected_min as " + VARIABLE_EXPECTED_MIN + ", "  //
+				+ " vo.expected_max as " + VARIABLE_EXPECTED_MAX //
+				+ " from cvterm variable " //
+				+ " inner join cvtermprop cpvartype on cpvartype.type_id = " + TermId.VARIABLE_TYPE.getId() //
+				+ "                                 and variable.cvterm_id = cpvartype.cvterm_id " //
+				+ " inner join cvterm variableType on variableType.name = cpvartype.value " //
+				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr " //
+				+ "   inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = " + TermId.HAS_METHOD.getId() //
+				+ "  ) method on method.vid = variable.cvterm_id " //
+				+ " left join (select pr.subject_id vid , p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr " //
+				+ "   inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = " + TermId.HAS_PROPERTY.getId() //
+				+ "  ) property on property.vid = variable.cvterm_id " //
+				+ " left join (select sr.subject_id vid , s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr " //
+				+ "  inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = " + TermId.HAS_SCALE.getId() //
+				+ " ) scale on scale.vid = variable.cvterm_id " //
+				+ " left join variable_overrides vo on vo.cvterm_id = variable.cvterm_id "
+				+ "                                 and (:programUUID is null || vo.program_uuid = :programUUID)" //
+				+ " where 1 = 1 ");
+			
+			addVariableWithFilterParams(new SqlQueryParamBuilder(queryBuilder), variableFilter);
+			queryBuilder.append(" group by variable.cvterm_id ");
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
+			addVariableWithFilterParams(new SqlQueryParamBuilder(sqlQuery), variableFilter);
+
+			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+			sqlQuery.addScalar(VARIABLE_ID);
+			sqlQuery.addScalar(VARIABLE_NAME);
+			sqlQuery.addScalar(VARIABLE_DEFINITION);
+			sqlQuery.addScalar(METHOD_ID);
+			sqlQuery.addScalar(METHOD_NAME);
+			sqlQuery.addScalar(METHOD_DEFINITION);
+			sqlQuery.addScalar(PROPERTY_ID);
+			sqlQuery.addScalar(PROPERTY_NAME);
+			sqlQuery.addScalar(PROPERTY_DEFINITION);
+			sqlQuery.addScalar(SCALE_ID);
+			sqlQuery.addScalar(SCALE_NAME);
+			sqlQuery.addScalar(SCALE_DEFINITION);
+			sqlQuery.addScalar(VARIABLE_ALIAS);
+			sqlQuery.addScalar(VARIABLE_EXPECTED_MIN);
+			sqlQuery.addScalar(VARIABLE_EXPECTED_MAX);
+
+			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) sqlQuery.list();
+
+			final List<Variable> variables = new ArrayList<>();
+			for (final Map<String, Object> item : queryResults) {
+				final Variable variable = new Variable(new Term(
+					Util.typeSafeObjectToInteger(item.get(VARIABLE_ID)),
+					(String) item.get(VARIABLE_NAME),
+					(String) item.get(VARIABLE_DEFINITION)));
+				variable.setMethod(new Method(new Term(
+					Util.typeSafeObjectToInteger(item.get(METHOD_ID)),
+					(String) item.get(METHOD_NAME),
+					(String) item.get(METHOD_DEFINITION))));
+				variable.setProperty(new org.generationcp.middleware.domain.ontology.Property(new Term(
+					Util.typeSafeObjectToInteger(item.get(PROPERTY_ID)),
+					(String) item.get(PROPERTY_NAME),
+					(String) item.get(PROPERTY_DEFINITION))));
+				variable.setScale(new org.generationcp.middleware.domain.ontology.Scale(new Term(
+					Util.typeSafeObjectToInteger(item.get(SCALE_ID)),
+					(String) item.get(SCALE_NAME),
+					(String) item.get(SCALE_DEFINITION))));
+
+				final String alias = (String) item.get(VARIABLE_ALIAS);
+				final String expectedMin = (String) item.get(VARIABLE_EXPECTED_MIN);
+				final String expectedMax = (String) item.get(VARIABLE_EXPECTED_MAX);
+
+				variable.setAlias(alias);
+				variable.setMinValue(expectedMin);
+				variable.setMaxValue(expectedMax);
+
+				variables.add(variable);
+			}
+
+			return variables;
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getVariablesWithFilter(): " + e.getMessage(), e);
+		}
+	}
+
+	private static void addVariableWithFilterParams(final SqlQueryParamBuilder paramBuilder, final VariableFilter variableFilter) {
+
+		paramBuilder.setParameter(PROGRAMUUID, variableFilter.getProgramUuid());
+
+		if (!isEmpty(variableFilter.getVariableIds())) {
+			paramBuilder.append(" and variable.cvterm_id in (:variableIds) ");
+			paramBuilder.setParameterList("variableIds", variableFilter.getVariableIds());
 		}
 	}
 

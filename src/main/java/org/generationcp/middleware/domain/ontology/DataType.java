@@ -11,7 +11,6 @@ public enum DataType {
 	NUMERIC_DBID_VARIABLE(1118, "Numeric DBID Variable", true, "N"),
 	DATE_TIME_VARIABLE(1117, "Date", false, "D"),
 	CHARACTER_VARIABLE(1120, "Character", false, "T"),
-	FILE_VARIABLE(1121, "File", false, "F"),
 
 	//Special Data types
 	PERSON(1131, "Person", true, "C"),
@@ -71,7 +70,6 @@ public enum DataType {
 	 * "N" for Numeric
 	 * "D" for Date
 	 * "T" for Character/Text
-	 * "F" for File
 	 * For Special Data Types, the default data type code is letter 'C'.
 	 * @return
 	 */
