@@ -13,6 +13,7 @@ public class BreedingMethodSearchRequest {
 	private List<String> methodTypes = new ArrayList<>();
 	private List<Integer> methodIds = new ArrayList<>();
 	private List<String> methodAbbreviations = new ArrayList<>();
+	private List<String> methodNames = new ArrayList<>();
 	private boolean favoritesOnly;
 
 	public BreedingMethodSearchRequest() {
@@ -26,7 +27,7 @@ public class BreedingMethodSearchRequest {
 	}
 
 	public String getProgramUUID() {
-		return programUUID;
+		return this.programUUID;
 	}
 
 	public void setProgramUUID(final String programUUID) {
@@ -34,7 +35,7 @@ public class BreedingMethodSearchRequest {
 	}
 
 	public List<String> getMethodTypes() {
-		return methodTypes;
+		return this.methodTypes;
 	}
 
 	public void setMethodTypes(final List<String> methodTypes) {
@@ -42,7 +43,7 @@ public class BreedingMethodSearchRequest {
 	}
 
 	public List<Integer> getMethodIds() {
-		return methodIds;
+		return this.methodIds;
 	}
 
 	public void setMethodIds(final List<Integer> methodIds) {
@@ -50,7 +51,7 @@ public class BreedingMethodSearchRequest {
 	}
 
 	public List<String> getMethodAbbreviations() {
-		return methodAbbreviations;
+		return this.methodAbbreviations;
 	}
 
 	public void setMethodAbbreviations(final List<String> methodAbbreviations) {
@@ -58,11 +59,19 @@ public class BreedingMethodSearchRequest {
 	}
 
 	public boolean isFavoritesOnly() {
-		return favoritesOnly;
+		return this.favoritesOnly;
 	}
 
 	public void setFavoritesOnly(final boolean favoritesOnly) {
 		this.favoritesOnly = favoritesOnly;
+	}
+
+	public List<String> getMethodNames() {
+		return this.methodNames;
+	}
+
+	public void setMethodNames(final List<String> methodNames) {
+		this.methodNames = methodNames;
 	}
 
 	@Override

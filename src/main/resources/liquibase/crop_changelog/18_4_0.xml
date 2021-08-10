@@ -74,4 +74,259 @@
 		</createTable>
 	</changeSet>
 
+	<changeSet author="nahuel" id="v18.4.0-4" >
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="file_metadata_cvterm"/>
+			</not>
+		</preConditions>
+		<comment>Create file_metadata_cvterm: cvterms to formally describe an image or file</comment>
+        <sql dbms="mysql" splitStatements="true">
+			create table file_metadata_cvterm
+			(
+				file_metadata_id int null,
+				cvterm_id int null,
+				constraint pk_file_metadata_cvterm
+					primary key (file_metadata_id, cvterm_id),
+				constraint fk_file_metadata_cvterm_cvterm_cvterm_id
+					foreign key (cvterm_id) references cvterm (cvterm_id),
+				constraint fk_file_metadata_cvterm_file_metadata_file_id
+					foreign key (file_metadata_id) references file_metadata (file_id)
+			)
+				comment 'cvterms to formally describe an image or file';
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v18.4.0-5" >
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				select count(1) from cvterm where cvterm_id = 1121;
+			</sqlCheck>
+		</preConditions>
+		<comment>file datatype cleanup: delete filename phenotypes, convert file scales to character and delete file datatype</comment>
+        <sql dbms="mysql" splitStatements="true">
+			# delete filename rows from phenotype
+			delete from phenotype
+			where phenotype_id in (
+				select T.phenotype_id
+				from (
+					select p.phenotype_id
+					from phenotype p
+							 inner join cvterm variable on p.observable_id = variable.cvterm_id
+							 inner join cvterm_relationship cvtrscale ON variable.cvterm_id = cvtrscale.subject_id
+						and cvtrscale.type_id = 1220 # has scale
+							 inner join cvterm scale on cvtrscale.object_id = scale.cvterm_id
+							 inner join cvterm_relationship cvtrdatatype on scale.cvterm_id = cvtrdatatype.subject_id
+						and cvtrdatatype.type_id = 1105 # has type
+						and cvtrdatatype.object_id = 1121 # file data type
+				) T
+			);
+			# migrate existing file scales to character
+			update cvterm_relationship cr
+			set cr.object_id = 1120 # Character
+			where cr.cvterm_relationship_id in (
+				select T.cvterm_relationship_id from (
+					select cr1.cvterm_relationship_id
+					from cvterm_relationship cr1
+					where cr1.type_id = 1105 # has type
+						and cr1.object_id = 1121 # file data type
+				) T
+			);
+			# Delete file data type
+			delete from cvterm where cvterm_id = 1121;
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v18.4.0-6">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT 1 FROM CVTERM_RELATIONSHIP WHERE SUBJECT_ID = 6015 AND TYPE_ID = 1105;
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1) FROM CVTERM_RELATIONSHIP WHERE SUBJECT_ID = 6015 AND TYPE_ID = 1105 AND OBJECT_ID = 1136;
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Update data type of BMETH_CODE (cvterm ID: 6015) to Breeding Method (cvterm ID: 1136)</comment>
+		<sql dbms="mysql" splitStatements="false">
+			UPDATE CVTERM_RELATIONSHIP SET OBJECT_ID = 1136 WHERE SUBJECT_ID = 6015 AND TYPE_ID = 1105;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v18.4.0-7">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT 1 FROM CVTERM_RELATIONSHIP WHERE SUBJECT_ID = 6016 AND TYPE_ID = 1105;
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1) FROM CVTERM_RELATIONSHIP WHERE SUBJECT_ID = 6016 AND TYPE_ID = 1105 AND OBJECT_ID = 1132;
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Update data type of LOC_ABBR (cvterm ID: 6016) to Location (cvterm ID: 1132)</comment>
+		<sql dbms="mysql" splitStatements="false">
+			UPDATE CVTERM_RELATIONSHIP SET OBJECT_ID = 1132 WHERE SUBJECT_ID = 6016 AND TYPE_ID = 1105;
+		</sql>
+	</changeSet>
+
+	<changeSet author="darla" id="v18.4.0-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1911;</sqlCheck>
+		</preConditions>
+		<comment>Create "Contact Person Name" scale with character data type</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (1911, 1030, 'Contact Person Name', 'Name of contact person associated with incoming study', null, 0, 0);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			VALUES (1105, 1911, 1120);
+        </sql>
+    </changeSet>
+
+	<changeSet author="darla" id="v18.4.0-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1912;</sqlCheck>
+		</preConditions>
+		<comment>Create "Contact Person Email" scale with character data type</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (1912, 1030, 'Contact Person Email', 'Email of contact person associated with incoming study', null, 0, 0);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			VALUES (1105, 1912, 1120);
+        </sql>
+    </changeSet>
+
+	<changeSet author="darla" id="v18.4.0-10">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1913;</sqlCheck>
+		</preConditions>
+		<comment>Create "Contact Person Organization" scale with character data type</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (1913, 1030, 'Contact Person Organization', 'Organization of contact person associated with incoming study', null, 0, 0);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			VALUES (1105, 1913, 1120);
+        </sql>
+    </changeSet>
+
+	<changeSet author="darla" id="v18.4.0-11">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1914;</sqlCheck>
+		</preConditions>
+		<comment>Create "Contact Person Type" scale with character data type</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (1914, 1030, 'Contact Person Type', 'Type of contact person associated with incoming study', null, 0, 0);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			VALUES (1105, 1914, 1120);
+        </sql>
+    </changeSet>
+
+	<changeSet author="darla" id="v18.4.0-12">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8116;</sqlCheck>
+				<sqlCheck expectedResult="1">select count(*) from cvterm where cvterm_id = 1911;</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Create "CONTACT_NAME" variable</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (8116, 1040, 'CONTACT_NAME', 'Contact Person Name', null, 0, 0);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			VALUES
+			(1200, 8116, 2080),
+			(1210, 8116, 4030),
+			(1220, 8116, 1911);
+
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES
+			(8116, 1800, 'Study Detail', 0),
+			(8116, 1800, 'Environment Detail', 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="darla" id="v18.4.0-13">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8117;</sqlCheck>
+				<sqlCheck expectedResult="1">select count(*) from cvterm where cvterm_id = 1912;</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Create "CONTACT_EMAIL" variable</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (8117, 1040, 'CONTACT_EMAIL', 'Contact Person Email', null, 0, 0);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			VALUES
+			(1200, 8117, 2080),
+			(1210, 8117, 4030),
+			(1220, 8117, 1912);
+
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES
+			(8117, 1800,'Study Detail', 0),
+			(8117, 1800, 'Environment Detail', 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="darla" id="v18.4.0-14">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8118;</sqlCheck>
+				<sqlCheck expectedResult="1">select count(*) from cvterm where cvterm_id = 1913;</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Create "CONTACT_ORG" variable</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (8118, 1040, 'CONTACT_ORG', 'Contact Person Organization', null, 0, 0);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			VALUES
+			(1200, 8118, 2080),
+			(1210, 8118, 4030),
+			(1220, 8118, 1913);
+
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES
+			(8118, 1800,'Study Detail', 0),
+			(8118, 1800, 'Environment Detail', 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="darla" id="v18.4.0-15">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8119;</sqlCheck>
+				<sqlCheck expectedResult="1">select count(*) from cvterm where cvterm_id = 1914;</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Create "CONTACT_TYPE" variable</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (8119, 1040, 'CONTACT_TYPE', 'Contact Person Type', null, 0, 0);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			VALUES
+			(1200, 8119, 2080),
+			(1210, 8119, 4030),
+			(1220, 8119, 1914);
+
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES
+			(8119, 1800,'Study Detail', 0),
+			(8119, 1800, 'Environment Detail', 1);
+        </sql>
+    </changeSet>
+
 </databaseChangeLog>

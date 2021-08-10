@@ -1,6 +1,9 @@
 package org.generationcp.middleware.api.file;
 
+import org.generationcp.middleware.domain.ontology.Variable;
+
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 
 public class FileMetadataDTO {
@@ -18,8 +21,12 @@ public class FileMetadataDTO {
 	private Map<String, Object> imageLocation;
 	private String mimeType;
 	private Date fileTimestamp;
-	private String observationUnitId;
+	private String observationUnitUUID;
 	private Integer ndExperimentId;
+	/**
+	 * TODO move BMSAPI VariableDetails to Middleware
+	 */
+	private List<Variable> variables;
 
 	public Integer getFileId() {
 		return this.fileId;
@@ -125,12 +132,12 @@ public class FileMetadataDTO {
 		this.fileTimestamp = fileTimestamp;
 	}
 
-	public String getObservationUnitId() {
-		return this.observationUnitId;
+	public String getObservationUnitUUID() {
+		return this.observationUnitUUID;
 	}
 
-	public void setObservationUnitId(final String observationUnitId) {
-		this.observationUnitId = observationUnitId;
+	public void setObservationUnitUUID(final String observationUnitUUID) {
+		this.observationUnitUUID = observationUnitUUID;
 	}
 
 	public Integer getNdExperimentId() {
@@ -139,5 +146,13 @@ public class FileMetadataDTO {
 
 	public void setNdExperimentId(final Integer ndExperimentId) {
 		this.ndExperimentId = ndExperimentId;
+	}
+
+	public List<Variable> getVariables() {
+		return this.variables;
+	}
+
+	public void setVariables(final List<Variable> variables) {
+		this.variables = variables;
 	}
 }
