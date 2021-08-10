@@ -8,6 +8,4 @@ public interface VariableDataValidatorFactory {
 
 	Optional<VariableValueValidator> getValidator(final DataType dataType);
 
-	void registerDataTypeValidator(final DataType dataType, final VariableValueValidator validator);
-
 }

@@ -3,6 +3,8 @@ package org.generationcp.middleware.service.impl.observationunit;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
+import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitImportRequestDto;
@@ -27,7 +29,6 @@ import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
-import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,10 +46,10 @@ import java.util.Map;
 public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Resource
-	private StudyService studyService;
+	private TrialServiceBrapi trialServiceBrapi;
 
 	@Resource
-	private StudyInstanceService studyInstanceService;
+	private StudyServiceBrapi studyServiceBrapi;
 
 	@Resource
 	private ObservationUnitService observationUnitService;
@@ -87,12 +88,12 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		importRequest1.setTrialName(RandomStringUtils.randomAlphabetic(20));
 		importRequest1.setProgramDbId(this.commonTestProject.getUniqueID());
 
-		this.studySummary = this.studyService
+		this.studySummary = this.trialServiceBrapi
 			.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid()).get(0);
 
 		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
 		dto.setTrialDbId(String.valueOf(this.studySummary.getTrialDbId()));
-		this.studyInstanceDto = this.studyInstanceService
+		this.studyInstanceDto = this.studyServiceBrapi
 			.saveStudyInstances(this.crop.getCropName(), Collections.singletonList(dto), this.testUser.getUserid()).get(0);
 
 		this.germplasm = GermplasmTestDataInitializer.createGermplasm(1);

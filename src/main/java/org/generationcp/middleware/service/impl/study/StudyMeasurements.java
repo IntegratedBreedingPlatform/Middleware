@@ -177,7 +177,7 @@ public class StudyMeasurements {
 	}
 
 	@SuppressWarnings("unchecked")
-	List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier,
+	public List<Object[]> getAllStudyDetailsAsTable(final int projectBusinessIdentifier,
 			final List<MeasurementVariableDto> measurementVariables, final Integer instanceId) {
 		final String generateQuery = this.measurementQuery.getObservationQueryWithBlockRowCol(measurementVariables,
 				instanceId);
