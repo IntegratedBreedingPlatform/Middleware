@@ -266,7 +266,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 				Arrays.asList(VariableType.ENVIRONMENT_CONDITION.getName(), VariableType.ENVIRONMENT_DETAIL.getName()));
 
 		final List<Integer> categoricalVariableIds =
-			environmentVariablesMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+			environmentVariablesMap.values().stream().filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(Collectors.toList());
 
 		//Include season variable to the categorical values

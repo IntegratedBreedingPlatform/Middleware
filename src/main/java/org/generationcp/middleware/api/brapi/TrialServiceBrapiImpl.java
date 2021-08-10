@@ -307,11 +307,11 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 		final Map<String, MeasurementVariable> variableSynonymsMap) {
 		final List<Integer> categoricalVariableIds = new ArrayList<>();
 		categoricalVariableIds.addAll(
-			variableNamesMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+			variableNamesMap.values().stream().filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(
 				Collectors.toList()));
 		categoricalVariableIds.addAll(
-			variableSynonymsMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+			variableSynonymsMap.values().stream().filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(
 				Collectors.toList()));
 		return this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(categoricalVariableIds);
