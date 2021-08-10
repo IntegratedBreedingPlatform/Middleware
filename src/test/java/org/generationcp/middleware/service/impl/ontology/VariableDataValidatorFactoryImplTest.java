@@ -83,7 +83,6 @@ public class VariableDataValidatorFactoryImplTest extends IntegrationTestBase {
 		Assert.assertFalse(this.variableDataValidatorFactory.getValidator(DataType.STUDY).isPresent());
 		Assert.assertFalse(this.variableDataValidatorFactory.getValidator(DataType.DATASET).isPresent());
 		Assert.assertFalse(this.variableDataValidatorFactory.getValidator(DataType.GERMPLASM_LIST).isPresent());
-		Assert.assertFalse(this.variableDataValidatorFactory.getValidator(DataType.FILE_VARIABLE).isPresent());
 	}
 
 
