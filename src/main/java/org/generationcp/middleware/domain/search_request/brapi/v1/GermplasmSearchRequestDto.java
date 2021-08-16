@@ -21,46 +21,22 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	@JsonIgnore
 	private String preferredName;
 
+	private List<String> accessionNumbers;
 	private List<String> commonCropNames;
 	private List<String> germplasmDbIds;
+	private List<String> germplasmGenus;
 	private List<String> germplasmNames;
-	private List<String> studyDbIds;
-	private List<String> studyNames;
-	private List<String> externalReferenceIDs;
-	private List<String> externalReferenceSources;
-	private List<String> accessionNumbers;
-	private List<String> collections;
-	private List<String> genus;
 	private List<String> germplasmPUIs;
-	private List<String> parentDbIds;
-	private List<String> progenyDbIds;
-	private List<String> species;
-	private List<String> synonyms;
+	private List<String> germplasmSpecies;
 
 	public GermplasmSearchRequestDto() {
 		this.commonCropNames = Lists.newArrayList();
 		this.germplasmDbIds = Lists.newArrayList();
 		this.germplasmNames = Lists.newArrayList();
-		this.studyDbIds = Lists.newArrayList();
-		this.studyNames = Lists.newArrayList();
-		this.externalReferenceIDs = Lists.newArrayList();
-		this.externalReferenceSources = Lists.newArrayList();
 		this.accessionNumbers = Lists.newArrayList();
-		this.collections = Lists.newArrayList();
-		this.genus = Lists.newArrayList();
+		this.germplasmGenus = Lists.newArrayList();
 		this.germplasmPUIs = Lists.newArrayList();
-		this.parentDbIds = Lists.newArrayList();
-		this.progenyDbIds = Lists.newArrayList();
-		this.species = Lists.newArrayList();
-		this.synonyms = Lists.newArrayList();
-	}
-
-	public List<String> getStudyNames() {
-		return this.studyNames;
-	}
-
-	public void setStudyNames(final List<String> studyNames) {
-		this.studyNames = studyNames;
+		this.germplasmSpecies = Lists.newArrayList();
 	}
 
 	public int getPage() {
@@ -111,12 +87,12 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 		this.germplasmDbIds = germplasmDbIds;
 	}
 
-	public List<String> getGenus() {
-		return this.genus;
+	public List<String> getGermplasmGenus() {
+		return this.germplasmGenus;
 	}
 
-	public void setGenus(final List<String> genus) {
-		this.genus = genus;
+	public void setGermplasmGenus(final List<String> germplasmGenus) {
+		this.germplasmGenus = germplasmGenus;
 	}
 
 	public List<String> getGermplasmNames() {
@@ -135,68 +111,12 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 		this.germplasmPUIs = germplasmPUIs;
 	}
 
-	public List<String> getStudyDbIds() {
-		return this.studyDbIds;
+	public List<String> getGermplasmSpecies() {
+		return this.germplasmSpecies;
 	}
 
-	public void setStudyDbIds(final List<String> studyDbIds) {
-		this.studyDbIds = studyDbIds;
-	}
-
-	public List<String> getParentDbIds() {
-		return this.parentDbIds;
-	}
-
-	public void setParentDbIds(final List<String> parentDbIds) {
-		this.parentDbIds = parentDbIds;
-	}
-
-	public List<String> getProgenyDbIds() {
-		return this.progenyDbIds;
-	}
-
-	public void setProgenyDbIds(final List<String> progenyDbIds) {
-		this.progenyDbIds = progenyDbIds;
-	}
-
-	public List<String> getExternalReferenceIDs() {
-		return this.externalReferenceIDs;
-	}
-
-	public void setExternalReferenceIDs(final List<String> externalReferenceIDs) {
-		this.externalReferenceIDs = externalReferenceIDs;
-	}
-
-	public List<String> getExternalReferenceSources() {
-		return this.externalReferenceSources;
-	}
-
-	public void setExternalReferenceSources(final List<String> externalReferenceSources) {
-		this.externalReferenceSources = externalReferenceSources;
-	}
-
-	public List<String> getSynonyms() {
-		return this.synonyms;
-	}
-
-	public void setSynonyms(final List<String> synonyms) {
-		this.synonyms = synonyms;
-	}
-
-	public List<String> getSpecies() {
-		return this.species;
-	}
-
-	public void setSpecies(final List<String> species) {
-		this.species = species;
-	}
-
-	public List<String> getCollections() {
-		return this.collections;
-	}
-
-	public void setCollections(final List<String> collections) {
-		this.collections = collections;
+	public void setGermplasmSpecies(final List<String> germplasmSpecies) {
+		this.germplasmSpecies = germplasmSpecies;
 	}
 
 	@Override
@@ -219,17 +139,9 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 			CollectionUtils.isEmpty(this.commonCropNames) &&
 			CollectionUtils.isEmpty(this.germplasmDbIds) &&
 			CollectionUtils.isEmpty(this.germplasmNames) &&
-			CollectionUtils.isEmpty(this.studyDbIds) &&
-			CollectionUtils.isEmpty(this.studyNames) &&
-			CollectionUtils.isEmpty(this.externalReferenceIDs) &&
-			CollectionUtils.isEmpty(this.externalReferenceSources) &&
 			CollectionUtils.isEmpty(this.accessionNumbers) &&
-			CollectionUtils.isEmpty(this.collections) &&
-			CollectionUtils.isEmpty(this.genus) &&
+			CollectionUtils.isEmpty(this.germplasmGenus) &&
 			CollectionUtils.isEmpty(this.germplasmPUIs) &&
-			CollectionUtils.isEmpty(this.parentDbIds) &&
-			CollectionUtils.isEmpty(this.progenyDbIds) &&
-			CollectionUtils.isEmpty(this.species) &&
-			CollectionUtils.isEmpty(this.synonyms);
+			CollectionUtils.isEmpty(this.germplasmSpecies);
 	}
 }
