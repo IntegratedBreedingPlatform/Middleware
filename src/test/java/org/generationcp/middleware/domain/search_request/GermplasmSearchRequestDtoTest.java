@@ -1,6 +1,7 @@
 package org.generationcp.middleware.domain.search_request;
 
 import org.apache.commons.lang.RandomStringUtils;
+import org.fest.util.Lists;
 import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
 import org.junit.Assert;
 import org.junit.Test;
@@ -56,56 +57,49 @@ public class GermplasmSearchRequestDtoTest {
 	@Test
 	public void testNoFiltersSpecified_WithGermplasmSpecies() {
 		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
-		dto.setGermplasmSpecies(Collections.singletonList(RandomStringUtils.randomAlphabetic(20)));
+		dto.setSpecies(Collections.singletonList(RandomStringUtils.randomAlphabetic(20)));
 		Assert.assertFalse(dto.noFiltersSpecified());
 	}
 
 	@Test
 	public void testNoFiltersSpecified_WithGermplasmGenus() {
 		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
-		dto.setGermplasmGenus(Collections.singletonList(RandomStringUtils.randomAlphabetic(20)));
-		Assert.assertFalse(dto.noFiltersSpecified());
-	}
-
-	@Test
-	public void testNoFiltersSpecified_WithPreferredName() {
-		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
-		dto.setPreferredName(RandomStringUtils.randomAlphabetic(20));
+		dto.setGenus(Collections.singletonList(RandomStringUtils.randomAlphabetic(20)));
 		Assert.assertFalse(dto.noFiltersSpecified());
 	}
 
 	@Test
 	public void testNoFiltersSpecified_WithProgenyDbId() {
 		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
-		dto.setProgenyDbId(RandomStringUtils.randomNumeric(3));
+		dto.setProgenyDbIds(Lists.newArrayList(RandomStringUtils.randomNumeric(3)));
 		Assert.assertFalse(dto.noFiltersSpecified());
 	}
 
 	@Test
 	public void testNoFiltersSpecified_WithParentDbId() {
 		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
-		dto.setParentDbId(RandomStringUtils.randomNumeric(3));
+		dto.setParentDbIds(Lists.newArrayList(RandomStringUtils.randomNumeric(3)));
 		Assert.assertFalse(dto.noFiltersSpecified());
 	}
 
 	@Test
 	public void testNoFiltersSpecified_WithStudyDbId() {
 		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
-		dto.setStudyDbId(RandomStringUtils.randomNumeric(3));
+		dto.setStudyDbIds(Lists.newArrayList(RandomStringUtils.randomNumeric(3)));
 		Assert.assertFalse(dto.noFiltersSpecified());
 	}
 
 	@Test
 	public void testNoFiltersSpecified_WithExternalReferenceId() {
 		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
-		dto.setExternalReferenceId(RandomStringUtils.randomAlphabetic(20));
+		dto.setExternalReferenceIDs(Lists.newArrayList(RandomStringUtils.randomAlphabetic(20)));
 		Assert.assertFalse(dto.noFiltersSpecified());
 	}
 
 	@Test
 	public void testNoFiltersSpecified_WithExternalReferenceSource() {
 		final GermplasmSearchRequestDto dto = new GermplasmSearchRequestDto();
-		dto.setExternalReferenceSource(RandomStringUtils.randomAlphabetic(20));
+		dto.setExternalReferenceSources(Lists.newArrayList(RandomStringUtils.randomAlphabetic(20)));
 		Assert.assertFalse(dto.noFiltersSpecified());
 	}
 
