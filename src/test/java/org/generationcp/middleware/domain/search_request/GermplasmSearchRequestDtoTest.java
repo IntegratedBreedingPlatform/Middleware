@@ -2,7 +2,7 @@ package org.generationcp.middleware.domain.search_request;
 
 import org.apache.commons.lang.RandomStringUtils;
 import org.fest.util.Lists;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequestDto;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
