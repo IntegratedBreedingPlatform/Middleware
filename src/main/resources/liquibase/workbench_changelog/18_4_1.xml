@@ -4,7 +4,7 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="cuenyad" id="v19.1.0-1">
+	<changeSet author="cuenyad" id="v18.4.1-1">
 		<preConditions onFail="MARK_RAN">
 					<columnExists tableName="persons" columnName="pemail"/>
 		</preConditions>
