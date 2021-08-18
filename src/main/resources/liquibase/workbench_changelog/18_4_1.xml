@@ -6,7 +6,7 @@
 
 	<changeSet author="cuenyad" id="v18.4.1-1">
 		<preConditions onFail="MARK_RAN">
-					<columnExists tableName="persons" columnName="pemail"/>
+			<columnExists tableName="persons" columnName="pemail"/>
 		</preConditions>
 		<comment>
 			Increasing the pemail to VARCHAR(255)
