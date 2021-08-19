@@ -600,13 +600,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 					// Update if name is existing
 					final Name name = namesByType.get(0);
 					name.setLocationId(germplasm.getLocationId());
-					name.setNdate(germplasm.getGdate());
 					name.setNval(value);
 					this.daoFactory.getNameDao().update(name);
 				} else {
 					// Create new record if name not yet exists
 					final Name name = new Name(null, germplasm, nameTypeId, 0,
-						value, germplasm.getLocationId(), germplasm.getGdate(), 0);
+						value, germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
 					this.daoFactory.getNameDao().save(name);
 					germplasmNames.add(name);
 					namesMap.putIfAbsent(germplasm.getGid(), germplasmNames);
@@ -647,7 +646,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 					if (attributesByType.size() == 1) {
 						final Attribute attribute = attributesByType.get(0);
 						attribute.setLocationId(germplasm.getLocationId());
-						attribute.setAdate(germplasm.getGdate());
 						attribute.setAval(value);
 						attribute.setcValueId(cValueId);
 						this.daoFactory.getAttributeDAO().update(attribute);
@@ -655,7 +653,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 						this.daoFactory.getAttributeDAO()
 							.save(new Attribute(null, germplasm.getGid(), variable.getId(), value, cValueId,
 								germplasm.getLocationId(),
-								0, germplasm.getGdate()));
+								0, Util.getCurrentDateAsIntegerValue()));
 					}
 				}
 			}

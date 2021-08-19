@@ -40,6 +40,7 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -160,20 +161,20 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertEquals(newNameCode.getFldno(), savedDerivativeName.getTypeId());
 		assertEquals(1, savedDerivativeName.getNstat().intValue());
 		assertEquals(newLocation.getLocid(), savedDerivativeName.getLocationId());
-		assertEquals(creationDate, savedDerivativeName.getNdate().intValue());
+		assertEquals(Util.getCurrentDateAsIntegerValue(), savedDerivativeName.getNdate());
 		assertEquals("Name for " + germplasm.getGid(), savedDerivativeName.getNval());
 
 		final Name saveGermplasmPUI = namesMap.get(this.puiNameTypeId);
 		assertEquals(this.puiNameTypeId, saveGermplasmPUI.getTypeId());
 		assertEquals(0, saveGermplasmPUI.getNstat().intValue());
 		assertEquals(newLocation.getLocid(), saveGermplasmPUI.getLocationId());
-		assertEquals(creationDate, saveGermplasmPUI.getNdate().intValue());
+		assertEquals(Util.getCurrentDateAsIntegerValue(), saveGermplasmPUI.getNdate());
 		assertEquals(germplasmPUI, saveGermplasmPUI.getNval());
 
 		final Attribute savedAttribute = attributes.get(0);
 		assertEquals(this.attributeId, savedAttribute.getTypeId());
 		assertEquals(newLocation.getLocid(), savedAttribute.getLocationId());
-		assertEquals(creationDate, savedAttribute.getAdate().intValue());
+		assertEquals(Util.getCurrentDateAsIntegerValue(), savedAttribute.getAdate());
 		assertEquals("Note for " + germplasm.getGid(), savedAttribute.getAval());
 
 	}
@@ -228,20 +229,20 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertEquals(newNameCode.getFldno(), savedDerivativeName.getTypeId());
 		assertEquals(1, savedDerivativeName.getNstat().intValue());
 		assertEquals(newLocation.getLocid(), savedDerivativeName.getLocationId());
-		assertEquals(creationDate, savedDerivativeName.getNdate().intValue());
+		assertEquals(this.creationDate, savedDerivativeName.getNdate().toString());
 		assertEquals("Name for " + germplasm.getGid(), savedDerivativeName.getNval());
 
 		final Name saveGermplasmPUI = namesMap.get(this.puiNameTypeId);
 		assertEquals(this.puiNameTypeId, saveGermplasmPUI.getTypeId());
 		assertEquals(0, saveGermplasmPUI.getNstat().intValue());
 		assertEquals(newLocation.getLocid(), saveGermplasmPUI.getLocationId());
-		assertEquals(creationDate, saveGermplasmPUI.getNdate().intValue());
+		assertEquals(this.creationDate, saveGermplasmPUI.getNdate().toString());
 		assertEquals(newGermplasmPUI, saveGermplasmPUI.getNval());
 
 		final Attribute savedAttribute = attributes.get(0);
 		assertEquals(this.attributeId, savedAttribute.getTypeId());
 		assertEquals(newLocation.getLocid(), savedAttribute.getLocationId());
-		assertEquals(creationDate, savedAttribute.getAdate().intValue());
+		assertEquals(this.creationDate, savedAttribute.getAdate().toString());
 		assertEquals("Note for " + germplasm.getGid(), savedAttribute.getAval());
 
 	}
@@ -381,7 +382,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertEquals(this.puiNameTypeId, saveGermplasmPUI.getTypeId());
 		assertEquals(0, saveGermplasmPUI.getNstat().intValue());
 		assertEquals(newLocation.getLocid(), saveGermplasmPUI.getLocationId());
-		assertEquals(creationDate, saveGermplasmPUI.getNdate().intValue());
+		assertEquals(this.creationDate, saveGermplasmPUI.getNdate().toString());
 		assertEquals(this.germplasmPUI, saveGermplasmPUI.getNval());
 	}
 
