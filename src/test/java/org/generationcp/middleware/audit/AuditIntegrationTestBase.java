@@ -1,15 +1,14 @@
 package org.generationcp.middleware.audit;
 
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.utils.test.SQLQueryUtil;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -77,23 +76,7 @@ public abstract class AuditIntegrationTestBase extends IntegrationTestBase {
 	}
 
 	protected void insertEntity(final Map<String, Object> queryParams) {
-		List<String> fields = new ArrayList<>();
-		List<String> values = new ArrayList<>();
-
-		queryParams.entrySet().forEach(e -> {
-			fields.add(e.getKey());
-			values.add(this.formatValue(e.getValue()));
-		});
-
-		final String sql = new StringBuilder("INSERT INTO ")
-			.append(this.tableName)
-			.append("(")
-			.append(fields.stream().collect(Collectors.joining(", ")))
-			.append(") VALUES (")
-			.append(values.stream().collect(Collectors.joining(", ")))
-			.append(")")
-			.toString();
-
+		final String sql = SQLQueryUtil.generateInsertQuery(this.tableName, queryParams);
 		this.sessionProvder.getSession().createSQLQuery(sql).executeUpdate();
 	}
 

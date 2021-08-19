@@ -1,17 +1,25 @@
 package org.generationcp.middleware.api.program;
 
+import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
+import org.generationcp.middleware.pojos.workbench.Role;
+import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -62,8 +70,31 @@ public class ProgramServiceImpl implements ProgramService {
 
 	@Override
 	public ProgramDTO getLastOpenedProject(final Integer userId) {
-		final Project project =  this.daoFactory.getProjectDAO().getLastOpenedProject(userId);
+		final Project project = this.daoFactory.getProjectDAO().getLastOpenedProject(userId);
 		return project != null ? new ProgramDTO(project) : null;
+	}
+
+	@Override
+	public void addProgramMembers(final String programUUID,
+		final AddProgramMemberRequestDto addProgramMemberRequestDto) {
+		final Project project = this.daoFactory.getProjectDAO().getByUuid(programUUID);
+		final Map<Integer, WorkbenchUser> userMap =
+			this.daoFactory.getWorkbenchUserDAO().getUsers(new ArrayList<>(addProgramMemberRequestDto.getUserIds())).stream().collect(
+				Collectors.toMap(WorkbenchUser::getUserid, Function.identity()));
+		final Role role = this.daoFactory.getRoleDao().getRoleById(addProgramMemberRequestDto.getRoleId());
+		final WorkbenchUser loggedInUser = this.daoFactory.getWorkbenchUserDAO().getById(ContextHolder.getLoggedInUserId());
+		addProgramMemberRequestDto.getUserIds().forEach(u -> {
+			final UserRole userRole = new UserRole(userMap.get(u), role, project.getCropType(), project);
+			userRole.setCreatedDate(new Date());
+			userRole.setCreatedBy(loggedInUser);
+			this.daoFactory.getUserRoleDao().save(userRole);
+		});
+	}
+
+	@Override
+	public void removeProgramMembers(final String programUUID, final List<Integer> userIds) {
+		final Long projectId = this.daoFactory.getProjectDAO().getByUuid(programUUID).getProjectId();
+		this.daoFactory.getUserRoleDao().removeUsersFromProgram(userIds, projectId);
 	}
 
 }

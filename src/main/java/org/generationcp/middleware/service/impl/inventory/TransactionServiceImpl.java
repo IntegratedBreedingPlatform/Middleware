@@ -20,8 +20,10 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.generationcp.middleware.util.Util;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +43,9 @@ import java.util.stream.Collectors;
 public class TransactionServiceImpl implements TransactionService {
 
 	private DaoFactory daoFactory;
+
+	@Autowired
+	private LotService lotService;
 
 	public TransactionServiceImpl() {
 	}
@@ -67,7 +72,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
-		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> lots = this.lotService.searchLots(lotsSearchDto, null);
 
 		for (final ExtendedLotDto lotDto : lots) {
 			boolean withdrawAll = lotWithdrawalInputDto.getWithdrawalsPerUnit().get(lotDto.getUnitName()).isReserveAllAvailableBalance();
@@ -136,7 +141,7 @@ public class TransactionServiceImpl implements TransactionService {
 			lotsSearchDto.setLotIds(lotIds);
 
 			//Needs to be queried per transaction so we get the most recent available balance when editing transaction for the same lot.
-			final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null).get(0);
+			final ExtendedLotDto lotDto = this.lotService.searchLots(lotsSearchDto, null).get(0);
 
 			if (updateRequestDto.getNotes() != null) {
 				transaction.setComments(updateRequestDto.getNotes());
@@ -187,7 +192,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final Integer sourceId) {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
-		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> lots = this.lotService.searchLots(lotsSearchDto, null);
 
 		final Map<Integer, GermplasmStudySource> germplasmStudySourceMap =
 			this.daoFactory.getGermplasmStudySourceDAO()
@@ -223,7 +228,7 @@ public class TransactionServiceImpl implements TransactionService {
 
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
-		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> lots = this.lotService.searchLots(lotsSearchDto, null);
 		final Map<String, ExtendedLotDto> extendedLotDtoMap =
 			lots.stream().collect(Collectors.toMap(ExtendedLotDto::getLotUUID, extendedLotDto -> extendedLotDto));
 
@@ -264,7 +269,7 @@ public class TransactionServiceImpl implements TransactionService {
 	public void saveAdjustmentTransactions(final Integer userId, final Set<Integer> lotIds, final Double balance, final String notes) {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(new ArrayList<>(lotIds));
-		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> lots = this.lotService.searchLots(lotsSearchDto, null);
 		for (final ExtendedLotDto lotDto : lots) {
 			if (balance >= lotDto.getReservedTotal()) {
 				final Double amount = balance - lotDto.getActualBalance();
@@ -279,4 +284,9 @@ public class TransactionServiceImpl implements TransactionService {
 			}
 		}
 	}
+
+	public void setLotService(final LotService lotService) {
+		this.lotService = lotService;
+	}
+
 }

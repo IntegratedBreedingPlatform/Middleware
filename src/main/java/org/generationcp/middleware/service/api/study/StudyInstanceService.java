@@ -1,12 +1,10 @@
 package org.generationcp.middleware.service.api.study;
 
-import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
 import org.generationcp.middleware.domain.dms.InstanceObservationData;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -45,17 +43,4 @@ public interface StudyInstanceService {
 
 	Optional<Integer> getDatasetIdForInstanceIdAndDatasetType(Integer instanceId, DatasetTypeEnum datasetTypeEnum);
 
-	List<StudyInstanceDto> getStudyInstancesWithMetadata(StudySearchFilter studySearchFilter, Pageable pageable);
-
-	List<StudyInstanceDto> getStudyInstances(StudySearchFilter studySearchFilter, Pageable pageable);
-
-	long countStudyInstances(StudySearchFilter studySearchFilter);
-
-	List<StudyInstanceDto> saveStudyInstances(String crop, List<StudyImportRequestDTO> studyImportRequestDTOS, Integer userId);
-
-	/**
-	 * @param geolocationId
-	 * @return StudyDetailsDto
-	 */
-	StudyDetailsDto getStudyDetailsByInstance(Integer geolocationId);
 }

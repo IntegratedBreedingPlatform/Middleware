@@ -12,8 +12,8 @@ public class CharacterValueValidator implements VariableValueValidator {
 		return StringUtils.isEmpty(variable.getValue()) || variable.getValue().length() <= 255;
 	}
 
-	private void ensureCharacterDataType(final Integer datatTypeId) {
-		if (!DataType.CHARACTER_VARIABLE.getId().equals(datatTypeId)) {
+	private void ensureCharacterDataType(final Integer dataTypeId) {
+		if (!DataType.CHARACTER_VARIABLE.getId().equals(dataTypeId)) {
 			throw new IllegalStateException("The ensureCharacterDataType method must never be called for non character variables. "
 				+ "Please report this error to your administrator.");
 		}

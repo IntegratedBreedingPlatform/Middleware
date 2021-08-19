@@ -1,35 +1,30 @@
 package org.generationcp.middleware.api.germplasm;
 
-import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.springframework.util.CollectionUtils;
+import org.generationcp.middleware.util.uid.UIDGenerator;
 
 import java.util.List;
-import java.util.UUID;
 
 public class GermplasmGuidGenerator {
 
-	public static final String MID_STRING = "G";
+	private static final UIDGenerator.UID_ROOT UID_ROOT = UIDGenerator.UID_ROOT.GERMPLASM;
 	public static final int SUFFIX_LENGTH = 8;
 
 	public static void generateGermplasmGuids(final CropType crop, final List<Germplasm> germplasmList) {
-		Preconditions.checkNotNull(crop);
-		Preconditions.checkState(!CollectionUtils.isEmpty(germplasmList));
+		UIDGenerator.<Germplasm>generate(crop, germplasmList, UID_ROOT, SUFFIX_LENGTH,
+			new UIDGenerator.UIDAdapter<Germplasm>() {
 
-		final boolean doUseUUID = crop.isUseUUID();
-		for (final Germplasm germplasm : germplasmList) {
-			if (germplasm.getGermplasmUUID() == null) {
-				if (doUseUUID) {
-					germplasm.setGermplasmUUID(UUID.randomUUID().toString());
-				} else {
-					final String cropPrefix = crop.getPlotCodePrefix();
-					germplasm.setGermplasmUUID(cropPrefix + MID_STRING
-						+ RandomStringUtils.randomAlphanumeric(SUFFIX_LENGTH));
+				@Override
+				public String getUID(final Germplasm entry) {
+					return entry.getGermplasmUUID();
 				}
-			}
-		}
+
+				@Override
+				public void setUID(final Germplasm entry, final String uid) {
+					entry.setGermplasmUUID(uid);
+				}
+			});
 	}
 
 }

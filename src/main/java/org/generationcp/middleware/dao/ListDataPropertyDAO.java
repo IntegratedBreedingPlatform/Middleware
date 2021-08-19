@@ -88,9 +88,25 @@ public class ListDataPropertyDAO extends GenericDAO<ListDataProperty, Integer> {
 	}
 
 	public boolean isOntologyVariableInUse(final Integer variableId) {
-		final String sql = "select count(1) from listdataprops ldp inner join cvterm cv on ldp.column_name = cv.name and cv.cvterm_id = :variableId";
-		final Query query = this.getSession().createSQLQuery(sql);
-		query.setParameter("variableId", variableId);
-		return ((BigInteger) query.uniqueResult()).longValue() > 0;
+		try {
+			final String sql =
+				"select count(1) from listdataprops ldp inner join cvterm cv on ldp.column_name = cv.name and cv.cvterm_id = :variableId";
+			final Query query = this.getSession().createSQLQuery(sql);
+			query.setParameter("variableId", variableId);
+			return ((BigInteger) query.uniqueResult()).longValue() > 0;
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with isOntologyVariableInUse method for variableId : " + variableId + e.getMessage(), e);
+		}
+	}
+
+	public boolean isNameTypeInUse(final String nameType) {
+		try {
+			final String sql = "select count(1) from listdataprops ldp inner join cvterm cv on ldp.column_name = :nameType";
+			final Query query = this.getSession().createSQLQuery(sql);
+			query.setParameter("nameType", nameType);
+			return ((BigInteger) query.uniqueResult()).longValue() > 0;
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with isNameTypeInUse method for nameType : " + nameType + e.getMessage(), e);
+		}
 	}
 }

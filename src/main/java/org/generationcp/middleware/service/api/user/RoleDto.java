@@ -1,11 +1,13 @@
 package org.generationcp.middleware.service.api.user;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class RoleDto {
 
 	private Integer id;

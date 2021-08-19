@@ -1,10 +1,13 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.AttributeDAO;
+import org.generationcp.middleware.dao.audit.germplasm.GermplasmAuditDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
+import org.generationcp.middleware.dao.ExperimentExternalReferenceDao;
+import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmExternalReferenceDAO;
@@ -22,6 +25,7 @@ import org.generationcp.middleware.dao.NamingConfigurationDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
+import org.generationcp.middleware.dao.SampleExternalReferenceDAO;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.dao.SearchRequestDAO;
 import org.generationcp.middleware.dao.StudyExternalReferenceDao;
@@ -550,6 +554,28 @@ public class DaoFactory {
 		final StudyInstanceExternalReferenceDao studyInstanceExternalReferenceDao = new StudyInstanceExternalReferenceDao();
 		studyInstanceExternalReferenceDao.setSession(this.sessionProvider.getSession());
 		return studyInstanceExternalReferenceDao;
+	}
+
+	public SampleExternalReferenceDAO getSampleExternalReferenceDAO() {
+		final SampleExternalReferenceDAO sampleExternalReferenceDAO = new SampleExternalReferenceDAO();
+		sampleExternalReferenceDAO.setSession(this.sessionProvider.getSession());
+		return sampleExternalReferenceDAO;
+	}
+
+	public ExperimentExternalReferenceDao getExperimentExternalReferenceDao() {
+		final ExperimentExternalReferenceDao experimentExternalReferenceDao = new ExperimentExternalReferenceDao();
+		experimentExternalReferenceDao.setSession(this.sessionProvider.getSession());
+		return experimentExternalReferenceDao;
+	}
+
+	public GermplasmAuditDAO getGermplasmAuditDAO() {
+		return new GermplasmAuditDAO(this.sessionProvider.getSession());
+	}
+
+	public FileMetadataDAO getFileMetadataDAO() {
+		final FileMetadataDAO fileMetadataDAO = new FileMetadataDAO();
+		fileMetadataDAO.setSession(this.sessionProvider.getSession());
+		return fileMetadataDAO;
 	}
 
 }

@@ -2,9 +2,10 @@
 package org.generationcp.middleware.service.api;
 
 import org.generationcp.middleware.domain.sample.SampleDTO;
-import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
+import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRequestDTO;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
+import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
@@ -25,8 +26,6 @@ public interface SampleService {
 	 */
 	long countFilter(final String obsUnitId, final Integer listId);
 
-	SampleDetailsDTO getSampleObservation(final String sampleId);
-
 	Map<String, SampleDTO> getSamplesBySampleUID (final Set<String> sampleUIDs);
 
 	List<SampleDTO> getByGid(final Integer gid);
@@ -34,4 +33,8 @@ public interface SampleService {
 	Boolean studyHasSamples(final Integer studyId);
 
 	Boolean studyEntryHasSamples(final Integer studyId, final Integer entryId);
+
+	List<SampleObservationDto> getSampleObservations(SampleSearchRequestDTO sampleSearchRequestDTO, Pageable pageable);
+
+	long countSampleObservations(SampleSearchRequestDTO sampleSearchRequestDTO);
 }

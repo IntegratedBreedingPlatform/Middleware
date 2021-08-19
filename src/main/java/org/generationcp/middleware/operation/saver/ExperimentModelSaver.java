@@ -26,8 +26,6 @@ import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
-
-import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorImpl;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -36,10 +34,10 @@ import java.util.List;
 
 @Transactional
 public class ExperimentModelSaver {
-	
-	private DaoFactory daoFactory;
-	private PhenotypeSaver phenotypeSaver;
-	private GeolocationSaver geolocationSaver;
+
+	private final DaoFactory daoFactory;
+	private final PhenotypeSaver phenotypeSaver;
+	private final GeolocationSaver geolocationSaver;
 
 	public ExperimentModelSaver(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -47,7 +45,8 @@ public class ExperimentModelSaver {
 		this.geolocationSaver = new GeolocationSaver(sessionProvider);
 	}
 
-	public ExperimentModel addExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
+	public ExperimentModel addExperiment(final CropType crop, final int projectId, final ExperimentType experimentType,
+		final Values values) {
 		final ExperimentModel experimentModel = this.create(crop, projectId, values, experimentType);
 
 		this.daoFactory.getExperimentDao().save(experimentModel);
@@ -58,12 +57,12 @@ public class ExperimentModelSaver {
 
 	public void addOrUpdateExperiment(final CropType crop, final int projectId, final ExperimentType experimentType, final Values values) {
 		final int experimentId =
-				this.daoFactory.getExperimentDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
-						values.getGermplasmId());
-		if(experimentId != 0 ) {
+			this.daoFactory.getExperimentDao().getExperimentIdByLocationIdStockId(projectId, values.getLocationId(),
+				values.getGermplasmId());
+		if (experimentId != 0) {
 			for (final Variable variable : values.getVariableList().getVariables()) {
 				final int val = this.daoFactory.getPhenotypeDAO()
-						.updatePhenotypesByExperimentIdAndObervableId(experimentId, variable.getVariableType().getId(), variable.getValue());
+					.updatePhenotypesByExperimentIdAndObervableId(experimentId, variable.getVariableType().getId(), variable.getValue());
 				if (val == 0) {
 					this.phenotypeSaver.save(experimentId, variable);
 				}
@@ -93,8 +92,7 @@ public class ExperimentModelSaver {
 		if (values.getGermplasmId() != null) {
 			experimentModel.setStock(this.daoFactory.getStockDao().getById(values.getGermplasmId()));
 		}
-		final ObservationUnitIDGenerator observationUnitIDGenerator = new ObservationUnitIDGeneratorImpl();
-		observationUnitIDGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
+		ObservationUnitIDGenerator.generateObservationUnitIds(crop, Arrays.asList(experimentModel));
 		return experimentModel;
 	}
 
@@ -106,7 +104,8 @@ public class ExperimentModelSaver {
 		return location;
 	}
 
-	protected List<ExperimentProperty> createTrialDesignExperimentProperties(final ExperimentModel experimentModel, final VariableList factors) {
+	protected List<ExperimentProperty> createTrialDesignExperimentProperties(final ExperimentModel experimentModel,
+		final VariableList factors) {
 
 		final List<ExperimentProperty> experimentProperties = new ArrayList<>();
 

@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.germplasm;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -104,11 +105,14 @@ public class GermplasmServiceImplTest {
 	@Captor
 	private ArgumentCaptor<List<Integer>> integerListArgumentCaptor;
 
+	@Mock
+	private GermplasmNameTypeService germplasmNameTypeService;
+
 	private final String locationAbbreviation = RandomStringUtils.randomAlphabetic(3);
 
 	private final String methodAbbreviation = RandomStringUtils.randomAlphabetic(3);
 
-	private final String germplasmUUID = RandomStringUtils.randomAlphabetic(36);
+	private final String germplasmPUI = RandomStringUtils.randomAlphabetic(36);
 
 	private final String cropName = "maize";
 
@@ -130,14 +134,15 @@ public class GermplasmServiceImplTest {
 		this.germplasmService.setWorkbenchDataManager(this.workbenchDataManager);
 		this.germplasmService.setOntologyDataManager(this.ontologyDataManager);
 		this.germplasmService.setOntologyVariableDataManager(this.ontologyVariableDataManager);
-		this.germplasmService.setGermplasmAttributeService(germplasmAttributeService);
+		this.germplasmService.setGermplasmAttributeService(this.germplasmAttributeService);
+		this.germplasmService.setGermplasmNameTypeService(this.germplasmNameTypeService);
 
 	}
 
 	@Test
 	public void testGetPlotCodeValue() {
 		final GermplasmServiceImpl unitToTest = new GermplasmServiceImpl(Mockito.mock(HibernateSessionProvider.class));
-		unitToTest.setGermplasmAttributeService(germplasmAttributeService);
+		unitToTest.setGermplasmAttributeService(this.germplasmAttributeService);
 
 		// We want to mock away calls to other methods in same unit.
 		final GermplasmServiceImpl partiallyMockedUnit = Mockito.spy(unitToTest);
@@ -145,7 +150,7 @@ public class GermplasmServiceImplTest {
 		// First set up data such that no plot code attribute is associated.
 		Mockito.doReturn(null).when(partiallyMockedUnit).getPlotCodeField();
 		final List<Attribute> attributes = new ArrayList<>();
-		Mockito.doReturn(attributes).when(germplasmAttributeService).getAttributesByGID(ArgumentMatchers.anyInt());
+		Mockito.doReturn(attributes).when(this.germplasmAttributeService).getAttributesByGID(ArgumentMatchers.anyInt());
 
 		final String plotCode1 = partiallyMockedUnit.getPlotCodeValue(GID);
 		assertThat("getPlotCodeValue() should never return null.", plotCode1, is(notNullValue()));
@@ -159,7 +164,7 @@ public class GermplasmServiceImplTest {
 		plotCodeAttr.setTypeId(plotCodeVariable.getId());
 		plotCodeAttr.setAval("The PlotCode Value");
 		attributes.add(plotCodeAttr);
-		Mockito.when(germplasmAttributeService.getAttributesByGID(GID)).thenReturn(attributes);
+		Mockito.when(this.germplasmAttributeService.getAttributesByGID(GID)).thenReturn(attributes);
 
 		final String plotCode2 = partiallyMockedUnit.getPlotCodeValue(GID);
 		assertThat("getPlotCodeValue() should never return null.", plotCode2, is(notNullValue()));
@@ -232,13 +237,14 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.emptyList());
 		Mockito.when(this.workbenchDataManager.getCropTypeByName(this.cropName)).thenReturn(new CropType());
 
-		this.germplasmService.importGermplasm(this.cropName, programUUID, germplasmImportRequestDto);
+		this.germplasmService.importGermplasm(this.cropName, this.programUUID, germplasmImportRequestDto);
 	}
 
 	@Test
 	public void test_importGermplasm_MatchesAreNotLoaded_WhenSkipWhenMatchesIsFalse() {
 		final GermplasmServiceImpl unitToTest = new GermplasmServiceImpl(Mockito.mock(HibernateSessionProvider.class));
 		unitToTest.setWorkbenchDataManager(this.workbenchDataManager);
+		unitToTest.setGermplasmNameTypeService(this.germplasmNameTypeService);
 
 		final GermplasmServiceImpl partiallyMockedUnit = Mockito.spy(unitToTest);
 		ReflectionTestUtils.setField(partiallyMockedUnit, "daoFactory", this.daoFactory);
@@ -253,7 +259,7 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.emptyList());
 		Mockito.when(this.workbenchDataManager.getCropTypeByName(this.cropName)).thenReturn(new CropType());
 
-		partiallyMockedUnit.importGermplasm(this.cropName, programUUID, germplasmImportRequestDto);
+		partiallyMockedUnit.importGermplasm(this.cropName, this.programUUID, germplasmImportRequestDto);
 		Mockito.verify(partiallyMockedUnit, Mockito.times(0)).findGermplasmMatches(Mockito.any(), Mockito.isNull());
 	}
 
@@ -261,6 +267,7 @@ public class GermplasmServiceImplTest {
 	public void test_importGermplasm_SaveGermplasmIsNeverCalled_WhenAMatchIsFound() {
 		final GermplasmServiceImpl unitToTest = new GermplasmServiceImpl(Mockito.mock(HibernateSessionProvider.class));
 		unitToTest.setWorkbenchDataManager(this.workbenchDataManager);
+		unitToTest.setGermplasmNameTypeService(this.germplasmNameTypeService);
 
 		final GermplasmServiceImpl partiallyMockedUnit = Mockito.spy(unitToTest);
 		ReflectionTestUtils.setField(partiallyMockedUnit, "daoFactory", this.daoFactory);
@@ -278,7 +285,7 @@ public class GermplasmServiceImplTest {
 		Mockito.doReturn(Collections.singletonList(this.createGermplasmDto())).when(partiallyMockedUnit)
 			.findGermplasmMatches(Mockito.any(GermplasmMatchRequestDto.class), ArgumentMatchers.isNull());
 
-		partiallyMockedUnit.importGermplasm(this.cropName, programUUID, germplasmImportRequestDto);
+		partiallyMockedUnit.importGermplasm(this.cropName, this.programUUID, germplasmImportRequestDto);
 		Mockito.verify(this.germplasmDAO, Mockito.times(0)).save(Mockito.any());
 	}
 
@@ -286,6 +293,7 @@ public class GermplasmServiceImplTest {
 	public void test_importGermplasm_ReferenceIsSet_WhenAReferenceIsSpecified() {
 		final GermplasmServiceImpl unitToTest = new GermplasmServiceImpl(Mockito.mock(HibernateSessionProvider.class));
 		unitToTest.setWorkbenchDataManager(this.workbenchDataManager);
+		unitToTest.setGermplasmNameTypeService(this.germplasmNameTypeService);
 
 		final GermplasmServiceImpl partiallyMockedUnit = Mockito.spy(unitToTest);
 		ReflectionTestUtils.setField(partiallyMockedUnit, "daoFactory", this.daoFactory);
@@ -298,8 +306,9 @@ public class GermplasmServiceImplTest {
 		Mockito.when(this.methodDAO.getByCode(Mockito.anyList())).thenReturn(Collections.singletonList(this.createMethod()));
 		Mockito.when(this.locationDAO.getByAbbreviations(Mockito.anyList())).thenReturn(Collections.singletonList(this.createLocation()));
 		Mockito.when(this.workbenchDataManager.getCropTypeByName(this.cropName)).thenReturn(new CropType());
+		Mockito.when(this.germplasmNameTypeService.filterGermplasmNameTypes(Mockito.anySet())).thenReturn(Collections.emptyList());
 
-		partiallyMockedUnit.importGermplasm(this.cropName, programUUID, germplasmImportRequestDto);
+		partiallyMockedUnit.importGermplasm(this.cropName, this.programUUID, germplasmImportRequestDto);
 		Mockito.verify(this.bibrefDAO, Mockito.times(1)).save(Mockito.any());
 	}
 
@@ -317,7 +326,7 @@ public class GermplasmServiceImplTest {
 		germplasmImportDTO.setLocationAbbr(this.locationAbbreviation);
 		germplasmImportDTO.setCreationDate("20201212");
 		germplasmImportDTO.setReference("Reference");
-		germplasmImportDTO.setGermplasmUUID(this.germplasmUUID);
+		germplasmImportDTO.setGermplasmPUI(this.germplasmPUI);
 		return germplasmImportDTO;
 	}
 
@@ -339,7 +348,7 @@ public class GermplasmServiceImplTest {
 
 	private GermplasmDto createGermplasmDto() {
 		final GermplasmDto germplasmDto = new GermplasmDto();
-		germplasmDto.setGermplasmUUID(this.germplasmUUID);
+		germplasmDto.setGermplasmPUI(this.germplasmPUI);
 		germplasmDto.setGid(1);
 		final GermplasmNameDto germplasmNameDto = new GermplasmNameDto();
 		germplasmNameDto.setName("name");

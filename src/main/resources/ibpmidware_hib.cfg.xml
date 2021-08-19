@@ -13,6 +13,8 @@
         <mapping class="org.generationcp.middleware.pojos.GermplasmExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.StudyExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.InstanceExternalReference"/>
+        <mapping class="org.generationcp.middleware.pojos.ExperimentExternalReference"/>
+        <mapping class="org.generationcp.middleware.pojos.SampleExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.Location"/>
         <mapping class="org.generationcp.middleware.pojos.LocationDetails"/>
         <mapping class="org.generationcp.middleware.pojos.Locdes"/>
@@ -120,9 +122,10 @@
         <!-- Derived variables -->
         <mapping class="org.generationcp.middleware.pojos.derived_variables.Formula"/>
 
+        <!-- Other -->
         <mapping class="org.generationcp.middleware.pojos.search.SearchRequest"/>
-
         <mapping class="org.generationcp.middleware.pojos.GermplasmStudySource"/>
+        <mapping class="org.generationcp.middleware.pojos.file.FileMetadata"/>
 
     </session-factory>
 </hibernate-configuration>

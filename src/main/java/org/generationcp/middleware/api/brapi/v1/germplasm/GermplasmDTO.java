@@ -42,8 +42,7 @@ public class GermplasmDTO {
 	private Map<String, String> additionalInfo;
 	private String gid;
 	private List<ExternalReferenceDTO> externalReferences;
-
-	private final static String documentationURL = null;
+	private String documentationURL;
 
 	public String getBreedingMethodDbId() {
 		return this.breedingMethodDbId;
@@ -79,6 +78,10 @@ public class GermplasmDTO {
 
 	public String getDocumentationURL() {
 		return this.documentationURL;
+	}
+
+	public void setDocumentationURL(final String documentationURL) {
+		this.documentationURL = documentationURL;
 	}
 
 	public String getGermplasmDbId() {

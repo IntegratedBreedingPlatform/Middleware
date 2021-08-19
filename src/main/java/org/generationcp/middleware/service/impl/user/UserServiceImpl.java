@@ -4,6 +4,7 @@ import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
+import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -24,6 +25,7 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -50,6 +52,11 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public WorkbenchUser getUserById(final Integer userId) {
 		return this.workbenchDaoFactory.getWorkbenchUserDAO().getById(userId);
+	}
+
+	@Override
+	public List<WorkbenchUser> getUsersByIds(final List<Integer> userIds) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUsers(userIds);
 	}
 
 	@Override
@@ -190,8 +197,8 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Integer updateUser(final UserDto userDto) {
 		final Integer currentDate = Util.getCurrentDateAsIntegerValue();
-		WorkbenchUser user = null;
-		Integer idUserSaved = null;
+		final WorkbenchUser user;
+		final Integer idUserSaved;
 
 		try {
 			user = this.getUserById(userDto.getUserId());
@@ -245,19 +252,6 @@ public class UserServiceImpl implements UserService {
 		this.workbenchDaoFactory.getPersonDAO().saveOrUpdate(user.getPerson());
 	}
 
-	@Override
-	public void deleteUser(final WorkbenchUser user) {
-
-		try {
-
-			this.workbenchDaoFactory.getWorkbenchUserDAO().makeTransient(user);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while deleting User: userService.deleteUser(user=" + user + "):  " + e.getMessage(), e);
-		}
-	}
 
 	@Override
 	public boolean isUsernameExists(final String userName) {
@@ -280,11 +274,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
-		this.workbenchDaoFactory.getUserRoleDao().removeUsersFromProgram(workbenchUserIds, projectId);
-	}
-
-	@Override
 	public List<UserDto> getUsersByPersonIds(final List<Integer> personIds) {
 		final List<WorkbenchUser> workbenchUsers = this.workbenchDaoFactory.getWorkbenchUserDAO().getUsersByPersonIds(personIds);
 		final List<UserDto> userDtos = new ArrayList<>();
@@ -298,16 +287,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public Person getPersonById(final int id) {
 		return this.workbenchDaoFactory.getPersonDAO().getById(id, false);
-	}
-
-	@Override
-	public Person getPersonByEmail(final String email) {
-		return this.workbenchDaoFactory.getPersonDAO().getPersonByEmail(email);
-	}
-
-	@Override
-	public Person getPersonByEmailAndName(final String email, final String firstName, final String lastName) {
-		return this.workbenchDaoFactory.getPersonDAO().getPersonByEmailAndName(email, firstName, lastName);
 	}
 
 	@Override
@@ -482,11 +461,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public CropPerson getCropPerson(final String cropName, final Integer personId) {
-		return this.workbenchDaoFactory.getCropPersonDAO().getByCropNameAndPersonId(cropName, personId);
-	}
-
-	@Override
 	public Map<Integer, String> getPersonNamesByPersonIds(final List<Integer> personIds) {
 		return this.workbenchDaoFactory.getPersonDAO().getPersonNamesByPersonIds(personIds);
 	}
@@ -509,6 +483,28 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public List<WorkbenchUser> getUsersWithRole(final int roleId) {
 		return this.workbenchDaoFactory.getUserRoleDao().getUsersByRoleId(roleId);
+	}
+
+	@Override
+	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final Pageable pageable) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getProgramMembers(programUUID, pageable);
+	}
+
+	@Override
+	public long countAllProgramMembers(final String programUUID) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().countAllProgramMembers(programUUID);
+	}
+
+	@Override
+	public List<UserDto> getProgramMembersEligibleUsers(final String programUUID, final Pageable pageable) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO()
+			.getAllProgramEligibleUsers(programUUID, pageable);
+	}
+
+	@Override
+	public long countProgramMembersEligibleUsers(final String programUUID) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO()
+			.countAllProgramEligibleUsers(programUUID);
 	}
 
 	private UserRole buildNewUserRole(final WorkbenchUser user, final UserRoleDto userRoleDto) {
