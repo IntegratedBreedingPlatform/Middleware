@@ -19,7 +19,7 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -180,7 +180,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 			createdGermplasmUUIDs.add(germplasm.getGermplasmUUID());
 		}
 		if (!createdGermplasmUUIDs.isEmpty()) {
-			final GermplasmSearchRequestDto searchRequestDto = new GermplasmSearchRequestDto();
+			final GermplasmSearchRequest searchRequestDto = new GermplasmSearchRequest();
 			searchRequestDto.setGermplasmDbIds(createdGermplasmUUIDs);
 			return this.searchGermplasmDTO(searchRequestDto, null);
 		}
@@ -298,17 +298,17 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 	}
 
 	@Override
-	public List<GermplasmDTO> searchGermplasmDTO(final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Pageable pageable) {
+	public List<GermplasmDTO> searchGermplasmDTO(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable) {
 		final List<GermplasmDTO> germplasmDTOList =
-			this.daoFactory.getGermplasmDao().getGermplasmDTOList(germplasmSearchRequestDTO, pageable);
+			this.daoFactory.getGermplasmDao().getGermplasmDTOList(germplasmSearchRequest, pageable);
 		this.populateExternalReferences(germplasmDTOList);
 		this.populateSynonymsAndAttributes(germplasmDTOList);
 		return germplasmDTOList;
 	}
 
 	@Override
-	public long countGermplasmDTOs(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
-		return this.daoFactory.getGermplasmDao().countGermplasmDTOs(germplasmSearchRequestDTO);
+	public long countGermplasmDTOs(final GermplasmSearchRequest germplasmSearchRequest) {
+		return this.daoFactory.getGermplasmDao().countGermplasmDTOs(germplasmSearchRequest);
 	}
 
 	@Override
@@ -325,7 +325,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 
 	@Override
 	public Optional<GermplasmDTO> getGermplasmDTOByGUID(final String germplasmUUID) {
-		final GermplasmSearchRequestDto searchDto = new GermplasmSearchRequestDto();
+		final GermplasmSearchRequest searchDto = new GermplasmSearchRequest();
 		searchDto.setGermplasmDbIds(Collections.singletonList(germplasmUUID));
 		final List<GermplasmDTO> germplasmDTOS = this.searchGermplasmDTO(searchDto, new PageRequest(0, 1));
 		if (!CollectionUtils.isEmpty(germplasmDTOS)) {

@@ -13,7 +13,7 @@ import java.util.List;
 
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GermplasmSearchRequestDto extends SearchRequestDto {
+public class GermplasmSearchRequest extends SearchRequestDto {
 
 	private int page;
 	private int pageSize;
@@ -37,7 +37,7 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 	private List<String> species;
 	private List<String> synonyms;
 
-	public GermplasmSearchRequestDto() {
+	public GermplasmSearchRequest() {
 		this.commonCropNames = Lists.newArrayList();
 		this.germplasmDbIds = Lists.newArrayList();
 		this.germplasmNames = Lists.newArrayList();
@@ -63,19 +63,19 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 		this.studyNames = studyNames;
 	}
 
-	public int getPage() {
+	public Integer getPage() {
 		return this.page;
 	}
 
-	public void setPage(final int page) {
+	public void setPage(final Integer page) {
 		this.page = page;
 	}
 
-	public int getPageSize() {
+	public Integer getPageSize() {
 		return this.pageSize;
 	}
 
-	public void setPageSize(final int pageSize) {
+	public void setPageSize(final Integer pageSize) {
 		this.pageSize = pageSize;
 	}
 

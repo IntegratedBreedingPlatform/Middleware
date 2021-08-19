@@ -1,10 +1,7 @@
 package org.generationcp.middleware.domain.search_request.brapi.v1;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -17,9 +14,6 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 
 	private int page;
 	private int pageSize;
-
-	@JsonIgnore
-	private String preferredName;
 
 	private List<String> accessionNumbers;
 	private List<String> commonCropNames;
@@ -53,14 +47,6 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 
 	public void setPageSize(final int pageSize) {
 		this.pageSize = pageSize;
-	}
-
-	public String getPreferredName() {
-		return this.preferredName;
-	}
-
-	public void setPreferredName(final String preferredName) {
-		this.preferredName = preferredName;
 	}
 
 	public List<String> getAccessionNumbers() {
@@ -134,14 +120,4 @@ public class GermplasmSearchRequestDto extends SearchRequestDto {
 		return Pojomatic.equals(this, o);
 	}
 
-	public boolean noFiltersSpecified() {
-		return StringUtils.isEmpty(this.preferredName) &&
-			CollectionUtils.isEmpty(this.commonCropNames) &&
-			CollectionUtils.isEmpty(this.germplasmDbIds) &&
-			CollectionUtils.isEmpty(this.germplasmNames) &&
-			CollectionUtils.isEmpty(this.accessionNumbers) &&
-			CollectionUtils.isEmpty(this.germplasmGenus) &&
-			CollectionUtils.isEmpty(this.germplasmPUIs) &&
-			CollectionUtils.isEmpty(this.germplasmSpecies);
-	}
 }
