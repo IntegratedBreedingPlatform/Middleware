@@ -14,8 +14,12 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.study.MyStudiesDTO;
+import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
@@ -53,6 +57,7 @@ import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -2020,6 +2025,48 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		criteria.setProjection(Projections.rowCount());
 		final Long count = (Long) criteria.uniqueResult();
 		return count.intValue() == datasetIds.size();
+	}
+
+	public List<StudyDTO> filterStudies(final String programUUID, final StudySearchRequest studySearchRequest, final Pageable pageable) {
+
+		final ProjectionList projectionList = Projections.projectionList();
+		projectionList.add(Projections.property("projectId"), "studyId");
+		projectionList.add(Projections.property("name"), "name");
+		projectionList.add(Projections.property("description"), "description");
+		projectionList.add(Projections.property("programUUID"), "programUUID");
+
+		final Criteria criteria = this.getBaseFilteredStudiesCriteria(programUUID)
+			.addOrder(Order.asc("name"))
+			.setProjection(projectionList)
+			.setResultTransformer(Transformers.aliasToBean(StudyDTO.class));
+
+		this.addStudySearchFilters(criteria, studySearchRequest);
+		this.addPagination(criteria, pageable);
+
+		return criteria.list();
+	}
+
+	public long countFilteredStudies(final String programUUID, final StudySearchRequest studySearchRequest) {
+		final Criteria criteria = this.getBaseFilteredStudiesCriteria(programUUID);
+		this.addStudySearchFilters(criteria, studySearchRequest);
+		criteria.setProjection(Projections.rowCount());
+		return (Long) criteria.uniqueResult();
+	}
+
+	private Criteria getBaseFilteredStudiesCriteria(final String programUUID) {
+		return this.getSession().createCriteria(this.getPersistentClass())
+			.createAlias("studyType", "studyType")
+			.createAlias("parent", "parent")
+			.add(Restrictions.isNotNull("studyType"))
+			.add(Restrictions.eq("deleted", false))
+			.add(Restrictions.eq("programUUID", programUUID))
+			.setResultTransformer(Transformers.aliasToBean(StudyDTO.class));
+	}
+
+	private void addStudySearchFilters(final Criteria criteria, final StudySearchRequest request) {
+		if (!StringUtils.isEmpty(request.getStudyName())) {
+			criteria.add(Restrictions.like("name", "%" +request.getStudyName() + "%"));
+		}
 	}
 
 }
