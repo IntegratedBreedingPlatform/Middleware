@@ -860,9 +860,28 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		allNames.addAll(this.saveGermplasmWithNames(GermplasmImportRequest.GENUS_NAME_TYPE));
 		allNames.addAll(this.saveGermplasmWithNames(GermplasmImportRequest.ACCNO_NAME_TYPE));
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();
-		request.setGermplasmNames(allNames);
+		request.setSynonyms(allNames);
 		final Long count = this.daoFactory.getGermplasmDao().countGermplasmDTOs(request);
 		Assert.assertThat(count.intValue(), is(allNames.size()));
+	}
+
+	@Test
+	public void testCountGermplasmDTOs_FilterByGermplasmNames() {
+		final Germplasm germplasm1 =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final String displayName1 = RandomStringUtils.randomAlphanumeric(255);
+		germplasm1.getPreferredName().setNval(displayName1);
+		this.germplasmDataDM.addGermplasm(germplasm1, germplasm1.getPreferredName(), this.cropType);
+		final Germplasm germplasm2 =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final String displayName2 = RandomStringUtils.randomAlphanumeric(255);
+		germplasm2.getPreferredName().setNval(displayName2);
+		this.germplasmDataDM.addGermplasm(germplasm2, germplasm2.getPreferredName(), this.cropType);
+
+		final GermplasmSearchRequest request = new GermplasmSearchRequest();
+		request.setGermplasmNames(Lists.newArrayList(displayName1, displayName2));
+		final Long count = this.daoFactory.getGermplasmDao().countGermplasmDTOs(request);
+		Assert.assertThat(count.intValue(), is(2));
 	}
 
 	@Test

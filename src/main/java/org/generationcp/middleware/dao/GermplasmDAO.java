@@ -1206,6 +1206,10 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			paramBuilder.setParameterList("germplasmPUIs", germplasmSearchRequest.getGermplasmPUIs());
 		}
 
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getSynonyms())) {
+			paramBuilder.setParameterList("synonyms", germplasmSearchRequest.getSynonyms());
+		}
+
 		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getGermplasmNames())) {
 			paramBuilder.setParameterList("germplasmNames", germplasmSearchRequest.getGermplasmNames());
 		}
@@ -1243,9 +1247,15 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 
 		// Search synonyms or non-default names
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getSynonyms())) {
+			paramBuilder.append(" AND g.gid IN ( SELECT n.gid ");
+			paramBuilder.append(" FROM names n WHERE n.nval IN (:synonyms) and n.nstat != 9 and n.nstat != 1 ) "); //
+		}
+
+		// Search preferred names
 		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getGermplasmNames())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT n.gid ");
-			paramBuilder.append(" FROM names n WHERE n.nval IN (:germplasmNames) and n.nstat != 9 and n.nstat != 1 ) "); //
+			paramBuilder.append(" FROM names n WHERE n.nstat = 1 AND n.nval in (:germplasmNames) ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getStudyDbIds())) {
