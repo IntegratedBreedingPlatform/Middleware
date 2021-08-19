@@ -402,8 +402,6 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 			GermplasmNameTypeDTO::getCode, GermplasmNameTypeDTO::getId));
 	}
 
-
-
 	// Add to attributes map to be saved the custom attribute fields in import request dto
 	private void addCustomAttributeFieldsToAdditionalInfo(final GermplasmImportRequest germplasmDto) {
 		final Map<String, String> customAttributeFieldsMap = germplasmDto.getCustomAttributeFieldsMap();
@@ -429,7 +427,9 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 	}
 
 	private void enforcePUIUniqueness(final List<GermplasmImportRequest> germplasmImportRequestList) {
-		final List<String> puisList = germplasmImportRequestList.stream().map(GermplasmImportRequest::collectGermplasmPUIs).flatMap(List::stream).collect(Collectors.toList());
+		final List<String> puisList =
+			germplasmImportRequestList.stream().map(GermplasmImportRequest::collectGermplasmPUIs).flatMap(List::stream)
+				.collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(puisList)) {
 			final List<String> existingGermplasmPUIs = this.daoFactory.getNameDao().getExistingGermplasmPUIs(puisList);
 			if (!CollectionUtils.isEmpty(existingGermplasmPUIs)) {
@@ -440,7 +440,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 
 	private void enforcePUIUniqueness(final GermplasmUpdateRequest germplasmUpdateRequest, final Name puiName) {
 		final List<String> puisList = germplasmUpdateRequest.collectGermplasmPUIs();
-		if (!CollectionUtils.isEmpty(puisList) ) {
+		if (!CollectionUtils.isEmpty(puisList)) {
 			final List<String> existingGermplasmPUIs = this.daoFactory.getNameDao().getExistingGermplasmPUIs(puisList);
 			if (!CollectionUtils.isEmpty(existingGermplasmPUIs) && (puiName == null || !puisList.get(0).equals(puiName.getNval()))) {
 				throw new MiddlewareRequestException("", "brapi.update.germplasm.pui.exists", StringUtils.join(existingGermplasmPUIs, ","));
@@ -496,7 +496,5 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 			return new HashMap<>();
 		}
 	}
-
-
 
 }

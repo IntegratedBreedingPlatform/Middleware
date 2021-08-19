@@ -183,10 +183,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			this.daoFactory.getCvTermDao().getVariablesBySynonymsAndVariableType(variableNames, VariableType.EXPERIMENTAL_DESIGN);
 		final List<Integer> categoricalVariableIds = new ArrayList<>();
 		categoricalVariableIds.addAll(
-			variableNamesMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+			variableNamesMap.values().stream()
+				.filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(Collectors.toList()));
 		categoricalVariableIds.addAll(
-			variableSynonymsMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+			variableSynonymsMap.values().stream()
+				.filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(Collectors.toList()));
 		final Map<Integer, List<ValueReference>> categoricalVariablesMap =
 			this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(categoricalVariableIds);
@@ -319,11 +321,11 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		if (!StringUtils.isEmpty(position.getPositionCoordinateX()) && !StringUtils.isEmpty(position.getPositionCoordinateY())) {
 			if (!plotExperimentVariablesMap.get(trialDbId).contains(TermId.RANGE_NO.getId())) {
 				this.addProjectProperty(TermId.RANGE_NO.getId(), "FIELDMAP RANGE", trialDbId, plotExperimentVariablesMap,
-						trialIdPlotDatasetMap);
+					trialIdPlotDatasetMap);
 			}
 			if (!plotExperimentVariablesMap.get(trialDbId).contains(TermId.COLUMN_NO.getId())) {
 				this.addProjectProperty(TermId.COLUMN_NO.getId(), "FIELDMAP COLUMN", trialDbId, plotExperimentVariablesMap,
-						trialIdPlotDatasetMap);
+					trialIdPlotDatasetMap);
 			}
 		}
 	}
@@ -342,9 +344,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	private Map<Integer, List<Integer>> populatePlotExperimentVariablesMap(final Map<Integer, DmsProject> plotDatasetMap) {
 		final Map<Integer, List<Integer>> plotExperimentVariablesMap = new HashMap<>();
-		for (final Map.Entry plotDatasetEntry : plotDatasetMap.entrySet()) {
-			final Integer key = (Integer) plotDatasetEntry.getKey();
-			final DmsProject plotDataset = (DmsProject) plotDatasetEntry.getValue();
+		for (final Map.Entry<Integer, DmsProject> plotDatasetEntry : plotDatasetMap.entrySet()) {
+			final Integer key = plotDatasetEntry.getKey();
+			final DmsProject plotDataset = plotDatasetEntry.getValue();
 			plotExperimentVariablesMap.put(key,
 				plotDataset.getProperties().stream().filter(p -> p.getTypeId().equals(VariableType.EXPERIMENTAL_DESIGN.getId()))
 					.map(ProjectProperty::getVariableId).collect(Collectors.toList()));
