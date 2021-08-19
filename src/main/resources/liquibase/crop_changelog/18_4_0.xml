@@ -328,5 +328,36 @@
 			(8119, 1800, 'Environment Detail', 1);
         </sql>
     </changeSet>
+	
+	<changeSet author="corina" id="v18.4.0-16">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1) FROM udflds where ftable = 'NAMES' AND ftype = 'NAME' and fcode = 'LNAME';
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1) FROM udflds where fldno = 13;
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Insert LNAME nametype into udflds table - using fldno 13 if not yet existing</comment>
+		<sql dbms="mysql" splitStatements="false">
+			INSERT INTO udflds (fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid)
+			VALUES (13, 'NAMES', 'NAME', 'LNAME', 'LINE NAME', '-', '-', 0, 0, 20210818, 0);
+		</sql>
+	</changeSet>
+
+	<changeSet author="corina" id="v18.4.0-17">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(1) FROM udflds where ftable = 'NAMES' AND ftype = 'NAME' and fcode = 'LNAME';
+			</sqlCheck>
+		</preConditions>
+		<comment>Insert LNAME nametype into udflds table - use next available fldno if fldno 13 is already taken</comment>
+		<sql dbms="mysql" splitStatements="false">
+			INSERT INTO udflds (ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid)
+			VALUES ('NAMES', 'NAME', 'LNAME', 'LINE NAME', '-', '-', 0, 0, 20210818, 0);
+		</sql>
+	</changeSet>
 
 </databaseChangeLog>
