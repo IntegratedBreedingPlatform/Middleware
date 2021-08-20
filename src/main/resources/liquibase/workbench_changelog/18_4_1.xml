@@ -16,4 +16,32 @@
 				CHANGE COLUMN pemail pemail VARCHAR (255) NOT NULL DEFAULT '-';
 		</sql>
 	</changeSet>
+
+	<changeSet author="lkovacic" id="v18.4.1-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(1) FROM (SELECT 1
+					FROM role_permission rp
+							 INNER JOIN permission p ON rp.permission_id = p.permission_id
+					WHERE p.name IN ('IMPORT_GERMPLASM', 'MANAGE_GERMPLASM', 'GERMPLASM', 'MODIFY_NAMES', 'EDIT_GERMPLASM', 'CROP_MANAGEMENT', 'MANAGE_CROP_METADATA')
+					GROUP BY rp.role_id
+					HAVING SUM(p.name = 'CROP_MANAGEMENT') = 0 AND SUM(p.name = 'MANAGE_CROP_METADATA') = 0) AS count;
+            </sqlCheck>
+		</preConditions>
+		<comment>
+			Add 'MANAGE_CROP_METADATA' for everyone who has 'IMPORT_GERMPLASM' or 'MODIFY_NAMES' permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET @permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_CROP_METADATA');
+
+			INSERT INTO role_permission(role_id, permission_id)
+				SELECT role_id, @permission_id
+				FROM role_permission rp
+						 INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE p.name IN ('IMPORT_GERMPLASM', 'MANAGE_GERMPLASM', 'GERMPLASM', 'MODIFY_NAMES', 'EDIT_GERMPLASM', 'CROP_MANAGEMENT', 'MANAGE_CROP_METADATA')
+				GROUP BY rp.role_id
+				HAVING SUM(p.name = 'CROP_MANAGEMENT') = 0 AND SUM(p.name = 'MANAGE_CROP_METADATA') = 0;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
