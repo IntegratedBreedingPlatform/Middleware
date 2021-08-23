@@ -68,6 +68,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
  */
@@ -78,6 +80,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	private static final String PROPERTY_IDS = "propertyIds";
 	private static final String VARIABLE_IDS = "variableIds";
 	private static final String SCALE_IDS = "scaleIds";
+	private static final String DATASET_IDS = "datasetIds";
+
 	private static final String VARIABLE_DOES_NOT_EXIST = "Variable does not exist";
 	private static final String TERM_IS_NOT_VARIABLE = "The term {0} is not Variable.";
 	private static final String VARIABLE_EXIST_WITH_SAME_NAME = "Variable exist with same name";
@@ -130,7 +134,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	@SuppressWarnings("rawtypes")
 	@Override
 	//FIXME Move queries to DAOs https://ibplatform.atlassian.net/browse/IBP-4705
-	//  possible candidate: org.generationcp.middleware.dao.oms.CVTermDao.getVariablesWithFilter
+	//  - possible candidate: org.generationcp.middleware.dao.oms.CVTermDao.getVariablesWithFilter
+	//  - Use SqlQueryParamBuilder
 	//IMPORTANT: This filter executes an UNION of:
 	//VariableIds and VariableTypes
 	//PropertyIds and PropertyClasses
@@ -287,6 +292,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 					}
 					filterClause += ")";
 					listParameters.put(NAMES, variableFilter.getNames());
+				}
+
+				// filter by study dataset
+				final List<Integer> datasetIds = variableFilter.getDatasetIds();
+				if (!isEmpty(datasetIds)) {
+					filterClause += " and exists(select 1 from projectprop pp where pp.project_id in (:datasetIds) "
+						+ " and pp.variable_id = v.cvterm_id)";
+					listParameters.put(DATASET_IDS, datasetIds);
 				}
 			}
 
