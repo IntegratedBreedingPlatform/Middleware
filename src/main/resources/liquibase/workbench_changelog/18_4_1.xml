@@ -19,8 +19,8 @@
 
 	<changeSet author="lkovacic" id="v18.4.1-2">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">
-				SELECT count(1) FROM (SELECT 1
+			<sqlCheck expectedResult="1">
+				SELECT count(1) > 0 FROM (SELECT 1
 					FROM role_permission rp
 							 INNER JOIN permission p ON rp.permission_id = p.permission_id
 					WHERE p.name IN ('IMPORT_GERMPLASM', 'MANAGE_GERMPLASM', 'GERMPLASM', 'MODIFY_NAMES', 'EDIT_GERMPLASM', 'CROP_MANAGEMENT', 'MANAGE_CROP_METADATA')
