@@ -5,6 +5,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.SampleDao;
@@ -43,7 +45,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.text.SimpleDateFormat;
@@ -51,6 +52,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
@@ -562,6 +568,49 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(String.valueOf(TermId.SEASON_DRY.getId()), studyInstanceDto.getSeasons().get(0).getSeasonDbId());
 		Assert.assertEquals("Dry season", studyInstanceDto.getSeasons().get(0).getSeason());
 
+	}
+
+	@Test
+	public void filterStudies_OK() {
+		final String programUUID = UUID.randomUUID().toString();
+
+		final String studyName1 = "This is a new Study";
+		final DmsProject study1 = this.createProject(studyName1, programUUID);
+
+		final String studyName2 = "Study";
+		final DmsProject study2 = this.createProject(studyName2, programUUID);
+
+		final StudySearchRequest studySearchRequest1 = new StudySearchRequest();
+		assertThat(this.dmsProjectDao.countFilteredStudies(programUUID, studySearchRequest1), is(2L));
+
+		final PageRequest pageRequest1 = new PageRequest(0, 50, new Sort(Sort.Direction.fromString("asc"), "name"));
+		final List<StudyDTO> filterStudiesResponse1 = this.dmsProjectDao.filterStudies(programUUID, studySearchRequest1, pageRequest1);
+		assertThat(filterStudiesResponse1, hasSize(2));
+		this.assertStudyDTO(filterStudiesResponse1.get(0), study2.getProjectId(), study2.getName(), programUUID);
+		this.assertStudyDTO(filterStudiesResponse1.get(1), study1.getProjectId(), study1.getName(), programUUID);
+
+		final PageRequest pageRequest2 = new PageRequest(0, 50, new Sort(Sort.Direction.fromString("desc"), "name"));
+		final List<StudyDTO> filterStudiesResponse2 = this.dmsProjectDao.filterStudies(programUUID, studySearchRequest1, pageRequest2);
+		assertThat(filterStudiesResponse2, hasSize(2));
+		this.assertStudyDTO(filterStudiesResponse2.get(0), study1.getProjectId(), study1.getName(), programUUID);
+		this.assertStudyDTO(filterStudiesResponse2.get(1), study2.getProjectId(), study2.getName(), programUUID);
+
+		final StudySearchRequest studySearchRequest3 = new StudySearchRequest();
+		studySearchRequest3.setStudyName("a new");
+
+		assertThat(this.dmsProjectDao.countFilteredStudies(programUUID, studySearchRequest3), is(1L));
+
+		final List<StudyDTO> filterStudiesResponse3 = this.dmsProjectDao.filterStudies(programUUID, studySearchRequest3, new PageRequest(0, 50));
+		assertThat(filterStudiesResponse3, hasSize(1));
+		this.assertStudyDTO(filterStudiesResponse3.get(0), study1.getProjectId(), study1.getName(), programUUID);
+	}
+
+	private void assertStudyDTO(final StudyDTO studyDTO, final Integer studyId, final String name, final String programUUID) {
+		assertNotNull(studyDTO);
+		assertThat(studyDTO.getStudyId(), is(studyId));
+		assertThat(studyDTO.getName(), is(name));
+		assertNotNull(studyDTO.getDescription());
+		assertThat(studyDTO.getProgramUUID(), is(programUUID));
 	}
 
 	private DmsProject createProject(final String name, final String programUUID) {
