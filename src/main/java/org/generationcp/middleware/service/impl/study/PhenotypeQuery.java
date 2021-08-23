@@ -10,7 +10,7 @@ public class PhenotypeQuery {
 		+ "  nde.obs_unit_id AS observationUnitDbId, " //
 		+ "  nde.json_props AS jsonProps, " //
 		+ "  CONCAT(dataset_type.name, plotNumber.value) AS observationUnitName, " //
-		+ "  dataset_type.name AS observationLevel, " //
+		+ "  dataset_type.name AS datasetName, " //
 		+ "  NULL AS plantNumber, " // Until we have plant level observation
 		+ "  g.germplsm_uuid AS germplasmDbId, " //
 		+ "  s.name AS germplasmName, " //

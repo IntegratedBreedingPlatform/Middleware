@@ -13,6 +13,8 @@ package org.generationcp.middleware.dao.dms;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.brapi.v2.observationunit.Treatment;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -934,7 +936,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		addObservationUnitSearchQueryParams(requestDTO, sqlQuery);
 
 		sqlQuery.addScalar("nd_experiment_id").addScalar("observationUnitDbId", new StringType()).addScalar("observationUnitName")
-			.addScalar("observationLevel").addScalar("plantNumber", new IntegerType()).addScalar("germplasmDbId", new StringType())
+			.addScalar("datasetName").addScalar("plantNumber", new IntegerType()).addScalar("germplasmDbId", new StringType())
 			.addScalar("germplasmName").addScalar("instanceNumber").addScalar("studyDbId", new StringType()).addScalar("studyName")
 			.addScalar("programName")
 			.addScalar("FieldMapRow").addScalar("FieldMapCol").addScalar("plotNumber", new StringType())
@@ -958,9 +960,13 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setExperimentId(ndExperimentId);
 				observationUnit.setObservationUnitDbId((String) row[1]); // OBS_UNIT_ID
 				observationUnit.setObservationUnitName((String) row[2]);
-				observationUnit.setObservationLevel((String) row[3]);
+				final String datasetName = (String) row[3];
+				final DatasetTypeEnum datasetTypeEnum = DatasetTypeEnum.getByName(datasetName);
+				final String observationLevelName = ObservationLevelMapper.getObservationLevelNameEnumByDataset(datasetTypeEnum);
+				observationUnit.setObservationLevel(observationLevelName);
 				observationUnit.setObservationLevels("1");
-				observationUnit.setPlantNumber((String) row[4]);
+				final String plantNumber = (String) row[4];
+				observationUnit.setPlantNumber(plantNumber);
 				observationUnit.setGermplasmDbId((String) row[5]);
 				observationUnit.setGermplasmName((String) row[6]);
 				observationUnit.setInstanceNumber((String) row[7]);
@@ -978,7 +984,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setY(y);
 				observationUnit.setPositionCoordinateX(x);
 				observationUnit.setPositionCoordinateY(y);
-				observationUnit.setPlotNumber((String) row[13]);
+				final String plotNumber = (String) row[13];
+				observationUnit.setPlotNumber(plotNumber);
 				observationUnit.setBlockNumber((String) row[14]);
 				observationUnit.setReplicate((String) row[15]);
 				observationUnit.setStudyLocationDbId((String) row[18]);
@@ -990,8 +997,20 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setLocationDbId(observationUnit.getStudyLocationDbId());
 				observationUnit.setLocationName(observationUnit.getStudyLocation());
 				observationUnit.setObservationUnitPUI("");
+
 				final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
-				observationUnitPosition.setObservationLevel((String) row[3]);
+				final ObservationLevelRelationship observationLevel = new ObservationLevelRelationship();
+				observationLevel.setLevelName(observationLevelName);
+				switch (datasetTypeEnum) {
+					case PLOT_DATA:
+						observationLevel.setLevelCode(plotNumber);
+						break;
+					case PLANT_SUBOBSERVATIONS:
+						// TODO add support for plant, query returns null as of now
+						observationLevel.setLevelCode(plantNumber);
+						break;
+				}
+				observationUnitPosition.setObservationLevel(observationLevel);
 				observationUnitPosition.setEntryType(observationUnit.getEntryType());
 				observationUnitPosition.setPositionCoordinateX(row[12] != null ? (String) row[12] : null);
 				if (observationUnitPosition.getPositionCoordinateX() != null) {
