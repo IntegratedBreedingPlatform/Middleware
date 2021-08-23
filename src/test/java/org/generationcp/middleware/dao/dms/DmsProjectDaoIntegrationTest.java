@@ -45,6 +45,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import java.text.SimpleDateFormat;
 import java.util.Collections;
@@ -582,19 +583,26 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		final StudySearchRequest studySearchRequest1 = new StudySearchRequest();
 		assertThat(this.dmsProjectDao.countFilteredStudies(programUUID, studySearchRequest1), is(2L));
 
-		final List<StudyDTO> filterStudiesResponse1 = this.dmsProjectDao.filterStudies(programUUID, studySearchRequest1, new PageRequest(0, 50));
+		final PageRequest pageRequest1 = new PageRequest(0, 50, new Sort(Sort.Direction.fromString("asc"), "name"));
+		final List<StudyDTO> filterStudiesResponse1 = this.dmsProjectDao.filterStudies(programUUID, studySearchRequest1, pageRequest1);
 		assertThat(filterStudiesResponse1, hasSize(2));
 		this.assertStudyDTO(filterStudiesResponse1.get(0), study2.getProjectId(), study2.getName(), programUUID);
 		this.assertStudyDTO(filterStudiesResponse1.get(1), study1.getProjectId(), study1.getName(), programUUID);
 
-		final StudySearchRequest studySearchRequest2 = new StudySearchRequest();
-		studySearchRequest2.setStudyName("a new");
+		final PageRequest pageRequest2 = new PageRequest(0, 50, new Sort(Sort.Direction.fromString("desc"), "name"));
+		final List<StudyDTO> filterStudiesResponse2 = this.dmsProjectDao.filterStudies(programUUID, studySearchRequest1, pageRequest2);
+		assertThat(filterStudiesResponse2, hasSize(2));
+		this.assertStudyDTO(filterStudiesResponse2.get(0), study1.getProjectId(), study1.getName(), programUUID);
+		this.assertStudyDTO(filterStudiesResponse2.get(1), study2.getProjectId(), study2.getName(), programUUID);
 
-		assertThat(this.dmsProjectDao.countFilteredStudies(programUUID, studySearchRequest2), is(1L));
+		final StudySearchRequest studySearchRequest3 = new StudySearchRequest();
+		studySearchRequest3.setStudyName("a new");
 
-		final List<StudyDTO> filterStudiesResponse2 = this.dmsProjectDao.filterStudies(programUUID, studySearchRequest2, new PageRequest(0, 50));
-		assertThat(filterStudiesResponse2, hasSize(1));
-		this.assertStudyDTO(filterStudiesResponse1.get(0), study2.getProjectId(), study2.getName(), programUUID);
+		assertThat(this.dmsProjectDao.countFilteredStudies(programUUID, studySearchRequest3), is(1L));
+
+		final List<StudyDTO> filterStudiesResponse3 = this.dmsProjectDao.filterStudies(programUUID, studySearchRequest3, new PageRequest(0, 50));
+		assertThat(filterStudiesResponse3, hasSize(1));
+		this.assertStudyDTO(filterStudiesResponse3.get(0), study1.getProjectId(), study1.getName(), programUUID);
 	}
 
 	private void assertStudyDTO(final StudyDTO studyDTO, final Integer studyId, final String name, final String programUUID) {

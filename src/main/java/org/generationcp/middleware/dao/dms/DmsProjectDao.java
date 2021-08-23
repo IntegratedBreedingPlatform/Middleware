@@ -2036,10 +2036,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		projectionList.add(Projections.property("programUUID"), "programUUID");
 
 		final Criteria criteria = this.getBaseFilteredStudiesCriteria(programUUID)
-			.addOrder(Order.asc("name"))
 			.setProjection(projectionList)
 			.setResultTransformer(Transformers.aliasToBean(StudyDTO.class));
 
+		this.addOrder(criteria, pageable);
 		this.addStudySearchFilters(criteria, studySearchRequest);
 		this.addPagination(criteria, pageable);
 
