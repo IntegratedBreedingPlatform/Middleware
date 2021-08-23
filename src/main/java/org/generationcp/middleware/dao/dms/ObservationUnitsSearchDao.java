@@ -557,11 +557,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 			final String germplasmDescriptorClauseFormat =
 				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND %s) AS '%s'";
-
+			final Map<String, Integer> variablesMap = getVariableIdsAliasMap(searchDto.getDatasetId());
 			for (final String gpFactor : searchDto.getGenericGermplasmDescriptors()) {
 
 				if (noFilterVariables || filterColumns.contains(gpFactor)) {
-					final int cvtermId = this.getVariableIdbyName(gpFactor, searchDto.getDatasetId());
+					final int cvtermId = variablesMap.get(gpFactor);
 					final String cvtermQuery;
 					if (fixedGermplasmDescriptors.contains(cvtermId)) {
 						final String germplasmDescriptorClauseFormatFixed =
@@ -1192,21 +1192,19 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		return result;
 	}
 
-	private Integer getVariableIdbyName(final String variableName, final int datasetId) {
-		final String query = "SELECT cvt.cvterm_id "
+	private Map<String, Integer> getVariableIdsAliasMap(final int datasetId) {
+		final Map<String, Integer> variablesMap = new HashMap<>();
+		final String query = "SELECT pp.alias, cvt.cvterm_id "
 			+ "FROM projectprop pp "
 			+ "INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
-			+ "WHERE pp.project_id = :datasetId AND pp.alias = :variable";
+			+ "WHERE pp.project_id = :datasetId";
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
 		sqlQuery.setParameter("datasetId", datasetId);
-		sqlQuery.setParameter("variable", variableName);
-		final List<Integer> list = sqlQuery.list();
-		if (list == null || list.isEmpty()) {
-			return 0;
-		} else {
-			return list.get(0);
+		final List<Object[]> list = sqlQuery.list();
+		for (final Object[] row : list) {
+			variablesMap.put((String) row[0], (Integer) row[1]);
 		}
-
+		return variablesMap;
 	}
 
 }

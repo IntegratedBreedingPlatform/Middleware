@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -306,38 +307,38 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		query.executeUpdate();
 	}
 
-	public List<String> getGermplasmDescriptors(final int studyIdentifier) {
-		final List<String> list = this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
+	public Map<Integer, String> getGermplasmDescriptors(final int studyIdentifier) {
+		return this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
 			Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
-		if (list != null && !list.isEmpty()) {
-			return Collections.unmodifiableList(list);
-		}
-		return Collections.unmodifiableList(Collections.<String>emptyList());
+
 	}
 
-	public List<String> getDesignFactors(final int studyIdentifier) {
-		final List<String> list = this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
+	public Map<Integer, String> getDesignFactors(final int studyIdentifier) {
+		return this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId()));
-		if (list != null && !list.isEmpty()) {
-			return Collections.unmodifiableList(list);
-		}
-		return Collections.unmodifiableList(Collections.<String>emptyList());
 	}
 
-	private List<String> findPlotDatasetVariablesByTypesForStudy(final int studyIdentifier, final List<Integer> variableTypeIds) {
+	private Map<Integer, String> findPlotDatasetVariablesByTypesForStudy(final int studyIdentifier, final List<Integer> variableTypeIds) {
 		final String nameQuery = variableTypeIds.contains(VariableType.GERMPLASM_DESCRIPTOR.getId()) ?
-			" SELECT CASE WHEN pp.alias IS NOT NULL AND pp.alias != '' THEN pp.alias ELSE cvt.name END as name" : " SELECT cvt.name ";
+			" SELECT CASE WHEN pp.alias IS NOT NULL AND pp.alias != '' THEN pp.alias ELSE cvt.name END as name, " : " SELECT cvt.name, ";
 		final String variablesQuery = nameQuery +
-			" FROM  projectprop pp "
+			" cvt.cvterm_id "
+			+ " FROM  projectprop pp "
 			+ " INNER JOIN project ds ON ds.project_id = pp.project_ID AND ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 			+ " INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
 			+ " WHERE pp.type_id IN (:variableTypeIds)"
 			+ " AND ds.study_id = :studyId";
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(variablesQuery);
 		sqlQuery.addScalar("name");
+		sqlQuery.addScalar("cvterm_id");
 		sqlQuery.setParameter("studyId", studyIdentifier);
 		sqlQuery.setParameterList("variableTypeIds", variableTypeIds);
-		return sqlQuery.list();
+		final Map<Integer, String> map = Maps.newHashMap();
+		final List<Object[]> list = sqlQuery.list();
+		for (final Object[] row : list) {
+			map.put((Integer) row[1], (String) row[0]);
+		}
+		return map;
 	}
 
 	public List<ProjectProperty> getByStudyAndStandardVariableIds(final int studyId, final List<Integer> standardVariableIds) {

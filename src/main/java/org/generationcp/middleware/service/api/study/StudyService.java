@@ -4,6 +4,7 @@ package org.generationcp.middleware.service.api.study;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 
 import java.util.List;
+import java.util.Map;
 
 public interface StudyService {
 
@@ -18,9 +19,9 @@ public interface StudyService {
 	 */
 	boolean hasMeasurementDataEntered(List<Integer> ids, int studyId);
 
-	List<String> getGenericGermplasmDescriptors(int studyIdentifier);
+	Map<Integer, String> getGenericGermplasmDescriptors(int studyIdentifier);
 
-	List<String> getAdditionalDesignFactors(int studyIdentifier);
+	Map<Integer, String> getAdditionalDesignFactors(int studyIdentifier);
 
 	Integer getPlotDatasetId(int studyId);
 
