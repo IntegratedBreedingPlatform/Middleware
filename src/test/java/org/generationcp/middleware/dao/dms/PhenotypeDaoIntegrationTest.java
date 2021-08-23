@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.dms;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
@@ -64,11 +65,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import static org.hamcrest.Matchers.is;
+
 public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 	private static final int NO_OF_GERMPLASM = 5;
-
-	private static final String PLOT = "PLOT";
 
 	private PhenotypeDao phenotypeDao;
 
@@ -374,6 +375,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(new Long(1), outOfSyncMap.get(plot.getProjectId()));
 	}
 
+	// FIXME this test can be improved to be easier to work with / add assertions
 	@Test
 	public void testSearchObservationUnits() {
 		// Create 2 studies
@@ -404,6 +406,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		this.createEnvironmentData(plot2, 1, traitIds, true);
 		this.sessionProvder.getSession().flush();
 
+		// Search by program
 		final ObservationUnitSearchRequestDTO dto = new ObservationUnitSearchRequestDTO();
 		dto.setProgramDbIds(Collections.singletonList(uniqueID));
 		final List<ObservationUnitDto> results = this.phenotypeDao.searchObservationUnits(1000, 1, dto);
@@ -438,6 +441,20 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		dto2.setTrialDbIds(Collections.singletonList(study2.getProjectId().toString()));
 		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countObservationUnits(dto2));
 
+		final List<ObservationUnitDto> study2ObservationUnits = this.phenotypeDao.searchObservationUnits(1000, 1, dto2);
+		study2ObservationUnits.forEach(observationUnitDto -> {
+			Assert.assertThat(observationUnitDto.getObservationUnitPosition().getObservationLevel().getLevelName(),
+				is(DatasetTypeEnum.MEANS_DATA.getName()));
+		});
+
+		final ObservationUnitSearchRequestDTO dto2Study1 = new ObservationUnitSearchRequestDTO();
+		dto2Study1.setTrialDbIds(Collections.singletonList(this.study.getProjectId().toString()));
+		final List<ObservationUnitDto> study1ObservationUnits = this.phenotypeDao.searchObservationUnits(1000, 1, dto2Study1);
+		study1ObservationUnits.forEach(observationUnitDto -> {
+			Assert.assertThat(observationUnitDto.getObservationUnitPosition().getObservationLevel().getLevelName(),
+				is(ObservationLevelMapper.ObservationLevelEnum.PLOT.getName()));
+		});
+
 		// Search by Geolocation ID
 		final ObservationUnitSearchRequestDTO dto3 = new ObservationUnitSearchRequestDTO();
 		dto3.setStudyDbIds(Collections.singletonList(environment1.toString()));
@@ -457,7 +474,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		// Search by Dataset Type, just for current program
 		final ObservationUnitSearchRequestDTO dto6 = new ObservationUnitSearchRequestDTO();
 		dto6.setProgramDbIds(Collections.singletonList(uniqueID));
-		dto6.setObservationLevel(PLOT);
+		dto6.setObservationLevel(ObservationLevelMapper.ObservationLevelEnum.PLOT.getName());
 		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countObservationUnits(dto6));
 	}
 
