@@ -7,7 +7,6 @@ import com.google.common.collect.Table;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.FormulaDAO;
-import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
@@ -45,7 +44,6 @@ import org.generationcp.middleware.service.api.derived_variables.DerivedVariable
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.ObservationUnitIDGeneratorTest;
-import org.generationcp.middleware.service.impl.study.StudyServiceImplTest;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.junit.Assert;
@@ -122,9 +120,6 @@ public class DatasetServiceImplTest {
 	private DmsProjectDao dmsProjectDao;
 
 	@Mock
-	private DatasetTypeDAO datasetTypeDAO;
-
-	@Mock
 	private ExperimentDao experimentDao;
 
 	@Mock
@@ -176,7 +171,6 @@ public class DatasetServiceImplTest {
 		when(this.daoFactory.getExperimentDao()).thenReturn(this.experimentDao);
 		when(this.daoFactory.getFormulaDAO()).thenReturn(this.formulaDao);
 		when(this.daoFactory.getObservationUnitsSearchDAO()).thenReturn(this.obsUnitsSearchDao);
-		when(this.daoFactory.getDatasetTypeDao()).thenReturn(this.datasetTypeDAO);
 	}
 
 	@Test
@@ -406,7 +400,6 @@ public class DatasetServiceImplTest {
 		final DatasetDTO datasetDTO = datasetDTOList.get(4);
 		final DatasetType datasetType = new DatasetType();
 		datasetType.setDatasetTypeId(datasetDTO.getDatasetTypeId());
-		Mockito.when(this.datasetTypeDAO.getById(datasetDTO.getDatasetTypeId())).thenReturn(datasetType);
 		Mockito.when(this.datasetService.getDataset(datasetDTOList.get(4).getDatasetId())).thenReturn(datasetDTO);
 		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
 		assertThat(datasetDTOList.get(4), equalTo(result));
