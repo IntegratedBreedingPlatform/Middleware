@@ -247,4 +247,16 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="mderamos" id="v18.4.1-13">
+		<preConditions onFail="CONTINUE">
+			<and>
+				<not><indexExists tableName="location" indexName="uk_location_labbr"/></not>
+				<sqlCheck expectedResult="0">select count(*) from (SELECT count(*) from location where labbr is not null group by labbr having count(*) > 1) a </sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Adding unique constraint to labbr column of location table </comment>
+	    <addUniqueConstraint columnNames="labbr" constraintName="uk_location_labbr" tableName="location"/>
+	</changeSet>
+
+
 </databaseChangeLog>
