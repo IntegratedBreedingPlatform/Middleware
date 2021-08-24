@@ -401,6 +401,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		}
 	}
 
+	/*
+	 * FIXME IBP-4289
+	 *  - ObservationLevelRelationship not consistent with /observationlevels
+	 *  - dto carrying different formats at different points in the call hierarchy (perhaps map directly before saving to ndexpprops?)
+	 *  - See ObservationLevelMapper
+	 */
 	private void renameObservationLevelNamesToBeSaved(final List<ObservationLevelRelationship> relationships) {
 		if (!CollectionUtils.isEmpty(relationships)) {
 			//Convert observation level relationship names to their equivalent in BMS database
