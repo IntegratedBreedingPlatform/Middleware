@@ -2,6 +2,9 @@
 package org.generationcp.middleware.service.api.study;
 
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
+import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudySearchRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -30,4 +33,9 @@ public interface StudyService {
 	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId);
 
 	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
+
+	List<StudyDTO> getFilteredStudies(String programUUID, StudySearchRequest studySearchRequest, Pageable pageable);
+
+	long countFilteredStudies(String programUUID, StudySearchRequest studySearchRequest);
+	
 }
