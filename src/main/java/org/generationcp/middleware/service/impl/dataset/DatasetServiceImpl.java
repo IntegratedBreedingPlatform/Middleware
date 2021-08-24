@@ -1,14 +1,11 @@
 package org.generationcp.middleware.service.impl.dataset;
 
-import com.google.common.base.Function;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
@@ -56,7 +53,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -201,14 +197,9 @@ public class DatasetServiceImpl implements DatasetService {
 		if (Boolean.TRUE.equals(draftMode)) {
 			final Set<Integer> pendingVariableIds = this.daoFactory.getPhenotypeDAO().getPendingVariableIds(observationSetId);
 			variateColumns =
-				Lists.newArrayList(Iterables.filter(variateColumns, new com.google.common.base.Predicate<MeasurementVariable>() {
-
-					@Override
-					public boolean apply(@Nullable final MeasurementVariable input) {
-						return pendingVariableIds.contains(input.getTermId())
-							|| VariableType.OBSERVATION_UNIT.equals(input.getVariableType());
-					}
-				}));
+				Lists.newArrayList(Iterables.filter(variateColumns, input -> pendingVariableIds.contains(input.getTermId())
+					|| VariableType.OBSERVATION_UNIT.equals(input.getVariableType())
+				));
 		}
 
 		// Virtual columns
@@ -232,15 +223,15 @@ public class DatasetServiceImpl implements DatasetService {
 		return factorColumns;
 	}
 
-	private MeasurementVariable addTermIdColumn(final TermId TermId, final VariableType VariableType, final String name,
+	private MeasurementVariable addTermIdColumn(final TermId termId, final VariableType variableType, final String name,
 		final boolean factor) {
-		final MeasurementVariable MeasurementVariable = new MeasurementVariable();
-		MeasurementVariable.setName(StringUtils.isBlank(name) ? TermId.name() : name);
-		MeasurementVariable.setAlias(TermId.name());
-		MeasurementVariable.setTermId(TermId.getId());
-		MeasurementVariable.setVariableType(VariableType);
-		MeasurementVariable.setFactor(factor);
-		return MeasurementVariable;
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName(StringUtils.isBlank(name) ? termId.name() : name);
+		measurementVariable.setAlias(termId.name());
+		measurementVariable.setTermId(termId.getId());
+		measurementVariable.setVariableType(variableType);
+		measurementVariable.setFactor(factor);
+		return measurementVariable;
 	}
 
 	@Override
@@ -529,13 +520,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputId(variableId);
 		if (!org.springframework.util.CollectionUtils.isEmpty(formulaList) && !org.springframework.util.CollectionUtils
 			.isEmpty(observationUnitIds)) {
-			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
-
-				@Override
-				public Integer apply(final Formula formula) {
-					return formula.getTargetCVTerm().getCvTermId();
-				}
-			});
+			final List<Integer> targetVariableIds = Lists.transform(formulaList, formula -> formula.getTargetCVTerm().getCvTermId());
 			this.daoFactory.getPhenotypeDAO()
 				.updateOutOfSyncPhenotypes(observationUnitIds, Sets.newHashSet(targetVariableIds));
 
@@ -556,13 +541,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputIds(variableIds);
 		if (!formulaList.isEmpty()) {
-			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
-
-				@Override
-				public Integer apply(final Formula formula) {
-					return formula.getTargetCVTerm().getCvTermId();
-				}
-			});
+			final List<Integer> targetVariableIds = Lists.transform(formulaList, formula -> formula.getTargetCVTerm().getCvTermId());
 			this.daoFactory.getPhenotypeDAO()
 				.updateOutOfSyncPhenotypesByGeolocation(geolocation, Sets.newHashSet(targetVariableIds));
 		}
@@ -572,7 +551,6 @@ public class DatasetServiceImpl implements DatasetService {
 	public DatasetDTO getDataset(final Integer datasetId) {
 		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
 		if (datasetDTO != null) {
-			final DatasetType datasetType = this.daoFactory.getDatasetTypeDao().getById(datasetDTO.getDatasetTypeId());
 			datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
 			final List<Integer> variableTypes = DatasetTypeEnum.SUMMARY_DATA.getId() == datasetDTO.getDatasetTypeId() ?
 				DatasetServiceImpl.ENVIRONMENT_DATASET_VARIABLE_TYPES : DatasetServiceImpl.OBSERVATION_DATASET_VARIABLE_TYPES;
@@ -769,28 +747,18 @@ public class DatasetServiceImpl implements DatasetService {
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 			for (final MeasurementVariable measurementVariable : measurementVariableList) {
-				final Collection<Phenotype> selectedPhenotypes = CollectionUtils.select(phenotypes, new Predicate() {
-
-					@Override
-					public boolean evaluate(final Object o) {
-						final Phenotype phenotype = (Phenotype) o;
-						return phenotype.getObservableId().equals(measurementVariable.getTermId());
-					}
+				final Collection<Phenotype> selectedPhenotypes = CollectionUtils.select(phenotypes, o -> {
+					final Phenotype phenotype = (Phenotype) o;
+					return phenotype.getObservableId().equals(measurementVariable.getTermId());
 				});
 
 				Collection<Phenotype> possibleValues = null;
 				if (measurementVariable.getPossibleValues() != null && !measurementVariable.getPossibleValues().isEmpty()) {
 					possibleValues =
-						CollectionUtils.collect(measurementVariable.getPossibleValues(), new Transformer() {
-
-							@Override
-							public String transform(final Object input) {
-								final ValueReference variable = (ValueReference) input;
-								return variable.getName();
-							}
-
+						CollectionUtils.collect(measurementVariable.getPossibleValues(), input -> {
+							final ValueReference variable = (ValueReference) input;
+							return variable.getName();
 						});
-
 				}
 
 				for (final Phenotype phenotype : selectedPhenotypes) {
@@ -838,25 +806,17 @@ public class DatasetServiceImpl implements DatasetService {
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 			for (final MeasurementVariable measurementVariable : measurementVariableList) {
-				final Collection<Phenotype> selectedPhenotypes = CollectionUtils.select(draftPhenotypes, new Predicate() {
-
-					@Override
-					public boolean evaluate(final Object o) {
-						final Phenotype phenotype = (Phenotype) o;
-						return phenotype.getObservableId().equals(measurementVariable.getTermId());
-					}
+				final Collection<Phenotype> selectedPhenotypes = CollectionUtils.select(draftPhenotypes, o -> {
+					final Phenotype phenotype = (Phenotype) o;
+					return phenotype.getObservableId().equals(measurementVariable.getTermId());
 				});
 
 				Collection<Phenotype> possibleValues = null;
 				if (measurementVariable.getPossibleValues() != null && !measurementVariable.getPossibleValues().isEmpty()) {
 					possibleValues =
-						CollectionUtils.collect(measurementVariable.getPossibleValues(), new Transformer() {
-
-							@Override
-							public String transform(final Object input) {
-								final ValueReference variable = (ValueReference) input;
-								return variable.getName();
-							}
+						CollectionUtils.collect(measurementVariable.getPossibleValues(), input -> {
+							final ValueReference variable = (ValueReference) input;
+							return variable.getName();
 						});
 				}
 

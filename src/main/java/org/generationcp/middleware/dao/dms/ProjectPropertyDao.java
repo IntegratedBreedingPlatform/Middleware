@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -30,8 +29,6 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -46,7 +43,6 @@ import java.util.Map;
 public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 	private static final String TYPE_ID = "typeId";
-	private static final Logger LOG = LoggerFactory.getLogger(ProjectPropertyDao.class);
 
 	/**
 	 * @param variableNames
@@ -56,12 +52,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByAlias(final List<String> variableNames,
 		final String programUUID) {
 
-		final List<String> propertyNamesInUpperCase = Lists.transform(variableNames, new Function<String, String>() {
-
-			public String apply(final String s) {
-				return s.toUpperCase();
-			}
-		});
+		final List<String> propertyNamesInUpperCase = Lists.transform(variableNames, String::toUpperCase);
 
 		try {
 			if (!propertyNamesInUpperCase.isEmpty()) {
@@ -87,7 +78,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		} catch (final HibernateException e) {
 			final String message =
 				"Error in getStandardVariableIdsWithTypeByPropertyNames=" + variableNames + " in ProjectPropertyDao: " + e.getMessage();
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 
@@ -126,7 +116,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error in getByStandardVariableId(" + project.getProjectId() + ", " + standardVariableId + ")";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 		return projectProperty;
@@ -141,7 +130,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error in getNextRank(" + projectId + ")";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
@@ -156,7 +144,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error in getByTypeAndValue(" + typeId + ", " + value + ")";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
@@ -176,7 +163,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			return projectPropMap;
 		} catch (final HibernateException e) {
 			final String message = "Error in getPropsForProjectIds(" + projectIds + ")";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
@@ -238,7 +224,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error in getByProjectId(" + dmsProject.getProjectId() + ") in ProjectPropertyDao";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 		return list;
@@ -284,7 +269,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			return projectPropMap;
 		} catch (final MiddlewareQueryException e) {
 			final String message = "Error with getProjectPropsAndValuesByStudyIds() query from studyIds: " + studyIds;
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
@@ -349,7 +333,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error in getByStudyAndStandardVariableIds(" + standardVariableIds + ")";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
@@ -405,7 +388,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		} catch (final HibernateException e) {
 			final String message = "Error in getByProjectIdAndVariableIds(" + dmsProject.getProjectId() + ", " + standardVariableIds
 				+ ") in ProjectPropertyDao";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 		return list;
