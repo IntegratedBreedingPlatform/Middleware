@@ -747,7 +747,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	 * @param programUUID
 	 */
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
-		final String programUUID) {
+		final String programUUID, final Integer maxTotalResults) {
 
 		try {
 			// list is used again in a query wrapper to paginate (filtered+included) gids
@@ -799,6 +799,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 				if (!GERMPLASM_SEARCH_FIXED_SCALARS.contains(propertyId)) {
 					query.addScalar(propertyId);
 				}
+			}
+
+			if (maxTotalResults != null) {
+				query.setMaxResults(maxTotalResults);
 			}
 
 			/*

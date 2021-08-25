@@ -5,6 +5,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +20,9 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 
 	private final DaoFactory daoFactory;
 
+	@Value("${export.max.total.results}")
+	public int maxTotalResults;
+
 	public GermplasmSearchServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
@@ -26,7 +30,13 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
 		final String programUUID) {
-		return this.daoFactory.getGermplasmSearchDAO().searchGermplasm(germplasmSearchRequest, pageable, programUUID);
+		return this.daoFactory.getGermplasmSearchDAO().searchGermplasm(germplasmSearchRequest, pageable, programUUID, null);
+	}
+
+	@Override
+	public List<GermplasmSearchResponse> searchGermplasmApplyExportResultsLimit(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
+		final String programUUID) {
+		return this.daoFactory.getGermplasmSearchDAO().searchGermplasm(germplasmSearchRequest, pageable, programUUID, this.maxTotalResults);
 	}
 
 	@Override

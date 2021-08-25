@@ -11,6 +11,9 @@ public interface GermplasmSearchService {
 	List<GermplasmSearchResponse> searchGermplasm(GermplasmSearchRequest germplasmSearchRequest, Pageable pageable,
 		final String programUUID);
 
+	List<GermplasmSearchResponse> searchGermplasmApplyExportResultsLimit(GermplasmSearchRequest germplasmSearchRequest, Pageable pageable,
+		final String programUUID);
+
 	long countSearchGermplasm(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
 	List<UserDefinedField> getGermplasmNameTypes(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
