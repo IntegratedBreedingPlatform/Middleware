@@ -26,7 +26,7 @@ public class VariableFilter {
 	private final List<Integer> datasetIds = new ArrayList<>();
 
 	public String getProgramUuid() {
-		return programUuid;
+		return this.programUuid;
 	}
 
 	public void setProgramUuid(final String programUuid) {
@@ -34,7 +34,7 @@ public class VariableFilter {
 	}
 
 	public boolean isFetchAll() {
-		return fetchAll;
+		return this.fetchAll;
 	}
 
 	public void setFetchAll(final boolean fetchAll) {
@@ -42,7 +42,7 @@ public class VariableFilter {
 	}
 
 	public boolean isFavoritesOnly() {
-		return favoritesOnly;
+		return this.favoritesOnly;
 	}
 
 	public void setFavoritesOnly(final boolean favoritesOnly) {
@@ -50,7 +50,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getMethodIds() {
-		return methodIds;
+		return this.methodIds;
 	}
 
 	public void addMethodId(final Integer id) {
@@ -58,7 +58,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getPropertyIds() {
-		return propertyIds;
+		return this.propertyIds;
 	}
 
 	public void addPropertyId(final Integer id) {
@@ -66,7 +66,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getScaleIds() {
-		return scaleIds;
+		return this.scaleIds;
 	}
 
 	public void addScaleId(final Integer id) {
@@ -74,7 +74,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getVariableIds() {
-		return variableIds;
+		return this.variableIds;
 	}
 
 	public void addVariableId(final Integer id) {
@@ -82,7 +82,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getExcludedVariableIds() {
-		return excludedVariableIds;
+		return this.excludedVariableIds;
 	}
 
 	public void addExcludedVariableId(final Integer id) {
@@ -90,7 +90,7 @@ public class VariableFilter {
 	}
 
 	public List<DataType> getDataTypes() {
-		return dataTypes;
+		return this.dataTypes;
 	}
 
 	public void addDataType(final DataType dataType) {
@@ -98,7 +98,7 @@ public class VariableFilter {
 	}
 
 	public List<VariableType> getVariableTypes() {
-		return variableTypes;
+		return this.variableTypes;
 	}
 
 	public void addVariableType(final VariableType variableType) {
@@ -106,7 +106,7 @@ public class VariableFilter {
 	}
 
 	public List<String> getPropertyClasses() {
-		return propertyClasses;
+		return this.propertyClasses;
 	}
 
 	public void addPropertyClass(final String className) {
@@ -114,7 +114,7 @@ public class VariableFilter {
 	}
 
 	public List<String> getNames() {
-		return names;
+		return this.names;
 	}
 
 	public void addName(final String name) {
@@ -122,7 +122,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getDatasetIds() {
-		return datasetIds;
+		return this.datasetIds;
 	}
 
 	public void addDatasetId(final Integer datasetId) {
@@ -132,19 +132,19 @@ public class VariableFilter {
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this)
-			.append("programUuid", programUuid)
-			.append("fetchAll", fetchAll)
-			.append("favoritesOnly", favoritesOnly)
-			.append("methodIds", methodIds)
-			.append("propertyIds", propertyIds)
-			.append("scaleIds", scaleIds)
-			.append("variableIds", variableIds)
-			.append("excludedVariableIds", excludedVariableIds)
-			.append("dataTypes", dataTypes)
-			.append("variableTypes", variableTypes)
-			.append("propertyClasses", propertyClasses)
-			.append("names", names)
-			.append("datasetIds", datasetIds)
+			.append("programUuid", this.programUuid)
+			.append("fetchAll", this.fetchAll)
+			.append("favoritesOnly", this.favoritesOnly)
+			.append("methodIds", this.methodIds)
+			.append("propertyIds", this.propertyIds)
+			.append("scaleIds", this.scaleIds)
+			.append("variableIds", this.variableIds)
+			.append("excludedVariableIds", this.excludedVariableIds)
+			.append("dataTypes", this.dataTypes)
+			.append("variableTypes", this.variableTypes)
+			.append("propertyClasses", this.propertyClasses)
+			.append("names", this.names)
+			.append("datasetIds", this.datasetIds)
 			.toString();
 	}
 
@@ -153,23 +153,24 @@ public class VariableFilter {
 		if (this == o)
 			return true;
 
-		if (o == null || getClass() != o.getClass())
+		if (o == null || this.getClass() != o.getClass())
 			return false;
 
 		final VariableFilter that = (VariableFilter) o;
 
-		return new EqualsBuilder().append(fetchAll, that.fetchAll).append(favoritesOnly, that.favoritesOnly)
-			.append(programUuid, that.programUuid).append(methodIds, that.methodIds).append(propertyIds, that.propertyIds)
-			.append(scaleIds, that.scaleIds).append(variableIds, that.variableIds).append(excludedVariableIds, that.excludedVariableIds)
-			.append(dataTypes, that.dataTypes).append(variableTypes, that.variableTypes).append(propertyClasses, that.propertyClasses)
-			.append(names, that.names).append(datasetIds, that.datasetIds).isEquals();
+		return new EqualsBuilder().append(this.fetchAll, that.fetchAll).append(this.favoritesOnly, that.favoritesOnly)
+			.append(this.programUuid, that.programUuid).append(this.methodIds, that.methodIds).append(this.propertyIds, that.propertyIds)
+			.append(this.scaleIds, that.scaleIds).append(this.variableIds, that.variableIds).append(this.excludedVariableIds, that.excludedVariableIds)
+			.append(this.dataTypes, that.dataTypes).append(this.variableTypes, that.variableTypes).append(this.propertyClasses, that.propertyClasses)
+			.append(this.names, that.names).append(this.datasetIds, that.datasetIds).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder(17, 37).append(programUuid).append(fetchAll).append(favoritesOnly).append(methodIds).append(propertyIds)
-			.append(scaleIds).append(variableIds).append(excludedVariableIds).append(dataTypes).append(variableTypes)
-			.append(propertyClasses)
-			.append(names).append(datasetIds).toHashCode();
+		return new HashCodeBuilder(17, 37).append(this.programUuid).append(this.fetchAll).append(this.favoritesOnly).append(this.methodIds).append(
+			this.propertyIds)
+			.append(this.scaleIds).append(this.variableIds).append(this.excludedVariableIds).append(this.dataTypes).append(this.variableTypes)
+			.append(this.propertyClasses)
+			.append(this.names).append(this.datasetIds).toHashCode();
 	}
 }
