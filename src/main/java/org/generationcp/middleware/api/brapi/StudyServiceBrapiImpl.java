@@ -608,7 +608,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 			TermId.LOCATION_ID.getId(),
 			TermId.TRIAL_INSTANCE_FACTOR.getId(),
 			TermId.EXPERIMENT_DESIGN_FACTOR.getId());
-		// filter the already added variables
+		//filter the variables already added
 		filterVariables.addAll(environmentParameterVariables.stream().map(MeasurementVariable::getTermId).collect(Collectors.toList()));
 
 		final List<MeasurementVariable> variables = environmentVariables
