@@ -5,8 +5,10 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
@@ -66,40 +69,44 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public List<String> getGenericGermplasmDescriptors(final int studyIdentifier) {
+	public Map<Integer, String> getGenericGermplasmDescriptors(final int studyIdentifier) {
 
-		final List<String> allGermplasmDescriptors = this.daoFactory.getProjectPropertyDAO().getGermplasmDescriptors(studyIdentifier);
+		final Map<Integer, String> allGermplasmDescriptors = this.daoFactory.getProjectPropertyDAO().getGermplasmDescriptors(studyIdentifier);
 		/**
 		 * Fixed descriptors are the ones that are NOT stored in stockprop or nd_experimentprop. We dont need additional joins to props
 		 * table for these as they are available in columns in main entity (e.g. stock or nd_experiment) tables.
 		 */
-		final List<String> fixedGermplasmDescriptors =
-			Lists.newArrayList("GID", "DESIGNATION", "ENTRY_NO", "ENTRY_TYPE", "ENTRY_CODE", "OBS_UNIT_ID");
-		final List<String> genericGermplasmDescriptors = Lists.newArrayList();
+		final List<Integer> fixedGermplasmDescriptors =
+			Lists.newArrayList(TermId.GID.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.ENTRY_TYPE.getId(),
+				TermId.ENTRY_CODE.getId(), TermId.OBS_UNIT_ID
+					.getId());
+		final Map<Integer, String> genericGermplasmDescriptors = Maps.newHashMap();
 
-		for (final String gpDescriptor : allGermplasmDescriptors) {
-			if (!fixedGermplasmDescriptors.contains(gpDescriptor)) {
-				genericGermplasmDescriptors.add(gpDescriptor);
+		for (final Map.Entry<Integer, String> gpDescriptor : allGermplasmDescriptors.entrySet()) {
+			if (!fixedGermplasmDescriptors.contains(gpDescriptor.getKey())) {
+				genericGermplasmDescriptors.put(gpDescriptor.getKey(), gpDescriptor.getValue());
 			}
 		}
 		return genericGermplasmDescriptors;
 	}
 
 	@Override
-	public List<String> getAdditionalDesignFactors(final int studyIdentifier) {
+	public Map<Integer, String> getAdditionalDesignFactors(final int studyIdentifier) {
 
-		final List<String> allDesignFactors = this.daoFactory.getProjectPropertyDAO().getDesignFactors(studyIdentifier);
+		final Map<Integer, String> allDesignFactors = this.daoFactory.getProjectPropertyDAO().getDesignFactors(studyIdentifier);
 		/**
 		 * Fixed design factors are already being retrieved individually in Measurements query. We are only interested in additional
 		 * EXPERIMENTAL_DESIGN and TREATMENT FACTOR variables
 		 */
-		final List<String> fixedDesignFactors =
-			Lists.newArrayList("REP_NO", "PLOT_NO", "BLOCK_NO", "ROW", "COL", "FIELDMAP COLUMN", "FIELDMAP RANGE");
-		final List<String> additionalDesignFactors = Lists.newArrayList();
+		final List<Integer> fixedDesignFactors =
+			Lists.newArrayList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId(), TermId.ROW.getId(),
+				TermId.COL.getId(), TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE
+					.getId());
+		final Map<Integer, String> additionalDesignFactors = Maps.newHashMap();
 
-		for (final String designFactor : allDesignFactors) {
-			if (!fixedDesignFactors.contains(designFactor)) {
-				additionalDesignFactors.add(designFactor);
+		for (final Map.Entry<Integer, String> designFactor : allDesignFactors.entrySet()) {
+			if (!fixedDesignFactors.contains(designFactor.getKey())) {
+				additionalDesignFactors.put(designFactor.getKey(), designFactor.getValue());
 			}
 		}
 		return additionalDesignFactors;

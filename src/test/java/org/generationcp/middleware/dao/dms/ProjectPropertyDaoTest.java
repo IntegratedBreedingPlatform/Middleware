@@ -232,11 +232,11 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		this.saveProjectVariable(plotDataset, variable3, 3, VariableType.GERMPLASM_DESCRIPTOR);
 		this.saveProjectVariable(plotDataset, variable4, 4, VariableType.EXPERIMENTAL_DESIGN);
 
-		final List<String> germplasmDescriptors = this.projectPropDao.getGermplasmDescriptors(this.study.getProjectId());
+		final Map<Integer, String> germplasmDescriptors = this.projectPropDao.getGermplasmDescriptors(this.study.getProjectId());
 		Assert.assertNotNull(germplasmDescriptors);
 		Assert.assertEquals(2, germplasmDescriptors.size());
-		Assert.assertTrue(germplasmDescriptors.contains(variable1.getName()));
-		Assert.assertTrue(germplasmDescriptors.contains(variable3.getName()));
+		Assert.assertTrue(germplasmDescriptors.values().contains(variable1.getName()));
+		Assert.assertTrue(germplasmDescriptors.values().contains(variable3.getName()));
 	}
 
 
@@ -252,11 +252,11 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		this.saveProjectVariable(plotDataset, variable1, 1, VariableType.GERMPLASM_DESCRIPTOR);
 		this.saveProjectVariable(plotDataset, variable2, 2, VariableType.GERMPLASM_DESCRIPTOR);
 
-		final List<String> germplasmDescriptors = this.projectPropDao.getGermplasmDescriptors(this.study.getProjectId());
+		final Map<Integer, String> germplasmDescriptors = this.projectPropDao.getGermplasmDescriptors(this.study.getProjectId());
 		Assert.assertNotNull(germplasmDescriptors);
 		Assert.assertEquals(2, germplasmDescriptors.size());
-		Assert.assertTrue(germplasmDescriptors.contains(variable1.getName()));
-		Assert.assertTrue(germplasmDescriptors.contains(variable2.getName()));
+		Assert.assertTrue(germplasmDescriptors.values().contains(variable1.getName()));
+		Assert.assertTrue(germplasmDescriptors.values().contains(variable2.getName()));
 
 	}
 
@@ -300,11 +300,11 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		this.saveProjectVariable(plotDataset, variable4, 4, VariableType.EXPERIMENTAL_DESIGN);
 		this.saveProjectVariable(plotDataset, variable5, 5, VariableType.TREATMENT_FACTOR);
 
-		final List<String> designFactors = this.projectPropDao.getDesignFactors(this.study.getProjectId());
+		final Map<Integer, String> designFactors = this.projectPropDao.getDesignFactors(this.study.getProjectId());
 		Assert.assertNotNull(designFactors);
 		Assert.assertEquals(2, designFactors.size());
-		Assert.assertTrue(designFactors.contains(variable4.getName()));
-		Assert.assertTrue(designFactors.contains(variable5.getName()));
+		Assert.assertTrue(designFactors.values().contains(variable4.getName()));
+		Assert.assertTrue(designFactors.values().contains(variable5.getName()));
 	}
 
 	private DmsProject saveDataset(final DatasetTypeEnum datasetType) {
