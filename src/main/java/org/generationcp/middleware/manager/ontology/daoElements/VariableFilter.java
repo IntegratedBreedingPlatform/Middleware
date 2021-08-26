@@ -1,5 +1,8 @@
 package org.generationcp.middleware.manager.ontology.daoElements;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 
@@ -20,9 +23,10 @@ public class VariableFilter {
 	private final List<VariableType> variableTypes = new ArrayList<>();
 	private final List<String> propertyClasses = new ArrayList<>();
 	private final List<String> names = new ArrayList<>();
+	private final List<Integer> datasetIds = new ArrayList<>();
 
 	public String getProgramUuid() {
-		return programUuid;
+		return this.programUuid;
 	}
 
 	public void setProgramUuid(final String programUuid) {
@@ -30,7 +34,7 @@ public class VariableFilter {
 	}
 
 	public boolean isFetchAll() {
-		return fetchAll;
+		return this.fetchAll;
 	}
 
 	public void setFetchAll(final boolean fetchAll) {
@@ -38,7 +42,7 @@ public class VariableFilter {
 	}
 
 	public boolean isFavoritesOnly() {
-		return favoritesOnly;
+		return this.favoritesOnly;
 	}
 
 	public void setFavoritesOnly(final boolean favoritesOnly) {
@@ -46,7 +50,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getMethodIds() {
-		return methodIds;
+		return this.methodIds;
 	}
 
 	public void addMethodId(final Integer id) {
@@ -54,7 +58,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getPropertyIds() {
-		return propertyIds;
+		return this.propertyIds;
 	}
 
 	public void addPropertyId(final Integer id) {
@@ -62,7 +66,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getScaleIds() {
-		return scaleIds;
+		return this.scaleIds;
 	}
 
 	public void addScaleId(final Integer id) {
@@ -70,7 +74,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getVariableIds() {
-		return variableIds;
+		return this.variableIds;
 	}
 
 	public void addVariableId(final Integer id) {
@@ -78,7 +82,7 @@ public class VariableFilter {
 	}
 
 	public List<Integer> getExcludedVariableIds() {
-		return excludedVariableIds;
+		return this.excludedVariableIds;
 	}
 
 	public void addExcludedVariableId(final Integer id) {
@@ -86,7 +90,7 @@ public class VariableFilter {
 	}
 
 	public List<DataType> getDataTypes() {
-		return dataTypes;
+		return this.dataTypes;
 	}
 
 	public void addDataType(final DataType dataType) {
@@ -94,7 +98,7 @@ public class VariableFilter {
 	}
 
 	public List<VariableType> getVariableTypes() {
-		return variableTypes;
+		return this.variableTypes;
 	}
 
 	public void addVariableType(final VariableType variableType) {
@@ -102,7 +106,7 @@ public class VariableFilter {
 	}
 
 	public List<String> getPropertyClasses() {
-		return propertyClasses;
+		return this.propertyClasses;
 	}
 
 	public void addPropertyClass(final String className) {
@@ -110,76 +114,63 @@ public class VariableFilter {
 	}
 
 	public List<String> getNames() {
-		return names;
+		return this.names;
 	}
 
 	public void addName(final String name) {
 		this.names.add(name);
 	}
 
+	public List<Integer> getDatasetIds() {
+		return this.datasetIds;
+	}
+
+	public void addDatasetId(final Integer datasetId) {
+		this.datasetIds.add(datasetId);
+	}
 
 	@Override
 	public String toString() {
-		return "VariableFilter{" +
-				"programUuid='" + programUuid + '\'' +
-				", fetchAll=" + fetchAll +
-				", favoritesOnly=" + favoritesOnly +
-				", methodIds=" + methodIds +
-				", propertyIds=" + propertyIds +
-				", scaleIds=" + scaleIds +
-				", variableIds=" + variableIds +
-				", dataTypes=" + dataTypes +
-				", variableTypes=" + variableTypes +
-				", propertyClasses=" + propertyClasses +
-			", names=" + names +
-			'}';
+		return new ToStringBuilder(this)
+			.append("programUuid", this.programUuid)
+			.append("fetchAll", this.fetchAll)
+			.append("favoritesOnly", this.favoritesOnly)
+			.append("methodIds", this.methodIds)
+			.append("propertyIds", this.propertyIds)
+			.append("scaleIds", this.scaleIds)
+			.append("variableIds", this.variableIds)
+			.append("excludedVariableIds", this.excludedVariableIds)
+			.append("dataTypes", this.dataTypes)
+			.append("variableTypes", this.variableTypes)
+			.append("propertyClasses", this.propertyClasses)
+			.append("names", this.names)
+			.append("datasetIds", this.datasetIds)
+			.toString();
 	}
 
 	@Override
 	public boolean equals(final Object o) {
 		if (this == o)
 			return true;
-		if (!(o instanceof VariableFilter))
+
+		if (o == null || this.getClass() != o.getClass())
 			return false;
 
 		final VariableFilter that = (VariableFilter) o;
 
-		if (isFetchAll() != that.isFetchAll())
-			return false;
-		if (isFavoritesOnly() != that.isFavoritesOnly())
-			return false;
-		if (getProgramUuid() != null ? !getProgramUuid().equals(that.getProgramUuid()) : that.getProgramUuid() != null)
-			return false;
-		if (getMethodIds() != null ? !getMethodIds().equals(that.getMethodIds()) : that.getMethodIds() != null)
-			return false;
-		if (getPropertyIds() != null ? !getPropertyIds().equals(that.getPropertyIds()) : that.getPropertyIds() != null)
-			return false;
-		if (getScaleIds() != null ? !getScaleIds().equals(that.getScaleIds()) : that.getScaleIds() != null)
-			return false;
-		if (getVariableIds() != null ? !getVariableIds().equals(that.getVariableIds()) : that.getVariableIds() != null)
-			return false;
-		if (getDataTypes() != null ? !getDataTypes().equals(that.getDataTypes()) : that.getDataTypes() != null)
-			return false;
-		if (getVariableTypes() != null ? !getVariableTypes().equals(that.getVariableTypes()) : that.getVariableTypes() != null)
-			return false;
-		if (getNames() != null ? !getNames().equals(that.getNames()) : that.getNames() != null)
-			return false;
-		return !(getPropertyClasses() != null ? !getPropertyClasses().equals(that.getPropertyClasses()) : that.getPropertyClasses() != null);
+		return new EqualsBuilder().append(this.fetchAll, that.fetchAll).append(this.favoritesOnly, that.favoritesOnly)
+			.append(this.programUuid, that.programUuid).append(this.methodIds, that.methodIds).append(this.propertyIds, that.propertyIds)
+			.append(this.scaleIds, that.scaleIds).append(this.variableIds, that.variableIds).append(this.excludedVariableIds, that.excludedVariableIds)
+			.append(this.dataTypes, that.dataTypes).append(this.variableTypes, that.variableTypes).append(this.propertyClasses, that.propertyClasses)
+			.append(this.names, that.names).append(this.datasetIds, that.datasetIds).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
-		int result = getProgramUuid() != null ? getProgramUuid().hashCode() : 0;
-		result = 31 * result + (isFetchAll() ? 1 : 0);
-		result = 31 * result + (isFavoritesOnly() ? 1 : 0);
-		result = 31 * result + (getMethodIds() != null ? getMethodIds().hashCode() : 0);
-		result = 31 * result + (getPropertyIds() != null ? getPropertyIds().hashCode() : 0);
-		result = 31 * result + (getScaleIds() != null ? getScaleIds().hashCode() : 0);
-		result = 31 * result + (getVariableIds() != null ? getVariableIds().hashCode() : 0);
-		result = 31 * result + (getDataTypes() != null ? getDataTypes().hashCode() : 0);
-		result = 31 * result + (getVariableTypes() != null ? getVariableTypes().hashCode() : 0);
-		result = 31 * result + (getPropertyClasses() != null ? getPropertyClasses().hashCode() : 0);
-		result = 31 * result + (getNames() != null ? getNames().hashCode() : 0);
-		return result;
+		return new HashCodeBuilder(17, 37).append(this.programUuid).append(this.fetchAll).append(this.favoritesOnly).append(this.methodIds).append(
+			this.propertyIds)
+			.append(this.scaleIds).append(this.variableIds).append(this.excludedVariableIds).append(this.dataTypes).append(this.variableTypes)
+			.append(this.propertyClasses)
+			.append(this.names).append(this.datasetIds).toHashCode();
 	}
 }
