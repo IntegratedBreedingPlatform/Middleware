@@ -8,6 +8,7 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface GermplasmAttributeService {
 
@@ -25,6 +26,6 @@ public interface GermplasmAttributeService {
 
 	List<Variable> getGermplasmAttributeVariables(List<Integer> gids, String programUUID);
 
-	List<Attribute> getAttributesByGID(Integer gid);
+	Map<Integer, List<AttributeDTO>> getAttributesByGIDsMap(List<Integer> gids);
 
 }

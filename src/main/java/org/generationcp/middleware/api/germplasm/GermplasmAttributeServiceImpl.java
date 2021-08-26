@@ -7,13 +7,20 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.util.VariableValueUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Transactional
 public class GermplasmAttributeServiceImpl implements GermplasmAttributeService {
@@ -65,11 +72,6 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	public List<Attribute> getAttributesByGID(final Integer gid) {
-		return this.daoFactory.getAttributeDAO().getByGID(gid);
-	}
-
-	@Override
 	public List<AttributeDTO> getAttributesByGUID(
 		final String germplasmUUID, final List<String> attributeDbIds, final Pageable pageable) {
 		return this.daoFactory.getAttributeDAO().getAttributesByGUIDAndAttributeIds(germplasmUUID, attributeDbIds, pageable);
@@ -83,6 +85,11 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	@Override
 	public List<Variable> getGermplasmAttributeVariables(final List<Integer> gids, final String programUUID) {
 		return this.daoFactory.getGermplasmDao().getGermplasmAttributeVariables(gids, programUUID);
+	}
+
+	@Override
+	public Map<Integer, List<AttributeDTO>> getAttributesByGIDsMap(final List<Integer> gids) {
+		return this.daoFactory.getAttributeDAO().getAttributesByGidsMap(gids);
 	}
 
 }
