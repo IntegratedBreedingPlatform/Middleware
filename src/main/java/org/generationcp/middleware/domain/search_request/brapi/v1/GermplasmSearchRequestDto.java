@@ -2,7 +2,6 @@ package org.generationcp.middleware.domain.search_request.brapi.v1;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
