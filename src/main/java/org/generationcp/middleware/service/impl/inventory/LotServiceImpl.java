@@ -59,7 +59,7 @@ public class LotServiceImpl implements LotService {
 
 	private DaoFactory daoFactory;
 
-	@Value("${export.max.total.results}")
+	@Value("${export.lot.max.total.results}")
 	public int maxTotalResults;
 
 	@Autowired
