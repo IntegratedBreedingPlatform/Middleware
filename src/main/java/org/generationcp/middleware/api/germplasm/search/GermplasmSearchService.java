@@ -16,9 +16,4 @@ public interface GermplasmSearchService {
 
 	long countSearchGermplasm(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 
-	List<UserDefinedField> getGermplasmNameTypes(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
-
-	Map<Integer, Map<Integer, String>> getGermplasmSearchAttributeValues(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
-
-	Map<Integer, Map<Integer, String>> getGermplasmSearchNameValues(GermplasmSearchRequest germplasmSearchRequest, String programUUID);
 }
