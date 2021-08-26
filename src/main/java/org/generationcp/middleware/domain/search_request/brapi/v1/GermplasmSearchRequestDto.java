@@ -10,7 +10,7 @@ import java.util.List;
 
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class GermplasmSearchRequestDto extends SearchRequestDto {
+public class GermplasmSearchRequestDto {
 
 	private int page;
 	private int pageSize;
