@@ -14,9 +14,6 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 
 	private final DaoFactory daoFactory;
 
-	@Value("${export.max.total.results}")
-	public int maxTotalResults;
-
 	public GermplasmSearchServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
@@ -24,13 +21,7 @@ public class GermplasmSearchServiceImpl implements GermplasmSearchService {
 	@Override
 	public List<GermplasmSearchResponse> searchGermplasm(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
 		final String programUUID) {
-		return this.daoFactory.getGermplasmSearchDAO().searchGermplasm(germplasmSearchRequest, pageable, programUUID, null);
-	}
-
-	@Override
-	public List<GermplasmSearchResponse> searchGermplasmApplyExportResultsLimit(final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable,
-		final String programUUID) {
-		return this.daoFactory.getGermplasmSearchDAO().searchGermplasm(germplasmSearchRequest, pageable, programUUID, this.maxTotalResults);
+		return this.daoFactory.getGermplasmSearchDAO().searchGermplasm(germplasmSearchRequest, pageable, programUUID);
 	}
 
 	@Override

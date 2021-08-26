@@ -140,7 +140,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	@Test
 	public void testSearchGermplasmExactMatchGID() {
 		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
 		this.assertPossibleGermplasmFields(results);
 		this.assertInventoryFields(results);
@@ -150,7 +150,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	public void testSearchGermplasmExactMatchGermplasmName() {
 		final GermplasmSearchRequest request =
 			this.createSearchRequest(this.preferredName.getNval(), SqlTextFilter.Type.EXACTMATCH);
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 		Assert.assertEquals(
 			"The results should contain one germplasm since there's only one test data with '" + this.preferredName.getNval()
 				+ "' name", 1, results.size());
@@ -168,7 +168,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		final GermplasmSearchRequest request =
 			this.createSearchRequest(germplasm.getPreferredName().getNval(), SqlTextFilter.Type.STARTSWITH);
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 		Assert.assertEquals(
 			"The results should contain one germplasm since there's only one test data with name that starts with " + germplasm
 				.getPreferredName().getNval(), 1, results.size());
@@ -179,7 +179,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	public void testSearchGermplasmContainsGermplasmName() {
 		final GermplasmSearchRequest request =
 			this.createSearchRequest(this.preferredName.getNval(), SqlTextFilter.Type.CONTAINS);
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 		Assert.assertEquals("The results should contain one germplasm since there's only one test data with name that contains "
 				+ this.preferredName.getNval(), 1, results.size());
 		this.assertPossibleGermplasmFields(results);
@@ -205,7 +205,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.GENERATIVE);
 		request.setIncludePedigree(includePedigree);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 
 		Assert.assertTrue("Result should include both child and parent germplasms", results.size() >= 2);
 		final List<Integer> resultGIDs = Lists.newArrayList();
@@ -227,7 +227,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.GENERATIVE);
 		request.setIncludePedigree(includePedigree);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 
 		final List<Integer> resultGIDs = Lists.newArrayList();
 		for (final GermplasmSearchResponse germplasm : results) {
@@ -250,7 +250,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.GENERATIVE);
 		request.setIncludePedigree(includePedigree);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 
 		final List<Integer> resultGIDs = Lists.newArrayList();
 		for (final GermplasmSearchResponse germplasm : results) {
@@ -273,7 +273,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.DERIVATIVE);
 		request.setIncludePedigree(includePedigree);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 
 		final List<Integer> resultGIDs = Lists.newArrayList();
 		for (final GermplasmSearchResponse germplasm : results) {
@@ -296,7 +296,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.BOTH);
 		request.setIncludePedigree(includePedigree);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 
 		final List<Integer> resultGIDs = Lists.newArrayList();
 		for (final GermplasmSearchResponse germplasm : results) {
@@ -319,7 +319,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		includePedigree.setType(GermplasmSearchRequest.IncludePedigree.Type.BOTH);
 		request.setIncludePedigree(includePedigree);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 
 		final List<Integer> resultGIDs = Lists.newArrayList();
 		for (final GermplasmSearchResponse germplasm : results) {
@@ -337,7 +337,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
 		request.setIncludeGroupMembers(true);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 		Assert.assertEquals("The result should contain 2 germplasms (one is the actual result and the other is the MG member)", 2,
 			results.size());
 		this.assertPossibleGermplasmFields(results);
@@ -377,7 +377,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
 
@@ -405,7 +405,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
 
@@ -426,7 +426,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
 
@@ -448,7 +448,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
 
@@ -471,7 +471,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
 
@@ -490,7 +490,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		propertyIds.add(NOTE_ATTRIBUTE);
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
 
@@ -509,7 +509,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		propertyIds.add(DERIVATIVE_NAME);
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
 
@@ -530,7 +530,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.PREFERRED_ID}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -553,7 +553,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.PREFERRED_ID}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -576,7 +576,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.PREFERRED_NAME}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -600,7 +600,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.PREFERRED_NAME}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -624,7 +624,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.GERMPLASM_DATE}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -648,7 +648,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.GERMPLASM_DATE}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -672,7 +672,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.LOCATION_NAME}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -696,7 +696,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.LOCATION_NAME}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -720,7 +720,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.METHOD_NAME}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -744,7 +744,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.METHOD_NAME}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -768,7 +768,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.METHOD_ABBREVIATION}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -792,7 +792,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.METHOD_ABBREVIATION}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -816,7 +816,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.METHOD_NUMBER}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -840,7 +840,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.METHOD_NUMBER}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -864,7 +864,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.METHOD_GROUP}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -888,7 +888,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {GermplasmSearchDAO.METHOD_GROUP}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -912,7 +912,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {NOTE_ATTRIBUTE.toUpperCase()}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -936,7 +936,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {NOTE_ATTRIBUTE.toUpperCase()}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -960,7 +960,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {DERIVATIVE_NAME}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -984,7 +984,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 		this.mockSortState(new String[] {DERIVATIVE_NAME}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -1004,7 +1004,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.mockSortState(new String[] {GermplasmSearchDAO.NAMES}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -1024,7 +1024,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.mockSortState(new String[] {GermplasmSearchDAO.NAMES}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -1044,7 +1044,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.mockSortState(new String[] {GermplasmSearchDAO.GID}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<Integer> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -1064,7 +1064,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.mockSortState(new String[] {GermplasmSearchDAO.GID}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<Integer> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -1084,7 +1084,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.mockSortState(new String[] {GermplasmSearchDAO.GROUP_ID}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<Integer> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -1104,7 +1104,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.mockSortState(new String[] {GermplasmSearchDAO.GROUP_ID}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<Integer> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -1124,7 +1124,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.mockSortState(new String[] {GermplasmSearchDAO.AVAIL_LOTS}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<Integer> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -1144,7 +1144,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.mockSortState(new String[] {GermplasmSearchDAO.AVAIL_LOTS}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<Integer> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -1164,7 +1164,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.mockSortState(new String[] {GermplasmSearchDAO.AVAIL_BALANCE}, new boolean[] {true});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -1184,7 +1184,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.mockSortState(new String[] {GermplasmSearchDAO.AVAIL_BALANCE}, new boolean[] {false});
 
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
@@ -1194,38 +1194,6 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		// Check if the list is in descending order
 		Assert.assertTrue(Ordering.natural().reverse().isOrdered(list));
 
-	}
-
-
-	@Test
-	public void testGetGermplasmAttributeValues() {
-		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
-		final List<Attribute> attributes = this.dao.getGermplasmSearchAttributeValues(request, null);
-		Assert.assertEquals(1, attributes.size());
-		Assert.assertEquals(attributes.get(0).getGermplasmId(), this.germplasmGID);
-		Assert.assertEquals(attributes.get(0).getAval(), this.attributeValue);
-
-	}
-
-	@Test
-	public void testGetGermplasmNameTypes() {
-		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
-		final List<UserDefinedField> userDefinedFields = this.dao.getGermplasmNameTypes(request, null);
-		Assert.assertEquals(2, userDefinedFields.size());
-		Assert.assertTrue(userDefinedFields.stream().allMatch(userDefinedField -> userDefinedField.getFtable().equals("NAMES")));
-		Assert.assertTrue(userDefinedFields.stream().anyMatch(userDefinedField -> userDefinedField.getFcode().equals("DRVNM")));
-		Assert.assertTrue(userDefinedFields.stream().anyMatch(userDefinedField -> userDefinedField.getFcode().equals("ACCNO")));
-
-	}
-
-	@Test
-	public void testGetGermplasmNameValues() {
-		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
-		final List<Name> names = this.dao.getGermplasmSearchNameValues(request, null);
-		Assert.assertEquals(3, names.size());
-		Assert.assertTrue(names.contains(this.preferredName));
-		Assert.assertTrue(names.contains(this.preferredId));
-		Assert.assertTrue(names.stream().allMatch(name1 -> name1.getGermplasm().getGid().equals(this.germplasmGID)));
 	}
 
 	@Test
@@ -1240,7 +1208,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();
 		request.setGermplasmListIds(Collections.singletonList(germplasmListId));
-		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID, null);
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 
 
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
