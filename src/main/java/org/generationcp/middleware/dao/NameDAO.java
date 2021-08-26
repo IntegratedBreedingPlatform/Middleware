@@ -53,7 +53,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		+ "    l.lname as locationName, " //
 		+ "    u.fcode as nameTypeCode, " //
 		+ "    u.fname as nameTypeDescription, " //
-		+ "    CASE WHEN n.nstat = 1 THEN true ELSE false END as preferred " //
+		+ "    CASE WHEN n.nstat = 1 THEN true ELSE false END as preferred,"
+		+ "    u.fldno as nameTypeId " //
 		+ "from " //
 		+ "    names n " //
 		+ "        left join " //
@@ -504,7 +505,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
 		sqlQuery.addScalar("id").addScalar("gid").addScalar("name").addScalar("date").addScalar("locationId").addScalar("locationName")
 			.addScalar("nameTypeCode")
-			.addScalar("nameTypeDescription").addScalar("preferred", new BooleanType());
+			.addScalar("nameTypeDescription").addScalar("preferred", new BooleanType()).addScalar("nameTypeId");
 		sqlQuery.setParameterList("gids", gids);
 		sqlQuery.setResultTransformer(Transformers.aliasToBean(GermplasmNameDto.class));
 		try {
