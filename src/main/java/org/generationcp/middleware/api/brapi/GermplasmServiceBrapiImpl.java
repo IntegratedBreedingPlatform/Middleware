@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.brapi;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
@@ -451,24 +452,12 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 	private Map<Integer, Map<String, String>> getAttributesNameAndValuesMapForGids(final List<Integer> gidList) {
 		final Map<Integer, Map<String, String>> attributeMap = new HashMap<>();
 
-		// retrieve attribute values
-		final List<Attribute> attributeList = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(gidList);
-		final Set<Integer> variableIds = attributeList.stream().map(Attribute::getTypeId).collect(Collectors.toSet());
+		final Map<Integer, List<AttributeDTO>> attributesByGidsMap = this.daoFactory.getAttributeDAO().getAttributesByGidsMap(gidList);
 
-		final VariableFilter variableFilter = new VariableFilter();
-		variableIds.forEach(variableFilter::addVariableId);
-
-		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
-		final Map<Integer, Variable> variableMap = variables.stream().collect(Collectors.toMap(Variable::getId, Function.identity()));
-
-		for (final Attribute attribute : attributeList) {
-			Map<String, String> attrByType = attributeMap.get(attribute.getGermplasmId());
-			if (attrByType == null) {
-				attrByType = new HashMap<>();
-			}
-			final String attributeType = variableMap.get(attribute.getTypeId()).getName();
-			attrByType.put(attributeType, attribute.getAval());
-			attributeMap.put(attribute.getGermplasmId(), attrByType);
+		for (final Map.Entry<Integer, List<AttributeDTO>> gidAttributes : attributesByGidsMap.entrySet()) {
+			final Map<String, String> attributeCodeValueMap = new HashMap<>();
+			gidAttributes.getValue().stream().forEach(attributeDTO -> attributeCodeValueMap.put(attributeDTO.getAttributeCode(), attributeDTO.getValue()));
+			attributeMap.put(gidAttributes.getKey(), attributeCodeValueMap);
 		}
 
 		return attributeMap;

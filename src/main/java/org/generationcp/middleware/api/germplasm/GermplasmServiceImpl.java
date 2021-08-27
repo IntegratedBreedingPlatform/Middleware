@@ -138,15 +138,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public String getPlotCodeValue(final Integer gid) {
-		final Term plotCodeVariable = this.getPlotCodeField();
-		final Optional<Attribute> plotCode = this.germplasmAttributeService.getAttributesByGID(gid)
-			.stream()
-			.filter(attribute -> attribute.getTypeId().equals(plotCodeVariable.getId()))
-			.findFirst();
-		if (plotCode.isPresent()) {
-			return plotCode.get().getAval();
-		}
-		return GermplasmListDataDAO.SOURCE_UNKNOWN;
+		final Map<Integer, String> plotCodeValues = this.getPlotCodeValues(Collections.singleton(gid));
+		return plotCodeValues.getOrDefault(gid, GermplasmListDataDAO.SOURCE_UNKNOWN);
 	}
 
 	@Override

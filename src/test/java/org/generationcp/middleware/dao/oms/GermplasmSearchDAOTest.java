@@ -1196,38 +1196,6 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 	}
 
-
-	@Test
-	public void testGetGermplasmAttributeValues() {
-		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
-		final List<Attribute> attributes = this.dao.getGermplasmSearchAttributeValues(request, null);
-		Assert.assertEquals(1, attributes.size());
-		Assert.assertEquals(attributes.get(0).getGermplasmId(), this.germplasmGID);
-		Assert.assertEquals(attributes.get(0).getAval(), this.attributeValue);
-
-	}
-
-	@Test
-	public void testGetGermplasmNameTypes() {
-		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
-		final List<UserDefinedField> userDefinedFields = this.dao.getGermplasmNameTypes(request, null);
-		Assert.assertEquals(2, userDefinedFields.size());
-		Assert.assertTrue(userDefinedFields.stream().allMatch(userDefinedField -> userDefinedField.getFtable().equals("NAMES")));
-		Assert.assertTrue(userDefinedFields.stream().anyMatch(userDefinedField -> userDefinedField.getFcode().equals("DRVNM")));
-		Assert.assertTrue(userDefinedFields.stream().anyMatch(userDefinedField -> userDefinedField.getFcode().equals("ACCNO")));
-
-	}
-
-	@Test
-	public void testGetGermplasmNameValues() {
-		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
-		final List<Name> names = this.dao.getGermplasmSearchNameValues(request, null);
-		Assert.assertEquals(3, names.size());
-		Assert.assertTrue(names.contains(this.preferredName));
-		Assert.assertTrue(names.contains(this.preferredId));
-		Assert.assertTrue(names.stream().allMatch(name1 -> name1.getGermplasm().getGid().equals(this.germplasmGID)));
-	}
-
 	@Test
 	public void testSearchGermplasmByList() {
 

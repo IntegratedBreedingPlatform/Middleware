@@ -25,7 +25,9 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link Attribute}.
@@ -158,7 +160,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			attributes = query.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getAttributesByGid(gidList=" + germplasmUUID + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error with getAttributesByGUIDAndAttributeIds(germplasmUUID=" + germplasmUUID + "): " + e.getMessage(), e);
 		}
 		return attributes;
 	}
@@ -200,6 +202,44 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			sql = sql + " AND u.cvterm_id IN ( :attributs )";
 		}
 		return sql;
+	}
+
+	public Map<Integer, List<AttributeDTO>> getAttributesByGidsMap(
+		final List<Integer> gids) {
+
+		final Map<Integer, List<AttributeDTO>> attributesMap = new HashMap<>();
+		try {
+			final 	String sql = "SELECT "
+				+ "    u.name AS attributeCode,"
+				+ "    u.cvterm_id AS attributeDbId,"
+				+ "    u.definition AS attributeName,"
+				+ "    a.adate AS determinedDate,"
+				+ "    a.aval AS value, "
+				+ "    a.gid AS gid "
+				+ " FROM"
+				+ "    atributs a"
+				+ "        INNER JOIN"
+				+ "    cvterm u ON a.atype = u.cvterm_id "
+				+ "        INNER JOIN"
+				+ "    germplsm g ON a.gid = g.gid "
+				+ " WHERE"
+				+ "    g.gid IN (:gids) ";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameterList("gids", gids);
+
+			final List<Object[]> rows = query.list();
+			for (final Object[] row : rows) {
+				final AttributeDTO attributeDTO = new AttributeDTO((String)row[0], (Integer)row[1], (String)row[2], (Integer)row[3], (String)row[4]);
+				final Integer gid = (Integer) row[5];
+				attributesMap.putIfAbsent(gid, new ArrayList<>());
+				attributesMap.get(gid).add(attributeDTO);
+			}
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getAttributesByGidsMap(gids=" + gids + "): " + e.getMessage(), e);
+		}
+		return attributesMap;
 	}
 
 	public long countByVariables(final List<Integer> variablesIds){

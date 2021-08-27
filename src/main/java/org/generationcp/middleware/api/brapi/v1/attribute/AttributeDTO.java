@@ -12,6 +12,19 @@ public class AttributeDTO {
 	private Integer determinedDate;
 	private String  value;
 
+	public AttributeDTO() {
+		super();
+	}
+
+	public AttributeDTO(final String attributeCode, final Integer attributeDbId, final String attributeName, final Integer determinedDate,
+		final String value) {
+		this.attributeCode = attributeCode;
+		this.attributeDbId = attributeDbId;
+		this.attributeName = attributeName;
+		this.determinedDate = determinedDate;
+		this.value = value;
+	}
+
 	public String getAttributeCode() {
 		return this.attributeCode;
 	}

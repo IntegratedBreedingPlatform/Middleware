@@ -59,7 +59,7 @@ public class LotServiceImpl implements LotService {
 
 	private DaoFactory daoFactory;
 
-	@Value("${export.max.total.results}")
+	@Value("${export.lot.max.total.results}")
 	public int maxTotalResults;
 
 	@Autowired
@@ -125,7 +125,7 @@ public class LotServiceImpl implements LotService {
 	public void updateLots(final String programUUID, final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotUpdateRequestDto) {
 		final List<Lot> lots =
 			this.daoFactory.getLotDao()
-				.filterByColumnValues("lotUuId", lotDtos.stream().map(extendedLotDto -> extendedLotDto.getLotUUID()).collect(
+				.filterByColumnValues("lotUuId", lotDtos.stream().map(ExtendedLotDto::getLotUUID).collect(
 					Collectors.toList()));
 		if (lotUpdateRequestDto.getSingleInput() != null) {
 			this.updateLots(lots, lotUpdateRequestDto.getSingleInput());
@@ -156,10 +156,10 @@ public class LotServiceImpl implements LotService {
 	private void updateLots(final String programUUID, final List<Lot> lots, final LotMultiUpdateRequestDto lotMultiUpdateRequestDto) {
 		try {
 			final Map<String, Integer> locationsByLocationAbbrMap =
-				buildLocationsByLocationAbbrMap(programUUID, lotMultiUpdateRequestDto.getLotList().stream()
+				this.buildLocationsByLocationAbbrMap(programUUID, lotMultiUpdateRequestDto.getLotList().stream()
 					.map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr)
 					.collect(Collectors.toList()));
-			final Map<String, Integer> unitMapByName = buildUnitsByNameMap();
+			final Map<String, Integer> unitMapByName = this.buildUnitsByNameMap();
 			final Map<String, LotMultiUpdateRequestDto.LotUpdateDto> lotUpdateMapByLotUID =
 				Maps.uniqueIndex(lotMultiUpdateRequestDto.getLotList(), LotMultiUpdateRequestDto.LotUpdateDto::getLotUID);
 
@@ -180,7 +180,7 @@ public class LotServiceImpl implements LotService {
 
 				this.daoFactory.getLotDao().saveOrUpdate(lot);
 			}
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
 			throw new MiddlewareRequestException("", "common.middleware.error.update.lots");
 		}
@@ -206,11 +206,11 @@ public class LotServiceImpl implements LotService {
 	public List<String> saveLots(final CropType cropType, final String programUUID, final Integer userId,
 		final List<LotItemDto> lotItemDtos) {
 		try {
-			final Map<String, Integer> locationsByLocationAbbrMap = buildLocationsByLocationAbbrMap(programUUID, lotItemDtos.stream()
+			final Map<String, Integer> locationsByLocationAbbrMap = this.buildLocationsByLocationAbbrMap(programUUID, lotItemDtos.stream()
 				.map(LotItemDto::getStorageLocationAbbr)
 				.collect(Collectors.toList()));
 
-			final Map<String, Integer> unitsByNameMap = buildUnitsByNameMap();
+			final Map<String, Integer> unitsByNameMap = this.buildUnitsByNameMap();
 
 			final List<String> lotUUIDs = new ArrayList<>();
 
@@ -256,7 +256,7 @@ public class LotServiceImpl implements LotService {
 					transaction.setQuantity(initialBalance);
 					transaction.setCommitmentDate(0);
 
-					daoFactory.getTransactionDAO().save(transaction);
+					this.daoFactory.getTransactionDAO().save(transaction);
 				}
 			}
 			return lotUUIDs;
@@ -268,12 +268,12 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public List<LotDto> getLotsByStockIds(final List<String> stockIds) {
-		return daoFactory.getLotDao().getLotsByStockIds(stockIds);
+		return this.daoFactory.getLotDao().getLotsByStockIds(stockIds);
 	}
 
 	@Override
 	public LotSearchMetadata getLotSearchMetadata(final LotsSearchDto lotsSearchDto) {
-		return new LotSearchMetadata(daoFactory.getLotDao().getLotsCountPerScaleName(lotsSearchDto));
+		return new LotSearchMetadata(this.daoFactory.getLotDao().getLotsCountPerScaleName(lotsSearchDto));
 	}
 
 	@Override
@@ -303,7 +303,7 @@ public class LotServiceImpl implements LotService {
 			discardTransaction.setTransactionDate(new Date());
 			discardTransaction.setQuantity(-1 * extendedLotDto.getAvailableBalance());
 			discardTransaction.setCommitmentDate(Util.getCurrentDateAsIntegerValue());
-			daoFactory.getTransactionDAO().save(discardTransaction);
+			this.daoFactory.getTransactionDAO().save(discardTransaction);
 		}
 
 		this.daoFactory.getLotDao().closeLots(lotIds);
@@ -322,7 +322,7 @@ public class LotServiceImpl implements LotService {
 					userId, null, keepLotId, extendedLotDto.getActualBalance());
 				transaction.setSourceType(TransactionSourceType.MERGED_LOT.name());
 				transaction.setSourceId(extendedLotDto.getLotId());
-				daoFactory.getTransactionDAO().save(transaction);
+				this.daoFactory.getTransactionDAO().save(transaction);
 			});
 
 		//Close the discarded lots
