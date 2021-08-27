@@ -32,7 +32,7 @@ import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -1181,118 +1181,129 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	private void addGermplasmSearchParameters(final SqlQueryParamBuilder paramBuilder,
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
-		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getPreferredName())) {
-			paramBuilder.setParameter("preferredName", germplasmSearchRequestDTO.getPreferredName() + "%"); //
+		final GermplasmSearchRequest germplasmSearchRequest) {
+		if (StringUtils.isNoneBlank(germplasmSearchRequest.getPreferredName())) {
+			paramBuilder.setParameter("preferredName", germplasmSearchRequest.getPreferredName() + "%"); //
 		}
 
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getAccessionNumbers())) {
-			paramBuilder.setParameterList("accessionNumbers", germplasmSearchRequestDTO.getAccessionNumbers());
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getAccessionNumbers())) {
+			paramBuilder.setParameterList("accessionNumbers", germplasmSearchRequest.getAccessionNumbers());
 		}
 
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getCommonCropNames())) {
-			paramBuilder.setParameterList("commonCropNames", germplasmSearchRequestDTO.getCommonCropNames());
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getCommonCropNames())) {
+			paramBuilder.setParameterList("commonCropNames", germplasmSearchRequest.getCommonCropNames());
 		}
 
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmDbIds())) {
-			paramBuilder.setParameterList("germplasmDbIds", germplasmSearchRequestDTO.getGermplasmDbIds());
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getGermplasmDbIds())) {
+			paramBuilder.setParameterList("germplasmDbIds", germplasmSearchRequest.getGermplasmDbIds());
 		}
 
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmGenus())) {
-			paramBuilder.setParameterList("germplasmGenus", germplasmSearchRequestDTO.getGermplasmGenus());
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getGenus())) {
+			paramBuilder.setParameterList("germplasmGenus", germplasmSearchRequest.getGenus());
 		}
 
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmPUIs())) {
-			paramBuilder.setParameterList("germplasmPUIs", germplasmSearchRequestDTO.getGermplasmPUIs());
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getGermplasmPUIs())) {
+			paramBuilder.setParameterList("germplasmPUIs", germplasmSearchRequest.getGermplasmPUIs());
 		}
 
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmNames())) {
-			paramBuilder.setParameterList("germplasmNames", germplasmSearchRequestDTO.getGermplasmNames());
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getSynonyms())) {
+			paramBuilder.setParameterList("synonyms", germplasmSearchRequest.getSynonyms());
 		}
 
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
-			paramBuilder.setParameterList("germplasmSpecies", germplasmSearchRequestDTO.getGermplasmSpecies());
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getGermplasmNames())) {
+			paramBuilder.setParameterList("germplasmNames", germplasmSearchRequest.getGermplasmNames());
 		}
 
-		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getStudyDbId())) {
-			paramBuilder.setParameter("studyDbId", germplasmSearchRequestDTO.getStudyDbId());
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getSpecies())) {
+			paramBuilder.setParameterList("germplasmSpecies", germplasmSearchRequest.getSpecies());
 		}
 
-		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getParentDbId())) {
-			paramBuilder.setParameter("parentDbId", germplasmSearchRequestDTO.getParentDbId());
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getStudyDbIds())) {
+			paramBuilder.setParameterList("studyDbIds", germplasmSearchRequest.getStudyDbIds());
 		}
 
-		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getProgenyDbId())) {
-			paramBuilder.setParameter("progenyDbId", germplasmSearchRequestDTO.getProgenyDbId());
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getParentDbIds())) {
+			paramBuilder.setParameterList("parentDbIds", germplasmSearchRequest.getParentDbIds());
 		}
 
-		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getExternalReferenceSource())) {
-			paramBuilder.setParameter("referenceSource", germplasmSearchRequestDTO.getExternalReferenceSource());
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getProgenyDbIds())) {
+			paramBuilder.setParameterList("progenyDbIds", germplasmSearchRequest.getProgenyDbIds());
 		}
 
-		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getExternalReferenceId())) {
-			paramBuilder.setParameter("referenceId", germplasmSearchRequestDTO.getExternalReferenceId());
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getExternalReferenceSources())) {
+			paramBuilder.setParameterList("referenceSources", germplasmSearchRequest.getExternalReferenceSources());
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getExternalReferenceIDs())) {
+			paramBuilder.setParameterList("referenceIds", germplasmSearchRequest.getExternalReferenceIDs());
 		}
 	}
 
 	// These are appended to the MAIN where clause because they are filters on (or EXISTS clause related to) the main germplasm object
 	private void addGermplasmSearchRequestFilters(final SqlQueryParamBuilder paramBuilder,
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmDbIds())) {
+		final GermplasmSearchRequest germplasmSearchRequest) {
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getGermplasmDbIds())) {
 			paramBuilder.append(" AND g.germplsm_uuid IN (:germplasmDbIds) ");
 		}
 
 		// Search synonyms or non-default names
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmNames())) {
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getSynonyms())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT n.gid ");
-			paramBuilder.append(" FROM names n WHERE n.nval IN (:germplasmNames) and n.nstat != 9 and n.nstat != 1 ) "); //
+			paramBuilder.append(" FROM names n WHERE n.nval IN (:synonyms) and n.nstat != 9 and n.nstat != 1 ) "); //
 		}
 
-		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getStudyDbId())) {
+		// Search preferred names
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getGermplasmNames())) {
+			paramBuilder.append(" AND g.gid IN ( SELECT n.gid ");
+			paramBuilder.append(" FROM names n WHERE n.nstat = 1 AND n.nval in (:germplasmNames) ) ");
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getStudyDbIds())) {
 			paramBuilder.append(" AND g.gid IN ( "
 				+ "  SELECT s.dbxref_id from stock s "
 				+ "   INNER JOIN nd_experiment e ON e.stock_id = s.stock_id "
-				+ "   WHERE e.nd_geolocation_id = :studyDbId ) ");
+				+ "   WHERE e.nd_geolocation_id in (:studyDbIds)) ");
 		}
 
-		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getParentDbId())) {
-			paramBuilder.append(" AND (g.gpid1 = (select parent.gid from germplsm parent where parent.germplsm_uuid = :parentDbId) "
-				+ "OR g.gpid2 = (select parent.gid from germplsm parent where parent.germplsm_uuid = :parentDbId) "
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getParentDbIds())) {
+			paramBuilder.append(" AND (g.gpid1 = (select parent.gid from germplsm parent where parent.germplsm_uuid in (:parentDbIds)) "
+				+ "OR g.gpid2 = (select parent.gid from germplsm parent where parent.germplsm_uuid in (:parentDbIds)) "
 				+ "OR g.gid = (Select p.gid from progntrs p INNER JOIN germplsm parent ON p.pid = parent.gid "
-				+ " WHERE parent.germplsm_uuid = :parentDbId )) AND g.gnpgs >= 1");
+				+ " WHERE parent.germplsm_uuid in (:parentDbIds))) AND g.gnpgs >= 1");
 		}
 
-		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getProgenyDbId())) {
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getProgenyDbIds())) {
 			paramBuilder
-				.append(" AND ( g.gid = (SELECT gpid1 from germplsm child WHERE child.germplsm_uuid = :progenyDbId AND child.gnpgs >= 1) "
-					+ "OR g. gid = (SELECT gpid2 from germplsm child WHERE child.germplsm_uuid = :progenyDbId AND child.gnpgs >= 1) "
+				.append(" AND ( g.gid = (SELECT gpid1 from germplsm child WHERE child.germplsm_uuid in (:progenyDbIds) AND child.gnpgs >= 1) "
+					+ "OR g. gid = (SELECT gpid2 from germplsm child WHERE child.germplsm_uuid in (:progenyDbIds) AND child.gnpgs >= 1) "
 					+ "OR g.gid = (Select p.pid from progntrs p INNER JOIN germplsm child ON p.gid = child.gid "
-					+ "WHERE child.germplsm_uuid = :progenyDbId )) ");
+					+ "WHERE child.germplsm_uuid in (:progenyDbIds))) ");
 		}
 
-		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getExternalReferenceId())) {
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getExternalReferenceIDs())) {
 			paramBuilder.append(" AND g.gid IN ( ");
-			paramBuilder.append(" SELECT ref.gid FROM external_reference_germplasm ref WHERE ref.reference_id = :referenceId) "); //
+			paramBuilder.append(" SELECT ref.gid FROM external_reference_germplasm ref WHERE ref.reference_id in (:referenceIds)) "); //
 		}
 
-		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getExternalReferenceSource())) {
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getExternalReferenceSources())) {
 			paramBuilder.append(" AND g.gid IN (  ");
-			paramBuilder.append(" SELECT ref.gid FROM external_reference_germplasm ref WHERE ref.reference_source = :referenceSource) "); //
+			paramBuilder.append(
+				" SELECT ref.gid FROM external_reference_germplasm ref WHERE ref.reference_source in (:referenceSources)) "); //
 		}
 
-		if (StringUtils.isNoneBlank(germplasmSearchRequestDTO.getPreferredName())) {
+		if (StringUtils.isNoneBlank(germplasmSearchRequest.getPreferredName())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT n.gid ");
 			paramBuilder.append(" FROM names n WHERE n.nstat = 1 AND n.nval like :preferredName ) ");
 		}
 
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getAccessionNumbers())) {
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getAccessionNumbers())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT n.gid  ");
 			paramBuilder.append(" FROM names n ");
 			paramBuilder.append(" INNER JOIN udflds u on n.ntype = u.fldno AND u.fcode = '" + GermplasmImportRequest.ACCNO_NAME_TYPE + "'");
 			paramBuilder.append(" WHERE n.nval IN (:accessionNumbers)  ) ");
 		}
 
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getCommonCropNames())) {
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getCommonCropNames())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT a.gid  ");
 			paramBuilder.append(" FROM atributs a");
 			paramBuilder.append(
@@ -1301,21 +1312,21 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			paramBuilder.append(" WHERE a.aval IN (:commonCropNames)  ) ");
 		}
 
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmGenus())) {
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getGenus())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT n.gid  ");
 			paramBuilder.append(" FROM names n ");
 			paramBuilder.append(" INNER JOIN udflds u on n.ntype = u.fldno AND u.fcode = '" + GermplasmImportRequest.GENUS_NAME_TYPE + "'");
 			paramBuilder.append(" WHERE n.nval IN (:germplasmGenus)  ) ");
 		}
 
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmPUIs())) {
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getGermplasmPUIs())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT n.gid  ");
 			paramBuilder.append(" FROM names n ");
 			paramBuilder.append(" INNER JOIN udflds u on n.ntype = u.fldno AND u.fcode = '" + GermplasmImportRequest.PUI_NAME_TYPE + "'");
 			paramBuilder.append(" WHERE n.nval IN (:germplasmPUIs)  ) ");
 		}
 
-		if (!CollectionUtils.isEmpty(germplasmSearchRequestDTO.getGermplasmSpecies())) {
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getSpecies())) {
 			paramBuilder.append(" AND g.gid IN ( SELECT a.gid  ");
 			paramBuilder.append(" FROM atributs a");
 			paramBuilder.append(
@@ -1327,12 +1338,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public List<GermplasmDTO> getGermplasmDTOList(
-		final GermplasmSearchRequestDto germplasmSearchRequestDTO, final Pageable pageable) {
+		final GermplasmSearchRequest germplasmSearchRequest, final Pageable pageable) {
 
 		try {
 			// Apply search filter and pagination on main germplasm entity
-			final SQLQuery filterQuery = this.getSession().createSQLQuery(this.buildFilterGermplasmQuery(germplasmSearchRequestDTO));
-			this.addGermplasmSearchParameters(new SqlQueryParamBuilder(filterQuery), germplasmSearchRequestDTO);
+			final SQLQuery filterQuery = this.getSession().createSQLQuery(this.buildFilterGermplasmQuery(germplasmSearchRequest));
+			this.addGermplasmSearchParameters(new SqlQueryParamBuilder(filterQuery), germplasmSearchRequest);
 			addPaginationToSQLQuery(filterQuery, pageable);
 			final List<String> gids = filterQuery.list();
 
@@ -1385,12 +1396,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			+ "     LEFT JOIN nd_experiment ne on source.nd_experiment_id = ne.nd_experiment_id ";
 	}
 
-	private String buildFilterGermplasmQuery(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
+	private String buildFilterGermplasmQuery(final GermplasmSearchRequest germplasmSearchRequest) {
 		final StringBuilder queryBuilder = new StringBuilder();
 		queryBuilder.append(" SELECT g.gid ");
 		queryBuilder.append(" FROM germplsm g ");
 		queryBuilder.append(" WHERE g.deleted = 0 AND g.grplce = 0 ");
-		this.addGermplasmSearchRequestFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequestDTO);
+		this.addGermplasmSearchRequestFilters(new SqlQueryParamBuilder(queryBuilder), germplasmSearchRequest);
 		return queryBuilder.toString();
 	}
 
@@ -1404,17 +1415,17 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		return queryBuilder.toString();
 	}
 
-	public long countGermplasmDTOs(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.buildCountGermplasmDTOsQuery((germplasmSearchRequestDTO)));
-		this.addGermplasmSearchParameters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequestDTO);
+	public long countGermplasmDTOs(final GermplasmSearchRequest germplasmSearchRequest) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.buildCountGermplasmDTOsQuery((germplasmSearchRequest)));
+		this.addGermplasmSearchParameters(new SqlQueryParamBuilder(sqlQuery), germplasmSearchRequest);
 
 		final long count = ((BigInteger) sqlQuery.uniqueResult()).longValue();
 		/* For unfiltered search and result of initial non-deleted germplasm count is < 5000, query the actual
 		   non-deleted germplasm count. We are sure at this point that the germplasm DB is small enough for "g.deleted = 0 and grplce = 0"
 		   clause to run in performant manner
 		 */
-		if (count < 5000 && germplasmSearchRequestDTO.noFiltersSpecified()) {
-			final SQLQuery sqlQuery2 = this.getSession().createSQLQuery(this.getCountFilteredGermplasmQuery((germplasmSearchRequestDTO)));
+		if (count < 5000 && germplasmSearchRequest.noFiltersSpecified()) {
+			final SQLQuery sqlQuery2 = this.getSession().createSQLQuery(this.getCountFilteredGermplasmQuery((germplasmSearchRequest)));
 			return ((BigInteger) sqlQuery2.uniqueResult()).longValue();
 		}
 		return count;
@@ -1427,16 +1438,16 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	 Workaround is for unfiltered search we "limit" count results to 5000 by getting the smaller of 5000 and
 	 count of ALL germplasm (We basically avoid running the "g.deleted = 0 and grplce = 0" clause for unfiltered search)
 	 */
-	String buildCountGermplasmDTOsQuery(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
-		if (germplasmSearchRequestDTO.noFiltersSpecified()) {
+	String buildCountGermplasmDTOsQuery(final GermplasmSearchRequest germplasmSearchRequest) {
+		if (germplasmSearchRequest.noFiltersSpecified()) {
 			return "SELECT LEAST(count(1), 5000) FROM germplsm ";
 		} else {
-			return this.getCountFilteredGermplasmQuery(germplasmSearchRequestDTO);
+			return this.getCountFilteredGermplasmQuery(germplasmSearchRequest);
 		}
 	}
 
-	private String getCountFilteredGermplasmQuery(final GermplasmSearchRequestDto germplasmSearchRequestDTO) {
-		return "SELECT COUNT(1) FROM ( " + this.buildFilterGermplasmQuery(germplasmSearchRequestDTO) + ") as T ";
+	private String getCountFilteredGermplasmQuery(final GermplasmSearchRequest germplasmSearchRequest) {
+		return "SELECT COUNT(1) FROM ( " + this.buildFilterGermplasmQuery(germplasmSearchRequest) + ") as T ";
 	}
 
 	public long countGermplasmByStudy(final Integer studyDbId) {
@@ -1482,7 +1493,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private SQLQuery addScalarsForGermplasmDTO(final SQLQuery sqlQuery) {
 		return sqlQuery.addScalar("germplasmDbId").addScalar("gid").addScalar("accessionNumber").addScalar("acquisitionDate")
-			.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmPUI").addScalar("germplasmSeedSource")
+			.addScalar("countryOfOriginCode").addScalar("germplasmName").addScalar("genus").addScalar("germplasmPUI")
+			.addScalar("germplasmSeedSource")
 			.addScalar("species").addScalar("speciesAuthority").addScalar("subtaxa").addScalar("subtaxaAuthority")
 			.addScalar("instituteCode").addScalar("instituteName").addScalar("germplasmOrigin").addScalar("commonCropName")
 			.addScalar("breedingMethodDbId");
@@ -1548,7 +1560,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	private void addScalarsToFindGermplasmMatchesQuery(final SQLQuery sqlQuery) {
-		sqlQuery.addScalar("gid").addScalar("germplasmUUID").addScalar("preferredName").addScalar("germplasmPUI").addScalar("creationDate").addScalar("reference")
+		sqlQuery.addScalar("gid").addScalar("germplasmUUID").addScalar("preferredName").addScalar("germplasmPUI").addScalar("creationDate")
+			.addScalar("reference")
 			.addScalar("breedingLocationId")
 			.addScalar("breedingLocation").addScalar("breedingMethodId").addScalar("breedingMethod")
 			.addScalar("isGroupedLine", new BooleanType())
