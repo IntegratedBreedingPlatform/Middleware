@@ -4,7 +4,6 @@ import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
 import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.pojos.Attribute;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
