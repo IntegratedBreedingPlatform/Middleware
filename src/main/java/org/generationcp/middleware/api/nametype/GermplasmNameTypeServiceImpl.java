@@ -76,10 +76,10 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
-	public List<GermplasmNameTypeDTO> getNameTypes(final Pageable pageable) {
+	public List<GermplasmNameTypeDTO> searchNameTypes(final NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest, final Pageable pageable) {
 		final Map<Integer, String> userMap = this.userService.getAllUserIDFullNameMap();
 
-		final List<UserDefinedField> userDefinedFields = this.daoFactory.getUserDefinedFieldDAO().getNameTypes(pageable);
+		final List<UserDefinedField> userDefinedFields = this.daoFactory.getUserDefinedFieldDAO().searchNameTypes(nameTypeMetadataFilterRequest, pageable);
 		if(!userDefinedFields.isEmpty()){
 			return userDefinedFields.stream().map(
 				userDefinedField ->
@@ -92,8 +92,8 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
-	public long countAllNameTypes() {
-		return this.daoFactory.getUserDefinedFieldDAO().countAllNameTypes();
+	public long countSearchNameTypes(final NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest) {
+		return this.daoFactory.getUserDefinedFieldDAO().countSearchNameTypes(nameTypeMetadataFilterRequest);
 	}
 
 	@Override
