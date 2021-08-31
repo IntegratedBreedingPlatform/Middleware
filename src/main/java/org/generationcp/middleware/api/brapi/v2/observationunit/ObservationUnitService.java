@@ -4,6 +4,8 @@ import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public interface ObservationUnitService {
 
@@ -29,5 +31,8 @@ public interface ObservationUnitService {
 	long countObservationUnits(ObservationUnitSearchRequestDTO requestDTO);
 
 	List<String> importObservationUnits(String crop, List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos);
+
+	Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocationsAndLevelCodes(Set<String> geolocationIds,
+		Set<String> levelCodes);
 
 }
