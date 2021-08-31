@@ -86,8 +86,50 @@ public class GermplasmNameTypeServiceImplIntegrationTest extends IntegrationTest
 
 	@Test
 	public void testGetNameTypes_Pagination_Ok() {
-		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmNameTypeService.getNameTypes(new PageRequest(0, 10));
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmNameTypeService.searchNameTypes(new NameTypeMetadataFilterRequest(), new PageRequest(0, 10));
 		Assert.assertThat(10, equalTo(germplasmNameTypeDTOs.size()));
+	}
+
+	@Test
+	public void testSearchNameType_FilteredByName_ok() {
+		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO(
+			GermplasmNameTypeServiceImplIntegrationTest.CODE, GermplasmNameTypeServiceImplIntegrationTest.NAME, //
+			GermplasmNameTypeServiceImplIntegrationTest.DESCRIPTION); //
+		final Integer nameTypeId = this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO);
+
+		final  NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest =new NameTypeMetadataFilterRequest();
+		nameTypeMetadataFilterRequest.setName(germplasmNameTypeRequestDTO.getName());
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmNameTypeService.searchNameTypes(nameTypeMetadataFilterRequest, new PageRequest(0, 10));
+		Assert.assertThat(1, equalTo(germplasmNameTypeDTOs.size()));
+		Assert.assertThat(germplasmNameTypeRequestDTO.getName(), equalTo(germplasmNameTypeDTOs.get(0).getName()));
+	}
+
+	@Test
+	public void testSearchNameType_FilteredByCode_ok() {
+		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO(
+			GermplasmNameTypeServiceImplIntegrationTest.CODE, GermplasmNameTypeServiceImplIntegrationTest.NAME, //
+			GermplasmNameTypeServiceImplIntegrationTest.DESCRIPTION); //
+		final Integer nameTypeId = this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO);
+
+		final  NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest =new NameTypeMetadataFilterRequest();
+		nameTypeMetadataFilterRequest.setCode(germplasmNameTypeRequestDTO.getCode());
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmNameTypeService.searchNameTypes(nameTypeMetadataFilterRequest, new PageRequest(0, 10));
+		Assert.assertThat(1, equalTo(germplasmNameTypeDTOs.size()));
+		Assert.assertThat(germplasmNameTypeRequestDTO.getCode(), equalTo(germplasmNameTypeDTOs.get(0).getCode()));
+	}
+
+	@Test
+	public void testSearchNameType_FilteredByDescription_ok() {
+		final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO = this.buildGermplasmNameTypeRequestDTO(
+			GermplasmNameTypeServiceImplIntegrationTest.CODE, GermplasmNameTypeServiceImplIntegrationTest.NAME, //
+			GermplasmNameTypeServiceImplIntegrationTest.DESCRIPTION); //
+		final Integer nameTypeId = this.germplasmNameTypeService.createNameType(germplasmNameTypeRequestDTO);
+
+		final  NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest =new NameTypeMetadataFilterRequest();
+		nameTypeMetadataFilterRequest.setDescription(germplasmNameTypeRequestDTO.getDescription());
+		final List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = this.germplasmNameTypeService.searchNameTypes(nameTypeMetadataFilterRequest, new PageRequest(0, 10));
+		Assert.assertThat(1, equalTo(germplasmNameTypeDTOs.size()));
+		Assert.assertThat(germplasmNameTypeRequestDTO.getDescription(), equalTo(germplasmNameTypeDTOs.get(0).getDescription()));
 	}
 
 	private void verifyAssertGermplasmNameTypeRequestDTO(final Integer nameTypeId, final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO,
