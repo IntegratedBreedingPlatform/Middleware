@@ -238,7 +238,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	}
 
 	@Override
-	public Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocationsAndLevelCodes(
+	public Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocations(
 		final Set<String> geolocationIds) {
 		return this.daoFactory.getExperimentPropertyDao().getPlotObservationLevelRelationshipsByGeolocations(geolocationIds);
 	}
