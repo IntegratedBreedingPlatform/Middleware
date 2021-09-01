@@ -137,10 +137,19 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	public String getFilePath(final String observationUnitId, final String fileName) {
 		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId);
 		final DmsProject study = experimentModel.getProject().getStudy();
-		return FILE_PATH_PREFIX_PROGRAMUUID + study.getProgramUUID()
+		final String path = FILE_PATH_PREFIX_PROGRAMUUID + study.getProgramUUID()
 			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_STUDYID + study.getProjectId()
 			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_OBSUNITUUID + observationUnitId
 			+ FILE_PATH_SLASH + fileName;
+		this.validatePathNotExists(path);
+		return path;
+	}
+
+	private void validatePathNotExists(final String path) {
+		final FileMetadata fileMetadata = this.daoFactory.getFileMetadataDAO().getByPath(path);
+		if (fileMetadata != null) {
+			throw new MiddlewareRequestException("", "filemetadata.path.overwrite");
+		}
 	}
 
 	@Override
