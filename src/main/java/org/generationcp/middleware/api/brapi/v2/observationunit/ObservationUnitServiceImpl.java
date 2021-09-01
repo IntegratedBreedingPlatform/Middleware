@@ -239,9 +239,8 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	@Override
 	public Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocationsAndLevelCodes(
-		final Set<String> geolocationIds, final Set<String> levelCodes) {
-		return this.daoFactory.getExperimentPropertyDao().getPlotObservationLevelRelationshipsByGeolocations(geolocationIds
-		);
+		final Set<String> geolocationIds) {
+		return this.daoFactory.getExperimentPropertyDao().getPlotObservationLevelRelationshipsByGeolocations(geolocationIds);
 	}
 
 	private void setJsonProps(final ExperimentModel model, final ObservationUnitImportRequestDto dto) {

@@ -32,7 +32,6 @@ public interface ObservationUnitService {
 
 	List<String> importObservationUnits(String crop, List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos);
 
-	Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocationsAndLevelCodes(Set<String> geolocationIds,
-		Set<String> levelCodes);
+	Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocationsAndLevelCodes(Set<String> geolocationIds);
 
 }
