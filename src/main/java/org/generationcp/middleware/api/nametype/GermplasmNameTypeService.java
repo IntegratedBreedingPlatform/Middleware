@@ -16,9 +16,9 @@ public interface GermplasmNameTypeService {
 
 	Integer createNameType(GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO);
 
-	List<GermplasmNameTypeDTO> getNameTypes(Pageable pageable);
+	List<GermplasmNameTypeDTO> searchNameTypes(NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest, Pageable pageable);
 
-	long countAllNameTypes();
+	long countSearchNameTypes(NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest);
 
 	List<GermplasmNameTypeDTO> filterGermplasmNameTypes(Set<String> codes);
 
