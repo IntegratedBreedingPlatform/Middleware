@@ -8,9 +8,9 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -20,11 +20,11 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.Service;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceSearchRequest;
-import org.generationcp.middleware.service.impl.study.generation.ExperimentModelGenerator;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
@@ -35,9 +35,6 @@ public class StudyServiceImpl extends Service implements StudyService {
 
 	@Resource
 	private StudyDataManager studyDataManager;
-
-	@Resource
-	private ExperimentModelGenerator experimentModelGenerator;
 
 	private static LoadingCache<StudyKey, String> studyIdToProgramIdCache;
 

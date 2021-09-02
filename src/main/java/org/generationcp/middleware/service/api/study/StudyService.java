@@ -38,8 +38,6 @@ public interface StudyService {
 
 	long countFilteredStudies(String programUUID, StudySearchRequest studySearchRequest);
 
-	List<StudySummary> saveStudies(String crop, List<TrialImportRequestDTO> trialImportRequestDtoList, Integer userId);
-
 	/**
 	 * Soft-delete all program studies
 	 *
