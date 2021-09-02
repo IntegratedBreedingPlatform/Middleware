@@ -77,4 +77,23 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			.add(Restrictions.eq("path", path))
 			.uniqueResult();
 	}
+
+	public void detachVariables(final Integer datasetId, final List<Integer> variableIds) {
+		this.getSession().createSQLQuery("delete " //
+			+ " from file_metadata_cvterm " //
+			+ " where file_metadata_id in ( " //
+			+ "     select T.file_id " //
+			+ "     from ( " //
+			+ "         select fm.file_id " //
+			+ "         from file_metadata fm " //
+			+ "                  inner join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
+			+ "                  inner join project dataset on ne.project_id = dataset.project_id " //
+			+ "                  inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
+			+ "         where dataset.project_id = :datasetId and fmc.cvterm_id in (:variableIds) " //
+			+ "     ) T " //
+			+ " ) ")
+			.setParameter("datasetId", datasetId)
+			.setParameterList("variableIds", variableIds)
+			.executeUpdate();
+	}
 }
