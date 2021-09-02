@@ -71,4 +71,10 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			paramBuilder.setParameter("observationUnitUUID", observationUnitUUID);
 		}
 	}
+
+	public FileMetadata getByPath(final String path) {
+		return (FileMetadata) this.getSession().createCriteria(this.getPersistentClass())
+			.add(Restrictions.eq("path", path))
+			.uniqueResult();
+	}
 }
