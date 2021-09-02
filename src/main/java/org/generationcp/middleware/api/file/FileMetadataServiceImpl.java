@@ -1,5 +1,7 @@
 package org.generationcp.middleware.api.file;
 
+import com.google.common.base.Preconditions;
+import org.apache.commons.codec.binary.Hex;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
@@ -23,6 +25,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
 
@@ -38,13 +43,15 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FileMetadataServiceImpl.class);
 
-	private static final String FILE_PATH_PREFIX_PROGRAMUUID = "programuuid-";
-	private static final String FILE_PATH_PREFIX_STUDYID = "studyid-";
-	private static final String FILE_PATH_PREFIX_OBSUNITUUID = "obsunituuid-";
+	public static final String FILE_PATH_PREFIX_PROGRAMUUID = "programuuid-";
+	public static final String FILE_PATH_PREFIX_STUDYID = "studyid-";
+	public static final String FILE_PATH_PREFIX_OBSUNITUUID = "obsunituuid-";
 	/**
 	 * AWS S3 uses forward slash to identify folders
 	 */
-	private static final String FILE_PATH_SLASH = "/";
+	public static final String FILE_PATH_SLASH = "/";
+	public static final String FILE_PATH_GERMPLASM_ROOT = "germplasm";
+	public static final String FILE_PATH_PREFIX_GERMPLASMUUID = "germplasmuuid-";
 
 	private final DaoFactory daoFactory;
 	
@@ -143,6 +150,34 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 			+ FILE_PATH_SLASH + fileName;
 		this.validatePathNotExists(path);
 		return path;
+	}
+
+	@Override
+	public String getFilePathForGermplasm(final String germplasmUUID, final String fileName) {
+		final MessageDigest md5;
+		try {
+			md5 = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalStateException("No MD5 algorithm available!");
+		}
+		/*
+		 * Because there is no natural structure for germplasm like in obsunits (program/study/)
+		 * we generate a virtual deterministic folder structure base on the uuid.
+		 * Since the uuid can be the custom uid format which has the same prefix the the entire crop,
+		 * we run it first through a hash function to get a hex string where each character has equal probability.
+		 * We then use the first hash characters as folder names
+		 * e.g final path e.g /germplasm/9/5/9/e/1/X2GIGdNDukMIGaa/myfile.png
+		 * In theory this should result in not too many files per directory and not too many directories either.
+		 */
+		final String hexString = Hex.encodeHexString(md5.digest(germplasmUUID.getBytes(StandardCharsets.UTF_8)));
+		return FILE_PATH_GERMPLASM_ROOT
+			+ FILE_PATH_SLASH + hexString.charAt(0)
+			+ FILE_PATH_SLASH + hexString.charAt(1)
+			+ FILE_PATH_SLASH + hexString.charAt(2)
+			+ FILE_PATH_SLASH + hexString.charAt(3)
+			+ FILE_PATH_SLASH + hexString.charAt(4)
+			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_GERMPLASMUUID + germplasmUUID
+			+ fileName;
 	}
 
 	private void validatePathNotExists(final String path) {

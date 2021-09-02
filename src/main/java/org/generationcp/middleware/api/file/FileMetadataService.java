@@ -18,6 +18,8 @@ public interface FileMetadataService {
 
 	String getFilePath(String observationUnitDbId, String fileName);
 
+	String getFilePathForGermplasm(String germplasmUUID, String fileName);
+
 	FileMetadataDTO save(FileMetadataDTO fileMetadataDTO, String observationUnitUUID, Integer termId);
 
 	List<FileMetadataDTO> search(FileMetadataFilterRequest filterRequest, String programUUID,
