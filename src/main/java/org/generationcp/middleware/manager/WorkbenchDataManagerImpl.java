@@ -70,23 +70,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Project> getProjects() {
-		return this.workbenchDaoFactory.getProjectDAO().getAll();
-	}
-
-	@Override
-	public List<Project> getProjects(final int start, final int numOfRows) {
-		return this.workbenchDaoFactory.getProjectDAO().getAll(start, numOfRows);
-	}
-
-	@Override
 	public List<Project> getProjects(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
 		return this.workbenchDaoFactory.getProjectDAO().getProjectsByFilter(pageable, programSearchRequest);
-	}
-
-	@Override
-	public long countProjectsByFilter(final ProgramSearchRequest programSearchRequest) {
-		return this.workbenchDaoFactory.getProjectDAO().countProjectsByFilter(programSearchRequest);
 	}
 
 	@Override
@@ -199,11 +184,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Tool> getToolsWithType(final ToolType toolType) {
-		return this.workbenchDaoFactory.getToolDAO().getToolsByToolType(toolType);
-	}
-
-	@Override
 	public Project getProjectById(final Long projectId) {
 		return this.workbenchDaoFactory.getProjectDAO().getById(projectId);
 	}
@@ -216,11 +196,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Project getProjectByUuidAndCrop(final String projectUuid, final String cropType) {
 		return this.workbenchDaoFactory.getProjectDAO().getByUuid(projectUuid, cropType);
-	}
-
-	@Override
-	public Project getLastOpenedProject(final Integer userId) {
-		return this.workbenchDaoFactory.getProjectDAO().getLastOpenedProject(userId);
 	}
 
 	@Override

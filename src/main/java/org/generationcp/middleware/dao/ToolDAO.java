@@ -52,17 +52,6 @@ public class ToolDAO extends GenericDAO<Tool, Long> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Tool> getToolsByToolType(ToolType toolType) throws MiddlewareQueryException {
-		try {
-			Criteria criteria = this.getSession().createCriteria(Tool.class).add(Restrictions.eq("toolType", toolType));
-			return criteria.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getToolsByToolType(toolType=" + toolType + ") query from Tool: " + e.getMessage(), e);
-		}
-		return new ArrayList<Tool>();
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<Tool> getUserTools() throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Tool.class).add(Restrictions.eq("userTool", true));
