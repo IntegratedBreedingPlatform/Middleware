@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.dao;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -208,6 +209,11 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		final List<Integer> gids) {
 
 		final Map<Integer, List<AttributeDTO>> attributesMap = new HashMap<>();
+
+		if (CollectionUtils.isEmpty(gids)) {
+			return attributesMap;
+		}
+
 		try {
 			final 	String sql = "SELECT "
 				+ "    u.name AS attributeCode,"
