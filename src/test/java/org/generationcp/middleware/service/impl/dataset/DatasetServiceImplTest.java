@@ -1,12 +1,13 @@
 package org.generationcp.middleware.service.impl.dataset;
 
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
+import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
-import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
@@ -83,12 +84,7 @@ public class DatasetServiceImplTest {
 
 	private static final int STUDY_ID = 1234;
 	private static final String FACT1 = "FACT1";
-	private static final ArrayList<String> DESING_FACTORS =
-		Lists.newArrayList(TermId.REP_NO.name(), TermId.PLOT_NO.name(), DatasetServiceImplTest.FACT1);
 	private static final String STOCK_ID = "STOCK_ID";
-	private static final ArrayList<String> GERMPLASM_DESCRIPTORS = Lists.newArrayList(
-		TermId.GID.name(), ColumnLabels.DESIGNATION.name(), TermId.ENTRY_NO.name(),
-		TermId.ENTRY_TYPE.name(), TermId.ENTRY_CODE.name(), TermId.OBS_UNIT_ID.name(), DatasetServiceImplTest.STOCK_ID);
 	private static final int DATASET_ID = 567;
 	private static final int INSTANCE_ID = 30;
 	private static final String PROGRAM_UUID = RandomStringUtils.randomAlphabetic(20);
@@ -125,9 +121,6 @@ public class DatasetServiceImplTest {
 	private DmsProjectDao dmsProjectDao;
 
 	@Mock
-	private DatasetTypeDAO datasetTypeDAO;
-
-	@Mock
 	private ExperimentDao experimentDao;
 
 	@Mock
@@ -143,6 +136,9 @@ public class DatasetServiceImplTest {
 	private FormulaDAO formulaDao;
 
 	@Mock
+	private FileMetadataDAO fileMetadataDAO;
+
+	@Mock
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Mock
@@ -151,8 +147,24 @@ public class DatasetServiceImplTest {
 	@InjectMocks
 	private DatasetServiceImpl datasetService = new DatasetServiceImpl();
 
+	private Map<Integer, String> germplasmDescriptorsMap;
+	private Map<Integer, String> designFactorsMap;
+
 	@Before
 	public void setup() {
+		this.germplasmDescriptorsMap = Maps.newHashMap();
+		this.germplasmDescriptorsMap.put(TermId.GID.getId(), TermId.GID.name());
+		this.germplasmDescriptorsMap.put(TermId.DESIG.getId(), ColumnLabels.DESIGNATION.name());
+		this.germplasmDescriptorsMap.put(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name());
+		this.germplasmDescriptorsMap.put(TermId.ENTRY_TYPE.getId(), TermId.ENTRY_TYPE.name());
+		this.germplasmDescriptorsMap.put(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.name());
+		this.germplasmDescriptorsMap.put(TermId.OBS_UNIT_ID.getId(), TermId.OBS_UNIT_ID.name());
+		this.germplasmDescriptorsMap.put(TermId.STOCK_ID.getId(), DatasetServiceImplTest.STOCK_ID);
+
+		this.designFactorsMap = Maps.newHashMap();
+		this.designFactorsMap.put(TermId.REP_NO.getId(), TermId.REP_NO.name());
+		this.designFactorsMap.put(TermId.PLOT_NO.getId(), TermId.PLOT_NO.name());
+		this.designFactorsMap.put(TermId.BLOCK_ID.getId(), DatasetServiceImplTest.FACT1);
 
 		this.datasetService.setDaoFactory(this.daoFactory);
 		this.datasetService.setStudyService(this.studyService);
@@ -163,7 +175,7 @@ public class DatasetServiceImplTest {
 		when(this.daoFactory.getExperimentDao()).thenReturn(this.experimentDao);
 		when(this.daoFactory.getFormulaDAO()).thenReturn(this.formulaDao);
 		when(this.daoFactory.getObservationUnitsSearchDAO()).thenReturn(this.obsUnitsSearchDao);
-		when(this.daoFactory.getDatasetTypeDao()).thenReturn(this.datasetTypeDAO);
+		when(this.daoFactory.getFileMetadataDAO()).thenReturn(this.fileMetadataDAO);
 	}
 
 	@Test
@@ -393,7 +405,6 @@ public class DatasetServiceImplTest {
 		final DatasetDTO datasetDTO = datasetDTOList.get(4);
 		final DatasetType datasetType = new DatasetType();
 		datasetType.setDatasetTypeId(datasetDTO.getDatasetTypeId());
-		Mockito.when(this.datasetTypeDAO.getById(datasetDTO.getDatasetTypeId())).thenReturn(datasetType);
 		Mockito.when(this.datasetService.getDataset(datasetDTOList.get(4).getDatasetId())).thenReturn(datasetDTO);
 		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
 		assertThat(datasetDTOList.get(4), equalTo(result));
@@ -485,9 +496,9 @@ public class DatasetServiceImplTest {
 
 		Mockito.when(this.mockSessionProvider.getSession()).thenReturn(this.mockSession);
 		Mockito.when(this.studyService.getGenericGermplasmDescriptors(DatasetServiceImplTest.STUDY_ID))
-			.thenReturn(GERMPLASM_DESCRIPTORS);
+			.thenReturn(this.germplasmDescriptorsMap);
 		Mockito.when(this.studyService.getAdditionalDesignFactors(DatasetServiceImplTest.STUDY_ID))
-			.thenReturn(DESING_FACTORS);
+			.thenReturn(this.designFactorsMap);
 
 		final SQLQuery mockQuery = Mockito.mock(SQLQuery.class);
 		final List<MeasurementVariableDto> projectTraits =
@@ -520,7 +531,8 @@ public class DatasetServiceImplTest {
 		final List<ObservationUnitRow> testMeasurements = Collections.singletonList(observationUnitRow);
 		Mockito.when(this.obsUnitsSearchDao.getObservationVariableName(DATASET_ID)).thenReturn("PLANT_NO");
 		final ObservationUnitsSearchDTO
-			searchDTO = new ObservationUnitsSearchDTO(DATASET_ID, INSTANCE_ID, GERMPLASM_DESCRIPTORS, DESING_FACTORS, projectTraits);
+			searchDTO = new ObservationUnitsSearchDTO(DATASET_ID, INSTANCE_ID, Lists.newArrayList(this.germplasmDescriptorsMap.values()),
+			Lists.newArrayList(this.designFactorsMap.values()), projectTraits);
 
 		Mockito.when(this.obsUnitsSearchDao.getObservationUnitTable(searchDTO, new PageRequest(0, 100))).thenReturn(testMeasurements);
 
@@ -604,8 +616,8 @@ public class DatasetServiceImplTest {
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setProjectId(datasetId);
 
-		Mockito.doReturn(new ArrayList<>()).when(this.studyService).getGenericGermplasmDescriptors(studyId);
-		Mockito.doReturn(new ArrayList<>()).when(this.studyService).getAdditionalDesignFactors(studyId);
+		Mockito.doReturn(Maps.newHashMap()).when(this.studyService).getGenericGermplasmDescriptors(studyId);
+		Mockito.doReturn(Maps.newHashMap()).when(this.studyService).getAdditionalDesignFactors(studyId);
 		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao)
 			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 

@@ -1,14 +1,11 @@
 package org.generationcp.middleware.service.impl.dataset;
 
-import com.google.common.base.Function;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
@@ -56,7 +53,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -201,14 +197,9 @@ public class DatasetServiceImpl implements DatasetService {
 		if (Boolean.TRUE.equals(draftMode)) {
 			final Set<Integer> pendingVariableIds = this.daoFactory.getPhenotypeDAO().getPendingVariableIds(observationSetId);
 			variateColumns =
-				Lists.newArrayList(Iterables.filter(variateColumns, new com.google.common.base.Predicate<MeasurementVariable>() {
-
-					@Override
-					public boolean apply(@Nullable final MeasurementVariable input) {
-						return pendingVariableIds.contains(input.getTermId())
-							|| VariableType.OBSERVATION_UNIT.equals(input.getVariableType());
-					}
-				}));
+				Lists.newArrayList(Iterables.filter(variateColumns, input -> pendingVariableIds.contains(input.getTermId())
+					|| VariableType.OBSERVATION_UNIT.equals(input.getVariableType())
+				));
 		}
 
 		// Virtual columns
@@ -232,15 +223,15 @@ public class DatasetServiceImpl implements DatasetService {
 		return factorColumns;
 	}
 
-	private MeasurementVariable addTermIdColumn(final TermId TermId, final VariableType VariableType, final String name,
+	private MeasurementVariable addTermIdColumn(final TermId termId, final VariableType variableType, final String name,
 		final boolean factor) {
-		final MeasurementVariable MeasurementVariable = new MeasurementVariable();
-		MeasurementVariable.setName(StringUtils.isBlank(name) ? TermId.name() : name);
-		MeasurementVariable.setAlias(TermId.name());
-		MeasurementVariable.setTermId(TermId.getId());
-		MeasurementVariable.setVariableType(VariableType);
-		MeasurementVariable.setFactor(factor);
-		return MeasurementVariable;
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName(StringUtils.isBlank(name) ? termId.name() : name);
+		measurementVariable.setAlias(termId.name());
+		measurementVariable.setTermId(termId.getId());
+		measurementVariable.setVariableType(variableType);
+		measurementVariable.setFactor(factor);
+		return measurementVariable;
 	}
 
 	@Override
@@ -426,6 +417,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public void removeDatasetVariables(final Integer datasetId, final List<Integer> variableIds) {
+		this.daoFactory.getFileMetadataDAO().detachVariables(datasetId, variableIds);
 		this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(datasetId, variableIds);
 		this.daoFactory.getPhenotypeDAO().deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
 	}
@@ -529,13 +521,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputId(variableId);
 		if (!org.springframework.util.CollectionUtils.isEmpty(formulaList) && !org.springframework.util.CollectionUtils
 			.isEmpty(observationUnitIds)) {
-			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
-
-				@Override
-				public Integer apply(final Formula formula) {
-					return formula.getTargetCVTerm().getCvTermId();
-				}
-			});
+			final List<Integer> targetVariableIds = Lists.transform(formulaList, formula -> formula.getTargetCVTerm().getCvTermId());
 			this.daoFactory.getPhenotypeDAO()
 				.updateOutOfSyncPhenotypes(observationUnitIds, Sets.newHashSet(targetVariableIds));
 
@@ -556,13 +542,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final List<Formula> formulaList = this.daoFactory.getFormulaDAO().getByInputIds(variableIds);
 		if (!formulaList.isEmpty()) {
-			final List<Integer> targetVariableIds = Lists.transform(formulaList, new Function<Formula, Integer>() {
-
-				@Override
-				public Integer apply(final Formula formula) {
-					return formula.getTargetCVTerm().getCvTermId();
-				}
-			});
+			final List<Integer> targetVariableIds = Lists.transform(formulaList, formula -> formula.getTargetCVTerm().getCvTermId());
 			this.daoFactory.getPhenotypeDAO()
 				.updateOutOfSyncPhenotypesByGeolocation(geolocation, Sets.newHashSet(targetVariableIds));
 		}
@@ -572,7 +552,6 @@ public class DatasetServiceImpl implements DatasetService {
 	public DatasetDTO getDataset(final Integer datasetId) {
 		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
 		if (datasetDTO != null) {
-			final DatasetType datasetType = this.daoFactory.getDatasetTypeDao().getById(datasetDTO.getDatasetTypeId());
 			datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
 			final List<Integer> variableTypes = DatasetTypeEnum.SUMMARY_DATA.getId() == datasetDTO.getDatasetTypeId() ?
 				DatasetServiceImpl.ENVIRONMENT_DATASET_VARIABLE_TYPES : DatasetServiceImpl.OBSERVATION_DATASET_VARIABLE_TYPES;
@@ -598,7 +577,7 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<ObservationUnitRow> getObservationUnitRows(
 		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
 
-		this.fillSearchDTO(studyId, datasetId, searchDTO);
+		this.updateSearchDto(studyId, datasetId, searchDTO);
 
 		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
 	}
@@ -607,15 +586,17 @@ public class DatasetServiceImpl implements DatasetService {
 	public List<Map<String, Object>> getObservationUnitRowsAsMapList(
 		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
 
-		this.fillSearchDTO(studyId, datasetId, searchDTO);
+		this.updateSearchDto(studyId, datasetId, searchDTO);
 
 		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTableMapList(searchDTO, pageable);
 	}
 
-	private void fillSearchDTO(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
+	private void updateSearchDto(final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO) {
 		searchDTO.setDatasetId(datasetId);
-		searchDTO.setGenericGermplasmDescriptors(this.findGenericGermplasmDescriptors(studyId));
-		searchDTO.setAdditionalDesignFactors(this.findAdditionalDesignFactors(studyId));
+		final Map<Integer, String> germplasmDescriptors = this.studyService.getGenericGermplasmDescriptors(studyId);
+		searchDTO.setGenericGermplasmDescriptors(Lists.newArrayList(germplasmDescriptors.values()));
+		final Map<Integer, String> designFactors = this.studyService.getAdditionalDesignFactors(studyId);
+		searchDTO.setAdditionalDesignFactors(Lists.newArrayList(designFactors.values()));
 
 		final List<MeasurementVariableDto> selectionMethodsAndTraits =
 			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
@@ -625,26 +606,18 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public List<ObservationUnitRow> getAllObservationUnitRows(final int studyId, final int datasetId) {
-
-		final List<String> designFactors = this.findAdditionalDesignFactors(studyId);
-		final List<String> germplasmDescriptors = this.findGenericGermplasmDescriptors(studyId);
-
 		final DmsProject environmentDataset =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
 		final List<MeasurementVariable> studyVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(
 			studyId,
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
-		final List<MeasurementVariableDto> selectionMethodsAndTraits =
-			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
-				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
-
-		final ObservationUnitsSearchDTO searchDTO =
-			new ObservationUnitsSearchDTO(datasetId, null, germplasmDescriptors, designFactors, new ArrayList<>());
+		final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+		searchDTO.setDatasetId(datasetId);
 		searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 		searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
-		searchDTO.setSelectionMethodsAndTraits(selectionMethodsAndTraits);
+		this.updateSearchDto(studyId, datasetId, searchDTO);
 
 		final List<ObservationUnitRow> observationUnits =
 			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, new PageRequest(0, Integer.MAX_VALUE));
@@ -653,14 +626,6 @@ public class DatasetServiceImpl implements DatasetService {
 		return observationUnits;
 	}
 
-	private List<String> findGenericGermplasmDescriptors(final int studyId) {
-
-		return this.studyService.getGenericGermplasmDescriptors(studyId);
-	}
-
-	private List<String> findAdditionalDesignFactors(final int studyId) {
-		return this.studyService.getAdditionalDesignFactors(studyId);
-	}
 
 	List<MeasurementVariableDto> getEnvironmentConditionVariableNames(final Integer trialDatasetId) {
 		final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
@@ -783,28 +748,18 @@ public class DatasetServiceImpl implements DatasetService {
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 			for (final MeasurementVariable measurementVariable : measurementVariableList) {
-				final Collection<Phenotype> selectedPhenotypes = CollectionUtils.select(phenotypes, new Predicate() {
-
-					@Override
-					public boolean evaluate(final Object o) {
-						final Phenotype phenotype = (Phenotype) o;
-						return phenotype.getObservableId().equals(measurementVariable.getTermId());
-					}
+				final Collection<Phenotype> selectedPhenotypes = CollectionUtils.select(phenotypes, o -> {
+					final Phenotype phenotype = (Phenotype) o;
+					return phenotype.getObservableId().equals(measurementVariable.getTermId());
 				});
 
 				Collection<Phenotype> possibleValues = null;
 				if (measurementVariable.getPossibleValues() != null && !measurementVariable.getPossibleValues().isEmpty()) {
 					possibleValues =
-						CollectionUtils.collect(measurementVariable.getPossibleValues(), new Transformer() {
-
-							@Override
-							public String transform(final Object input) {
-								final ValueReference variable = (ValueReference) input;
-								return variable.getName();
-							}
-
+						CollectionUtils.collect(measurementVariable.getPossibleValues(), input -> {
+							final ValueReference variable = (ValueReference) input;
+							return variable.getName();
 						});
-
 				}
 
 				for (final Phenotype phenotype : selectedPhenotypes) {
@@ -852,25 +807,17 @@ public class DatasetServiceImpl implements DatasetService {
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 			for (final MeasurementVariable measurementVariable : measurementVariableList) {
-				final Collection<Phenotype> selectedPhenotypes = CollectionUtils.select(draftPhenotypes, new Predicate() {
-
-					@Override
-					public boolean evaluate(final Object o) {
-						final Phenotype phenotype = (Phenotype) o;
-						return phenotype.getObservableId().equals(measurementVariable.getTermId());
-					}
+				final Collection<Phenotype> selectedPhenotypes = CollectionUtils.select(draftPhenotypes, o -> {
+					final Phenotype phenotype = (Phenotype) o;
+					return phenotype.getObservableId().equals(measurementVariable.getTermId());
 				});
 
 				Collection<Phenotype> possibleValues = null;
 				if (measurementVariable.getPossibleValues() != null && !measurementVariable.getPossibleValues().isEmpty()) {
 					possibleValues =
-						CollectionUtils.collect(measurementVariable.getPossibleValues(), new Transformer() {
-
-							@Override
-							public String transform(final Object input) {
-								final ValueReference variable = (ValueReference) input;
-								return variable.getName();
-							}
+						CollectionUtils.collect(measurementVariable.getPossibleValues(), input -> {
+							final ValueReference variable = (ValueReference) input;
+							return variable.getName();
 						});
 				}
 
@@ -896,7 +843,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final String variableId = searchDTO.getFilter().getVariableId().toString();
 		final List<Phenotype> phenotypes = new ArrayList<>();
-		this.fillSearchDTO(studyId, datasetId, searchDTO);
+		this.updateSearchDto(studyId, datasetId, searchDTO);
 
 		final List<ObservationUnitRow> observationUnitsByVariable =
 			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitsByVariable(searchDTO);
@@ -940,7 +887,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final String variableId = paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId().toString();
 		final List<Phenotype> phenotypes = new ArrayList<>();
 
-		this.fillSearchDTO(studyId, datasetId, paramDTO.getObservationUnitsSearchDTO());
+		this.updateSearchDto(studyId, datasetId, paramDTO.getObservationUnitsSearchDTO());
 		final Boolean draftMode = paramDTO.getObservationUnitsSearchDTO().getDraftMode();
 		final List<ObservationUnitRow> observationUnitsByVariable =
 			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitsByVariable(paramDTO.getObservationUnitsSearchDTO());
@@ -1160,12 +1107,6 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<Integer> instanceIds) {
 		final Map<Integer, List<ObservationUnitRow>> instanceMap = new LinkedHashMap<>();
 
-		final List<MeasurementVariableDto> selectionMethodsAndTraits =
-			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
-				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
-		final List<String> designFactors = this.findAdditionalDesignFactors(studyId);
-		final List<String> germplasmDescriptors = this.findGenericGermplasmDescriptors(studyId);
-
 		final DmsProject environmentDataset =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
 		final List<MeasurementVariable> studyVariables = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(
@@ -1173,12 +1114,13 @@ public class DatasetServiceImpl implements DatasetService {
 			Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
 
 		for (final Integer instanceId : instanceIds) {
-			final ObservationUnitsSearchDTO
-				searchDTO =
-				new ObservationUnitsSearchDTO(datasetId, instanceId, germplasmDescriptors, designFactors, selectionMethodsAndTraits);
+			final ObservationUnitsSearchDTO searchDTO = new ObservationUnitsSearchDTO();
+			searchDTO.setDatasetId(datasetId);
+			searchDTO.setInstanceId(instanceId);
 			searchDTO.setEnvironmentDetails(this.findAdditionalEnvironmentFactors(environmentDataset.getProjectId()));
 			searchDTO.setEnvironmentConditions(this.getEnvironmentConditionVariableNames(environmentDataset.getProjectId()));
 			searchDTO.setEnvironmentDatasetId(environmentDataset.getProjectId());
+			this.updateSearchDto(studyId, datasetId, searchDTO);
 
 			final List<ObservationUnitRow> observationUnits =
 				this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, null);

@@ -138,15 +138,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public String getPlotCodeValue(final Integer gid) {
-		final Term plotCodeVariable = this.getPlotCodeField();
-		final Optional<Attribute> plotCode = this.germplasmAttributeService.getAttributesByGID(gid)
-			.stream()
-			.filter(attribute -> attribute.getTypeId().equals(plotCodeVariable.getId()))
-			.findFirst();
-		if (plotCode.isPresent()) {
-			return plotCode.get().getAval();
-		}
-		return GermplasmListDataDAO.SOURCE_UNKNOWN;
+		final Map<Integer, String> plotCodeValues = this.getPlotCodeValues(Collections.singleton(gid));
+		return plotCodeValues.getOrDefault(gid, GermplasmListDataDAO.SOURCE_UNKNOWN);
 	}
 
 	@Override
@@ -600,13 +593,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 					// Update if name is existing
 					final Name name = namesByType.get(0);
 					name.setLocationId(germplasm.getLocationId());
-					name.setNdate(germplasm.getGdate());
 					name.setNval(value);
 					this.daoFactory.getNameDao().update(name);
 				} else {
 					// Create new record if name not yet exists
 					final Name name = new Name(null, germplasm, nameTypeId, 0,
-						value, germplasm.getLocationId(), germplasm.getGdate(), 0);
+						value, germplasm.getLocationId(), Util.getCurrentDateAsIntegerValue(), 0);
 					this.daoFactory.getNameDao().save(name);
 					germplasmNames.add(name);
 					namesMap.putIfAbsent(germplasm.getGid(), germplasmNames);
@@ -647,7 +639,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 					if (attributesByType.size() == 1) {
 						final Attribute attribute = attributesByType.get(0);
 						attribute.setLocationId(germplasm.getLocationId());
-						attribute.setAdate(germplasm.getGdate());
 						attribute.setAval(value);
 						attribute.setcValueId(cValueId);
 						this.daoFactory.getAttributeDAO().update(attribute);
@@ -655,7 +646,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 						this.daoFactory.getAttributeDAO()
 							.save(new Attribute(null, germplasm.getGid(), variable.getId(), value, cValueId,
 								germplasm.getLocationId(),
-								0, germplasm.getGdate()));
+								0, Util.getCurrentDateAsIntegerValue()));
 					}
 				}
 			}
@@ -733,8 +724,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 			.addAll(
 				germplasmUpdateDTOList.stream().map(GermplasmUpdateDTO::getPreferredNameType).filter(Objects::nonNull)
 					.collect(Collectors.toSet()));
-		return this.germplasmNameTypeService.filterGermplasmNameTypes(namesCode).stream().collect(Collectors.toMap(
-			GermplasmNameTypeDTO::getCode, GermplasmNameTypeDTO::getId));
+		return this.germplasmNameTypeService.filterGermplasmNameTypes(namesCode).stream().collect(Collectors.toMap(nameType ->
+			nameType.getCode().toUpperCase(), GermplasmNameTypeDTO::getId));
 	}
 
 	private Map<String, Integer> getNameTypesMapByName(final List<GermplasmImportDTO> germplasmDtos) {

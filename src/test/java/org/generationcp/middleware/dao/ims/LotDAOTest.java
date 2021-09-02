@@ -211,7 +211,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	@Test
 	public void testSearchAllLots() {
 
-		final List<ExtendedLotDto> extendedLotDtos = this.lotDAO.searchLots(null, null);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotDAO.searchLots(null, null , null);
 		Assert.assertTrue(extendedLotDtos.size() >= 3);
 
 	}
@@ -222,7 +222,7 @@ public class LotDAOTest extends IntegrationTestBase {
 
 		lotsSearchDto.setLotIds(Lists.newArrayList(this.lot1.getId(), this.lot2.getId()));
 
-		final List<ExtendedLotDto> extendedLotDtos = this.lotDAO.searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotDAO.searchLots(lotsSearchDto, null, null);
 		Assert.assertEquals(extendedLotDtos.size(), 2);
 	}
 
@@ -230,7 +230,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	public void testSearchLotsByLocationIds() {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLocationIds(Lists.newArrayList(this.location.getLocid()));
-		final List<ExtendedLotDto> extendedLotDtos = this.lotDAO.searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotDAO.searchLots(lotsSearchDto, null, null);
 
 		Assert.assertEquals(extendedLotDtos.size(), 1);
 	}
@@ -239,7 +239,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	public void testSearchLotsByGids() {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setGids(Lists.newArrayList(this.germplasm1.getGid()));
-		final List<ExtendedLotDto> extendedLotDtos = this.lotDAO.searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotDAO.searchLots(lotsSearchDto, null, null);
 
 		Assert.assertEquals(extendedLotDtos.size(), 2);
 	}
@@ -248,7 +248,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	public void testSearchLotsByGermplasmListIds() {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setGermplasmListIds(Lists.newArrayList(this.germplasmList.getId()));
-		final List<ExtendedLotDto> extendedLotDtos = this.lotDAO.searchLots(lotsSearchDto, null);
+		final List<ExtendedLotDto> extendedLotDtos = this.lotDAO.searchLots(lotsSearchDto, null, null);
 
 		Assert.assertEquals(extendedLotDtos.size(), 2);
 	}

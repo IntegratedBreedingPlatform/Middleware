@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 
 @Transactional
 public class GermplasmAttributeServiceImpl implements GermplasmAttributeService {
@@ -65,11 +66,6 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	public List<Attribute> getAttributesByGID(final Integer gid) {
-		return this.daoFactory.getAttributeDAO().getByGID(gid);
-	}
-
-	@Override
 	public List<AttributeDTO> getAttributesByGUID(
 		final String germplasmUUID, final List<String> attributeDbIds, final Pageable pageable) {
 		return this.daoFactory.getAttributeDAO().getAttributesByGUIDAndAttributeIds(germplasmUUID, attributeDbIds, pageable);
@@ -83,6 +79,11 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	@Override
 	public List<Variable> getGermplasmAttributeVariables(final List<Integer> gids, final String programUUID) {
 		return this.daoFactory.getGermplasmDao().getGermplasmAttributeVariables(gids, programUUID);
+	}
+
+	@Override
+	public Map<Integer, List<AttributeDTO>> getAttributesByGIDsMap(final List<Integer> gids) {
+		return this.daoFactory.getAttributeDAO().getAttributesByGidsMap(gids);
 	}
 
 }

@@ -1108,9 +1108,9 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public BiMap<String, String> createInstanceLocationIdToNameMapFromStudy(final int studyId) {
+	public Map<String, String> createInstanceLocationIdToNameMapFromStudy(final int studyId) {
 		// Create LocatioName to LocationId Map
-		final BiMap<String, String> map = HashBiMap.create();
+		final HashMap<String, String> map = new HashMap();
 		final List<InstanceMetadata> metadataList = this.getInstanceMetadata(studyId);
 		for (final InstanceMetadata instanceMetadata : metadataList) {
 			map.put(String.valueOf(instanceMetadata.getLocationDbId()), instanceMetadata.getLocationName());

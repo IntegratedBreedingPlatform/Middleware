@@ -26,6 +26,8 @@ public class GermplasmNameDto {
 
 	private Boolean preferred;
 
+	private Integer nameTypeId;
+
 	public String getName() {
 		return this.name;
 	}
@@ -96,6 +98,14 @@ public class GermplasmNameDto {
 
 	public void setPreferred(final Boolean preferred) {
 		this.preferred = preferred;
+	}
+
+	public Integer getNameTypeId() {
+		return this.nameTypeId;
+	}
+
+	public void setNameTypeId(final Integer nameTypeId) {
+		this.nameTypeId = nameTypeId;
 	}
 
 	@Override

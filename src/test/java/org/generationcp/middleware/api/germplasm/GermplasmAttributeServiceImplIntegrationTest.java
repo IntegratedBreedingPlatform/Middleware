@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
@@ -124,29 +123,6 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 		final GermplasmAttributeRequestDto dto = new GermplasmAttributeRequestDto(variables.get(0).getId(), ATTRIBUTE_VALUE,
 			ATTRIBUTE_DATE, LOCATION_ID);
 		return this.germplasmAttributeService.createGermplasmAttribute(germplasmId, dto);
-	}
-
-	@Test
-	public void testGetAttributesByGID() {
-		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
-
-		assertThat(this.germplasmAttributeService.getAttributesByGID(germplasm.getGid()), hasSize(0));
-
-		final Attribute attribute = new Attribute();
-		attribute.setGermplasmId(germplasm.getGid());
-		attribute.setTypeId(attributeId);
-		attribute.setAval(RandomStringUtils.randomAlphanumeric(50));
-		attribute.setAdate(germplasm.getGdate());
-
-		this.daoFactory.getAttributeDAO().save(attribute);
-
-		final List<Attribute> attributes = this.germplasmAttributeService.getAttributesByGID(germplasm.getGid());
-		assertThat(attributes, hasSize(1));
-		final Attribute actualAttribute = attributes.get(0);
-		assertNotNull(actualAttribute);
-		assertThat(actualAttribute.getAid(), is(attribute.getAid()));
-		assertThat(actualAttribute.getGermplasmId(), is(germplasm.getGid()));
 	}
 
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
