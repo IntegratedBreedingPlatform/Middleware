@@ -1,5 +1,6 @@
 package org.generationcp.middleware.dao.dms;
 
+import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
@@ -24,9 +25,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
+import java.util.Map;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 
@@ -139,6 +145,43 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 			.getAllFieldMapsInBlockByTrialInstanceId(this.study.getProjectId(), geolocation.getLocationId(), 9999);
 		assertEquals(0, fieldMapInfos2.size());
 
+	}
+
+	@Test
+	public void shouldGetPlotObservationLevelRelationshipsByGeolocationsAndLevelCodes_OK() {
+		final Geolocation instance1 = this.testDataInitializer.createTestGeolocation("1", 101);
+		final String plotCode1 = RandomStringUtils.randomNumeric(5);
+		final ExperimentModel experimentModel1 =
+			this.testDataInitializer.createTestExperiment(this.plot, instance1, TermId.PLOT_EXPERIMENT.getId(), plotCode1, null);
+		this.testDataInitializer.createTestStock(this.study, experimentModel1);
+
+		final Geolocation instance2 = this.testDataInitializer.createTestGeolocation("1", 101);
+		final String plotCode2 = RandomStringUtils.randomNumeric(5);
+		final ExperimentModel experimentModel2 =
+			this.testDataInitializer.createTestExperiment(this.plot, instance2, TermId.PLOT_EXPERIMENT.getId(), plotCode2, null);
+		final String plotCode3 = RandomStringUtils.randomNumeric(5);
+		this.testDataInitializer.addExperimentProp(experimentModel2, TermId.PLOT_NO.getId(), plotCode3, 2);
+		this.testDataInitializer.createTestStock(this.study, experimentModel2);
+
+		final Map<String, List<String>> plotObservationLevelRelationships =
+			this.experimentPropertyDao
+				.getPlotObservationLevelRelationshipsByGeolocations(Sets.newHashSet(instance1.getLocationId().toString(),
+					instance2.getLocationId().toString())
+				);
+		assertNotNull(plotObservationLevelRelationships);
+		assertThat(plotObservationLevelRelationships.size(), is(2));
+		assertTrue(plotObservationLevelRelationships.containsKey(instance1.getLocationId().toString()));
+
+		final List<String> instance1PlotLevelCodes = plotObservationLevelRelationships.get(instance1.getLocationId().toString());
+		assertThat(instance1PlotLevelCodes, hasSize(1));
+		assertThat(instance1PlotLevelCodes.get(0), is(plotCode1));
+
+
+		assertTrue(plotObservationLevelRelationships.containsKey(instance2.getLocationId().toString()));
+		final List<String> instance2PlotLevelCodes = plotObservationLevelRelationships.get(instance2.getLocationId().toString());
+		assertThat(instance2PlotLevelCodes, hasSize(2));
+		assertTrue(instance2PlotLevelCodes.contains(plotCode2));
+		assertTrue(instance2PlotLevelCodes.contains(plotCode3));
 	}
 
 }
