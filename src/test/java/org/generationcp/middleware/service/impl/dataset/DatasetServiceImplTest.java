@@ -6,6 +6,7 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.constant.ColumnLabels;
+import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -135,6 +136,9 @@ public class DatasetServiceImplTest {
 	private FormulaDAO formulaDao;
 
 	@Mock
+	private FileMetadataDAO fileMetadataDAO;
+
+	@Mock
 	private WorkbenchDataManager workbenchDataManager;
 
 	@Mock
@@ -171,6 +175,7 @@ public class DatasetServiceImplTest {
 		when(this.daoFactory.getExperimentDao()).thenReturn(this.experimentDao);
 		when(this.daoFactory.getFormulaDAO()).thenReturn(this.formulaDao);
 		when(this.daoFactory.getObservationUnitsSearchDAO()).thenReturn(this.obsUnitsSearchDao);
+		when(this.daoFactory.getFileMetadataDAO()).thenReturn(this.fileMetadataDAO);
 	}
 
 	@Test
