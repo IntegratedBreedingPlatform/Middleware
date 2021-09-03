@@ -15,7 +15,8 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 
 	private static final String SEARCH_BASE_QUERY = " select distinct f.* from file_metadata f " //
-		+ " inner join nd_experiment nde on f.nd_experiment_id = nde.nd_experiment_id " //
+		+ " left join nd_experiment nde on f.nd_experiment_id = nde.nd_experiment_id " //
+		+ " left join germplsm g on f.gid = g.gid " //
 		+ " left join file_metadata_cvterm fmc on f.file_id = fmc.file_metadata_id " //
 		+ "    left join cvterm variable on fmc.cvterm_id = variable.cvterm_id " //
 		+ "    left join variable_overrides vo on vo.cvterm_id = variable.cvterm_id " //
@@ -69,6 +70,12 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 		if (!isBlank(observationUnitUUID)) {
 			paramBuilder.append(" and nde.obs_unit_id = :observationUnitUUID ");
 			paramBuilder.setParameter("observationUnitUUID", observationUnitUUID);
+		}
+
+		final String germplasmUUID = filterRequest.getGermplasmUUID();
+		if (!isBlank(germplasmUUID)) {
+			paramBuilder.append(" and g.germplsm_uuid = :germplasmUUID ");
+			paramBuilder.setParameter("germplasmUUID", germplasmUUID);
 		}
 	}
 

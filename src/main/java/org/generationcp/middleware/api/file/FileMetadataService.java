@@ -20,10 +20,9 @@ public interface FileMetadataService {
 
 	String getFilePathForGermplasm(String germplasmUUID, String fileName);
 
-	FileMetadataDTO save(FileMetadataDTO fileMetadataDTO, String observationUnitUUID, Integer termId);
+	FileMetadataDTO save(FileMetadataDTO fileMetadataDTO, String observationUnitUUID, String germplasmUUID, Integer termId);
 
-	List<FileMetadataDTO> search(FileMetadataFilterRequest filterRequest, String programUUID,
-		final Pageable pageable);
+	List<FileMetadataDTO> search(FileMetadataFilterRequest filterRequest, String programUUID, Pageable pageable);
 
 	long countSearch(FileMetadataFilterRequest filterRequest, String programUUID, Pageable pageable);
 

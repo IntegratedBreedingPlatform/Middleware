@@ -11,6 +11,7 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.file.FileMetadata;
@@ -30,11 +31,13 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static java.util.Collections.singletonList;
 import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Transactional
@@ -188,15 +191,30 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public FileMetadataDTO save(final FileMetadataDTO fileMetadataDTO, final String observationUnitUUID, final Integer termId) {
-		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitUUID);
-
-		if (experimentModel == null) {
-			throw new MiddlewareRequestException("", "filemetadata.observationunit.not.found", new String[] {observationUnitUUID});
-		}
+	public FileMetadataDTO save(
+		final FileMetadataDTO fileMetadataDTO,
+		final String observationUnitUUID,
+		final String germplasmUUID,
+		final Integer termId
+	) {
 
 		final FileMetadata fileMetadata = new FileMetadata();
-		fileMetadata.setExperimentModel(experimentModel);
+		Preconditions.checkArgument(isBlank(observationUnitUUID) != isBlank(germplasmUUID));
+
+		if (!isBlank(observationUnitUUID)) {
+			final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitUUID);
+			if (experimentModel == null) {
+				throw new MiddlewareRequestException("", "filemetadata.observationunit.not.found", new String[] {observationUnitUUID});
+			}
+			fileMetadata.setExperimentModel(experimentModel);
+		} else {
+			final Optional<Germplasm> germplasmOptional = this.daoFactory.getGermplasmDao().getGermplasmByGUIDs(singletonList(germplasmUUID))
+				.stream().findFirst();
+			if (!germplasmOptional.isPresent()) {
+				throw new MiddlewareRequestException("", "filemetadata.germplasm.not.found", new String[] {germplasmUUID});
+			}
+			fileMetadata.setGermplasm(germplasmOptional.get());
+		}
 
 		if (termId != null) {
 			final CVTerm cvTerm = this.daoFactory.getCvTermDao().getById(termId);
