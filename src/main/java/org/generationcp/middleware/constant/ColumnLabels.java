@@ -78,7 +78,11 @@ public enum ColumnLabels {
 
     // GERMPLASM CHECK
     ENTRY_TYPE(TermId.ENTRY_TYPE, "CHECK TYPE"), //
-    GROUPGID(TermId.GROUPGID, "GROUPGID");
+    GROUPGID(TermId.GROUPGID, "GROUPGID"),
+
+    HAS_PROGENY(null, "HAS PROGENY"),
+    USED_IN_STUDY(null, "USED IN STUDY");
+
 
     private TermId termId;
     private String name;

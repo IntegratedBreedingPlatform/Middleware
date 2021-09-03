@@ -54,6 +54,9 @@ public class GermplasmSearchResponse {
 	private Integer breedingMethodId;
 	private String reference;
 
+	private Boolean hasProgeny;
+	private Boolean usedInStudy;
+
 	public GermplasmSearchResponse() {
 	}
 
@@ -295,6 +298,22 @@ public class GermplasmSearchResponse {
 
 	public void setLocationAbbr(final String locationAbbr) {
 		this.locationAbbr = locationAbbr;
+	}
+
+	public Boolean getHasProgeny() {
+		return this.hasProgeny;
+	}
+
+	public void setHasProgeny(final Boolean hasProgeny) {
+		this.hasProgeny = hasProgeny;
+	}
+
+	public Boolean getUsedInStudy() {
+		return this.usedInStudy;
+	}
+
+	public void setUsedInStudy(final Boolean usedInStudy) {
+		this.usedInStudy = usedInStudy;
 	}
 
 	@Override

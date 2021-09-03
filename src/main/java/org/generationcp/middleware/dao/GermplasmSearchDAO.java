@@ -102,6 +102,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	public static final String IMMEDIATE_SOURCE_GID = ColumnLabels.IMMEDIATE_SOURCE_GID.getName();
 	public static final String IMMEDIATE_SOURCE_PREFERRED_NAME = ColumnLabels.IMMEDIATE_SOURCE_PREFERRED_NAME.getName();
 
+	public static final String HAS_PROGENY = ColumnLabels.HAS_PROGENY.getName();
+	public static final String USED_IN_STUDY = ColumnLabels.USED_IN_STUDY.getName();
+
 	private static final int STOCKID_INDEX = 2;
 	private static final int LOT_INDEX = 5;
 	private static final int AVAIL_BALANCE_INDEX = 6;
@@ -123,7 +126,9 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		METHOD_NAME,
 		LOCATION_NAME,
 		LOCATION_ID,
-		METHOD_ID));
+		METHOD_ID,
+		HAS_PROGENY,
+		USED_IN_STUDY));
 
 	static {
 
