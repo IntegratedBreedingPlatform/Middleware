@@ -9,7 +9,7 @@ import org.pojomatic.annotations.AutoProperty;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class ContactDto {
 
-	private String contactDbId;
+	private String contactDbId = StringUtils.EMPTY;
 
 	private String name;
 
@@ -22,6 +22,16 @@ public class ContactDto {
 	private String instituteName = StringUtils.EMPTY;
 
 	public ContactDto() {
+	}
+
+	public ContactDto(final String contactDbId, final String name, final String email, final String type, final String orcid,
+		final String instituteName) {
+		this.contactDbId = contactDbId;
+		this.name = name;
+		this.email = email;
+		this.type = type;
+		this.orcid = orcid;
+		this.instituteName = instituteName;
 	}
 
 	public ContactDto(final String contactDbId, final String name, final String email, final String type) {
@@ -92,5 +102,21 @@ public class ContactDto {
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
+	}
+
+	public boolean atLeastOneContactDetailProvided() {
+		return StringUtils.isNotEmpty(this.getName()) || StringUtils.isNotEmpty(this.getEmail()) || StringUtils.isNotEmpty(this.getInstituteName()) || StringUtils.isNotEmpty(this.getType());
+	}
+
+	public void setFieldFromVariable(final Integer variableId, final String value) {
+		if (ContactVariable.CONTACT_NAME.getId().equals(variableId)) {
+			this.setName(value);
+		} else if (ContactVariable.CONTACT_EMAIL.getId().equals(variableId)) {
+			this.setEmail(value);
+		} else if (ContactVariable.CONTACT_ORG.getId().equals(variableId)) {
+			this.setInstituteName(value);
+		} else if (ContactVariable.CONTACT_TYPE.getId().equals(variableId)) {
+			this.setType(value);
+		}
 	}
 }

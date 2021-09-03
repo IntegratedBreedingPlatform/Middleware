@@ -1,27 +1,19 @@
 
 package org.generationcp.middleware.service.api.study;
 
-import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
-import org.generationcp.middleware.domain.dms.StudySummary;
+import org.generationcp.middleware.api.study.StudyDTO;
+import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 
 public interface StudyService {
 
 	boolean hasCrossesOrSelections(int studyId);
 
 	String getProgramUUID(Integer studyIdentifier);
-
-	TrialObservationTable getTrialObservationTable(int studyIdentifier);
-
-	/**
-	 * @param studyIdentifier id for the study (Nursery / Trial)
-	 * @param instanceDbId    id for a Trial instance of a Trial (Nursery has 1 instance). If present studyIdentifier will not be used
-	 * @return
-	 */
-	TrialObservationTable getTrialObservationTable(int studyIdentifier, Integer instanceDbId);
 
 	/**
 	 * @param ids     of the variables that i need to check data
@@ -30,21 +22,20 @@ public interface StudyService {
 	 */
 	boolean hasMeasurementDataEntered(List<Integer> ids, int studyId);
 
-	List<String> getGenericGermplasmDescriptors(int studyIdentifier);
+	Map<Integer, String> getGenericGermplasmDescriptors(int studyIdentifier);
 
-	List<String> getAdditionalDesignFactors(int studyIdentifier);
+	Map<Integer, String> getAdditionalDesignFactors(int studyIdentifier);
 
 	Integer getPlotDatasetId(int studyId);
 
 	Integer getEnvironmentDatasetId(int studyId);
 
-	List<StudySummary> getStudies(StudySearchFilter studySearchFilter, Pageable pageable);
-
-	long countStudies(StudySearchFilter studySearchFilter);
-
 	boolean studyHasGivenDatasetType(Integer studyId, Integer datasetTypeId);
 
 	List<GermplasmStudyDto> getGermplasmStudies(Integer gid);
 
-	List<StudySummary> saveStudies(String crop, List<TrialImportRequestDTO> trialImportRequestDtoList, Integer userId);
+	List<StudyDTO> getFilteredStudies(String programUUID, StudySearchRequest studySearchRequest, Pageable pageable);
+
+	long countFilteredStudies(String programUUID, StudySearchRequest studySearchRequest);
+	
 }

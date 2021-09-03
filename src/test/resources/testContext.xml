@@ -301,6 +301,15 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
+	<bean id="trialServiceBrapi" class="org.generationcp.middleware.api.brapi.TrialServiceBrapiImpl">
+		<property name="sessionProvider" ref="cropSessionProvider"/>
+		<property name="daoFactory" ref="daoFactory"/>
+	</bean>
+
+	<bean id="studyServiceBrapi" class="org.generationcp.middleware.api.brapi.StudyServiceBrapiImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 	<bean id="germplasmAttributeService" class="org.generationcp.middleware.api.germplasm.GermplasmAttributeServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
@@ -313,7 +322,7 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
-		<bean id="germplasmNameService" class="org.generationcp.middleware.api.germplasm.GermplasmNameServiceImpl">
+	<bean id="germplasmNameService" class="org.generationcp.middleware.api.germplasm.GermplasmNameServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
@@ -324,5 +333,19 @@
 	<bean id="GermplasmNameTypeService" class="org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
+
+	<bean id="personValidator" class="org.generationcp.middleware.service.api.ontology.PersonValidator"/>
+
+	<bean id="breedingMethodValidator" class="org.generationcp.middleware.service.api.ontology.BreedingMethodValidator" />
+
+	<bean id="locationValidator" class="org.generationcp.middleware.service.api.ontology.LocationValidator" />
+
+	<bean id="breedingMethodService" class="org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+	
+	<bean id="lotService" class="org.generationcp.middleware.service.impl.inventory.LotServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
 
 </beans>

@@ -11,9 +11,9 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import com.google.common.base.Function;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -29,8 +29,6 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.type.IntegerType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,7 +43,6 @@ import java.util.Map;
 public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 	private static final String TYPE_ID = "typeId";
-	private static final Logger LOG = LoggerFactory.getLogger(ProjectPropertyDao.class);
 
 	/**
 	 * @param variableNames
@@ -55,12 +52,7 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeByAlias(final List<String> variableNames,
 		final String programUUID) {
 
-		final List<String> propertyNamesInUpperCase = Lists.transform(variableNames, new Function<String, String>() {
-
-			public String apply(final String s) {
-				return s.toUpperCase();
-			}
-		});
+		final List<String> propertyNamesInUpperCase = Lists.transform(variableNames, String::toUpperCase);
 
 		try {
 			if (!propertyNamesInUpperCase.isEmpty()) {
@@ -86,7 +78,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		} catch (final HibernateException e) {
 			final String message =
 				"Error in getStandardVariableIdsWithTypeByPropertyNames=" + variableNames + " in ProjectPropertyDao: " + e.getMessage();
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 
@@ -125,7 +116,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error in getByStandardVariableId(" + project.getProjectId() + ", " + standardVariableId + ")";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 		return projectProperty;
@@ -140,7 +130,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error in getNextRank(" + projectId + ")";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
@@ -155,7 +144,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error in getByTypeAndValue(" + typeId + ", " + value + ")";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
@@ -175,7 +163,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			return projectPropMap;
 		} catch (final HibernateException e) {
 			final String message = "Error in getPropsForProjectIds(" + projectIds + ")";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
@@ -237,7 +224,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error in getByProjectId(" + dmsProject.getProjectId() + ") in ProjectPropertyDao";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 		return list;
@@ -283,7 +269,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			return projectPropMap;
 		} catch (final MiddlewareQueryException e) {
 			final String message = "Error with getProjectPropsAndValuesByStudyIds() query from studyIds: " + studyIds;
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
@@ -306,38 +291,36 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		query.executeUpdate();
 	}
 
-	public List<String> getGermplasmDescriptors(final int studyIdentifier) {
-		final List<String> list = this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
+	public Map<Integer, String> getGermplasmDescriptors(final int studyIdentifier) {
+		return this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
 			Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
-		if (list != null && !list.isEmpty()) {
-			return Collections.unmodifiableList(list);
-		}
-		return Collections.unmodifiableList(Collections.<String>emptyList());
+
 	}
 
-	public List<String> getDesignFactors(final int studyIdentifier) {
-		final List<String> list = this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
+	public Map<Integer, String> getDesignFactors(final int studyIdentifier) {
+		return this.findPlotDatasetVariablesByTypesForStudy(studyIdentifier,
 			Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.TREATMENT_FACTOR.getId()));
-		if (list != null && !list.isEmpty()) {
-			return Collections.unmodifiableList(list);
-		}
-		return Collections.unmodifiableList(Collections.<String>emptyList());
 	}
 
-	private List<String> findPlotDatasetVariablesByTypesForStudy(final int studyIdentifier, final List<Integer> variableTypeIds) {
-		final String nameQuery = variableTypeIds.contains(VariableType.GERMPLASM_DESCRIPTOR.getId()) ?
-			" SELECT CASE WHEN pp.alias IS NOT NULL AND pp.alias != '' THEN pp.alias ELSE cvt.name END as name" : " SELECT cvt.name ";
-		final String variablesQuery = nameQuery +
-			" FROM  projectprop pp "
+	private Map<Integer, String> findPlotDatasetVariablesByTypesForStudy(final int studyIdentifier, final List<Integer> variableTypeIds) {
+		final String variablesQuery =
+			" SELECT cvt.name, cvt.cvterm_id "
+			+ " FROM  projectprop pp "
 			+ " INNER JOIN project ds ON ds.project_id = pp.project_ID AND ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
 			+ " INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
 			+ " WHERE pp.type_id IN (:variableTypeIds)"
 			+ " AND ds.study_id = :studyId";
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(variablesQuery);
 		sqlQuery.addScalar("name");
+		sqlQuery.addScalar("cvterm_id");
 		sqlQuery.setParameter("studyId", studyIdentifier);
 		sqlQuery.setParameterList("variableTypeIds", variableTypeIds);
-		return sqlQuery.list();
+		final Map<Integer, String> map = Maps.newHashMap();
+		final List<Object[]> list = sqlQuery.list();
+		for (final Object[] row : list) {
+			map.put((Integer) row[1], (String) row[0]);
+		}
+		return map;
 	}
 
 	public List<ProjectProperty> getByStudyAndStandardVariableIds(final int studyId, final List<Integer> standardVariableIds) {
@@ -350,7 +333,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 
 		} catch (final HibernateException e) {
 			final String message = "Error in getByStudyAndStandardVariableIds(" + standardVariableIds + ")";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
@@ -406,7 +388,6 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 		} catch (final HibernateException e) {
 			final String message = "Error in getByProjectIdAndVariableIds(" + dmsProject.getProjectId() + ", " + standardVariableIds
 				+ ") in ProjectPropertyDao";
-			ProjectPropertyDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 		return list;

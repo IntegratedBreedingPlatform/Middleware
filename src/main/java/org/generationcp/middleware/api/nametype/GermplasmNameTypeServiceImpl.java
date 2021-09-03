@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.nametype;
 
+import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -9,6 +10,8 @@ import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
@@ -17,10 +20,12 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Transactional
+@Service
 public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 
 	private final DaoFactory daoFactory;
-	private static final String DEFAULT_FFMT_FIELD = "-";
+	private static final String DEFAULT_FIELD = "-";
 
 	@Autowired
 	protected UserService userService;
@@ -45,27 +50,40 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
+	public Optional<GermplasmNameTypeDTO> getNameTypeById(final Integer id) {
+		final UserDefinedField nameType = this.daoFactory.getUserDefinedFieldDAO().getById(id);
+		if (nameType != null) {
+			return Optional.of(new GermplasmNameTypeDTO(nameType.getFldno(), nameType.getFcode(), nameType.getFname()));
+		}
+		return Optional.empty();
+	}
+
+	@Override
 	public Integer createNameType(final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
+		final String fDesc =
+			StringUtils.isBlank(germplasmNameTypeRequestDTO.getDescription()) ? GermplasmNameTypeServiceImpl.DEFAULT_FIELD :
+				germplasmNameTypeRequestDTO.getDescription();
+
 		final UserDefinedField userDefinedField = new UserDefinedField();
 		userDefinedField.setFtable(UDTableType.NAMES_NAME.getTable());
 		userDefinedField.setFtype(UDTableType.NAMES_NAME.getType());
-		userDefinedField.setFcode(germplasmNameTypeRequestDTO.getCode().toUpperCase());
+		userDefinedField.setFcode(germplasmNameTypeRequestDTO.getCode());
 		userDefinedField.setFname(germplasmNameTypeRequestDTO.getName());
-		userDefinedField.setFfmt(GermplasmNameTypeServiceImpl.DEFAULT_FFMT_FIELD);
-		userDefinedField.setFdesc(germplasmNameTypeRequestDTO.getDescription());
+		userDefinedField.setFfmt(GermplasmNameTypeServiceImpl.DEFAULT_FIELD);
+		userDefinedField.setFdesc(fDesc);
 		userDefinedField.setLfldno(0);
 		userDefinedField.setFuid(ContextHolder.getLoggedInUserId());
 		userDefinedField.setFdate(Util.getCurrentDateAsIntegerValue());
 		userDefinedField.setScaleid(0);
-		daoFactory.getUserDefinedFieldDAO().save(userDefinedField);
+		this.daoFactory.getUserDefinedFieldDAO().save(userDefinedField);
 		return userDefinedField.getFldno();
 	}
 
 	@Override
-	public List<GermplasmNameTypeDTO> getNameTypes(final Pageable pageable) {
+	public List<GermplasmNameTypeDTO> searchNameTypes(final NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest, final Pageable pageable) {
 		final Map<Integer, String> userMap = this.userService.getAllUserIDFullNameMap();
 
-		final List<UserDefinedField> userDefinedFields = daoFactory.getUserDefinedFieldDAO().getNameTypes(pageable);
+		final List<UserDefinedField> userDefinedFields = this.daoFactory.getUserDefinedFieldDAO().searchNameTypes(nameTypeMetadataFilterRequest, pageable);
 		if(!userDefinedFields.isEmpty()){
 			return userDefinedFields.stream().map(
 				userDefinedField ->
@@ -78,8 +96,8 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 	}
 
 	@Override
-	public long countAllNameTypes() {
-		return daoFactory.getUserDefinedFieldDAO().countAllNameTypes();
+	public long countSearchNameTypes(final NameTypeMetadataFilterRequest nameTypeMetadataFilterRequest) {
+		return this.daoFactory.getUserDefinedFieldDAO().countSearchNameTypes(nameTypeMetadataFilterRequest);
 	}
 
 	@Override
@@ -124,6 +142,37 @@ public class GermplasmNameTypeServiceImpl implements GermplasmNameTypeService {
 				return germplasmNameTypeDTO;
 			})
 			.collect(Collectors.toList());
+	}
+
+	@Override
+	public boolean isNameTypeUsedInListDataProp(final String nameType) {
+		return this.daoFactory.getListDataPropertyDAO().isNameTypeInUse(nameType);
+	}
+
+	@Override
+	public void updateNameType(final Integer nameTypeId, final GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO) {
+		final UserDefinedField userDefinedField = this.daoFactory.getUserDefinedFieldDAO().getById(nameTypeId);
+
+		if (!StringUtils.isBlank(germplasmNameTypeRequestDTO.getCode())) {
+			userDefinedField.setFcode(germplasmNameTypeRequestDTO.getCode());
+		}
+		if (!StringUtils.isBlank(germplasmNameTypeRequestDTO.getName())) {
+			userDefinedField.setFname(germplasmNameTypeRequestDTO.getName());
+		}
+		if (!StringUtils.isBlank(germplasmNameTypeRequestDTO.getDescription())) {
+			userDefinedField.setFdesc(germplasmNameTypeRequestDTO.getDescription());
+		}
+
+		userDefinedField.setFuid(ContextHolder.getLoggedInUserId());
+		userDefinedField.setFdate(Util.getCurrentDateAsIntegerValue());
+
+		this.daoFactory.getUserDefinedFieldDAO().update(userDefinedField);
+	}
+
+	@Override
+	public void deleteNameType(final Integer nameTypeId) {
+		final UserDefinedField userDefinedField = this.daoFactory.getUserDefinedFieldDAO().getById(nameTypeId);
+		this.daoFactory.getUserDefinedFieldDAO().makeTransient(userDefinedField);
 	}
 
 }

@@ -55,6 +55,11 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
+	public List<WorkbenchUser> getUsersByIds(final List<Integer> userIds) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getUsers(userIds);
+	}
+
+	@Override
 	public List<WorkbenchUser> getUserByName(final String name, final int start, final int numOfRows, final Operation op) {
 		final WorkbenchUserDAO dao = this.workbenchDaoFactory.getWorkbenchUserDAO();
 		List<WorkbenchUser> users = new ArrayList<>();
@@ -266,11 +271,6 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean isSuperAdminUser(final Integer userId) {
 		return this.workbenchDaoFactory.getWorkbenchUserDAO().isSuperAdminUser(userId);
-	}
-
-	@Override
-	public void removeUsersFromProgram(final List<Integer> workbenchUserIds, final Long projectId) {
-		this.workbenchDaoFactory.getUserRoleDao().removeUsersFromProgram(workbenchUserIds, projectId);
 	}
 
 	@Override

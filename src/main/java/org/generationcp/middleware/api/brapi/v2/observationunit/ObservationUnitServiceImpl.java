@@ -12,7 +12,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.search_request.brapi.v1.GermplasmSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
@@ -148,9 +148,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 		final List<String> germplasmDbIds =
 			requestDtos.stream().map(ObservationUnitImportRequestDto::getGermplasmDbId).collect(Collectors.toList());
-		final GermplasmSearchRequestDto germplasmSearchRequestDto = new GermplasmSearchRequestDto();
-		germplasmSearchRequestDto.setGermplasmDbIds(germplasmDbIds);
-		final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmServiceBrapi.searchGermplasmDTO(germplasmSearchRequestDto, null)
+		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
+		germplasmSearchRequest.setGermplasmDbIds(germplasmDbIds);
+		final Map<String, GermplasmDTO> germplasmDTOMap = this.germplasmServiceBrapi.searchGermplasmDTO(germplasmSearchRequest, null)
 			.stream().collect(Collectors.toMap(GermplasmDTO::getGermplasmDbId, Function.identity()));
 
 		final List<Integer> trialIds = requestDtos.stream().map(r -> Integer.valueOf(r.getTrialDbId())).collect(Collectors.toList());
@@ -183,10 +183,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			this.daoFactory.getCvTermDao().getVariablesBySynonymsAndVariableType(variableNames, VariableType.EXPERIMENTAL_DESIGN);
 		final List<Integer> categoricalVariableIds = new ArrayList<>();
 		categoricalVariableIds.addAll(
-			variableNamesMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+			variableNamesMap.values().stream()
+				.filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(Collectors.toList()));
 		categoricalVariableIds.addAll(
-			variableSynonymsMap.values().stream().filter(var -> DataType.CATEGORICAL_VARIABLE.getId().equals(var.getDataTypeId()))
+			variableSynonymsMap.values().stream()
+				.filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(Collectors.toList()));
 		final Map<Integer, List<ValueReference>> categoricalVariablesMap =
 			this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(categoricalVariableIds);
@@ -233,6 +235,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		}
 
 		return observationUnitDbIds;
+	}
+
+	@Override
+	public Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocations(
+		final Set<String> geolocationIds) {
+		return this.daoFactory.getExperimentPropertyDao().getPlotObservationLevelRelationshipsByGeolocations(geolocationIds);
 	}
 
 	private void setJsonProps(final ExperimentModel model, final ObservationUnitImportRequestDto dto) {
@@ -319,11 +327,11 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		if (!StringUtils.isEmpty(position.getPositionCoordinateX()) && !StringUtils.isEmpty(position.getPositionCoordinateY())) {
 			if (!plotExperimentVariablesMap.get(trialDbId).contains(TermId.RANGE_NO.getId())) {
 				this.addProjectProperty(TermId.RANGE_NO.getId(), "FIELDMAP RANGE", trialDbId, plotExperimentVariablesMap,
-						trialIdPlotDatasetMap);
+					trialIdPlotDatasetMap);
 			}
 			if (!plotExperimentVariablesMap.get(trialDbId).contains(TermId.COLUMN_NO.getId())) {
 				this.addProjectProperty(TermId.COLUMN_NO.getId(), "FIELDMAP COLUMN", trialDbId, plotExperimentVariablesMap,
-						trialIdPlotDatasetMap);
+					trialIdPlotDatasetMap);
 			}
 		}
 	}
@@ -342,9 +350,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	private Map<Integer, List<Integer>> populatePlotExperimentVariablesMap(final Map<Integer, DmsProject> plotDatasetMap) {
 		final Map<Integer, List<Integer>> plotExperimentVariablesMap = new HashMap<>();
-		for (final Map.Entry plotDatasetEntry : plotDatasetMap.entrySet()) {
-			final Integer key = (Integer) plotDatasetEntry.getKey();
-			final DmsProject plotDataset = (DmsProject) plotDatasetEntry.getValue();
+		for (final Map.Entry<Integer, DmsProject> plotDatasetEntry : plotDatasetMap.entrySet()) {
+			final Integer key = plotDatasetEntry.getKey();
+			final DmsProject plotDataset = plotDatasetEntry.getValue();
 			plotExperimentVariablesMap.put(key,
 				plotDataset.getProperties().stream().filter(p -> p.getTypeId().equals(VariableType.EXPERIMENTAL_DESIGN.getId()))
 					.map(ProjectProperty::getVariableId).collect(Collectors.toList()));
@@ -401,6 +409,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		}
 	}
 
+	/*
+	 * FIXME IBP-4289
+	 *  - ObservationLevelRelationship not consistent with /observationlevels
+	 *  - dto carrying different formats at different points in the call hierarchy (perhaps map directly before saving to ndexpprops?)
+	 *  - See ObservationLevelMapper
+	 */
 	private void renameObservationLevelNamesToBeSaved(final List<ObservationLevelRelationship> relationships) {
 		if (!CollectionUtils.isEmpty(relationships)) {
 			//Convert observation level relationship names to their equivalent in BMS database

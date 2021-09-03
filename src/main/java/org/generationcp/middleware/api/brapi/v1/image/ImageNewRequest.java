@@ -18,6 +18,9 @@ public class ImageNewRequest {
 	private Integer imageFileSize;
 	private Integer imageHeight;
 	private Map<String, Object> imageLocation;
+	/**
+	 * human readable file name. Ignored for the moment
+	 */
 	private String imageName;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
