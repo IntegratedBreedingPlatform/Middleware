@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.core.Is.is;
@@ -29,12 +30,13 @@ public class FileMetadataServiceImplTest {
 	public void testGetFilePathForGermplasm_UUID() {
 		final CropType cropType = new CropType();
 		cropType.setCropName("maize");
+		cropType.setPlotCodePrefix(randomAlphanumeric(4));
 		cropType.setUseUUID(true);
 
 		final List<Germplasm> germplasmList = new ArrayList<>();
 		final Germplasm germplasm = new Germplasm();
 		germplasmList.add(germplasm);
-		final String fileName = RandomStringUtils.randomAlphanumeric(20);
+		final String fileName = randomAlphanumeric(20) + "." + randomAlphanumeric(3);
 
 		GermplasmGuidGenerator.generateGermplasmGuids(cropType, germplasmList);
 
@@ -50,12 +52,13 @@ public class FileMetadataServiceImplTest {
 	public void testGetFilePathForGermplasm_CustomUID() {
 		final CropType cropType = new CropType();
 		cropType.setCropName("maize");
+		cropType.setPlotCodePrefix(randomAlphanumeric(4));
 		cropType.setUseUUID(false);
 
 		final List<Germplasm> germplasmList = new ArrayList<>();
 		final Germplasm germplasm = new Germplasm();
 		germplasmList.add(germplasm);
-		final String fileName = RandomStringUtils.randomAlphanumeric(20);
+		final String fileName = randomAlphanumeric(20) + "." + randomAlphanumeric(3);
 
 		GermplasmGuidGenerator.generateGermplasmGuids(cropType, germplasmList);
 
@@ -79,7 +82,7 @@ public class FileMetadataServiceImplTest {
 				+ "\\" + FileMetadataServiceImpl.FILE_PATH_SLASH + HEX_REGEX
 				+ "\\" + FileMetadataServiceImpl.FILE_PATH_SLASH + HEX_REGEX
 				+ "\\" + FileMetadataServiceImpl.FILE_PATH_SLASH + FileMetadataServiceImpl.FILE_PATH_PREFIX_GERMPLASMUUID + germplasmUUID
-				+ fileName
+				+ "\\" + FileMetadataServiceImpl.FILE_PATH_SLASH + fileName
 		);
 	}
 }

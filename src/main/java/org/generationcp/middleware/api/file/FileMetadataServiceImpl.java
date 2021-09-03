@@ -177,7 +177,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 			+ FILE_PATH_SLASH + hexString.charAt(3)
 			+ FILE_PATH_SLASH + hexString.charAt(4)
 			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_GERMPLASMUUID + germplasmUUID
-			+ fileName;
+			+ FILE_PATH_SLASH + fileName;
 	}
 
 	private void validatePathNotExists(final String path) {
