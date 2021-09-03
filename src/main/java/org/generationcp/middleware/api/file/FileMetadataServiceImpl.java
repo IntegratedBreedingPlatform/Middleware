@@ -173,7 +173,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		 * In theory this should result in not too many files per directory and not too many directories either.
 		 */
 		final String hexString = Hex.encodeHexString(md5.digest(germplasmUUID.getBytes(StandardCharsets.UTF_8)));
-		return FILE_PATH_GERMPLASM_ROOT
+		final String path = FILE_PATH_GERMPLASM_ROOT
 			+ FILE_PATH_SLASH + hexString.charAt(0)
 			+ FILE_PATH_SLASH + hexString.charAt(1)
 			+ FILE_PATH_SLASH + hexString.charAt(2)
@@ -181,6 +181,8 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 			+ FILE_PATH_SLASH + hexString.charAt(4)
 			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_GERMPLASMUUID + germplasmUUID
 			+ FILE_PATH_SLASH + fileName;
+		this.validatePathNotExists(path);
+		return path;
 	}
 
 	private void validatePathNotExists(final String path) {
