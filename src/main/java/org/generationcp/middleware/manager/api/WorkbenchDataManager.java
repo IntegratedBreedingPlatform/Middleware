@@ -10,7 +10,6 @@
 
 package org.generationcp.middleware.manager.api;
 
-import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
@@ -281,34 +280,6 @@ public interface WorkbenchDataManager {
 	Boolean isLastOpenedProjectChanged();
 
 	/**
-	 * Retrive all standard presets with specific crop + tool
-	 *
-	 * @param cropName
-	 * @param toolId
-	 * @return
-	 */
-	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId);
-
-	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId, String toolSection);
-
-	List<StandardPreset> getStandardPresetFromCropAndToolByName(String presetName, String cropName, int toolId, String toolSection);
-
-	/**
-	 * save or update a standard preset
-	 *
-	 * @param standardPreset
-	 * @return
-	 */
-	StandardPreset saveOrUpdateStandardPreset(StandardPreset standardPreset);
-
-	/**
-	 * delete a standard preset by id
-	 *
-	 * @param standardPresetId
-	 */
-	void deleteStandardPreset(int standardPresetId);
-
-	/**
 	 * Close the sessionProvider
 	 */
 	void close();
@@ -326,14 +297,6 @@ public interface WorkbenchDataManager {
 	 * @return
 	 */
 	List<RoleType> getRoleTypes();
-
-	/**
-	 * Get standard preset
-	 *
-	 * @param presetId
-	 * @return StandardPreset
-	 */
-	StandardPreset getStandardPresetById(Integer presetId);
 
 	// TODO Move role methods to RoleServiceImp
 
