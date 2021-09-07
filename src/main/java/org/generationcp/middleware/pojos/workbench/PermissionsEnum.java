@@ -73,5 +73,9 @@ public enum PermissionsEnum {
 		+ ", 'MANAGE_GERMPLASM'"
 		+ ", 'IMPORT_GERMPLASM')";
 
+	public static final String HAS_MANAGE_GERMPLASM = " or hasAnyAuthority('ADMIN'"
+		+ ", 'GERMPLASM'"
+		+ ", 'MANAGE_GERMPLASM')";
+
 	public static final List<String> SITE_ADMIN_PERMISSIONS = Arrays.asList(SITE_ADMIN.name(), ADMINISTRATION.name(), ADMIN.name());
 }
