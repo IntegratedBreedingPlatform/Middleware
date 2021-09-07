@@ -11,8 +11,8 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
-import java.io.Serializable;
-import java.util.Date;
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -22,9 +22,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
-
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
+import java.io.Serializable;
+import java.util.Date;
 
 /**
  * POJO for workbench_project_activity table.
@@ -37,10 +36,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 public class ProjectActivity implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	/** Used by ProjectActivityDAO.getByProjectId() */
-	public static final String GET_ACTIVITIES_BY_PROJECT_ID = "SELECT wpa.* " + "FROM workbench_project_activity wpa "
-			+ "WHERE project_id = :projectId " + "ORDER BY date";
 
 	/** Used by ProjectActivityDAO.countByProjectId() */
 	public static final String COUNT_ACTIVITIES_BY_PROJECT_ID = "SELECT COUNT(*) " + "FROM workbench_project_activity "
@@ -72,7 +67,8 @@ public class ProjectActivity implements Serializable {
 	public ProjectActivity() {
 	}
 
-	public ProjectActivity(Integer projectActivityId, Project project, String name, String description, WorkbenchUser user, Date createdAt) {
+	public ProjectActivity(final Integer projectActivityId, final Project project, final String name, final String description,
+		final WorkbenchUser user, final Date createdAt) {
 		super();
 		this.projectActivityId = projectActivityId;
 		this.project = project;
@@ -86,7 +82,7 @@ public class ProjectActivity implements Serializable {
 		return this.projectActivityId;
 	}
 
-	public void setProjectActivityId(Integer projectActivityId) {
+	public void setProjectActivityId(final Integer projectActivityId) {
 		this.projectActivityId = projectActivityId;
 	}
 
@@ -94,7 +90,7 @@ public class ProjectActivity implements Serializable {
 		return this.project;
 	}
 
-	public void setProject(Project project) {
+	public void setProject(final Project project) {
 		this.project = project;
 	}
 
@@ -102,7 +98,7 @@ public class ProjectActivity implements Serializable {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -110,7 +106,7 @@ public class ProjectActivity implements Serializable {
 		return this.description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(final String description) {
 		this.description = description;
 	}
 
@@ -118,7 +114,7 @@ public class ProjectActivity implements Serializable {
 		return this.user;
 	}
 
-	public void setUser(WorkbenchUser user) {
+	public void setUser(final WorkbenchUser user) {
 		this.user = user;
 	}
 
@@ -126,7 +122,7 @@ public class ProjectActivity implements Serializable {
 		return this.createdAt;
 	}
 
-	public void setCreatedAt(Date date) {
+	public void setCreatedAt(final Date date) {
 		this.createdAt = date;
 	}
 
@@ -136,25 +132,25 @@ public class ProjectActivity implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
 		if (obj == this) {
 			return true;
 		}
-		if (!ProjectActivity.class.isInstance(obj)) {
+		if (!(obj instanceof ProjectActivity)) {
 			return false;
 		}
 
-		ProjectActivity otherObj = (ProjectActivity) obj;
+		final ProjectActivity otherObj = (ProjectActivity) obj;
 
 		return new EqualsBuilder().append(this.projectActivityId, otherObj.projectActivityId).isEquals();
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("ProjectActivity [projectActivityId=");
 		builder.append(this.projectActivityId);
 		builder.append(", project=");
