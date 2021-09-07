@@ -1,0 +1,65 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v19.2.0-1">
+        <preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<tableExists tableName="list_data_details"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Create table 'list_data_details'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table list_data_details (
+				id          int auto_increment
+					primary key,
+				variable_id int          not null,
+				lrecid      int          not null,
+				value       varchar(255) null,
+				cvalue_id   int          null,
+				constraint list_entry_details_data_cvterm_cvterm_id_fk
+					foreign key (variable_id) references cvterm(cvterm_id),
+				constraint list_entry_details_data_cvterm_cvterm_id_fk_2
+					foreign key (cvalue_id) references cvterm(cvterm_id),
+				constraint list_entry_details_data_listdata_lrecid_fk
+					foreign key (lrecid) references listdata(lrecid)
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.2.0-2">
+        <preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<tableExists tableName="list_data_view"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Create table 'list_data_view'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table list_data_view (
+				id          int auto_increment
+					primary key,
+				list_id     int         not null,
+				type_id     int         null,
+				variable_id int         null,
+				type        varchar(55) not null,
+				constraint list_data_view_cvterm_cvterm_id_fk
+					foreign key (type_id) references cvterm(cvterm_id),
+				constraint list_data_view_cvterm_cvterm_id_fk_2
+					foreign key (variable_id) references cvterm(cvterm_id),
+				constraint list_data_view_listnms_listid_fk
+					foreign key (list_id) references listnms(listid)
+			);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
