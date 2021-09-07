@@ -2067,7 +2067,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public void markProjectsAndChildrenAsDeleted(final List<Integer> projectIds) {
 		try {
-			if (!projectIds.isEmpty()) {
+			if (!CollectionUtils.isEmpty(projectIds)) {
 				final String timestamp = Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS");
 				final String sql =
 					"UPDATE project p SET p.deleted = 1, p.name = CONCAT(p.name, '#', :timestamp) WHERE "
