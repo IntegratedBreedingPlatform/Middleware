@@ -584,6 +584,21 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return new ArrayList<>();
 	}
 
+	public List<ExperimentModel> getExperimentsByStockIds(final Collection<Integer> stockIds) {
+		try {
+			if (stockIds != null && !stockIds.isEmpty()) {
+				final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+				criteria.add(Restrictions.in("stock.stockId", stockIds));
+				return criteria.list();
+			}
+		} catch (final HibernateException e) {
+			final String error = "Error in getExperimentsByStockIds=" + stockIds + " query in ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(error);
+			throw new MiddlewareQueryException(error, e);
+		}
+		return new ArrayList<>();
+	}
+
 	@SuppressWarnings("unchecked")
 	public Map<Integer, Set<Integer>> getEnvironmentsOfGermplasms(final Set<Integer> gids, final String programUUID) {
 		final Map<Integer, Set<Integer>> germplasmEnvironments = new HashMap<>();
