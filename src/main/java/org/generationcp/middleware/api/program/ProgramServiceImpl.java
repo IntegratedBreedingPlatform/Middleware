@@ -97,8 +97,4 @@ public class ProgramServiceImpl implements ProgramService {
 		this.daoFactory.getUserRoleDao().removeUsersFromProgram(userIds, projectId);
 	}
 
-	@Override
-	public long countProjectsByFilter(final ProgramSearchRequest programSearchRequest) {
-		return this.daoFactory.getProjectDAO().countProjectsByFilter(programSearchRequest);
-	}
 }

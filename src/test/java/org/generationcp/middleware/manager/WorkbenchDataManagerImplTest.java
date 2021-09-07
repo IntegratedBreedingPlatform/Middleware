@@ -93,6 +93,13 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testGetProjects() {
+		final List<Project> projects = this.workbenchDataManager.getProjects();
+		Assert.assertNotNull(projects);
+		Assert.assertFalse(projects.isEmpty());
+	}
+
+	@Test
 	public void testGetToolWithName() {
 		final String toolName = "fieldbook_web";
 		final Tool tool = this.workbenchDataManager.getToolWithName(toolName);
@@ -143,6 +150,20 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final List<Tool> results = this.workbenchDataManager.getAllTools();
 		Assert.assertNotNull(results);
 		Assert.assertFalse(results.isEmpty());
+	}
+
+	@Test
+	public void testGetLastOpenedProject() {
+		final Project results = this.workbenchDataManager.getLastOpenedProject(this.testUser1.getUserid());
+		Assert.assertNotNull(results);
+	}
+
+	@Test
+	public void testGetToolsWithType() {
+		final List<Tool> results = this.workbenchDataManager.getToolsWithType(ToolType.NATIVE);
+		Assert.assertNotNull(results);
+		Assert.assertFalse(results.isEmpty());
+		Debug.printObjects(IntegrationTestBase.INDENT, results);
 	}
 
 	@Test
@@ -227,6 +248,17 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 			}
 		}
 		return fulllist;
+	}
+
+	@Test
+	public void testCountProjectsByFilter() {
+		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+		final Project project = this.commonTestProject;
+		programSearchRequest.setProgramName(project.getProjectName());
+		programSearchRequest.setCommonCropName(project.getCropType().getCropName());
+		programSearchRequest.setLoggedInUserId(this.testUser1.getUserid());
+		final long count = this.workbenchDataManager.countProjectsByFilter(programSearchRequest);
+		assertThat(new Long(1), is(equalTo(count)));
 	}
 
 	@Test

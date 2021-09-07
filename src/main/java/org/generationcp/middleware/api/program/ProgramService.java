@@ -14,23 +14,10 @@ public interface ProgramService {
 
 	void saveOrUpdateProjectUserInfo(Integer userId, String  programUUID);
 
-	/**
-	 * Returns the project last accessed by the user.
-	 *
-	 * @param userId - the user id to match
-	 * @return the last Project opened by the given user
-	 */
 	ProgramDTO getLastOpenedProject(Integer userId);
 
 	void addProgramMembers(String programUUID, AddProgramMemberRequestDto addProgramMemberRequestDto);
 
 	void removeProgramMembers(String programUUID, List<Integer> userIds);
 
-	/**
-	 * Gets count projects.
-	 *
-	 * @param filters - the number of rows to retrieve
-	 * @return the number of all the projects
-	 */
-	long countProjectsByFilter(final ProgramSearchRequest programSearchRequest);
 }

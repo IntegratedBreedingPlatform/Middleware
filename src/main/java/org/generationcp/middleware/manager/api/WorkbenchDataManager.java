@@ -35,6 +35,31 @@ public interface WorkbenchDataManager {
 	/**
 	 * Gets the projects.
 	 *
+	 * @return the projects
+	 */
+	List<Project> getProjects();
+
+	/**
+	 * Gets the projects.
+	 *
+	 * @param start     - the starting record
+	 * @param numOfRows - the number of rows to retrieve
+	 * @return the projects
+	 */
+	List<Project> getProjects(int start, int numOfRows);
+
+	/**
+	 * Gets count projects.
+	 *
+	 * @param filters - the number of rows to retrieve
+	 * @return the number of all the projects
+	 */
+	//FIXME Remove this method, move tests. It is now in ProgramService
+	long countProjectsByFilter(final ProgramSearchRequest programSearchRequest);
+
+	/**
+	 * Gets the projects.
+	 *
 	 * @param pageable     - the starting record and number of page
 	 * @param programSearchRequest   - the filters that to be included in the query
 	 * @return All projects based on the given start, numOfRows and filters Map
@@ -111,6 +136,14 @@ public interface WorkbenchDataManager {
 	Tool getToolWithName(String toolName);
 
 	/**
+	 * Get the list of tools with the specified type.
+	 *
+	 * @param toolType the tool type
+	 * @return the list of matching tools
+	 */
+	List<Tool> getToolsWithType(ToolType toolType);
+
+	/**
 	 * Gets a project by id.
 	 *
 	 * @param projectId - the project id to match
@@ -135,6 +168,14 @@ public interface WorkbenchDataManager {
 	 * @return the project matching the given Uuid and crop type
 	 */
 	Project getProjectByUuidAndCrop(String projectUuid, String cropType);
+
+	/**
+	 * Returns the project last accessed by the user.
+	 *
+	 * @param userId - the user id to match
+	 * @return the last Project opened by the given user
+	 */
+	Project getLastOpenedProject(Integer userId);
 
 	/**
 	 * Adds a project activity.

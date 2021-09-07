@@ -136,6 +136,36 @@ public class ProjectDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testGetProgramsByUserIdAdminAndProgramUser() {
+
+		final int count = this.workbenchDataManager.getProjects().size();
+
+		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+		programSearchRequest.setLoggedInUserId(this.adminInstanceProgram.getUserid());
+		final Pageable pageable = new PageRequest(0, 100);
+		final List<Project> projects = this.workbenchProjectDao.getProjectsByFilter(pageable, programSearchRequest);
+		final Set<Project> projectSet = Sets.newHashSet(projects);
+
+		Assert.assertEquals(count, projects.size());
+		Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
+	}
+
+	@Test
+	public void testGetProgramsByUserIdAdminUser() {
+
+		final int count = this.workbenchDataManager.getProjects().size();
+
+		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
+		programSearchRequest.setLoggedInUserId(this.admin.getUserid());
+		final Pageable pageable = new PageRequest(0, 100);
+		final List<Project> projects = this.workbenchProjectDao.getProjectsByFilter(pageable, programSearchRequest);
+		final Set<Project> projectSet = Sets.newHashSet(projects);
+
+		Assert.assertEquals(count, projects.size());
+		Assert.assertEquals("No Duplicates", projects.size(), projectSet.size());
+	}
+
+	@Test
 	public void testGetProgramsByUserIdProgramAdminUser() {
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		programSearchRequest.setLoggedInUserId(this.programAdmin.getUserid());
