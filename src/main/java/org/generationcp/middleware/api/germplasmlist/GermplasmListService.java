@@ -69,4 +69,6 @@ public interface GermplasmListService {
 	 */
 	boolean toggleGermplasmListStatus(Integer listId);
 
+	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId);
+
 }

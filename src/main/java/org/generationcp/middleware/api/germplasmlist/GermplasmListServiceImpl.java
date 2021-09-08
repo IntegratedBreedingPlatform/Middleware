@@ -13,6 +13,7 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -25,6 +26,7 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
+import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -97,6 +99,42 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		public String getName() {
 			return this.name;
+		}
+
+	}
+
+	private enum GermplasmListStaticColumns {
+
+		ENTRY_NO("ENTRY_NO", TermId.ENTRY_NO.getId()),
+		GID("GID", TermId.GID.getId()),
+		DESIGNATION("DESIGNATION", TermId.DESIG.getId()),
+		LOTS("LOTS", TermId.GID_ACTIVE_LOTS_COUNT.getId()),
+		AVAILABLE("AVAILABLE", TermId.GID_AVAILABLE_BALANCE.getId()),
+		UNIT("UNIT", TermId.GID_UNIT.getId()),
+		IMMEDIATE_SOURCE_GID("IMMEDIATE SOURCE GID", TermId.IMMEDIATE_SOURCE_GID.getId()),
+		IMMEDIATE_SOURCE_NAME("IMMEDIATE SOURCE NAME", TermId.IMMEDIATE_SOURCE_NAME.getId()),
+		GROUP_SOURCE_GID("GROUP SOURCE GID", TermId.GROUP_SOURCE_GID.getId()),
+		GROUP_SOURCE_NAME("GROUP SOURCE NAME", TermId.GROUP_SOURCE_NAME.getId()),
+		CROSS("CROSS", TermId.CROSS.getId()),
+		FEMALE_PARENT_GID("FEMALE PARENT GID", TermId.FGID.getId()),
+		FEMALE_PARENT_NAME("FEMALE PARENT NAME", TermId.FEMALE_PARENT.getId()),
+		MALE_PARENT_GID("MALE PARENT GID", TermId.MGID.getId()),
+		MALE_PARENT_NAME("MALE PARENT NAME", TermId.MALE_PARENT.getId()),
+		BREEDING_METHOD_PREFERRED_NAME("BREEDING METHOD PREFERRED NAME", TermId.BREEDING_METHOD_NAME.getId()),
+		BREEDING_METHOD_ABBREVIATION("BREEDING METHOD ABBREVIATION", TermId.BREEDING_METHOD_ABBREVIATION.getId()),
+		BREEDING_METHOD_GROUP("BREEDING METHOD GROUP", TermId.BREEDING_METHOD_GROUP.getId()),
+		GUID("GUID", TermId.GUID.getId()),
+		LOCATION_NAME("LOCATION NAME", TermId.GERMPLASM_LOCATION.getId()),
+		LOCATION_ABBREVIATION("LOCATION ABBREVIATION", TermId.LOCATION_ABBR.getId()),
+		GERMPLASM_DATE("GERMPLASM DATE", TermId.GERMPLASM_DATE.getId()),
+		GERMPLASM_REFERENCE("REFERENCE", TermId.GERMPLASM_REFERENCE.getId());
+
+		private final String name;
+		private final int value;
+
+		GermplasmListStaticColumns(final String name, final int value) {
+			this.name = name;
+			this.value = value;
 		}
 
 	}
@@ -447,6 +485,45 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 		this.daoFactory.getGermplasmListDAO().save(germplasmList);
 		return germplasmList.isLockedList();
+	}
+
+	@Override
+	public List<GermplasmListColumnDTO> getGermplasmListColumns(final Integer listId) {
+		final List<GermplasmListData> listData = this.daoFactory.getGermplasmListDataDAO().getByListId(listId);
+		final List<Integer> gids = listData.stream().map(GermplasmListData::getGid).collect(Collectors.toList());
+		final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids);
+		final List<Attribute> attributes = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(gids);
+		final VariableFilter variableFilter = new VariableFilter();
+		attributes
+			.stream()
+			.map(Attribute::getTypeId)
+			.forEach(variableFilter::addVariableId);
+		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+
+		final List<GermplasmListColumnDTO> columns = Arrays.stream(GermplasmListStaticColumns.values())
+			.map(column -> new GermplasmListColumnDTO(column.value, column.name, GermplasmListColumnType.STATIC))
+			.collect(Collectors.toList());
+
+		final List<GermplasmListColumnDTO> nameColumns = nameTypes
+			.stream()
+			.map(nameType -> new GermplasmListColumnDTO(nameType.getFldno(), nameType.getFcode(), GermplasmListColumnType.NAMES))
+			.collect(Collectors.toList());
+		columns.addAll(nameColumns);
+
+		final List<GermplasmListColumnDTO> germplasmAttributeColumns = variables
+			.stream()
+			.map(variable -> {
+				Integer typeId = null;
+				// get first value because germplasm attributes/passport are not combinables with other types
+				if (!CollectionUtils.isEmpty(variable.getVariableTypes())) {
+					typeId = variable.getVariableTypes().iterator().next().getId();
+				}
+				return new GermplasmListColumnDTO(variable.getId(), variable.getName(), typeId, GermplasmListColumnType.VARIABLE);
+			})
+			.collect(Collectors.toList());
+		columns.addAll(germplasmAttributeColumns);
+
+		return columns;
 	}
 
 	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {
