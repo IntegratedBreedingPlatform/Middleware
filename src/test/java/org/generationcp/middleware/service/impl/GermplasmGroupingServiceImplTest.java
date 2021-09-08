@@ -9,6 +9,7 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -75,6 +76,7 @@ public class GermplasmGroupingServiceImplTest {
 		MockitoAnnotations.initMocks(this);
 		ReflectionTestUtils.setField(this.germplasmGroupingService, "daoFactory", this.daoFactory);
 		ReflectionTestUtils.setField(this.germplasmGroupingService, "germplasmDataManager", this.germplasmDataManager);
+		ReflectionTestUtils.setField(this.germplasmGroupingService, "maxRecursiveQueries", 10);
 		Mockito.doReturn(this.germplasmDAO).when(this.daoFactory).getGermplasmDao();
 		Mockito.doReturn(this.methodDAO).when(this.daoFactory).getMethodDAO();
 		Mockito.doReturn(this.userDefinedFieldDAO).when(this.daoFactory).getUserDefinedFieldDAO();
@@ -373,6 +375,39 @@ public class GermplasmGroupingServiceImplTest {
 		Assert.assertEquals("Expecting child2 mgid to remain unchanged as method is generative.", expectedChild2MGID, child2.getMgid());
 
 		Mockito.verify(this.germplasmDAO, Mockito.times(2)).save(ArgumentMatchers.any(Germplasm.class));
+	}
+	
+	@Test
+	public void testMarkFixedCase_ExceedsMaxRecursiveQueries() {
+		final Integer generativeMethodId = 123;
+		final Method method = new Method(generativeMethodId);
+		method.setMtype("GEN");
+		Mockito.when(this.methodDAO.getById(generativeMethodId)).thenReturn(method);
+
+		final Germplasm child1 = new Germplasm();
+		child1.setGid(2);
+		child1.setMgid(222);
+
+		final Germplasm child2 = new Germplasm();
+		child2.setGid(3);
+		final Integer expectedChild2MGID = 333;
+		child2.setMgid(expectedChild2MGID);
+		child2.setMethodId(generativeMethodId);
+
+		final Germplasm child3 = new Germplasm();
+		child2.setGid(4);
+
+		Mockito.when(this.germplasmDAO.getAllChildren(this.gidToFix)).thenReturn(Lists.newArrayList(child1, child2));
+		Mockito.when(this.germplasmDAO.getAllChildren(child2.getGid())).thenReturn(Lists.newArrayList(child3));
+
+		// Set 1 as maximum level to traverse for descendants
+		ReflectionTestUtils.setField(this.germplasmGroupingService, "maxRecursiveQueries", 1);
+		try {
+			this.germplasmGroupingService.markFixed(Collections.singletonList(this.gidToFix), true, false);
+			Assert.fail();
+		} catch (final MiddlewareRequestException exception) {
+			Assert.assertTrue(exception.getErrorCodeParamsMultiMap().containsKey("germplasm.grouping.max.recursive.queries.reached"));
+		}
 	}
 
 	/**
