@@ -9,7 +9,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
+import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
@@ -41,6 +43,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
+import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
@@ -123,7 +126,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private StudyEntryService studyEntryService;
-
 
 	private final GermplasmMethodValidator germplasmMethodValidator;
 
@@ -1106,14 +1108,92 @@ public class GermplasmServiceImpl implements GermplasmService {
 			.replaceGermplasm(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId());
 
 		// Replace non-selected germplasm used as entries in any study with the target germplasm.
-		this.studyEntryService.replaceStudyEntries(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId(), crossExpansion);
+		this.studyEntryService.replaceStudyEntries(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId(),
+			crossExpansion);
 
-		// Migrate names, passport and name-types attributes.
+		if (germplasmMergeRequestDto.getMergeOptions().isMigrateNameTypes()) {
+			// Migrate names from non-selected germplasm to the target germplasm
+			this.migrateNames(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId());
+		}
 
-		// Migrate lots.
+		if (germplasmMergeRequestDto.getMergeOptions().isMigrateAttributesData()) {
+			// Migrate attributes from non-selected germplasm to the target germplasm
+			this.migrateAttributes(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId(),
+				VariableType.GERMPLASM_ATTRIBUTE.getId());
+		}
+
+		if (germplasmMergeRequestDto.getMergeOptions().isMigratePassportData()) {
+			// Migrate passport from non-selected germplasm to the target germplasm
+			this.migrateAttributes(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId(),
+				VariableType.GERMPLASM_PASSPORT.getId());
+		}
+
+		// Migrate lots from non-selected germplasm to the target germplasm
+		this.migrateLots(nonSelectedGermplasmList, germplasmMergeRequestDto.getTargetGermplasmId());
+		this.closeLots(nonSelectedGermplasmList);
 
 		// Delete all non-selected germplasm that were merged
 		this.deleteGermplasm(gidsNonSelectedGermplasm);
+	}
+
+	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Integer targetGermplasmId) {
+		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(targetGermplasmId);
+		final NameDAO nameDAO = this.daoFactory.getNameDao();
+		final List<Name> names = nameDAO.getNamesByGids(gidsNonSelectedGermplasm);
+		final List<Integer> existingNameTypeIds = germplasm.getNames().stream().map(Name::getTypeId).collect(Collectors.toList());
+		for (final Name name : names) {
+			if (!existingNameTypeIds.contains(name.getTypeId())) {
+				final Name nameToSave =
+					new Name(null, germplasm, name.getTypeId(), name.getNstat(), name.getNval(), name.getLocationId(), name.getNdate(),
+						name.getReferenceId());
+				nameDAO.save(nameToSave);
+				nameDAO.makeTransient(name);
+				existingNameTypeIds.add(nameToSave.getTypeId());
+			}
+		}
+	}
+
+	private void migrateAttributes(final List<Integer> gidsNonSelectedGermplasm, final Integer targetGermplasmId,
+		final Integer variableTypeId) {
+		final AttributeDAO attributeDAO = this.daoFactory.getAttributeDAO();
+		final List<Attribute> attributesOfTargetGermplasm =
+			attributeDAO.getByGIDsAndVariableType(Arrays.asList(targetGermplasmId), variableTypeId);
+		final List<Attribute> attributesOfNonSelectedGermplasm =
+			attributeDAO.getByGIDsAndVariableType(gidsNonSelectedGermplasm, variableTypeId);
+		final List<Integer> existingAttributeTypeIds =
+			attributesOfTargetGermplasm.stream().map(Attribute::getTypeId).collect(Collectors.toList());
+		for (final Attribute attribute : attributesOfNonSelectedGermplasm) {
+			if (!existingAttributeTypeIds.contains(attribute.getTypeId())) {
+				final Attribute attributeToSave =
+					new Attribute(null, targetGermplasmId, attribute.getTypeId(), attribute.getAval(), attribute.getcValueId(),
+						attribute.getLocationId(), attribute.getReferenceId(), attribute.getAdate());
+				attributeDAO.save(attributeToSave);
+				attributeDAO.makeTransient(attribute);
+				existingAttributeTypeIds.add(attributeToSave.getTypeId());
+			}
+		}
+	}
+
+	private void migrateLots(final List<GermplasmMergeRequestDto.NonSelectedGermplasm> nonSelectedGermplasmList,
+		final Integer targetGermplasmId) {
+		final List<Integer> migrateLotsGids = nonSelectedGermplasmList.stream().filter(o -> !o.isOmit() && o.isMigrateLots())
+			.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
+				Collectors.toList());
+		final List<Lot> lotsToMigrate = this.daoFactory.getLotDao().getByGids(migrateLotsGids);
+		for (final Lot lot : lotsToMigrate) {
+			lot.setEntityId(targetGermplasmId);
+			this.daoFactory.getLotDao().saveOrUpdate(lot);
+		}
+
+	}
+
+	private void closeLots(final List<GermplasmMergeRequestDto.NonSelectedGermplasm> nonSelectedGermplasmList) {
+		final List<Integer> closeLotsGids = nonSelectedGermplasmList.stream().filter(o -> !o.isOmit() && o.isCloseLots())
+			.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
+				Collectors.toList());
+		final List<Integer> lotsToClose =
+			this.daoFactory.getLotDao().getByGids(closeLotsGids).stream().map(Lot::getId).collect(Collectors.toList());
+		this.daoFactory.getLotDao().closeLots(lotsToClose);
 
 	}
 

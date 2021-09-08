@@ -115,7 +115,7 @@ public class GermplasmMergeRequestDto {
 
 
 	@AutoProperty
-	private static class MergeOptions {
+	public static class MergeOptions {
 
 		private boolean migratePassportData;
 

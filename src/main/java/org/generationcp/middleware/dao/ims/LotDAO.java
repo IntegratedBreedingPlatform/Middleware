@@ -12,6 +12,7 @@ package org.generationcp.middleware.dao.ims;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
@@ -66,35 +67,36 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	 * as required by BMS-1052
 	 */
 	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS = "SELECT i.lotid, i.eid, " + "  locid, scaleid, i.comments, i.status,"
-			+ "  SUM(CASE WHEN trnstat = 1 THEN trnqty ELSE 0 END) AS actual_balance, "
-			+ "  SUM(CASE WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND trntype = " + TransactionType.WITHDRAWAL.getId()
-			+ ") THEN trnqty ELSE 0 END) AS available_balance, "
-			+ "  SUM(CASE WHEN trnstat = 0 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS reserved_amt, "
-			+ "  SUM(CASE WHEN trnstat = 1 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS committed_amt, ";
+		+ "  SUM(CASE WHEN trnstat = 1 THEN trnqty ELSE 0 END) AS actual_balance, "
+		+ "  SUM(CASE WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (trnstat = "
+		+ TransactionStatus.PENDING.getIntValue() + " AND trntype = " + TransactionType.WITHDRAWAL.getId()
+		+ ") THEN trnqty ELSE 0 END) AS available_balance, "
+		+ "  SUM(CASE WHEN trnstat = 0 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS reserved_amt, "
+		+ "  SUM(CASE WHEN trnstat = 1 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS committed_amt, ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS =
-			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS + "  GROUP_CONCAT(DISTINCT stock_id SEPARATOR ', ') AS stockids, created_date ";
+		LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS + "  GROUP_CONCAT(DISTINCT stock_id SEPARATOR ', ') AS stockids, created_date ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM_CONDITION =
-			"FROM ims_lot i " + "LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-					+ "WHERE (i.status = 0 OR :includeCloseLots) AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) " + "GROUP BY i.lotid ";
+		"FROM ims_lot i " + "LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
+			+ "WHERE (i.status = 0 OR :includeCloseLots) AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) " + "GROUP BY i.lotid ";
 
 	private static final String GET_LOTS_FOR_GERMPLASM =
-			LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS + LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
+		LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS + LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
 
 	private static final String GET_LOTS_FOR_LIST_ENTRIES =
-			"SELECT lot.*, recordid, trnqty * -1, trnstat, trnid " + "FROM " + "   (" + LotDAO.GET_LOTS_FOR_GERMPLASM + "   ) lot "
-					+ " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid " + "  AND trnstat in (:statusList) AND trnqty < 0 "
-					+ "  AND sourceid = :listId AND sourcetype = 'LIST' ";
+		"SELECT lot.*, recordid, trnqty * -1, trnstat, trnid " + "FROM " + "   (" + LotDAO.GET_LOTS_FOR_GERMPLASM + "   ) lot "
+			+ " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid " + "  AND trnstat in (:statusList) AND trnqty < 0 "
+			+ "  AND sourceid = :listId AND sourcetype = 'LIST' ";
 
 	private static final String GET_LOTS_STATUS_FOR_GERMPLASM = "SELECT i.lotid, COUNT(DISTINCT (act.trnstat)), act.trnstat"
-			+ " FROM ims_lot i LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9"
-			+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND act.trnqty < 0 AND i.eid IN (:gids)" + "GROUP BY i.lotid ORDER BY lotid";
+		+ " FROM ims_lot i LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9"
+		+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND act.trnqty < 0 AND i.eid IN (:gids)" + "GROUP BY i.lotid ORDER BY lotid";
 
 	private static final String GET_LOT_SCALE_FOR_GERMPLSMS = "select  lot.eid, lot.scaleid, cv.name from ims_lot lot "
-			+ " LEFT JOIN cvterm_relationship cvr ON cvr.subject_id = lot.scaleid AND cvr.type_id ="+ TermId.HAS_SCALE.getId()
-			+ " LEFT JOIN cvterm cv ON cv.cvterm_id = cvr.object_id "
-			+ " where lot.eid in (:gids) AND lot.etype = 'GERMPLSM' AND lot.status <> 9 ORDER BY lot.eid";
+		+ " LEFT JOIN cvterm_relationship cvr ON cvr.subject_id = lot.scaleid AND cvr.type_id =" + TermId.HAS_SCALE.getId()
+		+ " LEFT JOIN cvterm cv ON cv.cvterm_id = cvr.object_id "
+		+ " where lot.eid in (:gids) AND lot.etype = 'GERMPLSM' AND lot.status <> 9 ORDER BY lot.eid";
 
 	@SuppressWarnings("unchecked")
 	public List<Lot> getByEntityType(final String type, final int start, final int numOfRows) throws MiddlewareQueryException {
@@ -110,16 +112,29 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		return new ArrayList<Lot>();
 	}
 
+	public List<Lot> getByGids(final List<Integer> gids) {
+		if (CollectionUtils.isNotEmpty(gids)) {
+			try {
+				final Criteria criteria = this.getSession().createCriteria(Lot.class);
+				criteria.add(Restrictions.in("entityId", gids));
+				return criteria.list();
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException("Error with getByGids(gid=" + gids + ") query from LotDAO: " + e.getMessage(), e);
+			}
+		}
+		return new ArrayList<>();
+	}
+
 	@SuppressWarnings("unchecked")
 	public Map<Integer, BigInteger> countLotsWithAvailableBalance(final List<Integer> gids) throws MiddlewareQueryException {
 		final Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
 
 		try {
 			final String sql = "SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED) FROM ( "
-					+ "SELECT i.lotid, i.eid AS entity_id, " + "   SUM(trnqty) AS avail_bal " + "  FROM ims_lot i "
-					+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-					+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
-					+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
+				+ "SELECT i.lotid, i.eid AS entity_id, " + "   SUM(trnqty) AS avail_bal " + "  FROM ims_lot i "
+				+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
+				+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
+				+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
 
 			final Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
 			final List<Object[]> result = query.list();
@@ -143,13 +158,14 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 		try {
 			final String sql = "SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED), Count(DISTINCT lotid) "
-					+ ",sum(avail_bal), count(distinct scaleid), scaleid " + " FROM ( " + "SELECT i.lotid, i.eid AS entity_id, "
-					+ "  SUM(CASE WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (trnstat = " + TransactionStatus.PENDING.getIntValue() + " AND trntype = " + TransactionType.WITHDRAWAL.getId()
-					+ ") THEN trnqty ELSE 0 END) AS avail_bal, "
-					+ "i.scaleid as scaleid " + " FROM ims_lot i "
-					+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-					+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
-					+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
+				+ ",sum(avail_bal), count(distinct scaleid), scaleid " + " FROM ( " + "SELECT i.lotid, i.eid AS entity_id, "
+				+ "  SUM(CASE WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (trnstat = "
+				+ TransactionStatus.PENDING.getIntValue() + " AND trntype = " + TransactionType.WITHDRAWAL.getId()
+				+ ") THEN trnqty ELSE 0 END) AS avail_bal, "
+				+ "i.scaleid as scaleid " + " FROM ims_lot i "
+				+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
+				+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
+				+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
 
 			final Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
 			final List<Object[]> result = query.list();
@@ -165,7 +181,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				}
 
 				lotCounts.put(gid,
-						new Object[] {lotsWithAvailableBalance, lotCount, availableBalance, distinctScaleIdCount, allLotsScaleId});
+					new Object[] {lotsWithAvailableBalance, lotCount, availableBalance, distinctScaleIdCount, allLotsScaleId});
 			}
 
 		} catch (final Exception e) {
@@ -195,8 +211,8 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 		} catch (final Exception e) {
 			this.logAndThrowException(
-					"Error at getLotAggregateDataForListEntry for list ID = " + listId + " and GID = " + gid + AT_LOT_DAO + e.getMessage(),
-					e);
+				"Error at getLotAggregateDataForListEntry for list ID = " + listId + " and GID = " + gid + AT_LOT_DAO + e.getMessage(),
+				e);
 		}
 		return lots;
 	}
@@ -268,7 +284,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	public Set<Integer> getGermplasmsWithOpenLots(final List<Integer> gids) {
 		try {
 			final Query query = this.getSession().createSQLQuery("select distinct (i.eid) FROM ims_lot i "
-				+ "WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) GROUP BY i.lotid ")
+					+ "WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) GROUP BY i.lotid ")
 				.setParameterList("gids", gids);
 			return Sets.newHashSet(query.list());
 		} catch (final Exception e) {
@@ -344,14 +360,14 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				if (recordId != null && qty != null && transactionState != null) {
 					Double prevValue = null;
 					Double prevTotal = null;
-					if(TransactionStatus.PENDING.getIntValue() == transactionState && (qty * -1) < 0.0) {
+					if (TransactionStatus.PENDING.getIntValue() == transactionState && (qty * -1) < 0.0) {
 						prevValue = reservationMap.get(recordId);
 						prevTotal = prevValue == null ? 0d : prevValue;
 
 						reservationMap.put(recordId, prevTotal + qty);
 					}
 
-					if(TransactionStatus.CONFIRMED.getIntValue() == transactionState) {
+					if (TransactionStatus.CONFIRMED.getIntValue() == transactionState) {
 						prevValue = committedMap.get(recordId);
 						prevTotal = prevValue == null ? 0d : prevValue;
 
@@ -418,7 +434,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("createdByUsername");
 			query.addScalar("createdDate", DateType.INSTANCE);
 			query.addScalar("lastDepositDate", DateType.INSTANCE);
-			query.addScalar("lastWithdrawalDate",DateType.INSTANCE);
+			query.addScalar("lastWithdrawalDate", DateType.INSTANCE);
 			query.addScalar("germplasmUUID");
 
 			query.setResultTransformer(Transformers.aliasToBean(ExtendedLotDto.class));
@@ -493,7 +509,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filterLotsQuery), lotsSearchDto);
 
 			final String countQuery = "SELECT scale.name, count(*) from ("  //
-			+ filterLotsQuery + ") as lot left join cvterm scale on (scale.cvterm_id = lot.unitId) " //
+				+ filterLotsQuery + ") as lot left join cvterm scale on (scale.cvterm_id = lot.unitId) " //
 				+ "group by  scale.name "; //
 
 			final SQLQuery query = this.getSession().createSQLQuery(countQuery);
@@ -569,11 +585,13 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public void closeLots(final List<Integer> lotIds) {
 		try {
-			final String hqlUpdate = "update Lot l set l.status= :status where l.id in (:idList)";
-			this.getSession().createQuery(hqlUpdate)
-				.setParameter("status", LotStatus.CLOSED.getIntValue())
-				.setParameterList("idList", lotIds)
-				.executeUpdate();
+			if (CollectionUtils.isNotEmpty(lotIds)) {
+				final String hqlUpdate = "update Lot l set l.status= :status where l.id in (:idList)";
+				this.getSession().createQuery(hqlUpdate)
+					.setParameter("status", LotStatus.CLOSED.getIntValue())
+					.setParameterList("idList", lotIds)
+					.executeUpdate();
+			}
 		} catch (final HibernateException e) {
 			final String message = "Error with closeLots query from Transaction: " + e.getMessage();
 			LOG.error(message, e);

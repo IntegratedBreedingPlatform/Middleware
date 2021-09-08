@@ -57,6 +57,26 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return toReturn;
 	}
 
+	public List<Attribute> getByGIDsAndVariableType(final List<Integer> gids, final Integer variableTypeId) {
+		try {
+			if (CollectionUtils.isNotEmpty(gids)) {
+				final StringBuilder queryString = new StringBuilder("SELECT {a.*} FROM atributs a ");
+				queryString.append("INNER JOIN cvterm cv ON a.atype = cv.cvterm_id ");
+				queryString.append("INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id ");
+				queryString.append("AND cp.value = (select name from cvterm where cvterm_id = :variableTypeId) ");
+				queryString.append("WHERE a.gid in (:gids) ");
+				final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+				query.addEntity("a", Attribute.class);
+				query.setParameter("variableTypeId", variableTypeId);
+				query.setParameterList("gids", gids);
+				return query.list();
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getByGIDsAndVariableType(gid=" + gids + ") query from Attributes: " + e.getMessage(), e);
+		}
+		return new ArrayList<>();
+	}
+
 	public List<Attribute> getAttributeValuesGIDList(final List<Integer> gidList) {
 		List<Attribute> attributes = new ArrayList<>();
 		if (gidList != null && !gidList.isEmpty()) {
