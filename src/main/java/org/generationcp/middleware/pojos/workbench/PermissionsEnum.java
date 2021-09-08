@@ -56,6 +56,7 @@ public enum PermissionsEnum {
 		+ ", 'MS_WITHDRAW_INVENTORY'"
 		+ ", 'MS_CREATE_PENDING_WITHDRAWALS'"
 		+ ", 'MS_CREATE_CONFIRMED_WITHDRAWALS'"
+		+ ", 'MS_MANAGE_FILES'"
 		+ ", 'MS_CREATE_LOTS')";
 
 	public static final String HAS_CREATE_LOTS_BATCH = " or hasAnyAuthority('ADMIN'"
@@ -78,6 +79,16 @@ public enum PermissionsEnum {
 		+ ", 'MANAGE_GERMPLASM'"
 		+ ", 'EDIT_GERMPLASM'"
 		+ ", 'MODIFY_ATTRIBUTES')";
+
+	public static final String HAS_MANAGE_FILES = " or hasAnyAuthority('ADMIN'"
+		+ ", 'STUDIES'"
+		+ ", 'MANAGE_STUDIES'"
+		+ ", 'MS_MANAGE_OBSERVATION_UNITS'"
+		+ ", 'MS_MANAGE_FILES'"
+		+ ", 'GERMPLASM'"
+		+ ", 'MANAGE_GERMPLASM'"
+		+ ", 'EDIT_GERMPLASM'"
+		+ ", 'MG_MANAGE_FILES')";
 
 	public static final List<String> SITE_ADMIN_PERMISSIONS = Arrays.asList(SITE_ADMIN.name(), ADMINISTRATION.name(), ADMIN.name());
 }
