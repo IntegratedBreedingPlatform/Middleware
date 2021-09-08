@@ -29,6 +29,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -564,6 +565,33 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		criteria.add(Restrictions.eq("ndExperimentpropId", experimentPropertyId));
 		criteria.add(Restrictions.eq("experiment.ndExperimentId", experimentId));
 		return (ExperimentProperty) criteria.uniqueResult();
+	}
+
+	public Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocations(
+		final Set<String> geolocationIds) {
+		final StringBuilder sql = new StringBuilder()
+			.append("SELECT e.nd_geolocation_id AS studyDbId, eprop.value AS levelCode ")
+			.append(" FROM nd_experiment e INNER JOIN nd_experimentprop eprop on e.nd_experiment_id = eprop.nd_experiment_id ")
+			.append(" WHERE e.nd_geolocation_id IN(:geolocationIds) AND eprop.type_id =").append(TermId.PLOT_NO.getId());
+		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+		query.addScalar("studyDbId", StringType.INSTANCE);
+		query.addScalar("levelCode");
+		query.setParameterList("geolocationIds", geolocationIds);
+		query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+
+		final List<Map<String, String>> queryResults = (List<Map<String, String>>) query.list();
+		final Map<String, List<String>> plotObservationLevelRelationships = new HashMap<>();
+		queryResults
+			.stream()
+			.forEach(result -> {
+				if (plotObservationLevelRelationships.get(result.get("studyDbId")) == null) {
+					plotObservationLevelRelationships.put(result.get("studyDbId"), new ArrayList<>());
+				}
+
+				plotObservationLevelRelationships.get(result.get("studyDbId")).add(result.get("levelCode"));
+
+			});
+		return plotObservationLevelRelationships;
 	}
 
 }

@@ -237,6 +237,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		return observationUnitDbIds;
 	}
 
+	@Override
+	public Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocations(
+		final Set<String> geolocationIds) {
+		return this.daoFactory.getExperimentPropertyDao().getPlotObservationLevelRelationshipsByGeolocations(geolocationIds);
+	}
+
 	private void setJsonProps(final ExperimentModel model, final ObservationUnitImportRequestDto dto) {
 		if (dto.getObservationUnitPosition().getGeoCoordinates() != null) {
 			try {

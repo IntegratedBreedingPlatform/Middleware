@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl;
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -20,6 +21,7 @@ import org.generationcp.middleware.util.Util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,6 +49,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
+
+	@Value("${germplasm.grouping.max.recursion}")
+	public int maxRecursiveQueries;
 
 	private DaoFactory daoFactory;
 
@@ -144,6 +149,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	private GermplasmPedigreeTreeNode buildDescendantsTree(final Germplasm germplasm, final int level) {
+		if (level > this.maxRecursiveQueries) {
+			throw new MiddlewareRequestException("", "germplasm.grouping.max.recursive.queries.reached", "");
+		}
 		final GermplasmPedigreeTreeNode node = new GermplasmPedigreeTreeNode();
 		node.setGermplasm(germplasm);
 
