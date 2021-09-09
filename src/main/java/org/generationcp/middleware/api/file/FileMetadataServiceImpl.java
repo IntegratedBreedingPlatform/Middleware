@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -95,7 +96,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		fileMetadataMapper.map(imageNewRequest, fileMetadata);
 
 		// assigned path, to be saved later using file storage
-		final String path = this.getFilePath(observationUnitDbId, imageNewRequest.getImageFileName());
+		final String path = this.getFilePathForObservationUnit(observationUnitDbId, imageNewRequest.getImageFileName());
 		fileMetadata.setPath(path);
 
 		this.daoFactory.getFileMetadataDAO().save(fileMetadata);
@@ -140,11 +141,25 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		return fileMetadataDTO;
 	}
 
+	@Override
+	public List<FileMetadataDTO> getAll(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
+		final List<FileMetadata> fileMetadataList = this.daoFactory.getFileMetadataDAO()
+			.getAll(variableIds, datasetId, germplasmUUID);
+		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
+		final List<FileMetadataDTO> fileMetadataDTOList = new ArrayList<>();
+		for (FileMetadata fileMetadata : fileMetadataList) {
+			final FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
+			fileMetadataMapper.map(fileMetadata, fileMetadataDTO);
+			fileMetadataDTOList.add(fileMetadataDTO);
+		}
+		return fileMetadataDTOList;
+	}
+
 	/**
 	 * Resolve predetermined path based on params (e.g, for observations, germplasm, etc)
 	 */
 	@Override
-	public String getFilePath(final String observationUnitId, final String fileName) {
+	public String getFilePathForObservationUnit(final String observationUnitId, final String fileName) {
 		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId);
 		final DmsProject study = experimentModel.getProject().getStudy();
 		final String path = FILE_PATH_PREFIX_PROGRAMUUID + study.getProgramUUID()
@@ -266,14 +281,28 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public long countSearch(final FileMetadataFilterRequest filterRequest, final String programUUID, final Pageable pageable) {
-		return this.daoFactory.getFileMetadataDAO().countSearch(filterRequest, programUUID, pageable);
+	public long countSearch(final FileMetadataFilterRequest filterRequest, final String programUUID) {
+		return this.daoFactory.getFileMetadataDAO().countSearch(filterRequest, programUUID);
 	}
 
 	@Override
 	public void delete(final String fileUUID) {
 		final FileMetadata fileMetadata = this.daoFactory.getFileMetadataDAO().getByFileUUID(fileUUID);
 		this.daoFactory.getFileMetadataDAO().makeTransient(fileMetadata);
+	}
+
+	@Override
+	public void detachFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
+		Preconditions.checkArgument((datasetId == null) != isBlank(germplasmUUID));
+
+		this.daoFactory.getFileMetadataDAO().detachFiles(variableIds, datasetId, germplasmUUID);
+	}
+
+	@Override
+	public void removeFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
+		Preconditions.checkArgument((datasetId == null) != isBlank(germplasmUUID));
+
+		this.daoFactory.getFileMetadataDAO().removeFiles(variableIds, datasetId, germplasmUUID);
 	}
 
 }

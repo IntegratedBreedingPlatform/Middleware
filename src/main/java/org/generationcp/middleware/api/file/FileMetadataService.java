@@ -16,7 +16,9 @@ public interface FileMetadataService {
 
 	FileMetadataDTO getByFileUUID(String fileUUID);
 
-	String getFilePath(String observationUnitDbId, String fileName);
+	List<FileMetadataDTO> getAll(List<Integer> variableId, Integer datasetId, String germplasmUUID);
+
+	String getFilePathForObservationUnit(String observationUnitDbId, String fileName);
 
 	String getFilePathForGermplasm(String germplasmUUID, String fileName);
 
@@ -24,7 +26,11 @@ public interface FileMetadataService {
 
 	List<FileMetadataDTO> search(FileMetadataFilterRequest filterRequest, String programUUID, Pageable pageable);
 
-	long countSearch(FileMetadataFilterRequest filterRequest, String programUUID, Pageable pageable);
+	long countSearch(FileMetadataFilterRequest filterRequest, String programUUID);
 
 	void delete(String fileUUID);
+
+	void detachFiles(List<Integer> variableIds, Integer datasetId, String germplasmUUID);
+
+	void removeFiles(List<Integer> variableIds, Integer datasetId, String germplasmUUID);
 }

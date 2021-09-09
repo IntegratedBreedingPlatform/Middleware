@@ -3,14 +3,17 @@ package org.generationcp.middleware.dao;
 import org.generationcp.middleware.api.file.FileMetadataFilterRequest;
 import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
+import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 
@@ -29,6 +32,24 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			.uniqueResult();
 	}
 
+	public List<FileMetadata> getAll(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
+			.createAlias("variables", "variables", JoinType.LEFT_OUTER_JOIN)
+			.createAlias("germplasm", "germplasm", JoinType.LEFT_OUTER_JOIN)
+			.createAlias("experimentModel", "experimentModel", JoinType.LEFT_OUTER_JOIN);
+		if (!isEmpty(variableIds)) {
+			criteria.add(Restrictions.in("variables.cvTermId", variableIds));
+		}
+		if (datasetId != null) {
+			criteria.add(Restrictions.eq("experimentModel.project.projectId", datasetId));
+		}
+		if (!isBlank(germplasmUUID)) {
+			criteria.add(Restrictions.eq("germplasm.germplasmUUID", germplasmUUID));
+		}
+		return criteria.list();
+
+	}
+
 	public List<FileMetadata> search(final FileMetadataFilterRequest filterRequest, final String programUUID, final Pageable pageable) {
 
 		final StringBuilder queryBuilder = new StringBuilder(SEARCH_BASE_QUERY);
@@ -41,7 +62,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 	}
 
 
-	public long countSearch(final FileMetadataFilterRequest filterRequest, final String programUUID, final Pageable pageable) {
+	public long countSearch(final FileMetadataFilterRequest filterRequest, final String programUUID) {
 		final StringBuilder queryBuilder = new StringBuilder(SEARCH_BASE_QUERY);
 		addSearchParams(new SqlQueryParamBuilder(queryBuilder), filterRequest, programUUID);
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery("select count(1) from (" + queryBuilder.toString() + ") as T");
@@ -85,22 +106,51 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			.uniqueResult();
 	}
 
-	public void detachVariables(final Integer datasetId, final List<Integer> variableIds) {
-		this.getSession().createSQLQuery("delete " //
+	public void detachFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery("delete " //
 			+ " from file_metadata_cvterm " //
 			+ " where file_metadata_id in ( " //
 			+ "     select T.file_id " //
 			+ "     from ( " //
 			+ "         select fm.file_id " //
 			+ "         from file_metadata fm " //
-			+ "                  inner join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
-			+ "                  inner join project dataset on ne.project_id = dataset.project_id " //
+			+ "                  left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
+			+ "                  left join germplsm g on fm.gid = g.gid " //
 			+ "                  inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
-			+ "         where dataset.project_id = :datasetId and fmc.cvterm_id in (:variableIds) " //
+			+ "         where fmc.cvterm_id in (:variableIds)"  //
+			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //
+			+ " 			  and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) " //
 			+ "     ) T " //
-			+ " ) ")
-			.setParameter("datasetId", datasetId)
-			.setParameterList("variableIds", variableIds)
-			.executeUpdate();
+			+ " ) ");
+
+		sqlQuery.setParameter("datasetId", datasetId);
+		sqlQuery.setParameter("germplasmUUID", germplasmUUID);
+		sqlQuery.setParameterList("variableIds", variableIds);
+		sqlQuery.executeUpdate();
 	}
+
+	public void removeFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery("delete fm, fmc " //
+			+ " from file_metadata fm " //
+			+ "      inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
+			+ " where fm.file_id in ( " //
+			+ "     select T.file_id " //
+			+ "     from ( " //
+			+ "         select fm.file_id " //
+			+ "         from file_metadata fm " //
+			+ "                  left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
+			+ "                  left join germplsm g on fm.gid = g.gid " //
+			+ "                  inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
+			+ "         where fmc.cvterm_id in (:variableIds) " //
+			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //
+			+ " 			  and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) " //
+			+ "     ) T " //
+			+ " ) ");
+
+		sqlQuery.setParameter("datasetId", datasetId);
+		sqlQuery.setParameter("germplasmUUID", germplasmUUID);
+		sqlQuery.setParameterList("variableIds", variableIds);
+		sqlQuery.executeUpdate();
+	}
+
 }
