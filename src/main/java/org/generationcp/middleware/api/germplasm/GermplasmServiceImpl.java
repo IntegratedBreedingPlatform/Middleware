@@ -1133,7 +1133,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		this.closeLots(nonSelectedGermplasmList);
 
 		// Delete all non-selected germplasm that were merged
-		this.deleteGermplasm(gidsNonSelectedGermplasm);
+		this.daoFactory.getGermplasmDao().deleteGermplasm(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId());
 	}
 
 	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Integer targetGermplasmId) {

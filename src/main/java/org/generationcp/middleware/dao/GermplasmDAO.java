@@ -66,7 +66,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -1059,12 +1058,22 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	public void deleteGermplasm(final List<Integer> gids) {
-		final StringBuilder queryString = new StringBuilder();
+		this.deleteGermplasm(gids, null);
+	}
 
+	public void deleteGermplasm(final List<Integer> gids, final Integer germplasmReplaceGid) {
+		final StringBuilder queryString = new StringBuilder();
 		try {
-			queryString.append("UPDATE germplsm SET deleted = 1, germplsm_uuid = CONCAT (germplsm_uuid, '#', '" + Util
-				.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS") + "'), modified_date = CURRENT_TIMESTAMP, modified_by = :userId "
-				+ "WHERE gid in (:gids)");
+			queryString.append("UPDATE germplsm SET ");
+			queryString.append("deleted = 1, ");
+			queryString.append("germplsm_uuid = CONCAT (germplsm_uuid, '#', '" +
+				Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS") + "'), ");
+			queryString.append("modified_date = CURRENT_TIMESTAMP, ");
+			queryString.append("modified_by = :userId ");
+			if (germplasmReplaceGid != null) {
+				queryString.append(", grplce = " + germplasmReplaceGid + " ");
+			}
+			queryString.append("WHERE gid in (:gids) ");
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("gids", gids);
 			query.setParameter("userId", ContextHolder.getLoggedInUserId());
@@ -1276,10 +1285,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getProgenyDbIds())) {
 			paramBuilder
-				.append(" AND ( g.gid = (SELECT gpid1 from germplsm child WHERE child.germplsm_uuid in (:progenyDbIds) AND child.gnpgs >= 1) "
-					+ "OR g. gid = (SELECT gpid2 from germplsm child WHERE child.germplsm_uuid in (:progenyDbIds) AND child.gnpgs >= 1) "
-					+ "OR g.gid = (Select p.pid from progntrs p INNER JOIN germplsm child ON p.gid = child.gid "
-					+ "WHERE child.germplsm_uuid in (:progenyDbIds))) ");
+				.append(
+					" AND ( g.gid = (SELECT gpid1 from germplsm child WHERE child.germplsm_uuid in (:progenyDbIds) AND child.gnpgs >= 1) "
+						+ "OR g. gid = (SELECT gpid2 from germplsm child WHERE child.germplsm_uuid in (:progenyDbIds) AND child.gnpgs >= 1) "
+						+ "OR g.gid = (Select p.pid from progntrs p INNER JOIN germplsm child ON p.gid = child.gid "
+						+ "WHERE child.germplsm_uuid in (:progenyDbIds))) ");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getExternalReferenceIDs())) {
