@@ -9,6 +9,7 @@ public class GermplasmListColumnDTO {
 
 	private int id;
 	private String name;
+	private String alias;
 	private Integer typeId;
 	private GermplasmListColumnCategory category;
 	private boolean selected;
@@ -16,17 +17,18 @@ public class GermplasmListColumnDTO {
 	public GermplasmListColumnDTO() {
 	}
 
-	public GermplasmListColumnDTO(final int id, final String name, final GermplasmListColumnCategory category, boolean selected) {
+	public GermplasmListColumnDTO(final int id, final String name, final GermplasmListColumnCategory category, final boolean selected) {
 		this.id = id;
 		this.name = name;
 		this.category = category;
 		this.selected = selected;
 	}
 
-	public GermplasmListColumnDTO(final int id, final String name, final Integer typeId,
-		final GermplasmListColumnCategory category, boolean selected) {
+	public GermplasmListColumnDTO(final int id, final String name, final String alias, final Integer typeId,
+		final GermplasmListColumnCategory category, final boolean selected) {
 		this.id = id;
 		this.name = name;
+		this.alias = alias;
 		this.typeId = typeId;
 		this.category = category;
 		this.selected = selected;
@@ -46,6 +48,14 @@ public class GermplasmListColumnDTO {
 
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(final String alias) {
+		this.alias = alias;
 	}
 
 	public Integer getTypeId() {

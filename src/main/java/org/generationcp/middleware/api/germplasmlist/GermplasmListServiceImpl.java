@@ -454,7 +454,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public List<GermplasmListColumnDTO> getGermplasmListColumns(final Integer listId) {
+	public List<GermplasmListColumnDTO> getGermplasmListColumns(final Integer listId, final String programUUID) {
 		final List<GermplasmListDataView> selectedColumns = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
 		final List<Integer> selectedColumnIds = selectedColumns
 			.stream()
@@ -466,6 +466,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids);
 		final List<Attribute> attributes = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(gids);
 		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.setProgramUuid(programUUID);
 		attributes
 			.stream()
 			.map(Attribute::getTypeId)
@@ -492,8 +493,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				if (!CollectionUtils.isEmpty(variable.getVariableTypes())) {
 					typeId = variable.getVariableTypes().iterator().next().getId();
 				}
-				return new GermplasmListColumnDTO(variable.getId(), variable.getName(), typeId, GermplasmListColumnCategory.VARIABLE,
-					selectedColumnIds.contains(variable.getId()));
+				return new GermplasmListColumnDTO(variable.getId(), variable.getName(), variable.getAlias(), typeId,
+					GermplasmListColumnCategory.VARIABLE, selectedColumnIds.contains(variable.getId()));
 			})
 			.collect(Collectors.toList());
 		columns.addAll(germplasmAttributeColumns);

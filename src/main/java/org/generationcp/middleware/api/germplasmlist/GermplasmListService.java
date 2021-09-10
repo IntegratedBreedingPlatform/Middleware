@@ -70,7 +70,7 @@ public interface GermplasmListService {
 	 */
 	boolean toggleGermplasmListStatus(Integer listId);
 
-	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId);
+	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId, final String programUUID);
 
 	List<MeasurementVariable> getGermplasmListDataTableHeader(Integer listId);
 
