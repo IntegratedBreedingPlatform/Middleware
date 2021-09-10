@@ -19,7 +19,7 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 
 	public List<GermplasmListDataView> getByListId(final Integer listId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-		criteria.add(Restrictions.eq("listid", listId));
+		criteria.add(Restrictions.eq("list.id", listId));
 		return criteria.list();
 	}
 
