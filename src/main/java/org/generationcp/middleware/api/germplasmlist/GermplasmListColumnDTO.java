@@ -11,22 +11,25 @@ public class GermplasmListColumnDTO {
 	private String name;
 	private Integer typeId;
 	private GermplasmListColumnCategory category;
+	private boolean selected;
 
 	public GermplasmListColumnDTO() {
 	}
 
-	public GermplasmListColumnDTO(final int id, final String name, final GermplasmListColumnCategory category) {
+	public GermplasmListColumnDTO(final int id, final String name, final GermplasmListColumnCategory category, boolean selected) {
 		this.id = id;
 		this.name = name;
 		this.category = category;
+		this.selected = selected;
 	}
 
 	public GermplasmListColumnDTO(final int id, final String name, final Integer typeId,
-		final GermplasmListColumnCategory category) {
+		final GermplasmListColumnCategory category, boolean selected) {
 		this.id = id;
 		this.name = name;
 		this.typeId = typeId;
 		this.category = category;
+		this.selected = selected;
 	}
 
 	public int getId() {
@@ -59,6 +62,14 @@ public class GermplasmListColumnDTO {
 
 	public void setCategory(final GermplasmListColumnCategory category) {
 		this.category = category;
+	}
+
+	public boolean isSelected() {
+		return selected;
+	}
+
+	public void setSelected(final boolean selected) {
+		this.selected = selected;
 	}
 
 	@Override

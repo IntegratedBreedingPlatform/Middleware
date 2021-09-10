@@ -455,6 +455,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public List<GermplasmListColumnDTO> getGermplasmListColumns(final Integer listId) {
+		final List<GermplasmListDataView> selectedColumns = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
+		final List<Integer> selectedColumnIds = selectedColumns
+			.stream()
+			.map(GermplasmListDataView::getVariableId)
+			.collect(Collectors.toList());
+
 		final List<GermplasmListData> listData = this.daoFactory.getGermplasmListDataDAO().getByListId(listId);
 		final List<Integer> gids = listData.stream().map(GermplasmListData::getGid).collect(Collectors.toList());
 		final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids);
@@ -467,12 +473,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 
 		final List<GermplasmListColumnDTO> columns = Arrays.stream(GermplasmListStaticColumns.values())
-			.map(column -> new GermplasmListColumnDTO(column.getTermId().getId(), column.getName(), GermplasmListColumnCategory.STATIC))
+			.map(column -> new GermplasmListColumnDTO(column.getTermId().getId(), column.getName(), GermplasmListColumnCategory.STATIC,
+				selectedColumnIds.contains(column.getTermId().getId())))
 			.collect(Collectors.toList());
 
 		final List<GermplasmListColumnDTO> nameColumns = nameTypes
 			.stream()
-			.map(nameType -> new GermplasmListColumnDTO(nameType.getFldno(), nameType.getFcode(), GermplasmListColumnCategory.NAMES))
+			.map(nameType -> new GermplasmListColumnDTO(nameType.getFldno(), nameType.getFcode(), GermplasmListColumnCategory.NAMES,
+				selectedColumnIds.contains(nameType.getFldno())))
 			.collect(Collectors.toList());
 		columns.addAll(nameColumns);
 
@@ -484,7 +492,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				if (!CollectionUtils.isEmpty(variable.getVariableTypes())) {
 					typeId = variable.getVariableTypes().iterator().next().getId();
 				}
-				return new GermplasmListColumnDTO(variable.getId(), variable.getName(), typeId, GermplasmListColumnCategory.VARIABLE);
+				return new GermplasmListColumnDTO(variable.getId(), variable.getName(), typeId, GermplasmListColumnCategory.VARIABLE,
+					selectedColumnIds.contains(variable.getId()));
 			})
 			.collect(Collectors.toList());
 		columns.addAll(germplasmAttributeColumns);
