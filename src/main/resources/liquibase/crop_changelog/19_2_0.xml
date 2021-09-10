@@ -55,7 +55,7 @@
 				constraint list_data_view_cvterm_cvterm_id_fk
 					foreign key (type_id) references cvterm(cvterm_id),
 				constraint list_data_view_listnms_listid_fk
-					foreign key (list_id) references listnms(listid)
+					foreign key (listid) references listnms(listid)
 			);
 		</sql>
 	</changeSet>
