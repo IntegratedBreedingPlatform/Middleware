@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasmlist;
 
+import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -9,23 +10,23 @@ public class GermplasmListColumnDTO {
 	private int id;
 	private String name;
 	private Integer typeId;
-	private GermplasmListColumnType columnType;
+	private GermplasmListColumnCategory category;
 
 	public GermplasmListColumnDTO() {
 	}
 
-	public GermplasmListColumnDTO(final int id, final String name, final GermplasmListColumnType columnType) {
+	public GermplasmListColumnDTO(final int id, final String name, final GermplasmListColumnCategory category) {
 		this.id = id;
 		this.name = name;
-		this.columnType = columnType;
+		this.category = category;
 	}
 
 	public GermplasmListColumnDTO(final int id, final String name, final Integer typeId,
-		final GermplasmListColumnType columnType) {
+		final GermplasmListColumnCategory category) {
 		this.id = id;
 		this.name = name;
 		this.typeId = typeId;
-		this.columnType = columnType;
+		this.category = category;
 	}
 
 	public int getId() {
@@ -52,12 +53,12 @@ public class GermplasmListColumnDTO {
 		this.typeId = typeId;
 	}
 
-	public GermplasmListColumnType getColumnType() {
-		return columnType;
+	public GermplasmListColumnCategory getCategory() {
+		return category;
 	}
 
-	public void setColumnType(final GermplasmListColumnType columnType) {
-		this.columnType = columnType;
+	public void setCategory(final GermplasmListColumnCategory category) {
+		this.category = category;
 	}
 
 	@Override
