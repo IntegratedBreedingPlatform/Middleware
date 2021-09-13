@@ -18,8 +18,6 @@ import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategory;
-import org.generationcp.middleware.pojos.workbench.WorkbenchSidebarCategoryLink;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.springframework.data.domain.Pageable;
@@ -37,15 +35,6 @@ public interface WorkbenchDataManager {
 	 * @return the projects
 	 */
 	List<Project> getProjects();
-
-	/**
-	 * Gets the projects.
-	 *
-	 * @param start     - the starting record
-	 * @param numOfRows - the number of rows to retrieve
-	 * @return the projects
-	 */
-	List<Project> getProjects(int start, int numOfRows);
 
 	/**
 	 * Gets count projects.
@@ -88,22 +77,6 @@ public interface WorkbenchDataManager {
 	 * @return the project saved
 	 */
 	Project saveOrUpdateProject(Project project);
-
-	/**
-	 * Save a project.
-	 *
-	 * @param project the project
-	 * @return The Project added
-	 */
-	Project addProject(Project project);
-
-	/**
-	 * Update a project using Hibernate's Session.merge() method.
-	 *
-	 * @param project the project
-	 * @return The merged Project.
-	 */
-	Project mergeProject(Project project);
 
 	/**
 	 * Delete project.
@@ -243,41 +216,12 @@ public interface WorkbenchDataManager {
 	long countProjectActivitiesByProjectId(Long projectId);
 
 	/**
-	 * Gets the all workbench sidebar category.
-	 *
-	 * @return the all workbench sidebar category
-	 */
-	List<WorkbenchSidebarCategory> getAllWorkbenchSidebarCategory();
-
-	/**
-	 * Gets the all workbench sidebar links.
-	 *
-	 * @return the all workbench sidebar links
-	 */
-	List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinks();
-
-	/**
-	 * Gets the all workbench sidebar links by category id.
-	 *
-	 * @param category the category
-	 * @return the all workbench sidebar links by category id
-	 */
-	List<WorkbenchSidebarCategoryLink> getAllWorkbenchSidebarLinksByCategoryId(WorkbenchSidebarCategory category);
-
-	/**
 	 * Returns the project last accessed regardless of user.
 	 *
 	 * @return the last Project opened by the given user
 	 */
 
 	Project getLastOpenedProjectAnyUser();
-
-	/**
-	 * Detects whether the selected project in Workbench has changed
-	 *
-	 * @return True if the project has changed, otherwise false
-	 */
-	Boolean isLastOpenedProjectChanged();
 
 	/**
 	 * Close the sessionProvider
@@ -298,6 +242,7 @@ public interface WorkbenchDataManager {
 	 */
 	List<RoleType> getRoleTypes();
 
+
 	// TODO Move role methods to RoleServiceImp
 
 	/**
@@ -307,14 +252,6 @@ public interface WorkbenchDataManager {
 	 * @return ROle Type
 	 */
 	RoleType getRoleType(Integer id);
-
-	/**
-	 * Get sidebar links by category
-	 *
-	 * @param workbenchSidebarCategoryLink
-	 * @return
-	 */
-	WorkbenchSidebarCategoryLink getWorkbenchSidebarLinksByCategoryId(Integer workbenchSidebarCategoryLink);
 
 	/**
 	 * Save or update role

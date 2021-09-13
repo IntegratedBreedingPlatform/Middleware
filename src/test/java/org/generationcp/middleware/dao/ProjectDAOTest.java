@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -36,6 +37,9 @@ public class ProjectDAOTest extends IntegrationTestBase {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private ProgramService programService;
 
 	private ProjectDAO workbenchProjectDao;
 
@@ -90,12 +94,12 @@ public class ProjectDAOTest extends IntegrationTestBase {
 
 		if (this.project1 == null) {
 			this.project1 = this.workbenchTestDataUtil.createTestProjectData();
-			this.workbenchDataManager.addProject(this.project1);
+			this.programService.addProgram(this.project1);
 		}
 
 		if (this.project2 == null) {
 			this.project2 = this.workbenchTestDataUtil.createTestProjectData();
-			this.workbenchDataManager.addProject(this.project2);
+			this.programService.addProgram(this.project2);
 		}
 
 		if (this.adminInstanceProgram == null) {

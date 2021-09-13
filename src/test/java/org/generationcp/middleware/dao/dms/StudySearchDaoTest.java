@@ -18,6 +18,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.FieldbookService;
+import org.generationcp.middleware.service.api.study.StudyService;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
@@ -58,6 +59,9 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
+	@Autowired
+	private StudyService studyService;
 	
 	@Mock
 	private Session mockSession;
@@ -153,7 +157,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		// Delete test study
 		final StudyReference study = studiesByName.get(0);
-		this.fieldbookService.deleteStudy(study.getId(), this.fieldbookService.getStudy(study.getId()).getUser());
+		this.studyService.deleteStudy(study.getId());
 		flush();
 
 		// Check that deleted study is not retrieved
@@ -191,7 +195,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		// Delete test study
 		final StudyReference studyToDelete = studyReferences.get(0);
-		this.fieldbookService.deleteStudy(studyToDelete.getId(), this.fieldbookService.getStudy(studyToDelete.getId()).getUser());
+		this.studyService.deleteStudy(studyToDelete.getId());
 		flush();
 
 		// Check that deleted study is not retrieved
@@ -232,7 +236,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 		// Delete test study
 		final StudyReference studyToDelete = drySeasonStudyReferences.get(0);
-		this.fieldbookService.deleteStudy(studyToDelete.getId(), this.fieldbookService.getStudy(studyToDelete.getId()).getUser());
+		this.studyService.deleteStudy(studyToDelete.getId());
 		flush();
 
 		// Check that deleted study is not retrieved
@@ -285,7 +289,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		
 		// Delete test study
 		final StudyReference studyToDelete = studies.get(0);
-		this.fieldbookService.deleteStudy(studyToDelete.getId(), this.fieldbookService.getStudy(studyToDelete.getId()).getUser());
+		this.studyService.deleteStudy(studyToDelete.getId());
 		flush();
 		
 		// Check that deleted study is not retrieved

@@ -1,7 +1,7 @@
 package org.generationcp.middleware.api.breedingmethod;
 
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.data.initializer.ProgramFavoriteTestDataInitializer;
+import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -27,14 +27,14 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
 
-	private BreedingMethodServiceImpl breedingMethodService;
+	@Autowired
+	private ProgramFavoriteService programFavoriteService;
 
-	private ProgramFavoriteTestDataInitializer programFavoriteTestDataInitializer;
+	private BreedingMethodServiceImpl breedingMethodService;
 
 	@Before
 	public void setUp() {
 		this.breedingMethodService = new BreedingMethodServiceImpl(this.sessionProvder);
-		this.programFavoriteTestDataInitializer = new ProgramFavoriteTestDataInitializer();
 	}
 
 	@Test
@@ -57,9 +57,7 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 		//Create a favorite breeding method
 		final Method favoriteBreedingMethod = allMethods.get(0);
 		final String programUUID = UUID.randomUUID().toString();
-		final ProgramFavorite
-			programFavorite = this.programFavoriteTestDataInitializer.createProgramFavorite(favoriteBreedingMethod.getMid(), programUUID);
-		this.germplasmDataManager.saveProgramFavorite(programFavorite);
+		this.programFavoriteService.addProgramFavorite(programUUID, ProgramFavorite.FavoriteType.METHOD, favoriteBreedingMethod.getMid());
 
 		//Should get only the favorite breeding method
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();

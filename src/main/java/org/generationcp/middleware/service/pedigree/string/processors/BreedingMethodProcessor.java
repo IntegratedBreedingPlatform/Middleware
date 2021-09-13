@@ -16,7 +16,7 @@ public interface BreedingMethodProcessor {
 	 * @param germplasmNode the node to process
 	 * @param level the number of levels to iterated
 	 * @param fixedLineNameResolver resolver that enables us to resolve fixed lines in case of encountring a fixed line
-	 * @param originatesFromComplexCross signifies that the crosss originates from a complex cross
+	 * @param originatesFromComplexCross signifies that the cross originates from a complex cross
 	 * @return the resulting pedigree string
 	 */
 	PedigreeString processGermplasmNode(GermplasmNode germplasmNode, Integer level, FixedLineNameResolver fixedLineNameResolver, boolean originatesFromComplexCross);

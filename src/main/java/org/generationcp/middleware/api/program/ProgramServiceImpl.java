@@ -4,12 +4,14 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
+import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
+import org.generationcp.middleware.util.Util;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +20,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -97,4 +101,63 @@ public class ProgramServiceImpl implements ProgramService {
 		this.daoFactory.getUserRoleDao().removeUsersFromProgram(userIds, projectId);
 	}
 
+	@Override
+	public ProgramDTO addProgram(final String crop, final ProgramBasicDetailsDto programBasicDetailsDto) {
+		final Project project = new Project();
+		project.setUniqueID(UUID.randomUUID().toString());
+		project.setProjectName(programBasicDetailsDto.getName());
+		project.setUserId(ContextHolder.getLoggedInUserId());
+		project.setCropType(this.daoFactory.getCropTypeDAO().getByName(crop));
+		project.setLastOpenDate(null);
+		project.setStartDate(Util.tryParseDate(programBasicDetailsDto.getStartDate(), Util.FRONTEND_DATE_FORMAT));
+		this.daoFactory.getProjectDAO().save(project);
+		final ProgramDTO programDTO = new ProgramDTO(project);
+		final WorkbenchUser loggedInUser = this.daoFactory.getWorkbenchUserDAO().getById(ContextHolder.getLoggedInUserId());
+		programDTO.setCreatedBy(loggedInUser.getName());
+		return programDTO;
+	}
+
+	@Override
+	public Project addProgram(final Project project) {
+		project.setUniqueID(UUID.randomUUID().toString());
+		this.daoFactory.getProjectDAO().save(project);
+		return project;
+	}
+
+	@Override
+	public Optional<ProgramDTO> getProgram(final String cropName, final String programName) {
+		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(cropName);
+		if (cropType == null) {
+			return Optional.empty();
+		}
+		final Project project = this.daoFactory.getProjectDAO().getProjectByNameAndCrop(programName, cropType);
+		if (project != null) {
+			final WorkbenchUser loggedInUser = this.daoFactory.getWorkbenchUserDAO().getById(ContextHolder.getLoggedInUserId());
+			final ProgramDTO programDTO = new ProgramDTO(project);
+			programDTO.setCreatedBy(loggedInUser.getName());
+			return Optional.of(programDTO);
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public void deleteProgramAndDependencies(final String programUUID) {
+		this.daoFactory.getProjectActivityDAO().deleteAllProjectActivities(programUUID);
+		this.daoFactory.getProjectUserInfoDAO().deleteAllProjectUserInfo(programUUID);
+		this.daoFactory.getUserRoleDao().deleteProgramRolesAssociations(programUUID);
+		this.daoFactory.getProjectDAO().deleteProjectByUUID(programUUID);
+	}
+
+	@Override
+	public void editProgram(final String programUUID, final ProgramBasicDetailsDto programBasicDetailsDto) {
+		final Project project = this.daoFactory.getProjectDAO().getByUuid(programUUID);
+		if (programBasicDetailsDto.getName() != null) {
+			project.setProjectName(programBasicDetailsDto.getName());
+		}
+		if (programBasicDetailsDto.getStartDate() != null) {
+			project.setStartDate(Util.tryParseDate(programBasicDetailsDto.getStartDate(), Util.FRONTEND_DATE_FORMAT));
+		}
+		this.daoFactory.getProjectDAO().update(project);
+	}
 }

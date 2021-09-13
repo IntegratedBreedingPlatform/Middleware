@@ -410,6 +410,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 	}
 
+	@Override
+	public void deleteProgramGermplasmLists(final String programUUID) {
+		this.daoFactory.getGermplasmListDAO().markProgramGermplasmListsAsDeleted(programUUID);
+	}
+
 	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {
 		try {
 			for (final GermplasmListData data : germplasmListData) {

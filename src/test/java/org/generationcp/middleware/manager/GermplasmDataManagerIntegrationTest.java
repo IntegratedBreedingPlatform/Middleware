@@ -17,6 +17,7 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
 import org.generationcp.middleware.dao.MethodDAO;
@@ -29,13 +30,11 @@ import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.data.initializer.NameTestDataInitializer;
-import org.generationcp.middleware.data.initializer.ProgramFavoriteTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserDefinedFieldTestDataInitializer;
 import org.generationcp.middleware.domain.gms.search.GermplasmSearchParameter;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -91,7 +90,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	private GermplasmDataManager germplasmDataManager;
 
 	@Autowired
-	private LocationDataManager locationManager;
+	private ProgramFavoriteService programFavoriteService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -114,8 +113,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
-	private ProgramFavoriteTestDataInitializer programFavoriteTestDataInitializer;
-
 	private UserDefinedFieldDAO userDefinedFieldDAO;
 
 	private KeySequenceRegisterDAO keySequenceRegisterDAO;
@@ -124,8 +121,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() {
-		this.programFavoriteTestDataInitializer = new ProgramFavoriteTestDataInitializer();
-
 		if (this.nameDAO == null) {
 			this.nameDAO = new NameDAO(this.sessionProvder.getSession());
 		}
@@ -924,8 +919,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Method method = this.germplasmDataManager.getMethodByID(154);
 
 		final String programUUID = UUID.randomUUID().toString();
-		final ProgramFavorite programFavorite = this.programFavoriteTestDataInitializer.createProgramFavorite(method.getMid(), programUUID);
-		this.germplasmDataManager.saveProgramFavorite(programFavorite);
+		this.programFavoriteService.addProgramFavorite(programUUID, ProgramFavorite.FavoriteType.METHOD, method.getMid());
 
 		final List<Method> methods = this.germplasmDataManager.getFavoriteMethodsByMethodType(method.getMtype(), programUUID);
 		final Method resultMethod = methods.get(0);

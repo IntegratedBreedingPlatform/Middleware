@@ -862,23 +862,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		}
 	}
 
-	@Override
-	public void saveProgramFavorite(final ProgramFavorite favorite) {
-
-		try {
-
-			final ProgramFavoriteDAO dao = this.daoFactory.getProgramFavoriteDao();
-			dao.save(favorite);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorite(favorite=" + favorite + "): "
-					+ e.getMessage(),
-				e);
-		}
-
-	}
 
 	@Override
 	public void deleteProgramFavorites(final List<ProgramFavorite> list) {

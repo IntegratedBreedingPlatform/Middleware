@@ -24,7 +24,6 @@ import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.criterion.SimpleExpression;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -295,29 +294,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Method> getMethodsNotGenerativeById(final List<Integer> ids) {
-		try {
-			final List<Integer> validMethodClasses = new ArrayList<>();
-			validMethodClasses.addAll(Method.BULKED_CLASSES);
-			validMethodClasses.addAll(Method.NON_BULKED_CLASSES);
-
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.ne("mtype", "GEN"));
-			criteria.add(Restrictions.in("geneq", validMethodClasses));
-			if (ids.size() > 0) {
-				criteria.add(Restrictions.in("mid", ids));
-			}
-			criteria.addOrder(Order.asc(METHOD_NAME));
-
-			return criteria.list();
-		} catch (final HibernateException e) {
-			MethodDAO.LOG.error(this.getLogExceptionMessage("getMethodsNotGenerativeById", "", null, e.getMessage(), "Method"), e);
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsNotGenerativeById", "", null, e.getMessage(),
-				"Method"), e);
-		}
-	}
-
 	public long countByGroup(final String group) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Method.class);
@@ -445,31 +421,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		return method;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<Method> getDerivativeAndMaintenanceMethods(final List<Integer> ids) {
-		try {
-			final List<Integer> validMethodClasses = new ArrayList<Integer>();
-			validMethodClasses.addAll(Method.BULKED_CLASSES);
-			validMethodClasses.addAll(Method.NON_BULKED_CLASSES);
-
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			final SimpleExpression der = Restrictions.eq("mtype", "DER");
-			final SimpleExpression man = Restrictions.eq("mtype", "MAN");
-			criteria.add(Restrictions.or(der, man));
-			if (ids.size() > 0) {
-				criteria.add(Restrictions.in("mid", ids));
-			}
-			criteria.add(Restrictions.in("geneq", validMethodClasses));
-			criteria.addOrder(Order.asc(METHOD_NAME));
-
-			return criteria.list();
-		} catch (final HibernateException e) {
-			MethodDAO.LOG.error(this.getLogExceptionMessage("getMethodsNotGenerativeById", "", null, e.getMessage(), "Method"), e);
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getAllMethodsDerivativeAndManintenance", "", null, e.getMessage(), "Method"), e);
-		}
-	}
-
 	public List<Method> getFavoriteMethodsByMethodType(final String methodType, final String programUUID) {
 		try {
 			final Query query = this.getSession().getNamedQuery(Method.GET_FAVORITE_METHODS_BY_TYPE);
@@ -492,73 +443,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 
 		methodsCodes.addAll(query.list());
 		return methodsCodes;
-	}
-
-	public List<Method> getAllNoBulkingMethods() {
-		try {
-
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.in("geneq", Method.NON_BULKED_CLASSES));
-			criteria.addOrder(Order.asc(METHOD_NAME));
-			return criteria.list();
-
-		} catch (final HibernateException e) {
-			MethodDAO.LOG.error(this.getLogExceptionMessage("getAllNoBulkingMethods", "", null, e.getMessage(), "Method"), e);
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("getAllNoBulkingMethods", "", null, e.getMessage(), "Method"),
-				e);
-		}
-	}
-
-	public List<Method> getNoBulkingMethodsByIdList(final List<Integer> ids) {
-		if (!ids.isEmpty()) {
-			try {
-
-				final Criteria criteria = this.getSession().createCriteria(Method.class);
-				criteria.add(Restrictions.in("geneq", Method.NON_BULKED_CLASSES));
-				criteria.add(Restrictions.in("mid", ids));
-				return criteria.list();
-
-			} catch (final HibernateException e) {
-				MethodDAO.LOG.error(this.getLogExceptionMessage("getNoBulkingMethodsByIdList", "", null, e.getMessage(), "Method"), e);
-				throw new MiddlewareQueryException(
-					this.getLogExceptionMessage("getNoBulkingMethodsByIdList", "", null, e.getMessage(), "Method"), e);
-			}
-		} else {
-			return new ArrayList<>();
-		}
-	}
-
-	public List<Method> getAllMethodsNotBulkingNotGenerative() {
-		try {
-
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.in("geneq", Method.NON_BULKED_CLASSES));
-			criteria.add(Restrictions.ne("mtype", "GEN"));
-			criteria.addOrder(Order.asc(METHOD_NAME));
-			return criteria.list();
-
-		} catch (final HibernateException e) {
-			MethodDAO.LOG.error(this.getLogExceptionMessage("getAllMethodsNotBulkingNotGenerative", "", null, e.getMessage(), "Method"), e);
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getAllMethodsNotBulkingNotGenerative", "", null, e.getMessage(), "Method"), e);
-		}
-	}
-
-	public List<Method> getNoBulkingMethodsByType(final String type, final String programUUID) {
-		try {
-
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.in("geneq", Method.NON_BULKED_CLASSES));
-			criteria.add(Restrictions.eq("mtype", type));
-			criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
-			criteria.addOrder(Order.asc(METHOD_NAME));
-			return criteria.list();
-
-		} catch (final HibernateException e) {
-			MethodDAO.LOG.error(this.getLogExceptionMessage("getNoBulkingMethodsByType", "", null, e.getMessage(), "Method"), e);
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("getNoBulkingMethodsByType", "", null, e.getMessage(), "Method"),
-				e);
-		}
 	}
 
 	public List<Method> filterMethods(final BreedingMethodSearchRequest methodSearchRequest, final Pageable pageable) {
@@ -632,4 +516,18 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
+
+	public void deleteAllProgramMethods(final String programUUID) {
+		try {
+			final String sql = "DELETE m FROM methods m WHERE m.program_uuid = :programUUID";
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+			sqlQuery.setParameter("programUUID", programUUID);
+			sqlQuery.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error in deleteAllProgramMethods(" + programUUID + ") in LocationDAO: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 }

@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware;
 
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
@@ -67,6 +68,9 @@ public class DataSetupTest extends IntegrationTestBase {
 
     @Autowired
     private FieldbookService middlewareFieldbookService;
+
+	@Autowired
+	private ProgramService programService;
 
     private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
@@ -174,7 +178,7 @@ public class DataSetupTest extends IntegrationTestBase {
         program.setStartDate(new Date(System.currentTimeMillis()));
         program.setCropType(cropType);
         program.setLastOpenDate(new Date(System.currentTimeMillis()));
-        this.workbenchDataManager.addProject(program);
+        this.programService.addProgram(program);
 
         // FIXME (BMS-4631) replace this with adding to workbench_project_user_info
 //		this.workbenchDataManager.addProjectUserRole(projectUserRoles);
