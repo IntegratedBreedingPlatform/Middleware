@@ -15,7 +15,6 @@ import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
@@ -27,10 +26,7 @@ import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -299,72 +295,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Project getLastOpenedProjectAnyUser() {
 		return this.workbenchDaoFactory.getProjectDAO().getLastOpenedProjectAnyUser();
-	}
-
-	@Override
-	public List<StandardPreset> getStandardPresetFromCropAndTool(final String cropName, final int toolId) {
-
-		try {
-			final Criteria criteria = this.getCurrentSession().createCriteria(StandardPreset.class);
-
-			criteria.add(Restrictions.eq("cropName", cropName));
-			criteria.add(Restrictions.eq("toolId", toolId));
-
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"error in: WorkbenchDataManager.getStandardPresetFromCropAndTool(cropName=" + cropName + "): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public List<StandardPreset> getStandardPresetFromCropAndTool(final String cropName, final int toolId, final String toolSection) {
-
-		try {
-			final Criteria criteria = this.getCurrentSession().createCriteria(StandardPreset.class);
-
-			criteria.add(Restrictions.eq("cropName", cropName));
-			criteria.add(Restrictions.eq("toolId", toolId));
-			criteria.add(Restrictions.eq("toolSection", toolSection));
-
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"error in: WorkbenchDataManager.getStandardPresetFromCropAndTool(cropName=" + cropName + "): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public List<StandardPreset> getStandardPresetFromCropAndToolByName(
-		final String presetName, final String cropName, final int toolId,
-		final String toolSection) {
-
-		try {
-			final Criteria criteria = this.getCurrentSession().createCriteria(StandardPreset.class);
-
-			criteria.add(Restrictions.eq("cropName", cropName));
-			criteria.add(Restrictions.eq("toolId", toolId));
-			criteria.add(Restrictions.eq("toolSection", toolSection));
-			criteria.add(Restrictions.like("name", presetName));
-
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"error in: WorkbenchDataManager.getStandardPresetFromCropAndToolByName(cropName=" + cropName + "): " + e.getMessage(),
-				e);
-		}
-	}
-
-	@Override
-	public StandardPreset saveOrUpdateStandardPreset(final StandardPreset standardPreset) {
-		try {
-			return this.workbenchDaoFactory.getStandardPresetDAO().saveOrUpdate(standardPreset);
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Cannot perform: WorkbenchDataManager.saveOrUpdateStandardPreset(standardPreset=" + standardPreset.getName() + "): " + e
-					.getMessage(), e);
-		}
 	}
 
 	@Override

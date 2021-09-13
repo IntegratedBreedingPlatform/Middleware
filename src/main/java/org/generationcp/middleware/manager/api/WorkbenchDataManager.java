@@ -10,7 +10,6 @@
 
 package org.generationcp.middleware.manager.api;
 
-import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
@@ -223,27 +222,6 @@ public interface WorkbenchDataManager {
 	 */
 
 	Project getLastOpenedProjectAnyUser();
-
-	/**
-	 * Retrive all standard presets with specific crop + tool
-	 *
-	 * @param cropName
-	 * @param toolId
-	 * @return
-	 */
-	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId);
-
-	List<StandardPreset> getStandardPresetFromCropAndTool(String cropName, int toolId, String toolSection);
-
-	List<StandardPreset> getStandardPresetFromCropAndToolByName(String presetName, String cropName, int toolId, String toolSection);
-
-	/**
-	 * save or update a standard preset
-	 *
-	 * @param standardPreset
-	 * @return
-	 */
-	StandardPreset saveOrUpdateStandardPreset(StandardPreset standardPreset);
 
 	/**
 	 * Close the sessionProvider

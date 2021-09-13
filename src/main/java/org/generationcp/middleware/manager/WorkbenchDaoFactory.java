@@ -13,7 +13,6 @@ import org.generationcp.middleware.dao.RPackageDAO;
 import org.generationcp.middleware.dao.RoleDAO;
 import org.generationcp.middleware.dao.RoleTypeDAO;
 import org.generationcp.middleware.dao.RoleTypePermissionDAO;
-import org.generationcp.middleware.dao.StandardPresetDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.UserRoleDao;
@@ -94,12 +93,6 @@ public class WorkbenchDaoFactory {
 		final ToolDAO toolDAO = new ToolDAO();
 		toolDAO.setSession(this.sessionProvider.getSession());
 		return toolDAO;
-	}
-
-	public StandardPresetDAO getStandardPresetDAO() {
-		final StandardPresetDAO standardPresetDAO = new StandardPresetDAO();
-		standardPresetDAO.setSession(this.sessionProvider.getSession());
-		return standardPresetDAO;
 	}
 
 	public WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDAO() {
