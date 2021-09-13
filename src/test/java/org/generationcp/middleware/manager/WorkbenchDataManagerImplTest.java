@@ -14,7 +14,6 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.presets.StandardPreset;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
@@ -164,90 +163,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertNotNull(results);
 		Assert.assertFalse(results.isEmpty());
 		Debug.printObjects(IntegrationTestBase.INDENT, results);
-	}
-
-	@Test
-	public void testStandardPreset() throws Exception {
-		final StandardPreset preset = new StandardPreset();
-		preset.setConfiguration("<configuration/>");
-		preset.setName("configuration_01");
-		preset.setToolId(1);
-		preset.setCropName("crop_name");
-
-		final StandardPreset results = this.workbenchDataManager.saveOrUpdateStandardPreset(preset);
-		Assert.assertTrue("we retrieve the saved primary id", results.getStandardPresetId() > 0);
-
-		final Integer id = results.getStandardPresetId();
-		final StandardPreset retrievedResult = this.workbenchDaoFactory.getStandardPresetDAO().getById(id);
-		Assert.assertEquals("we retrieved the correct object from database", results, retrievedResult);
-
-		final List<StandardPreset> out = this.workbenchDaoFactory.getStandardPresetDAO().getAll();
-		Assert.assertFalse(out.isEmpty());
-	}
-
-	@Test
-	public void testGetAllStandardPreset() throws Exception {
-		final List<StandardPreset> out = this.workbenchDaoFactory.getStandardPresetDAO().getAll();
-		Assert.assertTrue(out.size() > 0);
-	}
-
-	@Test
-	public void testGetStandardPresetFromCropAndTool() throws Exception {
-		this.initializeStandardPresets();
-
-		for (int j = 1; j < 3; j++) {
-			final List<StandardPreset> presetsList = this.workbenchDataManager.getStandardPresetFromCropAndTool("crop_name_" + j, j);
-			for (final StandardPreset p : presetsList) {
-				Assert.assertEquals("should only retrieve all standard presets with crop_name_1", "crop_name_" + j, p.getCropName());
-				Assert.assertEquals("should be the same tool as requested", Integer.valueOf(j), p.getToolId());
-			}
-		}
-
-	}
-
-	@Test
-	public void testGetStandardPresetFromCropAndToolAndToolSection() throws Exception {
-		this.initializeStandardPresets();
-
-		for (int j = 1; j < 3; j++) {
-			final List<StandardPreset> presetsList =
-				this.workbenchDataManager.getStandardPresetFromCropAndTool("crop_name_" + j, j, "tool_section_" + j);
-			for (final StandardPreset p : presetsList) {
-				Assert.assertEquals("should only retrieve all standard presets with same crop name", "crop_name_" + j, p.getCropName());
-				Assert.assertEquals("should only retrieve all standard presets with same tool section", "tool_section_" + j,
-					p.getToolSection());
-				Assert.assertEquals("should be the same tool as requested", Integer.valueOf(j), p.getToolId());
-			}
-		}
-	}
-
-	@Test
-	public void testGetStandardPresetFromProgramAndToolByName() throws Exception {
-		this.initializeStandardPresets();
-
-		// this should exists
-		final List<StandardPreset> result =
-			this.workbenchDataManager.getStandardPresetFromCropAndToolByName("configuration_1_1", "crop_name_1", 1, "tool_section_1");
-
-		Assert.assertTrue("result should not be empty", result.size() > 0);
-		Assert.assertEquals("Should return the same name", "configuration_1_1", result.get(0).getName());
-	}
-
-	protected List<StandardPreset> initializeStandardPresets() {
-		final List<StandardPreset> fulllist = new ArrayList<>();
-		for (int j = 1; j < 3; j++) {
-			for (int i = 1; i < 6; i++) {
-				final StandardPreset preset = new StandardPreset();
-				preset.setConfiguration("<configuration/>");
-				preset.setName("configuration_" + j + "_" + i);
-				preset.setToolId(j);
-				preset.setCropName("crop_name_" + j);
-				preset.setToolSection("tool_section_" + j);
-
-				fulllist.add(this.workbenchDataManager.saveOrUpdateStandardPreset(preset));
-			}
-		}
-		return fulllist;
 	}
 
 	@Test
