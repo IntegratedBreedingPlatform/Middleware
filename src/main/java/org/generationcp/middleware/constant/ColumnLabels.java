@@ -81,11 +81,12 @@ public enum ColumnLabels {
     GROUPGID(TermId.GROUPGID, "GROUPGID"),
 
     HAS_PROGENY(null, "HAS PROGENY"),
-    USED_IN_STUDY(null, "USED IN STUDY");
+    USED_IN_STUDY(null, "USED IN STUDY"),
+    USED_IN_LOCKED_LIST(null, "USED IN LOCKED LIST");
 
 
-    private TermId termId;
-    private String name;
+    private final TermId termId;
+    private final String name;
     private static final Map<String, ColumnLabels> LOOKUP = new HashMap<>();
     private static final List<String> ADDABLE_GERMPLASM_COLUMNS = new ArrayList<>();
 

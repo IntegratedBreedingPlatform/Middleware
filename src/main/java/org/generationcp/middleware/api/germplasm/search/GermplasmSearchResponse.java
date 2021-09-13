@@ -56,6 +56,7 @@ public class GermplasmSearchResponse {
 
 	private Boolean hasProgeny;
 	private Boolean usedInStudy;
+	private Boolean usedInLockedList;
 
 	public GermplasmSearchResponse() {
 	}
@@ -314,6 +315,14 @@ public class GermplasmSearchResponse {
 
 	public void setUsedInStudy(final Boolean usedInStudy) {
 		this.usedInStudy = usedInStudy;
+	}
+
+	public Boolean getUsedInLockedList() {
+		return this.usedInLockedList;
+	}
+
+	public void setUsedInLockedList(final Boolean usedInLockedList) {
+		this.usedInLockedList = usedInLockedList;
 	}
 
 	@Override
