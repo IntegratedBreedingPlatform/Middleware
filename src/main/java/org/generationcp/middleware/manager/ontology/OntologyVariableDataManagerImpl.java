@@ -57,7 +57,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -574,6 +573,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		variable.setGermplasm((int) this.daoFactory.getAttributeDAO().countByVariables(Lists.newArrayList(variable.getId())));
 
 		variable.setBreedingMethods((int) this.daoFactory.getMethodDAO().countByVariable(variable.getId()));
+
+		variable.setLists((int) this.daoFactory.getGermplasmListDataViewDAO().countListByVariableId(variable.getId()));
 
 		//setting variable observations, first observations will be null so set it to 0
 		Integer observations = 0;
