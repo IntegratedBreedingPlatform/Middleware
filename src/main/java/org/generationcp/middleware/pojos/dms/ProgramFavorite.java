@@ -18,7 +18,7 @@ public class ProgramFavorite {
 
 		private final String name;
 
-		FavoriteType(String name) {
+		FavoriteType(final String name) {
 			this.name = name;
 		}
 
@@ -26,8 +26,8 @@ public class ProgramFavorite {
 			return this.name;
 		}
 
-		public static FavoriteType getByName(String name) {
-			for (FavoriteType type : FavoriteType.values()) {
+		public static FavoriteType getByName(final String name) {
+			for (final FavoriteType type : FavoriteType.values()) {
 				if (type.getName().equalsIgnoreCase(name)) {
 					return type;
 				}
@@ -55,11 +55,20 @@ public class ProgramFavorite {
 	@Column(name = "entity_id")
 	private Integer entityId;
 
+	public ProgramFavorite() {
+	}
+
+	public ProgramFavorite(final String uniqueID, final FavoriteType favoriteType, final Integer entityId) {
+		this.uniqueID = uniqueID;
+		this.entityType = favoriteType.getName();
+		this.entityId = entityId;
+	}
+
 	public Integer getProgramFavoriteId() {
 		return this.programFavoriteId;
 	}
 
-	public void setProgramFavoriteId(Integer programFavoriteId) {
+	public void setProgramFavoriteId(final Integer programFavoriteId) {
 		this.programFavoriteId = programFavoriteId;
 	}
 
@@ -67,7 +76,7 @@ public class ProgramFavorite {
 		return this.entityType;
 	}
 
-	public void setEntityType(String entityType) {
+	public void setEntityType(final String entityType) {
 		this.entityType = entityType;
 	}
 
@@ -75,7 +84,7 @@ public class ProgramFavorite {
 		return this.entityId;
 	}
 
-	public void setEntityId(Integer entityId) {
+	public void setEntityId(final Integer entityId) {
 		this.entityId = entityId;
 	}
 
@@ -83,7 +92,7 @@ public class ProgramFavorite {
 		return this.uniqueID;
 	}
 
-	public void setUniqueID(String uniqueID) {
+	public void setUniqueID(final String uniqueID) {
 		this.uniqueID = uniqueID;
 	}
 

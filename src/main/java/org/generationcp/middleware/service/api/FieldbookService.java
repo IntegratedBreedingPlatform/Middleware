@@ -12,19 +12,25 @@ package org.generationcp.middleware.service.api;
 
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.tuple.Pair;
-import org.apache.commons.lang3.tuple.Triple;
-import org.generationcp.middleware.domain.dms.*;
+import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.PhenotypicType;
+import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.dms.Study;
+import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
-import org.generationcp.middleware.domain.gms.GermplasmListType;
-import org.generationcp.middleware.domain.oms.StandardVariableReference;
-import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.*;
+import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 
@@ -516,11 +522,6 @@ public interface FieldbookService {
 	 * @return the method by name
 	 */
 	Method getMethodByName(String name);
-
-	/*
-	 * Deletes a study (logical delete).
-	 */
-	void deleteStudy(int studyId, Integer currentUserId) throws UnpermittedDeletionException;
 
 	/**
 	 * Gets the favorite project location ids.

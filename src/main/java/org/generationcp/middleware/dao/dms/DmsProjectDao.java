@@ -14,12 +14,10 @@ package org.generationcp.middleware.dao.dms;
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.FolderReference;
@@ -45,7 +43,6 @@ import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
-import org.generationcp.middleware.service.api.user.ContactDto;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.FormulaUtils;
 import org.generationcp.middleware.util.Util;
@@ -57,7 +54,6 @@ import org.hibernate.criterion.CriteriaSpecification;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -2039,9 +2035,9 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			.setProjection(projectionList)
 			.setResultTransformer(Transformers.aliasToBean(StudyDTO.class));
 
-		this.addOrder(criteria, pageable);
+		addOrder(criteria, pageable);
 		this.addStudySearchFilters(criteria, studySearchRequest);
-		this.addPagination(criteria, pageable);
+		addPagination(criteria, pageable);
 
 		return criteria.list();
 	}
@@ -2069,4 +2065,22 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
+	public void markProjectsAndChildrenAsDeleted(final List<Integer> projectIds) {
+		try {
+			if (!CollectionUtils.isEmpty(projectIds)) {
+				final String timestamp = Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS");
+				final String sql =
+					"UPDATE project p SET p.deleted = 1, p.name = CONCAT(p.name, '#', :timestamp) WHERE "
+						+ "p.project_id IN (:projectIds) OR p.study_id IN (:projectIds)";
+				final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+				sqlQuery.setParameter("timestamp", timestamp);
+				sqlQuery.setParameterList("projectIds", projectIds);
+				sqlQuery.executeUpdate();
+			}
+		} catch (final MiddlewareQueryException e) {
+			final String message = "Error with markProjectsAndChildrenAsDeleted() query from projectIds: " + projectIds;
+			DmsProjectDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }

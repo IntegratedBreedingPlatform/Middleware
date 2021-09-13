@@ -111,7 +111,6 @@
 
         <!-- Mapping for presets -->
         <mapping class="org.generationcp.middleware.pojos.presets.ProgramPreset"/>
-        <mapping class="org.generationcp.middleware.pojos.presets.StandardPreset"/>
 
         <mapping class="org.generationcp.middleware.pojos.UserProgramTreeState"/>
 

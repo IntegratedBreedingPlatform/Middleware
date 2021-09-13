@@ -419,6 +419,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public void deleteProgramGermplasmLists(final String programUUID) {
+		this.daoFactory.getGermplasmListDAO().markProgramGermplasmListsAsDeleted(programUUID);
+	}
+
+	@Override
 	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest request,
 		final Pageable pageable) {
 		return this.daoFactory.getGermplasmListDAO().searchGermplasmList(request, pageable);

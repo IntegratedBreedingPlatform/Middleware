@@ -54,6 +54,8 @@ public interface GermplasmListService {
 
 	void performGermplasmListEntriesDeletion(List<Integer> gids);
 
+	void deleteProgramGermplasmLists(String programUUID);
+
 	List<GermplasmListSearchResponse> searchGermplasmList(GermplasmListSearchRequest request, Pageable pageable);
 
 	long countSearchGermplasmList(GermplasmListSearchRequest request);

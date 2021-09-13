@@ -38,4 +38,7 @@ public interface LocationService {
 	List<Integer> getFavoriteProjectLocationIds(String programUUID);
 
 	List<org.generationcp.middleware.api.location.Location> getLocations(LocationSearchRequest locationSearchRequest, Pageable pageable);
+
+	void deleteProgramLocations(String programUUID);
+
 }

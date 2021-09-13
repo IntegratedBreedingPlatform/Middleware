@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.impl.user;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.data.initializer.UserDtoTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserRoleDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
@@ -48,6 +49,9 @@ public class UserServiceImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private ProgramService programService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -463,7 +467,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetProjectUserInfoByProjectIdAndUserId() {
 		final Project project = this.workbenchTestDataUtil.createTestProjectData();
-		this.workbenchDataManager.addProject(project);
+		this.programService.addProgram(project);
 		final WorkbenchUser user1 = this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
 
 		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, user1);
