@@ -15,6 +15,7 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -1134,6 +1135,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		// Delete all non-selected germplasm that were merged
 		this.daoFactory.getGermplasmDao().deleteGermplasm(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId());
+	}
+
+	@Override
+	public List<GermplasmMergeDto> getGermplasmMergeDTOs(final Integer gid) {
+		return this.daoFactory.getGermplasmDao().getGermplasmMergeDtos(gid);
 	}
 
 	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Integer targetGermplasmId) {

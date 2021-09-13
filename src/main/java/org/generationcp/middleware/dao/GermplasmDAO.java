@@ -19,6 +19,7 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergeDto;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -2003,6 +2004,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		} catch (final HibernateException e) {
 			final String message =
 				"Error with getGermplasmAttributeVariables(gids=" + gids + ") : " + e.getMessage();
+			GermplasmDAO.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public List<GermplasmMergeDto> getGermplasmMergeDtos(final int gid) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(Germplasm.class);
+			criteria.add(Restrictions.eq("grplce", gid));
+			final List<Germplasm> list = criteria.list();
+			return list.stream().map(
+					o -> new GermplasmMergeDto(o.getGid(), (o.getPreferredName() != null) ? o.getPreferredName().getNval() : StringUtils.EMPTY,
+						o.getModifiedDate()))
+				.collect(Collectors.toList());
+		} catch (final HibernateException e) {
+			final String message =
+				"Error with getGermplasmMergeDtos(gids=" + gid + ") : " + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
