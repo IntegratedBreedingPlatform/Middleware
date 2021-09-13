@@ -16,7 +16,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="nahuel" id="v19.1.0-1">
+	<changeSet author="nahuel" id="v19.1.0-2">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT count(*) FROM permission where name = 'MG_MANAGE_FILES'
@@ -37,7 +37,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="nahuel" id="v19.1.0-2">
+	<changeSet author="nahuel" id="v19.1.0-3">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT count(*) FROM permission where name = 'MS_MANAGE_FILES'
