@@ -37,5 +37,13 @@ public interface StudyService {
 	List<StudyDTO> getFilteredStudies(String programUUID, StudySearchRequest studySearchRequest, Pageable pageable);
 
 	long countFilteredStudies(String programUUID, StudySearchRequest studySearchRequest);
-	
+
+	/**
+	 * Soft-delete all program studies
+	 *
+	 * @param programUUID Program UUID of the studies to be deleted
+	 */
+	void deleteProgramStudies(String programUUID);
+
+	void deleteStudy(int studyId);
 }

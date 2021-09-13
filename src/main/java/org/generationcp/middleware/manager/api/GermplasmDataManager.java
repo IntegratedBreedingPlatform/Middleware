@@ -692,14 +692,6 @@ public interface GermplasmDataManager {
 	void saveProgramFavorites(List<ProgramFavorite> list);
 
 	/**
-	 * Saves a favorite method/location
-	 *
-	 * @param favorite to be saved
-	 * @return none
-	 */
-	void saveProgramFavorite(ProgramFavorite favorite);
-
-	/**
 	 * Deletes a list of favorite methods/locations
 	 *
 	 * @param list of ProgramFavorite

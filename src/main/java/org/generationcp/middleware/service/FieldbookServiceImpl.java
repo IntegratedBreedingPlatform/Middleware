@@ -28,7 +28,6 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
@@ -646,23 +645,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void deleteStudy(final int studyId, final Integer currentUserId) throws UnpermittedDeletionException {
-		final Integer studyUserId = this.getStudy(studyId).getUser();
-		if (studyUserId != null && !studyUserId.equals(currentUserId)) {
-			throw new UnpermittedDeletionException(
-					"You are not able to delete this nursery or trial as you are not the owner. The owner is " + this
-							.getOwnerListName(studyUserId));
-		}
-
-		try {
-			this.studyDataManager.deleteStudy(studyId);
-
-		} catch (final Exception e) {
-			this.logAndThrowException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e, FieldbookServiceImpl.LOG);
-		}
-	}
-
-	@Override
 	public List<Integer> getFavoriteProjectLocationIds(final String programUUID) {
 		final List<ProgramFavorite> favList =
 				this.getGermplasmDataManager().getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
@@ -726,7 +708,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		this.germplasmListManager = germplasmListManager;
 	}
 
-	protected void setLocationDataManager(LocationDataManager locationDataManager) {
+	protected void setLocationDataManager(final LocationDataManager locationDataManager) {
 		this.locationDataManager = locationDataManager;
 	}
 

@@ -4,6 +4,18 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
+	<changeSet author="cuenyad" id="v19.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="standard_preset" />
+		</preConditions>
+		<comment>
+			Drop standard_preset IBP-4762
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE standard_preset;
+		</sql>
+	</changeSet>
+
 	<changeSet author="nahuel" id="v19.1.0-1">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
@@ -46,4 +58,5 @@
 			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @ms_manage_files_id, '1');
 		</sql>
 	</changeSet>
+
 </databaseChangeLog>

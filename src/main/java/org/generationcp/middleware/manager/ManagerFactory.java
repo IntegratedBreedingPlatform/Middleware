@@ -23,6 +23,8 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListServiceImpl;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl;
+import org.generationcp.middleware.api.program.ProgramFavoriteService;
+import org.generationcp.middleware.api.program.ProgramFavoriteServiceImpl;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -56,7 +58,6 @@ import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
 import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
-import org.generationcp.middleware.service.ReportServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
@@ -64,7 +65,6 @@ import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
-import org.generationcp.middleware.service.api.ReportService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
@@ -228,10 +228,6 @@ public class ManagerFactory implements Serializable {
 		return new OntologyServiceImpl(this.sessionProvider);
 	}
 
-	public ReportService getReportService() {
-		return new ReportServiceImpl(this.sessionProvider);
-	}
-
 	public PedigreeService getPedigreeService() {
 		return PedigreeFactory.getPedigreeService(this.sessionProvider, this.pedigreeProfile, this.cropName);
 	}
@@ -385,4 +381,9 @@ public class ManagerFactory implements Serializable {
 	public VariableDataValidatorFactory getVariableDataValidatorFactory() {
 		return new VariableDataValidatorFactoryImpl();
 	}
+
+	public ProgramFavoriteService getProgramFavoriteService() {
+		return new ProgramFavoriteServiceImpl(this.sessionProvider);
+	}
+
 }
