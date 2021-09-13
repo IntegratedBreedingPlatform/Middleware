@@ -107,12 +107,10 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 	}
 
 	public void detachFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery("delete " //
-			+ " from file_metadata_cvterm " //
-			+ " where file_metadata_id in ( " //
-			+ "     select T.file_id " //
-			+ "     from ( " //
-			+ "         select fm.file_id " //
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery("delete fmc " //
+			+ " from file_metadata_cvterm fmc " //
+			+ " inner join ( " //
+			+ "         select fmc.file_metadata_id, fmc.cvterm_id " //
 			+ "         from file_metadata fm " //
 			+ "                  left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
 			+ "                  left join germplsm g on fm.gid = g.gid " //
@@ -120,8 +118,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			+ "         where fmc.cvterm_id in (:variableIds)"  //
 			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //
 			+ " 			  and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) " //
-			+ "     ) T " //
-			+ " ) ");
+			+ " ) T on T.file_metadata_id = fmc.file_metadata_id and T.cvterm_id = fmc.cvterm_id ");
 
 		sqlQuery.setParameter("datasetId", datasetId);
 		sqlQuery.setParameter("germplasmUUID", germplasmUUID);
@@ -129,14 +126,21 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 		sqlQuery.executeUpdate();
 	}
 
+	/**
+	 * Important Note:
+	 * file_metadata_cvterm is prepared to link a file to (possibly) many variables,
+	 * something that is not currently possible to achieve through the BMS interface,
+	 * but it is consistent with the brapi schema (See {@link org.generationcp.middleware.api.brapi.v1.image.Image#descriptiveOntologyTerms}
+	 * <br>
+	 * If the multple-variable scenario becomes a reality in the future, this query will need to raise an exception for those cases,
+	 * prompting the user to execute a detach variables instead ({@link #detachFiles(List, Integer, String)})
+	 */
 	public void removeFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery("delete fm, fmc " //
 			+ " from file_metadata fm " //
-			+ "      inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
-			+ " where fm.file_id in ( " //
-			+ "     select T.file_id " //
-			+ "     from ( " //
-			+ "         select fm.file_id " //
+			+ " inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
+			+ " inner join ( " //
+			+ "         select fmc.file_metadata_id, fmc.cvterm_id " //
 			+ "         from file_metadata fm " //
 			+ "                  left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
 			+ "                  left join germplsm g on fm.gid = g.gid " //
@@ -144,8 +148,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			+ "         where fmc.cvterm_id in (:variableIds) " //
 			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //
 			+ " 			  and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) " //
-			+ "     ) T " //
-			+ " ) ");
+			+ " ) T on T.file_metadata_id = fmc.file_metadata_id and T.cvterm_id = fmc.cvterm_id ");
 
 		sqlQuery.setParameter("datasetId", datasetId);
 		sqlQuery.setParameter("germplasmUUID", germplasmUUID);
