@@ -142,7 +142,7 @@ public class ProjectDAOTest extends IntegrationTestBase {
 
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		programSearchRequest.setLoggedInUserId(this.adminInstanceProgram.getUserid());
-		final Pageable pageable = new PageRequest(0, 100);
+		final Pageable pageable = new PageRequest(0, count);
 		final List<Project> projects = this.workbenchProjectDao.getProjectsByFilter(pageable, programSearchRequest);
 		final Set<Project> projectSet = Sets.newHashSet(projects);
 
@@ -157,7 +157,7 @@ public class ProjectDAOTest extends IntegrationTestBase {
 
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		programSearchRequest.setLoggedInUserId(this.admin.getUserid());
-		final Pageable pageable = new PageRequest(0, 100);
+		final Pageable pageable = new PageRequest(0, count);
 		final List<Project> projects = this.workbenchProjectDao.getProjectsByFilter(pageable, programSearchRequest);
 		final Set<Project> projectSet = Sets.newHashSet(projects);
 
