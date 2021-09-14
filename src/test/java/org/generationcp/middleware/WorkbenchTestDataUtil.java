@@ -2,6 +2,7 @@
 package org.generationcp.middleware;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -33,6 +34,9 @@ public class WorkbenchTestDataUtil {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private ProgramService programService;
 
 	private Project commonTestProject;
 	private WorkbenchUser testUser1, testUser2;
@@ -141,7 +145,7 @@ public class WorkbenchTestDataUtil {
 		this.userService.addUser(this.testUser2);
 
 		this.commonTestProject.setUserId(this.testUser1.getUserid());
-		this.workbenchDataManager.addProject(this.commonTestProject);
+		this.programService.addProgram(this.commonTestProject);
 
 		this.testProjectActivity1 = this.createTestProjectActivityData(this.commonTestProject, this.testUser1);
 		this.workbenchDataManager.addProjectActivity(this.testProjectActivity1);

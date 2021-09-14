@@ -32,7 +32,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
-import java.util.Comparator;
 
 /**
  * POJO for location table.
@@ -51,15 +50,11 @@ public class Location implements Serializable, Comparable<Location> {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String GET_ALL = "getAllLocation";
-	public static final String COUNT_ALL = "countAllLocation";
-
 	public static final String GET_PROVINCE_BY_COUNTRY =
 			"select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV'  and l.cntryid = (:countryId) order by l.lname";
 	public static final String GET_ALL_PROVINCES =
 			"select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV' order by l.lname";
 
-	public static final int UNKNOWN_LOCATION_ID = 0;
 	public static final String UNSPECIFIED_LOCATION = "Unspecified Location";
 	
 	public static final Integer[] BREEDING_LOCATION_TYPE_IDS = {410, 411, 412};
@@ -139,12 +134,13 @@ public class Location implements Serializable, Comparable<Location> {
 	public Location() {
 	}
 
-	public Location(Integer locid) {
+	public Location(final Integer locid) {
 		this.locid = locid;
 	}
 
-	public Location(Integer locid, Integer ltype, Integer nllp, String lname, String labbr, Integer snl3id, Integer snl2id, Integer snl1id,
-			Integer cntryid, Integer lrplce) {
+	public Location(final Integer locid, final Integer ltype, final Integer nllp, final String lname, final String labbr,
+		final Integer snl3id, final Integer snl2id, final Integer snl1id,
+		final Integer cntryid, final Integer lrplce) {
 		super();
 		this.locid = locid;
 		this.ltype = ltype;
@@ -162,7 +158,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return this.locid;
 	}
 
-	public void setLocid(Integer locid) {
+	public void setLocid(final Integer locid) {
 		this.locid = locid;
 	}
 
@@ -170,7 +166,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return this.programUUID;
 	}
 
-	public void setProgramUUID(String programUUID) {
+	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
 	}
 
@@ -178,7 +174,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return this.ltype;
 	}
 
-	public void setLtype(Integer ltype) {
+	public void setLtype(final Integer ltype) {
 		this.ltype = ltype;
 	}
 
@@ -186,7 +182,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return this.cntryid;
 	}
 
-	public void setCntryid(Integer cntryid) {
+	public void setCntryid(final Integer cntryid) {
 		this.cntryid = cntryid;
 	}
 
@@ -194,7 +190,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return this.nllp;
 	}
 
-	public void setNllp(Integer nllp) {
+	public void setNllp(final Integer nllp) {
 		this.nllp = nllp;
 	}
 
@@ -202,7 +198,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return this.lname;
 	}
 
-	public void setLname(String lname) {
+	public void setLname(final String lname) {
 		this.lname = lname;
 	}
 
@@ -210,7 +206,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return this.labbr;
 	}
 
-	public void setLabbr(String labbr) {
+	public void setLabbr(final String labbr) {
 		this.labbr = labbr;
 	}
 
@@ -218,7 +214,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return this.snl3id;
 	}
 
-	public void setSnl3id(Integer snl3id) {
+	public void setSnl3id(final Integer snl3id) {
 		this.snl3id = snl3id;
 	}
 
@@ -226,7 +222,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return this.snl2id;
 	}
 
-	public void setSnl2id(Integer snl2id) {
+	public void setSnl2id(final Integer snl2id) {
 		this.snl2id = snl2id;
 	}
 
@@ -234,7 +230,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return this.snl1id;
 	}
 
-	public void setSnl1id(Integer snl1id) {
+	public void setSnl1id(final Integer snl1id) {
 		this.snl1id = snl1id;
 	}
 
@@ -242,7 +238,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return this.lrplce;
 	}
 
-	public void setLrplce(Integer lrplce) {
+	public void setLrplce(final Integer lrplce) {
 		this.lrplce = lrplce;
 	}
 
@@ -250,7 +246,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return this.georef;
 	}
 
-	public void setGeoref(Georef georef) {
+	public void setGeoref(final Georef georef) {
 		this.georef = georef;
 	}
 
@@ -261,7 +257,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return null;
 	}
 
-	public void setLatitude(Double latitude) {
+	public void setLatitude(final Double latitude) {
 		if (this.georef == null) {
 			this.georef = new Georef(this.locid);
 		}
@@ -275,7 +271,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return null;
 	}
 
-	public void setLongitude(Double longitude) {
+	public void setLongitude(final Double longitude) {
 		if (this.georef == null) {
 			this.georef = new Georef(this.locid);
 		}
@@ -289,7 +285,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return null;
 	}
 
-	public void setAltitude(Double altitude) {
+	public void setAltitude(final Double altitude) {
 		if (this.georef == null) {
 			this.georef = new Georef(this.locid);
 		}
@@ -311,7 +307,7 @@ public class Location implements Serializable, Comparable<Location> {
 	/**
 	 * @param parentLocationName the parentLocationName to set
 	 */
-	 public void setParentLocationName(String parentLocationName) {
+	public void setParentLocationName(final String parentLocationName) {
 		this.parentLocationName = parentLocationName;
 	}
 
@@ -325,7 +321,7 @@ public class Location implements Serializable, Comparable<Location> {
 	/**
 	 * @param parentLocationId the parentLocationId to set
 	 */
-	public void setParentLocationId(Integer parentLocationId) {
+	public void setParentLocationId(final Integer parentLocationId) {
 		this.parentLocationId = parentLocationId;
 	}
 
@@ -333,7 +329,7 @@ public class Location implements Serializable, Comparable<Location> {
 		return this.parentLocationAbbr;
 	}
 
-	public void setParentLocationAbbr(String parentLocationAbbr) {
+	public void setParentLocationAbbr(final String parentLocationAbbr) {
 		this.parentLocationAbbr = parentLocationAbbr;
 	}
 
@@ -346,7 +342,7 @@ public class Location implements Serializable, Comparable<Location> {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (this == obj) {
 			return true;
 		}
@@ -356,20 +352,16 @@ public class Location implements Serializable, Comparable<Location> {
 		if (this.getClass() != obj.getClass()) {
 			return false;
 		}
-		Location other = (Location) obj;
+		final Location other = (Location) obj;
 		if (this.locid == null) {
-			if (other.getLocid() != null) {
-				return false;
-			}
-		} else if (!this.locid.equals(other.getLocid())) {
-			return false;
-		}
-		return true;
+			return other.getLocid() == null;
+		} else
+			return this.locid.equals(other.getLocid());
 	}
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Location [locid=");
 		builder.append(this.locid);
 		builder.append(", ltype=");
@@ -405,29 +397,13 @@ public class Location implements Serializable, Comparable<Location> {
 	}
 
 	@Override
-	 public int compareTo(Location compareLocation) {
+	public int compareTo(final Location compareLocation) {
 
-		String compareName = compareLocation.getLname();
+		final String compareName = compareLocation.getLname();
 
 		// ascending order
 		return this.lname.compareTo(compareName);
 
 	}
-
-	public static Comparator<Location> LocationNameComparator = new Comparator<Location>() {
-
-		@Override
-		public int compare(Location location1, Location location2) {
-			String locationName1 = location1.getLname().toUpperCase();
-			String locationName2 = location2.getLname().toUpperCase();
-
-			// ascending order
-			return locationName1.compareTo(locationName2);
-
-			// descending order
-
-		}
-
-	};
 
 }

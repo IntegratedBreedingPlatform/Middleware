@@ -16,7 +16,6 @@ import org.generationcp.middleware.api.location.Coordinate;
 import org.generationcp.middleware.api.location.Geometry;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
-import org.generationcp.middleware.domain.dms.LocationDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
@@ -585,32 +584,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
-	public List<LocationDto> getLocationDtoByIds(final Collection<Integer> ids) {
-		final List<LocationDto> returnList = new ArrayList<>();
-		if (ids == null || ids.isEmpty()) {
-			return returnList;
-		}
-		try {
-			final String sql = "SELECT l.lname, prov.lname, c.isoabbr, l.locid" + " FROM location l"
-				+ " LEFT JOIN location prov ON prov.locid = l.snl1id" + " LEFT JOIN cntry c ON c.cntryid = l.cntryid"
-				+ " WHERE l.locid in (:ids)";
-			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			query.setParameterList("ids", ids);
-			final List<Object[]> results = query.list();
-
-			if (results != null) {
-				for (final Object[] result : results) {
-					returnList.add(new LocationDto((Integer) result[3], (String) result[0], (String) result[1], (String) result[2]));
-				}
-			}
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("getLocationDtoById", "id", ids.toString(), e.getMessage(),
-				LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-		return returnList;
-	}
-
 	public List<Location> getLocationByIds(final Collection<Integer> ids) {
 
 		if (ids == null || ids.isEmpty()) {
@@ -1152,5 +1125,18 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			return Optional.of(locations.get(0));
 		}
 		return Optional.empty();
+	}
+
+	public void deleteAllProgramLocations(final String programUUID) {
+		try {
+			final String sql = "DELETE l FROM location l WHERE l.program_uuid = :programUUID";
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+			sqlQuery.setParameter("programUUID", programUUID);
+			sqlQuery.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error in deleteAllProgramLocations(" + programUUID + ") in LocationDAO: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 }

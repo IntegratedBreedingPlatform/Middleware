@@ -54,6 +54,8 @@ public interface GermplasmListService {
 
 	void performGermplasmListEntriesDeletion(List<Integer> gids);
 
+	void deleteProgramGermplasmLists(String programUUID);
+
 	List<GermplasmListSearchResponse> searchGermplasmList(GermplasmListSearchRequest request, Pageable pageable);
 
 	long countSearchGermplasmList(GermplasmListSearchRequest request);
@@ -70,7 +72,7 @@ public interface GermplasmListService {
 	 */
 	boolean toggleGermplasmListStatus(Integer listId);
 
-	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId);
+	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId, final String programUUID);
 
 	List<MeasurementVariable> getGermplasmListDataTableHeader(Integer listId);
 

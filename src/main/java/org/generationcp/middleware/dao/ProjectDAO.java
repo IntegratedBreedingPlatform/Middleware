@@ -23,6 +23,8 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
@@ -35,6 +37,8 @@ import java.util.Map;
  *
  */
 public class ProjectDAO extends GenericDAO<Project, Long> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(ProjectDAO.class);
 
 	/**
 	 * User will be able to see the following programs: <br>
@@ -123,6 +127,7 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		return null;
 	}
 
+	//FIXME, if 2 projects with same name, different crop, then an error may occur
 	public void deleteProject(final String projectName) {
 		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of
 		// synch with
@@ -133,6 +138,18 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		final SQLQuery query = this.getSession().createSQLQuery("delete from workbench_project where project_name= '" + projectName + "';");
 
 		query.executeUpdate();
+	}
+
+	public void deleteProjectByUUID(final String programUUID) {
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery("delete from workbench_project where project_uuid = :programUUID");
+			query.setParameter("programUUID", programUUID);
+			query.executeUpdate();
+		} catch (final Exception e) {
+			final String message = "Error with deleteProjectByUUID(programUUID=" + programUUID + " ): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
 	}
 
 	public Project getProjectByNameAndCrop(final String projectName, final CropType cropType) throws MiddlewareQueryException {
@@ -183,12 +200,6 @@ public class ProjectDAO extends GenericDAO<Project, Long> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error with getLastOpenedProjectAnyUser(" + ") query from Project " + e.getMessage(), e);
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Project> getProjectsByCrop(final CropType cropType) throws MiddlewareQueryException {
-		final Criteria criteria = this.getSession().createCriteria(Project.class).add(Restrictions.eq("cropType", cropType));
-		return criteria.list();
 	}
 
 	public List<Project> getProjectsByFilter(final Pageable pageable, final ProgramSearchRequest programSearchRequest)
