@@ -62,7 +62,7 @@ import java.util.stream.Collectors;
 	@NamedQuery(name = "getAllGermplasm", query = "FROM Germplasm"),
 	@NamedQuery(name = "countAllGermplasm", query = "SELECT COUNT(g) FROM Germplasm g"),
 
-	@NamedQuery(name = "countMatchGermplasmInList", query = "SELECT COUNT(g) FROM Germplasm g WHERE g.gid IN (:gids)")
+	@NamedQuery(name = "countMatchGermplasmInList", query = "SELECT COUNT(g) FROM Germplasm g WHERE g.gid IN (:gids) AND g.deleted = 0")
 })
 @NamedNativeQueries({
 	@NamedNativeQuery(name = "getGermplasmDescendants",

@@ -499,6 +499,23 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testCountMatchGermplasmInListWithDeletedGid() {
+
+		final Set<Integer> gids = new HashSet<>();
+
+		final Germplasm deletedGermplasm =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		deletedGermplasm.setDeleted(true);
+
+		gids.add(deletedGermplasm.getGid());
+
+		final long result = this.daoFactory.getGermplasmDao().countMatchGermplasmInList(gids);
+
+		Assert.assertEquals("The count should be zero because the gid in the list is already deleted.", 0, (int) result);
+
+	}
+
+	@Test
 	public void testCountMatchGermplasmInListNoGidExists() {
 
 		final Integer dummyGid = Integer.MIN_VALUE + 1;
