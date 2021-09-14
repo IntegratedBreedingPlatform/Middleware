@@ -5,7 +5,7 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 	<changeSet author="nahuel" id="v19.1.0-1">
-		<preConditions>
+		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="file_metadata" columnName="gid"/>
 			</not>
