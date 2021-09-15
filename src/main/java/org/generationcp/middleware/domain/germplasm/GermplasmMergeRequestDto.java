@@ -65,6 +65,17 @@ public class GermplasmMergeRequestDto {
 
 		private boolean omit;
 
+		public NonSelectedGermplasm() {
+
+		}
+
+		public NonSelectedGermplasm(final Integer germplasmId, final boolean migrateLots, final boolean closeLots, final boolean omit) {
+			this.germplasmId = germplasmId;
+			this.migrateLots = migrateLots;
+			this.closeLots = closeLots;
+			this.omit = omit;
+		}
+
 		public Integer getGermplasmId() {
 			return this.germplasmId;
 		}
