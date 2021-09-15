@@ -761,14 +761,6 @@ public interface GermplasmDataManager {
 	List<Germplasm> getGermplasmWithAllNamesAndAncestry(Set<Integer> gids, int numberOfLevels);
 
 	/**
-	 * Returns the count of records that matched the gids in the specified list.
-	 *
-	 * @param gids - The list of gids to match for in the germplasm table
-	 * @return
-	 */
-	long countMatchGermplasmInList(Set<Integer> gids);
-
-	/**
 	 * Returns map of list of names with given gids and ntype ids
 	 *
 	 * @param gids

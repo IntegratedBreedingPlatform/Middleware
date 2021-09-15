@@ -323,6 +323,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
+	public long countMatchGermplasmInList(final Set<Integer> gids) {
+		return this.daoFactory.getGermplasmDao().countMatchGermplasmInList(gids);
+	}
+
+	@Override
 	public Set<Integer> importGermplasmUpdates(final String programUUID, final List<GermplasmUpdateDTO> germplasmUpdateDTOList) {
 
 		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();

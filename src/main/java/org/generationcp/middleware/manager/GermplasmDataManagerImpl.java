@@ -1022,11 +1022,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public long countMatchGermplasmInList(final Set<Integer> gids) {
-		return this.daoFactory.getGermplasmDao().countMatchGermplasmInList(gids);
-	}
-
-	@Override
 	public Map<Integer, List<Name>> getNamesByGidsAndNTypeIdsInMap(final List<Integer> gids, final List<Integer> ntypeIds) {
 		return this.daoFactory.getNameDao().getNamesByGidsAndNTypeIdsInMap(gids, ntypeIds);
 	}

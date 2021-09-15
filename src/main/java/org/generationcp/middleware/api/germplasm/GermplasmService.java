@@ -55,6 +55,14 @@ public interface GermplasmService {
 
 	List<GermplasmDto> findGermplasmMatches(GermplasmMatchRequestDto germplasmMatchRequestDto, Pageable pageable);
 
+	/**
+	 * Returns the count of records that matched the gids in the specified list.
+	 *
+	 * @param gids - The list of gids to match for in the germplasm table
+	 * @return
+	 */
+	long countMatchGermplasmInList(Set<Integer> gids);
+
 	Set<Integer> importGermplasmUpdates(String programUUID, List<GermplasmUpdateDTO> germplasmUpdateDTOList);
 
 	/**

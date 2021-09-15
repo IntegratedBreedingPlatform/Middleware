@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service;
 
 import com.google.common.base.Optional;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -17,8 +18,6 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
-import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
@@ -73,7 +72,7 @@ public class DataImportServiceImplTest {
 	private OntologyDataManager ontologyDataManager;
 
 	@Mock
-	private GermplasmDataManager germplasmDataManager;
+	private GermplasmService germplasmService;
 
 	@Mock
 	private LocationDataManager locationDataManager;
@@ -429,7 +428,7 @@ public class DataImportServiceImplTest {
 		final Set<Integer> gids =
 				this.dataImportService.extractGidsFromObservations(WorkbookTestDataInitializer.GID, this.workbook.getObservations());
 
-		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(gids)).thenReturn(Long.valueOf(gids.size()));
+		Mockito.when(this.germplasmService.countMatchGermplasmInList(gids)).thenReturn(Long.valueOf(gids.size()));
 
 		Assert.assertTrue("Should return true because all gids in the list exist in the database",
 				this.dataImportService.checkIfAllGidsExistInDatabase(gids));
@@ -442,7 +441,7 @@ public class DataImportServiceImplTest {
 		final Set<Integer> gids =
 				this.dataImportService.extractGidsFromObservations(WorkbookTestDataInitializer.GID, this.workbook.getObservations());
 
-		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(gids)).thenReturn(0L);
+		Mockito.when(this.germplasmService.countMatchGermplasmInList(gids)).thenReturn(0L);
 
 		Assert.assertFalse("Should return false because not all gids in the list exist in the database",
 				this.dataImportService.checkIfAllGidsExistInDatabase(gids));
@@ -453,7 +452,7 @@ public class DataImportServiceImplTest {
 	public void testCheckForInvalidGidsAllGidsExist() {
 
 		// The count of matched record in germplasm should match the number of observation in data file.
-		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Matchers.anySetOf(Integer.class)))
+		Mockito.when(this.germplasmService.countMatchGermplasmInList(Matchers.anySetOf(Integer.class)))
 				.thenReturn(Long.valueOf(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS));
 
 		final List<Message> messages = new ArrayList<>();
@@ -467,7 +466,7 @@ public class DataImportServiceImplTest {
 	public void testCheckForInvalidGidsDoNotExist() {
 
 		// Retun a number not equal to no of observation to simulate that there are gids that do not exist in the database.
-		Mockito.when(this.germplasmDataManager.countMatchGermplasmInList(Matchers.anySetOf(Integer.class))).thenReturn(Long.valueOf(0L));
+		Mockito.when(this.germplasmService.countMatchGermplasmInList(Matchers.anySetOf(Integer.class))).thenReturn(Long.valueOf(0L));
 
 		final List<Message> messages = new ArrayList<>();
 		this.dataImportService.checkForInvalidGids(this.workbook, messages);

@@ -12,6 +12,7 @@ package org.generationcp.middleware.service;
 
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -32,7 +33,6 @@ import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
@@ -85,7 +85,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	private OntologyDataManager ontologyDataManager;
 
 	@Resource
-	private GermplasmDataManager germplasmDataManager;
+	private GermplasmService germplasmService;
 
 	@Resource
 	private LocationDataManager locationDataManager;
@@ -974,7 +974,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 */
 	boolean checkIfAllGidsExistInDatabase(final Set<Integer> gids) {
 
-		final long matchedGermplasmCount = this.germplasmDataManager.countMatchGermplasmInList(gids);
+		final long matchedGermplasmCount = this.germplasmService.countMatchGermplasmInList(gids);
 
 		// If the number of gids in the list matched the count of germplasm
 		// records matched in the database, it means
