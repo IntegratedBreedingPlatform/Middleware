@@ -778,7 +778,7 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 
 	@Override
 	public Method getMethodByCode(final String code) {
-		return this.daoFactory.getMethodDAO().getByCode(Collections.singletonList(code)).get(0);
+		return this.daoFactory.getMethodDAO().getByCode(code);
 	}
 
 	@Override
