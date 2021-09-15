@@ -1,10 +1,22 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-    <changeSet author="mderamos" id="v19.1.0-1">
+	<changeSet author="cuenyad" id="v19.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="standard_preset" />
+		</preConditions>
+		<comment>
+			Drop standard_preset IBP-4762
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DROP TABLE standard_preset;
+		</sql>
+	</changeSet>
+
+    <changeSet author="mderamos" id="v19.1.0-2">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(*) FROM permission where name = 'MERGE_GERMPLASM'

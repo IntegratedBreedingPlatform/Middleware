@@ -3,7 +3,6 @@ package org.generationcp.middleware.api.breedingmethod;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
 import org.generationcp.middleware.data.initializer.MethodTestDataInitializer;
-import org.generationcp.middleware.data.initializer.ProgramFavoriteTestDataInitializer;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -98,8 +97,7 @@ public class BreedingMethodServiceImplTest {
 		Mockito.when(this.methodDAO.filterMethods(searchRequest, null))
 			.thenReturn(methods);
 
-		final ProgramFavorite programFavorite =
-			new ProgramFavoriteTestDataInitializer().createProgramFavorite(method.getMid(), PROGRAM_UUID);
+		final ProgramFavorite programFavorite = new ProgramFavorite(PROGRAM_UUID, ProgramFavorite.FavoriteType.METHOD, method.getMid());
 		Mockito.when(this.programFavoriteDAO.getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, PROGRAM_UUID))
 			.thenReturn(Arrays.asList(programFavorite));
 

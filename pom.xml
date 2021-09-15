@@ -8,7 +8,6 @@
 	<name>Middleware</name>
 
 	<properties>
-		<jasper.version>6.0.0</jasper.version>
 		<itext.version>2.1.7</itext.version>
 		<reflections.version>0.9.9</reflections.version>
 		<atomikos.version>3.9.3</atomikos.version>
@@ -182,11 +181,10 @@
 			<version>3.8</version>
 		</dependency>
 
-		<!-- Jasper reports module -->
 		<dependency>
-			<groupId>net.sf.jasperreports</groupId>
-			<artifactId>jasperreports</artifactId>
-			<version>${jasper.version}</version>
+			<groupId>org.olap4j</groupId>
+			<artifactId>olap4j</artifactId>
+			<version>1.2.0</version>
 		</dependency>
 
 		<dependency>
@@ -194,6 +192,12 @@
 			<artifactId>itext</artifactId>
 			<version>${itext.version}</version>
 			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>commons-collections</groupId>
+			<artifactId>commons-collections</artifactId>
+			<version>3.2.1</version>
 		</dependency>
 
 		<dependency>
