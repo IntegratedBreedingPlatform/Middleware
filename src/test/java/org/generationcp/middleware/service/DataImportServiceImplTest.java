@@ -1,7 +1,8 @@
 package org.generationcp.middleware.service;
 
 import com.google.common.base.Optional;
-import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -28,6 +29,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Matchers;
 import org.mockito.Mock;
@@ -72,7 +74,7 @@ public class DataImportServiceImplTest {
 	private OntologyDataManager ontologyDataManager;
 
 	@Mock
-	private GermplasmService germplasmService;
+	private GermplasmSearchService germplasmSearchService;
 
 	@Mock
 	private LocationDataManager locationDataManager;
@@ -428,10 +430,10 @@ public class DataImportServiceImplTest {
 		final Set<Integer> gids =
 				this.dataImportService.extractGidsFromObservations(WorkbookTestDataInitializer.GID, this.workbook.getObservations());
 
-		Mockito.when(this.germplasmService.countMatchGermplasmInList(gids)).thenReturn(Long.valueOf(gids.size()));
+		Mockito.when(this.germplasmSearchService.countSearchGermplasm(this.getGermplasmSearchRequest(gids), PROGRAM_UUID)).thenReturn(Long.valueOf(gids.size()));
 
 		Assert.assertTrue("Should return true because all gids in the list exist in the database",
-				this.dataImportService.checkIfAllGidsExistInDatabase(gids));
+				this.dataImportService.checkIfAllGidsExistInDatabase(gids, PROGRAM_UUID));
 
 	}
 
@@ -441,10 +443,10 @@ public class DataImportServiceImplTest {
 		final Set<Integer> gids =
 				this.dataImportService.extractGidsFromObservations(WorkbookTestDataInitializer.GID, this.workbook.getObservations());
 
-		Mockito.when(this.germplasmService.countMatchGermplasmInList(gids)).thenReturn(0L);
+		Mockito.when(this.germplasmSearchService.countSearchGermplasm(this.getGermplasmSearchRequest(gids), PROGRAM_UUID)).thenReturn(0L);
 
 		Assert.assertFalse("Should return false because not all gids in the list exist in the database",
-				this.dataImportService.checkIfAllGidsExistInDatabase(gids));
+				this.dataImportService.checkIfAllGidsExistInDatabase(gids, PROGRAM_UUID));
 
 	}
 
@@ -452,11 +454,11 @@ public class DataImportServiceImplTest {
 	public void testCheckForInvalidGidsAllGidsExist() {
 
 		// The count of matched record in germplasm should match the number of observation in data file.
-		Mockito.when(this.germplasmService.countMatchGermplasmInList(Matchers.anySetOf(Integer.class)))
+		Mockito.when(this.germplasmSearchService.countSearchGermplasm(ArgumentMatchers.any(GermplasmSearchRequest.class), ArgumentMatchers.eq(PROGRAM_UUID)))
 				.thenReturn(Long.valueOf(WorkbookTestDataInitializer.DEFAULT_NO_OF_OBSERVATIONS));
 
 		final List<Message> messages = new ArrayList<>();
-		this.dataImportService.checkForInvalidGids(this.workbook, messages);
+		this.dataImportService.checkForInvalidGids(this.workbook, messages, PROGRAM_UUID);
 
 		Assert.assertTrue("All gids exist in the database, so no error message should be added in messages list.", messages.isEmpty());
 
@@ -466,10 +468,11 @@ public class DataImportServiceImplTest {
 	public void testCheckForInvalidGidsDoNotExist() {
 
 		// Retun a number not equal to no of observation to simulate that there are gids that do not exist in the database.
-		Mockito.when(this.germplasmService.countMatchGermplasmInList(Matchers.anySetOf(Integer.class))).thenReturn(Long.valueOf(0L));
+		Mockito.when(this.germplasmSearchService.countSearchGermplasm(ArgumentMatchers.any(GermplasmSearchRequest.class),
+			ArgumentMatchers.eq(PROGRAM_UUID))).thenReturn(Long.valueOf(0L));
 
 		final List<Message> messages = new ArrayList<>();
-		this.dataImportService.checkForInvalidGids(this.workbook, messages);
+		this.dataImportService.checkForInvalidGids(this.workbook, messages, PROGRAM_UUID);
 
 		Assert.assertTrue(!messages.isEmpty());
 		// Make sure that invalid gids error message is added to the messages list.
@@ -489,7 +492,7 @@ public class DataImportServiceImplTest {
 		}
 
 		final List<Message> messages = new ArrayList<>();
-		this.dataImportService.checkForInvalidGids(this.workbook, messages);
+		this.dataImportService.checkForInvalidGids(this.workbook, messages, PROGRAM_UUID);
 
 		Assert.assertTrue(!messages.isEmpty());
 		// Make sure that gid doesnt exist error message is added to the messages list.
@@ -1040,6 +1043,13 @@ public class DataImportServiceImplTest {
 			}
 		}
 
+	}
+
+	private GermplasmSearchRequest getGermplasmSearchRequest(Set<Integer> gids) {
+		GermplasmSearchRequest searchRequest = new GermplasmSearchRequest();
+		searchRequest.setGids(new ArrayList<>(gids));
+
+		return searchRequest;
 	}
 
 }

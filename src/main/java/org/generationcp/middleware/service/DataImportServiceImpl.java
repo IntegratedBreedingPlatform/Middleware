@@ -13,6 +13,8 @@ package org.generationcp.middleware.service;
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -85,7 +87,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	private OntologyDataManager ontologyDataManager;
 
 	@Resource
-	private GermplasmService germplasmService;
+	private GermplasmSearchService germplasmSearchService;
 
 	@Resource
 	private LocationDataManager locationDataManager;
@@ -256,7 +258,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// one for Wizard style)
 		messages.addAll(this.checkForEmptyRequiredVariables(workbook));
 
-		this.checkForInvalidGids(workbook, messages);
+		this.checkForInvalidGids(workbook, messages, programUUID);
 
 		// moved checking below as this needs to parse the contents of the
 		// observation sheet for multi-locations
@@ -944,7 +946,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public void checkForInvalidGids(final Workbook workbook, final List<Message> messages) {
+	public void checkForInvalidGids(final Workbook workbook, final List<Message> messages, final String programUUID) {
 
 		final Optional<MeasurementVariable> gidResult = this.findMeasurementVariableByTermId(TermId.GID.getId(), workbook.getFactors());
 		if (gidResult.isPresent()) {
@@ -953,7 +955,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 			final Set<Integer> gids = this.extractGidsFromObservations(gidLabel, workbook.getObservations());
 
 			if (!this.checkIfAllObservationHasGidAndNumeric(gidLabel, workbook.getObservations()) || !this
-				.checkIfAllGidsExistInDatabase(gids)) {
+				.checkIfAllGidsExistInDatabase(gids, programUUID)) {
 				messages.add(new Message(DataImportServiceImpl.ERROR_INVALID_GIDS_FROM_DATA_FILE));
 			}
 
@@ -972,9 +974,10 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	 * @param gids
 	 * @return
 	 */
-	boolean checkIfAllGidsExistInDatabase(final Set<Integer> gids) {
-
-		final long matchedGermplasmCount = this.germplasmService.countMatchGermplasmInList(gids);
+	boolean checkIfAllGidsExistInDatabase(final Set<Integer> gids, final String programUUID) {
+		GermplasmSearchRequest searchRequest = new GermplasmSearchRequest();
+		searchRequest.setGids(new ArrayList<>(gids));
+		final long matchedGermplasmCount = this.germplasmSearchService.countSearchGermplasm(searchRequest, programUUID);
 
 		// If the number of gids in the list matched the count of germplasm
 		// records matched in the database, it means

@@ -158,7 +158,7 @@ public interface DataImportService {
 
 	Optional<MeasurementVariable> findMeasurementVariableByTermId(int termId, List<MeasurementVariable> list);
 
-	void checkForInvalidGids(final Workbook workbook, final List<Message> messages);
+	void checkForInvalidGids(final Workbook workbook, final List<Message> messages, final String programUUID);
 
 	/**
 	 * Checks the Workbook's observation data for out-of-bounds values. Returns
