@@ -256,23 +256,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Method> getMethodsByUniqueID(final String programUUID) {
-		return this.daoFactory.getMethodDAO().getByUniqueID(programUUID);
-	}
-
-	@Override
-	public long countMethodsByUniqueID(final String programUUID) {
-		return this.daoFactory.getMethodDAO().countByUniqueID(programUUID);
-	}
-
-	@Override
 	public List<Method> getMethodsByType(final String type) {
 		return this.daoFactory.getMethodDAO().getByType(type);
-	}
-
-	@Override
-	public List<Method> getMethodsByType(final String type, final String programUUID) {
-		return this.daoFactory.getMethodDAO().getByType(type, programUUID);
 	}
 
 	@Override
@@ -283,11 +268,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public long countMethodsByType(final String type) {
 		return this.daoFactory.getMethodDAO().countByType(type);
-	}
-
-	@Override
-	public long countMethodsByType(final String type, final String programUUID) {
-		return this.daoFactory.getMethodDAO().countByType(type, programUUID);
 	}
 
 	@Override
@@ -797,11 +777,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public Method getMethodByCode(final String code, final String programUUID) {
-		return this.daoFactory.getMethodDAO().getByCode(code, programUUID);
-	}
-
-	@Override
 	public Method getMethodByCode(final String code) {
 		return this.daoFactory.getMethodDAO().getByCode(Collections.singletonList(code)).get(0);
 	}
@@ -810,17 +785,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	public Method getMethodByName(final String name) {
 		final List<Method> methods;
 		methods = this.daoFactory.getMethodDAO().getByName(name);
-		if (methods != null && !methods.isEmpty()) {
-			return methods.get(0);
-		} else {
-			return new Method();
-		}
-	}
-
-	@Override
-	public Method getMethodByName(final String name, final String programUUID) {
-		final List<Method> methods;
-		methods = this.daoFactory.getMethodDAO().getByName(name, programUUID);
 		if (methods != null && !methods.isEmpty()) {
 			return methods.get(0);
 		} else {
@@ -882,31 +846,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Override
 	public boolean checkIfMatches(final String name) {
 		return this.daoFactory.getNameDao().checkIfMatches(name);
-	}
-
-	@Override
-	public List<Method> getProgramMethods(final String programUUID) {
-		return this.daoFactory.getMethodDAO().getProgramMethods(programUUID);
-	}
-
-	@Override
-	public void deleteProgramMethodsByUniqueId(final String programUUID) {
-
-		final MethodDAO methodDao = this.daoFactory.getMethodDAO();
-		try {
-
-			final List<Method> list = this.getProgramMethods(programUUID);
-			for (final Method method : list) {
-				methodDao.makeTransient(method);
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while deleting methods: GermplasmDataManager.deleteProgramMethodsByUniqueId(uniqueId=" + programUUID
-					+ "): " + e.getMessage(),
-				e);
-		}
 	}
 
 	@Override

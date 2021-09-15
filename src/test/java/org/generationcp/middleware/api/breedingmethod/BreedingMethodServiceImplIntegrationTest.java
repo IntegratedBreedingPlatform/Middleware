@@ -17,7 +17,6 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -35,16 +34,6 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 	@Before
 	public void setUp() {
 		this.breedingMethodService = new BreedingMethodServiceImpl(this.sessionProvder);
-	}
-
-	@Test
-	public void testGetBreedingMethodsWithoutProgram_Ok() {
-		final List<Method> methodsWithoutProgram = this.germplasmDataManager.getMethodsByUniqueID(null);
-
-		//Should get all breeding methods without program
-		final List<BreedingMethodDTO> actualMethodsWithoutProgram = this.breedingMethodService.getBreedingMethods(new BreedingMethodSearchRequest(), null);
-		assertNotNull(actualMethodsWithoutProgram);
-		assertThat(actualMethodsWithoutProgram, hasSize(methodsWithoutProgram.size()));
 	}
 
 	@Test
@@ -70,31 +59,10 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 	}
 
 	@Test
-	public void testGetBreedingMethodsByProgramUUID_Ok() {
-		final String newMethodCode = "NEWMETHO";
-		final String programUUID = UUID.randomUUID().toString();
-		final List<Method> methodsByUniqueID = this.germplasmDataManager.getMethodsByUniqueID(programUUID);
-		assertNotNull(methodsByUniqueID);
-		assertTrue(methodsByUniqueID.size() > 1);
-		assertThat(methodsByUniqueID, not(hasItem(hasProperty("code", is(newMethodCode)))));
-
-		final Method newMethod = new Method(null, "NEW", "S", newMethodCode, "New Method", "New Method", 0, 0, 0, 0, 0, 0, 0, 0, programUUID);
-		this.germplasmDataManager.addMethod(newMethod);
-
-		//Should get all methods without program and also the method previously created
-		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
-		searchRequest.setProgramUUID(programUUID);
-		final List<BreedingMethodDTO> favoriteBreedingMethods = this.breedingMethodService.getBreedingMethods(searchRequest, null);
-		assertNotNull(favoriteBreedingMethods);
-		assertThat(favoriteBreedingMethods.size(), is(methodsByUniqueID.size() + 1));
-		assertThat(favoriteBreedingMethods, hasItem(hasProperty("code", is(newMethodCode))));
-	}
-
-	@Test
 	public void testGetBreedingMethodsByCodes_Ok() {
 		final String newMethodCode = "NEWMETHO";
 
-		final Method newMethod = new Method(null, "NEW", "S", newMethodCode, "New Method", "New Method", 0, 0, 0, 0, 0, 0, 0, 0, null);
+		final Method newMethod = new Method(null, "NEW", "S", newMethodCode, "New Method", "New Method", 0, 0, 0, 0, 0, 0, 0, 0);
 		this.germplasmDataManager.addMethod(newMethod);
 
 		//Should get all methods without program and also the method previously created

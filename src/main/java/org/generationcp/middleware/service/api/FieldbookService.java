@@ -499,11 +499,9 @@ public interface FieldbookService {
 	 *
 	 * @param code
 	 *            the code
-	 * @param programUUID
-	 *            unique id of the program
 	 * @return the method by code
 	 */
-	Method getMethodByCode(String code, String programUUID);
+	Method getMethodByCode(String code);
 
 	/**
 	 * Gets the method by id.
