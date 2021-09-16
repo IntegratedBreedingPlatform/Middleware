@@ -30,6 +30,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -55,8 +56,10 @@ import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -1216,6 +1219,88 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		this.assertInventoryFields(results);
 	}
 
+	@Test
+	public void testCountSearchGermplasm_AllGidsExist() {
+
+		final Germplasm germplasm1 =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Germplasm germplasm2 =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+
+		this.germplasmDao.save(germplasm1);
+		this.germplasmDao.save(germplasm2);
+
+		final Set<Integer> gids = new HashSet<>();
+		gids.add(germplasm1.getGid());
+		gids.add(germplasm2.getGid());
+
+		final long result = this.dao.countSearchGermplasm(this.getGermplasmSearchRequest(gids), this.programUUID);
+
+		Assert.assertEquals("The number of gids in list should match the count of records matched in the database.", gids.size(),
+			(int) result);
+
+	}
+
+	@Test
+	public void testCountSearchGermplasm_OnlyOneGidExists() {
+
+		final Set<Integer> gids = new HashSet<>();
+		final Integer dummyGid = Integer.MIN_VALUE + 1;
+
+		final Germplasm germplasm1 =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDao.save(germplasm1);
+
+		final Germplasm germplasm = this.germplasmDao.getById(dummyGid);
+		Assert.assertNull("Make sure that gid " + dummyGid + " doesn't exist.", germplasm);
+
+		gids.add(germplasm1.getGid());
+		gids.add(dummyGid);
+
+		final long result = this.dao.countSearchGermplasm(this.getGermplasmSearchRequest(gids), this.programUUID);
+
+		Assert.assertEquals("Only one gid has a match in the database.", 1, (int) result);
+
+	}
+
+	@Test
+	public void testCountSearchGermplasm_WithDeletedGid() {
+
+		final Set<Integer> gids = new HashSet<>();
+
+		final Germplasm deletedGermplasm =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		deletedGermplasm.setDeleted(true);
+		this.germplasmDao.save(deletedGermplasm);
+
+		gids.add(deletedGermplasm.getGid());
+
+		final long result = this.dao.countSearchGermplasm(this.getGermplasmSearchRequest(gids), this.programUUID);
+
+		Assert.assertEquals("The count should be zero because the gid in the list is already deleted.", 0, (int) result);
+
+	}
+
+	@Test
+	public void testCountSearchGermplasm_NoGidExists() {
+
+		final Integer dummyGid = Integer.MIN_VALUE + 1;
+
+		final Set<Integer> gids = new HashSet<>();
+
+		final Germplasm germplasm = this.germplasmDao.getById(dummyGid);
+
+		Assert.assertNull("We're testing a gid that doesnt exist, so the germplasm should be null.", germplasm);
+
+		// Add dummy gid that do not exist in the database
+		gids.add(dummyGid);
+
+		final long result = this.dao.countSearchGermplasm(this.getGermplasmSearchRequest(gids), this.programUUID);
+
+		Assert.assertEquals("The count should be zero because the gid in the list doesn't exist.", 0, (int) result);
+
+	}
+
 	private void initializeGermplasms() {
 		final Germplasm fParent =
 			GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
@@ -1487,4 +1572,10 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		this.germplasmDataDM.addGermplasm(this.descendant, this.descendant.getPreferredName(), this.cropType);
 	}
 
+	private GermplasmSearchRequest getGermplasmSearchRequest(Set<Integer> gids) {
+		GermplasmSearchRequest searchRequest = new GermplasmSearchRequest();
+		searchRequest.setGids(new ArrayList<>(gids));
+
+		return searchRequest;
+	}
 }
