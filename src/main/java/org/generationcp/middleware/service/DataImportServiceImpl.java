@@ -12,7 +12,6 @@ package org.generationcp.middleware.service;
 
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.domain.dms.Enumeration;
