@@ -52,8 +52,8 @@ public enum GermplasmListStaticColumns {
 		return name;
 	}
 
-	public TermId getTermId() {
-		return termId;
+	public Integer getTermId() {
+		return termId.getId();
 	}
 
 	public boolean isDefault() {
@@ -66,11 +66,10 @@ public enum GermplasmListStaticColumns {
 			.collect(Collectors.toList());
 	}
 
-	public static String getColumnNameByTermId(int termId) {
+	public static GermplasmListStaticColumns getValueByTermId(int termId) {
 		return Arrays.stream(GermplasmListStaticColumns.values())
 			.filter(c -> c.termId.getId() == termId)
 			.findFirst()
-			.map(GermplasmListStaticColumns::getName)
 			.orElseThrow(() -> new IllegalStateException(String.format("There is no a static columns with termId %s.", termId)));
 	}
 

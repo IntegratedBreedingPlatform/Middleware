@@ -129,6 +129,7 @@ public class GermplasmListDataSearchDAOQuery {
 	private static void addFixedScalars(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause) {
 		selectClause.add(addSelectExpression(scalars, "listData.lrecid", LIST_DATA_ID_ALIAS));
 		selectClause.add(addSelectExpression(scalars, "listData.entryid", GermplasmListStaticColumns.ENTRY_NO.name()));
+		// TODO: review if we need to get designation from listdata table or from names
 		selectClause.add(addSelectExpression(scalars, "listData.desig", GermplasmListStaticColumns.DESIGNATION.name()));
 		selectClause.add(addSelectExpression(scalars, "g.gid", GermplasmListStaticColumns.GID.name()));
 		selectClause.add(addSelectExpression(scalars, "g.germplsm_uuid", GermplasmListStaticColumns.GUID.name()));
@@ -147,7 +148,7 @@ public class GermplasmListDataSearchDAOQuery {
 
 	private static void addGroupSourceNameData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
 		final Set<String> joins, final List<Integer> columnVariableIds) {
-		if (columnVariableIds.contains(GermplasmListStaticColumns.GROUP_SOURCE_NAME.getTermId().getId())) {
+		if (columnVariableIds.contains(GermplasmListStaticColumns.GROUP_SOURCE_NAME.getTermId())) {
 			final String groupSourceNameExpression = "CASE \n  WHEN g.gnpgs = -1 \n AND g.gpid1 IS NOT NULL \n"
 				+ " AND g.gpid1 <> 0 THEN groupSource.nval \n ELSE '-' \n" + " END \n";
 
@@ -160,7 +161,7 @@ public class GermplasmListDataSearchDAOQuery {
 
 	private static void addImmediateSourceNameData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
 		final Set<String> joins, final List<Integer> columnVariableIds) {
-		if (columnVariableIds.contains(GermplasmListStaticColumns.IMMEDIATE_SOURCE_NAME.getTermId().getId())) {
+		if (columnVariableIds.contains(GermplasmListStaticColumns.IMMEDIATE_SOURCE_NAME.getTermId())) {
 			final String immediateSourceNameExpression = "CASE \n WHEN g.gnpgs = -1 AND g.gpid2 IS NOT NULL \n"
 				+ "	AND g.gpid2 <> 0 THEN immediateSource.nval \n" + "	ELSE '-' \n END \n";
 
@@ -173,7 +174,7 @@ public class GermplasmListDataSearchDAOQuery {
 
 	private static void addLotsNumberData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
 		final Set<String> joins, final List<Integer> columnVariableIds) {
-		if (columnVariableIds.contains(GermplasmListStaticColumns.LOTS.getTermId().getId())) {
+		if (columnVariableIds.contains(GermplasmListStaticColumns.LOTS.getTermId())) {
 			selectClause.add(addSelectExpression(scalars, "COUNT(DISTINCT lot.lotid)", GermplasmListStaticColumns.LOTS.name()));
 
 			joins.add(LOT_JOIN);
@@ -182,8 +183,8 @@ public class GermplasmListDataSearchDAOQuery {
 
 	private static void addLotsAvailableAndUnitData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
 		final Set<String> joins, final List<Integer> columnVariableIds) {
-		if (columnVariableIds.contains(GermplasmListStaticColumns.AVAILABLE.getTermId().getId()) ||
-			columnVariableIds.contains(GermplasmListStaticColumns.UNIT.getTermId().getId())) {
+		if (columnVariableIds.contains(GermplasmListStaticColumns.AVAILABLE.getTermId()) ||
+			columnVariableIds.contains(GermplasmListStaticColumns.UNIT.getTermId())) {
 			final String lotAvailableExpression = " IF(COUNT(DISTINCT IFNULL(gl.scaleid, 'null')) = 1, "
 				+ "  IFNULL((SELECT SUM(CASE WHEN gt.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
 				+ "    OR (gt.trnstat = " + TransactionStatus.PENDING.getIntValue() //
@@ -202,9 +203,9 @@ public class GermplasmListDataSearchDAOQuery {
 
 	private static void addBreedingMethodData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
 		final Set<String> joins, final List<Integer> columnVariableIds) {
-		if (columnVariableIds.contains(GermplasmListStaticColumns.BREEDING_METHOD_PREFERRED_NAME.getTermId().getId()) ||
-			columnVariableIds.contains(GermplasmListStaticColumns.BREEDING_METHOD_ABBREVIATION.getTermId().getId()) ||
-			columnVariableIds.contains(GermplasmListStaticColumns.BREEDING_METHOD_GROUP.getTermId().getId())) {
+		if (columnVariableIds.contains(GermplasmListStaticColumns.BREEDING_METHOD_PREFERRED_NAME.getTermId()) ||
+			columnVariableIds.contains(GermplasmListStaticColumns.BREEDING_METHOD_ABBREVIATION.getTermId()) ||
+			columnVariableIds.contains(GermplasmListStaticColumns.BREEDING_METHOD_GROUP.getTermId())) {
 			selectClause
 				.add(addSelectExpression(scalars, "method.mname", GermplasmListStaticColumns.BREEDING_METHOD_PREFERRED_NAME.name()));
 			selectClause
@@ -217,8 +218,8 @@ public class GermplasmListDataSearchDAOQuery {
 
 	private static void addLocationData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
 		final Set<String> joins, final List<Integer> columnVariableIds) {
-		if (columnVariableIds.contains(GermplasmListStaticColumns.LOCATION_NAME.getTermId().getId()) ||
-			columnVariableIds.contains(GermplasmListStaticColumns.LOCATION_ABBREVIATION.getTermId().getId())) {
+		if (columnVariableIds.contains(GermplasmListStaticColumns.LOCATION_NAME.getTermId()) ||
+			columnVariableIds.contains(GermplasmListStaticColumns.LOCATION_ABBREVIATION.getTermId())) {
 			selectClause.add(addSelectExpression(scalars, "loc.lname", GermplasmListStaticColumns.LOCATION_NAME.name()));
 			selectClause.add(addSelectExpression(scalars, "method.mcode", GermplasmListStaticColumns.LOCATION_ABBREVIATION.name()));
 
@@ -228,7 +229,7 @@ public class GermplasmListDataSearchDAOQuery {
 
 	private static void addReferenceData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
 		final Set<String> joins, final List<Integer> columnVariableIds) {
-		if (columnVariableIds.contains(GermplasmListStaticColumns.GERMPLASM_REFERENCE.getTermId().getId())) {
+		if (columnVariableIds.contains(GermplasmListStaticColumns.GERMPLASM_REFERENCE.getTermId())) {
 			selectClause.add(addSelectExpression(scalars, "ref.analyt", GermplasmListStaticColumns.GERMPLASM_REFERENCE.name()));
 
 			joins.add(REFERENCE_JOIN);
