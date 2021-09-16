@@ -1,5 +1,7 @@
 package org.generationcp.middleware.pojos;
 
+import org.generationcp.middleware.domain.ontology.VariableType;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -73,4 +75,18 @@ public class GermplasmListDataView implements Serializable {
 	public Integer getVariableId() {
 		return variableId;
 	}
+
+	public boolean isStaticColumn() {
+		return this.category == GermplasmListColumnCategory.STATIC;
+	}
+
+	public boolean isNameColumn() {
+		return this.category == GermplasmListColumnCategory.NAMES;
+	}
+
+	public boolean isDescriptorColumn() {
+		return this.category == GermplasmListColumnCategory.VARIABLE && (this.typeId.equals(VariableType.GERMPLASM_PASSPORT.getId()) ||
+			this.typeId.equals(VariableType.GERMPLASM_ATTRIBUTE.getId()));
+	}
+
 }

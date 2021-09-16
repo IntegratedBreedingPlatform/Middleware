@@ -438,7 +438,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId,
 		final GermplasmListDataSearchRequest request,
 		final Pageable pageable) {
-		return this.daoFactory.getGermplasmListDataDAO().searchGermplasmListData(listId, request, pageable);
+
+		final List<GermplasmListDataView> view = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
+		//TODO: if there is no view yet -> should I provide a default one?
+		return this.daoFactory.getGermplasmListDataDAO().searchGermplasmListData(listId, view, request, pageable);
 	}
 
 	@Override

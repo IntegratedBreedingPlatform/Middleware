@@ -3,11 +3,14 @@ package org.generationcp.middleware.api.germplasmlist.search;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.Map;
+
 @AutoProperty
 public class GermplasmListDataSearchResponse {
 
 	private Integer listDataId;
-	private Integer entryNumber;
+
+	private Map<String, Object> data;
 
 	public Integer getListDataId() {
 		return listDataId;
@@ -17,12 +20,12 @@ public class GermplasmListDataSearchResponse {
 		this.listDataId = listDataId;
 	}
 
-	public Integer getEntryNumber() {
-		return entryNumber;
+	public Map<String, Object> getData() {
+		return data;
 	}
 
-	public void setEntryNumber(final Integer entryNumber) {
-		this.entryNumber = entryNumber;
+	public void setData(final Map<String, Object> data) {
+		this.data = data;
 	}
 
 	@Override

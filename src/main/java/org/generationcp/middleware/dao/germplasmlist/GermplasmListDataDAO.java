@@ -18,6 +18,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.util.SQLQueryBuilder;
@@ -28,7 +29,6 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.hibernate.transform.Transformers;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
@@ -36,6 +36,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * DAO class for {@link GermplasmListData}.
@@ -296,29 +298,46 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	}
 
 	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId,
+		final List<GermplasmListDataView> view,
 		final GermplasmListDataSearchRequest germplasmListDataSearchRequest, final Pageable pageable) {
 
-		final SQLQueryBuilder queryBuilder = GermplasmListDataSearchDAOQuery.getSelectQuery(germplasmListDataSearchRequest, pageable);
+		final SQLQueryBuilder queryBuilder = GermplasmListDataSearchDAOQuery.getSelectQuery(germplasmListDataSearchRequest, view, pageable);
 		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
-		query.setParameter("listId", listId);
+		queryBuilder.setParameter("listId", listId);
+		queryBuilder.addScalarsToQuery(query);
 		queryBuilder.addParamsToQuery(query);
-
-		query.addScalar(GermplasmListDataSearchDAOQuery.LIST_DATA_ID_ALIAS);
-		query.addScalar(GermplasmListDataSearchDAOQuery.ENTRY_NUMBER_ALIAS);
-		query.setResultTransformer(Transformers.aliasToBean(GermplasmListDataSearchResponse.class));
 
 		GenericDAO.addPaginationToSQLQuery(query, pageable);
 
-		return (List<GermplasmListDataSearchResponse>) query.list();
+		final List<Object[]> results = query.list();
+		return mapToGermplasmListSearchResponse(results, queryBuilder.getScalars());
 	}
 
 	public long countSearchGermplasmListData(final Integer listId, final GermplasmListDataSearchRequest germplasmListDataSearchRequest) {
 		final SQLQueryBuilder queryBuilder = GermplasmListDataSearchDAOQuery.getCountQuery(germplasmListDataSearchRequest);
 		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
-		query.setParameter("listId", listId);
+		queryBuilder.setParameter("listId", listId);
 		queryBuilder.addParamsToQuery(query);
 
 		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
+	private List<GermplasmListDataSearchResponse> mapToGermplasmListSearchResponse(final List<Object[]> results, final List<SQLQueryBuilder.Scalar> scalars) {
+		return results.stream().map(result -> {
+			final GermplasmListDataSearchResponse row = new GermplasmListDataSearchResponse();
+			final Map<String, Object> data = new HashMap<>();
+			IntStream.range(0, scalars.size()).forEach(i -> {
+				final SQLQueryBuilder.Scalar scalar = scalars.get(i);
+				if (scalar.getColumnName().equals(GermplasmListDataSearchDAOQuery.LIST_DATA_ID_ALIAS)) {
+					row.setListDataId((Integer) result[i]);
+					return;
+				}
+				//TODO: filter data which currently is in the view ???
+				data.put(scalar.getColumnName(), result[i]);
+			});
+			row.setData(data);
+			return row;
+		}).collect(Collectors.toList());
 	}
 
 }

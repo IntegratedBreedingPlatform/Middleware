@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-enum GermplasmListStaticColumns {
+public enum GermplasmListStaticColumns {
 
 	ENTRY_NO("ENTRY_NO", TermId.ENTRY_NO, true),
 	GID("GID", TermId.GID, true),
@@ -72,7 +72,6 @@ enum GermplasmListStaticColumns {
 			.findFirst()
 			.map(GermplasmListStaticColumns::getName)
 			.orElseThrow(() -> new IllegalStateException(String.format("There is no a static columns with termId %s.", termId)));
-
 	}
 
 }
