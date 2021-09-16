@@ -80,6 +80,10 @@ public enum PermissionsEnum {
 		+ ", 'EDIT_GERMPLASM'"
 		+ ", 'MODIFY_ATTRIBUTES')";
 
+	/**
+	 * To simplify, we put them all together in a single bag (studies and germplasm).
+	 * In the frontend we can differentiate between both
+	 */
 	public static final String HAS_MANAGE_FILES = " or hasAnyAuthority('ADMIN'"
 		+ ", 'STUDIES'"
 		+ ", 'MANAGE_STUDIES'"
