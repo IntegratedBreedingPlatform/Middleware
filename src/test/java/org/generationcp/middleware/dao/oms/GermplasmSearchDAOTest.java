@@ -184,7 +184,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			this.createSearchRequest(this.preferredName.getNval(), SqlTextFilter.Type.CONTAINS);
 		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 		Assert.assertEquals("The results should contain one germplasm since there's only one test data with name that contains "
-				+ this.preferredName.getNval(), 1, results.size());
+			+ this.preferredName.getNval(), 1, results.size());
 		this.assertPossibleGermplasmFields(results);
 		this.assertInventoryFields(results);
 	}
@@ -1206,13 +1206,12 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		final int germplasmListId = this.germplasmListManager.addGermplasmList(germplasmList);
 
 		final GermplasmListData germplasmListData =
-				GermplasmListDataTestDataInitializer.createGermplasmListData(germplasmList, this.germplasmGID, 2);
+			GermplasmListDataTestDataInitializer.createGermplasmListData(germplasmList, this.germplasmGID, 2);
 		this.germplasmListManager.addGermplasmListData(germplasmListData);
 
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();
 		request.setGermplasmListIds(Collections.singletonList(germplasmListId));
 		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
-
 
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
 		this.assertPossibleGermplasmFields(results);
@@ -1563,11 +1562,13 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		this.germplasmDataDM.addGermplasm(this.grandParentGermplasm, this.grandParentGermplasm.getPreferredName(), this.cropType);
 
 		this.groupSource = GermplasmTestDataInitializer
-			.createGermplasm(this.germplasmDate, this.grandParentGermplasm.getGid(), 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			.createGermplasm(this.germplasmDate, this.grandParentGermplasm.getGid(), 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName",
+				"LocationName");
 		this.germplasmDataDM.addGermplasm(this.groupSource, this.groupSource.getPreferredName(), this.cropType);
 
 		this.descendant = GermplasmTestDataInitializer
-			.createGermplasm(this.germplasmDate, this.groupSource.getGid(), this.groupSource.getGid(), -1, 0, 0, 1, 1, 0, 1, 1, "MethodName",
+			.createGermplasm(this.germplasmDate, this.groupSource.getGid(), this.groupSource.getGid(), -1, 0, 0, 1, 1, 0, 1, 1,
+				"MethodName",
 				"LocationName");
 		this.germplasmDataDM.addGermplasm(this.descendant, this.descendant.getPreferredName(), this.cropType);
 	}
