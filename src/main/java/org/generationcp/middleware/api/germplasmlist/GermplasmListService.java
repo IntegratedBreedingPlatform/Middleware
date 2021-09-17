@@ -74,6 +74,6 @@ public interface GermplasmListService {
 
 	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId, final String programUUID);
 
-	List<MeasurementVariable> getGermplasmListDataTableHeader(Integer listId);
+	List<MeasurementVariable> getGermplasmListDataTableHeader(Integer listId, final String programUUID);
 
 }

@@ -550,7 +550,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getGermplasmListDataTableHeader(final Integer listId) {
+	public List<MeasurementVariable> getGermplasmListDataTableHeader(final Integer listId, final String programUUID) {
 		final List<GermplasmListDataView> columns =
 			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
 		// If the list has not columns saved yet, we return a default list of columns
@@ -592,6 +592,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final List<Integer> variableIds = columnIdsByCategory.get(GermplasmListColumnCategory.VARIABLE);
 		if (!CollectionUtils.isEmpty(variableIds)) {
 			final VariableFilter variableFilter = new VariableFilter();
+			variableFilter.setProgramUuid(programUUID);
 			variableIds
 				.forEach(variableFilter::addVariableId);
 			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
