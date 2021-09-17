@@ -18,6 +18,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
@@ -1140,6 +1141,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public List<GermplasmMergeDto> getGermplasmMergeDTOs(final Integer gid) {
 		return this.daoFactory.getGermplasmDao().getGermplasmMergeDtos(gid);
+	}
+
+	@Override
+	public List<GermplasmProgenyDto> getGermplasmProgenyDTOs(final Integer gid) {
+		return this.daoFactory.getGermplasmDao().getGermplasmDescendantByGID(gid, 0, Integer.MAX_VALUE).stream().map((germplasm) -> {
+			return new GermplasmProgenyDto(germplasm.getGid(),
+				germplasm.getPreferredName() != null ? germplasm.getPreferredName().getNval() : StringUtils.EMPTY);
+		}).collect(Collectors.toList());
 	}
 
 	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Integer targetGermplasmId) {
