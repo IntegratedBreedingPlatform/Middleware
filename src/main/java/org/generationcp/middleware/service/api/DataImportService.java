@@ -42,7 +42,7 @@ public interface DataImportService {
 	 * @param crop
 	 * @return id of created trial or nursery
 	 */
-	int saveDataset(final Workbook workbook, final String programUUID, final CropType crop);
+	int saveDataset(Workbook workbook, String programUUID, CropType crop);
 
 	/**
 	 * Saves a workbook as a local trial or nursery on the new CHADO schema
@@ -58,8 +58,8 @@ public interface DataImportService {
 	 * @param crop
 	 * @return id of created trial or nursery
 	 */
-	int saveDataset(final Workbook workbook, final boolean retainValues, final boolean isDeleteObservations,
-			final String programUUID, final CropType crop);
+	int saveDataset(Workbook workbook, boolean retainValues, boolean isDeleteObservations,
+			String programUUID, CropType crop);
 
 	/**
 	 * Given a file, parse the file to create a workbook object
@@ -67,7 +67,7 @@ public interface DataImportService {
 	 * @param file
 	 * @return workbook
 	 */
-	Workbook parseWorkbook(File file, final Integer currentIbdbUserId) throws WorkbookParserException;
+	Workbook parseWorkbook(File file, Integer currentIbdbUserId) throws WorkbookParserException;
 
 	/**
 	 * Parses the file to create a workbook object with options to discard the
@@ -83,7 +83,7 @@ public interface DataImportService {
 	 * @return
 	 * @throws WorkbookParserException
 	 */
-	Workbook parseWorkbook(File file, String programUUID, boolean discardInvalidValues, WorkbookParser workbookParser, final Integer currentIbdbUserId)
+	Workbook parseWorkbook(File file, String programUUID, boolean discardInvalidValues, WorkbookParser workbookParser, Integer currentIbdbUserId)
 			throws WorkbookParserException;
 
 	/**
@@ -94,7 +94,7 @@ public interface DataImportService {
 	 * @throws WorkbookParserException
 	 * @throws MiddlewareQueryException
 	 */
-	Workbook strictParseWorkbook(File file, String programUUID, final Integer currentIbdbUserId) throws WorkbookParserException,
+	Workbook strictParseWorkbook(File file, String programUUID, Integer currentIbdbUserId) throws WorkbookParserException,
 		MiddlewareException;
 
 	/**
@@ -140,7 +140,7 @@ public interface DataImportService {
 	 * @param crop
 	 * @return id of created the study (Table.column = Project.project_id)
 	 */
-	int saveProjectOntology(final Workbook workbook, final String programUUID, final CropType crop)
+	int saveProjectOntology(Workbook workbook, String programUUID, CropType crop)
 			throws MiddlewareQueryException;
 
 	/**
@@ -151,14 +151,14 @@ public interface DataImportService {
 	 * @param crop
 	 * @return 1 = successful, 0 = failure
 	 */
-	int saveProjectData(final Workbook workbook, final String programUUID, final CropType crop)
+	int saveProjectData(Workbook workbook, String programUUID, CropType crop)
 			throws MiddlewareQueryException;
 
 	Map<String, List<Message>> validateProjectData(Workbook importData, String programUUID) throws MiddlewareException;
 
 	Optional<MeasurementVariable> findMeasurementVariableByTermId(int termId, List<MeasurementVariable> list);
 
-	void checkForInvalidGids(final Workbook workbook, final List<Message> messages);
+	void checkForInvalidGids(Workbook workbook, List<Message> messages, String programUUID);
 
 	/**
 	 * Checks the Workbook's observation data for out-of-bounds values. Returns
@@ -190,7 +190,7 @@ public interface DataImportService {
 	 */
 	void populatePossibleValuesForCategoricalVariates(List<MeasurementVariable> variates, String programUUID);
 
-	Workbook parseWorkbookDescriptionSheet(org.apache.poi.ss.usermodel.Workbook excelWorkbook, final Integer currentIbdbUserId)
+	Workbook parseWorkbookDescriptionSheet(org.apache.poi.ss.usermodel.Workbook excelWorkbook, Integer currentIbdbUserId)
 			throws WorkbookParserException;
 
 	void processExperimentalDesign(Workbook workbook, String programUUID, String exptDesignValueFromObsSheet) throws WorkbookParserException;
