@@ -1,12 +1,15 @@
 package org.generationcp.middleware.api.file;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
+import org.generationcp.middleware.dao.FileMetadataDAO;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
 import java.util.ArrayList;
@@ -17,14 +20,27 @@ import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.hamcrest.core.Is.is;
+import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FileMetadataServiceImplTest {
 
 	public static final String HEX_REGEX = "[0-9a-fA-F]";
 
+	@Mock
+	private DaoFactory daoFactory;
+
+	@Mock
+	private FileMetadataDAO fileMetadataDAO;
+
 	@InjectMocks
 	private FileMetadataServiceImpl fileMetadataService;
+
+	@Before
+	public void setup() {
+		this.fileMetadataService.setDaoFactory(this.daoFactory);
+		when(this.daoFactory.getFileMetadataDAO()).thenReturn(this.fileMetadataDAO);
+	}
 
 	@Test
 	public void testGetFilePathForGermplasm_UUID() {

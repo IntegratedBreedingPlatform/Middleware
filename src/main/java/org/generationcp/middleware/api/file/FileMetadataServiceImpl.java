@@ -17,11 +17,9 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.util.uid.FileUIDGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,10 +55,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	public static final String FILE_PATH_GERMPLASM_ROOT = "germplasm";
 	public static final String FILE_PATH_PREFIX_GERMPLASMUUID = "germplasmuuid-";
 
-	private final DaoFactory daoFactory;
-	
-	@Autowired
-	private DatasetService datasetService;
+	private DaoFactory daoFactory;
 
 	public FileMetadataServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -303,6 +298,10 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		Preconditions.checkArgument((datasetId == null) != isBlank(germplasmUUID));
 
 		this.daoFactory.getFileMetadataDAO().removeFiles(variableIds, datasetId, germplasmUUID);
+	}
+
+	void setDaoFactory(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
 	}
 
 }
