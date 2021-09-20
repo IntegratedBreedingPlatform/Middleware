@@ -43,7 +43,6 @@ public class GermplasmListDataSearchDAOQuery {
 		}
 	}
 
-
 	// Base query
 	private final static String BASE_QUERY = "SELECT %s " // usage of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ " FROM listdata listData "
@@ -60,6 +59,7 @@ public class GermplasmListDataSearchDAOQuery {
 	static final String BREEDING_METHOD_ID_ALIAS = "BREEDING_METHOD_ID";
 
 	// Join clause
+	private static final String DESIGNATION_JOIN = "LEFT JOIN names desig ON listData.gid = desig.gid AND desig.nstat = 1" ;
 	private static final String LOT_JOIN =
 		String.format("LEFT JOIN ims_lot lot ON listData.gid = lot.eid AND etype = 'GERMPLSM' AND lot.status = %s",
 			LotStatus.ACTIVE.getIntValue());
@@ -97,6 +97,7 @@ public class GermplasmListDataSearchDAOQuery {
 		});
 
 		addFixedScalars(scalars, selects);
+		addDesignationData(scalars, selects, joins, staticColumnIds);
 		addGroupSourceNameData(scalars, selects, joins, staticColumnIds);
 		addImmediateSourceNameData(scalars, selects, joins, staticColumnIds);
 		addLotsNumberData(scalars, selects, joins, staticColumnIds);
@@ -133,8 +134,6 @@ public class GermplasmListDataSearchDAOQuery {
 	private static void addFixedScalars(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause) {
 		selectClause.add(addSelectExpression(scalars, "listData.lrecid", LIST_DATA_ID_ALIAS));
 		selectClause.add(addSelectExpression(scalars, "listData.entryid", GermplasmListStaticColumns.ENTRY_NO.name()));
-		// TODO: review if we need to get designation from listdata table or from names
-		selectClause.add(addSelectExpression(scalars, "listData.desig", GermplasmListStaticColumns.DESIGNATION.name()));
 		selectClause.add(addSelectExpression(scalars, "g.gid", GermplasmListStaticColumns.GID.name()));
 		selectClause.add(addSelectExpression(scalars, "g.germplsm_uuid", GermplasmListStaticColumns.GUID.name()));
 		selectClause
@@ -148,6 +147,15 @@ public class GermplasmListDataSearchDAOQuery {
 			+ " AND g.gpid2 <> 0 THEN g.gpid2 \n ELSE '-' \n" + " END \n";
 		selectClause
 			.add(addSelectExpression(scalars, immediateSourceGIDExpression, GermplasmListStaticColumns.IMMEDIATE_SOURCE_GID.name()));
+	}
+
+	private static void addDesignationData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
+		final Set<String> joins, final List<Integer> columnVariableIds) {
+		if (columnVariableIds.contains(GermplasmListStaticColumns.DESIGNATION.getTermId())) {
+			selectClause.add(addSelectExpression(scalars, "desig.nval", GermplasmListStaticColumns.DESIGNATION.name()));
+
+			joins.add(DESIGNATION_JOIN);
+		}
 	}
 
 	private static void addGroupSourceNameData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
