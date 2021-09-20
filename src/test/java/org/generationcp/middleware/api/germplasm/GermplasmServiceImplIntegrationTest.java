@@ -1957,7 +1957,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		this.sessionProvder.getSession().flush();
 		this.sessionProvder.getSession().clear();
-
 		this.sessionProvder.getSession().refresh(germplasm);
 
 		final Germplasm updatedGermplasm = this.daoFactory.getGermplasmDao().getById(germplasm.getGid());
@@ -2518,7 +2517,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(name);
 		this.sessionProvder.getSession().flush();
 		this.daoFactory.getNameDao().refresh(name);
-		this.daoFactory.getGermplasmDao().refresh(germplasm);
 
 		assertNotNull(name.getCreatedDate());
 		assertThat(name.getCreatedBy(), is(this.userId));
