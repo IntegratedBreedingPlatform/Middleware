@@ -52,8 +52,10 @@ public class GermplasmListDataSearchDAOQuery {
 		+ "		AND g.deleted = 0";
 	private static final String COUNT_EXPRESSION = " COUNT(1) ";
 
-	// List data
+	// Alias for columns which are not columns of the table
 	static final String LIST_DATA_ID_ALIAS = "listDataId";
+	static final String LOCATION_ID_ALIAS = "LOCATION_ID";
+	static final String BREEDING_METHOD_ID_ALIAS = "BREEDING_METHOD_ID";
 
 	// Join clause
 	private static final String LOT_JOIN =
@@ -207,6 +209,8 @@ public class GermplasmListDataSearchDAOQuery {
 			columnVariableIds.contains(GermplasmListStaticColumns.BREEDING_METHOD_ABBREVIATION.getTermId()) ||
 			columnVariableIds.contains(GermplasmListStaticColumns.BREEDING_METHOD_GROUP.getTermId())) {
 			selectClause
+				.add(addSelectExpression(scalars, "method.mid", BREEDING_METHOD_ID_ALIAS));
+			selectClause
 				.add(addSelectExpression(scalars, "method.mname", GermplasmListStaticColumns.BREEDING_METHOD_PREFERRED_NAME.name()));
 			selectClause
 				.add(addSelectExpression(scalars, "method.mcode", GermplasmListStaticColumns.BREEDING_METHOD_ABBREVIATION.name()));
@@ -220,8 +224,9 @@ public class GermplasmListDataSearchDAOQuery {
 		final Set<String> joins, final List<Integer> columnVariableIds) {
 		if (columnVariableIds.contains(GermplasmListStaticColumns.LOCATION_NAME.getTermId()) ||
 			columnVariableIds.contains(GermplasmListStaticColumns.LOCATION_ABBREVIATION.getTermId())) {
+			selectClause.add(addSelectExpression(scalars, "loc.locid", LOCATION_ID_ALIAS));
 			selectClause.add(addSelectExpression(scalars, "loc.lname", GermplasmListStaticColumns.LOCATION_NAME.name()));
-			selectClause.add(addSelectExpression(scalars, "method.mcode", GermplasmListStaticColumns.LOCATION_ABBREVIATION.name()));
+			selectClause.add(addSelectExpression(scalars, "loc.labbr", GermplasmListStaticColumns.LOCATION_ABBREVIATION.name()));
 
 			joins.add(LOCATION_JOIN);
 		}
