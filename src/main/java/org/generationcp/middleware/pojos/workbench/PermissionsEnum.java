@@ -10,6 +10,8 @@ public enum PermissionsEnum {
 	GERMPLASM,
 	MANAGE_GERMPLASM,
 	IMPORT_GERMPLASM,
+	EDIT_GERMPLASM,
+	MG_MANAGE_FILES,
 	STUDIES,
 	LISTS,
 	SAMPLES_LISTS,
@@ -21,6 +23,8 @@ public enum PermissionsEnum {
 	ADD_PROGRAM,
 	MANAGE_PROGRAM_SETTINGS,
 	MANAGE_STUDIES,
+	MS_MANAGE_OBSERVATION_UNITS,
+	MS_MANAGE_FILES,
 	BROWSE_STUDIES,
 	HEAD_TO_HEAD_QUERY,
 	MULTI_TRAIT_QUERY,
@@ -80,10 +84,6 @@ public enum PermissionsEnum {
 		+ ", 'EDIT_GERMPLASM'"
 		+ ", 'MODIFY_ATTRIBUTES')";
 
-	/**
-	 * To simplify, we put them all together in a single bag (studies and germplasm).
-	 * In the frontend we can differentiate between both
-	 */
 	public static final String HAS_MANAGE_FILES = " or hasAnyAuthority('ADMIN'"
 		+ ", 'STUDIES'"
 		+ ", 'MANAGE_STUDIES'"

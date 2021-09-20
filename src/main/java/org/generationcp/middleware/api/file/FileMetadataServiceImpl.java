@@ -133,7 +133,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	public FileMetadataDTO getByFileUUID(final String fileUUID) {
 		final FileMetadata fileMetadata = this.daoFactory.getFileMetadataDAO().getByFileUUID(fileUUID);
 		if (fileMetadata == null) {
-			throw new MiddlewareRequestException("", "filemetadata.record.not.found", new String[] {"fileUUID=" + fileUUID});
+			throw new MiddlewareRequestException("", "filemetadata.record.not.found", "fileUUID=" + fileUUID);
 		}
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
 		final FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
