@@ -7,6 +7,4 @@ import java.util.List;
 public interface MethodService {
 
 	List<Method> getAllBreedingMethods();
-
-	void deleteProgramMethods(String programUUID);
 }

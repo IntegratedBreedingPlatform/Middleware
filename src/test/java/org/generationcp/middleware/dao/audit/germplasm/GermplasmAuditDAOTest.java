@@ -315,7 +315,7 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 	private Method createBreedingMethod(final String name, final String type) {
 		final Method method =
 			new Method(null, type, "S", "UGM", name, "description", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
-				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610), null);
+				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610));
 		this.methodDAO.save(method);
 		return method;
 	}
