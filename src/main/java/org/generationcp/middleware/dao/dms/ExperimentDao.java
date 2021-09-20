@@ -262,7 +262,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	public void deleteExperimentsForDatasets(final List<Integer> datasetIds, final List<Integer> instanceNumbers) {
 
-
 		// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
 		// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
 		// statement
@@ -306,7 +305,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		statement.setParameter("cancelledStatus", TransactionStatus.CANCELLED.getIntValue());
 		statement.executeUpdate();
 
-
 		// Delete external references of experiments
 		queryString = "DELETE eref FROM external_reference_experiment eref "
 			+ "  INNER JOIN nd_experiment e ON e.nd_experiment_id = eref.nd_experiment_id "
@@ -324,7 +322,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			statement.setParameterList("instanceNumbers", instanceNumbers);
 		}
 		statement.executeUpdate();
-
 
 		// Delete experiments
 		queryString = "DELETE e, eprop " + "FROM nd_experiment e "
@@ -727,17 +724,19 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
-	public Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer projectId, final Set<Integer> instanceNumbers, final Set<Integer> plotNumbers) {
+	public Table<Integer, Integer, Integer> getTrialNumberPlotNumberObservationUnitIdTable(final Integer projectId,
+		final Set<Integer> instanceNumbers, final Set<Integer> plotNumbers) {
 		final Table<Integer, Integer, Integer> experimentsTable = HashBasedTable.create();
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("project.projectId", projectId));
 			criteria.createAlias("properties", "prop");
 			criteria.createAlias("geoLocation", "instance");
-			criteria.add(Restrictions.in("instance.description", instanceNumbers.stream().map(num -> String.valueOf(num)).collect(Collectors.toList())));
+			criteria.add(Restrictions.in("instance.description",
+				instanceNumbers.stream().map(num -> String.valueOf(num)).collect(Collectors.toList())));
 			criteria.add(Restrictions.and(
-					Restrictions.eq("prop.typeId", TermId.PLOT_NO.getId()),
-					Restrictions.in("prop.value", plotNumbers.stream().map(plot -> String.valueOf(plot)).collect(Collectors.toList()))));
+				Restrictions.eq("prop.typeId", TermId.PLOT_NO.getId()),
+				Restrictions.in("prop.value", plotNumbers.stream().map(plot -> String.valueOf(plot)).collect(Collectors.toList()))));
 			final ProjectionList projectionList = Projections.projectionList();
 			projectionList.add(Projections.property("instance.description"));
 			projectionList.add(Projections.property("prop.value"));
@@ -751,7 +750,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			return experimentsTable;
 		} catch (final HibernateException e) {
 			final String message =
-					"Error at getTrialNumberPlotNumberObservationUnitIdTable=" + projectId + "," + plotNumbers + " query at ExperimentDao: " + e.getMessage();
+				"Error at getTrialNumberPlotNumberObservationUnitIdTable=" + projectId + "," + plotNumbers + " query at ExperimentDao: "
+					+ e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -931,7 +931,8 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			} else if (VariableType.GERMPLASM_DESCRIPTOR.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP;
 			} else if (VariableType.TRAIT.getId() == variableTypeId || VariableType.ANALYSIS.getId() == variableTypeId
-				|| VariableType.ENVIRONMENT_CONDITION.getId() == variableTypeId || VariableType.SELECTION_METHOD.getId() == variableTypeId) {
+				|| VariableType.ENVIRONMENT_CONDITION.getId() == variableTypeId
+				|| VariableType.SELECTION_METHOD.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_PHENOTYPE;
 			}
 
@@ -1010,32 +1011,31 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		try {
 			final StringBuilder sql = new StringBuilder(
 				"SELECT\n"
-				+ "    g.description AS environment,\n"
-				+ "    COUNT(*) AS nOfObservations,\n"
-				+ "    (SELECT COUNT(*)\n"
-				+ "        FROM stock s\n"
-				+ "        WHERE s.project_id = :studyId) AS nOfEntries,\n"
-				+ "    COALESCE((SELECT geop.value\n"
-				+ "        FROM nd_geolocationprop geop\n"
-				+ "         WHERE nd.nd_geolocation_id = geop.nd_geolocation_id\n"
-				+ "         AND geop.type_id = " + TermId.NUMBER_OF_REPLICATES.getId() +"),\n"
-				+ "            1) AS nOfReps\n"
-				+ "FROM\n"
-				+ "    nd_experiment nd,\n"
-				+ "    nd_geolocation g\n"
-				+ "WHERE\n"
-				+ "    g.nd_geolocation_id = nd.nd_geolocation_id\n"
-				+ "        AND nd.project_id = :datasetId \n"
-				+ "GROUP BY g.description;");
+					+ "    g.description AS environment,\n"
+					+ "    COUNT(*) AS nOfObservations,\n"
+					+ "    (SELECT COUNT(*)\n"
+					+ "        FROM stock s\n"
+					+ "        WHERE s.project_id = :studyId) AS nOfEntries,\n"
+					+ "    COALESCE((SELECT geop.value\n"
+					+ "        FROM nd_geolocationprop geop\n"
+					+ "         WHERE nd.nd_geolocation_id = geop.nd_geolocation_id\n"
+					+ "         AND geop.type_id = " + TermId.NUMBER_OF_REPLICATES.getId() + "),\n"
+					+ "            1) AS nOfReps\n"
+					+ "FROM\n"
+					+ "    nd_experiment nd,\n"
+					+ "    nd_geolocation g\n"
+					+ "WHERE\n"
+					+ "    g.nd_geolocation_id = nd.nd_geolocation_id\n"
+					+ "        AND nd.project_id = :datasetId \n"
+					+ "GROUP BY g.description;");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
-			query.addScalar("environment",new LongType());
-			query.addScalar("nOfObservations",new LongType());
-			query.addScalar("nOfEntries",new LongType());
-			query.addScalar("nOfReps",new LongType());
+			query.addScalar("environment", new LongType());
+			query.addScalar("nOfObservations", new LongType());
+			query.addScalar("nOfEntries", new LongType());
+			query.addScalar("nOfReps", new LongType());
 			query.setParameter("studyId", studyId);
 			query.setParameter("datasetId", datasetId);
-
 
 			query.setResultTransformer(Transformers.aliasToBean(InstanceDetailsDTO.class));
 			final List<InstanceDetailsDTO> results = query.list();
@@ -1050,7 +1050,6 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
-
 
 	public Map<Integer, Map<String, List<Object>>> getValuesFromObservations(final int studyId, final List<Integer> datasetTypeIds,
 		final Map<Integer, Integer> inputVariableDatasetMap) {
@@ -1155,6 +1154,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 
 	/**
 	 * Replace stock_id from the parent row and its children recursively
+	 *
 	 * @param observationUnitIds from the parent (plot, observation) dataset
 	 * @param newEntryId
 	 */
@@ -1163,13 +1163,15 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			return;
 		}
 		try {
-			final String hqlUpdate = "update ExperimentModel e set e.stock.id = :newEntryId where e.ndExperimentId in (:observationUnitIds)";
+			final String hqlUpdate =
+				"update ExperimentModel e set e.stock.id = :newEntryId where e.ndExperimentId in (:observationUnitIds)";
 			this.getSession().createQuery(hqlUpdate)
 				.setParameter("newEntryId", newEntryId)
 				.setParameterList("observationUnitIds", observationUnitIds)
 				.executeUpdate();
-			final List<Integer> children = this.getExperimentsByParentIds(observationUnitIds).stream().map(ExperimentModel::getNdExperimentId).collect(
-				Collectors.toList());
+			final List<Integer> children =
+				this.getExperimentsByParentIds(observationUnitIds).stream().map(ExperimentModel::getNdExperimentId).collect(
+					Collectors.toList());
 			this.updateEntryId(children, newEntryId);
 		} catch (final HibernateException e) {
 			final String message = "Error with updateEntryId query from ExperimentModel: " + e.getMessage();
