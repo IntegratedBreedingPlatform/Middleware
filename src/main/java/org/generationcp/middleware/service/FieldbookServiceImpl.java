@@ -635,8 +635,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public Method getMethodByCode(final String code, final String programUUID) {
-		return this.getGermplasmDataManager().getMethodByCode(code, programUUID);
+	public Method getMethodByCode(final String code) {
+		return this.getGermplasmDataManager().getMethodByCode(code);
 	}
 
 	@Override

@@ -28,9 +28,9 @@ public class FieldbookListUtilTest {
 	@Test
 	public void sortMethodNamesInAscendingOrderTest() throws Exception {
 		List<Method> newMethodList = new ArrayList<Method>();
-		Method methodOne = this.createMethod("UUID", 10, "AName");
-		Method methodTwo = this.createMethod("UUID2", 12, "SecondName");
-		Method methodThree = this.createMethod("UUID3", 14, "ThirdName");
+		Method methodOne = this.createMethod(10, "AName");
+		Method methodTwo = this.createMethod(12, "SecondName");
+		Method methodThree = this.createMethod(14, "ThirdName");
 
 		newMethodList.add(methodTwo);
 		newMethodList.add(methodOne);
@@ -43,9 +43,8 @@ public class FieldbookListUtilTest {
 		assertEquals("ThirdName", newMethodList.get(2).getMname());
 	}
 
-	public Method createMethod(String uniqueId, Integer id, String name) {
+	public Method createMethod(Integer id, String name) {
 		Method methodName = new Method();
-		methodName.setUniqueID(uniqueId);
 		methodName.setMid(id);
 		methodName.setMname(name);
 		return methodName;
