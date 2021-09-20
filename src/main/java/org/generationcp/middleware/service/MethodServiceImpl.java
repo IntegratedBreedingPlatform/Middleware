@@ -25,9 +25,4 @@ public class MethodServiceImpl extends Service implements MethodService {
 		FieldbookListUtil.sortMethodNamesInAscendingOrder(methodList);
 		return methodList;
 	}
-
-	@Override
-	public void deleteProgramMethods(final String programUUID) {
-		this.daoFactory.getMethodDAO().deleteAllProgramMethods(programUUID);
-	}
 }

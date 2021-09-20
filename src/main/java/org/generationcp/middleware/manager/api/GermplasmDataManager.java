@@ -213,22 +213,6 @@ public interface GermplasmDataManager {
 	boolean isMethodNamingConfigurationValid(Method breedingMethod);
 
 	/**
-	 * Returns all the method records.
-	 *
-	 * @param programUUID - unique id of the current program
-	 * @return List of Method POJOs
-	 */
-	List<Method> getMethodsByUniqueID(String programUUID);
-
-	/**
-	 * Returns the number of Methods with type matching the given parameter. Retrieves from both local and central databases.
-	 *
-	 * @param programUUID - unique id of the current program
-	 * @return Number of Methods matching the given type
-	 */
-	long countMethodsByUniqueID(String programUUID);
-
-	/**
 	 * Gets the all methods not generative.
 	 *
 	 * @return the all methods not generative
@@ -244,22 +228,12 @@ public interface GermplasmDataManager {
 	List<Method> getMethodsByType(String type);
 
 	/**
-	 * Returns all the method records matching the given type. Retrieves from both local and central databases.
-	 *
-	 * @param type        the type of the method
-	 * @param programUUID - unique id of the current program
-	 * @return List of Method POJOs
-	 */
-	List<Method> getMethodsByType(String type, String programUUID);
-
-	/**
 	 * Returns the number of Methods with type matching the given parameter. Retrieves from both local and central databases.
 	 *
 	 * @param type        - search string for the methods
-	 * @param programUUID - unique id of the current program
 	 * @return Number of Methods matching the given type
 	 */
-	long countMethodsByType(String type, String programUUID);
+	long countMethodsByType(String type);
 
 	/**
 	 * Returns all the method records matching the given group and the methods having the 'G' group. Retrieves from both local and central
@@ -279,14 +253,6 @@ public interface GermplasmDataManager {
 	 * @return List of Method POJOs
 	 */
 	List<Method> getMethodsByType(String type, int start, int numOfRows);
-
-	/**
-	 * Returns the number of Methods with type matching the given parameter. Retrieves from both local and central databases.
-	 *
-	 * @param type - search string for the methods
-	 * @return Number of Methods matching the given type
-	 */
-	long countMethodsByType(String type);
 
 	/**
 	 * Returns all the method records matching the given group. Retrieves from both local and central databases.
@@ -632,15 +598,6 @@ public interface GermplasmDataManager {
 	 * Gets the method by code.
 	 *
 	 * @param code        the code
-	 * @param programUUID - uniqueId of the current program
-	 * @return the method by code
-	 */
-	Method getMethodByCode(String code, String programUUID);
-
-	/**
-	 * Gets the method by code.
-	 *
-	 * @param code the code
 	 * @return the method by code
 	 */
 	Method getMethodByCode(String code);
@@ -652,15 +609,6 @@ public interface GermplasmDataManager {
 	 * @return the method by name
 	 */
 	Method getMethodByName(String name);
-
-	/**
-	 * Gets the method by name.
-	 *
-	 * @param name        the code
-	 * @param programUUID - uniqueID of the current program
-	 * @return the method by name
-	 */
-	Method getMethodByName(String name, String programUUID);
 
 	List<Germplasm> getProgenitorsByGIDWithPrefName(Integer gid);
 
@@ -706,21 +654,6 @@ public interface GermplasmDataManager {
 	 * @return
 	 */
 	boolean checkIfMatches(String name);
-
-	/**
-	 * get all method records filtered by programUUID
-	 *
-	 * @param programUUID
-	 * @return list of mid
-	 */
-	List<Method> getProgramMethods(String programUUID);
-
-	/**
-	 * delete all method records filtered by programUUID
-	 *
-	 * @param programUUID
-	 */
-	void deleteProgramMethodsByUniqueId(String programUUID);
 
 	/**
 	 * Generates a Map of {@link GermplasmPedigreeTreeNode}, which is a wrapper for a Germplasm and its immediate parents, stored as nodes

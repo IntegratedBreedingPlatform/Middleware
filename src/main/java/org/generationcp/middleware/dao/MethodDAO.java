@@ -42,7 +42,6 @@ import java.util.Set;
  */
 public class MethodDAO extends GenericDAO<Method, Integer> {
 
-	private static final String UNIQUE_ID = "uniqueID";
 	private static final String METHOD_NAME = "mname";
 
 	private static final Logger LOG = LoggerFactory.getLogger(MethodDAO.class);
@@ -93,36 +92,10 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Method> getByUniqueID(final String programUUID) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
-			criteria.addOrder(Order.asc(METHOD_NAME));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getMethodsByType", "programUUID", programUUID, e.getMessage(), "Method"), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<Method> getByType(final String type) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Method.class);
 			criteria.add(Restrictions.eq("mtype", type));
-			criteria.addOrder(Order.asc(METHOD_NAME));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsByType", "type", type, e.getMessage(), "Method"), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Method> getByType(final String type, final String programUUID) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.eq("mtype", type));
-			criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
 			criteria.addOrder(Order.asc(METHOD_NAME));
 			return criteria.list();
 		} catch (final HibernateException e) {
@@ -153,31 +126,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(this.getLogExceptionMessage("countMethodsByType", "type", type, e.getMessage(), "Method"),
 				e);
-		}
-	}
-
-	public long countByType(final String type, final String programUUID) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.eq("mtype", type));
-			criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
-			criteria.setProjection(Projections.rowCount());
-			return ((Long) criteria.uniqueResult()).longValue(); // count
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("countMethodsByType", "type", type, e.getMessage(), "Method"),
-				e);
-		}
-	}
-
-	public long countByUniqueID(final String programUUID) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
-			criteria.setProjection(Projections.rowCount());
-			return ((Long) criteria.uniqueResult()).longValue(); // count
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("countMethodsByType", "programUUID", programUUID, e.getMessage(), "Method"), e);
 		}
 	}
 
@@ -306,11 +254,10 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		}
 	}
 
-	public Method getByCode(final String code, final String programUUID) {
+	public Method getByCode(final String code) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Method.class);
 			criteria.add(Restrictions.eq("mcode", code));
-			criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
 			return (Method) criteria.uniqueResult();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsByCode", "code", code, e.getMessage(), "Method"), e);
@@ -336,21 +283,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			queryString.append("FROM methods m WHERE m.mname = :mname");
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameter(METHOD_NAME, name);
-			this.addMethodScalar(query);
-			return query.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("getByName", "name", name, e.getMessage(), "Method"), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Method> getByName(final String name, final String uniqueId) {
-		try {
-			final StringBuilder queryString = this.createSelectMethodString();
-			queryString.append("FROM methods m WHERE m.mname = :mname ").append("AND m.program_uuid = :uniqueId");
-			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.setParameter(METHOD_NAME, name);
-			query.setParameter("uniqueId", uniqueId);
 			this.addMethodScalar(query);
 			return query.list();
 		} catch (final HibernateException e) {
@@ -394,8 +326,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			.addScalar("geneq")
 			.addScalar("muid")
 			.addScalar("lmid")
-			.addScalar("mdate")
-			.addScalar("uniqueID");
+			.addScalar("mdate");
 		query.setResultTransformer(Transformers.aliasToBean(Method.class));
 	}
 
@@ -403,22 +334,8 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		final StringBuilder sql = new StringBuilder();
 		sql.append("SELECT m.mid AS mid, m.mtype AS mtype, m.mgrp AS mgrp, m.mcode AS mcode, m.mname AS mname, m.mdesc AS mdesc, ")
 			.append(" m.mref AS mref, m.mprgn AS mprgn, m.mfprg AS mfprg, m.mattr AS mattr, m.geneq AS geneq, m.muid AS muid, m.lmid AS lmid, ")
-			.append(" m.mdate AS mdate, m.program_uuid AS uniqueID ");
+			.append(" m.mdate AS mdate ");
 		return sql;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Method> getProgramMethods(final String programUUID) {
-		List<Method> method = new ArrayList<Method>();
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID));
-			method = criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getProgramMethods", "programUUID", programUUID, e.getMessage(), "Method"), e);
-		}
-		return method;
 	}
 
 	public List<Method> getFavoriteMethodsByMethodType(final String methodType, final String programUUID) {
@@ -475,12 +392,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 
 	private Criteria setCriteriaFilteredMethods(final BreedingMethodSearchRequest methodSearchRequest) {
 		final Criteria criteria = this.getSession().createCriteria(Method.class);
-		final String programUUID = methodSearchRequest.getProgramUUID();
-		if (StringUtils.isEmpty(programUUID)) {
-			criteria.add(Restrictions.isNull(MethodDAO.UNIQUE_ID));
-		} else {
-			criteria.add(Restrictions.or(Restrictions.eq(MethodDAO.UNIQUE_ID, programUUID), Restrictions.isNull(MethodDAO.UNIQUE_ID)));
-		}
 
 		final List<Integer> methodIds = methodSearchRequest.getMethodIds();
 		if (!CollectionUtils.isEmpty(methodIds)) {
@@ -514,19 +425,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		} catch (final HibernateException e) {
 			final String errorMessage = "Error at countByVariable=" + variableId + " in AttributeDAO: " + e.getMessage();
 			throw new MiddlewareQueryException(errorMessage, e);
-		}
-	}
-
-	public void deleteAllProgramMethods(final String programUUID) {
-		try {
-			final String sql = "DELETE m FROM methods m WHERE m.program_uuid = :programUUID";
-			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
-			sqlQuery.setParameter("programUUID", programUUID);
-			sqlQuery.executeUpdate();
-		} catch (final HibernateException e) {
-			final String message = "Error in deleteAllProgramMethods(" + programUUID + ") in LocationDAO: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
