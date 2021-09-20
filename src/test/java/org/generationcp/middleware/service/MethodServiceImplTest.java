@@ -48,7 +48,6 @@ public class MethodServiceImplTest extends IntegrationTestBase {
 		Assert.assertFalse(methodList.isEmpty());
 
 		Method method = new Method();
-		method.setUniqueID(this.commonTestProject.getUniqueID());
 		method.setMname("NEW METHOD NAME");
 		method.setMdesc("NEW METHOD DESC");
 		method.setMcode("0");

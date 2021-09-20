@@ -1,0 +1,17 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="nahuel" id="v19.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="methods" columnName="program_uuid"/>
+		</preConditions>
+		<comment>start program_uuid removal from methods: rename column to program_uuid_bkp</comment>
+		<sql dbms="mysql" splitStatements="true">
+			alter table methods change program_uuid program_uuid_bkp varchar(36) charset utf8 null;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
