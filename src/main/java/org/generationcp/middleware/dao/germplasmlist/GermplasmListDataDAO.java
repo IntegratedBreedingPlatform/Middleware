@@ -328,12 +328,11 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			final Map<String, Object> data = new HashMap<>();
 			IntStream.range(0, scalars.size()).forEach(i -> {
 				final SQLQueryBuilder.Scalar scalar = scalars.get(i);
-				if (scalar.getColumnName().equals(GermplasmListDataSearchDAOQuery.LIST_DATA_ID_ALIAS)) {
+				if (scalar.getColumnAlias().equals(GermplasmListDataSearchDAOQuery.LIST_DATA_ID_ALIAS)) {
 					row.setListDataId((Integer) result[i]);
 					return;
 				}
-				//TODO: filter data which currently is in the view ???
-				data.put(scalar.getColumnName(), result[i]);
+				data.put(scalar.getColumnAlias(), result[i]);
 			});
 			row.setData(data);
 			return row;
