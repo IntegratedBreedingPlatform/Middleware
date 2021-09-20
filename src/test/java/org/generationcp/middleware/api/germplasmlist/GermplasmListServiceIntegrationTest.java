@@ -177,7 +177,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void shouldAddGermplasmListData_OK() {
-		final Method method = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD, null);
+		final Method method = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
 		final Germplasm germplasm = this.createGermplasm(method);
 
 		final int randomInt = new Random().nextInt(100);
@@ -223,7 +223,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
 
 		// Add entry to list
-		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD, null);
+		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
 		final Germplasm existingGermplasmEntry = this.createGermplasm(singleCrossMethod);
 		final GermplasmListData germplasmListData = this.createGermplasmListData(germplasmList, existingGermplasmEntry.getGid(), 1);
 		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
@@ -235,7 +235,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getListDataPropertyDAO().save(existingEntryProperty);
 
 		//Create entry to add into existing list
-		final Method doubleCrossMethod = this.daoFactory.getMethodDAO().getByCode(DOUBLE_CROSS_METHOD, null);
+		final Method doubleCrossMethod = this.daoFactory.getMethodDAO().getByCode(DOUBLE_CROSS_METHOD);
 		final Germplasm addGermplasmEntry = this.createGermplasm(doubleCrossMethod);
 
 		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite = new SearchCompositeDto<>();
@@ -269,7 +269,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
 
 		// Add entry to list
-		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD, null);
+		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
 		final Germplasm existingGermplasmEntry = this.createGermplasm(singleCrossMethod);
 		final GermplasmListData germplasmListData = this.createGermplasmListData(germplasmList, existingGermplasmEntry.getGid(), 1);
 		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
@@ -281,7 +281,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getListDataPropertyDAO().save(existingEntryProperty);
 
 		//Create entry to add into existing list
-		final Method doubleCrossMethod = this.daoFactory.getMethodDAO().getByCode(DOUBLE_CROSS_METHOD, null);
+		final Method doubleCrossMethod = this.daoFactory.getMethodDAO().getByCode(DOUBLE_CROSS_METHOD);
 		final Germplasm addGermplasmEntry = this.createGermplasm(doubleCrossMethod);
 
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
@@ -310,7 +310,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void shouldGetGermplasmLists_OK() {
 		//create germplasm
-		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD, null);
+		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
 		final Germplasm germplasm = this.createGermplasm(singleCrossMethod);
 
 		final List<GermplasmListDto>  germplasmListDtos = this.germplasmListService.getGermplasmLists(germplasm.getGid());

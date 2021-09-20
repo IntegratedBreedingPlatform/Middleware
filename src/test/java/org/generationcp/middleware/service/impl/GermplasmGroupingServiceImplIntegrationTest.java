@@ -140,7 +140,7 @@ public class GermplasmGroupingServiceImplIntegrationTest extends IntegrationTest
 		final Method method =
 			new Method(null, breedingMethodType, "G", RandomStringUtils.randomAlphanumeric(4).toUpperCase(),
 				RandomStringUtils.randomAlphanumeric(10),
-				RandomStringUtils.randomAlphanumeric(10), 0, 1, 1, 0, 1490, 1, 0, 19980708, "");
+				RandomStringUtils.randomAlphanumeric(10), 0, 1, 1, 0, 1490, 1, 0, 19980708);
 		this.daoFactory.getMethodDAO().save(method);
 		this.sessionProvder.getSession().flush();
 		this.daoFactory.getMethodDAO().refresh(method);

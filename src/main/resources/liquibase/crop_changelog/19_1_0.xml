@@ -6,6 +6,16 @@
 
 	<changeSet author="nahuel" id="v19.1.0-1">
 		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="methods" columnName="program_uuid"/>
+		</preConditions>
+		<comment>start program_uuid removal from methods: rename column to program_uuid_bkp</comment>
+		<sql dbms="mysql" splitStatements="true">
+			alter table methods change program_uuid program_uuid_bkp varchar(36) charset utf8 null;
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v19.1.0-2">
+		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="file_metadata" columnName="gid"/>
 			</not>
