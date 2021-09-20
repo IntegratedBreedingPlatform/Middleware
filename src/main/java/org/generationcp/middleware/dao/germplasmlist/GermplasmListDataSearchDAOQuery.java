@@ -20,6 +20,7 @@ public class GermplasmListDataSearchDAOQuery {
 
 	// TODO: define in common constants
 	private static final String MIXED_UNITS_LABEL = "Mixed";
+	private static final Integer NAME_DELETED_STATUS = 9;
 
 
 	//TODO: check if it's necessary to do a dynamic sort columns
@@ -247,7 +248,8 @@ public class GermplasmListDataSearchDAOQuery {
 		String alias = "attr_" + variableId;
 		selectClause.add(addSelectExpression(scalars, String.format("%s.aval", alias), variableId.toString(), "attr_val"));
 
-		String join = "LEFT JOIN atributs " + alias + " ON g.gid = " + alias + ".gid AND " + alias + ".atype = " + variableId;
+		String join = String.format("LEFT JOIN atributs %1$s ON g.gid = %1$s.gid AND %1$s.atype = %2$s",
+			alias, variableId);
 		joins.add(String.format(join, alias, alias, variableId));
 	}
 
@@ -257,7 +259,8 @@ public class GermplasmListDataSearchDAOQuery {
 		String alias = "name_" + nameTypeId;
 		selectClause.add(addSelectExpression(scalars, String.format("%s.nval", alias), nameTypeId.toString(), "name_val"));
 
-		String join = "LEFT JOIN names " + alias + " ON g.gid = " + alias + ".gid AND " + alias + ".ntype = " + nameTypeId;
+		String join = String.format("LEFT JOIN names %1$s ON g.gid = %1$s.gid AND %1$s.ntype = %2$s AND %1$s.nstat <> %3$s",
+			alias, nameTypeId, NAME_DELETED_STATUS);
 		joins.add(String.format(join, alias, alias, nameTypeId));
 	}
 
