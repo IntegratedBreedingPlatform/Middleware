@@ -550,14 +550,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public List<MeasurementVariable> getGermplasmListDataTableHeader(final Integer listId, final String programUUID) {
+	public List<GermplasmListMeasurementVariableDTO> getGermplasmListDataTableHeader(final Integer listId, final String programUUID) {
 		final List<GermplasmListDataView> columns =
 			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
 		// If the list has not columns saved yet, we return a default list of columns
 		if (columns.isEmpty()) {
 			return GermplasmListStaticColumns.getDefaultColumns()
 				.stream()
-				.map(column -> this.buildColumn(column.getTermId(), column.getName(), column.name()))
+				.map(column -> this.buildColumn(column.getTermId(), column.getName(), column.name(), GermplasmListColumnCategory.STATIC))
 				.collect(Collectors.toList());
 		}
 
@@ -566,14 +566,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.collect(groupingBy(GermplasmListDataView::getCategory, HashMap::new,
 				Collectors.mapping(GermplasmListDataView::getVariableId, Collectors.toList())));
 
-		final List<MeasurementVariable> header = new ArrayList<>();
+		final List<GermplasmListMeasurementVariableDTO> header = new ArrayList<>();
 		final List<Integer> staticIds = columnIdsByCategory.get(GermplasmListColumnCategory.STATIC);
 		if (!CollectionUtils.isEmpty(staticIds)) {
-			final List<MeasurementVariable> staticColumns = staticIds
+			final List<GermplasmListMeasurementVariableDTO> staticColumns = staticIds
 				.stream()
 				.map(id -> {
 					final GermplasmListStaticColumns staticColumn = GermplasmListStaticColumns.getValueByTermId(id);
-					return this.buildColumn(id, staticColumn.getName(), staticColumn.name());
+					return this.buildColumn(id, staticColumn.getName(), staticColumn.name(), GermplasmListColumnCategory.STATIC);
 				})
 				.collect(Collectors.toList());
 			header.addAll(staticColumns);
@@ -582,9 +582,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final List<Integer> nameTypeIds = columnIdsByCategory.get(GermplasmListColumnCategory.NAMES);
 		if (!CollectionUtils.isEmpty(nameTypeIds)) {
 			final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().filterByColumnValues("fldno", nameTypeIds);
-			final List<MeasurementVariable> nameColumns = nameTypes
+			final List<GermplasmListMeasurementVariableDTO> nameColumns = nameTypes
 				.stream()
-				.map(nameType -> this.buildColumn(nameType.getFldno(), nameType.getFname(), nameType.getFcode()))
+				.map(nameType -> this.buildColumn(nameType.getFldno(), nameType.getFname(), nameType.getFcode(), GermplasmListColumnCategory.NAMES))
 				.collect(Collectors.toList());
 			header.addAll(nameColumns);
 		}
@@ -597,9 +597,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				.forEach(variableFilter::addVariableId);
 			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 			// TODO: get required properties for entry details
-			final List<MeasurementVariable> variableColumns = variables
+			final List<GermplasmListMeasurementVariableDTO> variableColumns = variables
 				.stream()
-				.map(variable -> this.buildColumn(variable.getId(), variable.getName(), variable.getAlias()))
+				.map(variable -> this.buildColumn(variable.getId(), variable.getName(), variable.getAlias(), GermplasmListColumnCategory.VARIABLE))
 				.collect(Collectors.toList());
 			header.addAll(variableColumns);
 		}
@@ -607,11 +607,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return header;
 	}
 
-	private MeasurementVariable buildColumn(final int termId, final String name, final String alias) {
-		final MeasurementVariable column = new MeasurementVariable();
+	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias, final GermplasmListColumnCategory category) {
+		final GermplasmListMeasurementVariableDTO column = new GermplasmListMeasurementVariableDTO();
 		column.setTermId(termId);
 		column.setName(name);
 		column.setAlias(alias);
+		column.setColumnCategory(category);
 		return column;
 	}
 
