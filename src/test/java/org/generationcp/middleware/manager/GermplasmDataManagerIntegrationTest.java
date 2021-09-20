@@ -365,16 +365,15 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testAddMethods() throws MiddlewareQueryException {
 		final List<Method> methods = new ArrayList<>();
-		final String programUUID = UUID.randomUUID().toString();
 		methods.add(
 			new Method(null, "GEN", "S", "UGM", "yesno", "description 1", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
-				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610), programUUID));
+				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
 		methods.add(
 			new Method(null, "GEN", "S", "UGM", "yesno", "description 2", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
-				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610), programUUID));
+				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
 		methods.add(
 			new Method(null, "GEN", "S", "UGM", "yesno", "description 3", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
-				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610), programUUID));
+				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610)));
 
 		final List<Integer> methodsAdded = this.germplasmDataManager.addMethod(methods);
 		Debug.println(IntegrationTestBase.INDENT, "testAddMethods() Methods added: " + methodsAdded.size());
@@ -384,16 +383,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 			Debug.println(IntegrationTestBase.INDENT, method);
 			this.germplasmDataManager.deleteMethod(method);
 		}
-	}
-
-	@Test
-	public void testGetMethodsByUniqueID() throws MiddlewareQueryException {
-		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		final List<Method> methodsFilteredByProgramUUID = this.germplasmDataManager.getMethodsByUniqueID(programUUID);
-		assertThat("Expecting to have returned results.", methodsFilteredByProgramUUID, is(notNullValue()));
-		Debug.println(IntegrationTestBase.INDENT,
-			"testGetMethodsByUniqueID(programUUID=" + programUUID + "): " + methodsFilteredByProgramUUID.size());
-		Debug.printObjects(IntegrationTestBase.INDENT * 2, methodsFilteredByProgramUUID);
 	}
 
 	@Test
@@ -407,13 +396,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodsByType(type=" + type + "): " + methods.size());
 		Debug.printObjects(IntegrationTestBase.INDENT * 2, methods);
 
-		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		final List<Method> methodsFilteredByProgramUUID = this.germplasmDataManager.getMethodsByType(type, programUUID);
+		final List<Method> methodsFilteredByProgramUUID = this.germplasmDataManager.getMethodsByType(type);
 		assertThat("Expecting to have returned results.", methodsFilteredByProgramUUID, is(notNullValue()));
-
-		Debug.println(IntegrationTestBase.INDENT,
-			"testGetMethodsByType(type=" + type + ", programUUID=" + programUUID + "): " + methodsFilteredByProgramUUID.size());
-		Debug.printObjects(IntegrationTestBase.INDENT * 2, methodsFilteredByProgramUUID);
 
 		final List<Method> methodList = this.germplasmDataManager.getMethodsByType(type, start, numOfRows);
 		assertThat("Expecting to have returned results.", methodList, is(notNullValue()));
@@ -424,31 +408,10 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountMethodsByUniqueID() {
-		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		final long count = this.germplasmDataManager.countMethodsByUniqueID(programUUID);
-		assertThat("Expecting to have returned results.", count, is(greaterThan(0l)));
-		Debug.println(IntegrationTestBase.INDENT, "testCountMethodsByUniqueID(programUUID=" + programUUID + "): " + count);
-	}
-
-	@Test
 	public void testCountMethodsByType() {
 		String type = "GEN";
 		final long count = this.germplasmDataManager.countMethodsByType(type);
 		assertThat("Expecting to have returned results.", count, is(greaterThan(0l)));
-
-		Debug.println(IntegrationTestBase.INDENT, "testCountMethodsByType(type=" + type + "): " + count);
-
-		type = "GEN";
-		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		final long countWithProgramUUID = this.germplasmDataManager.countMethodsByType(type, programUUID);
-		assertThat("Expecting to have returned results.", count, is(greaterThan(0l)));
-
-		Debug.println(IntegrationTestBase.INDENT, "testCountMethodsByType(type=" + type + "): " + countWithProgramUUID);
-
-		assertThat("The results that is filtered by programUUID must be less than or equal to the results without programUUID.", count,
-			is(greaterThanOrEqualTo(countWithProgramUUID)));
-
 	}
 
 	@Test
@@ -805,28 +768,12 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetMethodByNameWithProgramUUID() {
-		final String name = "breeders seed";
-		final String programUUID = this.commonTestProject.getUniqueID();
-		final Method method = this.germplasmDataManager.getMethodByName(name, programUUID);
-		assertThat("Expecting the return method is not null.", method, is(notNullValue()));
-	}
-
-	@Test
 	public void testGetMethodByCode() {
 		final String code = "VBS";
 		final Method method = this.germplasmDataManager.getMethodByCode(code);
 		assertThat(method, is(notNullValue()));
 		Debug.println(IntegrationTestBase.INDENT, "testGetMethodByCode(" + code + "): ");
 		Debug.println(IntegrationTestBase.INDENT, method);
-	}
-
-	@Test
-	public void testGetMethodByCodeWithProgramUUID() {
-		final String code = "VBS";
-		final String programUUID = this.commonTestProject.getUniqueID();
-		final Method method = this.germplasmDataManager.getMethodByCode(code, programUUID);
-		assertThat("Expecting the return method is not null.", method, is(notNullValue()));
 	}
 
 	@Test
@@ -873,31 +820,8 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		Debug.println(IntegrationTestBase.INDENT, readAttribute);
 	}
 
-	@Test
-	public void getProgramMethodsAndDeleteByUniqueId() {
-		// create program locations
-		final String programUUID = this.commonTestProject.getUniqueID();
-		final Method testMethod1 = this.createMethodTestData(programUUID);
-		final Method testMethod2 = this.createMethodTestData(programUUID);
-		try {
-			this.germplasmDataManager.addMethod(testMethod1);
-			this.germplasmDataManager.addMethod(testMethod2);
-			// verify
-			List<Method> methodList = this.germplasmDataManager.getProgramMethods(programUUID);
-			assertThat("There should be 2 program methods with programUUID[" + programUUID + "]", 2, is(equalTo(methodList.size())));
-			// delete locations
-			this.germplasmDataManager.deleteProgramMethodsByUniqueId(programUUID);
-			methodList = this.germplasmDataManager.getProgramMethods(programUUID);
-			assertThat("There should be no program methods with programUUID[" + programUUID + "]", methodList,
-				org.hamcrest.Matchers.empty());
-		} catch (final MiddlewareQueryException e) {
-			assertThat("Getting and deleting of program methods failed", Boolean.FALSE);
-		}
-	}
-
 	private Method createMethodTestData(final String programUUID) {
 		final Method method = new Method();
-		method.setUniqueID(programUUID);
 		method.setMname("TEST-LOCATION" + System.currentTimeMillis());
 		method.setMdesc("TEST-LOCATION-DESC" + System.currentTimeMillis());
 		method.setMcode("0");

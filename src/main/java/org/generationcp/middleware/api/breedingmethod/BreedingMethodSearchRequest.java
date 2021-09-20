@@ -9,6 +9,9 @@ import java.util.List;
 @AutoProperty
 public class BreedingMethodSearchRequest {
 
+	/**
+	 * Used to get program favorites
+	 */
 	private String programUUID;
 	private List<String> methodTypes = new ArrayList<>();
 	private List<Integer> methodIds = new ArrayList<>();
