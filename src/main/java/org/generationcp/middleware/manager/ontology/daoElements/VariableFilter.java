@@ -24,6 +24,7 @@ public class VariableFilter {
 	private final List<String> propertyClasses = new ArrayList<>();
 	private final List<String> names = new ArrayList<>();
 	private final List<Integer> datasetIds = new ArrayList<>();
+	private final List<String> germplasmUUIDs = new ArrayList<>();
 
 	public String getProgramUuid() {
 		return this.programUuid;
@@ -129,6 +130,14 @@ public class VariableFilter {
 		this.datasetIds.add(datasetId);
 	}
 
+	public List<String> getGermplasmUUIDs() {
+		return this.germplasmUUIDs;
+	}
+
+	public void addGermplasmUUID(final String germplasmUUIDs) {
+		this.germplasmUUIDs.add(germplasmUUIDs);
+	}
+
 	@Override
 	public String toString() {
 		return new ToStringBuilder(this)
@@ -145,6 +154,7 @@ public class VariableFilter {
 			.append("propertyClasses", this.propertyClasses)
 			.append("names", this.names)
 			.append("datasetIds", this.datasetIds)
+			.append("germplasmUUIDs", this.germplasmUUIDs)
 			.toString();
 	}
 
@@ -162,15 +172,17 @@ public class VariableFilter {
 			.append(this.programUuid, that.programUuid).append(this.methodIds, that.methodIds).append(this.propertyIds, that.propertyIds)
 			.append(this.scaleIds, that.scaleIds).append(this.variableIds, that.variableIds).append(this.excludedVariableIds, that.excludedVariableIds)
 			.append(this.dataTypes, that.dataTypes).append(this.variableTypes, that.variableTypes).append(this.propertyClasses, that.propertyClasses)
-			.append(this.names, that.names).append(this.datasetIds, that.datasetIds).isEquals();
+			.append(this.names, that.names).append(this.datasetIds, that.datasetIds).append(this.germplasmUUIDs, that.germplasmUUIDs).isEquals();
 	}
 
 	@Override
 	public int hashCode() {
 		return new HashCodeBuilder(17, 37).append(this.programUuid).append(this.fetchAll).append(this.favoritesOnly).append(this.methodIds).append(
 			this.propertyIds)
-			.append(this.scaleIds).append(this.variableIds).append(this.excludedVariableIds).append(this.dataTypes).append(this.variableTypes)
+			.append(this.scaleIds).append(this.variableIds).append(this.excludedVariableIds).append(this.dataTypes).append(
+				this.variableTypes)
 			.append(this.propertyClasses)
-			.append(this.names).append(this.datasetIds).toHashCode();
+			.append(this.names).append(this.datasetIds).append(this.germplasmUUIDs).toHashCode();
 	}
+
 }

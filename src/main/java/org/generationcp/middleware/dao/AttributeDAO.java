@@ -22,6 +22,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.BooleanType;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
@@ -104,7 +105,10 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			queryString.append("cv.definition AS variableDescription, ");
 			queryString.append("CAST(a.adate AS CHAR(255)) AS date, ");
 			queryString.append("a.alocn AS locationId, ");
-			queryString.append("l.lname AS locationName ");
+			queryString.append("l.lname AS locationName, ");
+			queryString.append("(select exists(select 1 from file_metadata f "
+				+ " inner join file_metadata_cvterm fmc on f.file_id = fmc.file_metadata_id "
+				+ " where f.gid = a.gid and fmc.cvterm_id = a.atype)) AS hasFiles ");
 			queryString.append("FROM atributs a ");
 			queryString.append("INNER JOIN cvterm cv ON a.atype = cv.cvterm_id ");
 			queryString.append("INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id ");
@@ -124,6 +128,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			sqlQuery.addScalar("date");
 			sqlQuery.addScalar("locationId");
 			sqlQuery.addScalar("locationName");
+			sqlQuery.addScalar("hasFiles", new BooleanType());
 			sqlQuery.setParameter("gid", gid);
 			if (variableTypeId != null) {
 				sqlQuery.setParameter("variableTypeId", variableTypeId);
