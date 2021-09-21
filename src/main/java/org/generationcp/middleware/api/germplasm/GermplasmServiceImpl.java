@@ -9,13 +9,14 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
+import org.generationcp.middleware.constant.SystemNameTypes;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmMergeDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
@@ -95,8 +96,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 
-	public static final List<String> SYSTEM_NAMES =
-		Collections.unmodifiableList(Arrays.asList("CODE1", "CODE2", "CODE3", "PUI", "CRSNM", "DRVNM", "LNAME", "PED", "SELHISFIX"));
 	public static final String PLOT_CODE = "PLOTCODE_AP_text";
 
 	private static final String DEFAULT_BIBREF_FIELD = "-";
@@ -1099,6 +1098,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public void mergeGermplasm(final GermplasmMergeRequestDto germplasmMergeRequestDto, final String crossExpansion) {
 
+		final Germplasm targetGermplasm = this.daoFactory.getGermplasmDao().getById(germplasmMergeRequestDto.getTargetGermplasmId());
+
 		final List<GermplasmMergeRequestDto.NonSelectedGermplasm> nonSelectedGermplasmList =
 			germplasmMergeRequestDto.getNonSelectedGermplasm().stream().filter(
 				nonSelectedGermplasm -> !nonSelectedGermplasm.isOmit()).collect(Collectors.toList());
@@ -1109,7 +1110,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		// Replace the non-selected germplasm in Germplasm List entries with the target germplasm.
 		this.daoFactory.getGermplasmListDataDAO()
-			.replaceGermplasm(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId());
+			.replaceGermplasm(gidsNonSelectedGermplasm, targetGermplasm, crossExpansion);
 
 		// Replace non-selected germplasm used as entries in any study with the target germplasm.
 		this.studyEntryService.replaceStudyEntries(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId(),
@@ -1117,7 +1118,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		if (germplasmMergeRequestDto.getMergeOptions().isMigrateNameTypes()) {
 			// Migrate names from non-selected germplasm to the target germplasm
-			this.migrateNames(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId());
+			this.migrateNames(gidsNonSelectedGermplasm, targetGermplasm);
 		}
 
 		if (germplasmMergeRequestDto.getMergeOptions().isMigrateAttributesData()) {
@@ -1141,29 +1142,28 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public List<GermplasmMergeDto> getGermplasmMergeDTOs(final Integer gid) {
+	public List<GermplasmMergedDto> getGermplasmMerged(final Integer gid) {
 		return this.daoFactory.getGermplasmDao().getGermplasmMergeDtos(gid);
 	}
 
 	@Override
-	public List<GermplasmProgenyDto> getGermplasmProgenyDTOs(final Integer gid) {
+	public List<GermplasmProgenyDto> getGermplasmProgenies(final Integer gid) {
 		return this.daoFactory.getGermplasmDao().getGermplasmDescendantByGID(gid, 0, Integer.MAX_VALUE).stream().map((germplasm) -> {
 			return new GermplasmProgenyDto(germplasm.getGid(),
 				germplasm.getPreferredName() != null ? germplasm.getPreferredName().getNval() : StringUtils.EMPTY);
 		}).collect(Collectors.toList());
 	}
 
-	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Integer targetGermplasmId) {
+	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Germplasm targetGermplasm) {
 		final List<Integer> systemNameTypeIds = this.getSystemNameTypeIds();
-		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(targetGermplasmId);
 		final NameDAO nameDAO = this.daoFactory.getNameDao();
 		final List<Name> names = nameDAO.getNamesByGids(gidsNonSelectedGermplasm);
-		final List<Integer> existingNameTypeIds = germplasm.getNames().stream().map(Name::getTypeId).collect(Collectors.toList());
+		final List<Integer> existingNameTypeIds = targetGermplasm.getNames().stream().map(Name::getTypeId).collect(Collectors.toList());
 		for (final Name name : names) {
 			// If name is a system name (e.g. PUI, CODE1, CODE2...), do not migrate if it's already present
 			if (!(systemNameTypeIds.contains(name.getTypeId()) && existingNameTypeIds.contains(name.getTypeId()))) {
 				final Name nameToSave =
-					new Name(null, germplasm, name.getTypeId(), 0, name.getNval(), name.getLocationId(), name.getNdate(),
+					new Name(null, targetGermplasm, name.getTypeId(), 0, name.getNval(), name.getLocationId(), name.getNdate(),
 						name.getReferenceId());
 				nameDAO.save(nameToSave);
 				nameDAO.makeTransient(name);
@@ -1198,12 +1198,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final List<Integer> migrateLotsGids = nonSelectedGermplasmList.stream().filter(o -> !o.isOmit() && o.isMigrateLots())
 			.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
 				Collectors.toList());
-		final List<Lot> lotsToMigrate = this.daoFactory.getLotDao().getByGids(migrateLotsGids);
-		for (final Lot lot : lotsToMigrate) {
-			lot.setEntityId(targetGermplasmId);
-			this.daoFactory.getLotDao().saveOrUpdate(lot);
-		}
-
+		this.daoFactory.getLotDao().replaceGermplasm(migrateLotsGids, targetGermplasmId);
 	}
 
 	private void closeLots(final List<GermplasmMergeRequestDto.NonSelectedGermplasm> nonSelectedGermplasmList) {
@@ -1309,8 +1304,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private List<Integer> getSystemNameTypeIds() {
-		final List<GermplasmNameTypeDTO> nameTypeDTOS = this.germplasmNameTypeService.filterGermplasmNameTypes(
-			new HashSet<>(SYSTEM_NAMES));
+		final List<GermplasmNameTypeDTO> nameTypeDTOS = this.germplasmNameTypeService.filterGermplasmNameTypes(SystemNameTypes.getTypes());
 		return nameTypeDTOS.stream().map(GermplasmNameTypeDTO::getId).collect(Collectors.toList());
 	}
 

@@ -8,15 +8,17 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.constant.SystemNameTypes;
 import org.generationcp.middleware.dao.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmMergeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
@@ -2128,7 +2130,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	private void createSystemDefinedNames(final Germplasm germplasm) {
 		final List<UserDefinedField> systemNamesUserDefinedFields =
 			this.daoFactory.getUserDefinedFieldDAO().getByCodes(UDTableType.NAMES_NAME.getTable(),
-				Collections.singleton(UDTableType.NAMES_NAME.getType()), new HashSet<>(GermplasmServiceImpl.SYSTEM_NAMES));
+				Collections.singleton(UDTableType.NAMES_NAME.getType()),
+				SystemNameTypes.getTypes());
 
 		for (final UserDefinedField userDefinedField : systemNamesUserDefinedFields) {
 			this.addName(germplasm, userDefinedField.getFldno(), RandomStringUtils.randomAlphabetic(10), 0,
@@ -2173,7 +2176,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(9, targetGermplasmDto.getNames().size());
 		final List<String> nameCodes =
 			targetGermplasmDto.getNames().stream().map(GermplasmNameDto::getNameTypeCode).collect(Collectors.toList());
-		Assert.assertTrue(GermplasmServiceImpl.SYSTEM_NAMES.containsAll(nameCodes));
+		Assert.assertTrue(SystemNameTypes.getTypes().containsAll(nameCodes));
 
 	}
 
@@ -2512,11 +2515,53 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		this.sessionProvder.getSession().flush();
 
-		final List<GermplasmMergeDto> result = this.germplasmService.getGermplasmMergeDTOs(targetGermplasm.getGid());
+		final List<GermplasmMergedDto> result = this.germplasmService.getGermplasmMerged(targetGermplasm.getGid());
 		assertThat(result.size(), equalTo(2));
 		assertThat(result.get(0).getGid(), equalTo(germplasmToMerge1.getGid()));
 		assertThat(result.get(1).getGid(), equalTo(germplasmToMerge2.getGid()));
 
+	}
+
+	@Test
+	public void testGermplasmProgenies() {
+		final Method derivativeMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Method generativeMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Germplasm parentGermplasm = this.createGermplasm(derivativeMethod, null, null, 0, 0, 0, null, null);
+
+		final Germplasm child1 = this.createGermplasm(generativeMethod, null, null, 2, parentGermplasm.getGid(), 1, null, null);
+		final Name name1 =
+			this.addName(child1, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), RandomStringUtils.randomAlphabetic(10), 0,
+				this.creationDate, 1);
+		final Germplasm child2 = this.createGermplasm(generativeMethod, null, null, 2, 1, parentGermplasm.getGid(), null, null);
+		final Name name2 =
+			this.addName(child2, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), RandomStringUtils.randomAlphabetic(10), 0,
+				this.creationDate, 1);
+		final Germplasm child3 = this.createGermplasm(derivativeMethod, null, null, -1, 1, parentGermplasm.getGid(), null, null);
+		final Name name3 =
+			this.addName(child3, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), RandomStringUtils.randomAlphabetic(10), 0,
+				this.creationDate, 1);
+		final Germplasm child4 = this.createGermplasm(derivativeMethod, null, null, -1, parentGermplasm.getGid(), 1, null, null);
+		final Name name4 =
+			this.addName(child4, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), RandomStringUtils.randomAlphabetic(10), 0,
+				this.creationDate, 1);
+		final Germplasm child5 = this.createGermplasm(generativeMethod, null, null, 3, 1, 2, null, null);
+		this.addProgenitor(child5, parentGermplasm);
+		final Name name5 =
+			this.addName(child5, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), RandomStringUtils.randomAlphabetic(10), 0,
+				this.creationDate, 1);
+
+		this.sessionProvder.getSession().flush();
+		this.sessionProvder.getSession().clear();
+
+		final Map<Integer, GermplasmProgenyDto> progenies =
+			this.germplasmService.getGermplasmProgenies(parentGermplasm.getGid()).stream().collect(
+				Collectors.toMap(GermplasmProgenyDto::getGid, Function.identity()));
+		assertThat(progenies.size(), equalTo(5));
+		assertThat(progenies.get(child1.getGid()).getDesignation(), equalTo(name1.getNval()));
+		assertThat(progenies.get(child2.getGid()).getDesignation(), equalTo(name2.getNval()));
+		assertThat(progenies.get(child3.getGid()).getDesignation(), equalTo(name3.getNval()));
+		assertThat(progenies.get(child4.getGid()).getDesignation(), equalTo(name4.getNval()));
+		assertThat(progenies.get(child5.getGid()).getDesignation(), equalTo(name5.getNval()));
 	}
 
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,

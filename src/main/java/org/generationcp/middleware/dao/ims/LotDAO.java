@@ -598,4 +598,21 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
+	public void replaceGermplasm(final List<Integer> gidsToReplace, final Integer gidReplaceWith) {
+		try {
+			if (CollectionUtils.isNotEmpty(gidsToReplace)) {
+				final String hqlUpdate = "update Lot l set l.entityId = :gidReplaceWith where l.entityId in (:gidsToReplace)";
+				this.getSession().createQuery(hqlUpdate)
+					.setParameter("gidReplaceWith", gidReplaceWith)
+					.setParameterList("gidsToReplace", gidsToReplace)
+					.executeUpdate();
+			}
+		} catch (final HibernateException e) {
+			final String message = "Error with replaceGermplasm query from Lot: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+	}
 }

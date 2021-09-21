@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -292,21 +293,24 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 	}
 
-	public void replaceGermplasm(final List<Integer> gidsToReplace, final Integer replaceWithGid) {
+	public void replaceGermplasm(final List<Integer> gidsToReplace, final Germplasm germplasm, final String crossExpansion) {
 		Preconditions.checkNotNull(gidsToReplace, "gidsToReplace passed cannot be null.");
 		Preconditions.checkArgument(!gidsToReplace.isEmpty(), "gidsToReplace passed cannot be empty.");
-		Preconditions.checkNotNull(replaceWithGid, "replaceWithGid passed in cannot be null.");
+		Preconditions.checkNotNull(germplasm, "germplasm passed in cannot be null.");
 
 		try {
 			final Query query =
 				this.getSession().createQuery(
-					"UPDATE GermplasmListData listData SET listData.gid = :replaceWithGid WHERE listData.gid in (:gidsToReplace)");
-			query.setParameter("replaceWithGid", replaceWithGid);
+					"UPDATE GermplasmListData listData SET listData.gid = :replaceWithGid, listData.designation = :designation, listData.groupName = :groupName WHERE listData.gid in (:gidsToReplace)");
+			query.setParameter("replaceWithGid", germplasm.getGid());
+			query.setParameter("designation",
+				germplasm.getPreferredName() != null ? germplasm.getPreferredName().getNval() : StringUtils.EMPTY);
+			query.setParameter("groupName", crossExpansion);
 			query.setParameterList("gidsToReplace", gidsToReplace);
 			query.executeUpdate();
 		} catch (final HibernateException e) {
 			final String errorMessage =
-				"Error in replaceGermplasm for gidsToReplace=" + gidsToReplace + ", replaceWithGid=" + replaceWithGid + " " + e
+				"Error in replaceGermplasm for gidsToReplace=" + gidsToReplace + ", germplasm=" + germplasm + " " + e
 					.getMessage();
 			throw new MiddlewareQueryException(errorMessage, e);
 		}

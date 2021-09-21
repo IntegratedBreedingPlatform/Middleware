@@ -6,13 +6,13 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.Date;
 
 @AutoProperty
-public class GermplasmMergeDto {
+public class GermplasmMergedDto {
 
 	private Integer gid;
 	private String designation;
 	private Date modifiedDate;
 
-	public GermplasmMergeDto(final Integer gid, final String designation, final Date modifiedDate) {
+	public GermplasmMergedDto(final Integer gid, final String designation, final Date modifiedDate) {
 		this.gid = gid;
 		this.designation = designation;
 		this.modifiedDate = modifiedDate;

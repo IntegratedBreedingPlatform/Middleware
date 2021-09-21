@@ -2,6 +2,7 @@
 package org.generationcp.middleware.dao;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
@@ -333,6 +334,7 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	@Test
 	public void testReplaceGermplasm() {
 
+		final String crossExpansion = RandomStringUtils.randomAlphabetic(10);
 		final Germplasm targetGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 		final Germplasm germplasm1 = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 		final GermplasmListData germplasmListData1 = this.createTestListWithListData(germplasm1);
@@ -342,7 +344,7 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		final GermplasmListData germplasmListData3 = this.createTestListWithListData(germplasm3);
 
 		this.germplasmListDataDAO.replaceGermplasm(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()),
-			targetGermplasm.getGid());
+			targetGermplasm, crossExpansion);
 
 		this.sessionProvder.getSession().refresh(germplasmListData1);
 		this.sessionProvder.getSession().refresh(germplasmListData2);
@@ -351,6 +353,12 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(germplasmListData1.getGermplasmId(), targetGermplasm.getGid());
 		Assert.assertEquals(germplasmListData2.getGermplasmId(), targetGermplasm.getGid());
 		Assert.assertEquals(germplasmListData3.getGermplasmId(), targetGermplasm.getGid());
+		Assert.assertEquals(germplasmListData1.getDesignation(), targetGermplasm.getPreferredName().getNval());
+		Assert.assertEquals(germplasmListData2.getDesignation(), targetGermplasm.getPreferredName().getNval());
+		Assert.assertEquals(germplasmListData3.getDesignation(), targetGermplasm.getPreferredName().getNval());
+		Assert.assertEquals(germplasmListData1.getGroupName(), crossExpansion);
+		Assert.assertEquals(germplasmListData2.getGroupName(), crossExpansion);
+		Assert.assertEquals(germplasmListData3.getGroupName(), crossExpansion);
 	}
 
 }

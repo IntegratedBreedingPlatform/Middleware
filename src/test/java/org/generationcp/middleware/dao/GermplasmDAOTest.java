@@ -17,7 +17,7 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.domain.germplasm.GermplasmMergeDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -67,7 +67,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -1188,7 +1187,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		this.daoFactory.getGermplasmDao().deleteGermplasm(Arrays.asList(germplasm2.getGid(), germplasm3.getGid(), germplasm1.getGid()));
 		this.sessionProvder.getSession().flush();
-		final List<GermplasmMergeDto> result = this.daoFactory.getGermplasmDao().getGermplasmMergeDtos(germplasm1.getGid());
+		final List<GermplasmMergedDto> result = this.daoFactory.getGermplasmDao().getGermplasmMergeDtos(germplasm1.getGid());
 		assertThat(result.size(), equalTo(2));
 		assertThat(result.get(0).getGid(), equalTo(germplasm2.getGid()));
 		assertThat(result.get(0).getDesignation(), equalTo(germplasm2.getPreferredName().getNval()));
