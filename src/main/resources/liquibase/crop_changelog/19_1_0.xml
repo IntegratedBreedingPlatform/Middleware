@@ -14,4 +14,20 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="nahuel" id="v19.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="file_metadata" columnName="gid"/>
+			</not>
+		</preConditions>
+		<comment>link file_metadata to germplasm</comment>
+		<sql dbms="mysql" splitStatements="true">
+			alter table file_metadata
+				add gid int null;
+
+			alter table file_metadata
+				add constraint fk_file_metadata_germplsm_gid
+					foreign key (gid) references germplsm (gid);
+		</sql>
+	</changeSet>
 </databaseChangeLog>

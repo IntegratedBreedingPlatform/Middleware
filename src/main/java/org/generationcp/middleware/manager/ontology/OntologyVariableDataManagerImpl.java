@@ -80,6 +80,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	private static final String VARIABLE_IDS = "variableIds";
 	private static final String SCALE_IDS = "scaleIds";
 	private static final String DATASET_IDS = "datasetIds";
+	private static final String GERMPLASM_UUIDS = "germplasmUUIDs";
 
 	private static final String VARIABLE_DOES_NOT_EXIST = "Variable does not exist";
 	private static final String TERM_IS_NOT_VARIABLE = "The term {0} is not Variable.";
@@ -287,6 +288,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 					filterClause += " and exists(select 1 from projectprop pp where pp.project_id in (:datasetIds) "
 						+ " and pp.variable_id = v.cvterm_id)";
 					listParameters.put(DATASET_IDS, datasetIds);
+				}
+
+				// filter by gid
+				final List<String> germplasmUUIDs = variableFilter.getGermplasmUUIDs();
+				if (!isEmpty(germplasmUUIDs)) {
+					filterClause += " and exists(select 1 from germplsm g inner join atributs a on a.gid = g.gid "
+						+ " where g.germplsm_uuid in (:germplasmUUIDs) and a.atype = v.cvterm_id) ";
+					listParameters.put(GERMPLASM_UUIDS, germplasmUUIDs);
 				}
 			}
 

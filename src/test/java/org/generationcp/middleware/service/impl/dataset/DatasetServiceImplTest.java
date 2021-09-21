@@ -175,7 +175,6 @@ public class DatasetServiceImplTest {
 		when(this.daoFactory.getExperimentDao()).thenReturn(this.experimentDao);
 		when(this.daoFactory.getFormulaDAO()).thenReturn(this.formulaDao);
 		when(this.daoFactory.getObservationUnitsSearchDAO()).thenReturn(this.obsUnitsSearchDao);
-		when(this.daoFactory.getFileMetadataDAO()).thenReturn(this.fileMetadataDAO);
 	}
 
 	@Test

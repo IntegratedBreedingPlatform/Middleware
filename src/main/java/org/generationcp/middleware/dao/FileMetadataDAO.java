@@ -3,19 +3,23 @@ package org.generationcp.middleware.dao;
 import org.generationcp.middleware.api.file.FileMetadataFilterRequest;
 import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
+import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.List;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 
 	private static final String SEARCH_BASE_QUERY = " select distinct f.* from file_metadata f " //
-		+ " inner join nd_experiment nde on f.nd_experiment_id = nde.nd_experiment_id " //
+		+ " left join nd_experiment nde on f.nd_experiment_id = nde.nd_experiment_id " //
+		+ " left join germplsm g on f.gid = g.gid " //
 		+ " left join file_metadata_cvterm fmc on f.file_id = fmc.file_metadata_id " //
 		+ "    left join cvterm variable on fmc.cvterm_id = variable.cvterm_id " //
 		+ "    left join variable_overrides vo on vo.cvterm_id = variable.cvterm_id " //
@@ -26,6 +30,24 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 		return (FileMetadata) this.getSession().createCriteria(this.getPersistentClass())
 			.add(Restrictions.eq("fileUUID", fileUUID))
 			.uniqueResult();
+	}
+
+	public List<FileMetadata> getAll(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
+			.createAlias("variables", "variables", JoinType.LEFT_OUTER_JOIN)
+			.createAlias("germplasm", "germplasm", JoinType.LEFT_OUTER_JOIN)
+			.createAlias("experimentModel", "experimentModel", JoinType.LEFT_OUTER_JOIN);
+		if (!isEmpty(variableIds)) {
+			criteria.add(Restrictions.in("variables.cvTermId", variableIds));
+		}
+		if (datasetId != null) {
+			criteria.add(Restrictions.eq("experimentModel.project.projectId", datasetId));
+		}
+		if (!isBlank(germplasmUUID)) {
+			criteria.add(Restrictions.eq("germplasm.germplasmUUID", germplasmUUID));
+		}
+		return criteria.list();
+
 	}
 
 	public List<FileMetadata> search(final FileMetadataFilterRequest filterRequest, final String programUUID, final Pageable pageable) {
@@ -40,7 +62,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 	}
 
 
-	public long countSearch(final FileMetadataFilterRequest filterRequest, final String programUUID, final Pageable pageable) {
+	public long countSearch(final FileMetadataFilterRequest filterRequest, final String programUUID) {
 		final StringBuilder queryBuilder = new StringBuilder(SEARCH_BASE_QUERY);
 		addSearchParams(new SqlQueryParamBuilder(queryBuilder), filterRequest, programUUID);
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery("select count(1) from (" + queryBuilder.toString() + ") as T");
@@ -70,6 +92,12 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			paramBuilder.append(" and nde.obs_unit_id = :observationUnitUUID ");
 			paramBuilder.setParameter("observationUnitUUID", observationUnitUUID);
 		}
+
+		final String germplasmUUID = filterRequest.getGermplasmUUID();
+		if (!isBlank(germplasmUUID)) {
+			paramBuilder.append(" and g.germplsm_uuid = :germplasmUUID ");
+			paramBuilder.setParameter("germplasmUUID", germplasmUUID);
+		}
 	}
 
 	public FileMetadata getByPath(final String path) {
@@ -78,22 +106,63 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			.uniqueResult();
 	}
 
-	public void detachVariables(final Integer datasetId, final List<Integer> variableIds) {
-		this.getSession().createSQLQuery("delete " //
-			+ " from file_metadata_cvterm " //
-			+ " where file_metadata_id in ( " //
-			+ "     select T.file_id " //
-			+ "     from ( " //
-			+ "         select fm.file_id " //
+	public void detachFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery("delete fmc " //
+			+ " from file_metadata_cvterm fmc " //
+			+ " inner join ( " //
+			+ "         select fmc.file_metadata_id, fmc.cvterm_id " //
 			+ "         from file_metadata fm " //
-			+ "                  inner join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
-			+ "                  inner join project dataset on ne.project_id = dataset.project_id " //
+			+ "                  left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
+			+ "                  left join germplsm g on fm.gid = g.gid " //
 			+ "                  inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
-			+ "         where dataset.project_id = :datasetId and fmc.cvterm_id in (:variableIds) " //
-			+ "     ) T " //
-			+ " ) ")
+			+ "         where fmc.cvterm_id in (:variableIds)"  //
+			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //
+			+ " 			  and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) " //
+			+ " ) T on T.file_metadata_id = fmc.file_metadata_id and T.cvterm_id = fmc.cvterm_id ");
+
+		sqlQuery.setParameter("datasetId", datasetId);
+		sqlQuery.setParameter("germplasmUUID", germplasmUUID);
+		sqlQuery.setParameterList("variableIds", variableIds);
+		sqlQuery.executeUpdate();
+	}
+
+	/**
+	 * Important Note:
+	 * file_metadata_cvterm is prepared to link a file to (possibly) many variables,
+	 * something that is not currently possible to achieve through the BMS interface,
+	 * but it is consistent with the brapi schema (See {@link org.generationcp.middleware.api.brapi.v1.image.Image#descriptiveOntologyTerms}
+	 * <br>
+	 * If the multiple-variable scenario becomes a reality in the future, this query will need to raise an exception for those cases,
+	 * prompting the user to execute a detach variables instead ({@link #detachFiles(List, Integer, String)})
+	 */
+	public void removeFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
+		final List<Integer> fileMetadataIds = this.getSession().createSQLQuery("select fm.file_id " //
+			+ "         from file_metadata fm " //
+			+ "                  left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
+			+ "                  left join germplsm g on fm.gid = g.gid " //
+			+ "                  inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
+			+ "         where fmc.cvterm_id in (:variableIds) " //
+			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //
+			+ " 			  and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) ")
 			.setParameter("datasetId", datasetId)
+			.setParameter("germplasmUUID", germplasmUUID)
 			.setParameterList("variableIds", variableIds)
+			.list();
+
+		/*
+		 * We do multiple deletes instead of single delete join (delete fmc, fm from ...) because
+		 * "the MySQL optimizer might process tables in an order that differs from that of their parent/child relationship"
+		 */
+
+		this.getSession().createSQLQuery("delete from file_metadata_cvterm "
+			+ " where file_metadata_id in (:fileMetadataIds)")
+			.setParameterList("fileMetadataIds", fileMetadataIds)
+			.executeUpdate();
+
+		this.getSession().createSQLQuery("delete from file_metadata "
+			+ " where file_metadata.file_id in (:fileMetadataIds)")
+			.setParameterList("fileMetadataIds", fileMetadataIds)
 			.executeUpdate();
 	}
+
 }
