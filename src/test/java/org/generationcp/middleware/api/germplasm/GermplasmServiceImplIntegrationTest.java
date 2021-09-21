@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
@@ -2079,14 +2080,14 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		// Add LINE name to the target germplasm
 		final Name lineName =
 			this.addName(targetGermplasm, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), RandomStringUtils.randomAlphabetic(10), 0,
-				this.creationDate, 0);
+				this.creationDate, 1);
 
 		final Germplasm germplasmToMerge = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
 		// Add MANAGEMENT_NAME to the germplasm to be merged
 		final Name managementName =
 			this.addName(germplasmToMerge, GermplasmNameType.MANAGEMENT_NAME.getUserDefinedFieldID(),
 				RandomStringUtils.randomAlphabetic(10), 0,
-				this.creationDate, 0);
+				this.creationDate, 1);
 
 		this.sessionProvder.getSession().refresh(targetGermplasm);
 
@@ -2118,32 +2119,36 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertTrue(targetGermplasmDto.getNames().stream().anyMatch(
 			n -> n.getNameTypeId().equals(managementName.getTypeId()) && n.getName()
 				.equals(managementName.getNval())));
+		Assert.assertFalse(targetGermplasmDto.getNames().stream().filter(
+			n -> n.getNameTypeId().equals(managementName.getTypeId()) && n.getName()
+				.equals(managementName.getNval())).findFirst().get().isPreferred());
+
+	}
+
+	private void createSystemDefinedNames(final Germplasm germplasm) {
+		final List<UserDefinedField> systemNamesUserDefinedFields =
+			this.daoFactory.getUserDefinedFieldDAO().getByCodes(UDTableType.NAMES_NAME.getTable(),
+				Collections.singleton(UDTableType.NAMES_NAME.getType()), new HashSet<>(GermplasmServiceImpl.SYSTEM_NAMES));
+
+		for (final UserDefinedField userDefinedField : systemNamesUserDefinedFields) {
+			this.addName(germplasm, userDefinedField.getFldno(), RandomStringUtils.randomAlphabetic(10), 0,
+				this.creationDate, 0);
+		}
 
 	}
 
 	@Test
-	public void testMergeGermplasm_MigrateNames_WithDuplicateNameTypes() {
+	public void testMergeGermplasm_MigrateNames_WithDuplicateSystemNameTypes() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
 		final Germplasm targetGermplasm = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
-		// Add LINE name to the target germplasm
-		final Name lineName1 =
-			this.addName(targetGermplasm, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), RandomStringUtils.randomAlphabetic(10), 0,
-				this.creationDate, 0);
+		this.createSystemDefinedNames(targetGermplasm);
 
 		final Germplasm germplasmToMerge1 = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
-		// Add MANAGEMENT_NAME to the germplasm to be merged
-		final Name lineName2 =
-			this.addName(germplasmToMerge1, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(),
-				RandomStringUtils.randomAlphabetic(10), 0,
-				this.creationDate, 0);
+		this.createSystemDefinedNames(germplasmToMerge1);
 
 		final Germplasm germplasmToMerge2 = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
-		// Add MANAGEMENT_NAME to the germplasm to be merged
-		final Name lineName3 =
-			this.addName(germplasmToMerge2, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(),
-				RandomStringUtils.randomAlphabetic(10), 0,
-				this.creationDate, 0);
+		this.createSystemDefinedNames(germplasmToMerge2);
 
 		this.sessionProvder.getSession().refresh(targetGermplasm);
 
@@ -2163,11 +2168,65 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertNotNull(targetGermplasmDto);
 		Assert.assertNull(germplasmToMergeDto);
 
-		// The names from first and second germplasm that were merged should not be migrated because they have
-		// the same type of name that already exists in the target germplasm.
-		Assert.assertEquals(1, targetGermplasmDto.getNames().size());
+		// The names from first and second germplasm that were merged should not be migrated because they are system names
+		// and have a nametype that already exists in the target germplasm.
+		Assert.assertEquals(9, targetGermplasmDto.getNames().size());
+		final List<String> nameCodes =
+			targetGermplasmDto.getNames().stream().map(GermplasmNameDto::getNameTypeCode).collect(Collectors.toList());
+		Assert.assertTrue(GermplasmServiceImpl.SYSTEM_NAMES.containsAll(nameCodes));
+
+	}
+
+	@Test
+	public void testMergeGermplasm_MigrateNames_WithDuplicateNameTypes() {
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+
+		final Germplasm targetGermplasm = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
+		// Add ALTERNATE_CROSS_NAME name to the target germplasm
+		final Name altCrossName1 =
+			this.addName(targetGermplasm, GermplasmNameType.ALTERNATE_CROSS_NAME.getUserDefinedFieldID(),
+				RandomStringUtils.randomAlphabetic(10), 0,
+				this.creationDate, 1);
+
+		final Germplasm germplasmToMerge1 = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
+		// Add ALTERNATE_CROSS_NAME to the germplasm to be merged
+		final Name altCrossName2 =
+			this.addName(germplasmToMerge1, GermplasmNameType.ALTERNATE_CROSS_NAME.getUserDefinedFieldID(),
+				RandomStringUtils.randomAlphabetic(10), 0,
+				this.creationDate, 1);
+
+		final Germplasm germplasmToMerge2 = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
+		// Add ALTERNATE_CROSS_NAME to the germplasm to be merged
+		final Name altCrossName3 =
+			this.addName(germplasmToMerge2, GermplasmNameType.ALTERNATE_CROSS_NAME.getUserDefinedFieldID(),
+				RandomStringUtils.randomAlphabetic(10), 0,
+				this.creationDate, 1);
+
+		this.sessionProvder.getSession().refresh(targetGermplasm);
+
+		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
+		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
+		germplasmMergeRequestDto.setNonSelectedGermplasm(
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false, false)));
+		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
+
+		germplasmMergeRequestDto.getMergeOptions().setMigrateNameTypes(true);
+		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
+		this.sessionProvder.getSession().flush();
+		final GermplasmDto targetGermplasmDto = this.germplasmService.getGermplasmDtoById(targetGermplasm.getGid());
+		final GermplasmDto germplasmToMergeDto = this.germplasmService.getGermplasmDtoById(germplasmToMerge1.getGid());
+
+		Assert.assertNotNull(targetGermplasmDto);
+		Assert.assertNull(germplasmToMergeDto);
+
+		Assert.assertEquals(3, targetGermplasmDto.getNames().size());
 		Assert.assertTrue(targetGermplasmDto.getNames().stream().anyMatch(
-			n -> n.getNameTypeId().equals(lineName1.getTypeId()) && n.getName().equals(lineName1.getNval())));
+			n -> n.getName().equals(altCrossName1.getNval())));
+		Assert.assertTrue(targetGermplasmDto.getNames().stream().anyMatch(
+			n -> n.getName().equals(altCrossName2.getNval())));
+		Assert.assertTrue(targetGermplasmDto.getNames().stream().anyMatch(
+			n -> n.getName().equals(altCrossName3.getNval())));
 
 	}
 

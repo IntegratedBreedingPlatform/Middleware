@@ -95,6 +95,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 
+	public static final List<String> SYSTEM_NAMES =
+		Collections.unmodifiableList(Arrays.asList("CODE1", "CODE2", "CODE3", "PUI", "CRSNM", "DRVNM", "LNAME", "PED", "SELHISFIX"));
 	public static final String PLOT_CODE = "PLOTCODE_AP_text";
 
 	private static final String DEFAULT_BIBREF_FIELD = "-";
@@ -1152,14 +1154,16 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Integer targetGermplasmId) {
+		final List<Integer> systemNameTypeIds = this.getSystemNameTypeIds();
 		final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(targetGermplasmId);
 		final NameDAO nameDAO = this.daoFactory.getNameDao();
 		final List<Name> names = nameDAO.getNamesByGids(gidsNonSelectedGermplasm);
 		final List<Integer> existingNameTypeIds = germplasm.getNames().stream().map(Name::getTypeId).collect(Collectors.toList());
 		for (final Name name : names) {
-			if (!existingNameTypeIds.contains(name.getTypeId())) {
+			// If name is a system name (e.g. PUI, CODE1, CODE2...), do not migrate if it's already present
+			if (!(systemNameTypeIds.contains(name.getTypeId()) && existingNameTypeIds.contains(name.getTypeId()))) {
 				final Name nameToSave =
-					new Name(null, germplasm, name.getTypeId(), name.getNstat(), name.getNval(), name.getLocationId(), name.getNdate(),
+					new Name(null, germplasm, name.getTypeId(), 0, name.getNval(), name.getLocationId(), name.getNdate(),
 						name.getReferenceId());
 				nameDAO.save(nameToSave);
 				nameDAO.makeTransient(name);
@@ -1302,6 +1306,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 			return Optional.of(workbenchUser.getName());
 		}
 		return Optional.empty();
+	}
+
+	private List<Integer> getSystemNameTypeIds() {
+		final List<GermplasmNameTypeDTO> nameTypeDTOS = this.germplasmNameTypeService.filterGermplasmNameTypes(
+			new HashSet<>(SYSTEM_NAMES));
+		return nameTypeDTOS.stream().map(GermplasmNameTypeDTO::getId).collect(Collectors.toList());
 	}
 
 	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
