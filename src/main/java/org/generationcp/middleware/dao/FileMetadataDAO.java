@@ -132,28 +132,37 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 	 * something that is not currently possible to achieve through the BMS interface,
 	 * but it is consistent with the brapi schema (See {@link org.generationcp.middleware.api.brapi.v1.image.Image#descriptiveOntologyTerms}
 	 * <br>
-	 * If the multple-variable scenario becomes a reality in the future, this query will need to raise an exception for those cases,
+	 * If the multiple-variable scenario becomes a reality in the future, this query will need to raise an exception for those cases,
 	 * prompting the user to execute a detach variables instead ({@link #detachFiles(List, Integer, String)})
 	 */
 	public void removeFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery("delete fm, fmc " //
-			+ " from file_metadata fm " //
-			+ " inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
-			+ " inner join ( " //
-			+ "         select fmc.file_metadata_id, fmc.cvterm_id " //
+		final List<Integer> fileMetadataIds = this.getSession().createSQLQuery("select fm.file_id " //
 			+ "         from file_metadata fm " //
 			+ "                  left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
 			+ "                  left join germplsm g on fm.gid = g.gid " //
 			+ "                  inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
 			+ "         where fmc.cvterm_id in (:variableIds) " //
 			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //
-			+ " 			  and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) " //
-			+ " ) T on T.file_metadata_id = fmc.file_metadata_id and T.cvterm_id = fmc.cvterm_id ");
+			+ " 			  and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) ")
+			.setParameter("datasetId", datasetId)
+			.setParameter("germplasmUUID", germplasmUUID)
+			.setParameterList("variableIds", variableIds)
+			.list();
 
-		sqlQuery.setParameter("datasetId", datasetId);
-		sqlQuery.setParameter("germplasmUUID", germplasmUUID);
-		sqlQuery.setParameterList("variableIds", variableIds);
-		sqlQuery.executeUpdate();
+		/*
+		 * We do multiple deletes instead of single delete join (delete fmc, fm from ...) because
+		 * "the MySQL optimizer might process tables in an order that differs from that of their parent/child relationship"
+		 */
+
+		this.getSession().createSQLQuery("delete from file_metadata_cvterm "
+			+ " where file_metadata_id in (:fileMetadataIds)")
+			.setParameterList("fileMetadataIds", fileMetadataIds)
+			.executeUpdate();
+
+		this.getSession().createSQLQuery("delete from file_metadata "
+			+ " where file_metadata.file_id in (:fileMetadataIds)")
+			.setParameterList("fileMetadataIds", fileMetadataIds)
+			.executeUpdate();
 	}
 
 }
