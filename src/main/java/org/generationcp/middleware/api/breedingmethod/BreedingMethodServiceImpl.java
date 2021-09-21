@@ -1,6 +1,8 @@
 package org.generationcp.middleware.api.breedingmethod;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Method;
@@ -8,6 +10,7 @@ import org.generationcp.middleware.pojos.MethodClass;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.util.Util;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Transactional
 @Service
@@ -56,13 +61,36 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	}
 
 	@Override
+	public BreedingMethodDTO create(final BreedingMethodNewRequest breedingMethod) {
+		final String name = breedingMethod.getName();
+		final List<Method> methods = this.daoFactory.getMethodDAO().getByName(name);
+		if (!isEmpty(methods)) {
+			throw new MiddlewareRequestException("", "breeding.methods.name.exists", name);
+		}
+		final String code = breedingMethod.getCode();
+		final Method byCode = this.daoFactory.getMethodDAO().getByCode(code);
+		if (byCode != null) {
+			throw new MiddlewareRequestException("", "breeding.methods.code.exists", code);
+		}
+
+		final BreedingMethodMapper mapper = new BreedingMethodMapper();
+		final Method method = new Method();
+		mapper.map(breedingMethod, method);
+		method.setUser(ContextHolder.getLoggedInUserId());
+		method.setMdate(Util.getCurrentDateAsIntegerValue());
+
+		final Method savedMethod = this.daoFactory.getMethodDAO().save(method);
+		return new BreedingMethodDTO(savedMethod);
+	}
+
+	@Override
 	public List<BreedingMethodDTO> getBreedingMethods(final BreedingMethodSearchRequest methodSearchRequest, final Pageable pageable) {
 		final String programUUID = methodSearchRequest.getProgramUUID();
 		final boolean favoritesOnly = methodSearchRequest.isFavoritesOnly();
 		if (!StringUtils.isEmpty(programUUID) && favoritesOnly) {
 			final List<Integer> favoriteProjectMethodsIds = this.getFavoriteProjectMethodsIds(programUUID);
 			// if filtering by program favorite methods but none exist, do not proceed with search and immediately return empty list
-			if (CollectionUtils.isEmpty(favoriteProjectMethodsIds)) {
+			if (isEmpty(favoriteProjectMethodsIds)) {
 				return Collections.EMPTY_LIST;
 			}
 			methodSearchRequest.setMethodIds(favoriteProjectMethodsIds);

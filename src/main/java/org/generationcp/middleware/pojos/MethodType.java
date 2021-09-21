@@ -47,5 +47,5 @@ public enum MethodType {
 
 	public static List<String> getAdvancingMethodTypes(){
 		return Arrays.asList(MethodType.DERIVATIVE.getCode(), MethodType.MAINTENANCE.getCode());
-	};
+	}
 }

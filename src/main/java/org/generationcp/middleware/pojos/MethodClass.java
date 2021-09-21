@@ -26,7 +26,6 @@ public enum MethodClass {
 	private final Integer id;
 
 	private static final Map<Integer, MethodClass> LOOKUP = new HashMap<>();
-	private static final Map<MethodType, List<MethodClass>> BY_METHOD_TYPE = new HashMap<>();
 
 	static {
 		for (final MethodClass methodType : EnumSet.allOf(MethodClass.class)) {
@@ -34,7 +33,7 @@ public enum MethodClass {
 		}
 	}
 
-	private MethodClass(final Integer id) {
+	MethodClass(final Integer id) {
 		this.id = id;
 	}
 
@@ -42,7 +41,7 @@ public enum MethodClass {
 		return this.id;
 	}
 
-	public static MethodClass getMethodClass(final String id) {
+	public static MethodClass getMethodClass(final Integer id) {
 		return MethodClass.LOOKUP.get(id);
 	}
 
@@ -58,4 +57,7 @@ public enum MethodClass {
 		return new ArrayList<>(LOOKUP.keySet());
 	}
 
+	public static List<MethodClass> getAll() {
+		return Arrays.asList(MethodClass.values());
+	}
 }
