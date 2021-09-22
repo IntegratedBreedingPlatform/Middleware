@@ -16,8 +16,8 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
@@ -46,6 +46,8 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
+import org.generationcp.middleware.pojos.UDTableType;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -1143,7 +1145,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public List<GermplasmMergedDto> getGermplasmMerged(final Integer gid) {
-		return this.daoFactory.getGermplasmDao().getGermplasmMergeDtos(gid);
+		return this.daoFactory.getGermplasmDao().getGermplasmMerged(gid);
 	}
 
 	@Override
@@ -1155,13 +1157,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Germplasm targetGermplasm) {
-		final List<Integer> systemNameTypeIds = this.getSystemNameTypeIds();
+		final UserDefinedField puiUserDefinedField = this.daoFactory.getUserDefinedFieldDAO()
+			.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), SystemNameTypes.PUI.getType());
 		final NameDAO nameDAO = this.daoFactory.getNameDao();
 		final List<Name> names = nameDAO.getNamesByGids(gidsNonSelectedGermplasm);
 		final List<Integer> existingNameTypeIds = targetGermplasm.getNames().stream().map(Name::getTypeId).collect(Collectors.toList());
 		for (final Name name : names) {
-			// If name is a system name (e.g. PUI, CODE1, CODE2...), do not migrate if it's already present
-			if (!(systemNameTypeIds.contains(name.getTypeId()) && existingNameTypeIds.contains(name.getTypeId()))) {
+			// If name is a PUI do not migrate if it's already present
+			if (!(puiUserDefinedField.getFldno().equals(name.getTypeId()) && existingNameTypeIds.contains(name.getTypeId()))) {
 				final Name nameToSave =
 					new Name(null, targetGermplasm, name.getTypeId(), 0, name.getNval(), name.getLocationId(), name.getNdate(),
 						name.getReferenceId());
@@ -1301,11 +1304,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 			return Optional.of(workbenchUser.getName());
 		}
 		return Optional.empty();
-	}
-
-	private List<Integer> getSystemNameTypeIds() {
-		final List<GermplasmNameTypeDTO> nameTypeDTOS = this.germplasmNameTypeService.filterGermplasmNameTypes(SystemNameTypes.getTypes());
-		return nameTypeDTOS.stream().map(GermplasmNameTypeDTO::getId).collect(Collectors.toList());
 	}
 
 	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
