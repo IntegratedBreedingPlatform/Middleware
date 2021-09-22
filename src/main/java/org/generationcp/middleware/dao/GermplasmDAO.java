@@ -1992,7 +1992,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public List<GermplasmMergedDto> getGermplasmMergeDtos(final int gid) {
+	public List<GermplasmMergedDto> getGermplasmMerged(final int gid) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Germplasm.class);
 			criteria.add(Restrictions.eq("grplce", gid));

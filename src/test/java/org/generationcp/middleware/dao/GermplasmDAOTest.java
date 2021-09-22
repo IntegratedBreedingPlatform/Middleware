@@ -1187,7 +1187,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		this.daoFactory.getGermplasmDao().deleteGermplasm(Arrays.asList(germplasm2.getGid(), germplasm3.getGid(), germplasm1.getGid()));
 		this.sessionProvder.getSession().flush();
-		final List<GermplasmMergedDto> result = this.daoFactory.getGermplasmDao().getGermplasmMergeDtos(germplasm1.getGid());
+		final List<GermplasmMergedDto> result = this.daoFactory.getGermplasmDao().getGermplasmMerged(germplasm1.getGid());
 		assertThat(result.size(), equalTo(2));
 		assertThat(result.get(0).getGid(), equalTo(germplasm2.getGid()));
 		assertThat(result.get(0).getDesignation(), equalTo(germplasm2.getPreferredName().getNval()));
