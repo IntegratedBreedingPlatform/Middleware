@@ -13,6 +13,8 @@ public interface BreedingMethodService {
 
 	BreedingMethodDTO create(BreedingMethodNewRequest breedingMethod);
 
+	BreedingMethodDTO edit(Integer breedingMethodDbId, BreedingMethodNewRequest breedingMethod);
+
 	List<BreedingMethodDTO> getBreedingMethods(BreedingMethodSearchRequest methodSearchRequest, Pageable pageable);
 
 	Long countBreedingMethods(BreedingMethodSearchRequest methodSearchRequest);

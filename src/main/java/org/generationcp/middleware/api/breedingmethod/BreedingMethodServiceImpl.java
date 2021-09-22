@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.breedingmethod;
 
+import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
@@ -14,7 +15,6 @@ import org.generationcp.middleware.util.Util;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -81,6 +81,17 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 
 		final Method savedMethod = this.daoFactory.getMethodDAO().save(method);
 		return new BreedingMethodDTO(savedMethod);
+	}
+
+	@Override
+	public BreedingMethodDTO edit(final Integer breedingMethodDbId, final BreedingMethodNewRequest breedingMethodRequest) {
+		final Method method = this.daoFactory.getMethodDAO().getById(breedingMethodDbId);
+		Preconditions.checkNotNull(method);
+
+		final BreedingMethodMapper mapper = new BreedingMethodMapper();
+		mapper.mapForUpdate(breedingMethodRequest, method);
+		this.daoFactory.getMethodDAO().update(method);
+		return new BreedingMethodDTO(method);
 	}
 
 	@Override
