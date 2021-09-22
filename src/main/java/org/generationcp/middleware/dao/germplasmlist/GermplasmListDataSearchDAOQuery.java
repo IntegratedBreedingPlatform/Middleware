@@ -63,8 +63,9 @@ public class GermplasmListDataSearchDAOQuery {
 	private static final String LOT_JOIN =
 		String.format("LEFT JOIN ims_lot lot ON listData.gid = lot.eid AND etype = 'GERMPLSM' AND lot.status = %s",
 			LotStatus.ACTIVE.getIntValue());
+	private static final String LOT_UNIT_SCALE_JOIN = "LEFT JOIN cvterm scale ON scale.cvterm_id = lot.scaleid";
 	private static final String TRANSACTION_JOIN =
-		String.format("LEFT JOIN ims_transaction gt ON gt.lotid = gl.lotid AND gt.trnstat <> %s", TransactionStatus.CANCELLED.getValue());
+		String.format("LEFT JOIN ims_transaction gt ON gt.lotid = lot.lotid AND gt.trnstat <> %s", TransactionStatus.CANCELLED.getIntValue());
 	private static final String GROUP_SOURCE_NAME_JOIN =
 		"LEFT JOIN names groupSource ON g.gpid1 = groupSource.gid AND groupSource.nstat = 1";
 	private static final String IMMEDIATE_SOURCE_NAME_JOIN =
@@ -101,7 +102,8 @@ public class GermplasmListDataSearchDAOQuery {
 		addGroupSourceNameData(scalars, selects, joins, staticColumnIds);
 		addImmediateSourceNameData(scalars, selects, joins, staticColumnIds);
 		addLotsNumberData(scalars, selects, joins, staticColumnIds);
-		addLotsAvailableAndUnitData(scalars, selects, joins, staticColumnIds);
+		addLotsAvailableData(scalars, selects, joins, staticColumnIds);
+		addLotsUnitData(scalars, selects, joins, staticColumnIds);
 		addBreedingMethodData(scalars, selects, joins, staticColumnIds);
 		addLocationData(scalars, selects, joins, staticColumnIds);
 		addReferenceData(scalars, selects, joins, staticColumnIds);
@@ -193,23 +195,31 @@ public class GermplasmListDataSearchDAOQuery {
 		}
 	}
 
-	private static void addLotsAvailableAndUnitData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
+	private static void addLotsAvailableData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
 		final Set<String> joins, final List<Integer> columnVariableIds) {
-		if (columnVariableIds.contains(GermplasmListStaticColumns.AVAILABLE.getTermId()) ||
-			columnVariableIds.contains(GermplasmListStaticColumns.UNIT.getTermId())) {
-			final String lotAvailableExpression = " IF(COUNT(DISTINCT IFNULL(gl.scaleid, 'null')) = 1, "
+		if (columnVariableIds.contains(GermplasmListStaticColumns.AVAILABLE.getTermId())) {
+			final String lotAvailableExpression = " IF(COUNT(DISTINCT IFNULL(lot.scaleid, 'null')) = 1, "
 				+ "  IFNULL((SELECT SUM(CASE WHEN gt.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
 				+ "    OR (gt.trnstat = " + TransactionStatus.PENDING.getIntValue() //
 				+ "    AND gt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN gt.trnqty ELSE 0 END)) " //
 				+ "  /(COUNT(gt.trnid)/count(DISTINCT gt.trnid)), 0)" //
 				+ " , '" + MIXED_UNITS_LABEL + "')"; // AS  `" + GermplasmSearchDAO.AVAIL_BALANCE + "`, \n"  //
 			selectClause.add(addSelectExpression(scalars, lotAvailableExpression, GermplasmListStaticColumns.AVAILABLE.name()));
-			selectClause.add(addSelectExpression(scalars,
-				" IF(COUNT(DISTINCT IFNULL(gl.scaleid, 'null')) = 1, scale.name, " + MIXED_UNITS_LABEL + "')",
-				GermplasmListStaticColumns.UNIT.name()));
 
 			joins.add(LOT_JOIN);
 			joins.add(TRANSACTION_JOIN);
+		}
+	}
+
+	private static void addLotsUnitData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
+		final Set<String> joins, final List<Integer> columnVariableIds) {
+		if (columnVariableIds.contains(GermplasmListStaticColumns.UNIT.getTermId())) {
+			selectClause.add(addSelectExpression(scalars,
+				" IF(COUNT(DISTINCT IFNULL(lot.scaleid, 'null')) = 1, scale.name, '" + MIXED_UNITS_LABEL + "')",
+				GermplasmListStaticColumns.UNIT.name()));
+
+			joins.add(LOT_JOIN);
+			joins.add(LOT_UNIT_SCALE_JOIN);
 		}
 	}
 
