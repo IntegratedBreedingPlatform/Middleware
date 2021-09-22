@@ -115,7 +115,7 @@ public class GermplasmListDataSearchDAOQuery {
 		final SQLQueryBuilder sqlQueryBuilder = new SQLQueryBuilder(sql, scalars);
 
 		addFilters(sqlQueryBuilder, request);
-		sqlQueryBuilder.append(" GROUP BY g.gid");
+		sqlQueryBuilder.append(" GROUP BY listData.gid, listData.entryid ");
 		//TODO: get sort from scalars???
 		DAOQueryUtils.addOrder(input -> SortColumn.getByValue(input).value, sqlQueryBuilder, pageable);
 
