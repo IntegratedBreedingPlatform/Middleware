@@ -117,6 +117,9 @@ public class GermplasmList implements Serializable {
 	@OrderBy("entryId asc")
 	private List<GermplasmListData> listData = new ArrayList<>();
 
+	@OneToMany(mappedBy = "list", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private List<GermplasmListDataView> view = new ArrayList<>();
+
 	@Transient
 	private String tabLabel;
 
@@ -344,6 +347,15 @@ public class GermplasmList implements Serializable {
 	public void setListData(final List<GermplasmListData> listData) {
 		this.listData.clear();
 		this.listData.addAll(listData);
+	}
+
+	public List<GermplasmListDataView> getView() {
+		return this.view;
+	}
+
+	public void setView(final List<GermplasmListDataView> view) {
+		this.view.clear();
+		this.view.addAll(view);
 	}
 
 	@Override

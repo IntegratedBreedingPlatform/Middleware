@@ -75,4 +75,6 @@ public interface GermplasmListService {
 
 	List<GermplasmListMeasurementVariableDTO> getGermplasmListDataTableHeader(Integer listId, final String programUUID);
 
+	void saveGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view);
+
 }
