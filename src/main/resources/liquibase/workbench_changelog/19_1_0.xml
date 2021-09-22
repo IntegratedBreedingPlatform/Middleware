@@ -16,4 +16,47 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="nahuel" id="v19.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*) FROM permission where name = 'MG_MANAGE_FILES'
+			</sqlCheck>
+		</preConditions>
+		<comment>Add Manage Germplasm "Manage files" permission</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @edit_germplasm_id = (select permission_id from permission where name = 'EDIT_GERMPLASM');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MG_MANAGE_FILES', 'Manage Files', @edit_germplasm_id, null);
+
+			SET @mg_manage_files_id = (SELECT permission_id FROM permission where name = 'MG_MANAGE_FILES');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @mg_manage_files_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @mg_manage_files_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @mg_manage_files_id, '1');
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v19.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*) FROM permission where name = 'MS_MANAGE_FILES'
+			</sqlCheck>
+		</preConditions>
+		<comment>Add Manage Studies "Manage files" permission</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @ms_manage_observation_units_id = (select permission_id from permission where name = 'MS_MANAGE_OBSERVATION_UNITS');
+			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'study_manager_fieldbook_web');
+
+			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
+			values ('MS_MANAGE_FILES', 'Manage Files', @ms_manage_observation_units_id, @sidebar_category_link_id);
+
+			SET @ms_manage_files_id = (SELECT permission_id FROM permission where name = 'MS_MANAGE_FILES');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @ms_manage_files_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @ms_manage_files_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @ms_manage_files_id, '1');
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

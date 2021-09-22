@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao.germplasmlist;
 
 import org.generationcp.middleware.api.germplasmlist.GermplasmListStaticColumns;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -20,6 +21,7 @@ public class GermplasmListDataSearchDAOQuery {
 
 	// TODO: define in common constants
 	private static final String MIXED_UNITS_LABEL = "Mixed";
+	private static final Integer NAME_DELETED_STATUS = 9;
 
 
 	//TODO: check if it's necessary to do a dynamic sort columns
@@ -41,7 +43,6 @@ public class GermplasmListDataSearchDAOQuery {
 		}
 	}
 
-
 	// Base query
 	private final static String BASE_QUERY = "SELECT %s " // usage of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ " FROM listdata listData "
@@ -52,10 +53,13 @@ public class GermplasmListDataSearchDAOQuery {
 		+ "		AND g.deleted = 0";
 	private static final String COUNT_EXPRESSION = " COUNT(1) ";
 
-	// List data
+	// Alias for columns which are not columns of the table
 	static final String LIST_DATA_ID_ALIAS = "listDataId";
+	static final String LOCATION_ID_ALIAS = "LOCATION_ID";
+	static final String BREEDING_METHOD_ID_ALIAS = "BREEDING_METHOD_ID";
 
 	// Join clause
+	private static final String DESIGNATION_JOIN = "LEFT JOIN names desig ON listData.gid = desig.gid AND desig.nstat = 1" ;
 	private static final String LOT_JOIN =
 		String.format("LEFT JOIN ims_lot lot ON listData.gid = lot.eid AND etype = 'GERMPLSM' AND lot.status = %s",
 			LotStatus.ACTIVE.getIntValue());
@@ -93,6 +97,7 @@ public class GermplasmListDataSearchDAOQuery {
 		});
 
 		addFixedScalars(scalars, selects);
+		addDesignationData(scalars, selects, joins, staticColumnIds);
 		addGroupSourceNameData(scalars, selects, joins, staticColumnIds);
 		addImmediateSourceNameData(scalars, selects, joins, staticColumnIds);
 		addLotsNumberData(scalars, selects, joins, staticColumnIds);
@@ -129,8 +134,6 @@ public class GermplasmListDataSearchDAOQuery {
 	private static void addFixedScalars(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause) {
 		selectClause.add(addSelectExpression(scalars, "listData.lrecid", LIST_DATA_ID_ALIAS));
 		selectClause.add(addSelectExpression(scalars, "listData.entryid", GermplasmListStaticColumns.ENTRY_NO.name()));
-		// TODO: review if we need to get designation from listdata table or from names
-		selectClause.add(addSelectExpression(scalars, "listData.desig", GermplasmListStaticColumns.DESIGNATION.name()));
 		selectClause.add(addSelectExpression(scalars, "g.gid", GermplasmListStaticColumns.GID.name()));
 		selectClause.add(addSelectExpression(scalars, "g.germplsm_uuid", GermplasmListStaticColumns.GUID.name()));
 		selectClause
@@ -144,6 +147,15 @@ public class GermplasmListDataSearchDAOQuery {
 			+ " AND g.gpid2 <> 0 THEN g.gpid2 \n ELSE '-' \n" + " END \n";
 		selectClause
 			.add(addSelectExpression(scalars, immediateSourceGIDExpression, GermplasmListStaticColumns.IMMEDIATE_SOURCE_GID.name()));
+	}
+
+	private static void addDesignationData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
+		final Set<String> joins, final List<Integer> columnVariableIds) {
+		if (columnVariableIds.contains(GermplasmListStaticColumns.DESIGNATION.getTermId())) {
+			selectClause.add(addSelectExpression(scalars, "desig.nval", GermplasmListStaticColumns.DESIGNATION.name()));
+
+			joins.add(DESIGNATION_JOIN);
+		}
 	}
 
 	private static void addGroupSourceNameData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
@@ -207,6 +219,8 @@ public class GermplasmListDataSearchDAOQuery {
 			columnVariableIds.contains(GermplasmListStaticColumns.BREEDING_METHOD_ABBREVIATION.getTermId()) ||
 			columnVariableIds.contains(GermplasmListStaticColumns.BREEDING_METHOD_GROUP.getTermId())) {
 			selectClause
+				.add(addSelectExpression(scalars, "method.mid", BREEDING_METHOD_ID_ALIAS));
+			selectClause
 				.add(addSelectExpression(scalars, "method.mname", GermplasmListStaticColumns.BREEDING_METHOD_PREFERRED_NAME.name()));
 			selectClause
 				.add(addSelectExpression(scalars, "method.mcode", GermplasmListStaticColumns.BREEDING_METHOD_ABBREVIATION.name()));
@@ -220,8 +234,9 @@ public class GermplasmListDataSearchDAOQuery {
 		final Set<String> joins, final List<Integer> columnVariableIds) {
 		if (columnVariableIds.contains(GermplasmListStaticColumns.LOCATION_NAME.getTermId()) ||
 			columnVariableIds.contains(GermplasmListStaticColumns.LOCATION_ABBREVIATION.getTermId())) {
+			selectClause.add(addSelectExpression(scalars, "loc.locid", LOCATION_ID_ALIAS));
 			selectClause.add(addSelectExpression(scalars, "loc.lname", GermplasmListStaticColumns.LOCATION_NAME.name()));
-			selectClause.add(addSelectExpression(scalars, "method.mcode", GermplasmListStaticColumns.LOCATION_ABBREVIATION.name()));
+			selectClause.add(addSelectExpression(scalars, "loc.labbr", GermplasmListStaticColumns.LOCATION_ABBREVIATION.name()));
 
 			joins.add(LOCATION_JOIN);
 		}
@@ -239,36 +254,38 @@ public class GermplasmListDataSearchDAOQuery {
 	private static void addDescriptorData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
 		final Set<String> joins, final Integer variableId) {
 
-		String alias = "attr_" + variableId;
-		selectClause.add(addSelectExpression(scalars, String.format("%s.aval", alias), variableId.toString(), "attr_val"));
+		String alias = formatDynamicAlias(GermplasmListColumnCategory.VARIABLE, variableId);
+		selectClause.add(addSelectExpression(scalars, String.format("%s.aval", alias), alias));
 
-		String join = "LEFT JOIN atributs " + alias + " ON g.gid = " + alias + ".gid AND " + alias + ".atype = " + variableId;
+		String join = String.format("LEFT JOIN atributs %1$s ON g.gid = %1$s.gid AND %1$s.atype = %2$s",
+			alias, variableId);
 		joins.add(String.format(join, alias, alias, variableId));
 	}
 
 	private static void addNameData(final List<SQLQueryBuilder.Scalar> scalars, final List<String> selectClause,
 		final Set<String> joins, final Integer nameTypeId) {
 
-		String alias = "name_" + nameTypeId;
-		selectClause.add(addSelectExpression(scalars, String.format("%s.nval", alias), nameTypeId.toString(), "name_val"));
+		String alias = formatDynamicAlias(GermplasmListColumnCategory.NAMES, nameTypeId);
+		selectClause
+			.add(addSelectExpression(scalars, String.format("%s.nval", alias), alias));
 
-		String join = "LEFT JOIN names " + alias + " ON g.gid = " + alias + ".gid AND " + alias + ".ntype = " + nameTypeId;
+		String join = String.format("LEFT JOIN names %1$s ON g.gid = %1$s.gid AND %1$s.ntype = %2$s AND %1$s.nstat <> %3$s",
+			alias, nameTypeId, NAME_DELETED_STATUS);
 		joins.add(String.format(join, alias, alias, nameTypeId));
 	}
 
 	static String addSelectExpression(final List<SQLQueryBuilder.Scalar> scalars, final String expression, final String columnAlias) {
-		return addSelectExpression(scalars, expression, columnAlias, null);
-	}
-
-	static String addSelectExpression(final List<SQLQueryBuilder.Scalar> scalars, final String expression, final String columnAlias,
-		final String scalarPrefix) {
-		final SQLQueryBuilder.Scalar scalar = new SQLQueryBuilder.Scalar(columnAlias, scalarPrefix);
+		final SQLQueryBuilder.Scalar scalar = new SQLQueryBuilder.Scalar(columnAlias);
 		scalars.add(scalar);
-		return String.format("%s AS %s", expression, scalar.getAlias());
+		return String.format("%s AS %s", expression, scalar.getColumnAlias());
 	}
 
 	private static String formatQuery(final String selectExpression, final String joinClause) {
 		return String.format(BASE_QUERY, selectExpression, joinClause);
+	}
+
+	private static String formatDynamicAlias(final GermplasmListColumnCategory category, final Integer variableId) {
+		return String.format("%s_%s",  category, variableId);
 	}
 
 }

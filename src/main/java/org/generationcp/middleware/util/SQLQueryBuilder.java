@@ -39,7 +39,7 @@ public class SQLQueryBuilder {
 	}
 
 	public void addScalarsToQuery(final SQLQuery query) {
-		this.scalars.forEach(scalar -> query.addScalar(scalar.getAlias(), scalar.getType()));
+		this.scalars.forEach(scalar -> query.addScalar(scalar.getColumnAlias(), scalar.getType()));
 	}
 
 	public void addParamsToQuery(final SQLQuery query) {
@@ -58,28 +58,21 @@ public class SQLQueryBuilder {
 
 	public static class Scalar {
 
-		private final String columnName;
-		private final String prefix;
+		private final String columnAlias;
 		private final Type type;
 
-		public Scalar(final String columnName, final String prefix) {
-			this.columnName = columnName;
-			this.prefix = prefix;
+		public Scalar(final String columnAlias) {
+			this.columnAlias = columnAlias;
 			this.type = null;
 		}
 
-		public Scalar(final String columnName, final String prefix, final Type type) {
-			this.columnName = columnName;
-			this.prefix = prefix;
+		public Scalar(final String columnAlias, final Type type) {
+			this.columnAlias = columnAlias;
 			this.type = type;
 		}
 
-		public String getColumnName() {
-			return columnName;
-		}
-
-		public String getAlias() {
-			return (this.prefix == null) ? this.columnName : String.format("%s_%s", this.prefix, this.columnName);
+		public String getColumnAlias() {
+			return columnAlias;
 		}
 
 		public Type getType() {

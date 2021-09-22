@@ -5,7 +5,6 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSea
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -75,7 +74,9 @@ public interface GermplasmListService {
 
 	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId, final String programUUID);
 
-	List<MeasurementVariable> getGermplasmListDataTableHeader(Integer listId, final String programUUID);
+	List<GermplasmListMeasurementVariableDTO> getGermplasmListDataTableHeader(Integer listId, final String programUUID);
+
+	void saveGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view);
 
 	List<Integer> getListOntologyVariables(Integer listId);
 
