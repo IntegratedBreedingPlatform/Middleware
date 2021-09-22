@@ -607,6 +607,29 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return header;
 	}
 
+	@Override
+	public List<Integer> getListOntologyVariables(final Integer listId) {
+		final List<GermplasmListDataView> columns =
+			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
+		return columns.stream().filter(c -> c.getCategory().equals(GermplasmListColumnCategory.VARIABLE)).map(c -> c.getVariableId())
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	public void addVariableToList(final Integer listId, final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
+		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
+		final GermplasmListDataView germplasmListDataView = new GermplasmListDataView(germplasmList, GermplasmListColumnCategory.VARIABLE,
+			germplasmListVariableRequestDto.getVariableTypeId(), germplasmListVariableRequestDto.getVariableId());
+		this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
+	}
+
+	@Override
+	public void removeListVariables(final Integer listId, final Set<Integer> variableIds) {
+
+		//TODO Confirm if RANK will be recalculated as part of this deletion when implemented
+		this.daoFactory.getGermplasmListDataViewDAO().deleteByListIdAndVariableIds(listId, variableIds);
+	}
+
 	private MeasurementVariable buildColumn(final int termId, final String name, final String alias) {
 		final MeasurementVariable column = new MeasurementVariable();
 		column.setTermId(termId);

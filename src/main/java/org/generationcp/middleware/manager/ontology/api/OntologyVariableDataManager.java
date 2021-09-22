@@ -12,8 +12,6 @@
 
 package org.generationcp.middleware.manager.ontology.api;
 
-import java.util.List;
-
 import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -23,6 +21,8 @@ import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariable
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.service.api.study.VariableDTO;
+
+import java.util.List;
 
 /**
  * This is the API for retrieving ontology variable data.
@@ -103,13 +103,13 @@ public interface OntologyVariableDataManager {
 
 	boolean areVariablesUsedInAttributes(List<Integer> variablesIds);
 
-	public List<VariableOverrides> getVariableOverridesByVariableIds(List<Integer> variableIds);
+	List<VariableOverrides> getVariableOverridesByVariableIds(List<Integer> variableIds);
 
-	public VariableOverrides getVariableOverridesByVariableIdAndProgram(Integer variableId, String programUuid);
+	VariableOverrides getVariableOverridesByVariableIdAndProgram(Integer variableId, String programUuid);
 
-	public List<VariableOverridesDto> getVariableOverridesByAliasAndProgram(String alias, String programUuid);
+	List<VariableOverridesDto> getVariableOverridesByAliasAndProgram(String alias, String programUuid);
 
-	public List<VariableType> getVariableTypes(Integer variableId);
+	List<VariableType> getVariableTypes(Integer variableId);
 
 	Optional<DataType> getDataType(Integer variableId);
 
@@ -131,5 +131,5 @@ public interface OntologyVariableDataManager {
 
 	boolean hasUsage(int variableId);
 
-	public boolean hasVariableAttributeGermplasmDeleted(int variableId);
+	boolean hasVariableAttributeGermplasmDeleted(int variableId);
 }

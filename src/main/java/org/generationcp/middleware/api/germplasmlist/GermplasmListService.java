@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface GermplasmListService {
 
@@ -75,5 +76,11 @@ public interface GermplasmListService {
 	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId, final String programUUID);
 
 	List<MeasurementVariable> getGermplasmListDataTableHeader(Integer listId, final String programUUID);
+
+	List<Integer> getListOntologyVariables(Integer listId);
+
+	void addVariableToList(Integer listId, GermplasmListVariableRequestDto germplasmListVariableRequestDto);
+
+	void removeListVariables(Integer listId, Set<Integer> variableIds);
 
 }
