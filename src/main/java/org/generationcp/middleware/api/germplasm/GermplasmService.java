@@ -2,6 +2,9 @@ package org.generationcp.middleware.api.germplasm;
 
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergeRequestDto;
+import org.generationcp.middleware.domain.germplasm.GermplasmProgenyDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmUpdateDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsDetailsDto;
 import org.generationcp.middleware.domain.germplasm.ProgenitorsUpdateRequestDto;
@@ -82,4 +85,9 @@ public interface GermplasmService {
 
 	void updateGermplasmPedigree(Integer gid, ProgenitorsUpdateRequestDto progenitorsUpdateRequestDto);
 
+	void mergeGermplasm(GermplasmMergeRequestDto germplasmMergeRequestDto, String crossExpansion);
+
+	List<GermplasmMergedDto> getGermplasmMerged(Integer gid);
+
+	List<GermplasmProgenyDto> getGermplasmProgenies(Integer gid);
 }
