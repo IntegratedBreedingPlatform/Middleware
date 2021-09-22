@@ -22,6 +22,7 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.BooleanType;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
@@ -32,7 +33,6 @@ import java.util.Map;
 
 /**
  * DAO class for {@link Attribute}.
- *
  */
 public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
@@ -55,6 +55,28 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			throw new MiddlewareQueryException("Error with getByGID(gid=" + gid + ") query from Attributes: " + e.getMessage(), e);
 		}
 		return toReturn;
+	}
+
+	public List<Attribute> getByGIDsAndVariableType(final List<Integer> gids, final Integer variableTypeId) {
+		try {
+			if (CollectionUtils.isNotEmpty(gids)) {
+				final StringBuilder queryString = new StringBuilder("SELECT {a.*} FROM atributs a ");
+				queryString.append("INNER JOIN cvterm cv ON a.atype = cv.cvterm_id ");
+				queryString.append(
+					"INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id ");
+				queryString.append("AND cp.value = (select name from cvterm where cvterm_id = :variableTypeId) ");
+				queryString.append("WHERE a.gid in (:gids) ");
+				final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+				query.addEntity("a", Attribute.class);
+				query.setParameter("variableTypeId", variableTypeId);
+				query.setParameterList("gids", gids);
+				return query.list();
+			}
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error with getByGIDsAndVariableType(gid=" + gids + ") query from Attributes: " + e.getMessage(), e);
+		}
+		return new ArrayList<>();
 	}
 
 	public List<Attribute> getAttributeValuesGIDList(final List<Integer> gidList) {
@@ -93,7 +115,8 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return returnList;
 	}
 
-	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId, final String programUUID) {
+	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId,
+		final String programUUID) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("Select a.aid AS id, ");
@@ -104,10 +127,14 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			queryString.append("cv.definition AS variableDescription, ");
 			queryString.append("CAST(a.adate AS CHAR(255)) AS date, ");
 			queryString.append("a.alocn AS locationId, ");
-			queryString.append("l.lname AS locationName ");
+			queryString.append("l.lname AS locationName, ");
+			queryString.append("(select exists(select 1 from file_metadata f "
+				+ " inner join file_metadata_cvterm fmc on f.file_id = fmc.file_metadata_id "
+				+ " where f.gid = a.gid and fmc.cvterm_id = a.atype)) AS hasFiles ");
 			queryString.append("FROM atributs a ");
 			queryString.append("INNER JOIN cvterm cv ON a.atype = cv.cvterm_id ");
-			queryString.append("INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id ");
+			queryString.append(
+				"INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id ");
 			queryString.append("LEFT JOIN location l on a.alocn = l.locid ");
 			queryString.append("LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = cv.cvterm_id AND vpo.program_uuid = :programUUID ");
 			queryString.append("WHERE a.gid = :gid ");
@@ -124,6 +151,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			sqlQuery.addScalar("date");
 			sqlQuery.addScalar("locationId");
 			sqlQuery.addScalar("locationName");
+			sqlQuery.addScalar("hasFiles", new BooleanType());
 			sqlQuery.setParameter("gid", gid);
 			if (variableTypeId != null) {
 				sqlQuery.setParameter("variableTypeId", variableTypeId);
@@ -139,7 +167,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 	}
 
 	public List<AttributeDTO> getAttributesByGUIDAndAttributeIds(
-			final String germplasmUUID, final List<String> attributeIds, final Pageable pageable) {
+		final String germplasmUUID, final List<String> attributeIds, final Pageable pageable) {
 
 		final List<AttributeDTO> attributes;
 		try {
@@ -161,7 +189,8 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			attributes = query.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error with getAttributesByGUIDAndAttributeIds(germplasmUUID=" + germplasmUUID + "): " + e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				"Error with getAttributesByGUIDAndAttributeIds(germplasmUUID=" + germplasmUUID + "): " + e.getMessage(), e);
 		}
 		return attributes;
 	}
@@ -215,7 +244,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		}
 
 		try {
-			final 	String sql = "SELECT "
+			final String sql = "SELECT "
 				+ "    u.name AS attributeCode,"
 				+ "    u.cvterm_id AS attributeDbId,"
 				+ "    u.definition AS attributeName,"
@@ -236,7 +265,8 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
 			final List<Object[]> rows = query.list();
 			for (final Object[] row : rows) {
-				final AttributeDTO attributeDTO = new AttributeDTO((String)row[0], (Integer)row[1], (String)row[2], (Integer)row[3], (String)row[4]);
+				final AttributeDTO attributeDTO =
+					new AttributeDTO((String) row[0], (Integer) row[1], (String) row[2], (Integer) row[3], (String) row[4]);
 				final Integer gid = (Integer) row[5];
 				attributesMap.putIfAbsent(gid, new ArrayList<>());
 				attributesMap.get(gid).add(attributeDTO);
@@ -248,7 +278,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return attributesMap;
 	}
 
-	public long countByVariables(final List<Integer> variablesIds){
+	public long countByVariables(final List<Integer> variablesIds) {
 		try {
 			final SQLQuery query =
 				this.getSession().createSQLQuery(COUNT_ATTRIBUTE_WITH_VARIABLES);

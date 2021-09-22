@@ -17,6 +17,8 @@ public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
 
 	private String locationName;
 
+	private Boolean hasFiles;
+
 	public GermplasmAttributeDto() {
 	}
 
@@ -58,6 +60,14 @@ public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
 
 	public void setVariableName(final String variableName) {
 		this.variableName = variableName;
+	}
+
+	public Boolean getHasFiles() {
+		return hasFiles;
+	}
+
+	public void setHasFiles(final Boolean hasFiles) {
+		this.hasFiles = hasFiles;
 	}
 
 	@Override
