@@ -145,7 +145,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	public List<GermplasmListDto> getGermplasmListDtos(final Integer gid) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT l.listid AS listId, ");
+			queryString.append("SELECT DISTINCT l.listid AS listId, ");
 			queryString.append("l.listname AS listName, ");
 			queryString.append("STR_TO_DATE (convert(l.listdate,char), '%Y%m%d') AS  creationDate, ");
 			queryString.append("l.listdesc AS description, ");
