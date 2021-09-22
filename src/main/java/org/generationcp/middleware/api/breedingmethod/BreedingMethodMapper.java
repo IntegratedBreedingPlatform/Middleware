@@ -7,7 +7,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class BreedingMethodMapper {
 
 	public void map(final BreedingMethodNewRequest from, final Method to) {
-		to.setMcode(from.getCode());
+		to.setMcode(from.getCode().toUpperCase());
 		to.setMname(from.getName());
 		to.setMdesc(from.getDescription());
 		to.setMtype(from.getType());
@@ -27,7 +27,7 @@ public class BreedingMethodMapper {
 
 	public void mapForUpdate(final BreedingMethodNewRequest from, final Method to) {
 		if (!isBlank(from.getCode())) {
-			to.setMcode(from.getCode());
+			to.setMcode(from.getCode().toUpperCase());
 		}
 		if (!isBlank(from.getName())) {
 			to.setMname(from.getName());

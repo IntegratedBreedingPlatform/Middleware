@@ -944,6 +944,16 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	}
 
 	/**
+	 * @return first germplasm (even deleted) find by method
+	 */
+	public Optional<Germplasm> findOneByMethodId(final int breedingMethodDbId) {
+		return Optional.ofNullable((Germplasm) this.getSession().createCriteria(this.getPersistentClass())
+			.add(Restrictions.eq("method.mid", breedingMethodDbId))
+			.setMaxResults(1)
+			.uniqueResult());
+	}
+
+	/**
 	 * Returns a Map with the names of parental germplasm for a given study. These names are returned in a Map, where the key is the
 	 * germplasm identifier (gid) and the value is a list with all the names ({@link Name}) for such germplasm. This method optimizes data
 	 * returned, because in a study is common that many entries have common parents, so those duplicated parents are omitted in returned

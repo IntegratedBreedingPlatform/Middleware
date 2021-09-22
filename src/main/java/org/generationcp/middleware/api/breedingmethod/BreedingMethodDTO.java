@@ -8,6 +8,7 @@ import org.pojomatic.annotations.AutoProperty;
 public class BreedingMethodDTO extends BreedingMethodNewRequest {
 
 	private Integer mid;
+	private Boolean isBulkingMethod;
 
 	public BreedingMethodDTO() {
 	}
@@ -37,6 +38,14 @@ public class BreedingMethodDTO extends BreedingMethodNewRequest {
 
 	public void setMid(final Integer mid) {
 		this.mid = mid;
+	}
+
+	public Boolean getIsBulkingMethod() {
+		return this.isBulkingMethod;
+	}
+
+	public void setIsBulkingMethod(final Boolean isBulkingMethod) {
+		this.isBulkingMethod = isBulkingMethod;
 	}
 
 	@Override

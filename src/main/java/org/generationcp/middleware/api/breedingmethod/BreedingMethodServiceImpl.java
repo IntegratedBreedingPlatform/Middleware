@@ -67,7 +67,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 		if (!isEmpty(methods)) {
 			throw new MiddlewareRequestException("", "breeding.methods.name.exists", name);
 		}
-		final String code = breedingMethod.getCode();
+		final String code = breedingMethod.getCode().toUpperCase();
 		final Method byCode = this.daoFactory.getMethodDAO().getByCode(code);
 		if (byCode != null) {
 			throw new MiddlewareRequestException("", "breeding.methods.code.exists", code);
@@ -92,6 +92,12 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 		mapper.mapForUpdate(breedingMethodRequest, method);
 		this.daoFactory.getMethodDAO().update(method);
 		return new BreedingMethodDTO(method);
+	}
+
+	@Override
+	public void delete(final Integer breedingMethodDbId) {
+		final Method method = this.daoFactory.getMethodDAO().getById(breedingMethodDbId);
+		this.daoFactory.getMethodDAO().makeTransient(method);
 	}
 
 	@Override

@@ -13,7 +13,6 @@ public class BreedingMethodNewRequest {
 	private String group;
 	private Integer methodClass;
 	private Integer numberOfProgenitors;
-	private Boolean isBulkingMethod;
 	private String separator;
 	private String prefix;
 	private String count;
@@ -73,14 +72,6 @@ public class BreedingMethodNewRequest {
 
 	public void setNumberOfProgenitors(final Integer numberOfProgenitors) {
 		this.numberOfProgenitors = numberOfProgenitors;
-	}
-
-	public Boolean getIsBulkingMethod() {
-		return this.isBulkingMethod;
-	}
-
-	public void setIsBulkingMethod(final Boolean isBulkingMethod) {
-		this.isBulkingMethod = isBulkingMethod;
 	}
 
 	public String getSeparator() {
