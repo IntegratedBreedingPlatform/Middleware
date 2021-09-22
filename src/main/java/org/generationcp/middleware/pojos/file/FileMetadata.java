@@ -3,6 +3,7 @@ package org.generationcp.middleware.pojos.file;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.generationcp.middleware.pojos.AbstractEntity;
+import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 
@@ -69,6 +70,10 @@ public class FileMetadata extends AbstractEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "nd_experiment_id")
 	private ExperimentModel experimentModel;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "gid")
+	private Germplasm germplasm;
 
 	@OneToMany
 	@JoinTable(
@@ -179,6 +184,14 @@ public class FileMetadata extends AbstractEntity {
 
 	public void setExperimentModel(final ExperimentModel experimentModel) {
 		this.experimentModel = experimentModel;
+	}
+
+	public Germplasm getGermplasm() {
+		return germplasm;
+	}
+
+	public void setGermplasm(final Germplasm germplasm) {
+		this.germplasm = germplasm;
 	}
 
 	public List<CVTerm> getVariables() {

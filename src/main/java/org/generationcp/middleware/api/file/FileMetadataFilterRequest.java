@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.file;
 public class FileMetadataFilterRequest {
 
 	private String observationUnitUUID;
+	private String germplasmUUID;
 	private String variableName;
 	private String fileName;
 
@@ -12,6 +13,14 @@ public class FileMetadataFilterRequest {
 
 	public void setObservationUnitUUID(final String observationUnitUUID) {
 		this.observationUnitUUID = observationUnitUUID;
+	}
+
+	public String getGermplasmUUID() {
+		return germplasmUUID;
+	}
+
+	public void setGermplasmUUID(final String germplasmUUID) {
+		this.germplasmUUID = germplasmUUID;
 	}
 
 	public String getVariableName() {
