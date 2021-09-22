@@ -700,4 +700,18 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
+	public List<StockModel> getStocksByGids(final List<Integer> gids) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
+			criteria.createAlias("project", "project");
+			criteria.add(Restrictions.in("germplasm.gid", gids));
+			criteria.add(Restrictions.eq("project.deleted", false));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error in getStocksByGids=" + gids + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
 }

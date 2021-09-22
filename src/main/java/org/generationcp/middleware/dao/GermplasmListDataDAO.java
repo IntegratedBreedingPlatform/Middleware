@@ -11,12 +11,8 @@
 
 package org.generationcp.middleware.dao;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -30,11 +26,14 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 
-import com.google.common.base.Preconditions;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link GermplasmListData}.
- *
  */
 public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer> {
 
@@ -71,12 +70,12 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 		final Criteria criteria = this.getSession().createCriteria(GermplasmListData.class);
 		criteria.createAlias(GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE,
-				GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS);
+			GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS);
 		criteria.createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
 
 		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_LIST_NAME_ID_COLUMN, id));
 		criteria.add(Restrictions.ne(GermplasmListDataDAO.GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN,
-				GermplasmListDataDAO.STATUS_DELETED));
+			GermplasmListDataDAO.STATUS_DELETED));
 		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_DELETED_COLUMN, Boolean.FALSE));
 		criteria.addOrder(Order.asc(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN));
 		final List<GermplasmListData> germplasmListDataList = criteria.list();
@@ -109,11 +108,11 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		try {
 
 			final Criteria criteria = this.getSession().createCriteria(GermplasmListData.class);
-			criteria.createAlias("list","l");
+			criteria.createAlias("list", "l");
 			criteria.createAlias("germplasm", "g");
 
 			criteria.add(Restrictions.in("l.id", listIds));
-			criteria.add(Restrictions.ne("status", 	GermplasmListDataDAO.STATUS_DELETED));
+			criteria.add(Restrictions.ne("status", GermplasmListDataDAO.STATUS_DELETED));
 			criteria.add(Restrictions.eq("g.deleted", Boolean.FALSE));
 			criteria.addOrder(Order.asc("entryId"));
 			final List<GermplasmListData> germplasmListDataList = criteria.list();
@@ -123,7 +122,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 				germplasmListDataMap.get(germplasmListData.getList().getId()).add(germplasmListData);
 			}
 			return germplasmListDataMap;
-		} catch(final HibernateException e) {
+		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in getGermplasmDataListMapByListIds=" + listIds + " in GermplasmListDataDAO: "
 				+ e.getMessage(), e);
 		}
@@ -140,7 +139,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_DELETED_COLUMN, Boolean.FALSE));
 		criteria.add(Restrictions.in(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ID_COLUMN, entryIds));
 		criteria.add(Restrictions.ne(GermplasmListDataDAO.GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN,
-				GermplasmListDataDAO.STATUS_DELETED));
+			GermplasmListDataDAO.STATUS_DELETED));
 		criteria.addOrder(Order.asc(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN));
 		return criteria.list();
 	}
@@ -153,13 +152,13 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 		final Criteria criteria = this.getSession().createCriteria(GermplasmListData.class);
 		criteria.createAlias(GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE,
-				GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS);
+			GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS);
 		criteria.createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
 		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_DELETED_COLUMN, Boolean.FALSE));
 		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_LIST_NAME_ID_COLUMN, listId));
 		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN, entryId));
 		criteria.add(Restrictions.ne(GermplasmListDataDAO.GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN,
-				GermplasmListDataDAO.STATUS_DELETED));
+			GermplasmListDataDAO.STATUS_DELETED));
 		criteria.addOrder(Order.asc(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN));
 		return (GermplasmListData) criteria.uniqueResult();
 	}
@@ -172,13 +171,13 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 		final Criteria criteria = this.getSession().createCriteria(GermplasmListData.class);
 		criteria.createAlias(GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE,
-				GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS);
+			GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS);
 		criteria.createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
 		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_DELETED_COLUMN, Boolean.FALSE));
 		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_LIST_NAME_ID_COLUMN, listId));
 		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ID_COLUMN, lrecId));
 		criteria.add(Restrictions.ne(GermplasmListDataDAO.GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN,
-				GermplasmListDataDAO.STATUS_DELETED));
+			GermplasmListDataDAO.STATUS_DELETED));
 		criteria.addOrder(Order.asc(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ID_COLUMN));
 		return (GermplasmListData) criteria.uniqueResult();
 
@@ -203,10 +202,13 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		try {
 
 			final String queryStr = "select  lp.lrecid as lrecid,  lp.entryid as entryid,  lp.desig as desig,  lp.grpname as grpname, "
-				+ " if(g.gpid1 = 0, '" + Name.UNKNOWN + "', femaleParentName.nval) as fnval,  g.gpid1 as fpgid,  if(g.gpid2 = 0, '" + Name.UNKNOWN + "', maleParentName.nval) as mnval,  g.gpid2 as mpgid,  "
+				+ " if(g.gpid1 = 0, '" + Name.UNKNOWN + "', femaleParentName.nval) as fnval,  g.gpid1 as fpgid,  if(g.gpid2 = 0, '"
+				+ Name.UNKNOWN + "', maleParentName.nval) as mnval,  g.gpid2 as mpgid,  "
 				+ " g.gid as gid,  lp.source as source,  m.mname as mname, "
-				+ " if(g.gpid2 = 0, '" + Name.UNKNOWN + "', (select nMale.grpName from listdata nMale where nMale.gid = maleParentName.gid limit 1)) as malePedigree, "
-				+ " if(g.gpid1 = 0, '" + Name.UNKNOWN + "', (select nFemale.grpName from listdata nFemale where nFemale.gid = femaleParentName.gid limit 1)) as femalePedigree "
+				+ " if(g.gpid2 = 0, '" + Name.UNKNOWN
+				+ "', (select nMale.grpName from listdata nMale where nMale.gid = maleParentName.gid limit 1)) as malePedigree, "
+				+ " if(g.gpid1 = 0, '" + Name.UNKNOWN
+				+ "', (select nFemale.grpName from listdata nFemale where nFemale.gid = femaleParentName.gid limit 1)) as femalePedigree "
 				+ "from listdata lp  inner join germplsm g on lp.gid = g.gid  "
 				+ "left outer join names maleParentName on g.gpid2 = maleParentName.gid and maleParentName.nstat = :preferredNameNstat  "
 				+ "left outer join names femaleParentName on g.gpid1 = femaleParentName.gid and femaleParentName.nstat = :preferredNameNstat  "
@@ -233,7 +235,8 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			this.createCrossListDataRows(germplasmListData, query);
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in retrieveCrossListData=" + listID + " in GermplasmListDataDAO: " + e.getMessage(), e);
+			throw new MiddlewareQueryException("Error in retrieveCrossListData=" + listID + " in GermplasmListDataDAO: " + e.getMessage(),
+				e);
 		}
 
 		return germplasmListData;
@@ -254,18 +257,18 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			final Integer gid = (Integer) row[8];
 			final String seedSource = (String) row[9];
 			final String methodName = (String) row[10];
-		  	final String malePedigree = (String) row[11];
-		  	final String femalePedigree = (String) row[12];
+			final String malePedigree = (String) row[11];
+			final String femalePedigree = (String) row[12];
 
-		  	final GermplasmListData data = new GermplasmListData();
-		  	data.setId(id);
-		  	data.setEntryId(entryId);
-		  	data.setGid(gid);
-		  	data.setDesignation(designation);
-		  	data.setFemaleParent(new GermplasmParent(fgid, femaleParent, femalePedigree));
-		  	data.setSeedSource(seedSource);
-		  	data.setBreedingMethodName(methodName);
-		  	data.addMaleParent(new GermplasmParent(mgid, maleParent, malePedigree));
+			final GermplasmListData data = new GermplasmListData();
+			data.setId(id);
+			data.setEntryId(entryId);
+			data.setGid(gid);
+			data.setDesignation(designation);
+			data.setFemaleParent(new GermplasmParent(fgid, femaleParent, femalePedigree));
+			data.setSeedSource(seedSource);
+			data.setBreedingMethodName(methodName);
+			data.addMaleParent(new GermplasmParent(mgid, maleParent, malePedigree));
 
 			dataList.add(data);
 		}
@@ -287,6 +290,30 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			GermplasmListDataDAO.STATUS_DELETED));
 		final List result = criteria.list();
 		return (result != null && result.size() > 0 ? (GermplasmListData) result.get(0) : null);
+
+	}
+
+	public void replaceGermplasm(final List<Integer> gidsToReplace, final Germplasm germplasm, final String crossExpansion) {
+		Preconditions.checkNotNull(gidsToReplace, "gidsToReplace passed cannot be null.");
+		Preconditions.checkArgument(!gidsToReplace.isEmpty(), "gidsToReplace passed cannot be empty.");
+		Preconditions.checkNotNull(germplasm, "germplasm passed in cannot be null.");
+
+		try {
+			final Query query =
+				this.getSession().createQuery(
+					"UPDATE GermplasmListData listData SET listData.gid = :replaceWithGid, listData.designation = :designation, listData.groupName = :groupName WHERE listData.gid in (:gidsToReplace)");
+			query.setParameter("replaceWithGid", germplasm.getGid());
+			query.setParameter("designation",
+				germplasm.getPreferredName() != null ? germplasm.getPreferredName().getNval() : StringUtils.EMPTY);
+			query.setParameter("groupName", crossExpansion);
+			query.setParameterList("gidsToReplace", gidsToReplace);
+			query.executeUpdate();
+		} catch (final HibernateException e) {
+			final String errorMessage =
+				"Error in replaceGermplasm for gidsToReplace=" + gidsToReplace + ", germplasm=" + germplasm + " " + e
+					.getMessage();
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
 
 	}
 }

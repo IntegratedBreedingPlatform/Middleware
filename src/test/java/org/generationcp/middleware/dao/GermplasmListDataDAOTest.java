@@ -1,12 +1,8 @@
 
 package org.generationcp.middleware.dao;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
@@ -21,6 +17,11 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
@@ -83,27 +84,27 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		final GermplasmListData testGermplasmListData1 = this.createTestListWithListData();
 		// create another list data
 		final GermplasmListData testGermplasmListData2 = this
-				.createTestListDataForList(testGermplasmListData1.getList().getId());
+			.createTestListDataForList(testGermplasmListData1.getList().getId());
 
 		// get the 2 list data records from the database
 		final List<Integer> listDataIds = Arrays
-				.asList(new Integer[] { testGermplasmListData1.getId(), testGermplasmListData2.getId() });
+			.asList(new Integer[] {testGermplasmListData1.getId(), testGermplasmListData2.getId()});
 		final List<GermplasmListData> listDataRecords = this.germplasmListDataDAO.getByIds(listDataIds);
 		Assert.assertEquals("There should be 2 list data records returned", 2, listDataRecords.size());
 		for (final GermplasmListData germplasmListData : listDataRecords) {
 			Assert.assertTrue(
-					"The list data record id " + germplasmListData.getId() + " should be found in " + listDataIds,
-					listDataIds.contains(germplasmListData.getId()));
+				"The list data record id " + germplasmListData.getId() + " should be found in " + listDataIds,
+				listDataIds.contains(germplasmListData.getId()));
 			if (testGermplasmListData1.getId().equals(germplasmListData.getId())) {
 				Assert.assertEquals("The list id should be " + testGermplasmListData1.getList().getId(),
-						testGermplasmListData1.getList().getId(), germplasmListData.getList().getId());
+					testGermplasmListData1.getList().getId(), germplasmListData.getList().getId());
 				Assert.assertEquals("The gid should be " + testGermplasmListData1.getGid(),
-						testGermplasmListData1.getGid(), germplasmListData.getGid());
+					testGermplasmListData1.getGid(), germplasmListData.getGid());
 			} else if (testGermplasmListData2.getId().equals(germplasmListData.getId())) {
 				Assert.assertEquals("The list id should be " + testGermplasmListData2.getList().getId(),
-						testGermplasmListData2.getList().getId(), germplasmListData.getList().getId());
+					testGermplasmListData2.getList().getId(), germplasmListData.getList().getId());
 				Assert.assertEquals("The gid id should be " + testGermplasmListData2.getGid(),
-						testGermplasmListData2.getGid(), germplasmListData.getGid());
+					testGermplasmListData2.getGid(), germplasmListData.getGid());
 			}
 		}
 
@@ -117,15 +118,15 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 		// get the list data record from the database
 		final List<GermplasmListData> listDataRecords = this.germplasmListDataDAO
-				.getByListId(testGermplasmListData.getList().getId());
+			.getByListId(testGermplasmListData.getList().getId());
 		Assert.assertEquals("There should be 1 list data record returned", 1, listDataRecords.size());
 		final GermplasmListData germplasmListData = listDataRecords.get(0);
 		Assert.assertEquals("The id should be " + testGermplasmListData.getId(), testGermplasmListData.getId(),
-				germplasmListData.getId());
+			germplasmListData.getId());
 		Assert.assertEquals("The list id should be " + testGermplasmListData.getList().getId(),
-				testGermplasmListData.getList().getId(), germplasmListData.getList().getId());
+			testGermplasmListData.getList().getId(), germplasmListData.getList().getId());
 		Assert.assertEquals("The gid should be " + testGermplasmListData.getGid(), testGermplasmListData.getGid(),
-				germplasmListData.getGid());
+			germplasmListData.getGid());
 
 	}
 
@@ -158,17 +159,17 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 		// get the list data record from the database
 		final GermplasmListData germplasmListData = this.germplasmListDataDAO
-				.getByListIdAndEntryId(testGermplasmListData.getList().getId(), GermplasmListDataDAOTest.TEST_ENTRY_ID);
+			.getByListIdAndEntryId(testGermplasmListData.getList().getId(), GermplasmListDataDAOTest.TEST_ENTRY_ID);
 
 		Assert.assertNotNull("The germplasm list data should not be null", germplasmListData);
 		Assert.assertEquals("The id should be " + testGermplasmListData.getId(), testGermplasmListData.getId(),
-				germplasmListData.getId());
+			germplasmListData.getId());
 		Assert.assertEquals("The list id should be " + testGermplasmListData.getList().getId(),
-				testGermplasmListData.getList().getId(), germplasmListData.getList().getId());
+			testGermplasmListData.getList().getId(), germplasmListData.getList().getId());
 		Assert.assertEquals("The entry id should be " + testGermplasmListData.getEntryId(),
-				testGermplasmListData.getEntryId(), germplasmListData.getEntryId());
+			testGermplasmListData.getEntryId(), germplasmListData.getEntryId());
 		Assert.assertEquals("The gid should be " + testGermplasmListData.getGid(), testGermplasmListData.getGid(),
-				germplasmListData.getGid());
+			germplasmListData.getGid());
 	}
 
 	@Test
@@ -179,60 +180,60 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 		// get the list data record from the database
 		final GermplasmListData germplasmListData = this.germplasmListDataDAO
-				.getByListIdAndLrecId(testGermplasmListData.getList().getId(), testGermplasmListData.getId());
+			.getByListIdAndLrecId(testGermplasmListData.getList().getId(), testGermplasmListData.getId());
 
 		Assert.assertNotNull("The germplasm list data should not be null", germplasmListData);
 		Assert.assertEquals("The id should be " + testGermplasmListData.getId(), testGermplasmListData.getId(),
-				germplasmListData.getId());
+			germplasmListData.getId());
 		Assert.assertEquals("The list id should be " + testGermplasmListData.getList().getId(),
-				testGermplasmListData.getList().getId(), germplasmListData.getList().getId());
+			testGermplasmListData.getList().getId(), germplasmListData.getList().getId());
 		Assert.assertEquals("The entry id should be " + testGermplasmListData.getEntryId(),
-				testGermplasmListData.getEntryId(), germplasmListData.getEntryId());
+			testGermplasmListData.getEntryId(), germplasmListData.getEntryId());
 		Assert.assertEquals("The gid should be " + testGermplasmListData.getGid(), testGermplasmListData.getGid(),
-				germplasmListData.getGid());
+			germplasmListData.getGid());
 	}
 
 	@Test
 	public void testRetrieveCrossListDataWithImmediateParents() {
 		final Germplasm parentGermplasm = this.germplasmTestDataGenerator
-				.createGermplasmWithPreferredAndNonpreferredNames();
+			.createGermplasmWithPreferredAndNonpreferredNames();
 		final Germplasm childGermplasm = this.germplasmTestDataGenerator.createChildGermplasm(parentGermplasm,
-				"VARIETY");
+			"VARIETY");
 		final GermplasmListData listData = this.createTestListWithListData(childGermplasm);
 		final List<GermplasmListData> listDataList = this.germplasmListDataDAO
-				.retrieveGermplasmListDataWithImmediateParents(listData.getList().getId());
+			.retrieveGermplasmListDataWithImmediateParents(listData.getList().getId());
 		Assert.assertEquals("There should be only 1 list data under the list with id" + listData.getList().getId(), 1,
-				listDataList.size());
+			listDataList.size());
 
 		for (final GermplasmListData currentGermplasmListData : listDataList) {
 			Assert.assertEquals("List data id should be " + listData.getId(), listData.getId(),
-					currentGermplasmListData.getId());
+				currentGermplasmListData.getId());
 			Assert.assertEquals("Entry id should be " + listData.getEntryId(), listData.getEntryId(),
-					currentGermplasmListData.getEntryId());
+				currentGermplasmListData.getEntryId());
 			Assert.assertEquals("Desig should be " + listData.getDesignation(), listData.getDesignation(),
-					currentGermplasmListData.getDesignation());
+				currentGermplasmListData.getDesignation());
 			Assert.assertEquals("Gid should be " + listData.getGid(), listData.getGid(),
-					currentGermplasmListData.getGid());
+				currentGermplasmListData.getGid());
 			Assert.assertEquals("Seed source should be " + listData.getSeedSource(), listData.getSeedSource(),
-					currentGermplasmListData.getSeedSource());
+				currentGermplasmListData.getSeedSource());
 			Assert.assertEquals("Breeding method name should be " + GermplasmTestDataGenerator.TEST_METHOD_NAME,
-					GermplasmTestDataGenerator.TEST_METHOD_NAME, currentGermplasmListData.getBreedingMethodName());
+				GermplasmTestDataGenerator.TEST_METHOD_NAME, currentGermplasmListData.getBreedingMethodName());
 
 			// Check parent germplasm values
 			Assert.assertEquals("Female Parent GID should be " + listData.getFemaleGid(), listData.getFemaleGid(),
-					currentGermplasmListData.getFemaleGid());
+				currentGermplasmListData.getFemaleGid());
 			Assert.assertEquals("Male Parent GID should be " + listData.getMaleGid(), listData.getMaleGid(),
-					currentGermplasmListData.getMaleGid());
+				currentGermplasmListData.getMaleGid());
 			Assert.assertEquals("Female Parent designation should be " + parentGermplasm.getPreferredName().getNval(),
-					parentGermplasm.getPreferredName().getNval(), currentGermplasmListData.getFemaleParentDesignation());
+				parentGermplasm.getPreferredName().getNval(), currentGermplasmListData.getFemaleParentDesignation());
 			Assert.assertEquals("Male Parent designation should be " + parentGermplasm.getPreferredName().getNval(),
-					parentGermplasm.getPreferredName().getNval(), currentGermplasmListData.getMaleParents().get(0).getDesignation());
+				parentGermplasm.getPreferredName().getNval(), currentGermplasmListData.getMaleParents().get(0).getDesignation());
 		}
 	}
 
 	private GermplasmListData createTestListWithListData() {
 		final Germplasm listDataGermplasm = this.germplasmTestDataGenerator
-				.createGermplasmWithPreferredAndNonpreferredNames();
+			.createGermplasmWithPreferredAndNonpreferredNames();
 		return this.createTestListWithListData(listDataGermplasm);
 	}
 
@@ -244,14 +245,14 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	private GermplasmListData createTestListDataForList(final Integer listId) {
 		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(listId, true);
 		final Germplasm listDataGermplasm = this.germplasmTestDataGenerator
-				.createGermplasmWithPreferredAndNonpreferredNames();
+			.createGermplasmWithPreferredAndNonpreferredNames();
 		return this.createTestListDataForList(listDataGermplasm, germplasmList);
 	}
 
 	private GermplasmListData createTestListDataForList(final Germplasm listDataGermplasm,
-			final GermplasmList listDataGermplasmList) {
+		final GermplasmList listDataGermplasmList) {
 		final GermplasmListData listData = GermplasmListDataTestDataInitializer.createGermplasmListData(
-				listDataGermplasmList, listDataGermplasm.getGid(), GermplasmListDataDAOTest.TEST_ENTRY_ID);
+			listDataGermplasmList, listDataGermplasm.getGid(), GermplasmListDataDAOTest.TEST_ENTRY_ID);
 		listData.setFemaleParent(new GermplasmParent(listDataGermplasm.getGpid1(), "", ""));
 		listData.addMaleParent(new GermplasmParent(listDataGermplasm.getGpid2(), "", ""));
 		this.germplasmListDataDAO.save(listData);
@@ -274,60 +275,90 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 		// get the list data record from the database
 		final GermplasmListData germplasmListData = this.germplasmListDataDAO
-				.getByListIdAndGid(testGermplasmListData.getList().getId(), germplasm.getGid());
+			.getByListIdAndGid(testGermplasmListData.getList().getId(), germplasm.getGid());
 		Assert.assertNotNull(germplasmListData);
 
 		Assert.assertNotNull("The germplasm list data should not be null", germplasmListData);
 		Assert.assertEquals("The id should be " + testGermplasmListData.getId(), testGermplasmListData.getId(),
-				germplasmListData.getId());
+			germplasmListData.getId());
 		Assert.assertEquals("The list id should be " + testGermplasmListData.getList().getId(),
-				testGermplasmListData.getList().getId(), germplasmListData.getList().getId());
+			testGermplasmListData.getList().getId(), germplasmListData.getList().getId());
 		Assert.assertEquals("The entry id should be " + testGermplasmListData.getEntryId(),
-				testGermplasmListData.getEntryId(), germplasmListData.getEntryId());
+			testGermplasmListData.getEntryId(), germplasmListData.getEntryId());
 		Assert.assertEquals("The gid should be " + testGermplasmListData.getGid(), testGermplasmListData.getGid(),
-				germplasmListData.getGid());
+			germplasmListData.getGid());
 	}
 
 	@Test
 	public void testSearchForGermplasmListsWhereOperationIsEqual() {
 		final GermplasmList testList = this.createTestList();
 		final List<GermplasmList> resultLists = this.germplasmListDAO.searchForGermplasmLists(testList.getName(),
-				testList.getProgramUUID(), Operation.EQUAL);
+			testList.getProgramUUID(), Operation.EQUAL);
 
 		Assert.assertEquals("The results array should contain 1 germplasm list.", 1, resultLists.size());
 		Assert.assertEquals("The germplasm lists should have the same name.", testList.getName(),
-				resultLists.get(0).getName());
+			resultLists.get(0).getName());
 		Assert.assertEquals("The germplasm lists should have the same type.", testList.getType(),
-				resultLists.get(0).getType());
+			resultLists.get(0).getType());
 		Assert.assertEquals("The germplasm lists should have the same id.", testList.getId(),
-				resultLists.get(0).getId());
+			resultLists.get(0).getId());
 	}
 
 	@Test
 	public void testSearchForGermplasmListsWhereOperationIsLike() {
 		final GermplasmList testList = this.createTestList();
 		List<GermplasmList> resultLists = this.germplasmListDAO.searchForGermplasmLists(testList.getName(),
-				testList.getProgramUUID(), Operation.LIKE);
+			testList.getProgramUUID(), Operation.LIKE);
 
 		Assert.assertEquals("The results array should contain 1 germplasm list.", 1, resultLists.size());
 		Assert.assertEquals("The germplasm lists should have the same name.", testList.getName(),
-				resultLists.get(0).getName());
+			resultLists.get(0).getName());
 		Assert.assertEquals("The germplasm lists should have the same type.", testList.getType(),
-				resultLists.get(0).getType());
+			resultLists.get(0).getType());
 		Assert.assertEquals("The germplasm lists should have the same id.", testList.getId(),
-				resultLists.get(0).getId());
+			resultLists.get(0).getId());
 
 		// With percent sign
 		resultLists = this.germplasmListDAO.searchForGermplasmLists(testList.getName() + "%", testList.getProgramUUID(),
-				Operation.LIKE);
+			Operation.LIKE);
 
 		Assert.assertEquals("The results array should contain 1 germplasm list.", 1, resultLists.size());
 		Assert.assertEquals("The germplasm lists should have the same name.", testList.getName(),
-				resultLists.get(0).getName());
+			resultLists.get(0).getName());
 		Assert.assertEquals("The germplasm lists should have the same type.", testList.getType(),
-				resultLists.get(0).getType());
+			resultLists.get(0).getType());
 		Assert.assertEquals("The germplasm lists should have the same id.", testList.getId(),
-				resultLists.get(0).getId());
+			resultLists.get(0).getId());
+	}
+
+	@Test
+	public void testReplaceGermplasm() {
+
+		final String crossExpansion = RandomStringUtils.randomAlphabetic(10);
+		final Germplasm targetGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final Germplasm germplasm1 = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final GermplasmListData germplasmListData1 = this.createTestListWithListData(germplasm1);
+		final Germplasm germplasm2 = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final GermplasmListData germplasmListData2 = this.createTestListWithListData(germplasm2);
+		final Germplasm germplasm3 = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final GermplasmListData germplasmListData3 = this.createTestListWithListData(germplasm3);
+
+		this.germplasmListDataDAO.replaceGermplasm(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()),
+			targetGermplasm, crossExpansion);
+
+		this.sessionProvder.getSession().refresh(germplasmListData1);
+		this.sessionProvder.getSession().refresh(germplasmListData2);
+		this.sessionProvder.getSession().refresh(germplasmListData3);
+
+		Assert.assertEquals(germplasmListData1.getGermplasmId(), targetGermplasm.getGid());
+		Assert.assertEquals(germplasmListData2.getGermplasmId(), targetGermplasm.getGid());
+		Assert.assertEquals(germplasmListData3.getGermplasmId(), targetGermplasm.getGid());
+		Assert.assertEquals(germplasmListData1.getDesignation(), targetGermplasm.getPreferredName().getNval());
+		Assert.assertEquals(germplasmListData2.getDesignation(), targetGermplasm.getPreferredName().getNval());
+		Assert.assertEquals(germplasmListData3.getDesignation(), targetGermplasm.getPreferredName().getNval());
+		Assert.assertEquals(germplasmListData1.getGroupName(), crossExpansion);
+		Assert.assertEquals(germplasmListData2.getGroupName(), crossExpansion);
+		Assert.assertEquals(germplasmListData3.getGroupName(), crossExpansion);
 	}
 
 }
