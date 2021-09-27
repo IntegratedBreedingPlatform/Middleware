@@ -1229,6 +1229,16 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	}
 
+	public long countByVariableIdAndValue(final Integer variableId, final String value) {
+		return (long) this.getSession().createCriteria(this.getPersistentClass())
+			.add(Restrictions.eq("observableId", variableId))
+			.add(Restrictions.disjunction()
+				.add(Restrictions.eq("value", value))
+				.add(Restrictions.eq("draftValue", value)))
+			.setProjection(Projections.rowCount())
+			.uniqueResult();
+	}
+
 	@Override
 	public Phenotype save(final Phenotype phenotype) {
 		try {

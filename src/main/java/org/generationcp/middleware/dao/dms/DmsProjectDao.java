@@ -1455,6 +1455,15 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
+	public long countByVariableIdAndValue(final Integer variableId, final String value) {
+		return (long) this.getSession().createCriteria(this.getPersistentClass())
+			.createAlias("properties", "property")
+			.add(Restrictions.eq("property.variableId", variableId))
+			.add(Restrictions.eq("property.value", value))
+			.setProjection(Projections.rowCount())
+			.uniqueResult();
+	}
+
 	public DatasetDTO getDataset(final Integer datasetId) {
 		final DatasetDTO datasetDTO;
 		try {
