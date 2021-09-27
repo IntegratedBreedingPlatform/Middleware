@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -104,17 +105,24 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	public List<BreedingMethodDTO> getBreedingMethods(final BreedingMethodSearchRequest methodSearchRequest, final Pageable pageable) {
 		final String programUUID = methodSearchRequest.getProgramUUID();
 		final boolean favoritesOnly = methodSearchRequest.isFavoritesOnly();
+
+		final List<Integer> favoriteProjectMethodsIds = this.getFavoriteProjectMethodsIds(programUUID);
+		final HashSet<Integer> favoriteIdsSet = new HashSet<>(favoriteProjectMethodsIds);
+
 		if (!StringUtils.isEmpty(programUUID) && favoritesOnly) {
-			final List<Integer> favoriteProjectMethodsIds = this.getFavoriteProjectMethodsIds(programUUID);
 			// if filtering by program favorite methods but none exist, do not proceed with search and immediately return empty list
 			if (isEmpty(favoriteProjectMethodsIds)) {
-				return Collections.EMPTY_LIST;
+				return Collections.emptyList();
 			}
 			methodSearchRequest.setMethodIds(favoriteProjectMethodsIds);
 		}
 
 		return this.daoFactory.getMethodDAO().filterMethods(methodSearchRequest, pageable).stream()
-			.map(method -> new BreedingMethodDTO(method))
+			.map(method -> {
+				final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO(method);
+				breedingMethodDTO.setFavorite(favoriteIdsSet.contains(method.getMid()));
+				return breedingMethodDTO;
+			})
 			.collect(Collectors.toList());
 	}
 

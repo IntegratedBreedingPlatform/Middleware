@@ -9,6 +9,7 @@ public class BreedingMethodDTO extends BreedingMethodNewRequest {
 
 	private Integer mid;
 	private Boolean isBulkingMethod;
+	private Boolean isFavorite;
 
 	public BreedingMethodDTO() {
 	}
@@ -46,6 +47,14 @@ public class BreedingMethodDTO extends BreedingMethodNewRequest {
 
 	public void setIsBulkingMethod(final Boolean isBulkingMethod) {
 		this.isBulkingMethod = isBulkingMethod;
+	}
+
+	public Boolean getFavorite() {
+		return isFavorite;
+	}
+
+	public void setFavorite(final Boolean favorite) {
+		isFavorite = favorite;
 	}
 
 	@Override
