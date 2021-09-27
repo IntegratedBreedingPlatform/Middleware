@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSea
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -83,5 +84,7 @@ public interface GermplasmListService {
 	void addVariableToList(Integer listId, GermplasmListVariableRequestDto germplasmListVariableRequestDto);
 
 	void removeListVariables(Integer listId, Set<Integer> variableIds);
+
+	List<Variable> getGermplasmListVariables(String programUUID, Integer listId, Integer variableTypeId);
 
 }

@@ -50,6 +50,7 @@ import org.springframework.util.CollectionUtils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -643,9 +644,30 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public void removeListVariables(final Integer listId, final Set<Integer> variableIds) {
-
 		//TODO Confirm if RANK will be recalculated as part of this deletion when implemented
+		this.daoFactory.getGermplasmListDataDetailDAO().deleteByListIdAndVariableIds(listId, variableIds);
 		this.daoFactory.getGermplasmListDataViewDAO().deleteByListIdAndVariableIds(listId, variableIds);
+	}
+
+	@Override
+	public List<Variable> getGermplasmListVariables(final String programUUID, final Integer listId,
+		final Integer variableTypeId) {
+		final List<GermplasmListDataView> columns =
+			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
+		final List<Integer> variableIds = columns.stream().filter(
+			c -> c.getCategory().equals(GermplasmListColumnCategory.VARIABLE) && (c.getTypeId().equals(variableTypeId)
+				|| variableTypeId == null)).map(c -> c.getVariableId())
+			.collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(variableIds)) {
+			final VariableFilter variableFilter = new VariableFilter();
+			if (StringUtils.isNotEmpty(programUUID)) {
+				variableFilter.setProgramUuid(programUUID);
+			}
+			variableIds
+				.forEach(variableFilter::addVariableId);
+			return this.ontologyVariableDataManager.getWithFilter(variableFilter);
+		}
+		return Collections.emptyList();
 	}
 
 	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
