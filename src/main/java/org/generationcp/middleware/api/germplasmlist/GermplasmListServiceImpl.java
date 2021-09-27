@@ -631,11 +631,21 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public void saveGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view) {
 		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
+		final List<GermplasmListDataView> variableColumns = germplasmList.getView()
+			.stream()
+			.filter(column -> column.getCategory() == GermplasmListColumnCategory.VARIABLE &&
+				(column.getTypeId().equals(VariableType.GERMPLASM_PASSPORT.getId()) || column.getTypeId()
+					.equals(VariableType.GERMPLASM_ATTRIBUTE.getId())))
+			.collect(Collectors.toList());
+
 		final List<GermplasmListDataView> updatedView = view
 			.stream()
 			.map(updateColumn -> new GermplasmListDataView(germplasmList, updateColumn.getCategory(), updateColumn.getTypeId(),
 				updateColumn.getId()))
 			.collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(variableColumns)) {
+			updatedView.addAll(variableColumns);
+		}
 		germplasmList.setView(updatedView);
 		this.daoFactory.getGermplasmListDAO().save(germplasmList);
 	}
