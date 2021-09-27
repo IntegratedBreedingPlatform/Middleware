@@ -31,6 +31,8 @@ public interface StudyEntryService {
 
 	StudyEntryDto replaceStudyEntry(int studyId, int entryId, int gid, String crossExpansion);
 
+	void replaceStudyEntries(List<Integer> gidsToReplace, Integer replaceWithGid, String crossExpansion);
+
 	void updateStudyEntriesProperty(StudyEntryPropertyBatchUpdateRequest studyEntryPropertyBatchUpdateRequest);
 
 	Boolean hasUnassignedEntries(int studyId);

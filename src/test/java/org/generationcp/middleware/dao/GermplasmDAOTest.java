@@ -17,6 +17,7 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
 import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
@@ -66,7 +67,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -74,6 +74,8 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
@@ -1170,6 +1172,28 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertThat(updatedGermplasm.getGpid2(), is(maleParent.getGid()));
 		Assert.assertThat(updatedGermplasm.getModifiedBy(), is(this.findAdminUser()));
 		Assert.assertNotNull(updatedGermplasm.getModifiedDate());
+	}
+
+	@Test
+	public void testGetGermplasmMergeDTOs() {
+		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		this.daoFactory.getGermplasmDao().save(germplasm1);
+		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		final Germplasm germplasm3 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		germplasm2.setGrplce(germplasm1.getGid());
+		this.daoFactory.getGermplasmDao().save(germplasm2);
+		germplasm3.setGrplce(germplasm1.getGid());
+		this.daoFactory.getGermplasmDao().save(germplasm3);
+
+		this.daoFactory.getGermplasmDao().deleteGermplasm(Arrays.asList(germplasm2.getGid(), germplasm3.getGid(), germplasm1.getGid()));
+		this.sessionProvder.getSession().flush();
+		final List<GermplasmMergedDto> result = this.daoFactory.getGermplasmDao().getGermplasmMerged(germplasm1.getGid());
+		assertThat(result.size(), equalTo(2));
+		assertThat(result.get(0).getGid(), equalTo(germplasm2.getGid()));
+		assertThat(result.get(0).getDesignation(), equalTo(germplasm2.getPreferredName().getNval()));
+		assertThat(result.get(1).getGid(), equalTo(germplasm3.getGid()));
+		assertThat(result.get(1).getDesignation(), equalTo(germplasm3.getPreferredName().getNval()));
+
 	}
 
 	private Name saveGermplasmName(final Integer germplasmGID, final String nameType) {

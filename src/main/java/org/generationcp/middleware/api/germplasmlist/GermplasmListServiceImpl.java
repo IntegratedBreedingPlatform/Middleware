@@ -446,7 +446,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Pageable pageable) {
 
 		final List<GermplasmListDataView> view = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
-		//TODO: if there is no view yet -> should I provide a default one?
+		// TODO: review this once we define what we are gonna do with the default view
+		if (CollectionUtils.isEmpty(view)) {
+			final List<GermplasmListDataView> defaultView = GermplasmListStaticColumns.getDefaultColumns()
+				.stream()
+				.map(column -> new GermplasmListDataView(null, GermplasmListColumnCategory.STATIC, null, column.getTermId()))
+				.collect(Collectors.toList());
+			view.addAll(defaultView);
+		}
 		final List<GermplasmListDataSearchResponse> response =
 			this.daoFactory.getGermplasmListDataDAO().searchGermplasmListData(listId, view, request, pageable);
 
@@ -507,10 +514,19 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public List<GermplasmListColumnDTO> getGermplasmListColumns(final Integer listId, final String programUUID) {
 		final List<GermplasmListDataView> selectedColumns = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
-		final List<Integer> selectedColumnIds = selectedColumns
-			.stream()
-			.map(GermplasmListDataView::getVariableId)
-			.collect(Collectors.toList());
+		final List<Integer> selectedColumnIds;
+		// Return a default view if there is not a view defined yet
+		if (CollectionUtils.isEmpty(selectedColumns)) {
+			selectedColumnIds = GermplasmListStaticColumns.getDefaultColumns()
+				.stream()
+				.map(GermplasmListStaticColumns::getTermId)
+				.collect(Collectors.toList());
+		} else {
+			selectedColumnIds = selectedColumns
+				.stream()
+				.map(GermplasmListDataView::getVariableId)
+				.collect(Collectors.toList());
+		}
 
 		final List<GermplasmListData> listData = this.daoFactory.getGermplasmListDataDAO().getByListId(listId);
 		final List<Integer> gids = listData.stream().map(GermplasmListData::getGid).collect(Collectors.toList());
