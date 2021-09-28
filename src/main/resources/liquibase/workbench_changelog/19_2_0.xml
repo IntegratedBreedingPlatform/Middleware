@@ -11,9 +11,7 @@
 		<comment>
 			Drop users_migrated IBP-5013
 		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			DROP TABLE users_migrated;
-		</sql>
+		<dropTable cascadeConstraints="true" tableName="users_migrated" />
 	</changeSet>
 
 	<changeSet author="cheryleigh" id="v19.2.0-2">
@@ -23,8 +21,6 @@
 		<comment>
 			Drop persons_migrated IBP-5013
 		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			DROP TABLE persons_migrated;
-		</sql>
+		<dropTable cascadeConstraints="true" tableName="persons_migrated" />
 	</changeSet>
 </databaseChangeLog>
