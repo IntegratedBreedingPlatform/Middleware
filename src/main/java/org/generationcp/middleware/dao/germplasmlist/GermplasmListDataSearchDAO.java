@@ -199,7 +199,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 			joins.add(GROUP_SOURCE_NAME_JOIN);
 		}
 
-		if (!StringUtils.isEmpty(request.getBreedingMethodName()) || !StringUtils.isEmpty(request.getLocationAbbreviation()) ||
+		if (!StringUtils.isEmpty(request.getBreedingMethodName()) || !StringUtils.isEmpty(request.getBreedingMethodAbbreviation()) ||
 			!StringUtils.isEmpty(request.getBreedingMethodGroup())) {
 			joins.add(BREEDING_METHOD_JOIN);
 		}
@@ -244,8 +244,8 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 			final String value = immediateSourceNameFilter.getValue();
 			final SqlTextFilter.Type type = immediateSourceNameFilter.getType();
 			final String operator = GenericDAO.getOperator(type);
-			queryParams.put("groupSourceFilterName", GenericDAO.getParameter(type, value));
-			whereClauseBuilder.append(String.format(" AND %s %s :%s", "groupSourceFilterName.nval", operator, "immediateSourceName"));
+			queryParams.put("immediateSourceName", GenericDAO.getParameter(type, value));
+			whereClauseBuilder.append(String.format(" AND %s %s :%s", "immediateSourceFilterName.nval", operator, "immediateSourceName"));
 
 			joins.add(IMMEDIATE_SOURCE_NAME_FILTER_JOIN);
 		}
@@ -309,18 +309,18 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		}
 
 		if (request.getGermplasmDateFrom() != null) {
-			whereClauseBuilder.append(" and g.gdate >= :germplasmDateFrom ");
+			whereClauseBuilder.append(" AND g.gdate >= :germplasmDateFrom ");
 			queryParams.put("germplasmDateFrom", DATE_FORMAT.format(request.getGermplasmDateFrom()));
 		}
 
 		if (request.getGermplasmDateTo() != null) {
-			whereClauseBuilder.append(" AND and g.gdate <= :germplasmDateTo ");
-			queryParams.put("germplasmDateTo", DATE_FORMAT.format(request.getGermplasmDateFrom()));
+			queryParams.put("germplasmDateTo", DATE_FORMAT.format(request.getGermplasmDateTo()));
+			whereClauseBuilder.append(" AND g.gdate <= :germplasmDateTo ");
 		}
 
 		if (request.getReference() != null) {
+			queryParams.put("reference", "%" + request.getReference() + "%");
 			whereClauseBuilder.append(" AND ref.analyt like :reference ");
-			queryParams.put("reference", request.getReference());
 		}
 		return whereClauseBuilder.toString();
 	}
