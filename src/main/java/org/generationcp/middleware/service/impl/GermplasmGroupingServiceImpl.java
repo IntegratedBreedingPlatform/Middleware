@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.impl;
 
 import com.google.common.base.Optional;
 import com.google.common.base.Strings;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -26,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +60,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	private UserDefinedField selHistAtFixationNameType;
 
 	private DaoFactory daoFactory;
+
+	private Map<Integer, String> germplasmSelHistNameMap = new HashMap<>();
 
 	public GermplasmGroupingServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -208,7 +212,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		} else {
 			GermplasmGroupingServiceImpl.LOG.info("Assigning mgid = [{}] for germplasm with gid = [{}]", groupId, germplasm.getGid());
 			germplasm.setMgid(groupId);
-			this.copySelectionHistory(germplasm);
+			this.retrieveSelectionHistory(germplasm);
 			this.daoFactory.getGermplasmDao().save(germplasm);
 		}
 
@@ -332,17 +336,37 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		germplasm.getNames().add(codedName);
 	}
 
+	private void retrieveSelectionHistory(final Germplasm germplasm) {
+		final Integer gid = germplasm.getGid();
+
+		if (this.germplasmSelHistNameMap.containsKey(gid)) {
+			this.logSelectionHistoryTypeNameStatus(gid, this.germplasmSelHistNameMap.get(gid));
+		} else {
+			copySelectionHistory(germplasm);
+		}
+	}
+
 	private void copySelectionHistory(final Germplasm germplasm) {
+		final Integer gid = germplasm.getGid();
+		String nameVal = StringUtils.EMPTY;
 
 		final Name mySelectionHistory = this.findNameByType(germplasm, this.selHistNameType);
 		if (mySelectionHistory != null) {
 			this.addOrUpdateSelectionHistoryAtFixationName(germplasm, mySelectionHistory, this.selHistAtFixationNameType);
+			nameVal = mySelectionHistory.getNval();
+		}
+
+		this.germplasmSelHistNameMap.put(gid, nameVal);
+		this.logSelectionHistoryTypeNameStatus(gid, nameVal);
+	}
+
+	private void logSelectionHistoryTypeNameStatus(Integer gid, String nameVal) {
+		if (StringUtils.isEmpty(nameVal)) {
 			GermplasmGroupingServiceImpl.LOG
-				.info("Selection history at fixation for gid {} saved as germplasm name {} .", germplasm.getGid(),
-					mySelectionHistory.getNval());
+				.info("No selection history type name was found for germplasm {}. Nothing to copy.", gid);
 		} else {
 			GermplasmGroupingServiceImpl.LOG
-				.info("No selection history type name was found for germplasm {}. Nothing to copy.", germplasm.getGid());
+				.info("Selection history at fixation for gid {} saved as germplasm name {} .", gid, nameVal);
 		}
 	}
 
