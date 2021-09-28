@@ -11,7 +11,7 @@
 		<comment>
 			Drop users_migrated IBP-5013
 		</comment>
-		<dropTable cascadeConstraints="true" tableName="users_migrated" />
+		<dropTable tableName="users_migrated" />
 	</changeSet>
 
 	<changeSet author="cheryleigh" id="v19.2.0-2">
@@ -21,6 +21,6 @@
 		<comment>
 			Drop persons_migrated IBP-5013
 		</comment>
-		<dropTable cascadeConstraints="true" tableName="persons_migrated" />
+		<dropTable tableName="persons_migrated" />
 	</changeSet>
 </databaseChangeLog>
