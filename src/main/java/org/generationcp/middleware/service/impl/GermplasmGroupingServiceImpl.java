@@ -283,7 +283,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	UserDefinedField getSelectionHistoryNameType(final String nameType) {
-		final UserDefinedField selectionHistoryNameType = this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode("NAMES", "NAME", nameType);
+		final UserDefinedField selectionHistoryNameType =
+			this.daoFactory.getUserDefinedFieldDAO().getByTableTypeAndCode("NAMES", "NAME", nameType);
 		if (selectionHistoryNameType == null) {
 			throw new IllegalStateException(
 				"Missing required reference data: Please ensure User defined field (UDFLD) record for name type '" + nameType
@@ -383,8 +384,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	// have good visualization tools in BMS to verify results of such
 	// complex operations. INFO LOGGing helps.
 	@Override
-	public void processGroupInheritanceForCrosses(final String cropName, final Map<Integer, Integer> germplasmIdMethodIdMap, final boolean applyNewGroupToPreviousCrosses,
-			final Set<Integer> hybridMethods) {
+	public void processGroupInheritanceForCrosses(final String cropName, final Map<Integer, Integer> germplasmIdMethodIdMap,
+		final boolean applyNewGroupToPreviousCrosses,
+		final Set<Integer> hybridMethods) {
 		final GermplasmCache germplasmCache = new GermplasmCache(this.germplasmDataManager, 2);
 		final Set<Integer> gidsOfCrosses = germplasmIdMethodIdMap.keySet();
 		germplasmCache.initialiseCache(cropName, gidsOfCrosses, 2);
