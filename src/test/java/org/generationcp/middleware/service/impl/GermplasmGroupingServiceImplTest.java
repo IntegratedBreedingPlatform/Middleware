@@ -327,7 +327,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		final Method method = new Method(generativeMethodId);
 		method.setMtype("GEN");
-		Mockito.when(this.methodDAO.getById(generativeMethodId)).thenReturn(method);
+		this.germplasmToFix.setMethod(method);
 
 		final Germplasm child1 = new Germplasm();
 		child1.setGid(2);
@@ -351,10 +351,6 @@ public class GermplasmGroupingServiceImplTest {
 	 */
 	@Test
 	public void testMarkFixedCase7() {
-		final Integer generativeMethodId = 123;
-		final Method method = new Method(generativeMethodId);
-		method.setMtype("GEN");
-		Mockito.when(this.methodDAO.getById(generativeMethodId)).thenReturn(method);
 
 		final Germplasm child1 = new Germplasm();
 		child1.setGid(2);
@@ -364,7 +360,12 @@ public class GermplasmGroupingServiceImplTest {
 		child2.setGid(3);
 		final Integer expectedChild2MGID = 333;
 		child2.setMgid(expectedChild2MGID);
+
+		final Integer generativeMethodId = 123;
+		final Method method = new Method(generativeMethodId);
+		method.setMtype("GEN");
 		child2.setMethodId(generativeMethodId);
+		child2.setMethod(method);
 
 		Mockito.when(this.germplasmDAO.getAllChildren(this.gidToFix)).thenReturn(Lists.newArrayList(child1, child2));
 

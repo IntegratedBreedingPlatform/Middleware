@@ -186,7 +186,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 					germplasm.getGid(), germplasm.getMgid(), groupId);
 		}
 
-		final Method method = this.daoFactory.getMethodDAO().getById(germplasm.getMethodId());
+		final Method method = germplasm.getMethod();
 		if (method != null && method.isGenerative()) {
 			GermplasmGroupingServiceImpl.LOG
 				.info("Method {} ({}), of the germplasm (gid {}) is generative. MGID assignment for generative germplasm is not supported.",
