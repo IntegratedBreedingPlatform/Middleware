@@ -325,46 +325,4 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 	}
 
-	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId,
-		final List<GermplasmListDataView> view,
-		final GermplasmListDataSearchRequest germplasmListDataSearchRequest, final Pageable pageable) {
-
-		final SQLQueryBuilder queryBuilder = GermplasmListDataSearchDAOQuery.getSelectQuery(germplasmListDataSearchRequest, view, pageable);
-		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
-		queryBuilder.setParameter("listId", listId);
-		queryBuilder.addScalarsToQuery(query);
-		queryBuilder.addParamsToQuery(query);
-
-		GenericDAO.addPaginationToSQLQuery(query, pageable);
-
-		final List<Object[]> results = query.list();
-		return mapToGermplasmListSearchResponse(results, queryBuilder.getScalars());
-	}
-
-	public long countSearchGermplasmListData(final Integer listId, final GermplasmListDataSearchRequest germplasmListDataSearchRequest) {
-		final SQLQueryBuilder queryBuilder = GermplasmListDataSearchDAOQuery.getCountQuery(germplasmListDataSearchRequest);
-		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
-		queryBuilder.setParameter("listId", listId);
-		queryBuilder.addParamsToQuery(query);
-
-		return ((BigInteger) query.uniqueResult()).longValue();
-	}
-
-	private List<GermplasmListDataSearchResponse> mapToGermplasmListSearchResponse(final List<Object[]> results, final List<SQLQueryBuilder.Scalar> scalars) {
-		return results.stream().map(result -> {
-			final GermplasmListDataSearchResponse row = new GermplasmListDataSearchResponse();
-			final Map<String, Object> data = new HashMap<>();
-			IntStream.range(0, scalars.size()).forEach(i -> {
-				final SQLQueryBuilder.Scalar scalar = scalars.get(i);
-				if (scalar.getColumnAlias().equals(GermplasmListDataSearchDAOQuery.LIST_DATA_ID_ALIAS)) {
-					row.setListDataId((Integer) result[i]);
-					return;
-				}
-				data.put(scalar.getColumnAlias(), result[i]);
-			});
-			row.setData(data);
-			return row;
-		}).collect(Collectors.toList());
-	}
-
 }
