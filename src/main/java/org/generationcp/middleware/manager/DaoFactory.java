@@ -33,6 +33,7 @@ import org.generationcp.middleware.dao.StudyInstanceExternalReferenceDao;
 import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
+import org.generationcp.middleware.dao.VariableExternalReferenceDAO;
 import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -548,6 +549,12 @@ public class DaoFactory {
 		final StudyExternalReferenceDao studyExternalReferenceDAO = new StudyExternalReferenceDao();
 		studyExternalReferenceDAO.setSession(this.sessionProvider.getSession());
 		return studyExternalReferenceDAO;
+	}
+
+	public VariableExternalReferenceDAO getVariableExternalReferenceDAO() {
+		final VariableExternalReferenceDAO variableExternalReferenceDAO = new VariableExternalReferenceDAO();
+		variableExternalReferenceDAO.setSession(this.sessionProvider.getSession());
+		return variableExternalReferenceDAO;
 	}
 
 	public StudyInstanceExternalReferenceDao getStudyInstanceExternalReferenceDao() {
