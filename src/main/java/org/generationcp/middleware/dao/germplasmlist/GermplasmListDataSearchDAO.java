@@ -148,8 +148,8 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		this.addReferenceScalar(scalars, selects, joins, staticColumnIds);
 
 		final String selectClause = selects.stream().collect(Collectors.joining(","));
-		final String joinClause = this.getJoinClause(joins);
 		final String whereClause = this.addFilters(joins, queryParams, request);
+		final String joinClause = this.getJoinClause(joins);
 		// TODO
 //		final String orderClause = DAOQueryUtils.getOrderClause(input -> SortColumn.getByValue(input).value, pageable);
 		final String sql = this.formatQuery(selectClause, joinClause, whereClause, " GROUP BY listData.gid, listData.entryid ");
@@ -174,8 +174,8 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 
 		this.addCountQueryJoins(joins, request);
 
-		final String joinClause = this.getJoinClause(joins);
 		final String whereClause = this.addFilters(joins, queryParams, request);
+		final String joinClause = this.getJoinClause(joins);
 		final String sql = this.formatQuery(COUNT_EXPRESSION, joinClause, whereClause, "");
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
 		DAOQueryUtils.addParamsToQuery(query, queryParams);
