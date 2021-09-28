@@ -208,7 +208,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		} else {
 			GermplasmGroupingServiceImpl.LOG.info("Assigning mgid = [{}] for germplasm with gid = [{}]", groupId, germplasm.getGid());
 			germplasm.setMgid(groupId);
-			this.copySelectionHistory(germplasm, this.selHistNameType);
+			this.copySelectionHistory(germplasm);
 			this.daoFactory.getGermplasmDao().save(germplasm);
 		}
 
@@ -332,9 +332,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		germplasm.getNames().add(codedName);
 	}
 
-	private void copySelectionHistory(final Germplasm germplasm, final UserDefinedField nameType) {
+	private void copySelectionHistory(final Germplasm germplasm) {
 
-		final Name mySelectionHistory = this.findNameByType(germplasm, nameType);
+		final Name mySelectionHistory = this.findNameByType(germplasm, this.selHistNameType);
 		if (mySelectionHistory != null) {
 			this.addOrUpdateSelectionHistoryAtFixationName(germplasm, mySelectionHistory, this.selHistAtFixationNameType);
 			GermplasmGroupingServiceImpl.LOG
