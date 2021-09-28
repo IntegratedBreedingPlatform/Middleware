@@ -53,6 +53,10 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	@Value("${germplasm.grouping.max.recursion}")
 	public int maxRecursiveQueries;
 
+	private UserDefinedField selHistNameType;
+
+	private UserDefinedField selHistAtFixationNameType;
+
 	private DaoFactory daoFactory;
 
 	public GermplasmGroupingServiceImpl(final HibernateSessionProvider sessionProvider) {
@@ -64,6 +68,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		final List<Germplasm> germplasmList = this.daoFactory.getGermplasmDao().getByGIDList(gids);
 		final Map<Integer, Germplasm> germplasmMap = germplasmList.stream().collect(Collectors.toMap(
 			Germplasm::getGid, Function.identity()));
+		this.selHistNameType = getSelectionHistoryNameType(SELECTION_HISTORY_NAME_CODE);
+		this.selHistAtFixationNameType = getSelectionHistoryNameType(SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+
 		for (final Integer gid : gids) {
 			GermplasmGroupingServiceImpl.LOG.info("Marking germplasm with gid {} as fixed.", gid);
 			final Germplasm germplasmToFix = germplasmMap.get(gid);
@@ -201,7 +208,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		} else {
 			GermplasmGroupingServiceImpl.LOG.info("Assigning mgid = [{}] for germplasm with gid = [{}]", groupId, germplasm.getGid());
 			germplasm.setMgid(groupId);
-			this.copySelectionHistory(germplasm);
+			this.copySelectionHistory(germplasm, this.selHistNameType);
 			this.daoFactory.getGermplasmDao().save(germplasm);
 		}
 
@@ -242,16 +249,21 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	 * but will not be the name displayed in lists.
 	 */
 	private void addOrUpdateSelectionHistoryAtFixationName(final Germplasm germplasm, final Name nameToCopyFrom) {
+		this.addOrUpdateSelectionHistoryAtFixationName(germplasm, nameToCopyFrom,
+			this.getSelectionHistoryNameType(SELECTION_HISTORY_AT_FIXATION_NAME_CODE));
+	}
+
+	private void addOrUpdateSelectionHistoryAtFixationName(final Germplasm germplasm, final Name nameToCopyFrom,
+		final UserDefinedField nameType) {
 
 		// 1. Check if there is an existing "selection history at fixation" name
 		final Name existingSelHisFixName =
-			this.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+			this.findNameByType(germplasm, nameType);
 
 		// 2. Add a new name as "selection history at fixation" with supplied
 		// name value.
 		if (existingSelHisFixName == null) {
-			final UserDefinedField selHisFixNameType =
-				this.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+			final UserDefinedField selHisFixNameType = nameType;
 			final Name newSelectionHistoryAtFixation = new Name();
 			newSelectionHistoryAtFixation.setGermplasm(germplasm);
 			newSelectionHistoryAtFixation.setTypeId(selHisFixNameType.getFldno());
@@ -319,12 +331,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		germplasm.getNames().add(codedName);
 	}
 
-	private void copySelectionHistory(final Germplasm germplasm) {
+	private void copySelectionHistory(final Germplasm germplasm, final UserDefinedField nameType) {
 
-		final Name mySelectionHistory = this.getSelectionHistory(germplasm, GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE);
-
+		final Name mySelectionHistory = this.findNameByType(germplasm, nameType);
 		if (mySelectionHistory != null) {
-			this.addOrUpdateSelectionHistoryAtFixationName(germplasm, mySelectionHistory);
+			this.addOrUpdateSelectionHistoryAtFixationName(germplasm, mySelectionHistory, this.selHistAtFixationNameType);
 			GermplasmGroupingServiceImpl.LOG
 				.info("Selection history at fixation for gid {} saved as germplasm name {} .", germplasm.getGid(),
 					mySelectionHistory.getNval());
