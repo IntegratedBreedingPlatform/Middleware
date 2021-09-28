@@ -572,8 +572,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final List<GermplasmListDataView> variableColumns = germplasmList.getView()
 			.stream()
 			.filter(column -> column.getCategory() == GermplasmListColumnCategory.VARIABLE &&
-				(!column.getTypeId().equals(VariableType.GERMPLASM_PASSPORT.getId()) || !column.getTypeId()
-					.equals(VariableType.GERMPLASM_ATTRIBUTE.getId())))
+				!column.getTypeId().equals(VariableType.GERMPLASM_PASSPORT.getId()) &&
+				!column.getTypeId().equals(VariableType.GERMPLASM_ATTRIBUTE.getId()))
 			.collect(Collectors.toList());
 
 		final List<GermplasmListDataView> updatedView = view
