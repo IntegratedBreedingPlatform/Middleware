@@ -896,6 +896,19 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		}
 	}
 
+	public List<ExperimentModel> getByObsUnitIds(final List<String> obsUnitIds) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.in("obsUnitId", obsUnitIds));
+			return criteria.list();
+
+		} catch (final HibernateException e) {
+			final String message = "Error at getByObsUnitIds query at ExperimentDao: " + e.getMessage();
+			ExperimentDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
 	public long countByObservedVariable(final int variableId, final int variableTypeId) throws MiddlewareQueryException {
 		try {
 			String sql = null;

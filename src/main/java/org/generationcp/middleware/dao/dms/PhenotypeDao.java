@@ -13,6 +13,8 @@ package org.generationcp.middleware.dao.dms;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
+import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
@@ -49,6 +51,7 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
@@ -1371,14 +1374,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public List<Phenotype> getDatasetDraftData(final Integer datasetId) {
 		final List<Map<String, Object>> results = this.getSession().createSQLQuery("select {ph.*}, {e.*}, "
-			+ " (select exists( "
-			+ "     select 1 from formula where target_variable_id = ph.observable_id and active = 1"
-			+ " )) as isDerivedTrait "
-			+ " from phenotype ph"
-			+ " inner join nd_experiment e on ph.nd_experiment_id = e.nd_experiment_id"
-			+ " inner join project p on e.project_id = p.project_id "
-			+ " where p.project_id = :datasetId "
-			+ " and (ph.draft_value is not null or ph.draft_cvalue_id is not null)")
+				+ " (select exists( "
+				+ "     select 1 from formula where target_variable_id = ph.observable_id and active = 1"
+				+ " )) as isDerivedTrait "
+				+ " from phenotype ph"
+				+ " inner join nd_experiment e on ph.nd_experiment_id = e.nd_experiment_id"
+				+ " inner join project p on e.project_id = p.project_id "
+				+ " where p.project_id = :datasetId "
+				+ " and (ph.draft_value is not null or ph.draft_cvalue_id is not null)")
 			.addEntity("ph", Phenotype.class)
 			.addEntity("e", ExperimentModel.class)
 			.addScalar("isDerivedTrait", new BooleanType())
@@ -1476,6 +1479,130 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 
 		return !queryResults.isEmpty();
+	}
+
+	public List<ObservationDto> searchObservations(final ObservationSearchRequestDto observationSearchRequestDto, final Integer pageSize,
+		final Integer pageNumber) {
+
+		try {
+			final SQLQuery sqlQuery =
+				this.getSession().createSQLQuery(this.createObservationSearchQueryString(observationSearchRequestDto));
+			sqlQuery.addScalar("germplasmDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("germplasmName", StringType.INSTANCE);
+			sqlQuery.addScalar("observationDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("observationTimeStamp", StringType.INSTANCE);
+			sqlQuery.addScalar("observationUnitDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("observationUnitName", StringType.INSTANCE);
+			sqlQuery.addScalar("observationVariableDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("observationVariableName", StringType.INSTANCE);
+			sqlQuery.addScalar("studyDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("value", StringType.INSTANCE);
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(ObservationDto.class));
+			this.addObservationSearchQueryParams(observationSearchRequestDto, sqlQuery);
+
+			if (pageNumber != null && pageSize != null) {
+				sqlQuery.setFirstResult(pageSize * (pageNumber - 1));
+				sqlQuery.setMaxResults(pageSize);
+			}
+
+			return sqlQuery.list();
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				"Unexpected error in executing searchObservationDto(observationSearchRequestDto = " + observationSearchRequestDto
+					+ ") query: " + he.getMessage(), he);
+		}
+
+	}
+
+	public long countObservations(final ObservationSearchRequestDto observationSearchRequestDto) {
+		try {
+			final SQLQuery sqlQuery =
+				this.getSession().createSQLQuery(this.createObservationSearchQueryStringCount(observationSearchRequestDto));
+			this.addObservationSearchQueryParams(observationSearchRequestDto, sqlQuery);
+			return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				"Unexpected error in executing countObservations(observationSearchRequestDto = " + observationSearchRequestDto
+					+ ") query: " + he.getMessage(), he);
+		}
+	}
+
+	private String createObservationSearchQueryStringCount(final ObservationSearchRequestDto observationSearchRequestDto) {
+		final StringBuilder sql = new StringBuilder();
+		sql.append("SELECT COUNT(1) ");
+		this.addObservationSearchQueryJoins(sql);
+		this.addObservationSearchQueryFilter(observationSearchRequestDto, sql);
+
+		return sql.toString();
+	}
+
+	private String createObservationSearchQueryString(final ObservationSearchRequestDto observationSearchRequestDto) {
+		final StringBuilder sql = new StringBuilder();
+		// TODO: external reference source for observation
+		sql.append("SELECT ");
+		sql.append("germplsm.germplsm_uuid AS germplasmDbId,");
+		sql.append("	names.nval AS germplasmName, ");
+		sql.append("p.phenotype_id AS observationDbId, ");
+		sql.append("	p.updated_date AS observationTimeStamp, ");
+		sql.append("obs_unit.obs_unit_id AS observationUnitDbId, ");
+		sql.append("	'' AS observationUnitName, ");
+		sql.append("p.observable_id AS observationVariableDbId, ");
+		sql.append("	cvterm.name AS observationVariableName, ");
+		sql.append("instance.nd_geolocation_id AS studyDbId, ");
+		sql.append("	CASE WHEN p.cvalue_id IS NOT NULL THEN p.cvalue_id ELSE p.value END AS value ");
+		this.addObservationSearchQueryJoins(sql);
+		this.addObservationSearchQueryFilter(observationSearchRequestDto, sql);
+		return sql.toString();
+	}
+
+	private void addObservationSearchQueryJoins(final StringBuilder stringBuilder) {
+		stringBuilder.append("FROM ");
+		stringBuilder.append("phenotype p ");
+		stringBuilder.append("LEFT JOIN nd_experiment obs_unit ON p.nd_experiment_id = obs_unit.nd_experiment_id ");
+		stringBuilder.append("LEFT JOIN nd_geolocation instance ON instance.nd_geolocation_id = obs_unit.nd_geolocation_id ");
+		stringBuilder.append("LEFT JOIN stock ON obs_unit.stock_id = stock.stock_id ");
+		stringBuilder.append("LEFT JOIN germplsm ON stock.dbxref_id = germplsm.gid ");
+		stringBuilder.append("LEFT JOIN names ON stock.dbxref_id = names.gid AND names.nstat = 1 ");
+		stringBuilder.append("LEFT JOIN cvterm ON p.observable_id = cvterm.cvterm_id ");
+		stringBuilder.append("WHERE 1=1 ");
+	}
+
+	private void addObservationSearchQueryParams(final ObservationSearchRequestDto observationSearchRequestDto, final SQLQuery sqlQuery) {
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationDbIds())) {
+			sqlQuery.setParameterList("observationDbIds", observationSearchRequestDto.getObservationDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationUnitDbIds())) {
+			sqlQuery.setParameterList("observationUnitDbIds", observationSearchRequestDto.getObservationUnitDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getGermplasmDbIds())) {
+			sqlQuery.setParameterList("germplasmDbIds", observationSearchRequestDto.getGermplasmDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationVariableDbIds())) {
+			sqlQuery.setParameterList("observationVariableDbIds", observationSearchRequestDto.getObservationVariableDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getStudyDbIds())) {
+			sqlQuery.setParameterList("studyDbIds", observationSearchRequestDto.getStudyDbIds());
+		}
+	}
+
+	private void addObservationSearchQueryFilter(final ObservationSearchRequestDto observationSearchRequestDto,
+		final StringBuilder stringBuilder) {
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationDbIds())) {
+			stringBuilder.append("AND p.phenotype_id in (:observationDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationUnitDbIds())) {
+			stringBuilder.append("AND obs_unit.obs_unit_id in (:observationUnitDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getGermplasmDbIds())) {
+			stringBuilder.append("AND germplsm.germplsm_uuid in (:germplasmDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationVariableDbIds())) {
+			stringBuilder.append("AND p.observable_id in (:observationVariableDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getStudyDbIds())) {
+			stringBuilder.append("AND instance.nd_geolocation_id in (:studyDbIds) ");
+		}
+		// TODO: Filter by locationDbIds, trialDbIds, programDbIds, externalReferenceIds, externalReferenceSources
 	}
 
 }
