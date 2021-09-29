@@ -485,7 +485,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		final Set<String> joins, final Integer variableId) {
 
 		String alias = formatDynamicAlias(GermplasmListColumnCategory.VARIABLE, variableId);
-		selectClause.add(this.addSelectExpression(scalars, String.format("%s.id", alias), alias + "_detail_id"));
+		selectClause.add(this.addSelectExpression(scalars, String.format("%s.id", alias), alias + "_DETAIL_ID"));
 		selectClause.add(this.addSelectExpression(scalars, String.format("%s.value", alias), alias));
 
 		String join = String.format("LEFT JOIN list_data_details %1$s ON listData.lrecid = %1$s.lrecid AND %1$s.variable_id = %2$s",
