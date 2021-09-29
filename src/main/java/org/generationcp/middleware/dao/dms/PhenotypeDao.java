@@ -1549,7 +1549,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		sql.append("p.observable_id AS observationVariableDbId, ");
 		sql.append("	cvterm.name AS observationVariableName, ");
 		sql.append("instance.nd_geolocation_id AS studyDbId, ");
-		sql.append("	CASE WHEN p.cvalue_id IS NOT NULL THEN p.cvalue_id ELSE p.value END AS value ");
+		sql.append("	p.value AS value ");
 		this.addObservationSearchQueryJoins(sql);
 		this.addObservationSearchQueryFilter(observationSearchRequestDto, sql);
 		return sql.toString();
