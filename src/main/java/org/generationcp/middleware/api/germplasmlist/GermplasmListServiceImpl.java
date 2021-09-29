@@ -589,12 +589,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.daoFactory.getGermplasmListDAO().save(germplasmList);
 	}
 
-
 	@Override
-	public List<Integer> getListOntologyVariables(final Integer listId) {
+	public List<Integer> getListOntologyVariables(final Integer listId, final List<Integer> types) {
 		final List<GermplasmListDataView> columns =
 			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
-		return columns.stream().filter(c -> c.getCategory().equals(GermplasmListColumnCategory.VARIABLE)).map(c -> c.getVariableId())
+		return columns.stream()
+			.filter(c -> c.getCategory().equals(GermplasmListColumnCategory.VARIABLE) && (types == null || types.contains(c.getTypeId())))
+			.map(c -> c.getVariableId())
 			.collect(Collectors.toList());
 	}
 

@@ -44,7 +44,7 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 	public GermplasmListDataDetail getByListDataIdAndVariableId(final Integer listDataId, final Integer variableId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmListDataDetail.class);
-			criteria.add(Restrictions.eq("listDataId", listDataId));
+			criteria.add(Restrictions.eq("listData.id", listDataId));
 			criteria.add(Restrictions.eq("variableId", variableId));
 			final Object result = criteria.uniqueResult();
 			return (result == null) ? null : (GermplasmListDataDetail) result;

@@ -73,7 +73,7 @@ public interface GermplasmListService {
 
 	void saveGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view);
 
-	List<Integer> getListOntologyVariables(Integer listId);
+	List<Integer> getListOntologyVariables(Integer listId, List<Integer> types);
 
 	void addVariableToList(Integer listId, GermplasmListVariableRequestDto germplasmListVariableRequestDto);
 

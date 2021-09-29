@@ -15,7 +15,7 @@ import javax.persistence.Table;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "list_data_detail")
+@Table(name = "list_data_details")
 public class GermplasmListDataDetail implements Serializable {
 
 	@Id
