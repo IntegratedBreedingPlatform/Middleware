@@ -127,12 +127,16 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 			}
 
 			if (column.isNameColumn()) {
-				addNameScalar(scalars, selects, joins, column.getVariableId());
+				this.addNameScalar(scalars, selects, joins, column.getVariableId());
 				return;
 			}
 
 			if (column.isDescriptorColumn()) {
-				addDescriptorScalar(scalars, selects, joins, column.getVariableId());
+				this.addDescriptorScalar(scalars, selects, joins, column.getVariableId());
+			}
+
+			if (column.isEntryDetailColumn()) {
+				this.addEntryDetailScalar(scalars, selects, joins, column.getVariableId());
 			}
 		});
 
@@ -454,17 +458,6 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		}
 	}
 
-	private void addDescriptorScalar(final List<String> scalars, final List<String> selectClause,
-		final Set<String> joins, final Integer variableId) {
-
-		String alias = formatDynamicAlias(GermplasmListColumnCategory.VARIABLE, variableId);
-		selectClause.add(this.addSelectExpression(scalars, String.format("%s.aval", alias), alias));
-
-		String join = String.format("LEFT JOIN atributs %1$s ON g.gid = %1$s.gid AND %1$s.atype = %2$s",
-			alias, variableId);
-		joins.add(String.format(join, alias, alias, variableId));
-	}
-
 	private void addNameScalar(final List<String> scalars, final List<String> selectClause,
 		final Set<String> joins, final Integer nameTypeId) {
 
@@ -477,7 +470,30 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		joins.add(String.format(join, alias, alias, nameTypeId));
 	}
 
-	static String addSelectExpression(final List<String> scalars, final String expression, final String columnAlias) {
+	private void addDescriptorScalar(final List<String> scalars, final List<String> selectClause,
+		final Set<String> joins, final Integer variableId) {
+
+		String alias = formatDynamicAlias(GermplasmListColumnCategory.VARIABLE, variableId);
+		selectClause.add(this.addSelectExpression(scalars, String.format("%s.aval", alias), alias));
+
+		String join = String.format("LEFT JOIN atributs %1$s ON g.gid = %1$s.gid AND %1$s.atype = %2$s",
+			alias, variableId);
+		joins.add(String.format(join, alias, alias, variableId));
+	}
+
+	private void addEntryDetailScalar(final List<String> scalars, final List<String> selectClause,
+		final Set<String> joins, final Integer variableId) {
+
+		String alias = formatDynamicAlias(GermplasmListColumnCategory.VARIABLE, variableId);
+		selectClause.add(this.addSelectExpression(scalars, String.format("%s.id", alias), alias + "_detail_id"));
+		selectClause.add(this.addSelectExpression(scalars, String.format("%s.value", alias), alias));
+
+		String join = String.format("LEFT JOIN list_data_details %1$s ON listData.lrecid = %1$s.lrecid AND %1$s.variable_id = %2$s",
+			alias, variableId);
+		joins.add(String.format(join, alias, alias, variableId));
+	}
+
+	private String addSelectExpression(final List<String> scalars, final String expression, final String columnAlias) {
 		scalars.add(columnAlias);
 		return String.format("%s AS %s", expression, columnAlias);
 	}

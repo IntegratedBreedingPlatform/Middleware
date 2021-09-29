@@ -89,4 +89,9 @@ public class GermplasmListDataView implements Serializable {
 			this.typeId.equals(VariableType.GERMPLASM_ATTRIBUTE.getId()));
 	}
 
+	public boolean isEntryDetailColumn() {
+		return this.category == GermplasmListColumnCategory.VARIABLE && !this.typeId.equals(VariableType.GERMPLASM_PASSPORT.getId()) &&
+			!this.typeId.equals(VariableType.GERMPLASM_ATTRIBUTE.getId());
+	}
+
 }
