@@ -3,9 +3,11 @@ package org.generationcp.middleware.dao.germplasmlist;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
+import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,4 +41,19 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 		}
 	}
 
+	public GermplasmListDataDetail getByListDataIdAndVariableId(final Integer listDataId, final Integer variableId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(GermplasmListDataDetail.class);
+			criteria.add(Restrictions.eq("listDataId", listDataId));
+			criteria.add(Restrictions.eq("variableId", variableId));
+			final Object result = criteria.uniqueResult();
+			return (result == null) ? null : (GermplasmListDataDetail) result;
+		} catch (final HibernateException e) {
+			final String errorMessage =
+				"Error with deleteByListIdAndVariableIds(" + listDataId + "," + variableId + ") query from GermplasmListDataDetailDAO: " + e
+					.getMessage();
+			GermplasmListDataDetailDAO.LOG.error(errorMessage);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
 }

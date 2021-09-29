@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.constant.ColumnLabels;
@@ -29,6 +28,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.Method;
@@ -632,6 +632,34 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			return this.ontologyVariableDataManager.getWithFilter(variableFilter);
 		}
 		return Collections.emptyList();
+	}
+
+	@Override
+	public Optional<GermplasmListDataDto> getGermplasmListData(final Integer listDataId) {
+		final GermplasmListData germplasmListData = this.daoFactory.getGermplasmListDataDAO().getById(listDataId);
+		if (germplasmListData != null) {
+			final GermplasmListDataDto germplasmListDataDto =
+				new GermplasmListDataDto(germplasmListData.getListDataId(), germplasmListData.getList().getId(),
+					germplasmListData.getEntryId(), germplasmListData.getGid());
+			return Optional.of(germplasmListDataDto);
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public Integer saveListDataObservation(final Integer listId, final GermplasmListObservationRequestDto observationRequestDto) {
+		final GermplasmListDataDetail observation = this.daoFactory.getGermplasmListDataDetailDAO()
+			.getByListDataIdAndVariableId(observationRequestDto.getListDataId(), observationRequestDto.getVariableId());
+		if (observation != null) {
+			throw new MiddlewareRequestException("", "germplasm.list.data.details.exists", "");
+		}
+		final GermplasmListData germplasmListData =
+			this.daoFactory.getGermplasmListDataDAO().getById(observationRequestDto.getListDataId());
+		final GermplasmListDataDetail germplasmListDataDetail =
+			new GermplasmListDataDetail(germplasmListData, observationRequestDto.getVariableId(), observationRequestDto.getValue(),
+				observationRequestDto.getcValueId());
+		this.daoFactory.getGermplasmListDataDetailDAO().save(germplasmListDataDetail);
+		return germplasmListData.getId();
 	}
 
 	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,

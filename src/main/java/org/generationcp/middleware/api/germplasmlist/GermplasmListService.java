@@ -1,8 +1,6 @@
 package org.generationcp.middleware.api.germplasmlist;
 
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -82,5 +80,9 @@ public interface GermplasmListService {
 	void removeListVariables(Integer listId, Set<Integer> variableIds);
 
 	List<Variable> getGermplasmListVariables(String programUUID, Integer listId, Integer variableTypeId);
+
+	Optional<GermplasmListDataDto> getGermplasmListData(Integer listDataId);
+
+	Integer saveListDataObservation(Integer listId, GermplasmListObservationRequestDto observationRequestDto);
 
 }

@@ -1,7 +1,9 @@
 package org.generationcp.middleware.api.germplasmlist;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
+@AutoProperty
 public class GermplasmListVariableRequestDto {
 
 	private Integer variableTypeId;
