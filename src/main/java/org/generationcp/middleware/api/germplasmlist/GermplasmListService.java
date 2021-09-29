@@ -61,10 +61,6 @@ public interface GermplasmListService {
 
 	long countSearchGermplasmList(GermplasmListSearchRequest request);
 
-	List<GermplasmListDataSearchResponse> searchGermplasmListData(Integer listId, GermplasmListDataSearchRequest request, Pageable pageable);
-
-	long countSearchGermplasmListData(Integer listId, GermplasmListDataSearchRequest request);
-
 	/**
 	 * Lock the list if it's unlocked and vice versa.
 	 *
