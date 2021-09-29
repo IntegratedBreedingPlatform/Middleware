@@ -55,11 +55,16 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	@Override
 	public Optional<BreedingMethodDTO> getBreedingMethod(final Integer breedingMethodDbId) {
 		final Method methodEntity = this.daoFactory.getMethodDAO().getById(breedingMethodDbId);
-		final Optional<ProgramFavorite> programFavorite = this.daoFactory.getProgramFavoriteDao().getProgramFavorite(
-			ContextHolder.getCurrentProgram(), ProgramFavorite.FavoriteType.METHOD, breedingMethodDbId);
+
+		final Optional<String> programOptional = ContextHolder.getCurrentProgramOptional();
+		final Optional<ProgramFavorite> programFavorite = programOptional.isPresent()
+			? this.daoFactory.getProgramFavoriteDao().getProgramFavorite(
+			programOptional.get(), ProgramFavorite.FavoriteType.METHOD, breedingMethodDbId)
+			: Optional.empty();
+
 		if (!Objects.isNull(methodEntity)) {
 			final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO(methodEntity);
-			breedingMethodDTO.setFavorite(programFavorite.isPresent());
+			breedingMethodDTO.setFavorite(programOptional.isPresent() ? programFavorite.isPresent() : null);
 			return Optional.of(breedingMethodDTO);
 		}
 		return Optional.empty();
