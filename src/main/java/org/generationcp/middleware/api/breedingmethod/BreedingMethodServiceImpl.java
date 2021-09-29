@@ -25,6 +25,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 @Transactional
@@ -94,12 +95,27 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 	}
 
 	@Override
-	public BreedingMethodDTO edit(final Integer breedingMethodDbId, final BreedingMethodNewRequest breedingMethodRequest) {
+	public BreedingMethodDTO edit(final Integer breedingMethodDbId, final BreedingMethodNewRequest breedingMethod) {
 		final Method method = this.daoFactory.getMethodDAO().getById(breedingMethodDbId);
 		Preconditions.checkNotNull(method);
 
+		final String name = breedingMethod.getName();
+		if (!isBlank(name) && !name.equalsIgnoreCase(method.getMname())) {
+			final List<Method> methods = this.daoFactory.getMethodDAO().getByName(name);
+			if (!isEmpty(methods)) {
+				throw new MiddlewareRequestException("", "breeding.methods.name.exists", name);
+			}
+		}
+		final String code = breedingMethod.getCode().toUpperCase();
+		if (!isBlank(code) && !code.equalsIgnoreCase(method.getMcode())) {
+			final Method byCode = this.daoFactory.getMethodDAO().getByCode(code);
+			if (byCode != null) {
+				throw new MiddlewareRequestException("", "breeding.methods.code.exists", code);
+			}
+		}
+
 		final BreedingMethodMapper mapper = new BreedingMethodMapper();
-		mapper.mapForUpdate(breedingMethodRequest, method);
+		mapper.mapForUpdate(breedingMethod, method);
 		this.daoFactory.getMethodDAO().update(method);
 		return new BreedingMethodDTO(method);
 	}
