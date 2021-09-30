@@ -83,6 +83,12 @@ public interface GermplasmListService {
 
 	Optional<GermplasmListDataDto> getGermplasmListData(Integer listDataId);
 
+	Optional<GermplasmListObservationDto> getGermplasmListObservation(Integer observationId);
+
 	Integer saveListDataObservation(Integer listId, GermplasmListObservationRequestDto observationRequestDto);
+
+	void updateListDataObservation(Integer observationId, String value, Integer cValueId);
+
+	void deleteListDataObservation(Integer observationId);
 
 }

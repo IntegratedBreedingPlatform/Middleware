@@ -648,6 +648,19 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public Optional<GermplasmListObservationDto> getGermplasmListObservation(final Integer observationId) {
+		final GermplasmListDataDetail germplasmListDataDetail = this.daoFactory.getGermplasmListDataDetailDAO().getById(observationId);
+		if (germplasmListDataDetail != null) {
+			final GermplasmListObservationDto germplasmListObservationDto =
+				new GermplasmListObservationDto(observationId, germplasmListDataDetail.getListData().getListDataId(),
+					germplasmListDataDetail.getVariableId(), germplasmListDataDetail.getValue(),
+					germplasmListDataDetail.getCategoricalValueId());
+			return Optional.of(germplasmListObservationDto);
+		}
+		return Optional.empty();
+	}
+
+	@Override
 	public Integer saveListDataObservation(final Integer listId, final GermplasmListObservationRequestDto observationRequestDto) {
 		final GermplasmListDataDetail observation = this.daoFactory.getGermplasmListDataDetailDAO()
 			.getByListDataIdAndVariableId(observationRequestDto.getListDataId(), observationRequestDto.getVariableId());
@@ -661,6 +674,20 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				observationRequestDto.getcValueId());
 		this.daoFactory.getGermplasmListDataDetailDAO().save(germplasmListDataDetail);
 		return germplasmListData.getId();
+	}
+
+	@Override
+	public void updateListDataObservation(final Integer observationId, final String value, final Integer cValueId) {
+		final GermplasmListDataDetail germplasmListDataDetail = this.daoFactory.getGermplasmListDataDetailDAO().getById(observationId);
+		germplasmListDataDetail.setValue(value);
+		germplasmListDataDetail.setCategoricalValueId(cValueId);
+		this.daoFactory.getGermplasmListDataDetailDAO().update(germplasmListDataDetail);
+	}
+
+	@Override
+	public void deleteListDataObservation(final Integer observationId) {
+		final GermplasmListDataDetail germplasmListDataDetail = this.daoFactory.getGermplasmListDataDetailDAO().getById(observationId);
+		this.daoFactory.getGermplasmListDataDetailDAO().makeTransient(germplasmListDataDetail);
 	}
 
 	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,

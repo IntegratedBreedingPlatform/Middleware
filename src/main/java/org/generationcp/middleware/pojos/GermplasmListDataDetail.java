@@ -48,6 +48,22 @@ public class GermplasmListDataDetail implements Serializable {
 		this.categoricalValueId = categoricalValueId;
 	}
 
+	public GermplasmListData getListData() {
+		return listData;
+	}
+
+	public Integer getVariableId() {
+		return variableId;
+	}
+
+	public String getValue() {
+		return value;
+	}
+
+	public Integer getCategoricalValueId() {
+		return categoricalValueId;
+	}
+
 	public void setListData(final GermplasmListData listData) {
 		this.listData = listData;
 	}

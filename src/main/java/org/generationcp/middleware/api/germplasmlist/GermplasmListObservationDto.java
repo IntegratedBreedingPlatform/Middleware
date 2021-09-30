@@ -8,6 +8,15 @@ public class GermplasmListObservationDto extends GermplasmListObservationRequest
 
 	private Integer observationId;
 
+	public GermplasmListObservationDto() {
+	}
+
+	public GermplasmListObservationDto(final Integer observationId, final Integer listDataId, final Integer variableId, final String value,
+		final Integer cValueId) {
+		super(listDataId, variableId, value, cValueId);
+		this.observationId = observationId;
+	}
+
 	public Integer getObservationId() {
 		return observationId;
 	}

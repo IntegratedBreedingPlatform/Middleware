@@ -16,6 +16,17 @@ public class GermplasmListObservationRequestDto {
 	@JsonIgnore
 	private Integer cValueId;
 
+	public GermplasmListObservationRequestDto() {
+	}
+
+	public GermplasmListObservationRequestDto(final Integer listDataId, final Integer variableId, final String value,
+		final Integer cValueId) {
+		this.listDataId = listDataId;
+		this.variableId = variableId;
+		this.value = value;
+		this.cValueId = cValueId;
+	}
+
 	public Integer getListDataId() {
 		return listDataId;
 	}
