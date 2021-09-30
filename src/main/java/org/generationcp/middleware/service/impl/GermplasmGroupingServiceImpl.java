@@ -59,9 +59,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private UserDefinedField selHistAtFixationNameType;
 
-	private DaoFactory daoFactory;
+	private final DaoFactory daoFactory;
 
-	private Map<Integer, String> germplasmSelHistNameMap = new HashMap<>();
+	private final Map<Integer, String> germplasmSelHistNameMap = new HashMap<>();
 
 	public GermplasmGroupingServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -72,8 +72,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		final List<Germplasm> germplasmList = this.daoFactory.getGermplasmDao().getByGIDList(gids);
 		final Map<Integer, Germplasm> germplasmMap = germplasmList.stream().collect(Collectors.toMap(
 			Germplasm::getGid, Function.identity()));
-		this.selHistNameType = getSelectionHistoryNameType(SELECTION_HISTORY_NAME_CODE);
-		this.selHistAtFixationNameType = getSelectionHistoryNameType(SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+		this.selHistNameType = this.getSelectionHistoryNameType(SELECTION_HISTORY_NAME_CODE);
+		this.selHistAtFixationNameType = this.getSelectionHistoryNameType(SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 
 		for (final Integer gid : gids) {
 			GermplasmGroupingServiceImpl.LOG.info("Marking germplasm with gid {} as fixed.", gid);
@@ -342,7 +342,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		if (this.germplasmSelHistNameMap.containsKey(gid)) {
 			this.logSelectionHistoryTypeNameStatus(gid, this.germplasmSelHistNameMap.get(gid));
 		} else {
-			copySelectionHistory(germplasm);
+			this.copySelectionHistory(germplasm);
 		}
 	}
 
@@ -360,7 +360,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		this.logSelectionHistoryTypeNameStatus(gid, nameVal);
 	}
 
-	private void logSelectionHistoryTypeNameStatus(Integer gid, String nameVal) {
+	private void logSelectionHistoryTypeNameStatus(final Integer gid, final String nameVal) {
 		if (StringUtils.isEmpty(nameVal)) {
 			GermplasmGroupingServiceImpl.LOG
 				.info("No selection history type name was found for germplasm {}. Nothing to copy.", gid);
