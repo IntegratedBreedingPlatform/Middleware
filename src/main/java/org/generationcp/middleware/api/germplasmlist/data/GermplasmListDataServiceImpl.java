@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.germplasmlist.data;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
 import org.generationcp.middleware.constant.ColumnLabels;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -365,11 +366,12 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	 */
 	private List<GermplasmListMeasurementVariableDTO> getVariableColumns(final List<Integer> variableIds, final String programUUID) {
 		if (!CollectionUtils.isEmpty(variableIds)) {
+			final Map<Integer, List<ValueReference>> categoricalVariablesMap =
+				this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(variableIds);
 			final VariableFilter variableFilter = new VariableFilter();
 			variableFilter.setProgramUuid(programUUID);
 			variableIds.forEach(variableFilter::addVariableId);
 			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
-			// TODO: get required properties for entry details
 			final List<GermplasmListMeasurementVariableDTO> descriptorColumns = new ArrayList<>();
 			final List<GermplasmListMeasurementVariableDTO> entryDetailsColumns = new ArrayList<>();
 			variables
@@ -382,7 +384,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 					}
 					final GermplasmListMeasurementVariableDTO measurementVariableDTO =
 						this.buildColumn(variable.getId(), variable.getName(), variable.getAlias(), GermplasmListColumnCategory.VARIABLE,
-							variableType);
+							variable.getScale().getDataType().getId(), categoricalVariablesMap.get(variable.getId()));
 					if (variableType == VariableType.GERMPLASM_ATTRIBUTE || variableType == VariableType.GERMPLASM_PASSPORT) {
 						descriptorColumns.add(measurementVariableDTO);
 					} else {
@@ -396,17 +398,19 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 
 	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
 		final GermplasmListColumnCategory category) {
-		return this.buildColumn(termId, name, alias, category, null);
+		return this.buildColumn(termId, name, alias, category, null, null);
 	}
 
 	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
-		final GermplasmListColumnCategory category, final VariableType variableType) {
+		final GermplasmListColumnCategory category, final Integer datatypeId, final List<ValueReference> possibleValues) {
+
 		final GermplasmListMeasurementVariableDTO column = new GermplasmListMeasurementVariableDTO();
 		column.setTermId(termId);
 		column.setName(name);
 		column.setAlias(alias);
 		column.setColumnCategory(category);
-		column.setVariableType(variableType);
+		column.setDataTypeId(datatypeId);
+		column.setPossibleValues(possibleValues);
 		return column;
 	}
 
