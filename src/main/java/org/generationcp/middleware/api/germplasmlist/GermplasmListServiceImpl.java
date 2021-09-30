@@ -10,6 +10,7 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
+import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -550,16 +551,18 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final List<Integer> variableIds = columnIdsByCategory.get(GermplasmListColumnCategory.VARIABLE);
 		if (!CollectionUtils.isEmpty(variableIds)) {
+			final Map<Integer, List<ValueReference>> categoricalVariablesMap =
+				this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(variableIds);
 			final VariableFilter variableFilter = new VariableFilter();
 			variableFilter.setProgramUuid(programUUID);
-			variableIds
-				.forEach(variableFilter::addVariableId);
+			variableIds.forEach(variableFilter::addVariableId);
 			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 			// TODO: get required properties for entry details
 			final List<GermplasmListMeasurementVariableDTO> variableColumns = variables
 				.stream()
 				.map(variable -> this
-					.buildColumn(variable.getId(), variable.getName(), variable.getAlias(), GermplasmListColumnCategory.VARIABLE))
+					.buildColumn(variable.getId(), variable.getName(), variable.getAlias(), GermplasmListColumnCategory.VARIABLE,
+						variable.getScale().getDataType().getId(), categoricalVariablesMap.get(variable.getId())))
 				.collect(Collectors.toList());
 			header.addAll(variableColumns);
 		}
@@ -697,6 +700,19 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		column.setName(name);
 		column.setAlias(alias);
 		column.setColumnCategory(category);
+		return column;
+	}
+
+	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
+		final GermplasmListColumnCategory category, final Integer datatypeId, final List<ValueReference> possibleValues) {
+
+		final GermplasmListMeasurementVariableDTO column = new GermplasmListMeasurementVariableDTO();
+		column.setTermId(termId);
+		column.setName(name);
+		column.setAlias(alias);
+		column.setColumnCategory(category);
+		column.setDataTypeId(datatypeId);
+		column.setPossibleValues(possibleValues);
 		return column;
 	}
 
