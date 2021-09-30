@@ -569,6 +569,14 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Null values should not be included", this.germplasm.size(), observations.size());
 	}
 
+	@Test
+	public void testCountByVariableIdAndValue() {
+		this.createEnvironmentData(1, true);
+
+		final long phenotypeCount = this.phenotypeDao.countByVariableIdAndValue(this.trait.getCvTermId(), this.phenotypes.get(0).getValue());
+		Assert.assertThat(phenotypeCount, is(1L));
+	}
+
 	/**
 	 * Method getNumericTraitInfoList(Collection: environment, Collection: trait) is use when environment is > 1000
 	 */

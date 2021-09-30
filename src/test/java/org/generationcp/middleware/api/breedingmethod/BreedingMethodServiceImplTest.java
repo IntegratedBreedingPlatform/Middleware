@@ -77,11 +77,6 @@ public class BreedingMethodServiceImplTest {
 
 		Mockito.verify(this.methodDAO)
 			.filterMethods(ArgumentMatchers.eq(searchRequest), ArgumentMatchers.eq(null));
-
-		Mockito.verify(this.programFavoriteDAO, new Times(0)).getProgramFavorites(
-			ArgumentMatchers.any(ProgramFavorite.FavoriteType.class),
-			ArgumentMatchers.anyInt(),
-			ArgumentMatchers.anyString());
 	}
 
 	@Test

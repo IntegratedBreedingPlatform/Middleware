@@ -4,7 +4,27 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="lkovacic" id="v19.2.0-1">
+	<changeSet author="cheryleigh" id="v19.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="users_migrated" />
+		</preConditions>
+		<comment>
+			Drop users_migrated IBP-5013
+		</comment>
+		<dropTable tableName="users_migrated" />
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v19.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="persons_migrated" />
+		</preConditions>
+		<comment>
+			Drop persons_migrated IBP-5013
+		</comment>
+		<dropTable tableName="persons_migrated" />
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.2.0-3">
         <preConditions onFail="MARK_RAN">
 			<and>
 				<not>
@@ -17,12 +37,16 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			create table list_data_details (
-				id          int auto_increment
+				id            int auto_increment
 					primary key,
-				variable_id int          not null,
-				lrecid      int          not null,
-				value       varchar(255) null,
-				cvalue_id   int          null,
+				variable_id   int                                 not null,
+				lrecid        int                                 not null,
+				value         varchar(255)                        null,
+				cvalue_id     int                                 null,
+				created_by    int       default 0                 not null,
+				modified_by   int                                 null,
+				created_date  timestamp default CURRENT_TIMESTAMP not null,
+				modified_date timestamp                           null,
 				constraint list_entry_details_data_cvterm_cvterm_id_fk
 					foreign key (variable_id) references cvterm(cvterm_id),
 				constraint list_entry_details_data_cvterm_cvterm_id_fk_2
@@ -33,7 +57,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v19.2.0-2">
+	<changeSet author="lkovacic" id="v19.2.0-4">
         <preConditions onFail="MARK_RAN">
 			<and>
 				<not>

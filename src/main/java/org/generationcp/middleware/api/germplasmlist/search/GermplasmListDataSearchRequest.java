@@ -8,6 +8,7 @@ import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @AutoProperty
 public class GermplasmListDataSearchRequest extends SearchRequestDto {
@@ -30,6 +31,10 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date germplasmDateTo;
 	private String reference;
+
+	private Map<Integer, Object> namesFilters;
+	private Map<Integer, Object> descriptorsFilters;
+	private Map<Integer, Object> variablesFilters;
 
 	public List<Integer> getEntryNumbers() {
 		return entryNumbers;
@@ -157,6 +162,30 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 
 	public void setReference(final String reference) {
 		this.reference = reference;
+	}
+
+	public Map<Integer, Object> getNamesFilters() {
+		return namesFilters;
+	}
+
+	public void setNamesFilters(final Map<Integer, Object> namesFilters) {
+		this.namesFilters = namesFilters;
+	}
+
+	public Map<Integer, Object> getDescriptorsFilters() {
+		return descriptorsFilters;
+	}
+
+	public void setDescriptorsFilters(final Map<Integer, Object> descriptorsFilters) {
+		this.descriptorsFilters = descriptorsFilters;
+	}
+
+	public Map<Integer, Object> getVariablesFilters() {
+		return variablesFilters;
+	}
+
+	public void setVariablesFilters(final Map<Integer, Object> variablesFilters) {
+		this.variablesFilters = variablesFilters;
 	}
 
 	@Override
