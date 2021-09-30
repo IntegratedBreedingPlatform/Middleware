@@ -102,6 +102,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	protected static final String VARIABLE_EXPECTED_MAX = "expectedMax";
 	protected static final String VARIABLE_CREATION_DATE = "variableCreationDate";
 	protected static final String VARIABLE_TRAIT_CLASS = "traitClass";
+	protected static final String VARIABLE_NAME_SYNONYMS = "synonyms";
 	protected static final String VARIABLE_FORMULA_DEFINITION = "formulaDefinition";
 	// parameters
 	public static final String VARIABLE_TYPE_NAMES = "variableTypeNames";
@@ -1549,9 +1550,11 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	private String createCountObservationVariablesQueryString(final VariableSearchRequestDTO requestDTO) {
-		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT variable.cvterm_id) ");
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(1) FROM ( ");
+		sql.append("SELECT DISTINCT variable.cvterm_id ");
 		this.appendObservationVariablesFromQuery(sql);
 		this.appendObservationVariableSeachFilters(sql, requestDTO);
+		sql.append(") as variableIds");
 		return sql.toString();
 	}
 
@@ -1574,7 +1577,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
 			sqlQuery.setParameterList("referenceIds", requestDTO.getExternalReferenceIDs());
-
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
@@ -1616,7 +1618,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public String createObservationVariablesQuery(final VariableSearchRequestDTO requestDTO) {
 		final StringBuilder stringBuilder = new StringBuilder(" SELECT DISTINCT ");
-		stringBuilder.append("   pp.alias AS " + VARIABLE_ALIAS + ", ");
+		stringBuilder.append("   vo.alias AS " + VARIABLE_ALIAS + ", ");
 		stringBuilder.append("   variable.cvterm_id AS " + VARIABLE_ID + ", ");
 		stringBuilder.append("   variable.name AS " + VARIABLE_NAME + ", ");
 		stringBuilder.append("   scale.name AS " + VARIABLE_SCALE + ", ");
@@ -1636,10 +1638,11 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		stringBuilder.append("   vo.expected_max AS " + VARIABLE_EXPECTED_MAX + ", ");
 		stringBuilder.append("   variableDateCreated.value AS " + VARIABLE_CREATION_DATE + ", ");
 		stringBuilder.append("   GROUP_CONCAT(DISTINCT category.name SEPARATOR '|') AS " + VARIABLE_SCALE_CATEGORIES + ",");
-		stringBuilder.append("   GROUP_CONCAT(DISTINCT traitClass.name SEPARATOR ',') AS " + VARIABLE_TRAIT_CLASS);
+		stringBuilder.append("   GROUP_CONCAT(DISTINCT traitClass.name SEPARATOR ',') AS " + VARIABLE_TRAIT_CLASS + ",");
+		stringBuilder.append("   GROUP_CONCAT(DISTINCT synonym.synonym SEPARATOR ',') AS " + VARIABLE_NAME_SYNONYMS);
 		this.appendObservationVariablesFromQuery(stringBuilder);
 		this.appendObservationVariableSeachFilters(stringBuilder, requestDTO);
-
+		LOG.error(stringBuilder.toString());
 		return stringBuilder.toString();
 	}
 
@@ -1682,9 +1685,11 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		stringBuilder.append(TermId.IS_A.getId() + ")" + " traitClass on traitClass.propertyTermId = property.cvterm_id ");
 		// Retrieve the categories (valid values) of the variables' scale
 		stringBuilder.append("   LEFT JOIN (SELECT cvtrcategory.subject_id, o.name as name");
-		stringBuilder.append(
-				"	  FROM cvterm o inner JOIN cvterm_relationship cvtrcategory ON cvtrcategory.object_id = o.cvterm_id AND cvtrcategory.type_id = ");
+		stringBuilder.append("	  FROM cvterm o inner JOIN cvterm_relationship cvtrcategory ON cvtrcategory.object_id = o.cvterm_id AND cvtrcategory.type_id = ");
 		stringBuilder.append(TermId.HAS_VALUE.getId() + ")" + " category on category.subject_id = scale.cvterm_id ");
+		// Retrieve the variable synonyms
+		stringBuilder.append("	LEFT JOIN (SELECT syn.cvterm_id, syn.synonym as synonym FROM cvtermsynonym syn) ");
+		stringBuilder.append("		synonym on synonym.cvterm_id = variable.cvterm_id ");
 		// Left Join project and project prop to check if there are variables associated to a study
 		stringBuilder.append("	  LEFT JOIN projectprop pp ON pp.variable_id = variable.cvterm_id");
 		stringBuilder.append("	  LEFT JOIN project dataset ON dataset.project_id = pp.project_id AND dataset.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId());
@@ -1720,7 +1725,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		if(!CollectionUtils.isEmpty(requestDTO.getObservationVariableNames())) {
 			stringBuilder.append(" AND (variable.name IN (:observationVariableNames) || ");
-			stringBuilder.append(" pp.alias IN (:observationVariableNames)) ");
+			stringBuilder.append(" vo.alias IN (:observationVariableNames)) ");
 		}
 
 		if(!CollectionUtils.isEmpty(requestDTO.getOntologyDbIds())) {
@@ -1903,7 +1908,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			.addScalar(VARIABLE_EXPECTED_MAX, new DoubleType())
 			.addScalar(VARIABLE_CREATION_DATE)
 			.addScalar(VARIABLE_SCALE_CATEGORIES)
-			.addScalar(VARIABLE_TRAIT_CLASS);
+			.addScalar(VARIABLE_TRAIT_CLASS)
+			.addScalar(VARIABLE_NAME_SYNONYMS);
 
 	}
 
@@ -1928,6 +1934,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			variableDto.setObservationVariableName(observationVariableName);
 			variableDto.setDate(result.get(VARIABLE_CREATION_DATE) != null ? String.valueOf(result.get(VARIABLE_CREATION_DATE)) : null);
 			variableDto.setDefaultValue(StringUtils.EMPTY);
+			final List<String> synonyms = result.get(VARIABLE_NAME_SYNONYMS) != null ?
+					Arrays.asList(StringUtils.split(String.valueOf(result.get(VARIABLE_NAME_SYNONYMS)), ",")) : new ArrayList<>();
+			variableDto.setSynonyms(synonyms);
 
 			final VariableDTO.Trait trait = variableDto.getTrait();
 			trait.setName(String.valueOf(result.get(VARIABLE_PROPERTY)));
