@@ -16,7 +16,7 @@
 
 	<changeSet author="cheryleigh" id="v19.2.0-2">
 		<preConditions onFail="MARK_RAN">
-			<tableExists tableName="persons_migrated " />
+			<tableExists tableName="persons_migrated" />
 		</preConditions>
 		<comment>
 			Drop persons_migrated IBP-5013
