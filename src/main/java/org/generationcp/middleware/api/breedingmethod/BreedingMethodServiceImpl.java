@@ -145,7 +145,9 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 		return this.daoFactory.getMethodDAO().filterMethods(methodSearchRequest, pageable).stream()
 			.map(method -> {
 				final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO(method);
-				breedingMethodDTO.setFavorite(favoriteIdsSet.contains(method.getMid()));
+				if (!StringUtils.isEmpty(programUUID)) {
+					breedingMethodDTO.setFavorite(favoriteIdsSet.contains(method.getMid()));
+				}
 				return breedingMethodDTO;
 			})
 			.collect(Collectors.toList());
