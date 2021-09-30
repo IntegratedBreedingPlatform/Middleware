@@ -46,7 +46,8 @@ public class GermplasmListSearchDAOQuery {
 		}
 	}
 
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
+	//TODO: move to utils
+	public static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
 
 	static final String LIST_ID_ALIAS = "listId";
 	static final String LIST_NAME_ALIAS = "listName";
@@ -93,7 +94,7 @@ public class GermplasmListSearchDAOQuery {
 		if (hasGroupByClause(request)) {
 			addGroupBy(sqlQueryBuilder, request);
 		}
-		DAOQueryUtils.addOrder(input -> SortColumn.getByValue(input).value, sqlQueryBuilder, pageable);
+		sqlQueryBuilder.append(DAOQueryUtils.getOrderClause(input -> SortColumn.getByValue(input).value, pageable));
 		return sqlQueryBuilder;
 	}
 

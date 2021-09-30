@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
@@ -51,7 +50,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +57,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -440,65 +437,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId,
-		final GermplasmListDataSearchRequest request,
-		final Pageable pageable) {
-
-		final List<GermplasmListDataView> view = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
-		// TODO: review this once we define what we are gonna do with the default view
-		if (CollectionUtils.isEmpty(view)) {
-			final List<GermplasmListDataView> defaultView = GermplasmListStaticColumns.getDefaultColumns()
-				.stream()
-				.map(column -> new GermplasmListDataView(null, GermplasmListColumnCategory.STATIC, null, column.getTermId()))
-				.collect(Collectors.toList());
-			view.addAll(defaultView);
-		}
-		final List<GermplasmListDataSearchResponse> response =
-			this.daoFactory.getGermplasmListDataDAO().searchGermplasmListData(listId, view, request, pageable);
-
-		if (CollectionUtils.isEmpty(response)) {
-			return response;
-		}
-
-		final boolean hasCrossData = view
-			.stream()
-			.anyMatch(c -> c.getVariableId().equals(GermplasmListStaticColumns.CROSS.getTermId()));
-
-		if (hasCrossData) {
-			final Map<Integer, GermplasmListDataSearchResponse> rowsIndexedByGid = response
-				.stream()
-				.collect(Collectors.toMap(r -> (Integer) r.getData().get(GermplasmListStaticColumns.GID.name()), Function.identity()));
-
-			final Map<Integer, String> pedigreeStringMap =
-				this.pedigreeService.getCrossExpansions(new HashSet(rowsIndexedByGid.keySet()), null, this.crossExpansionProperties);
-
-			rowsIndexedByGid.entrySet().stream().forEach(e -> {
-				final Integer gid = e.getKey();
-				final GermplasmListDataSearchResponse row = e.getValue();
-				row.getData().put(GermplasmListStaticColumns.CROSS.getName(), pedigreeStringMap.get(gid));
-			});
-
-			final boolean hasPedigreeData = view
-				.stream()
-				.anyMatch(c -> c.getVariableId().equals(GermplasmListStaticColumns.FEMALE_PARENT_GID.getTermId()) ||
-					c.getVariableId().equals(GermplasmListStaticColumns.FEMALE_PARENT_NAME.getTermId()) ||
-					c.getVariableId().equals(GermplasmListStaticColumns.MALE_PARENT_GID.getTermId()) ||
-					c.getVariableId().equals(GermplasmListStaticColumns.MALE_PARENT_NAME.getTermId()));
-
-			if (hasPedigreeData) {
-				this.addParentsFromPedigreeTable(rowsIndexedByGid);
-			}
-		}
-
-		return response;
-	}
-
-	@Override
-	public long countSearchGermplasmListData(final Integer listId, final GermplasmListDataSearchRequest request) {
-		return this.daoFactory.getGermplasmListDataDAO().countSearchGermplasmListData(listId, request);
-	}
-
-	@Override
 	public boolean toggleGermplasmListStatus(final Integer listId) {
 		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
 		if (germplasmList.isLockedList()) {
@@ -619,8 +557,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			// TODO: get required properties for entry details
 			final List<GermplasmListMeasurementVariableDTO> variableColumns = variables
 				.stream()
-				.map(variable -> this
-					.buildColumn(variable.getId(), variable.getName(), variable.getAlias(), GermplasmListColumnCategory.VARIABLE))
+				.map(variable -> {
+					VariableType variableType = null;
+					if (!CollectionUtils.isEmpty(variable.getVariableTypes())) {
+						variableType = variable.getVariableTypes().iterator().next();
+					}
+					return this.buildColumn(variable.getId(), variable.getName(), variable.getAlias(), GermplasmListColumnCategory.VARIABLE,
+						variableType);
+				})
 				.collect(Collectors.toList());
 			header.addAll(variableColumns);
 		}
@@ -631,22 +575,38 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public void saveGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view) {
 		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
+		final List<GermplasmListDataView> variableColumns = germplasmList.getView()
+			.stream()
+			.filter(column -> column.getCategory() == GermplasmListColumnCategory.VARIABLE &&
+				!column.getTypeId().equals(VariableType.GERMPLASM_PASSPORT.getId()) &&
+				!column.getTypeId().equals(VariableType.GERMPLASM_ATTRIBUTE.getId()))
+			.collect(Collectors.toList());
+
 		final List<GermplasmListDataView> updatedView = view
 			.stream()
 			.map(updateColumn -> new GermplasmListDataView(germplasmList, updateColumn.getCategory(), updateColumn.getTypeId(),
 				updateColumn.getId()))
 			.collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(variableColumns)) {
+			updatedView.addAll(variableColumns);
+		}
 		germplasmList.setView(updatedView);
 		this.daoFactory.getGermplasmListDAO().save(germplasmList);
 	}
 
 	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
 		final GermplasmListColumnCategory category) {
+		return this.buildColumn(termId, name, alias, category, null);
+	}
+
+	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
+		final GermplasmListColumnCategory category, final VariableType variableType) {
 		final GermplasmListMeasurementVariableDTO column = new GermplasmListMeasurementVariableDTO();
 		column.setTermId(termId);
 		column.setName(name);
 		column.setAlias(alias);
 		column.setColumnCategory(category);
+		column.setVariableType(variableType);
 		return column;
 	}
 
@@ -1019,36 +979,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			throw new MiddlewareRequestException("",
 				"list.add.limit",
 				new String[] {String.valueOf(this.maxAddEntriesLimit)});
-		}
-	}
-
-	private void addParentsFromPedigreeTable(final Map<Integer, GermplasmListDataSearchResponse> rowsIndexedByGid) {
-
-		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
-		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable =
-			this.pedigreeDataManager.generatePedigreeTable(rowsIndexedByGid.keySet(), level, false);
-
-		for (final Map.Entry<Integer, GermplasmListDataSearchResponse> entry : rowsIndexedByGid.entrySet()) {
-			final Integer gid = entry.getKey();
-			final GermplasmListDataSearchResponse row = entry.getValue();
-
-			final Optional<Germplasm> femaleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.FGID.getName());
-			femaleParent.ifPresent(value -> {
-				final Germplasm germplasm = value;
-				row.getData().put(GermplasmListStaticColumns.FEMALE_PARENT_GID.name(),
-					germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN);
-				row.getData().put(GermplasmListStaticColumns.FEMALE_PARENT_NAME.name(),
-					germplasm.getPreferredName().getNval());
-			});
-
-			final Optional<Germplasm> maleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.MGID.getName());
-			if (maleParent.isPresent()) {
-				final Germplasm germplasm = maleParent.get();
-				row.getData().put(GermplasmListStaticColumns.MALE_PARENT_GID.name(),
-					germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN);
-				row.getData().put(GermplasmListStaticColumns.MALE_PARENT_NAME.name(),
-					germplasm.getPreferredName().getNval());
-			}
 		}
 	}
 

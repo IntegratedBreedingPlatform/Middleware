@@ -1,6 +1,8 @@
 
 package org.generationcp.middleware.util;
 
+import com.google.common.base.Strings;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,12 +11,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.TimeZone;
 
-import com.google.common.base.Strings;
-
 public class ISO8601DateParser {
 
 	private static final String DATETIME_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'";
-
 	private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 	public static Date parseToDateTime(String input) throws java.text.ParseException {
@@ -43,7 +42,11 @@ public class ISO8601DateParser {
 	}
 
 	public static Date parseToDate(long input){
-		return java.sql.Date.valueOf(LocalDate.parse(String.valueOf(input), DATE_FORMAT));
+		try {
+			return java.sql.Date.valueOf(LocalDate.parse(String.valueOf(input), DATE_FORMAT));
+		} catch (Exception e) {
+			return null;
+		}
 	}
 
 }

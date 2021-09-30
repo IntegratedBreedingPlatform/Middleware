@@ -1,5 +1,7 @@
 package org.generationcp.middleware.domain.sqlfilter;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class SqlTextFilter {
 
 	public enum Type {
@@ -25,6 +27,7 @@ public class SqlTextFilter {
 		this.type = type;
 	}
 
+	@JsonIgnore
 	public boolean isEmpty() {
 		return this.value == null && this.type == null;
 	}
