@@ -557,8 +557,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			// TODO: get required properties for entry details
 			final List<GermplasmListMeasurementVariableDTO> variableColumns = variables
 				.stream()
-				.map(variable -> this
-					.buildColumn(variable.getId(), variable.getName(), variable.getAlias(), GermplasmListColumnCategory.VARIABLE))
+				.map(variable -> {
+					VariableType variableType = null;
+					if (!CollectionUtils.isEmpty(variable.getVariableTypes())) {
+						variableType = variable.getVariableTypes().iterator().next();
+					}
+					return this.buildColumn(variable.getId(), variable.getName(), variable.getAlias(), GermplasmListColumnCategory.VARIABLE,
+						variableType);
+				})
 				.collect(Collectors.toList());
 			header.addAll(variableColumns);
 		}
@@ -590,11 +596,17 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
 		final GermplasmListColumnCategory category) {
+		return this.buildColumn(termId, name, alias, category, null);
+	}
+
+	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
+		final GermplasmListColumnCategory category, final VariableType variableType) {
 		final GermplasmListMeasurementVariableDTO column = new GermplasmListMeasurementVariableDTO();
 		column.setTermId(termId);
 		column.setName(name);
 		column.setAlias(alias);
 		column.setColumnCategory(category);
+		column.setVariableType(variableType);
 		return column;
 	}
 

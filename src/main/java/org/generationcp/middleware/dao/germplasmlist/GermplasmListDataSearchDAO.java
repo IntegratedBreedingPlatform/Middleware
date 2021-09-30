@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -37,6 +38,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 
 	// TODO: define in common constants
 	private static final String MIXED_UNITS_LABEL = "Mixed";
+	// TODO: use name status
 	private static final Integer NAME_DELETED_STATUS = 9;
 
 	public GermplasmListDataSearchDAO(final Session session) {
@@ -66,12 +68,9 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 	// Base query
 	private final static String BASE_QUERY = "SELECT %s " // usage of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ " FROM listdata listData "
-		+ " %s " // usage of JOINS
-		+ " WHERE listData.listid = :listId "
-		+ "		AND listData.lrstatus <> " + GermplasmListDataDAO.STATUS_DELETED
-		+ "		AND g.deleted = 0 "
-		+ "			%s" // usage of WHERE
-		+ "			%s"; // usage of GROUP
+		+ " %s " // usage of join clause
+		+ " WHERE %s" // usage of where clause
+		+ "			%s"; // usage of group clause
 	private static final String COUNT_EXPRESSION = " COUNT(1) ";
 
 	// Alias for columns which are not columns of the table
@@ -151,11 +150,12 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		this.addLocationScalar(scalars, selects, joins, staticColumnIds);
 		this.addReferenceScalar(scalars, selects, joins, staticColumnIds);
 
+		final List<String> where = this.addFilters(joins, queryParams, request);
+		final String whereClause = this.getWhereClause(where);
 		final String selectClause = selects.stream().collect(Collectors.joining(","));
-		final String whereClause = this.addFilters(joins, queryParams, request);
 		final String joinClause = this.getJoinClause(joins);
 		// TODO
-//		final String orderClause = DAOQueryUtils.getOrderClause(input -> SortColumn.getByValue(input).value, pageable);
+		//		final String orderClause = DAOQueryUtils.getOrderClause(input -> SortColumn.getByValue(input).value, pageable);
 		final String sql = this.formatQuery(selectClause, joinClause, whereClause, " GROUP BY listData.gid, listData.entryid ");
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
 		DAOQueryUtils.addParamsToQuery(query, queryParams);
@@ -178,8 +178,9 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 
 		this.addCountQueryJoins(joins, request);
 
-		final String whereClause = this.addFilters(joins, queryParams, request);
+		final List<String> where = this.addFilters(joins, queryParams, request);
 		final String joinClause = this.getJoinClause(joins);
+		final String whereClause = this.getWhereClause(where);
 		final String sql = this.formatQuery(COUNT_EXPRESSION, joinClause, whereClause, "");
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
 		DAOQueryUtils.addParamsToQuery(query, queryParams);
@@ -215,23 +216,52 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		if (!StringUtils.isEmpty(request.getReference())) {
 			joins.add(REFERENCE_JOIN);
 		}
+
+		if (!CollectionUtils.isEmpty(request.getNamesFilters())) {
+			request.getNamesFilters().forEach((nameTypeId, o) -> {
+				final String alias = this.formatNamesAlias(nameTypeId);
+				final String join = this.formatNameJoin(alias, nameTypeId);
+				joins.add(join);
+			});
+		}
+
+		if (!CollectionUtils.isEmpty(request.getDescriptorsFilters())) {
+			request.getDescriptorsFilters().forEach((variableId, o) -> {
+				final String alias = this.formatVariableAlias(variableId);
+				final String join = this.formatDescriptorJoin(alias, variableId);
+				joins.add(join);
+			});
+		}
+
+		if (!CollectionUtils.isEmpty(request.getVariablesFilters())) {
+			request.getVariablesFilters().forEach((variableId, o) -> {
+				final String alias = this.formatVariableAlias(variableId);
+				final String join = this.formatEntryDetailJoin(alias, variableId);
+				joins.add(join);
+			});
+		}
 	}
 
-	private String addFilters(final Set<String> joins, final Map<String, Object> queryParams, final GermplasmListDataSearchRequest request) {
-		final StringBuilder whereClauseBuilder = new StringBuilder();
+	private List<String> addFilters(final Set<String> joins, final Map<String, Object> queryParams,
+		final GermplasmListDataSearchRequest request) {
+		final List<String> whereClause = new ArrayList<>();
+		whereClause.add("listData.listid = :listId");
+		whereClause.add("listData.lrstatus <> " + GermplasmListDataDAO.STATUS_DELETED);
+		whereClause.add("g.deleted = 0");
+
 		if (!CollectionUtils.isEmpty(request.getEntryNumbers())) {
 			queryParams.put("entryNumbers", request.getEntryNumbers());
-			whereClauseBuilder.append(" AND listData.entryId IN (:entryNumbers) ");
+			whereClause.add("listData.entryId IN (:entryNumbers) ");
 		}
 
 		if (!CollectionUtils.isEmpty(request.getGids())) {
 			queryParams.put("gids", request.getGids());
-			whereClauseBuilder.append(" AND listData.gid IN (:gids) ");
+			whereClause.add("listData.gid IN (:gids) ");
 		}
 
 		if (!StringUtils.isEmpty(request.getGermplasmUUID())) {
 			queryParams.put("germplasmUUID", request.getGermplasmUUID());
-			whereClauseBuilder.append(" AND g.germplsm_uuid = :germplasmUUID ");
+			whereClause.add("g.germplsm_uuid = :germplasmUUID ");
 		}
 
 		final SqlTextFilter designationFilter = request.getDesignationFilter();
@@ -240,7 +270,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 			final SqlTextFilter.Type type = designationFilter.getType();
 			final String operator = GenericDAO.getOperator(type);
 			queryParams.put("designation", GenericDAO.getParameter(type, value));
-			whereClauseBuilder.append(String.format(" AND %s %s :%s", "designation.nval", operator, "designation"));
+			whereClause.add(String.format("%s %s :%s", "designation.nval", operator, "designation"));
 		}
 
 		final SqlTextFilter immediateSourceNameFilter = request.getImmediateSourceName();
@@ -249,7 +279,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 			final SqlTextFilter.Type type = immediateSourceNameFilter.getType();
 			final String operator = GenericDAO.getOperator(type);
 			queryParams.put("immediateSourceName", GenericDAO.getParameter(type, value));
-			whereClauseBuilder.append(String.format(" AND %s %s :%s", "immediateSourceFilterName.nval", operator, "immediateSourceName"));
+			whereClause.add(String.format("%s %s :%s", "immediateSourceFilterName.nval", operator, "immediateSourceName"));
 
 			joins.add(IMMEDIATE_SOURCE_NAME_FILTER_JOIN);
 		}
@@ -260,7 +290,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 			final SqlTextFilter.Type type = groupSourceNameFilter.getType();
 			final String operator = GenericDAO.getOperator(type);
 			queryParams.put("groupSourceName", GenericDAO.getParameter(type, value));
-			whereClauseBuilder.append(String.format(" AND %s %s :%s", "groupSourceFilterName.nval", operator, "groupSourceName"));
+			whereClause.add(String.format("%s %s :%s", "groupSourceFilterName.nval", operator, "groupSourceName"));
 
 			joins.add(GROUP_SOURCE_NAME_FILTER_JOIN);
 		}
@@ -271,7 +301,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 			final SqlTextFilter.Type type = femaleParentNameFilter.getType();
 			final String operator = GenericDAO.getOperator(type);
 			queryParams.put("femaleParentName", GenericDAO.getParameter(type, value));
-			whereClauseBuilder.append(String.format(" AND %s %s :%s", "femaleParentName.nval", operator, "femaleParentName"));
+			whereClause.add(String.format("%s %s :%s", "femaleParentName.nval", operator, "femaleParentName"));
 
 			joins.add(FEMALE_PARENT_NAME_FILTER_JOIN);
 		}
@@ -282,51 +312,82 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 			final SqlTextFilter.Type type = maleParentNameFilter.getType();
 			final String operator = GenericDAO.getOperator(type);
 			queryParams.put("maleParentName", GenericDAO.getParameter(type, value));
-			whereClauseBuilder.append(String.format(" AND %s %s :%s", "maleParentName.nval", operator, "maleParentName"));
+			whereClause.add(String.format("%s %s :%s", "maleParentName.nval", operator, "maleParentName"));
 
 			joins.add(MALE_PARENT_NAME_FILTER_JOIN);
 		}
 
 		if (!StringUtils.isEmpty(request.getBreedingMethodName())) {
 			queryParams.put("breedingMethodName", "%" + request.getBreedingMethodName() + "%");
-			whereClauseBuilder.append(" AND method.mname LIKE :breedingMethodName ");
+			whereClause.add("method.mname LIKE :breedingMethodName ");
 		}
 
 		if (!StringUtils.isEmpty(request.getBreedingMethodAbbreviation())) {
 			queryParams.put("breedingMethodAbbr", "%" + request.getBreedingMethodAbbreviation() + "%");
-			whereClauseBuilder.append(" AND method.mcode LIKE :breedingMethodAbbr ");
+			whereClause.add("method.mcode LIKE :breedingMethodAbbr ");
 		}
 
 		if (!StringUtils.isEmpty(request.getBreedingMethodGroup())) {
 			queryParams.put("breedingMethodGroup", "%" + request.getBreedingMethodGroup() + "%");
-			whereClauseBuilder.append(" AND method.mgrp LIKE :breedingMethodGroup ");
+			whereClause.add("method.mgrp LIKE :breedingMethodGroup ");
 		}
 
 		if (!StringUtils.isEmpty(request.getLocationName())) {
 			queryParams.put("locationName", "%" + request.getLocationName() + "%");
-			whereClauseBuilder.append(" AND loc.lname LIKE :locationName ");
+			whereClause.add("loc.lname LIKE :locationName ");
 		}
 
 		if (!StringUtils.isEmpty(request.getLocationAbbreviation())) {
 			queryParams.put("locationAbbr", "%" + request.getLocationAbbreviation() + "%");
-			whereClauseBuilder.append(" AND loc.labbr LIKE :locationAbbr ");
+			whereClause.add("loc.labbr LIKE :locationAbbr ");
 		}
 
 		if (request.getGermplasmDateFrom() != null) {
-			whereClauseBuilder.append(" AND g.gdate >= :germplasmDateFrom ");
+			whereClause.add("g.gdate >= :germplasmDateFrom ");
 			queryParams.put("germplasmDateFrom", DATE_FORMAT.format(request.getGermplasmDateFrom()));
 		}
 
 		if (request.getGermplasmDateTo() != null) {
 			queryParams.put("germplasmDateTo", DATE_FORMAT.format(request.getGermplasmDateTo()));
-			whereClauseBuilder.append(" AND g.gdate <= :germplasmDateTo ");
+			whereClause.add("g.gdate <= :germplasmDateTo ");
 		}
 
 		if (request.getReference() != null) {
 			queryParams.put("reference", "%" + request.getReference() + "%");
-			whereClauseBuilder.append(" AND ref.analyt like :reference ");
+			whereClause.add("ref.analyt LIKE :reference ");
 		}
-		return whereClauseBuilder.toString();
+
+		final Map<Integer, Object> namesFilters = request.getNamesFilters();
+		if (!CollectionUtils.isEmpty(namesFilters)) {
+			namesFilters.forEach((nameTypeId, value) -> {
+				final String alias = this.formatNamesAlias(nameTypeId);
+				final String paramenterName = String.format("%s_NAME_FILTER", alias);
+				queryParams.put(paramenterName, "%" + value + "%");
+				whereClause.add(String.format("%s.nval LIKE :%s", alias, paramenterName));
+			});
+		}
+
+		final Map<Integer, Object> descriptorsFilters = request.getDescriptorsFilters();
+		if (!CollectionUtils.isEmpty(descriptorsFilters)) {
+			descriptorsFilters.forEach((variableId, value) -> {
+				final String alias = this.formatVariableAlias(variableId);
+				final String paramenterName = String.format("%s_DESCRIPTOR_FILTER", alias);
+				queryParams.put(paramenterName, "%" + value + "%");
+				whereClause.add(String.format("%s.aval LIKE :%s", alias, paramenterName));
+			});
+		}
+
+		final Map<Integer, Object> entryDetailFilters = request.getVariablesFilters();
+		if (!CollectionUtils.isEmpty(entryDetailFilters)) {
+			entryDetailFilters.forEach((variableId, value) -> {
+				final String alias = this.formatVariableAlias(variableId);
+				final String paramenterName = String.format("%s_ENTRY_DETAILS_FILTER", alias);
+				queryParams.put(paramenterName, "%" + value + "%");
+				whereClause.add(String.format("%s.value LIKE :%s", alias, paramenterName));
+			});
+		}
+
+		return whereClause;
 	}
 
 	private void addFixedScalars(final List<String> scalars, final List<String> selectClause) {
@@ -461,36 +522,33 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 	private void addNameScalar(final List<String> scalars, final List<String> selectClause,
 		final Set<String> joins, final Integer nameTypeId) {
 
-		String alias = formatDynamicAlias(GermplasmListColumnCategory.NAMES, nameTypeId);
+		final String alias = this.formatNamesAlias(nameTypeId);
 		selectClause
 			.add(this.addSelectExpression(scalars, String.format("%s.nval", alias), alias));
 
-		String join = String.format("LEFT JOIN names %1$s ON g.gid = %1$s.gid AND %1$s.ntype = %2$s AND %1$s.nstat <> %3$s",
-			alias, nameTypeId, NAME_DELETED_STATUS);
-		joins.add(String.format(join, alias, alias, nameTypeId));
+		final String join = this.formatNameJoin(alias, nameTypeId);
+		joins.add(join);
 	}
 
 	private void addDescriptorScalar(final List<String> scalars, final List<String> selectClause,
 		final Set<String> joins, final Integer variableId) {
 
-		String alias = formatDynamicAlias(GermplasmListColumnCategory.VARIABLE, variableId);
+		final String alias = this.formatVariableAlias(variableId);
 		selectClause.add(this.addSelectExpression(scalars, String.format("%s.aval", alias), alias));
 
-		String join = String.format("LEFT JOIN atributs %1$s ON g.gid = %1$s.gid AND %1$s.atype = %2$s",
-			alias, variableId);
-		joins.add(String.format(join, alias, alias, variableId));
+		final String join = this.formatDescriptorJoin(alias, variableId);
+		joins.add(join);
 	}
 
 	private void addEntryDetailScalar(final List<String> scalars, final List<String> selectClause,
 		final Set<String> joins, final Integer variableId) {
 
-		String alias = formatDynamicAlias(GermplasmListColumnCategory.VARIABLE, variableId);
+		final String alias = this.formatVariableAlias(variableId);
 		selectClause.add(this.addSelectExpression(scalars, String.format("%s.id", alias), alias + "_DETAIL_ID"));
 		selectClause.add(this.addSelectExpression(scalars, String.format("%s.value", alias), alias));
 
-		String join = String.format("LEFT JOIN list_data_details %1$s ON listData.lrecid = %1$s.lrecid AND %1$s.variable_id = %2$s",
-			alias, variableId);
-		joins.add(String.format(join, alias, alias, variableId));
+		final String join = this.formatEntryDetailJoin(alias, variableId);
+		joins.add(join);
 	}
 
 	private String addSelectExpression(final List<String> scalars, final String expression, final String columnAlias) {
@@ -502,8 +560,34 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		return String.format(BASE_QUERY, selectExpression, joinClause, whereClause, groupClause);
 	}
 
+	private String formatNamesAlias(final Integer nameTypeId) {
+		return formatDynamicAlias(GermplasmListColumnCategory.NAMES, nameTypeId);
+	}
+
+	private String formatVariableAlias(final Integer variableId) {
+		return formatDynamicAlias(GermplasmListColumnCategory.VARIABLE, variableId);
+	}
+
 	private String formatDynamicAlias(final GermplasmListColumnCategory category, final Integer variableId) {
 		return String.format("%s_%s", category, variableId);
+	}
+
+	private String formatNameJoin(final String alias, final Integer nameTypeId) {
+		return String.format("LEFT JOIN names %1$s ON g.gid = %1$s.gid AND %1$s.ntype = %2$s AND %1$s.nstat <> %3$s", alias, nameTypeId, NAME_DELETED_STATUS);
+	}
+
+	private String formatDescriptorJoin(final String alias, final Integer variableId) {
+		return String.format("LEFT JOIN atributs %1$s ON g.gid = %1$s.gid AND %1$s.atype = %2$s", alias, variableId);
+	}
+
+	private String formatEntryDetailJoin(final String alias, final Integer variableId) {
+		return String.format("LEFT JOIN list_data_details %1$s ON listData.lrecid = %1$s.lrecid AND %1$s.variable_id = %2$s", alias, variableId);
+	}
+
+	private String getWhereClause(final List<String> whereClause) {
+		return whereClause
+			.stream()
+			.collect(Collectors.joining(" AND "));
 	}
 
 	private String getJoinClause(final Set<String> joins) {
