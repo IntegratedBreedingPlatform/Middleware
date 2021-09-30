@@ -37,12 +37,16 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			create table list_data_details (
-				id          int auto_increment
+				id            int auto_increment
 					primary key,
-				variable_id int          not null,
-				lrecid      int          not null,
-				value       varchar(255) null,
-				cvalue_id   int          null,
+				variable_id   int                                 not null,
+				lrecid        int                                 not null,
+				value         varchar(255)                        null,
+				cvalue_id     int                                 null,
+				created_by    int       default 0                 not null,
+				modified_by   int                                 null,
+				created_date  timestamp default CURRENT_TIMESTAMP not null,
+				modified_date timestamp                           null,
 				constraint list_entry_details_data_cvterm_cvterm_id_fk
 					foreign key (variable_id) references cvterm(cvterm_id),
 				constraint list_entry_details_data_cvterm_cvterm_id_fk_2
