@@ -65,6 +65,11 @@ public class Method implements Serializable, Cloneable {
 
 	public static final List<Integer> NON_BULKED_CLASSES = Arrays.asList(TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
 
+	public static final Integer LOCAL_METHOD_ID_DEFAULT = 0;
+	public static final Integer METHOD_ATTRIBUTE_DEFAULT = 0;
+	public static final Integer NO_FEMALE_PARENTS_DEFAULT = 0;
+	public static final Integer METHOD_REFERENCE_DEFAULT = 0;
+
 	public static final String GET_ALL = "getAllMethods";
 	
 	public static final String GET_FAVORITE_METHODS_BY_TYPE = "getFavoriteMethodsByMethodType";
