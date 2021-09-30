@@ -293,7 +293,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 			}
 		}
 	}
-
+/*
 	@Test
 	public void testGetVariablesByDatasetId() {
 		// PH_M_cm
@@ -333,10 +333,10 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(traitCount, variablesDTOs.size());
 	}
 
+ */
+
 	@Test
 	public void testConvertToVariableDTO() {
-
-		final boolean filterByStudyId = true;
 		final Map<String, Object> map = new HashMap<>();
 		map.put(CVTermDao.VARIABLE_ID, "123");
 		map.put(CVTermDao.VARIABLE_NAME, "variableName");
@@ -360,7 +360,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		map.put(CVTermDao.VARIABLE_TRAIT_CLASS, "traitClass");
 		map.put(CVTermDao.VARIABLE_FORMULA_DEFINITION, "formulaDefinition");
 
-		final List<VariableDTO> variableDTOs = dao.convertToVariableDTO(Lists.newArrayList(map), filterByStudyId);
+		final List<VariableDTO> variableDTOs = dao.convertToVariableDTO(Lists.newArrayList(map));
 		final VariableDTO variableDTO = variableDTOs.get(0);
 
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_ID), variableDTO.getObservationVariableDbId());

@@ -117,16 +117,6 @@ public interface OntologyVariableDataManager {
 
 	void fillVariableUsage(Variable variable);
 
-	List<VariableDTO> getVariablesByDatasetId(Integer datasetId, List<Integer> variableTypes,
-		Integer pageSize, Integer pageNumber);
-
-	long countVariablesByDatasetId(Integer datasetId, List<Integer> variableTypes);
-
-	List<VariableDTO> getAllVariables(List<Integer> variableTypes,
-		String cropname, Integer pageSize, Integer pageNumber);
-
-	long countAllVariables(List<Integer> variableTypes);
-
 	List<Variable> searchAttributeVariables(String query, String programUUID);
 
 	boolean hasUsage(int variableId);
