@@ -5,88 +5,56 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class BreedingMethodDTO {
+public class BreedingMethodDTO extends BreedingMethodNewRequest {
 
-	private String code;
-	private String name;
-	private String description;
-	private String type;
-	private String group;
-	private Integer methodClass;
 	private Integer mid;
-	private Integer numberOfProgenitors;
 	private Boolean isBulkingMethod;
+	private Boolean isFavorite;
 
 	public BreedingMethodDTO() {
 	}
 
 	public BreedingMethodDTO(final Method method) {
 		this();
-		this.code = method.getMcode();
-		this.name = method.getMname();
-		this.description = method.getMdesc();
-		this.type = method.getMtype();
-		this.group = method.getMgrp();
-		this.methodClass = method.getGeneq();
-		this.numberOfProgenitors = method.getMprgn();
+		this.setCode(method.getMcode());
+		this.setName(method.getMname());
+		this.setDescription(method.getMdesc());
+		this.setType(method.getMtype());
+		this.setGroup(method.getMgrp());
+		this.setMethodClass(method.getGeneq());
+		this.setNumberOfProgenitors(method.getMprgn());
+		this.setIsBulkingMethod(method.isBulkingMethod());
+
+		this.setSeparator(method.getSeparator());
+		this.setPrefix(method.getPrefix());
+		this.setCount(method.getCount());
+		this.setSuffix(method.getSuffix());
+
 		this.mid = method.getMid();
-		this.isBulkingMethod = method.isBulkingMethod();
 	}
 
-	public String getCode() {
-		return this.code;
+	public Integer getMid() {
+		return this.mid;
 	}
 
-	public void setCode(final String code) {
-		this.code = code;
+	public void setMid(final Integer mid) {
+		this.mid = mid;
 	}
 
-	public String getName() {
-		return this.name;
+	public Boolean getIsBulkingMethod() {
+		return this.isBulkingMethod;
 	}
 
-	public void setName(final String name) {
-		this.name = name;
+	public void setIsBulkingMethod(final Boolean isBulkingMethod) {
+		this.isBulkingMethod = isBulkingMethod;
 	}
 
-	public String getDescription() {
-		return this.description;
+	public Boolean getFavorite() {
+		return isFavorite;
 	}
 
-	public void setDescription(final String description) {
-		this.description = description;
-	}
-
-	public String getType() {
-		return this.type;
-	}
-
-	public void setType(final String type) {
-		this.type = type;
-	}
-
-	public String getGroup() {
-		return this.group;
-	}
-
-	public void setGroup(final String group) {
-		this.group = group;
-	}
-
-	public Integer getMethodClass() {
-		return this.methodClass;
-	}
-
-	public void setMethodClass(final Integer methodClass) {
-		this.methodClass = methodClass;
-	}
-
-	public Integer getNumberOfProgenitors() {
-		return this.numberOfProgenitors;
-	}
-
-	public void setNumberOfProgenitors(final Integer numberOfProgenitors) {
-		this.numberOfProgenitors = numberOfProgenitors;
+	public void setFavorite(final Boolean favorite) {
+		isFavorite = favorite;
 	}
 
 	@Override
@@ -102,21 +70,5 @@ public class BreedingMethodDTO {
 	@Override
 	public String toString() {
 		return Pojomatic.toString(this);
-	}
-
-	public Integer getMid() {
-		return this.mid;
-	}
-
-	public void setMid(final Integer mid) {
-		this.mid = mid;
-	}
-
-	public Boolean getIsBulkingMethod() {
-		return this.isBulkingMethod;
-	}
-
-	public void setIsBulkingMethod(final boolean isBulkingMethod) {
-		this.isBulkingMethod = isBulkingMethod;
 	}
 }

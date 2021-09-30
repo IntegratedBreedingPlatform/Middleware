@@ -1139,6 +1139,16 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getExperimentDao().count(datasetId);
 	}
 
+	@Override
+	public long countByVariableIdAndValue(final Integer variableId, final String value) {
+		return this.daoFactory.getDmsProjectDAO().countByVariableIdAndValue(variableId, value);
+	}
+
+	@Override
+	public long countObservationsByVariableIdAndValue(final Integer variableId, final String value) {
+		return this.daoFactory.getPhenotypeDAO().countByVariableIdAndValue(variableId, value);
+	}
+
 	void addStudyVariablesToUnitRows(final List<ObservationUnitRow> observationUnits, final List<MeasurementVariable> studyVariables) {
 		for (final ObservationUnitRow observationUnitRow : observationUnits) {
 			for (final MeasurementVariable measurementVariable : studyVariables) {

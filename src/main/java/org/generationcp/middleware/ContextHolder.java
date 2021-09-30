@@ -4,6 +4,7 @@ package org.generationcp.middleware;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class ContextHolder {
 
@@ -32,6 +33,10 @@ public class ContextHolder {
 		return currentCropName;
 	}
 
+	/**
+	 * @deprecated use {@link #getCurrentProgramOptional()}
+	 */
+	@Deprecated
 	public static String getCurrentProgram() {
 		final String currentProgramId = ContextHolder.currentProgram.get();
 		if (StringUtils.isBlank(currentProgramId)) {
@@ -39,6 +44,14 @@ public class ContextHolder {
 			throw new IllegalStateException("Unable to use variable cache. Current Program database is unknown.");
 		}
 		return currentProgramId;
+	}
+
+	public static Optional<String> getCurrentProgramOptional() {
+		final String currentProgramId = ContextHolder.currentProgram.get();
+		if (StringUtils.isBlank(currentProgramId)) {
+			return Optional.empty();
+		}
+		return Optional.of(currentProgramId);
 	}
 
 	public static Integer getLoggedInUserId() {

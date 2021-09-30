@@ -4,6 +4,9 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.MethodClass;
+import org.generationcp.middleware.pojos.MethodGroup;
+import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,10 +16,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
 import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -72,6 +77,20 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 		assertNotNull(breedingMethods);
 		assertThat(breedingMethods.size(), is(1));
 		assertThat(breedingMethods, hasItem(hasProperty("code", is(newMethodCode))));
+	}
+
+	@Test
+	public void testCreate_Ok() {
+		final BreedingMethodNewRequest request = new BreedingMethodNewRequest();
+		request.setCode(randomAlphanumeric(8));
+		request.setName(randomAlphanumeric(50));
+		request.setDescription(randomAlphanumeric(255));
+		request.setType(MethodType.DERIVATIVE.getCode());
+		request.setGroup(MethodGroup.ALL_SYSTEM.getCode());
+		request.setMethodClass(MethodClass.SEED_ACQUISITION.getId());
+		request.setNumberOfProgenitors(-1);
+		final BreedingMethodDTO breedingMethodDTO = this.breedingMethodService.create(request);
+		assertThat(breedingMethodDTO.getMid(), notNullValue());
 	}
 
 }
