@@ -566,7 +566,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 						variableType = variable.getVariableTypes().iterator().next();
 					}
 					return this.buildColumn(variable.getId(), variable.getName(), variable.getAlias(), GermplasmListColumnCategory.VARIABLE,
-						variableType);
+						variableType, variable.getScale().getDataType().getId(), categoricalVariablesMap.get(variable.getId()));
 				})
 				.collect(Collectors.toList());
 			header.addAll(variableColumns);
@@ -700,28 +700,18 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
 		final GermplasmListColumnCategory category) {
-		return this.buildColumn(termId, name, alias, category, null);
+		return this.buildColumn(termId, name, alias, category, null, null, null);
 	}
 
 	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
-		final GermplasmListColumnCategory category, final VariableType variableType) {
+		final GermplasmListColumnCategory category, final VariableType variableType, final Integer datatypeId,
+		final List<ValueReference> possibleValues) {
 		final GermplasmListMeasurementVariableDTO column = new GermplasmListMeasurementVariableDTO();
 		column.setTermId(termId);
 		column.setName(name);
 		column.setAlias(alias);
 		column.setColumnCategory(category);
 		column.setVariableType(variableType);
-		return column;
-	}
-
-	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
-		final GermplasmListColumnCategory category, final Integer datatypeId, final List<ValueReference> possibleValues) {
-
-		final GermplasmListMeasurementVariableDTO column = new GermplasmListMeasurementVariableDTO();
-		column.setTermId(termId);
-		column.setName(name);
-		column.setAlias(alias);
-		column.setColumnCategory(category);
 		column.setDataTypeId(datatypeId);
 		column.setPossibleValues(possibleValues);
 		return column;
