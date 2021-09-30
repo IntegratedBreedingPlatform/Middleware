@@ -351,7 +351,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		map.put(CVTermDao.VARIABLE_PROPERTY_DESCRIPTION, "propertyDescription");
 		map.put(CVTermDao.VARIABLE_PROPERTY_ONTOLOGY_ID, "propertyOntology");
 		map.put(CVTermDao.VARIABLE_DATA_TYPE_ID, DataType.NUMERIC_VARIABLE.getId());
-		map.put(CVTermDao.VARIABLE_SCALE_CATEGORIES, "1|2|3|4|5");
+		map.put(CVTermDao.VARIABLE_SCALE_CATEGORIES, "a,1|b,2|c,3|d,4|e,5");
 		map.put(CVTermDao.VARIABLE_SCALE_MIN_RANGE, new Double(100));
 		map.put(CVTermDao.VARIABLE_SCALE_MAX_RANGE, new Double(1000));
 		map.put(CVTermDao.VARIABLE_EXPECTED_MIN, new Double(1));

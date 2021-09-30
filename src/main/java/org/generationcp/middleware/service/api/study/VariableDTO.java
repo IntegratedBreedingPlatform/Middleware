@@ -2,8 +2,11 @@ package org.generationcp.middleware.service.api.study;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.BrapiView;
+import org.generationcp.middleware.util.serializer.CategorySerializer;
+import org.generationcp.middleware.util.serializer.ObservationSerializer;
 
 import java.util.*;
 
@@ -531,8 +534,8 @@ public class VariableDTO {
 
 
 	public class ValidValues {
-
-		private List<String> categories = new ArrayList<>();
+		@JsonSerialize(using = CategorySerializer.class)
+		private List<CategoryDTO> categories = new ArrayList<>();
 		private Double max;
 		private Double min;
 
@@ -555,11 +558,11 @@ public class VariableDTO {
 			this.min = min;
 		}
 
-		public List<String> getCategories() {
+		public List<CategoryDTO> getCategories() {
 			return this.categories;
 		}
 
-		public void setCategories(final List<String> categories) {
+		public void setCategories(final List<CategoryDTO> categories) {
 			this.categories = categories;
 		}
 	}
