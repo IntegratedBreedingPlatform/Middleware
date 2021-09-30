@@ -16,7 +16,7 @@ import java.io.Serializable;
 
 @Entity
 @Table(name = "list_data_details")
-public class GermplasmListDataDetail implements Serializable {
+public class GermplasmListDataDetail extends AbstractEntity implements Serializable {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
