@@ -23,10 +23,12 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi{
     }
 
     public List<VariableDTO> getObservationVariables(VariableSearchRequestDTO requestDTO, Pageable pageable) {
-        return new ArrayList<>();
+        final List<VariableDTO> variableDTOS = this.daoFactory.getCvTermDao().getObservationVariables(requestDTO, pageable);
+
+        return variableDTOS;
     }
 
     public long countObservationVariables(VariableSearchRequestDTO requestDTO){
-        return 1;
+        return this.daoFactory.getCvTermDao().countObservationVariables(requestDTO);
     }
 }

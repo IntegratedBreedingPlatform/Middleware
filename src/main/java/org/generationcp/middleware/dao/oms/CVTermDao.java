@@ -32,6 +32,9 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRequestDTO;
+import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
@@ -39,6 +42,7 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
+import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -52,6 +56,7 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
@@ -1537,6 +1542,210 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	}
 
+	public long countObservationVariables(final VariableSearchRequestDTO requestDTO) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createCountObservationVariablesQueryString(requestDTO));
+		this.addObservationVariableSearchParameters(sqlQuery, requestDTO);
+		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+	}
+
+	private String createCountObservationVariablesQueryString(final VariableSearchRequestDTO requestDTO) {
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT variable.cvterm_id) ");
+		this.appendObservationVariablesFromQuery(sql);
+		this.appendObservationVariableSeachFilters(sql, requestDTO);
+		return sql.toString();
+	}
+
+	public List<VariableDTO> getObservationVariables(final VariableSearchRequestDTO requestDTO,
+		final Pageable pageable) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createObservationVariablesQuery(requestDTO));
+		if(pageable != null) {
+			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
+			sqlQuery.setMaxResults(pageable.getPageSize());
+		}
+		this.addObservationVariableSearchParameters(sqlQuery, requestDTO);
+		this.appendGetVariablesScalar(sqlQuery);
+		return this.convertToVariableDTO(this.getVariableQueryResult(sqlQuery, pageable.getPageSize(), pageable.getPageNumber()), true);
+	}
+
+	public void addObservationVariableSearchParameters(final SQLQuery sqlQuery, final VariableSearchRequestDTO requestDTO) {
+		if(!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
+			sqlQuery.setParameterList("dataTypeIds", this.convertVariableDtoScaleToDataTypeIds(requestDTO.getDataTypes()));
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
+			sqlQuery.setParameterList("referenceIds", requestDTO.getExternalReferenceIDs());
+
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
+			sqlQuery.setParameterList("referenceSources", requestDTO.getExternalReferenceSources());
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getMethodDbIds())) {
+			sqlQuery.setParameterList("methodDbIds", requestDTO.getMethodDbIds());
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getObservationVariableDbIds())) {
+			sqlQuery.setParameterList("observationVariableDbIds", requestDTO.getObservationVariableDbIds());
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getObservationVariableNames())) {
+			sqlQuery.setParameterList("observationVariableNames", requestDTO.getObservationVariableNames());
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getOntologyDbIds())) {
+			sqlQuery.setParameterList("ontologyDbIds", requestDTO.getOntologyDbIds());
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getScaleDbIds())) {
+			sqlQuery.setParameterList("scaleDbIds", requestDTO.getScaleDbIds());
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getStudyDbId())) {
+			sqlQuery.setParameterList("studyDbIds", requestDTO.getStudyDbId());
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getTraitClasses())) {
+			sqlQuery.setParameterList("traitClasses", requestDTO.getTraitClasses());
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getTraitDbIds())) {
+			sqlQuery.setParameterList("traitDbIds", requestDTO.getTraitDbIds());
+		}
+	}
+
+	public String createObservationVariablesQuery(final VariableSearchRequestDTO requestDTO) {
+		final StringBuilder stringBuilder = new StringBuilder(" SELECT DISTINCT ");
+		stringBuilder.append("   pp.alias AS " + VARIABLE_ALIAS + ", ");
+		stringBuilder.append("   variable.cvterm_id AS " + VARIABLE_ID + ", ");
+		stringBuilder.append("   variable.name AS " + VARIABLE_NAME + ", ");
+		stringBuilder.append("   scale.name AS " + VARIABLE_SCALE + ", ");
+		stringBuilder.append("   scale.cvterm_id AS " + VARIABLE_SCALE_ID + ", ");
+		stringBuilder.append("   method.name AS " + VARIABLE_METHOD + ", ");
+		stringBuilder.append("   method.cvterm_id AS " + VARIABLE_METHOD_ID + ", ");
+		stringBuilder.append("   method.definition AS " + VARIABLE_METHOD_DESCRIPTION + ", ");
+		stringBuilder.append("   property.name AS " + VARIABLE_PROPERTY + ", ");
+		stringBuilder.append("   property.cvterm_id AS " + VARIABLE_PROPERTY_ID + ", ");
+		stringBuilder.append("   property.definition AS " + VARIABLE_PROPERTY_DESCRIPTION + ", ");
+		stringBuilder.append("   propertyOntology.value AS " + VARIABLE_PROPERTY_ONTOLOGY_ID + ", ");
+		stringBuilder.append("   dataType.cvterm_id AS " + VARIABLE_DATA_TYPE_ID + ", ");
+		stringBuilder.append("   formula.definition AS " + VARIABLE_FORMULA_DEFINITION + ", ");
+		stringBuilder.append("   scaleMinRange.value AS " + VARIABLE_SCALE_MIN_RANGE + ", ");
+		stringBuilder.append("   scaleMaxRange.value AS " + VARIABLE_SCALE_MAX_RANGE + ", ");
+		stringBuilder.append("   vo.expected_min AS " + VARIABLE_EXPECTED_MIN + ", ");
+		stringBuilder.append("   vo.expected_max AS " + VARIABLE_EXPECTED_MAX + ", ");
+		stringBuilder.append("   variableDateCreated.value AS " + VARIABLE_CREATION_DATE + ", ");
+		stringBuilder.append("   GROUP_CONCAT(DISTINCT category.name SEPARATOR '|') AS " + VARIABLE_SCALE_CATEGORIES + ",");
+		stringBuilder.append("   GROUP_CONCAT(DISTINCT traitClass.name SEPARATOR ',') AS " + VARIABLE_TRAIT_CLASS);
+		this.appendObservationVariablesFromQuery(stringBuilder);
+		this.appendObservationVariableSeachFilters(stringBuilder, requestDTO);
+
+		return stringBuilder.toString();
+	}
+
+	public void appendObservationVariablesFromQuery(final StringBuilder stringBuilder) {
+		stringBuilder.append("   FROM cvterm variable ");
+		// Scale
+		stringBuilder.append("   INNER JOIN cvterm_relationship cvtrscale ON variable.cvterm_id = cvtrscale.subject_id ");
+		stringBuilder.append("                                            AND cvtrscale.type_id = " + TermId.HAS_SCALE.getId());
+		stringBuilder.append("   INNER JOIN cvterm scale ON cvtrscale.object_id = scale.cvterm_id ");
+		// Method
+		stringBuilder.append("   INNER JOIN cvterm_relationship cvtrmethod ON variable.cvterm_id = cvtrmethod.subject_id ");
+		stringBuilder.append("                                             AND cvtrmethod.type_id = " + TermId.HAS_METHOD.getId());
+		stringBuilder.append("   INNER JOIN cvterm method ON cvtrmethod.object_id = method.cvterm_id ");
+		stringBuilder.append("   INNER JOIN cvterm_relationship cvtrproperty ON variable.cvterm_id = cvtrproperty.subject_id ");
+		stringBuilder.append("                                               AND cvtrproperty.type_id = " + TermId.HAS_PROPERTY.getId());
+		// Trait
+		stringBuilder.append("   INNER JOIN cvterm property ON cvtrproperty.object_id = property.cvterm_id ");
+		stringBuilder.append("   INNER JOIN cvterm_relationship cvtrdataType ON scale.cvterm_id = cvtrdataType.subject_id ");
+		stringBuilder.append("                                               AND cvtrdataType.type_id = " + TermId.HAS_TYPE.getId());
+		// Datatype
+		stringBuilder.append("   INNER JOIN cvterm dataType ON cvtrdataType.object_id = dataType.cvterm_id ");
+		// VariableType
+		stringBuilder.append("   INNER JOIN cvtermprop variableType ");
+		stringBuilder.append("   ON variableType.cvterm_id = variable.cvterm_id AND variableType.type_id = " + TermId.VARIABLE_TYPE
+				.getId());
+		stringBuilder.append("   LEFT JOIN cvtermprop variableDateCreated on variable.cvterm_id = variableDateCreated.cvterm_id ");
+		stringBuilder.append("                                         AND variableDateCreated.type_id = " + TermId.CREATION_DATE.getId());
+		stringBuilder.append("   LEFT JOIN cvtermprop scaleMaxRange on scale.cvterm_id = scaleMaxRange.cvterm_id ");
+		stringBuilder.append("                                         AND scaleMaxRange.type_id = " + TermId.MAX_VALUE.getId());
+		stringBuilder.append("   LEFT JOIN cvtermprop scaleMinRange on scale.cvterm_id = scaleMinRange.cvterm_id ");
+		stringBuilder.append("                                         AND scaleMinRange.type_id = " + TermId.MIN_VALUE.getId());
+		// Formula Definition
+		stringBuilder.append("   LEFT JOIN formula ON formula.target_variable_id = variable.cvterm_id and formula.active = 1");
+		// Ontology ID for Property
+		stringBuilder.append("   LEFT JOIN cvtermprop propertyOntology ON propertyOntology.cvterm_id = property.cvterm_id");
+		stringBuilder.append("        AND propertyOntology.type_id = " + TermId.CROP_ONTOLOGY_ID.getId());
+		// Retrieve the Trait Classes of the variables' property
+		stringBuilder.append("   LEFT JOIN (select cvtr.subject_id propertyTermId, o.name ");
+		stringBuilder.append("   from cvterm o inner join cvterm_relationship cvtr on cvtr.object_id = o.cvterm_id and cvtr.type_id = ");
+		stringBuilder.append(TermId.IS_A.getId() + ")" + " traitClass on traitClass.propertyTermId = property.cvterm_id ");
+		// Retrieve the categories (valid values) of the variables' scale
+		stringBuilder.append("   LEFT JOIN (SELECT cvtrcategory.subject_id, o.name as name");
+		stringBuilder.append(
+				"	  FROM cvterm o inner JOIN cvterm_relationship cvtrcategory ON cvtrcategory.object_id = o.cvterm_id AND cvtrcategory.type_id = ");
+		stringBuilder.append(TermId.HAS_VALUE.getId() + ")" + " category on category.subject_id = scale.cvterm_id ");
+		// Left Join project and project prop to check if there are variables associated to a study
+		stringBuilder.append("	  LEFT JOIN projectprop pp ON pp.variable_id = variable.cvterm_id");
+		stringBuilder.append("	  LEFT JOIN project dataset ON dataset.project_id = pp.project_id AND dataset.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId());
+		stringBuilder.append("	  LEFT JOIN nd_experiment nde ON nde.project_id = dataset.project_id");
+		// To get Min and Max override values per program
+		stringBuilder.append(
+				"	  LEFT JOIN variable_overrides vo ON variable.cvterm_id = vo.cvterm_id AND dataset.program_uuid = vo.program_uuid");
+		stringBuilder.append(" WHERE variableType.value = '" + VariableType.TRAIT.getName() + "' ");
+	}
+
+	public void appendObservationVariableSeachFilters(final StringBuilder stringBuilder, final VariableSearchRequestDTO requestDTO) {
+		if(!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
+			stringBuilder.append(" AND dataType.cvterm_id IN (:dataTypeIds)");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
+			stringBuilder.append(" AND EXISTS (SELECT * FROM external_reference_variable vref ");
+			stringBuilder.append(" WHERE variable.cvterm_id = vref.cvterm_id AND vref.reference_id IN (:referenceIds)) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
+			stringBuilder.append(" AND EXISTS (SELECT * FROM external_reference_variable vref ");
+			stringBuilder.append(" WHERE variable.cvterm_id = vref.cvterm_id AND vref.reference_source IN (:referenceSources)) ");
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getMethodDbIds())) {
+			stringBuilder.append(" AND method.cvterm_id IN (:methodDbIds) ");
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getObservationVariableDbIds())) {
+			stringBuilder.append(" AND variable.cvterm_id IN (:observationVariableDbIds) ");
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getObservationVariableNames())) {
+			stringBuilder.append(" AND (variable.name IN (:observationVariableNames) || ");
+			stringBuilder.append(" pp.alias IN (:observationVariableNames)) ");
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getOntologyDbIds())) {
+			stringBuilder.append(" AND variable.cvterm_id IN (:ontologyDbIds) ");
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getScaleDbIds())) {
+			stringBuilder.append(" AND scale.cvterm_id IN (:scaleDbIds) ");
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getStudyDbId())) {
+			stringBuilder.append(" AND nde.nd_geolocation_id IN (:studyDbIds) ");
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getTraitClasses())) {
+			stringBuilder.append(" AND traitClass.name IN (:traitClasses) ");
+		}
+
+		if(!CollectionUtils.isEmpty(requestDTO.getTraitDbIds())) {
+			stringBuilder.append(" AND property.cvterm_id IN (:traitDbIds) ");
+		}
+
+		stringBuilder.append("   GROUP BY variable.cvterm_id, traitClass.propertyTermId, scale.cvterm_id ");
+	}
+
 	public List<Map<String, Object>> getVariableQueryResult(final SQLQuery sqlQuery, final Integer pageSize, final Integer pageNumber) {
 		if (pageNumber != null && pageSize != null) {
 			sqlQuery.setFirstResult(pageSize * (pageNumber - 1));
@@ -1789,6 +1998,25 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		} else {
 			return "";
 		}
+	}
+
+	protected List<String> convertVariableDtoScaleToDataTypeIds(final List<String> dataTypes) {
+		final List<String> dataTypeIds = new ArrayList<>();
+		for(final String dataType: dataTypes) {
+			if (VariableDTO.Scale.NOMINAL.equals(dataType)) {
+				dataTypeIds.add(DataType.CATEGORICAL_VARIABLE.getId().toString());
+			} else if (VariableDTO.Scale.TEXT.equals(dataType)) {
+				dataTypeIds.add(DataType.CHARACTER_VARIABLE.getId().toString());
+			} else if ( VariableDTO.Scale.DATE.equals(dataType)) {
+				dataTypeIds.add(DataType.DATE_TIME_VARIABLE.getId().toString());
+			} else if (VariableDTO.Scale.NUMERICAL.equals(dataType)) {
+				dataTypeIds.add(DataType.NUMERIC_VARIABLE.getId().toString());
+			} else {
+				// for unimplemented data types: Code, Duration and Ordinal
+				dataTypeIds.add(dataType);
+			}
+		}
+		return dataTypeIds;
 	}
 
 	/**
