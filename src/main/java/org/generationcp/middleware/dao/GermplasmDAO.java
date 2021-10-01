@@ -527,9 +527,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			// Get all derivative children
 			children.addAll(this.getDescendants(gid, 'D'));
 
-			// Get all maintenance children
-			children.addAll(this.getDescendants(gid, 'M'));
-
 			// Get all generative childern
 			children.addAll(this.getGenerativeChildren(gid));
 			return children;
@@ -941,6 +938,16 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			resultMap.put(gid, methodId);
 		}
 		return resultMap;
+	}
+
+	/**
+	 * @return first germplasm (even deleted) find by method
+	 */
+	public Optional<Germplasm> findOneByMethodId(final int breedingMethodDbId) {
+		return Optional.ofNullable((Germplasm) this.getSession().createCriteria(this.getPersistentClass())
+			.add(Restrictions.eq("method.mid", breedingMethodDbId))
+			.setMaxResults(1)
+			.uniqueResult());
 	}
 
 	/**

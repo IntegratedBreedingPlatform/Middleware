@@ -414,4 +414,8 @@ public interface DatasetService {
 	void replaceObservationUnitEntry(List<Integer> observationUnitIds, Integer newEntryId);
 
 	Long countObservationUnits(Integer datasetId);
+
+	long countByVariableIdAndValue(final Integer variableId, final String value);
+
+	long countObservationsByVariableIdAndValue(final Integer variableId, final String value);
 }

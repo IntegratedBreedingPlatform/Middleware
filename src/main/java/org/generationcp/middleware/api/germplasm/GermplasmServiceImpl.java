@@ -1161,6 +1161,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}).collect(Collectors.toList());
 	}
 
+	@Override
+	public Optional<Germplasm> findOneByMethodId(final Integer breedingMethodDbId) {
+		return this.daoFactory.getGermplasmDao().findOneByMethodId(breedingMethodDbId);
+	}
+
 	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Germplasm targetGermplasm) {
 		final UserDefinedField puiUserDefinedField = this.daoFactory.getUserDefinedFieldDAO()
 			.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), SystemNameTypes.PUI.getType());
