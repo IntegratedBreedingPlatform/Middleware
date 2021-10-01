@@ -552,10 +552,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			}
 
 			// Get favorite from ProgramFavoriteDAO
-			final ProgramFavorite programFavorite =
-				this.daoFactory.getProgramFavoriteDao()
-					.getProgramFavorite(programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
-			variable.setIsFavorite(programFavorite != null);
+			final java.util.Optional<ProgramFavorite> programFavorite = this.daoFactory.getProgramFavoriteDao().getProgramFavorite(
+				programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
+			variable.setIsFavorite(programFavorite.isPresent());
 
 			final int unknownUsage = -1;
 			variable.setStudies(unknownUsage);
@@ -777,8 +776,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		}
 
 		// Updating favorite to true if alias is defined
-		ProgramFavorite programFavorite = this.daoFactory.getProgramFavoriteDao().getProgramFavorite(variableInfo.getProgramUuid(),
-				ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
+		java.util.Optional<ProgramFavorite> programFavoriteOptional = this.daoFactory.getProgramFavoriteDao().getProgramFavorite(
+			variableInfo.getProgramUuid(), ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
 
 		final String previousAlias = variableOverrides == null ? null : variableOverrides.getAlias();
 		final String newAlias = "".equals(variableInfo.getAlias()) ? null : variableInfo.getAlias();
@@ -788,14 +787,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			isFavorite = true;
 		}
 
-		if (isFavorite && programFavorite == null) {
-			programFavorite = new ProgramFavorite();
+		if (isFavorite && !programFavoriteOptional.isPresent()) {
+			final ProgramFavorite programFavorite = new ProgramFavorite();
 			programFavorite.setEntityId(variableInfo.getId());
 			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE.getName());
 			programFavorite.setUniqueID(variableInfo.getProgramUuid());
 			this.daoFactory.getProgramFavoriteDao().save(programFavorite);
-		} else if (!isFavorite && programFavorite != null) {
-			this.daoFactory.getProgramFavoriteDao().makeTransient(programFavorite);
+		} else if (!isFavorite && programFavoriteOptional.isPresent()) {
+			this.daoFactory.getProgramFavoriteDao().makeTransient(programFavoriteOptional.get());
 		}
 
 		this.daoFactory

@@ -3,8 +3,27 @@
                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	<changeSet author="cheryleigh" id="v19.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="users_migrated" />
+		</preConditions>
+		<comment>
+			Drop users_migrated IBP-5013
+		</comment>
+		<dropTable tableName="users_migrated" />
+	</changeSet>
 
-    <changeSet author="mderamos" id="v19.2.0-1">
+	<changeSet author="cheryleigh" id="v19.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="persons_migrated" />
+		</preConditions>
+		<comment>
+			Drop persons_migrated IBP-5013
+		</comment>
+		<dropTable tableName="persons_migrated" />
+	</changeSet>
+
+    <changeSet author="mderamos" id="v19.2.0-3">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="external_reference_variable"/>
