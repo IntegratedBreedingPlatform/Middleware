@@ -29,7 +29,7 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 	public void deleteByListIdAndVariableIds(final Integer listId, final Set<Integer> variableIds) {
 		try {
 			final String query =
-				"DELETE ldd FROM list_data_details ldd INNER JOIN listdata ld ON (ld.llrecid = ldd.lrecid) WHERE ld.listid = :listId AND ldd.variable_id IN (:variableIds)";
+				"DELETE ldd FROM list_data_details ldd INNER JOIN listdata ld ON (ld.lrecid = ldd.lrecid) WHERE ld.listid = :listId AND ldd.variable_id IN (:variableIds)";
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
 			sqlQuery.setParameter("listId", listId);
 			sqlQuery.setParameterList("variableIds", variableIds);
