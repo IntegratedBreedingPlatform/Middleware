@@ -1174,8 +1174,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 					new Name(null, targetGermplasm, name.getTypeId(), 0, name.getNval(), name.getLocationId(), name.getNdate(),
 						name.getReferenceId());
 				nameDAO.save(nameToSave);
-				nameDAO.makeTransient(name);
 				existingNameTypeIds.add(nameToSave.getTypeId());
+			}
+			// Delete non-preferred names of merged germplasm (we need to retain the preferred name to be able to show in audit history)
+			if (name.getNstat() != 1) {
+				nameDAO.makeTransient(name);
 			}
 		}
 	}
