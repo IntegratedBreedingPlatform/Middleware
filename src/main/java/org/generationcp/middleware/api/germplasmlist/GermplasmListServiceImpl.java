@@ -11,6 +11,7 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -48,6 +49,7 @@ import org.springframework.util.CollectionUtils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -464,12 +466,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				.collect(Collectors.toList());
 		}
 
-		final List<Integer> gids = this.daoFactory.getGermplasmListDataDAO().getGidsByListId(listId);
-		final List<GermplasmListColumnDTO> columns = Arrays.stream(GermplasmListStaticColumns.values())
+		final List<GermplasmListColumnDTO> columns = GermplasmListStaticColumns.getColumnsSortedByRank()
 			.map(column -> new GermplasmListColumnDTO(column.getTermId(), column.getName(), GermplasmListColumnCategory.STATIC,
 				selectedColumnIds.contains(column.getTermId())))
 			.collect(Collectors.toList());
 
+		final List<Integer> gids = this.daoFactory.getGermplasmListDataDAO().getGidsByListId(listId);
 		final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids);
 		if (!CollectionUtils.isEmpty(nameTypes)) {
 			final List<GermplasmListColumnDTO> nameColumns = nameTypes
@@ -491,6 +493,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 			final List<GermplasmListColumnDTO> germplasmAttributeColumns = variables
 				.stream()
+				.sorted(Comparator.comparing(Term::getName))
 				.map(variable -> {
 					Integer typeId = null;
 					// get first value because germplasm attributes/passport are not combinables with other types
@@ -515,6 +518,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		if (columns.isEmpty()) {
 			return GermplasmListStaticColumns.getDefaultColumns()
 				.stream()
+				.sorted(Comparator.comparing(GermplasmListStaticColumns::getRank))
 				.map(column -> this.buildColumn(column.getTermId(), column.getName(), column.name(), GermplasmListColumnCategory.STATIC))
 				.collect(Collectors.toList());
 		}
@@ -529,46 +533,55 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		if (!CollectionUtils.isEmpty(staticIds)) {
 			final List<GermplasmListMeasurementVariableDTO> staticColumns = staticIds
 				.stream()
+				.sorted(Comparator.comparing(staticId -> GermplasmListStaticColumns.getValueByTermId(staticId).getRank()))
 				.map(id -> {
 					final GermplasmListStaticColumns staticColumn = GermplasmListStaticColumns.getValueByTermId(id);
-					return this.buildColumn(id, staticColumn.getName(), staticColumn.name(), GermplasmListColumnCategory.STATIC);
+					return this.buildColumn(staticColumn.getTermId(), staticColumn.getName(), staticColumn.name(),
+						GermplasmListColumnCategory.STATIC);
 				})
 				.collect(Collectors.toList());
 			header.addAll(staticColumns);
 		}
 
-		//TODO: order by name
 		final List<Integer> nameTypeIds = columnIdsByCategory.get(GermplasmListColumnCategory.NAMES);
 		if (!CollectionUtils.isEmpty(nameTypeIds)) {
 			final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().filterByColumnValues("fldno", nameTypeIds);
 			final List<GermplasmListMeasurementVariableDTO> nameColumns = nameTypes
 				.stream()
+				.sorted(Comparator.comparing(UserDefinedField::getFcode))
 				.map(nameType -> this
 					.buildColumn(nameType.getFldno(), nameType.getFname(), nameType.getFcode(), GermplasmListColumnCategory.NAMES))
 				.collect(Collectors.toList());
 			header.addAll(nameColumns);
 		}
 
-		//TODO: split descriptors and entrydetails -> order by name
 		final List<Integer> variableIds = columnIdsByCategory.get(GermplasmListColumnCategory.VARIABLE);
 		if (!CollectionUtils.isEmpty(variableIds)) {
 			final VariableFilter variableFilter = new VariableFilter();
 			variableFilter.setProgramUuid(programUUID);
-			variableIds
-				.forEach(variableFilter::addVariableId);
+			variableIds.forEach(variableFilter::addVariableId);
 			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 			// TODO: get required properties for entry details
-			final List<GermplasmListMeasurementVariableDTO> variableColumns = variables
+			final List<GermplasmListMeasurementVariableDTO> descriptorColumns = new ArrayList<>();
+			final List<GermplasmListMeasurementVariableDTO> variableColumns = new ArrayList<>();
+			variables
 				.stream()
-				.map(variable -> {
+				.sorted(Comparator.comparing(Variable::getName))
+				.forEach(variable -> {
 					VariableType variableType = null;
 					if (!CollectionUtils.isEmpty(variable.getVariableTypes())) {
 						variableType = variable.getVariableTypes().iterator().next();
 					}
-					return this.buildColumn(variable.getId(), variable.getName(), variable.getAlias(), GermplasmListColumnCategory.VARIABLE,
-						variableType);
-				})
-				.collect(Collectors.toList());
+					final GermplasmListMeasurementVariableDTO measurementVariableDTO =
+						this.buildColumn(variable.getId(), variable.getName(), variable.getAlias(), GermplasmListColumnCategory.VARIABLE,
+							variableType);
+					if (variableType == VariableType.GERMPLASM_ATTRIBUTE || variableType == VariableType.GERMPLASM_PASSPORT) {
+						descriptorColumns.add(measurementVariableDTO);
+					} else {
+						variableColumns.add(measurementVariableDTO);
+					}
+				});
+			header.addAll(descriptorColumns);
 			header.addAll(variableColumns);
 		}
 
