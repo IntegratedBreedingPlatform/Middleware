@@ -462,12 +462,15 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
-	public List<Integer> getGermplasmUsedInStudies(final List<Integer> gids) {
+	public List<Integer> getGermplasmUsedInStudies(final List<Integer> gids, final boolean lockedStudiesOnly) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
 			criteria.createAlias("project", "project");
 			criteria.add(Restrictions.in("germplasm.gid", gids));
 			criteria.add(Restrictions.eq("project.deleted", false));
+			if (lockedStudiesOnly) {
+				criteria.add(Restrictions.eq("project.locked", true));
+			}
 			criteria.setProjection(Projections.distinct(Projections.property("germplasm.gid")));
 			return criteria.list();
 		} catch (final HibernateException e) {

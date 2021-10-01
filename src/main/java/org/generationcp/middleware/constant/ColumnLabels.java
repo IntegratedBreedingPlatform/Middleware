@@ -81,7 +81,7 @@ public enum ColumnLabels {
 	GROUPGID(TermId.GROUPGID, "GROUPGID"),
 
 	HAS_PROGENY(null, "HAS PROGENY"),
-	USED_IN_STUDY(null, "USED IN STUDY"),
+	USED_IN_LOCKED_STUDY(null, "USED IN LOCKED STUDY"),
 	USED_IN_LOCKED_LIST(null, "USED IN LOCKED LIST");
 
 	private final TermId termId;

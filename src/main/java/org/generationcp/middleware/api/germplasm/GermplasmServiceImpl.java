@@ -417,7 +417,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public Set<Integer> getGermplasmUsedInStudies(final List<Integer> gids) {
-		return new HashSet<>(this.daoFactory.getStockDao().getGermplasmUsedInStudies(gids));
+		return new HashSet<>(this.daoFactory.getStockDao().getGermplasmUsedInStudies(gids, false));
+	}
+
+	@Override
+	public Set<Integer> getGermplasmUsedInLockedStudies(final List<Integer> gids) {
+		return new HashSet<>(this.daoFactory.getStockDao().getGermplasmUsedInStudies(gids, true));
 	}
 
 	private void saveGermplasmUpdateDTO(final Map<String, Variable> attributeVariablesMap,
