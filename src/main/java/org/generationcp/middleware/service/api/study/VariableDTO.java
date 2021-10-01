@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.util.serializer.CategorySerializer;
-import org.generationcp.middleware.util.serializer.ObservationSerializer;
 
 import java.util.*;
 
@@ -269,7 +268,11 @@ public class VariableDTO {
 		private List<ExternalReferenceDTO> externalReferences;
 		private String mainAbbreviation;
 
+		@JsonView(BrapiView.BrapiV2.class)
 		private String traitClass;
+
+		@JsonView(BrapiView.BrapiV1_3.class)
+		private String traitClassAttribute;
 		@JsonView(BrapiView.BrapiV1_3.class)
 		private String description;
 
@@ -322,8 +325,8 @@ public class VariableDTO {
 		}
 
 		@JsonProperty("class")
-		public String getTraitClass() {
-			return this.traitClass;
+		public String getTraitClassAttribute() {
+			return this.traitClassAttribute;
 		}
 
 		public String getDescription() {
@@ -368,8 +371,8 @@ public class VariableDTO {
 			this.attribute = attribute;
 		}
 
-		public void setTraitClass(final String traitClass) {
-			this.traitClass = traitClass;
+		public void setTraitClassAttribute(final String traitClassAttribute) {
+			this.traitClassAttribute = traitClassAttribute;
 		}
 
 		public void setDescription(final String description) {
@@ -414,6 +417,14 @@ public class VariableDTO {
 
 		public void setSynonyms(final List<String> synonyms) {
 			this.synonyms = synonyms;
+		}
+
+		public String getTraitClass() {
+			return traitClass;
+		}
+
+		public void setTraitClass(String traitClass) {
+			this.traitClass = traitClass;
 		}
 
 	}
@@ -577,7 +588,12 @@ public class VariableDTO {
 
 		@JsonView(BrapiView.BrapiV2.class)
 		private List<ExternalReferenceDTO> externalReferences;
+
+		@JsonView(BrapiView.BrapiV2.class)
 		private String methodClass;
+
+		@JsonView(BrapiView.BrapiV1_3.class)
+		private String methodClassAttribute;
 		private String description;
 		private String formula;
 		private String methodDbId;
@@ -593,8 +609,8 @@ public class VariableDTO {
 		// Getter Methods
 
 		@JsonProperty("class")
-		public String getMethodClass() {
-			return this.methodClass;
+		public String getMethodClassAttribute() {
+			return this.methodClassAttribute;
 		}
 
 		public String getDescription() {
@@ -627,8 +643,8 @@ public class VariableDTO {
 
 		// Setter Methods
 
-		public void setMethodClass(final String methodClass) {
-			this.methodClass = methodClass;
+		public void setMethodClassAttribute(final String methodClassAttribute) {
+			this.methodClassAttribute = methodClassAttribute;
 		}
 
 		public void setDescription(final String description) {
@@ -689,6 +705,14 @@ public class VariableDTO {
 
 		public void setOntologyReferenceObject(OntologyReference ontologyReferenceObject) {
 			this.ontologyReferenceObject = ontologyReferenceObject;
+		}
+
+		public String getMethodClass() {
+			return methodClass;
+		}
+
+		public void setMethodClass(String methodClass) {
+			this.methodClass = methodClass;
 		}
 	}
 

@@ -22,7 +22,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.StudyType;
@@ -39,7 +38,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class CvTermDaoTest extends IntegrationTestBase {
 
@@ -372,7 +370,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_PROPERTY), variableDTO.getTrait().getTraitName());
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_PROPERTY_ID), variableDTO.getTrait().getTraitDbId());
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_PROPERTY_DESCRIPTION), variableDTO.getTrait().getDescription());
-		Assert.assertEquals(map.get(CVTermDao.VARIABLE_TRAIT_CLASS), variableDTO.getTrait().getTraitClass());
+		Assert.assertEquals(map.get(CVTermDao.VARIABLE_TRAIT_CLASS), variableDTO.getTrait().getTraitClassAttribute());
 		Assert.assertEquals("Active", variableDTO.getTrait().getStatus());
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_PROPERTY_ONTOLOGY_ID), variableDTO.getTrait().getXref());
 

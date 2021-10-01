@@ -1739,6 +1739,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			trait.setTraitName(String.valueOf(result.get(VARIABLE_PROPERTY)));
 			trait.setTraitDbId(String.valueOf(result.get(VARIABLE_PROPERTY_ID)));
 			trait.setDescription(String.valueOf(result.get(VARIABLE_PROPERTY_DESCRIPTION)));
+			trait.setTraitClassAttribute(String.valueOf(result.get(VARIABLE_TRAIT_CLASS)));
 			trait.setTraitClass(String.valueOf(result.get(VARIABLE_TRAIT_CLASS)));
 			trait.setStatus("Active");
 			trait.setXref(String.valueOf(result.get(VARIABLE_PROPERTY_ONTOLOGY_ID)));
