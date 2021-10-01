@@ -681,7 +681,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			new GermplasmListDataDetail(germplasmListData, observationRequestDto.getVariableId(), observationRequestDto.getValue(),
 				observationRequestDto.getcValueId());
 		this.daoFactory.getGermplasmListDataDetailDAO().save(germplasmListDataDetail);
-		return germplasmListData.getId();
+		return germplasmListDataDetail.getId();
 	}
 
 	@Override
@@ -696,6 +696,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public void deleteListDataObservation(final Integer observationId) {
 		final GermplasmListDataDetail germplasmListDataDetail = this.daoFactory.getGermplasmListDataDetailDAO().getById(observationId);
 		this.daoFactory.getGermplasmListDataDetailDAO().makeTransient(germplasmListDataDetail);
+	}
+
+	@Override
+	public long countObservationsByVariables(final Integer listId, final List<Integer> variableIds) {
+		return this.daoFactory.getGermplasmListDataDetailDAO().countObservationsByListAndVariables(listId, variableIds);
 	}
 
 	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,

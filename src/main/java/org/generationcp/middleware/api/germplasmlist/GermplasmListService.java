@@ -91,4 +91,5 @@ public interface GermplasmListService {
 
 	void deleteListDataObservation(Integer observationId);
 
+	long countObservationsByVariables(Integer listId, List<Integer> variableIds);
 }

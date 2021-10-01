@@ -11,6 +11,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Set;
 
 public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDetail, Integer> {
@@ -56,4 +57,12 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
+
+	public long countObservationsByListAndVariables(final Integer listId, final List<Integer> variableIds) {
+		if (variableIds.isEmpty()) {
+			return 0l;
+		}
+		return 0;
+	}
+
 }

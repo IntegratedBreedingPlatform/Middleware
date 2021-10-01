@@ -48,6 +48,10 @@ public class GermplasmListDataDetail extends AbstractEntity implements Serializa
 		this.categoricalValueId = categoricalValueId;
 	}
 
+	public Integer getId() {
+		return id;
+	}
+
 	public GermplasmListData getListData() {
 		return listData;
 	}
