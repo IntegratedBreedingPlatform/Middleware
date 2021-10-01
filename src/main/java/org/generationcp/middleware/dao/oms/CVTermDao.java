@@ -1773,6 +1773,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			final VariableDTO.OntologyReference scaleOntologyReference =
 				variableDto.getScale().getOntologyReference();
 			scaleOntologyReference.setOntologyName(String.valueOf(result.get(VARIABLE_SCALE)));
+			scaleOntologyReference.setOntologyDbId(String.valueOf(result.get(VARIABLE_SCALE_ID)));
 
 			final VariableDTO.Method method = variableDto.getMethod();
 			method.setName(String.valueOf(result.get(VARIABLE_METHOD)));
@@ -1784,6 +1785,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			final VariableDTO.OntologyReference methodOntologyReference =
 				variableDto.getMethod().getOntologyReference();
 			methodOntologyReference.setOntologyName(String.valueOf(result.get(VARIABLE_METHOD)));
+			methodOntologyReference.setOntologyDbId(String.valueOf(result.get(VARIABLE_METHOD_ID)));
 
 			variables.add(variableDto);
 		}
