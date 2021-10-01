@@ -7,6 +7,7 @@ import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,13 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 		if (variableIds.isEmpty()) {
 			return 0l;
 		}
-		return 0;
+		final Criteria criteria = this.getSession().createCriteria(GermplasmListDataDetail.class);
+		criteria.setProjection(Projections.rowCount());
+		criteria.createAlias("listData", "listData");
+		criteria.createAlias("listData.list", "list");
+		criteria.add(Restrictions.eq("list.id", listId));
+		criteria.add(Restrictions.in("variableId", variableIds));
+		return (Long) criteria.uniqueResult();
 	}
 
 }
