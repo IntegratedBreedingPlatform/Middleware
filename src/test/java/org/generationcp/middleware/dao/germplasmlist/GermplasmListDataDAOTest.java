@@ -14,6 +14,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,6 +24,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
@@ -360,6 +364,16 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(germplasmListData1.getGroupName(), crossExpansion);
 		Assert.assertEquals(germplasmListData2.getGroupName(), crossExpansion);
 		Assert.assertEquals(germplasmListData3.getGroupName(), crossExpansion);
+	}
+
+	@Test
+	public void getGidsByListId() {
+		final Germplasm germplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final GermplasmListData germplasmListData = this.createTestListWithListData(germplasm);
+
+		final List<Integer> gidsByListId = this.germplasmListDataDAO.getGidsByListId(germplasmListData.getList().getId());
+		assertThat(gidsByListId, Matchers.hasSize(1));
+		assertThat(gidsByListId.get(0), is(germplasm.getGid()));
 	}
 
 }
