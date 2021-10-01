@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.constant.ColumnLabels;
@@ -427,13 +426,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest request,
-		final Pageable pageable) {
-		return this.daoFactory.getGermplasmListDAO().searchGermplasmList(request, pageable);
+		final Pageable pageable, final String programUUID) {
+		return this.daoFactory.getGermplasmListDAO().searchGermplasmList(request, pageable, programUUID);
 	}
 
 	@Override
-	public long countSearchGermplasmList(final GermplasmListSearchRequest request) {
-		return this.daoFactory.getGermplasmListDAO().countSearchGermplasmList(request);
+	public long countSearchGermplasmList(final GermplasmListSearchRequest request, final String programUUID) {
+		return this.daoFactory.getGermplasmListDAO().countSearchGermplasmList(request, programUUID);
 	}
 
 	@Override
@@ -465,6 +464,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				.collect(Collectors.toList());
 		}
 
+		// TODO: implement method getGidsByListId
 		final List<GermplasmListData> listData = this.daoFactory.getGermplasmListDataDAO().getByListId(listId);
 		final List<Integer> gids = listData.stream().map(GermplasmListData::getGid).collect(Collectors.toList());
 		final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids);
@@ -475,6 +475,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.stream()
 			.map(Attribute::getTypeId)
 			.forEach(variableFilter::addVariableId);
+		//TODO: not get variables
 		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 
 		final List<GermplasmListColumnDTO> columns = Arrays.stream(GermplasmListStaticColumns.values())
@@ -511,6 +512,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final List<GermplasmListDataView> columns =
 			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
 		// If the list has not columns saved yet, we return a default list of columns
+		//TODO: check if there are entry details columns -> add it the defaults columns
 		if (columns.isEmpty()) {
 			return GermplasmListStaticColumns.getDefaultColumns()
 				.stream()
@@ -536,6 +538,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			header.addAll(staticColumns);
 		}
 
+		//TODO: order by name
 		final List<Integer> nameTypeIds = columnIdsByCategory.get(GermplasmListColumnCategory.NAMES);
 		if (!CollectionUtils.isEmpty(nameTypeIds)) {
 			final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().filterByColumnValues("fldno", nameTypeIds);
@@ -547,6 +550,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			header.addAll(nameColumns);
 		}
 
+		//TODO: split descriptors and entrydetails -> order by name
 		final List<Integer> variableIds = columnIdsByCategory.get(GermplasmListColumnCategory.VARIABLE);
 		if (!CollectionUtils.isEmpty(variableIds)) {
 			final VariableFilter variableFilter = new VariableFilter();
