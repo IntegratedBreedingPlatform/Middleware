@@ -325,4 +325,11 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 	}
 
+	public List<Integer> getGidsByListId(final Integer listId) {
+		String sql = "SELECT gid FROM listdata ld WHERE ld.listid = :listId";
+		final SQLQuery query = this.getSession().createSQLQuery(sql);
+		query.setParameter("listId", listId);
+		return query.list();
+	}
+
 }
