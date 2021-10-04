@@ -1629,7 +1629,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		stringBuilder.append("	  LEFT JOIN nd_experiment nde ON nde.project_id = dataset.project_id");
 		// To get Min and Max override values per program
 		stringBuilder.append(
-				"	  LEFT JOIN variable_overrides vo ON variable.cvterm_id = vo.cvterm_id AND dataset.program_uuid = vo.program_uuid");
+				"	  LEFT JOIN variable_overrides vo ON variable.cvterm_id = vo.cvterm_id AND " +
+						"(vo.program_uuid IS NULL || dataset.program_uuid = vo.program_uuid)");
 		stringBuilder.append(" WHERE variableType.value = '" + VariableType.TRAIT.getName() + "' ");
 	}
 
@@ -1727,7 +1728,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			variableDto.setName(observationVariableName);
 			variableDto.setObservationVariableDbId(String.valueOf(result.get(VARIABLE_ID)));
+			variableDto.setOntologyDbId(String.valueOf(result.get(VARIABLE_ID)));
 			variableDto.setObservationVariableName(observationVariableName);
+			variableDto.setOntologyName(String.valueOf(result.get(VARIABLE_NAME)));
 			variableDto.setDate(result.get(VARIABLE_CREATION_DATE) != null ? String.valueOf(result.get(VARIABLE_CREATION_DATE)) : null);
 			variableDto.setDefaultValue(StringUtils.EMPTY);
 			final List<String> synonyms = result.get(VARIABLE_NAME_SYNONYMS) != null ?

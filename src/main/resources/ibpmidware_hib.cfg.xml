@@ -15,6 +15,7 @@
         <mapping class="org.generationcp.middleware.pojos.InstanceExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.ExperimentExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.SampleExternalReference"/>
+        <mapping class="org.generationcp.middleware.pojos.VariableExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.Location"/>
         <mapping class="org.generationcp.middleware.pojos.LocationDetails"/>
         <mapping class="org.generationcp.middleware.pojos.Locdes"/>
