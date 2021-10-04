@@ -55,26 +55,26 @@ public class VariableDTO {
 	private String xref;
 
 	public Map<String, String> getAdditionalInfo() {
-		return additionalInfo;
+		return this.additionalInfo;
 	}
 
-	public void setAdditionalInfo(Map<String, String> additionalInfo) {
+	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
 		this.additionalInfo = additionalInfo;
 	}
 
 	public String getCommonCropName() {
-		return commonCropName;
+		return this.commonCropName;
 	}
 
-	public void setCommonCropName(String commonCropName) {
+	public void setCommonCropName(final String commonCropName) {
 		this.commonCropName = commonCropName;
 	}
 
 	public List<ExternalReferenceDTO> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
-	public void setExternalReferences(List<ExternalReferenceDTO> externalReferences) {
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
 		this.externalReferences = externalReferences;
 	}
 
@@ -293,30 +293,30 @@ public class VariableDTO {
 		// Getter Methods
 
 		public Map<String, String> getAdditionalInfo() {
-			return additionalInfo;
+			return this.additionalInfo;
 		}
 
-		public void setAdditionalInfo(Map<String, String> additionalInfo) {
+		public void setAdditionalInfo(final Map<String, String> additionalInfo) {
 			this.additionalInfo = additionalInfo;
 		}
 
 		public List<String> getAlternativeAbbreviations() {
-			return alternativeAbbreviations;
+			return this.alternativeAbbreviations;
 		}
 
 		public List<ExternalReferenceDTO> getExternalReferences() {
-			return externalReferences;
+			return this.externalReferences;
 		}
 
-		public void setExternalReferences(List<ExternalReferenceDTO> externalReferences) {
+		public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
 			this.externalReferences = externalReferences;
 		}
 
 		public String getTraitDescription() {
-			return traitDescription;
+			return this.traitDescription;
 		}
 
-		public void setTraitDescription(String traitDescription) {
+		public void setTraitDescription(final String traitDescription) {
 			this.traitDescription = traitDescription;
 		}
 
@@ -420,10 +420,10 @@ public class VariableDTO {
 		}
 
 		public String getTraitClass() {
-			return traitClass;
+			return this.traitClass;
 		}
 
-		public void setTraitClass(String traitClass) {
+		public void setTraitClass(final String traitClass) {
 			this.traitClass = traitClass;
 		}
 
@@ -527,24 +527,24 @@ public class VariableDTO {
 		}
 
 		public Map<String, String> getAdditionalInfo() {
-			return additionalInfo;
+			return this.additionalInfo;
 		}
 
-		public void setAdditionalInfo(Map<String, String> additionalInfo) {
+		public void setAdditionalInfo(final Map<String, String> additionalInfo) {
 			this.additionalInfo = additionalInfo;
 		}
 
 		public List<ExternalReferenceDTO> getExternalReferences() {
-			return externalReferences;
+			return this.externalReferences;
 		}
 
-		public void setExternalReferences(List<ExternalReferenceDTO> externalReferences) {
+		public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
 			this.externalReferences = externalReferences;
 		}
 	}
 
 
-	public class ValidValues {
+	public static class ValidValues {
 		@JsonSerialize(using = CategorySerializer.class)
 		private List<CategoryDTO> categories = new ArrayList<>();
 		private Double max;
@@ -676,48 +676,48 @@ public class VariableDTO {
 		}
 
 		public Map<String, String> getAdditionalInfo() {
-			return additionalInfo;
+			return this.additionalInfo;
 		}
 
-		public void setAdditionalInfo(Map<String, String> additionalInfo) {
+		public void setAdditionalInfo(final Map<String, String> additionalInfo) {
 			this.additionalInfo = additionalInfo;
 		}
 
 		public String getBibliographicalReference() {
-			return bibliographicalReference;
+			return this.bibliographicalReference;
 		}
 
-		public void setBibliographicalReference(String bibliographicalReference) {
+		public void setBibliographicalReference(final String bibliographicalReference) {
 			this.bibliographicalReference = bibliographicalReference;
 		}
 
 		public List<ExternalReferenceDTO> getExternalReferences() {
-			return externalReferences;
+			return this.externalReferences;
 		}
 
-		public void setExternalReferences(List<ExternalReferenceDTO> externalReferences) {
+		public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
 			this.externalReferences = externalReferences;
 		}
 
 		public OntologyReference getOntologyReferenceObject() {
-			return ontologyReferenceObject;
+			return this.ontologyReferenceObject;
 		}
 
-		public void setOntologyReferenceObject(OntologyReference ontologyReferenceObject) {
+		public void setOntologyReferenceObject(final OntologyReference ontologyReferenceObject) {
 			this.ontologyReferenceObject = ontologyReferenceObject;
 		}
 
 		public String getMethodClass() {
-			return methodClass;
+			return this.methodClass;
 		}
 
-		public void setMethodClass(String methodClass) {
+		public void setMethodClass(final String methodClass) {
 			this.methodClass = methodClass;
 		}
 	}
 
 
-	public class OntologyReference {
+	public static class OntologyReference {
 
 		private List<DocumentationLink> documentationLinks = Arrays.asList(new DocumentationLink());
 		private String ontologyDbId;
@@ -770,7 +770,7 @@ public class VariableDTO {
 
 			@JsonProperty("URL")
 			public String getOntologyURL() {
-				return ontologyURL;
+				return this.ontologyURL;
 			}
 
 			public void setOntologyURL(final String ontologyURL) {

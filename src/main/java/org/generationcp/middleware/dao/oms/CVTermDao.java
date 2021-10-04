@@ -1797,7 +1797,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	}
 
-	private List<CategoryDTO> getCategoryDTOS(List<String> categoryValues) {
+	private List<CategoryDTO> getCategoryDTOS(final List<String> categoryValues) {
 		if(!CollectionUtils.isEmpty(categoryValues)) {
 			final List<CategoryDTO> categories = new ArrayList<>();
 			for (final String categoryValue: categoryValues) {

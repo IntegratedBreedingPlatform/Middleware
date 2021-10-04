@@ -53,9 +53,9 @@ public class CvTermDaoTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		daoFactory = new DaoFactory(this.sessionProvder);
-		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, workbenchSessionProvider);
-		CvTermDaoTest.dao = daoFactory.getCvTermDao();
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
+		CvTermDaoTest.dao = this.daoFactory.getCvTermDao();
 	}
 
 	@Test
@@ -262,7 +262,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		final List<Integer> termIds = Arrays.asList(METHOD_APPLIED, METHOD_ASSIGNED, METHOD_ENUMERATED);
 		final List<CVTerm> nonObsoleteMethods = dao.getAllByCvId(termIds, CvId.METHODS, true);
 		Assert.assertNotNull(nonObsoleteMethods);
-		Assert.assertEquals("Methods " + termIds.toString() + " should all be non-obsolete", 3, nonObsoleteMethods.size());
+		Assert.assertEquals("Methods " + termIds + " should all be non-obsolete", 3, nonObsoleteMethods.size());
 		for (final CVTerm cvTerm : nonObsoleteMethods) {
 			Assert.assertEquals("All methods should have cv id " + CvId.METHODS.getId(), cvTerm.getCv().intValue(), CvId.METHODS.getId());
 			Assert.assertFalse("Method " + cvTerm.getCvTermId() + " should be non-obsolete", cvTerm.isObsolete());
@@ -291,47 +291,6 @@ public class CvTermDaoTest extends IntegrationTestBase {
 			}
 		}
 	}
-/*
-	@Test
-	public void testGetVariablesByDatasetId() {
-		// PH_M_cm
-		final int variableId1 = 20456;
-		// AleuCol_E_1to5
-		final int variableId2 = 51547;
-		// ASI_Cmp_day
-		final int variableId3 = 20308;
-
-		final DmsProject study = this.createProject("Study " + UUID.randomUUID().toString(), UUID.randomUUID().toString());
-		final DmsProject plotDataset =
-			this.testDataInitializer.createDmsProject("Plot Dataset", "Plot Dataset-Description", study, study,
-				DatasetTypeEnum.PLOT_DATA);
-		final DmsProject plantSubObsDataset =
-			this.testDataInitializer.createDmsProject("Plant Dataset", "Plant Dataset-Description", study, plotDataset,
-				DatasetTypeEnum.PLANT_SUBOBSERVATIONS);
-		this.testDataInitializer.addProjectProp(plotDataset, variableId1, "PH_M_cm", VariableType.TRAIT, "", 1);
-		this.testDataInitializer.addProjectProp(plantSubObsDataset, variableId2, "AleuCol_E_1to5", VariableType.TRAIT, "", 1);
-		this.testDataInitializer
-			.addProjectProp(plantSubObsDataset, variableId3, "ASI_Cmp_day", VariableType.OBSERVATION_UNIT, "", 2);
-
-		final int traitCount = (int) dao.countVariablesByDatasetId(plotDataset.getProjectId(), Lists
-			.newArrayList(VariableType.TRAIT.getId()));
-		final List<VariableDTO> variablesDTOs = dao.getVariablesByDatasetId(plotDataset.getProjectId(), Lists
-			.newArrayList(VariableType.TRAIT.getId()), traitCount,1);
-		// Only return the TRAIT variables associated to a study
-		Assert.assertEquals(traitCount, variablesDTOs.size());
-		Assert.assertEquals(String.valueOf(variableId1), variablesDTOs.get(0).getObservationVariableDbId());
-	}
-
-	@Test
-	public void testGetAllVariables() {
-		final int traitCount = (int) dao.countAllVariables(Lists
-			.newArrayList(VariableType.TRAIT.getId()));
-		final List<VariableDTO> variablesDTOs = dao.getAllVariables(Lists
-			.newArrayList(VariableType.TRAIT.getId()), traitCount, 1);
-		Assert.assertEquals(traitCount, variablesDTOs.size());
-	}
-
- */
 
 	@Test
 	public void testConvertToVariableDTO() {

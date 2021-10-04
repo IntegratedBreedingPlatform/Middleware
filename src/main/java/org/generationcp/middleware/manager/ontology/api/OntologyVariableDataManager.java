@@ -22,7 +22,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
-import org.generationcp.middleware.service.api.study.VariableDTO;
 
 /**
  * This is the API for retrieving ontology variable data.

@@ -26,106 +26,106 @@ public class VariableSearchRequestDTO extends SearchRequestDto {
     private List<String> traitDbIds;
 
     public List<String> getDataTypes() {
-        return dataTypes;
+        return this.dataTypes;
     }
 
-    public void setDataTypes(List<String> dataTypes) {
+    public void setDataTypes(final List<String> dataTypes) {
         this.dataTypes = dataTypes;
     }
 
     public List<String> getExternalReferenceIDs() {
-        return externalReferenceIDs;
+        return this.externalReferenceIDs;
     }
 
-    public void setExternalReferenceIDs(List<String> externalReferenceIDs) {
+    public void setExternalReferenceIDs(final List<String> externalReferenceIDs) {
         this.externalReferenceIDs = externalReferenceIDs;
     }
 
     public List<String> getExternalReferenceSources() {
-        return externalReferenceSources;
+        return this.externalReferenceSources;
     }
 
-    public void setExternalReferenceSources(List<String> externalReferenceSources) {
+    public void setExternalReferenceSources(final List<String> externalReferenceSources) {
         this.externalReferenceSources = externalReferenceSources;
     }
 
     public List<String> getMethodDbIds() {
-        return methodDbIds;
+        return this.methodDbIds;
     }
 
-    public void setMethodDbIds(List<String> methodDbIds) {
+    public void setMethodDbIds(final List<String> methodDbIds) {
         this.methodDbIds = methodDbIds;
     }
 
     public List<String> getObservationVariableDbIds() {
-        return observationVariableDbIds;
+        return this.observationVariableDbIds;
     }
 
-    public void setObservationVariableDbIds(List<String> observationVariableDbIds) {
+    public void setObservationVariableDbIds(final List<String> observationVariableDbIds) {
         this.observationVariableDbIds = observationVariableDbIds;
     }
 
     public List<String> getObservationVariableNames() {
-        return observationVariableNames;
+        return this.observationVariableNames;
     }
 
-    public void setObservationVariableNames(List<String> observationVariableNames) {
+    public void setObservationVariableNames(final List<String> observationVariableNames) {
         this.observationVariableNames = observationVariableNames;
     }
 
     public List<String> getOntologyDbIds() {
-        return ontologyDbIds;
+        return this.ontologyDbIds;
     }
 
-    public void setOntologyDbIds(List<String> ontologyDbIds) {
+    public void setOntologyDbIds(final List<String> ontologyDbIds) {
         this.ontologyDbIds = ontologyDbIds;
     }
 
     public int getPage() {
-        return page;
+        return this.page;
     }
 
-    public void setPage(int page) {
+    public void setPage(final int page) {
         this.page = page;
     }
 
     public int getPageSize() {
-        return pageSize;
+        return this.pageSize;
     }
 
-    public void setPageSize(int pageSize) {
+    public void setPageSize(final int pageSize) {
         this.pageSize = pageSize;
     }
 
     public List<String> getScaleDbIds() {
-        return scaleDbIds;
+        return this.scaleDbIds;
     }
 
-    public void setScaleDbIds(List<String> scaleDbIds) {
+    public void setScaleDbIds(final List<String> scaleDbIds) {
         this.scaleDbIds = scaleDbIds;
     }
 
     public List<String> getStudyDbId() {
-        return studyDbId;
+        return this.studyDbId;
     }
 
-    public void setStudyDbId(List<String> studyDbId) {
+    public void setStudyDbId(final List<String> studyDbId) {
         this.studyDbId = studyDbId;
     }
 
     public List<String> getTraitClasses() {
-        return traitClasses;
+        return this.traitClasses;
     }
 
-    public void setTraitClasses(List<String> traitClasses) {
+    public void setTraitClasses(final List<String> traitClasses) {
         this.traitClasses = traitClasses;
     }
 
     public List<String> getTraitDbIds() {
-        return traitDbIds;
+        return this.traitDbIds;
     }
 
-    public void setTraitDbIds(List<String> traitDbIds) {
+    public void setTraitDbIds(final List<String> traitDbIds) {
         this.traitDbIds = traitDbIds;
     }
 

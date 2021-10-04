@@ -16,18 +16,18 @@ public class CategoryDTO {
     }
 
     public String getLabel() {
-        return label;
+        return this.label;
     }
 
-    public void setLabel(String label) {
+    public void setLabel(final String label) {
         this.label = label;
     }
 
     public String getValue() {
-        return value;
+        return this.value;
     }
 
-    public void setValue(String value) {
+    public void setValue(final String value) {
         this.value = value;
     }
 }

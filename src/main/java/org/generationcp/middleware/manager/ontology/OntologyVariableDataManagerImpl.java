@@ -41,7 +41,6 @@ import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
-import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.util.ISO8601DateParser;
 import org.generationcp.middleware.util.StringUtil;
@@ -57,7 +56,6 @@ import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -776,7 +774,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		}
 
 		// Updating favorite to true if alias is defined
-		java.util.Optional<ProgramFavorite> programFavoriteOptional = this.daoFactory.getProgramFavoriteDao().getProgramFavorite(
+		final java.util.Optional<ProgramFavorite> programFavoriteOptional = this.daoFactory.getProgramFavoriteDao().getProgramFavorite(
 			variableInfo.getProgramUuid(), ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
 
 		final String previousAlias = variableOverrides == null ? null : variableOverrides.getAlias();

@@ -32,7 +32,7 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi{
         this.sessionProvider = sessionProvider;
     }
 
-    public List<VariableDTO> getObservationVariables(final String crop, VariableSearchRequestDTO requestDTO, Pageable pageable) {
+    public List<VariableDTO> getObservationVariables(final String crop, final VariableSearchRequestDTO requestDTO, final Pageable pageable) {
         final List<VariableDTO> variableDTOS = this.daoFactory.getCvTermDao().getObservationVariables(requestDTO, pageable);
         if(!CollectionUtils.isEmpty(variableDTOS)) {
             final List<String> variableIds = new ArrayList<>(variableDTOS.stream().map(VariableDTO::getObservationVariableDbId)
@@ -60,7 +60,7 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi{
         return variableDTOS;
     }
 
-    public long countObservationVariables(VariableSearchRequestDTO requestDTO){
+    public long countObservationVariables(final VariableSearchRequestDTO requestDTO){
         return this.daoFactory.getCvTermDao().countObservationVariables(requestDTO);
     }
 }

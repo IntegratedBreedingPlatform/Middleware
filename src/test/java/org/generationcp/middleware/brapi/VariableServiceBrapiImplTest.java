@@ -52,7 +52,7 @@ public class VariableServiceBrapiImplTest  extends IntegrationTestBase {
     }
 
     @Test
-    public void testgetObservationVariables() {
+    public void testGetObservationVariables() {
         final List<String> possibleValues = new ArrayList<>();
         possibleValues.add(RandomStringUtils.randomAlphabetic(5));
         possibleValues.add(RandomStringUtils.randomAlphabetic(5));
@@ -63,11 +63,11 @@ public class VariableServiceBrapiImplTest  extends IntegrationTestBase {
         vo.setVariableId(categoricalVariable.getCvTermId());
         this.daoFactory.getVariableProgramOverridesDao().save(vo);
 
-        final VariableExternalReference varExref = new VariableExternalReference();
-        varExref.setCvTerm(categoricalVariable);
-        varExref.setSource(RandomStringUtils.randomAlphabetic(5));
-        varExref.setReferenceId(RandomStringUtils.randomAlphabetic(5));
-        this.daoFactory.getVariableExternalReferenceDAO().save(varExref);
+        final VariableExternalReference varExRef = new VariableExternalReference();
+        varExRef.setCvTerm(categoricalVariable);
+        varExRef.setSource(RandomStringUtils.randomAlphabetic(5));
+        varExRef.setReferenceId(RandomStringUtils.randomAlphabetic(5));
+        this.daoFactory.getVariableExternalReferenceDAO().save(varExRef);
 
         final CVTermSynonym synonym = new CVTermSynonym();
         synonym.setSynonym(RandomStringUtils.randomAlphabetic(10));
@@ -80,12 +80,12 @@ public class VariableServiceBrapiImplTest  extends IntegrationTestBase {
 
         final VariableSearchRequestDTO searchRequestDTO = new VariableSearchRequestDTO();
         searchRequestDTO.setObservationVariableDbIds(Collections.singletonList(categoricalVariable.getCvTermId().toString()));
-        final String cropname = "MAIZE";
-        final List<VariableDTO> variableDTOS = this.variableServiceBrapi.getObservationVariables(cropname, searchRequestDTO, null);
-        Assert.assertEquals((long)1, variableDTOS.size());
+        final String cropName = "MAIZE";
+        final List<VariableDTO> variableDTOS = this.variableServiceBrapi.getObservationVariables(cropName, searchRequestDTO, null);
+        Assert.assertEquals(1, variableDTOS.size());
         final VariableDTO dto = variableDTOS.get(0);
-        Assert.assertEquals(cropname, dto.getCrop());
-        Assert.assertEquals(cropname, dto.getCommonCropName());
+        Assert.assertEquals(cropName, dto.getCrop());
+        Assert.assertEquals(cropName, dto.getCommonCropName());
         Assert.assertEquals(categoricalVariable.getCvTermId().toString(), dto.getObservationVariableDbId());
         Assert.assertEquals(categoricalVariable.getCvTermId().toString(), dto.getOntologyDbId());
         Assert.assertEquals(vo.getAlias(), dto.getObservationVariableName());
@@ -98,7 +98,7 @@ public class VariableServiceBrapiImplTest  extends IntegrationTestBase {
         Assert.assertEquals(synonym.getSynonym(), dto.getSynonyms().get(0));
         Assert.assertEquals(vo.getAlias(), dto.getName());
         Assert.assertEquals(1, dto.getExternalReferences().size());
-        Assert.assertEquals(varExref.getSource(), dto.getExternalReferences().get(0).getReferenceSource());
-        Assert.assertEquals(varExref.getReferenceId(), dto.getExternalReferences().get(0).getReferenceID());
+        Assert.assertEquals(varExRef.getSource(), dto.getExternalReferences().get(0).getReferenceSource());
+        Assert.assertEquals(varExRef.getReferenceId(), dto.getExternalReferences().get(0).getReferenceID());
     }
 }
