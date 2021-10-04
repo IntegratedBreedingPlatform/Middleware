@@ -452,24 +452,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public List<GermplasmListColumnDTO> getGermplasmListColumns(final Integer listId, final String programUUID) {
-		final List<GermplasmListDataView> selectedColumns = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
-		final List<Integer> selectedColumnIds;
-		// Return a default view if there is not a view defined yet
-		if (CollectionUtils.isEmpty(selectedColumns)) {
-			selectedColumnIds = GermplasmListStaticColumns.getDefaultColumns()
-				.stream()
-				.map(GermplasmListStaticColumns::getTermId)
-				.collect(Collectors.toList());
-		} else {
-			selectedColumnIds = selectedColumns
-				.stream()
-				.map(GermplasmListDataView::getVariableId)
-				.collect(Collectors.toList());
-		}
-
+		final List<GermplasmListDataView> view = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
+		final List<Integer> selectedColumnIds = this.getSelectedGermplasmListColumns(view);
 		final List<GermplasmListColumnDTO> columns = GermplasmListStaticColumns.getColumnsSortedByRank()
 			.map(column -> new GermplasmListColumnDTO(column.getTermId(), column.getName(), GermplasmListColumnCategory.STATIC,
-				selectedColumnIds.contains(column.getTermId())))
+					selectedColumnIds.contains(column.getTermId())))
 			.collect(Collectors.toList());
 
 		final List<Integer> gids = this.daoFactory.getGermplasmListDataDAO().getGidsByListId(listId);
@@ -512,27 +499,23 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public List<GermplasmListMeasurementVariableDTO> getGermplasmListDataTableHeader(final Integer listId, final String programUUID) {
-		final List<GermplasmListDataView> columns =
+		final List<GermplasmListDataView> view =
 			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
 		// Provide a default view
-		if (columns.isEmpty()) {
-			return this.getDefaultStaticColumns();
+		if (view.isEmpty()) {
+			return this.transformDefaultStaticColumns();
 		}
 
 		// Check if there are only entry details columns
-		final List<Integer> entryDetailsColumnIds = columns
-			.stream()
-			.filter(GermplasmListDataView::isEntryDetailColumn)
-			.map(GermplasmListDataView::getVariableId)
-			.collect(Collectors.toList());
+		final List<Integer> entryDetailsColumnIds = this.getEntryDetailsColumnsIds(view);
 		// The user only added entry details to the view, so we provide a default view with static columns plus these entry details columns
-		if (columns.size() == entryDetailsColumnIds.size()) {
-			final List<GermplasmListMeasurementVariableDTO> defaultStaticColumns = this.getDefaultStaticColumns();
+		if (view.size() == entryDetailsColumnIds.size()) {
+			final List<GermplasmListMeasurementVariableDTO> defaultStaticColumns = this.transformDefaultStaticColumns();
 			final List<GermplasmListMeasurementVariableDTO> variableColumns = this.getVariableColumns(entryDetailsColumnIds, programUUID);
 			return Stream.concat(defaultStaticColumns.stream(), variableColumns.stream()).collect(Collectors.toList());
 		}
 
-		final Map<GermplasmListColumnCategory, List<Integer>> columnIdsByCategory = columns
+		final Map<GermplasmListColumnCategory, List<Integer>> columnIdsByCategory = view
 			.stream()
 			.collect(groupingBy(GermplasmListDataView::getCategory, HashMap::new,
 				Collectors.mapping(GermplasmListDataView::getVariableId, Collectors.toList())));
@@ -635,10 +618,34 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 	}
 
-	private List<GermplasmListMeasurementVariableDTO> getDefaultStaticColumns() {
-		return GermplasmListStaticColumns.getDefaultColumns()
+	private List<Integer> getSelectedGermplasmListColumns(final List<GermplasmListDataView> view) {
+		// Return a default view if there is not a view defined yet
+		if (CollectionUtils.isEmpty(view)) {
+			return GermplasmListStaticColumns.getDefaultColumnIdsSortedByRank();
+		}
+		final List<Integer> selectedColumnIds = view
 			.stream()
-			.sorted(Comparator.comparing(GermplasmListStaticColumns::getRank))
+			.map(GermplasmListDataView::getVariableId)
+			.collect(Collectors.toList());
+
+		final List<Integer> entryDetailsColumnsIds = this.getEntryDetailsColumnsIds(view);
+		// Check if there are only entry details added. If it's the case, add the default columns
+		if (view.size() == entryDetailsColumnsIds.size()) {
+			selectedColumnIds.addAll(GermplasmListStaticColumns.getDefaultColumnIdsSortedByRank());
+		}
+		return selectedColumnIds;
+	}
+
+	private List<Integer> getEntryDetailsColumnsIds(final List<GermplasmListDataView> view) {
+		return view
+			.stream()
+			.filter(GermplasmListDataView::isEntryDetailColumn)
+			.map(GermplasmListDataView::getVariableId)
+			.collect(Collectors.toList());
+	}
+
+	private List<GermplasmListMeasurementVariableDTO> transformDefaultStaticColumns() {
+		return GermplasmListStaticColumns.getDefaultColumnsSortedByRank()
 			.map(column -> this.buildColumn(column.getTermId(), column.getName(), column.name(), GermplasmListColumnCategory.STATIC))
 			.collect(Collectors.toList());
 	}

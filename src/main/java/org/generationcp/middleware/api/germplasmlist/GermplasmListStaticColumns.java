@@ -77,6 +77,18 @@ public enum GermplasmListStaticColumns {
 			.collect(Collectors.toList());
 	}
 
+	public static Stream<GermplasmListStaticColumns> getDefaultColumnsSortedByRank() {
+		return GermplasmListStaticColumns.getDefaultColumns()
+			.stream()
+			.sorted(Comparator.comparing(GermplasmListStaticColumns::getRank));
+	}
+
+	public static List<Integer> getDefaultColumnIdsSortedByRank() {
+		return GermplasmListStaticColumns.getDefaultColumnsSortedByRank()
+			.map(GermplasmListStaticColumns::getTermId)
+			.collect(Collectors.toList());
+	}
+
 	public static GermplasmListStaticColumns getValueByTermId(int termId) {
 		return Arrays.stream(GermplasmListStaticColumns.values())
 			.filter(c -> c.termId.getId() == termId)

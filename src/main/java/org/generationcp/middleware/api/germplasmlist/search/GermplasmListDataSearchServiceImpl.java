@@ -6,7 +6,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.PedigreeService;
@@ -23,6 +22,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Transactional
 @Service
@@ -49,16 +49,9 @@ public class GermplasmListDataSearchServiceImpl implements GermplasmListDataSear
 		final Pageable pageable) {
 
 		final List<GermplasmListDataView> view = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
-		// TODO: review this once we define what we are gonna do with the default view
-		if (CollectionUtils.isEmpty(view)) {
-			final List<GermplasmListDataView> defaultView = GermplasmListStaticColumns.getDefaultColumns()
-				.stream()
-				.map(column -> new GermplasmListDataView(null, GermplasmListColumnCategory.STATIC, null, column.getTermId()))
-				.collect(Collectors.toList());
-			view.addAll(defaultView);
-		}
+		final List<GermplasmListDataViewModel> viewModel = this.getView(view);
 		final List<GermplasmListDataSearchResponse> response =
-			this.daoFactory.getGermplasmListDataSearchDAO().searchGermplasmListData(listId, view, request, pageable);
+			this.daoFactory.getGermplasmListDataSearchDAO().searchGermplasmListData(listId, viewModel, request, pageable);
 
 		if (CollectionUtils.isEmpty(response)) {
 			return response;
@@ -131,9 +124,38 @@ public class GermplasmListDataSearchServiceImpl implements GermplasmListDataSear
 
 	private boolean viewHasParentData(final GermplasmListDataView column) {
 		return column.getVariableId().equals(GermplasmListStaticColumns.FEMALE_PARENT_GID.getTermId()) ||
-		column.getVariableId().equals(GermplasmListStaticColumns.FEMALE_PARENT_NAME.getTermId()) ||
+			column.getVariableId().equals(GermplasmListStaticColumns.FEMALE_PARENT_NAME.getTermId()) ||
 			column.getVariableId().equals(GermplasmListStaticColumns.MALE_PARENT_GID.getTermId()) ||
 			column.getVariableId().equals(GermplasmListStaticColumns.MALE_PARENT_NAME.getTermId());
+	}
+
+	private List<GermplasmListDataViewModel> getView(final List<GermplasmListDataView> view) {
+		// Provide default view
+		if (CollectionUtils.isEmpty(view)) {
+			return this.getDefaultView();
+		}
+
+		final List<GermplasmListDataView> entryDetailsColumns =
+			view.stream().filter(GermplasmListDataView::isEntryDetailColumn).collect(Collectors.toList());
+		// Check if there are only entry details in view
+		if (view.size() == entryDetailsColumns.size()) {
+			final List<GermplasmListDataViewModel> defaultView = this.getDefaultView();
+			final List<GermplasmListDataViewModel> entryDetailsModels =
+				entryDetailsColumns.stream().map(GermplasmListDataViewModel::new).collect(Collectors.toList());
+			return Stream.concat(defaultView.stream(), entryDetailsModels.stream()).collect(Collectors.toList());
+		}
+
+		return view
+			.stream()
+			.map(GermplasmListDataViewModel::new)
+			.collect(Collectors.toList());
+	}
+
+	private List<GermplasmListDataViewModel> getDefaultView() {
+		return GermplasmListStaticColumns.getDefaultColumns()
+			.stream()
+			.map(column -> GermplasmListDataViewModel.buildStaticGermplasmListDataViewModel(column.getTermId()))
+			.collect(Collectors.toList());
 	}
 
 }
