@@ -41,6 +41,7 @@ import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRe
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
 import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -1574,6 +1575,12 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		stringBuilder.append("LEFT JOIN germplsm ON stock.dbxref_id = germplsm.gid ");
 		stringBuilder.append("LEFT JOIN names ON stock.dbxref_id = names.gid AND names.nstat = 1 ");
 		stringBuilder.append("LEFT JOIN cvterm ON p.observable_id = cvterm.cvterm_id ");
+		stringBuilder.append("LEFT JOIN cvterm ON p.observable_id = cvterm.cvterm_id ");
+		stringBuilder.append("LEFT JOIN project plot ON plot.project_id = obs_unit.project_id ");
+		stringBuilder.append("LEFT JOIN project trial ON plot.study_id = trial.project_id ");
+		stringBuilder.append("LEFT JOIN nd_geolocation_prop location_prop ON location_prop.nd_geolocation_id = instance.nd_geolocation_id ");
+		stringBuilder.append("	location_prop.type_id = " + TermId.LOCATION_ID + " ");
+
 		stringBuilder.append("WHERE 1=1 ");
 	}
 
@@ -1592,6 +1599,21 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getStudyDbIds())) {
 			sqlQuery.setParameterList("studyDbIds", observationSearchRequestDto.getStudyDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getLocationDbIds())) {
+			sqlQuery.setParameterList("locationDbIds", observationSearchRequestDto.getLocationDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getTrialDbIds())) {
+			sqlQuery.setParameterList("trialDbIds", observationSearchRequestDto.getTrialDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getProgramDbIds())) {
+			sqlQuery.setParameterList("programDbIds", observationSearchRequestDto.getProgramDbIds());
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceID())) {
+			sqlQuery.setParameter("referenceId", observationSearchRequestDto.getExternalReferenceID());
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceSource())) {
+			sqlQuery.setParameter("referenceSource", observationSearchRequestDto.getExternalReferenceSource());
 		}
 	}
 
@@ -1612,7 +1634,23 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getStudyDbIds())) {
 			stringBuilder.append("AND instance.nd_geolocation_id in (:studyDbIds) ");
 		}
-		// TODO: Filter by locationDbIds, trialDbIds, programDbIds, externalReferenceIds, externalReferenceSources
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getLocationDbIds())) {
+			stringBuilder.append("AND location_prop.value in (:locationDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getTrialDbIds())) {
+			stringBuilder.append("AND trial.project_id in (:trialDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getProgramDbIds())) {
+			stringBuilder.append("AND trial.program_uuid in (:programDbIds) ");
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceID())) {
+			stringBuilder.append("AND EXISTS (SELECT * FROM external_reference_phenotype pref ");
+			stringBuilder.append("WHERE p.phenotype_id = pref.phenotype_id AND pref.reference_id = :referenceId) ");
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceSource())) {
+			stringBuilder.append("AND EXISTS (SELECT * FROM external_reference_phenotype pref ");
+			stringBuilder.append("WHERE p.phenotype_id = pref.phenotype_id AND pref.reference_source = :referenceSource) ");
+		}
 	}
 
 }
