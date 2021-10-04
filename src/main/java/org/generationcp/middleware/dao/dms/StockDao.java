@@ -103,17 +103,38 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockIds;
 	}
 
-	public long countStudiesByGid(final int gid) {
+	public long countStudiesByGids(final List<Integer> gids) {
 
 		try {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("select count(distinct p.project_id) " + "FROM stock s "
-					+ "INNER JOIN project p ON s.project_id = p.project_id " + "WHERE s.dbxref_id = " + gid
+					+ "INNER JOIN project p ON s.project_id = p.project_id "
+					+ "WHERE s.dbxref_id IN (:gids) "
 					+ " AND p.deleted = 0");
+			query.setParameterList("gids", gids);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error in countStudiesByGid=" + gid + StockDao.IN_STOCK_DAO + e.getMessage();
+			final String errorMessage = "Error in countStudiesByGids=" + gids + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
+	public long countPlotsByGids(final List<Integer> gids) {
+
+		try {
+			final SQLQuery query = this.getSession()
+				.createSQLQuery("select count(distinct e.nd_experiment_id) " + "FROM stock s "
+					+ "INNER JOIN project p ON s.project_id = p.project_id "
+					+ "INNER JOIN nd_experiment e on e.stock_id = s.stock_id "
+					+ "WHERE s.dbxref_id IN (:gids) "
+					+ " AND p.deleted = 0");
+			query.setParameterList("gids", gids);
+			return ((BigInteger) query.uniqueResult()).longValue();
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error in countStudiesByGids=" + gids + StockDao.IN_STOCK_DAO + e.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
