@@ -1640,12 +1640,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
-			stringBuilder.append(" AND EXISTS (SELECT * FROM external_reference_variable vref ");
+			stringBuilder.append(" AND EXISTS (SELECT * FROM external_reference_cvterm vref ");
 			stringBuilder.append(" WHERE variable.cvterm_id = vref.cvterm_id AND vref.reference_id IN (:referenceIds)) ");
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
-			stringBuilder.append(" AND EXISTS (SELECT * FROM external_reference_variable vref ");
+			stringBuilder.append(" AND EXISTS (SELECT * FROM external_reference_cvterm vref ");
 			stringBuilder.append(" WHERE variable.cvterm_id = vref.cvterm_id AND vref.reference_source IN (:referenceSources)) ");
 		}
 

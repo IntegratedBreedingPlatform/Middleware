@@ -19,8 +19,8 @@ import javax.persistence.Table;
 import java.io.Serializable;
 
 @Entity
-@Table(name = "external_reference_variable")
-public class VariableExternalReference extends AbstractEntity implements Serializable {
+@Table(name = "external_reference_cvterm")
+public class CvTermExternalReference extends AbstractEntity implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,10 +40,10 @@ public class VariableExternalReference extends AbstractEntity implements Seriali
     @Column(name = "reference_source")
     private String source;
 
-    public VariableExternalReference() {
+    public CvTermExternalReference() {
     }
 
-    public VariableExternalReference(final CVTerm cvTerm, final String referenceId, final String source) {
+    public CvTermExternalReference(final CVTerm cvTerm, final String referenceId, final String source) {
         this.cvTerm = cvTerm;
         this.referenceId = referenceId;
         this.source = source;
@@ -86,7 +86,7 @@ public class VariableExternalReference extends AbstractEntity implements Seriali
         if (!(other instanceof GermplasmExternalReference)) {
             return false;
         }
-        final VariableExternalReference castOther = (VariableExternalReference) other;
+        final CvTermExternalReference castOther = (CvTermExternalReference) other;
         return new EqualsBuilder().append(this.id, castOther.id).isEquals();
     }
 

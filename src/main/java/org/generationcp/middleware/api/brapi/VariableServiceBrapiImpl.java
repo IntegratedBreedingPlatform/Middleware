@@ -45,7 +45,7 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi{
                     .collect(Collectors.toSet()));
 
             final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
-                    this.daoFactory.getVariableExternalReferenceDAO().getExternalReferences(variableIds).stream()
+                    this.daoFactory.getCvTermExternalReferenceDAO().getExternalReferences(variableIds).stream()
                             .collect(groupingBy(
                                     ExternalReferenceDTO::getEntityId));
             for(final VariableDTO dto: variableDTOS) {

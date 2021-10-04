@@ -6,7 +6,7 @@ import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.pojos.VariableExternalReference;
+import org.generationcp.middleware.pojos.CvTermExternalReference;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
@@ -63,11 +63,11 @@ public class VariableServiceBrapiImplTest  extends IntegrationTestBase {
         vo.setVariableId(categoricalVariable.getCvTermId());
         this.daoFactory.getVariableProgramOverridesDao().save(vo);
 
-        final VariableExternalReference varExRef = new VariableExternalReference();
+        final CvTermExternalReference varExRef = new CvTermExternalReference();
         varExRef.setCvTerm(categoricalVariable);
         varExRef.setSource(RandomStringUtils.randomAlphabetic(5));
         varExRef.setReferenceId(RandomStringUtils.randomAlphabetic(5));
-        this.daoFactory.getVariableExternalReferenceDAO().save(varExRef);
+        this.daoFactory.getCvTermExternalReferenceDAO().save(varExRef);
 
         final CVTermSynonym synonym = new CVTermSynonym();
         synonym.setSynonym(RandomStringUtils.randomAlphabetic(10));
