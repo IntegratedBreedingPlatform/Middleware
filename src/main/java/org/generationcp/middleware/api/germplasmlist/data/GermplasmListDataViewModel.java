@@ -1,4 +1,4 @@
-package org.generationcp.middleware.api.germplasmlist.search;
+package org.generationcp.middleware.api.germplasmlist.data;
 
 import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListDataView;

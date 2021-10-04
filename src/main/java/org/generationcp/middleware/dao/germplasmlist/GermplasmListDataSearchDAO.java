@@ -1,10 +1,10 @@
 package org.generationcp.middleware.dao.germplasmlist;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListStaticColumns;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataViewModel;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataViewModel;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.pojos.GermplasmListColumnCategory;

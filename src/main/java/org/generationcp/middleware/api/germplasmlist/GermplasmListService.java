@@ -66,10 +66,4 @@ public interface GermplasmListService {
 	 */
 	boolean toggleGermplasmListStatus(Integer listId);
 
-	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId, final String programUUID);
-
-	List<GermplasmListMeasurementVariableDTO> getGermplasmListDataTableHeader(Integer listId, final String programUUID);
-
-	void saveGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view);
-
 }

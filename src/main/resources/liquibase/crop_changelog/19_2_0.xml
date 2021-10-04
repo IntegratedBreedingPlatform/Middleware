@@ -84,4 +84,46 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="v19.2.0-5">
+        <preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<tableExists tableName="list_data_default_view"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Create table 'list_data_default_view'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table list_data_default_view (
+				id   int auto_increment
+					primary key,
+				name varchar(255) null
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.2.0-6">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM list_data_default_view;
+				</sqlCheck>
+			</and>
+        </preConditions>
+		<comment>
+			Add data to 'list_data_default_view' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO list_data_default_view (name)
+			VALUES ('ENTRY_NO'),
+				('GID'),
+				('DESIGNATION'),
+				('LOTS'),
+				('AVAILABLE'),
+				('UNIT');
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

@@ -13,16 +13,12 @@ package org.generationcp.middleware.dao.germplasmlist;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
-import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -30,15 +26,12 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
-import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 /**
  * DAO class for {@link GermplasmListData}.

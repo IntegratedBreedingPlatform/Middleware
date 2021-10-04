@@ -25,6 +25,7 @@
         <mapping class="org.generationcp.middleware.pojos.GermplasmList"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmListData"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmListDataView"/>
+        <mapping class="org.generationcp.middleware.pojos.GermplasmListDataDefaultView"/>
         <mapping class="org.generationcp.middleware.pojos.Person"/>
         <mapping class="org.generationcp.middleware.pojos.ListDataProperty"/>
 

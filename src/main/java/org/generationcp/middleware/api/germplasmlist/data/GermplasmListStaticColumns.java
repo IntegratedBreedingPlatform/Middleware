@@ -1,21 +1,19 @@
-package org.generationcp.middleware.api.germplasmlist;
+package org.generationcp.middleware.api.germplasmlist.data;
 
 import org.generationcp.middleware.domain.oms.TermId;
 
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public enum GermplasmListStaticColumns {
 
-	ENTRY_NO("ENTRY_NO", TermId.ENTRY_NO, 1, true),
-	GID("GID", TermId.GID, 2, true),
-	DESIGNATION("DESIGNATION", TermId.DESIG, 3, true),
-	LOTS("LOTS", TermId.GID_ACTIVE_LOTS_COUNT, 4, true),
-	AVAILABLE("AVAILABLE", TermId.GID_AVAILABLE_BALANCE, 5, true),
-	UNIT("UNIT", TermId.GID_UNIT, 6, true),
+	ENTRY_NO("ENTRY_NO", TermId.ENTRY_NO, 1),
+	GID("GID", TermId.GID, 2),
+	DESIGNATION("DESIGNATION", TermId.DESIG, 3),
+	LOTS("LOTS", TermId.GID_ACTIVE_LOTS_COUNT, 4),
+	AVAILABLE("AVAILABLE", TermId.GID_AVAILABLE_BALANCE, 5),
+	UNIT("UNIT", TermId.GID_UNIT, 6),
 	IMMEDIATE_SOURCE_GID("IMMEDIATE SOURCE GID", TermId.IMMEDIATE_SOURCE_GID, 7),
 	IMMEDIATE_SOURCE_NAME("IMMEDIATE SOURCE NAME", TermId.IMMEDIATE_SOURCE_NAME, 8),
 	GROUP_SOURCE_GID("GROUP SOURCE GID", TermId.GROUP_SOURCE_GID, 9),
@@ -34,25 +32,14 @@ public enum GermplasmListStaticColumns {
 	GERMPLASM_DATE("GERMPLASM DATE", TermId.GERMPLASM_DATE, 22),
 	GERMPLASM_REFERENCE("REFERENCE", TermId.GERMPLASM_REFERENCE, 23);
 
-	private static int ranking = 0;
-
 	private final String name;
 	private final TermId termId;
 	private final int rank;
-	private final boolean isDefault;
 
 	GermplasmListStaticColumns(final String name, final TermId termId, final int rank) {
 		this.name = name;
 		this.termId = termId;
 		this.rank = rank;
-		this.isDefault = false;
-	}
-
-	GermplasmListStaticColumns(final String name, final TermId termId, final int rank, final boolean isDefault) {
-		this.name = name;
-		this.termId = termId;
-		this.rank = rank;
-		this.isDefault = isDefault;
 	}
 
 	public String getName() {
@@ -67,33 +54,18 @@ public enum GermplasmListStaticColumns {
 		return rank;
 	}
 
-	public boolean isDefault() {
-		return isDefault;
-	}
-
-	public static List<GermplasmListStaticColumns> getDefaultColumns() {
-		return Arrays.stream(GermplasmListStaticColumns.values())
-			.filter(GermplasmListStaticColumns::isDefault)
-			.collect(Collectors.toList());
-	}
-
-	public static Stream<GermplasmListStaticColumns> getDefaultColumnsSortedByRank() {
-		return GermplasmListStaticColumns.getDefaultColumns()
-			.stream()
-			.sorted(Comparator.comparing(GermplasmListStaticColumns::getRank));
-	}
-
-	public static List<Integer> getDefaultColumnIdsSortedByRank() {
-		return GermplasmListStaticColumns.getDefaultColumnsSortedByRank()
-			.map(GermplasmListStaticColumns::getTermId)
-			.collect(Collectors.toList());
-	}
-
-	public static GermplasmListStaticColumns getValueByTermId(int termId) {
+	public static GermplasmListStaticColumns getByTermId(int termId) {
 		return Arrays.stream(GermplasmListStaticColumns.values())
 			.filter(c -> c.termId.getId() == termId)
 			.findFirst()
 			.orElseThrow(() -> new IllegalStateException(String.format("There is no a static columns with termId %s.", termId)));
+	}
+
+	public static GermplasmListStaticColumns getByName(String name) {
+		return Arrays.stream(GermplasmListStaticColumns.values())
+			.filter(c -> c.getName().equalsIgnoreCase(name))
+			.findFirst()
+			.orElseThrow(() -> new IllegalStateException(String.format("There is no a static columns with name %s.", name)));
 	}
 
 	public static Stream<GermplasmListStaticColumns> getColumnsSortedByRank() {
