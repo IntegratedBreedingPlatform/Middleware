@@ -1,9 +1,13 @@
 package org.generationcp.middleware.api.brapi.v2.observation;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -16,12 +20,16 @@ public class ObservationDto {
 	private String germplasmDbId;
 	private String germplasmName;
 	private String observationDbId;
-	private String observationTimeStamp;
+
+	@JsonSerialize(as = Date.class)
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+	private Date observationTimeStamp;
+
 	private String observationUnitDbId;
 	private String observationUnitName;
 	private String observationVariableDbId;
 	private String observationVariableName;
-	private String season;
+	private SeasonDto season = new SeasonDto();
 	private String studyDbId;
 	private String uploadedBy;
 	private String value;
@@ -74,11 +82,11 @@ public class ObservationDto {
 		this.observationDbId = observationDbId;
 	}
 
-	public String getObservationTimeStamp() {
+	public Date getObservationTimeStamp() {
 		return this.observationTimeStamp;
 	}
 
-	public void setObservationTimeStamp(final String observationTimeStamp) {
+	public void setObservationTimeStamp(final Date observationTimeStamp) {
 		this.observationTimeStamp = observationTimeStamp;
 	}
 
@@ -114,11 +122,11 @@ public class ObservationDto {
 		this.observationVariableName = observationVariableName;
 	}
 
-	public String getSeason() {
+	public SeasonDto getSeason() {
 		return this.season;
 	}
 
-	public void setSeason(final String season) {
+	public void setSeason(final SeasonDto season) {
 		this.season = season;
 	}
 
@@ -144,6 +152,14 @@ public class ObservationDto {
 
 	public void setValue(final String value) {
 		this.value = value;
+	}
+
+	public void setSeasonName(final String seasonName) {
+		this.season.setSeason(seasonName);
+	}
+
+	public void setSeasonDbId(final String seasonDbId) {
+		this.season.setSeasonDbId(seasonDbId);
 	}
 
 	@Override

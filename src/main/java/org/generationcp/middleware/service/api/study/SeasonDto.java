@@ -12,6 +12,10 @@ public class SeasonDto {
 	private String seasonDbId;
 	private String year;
 
+	public SeasonDto() {
+		// default constructor
+	}
+
 	public SeasonDto(final String season, final String seasonDbId) {
 		this.season = season;
 		this.seasonDbId = seasonDbId;

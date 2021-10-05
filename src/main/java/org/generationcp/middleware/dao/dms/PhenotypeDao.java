@@ -54,6 +54,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
+import org.hibernate.type.DateType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
@@ -1501,14 +1502,15 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			sqlQuery.addScalar("germplasmDbId", StringType.INSTANCE);
 			sqlQuery.addScalar("germplasmName", StringType.INSTANCE);
 			sqlQuery.addScalar("observationDbId", StringType.INSTANCE);
-			sqlQuery.addScalar("observationTimeStamp", StringType.INSTANCE);
+			sqlQuery.addScalar("observationTimeStamp", DateType.INSTANCE);
 			sqlQuery.addScalar("observationUnitDbId", StringType.INSTANCE);
 			sqlQuery.addScalar("observationUnitName", StringType.INSTANCE);
 			sqlQuery.addScalar("observationVariableDbId", StringType.INSTANCE);
 			sqlQuery.addScalar("observationVariableName", StringType.INSTANCE);
 			sqlQuery.addScalar("studyDbId", StringType.INSTANCE);
 			sqlQuery.addScalar("value", StringType.INSTANCE);
-			sqlQuery.addScalar("season", StringType.INSTANCE);
+			sqlQuery.addScalar("seasonName", StringType.INSTANCE);
+			sqlQuery.addScalar("seasonDbId", StringType.INSTANCE);
 			sqlQuery.setResultTransformer(Transformers.aliasToBean(ObservationDto.class));
 			this.addObservationSearchQueryParams(observationSearchRequestDto, sqlQuery);
 
@@ -1561,7 +1563,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		sql.append("	cvterm.name AS observationVariableName, ");
 		sql.append("instance.nd_geolocation_id AS studyDbId, ");
 		sql.append("	p.value AS value, ");
-		sql.append(" cvtermSeason.definition AS season ");
+		sql.append(" cvtermSeason.definition AS seasonName, ");
+		sql.append(" cvtermSeason.cvterm_id AS seasonDbId ");
 		this.addObservationSearchQueryJoins(sql);
 		this.addObservationSearchQueryFilter(observationSearchRequestDto, sql);
 		return sql.toString();
