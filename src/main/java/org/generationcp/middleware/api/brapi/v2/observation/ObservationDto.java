@@ -1,8 +1,10 @@
 package org.generationcp.middleware.api.brapi.v2.observation;
 
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.List;
 import java.util.Map;
 
 @AutoProperty
@@ -10,7 +12,7 @@ public class ObservationDto {
 
 	private Map<String, String> additionalInfo;
 	private String collector;
-	private String externalReferences;
+	private List<ExternalReferenceDTO> externalReferences;
 	private String germplasmDbId;
 	private String germplasmName;
 	private String observationDbId;
@@ -40,11 +42,11 @@ public class ObservationDto {
 		this.collector = collector;
 	}
 
-	public String getExternalReferences() {
+	public List<ExternalReferenceDTO> getExternalReferences() {
 		return this.externalReferences;
 	}
 
-	public void setExternalReferences(final String externalReferences) {
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
 		this.externalReferences = externalReferences;
 	}
 

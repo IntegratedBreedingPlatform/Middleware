@@ -19,7 +19,7 @@ public class PhenotypeExternalReferenceDAO extends GenericDAO<PhenotypeExternalR
 
         try {
             final SQLQuery sqlQuery = this.getSession().createSQLQuery(
-                    "SELECT CAST(cvterm_id AS CHAR(255)) as entityId, reference_id as referenceID, reference_source as referenceSource "
+                    "SELECT CAST(phenotype_id AS CHAR(255)) as entityId, reference_id as referenceID, reference_source as referenceSource "
                             + "FROM external_reference_phenotype WHERE phenotype_id IN (:phenotypeIds)");
 
             sqlQuery.addScalar("entityId").addScalar("referenceID").addScalar("referenceSource")

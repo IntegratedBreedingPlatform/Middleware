@@ -1,15 +1,18 @@
 package org.generationcp.middleware.api.brapi;
 
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.PhenotypeExternalReference;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,6 +22,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @Transactional
@@ -33,7 +38,19 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 	@Override
 	public List<ObservationDto> searchObservations(final ObservationSearchRequestDto observationSearchRequestDto, final Integer pageSize,
 		final Integer pageNumber) {
-		return this.daoFactory.getPhenotypeDAO().searchObservations(observationSearchRequestDto, pageSize, pageNumber);
+		final List<ObservationDto> observationDtos = this.daoFactory.getPhenotypeDAO().searchObservations(observationSearchRequestDto, pageSize, pageNumber);
+		if (!CollectionUtils.isEmpty(observationDtos)) {
+			final List<String> observationDbIds = new ArrayList<>(observationDtos.stream().map(ObservationDto::getObservationDbId)
+					.collect(Collectors.toSet()));
+			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
+					this.daoFactory.getPhenotypeExternalReferenceDAO().getExternalReferences(observationDbIds).stream()
+							.collect(groupingBy(
+									ExternalReferenceDTO::getEntityId));
+			for(final ObservationDto observationDto: observationDtos) {
+				observationDto.setExternalReferences(externalReferencesMap.get(observationDto.getObservationDbId()));
+			}
+		}
+		return observationDtos;
 	}
 
 	@Override
@@ -62,10 +79,23 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 				this.resolveCategoricalIdValue(Integer.valueOf(observation.getObservationVariableDbId()), observation.getValue(),
 					validValuesForCategoricalVariables));
 			phenotype.setExperiment(experimentModelMap.get(observation.getObservationUnitDbId()));
+			this.setPhenotypeExternalReferences(observation, phenotype);
 			final Phenotype saved = dao.save(phenotype);
 			observationDbIds.add(saved.getPhenotypeId());
 		}
 		return observationDbIds;
+	}
+
+	private void setPhenotypeExternalReferences(final ObservationDto observationDto, final Phenotype phenotype) {
+		if (observationDto.getExternalReferences() != null) {
+			final List<PhenotypeExternalReference> references = new ArrayList<>();
+			observationDto.getExternalReferences().forEach(reference -> {
+				final PhenotypeExternalReference externalReference =
+						new PhenotypeExternalReference(phenotype, reference.getReferenceID(), reference.getReferenceSource());
+				references.add(externalReference);
+			});
+			phenotype.setExternalReferences(references);
+		}
 	}
 
 	private Map<Integer, List<ValueReference>> getCategoriesForCategoricalVariables(final List<ObservationDto> observations) {
