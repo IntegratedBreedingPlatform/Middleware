@@ -1508,6 +1508,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			sqlQuery.addScalar("observationVariableName", StringType.INSTANCE);
 			sqlQuery.addScalar("studyDbId", StringType.INSTANCE);
 			sqlQuery.addScalar("value", StringType.INSTANCE);
+			sqlQuery.addScalar("season", StringType.INSTANCE);
 			sqlQuery.setResultTransformer(Transformers.aliasToBean(ObservationDto.class));
 			this.addObservationSearchQueryParams(observationSearchRequestDto, sqlQuery);
 
@@ -1549,7 +1550,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	private String createObservationSearchQueryString(final ObservationSearchRequestDto observationSearchRequestDto) {
 		final StringBuilder sql = new StringBuilder();
-		// TODO: external reference source for observation
 		sql.append("SELECT ");
 		sql.append("germplsm.germplsm_uuid AS germplasmDbId,");
 		sql.append("	names.nval AS germplasmName, ");
@@ -1560,7 +1560,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		sql.append("p.observable_id AS observationVariableDbId, ");
 		sql.append("	cvterm.name AS observationVariableName, ");
 		sql.append("instance.nd_geolocation_id AS studyDbId, ");
-		sql.append("	p.value AS value ");
+		sql.append("	p.value AS value, ");
+		sql.append(" cvtermSeason.definition AS season ");
 		this.addObservationSearchQueryJoins(sql);
 		this.addObservationSearchQueryFilter(observationSearchRequestDto, sql);
 		return sql.toString();
@@ -1579,6 +1580,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		stringBuilder.append("LEFT JOIN project trial ON plot.study_id = trial.project_id ");
 		stringBuilder.append("LEFT JOIN nd_geolocationprop location_prop ON location_prop.nd_geolocation_id = instance.nd_geolocation_id ");
 		stringBuilder.append("	AND location_prop.type_id = " + TermId.LOCATION_ID.getId() + " ");
+		stringBuilder.append("LEFT OUTER JOIN nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = instance.nd_geolocation_id ");
+		stringBuilder.append("	AND geopropSeason.type_id = " + TermId.SEASON_VAR.getId() + " ");
+		stringBuilder.append("LEFT OUTER JOIN cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value ");
 
 		stringBuilder.append("WHERE 1=1 ");
 	}
@@ -1614,6 +1618,16 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceSource())) {
 			sqlQuery.setParameter("referenceSource", observationSearchRequestDto.getExternalReferenceSource());
 		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getSeasonDbId())) {
+			sqlQuery.setParameter("seasonDbId", observationSearchRequestDto.getSeasonDbId());
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getObservationTimeStampRangeStart())) {
+			sqlQuery.setParameter("observationTimeStampRangeStart", observationSearchRequestDto.getObservationTimeStampRangeStart());
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getObservationTimeStampRangeEnd())) {
+			sqlQuery.setParameter("observationTimeStampRangeEnd", observationSearchRequestDto.getObservationTimeStampRangeEnd());
+		}
+
 	}
 
 	private void addObservationSearchQueryFilter(final ObservationSearchRequestDto observationSearchRequestDto,
@@ -1649,6 +1663,15 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceSource())) {
 			stringBuilder.append("AND EXISTS (SELECT * FROM external_reference_phenotype pref ");
 			stringBuilder.append("WHERE p.phenotype_id = pref.phenotype_id AND pref.reference_source = :referenceSource) ");
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getSeasonDbId())) {
+			stringBuilder.append("AND cvtermSeason.cvterm_id = :seasonDbId ");
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getObservationTimeStampRangeStart())) {
+			stringBuilder.append("AND p.created_date >= :observationTimeStampRangeStart ");
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getObservationTimeStampRangeEnd())) {
+			stringBuilder.append("AND p.created_date <= :observationTimeStampRangeEnd ");
 		}
 	}
 
