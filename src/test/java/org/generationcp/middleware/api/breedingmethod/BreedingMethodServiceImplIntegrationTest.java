@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,7 +52,7 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 		//Create a favorite breeding method
 		final Method favoriteBreedingMethod = allMethods.get(0);
 		final String programUUID = UUID.randomUUID().toString();
-		this.programFavoriteService.addProgramFavorite(programUUID, ProgramFavorite.FavoriteType.METHOD, favoriteBreedingMethod.getMid());
+		this.programFavoriteService.addProgramFavorites(programUUID, ProgramFavorite.FavoriteType.METHOD, new HashSet<>(favoriteBreedingMethod.getMid()));
 
 		//Should get only the favorite breeding method
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();

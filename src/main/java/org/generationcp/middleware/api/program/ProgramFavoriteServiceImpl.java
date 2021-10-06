@@ -6,6 +6,9 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Set;
+
 @Service
 @Transactional
 public class ProgramFavoriteServiceImpl implements ProgramFavoriteService {
@@ -17,12 +20,14 @@ public class ProgramFavoriteServiceImpl implements ProgramFavoriteService {
 	}
 
 	@Override
-	public void addProgramFavorite(final String programUUID, final ProgramFavorite.FavoriteType favoriteType, final Integer entityId) {
-		final ProgramFavorite favorite = new ProgramFavorite();
-		favorite.setEntityId(entityId);
-		favorite.setEntityType(favoriteType.getName());
-		favorite.setUniqueID(programUUID);
-		this.daoFactory.getProgramFavoriteDao().save(favorite);
+	public void addProgramFavorites(final String programUUID, final ProgramFavorite.FavoriteType favoriteType, final Set<Integer> entityIds) {
+		entityIds.forEach(entityId -> {
+			final ProgramFavorite favorite = new ProgramFavorite();
+			favorite.setEntityId(entityId);
+			favorite.setEntityType(favoriteType.getName());
+			favorite.setUniqueID(programUUID);
+			this.daoFactory.getProgramFavoriteDao().save(favorite);
+		});
 	}
 
 	@Override
