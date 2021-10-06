@@ -6,6 +6,7 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.domain.dms.NameType;
@@ -766,11 +767,13 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		}
 
 		// Remove variable type properties which are not part of incoming set.
-		final Set<VariableType> toRemove = new HashSet<>(existingVariableTypes);
-		toRemove.removeAll(variableInfo.getVariableTypes());
+		if (CollectionUtils.isNotEmpty(variableInfo.getVariableTypes())) {
+			final Set<VariableType> toRemove = new HashSet<>(existingVariableTypes);
+			toRemove.removeAll(variableInfo.getVariableTypes());
 
-		for (final VariableType type : toRemove) {
-			this.daoFactory.getCvTermPropertyDao().makeTransient(existingProperties.get(type));
+			for (final VariableType type : toRemove) {
+				this.daoFactory.getCvTermPropertyDao().makeTransient(existingProperties.get(type));
+			}
 		}
 
 		// Saving alias, min, max values
