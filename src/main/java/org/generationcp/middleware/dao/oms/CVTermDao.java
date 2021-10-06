@@ -1767,7 +1767,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 					.setMax(result.get(VARIABLE_SCALE_MAX_RANGE) != null ? (Double) result.get(VARIABLE_SCALE_MAX_RANGE) : null);
 			}
 
-			scale.setDataType(this.convertDataTypeToVariableDtoScale((Integer) result.get(VARIABLE_DATA_TYPE_ID)));
+			scale.setDataType(this.getDataTypeBrapiName((Integer) result.get(VARIABLE_DATA_TYPE_ID)));
 			scale.setDecimalPlaces(DataType.NUMERIC_VARIABLE.getId().equals(result.get(VARIABLE_DATA_TYPE_ID)) ? 4 : null);
 			final List<String> categoryValues = result.get(VARIABLE_SCALE_CATEGORIES) != null ?
 				Arrays.asList(StringUtils.split(String.valueOf(result.get(VARIABLE_SCALE_CATEGORIES)), "|")) : new ArrayList<>();
@@ -1809,34 +1809,20 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return null;
 	}
 
-	protected String convertDataTypeToVariableDtoScale(final Integer dataTypeId) {
-		if (DataType.CATEGORICAL_VARIABLE.getId().equals(dataTypeId)) {
-			return VariableDTO.Scale.NOMINAL;
-		} else if (DataType.CHARACTER_VARIABLE.getId().equals(dataTypeId)) {
-			return VariableDTO.Scale.TEXT;
-		} else if (DataType.DATE_TIME_VARIABLE.getId().equals(dataTypeId)) {
-			return VariableDTO.Scale.DATE;
-		} else if (DataType.NUMERIC_VARIABLE.getId().equals(dataTypeId)) {
-			return VariableDTO.Scale.NUMERICAL;
+	protected String getDataTypeBrapiName(final Integer dataTypeId) {
+		if (DataType.getById(dataTypeId) != null) {
+			return DataType.getById(dataTypeId).getBrapiName();
 		} else {
-			return "";
+			return StringUtils.EMPTY;
 		}
 	}
 
-	protected List<String> convertVariableDtoScaleToDataTypeIds(final List<String> dataTypes) {
+	protected List<String> convertVariableDtoScaleToDataTypeIds(final List<String> brapiDataTypeNames) {
 		final List<String> dataTypeIds = new ArrayList<>();
-		for(final String dataType: dataTypes) {
-			if (VariableDTO.Scale.NOMINAL.equals(dataType)) {
-				dataTypeIds.add(DataType.CATEGORICAL_VARIABLE.getId().toString());
-			} else if (VariableDTO.Scale.TEXT.equals(dataType)) {
-				dataTypeIds.add(DataType.CHARACTER_VARIABLE.getId().toString());
-			} else if ( VariableDTO.Scale.DATE.equals(dataType)) {
-				dataTypeIds.add(DataType.DATE_TIME_VARIABLE.getId().toString());
-			} else if (VariableDTO.Scale.NUMERICAL.equals(dataType)) {
-				dataTypeIds.add(DataType.NUMERIC_VARIABLE.getId().toString());
-			} else {
-				// for unimplemented data types: Code, Duration and Ordinal
-				dataTypeIds.add(dataType);
+		for(final String brapiDataTypeName: brapiDataTypeNames) {
+			final DataType dataType = DataType.getByBrapiName(brapiDataTypeName);
+			if (dataType != null) {
+				dataTypeIds.add(dataType.getId().toString());
 			}
 		}
 		return dataTypeIds;

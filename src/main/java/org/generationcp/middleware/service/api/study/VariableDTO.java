@@ -7,14 +7,18 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.util.serializer.CategorySerializer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class VariableDTO {
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private Map<String, String> additionalInfo = new HashMap<>();
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private String commonCropName;
 
 	private List<String> contextOfUse = new ArrayList<>();
@@ -28,7 +32,7 @@ public class VariableDTO {
 	private String defaultValue;
 	private String documentationURL;
 
-	@JsonView(BrapiView.BrapiV2.class)
+	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private List<ExternalReferenceDTO> externalReferences;
 
 	private String growthStage;
@@ -50,6 +54,9 @@ public class VariableDTO {
 	private String status;
 	private String submissionTimestamp;
 	private List<String> synonyms = new ArrayList<>();
+
+	@JsonView(BrapiView.BrapiV2_1.class)
+	private List<String> studyDbIds = new ArrayList<>();
 
 	@JsonView(BrapiView.BrapiV1_3.class)
 	private String xref;
@@ -256,19 +263,28 @@ public class VariableDTO {
 		this.synonyms = synonyms;
 	}
 
+	public List<String> getStudyDbIds() {
+		return this.studyDbIds;
+	}
+
+	public void setStudyDbIds(final List<String> studyDbIds) {
+		this.studyDbIds = studyDbIds;
+	}
+
 	public class Trait {
-		@JsonView(BrapiView.BrapiV2.class)
+
+		@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 		private Map<String, String> additionalInfo = new HashMap<>();
 
 		private final List<String> alternativeAbbreviations = new ArrayList<>();
 		private String attribute;
 		private String entity;
 
-		@JsonView(BrapiView.BrapiV2.class)
+		@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 		private List<ExternalReferenceDTO> externalReferences;
 		private String mainAbbreviation;
 
-		@JsonView(BrapiView.BrapiV2.class)
+		@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 		private String traitClass;
 
 		@JsonView(BrapiView.BrapiV1_3.class)
@@ -276,9 +292,8 @@ public class VariableDTO {
 		@JsonView(BrapiView.BrapiV1_3.class)
 		private String description;
 
-		@JsonView(BrapiView.BrapiV2.class)
+		@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 		private String traitDescription;
-
 
 		private String name;
 		private OntologyReference ontologyReferenceObject = new OntologyReference();
@@ -432,19 +447,13 @@ public class VariableDTO {
 
 	public class Scale {
 
-		public static final String NOMINAL = "Nominal";
-		public static final String ORDINAL = "Ordinal";
-		public static final String DATE = "Date";
-		public static final String NUMERICAL = "Numerical";
-		public static final String TEXT = "Text";
-
-		@JsonView(BrapiView.BrapiV2.class)
+		@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 		private Map<String, String> additionalInfo = new HashMap<>();
 
 		private String dataType;
 		private Integer decimalPlaces;
 
-		@JsonView(BrapiView.BrapiV2.class)
+		@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 		private List<ExternalReferenceDTO> externalReferences;
 
 		@JsonView(BrapiView.BrapiV1_3.class)
@@ -545,6 +554,7 @@ public class VariableDTO {
 
 
 	public static class ValidValues {
+
 		@JsonSerialize(using = CategorySerializer.class)
 		private List<CategoryDTO> categories = new ArrayList<>();
 		private Double max;
@@ -580,16 +590,17 @@ public class VariableDTO {
 
 
 	public class Method {
-		@JsonView(BrapiView.BrapiV2.class)
+
+		@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 		private Map<String, String> additionalInfo = new HashMap<>();
 
-		@JsonView(BrapiView.BrapiV2.class)
+		@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 		private String bibliographicalReference;
 
-		@JsonView(BrapiView.BrapiV2.class)
+		@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 		private List<ExternalReferenceDTO> externalReferences;
 
-		@JsonView(BrapiView.BrapiV2.class)
+		@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 		private String methodClass;
 
 		@JsonView(BrapiView.BrapiV1_3.class)
@@ -719,7 +730,7 @@ public class VariableDTO {
 
 	public static class OntologyReference {
 
-		private List<DocumentationLink> documentationLinks = Arrays.asList(new DocumentationLink());
+		private List<DocumentationLink> documentationLinks = new ArrayList<>();
 		private String ontologyDbId;
 		private String ontologyName;
 		private String version;

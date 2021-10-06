@@ -342,7 +342,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_SCALE_ID), variableDTO.getScale().getScaleDbId());
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_EXPECTED_MIN), variableDTO.getScale().getValidValues().getMin());
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_EXPECTED_MAX), variableDTO.getScale().getValidValues().getMax());
-		Assert.assertEquals(VariableDTO.Scale.NUMERICAL, variableDTO.getScale().getDataType());
+		Assert.assertEquals(DataType.NUMERIC_VARIABLE.getBrapiName(), variableDTO.getScale().getDataType());
 		Assert.assertEquals(4, variableDTO.getScale().getDecimalPlaces().intValue());
 		Assert.assertEquals(5, variableDTO.getScale().getValidValues().getCategories().size());
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_SCALE), variableDTO.getScale().getOntologyReference().getOntologyName());
@@ -357,13 +357,13 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testConvertDataTypeToVariableDtoScale() {
+	public void testGetDataTypeBrapiName() {
 
-		Assert.assertEquals(VariableDTO.Scale.NUMERICAL, dao.convertDataTypeToVariableDtoScale(DataType.NUMERIC_VARIABLE.getId()));
-		Assert.assertEquals(VariableDTO.Scale.DATE, dao.convertDataTypeToVariableDtoScale(DataType.DATE_TIME_VARIABLE.getId()));
-		Assert.assertEquals(VariableDTO.Scale.NOMINAL, dao.convertDataTypeToVariableDtoScale(DataType.CATEGORICAL_VARIABLE.getId()));
-		Assert.assertEquals(VariableDTO.Scale.TEXT, dao.convertDataTypeToVariableDtoScale(DataType.CHARACTER_VARIABLE.getId()));
-		Assert.assertEquals("", dao.convertDataTypeToVariableDtoScale(DataType.DATASET.getId()));
+		Assert.assertEquals(DataType.NUMERIC_VARIABLE.getBrapiName(), dao.getDataTypeBrapiName(DataType.NUMERIC_VARIABLE.getId()));
+		Assert.assertEquals(DataType.DATE_TIME_VARIABLE.getBrapiName(), dao.getDataTypeBrapiName(DataType.DATE_TIME_VARIABLE.getId()));
+		Assert.assertEquals(DataType.CATEGORICAL_VARIABLE.getBrapiName(), dao.getDataTypeBrapiName(DataType.CATEGORICAL_VARIABLE.getId()));
+		Assert.assertEquals(DataType.CHARACTER_VARIABLE.getBrapiName(), dao.getDataTypeBrapiName(DataType.CHARACTER_VARIABLE.getId()));
+		Assert.assertEquals("", dao.getDataTypeBrapiName(DataType.DATASET.getId()));
 
 	}
 

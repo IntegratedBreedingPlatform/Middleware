@@ -10,6 +10,10 @@ public class CategoryDTO {
     private String label;
     private String value;
 
+    public CategoryDTO() {
+
+    }
+
     public CategoryDTO(final String label, final String value) {
         this.label = label;
         this.value = value;

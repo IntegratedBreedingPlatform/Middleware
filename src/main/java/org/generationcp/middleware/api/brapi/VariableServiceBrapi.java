@@ -11,4 +11,6 @@ public interface VariableServiceBrapi {
     List<VariableDTO> getObservationVariables(String crop, VariableSearchRequestDTO requestDTO, Pageable pageable);
 
     long countObservationVariables(VariableSearchRequestDTO requestDTO);
+
+	void updateObservationVariable(VariableDTO variable);
 }

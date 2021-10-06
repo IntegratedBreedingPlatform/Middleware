@@ -6,6 +6,7 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -48,7 +49,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 	@Autowired
 	private TermDataManager termDataManager;
-		
+
 	private static final String SCALE_DOES_NOT_EXIST = "Scale does not exist";
 	private static final String TERM_IS_NOT_SCALE = "Term is not scale";
 	private static final String SCALE_EXIST_WITH_SAME_NAME = "Scale exist with same name";
@@ -270,7 +271,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 	@Override
 	public void updateScale(Scale scale) {
-		
+
 		if (Objects.equals(scale.getDataType(), null)) {
 			throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);
 		}
@@ -362,10 +363,14 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			scale.setVocabularyId(CvId.SCALES.getId());
 
 			// Updating term to database.
-			term.setName(scale.getName());
-			term.setDefinition(scale.getDefinition());
-
-			daoFactory.getCvTermDao().merge(term);
+			if (StringUtils.isNotEmpty(scale.getName())) {
+				term.setName(scale.getName());
+				daoFactory.getCvTermDao().merge(term);
+			}
+			if (StringUtils.isNotEmpty(scale.getDefinition())) {
+				term.setDefinition(scale.getDefinition());
+				daoFactory.getCvTermDao().merge(term);
+			}
 
 			// Update data type if changed
 			if (!Objects.equals(oldDataType, scale.getDataType())) {
