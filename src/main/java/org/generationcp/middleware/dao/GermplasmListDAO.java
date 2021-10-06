@@ -636,6 +636,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	 * @param gids
 	 */
 	public List<Integer> getGermplasmUsedInLockedList(final List<Integer> gids) {
+		if (CollectionUtils.isEmpty(gids)) {
+			return Collections.emptyList();
+		}
 		final SQLQuery query = this.getSession()
 			.createSQLQuery(" SELECT ld.gid as gid "
 				+ " FROM listnms l"

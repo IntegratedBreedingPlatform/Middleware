@@ -47,6 +47,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -484,6 +485,9 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	public List<Integer> getGermplasmUsedInStudies(final List<Integer> gids, final boolean lockedStudiesOnly) {
+		if (CollectionUtils.isEmpty(gids)) {
+			return Collections.emptyList();
+		}
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
 			criteria.createAlias("project", "project");
