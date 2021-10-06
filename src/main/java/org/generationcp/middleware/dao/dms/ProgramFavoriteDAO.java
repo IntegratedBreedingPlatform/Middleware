@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -24,6 +25,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 /**
  * DAO class for {@link ProgramFavoriteDAO}.
@@ -88,6 +90,22 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 		}
 	}
 
+	public List<ProgramFavorite> getProgramFavorites(final String programUUID, final ProgramFavorite.FavoriteType favoriteType, final Set<Integer> entityId)
+		throws MiddlewareQueryException {
+		try {
+
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.eq("entityType", favoriteType.getName()));
+			criteria.add(Restrictions.eq("uniqueID", programUUID));
+			criteria.add(Restrictions.in("entityId", entityId));
+			return criteria.list();
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error in getProgramFavorites(" + favoriteType.getName() + "," + entityId.toArray() + ") in ProgramFavoriteDao: "
+				+ e.getMessage(), e);
+		}
+	}
+
 	public void deleteAllProgramFavorites(final String programUUID) {
 		try {
 			final String sql = "DELETE pf FROM program_favorites pf WHERE program_uuid = :programUUID";
@@ -96,6 +114,29 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 			sqlQuery.executeUpdate();
 		} catch (final HibernateException e) {
 			final String message = "Error in deleteAllProgramFavorites(" + programUUID + ") in ProgramFavoriteDao: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public void deleteProgramFavorites(final String programUUID, Set<Integer> programFavoriteIds) {
+		try {
+			final StringBuilder stringBuilder = new StringBuilder("DELETE pf FROM program_favorites pf WHERE pf.program_uuid = :programUUID");
+
+			if (!CollectionUtils.isEmpty(programFavoriteIds)) {
+				stringBuilder.append(" and pf.id in (:programFavoriteIds)");
+			}
+
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(stringBuilder.toString());
+			sqlQuery.setParameter("programUUID", programUUID);
+
+			if (!CollectionUtils.isEmpty(programFavoriteIds)) {
+				sqlQuery.setParameterList("programFavoriteIds", programFavoriteIds);
+			}
+
+			sqlQuery.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error in deleteProgramFavorites(" + programUUID + "," + programFavoriteIds.toArray() + ") in ProgramFavoriteDao: " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
