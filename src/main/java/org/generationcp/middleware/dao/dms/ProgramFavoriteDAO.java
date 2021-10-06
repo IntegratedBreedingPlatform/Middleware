@@ -122,21 +122,17 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 	public void deleteProgramFavorites(final String programUUID, Set<Integer> programFavoriteIds) {
 		try {
 			final StringBuilder stringBuilder = new StringBuilder("DELETE pf FROM program_favorites pf WHERE pf.program_uuid = :programUUID");
-
-			if (!CollectionUtils.isEmpty(programFavoriteIds)) {
-				stringBuilder.append(" and pf.id in (:programFavoriteIds)");
-			}
+			stringBuilder.append(" and pf.id in (:programFavoriteIds)");
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(stringBuilder.toString());
 			sqlQuery.setParameter("programUUID", programUUID);
-
-			if (!CollectionUtils.isEmpty(programFavoriteIds)) {
-				sqlQuery.setParameterList("programFavoriteIds", programFavoriteIds);
-			}
+			sqlQuery.setParameterList("programFavoriteIds", programFavoriteIds);
 
 			sqlQuery.executeUpdate();
 		} catch (final HibernateException e) {
-			final String message = "Error in deleteProgramFavorites(" + programUUID + "," + programFavoriteIds.toArray() + ") in ProgramFavoriteDao: " + e.getMessage();
+			final String message =
+				"Error in deleteProgramFavorites(" + programUUID + "," + programFavoriteIds.toArray() + ") in ProgramFavoriteDao: "
+					+ e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
