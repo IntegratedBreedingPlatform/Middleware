@@ -12,5 +12,5 @@ public interface VariableServiceBrapi {
 
     long countObservationVariables(VariableSearchRequestDTO requestDTO);
 
-	void updateObservationVariable(VariableDTO variable);
+	VariableDTO updateObservationVariable(VariableDTO variable);
 }

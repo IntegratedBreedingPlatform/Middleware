@@ -95,7 +95,7 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	}
 
 	@Override
-	public void updateObservationVariable(final VariableDTO variable) {
+	public VariableDTO updateObservationVariable(final VariableDTO variable) {
 
 		final OntologyVariableInfo ontologyVariableInfo = new OntologyVariableInfo();
 		ontologyVariableInfo.setId(Integer.valueOf(variable.getObservationVariableDbId()));
@@ -134,6 +134,8 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 					variable.getObservationVariableName());
 			}
 		}
+
+		return variable;
 	}
 
 	private void addObservationVariableToStudy(final Integer studyDbId, final Integer observationVariableDbId,
