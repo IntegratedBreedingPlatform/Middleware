@@ -72,6 +72,7 @@ import org.generationcp.middleware.dao.gdms.TrackDataDAO;
 import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDefaultViewDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDetailDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataSearchDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataViewDAO;
@@ -591,6 +592,10 @@ public class DaoFactory {
 
 	public GermplasmListDataDetailDAO getGermplasmListDataDetailDAO() {
 		return new GermplasmListDataDetailDAO(this.sessionProvider.getSession());
+	}
+
+	public GermplasmListDataDefaultViewDAO getGermplasmListDataDefaultViewDAO() {
+		return new GermplasmListDataDefaultViewDAO(this.sessionProvider.getSession());
 	}
 
 }

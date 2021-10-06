@@ -95,4 +95,130 @@
         </sql>
     </changeSet>
 
+	<changeSet author="lkovacic" id="v19.2.0-5">
+        <preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<tableExists tableName="list_data_default_view"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Create table 'list_data_default_view'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table list_data_default_view (
+				id   int auto_increment
+					primary key,
+				name varchar(255) null
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.2.0-6">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM list_data_default_view;
+				</sqlCheck>
+			</and>
+        </preConditions>
+		<comment>
+			Add data to 'list_data_default_view' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO list_data_default_view (name)
+			VALUES ('ENTRY_NO'),
+				('GID'),
+				('DESIGNATION'),
+				('LOTS'),
+				('AVAILABLE'),
+				('UNIT');
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.2.0-7">
+		<preConditions onFail="MARK_RAN">
+			<not><tableExists tableName="listadataprops_migration"></tableExists></not>
+		</preConditions>
+		<comment>
+			Migrate 'listdataprops' table to 'list_data_view'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			# Create listadataprops_migration Table
+			CREATE TEMPORARY TABLE listadataprops_migration (
+				listdataprop_column_name varchar(255)         null,
+				static_column_term_id    int                  null,
+				is_default               tinyint(1) default 0 null
+			);
+
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('ENTRY_NO', 8230, 1);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('GID', 8240, 1);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('DESIGNATION', 8250, 1);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('LOTS', -3, 1);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('LOCATIONS', 2110, 0);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('METHOD NAME', 1701, 0);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('AVAILABLE', -4, 1);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('UNIT', -5, 1);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('METHOD ABBREV', 1702, 0);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('METHOD GROUP', 1704, 0);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('FGID', 1725, 0);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('CROSS-FEMALE PREFERRED NAME', 1723, 0);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('MGID', 1726, 0);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('CROSS-MALE PREFERRED NAME', 1724, 0);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('GROUP SOURCE GID', -8, 0);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('GROUP SOURCE', -9, 0);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('IMMEDIATE SOURCE GID', -6, 0);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('IMMEDIATE SOURCE', -7, 0);
+			INSERT INTO listadataprops_migration (listdataprop_column_name, static_column_term_id, is_default) VALUES ('GERMPLASM DATE', 1709, 0);
+
+			# Add static columns
+			INSERT INTO list_data_view (listid, category, variable_id)
+				SELECT ld.listid, 'STATIC', m.static_column_term_id
+					FROM listdataprops props
+					   INNER JOIN listadataprops_migration m ON m.listdataprop_column_name = props.column_name AND m.is_default = 0
+					   INNER JOIN listdata ld ON ld.lrecid = props.listdata_id
+					GROUP BY props.column_name, ld.listid
+					ORDER BY ld.listid;
+
+			# Add names
+			INSERT INTO list_data_view (listid, category, variable_id)
+				SELECT ld.listid, 'NAMES', u.fldno
+					FROM listdataprops props
+						INNER JOIN listdata ld ON ld.lrecid = props.listdata_id
+						INNER JOIN udflds u ON u.fname = props.column_name AND ftable = 'NAMES' AND ftype = 'NAME'
+						LEFT JOIN listadataprops_migration m ON m.listdataprop_column_name = props.column_name
+					WHERE m.listdataprop_column_name is null
+					GROUP BY props.column_name, ld.listid
+					ORDER BY ld.listid;
+
+			# Add descriptors
+			INSERT INTO list_data_view (listid, category, variable_id, type_id)
+				SELECT ld.listid, 'VARIABLE', cv.cvterm_id, (case when (cp.value = 'Germplasm Attribute') then 1814 else 1813 end)
+					FROM listdataprops props
+						INNER JOIN listdata ld ON ld.lrecid = props.listdata_id
+						INNER JOIN cvterm cv ON cv.NAME = props.column_name AND cv.cv_id = 1040 AND is_obsolete = 0
+						INNER JOIN cvtermprop cp ON cv.cvterm_id = cp.cvterm_id AND cp.type_id = 1800
+						LEFT JOIN listadataprops_migration m ON m.listdataprop_column_name = props.column_name
+						LEFT JOIN udflds u ON u.fname = props.column_name AND ftable = 'NAMES' AND ftype = 'NAME'
+					WHERE m.listdataprop_column_name IS NULL AND u.fname is null AND (cp.value = 'Germplasm Attribute' OR cp.value = 'Germplasm Passport')
+					GROUP BY props.column_name,
+						ld.listid
+					ORDER BY ld.listid;
+
+			# Add static default columns
+			INSERT INTO list_data_view (listid, category, variable_id)
+				SELECT view.listid, 'STATIC', m.static_column_term_id
+					FROM list_data_view view
+						INNER JOIN listadataprops_migration m ON m.is_default = 1
+					GROUP BY view.listid, m.static_column_term_id
+					ORDER BY view.listid;
+
+			#Delete listadataprops_migration Table
+			DROP TABLE listadataprops_migration;
+
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

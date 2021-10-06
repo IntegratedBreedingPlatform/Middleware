@@ -1,14 +1,14 @@
 package org.generationcp.middleware.dao.germplasmlist;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListStaticColumns;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataViewModel;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
@@ -86,7 +86,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		"LEFT JOIN names maleParentName ON maleParentName.gid = g.gpid2 AND maleParentName.nstat = 1";
 
 	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId,
-		final List<GermplasmListDataView> view,
+		final List<GermplasmListDataViewModel> view,
 		final GermplasmListDataSearchRequest request, final Pageable pageable) {
 
 		final Map<String, Object> queryParams = new HashMap<>();
