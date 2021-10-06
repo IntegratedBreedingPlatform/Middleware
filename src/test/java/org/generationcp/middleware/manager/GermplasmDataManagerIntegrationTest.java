@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
@@ -842,7 +843,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Method method = this.germplasmDataManager.getMethodByID(154);
 
 		final String programUUID = UUID.randomUUID().toString();
-		this.programFavoriteService.addProgramFavorites(programUUID, ProgramFavorite.FavoriteType.METHOD, new HashSet<>(method.getMid()));
+		this.programFavoriteService.addProgramFavorites(programUUID, ProgramFavorite.FavoriteType.METHOD, ImmutableSet.of(method.getMid()));
 
 		final List<Method> methods = this.germplasmDataManager.getFavoriteMethodsByMethodType(method.getMtype(), programUUID);
 		final Method resultMethod = methods.get(0);
