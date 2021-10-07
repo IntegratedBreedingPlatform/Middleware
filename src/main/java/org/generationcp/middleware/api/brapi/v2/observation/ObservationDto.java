@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.brapi.v2.observation;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.study.SeasonDto;
@@ -154,10 +155,12 @@ public class ObservationDto {
 		this.value = value;
 	}
 
+	@JsonIgnore
 	public void setSeasonName(final String seasonName) {
 		this.season.setSeason(seasonName);
 	}
 
+	@JsonIgnore
 	public void setSeasonDbId(final String seasonDbId) {
 		this.season.setSeasonDbId(seasonDbId);
 	}
