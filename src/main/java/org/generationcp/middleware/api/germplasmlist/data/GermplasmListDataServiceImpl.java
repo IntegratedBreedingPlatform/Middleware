@@ -369,7 +369,6 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			variableFilter.setProgramUuid(programUUID);
 			variableIds.forEach(variableFilter::addVariableId);
 			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
-			// TODO: get required properties for entry details
 			final List<GermplasmListMeasurementVariableDTO> descriptorColumns = new ArrayList<>();
 			final List<GermplasmListMeasurementVariableDTO> entryDetailsColumns = new ArrayList<>();
 			variables
