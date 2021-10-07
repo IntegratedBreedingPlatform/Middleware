@@ -4,7 +4,6 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.dms.ValueReference;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -145,7 +144,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 			final List<GermplasmListColumnDTO> germplasmAttributeColumns = variables
 				.stream()
-				.sorted(Comparator.comparing(Term::getName))
+				.sorted(this.getVariableComparator())
 				.map(variable -> {
 					Integer typeId = null;
 					// get first value because germplasm attributes/passport are not combinables with other types
@@ -376,7 +375,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			final List<GermplasmListMeasurementVariableDTO> entryDetailsColumns = new ArrayList<>();
 			variables
 				.stream()
-				.sorted(Comparator.comparing(Variable::getName))
+				.sorted(this.getVariableComparator())
 				.forEach(variable -> {
 					VariableType variableType = null;
 					if (!CollectionUtils.isEmpty(variable.getVariableTypes())) {
@@ -412,6 +411,11 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		column.setDataTypeId(datatypeId);
 		column.setPossibleValues(possibleValues);
 		return column;
+	}
+
+	private Comparator<Variable> getVariableComparator() {
+		return Comparator.comparing(Variable::getAlias, Comparator.nullsLast(Comparator.naturalOrder()))
+				.thenComparing(Variable::getName);
 	}
 
 }
