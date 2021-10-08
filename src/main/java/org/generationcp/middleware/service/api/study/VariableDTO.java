@@ -557,25 +557,25 @@ public class VariableDTO {
 
 		@JsonSerialize(using = CategorySerializer.class)
 		private List<CategoryDTO> categories = new ArrayList<>();
-		private Double max;
-		private Double min;
+		private Integer max;
+		private Integer min;
 
 		// Getter Methods
 
-		public Double getMax() {
+		public Integer getMax() {
 			return this.max;
 		}
 
-		public Double getMin() {
+		public Integer getMin() {
 			return this.min;
 		}
 
 		// Setter Methods
-		public void setMax(final Double max) {
+		public void setMax(final Integer max) {
 			this.max = max;
 		}
 
-		public void setMin(final Double min) {
+		public void setMin(final Integer min) {
 			this.min = min;
 		}
 

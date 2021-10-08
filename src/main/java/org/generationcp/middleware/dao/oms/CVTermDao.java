@@ -1701,10 +1701,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			.addScalar(VARIABLE_PROPERTY_ONTOLOGY_ID)
 			.addScalar(VARIABLE_DATA_TYPE_ID)
 			.addScalar(VARIABLE_FORMULA_DEFINITION)
-			.addScalar(VARIABLE_SCALE_MIN_RANGE, new DoubleType())
-			.addScalar(VARIABLE_SCALE_MAX_RANGE, new DoubleType())
-			.addScalar(VARIABLE_EXPECTED_MIN, new DoubleType())
-			.addScalar(VARIABLE_EXPECTED_MAX, new DoubleType())
+			.addScalar(VARIABLE_SCALE_MIN_RANGE, new IntegerType())
+			.addScalar(VARIABLE_SCALE_MAX_RANGE, new IntegerType())
+			.addScalar(VARIABLE_EXPECTED_MIN, new IntegerType())
+			.addScalar(VARIABLE_EXPECTED_MAX, new IntegerType())
 			.addScalar(VARIABLE_CREATION_DATE)
 			.addScalar(VARIABLE_SCALE_CATEGORIES)
 			.addScalar(VARIABLE_TRAIT_CLASS)
@@ -1757,13 +1757,13 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			scale.setScaleDbId(String.valueOf(result.get(VARIABLE_SCALE_ID)));
 
 			if (result.get(VARIABLE_EXPECTED_MIN) != null && result.get(VARIABLE_EXPECTED_MAX) != null) {
-				scale.getValidValues().setMin((Double) result.get(VARIABLE_EXPECTED_MIN));
-				scale.getValidValues().setMax((Double) result.get(VARIABLE_EXPECTED_MAX));
+				scale.getValidValues().setMin((Integer) result.get(VARIABLE_EXPECTED_MIN));
+				scale.getValidValues().setMax((Integer) result.get(VARIABLE_EXPECTED_MAX));
 			} else {
 				scale.getValidValues()
-					.setMin(result.get(VARIABLE_SCALE_MIN_RANGE) != null ? (Double) result.get(VARIABLE_SCALE_MIN_RANGE) : null);
+					.setMin(result.get(VARIABLE_SCALE_MIN_RANGE) != null ? (Integer) result.get(VARIABLE_SCALE_MIN_RANGE) : null);
 				scale.getValidValues()
-					.setMax(result.get(VARIABLE_SCALE_MAX_RANGE) != null ? (Double) result.get(VARIABLE_SCALE_MAX_RANGE) : null);
+					.setMax(result.get(VARIABLE_SCALE_MAX_RANGE) != null ? (Integer) result.get(VARIABLE_SCALE_MAX_RANGE) : null);
 			}
 
 			scale.setDataType(this.getDataTypeBrapiName((Integer) result.get(VARIABLE_DATA_TYPE_ID)));
