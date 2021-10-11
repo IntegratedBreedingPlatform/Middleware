@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.oms;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -49,7 +50,6 @@ import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
-import org.hibernate.type.DoubleType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
@@ -1625,8 +1625,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		stringBuilder.append("		synonym on synonym.cvterm_id = variable.cvterm_id ");
 		// Left Join project and project prop to check if there are variables associated to a study
 		stringBuilder.append("	  LEFT JOIN projectprop pp ON pp.variable_id = variable.cvterm_id");
-		stringBuilder.append("	  LEFT JOIN project dataset ON dataset.project_id = pp.project_id AND dataset.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId());
-		stringBuilder.append("	  LEFT JOIN nd_experiment nde ON nde.project_id = dataset.project_id");
+		stringBuilder.append("	  LEFT JOIN project plotdataset ON plotdataset.project_id = pp.project_id AND plotdataset.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId());
+		stringBuilder.append("	  LEFT JOIN project envdataset ON envdataset.study_id = plotdataset.study_id AND envdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId());
+		stringBuilder.append("	  LEFT JOIN nd_experiment nde ON nde.project_id = envdataset.project_id AND nde.type_id = " + ExperimentType.TRIAL_ENVIRONMENT.getTermId());
 		// To get Min and Max override values per program
 		stringBuilder.append("	  LEFT JOIN variable_overrides vo ON vo.id = (SELECT MIN(vos.id) ");
 		stringBuilder.append("		FROM variable_overrides vos WHERE variable.cvterm_id = vos.cvterm_id) ");
