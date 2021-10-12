@@ -1,12 +1,11 @@
 package org.generationcp.middleware.pojos;
 
+import com.google.common.base.Preconditions;
 import org.generationcp.middleware.domain.ontology.VariableType;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -32,15 +31,17 @@ public class GermplasmListDataView implements Serializable {
 	@JoinColumn(name = "listid", nullable = false, updatable = false)
 	private GermplasmList list;
 
-	@Column(name = "category", nullable = false, updatable = false)
-	@Enumerated(EnumType.STRING)
-	private GermplasmListColumnCategory category;
+	@Column(name = "static_id", updatable = false)
+	private Integer staticId;
+
+	@Column(name = "name_fldno", updatable = false)
+	private Integer nameFldno;
+
+	@Column(name = "cvterm_id", updatable = false)
+	private Integer cvtermId;
 
 	@Column(name = "type_id", updatable = false)
 	private Integer typeId;
-
-	@Column(name = "variable_id", nullable = false, updatable = false)
-	private Integer variableId;
 
 	/**
 	 * Default constructor required by hibernate. Do not use it!
@@ -48,12 +49,8 @@ public class GermplasmListDataView implements Serializable {
 	protected GermplasmListDataView() {
 	}
 
-	public GermplasmListDataView(final GermplasmList list, final GermplasmListColumnCategory category, final Integer typeId,
-		final Integer variableId) {
+	private GermplasmListDataView(final GermplasmList list) {
 		this.list = list;
-		this.category = category;
-		this.typeId = typeId;
-		this.variableId = variableId;
 	}
 
 	public Integer getId() {
@@ -64,34 +61,135 @@ public class GermplasmListDataView implements Serializable {
 		return list;
 	}
 
-	public GermplasmListColumnCategory getCategory() {
-		return category;
+	public Integer getStaticId() {
+		return staticId;
+	}
+
+	public Integer getNameFldno() {
+		return nameFldno;
+	}
+
+	public Integer getCvtermId() {
+		return cvtermId;
 	}
 
 	public Integer getTypeId() {
 		return typeId;
 	}
 
-	public Integer getVariableId() {
-		return variableId;
+	public Integer getColumnId() {
+		if (this.isStaticColumn()) {
+			return this.staticId;
+		}
+		if (this.isNameColumn()) {
+			return this.nameFldno;
+		}
+		return this.cvtermId;
 	}
 
 	public boolean isStaticColumn() {
-		return this.category == GermplasmListColumnCategory.STATIC;
+		return this.staticId != null;
 	}
 
 	public boolean isNameColumn() {
-		return this.category == GermplasmListColumnCategory.NAMES;
+		return this.nameFldno != null;
+	}
+
+	public boolean isVariableColumn() {
+		return this.cvtermId != null;
 	}
 
 	public boolean isDescriptorColumn() {
-		return this.category == GermplasmListColumnCategory.VARIABLE && (this.typeId.equals(VariableType.GERMPLASM_PASSPORT.getId()) ||
+		return this.cvtermId != null && (this.typeId.equals(VariableType.GERMPLASM_PASSPORT.getId()) ||
 			this.typeId.equals(VariableType.GERMPLASM_ATTRIBUTE.getId()));
 	}
 
 	public boolean isEntryDetailColumn() {
-		return this.category == GermplasmListColumnCategory.VARIABLE && !this.typeId.equals(VariableType.GERMPLASM_PASSPORT.getId()) &&
+		return this.cvtermId != null && !this.typeId.equals(VariableType.GERMPLASM_PASSPORT.getId()) &&
 			!this.typeId.equals(VariableType.GERMPLASM_ATTRIBUTE.getId());
+	}
+
+	private static abstract class GermplasmListDataViewAbstractBuilder {
+
+		private final GermplasmList germplasmList;
+
+		private GermplasmListDataViewAbstractBuilder(final GermplasmList germplasmList) {
+			this.germplasmList = germplasmList;
+		}
+
+		protected GermplasmList getGermplasmList() {
+			return germplasmList;
+		}
+
+		public abstract GermplasmListDataView build();
+
+	}
+
+
+	public static class GermplasmListDataStaticViewBuilder extends GermplasmListDataViewAbstractBuilder {
+
+		private final Integer staticId;
+
+		public GermplasmListDataStaticViewBuilder(final GermplasmList germplasmList, final Integer staticId) {
+			super(germplasmList);
+
+			Preconditions.checkNotNull(staticId);
+			this.staticId = staticId;
+		}
+
+		@Override
+		public GermplasmListDataView build() {
+			final GermplasmListDataView view = new GermplasmListDataView(this.getGermplasmList());
+			view.staticId = this.staticId;
+			return view;
+		}
+
+	}
+
+
+	public static class GermplasmListDataNameViewBuilder extends GermplasmListDataViewAbstractBuilder {
+
+		private final Integer nameFldno;
+
+		public GermplasmListDataNameViewBuilder(final GermplasmList germplasmList, final Integer nameFldno) {
+			super(germplasmList);
+
+			Preconditions.checkNotNull(nameFldno);
+			this.nameFldno = nameFldno;
+		}
+
+		@Override
+		public GermplasmListDataView build() {
+			final GermplasmListDataView view = new GermplasmListDataView(this.getGermplasmList());
+			view.nameFldno = this.nameFldno;
+			return view;
+		}
+
+	}
+
+
+	public static class GermplasmListDataVariableViewBuilder extends GermplasmListDataViewAbstractBuilder {
+
+		private final Integer cvtermId;
+		private final Integer typeId;
+
+		public GermplasmListDataVariableViewBuilder(final GermplasmList germplasmList, final Integer cvtermId, final Integer typeId) {
+			super(germplasmList);
+
+			Preconditions.checkNotNull(cvtermId);
+			Preconditions.checkNotNull(typeId);
+			this.cvtermId = cvtermId;
+			this.typeId = typeId;
+		}
+
+		@Override
+		public GermplasmListDataView build() {
+			final GermplasmListDataView view = new GermplasmListDataView(this.getGermplasmList());
+			view.cvtermId = this.cvtermId;
+			view.typeId = this.typeId;
+			return view;
+		}
+
 	}
 
 }

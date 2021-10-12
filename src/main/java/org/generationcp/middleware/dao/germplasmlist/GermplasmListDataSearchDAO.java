@@ -100,22 +100,22 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		final List<Integer> staticColumnIds = new ArrayList<>();
 		view.forEach(column -> {
 			if (column.isStaticColumn()) {
-				staticColumnIds.add(column.getVariableId());
+				staticColumnIds.add(column.getColumnId());
 				return;
 			}
 
 			if (column.isNameColumn()) {
-				this.addNameScalar(scalars, selects, joins, column.getVariableId());
+				this.addNameScalar(scalars, selects, joins, column.getColumnId());
 				return;
 			}
 
 			if (column.isDescriptorColumn()) {
-				this.addDescriptorScalar(scalars, selects, joins, column.getVariableId());
+				this.addDescriptorScalar(scalars, selects, joins, column.getColumnId());
 				return;
 			}
 
 			if (column.isEntryDetailColumn()) {
-				this.addEntryDetailScalar(scalars, selects, joins, column.getVariableId());
+				this.addEntryDetailScalar(scalars, selects, joins, column.getColumnId());
 			}
 		});
 

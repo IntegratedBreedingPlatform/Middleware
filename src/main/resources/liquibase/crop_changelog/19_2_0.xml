@@ -70,14 +70,16 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			create table list_data_view (
-				id          int auto_increment
-					primary key,
-				listid      int         not null,
-				category    varchar(55) not null,
-				type_id     int         null,
-				variable_id int         not null,
+				id         int auto_increment primary key,
+				listid     int not null,
+				static_id  int null,
+				name_fldno int null,
+				cvterm_id  int null,
+				type_id    int null,
 				constraint list_data_view_cvterm_cvterm_id_fk
 					foreign key (type_id) references cvterm(cvterm_id),
+				constraint list_data_view_cvterm_cvterm_id_fk_2
+					foreign key (cvterm_id) references cvterm(cvterm_id),
 				constraint list_data_view_listnms_listid_fk
 					foreign key (listid) references listnms(listid)
 			);
@@ -137,9 +139,6 @@
 				</not>
 			</and>
 		</preConditions>
-
-
-
 		<comment>
 			Migrate 'listdataprops' table to 'list_data_view'
 		</comment>
@@ -173,8 +172,8 @@
 			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('GERMPLASM DATE', 1709, 0);
 
 			# Add static columns
-			INSERT INTO list_data_view (listid, category, variable_id)
-				SELECT ld.listid, 'STATIC', m.static_column_term_id
+			INSERT INTO list_data_view (listid, static_id)
+				SELECT ld.listid, m.static_column_term_id
 					FROM listdataprops props
 					   INNER JOIN listadataprops_migration_temporary m ON m.listdataprop_column_name = props.column_name AND m.is_default = 0
 					   INNER JOIN listdata ld ON ld.lrecid = props.listdata_id
@@ -182,8 +181,8 @@
 					ORDER BY ld.listid;
 
 			# Add names
-			INSERT INTO list_data_view (listid, category, variable_id)
-				SELECT ld.listid, 'NAMES', u.fldno
+			INSERT INTO list_data_view (listid, name_fldno)
+				SELECT ld.listid, u.fldno
 					FROM listdataprops props
 						INNER JOIN listdata ld ON ld.lrecid = props.listdata_id
 						INNER JOIN udflds u ON u.fname = props.column_name AND ftable = 'NAMES' AND ftype = 'NAME'
@@ -193,8 +192,8 @@
 					ORDER BY ld.listid;
 
 			# Add descriptors
-			INSERT INTO list_data_view (listid, category, variable_id, type_id)
-				SELECT ld.listid, 'VARIABLE', cv.cvterm_id, (case when (cp.value = 'Germplasm Attribute') then 1814 else 1813 end)
+			INSERT INTO list_data_view (listid, cvterm_id, type_id)
+				SELECT ld.listid, cv.cvterm_id, (case when (cp.value = 'Germplasm Attribute') then 1814 else 1813 end)
 					FROM listdataprops props
 						INNER JOIN listdata ld ON ld.lrecid = props.listdata_id
 						INNER JOIN cvterm cv ON cv.NAME = props.column_name AND cv.cv_id = 1040 AND is_obsolete = 0
@@ -206,9 +205,9 @@
 						ld.listid
 					ORDER BY ld.listid;
 
-			# Add static default columns
-			INSERT INTO list_data_view (listid, category, variable_id)
-				SELECT view.listid, 'STATIC', m.static_column_term_id
+			# Add default static columns
+			INSERT INTO list_data_view (listid, static_id)
+				SELECT view.listid, m.static_column_term_id
 					FROM list_data_view view
 						INNER JOIN listadataprops_migration_temporary m ON m.is_default = 1
 					GROUP BY view.listid, m.static_column_term_id

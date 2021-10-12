@@ -80,7 +80,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 
 		final boolean hasCrossData = view
 			.stream()
-			.anyMatch(c -> c.getVariableId().equals(GermplasmListStaticColumns.CROSS.getTermId()) || this.viewHasParentData(c));
+			.anyMatch(c -> GermplasmListStaticColumns.CROSS.getTermId().equals(c.getStaticId()) || this.viewHasParentData(c));
 
 		if (hasCrossData) {
 			final Map<Integer, GermplasmListDataSearchResponse> rowsIndexedByGid = response
@@ -178,13 +178,12 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			return Stream.concat(defaultStaticColumns.stream(), variableColumns.stream()).collect(Collectors.toList());
 		}
 
-		final Map<GermplasmListColumnCategory, List<Integer>> columnIdsByCategory = view
-			.stream()
-			.collect(groupingBy(GermplasmListDataView::getCategory, HashMap::new,
-				Collectors.mapping(GermplasmListDataView::getVariableId, Collectors.toList())));
-
 		final List<GermplasmListMeasurementVariableDTO> header = new ArrayList<>();
-		final List<Integer> staticIds = columnIdsByCategory.get(GermplasmListColumnCategory.STATIC);
+		final List<Integer> staticIds = view
+			.stream()
+			.filter(GermplasmListDataView::isStaticColumn)
+			.map(GermplasmListDataView::getStaticId)
+			.collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(staticIds)) {
 			final List<GermplasmListMeasurementVariableDTO> staticColumns = staticIds
 				.stream()
@@ -198,7 +197,11 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			header.addAll(staticColumns);
 		}
 
-		final List<Integer> nameTypeIds = columnIdsByCategory.get(GermplasmListColumnCategory.NAMES);
+		final List<Integer> nameTypeIds = view
+			.stream()
+			.filter(GermplasmListDataView::isNameColumn)
+			.map(GermplasmListDataView::getNameFldno)
+			.collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(nameTypeIds)) {
 			final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().filterByColumnValues("fldno", nameTypeIds);
 			final List<GermplasmListMeasurementVariableDTO> nameColumns = nameTypes
@@ -210,7 +213,11 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			header.addAll(nameColumns);
 		}
 
-		final List<Integer> variableIds = columnIdsByCategory.get(GermplasmListColumnCategory.VARIABLE);
+		final List<Integer> variableIds = view
+			.stream()
+			.filter(GermplasmListDataView::isVariableColumn)
+			.map(GermplasmListDataView::getCvtermId)
+			.collect(Collectors.toList());
 		final List<GermplasmListMeasurementVariableDTO> variableColumns = this.getVariableColumns(variableIds, programUUID);
 		if (!CollectionUtils.isEmpty(variableColumns)) {
 			header.addAll(variableColumns);
@@ -228,8 +235,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 
 		final List<GermplasmListDataView> updatedView = view
 			.stream()
-			.map(updateColumn -> new GermplasmListDataView(germplasmList, updateColumn.getCategory(), updateColumn.getTypeId(),
-				updateColumn.getId()))
+			.map(updateColumn -> GermplasmListDataViewFactory.create(germplasmList, updateColumn))
 			.collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(variableColumns)) {
 			updatedView.addAll(variableColumns);
@@ -269,10 +275,10 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	}
 
 	private boolean viewHasParentData(final GermplasmListDataView column) {
-		return column.getVariableId().equals(GermplasmListStaticColumns.FEMALE_PARENT_GID.getTermId()) ||
-			column.getVariableId().equals(GermplasmListStaticColumns.FEMALE_PARENT_NAME.getTermId()) ||
-			column.getVariableId().equals(GermplasmListStaticColumns.MALE_PARENT_GID.getTermId()) ||
-			column.getVariableId().equals(GermplasmListStaticColumns.MALE_PARENT_NAME.getTermId());
+		return column.isStaticColumn() && (GermplasmListStaticColumns.FEMALE_PARENT_GID.getTermId().equals(column.getStaticId()) ||
+			GermplasmListStaticColumns.FEMALE_PARENT_NAME.getTermId().equals(column.getStaticId()) ||
+			GermplasmListStaticColumns.MALE_PARENT_GID.getTermId().equals(column.getStaticId()) ||
+			GermplasmListStaticColumns.MALE_PARENT_NAME.getTermId().equals(column.getStaticId()));
 	}
 
 	private List<GermplasmListDataViewModel> getView(final List<GermplasmListDataView> view) {
@@ -311,7 +317,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		}
 		final List<Integer> selectedColumnIds = view
 			.stream()
-			.map(GermplasmListDataView::getVariableId)
+			.map(GermplasmListDataView::getColumnId)
 			.collect(Collectors.toList());
 
 		final List<Integer> entryDetailsColumnsIds = this.getEntryDetailsColumnsIds(view);
@@ -352,7 +358,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		return view
 			.stream()
 			.filter(GermplasmListDataView::isEntryDetailColumn)
-			.map(GermplasmListDataView::getVariableId)
+			.map(GermplasmListDataView::getCvtermId)
 			.collect(Collectors.toList());
 	}
 
@@ -415,7 +421,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 
 	private Comparator<Variable> getVariableComparator() {
 		return Comparator.comparing(Variable::getAlias, Comparator.nullsLast(Comparator.naturalOrder()))
-				.thenComparing(Variable::getName);
+			.thenComparing(Variable::getName);
 	}
 
 }
