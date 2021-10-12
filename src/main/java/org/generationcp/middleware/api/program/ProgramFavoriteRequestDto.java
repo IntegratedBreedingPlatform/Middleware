@@ -10,7 +10,7 @@ import java.util.Set;
 public class ProgramFavoriteRequestDto {
 
 	private ProgramFavorite.FavoriteType favoriteType;
-	private Set<Integer> entityId;
+	private Set<Integer> entityIds;
 
 	public ProgramFavorite.FavoriteType getFavoriteType() {
 		return this.favoriteType;
@@ -20,12 +20,12 @@ public class ProgramFavoriteRequestDto {
 		this.favoriteType = favoriteType;
 	}
 
-	public Set<Integer> getEntityId() {
-		return this.entityId;
+	public Set<Integer> getEntityIds() {
+		return this.entityIds;
 	}
 
-	public void setEntityId(final Set<Integer> entityId) {
-		this.entityId = entityId;
+	public void setEntityIds(final Set<Integer> entityIds) {
+		this.entityIds = entityIds;
 	}
 
 	@Override
