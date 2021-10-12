@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.breedingmethod;
 
+import com.google.common.collect.ImmutableSet;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -13,6 +14,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 
@@ -51,7 +53,7 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 		//Create a favorite breeding method
 		final Method favoriteBreedingMethod = allMethods.get(0);
 		final String programUUID = UUID.randomUUID().toString();
-		this.programFavoriteService.addProgramFavorite(programUUID, ProgramFavorite.FavoriteType.METHOD, favoriteBreedingMethod.getMid());
+		this.programFavoriteService.addProgramFavorites(programUUID, ProgramFavorite.FavoriteType.METHOD, ImmutableSet.of(favoriteBreedingMethod.getMid()));
 
 		//Should get only the favorite breeding method
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
