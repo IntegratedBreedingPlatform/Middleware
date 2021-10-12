@@ -5,6 +5,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -1211,14 +1212,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private void migrateLots(final List<GermplasmMergeRequestDto.NonSelectedGermplasm> nonSelectedGermplasmList,
 		final Integer targetGermplasmId) {
-		final List<Integer> migrateLotsGids = nonSelectedGermplasmList.stream().filter(o -> !o.isOmit() && o.isMigrateLots())
+		final List<Integer> migrateLotsGids = nonSelectedGermplasmList.stream().filter(o -> !o.isOmit() && BooleanUtils.isTrue(o.isMigrateLots()))
 			.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
 				Collectors.toList());
 		this.daoFactory.getLotDao().replaceGermplasm(migrateLotsGids, targetGermplasmId);
 	}
 
 	private void closeLots(final List<GermplasmMergeRequestDto.NonSelectedGermplasm> nonSelectedGermplasmList) {
-		final List<Integer> closeLotsGids = nonSelectedGermplasmList.stream().filter(o -> !o.isOmit() && o.isCloseLots())
+		final List<Integer> closeLotsGids = nonSelectedGermplasmList.stream().filter(o -> !o.isOmit() && BooleanUtils.isNotTrue(o.isMigrateLots()))
 			.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
 				Collectors.toList());
 		final List<Integer> lotsToClose =
