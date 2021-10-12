@@ -90,18 +90,22 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 		}
 	}
 
-	public List<ProgramFavorite> getProgramFavorites(final String programUUID, final ProgramFavorite.FavoriteType favoriteType, final Set<Integer> entityId)
+	public List<ProgramFavorite> getProgramFavorites(final String programUUID, final ProgramFavorite.FavoriteType favoriteType, final Set<Integer> entityIds)
 		throws MiddlewareQueryException {
 		try {
 
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("entityType", favoriteType.getName()));
 			criteria.add(Restrictions.eq("uniqueID", programUUID));
-			criteria.add(Restrictions.in("entityId", entityId));
+
+			if(CollectionUtils.isNotEmpty(entityIds)){
+				criteria.add(Restrictions.in("entityId", entityIds));
+			}
+
 			return criteria.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getProgramFavorites(" + favoriteType.getName() + "," + entityId.toArray() + ") in ProgramFavoriteDao: "
+			throw new MiddlewareQueryException("Error in getProgramFavorites(" + favoriteType.getName() + "," + entityIds.toArray() + ") in ProgramFavoriteDao: "
 				+ e.getMessage(), e);
 		}
 	}
