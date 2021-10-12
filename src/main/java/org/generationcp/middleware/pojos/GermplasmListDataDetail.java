@@ -1,6 +1,7 @@
 package org.generationcp.middleware.pojos;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -14,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
 
+@AutoProperty
 @Entity
 @Table(name = "list_data_details")
 public class GermplasmListDataDetail extends AbstractEntity implements Serializable {
