@@ -64,7 +64,8 @@ public class GermplasmListSearchDAOQuery {
 	private final static String BASE_QUERY = "SELECT %s " // usage of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ " FROM listnms list "
 		+ " %s " // usage of SELECT_JOINS
-		+ " WHERE list.liststatus NOT IN ('" + GermplasmList.Status.FOLDER.getCode() + "', '" + GermplasmList.Status.DELETED.getCode() + "') ";
+		+ " WHERE list.liststatus NOT IN ('" + GermplasmList.Status.FOLDER.getCode() + "', '" + GermplasmList.Status.DELETED.getCode() + "') "
+		+ "			AND list.program_uuid = :programUUID";
 
 	private final static String SELECT_NUMBER_OF_ENTRIES_EXPRESSION = " (SELECT count(1) FROM listdata l WHERE l.listid = list.listid) AS " + NUMBER_OF_ENTRIES_ALIAS;
 

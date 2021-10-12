@@ -10,14 +10,10 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
-import org.hamcrest.CoreMatchers;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -342,47 +338,6 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 
 		assertTrue(this.germplasmListService.toggleGermplasmListStatus(germplasmList.getId()));
 		assertFalse(this.germplasmListService.toggleGermplasmListStatus(germplasmList.getId()));
-	}
-
-	@Test
-	public void testSaveGermplasmListDataView_createAndUpdateView_OK() {
-
-		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List ",
-			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, GermplasmList.Status.LIST.getCode());
-		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
-
-		final List<GermplasmListDataUpdateViewDTO> newView = Arrays.asList(
-			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.ENTRY_NO.getTermId(), GermplasmListColumnCategory.STATIC),
-			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.GID.getTermId(), GermplasmListColumnCategory.STATIC));
-
-		this.germplasmListService.saveGermplasmListDataView(germplasmList.getId(), newView);
-
-		final List<GermplasmListDataView> currentNewView = this.daoFactory.getGermplasmListDataViewDAO().getByListId(germplasmList.getId());
-		assertThat(currentNewView, hasSize(2));
-		assertThat(currentNewView, CoreMatchers.hasItems(
-			Matchers.hasProperty("variableId", Matchers.is(GermplasmListStaticColumns.ENTRY_NO.getTermId())),
-			Matchers.hasProperty("variableId", Matchers.is(GermplasmListStaticColumns.GID.getTermId()))));
-
-		final List<GermplasmListDataUpdateViewDTO> updatedView = Arrays.asList(
-			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.ENTRY_NO.getTermId(), GermplasmListColumnCategory.STATIC),
-			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.DESIGNATION.getTermId(), GermplasmListColumnCategory.STATIC),
-			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.GERMPLASM_REFERENCE.getTermId(), GermplasmListColumnCategory.STATIC));
-
-		this.germplasmListService.saveGermplasmListDataView(germplasmList.getId(), updatedView);
-
-		final List<GermplasmListDataView> currentUpdatedView = this.daoFactory.getGermplasmListDataViewDAO().getByListId(germplasmList.getId());
-		assertThat(currentUpdatedView, hasSize(3));
-		assertThat(currentUpdatedView, CoreMatchers.hasItems(
-			Matchers.hasProperty("variableId", Matchers.is(GermplasmListStaticColumns.ENTRY_NO.getTermId())),
-			Matchers.hasProperty("variableId", Matchers.is(GermplasmListStaticColumns.DESIGNATION.getTermId())),
-			Matchers.hasProperty("variableId", Matchers.is(GermplasmListStaticColumns.GERMPLASM_REFERENCE.getTermId()))));
-	}
-
-	private GermplasmListDataUpdateViewDTO createGermplasmListDataUpdateViewDTO(final Integer id, final GermplasmListColumnCategory category) {
-		final GermplasmListDataUpdateViewDTO dto = new GermplasmListDataUpdateViewDTO();
-		dto.setId(id);
-		dto.setCategory(category);
-		return dto;
 	}
 
 	private Germplasm createGermplasm(final Method method) {

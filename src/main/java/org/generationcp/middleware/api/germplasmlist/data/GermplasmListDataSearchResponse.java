@@ -1,4 +1,4 @@
-package org.generationcp.middleware.api.germplasmlist.search;
+package org.generationcp.middleware.api.germplasmlist.data;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;

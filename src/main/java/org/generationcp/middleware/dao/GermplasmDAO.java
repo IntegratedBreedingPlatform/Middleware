@@ -527,9 +527,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			// Get all derivative children
 			children.addAll(this.getDescendants(gid, 'D'));
 
-			// Get all maintenance children
-			children.addAll(this.getDescendants(gid, 'M'));
-
 			// Get all generative childern
 			children.addAll(this.getGenerativeChildren(gid));
 			return children;

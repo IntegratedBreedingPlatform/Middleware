@@ -1,14 +1,14 @@
 package org.generationcp.middleware.dao.germplasmlist;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListStaticColumns;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchRequest;
-import org.generationcp.middleware.api.germplasmlist.search.GermplasmListDataSearchResponse;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataViewModel;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
@@ -21,13 +21,11 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -45,32 +43,13 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		super(session);
 	}
 
-	//TODO: check if it's necessary to do a dynamic sort columns
-	enum SortColumn {
-
-		ENTRY_NUMBER(GermplasmListStaticColumns.ENTRY_NO.name());
-
-		private String value;
-
-		SortColumn(final String value) {
-			this.value = value;
-		}
-
-		static SortColumn getByValue(final String value) {
-			return Arrays.stream(SortColumn.values())
-				.filter(e -> e.name().equals(value))
-				.findFirst()
-				.orElseThrow(() -> new IllegalStateException(String.format("Unsupported sort value %s.", value)));
-		}
-	}
-
-
 	// Base query
 	private final static String BASE_QUERY = "SELECT %s " // usage of SELECT_EXPRESION / COUNT_EXPRESSION
 		+ " FROM listdata listData "
 		+ " %s " // usage of join clause
 		+ " WHERE %s" // usage of where clause
-		+ "			%s"; // usage of group clause
+		+ "			%s" // usage of group clause
+		+ "			%s"; // usage of order clause
 	private static final String COUNT_EXPRESSION = " COUNT(1) ";
 
 	// Alias for columns which are not columns of the table
@@ -107,7 +86,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		"LEFT JOIN names maleParentName ON maleParentName.gid = g.gpid2 AND maleParentName.nstat = 1";
 
 	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId,
-		final List<GermplasmListDataView> view,
+		final List<GermplasmListDataViewModel> view,
 		final GermplasmListDataSearchRequest request, final Pageable pageable) {
 
 		final Map<String, Object> queryParams = new HashMap<>();
@@ -132,6 +111,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 
 			if (column.isDescriptorColumn()) {
 				this.addDescriptorScalar(scalars, selects, joins, column.getVariableId());
+				return;
 			}
 
 			if (column.isEntryDetailColumn()) {
@@ -154,9 +134,9 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		final String whereClause = this.getWhereClause(where);
 		final String selectClause = selects.stream().collect(Collectors.joining(","));
 		final String joinClause = this.getJoinClause(joins);
-		// TODO
-		//		final String orderClause = DAOQueryUtils.getOrderClause(input -> SortColumn.getByValue(input).value, pageable);
-		final String sql = this.formatQuery(selectClause, joinClause, whereClause, " GROUP BY listData.gid, listData.entryid ");
+		final String orderClause = DAOQueryUtils.getOrderClause(input -> input, pageable);
+		final String sql =
+			this.formatQuery(selectClause, joinClause, whereClause, " GROUP BY listData.gid, listData.entryid ", orderClause);
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
 		DAOQueryUtils.addParamsToQuery(query, queryParams);
 
@@ -181,7 +161,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		final List<String> where = this.addFilters(joins, queryParams, request);
 		final String joinClause = this.getJoinClause(joins);
 		final String whereClause = this.getWhereClause(where);
-		final String sql = this.formatQuery(COUNT_EXPRESSION, joinClause, whereClause, "");
+		final String sql = this.formatQuery(COUNT_EXPRESSION, joinClause, whereClause, "", "");
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
 		DAOQueryUtils.addParamsToQuery(query, queryParams);
 
@@ -556,8 +536,9 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		return String.format("%s AS %s", expression, columnAlias);
 	}
 
-	private String formatQuery(final String selectExpression, final String joinClause, final String whereClause, final String groupClause) {
-		return String.format(BASE_QUERY, selectExpression, joinClause, whereClause, groupClause);
+	private String formatQuery(final String selectExpression, final String joinClause, final String whereClause, final String groupClause,
+		final String orderClause) {
+		return String.format(BASE_QUERY, selectExpression, joinClause, whereClause, groupClause, orderClause);
 	}
 
 	private String formatNamesAlias(final Integer nameTypeId) {
@@ -573,7 +554,8 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 	}
 
 	private String formatNameJoin(final String alias, final Integer nameTypeId) {
-		return String.format("LEFT JOIN names %1$s ON g.gid = %1$s.gid AND %1$s.ntype = %2$s AND %1$s.nstat <> %3$s", alias, nameTypeId, NAME_DELETED_STATUS);
+		return String.format("LEFT JOIN names %1$s ON g.gid = %1$s.gid AND %1$s.ntype = %2$s AND %1$s.nstat <> %3$s", alias, nameTypeId,
+			NAME_DELETED_STATUS);
 	}
 
 	private String formatDescriptorJoin(final String alias, final Integer variableId) {
@@ -581,7 +563,8 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 	}
 
 	private String formatEntryDetailJoin(final String alias, final Integer variableId) {
-		return String.format("LEFT JOIN list_data_details %1$s ON listData.lrecid = %1$s.lrecid AND %1$s.variable_id = %2$s", alias, variableId);
+		return String
+			.format("LEFT JOIN list_data_details %1$s ON listData.lrecid = %1$s.lrecid AND %1$s.variable_id = %2$s", alias, variableId);
 	}
 
 	private String getWhereClause(final List<String> whereClause) {

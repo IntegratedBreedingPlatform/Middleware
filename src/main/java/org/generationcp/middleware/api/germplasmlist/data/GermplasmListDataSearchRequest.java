@@ -1,4 +1,4 @@
-package org.generationcp.middleware.api.germplasmlist.search;
+package org.generationcp.middleware.api.germplasmlist.data;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
