@@ -59,7 +59,7 @@ public class GermplasmMergeRequestDto {
 
 		private Integer germplasmId;
 
-		private Boolean migrateLots = false;
+		private Boolean migrateLots;
 
 		private Boolean omit = false;
 
