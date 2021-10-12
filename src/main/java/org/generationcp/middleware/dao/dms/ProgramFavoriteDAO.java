@@ -119,7 +119,7 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 		}
 	}
 
-	public void deleteProgramFavorites(final String programUUID, Set<Integer> programFavoriteIds) {
+	public void deleteProgramFavorites(final String programUUID, final Set<Integer> programFavoriteIds) {
 		try {
 			final StringBuilder stringBuilder = new StringBuilder("DELETE pf FROM program_favorites pf WHERE pf.program_uuid = :programUUID");
 			stringBuilder.append(" and pf.id in (:programFavoriteIds)");
