@@ -2,7 +2,6 @@
 package org.generationcp.middleware.manager.ontology;
 
 import com.google.common.base.Strings;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -328,12 +327,9 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 
 		try {
 
-			if (StringUtils.isNotEmpty(property.getName())) {
-				term.setName(property.getName());
-			}
-			if (StringUtils.isNotEmpty(property.getDefinition())) {
-				term.setDefinition(property.getDefinition());
-			}
+			term.setName(property.getName());
+			term.setDefinition(property.getDefinition());
+
 			daoFactory.getCvTermDao().merge(term);
 
 			// Save or update crop ontology

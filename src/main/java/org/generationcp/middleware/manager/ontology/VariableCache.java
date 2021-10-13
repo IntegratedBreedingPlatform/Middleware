@@ -1,11 +1,9 @@
 
 package org.generationcp.middleware.manager.ontology;
 
-import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.slf4j.Logger;
@@ -65,11 +63,6 @@ public class VariableCache {
 	}
 
 	private static String getCurrentProgram() {
-		final Optional<String> currentProgram = ContextHolder.getCurrentProgramOptional();
-		if (currentProgram.isPresent()) {
-			return currentProgram.get();
-		} else {
-			return StringUtils.EMPTY;
-		}
+		return ContextHolder.getCurrentProgram();
 	}
 }

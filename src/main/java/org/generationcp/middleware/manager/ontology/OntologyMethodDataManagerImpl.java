@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -149,12 +148,8 @@ public class OntologyMethodDataManagerImpl implements OntologyMethodDataManager 
 		// Constant CvId
 		method.setVocabularyId(CvId.METHODS.getId());
 
-		if (StringUtils.isNotEmpty(method.getName())) {
-			term.setName(method.getName());
-		}
-		if (StringUtils.isNotEmpty(method.getDefinition())) {
-			term.setDefinition(method.getDefinition());
-		}
+		term.setName(method.getName());
+		term.setDefinition(method.getDefinition());
 
 		this.daoFactory.getCvTermDao().merge(term);
 

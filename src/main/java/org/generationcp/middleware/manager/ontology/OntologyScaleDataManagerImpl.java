@@ -6,7 +6,6 @@ import com.google.common.base.Optional;
 import com.google.common.base.Predicate;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -363,14 +362,10 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 			scale.setVocabularyId(CvId.SCALES.getId());
 
 			// Updating term to database.
-			if (StringUtils.isNotEmpty(scale.getName())) {
-				term.setName(scale.getName());
-				daoFactory.getCvTermDao().merge(term);
-			}
-			if (StringUtils.isNotEmpty(scale.getDefinition())) {
-				term.setDefinition(scale.getDefinition());
-				daoFactory.getCvTermDao().merge(term);
-			}
+			term.setName(scale.getName());
+			term.setDefinition(scale.getDefinition());
+
+			daoFactory.getCvTermDao().merge(term);
 
 			// Update data type if changed
 			if (!Objects.equals(oldDataType, scale.getDataType())) {
