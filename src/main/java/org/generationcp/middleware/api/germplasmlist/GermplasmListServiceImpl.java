@@ -462,8 +462,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public void addVariableToList(final Integer listId, final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
 		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
-		final GermplasmListDataView germplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(germplasmList,
-			germplasmListVariableRequestDto.getVariableTypeId(), germplasmListVariableRequestDto.getVariableId()).build();
+		final GermplasmListDataView germplasmListDataView =
+			new GermplasmListDataView.GermplasmListDataVariableViewBuilder(germplasmList, germplasmListVariableRequestDto.getVariableId(),
+				germplasmListVariableRequestDto.getVariableTypeId()).build();
 		this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
 	}
 
