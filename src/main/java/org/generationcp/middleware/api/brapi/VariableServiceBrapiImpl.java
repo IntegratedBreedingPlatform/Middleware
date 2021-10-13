@@ -2,19 +2,20 @@ package org.generationcp.middleware.api.brapi;
 
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
-import org.generationcp.middleware.domain.ontology.Method;
-import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
+import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.study.CategoryDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +27,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -36,15 +40,6 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
-
-	@Autowired
-	private OntologyPropertyDataManager ontologyPropertyDataManager;
-
-	@Autowired
-	private OntologyMethodDataManager ontologyMethodDataManager;
-
-	@Autowired
-	private OntologyScaleDataManager ontologyScaleDataManager;
 
 	@Autowired
 	private DatasetService datasetService;
@@ -96,46 +91,137 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	@Override
 	public VariableDTO updateObservationVariable(final VariableDTO variable) {
+		final Integer variableId = Integer.valueOf(variable.getObservationVariableDbId());
+		final boolean isVariableUsedInStudy = this.ontologyVariableDataManager.areVariablesUsedInStudy(Arrays.asList(variableId));
+		this.updateVariable(variable, isVariableUsedInStudy);
+		this.updateProperty(variable, isVariableUsedInStudy);
+		this.updateMethod(variable, isVariableUsedInStudy);
+		this.updateScale(variable, isVariableUsedInStudy);
 
-		final OntologyVariableInfo ontologyVariableInfo = new OntologyVariableInfo();
-		ontologyVariableInfo.setId(Integer.valueOf(variable.getObservationVariableDbId()));
-		ontologyVariableInfo.setName(variable.getObservationVariableName());
-		ontologyVariableInfo.setPropertyId(Integer.valueOf(variable.getTrait().getTraitDbId()));
-		ontologyVariableInfo.setMethodId(Integer.valueOf(variable.getMethod().getMethodDbId()));
-		ontologyVariableInfo.setScaleId(Integer.valueOf(variable.getScale().getScaleDbId()));
-		ontologyVariableInfo.setIsFavorite(Boolean.FALSE);
-		this.ontologyVariableDataManager.updateVariable(ontologyVariableInfo);
-
-		final Property property = new Property();
-		property.setId(Integer.valueOf(variable.getTrait().getTraitDbId()));
-		property.setName(variable.getTrait().getName());
-		property.setDefinition(variable.getTrait().getDescription());
-		this.ontologyPropertyDataManager.updateProperty(property);
-
-		final Method method = new Method();
-		method.setId(Integer.valueOf(variable.getMethod().getMethodDbId()));
-		method.setName(variable.getMethod().getName());
-		method.setDefinition(variable.getMethod().getDescription());
-		this.ontologyMethodDataManager.updateMethod(method);
-
-		// TODO: Update Scale
-		//		final Scale scale = new Scale();
-		//		scale.setId(Integer.valueOf(variable.getScale().getScaleDbId()));
-		//		scale.setName(variable.getScale().getName());
-		//		scale.setDataType(DataType.getByBrapiName(variable.getScale().getDataType()));
-		//		for (final CategoryDTO categoryDTO : variable.getScale().getValidValues().getCategories()) {
-		//			scale.addCategory(new TermSummary(null, categoryDTO.getValue(), categoryDTO.getLabel()));
-		//		}
-		//		this.ontologyScaleDataManager.updateScale(scale);
-
+		// Assign variable to studies
 		if (!CollectionUtils.isEmpty(variable.getStudyDbIds())) {
 			for (final String studyDbId : variable.getStudyDbIds()) {
 				this.addObservationVariableToStudy(Integer.valueOf(studyDbId), Integer.valueOf(variable.getObservationVariableDbId()),
 					variable.getObservationVariableName());
 			}
 		}
-
 		return variable;
+	}
+
+	private void updateVariable(final VariableDTO variable, final boolean isVariableUsedInStudy) {
+		final Integer variableId = Integer.valueOf(variable.getObservationVariableDbId());
+		final CVTerm variableTerm = this.daoFactory.getCvTermDao().getById(variableId);
+		if (!isVariableUsedInStudy) {
+			variableTerm.setName(variable.getObservationVariableName());
+			this.updatePropertyMethodScaleRelation(variable);
+		}
+		this.daoFactory.getCvTermDao().update(variableTerm);
+	}
+
+	private void updatePropertyMethodScaleRelation(final VariableDTO variable) {
+		// load scale, method and property relationships
+		final Integer variableId = Integer.valueOf(variable.getObservationVariableDbId());
+		final List<CVTermRelationship> relationships = this.daoFactory.getCvTermRelationshipDao().getBySubject(variableId);
+		final Optional<CVTermRelationship> methodRelation =
+			relationships.stream().filter(r -> Objects.equals(r.getTypeId(), TermRelationshipId.HAS_METHOD.getId())).findAny();
+		final Optional<CVTermRelationship> propertyRelation =
+			relationships.stream().filter(r -> Objects.equals(r.getTypeId(), TermRelationshipId.HAS_PROPERTY.getId())).findAny();
+		final Optional<CVTermRelationship> scaleRelation =
+			relationships.stream().filter(r -> Objects.equals(r.getTypeId(), TermRelationshipId.HAS_SCALE.getId())).findAny();
+
+		if (propertyRelation.isPresent()) {
+			final CVTermRelationship cvTermRelationship = propertyRelation.get();
+			cvTermRelationship.setObjectId(Integer.valueOf(variable.getTrait().getTraitDbId()));
+			this.daoFactory.getCvTermRelationshipDao().update(cvTermRelationship);
+		}
+		if (methodRelation.isPresent()) {
+			final CVTermRelationship cvTermRelationship = methodRelation.get();
+			cvTermRelationship.setObjectId(Integer.valueOf(variable.getMethod().getMethodDbId()));
+			this.daoFactory.getCvTermRelationshipDao().update(cvTermRelationship);
+		}
+		if (scaleRelation.isPresent()) {
+			final CVTermRelationship cvTermRelationship = scaleRelation.get();
+			cvTermRelationship.setObjectId(Integer.valueOf(variable.getScale().getScaleDbId()));
+			this.daoFactory.getCvTermRelationshipDao().update(cvTermRelationship);
+		}
+	}
+
+	private void updateProperty(final VariableDTO variable, final boolean isVariableUsedInStudy) {
+		final Integer propertyId = Integer.valueOf(variable.getTrait().getTraitDbId());
+		final CVTerm propertyTerm = this.daoFactory.getCvTermDao().getById(propertyId);
+		if (isVariableUsedInStudy) {
+			propertyTerm.setName(variable.getTrait().getTraitName());
+		}
+		propertyTerm.setDefinition(variable.getMethod().getDescription());
+		this.daoFactory.getCvTermDao().update(propertyTerm);
+	}
+
+	private void updateMethod(final VariableDTO variable, final boolean isVariableUsedInStudy) {
+		final Integer methodId = Integer.valueOf(variable.getMethod().getMethodDbId());
+		final CVTerm methodTerm = this.daoFactory.getCvTermDao().getById(methodId);
+		if (isVariableUsedInStudy) {
+			methodTerm.setName(variable.getTrait().getName());
+		}
+		methodTerm.setDefinition(variable.getMethod().getDescription());
+		this.daoFactory.getCvTermDao().update(methodTerm);
+	}
+
+	private void updateScale(final VariableDTO variable, final boolean isVariableUsedInStudy) {
+		final Integer scaleId = Integer.valueOf(variable.getScale().getScaleDbId());
+		final CVTerm scaleTerm = this.daoFactory.getCvTermDao().getById(scaleId);
+
+		// Only update the categorical values and min, max if variable is not used in study
+		if (!isVariableUsedInStudy) {
+
+			scaleTerm.setName(variable.getScale().getScaleName());
+
+			final List<CVTermRelationship> relationships = this.daoFactory.getCvTermRelationshipDao().getBySubject(scaleTerm.getCvTermId());
+			final Optional<CVTermRelationship>
+				dataTypeRelationship = relationships.stream().filter(r -> r.getTypeId() == TermId.HAS_TYPE.getId()).findAny();
+			final DataType dataType = dataTypeRelationship.isPresent() ? DataType.getById(dataTypeRelationship.get().getObjectId()) : null;
+
+			// Update valid values if datatype is categorical
+			if (dataType == DataType.CATEGORICAL_VARIABLE) {
+				final List<Integer> valueIds =
+					relationships.stream().filter(r -> r.getTypeId() == TermId.HAS_VALUE.getId()).map(CVTermRelationship::getObjectId)
+						.collect(Collectors.toList());
+				final Map<String, CVTerm> categoricalValuesMap = this.daoFactory.getCvTermDao().getByIds(valueIds).stream()
+					.collect(Collectors.toMap(CVTerm::getName, Function.identity()));
+
+				for (final CategoryDTO categoryDTO : variable.getScale().getValidValues().getCategories()) {
+					if (categoricalValuesMap.containsKey(categoryDTO.getValue())) {
+						final CVTerm categoricalValueTerm = categoricalValuesMap.get(categoryDTO.getValue());
+						categoricalValueTerm.setDefinition(categoryDTO.getLabel());
+						this.daoFactory.getCvTermDao().update(categoricalValueTerm);
+					}
+				}
+			}
+
+			// Update min and max if datatype is numerical
+			if (dataType == DataType.NUMERIC_VARIABLE) {
+				final int maxTermId = TermId.MAX_VALUE.getId();
+				final int minTermId = TermId.MIN_VALUE.getId();
+				final Integer minScale = variable.getScale().getValidValues().getMin();
+				final Integer maxScale = variable.getScale().getValidValues().getMax();
+				this.updateScaleMinMax(scaleId, minScale, minTermId);
+				this.updateScaleMinMax(scaleId, maxScale, maxTermId);
+			}
+
+			this.daoFactory.getCvTermDao().update(scaleTerm);
+
+		}
+
+	}
+
+	private void updateScaleMinMax(final Integer scaleId, final Integer scaleSize, final int termId) {
+		if (scaleSize != null) {
+			this.daoFactory.getCvTermPropertyDao().save(scaleId, termId, String.valueOf(scaleSize), 0);
+		} else {
+			final CVTermProperty property = this.daoFactory.getCvTermPropertyDao().getOneByCvTermAndType(scaleId, termId);
+			if (property != null) {
+				this.daoFactory.getCvTermPropertyDao().makeTransient(property);
+			}
+		}
 	}
 
 	private void addObservationVariableToStudy(final Integer studyDbId, final Integer observationVariableDbId,
