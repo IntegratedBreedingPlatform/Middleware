@@ -48,8 +48,8 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 		final List<GermplasmListDataView> currentNewView = this.daoFactory.getGermplasmListDataViewDAO().getByListId(germplasmList.getId());
 		assertThat(currentNewView, hasSize(2));
 		assertThat(currentNewView, CoreMatchers.hasItems(
-			Matchers.hasProperty("variableId", Matchers.is(GermplasmListStaticColumns.ENTRY_NO.getTermId())),
-			Matchers.hasProperty("variableId", Matchers.is(GermplasmListStaticColumns.GID.getTermId()))));
+			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.ENTRY_NO.getTermId())),
+			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.GID.getTermId()))));
 
 		final List<GermplasmListDataUpdateViewDTO> updatedView = Arrays.asList(
 			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.ENTRY_NO.getTermId(), GermplasmListColumnCategory.STATIC),
@@ -61,9 +61,9 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 		final List<GermplasmListDataView> currentUpdatedView = this.daoFactory.getGermplasmListDataViewDAO().getByListId(germplasmList.getId());
 		assertThat(currentUpdatedView, hasSize(3));
 		assertThat(currentUpdatedView, CoreMatchers.hasItems(
-			Matchers.hasProperty("variableId", Matchers.is(GermplasmListStaticColumns.ENTRY_NO.getTermId())),
-			Matchers.hasProperty("variableId", Matchers.is(GermplasmListStaticColumns.DESIGNATION.getTermId())),
-			Matchers.hasProperty("variableId", Matchers.is(GermplasmListStaticColumns.GERMPLASM_REFERENCE.getTermId()))));
+			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.ENTRY_NO.getTermId())),
+			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.DESIGNATION.getTermId())),
+			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.GERMPLASM_REFERENCE.getTermId()))));
 	}
 
 	private GermplasmListDataUpdateViewDTO createGermplasmListDataUpdateViewDTO(final Integer id, final GermplasmListColumnCategory category) {
