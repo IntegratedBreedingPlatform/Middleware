@@ -328,11 +328,11 @@ public class VariableDTO {
 		}
 
 		public String getTraitDescription() {
-			return this.traitDescription;
+			return this.description;
 		}
 
 		public void setTraitDescription(final String traitDescription) {
-			this.traitDescription = traitDescription;
+			this.description = traitDescription;
 		}
 
 		public String getAttribute() {

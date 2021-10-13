@@ -309,10 +309,10 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		map.put(CVTermDao.VARIABLE_PROPERTY_ONTOLOGY_ID, "propertyOntology");
 		map.put(CVTermDao.VARIABLE_DATA_TYPE_ID, DataType.NUMERIC_VARIABLE.getId());
 		map.put(CVTermDao.VARIABLE_SCALE_CATEGORIES, "a,1|b,2|c,3|d,4|e,5");
-		map.put(CVTermDao.VARIABLE_SCALE_MIN_RANGE, new Double(100));
-		map.put(CVTermDao.VARIABLE_SCALE_MAX_RANGE, new Double(1000));
-		map.put(CVTermDao.VARIABLE_EXPECTED_MIN, new Double(1));
-		map.put(CVTermDao.VARIABLE_EXPECTED_MAX, new Double(10));
+		map.put(CVTermDao.VARIABLE_SCALE_MIN_RANGE, new Integer(100));
+		map.put(CVTermDao.VARIABLE_SCALE_MAX_RANGE, new Integer(1000));
+		map.put(CVTermDao.VARIABLE_EXPECTED_MIN, new Integer(1));
+		map.put(CVTermDao.VARIABLE_EXPECTED_MAX, new Integer(10));
 		map.put(CVTermDao.VARIABLE_CREATION_DATE, "variableCreationDate");
 		map.put(CVTermDao.VARIABLE_TRAIT_CLASS, "traitClass");
 		map.put(CVTermDao.VARIABLE_FORMULA_DEFINITION, "formulaDefinition");
@@ -363,7 +363,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(DataType.DATE_TIME_VARIABLE.getBrapiName(), dao.getDataTypeBrapiName(DataType.DATE_TIME_VARIABLE.getId()));
 		Assert.assertEquals(DataType.CATEGORICAL_VARIABLE.getBrapiName(), dao.getDataTypeBrapiName(DataType.CATEGORICAL_VARIABLE.getId()));
 		Assert.assertEquals(DataType.CHARACTER_VARIABLE.getBrapiName(), dao.getDataTypeBrapiName(DataType.CHARACTER_VARIABLE.getId()));
-		Assert.assertEquals("", dao.getDataTypeBrapiName(DataType.DATASET.getId()));
+		Assert.assertNull(dao.getDataTypeBrapiName(DataType.DATASET.getId()));
 
 	}
 
