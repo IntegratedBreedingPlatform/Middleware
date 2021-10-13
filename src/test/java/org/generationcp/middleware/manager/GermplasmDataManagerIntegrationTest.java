@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.manager;
 
+import com.google.common.collect.ImmutableSet;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
@@ -72,7 +73,6 @@ import java.util.UUID;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.core.Is.is;
@@ -409,7 +409,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountMethodsByType() {
-		String type = "GEN";
+		final String type = "GEN";
 		final long count = this.germplasmDataManager.countMethodsByType(type);
 		assertThat("Expecting to have returned results.", count, is(greaterThan(0l)));
 	}
@@ -843,7 +843,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		final Method method = this.germplasmDataManager.getMethodByID(154);
 
 		final String programUUID = UUID.randomUUID().toString();
-		this.programFavoriteService.addProgramFavorite(programUUID, ProgramFavorite.FavoriteType.METHOD, method.getMid());
+		this.programFavoriteService.addProgramFavorites(programUUID, ProgramFavorite.FavoriteType.METHOD, ImmutableSet.of(method.getMid()));
 
 		final List<Method> methods = this.germplasmDataManager.getFavoriteMethodsByMethodType(method.getMtype(), programUUID);
 		final Method resultMethod = methods.get(0);
