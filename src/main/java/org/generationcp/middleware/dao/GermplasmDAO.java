@@ -1597,24 +1597,44 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private void addGermplasmMatchesFilter(final SqlQueryParamBuilder sqlQueryParamBuilder,
 		final GermplasmMatchRequestDto germplasmMatchRequestDto) {
 		sqlQueryParamBuilder.append(" where g.deleted = 0 ");
-		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs()) && !CollectionUtils
-			.isEmpty(germplasmMatchRequestDto.getNames())) {
-			sqlQueryParamBuilder.append(" and (").append(" g.gid in (select gid from names n where n.nval in (:nameList) and n.nstat <> 9)")
-				.append(" or ")
-				.append(" pui.nval in (:puiList) ").append(") ");
+		sqlQueryParamBuilder.append(" and ( ");
+
+		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs())) {
+			sqlQueryParamBuilder.append(" pui.nval in (:puiList) ");
 			sqlQueryParamBuilder.setParameterList("puiList", germplasmMatchRequestDto.getGermplasmPUIs());
-			sqlQueryParamBuilder.setParameterList("nameList", germplasmMatchRequestDto.getNames());
-		} else {
-			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs())) {
-				sqlQueryParamBuilder.append(" and ").append(" pui.nval in (:puiList) ");
-				sqlQueryParamBuilder.setParameterList("puiList", germplasmMatchRequestDto.getGermplasmPUIs());
-			}
-			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getNames())) {
-				sqlQueryParamBuilder.append(" and ")
-					.append(" g.gid in (select gid from names n where n.nval in (:nameList) and n.nstat <> 9)");
-				sqlQueryParamBuilder.setParameterList("nameList", germplasmMatchRequestDto.getNames());
-			}
 		}
+
+		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getNames())) {
+			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs())) {
+				sqlQueryParamBuilder.append(" or ");
+			}
+
+			sqlQueryParamBuilder.append(" g.gid in (select gid from names n where n.nval in (:nameList) and n.nstat <> 9) ");
+			sqlQueryParamBuilder.setParameterList("nameList", germplasmMatchRequestDto.getNames());
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmUUIDs())) {
+			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs()) ||
+				!CollectionUtils.isEmpty(germplasmMatchRequestDto.getNames())) {
+				sqlQueryParamBuilder.append(" or ");
+			}
+
+			sqlQueryParamBuilder.append(" g.germplsm_uuid in (:guidList) ");
+			sqlQueryParamBuilder.setParameterList("guidList", germplasmMatchRequestDto.getGermplasmUUIDs());
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGids())) {
+			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs()) ||
+				!CollectionUtils.isEmpty(germplasmMatchRequestDto.getNames()) ||
+				!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmUUIDs())) {
+				sqlQueryParamBuilder.append(" or ");
+			}
+
+			sqlQueryParamBuilder.append(" g.gid in (:gidList) ");
+			sqlQueryParamBuilder.setParameterList("gidList", germplasmMatchRequestDto.getGids());
+
+		}
+		sqlQueryParamBuilder.append(" ) ");
 	}
 
 	StringBuilder buildGetExistingCrossesQueryString(final List<Integer> maleParentIds, final Optional<Integer> gid) {

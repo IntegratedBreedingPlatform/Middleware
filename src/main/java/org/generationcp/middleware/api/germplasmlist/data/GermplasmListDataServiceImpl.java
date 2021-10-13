@@ -29,7 +29,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,8 +36,6 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.groupingBy;
 
 @Transactional
 @Service
@@ -228,7 +225,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	@Override
 	public void saveGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view) {
 		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
-		final List<GermplasmListDataView> variableColumns = germplasmList.getView()
+		final List<GermplasmListDataView> entryDetailColumns = germplasmList.getView()
 			.stream()
 			.filter(GermplasmListDataView::isEntryDetailColumn)
 			.collect(Collectors.toList());
@@ -237,8 +234,8 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			.stream()
 			.map(updateColumn -> GermplasmListDataViewFactory.create(germplasmList, updateColumn))
 			.collect(Collectors.toList());
-		if (!CollectionUtils.isEmpty(variableColumns)) {
-			updatedView.addAll(variableColumns);
+		if (!CollectionUtils.isEmpty(entryDetailColumns)) {
+			updatedView.addAll(entryDetailColumns);
 		}
 		germplasmList.setView(updatedView);
 		this.daoFactory.getGermplasmListDAO().save(germplasmList);

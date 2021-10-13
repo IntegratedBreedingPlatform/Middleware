@@ -9,6 +9,8 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.constant.SystemNameTypes;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
+import org.generationcp.middleware.constant.SystemNameTypes;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;

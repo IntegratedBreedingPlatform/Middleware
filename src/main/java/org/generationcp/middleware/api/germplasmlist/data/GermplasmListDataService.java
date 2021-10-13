@@ -12,10 +12,10 @@ public interface GermplasmListDataService {
 
 	long countSearchGermplasmListData(Integer listId, GermplasmListDataSearchRequest request);
 
-	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId, final String programUUID);
+	List<GermplasmListColumnDTO> getGermplasmListColumns(Integer listId, String programUUID);
 
-	List<GermplasmListMeasurementVariableDTO> getGermplasmListDataTableHeader(Integer listId, final String programUUID);
+	List<GermplasmListMeasurementVariableDTO> getGermplasmListDataTableHeader(Integer listId, String programUUID);
 
-	void saveGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view);
+	void saveGermplasmListDataView(Integer listId, List<GermplasmListDataUpdateViewDTO> view);
 
 }
