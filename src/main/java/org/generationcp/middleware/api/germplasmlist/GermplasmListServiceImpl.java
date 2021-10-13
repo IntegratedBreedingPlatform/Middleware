@@ -454,16 +454,16 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final List<GermplasmListDataView> columns =
 			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
 		return columns.stream()
-			.filter(c -> c.getCategory().equals(GermplasmListColumnCategory.VARIABLE) && (types == null || types.contains(c.getTypeId())))
-			.map(c -> c.getVariableId())
+			.filter(c -> c.getCvtermId() != null && (types == null || types.contains(c.getTypeId())))
+			.map(c -> c.getCvtermId())
 			.collect(Collectors.toList());
 	}
 
 	@Override
 	public void addVariableToList(final Integer listId, final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
 		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
-		final GermplasmListDataView germplasmListDataView = new GermplasmListDataView(germplasmList, GermplasmListColumnCategory.VARIABLE,
-			germplasmListVariableRequestDto.getVariableTypeId(), germplasmListVariableRequestDto.getVariableId());
+		final GermplasmListDataView germplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(germplasmList,
+			germplasmListVariableRequestDto.getVariableTypeId(), germplasmListVariableRequestDto.getVariableId()).build();
 		this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
 	}
 
@@ -480,8 +480,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final List<GermplasmListDataView> columns =
 			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
 		final List<Integer> variableIds = columns.stream().filter(
-			c -> c.getCategory().equals(GermplasmListColumnCategory.VARIABLE) && (c.getTypeId().equals(variableTypeId)
-				|| variableTypeId == null)).map(c -> c.getVariableId())
+			c -> c.getCvtermId() != null && (c.getTypeId().equals(variableTypeId)
+				|| variableTypeId == null)).map(c -> c.getCvtermId())
 			.collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(variableIds)) {
 			final VariableFilter variableFilter = new VariableFilter();

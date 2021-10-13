@@ -2,7 +2,6 @@ package org.generationcp.middleware.dao.germplasmlist;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -37,7 +36,7 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("list", "l");
-			criteria.add(Restrictions.eq("variableId", variableId));
+			criteria.add(Restrictions.eq("cvtermId", variableId));
 			criteria.setProjection(Projections.countDistinct("l.id"));
 			return ((Long) criteria.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
@@ -51,10 +50,9 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 	public void deleteByListIdAndVariableIds(final Integer listId, final Set<Integer> variableIds) {
 		try {
 			final String query =
-				"DELETE FROM list_data_view WHERE listid = :listId AND variable_id IN :variableIds AND category = :category";
+				"DELETE FROM list_data_view WHERE listid = :listId AND cvterm_id IN :variableIds";
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
 			sqlQuery.setParameter("listId", listId);
-			sqlQuery.setParameter("category", GermplasmListColumnCategory.VARIABLE.name());
 			sqlQuery.setParameterList("variableIds", variableIds);
 			sqlQuery.executeUpdate();
 		} catch (final HibernateException e) {
