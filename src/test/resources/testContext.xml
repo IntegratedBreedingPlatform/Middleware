@@ -353,4 +353,9 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="copService" class="org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
+
 </beans>
