@@ -47,6 +47,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,17 +104,38 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return stockIds;
 	}
 
-	public long countStudiesByGid(final int gid) {
+	public long countStudiesByGids(final List<Integer> gids) {
 
 		try {
 			final SQLQuery query = this.getSession()
 				.createSQLQuery("select count(distinct p.project_id) " + "FROM stock s "
-					+ "INNER JOIN project p ON s.project_id = p.project_id " + "WHERE s.dbxref_id = " + gid
+					+ "INNER JOIN project p ON s.project_id = p.project_id "
+					+ "WHERE s.dbxref_id IN (:gids) "
 					+ " AND p.deleted = 0");
+			query.setParameterList("gids", gids);
 			return ((BigInteger) query.uniqueResult()).longValue();
 
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error in countStudiesByGid=" + gid + StockDao.IN_STOCK_DAO + e.getMessage();
+			final String errorMessage = "Error in countStudiesByGids=" + gids + StockDao.IN_STOCK_DAO + e.getMessage();
+			LOG.error(errorMessage, e);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
+	public long countPlotsByGids(final List<Integer> gids) {
+
+		try {
+			final SQLQuery query = this.getSession()
+				.createSQLQuery("select count(distinct e.nd_experiment_id) " + "FROM stock s "
+					+ "INNER JOIN project p ON s.project_id = p.project_id "
+					+ "INNER JOIN nd_experiment e on e.stock_id = s.stock_id "
+					+ "WHERE s.dbxref_id IN (:gids) "
+					+ " AND p.deleted = 0");
+			query.setParameterList("gids", gids);
+			return ((BigInteger) query.uniqueResult()).longValue();
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error in countStudiesByGids=" + gids + StockDao.IN_STOCK_DAO + e.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -462,12 +484,18 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
-	public List<Integer> getGermplasmUsedInStudies(final List<Integer> gids) {
+	public List<Integer> getGermplasmUsedInStudies(final List<Integer> gids, final boolean lockedStudiesOnly) {
+		if (CollectionUtils.isEmpty(gids)) {
+			return Collections.emptyList();
+		}
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
 			criteria.createAlias("project", "project");
 			criteria.add(Restrictions.in("germplasm.gid", gids));
 			criteria.add(Restrictions.eq("project.deleted", false));
+			if (lockedStudiesOnly) {
+				criteria.add(Restrictions.eq("project.locked", true));
+			}
 			criteria.setProjection(Projections.distinct(Projections.property("germplasm.gid")));
 			return criteria.list();
 		} catch (final HibernateException e) {

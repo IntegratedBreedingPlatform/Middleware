@@ -46,4 +46,9 @@ public interface StudyService {
 	void deleteProgramStudies(String programUUID);
 
 	void deleteStudy(int studyId);
+
+	long countStudiesByGids(List<Integer> gids);
+
+	long countPlotsByGids(List<Integer> gids);
+
 }

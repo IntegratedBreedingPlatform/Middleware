@@ -47,6 +47,7 @@ import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
@@ -241,6 +242,24 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			}
 		} catch (final HibernateException e) {
 			final String errorMessage = "Error with countByGID(gid=" + gid + ") query from GermplasmList " + e.getMessage();
+			GermplasmListDAO.LOG.error(errorMessage);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+		return 0;
+	}
+
+	public long countByGIDs(final List<Integer> gids) {
+		try {
+			if (!CollectionUtils.isEmpty(gids)) {
+				final Criteria criteria = this.getSession().createCriteria(GermplasmListData.class);
+				criteria.createAlias("list", "l");
+				criteria.add(Restrictions.in("gid", gids));
+				criteria.add(Restrictions.ne("l.status", GermplasmListDAO.STATUS_DELETED));
+				criteria.setProjection(Projections.countDistinct("l.id"));
+				return ((Long) criteria.uniqueResult()).longValue();
+			}
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error with countByGIDs(gids=" + gids + ") query from GermplasmList " + e.getMessage();
 			GermplasmListDAO.LOG.error(errorMessage);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -631,6 +650,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	 * @param gids
 	 */
 	public List<Integer> getGermplasmUsedInLockedList(final List<Integer> gids) {
+		if (CollectionUtils.isEmpty(gids)) {
+			return Collections.emptyList();
+		}
 		final SQLQuery query = this.getSession()
 			.createSQLQuery(" SELECT ld.gid as gid "
 				+ " FROM listnms l"
