@@ -25,13 +25,44 @@
 			SET @workbench_sidebar_category_link_id =  (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'manage_germplasm_lists');
 
 			INSERT INTO permission (`name`, `description`, `parent_id`, `workbench_sidebar_category_link_id`)
-			VALUES ('MANAGE_GERMPLASM_LISTS', 'Manage Germplasm Lists', @permission_id , @workbench_sidebar_category_link_id);
+			VALUES ('MANAGE_GERMPLASM_LISTS', 'Germplasm Lists Beta', @permission_id , @workbench_sidebar_category_link_id);
 
 			SET @manage_germplasm_lists_permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
 
 			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @manage_germplasm_lists_permission_id, '1');
 			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @manage_germplasm_lists_permission_id, '1');
 			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @manage_germplasm_lists_permission_id, '1');
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+                	SELECT count(*) FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS'
+            	</sqlCheck>
+				<sqlCheck expectedResult="0">
+                	SELECT count(*) FROM permission WHERE name = 'SEARCH_GERMPLASM_LISTS'
+            	</sqlCheck>
+			</and>
+        </preConditions>
+		<comment>
+			Add Search Germplasm Lists permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
+			SET @workbench_sidebar_category_link_id =  (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'manage_germplasm_lists');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`, `workbench_sidebar_category_link_id`)
+			VALUES ('SEARCH_GERMPLASM_LISTS', 'Search Germplasm Lists', @permission_id, @workbench_sidebar_category_link_id);
+
+			SET @search_germplasm_lists_permission_id = (SELECT permission_id FROM permission where name = 'SEARCH_GERMPLASM_LISTS');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @search_germplasm_lists_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @search_germplasm_lists_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @search_germplasm_lists_permission_id, '1');
 
 		</sql>
 	</changeSet>
