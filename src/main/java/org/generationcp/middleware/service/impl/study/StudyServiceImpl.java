@@ -170,6 +170,16 @@ public class StudyServiceImpl extends Service implements StudyService {
 		this.daoFactory.getDmsProjectDAO().markProjectsAndChildrenAsDeleted(Arrays.asList(studyId));
 	}
 
+	@Override
+	public long countStudiesByGids(final List<Integer> gids) {
+		return this.daoFactory.getStockDao().countStudiesByGids(gids);
+	}
+
+	@Override
+	public long countPlotsByGids(final List<Integer> gids) {
+		return this.daoFactory.getStockDao().countPlotsByGids(gids);
+	}
+
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
 	}

@@ -1996,8 +1996,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false, true)));
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, true)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
 
@@ -2029,8 +2029,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false, false)));
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
 
@@ -2059,8 +2059,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false, false)));
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
 
@@ -2095,7 +2095,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge.getGid(), false, false, false)));
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge.getGid(), false, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 
 		// If migrateNameTypes is false, migration of names should not execute
@@ -2173,8 +2173,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false, false)));
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 
 		germplasmMergeRequestDto.getMergeOptions().setMigrateNameTypes(true);
@@ -2219,7 +2219,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge.getGid(), false, false, false)));
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge.getGid(), false, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 
 		// If migrateAttributesData is false, migration of attributes should not execute
@@ -2268,8 +2268,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false, false)));
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 
 		germplasmMergeRequestDto.getMergeOptions().setMigrateAttributesData(true);
@@ -2306,7 +2306,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge.getGid(), false, false, false)));
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge.getGid(), false, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 
 		// If migratePassportData is false, migration of attributes should not execute
@@ -2360,8 +2360,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false, false)));
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 
 		germplasmMergeRequestDto.getMergeOptions().setMigrateAttributesData(true);
@@ -2395,8 +2395,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		// Set the migrateLots to true
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), true, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), true, false, false)));
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), true, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), true, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
@@ -2432,8 +2432,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		// Set the closeLots to true
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, true, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, true, false)));
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
@@ -2472,8 +2472,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false, false)));
+			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
+				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 		germplasmMergeRequestDto.getMergeOptions().setMigrateNameTypes(true);
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));

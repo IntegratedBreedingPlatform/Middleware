@@ -66,6 +66,7 @@ import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -250,7 +251,7 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
-		final long count = this.stockDao.countStudiesByGid(germplasm.getGid());
+		final long count = this.stockDao.countStudiesByGids(Collections.singletonList(germplasm.getGid()));
 		Assert.assertEquals(2, count);
 	}
 

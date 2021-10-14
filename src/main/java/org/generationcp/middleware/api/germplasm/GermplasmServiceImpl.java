@@ -5,6 +5,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
+import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -417,7 +418,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Override
 	public Set<Integer> getGermplasmUsedInStudies(final List<Integer> gids) {
-		return new HashSet<>(this.daoFactory.getStockDao().getGermplasmUsedInStudies(gids));
+		return new HashSet<>(this.daoFactory.getStockDao().getGermplasmUsedInStudies(gids, false));
+	}
+
+	@Override
+	public Set<Integer> getGermplasmUsedInLockedStudies(final List<Integer> gids) {
+		return new HashSet<>(this.daoFactory.getStockDao().getGermplasmUsedInStudies(gids, true));
 	}
 
 	private void saveGermplasmUpdateDTO(final Map<String, Variable> attributeVariablesMap,
@@ -1174,8 +1180,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 					new Name(null, targetGermplasm, name.getTypeId(), 0, name.getNval(), name.getLocationId(), name.getNdate(),
 						name.getReferenceId());
 				nameDAO.save(nameToSave);
-				nameDAO.makeTransient(name);
 				existingNameTypeIds.add(nameToSave.getTypeId());
+			}
+			// Delete non-preferred names of merged germplasm (we need to retain the preferred name to be able to show in audit history)
+			if (name.getNstat() != 1) {
+				nameDAO.makeTransient(name);
 			}
 		}
 	}
@@ -1203,14 +1212,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	private void migrateLots(final List<GermplasmMergeRequestDto.NonSelectedGermplasm> nonSelectedGermplasmList,
 		final Integer targetGermplasmId) {
-		final List<Integer> migrateLotsGids = nonSelectedGermplasmList.stream().filter(o -> !o.isOmit() && o.isMigrateLots())
+		final List<Integer> migrateLotsGids = nonSelectedGermplasmList.stream().filter(o -> !o.isOmit() && BooleanUtils.isTrue(o.isMigrateLots()))
 			.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
 				Collectors.toList());
 		this.daoFactory.getLotDao().replaceGermplasm(migrateLotsGids, targetGermplasmId);
 	}
 
 	private void closeLots(final List<GermplasmMergeRequestDto.NonSelectedGermplasm> nonSelectedGermplasmList) {
-		final List<Integer> closeLotsGids = nonSelectedGermplasmList.stream().filter(o -> !o.isOmit() && o.isCloseLots())
+		final List<Integer> closeLotsGids = nonSelectedGermplasmList.stream().filter(o -> !o.isOmit() && BooleanUtils.isNotTrue(o.isMigrateLots()))
 			.map(GermplasmMergeRequestDto.NonSelectedGermplasm::getGermplasmId).collect(
 				Collectors.toList());
 		final List<Integer> lotsToClose =

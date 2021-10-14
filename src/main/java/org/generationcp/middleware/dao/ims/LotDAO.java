@@ -282,13 +282,16 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 	}
 
 	public Set<Integer> getGermplasmsWithOpenLots(final List<Integer> gids) {
+		if (CollectionUtils.isEmpty(gids)) {
+			return Collections.emptySet();
+		}
 		try {
 			final Query query = this.getSession().createSQLQuery("select distinct (i.eid) FROM ims_lot i "
 					+ "WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) GROUP BY i.lotid ")
 				.setParameterList("gids", gids);
 			return Sets.newHashSet(query.list());
 		} catch (final Exception e) {
-			LotDAO.LOG.error("Error at checkGermplasmsWithOpenLots for GIDss = " + gids + AT_LOT_DAO + e.getMessage(), e);
+			LotDAO.LOG.error("Error at checkGermplasmsWithOpenLots for GIDs = " + gids + AT_LOT_DAO + e.getMessage(), e);
 			throw new MiddlewareQueryException("Error at checkGermplasmsWithOpenLots for GIDss = " + gids + AT_LOT_DAO + e.getMessage(), e);
 		}
 	}
