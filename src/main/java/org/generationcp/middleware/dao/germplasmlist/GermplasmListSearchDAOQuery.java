@@ -65,7 +65,7 @@ public class GermplasmListSearchDAOQuery {
 		+ " FROM listnms list "
 		+ " %s " // usage of SELECT_JOINS
 		+ " WHERE list.liststatus NOT IN ('" + GermplasmList.Status.FOLDER.getCode() + "', '" + GermplasmList.Status.DELETED.getCode() + "') "
-		+ "			AND list.program_uuid = :programUUID";
+		+ "			AND (list.program_uuid = :programUUID OR list.program_uuid IS NULL)";
 
 	private final static String SELECT_NUMBER_OF_ENTRIES_EXPRESSION = " (SELECT count(1) FROM listdata l WHERE l.listid = list.listid) AS " + NUMBER_OF_ENTRIES_ALIAS;
 
