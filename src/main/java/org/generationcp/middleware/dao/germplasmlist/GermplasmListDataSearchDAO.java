@@ -373,18 +373,19 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 	private void addFixedScalars(final List<String> scalars, final List<String> selectClause) {
 		selectClause.add(this.addSelectExpression(scalars, "listData.lrecid", LIST_DATA_ID_ALIAS));
 		selectClause.add(this.addSelectExpression(scalars, "listData.entryid", GermplasmListStaticColumns.ENTRY_NO.name()));
+		selectClause.add(this.addSelectExpression(scalars, "listData.entrycd", GermplasmListStaticColumns.ENTRY_CODE.name()));
 		selectClause.add(this.addSelectExpression(scalars, "g.gid", GermplasmListStaticColumns.GID.name()));
 		selectClause.add(this.addSelectExpression(scalars, "g.mgid", GermplasmListStaticColumns.GROUP_ID.name()));
 		selectClause.add(this.addSelectExpression(scalars, "g.germplsm_uuid", GermplasmListStaticColumns.GUID.name()));
 		selectClause
 			.add(this.addSelectExpression(scalars, "CAST(g.gdate as CHAR)", GermplasmListStaticColumns.GERMPLASM_DATE.name()));
 
-		final String groupSourceGIDExpression = "CASE \n WHEN g.gnpgs = -1 AND g.gpid1 IS NOT NULL \n"
-			+ " AND g.gpid1 <> 0 THEN g.gpid1 \n ELSE '-' \n" + " END \n";
+		final String groupSourceGIDExpression = "CASE WHEN g.gnpgs = -1 AND g.gpid1 IS NOT NULL "
+			+ " AND g.gpid1 <> 0 THEN g.gpid1 ELSE '-' END ";
 		selectClause.add(this.addSelectExpression(scalars, groupSourceGIDExpression, GermplasmListStaticColumns.GROUP_SOURCE_GID.name()));
 
-		final String immediateSourceGIDExpression = "CASE \n WHEN g.gnpgs = -1 AND g.gpid2 IS NOT NULL \n"
-			+ " AND g.gpid2 <> 0 THEN g.gpid2 \n ELSE '-' \n" + " END \n";
+		final String immediateSourceGIDExpression = "CASE WHEN g.gnpgs = -1 AND g.gpid2 IS NOT NULL "
+			+ " AND g.gpid2 <> 0 THEN g.gpid2 ELSE '-' END ";
 		selectClause
 			.add(this.addSelectExpression(scalars, immediateSourceGIDExpression, GermplasmListStaticColumns.IMMEDIATE_SOURCE_GID.name()));
 	}
@@ -401,8 +402,8 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 	private void addGroupSourceNameScalar(final List<String> scalars, final List<String> selectClause,
 		final Set<String> joins, final List<Integer> columnVariableIds) {
 		if (columnVariableIds.contains(GermplasmListStaticColumns.GROUP_SOURCE_NAME.getTermId())) {
-			final String groupSourceNameExpression = "CASE \n  WHEN g.gnpgs = -1 \n AND g.gpid1 IS NOT NULL \n"
-				+ " AND g.gpid1 <> 0 THEN groupSource.nval \n ELSE '-' \n" + " END \n";
+			final String groupSourceNameExpression = "CASE WHEN g.gnpgs = -1 AND g.gpid1 IS NOT NULL "
+				+ " AND g.gpid1 <> 0 THEN groupSource.nval ELSE '-' END ";
 
 			selectClause
 				.add(this.addSelectExpression(scalars, groupSourceNameExpression, GermplasmListStaticColumns.GROUP_SOURCE_NAME.name()));
@@ -414,8 +415,8 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 	private void addImmediateSourceNameScalar(final List<String> scalars, final List<String> selectClause,
 		final Set<String> joins, final List<Integer> columnVariableIds) {
 		if (columnVariableIds.contains(GermplasmListStaticColumns.IMMEDIATE_SOURCE_NAME.getTermId())) {
-			final String immediateSourceNameExpression = "CASE \n WHEN g.gnpgs = -1 AND g.gpid2 IS NOT NULL \n"
-				+ "	AND g.gpid2 <> 0 THEN immediateSource.nval \n" + "	ELSE '-' \n END \n";
+			final String immediateSourceNameExpression = "CASE WHEN g.gnpgs = -1 AND g.gpid2 IS NOT NULL "
+				+ "	AND g.gpid2 <> 0 THEN immediateSource.nval ELSE '-' END ";
 
 			selectClause
 				.add(this.addSelectExpression(scalars, immediateSourceNameExpression,
@@ -440,9 +441,9 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 			final String lotAvailableExpression = " IF(COUNT(DISTINCT IFNULL(lot.scaleid, 'null')) = 1, "
 				+ "  IFNULL((SELECT SUM(CASE WHEN gt.trnstat = " + TransactionStatus.CONFIRMED.getIntValue()
 				+ "    OR (gt.trnstat = " + TransactionStatus.PENDING.getIntValue() //
-				+ "    AND gt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN gt.trnqty ELSE 0 END)) " //
+				+ "    AND gt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN gt.trnqty ELSE 0 END)) "
 				+ "  /(COUNT(gt.trnid)/count(DISTINCT gt.trnid)), 0)" //
-				+ " , '" + MIXED_UNITS_LABEL + "')"; // AS  `" + GermplasmSearchDAO.AVAIL_BALANCE + "`, \n"  //
+				+ " , '" + MIXED_UNITS_LABEL + "')";
 			selectClause.add(this.addSelectExpression(scalars, lotAvailableExpression, GermplasmListStaticColumns.AVAILABLE.name()));
 
 			joins.add(LOT_JOIN);

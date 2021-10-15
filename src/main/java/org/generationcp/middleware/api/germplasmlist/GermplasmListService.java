@@ -55,10 +55,9 @@ public interface GermplasmListService {
 
 	long countGermplasmLists(List<Integer> gids);
 
-	List<GermplasmListSearchResponse> searchGermplasmList(GermplasmListSearchRequest request, Pageable pageable,
-		final String programUUID);
+	List<GermplasmListSearchResponse> searchGermplasmList(GermplasmListSearchRequest request, Pageable pageable, String programUUID);
 
-	long countSearchGermplasmList(GermplasmListSearchRequest request, final String programUUID);
+	long countSearchGermplasmList(GermplasmListSearchRequest request, String programUUID);
 
 	/**
 	 * Lock the list if it's unlocked and vice versa.
