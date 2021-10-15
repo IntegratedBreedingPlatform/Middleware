@@ -40,7 +40,7 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		final Integer pageNumber) {
 		final List<ObservationDto> observationDtos = this.daoFactory.getPhenotypeDAO().searchObservations(observationSearchRequestDto, pageSize, pageNumber);
 		if (!CollectionUtils.isEmpty(observationDtos)) {
-			final List<String> observationDbIds = new ArrayList<>(observationDtos.stream().map(ObservationDto::getObservationDbId)
+			final List<Integer> observationDbIds = new ArrayList<>(observationDtos.stream().map(o -> Integer.valueOf(o.getObservationDbId()))
 					.collect(Collectors.toSet()));
 			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
 					this.daoFactory.getPhenotypeExternalReferenceDAO().getExternalReferences(observationDbIds).stream()
