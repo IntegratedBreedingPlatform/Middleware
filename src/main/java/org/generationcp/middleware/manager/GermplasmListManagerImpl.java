@@ -574,7 +574,7 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 		final Set<Integer> codeFixedGermplasms = this.getCodeFixedGidsByGidList(germplasm);
 		final Set<Integer> germplasmOffspringByGIDs = this.getGermplasmOffspringByGIDs(germplasm);
-		final Set<Integer> germplasmUsedInStudies = new HashSet<>(this.daoFactory.getStockDao().getGermplasmUsedInStudies(germplasm));
+		final Set<Integer> germplasmUsedInStudies = new HashSet<>(this.daoFactory.getStockDao().getGermplasmUsedInStudies(germplasm, false));
 		final Set<Integer> germplasmWithOpenLots = this.getGidsWithOpenLots(germplasm);
 		final Set<Integer> germplasmInLockedLists = new HashSet<>(this.daoFactory.getGermplasmListDAO()
 			.getGermplasmUsedInLockedList(germplasm));
