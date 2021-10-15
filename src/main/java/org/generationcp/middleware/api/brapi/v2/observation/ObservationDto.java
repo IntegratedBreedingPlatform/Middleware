@@ -30,7 +30,7 @@ public class ObservationDto {
 	private String observationUnitName;
 	private String observationVariableDbId;
 	private String observationVariableName;
-	private SeasonDto season = new SeasonDto();
+	private SeasonDto season;
 	private String studyDbId;
 	private String uploadedBy;
 	private String value;
@@ -157,11 +157,17 @@ public class ObservationDto {
 
 	@JsonIgnore
 	public void setSeasonName(final String seasonName) {
+		if(this.season == null) {
+			this.season = new SeasonDto();
+		}
 		this.season.setSeason(seasonName);
 	}
 
 	@JsonIgnore
 	public void setSeasonDbId(final String seasonDbId) {
+		if(this.season == null) {
+			this.season = new SeasonDto();
+		}
 		this.season.setSeasonDbId(seasonDbId);
 	}
 
