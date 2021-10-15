@@ -60,13 +60,13 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 		final Pageable pageable) {
 		final List<VariableDTO> variableDTOS = this.daoFactory.getCvTermDao().getObservationVariables(requestDTO, pageable);
 		if (!CollectionUtils.isEmpty(variableDTOS)) {
-			final List<String> variableIds = new ArrayList<>(variableDTOS.stream().map(VariableDTO::getObservationVariableDbId)
+			final List<Integer> variableIds = new ArrayList<>(variableDTOS.stream().map(v -> Integer.valueOf(v.getObservationVariableDbId()))
 				.collect(Collectors.toSet()));
-			variableIds.addAll(variableDTOS.stream().map(variableDTO -> variableDTO.getTrait().getTraitDbId())
+			variableIds.addAll(variableDTOS.stream().map(variableDTO -> Integer.valueOf(variableDTO.getTrait().getTraitDbId()))
 				.collect(Collectors.toSet()));
-			variableIds.addAll(variableDTOS.stream().map(variableDTO -> variableDTO.getScale().getScaleDbId())
+			variableIds.addAll(variableDTOS.stream().map(variableDTO -> Integer.valueOf(variableDTO.getScale().getScaleDbId()))
 				.collect(Collectors.toSet()));
-			variableIds.addAll(variableDTOS.stream().map(variableDTO -> variableDTO.getMethod().getMethodDbId())
+			variableIds.addAll(variableDTOS.stream().map(variableDTO -> Integer.valueOf(variableDTO.getMethod().getMethodDbId()))
 				.collect(Collectors.toSet()));
 
 			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
