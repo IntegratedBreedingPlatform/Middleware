@@ -4,6 +4,8 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.Optional;
@@ -11,6 +13,7 @@ import java.util.Set;
 
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.generationcp.middleware.util.Debug.debug;
 
 /**
  * Coefficient of parentage (f): calculation utilities.
@@ -53,22 +56,21 @@ import static java.util.Optional.of;
  */
 public class CopCalculation {
 
+	private static final Logger LOG = LoggerFactory.getLogger(CopCalculation.class);
+
 	private static final double COP_DEFAULT = 0.0;
 	private static final int UNKNOWN_INBREEDING_GENERATIONS = 4;
 
-	private final BTypeEnum bTypeEnum;
 	/**
 	 * Named as in the paper just for consistency
 	 */
 	private final Table<Integer, Integer, Double> sparseMatrix;
 
 	public CopCalculation() {
-		this.bTypeEnum = BTypeEnum.SELF_POLINATING;
 		this.sparseMatrix = HashBasedTable.create();
 	}
 
-	public CopCalculation(final BTypeEnum bTypeEnum, final Table<Integer, Integer, Double> sparseMatrix) {
-		this.bTypeEnum = bTypeEnum != null ? bTypeEnum : BTypeEnum.SELF_POLINATING;
+	public CopCalculation(final Table<Integer, Integer, Double> sparseMatrix) {
 		this.sparseMatrix = sparseMatrix != null ? sparseMatrix : HashBasedTable.create();
 	}
 
@@ -83,12 +85,16 @@ public class CopCalculation {
 	 * @param g2
 	 */
 	public double coefficientOfParentage(final GermplasmTreeNode g1, final GermplasmTreeNode g2) {
-		if (g1 == null || g2 == null || g1.getGid() == null || g2.getGid() == null) {
+		if (g1 == null || g2 == null
+			|| g1.getGid() == null || g2.getGid() == null
+			|| g1.getGid() == 0 || g2.getGid() == 0) {
 			return COP_DEFAULT;
 		}
 		if (this.sparseMatrix.contains(g1.getGid(), g2.getGid())) {
+			debug("cop found: (gid1=%s-gid2=%s)", g1.getGid(), g2.getGid());
 			return this.sparseMatrix.get(g1.getGid(), g2.getGid());
 		}
+		debug("Calculating cop (gid1=%s-gid2=%s)", g1.getGid(), g2.getGid());
 
 		double cop = COP_DEFAULT;
 
@@ -132,8 +138,7 @@ public class CopCalculation {
 	 */
 	public double coefficientOfInbreeding(final GermplasmTreeNode g) {
 		if (this.isBTypeScenario(g)) {
-			// TODO get btype from method?
-			return this.bTypeEnum.getValue();
+			return this.getBType(g);
 		}
 
 		final double fg = g.getFemaleParentNode() != null && g.getMaleParentNode() != null
@@ -144,12 +149,17 @@ public class CopCalculation {
 		return 1 - ((1 - fg) / Math.pow(2.0, this.countInbreedingGenerations(g)));
 	}
 
+	private double getBType(final GermplasmTreeNode g) {
+		// TODO get btype from method?
+		return BTypeEnum.SELF_POLINATING.getValue();
+	}
+
 	private boolean isBTypeScenario(final GermplasmTreeNode g) {
 		// TODO complete
 		//  "if Z traces back to a single progenitor, such as a mutant strain"
 
 		// "If the progenitors of a strain are unknown"
-		return g.getNumberOfProgenitors() > 0 && (g.getFemaleParentNode() == null || g.getMaleParentNode() == null);
+		return this.isGenerative(g) && (g.getFemaleParentNode() == null || g.getMaleParentNode() == null);
 	}
 
 	private int countInbreedingGenerations(final GermplasmTreeNode g) {
@@ -159,7 +169,7 @@ public class CopCalculation {
 		}
 
 		int count = 1;
-		while (source != null && source.getNumberOfProgenitors() < 0) {
+		while (source != null && this.isDerivative(source)) {
 			count++;
 			source = source.getMaleParentNode();
 		}
@@ -171,7 +181,7 @@ public class CopCalculation {
 	 *  - unit test separately
 	 */
 	private Optional<GermplasmTreeNode> getCommonDerivativeAncestor(final GermplasmTreeNode g1, final GermplasmTreeNode g2) {
-		if (g1.getGid().equals(g2.getGid()) || g1.getNumberOfProgenitors() > 0 || g2.getNumberOfProgenitors() > 0) {
+		if (g1.getGid().equals(g2.getGid()) || this.isGenerative(g1) || this.isGenerative(g2)) {
 			return empty();
 		}
 		// source, aka immediate parent
@@ -208,7 +218,7 @@ public class CopCalculation {
 		if (this.hasUnknownParents(g)) {
 			return empty();
 		}
-		if (g.getNumberOfProgenitors() > 0) {
+		if (this.isGenerative(g)) {
 			return of(Pair.of(g.getFemaleParentNode(), g.getMaleParentNode()));
 		}
 		final GermplasmTreeNode groupSource = g.getFemaleParentNode();
@@ -218,7 +228,7 @@ public class CopCalculation {
 			return of(Pair.of(groupSource.getFemaleParentNode(), groupSource.getMaleParentNode()));
 		} else if (source != null) {
 			while (source != null) {
-				if (source.getNumberOfProgenitors() > 0 && source.getMaleParentNode() != null && source.getFemaleParentNode() != null) {
+				if (this.isGenerative(source) && source.getMaleParentNode() != null && source.getFemaleParentNode() != null) {
 					return of(Pair.of(source.getFemaleParentNode(), source.getMaleParentNode()));
 				} else {
 					source = source.getMaleParentNode();
@@ -228,8 +238,16 @@ public class CopCalculation {
 		return empty();
 	}
 
+	private boolean isGenerative(final GermplasmTreeNode g) {
+		return g != null && g.getNumberOfProgenitors() != null && g.getNumberOfProgenitors() > 0;
+	}
+
+	private boolean isDerivative(final GermplasmTreeNode g) {
+		return g != null && g.getNumberOfProgenitors() != null && g.getNumberOfProgenitors() < 0;
+	}
+
 	private boolean hasUnknownParents(final GermplasmTreeNode g) {
-		return g.getNumberOfProgenitors() > 0 && (g.getMaleParentNode() == null || g.getFemaleParentNode() == null);
+		return this.isGenerative(g) && (g.getMaleParentNode() == null || g.getFemaleParentNode() == null);
 	}
 
 	private Pair<GermplasmTreeNode, GermplasmTreeNode> sortByOrder(final GermplasmTreeNode g1, final GermplasmTreeNode g2) {
