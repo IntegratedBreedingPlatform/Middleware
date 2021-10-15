@@ -56,14 +56,14 @@ public enum GermplasmListStaticColumns {
 		return rank;
 	}
 
-	public static GermplasmListStaticColumns getByTermId(int termId) {
+	public static GermplasmListStaticColumns getByTermId(final int termId) {
 		return Arrays.stream(GermplasmListStaticColumns.values())
 			.filter(c -> c.termId.getId() == termId)
 			.findFirst()
 			.orElseThrow(() -> new IllegalStateException(String.format("There is no a static columns with termId %s.", termId)));
 	}
 
-	public static GermplasmListStaticColumns getByName(String name) {
+	public static GermplasmListStaticColumns getByName(final String name) {
 		return Arrays.stream(GermplasmListStaticColumns.values())
 			.filter(c -> c.getName().equalsIgnoreCase(name))
 			.findFirst()

@@ -367,7 +367,7 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void getGidsByListId() {
+	public void testGetGidsByListId() {
 		final Germplasm germplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 		final GermplasmListData germplasmListData = this.createTestListWithListData(germplasm);
 
