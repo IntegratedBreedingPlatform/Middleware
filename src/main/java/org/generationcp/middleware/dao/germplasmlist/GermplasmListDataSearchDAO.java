@@ -374,6 +374,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		selectClause.add(this.addSelectExpression(scalars, "listData.lrecid", LIST_DATA_ID_ALIAS));
 		selectClause.add(this.addSelectExpression(scalars, "listData.entryid", GermplasmListStaticColumns.ENTRY_NO.name()));
 		selectClause.add(this.addSelectExpression(scalars, "g.gid", GermplasmListStaticColumns.GID.name()));
+		selectClause.add(this.addSelectExpression(scalars, "g.mgid", GermplasmListStaticColumns.GROUP_ID.name()));
 		selectClause.add(this.addSelectExpression(scalars, "g.germplsm_uuid", GermplasmListStaticColumns.GUID.name()));
 		selectClause
 			.add(this.addSelectExpression(scalars, "CAST(g.gdate as CHAR)", GermplasmListStaticColumns.GERMPLASM_DATE.name()));
