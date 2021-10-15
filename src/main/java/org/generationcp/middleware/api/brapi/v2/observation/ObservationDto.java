@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.brapi.v2.observation;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import liquibase.util.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.pojomatic.Pojomatic;
@@ -157,18 +158,22 @@ public class ObservationDto {
 
 	@JsonIgnore
 	public void setSeasonName(final String seasonName) {
-		if(this.season == null) {
-			this.season = new SeasonDto();
+		if(StringUtils.isNotEmpty(seasonName)) {
+			if (this.season == null) {
+				this.season = new SeasonDto();
+			}
+			this.season.setSeason(seasonName);
 		}
-		this.season.setSeason(seasonName);
 	}
 
 	@JsonIgnore
 	public void setSeasonDbId(final String seasonDbId) {
-		if(this.season == null) {
-			this.season = new SeasonDto();
+		if(StringUtils.isNotEmpty(seasonDbId)) {
+			if (this.season == null) {
+				this.season = new SeasonDto();
+			}
+			this.season.setSeasonDbId(seasonDbId);
 		}
-		this.season.setSeasonDbId(seasonDbId);
 	}
 
 	@Override
