@@ -187,7 +187,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 				.sorted(Comparator.comparing(staticId -> GermplasmListStaticColumns.getByTermId(staticId).getRank()))
 				.map(id -> {
 					final GermplasmListStaticColumns staticColumn = GermplasmListStaticColumns.getByTermId(id);
-					return this.buildColumn(staticColumn.getTermId(), staticColumn.getName(), staticColumn.name(),
+					return new GermplasmListMeasurementVariableDTO(staticColumn.getTermId(), staticColumn.getName(), staticColumn.name(),
 						GermplasmListColumnCategory.STATIC);
 				})
 				.collect(Collectors.toList());
@@ -204,8 +204,8 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			final List<GermplasmListMeasurementVariableDTO> nameColumns = nameTypes
 				.stream()
 				.sorted(Comparator.comparing(UserDefinedField::getFcode))
-				.map(nameType -> this
-					.buildColumn(nameType.getFldno(), nameType.getFname(), nameType.getFcode(), GermplasmListColumnCategory.NAMES))
+				.map(nameType -> new GermplasmListMeasurementVariableDTO(nameType.getFldno(), nameType.getFname(), nameType.getFcode(),
+					GermplasmListColumnCategory.NAMES))
 				.collect(Collectors.toList());
 			header.addAll(nameColumns);
 		}
@@ -223,7 +223,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	}
 
 	@Override
-	public void saveGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view) {
+	public void updateGermplasmListDataView(final Integer listId, final List<GermplasmListDataUpdateViewDTO> view) {
 		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
 		final List<GermplasmListDataView> entryDetailColumns = germplasmList.getView()
 			.stream()
@@ -335,7 +335,8 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	private List<GermplasmListMeasurementVariableDTO> transformDefaultStaticColumns() {
 		return this.getDefaultColumns()
 			.stream()
-			.map(column -> this.buildColumn(column.getTermId(), column.getName(), column.name(), GermplasmListColumnCategory.STATIC))
+			.map(column -> new GermplasmListMeasurementVariableDTO(column.getTermId(), column.getName(), column.name(),
+				GermplasmListColumnCategory.STATIC))
 			.collect(Collectors.toList());
 	}
 
@@ -385,7 +386,8 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 						variableType = variable.getVariableTypes().iterator().next();
 					}
 					final GermplasmListMeasurementVariableDTO measurementVariableDTO =
-						this.buildColumn(variable.getId(), variable.getName(), variable.getAlias(), GermplasmListColumnCategory.VARIABLE,
+						new GermplasmListMeasurementVariableDTO(variable.getId(), variable.getName(), variable.getAlias(),
+							GermplasmListColumnCategory.VARIABLE,
 							variable.getScale().getDataType().getId(), categoricalVariablesMap.get(variable.getId()));
 					if (variableType == VariableType.GERMPLASM_ATTRIBUTE || variableType == VariableType.GERMPLASM_PASSPORT) {
 						descriptorColumns.add(measurementVariableDTO);
@@ -396,24 +398,6 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			return Stream.concat(descriptorColumns.stream(), entryDetailsColumns.stream()).collect(Collectors.toList());
 		}
 		return new ArrayList<>();
-	}
-
-	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
-		final GermplasmListColumnCategory category) {
-		return this.buildColumn(termId, name, alias, category, null, null);
-	}
-
-	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
-		final GermplasmListColumnCategory category, final Integer datatypeId, final List<ValueReference> possibleValues) {
-
-		final GermplasmListMeasurementVariableDTO column = new GermplasmListMeasurementVariableDTO();
-		column.setTermId(termId);
-		column.setName(name);
-		column.setAlias(alias);
-		column.setColumnCategory(category);
-		column.setDataTypeId(datatypeId);
-		column.setPossibleValues(possibleValues);
-		return column;
 	}
 
 	private Comparator<Variable> getVariableComparator() {

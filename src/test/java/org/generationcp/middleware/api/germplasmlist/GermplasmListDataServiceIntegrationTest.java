@@ -33,7 +33,7 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 	}
 
 	@Test
-	public void testSaveGermplasmListDataView_createAndUpdateView_OK() {
+	public void testUpdateGermplasmListDataView_createAndUpdateView_OK() {
 
 		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List ",
 			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, GermplasmList.Status.LIST.getCode());
@@ -43,7 +43,7 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.ENTRY_NO.getTermId(), GermplasmListColumnCategory.STATIC),
 			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.GID.getTermId(), GermplasmListColumnCategory.STATIC));
 
-		this.germplasmListDataService.saveGermplasmListDataView(germplasmList.getId(), newView);
+		this.germplasmListDataService.updateGermplasmListDataView(germplasmList.getId(), newView);
 
 		final List<GermplasmListDataView> currentNewView = this.daoFactory.getGermplasmListDataViewDAO().getByListId(germplasmList.getId());
 		assertThat(currentNewView, hasSize(2));
@@ -56,7 +56,7 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.DESIGNATION.getTermId(), GermplasmListColumnCategory.STATIC),
 			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.GERMPLASM_REFERENCE.getTermId(), GermplasmListColumnCategory.STATIC));
 
-		this.germplasmListDataService.saveGermplasmListDataView(germplasmList.getId(), updatedView);
+		this.germplasmListDataService.updateGermplasmListDataView(germplasmList.getId(), updatedView);
 
 		final List<GermplasmListDataView> currentUpdatedView = this.daoFactory.getGermplasmListDataViewDAO().getByListId(germplasmList.getId());
 		assertThat(currentUpdatedView, hasSize(3));

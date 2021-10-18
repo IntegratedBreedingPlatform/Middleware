@@ -67,4 +67,34 @@
 		</sql>
 	</changeSet>
 
+		<changeSet author="cuenyad" id="v19.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+                	SELECT count(*) FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS'
+            	</sqlCheck>
+				<sqlCheck expectedResult="0">
+                	SELECT count(*) FROM permission WHERE name = 'IMPORT_GERMPLASM_LISTS'
+            	</sqlCheck>
+			</and>
+        </preConditions>
+		<comment>
+			Add Import Germplasm Lists permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
+			SET @workbench_sidebar_category_link_id =  (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'manage_germplasm_lists');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`, `workbench_sidebar_category_link_id`)
+			VALUES ('IMPORT_GERMPLASM_LISTS', 'Import Germplasm Lists', @permission_id, @workbench_sidebar_category_link_id);
+
+			SET @import_germplasm_lists_permission_id = (SELECT permission_id FROM permission where name = 'IMPORT_GERMPLASM_LISTS');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @import_germplasm_lists_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @import_germplasm_lists_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @import_germplasm_lists_permission_id, '1');
+
+		</sql>
+	</changeSet>
 </databaseChangeLog>
