@@ -8,17 +8,17 @@ import java.util.List;
 @AutoProperty
 public class GermplasmMergeRequestDto {
 
-	private int targetGermplasmId;
+	private Integer targetGermplasmId;
 
 	private List<NonSelectedGermplasm> nonSelectedGermplasmList;
 
 	private MergeOptions mergeOptions;
 
-	public int getTargetGermplasmId() {
+	public Integer getTargetGermplasmId() {
 		return this.targetGermplasmId;
 	}
 
-	public void setTargetGermplasmId(final int targetGermplasmId) {
+	public void setTargetGermplasmId(final Integer targetGermplasmId) {
 		this.targetGermplasmId = targetGermplasmId;
 	}
 
@@ -59,20 +59,17 @@ public class GermplasmMergeRequestDto {
 
 		private Integer germplasmId;
 
-		private boolean migrateLots;
+		private Boolean migrateLots;
 
-		private boolean closeLots;
-
-		private boolean omit;
+		private Boolean omit = false;
 
 		public NonSelectedGermplasm() {
 
 		}
 
-		public NonSelectedGermplasm(final Integer germplasmId, final boolean migrateLots, final boolean closeLots, final boolean omit) {
+		public NonSelectedGermplasm(final Integer germplasmId, final Boolean migrateLots, final Boolean omit) {
 			this.germplasmId = germplasmId;
 			this.migrateLots = migrateLots;
-			this.closeLots = closeLots;
 			this.omit = omit;
 		}
 
@@ -84,20 +81,12 @@ public class GermplasmMergeRequestDto {
 			this.germplasmId = germplasmId;
 		}
 
-		public boolean isMigrateLots() {
+		public Boolean isMigrateLots() {
 			return this.migrateLots;
 		}
 
-		public void setMigrateLots(final boolean migrateLots) {
+		public void setMigrateLots(final Boolean migrateLots) {
 			this.migrateLots = migrateLots;
-		}
-
-		public boolean isCloseLots() {
-			return this.closeLots;
-		}
-
-		public void setCloseLots(final boolean closeLots) {
-			this.closeLots = closeLots;
 		}
 
 		public boolean isOmit() {
@@ -128,11 +117,11 @@ public class GermplasmMergeRequestDto {
 	@AutoProperty
 	public static class MergeOptions {
 
-		private boolean migratePassportData;
+		private boolean migratePassportData = false;
 
-		private boolean migrateAttributesData;
+		private boolean migrateAttributesData = false;
 
-		private boolean migrateNameTypes;
+		private boolean migrateNameTypes = false;
 
 		public boolean isMigratePassportData() {
 			return this.migratePassportData;
