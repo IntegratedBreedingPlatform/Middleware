@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearch
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -114,6 +115,10 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		this.germplasm.setGid(null);
 		GermplasmGuidGenerator.generateGermplasmGuids(this.crop, Collections.singletonList(this.germplasm));
 		this.daoFactory.getGermplasmDao().save(this.germplasm);
+
+		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid());
+		germplasmName.setTypeId(2);
+		this.daoFactory.getNameDao().save(germplasmName);
 
 		final ObservationUnitImportRequestDto observationUnitImportRequestDto = new ObservationUnitImportRequestDto();
 		observationUnitImportRequestDto.setTrialDbId(this.studySummary.getTrialDbId().toString());
@@ -212,7 +217,8 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		externalReferenceDTO.setReferenceSource(REF_SOURCE);
 		observationDto.setExternalReferences(Collections.singletonList(externalReferenceDTO));
 		observationDto.setValue(value);
-		final List<ObservationDto> observationDtos = this.createObservationDtos();
+		final List<ObservationDto> observationDtos = this.observationServiceBrapi
+				.createObservations(Collections.singletonList(observationDto));
 
 		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
 		observationSearchRequestDto.setObservationDbIds(
@@ -220,7 +226,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		final ObservationDto resultObservationDto = this.observationServiceBrapi
 			.searchObservations(observationSearchRequestDto, null).get(0);
 		Assert.assertEquals(value, resultObservationDto.getValue());
-		Assert.assertEquals(observationDtos.get(0).getObservationDbId().toString(), resultObservationDto.getObservationDbId());
+		Assert.assertEquals(observationDtos.get(0).getObservationDbId(), resultObservationDto.getObservationDbId());
 		Assert.assertEquals(this.observationUnitDbId, resultObservationDto.getObservationUnitDbId());
 		Assert.assertEquals(categoricalVariableDto.getObservationVariableDbId(), resultObservationDto.getObservationVariableDbId());
 		Assert.assertEquals(this.germplasm.getGermplasmUUID(), resultObservationDto.getGermplasmDbId());

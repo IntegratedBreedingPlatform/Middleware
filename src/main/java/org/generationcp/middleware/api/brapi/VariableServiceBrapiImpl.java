@@ -93,19 +93,20 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	public VariableDTO updateObservationVariable(final VariableDTO variable) {
 		final Integer variableId = Integer.valueOf(variable.getObservationVariableDbId());
 		final boolean isVariableUsedInStudy = this.ontologyVariableDataManager.areVariablesUsedInStudy(Arrays.asList(variableId));
-		this.updateVariable(variable, isVariableUsedInStudy);
+		if(!isVariableUsedInStudy) {
+			this.updateVariable(variable);
+			this.updateScaleMetaData(variable);
+		}
 
 		// Update property
-		this.updateCVTerm(Integer.valueOf(variable.getTrait().getTraitDbId()),
-			isVariableUsedInStudy ? variable.getTrait().getTraitName() : StringUtils.EMPTY, variable.getTrait().getTraitDescription());
+		this.updateCVTerm(Integer.valueOf(variable.getTrait().getTraitDbId()), variable.getTrait().getTraitName(),
+				variable.getTrait().getTraitDescription(), isVariableUsedInStudy);
 		// Update method
-		this.updateCVTerm(Integer.valueOf(variable.getMethod().getMethodDbId()),
-			isVariableUsedInStudy ? variable.getMethod().getMethodName() : StringUtils.EMPTY, variable.getTrait().getDescription());
+		this.updateCVTerm(Integer.valueOf(variable.getMethod().getMethodDbId()), variable.getMethod().getMethodName(),
+				variable.getMethod().getDescription(), isVariableUsedInStudy);
 		// Update scale
-		this.updateCVTerm(Integer.valueOf(variable.getScale().getScaleDbId()),
-			isVariableUsedInStudy ? variable.getScale().getScaleName() : StringUtils.EMPTY, StringUtils.EMPTY);
-
-		this.updateScaleMetaData(variable, isVariableUsedInStudy);
+		this.updateCVTerm(Integer.valueOf(variable.getScale().getScaleDbId()), variable.getScale().getScaleName(),
+				StringUtils.EMPTY, isVariableUsedInStudy);
 
 		// Assign variable to studies
 		if (!CollectionUtils.isEmpty(variable.getStudyDbIds())) {
@@ -118,16 +119,14 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 		return variable;
 	}
 
-	private void updateVariable(final VariableDTO variable, final boolean isVariableUsedInStudy) {
+	private void updateVariable(final VariableDTO variable) {
 		final Integer variableId = Integer.valueOf(variable.getObservationVariableDbId());
 		final CVTerm variableTerm = this.daoFactory.getCvTermDao().getById(variableId);
-		if (!isVariableUsedInStudy) {
-			// Updating of name, property, scale and method relationship is only applicable
-			// if the variable is not used in study.
-			variableTerm.setName(variable.getObservationVariableName());
-			this.updatePropertyMethodScaleRelation(variable);
-			this.daoFactory.getCvTermDao().update(variableTerm);
-		}
+
+		// Updating of name, property, scale and method relationship is only applicable
+		variableTerm.setName(variable.getObservationVariableName());
+		this.updatePropertyMethodScaleRelation(variable);
+		this.daoFactory.getCvTermDao().update(variableTerm);
 	}
 
 	private void updatePropertyMethodScaleRelation(final VariableDTO variable) {
@@ -158,9 +157,10 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 		this.daoFactory.getCvTermRelationshipDao().update(cvTermRelationship);
 	}
 
-	private void updateCVTerm(final int cvtermId, final String name, final String definition) {
+	private void updateCVTerm(final int cvtermId, final String name, final String definition,
+		final boolean isVariableUsedInStudy) {
 		final CVTerm cvTerm = this.daoFactory.getCvTermDao().getById(cvtermId);
-		if (StringUtils.isNotEmpty(name)) {
+		if (!isVariableUsedInStudy && StringUtils.isNotEmpty(name)) {
 			cvTerm.setName(name);
 		}
 		if (StringUtils.isNotEmpty(definition)) {
@@ -169,42 +169,38 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 		this.daoFactory.getCvTermDao().update(cvTerm);
 	}
 
-	private void updateScaleMetaData(final VariableDTO variable, final boolean isVariableUsedInStudy) {
+	private void updateScaleMetaData(final VariableDTO variable) {
 		final Integer scaleId = Integer.valueOf(variable.getScale().getScaleDbId());
-		// Only update the categorical values and min, max if variable is not used in study
-		if (!isVariableUsedInStudy) {
-			// Updating categories, min, max is only applicable
-			// if the variable is not used in study.
-			final List<CVTermRelationship> relationships = this.daoFactory.getCvTermRelationshipDao().getBySubject(scaleId);
-			final Optional<CVTermRelationship>
-				dataTypeRelationship = relationships.stream().filter(r -> r.getTypeId() == TermId.HAS_TYPE.getId()).findAny();
-			final DataType dataType = dataTypeRelationship.isPresent() ? DataType.getById(dataTypeRelationship.get().getObjectId()) : null;
+		// Updating categories, min, max is only applicable
+		final List<CVTermRelationship> relationships = this.daoFactory.getCvTermRelationshipDao().getBySubject(scaleId);
+		final Optional<CVTermRelationship>
+			dataTypeRelationship = relationships.stream().filter(r -> r.getTypeId() == TermId.HAS_TYPE.getId()).findAny();
+		final DataType dataType = dataTypeRelationship.isPresent() ? DataType.getById(dataTypeRelationship.get().getObjectId()) : null;
 
-			// Update valid values if datatype is categorical, this only updates the label
-			if (dataType == DataType.CATEGORICAL_VARIABLE) {
-				final List<Integer> valueIds =
-					relationships.stream().filter(r -> r.getTypeId() == TermId.HAS_VALUE.getId()).map(CVTermRelationship::getObjectId)
-						.collect(Collectors.toList());
-				final Map<String, CVTerm> categoricalValuesMap = this.daoFactory.getCvTermDao().getByIds(valueIds).stream()
-					.collect(Collectors.toMap(CVTerm::getName, Function.identity()));
+		// Update valid values if datatype is categorical, this only updates the label
+		if (dataType == DataType.CATEGORICAL_VARIABLE) {
+			final List<Integer> valueIds =
+				relationships.stream().filter(r -> r.getTypeId() == TermId.HAS_VALUE.getId()).map(CVTermRelationship::getObjectId)
+					.collect(Collectors.toList());
+			final Map<String, CVTerm> categoricalValuesMap = this.daoFactory.getCvTermDao().getByIds(valueIds).stream()
+				.collect(Collectors.toMap(CVTerm::getName, Function.identity()));
 
-				for (final ScaleCategoryDTO scaleCategoryDTO : variable.getScale().getValidValues().getCategories()) {
-					if (categoricalValuesMap.containsKey(scaleCategoryDTO.getValue())) {
-						final CVTerm categoricalValueTerm = categoricalValuesMap.get(scaleCategoryDTO.getValue());
-						categoricalValueTerm.setDefinition(scaleCategoryDTO.getLabel());
-						this.daoFactory.getCvTermDao().update(categoricalValueTerm);
-					}
+			for (final ScaleCategoryDTO scaleCategoryDTO : variable.getScale().getValidValues().getCategories()) {
+				if (categoricalValuesMap.containsKey(scaleCategoryDTO.getValue())) {
+					final CVTerm categoricalValueTerm = categoricalValuesMap.get(scaleCategoryDTO.getValue());
+					categoricalValueTerm.setDefinition(scaleCategoryDTO.getLabel());
+					this.daoFactory.getCvTermDao().update(categoricalValueTerm);
 				}
 			}
-			// Update min and max if datatype is numerical
-			if (dataType == DataType.NUMERIC_VARIABLE) {
-				final int maxTermId = TermId.MAX_VALUE.getId();
-				final int minTermId = TermId.MIN_VALUE.getId();
-				final Integer minScale = variable.getScale().getValidValues().getMin();
-				final Integer maxScale = variable.getScale().getValidValues().getMax();
-				this.updateScaleMinMax(scaleId, minScale, minTermId);
-				this.updateScaleMinMax(scaleId, maxScale, maxTermId);
-			}
+		}
+		// Update min and max if datatype is numerical
+		if (dataType == DataType.NUMERIC_VARIABLE) {
+			final int maxTermId = TermId.MAX_VALUE.getId();
+			final int minTermId = TermId.MIN_VALUE.getId();
+			final Integer minScale = variable.getScale().getValidValues().getMin();
+			final Integer maxScale = variable.getScale().getValidValues().getMax();
+			this.updateScaleMinMax(scaleId, minScale, minTermId);
+			this.updateScaleMinMax(scaleId, maxScale, maxTermId);
 		}
 
 	}

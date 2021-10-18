@@ -122,8 +122,6 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		final List<VariableDTO> variableDTOS = this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
 		Assert.assertEquals(1, variableDTOS.size());
 		final VariableDTO dto = variableDTOS.get(0);
-		Assert.assertEquals(cropName, dto.getCrop());
-		Assert.assertEquals(cropName, dto.getCommonCropName());
 		Assert.assertEquals(categoricalVariable.getCvTermId().toString(), dto.getObservationVariableDbId());
 		Assert.assertEquals(categoricalVariable.getCvTermId().toString(), dto.getOntologyDbId());
 		Assert.assertEquals(vo.getAlias(), dto.getObservationVariableName());
@@ -317,6 +315,9 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 
 		final CVTerm variable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.TRAIT);
 		final CVTerm newScale = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+				.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), newScale.getCvTermId(), DataType.NUMERIC_VARIABLE
+						.getId()));
 		final CVTerm newProperty = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.PROPERTIES.getId());
 		final CVTerm newMethod = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.METHODS.getId());
 
