@@ -1596,7 +1596,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private void addGermplasmMatchesFilter(final SqlQueryParamBuilder sqlQueryParamBuilder,
 		final GermplasmMatchRequestDto germplasmMatchRequestDto) {
-		sqlQueryParamBuilder.append(" where g.deleted = 0 ");
+		sqlQueryParamBuilder.append(" where g.deleted = 0 AND g.grplce = 0");
 		sqlQueryParamBuilder.append(" and ( ");
 
 		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs())) {
