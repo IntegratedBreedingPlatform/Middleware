@@ -109,9 +109,10 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 		// Assign variable to studies
 		if (!CollectionUtils.isEmpty(variable.getStudyDbIds())) {
+			final List<Integer> plotDatasetIds = new ArrayList<>();
 			for (final String studyDbId : variable.getStudyDbIds()) {
 				this.addObservationVariableToStudy(Integer.valueOf(studyDbId), Integer.valueOf(variable.getObservationVariableDbId()),
-					variable.getObservationVariableName());
+					variable.getObservationVariableName(), plotDatasetIds);
 			}
 		}
 		return variable;
@@ -141,33 +142,20 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 			relationships.stream().filter(r -> Objects.equals(r.getTypeId(), TermRelationshipId.HAS_SCALE.getId())).findAny();
 
 		if (propertyRelation.isPresent()) {
-			final CVTermRelationship cvTermRelationship = propertyRelation.get();
-			cvTermRelationship.setObjectId(Integer.valueOf(variable.getTrait().getTraitDbId()));
-			this.daoFactory.getCvTermRelationshipDao().update(cvTermRelationship);
+			this.updateVariableRelationship(propertyRelation.get(), variable.getTrait().getTraitDbId());
 		}
 		if (methodRelation.isPresent()) {
-			final CVTermRelationship cvTermRelationship = methodRelation.get();
-			cvTermRelationship.setObjectId(Integer.valueOf(variable.getMethod().getMethodDbId()));
-			this.daoFactory.getCvTermRelationshipDao().update(cvTermRelationship);
+			this.updateVariableRelationship(methodRelation.get(), variable.getMethod().getMethodDbId());
 		}
 		if (scaleRelation.isPresent()) {
-			final CVTermRelationship cvTermRelationship = scaleRelation.get();
-
-			final List<CVTermRelationship> dataTypeRelationship = this.daoFactory.getCvTermRelationshipDao()
-				.getBySubjectIdAndTypeId(cvTermRelationship.getObjectId(), TermId.HAS_TYPE.getId());
-
-			// Update Datatype
-			if (!CollectionUtils.isEmpty(dataTypeRelationship) && StringUtils.isNotEmpty(variable.getScale().getDataType())) {
-				final CVTermRelationship dataTypeRelationShip = dataTypeRelationship.get(0);
-				dataTypeRelationShip.setSubjectId(Integer.valueOf(variable.getScale().getScaleDbId()));
-				this.daoFactory.getCvTermRelationshipDao().update(dataTypeRelationShip);
-			}
-
-			cvTermRelationship.setObjectId(Integer.valueOf(variable.getScale().getScaleDbId()));
-			this.daoFactory.getCvTermRelationshipDao().update(cvTermRelationship);
-
+			this.updateVariableRelationship(scaleRelation.get(), variable.getScale().getScaleDbId());
 		}
 
+	}
+
+	private void updateVariableRelationship(final CVTermRelationship cvTermRelationship, final String objectId) {
+		cvTermRelationship.setObjectId(Integer.valueOf(objectId));
+		this.daoFactory.getCvTermRelationshipDao().update(cvTermRelationship);
 	}
 
 	private void updateCVTerm(final int cvtermId, final String name, final String definition) {
@@ -233,14 +221,17 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	}
 
 	private void addObservationVariableToStudy(final Integer studyDbId, final Integer observationVariableDbId,
-		final String observationVariableName) {
+		final String observationVariableName, final List<Integer> plotDatasetIds) {
 		final Integer plotDatasetId =
-			this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
-		final List<MeasurementVariable> studyMeasurementVariables =
-			this.datasetService.getObservationSetVariables(plotDatasetId, Arrays.asList(VariableType.TRAIT.getId()));
-		// Check first if the variable already exists in study
-		if (studyMeasurementVariables.stream().noneMatch(o -> o.getTermId() == observationVariableDbId)) {
-			this.datasetService.addDatasetVariable(plotDatasetId, observationVariableDbId, VariableType.TRAIT, observationVariableName);
+				this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		if(!plotDatasetIds.contains(plotDatasetId)) {
+			final List<MeasurementVariable> studyMeasurementVariables =
+					this.datasetService.getObservationSetVariables(plotDatasetId, Arrays.asList(VariableType.TRAIT.getId()));
+			// Check first if the variable already exists in study
+			if (studyMeasurementVariables.stream().noneMatch(o -> o.getTermId() == observationVariableDbId)) {
+				this.datasetService.addDatasetVariable(plotDatasetId, observationVariableDbId, VariableType.TRAIT, observationVariableName);
+			}
+			plotDatasetIds.add(plotDatasetId);
 		}
 	}
 }
