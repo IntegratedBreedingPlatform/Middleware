@@ -387,7 +387,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 					}
 					final GermplasmListMeasurementVariableDTO measurementVariableDTO =
 						new GermplasmListMeasurementVariableDTO(variable.getId(), variable.getName(), variable.getAlias(),
-							GermplasmListColumnCategory.VARIABLE,
+							GermplasmListColumnCategory.VARIABLE, variableType,
 							variable.getScale().getDataType().getId(), categoricalVariablesMap.get(variable.getId()));
 					if (variableType == VariableType.GERMPLASM_ATTRIBUTE || variableType == VariableType.GERMPLASM_PASSPORT) {
 						descriptorColumns.add(measurementVariableDTO);
