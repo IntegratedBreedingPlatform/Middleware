@@ -35,7 +35,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -182,13 +181,6 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		final VariableDTO variableDTO = variableDTOS.get(0);
 
 		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getTrait().setTraitName(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getTrait().setTraitDescription(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getMethod().setMethodName(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getMethod().setDescription(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getScale().setScaleName(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getScale().getValidValues().setMin(1000);
-		variableDTO.getScale().getValidValues().setMax(2000);
 		this.variableServiceBrapi.updateObservationVariable(variableDTO);
 		this.sessionProvder.getSession().flush();
 
@@ -198,14 +190,6 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		final VariableDTO retrievedVariable = retrievedVariables.get(0);
 		Assert.assertEquals(variableDTO.getObservationVariableDbId(), retrievedVariable.getObservationVariableDbId());
 		Assert.assertEquals(variableDTO.getObservationVariableName(), retrievedVariable.getObservationVariableName());
-		Assert.assertEquals(variableDTO.getTrait().getTraitName(), retrievedVariable.getTrait().getTraitName());
-		Assert.assertEquals(variableDTO.getTrait().getTraitDescription(), retrievedVariable.getTrait().getTraitDescription());
-		Assert.assertEquals(variableDTO.getMethod().getMethodName(), retrievedVariable.getMethod().getMethodName());
-		Assert.assertEquals(variableDTO.getMethod().getDescription(), retrievedVariable.getMethod().getDescription());
-		Assert.assertEquals(variableDTO.getScale().getScaleName(), retrievedVariable.getScale().getScaleName());
-		Assert.assertEquals(variableDTO.getScale().getValidValues().getMin(), retrievedVariable.getScale().getValidValues().getMin());
-		Assert.assertEquals(variableDTO.getScale().getValidValues().getMax(), retrievedVariable.getScale().getValidValues().getMax());
-
 	}
 
 	@Test
@@ -255,13 +239,6 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 
 		// Try to update the fields
 		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getTrait().setTraitName(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getTrait().setTraitDescription(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getMethod().setMethodName(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getMethod().setDescription(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getScale().setScaleName(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getScale().getValidValues().setMin(1000);
-		variableDTO.getScale().getValidValues().setMax(2000);
 		this.variableServiceBrapi.updateObservationVariable(variableDTO);
 		this.sessionProvder.getSession().flush();
 
@@ -272,42 +249,6 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(variable.getCvTermId().toString(), retrievedVariable.getObservationVariableDbId());
 		Assert.assertEquals(variable.getName(), retrievedVariable.getObservationVariableName());
 		Assert.assertEquals(property.getName(), retrievedVariable.getTrait().getTraitName());
-		Assert.assertEquals(variableDTO.getTrait().getTraitDescription(), retrievedVariable.getTrait().getTraitDescription());
-		Assert.assertEquals(method.getName(), retrievedVariable.getMethod().getMethodName());
-		Assert.assertEquals(method.getDefinition(), retrievedVariable.getMethod().getDescription());
-		Assert.assertEquals(scale.getName(), retrievedVariable.getScale().getScaleName());
-		Assert.assertNull(retrievedVariable.getScale().getValidValues().getMin());
-		Assert.assertNull(retrievedVariable.getScale().getValidValues().getMax());
-	}
-
-	@Test
-	public void testUpdateObservationVariable_UpdateCategories() {
-
-		final CVTerm variable =
-			this.testDataInitializer.createCategoricalVariable(VariableType.TRAIT, Arrays.asList("Categ1", "Categ2", "Categ3"));
-		final VariableSearchRequestDTO searchRequestDTO = new VariableSearchRequestDTO();
-		searchRequestDTO.setObservationVariableDbIds(Collections.singletonList(variable.getCvTermId().toString()));
-		final List<VariableDTO> variableDTOS =
-			this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
-		final VariableDTO variableDTO = variableDTOS.get(0);
-
-		variableDTO.getScale().getValidValues().getCategories().get(0).setLabel(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getScale().getValidValues().getCategories().get(1).setLabel(RandomStringUtils.randomAlphabetic(10));
-		variableDTO.getScale().getValidValues().getCategories().get(2).setLabel(RandomStringUtils.randomAlphabetic(10));
-		this.variableServiceBrapi.updateObservationVariable(variableDTO);
-		this.sessionProvder.getSession().flush();
-
-		final List<VariableDTO> retrievedVariables =
-			this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
-		Assert.assertEquals(1, retrievedVariables.size());
-		final VariableDTO retrievedVariable = retrievedVariables.get(0);
-		Assert.assertEquals(variableDTO.getScale().getValidValues().getCategories().get(0).getLabel(),
-			retrievedVariable.getScale().getValidValues().getCategories().get(0).getLabel());
-		Assert.assertEquals(variableDTO.getScale().getValidValues().getCategories().get(1).getLabel(),
-			retrievedVariable.getScale().getValidValues().getCategories().get(1).getLabel());
-		Assert.assertEquals(variableDTO.getScale().getValidValues().getCategories().get(2).getLabel(),
-			retrievedVariable.getScale().getValidValues().getCategories().get(2).getLabel());
-
 	}
 
 	@Test
@@ -329,13 +270,8 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 
 		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(10));
 		variableDTO.getTrait().setTraitDbId(newProperty.getCvTermId().toString());
-		variableDTO.getTrait().setTraitName(newProperty.getName());
-		variableDTO.getTrait().setTraitDescription(newProperty.getDefinition());
 		variableDTO.getMethod().setMethodDbId(newMethod.getCvTermId().toString());
-		variableDTO.getMethod().setMethodName(newMethod.getName());
-		variableDTO.getMethod().setDescription(newMethod.getDefinition());
 		variableDTO.getScale().setScaleDbId(newScale.getCvTermId().toString());
-		variableDTO.getScale().setScaleName(newScale.getName());
 		this.variableServiceBrapi.updateObservationVariable(variableDTO);
 		this.sessionProvder.getSession().flush();
 
@@ -345,11 +281,11 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		final VariableDTO retrievedVariable = retrievedVariables.get(0);
 		Assert.assertEquals(variableDTO.getObservationVariableDbId(), retrievedVariable.getObservationVariableDbId());
 		Assert.assertEquals(variableDTO.getObservationVariableName(), retrievedVariable.getObservationVariableName());
-		Assert.assertEquals(variableDTO.getTrait().getTraitName(), retrievedVariable.getTrait().getTraitName());
-		Assert.assertEquals(variableDTO.getTrait().getTraitDescription(), retrievedVariable.getTrait().getTraitDescription());
-		Assert.assertEquals(variableDTO.getMethod().getMethodName(), retrievedVariable.getMethod().getMethodName());
-		Assert.assertEquals(variableDTO.getMethod().getDescription(), retrievedVariable.getMethod().getDescription());
-		Assert.assertEquals(variableDTO.getScale().getScaleName(), retrievedVariable.getScale().getScaleName());
+		Assert.assertEquals(newProperty.getName(), retrievedVariable.getTrait().getTraitName());
+		Assert.assertEquals(newProperty.getDefinition(), retrievedVariable.getTrait().getTraitDescription());
+		Assert.assertEquals(newMethod.getName(), retrievedVariable.getMethod().getMethodName());
+		Assert.assertEquals(newMethod.getDefinition(), retrievedVariable.getMethod().getDescription());
+		Assert.assertEquals(newScale.getName(), retrievedVariable.getScale().getScaleName());
 
 	}
 
