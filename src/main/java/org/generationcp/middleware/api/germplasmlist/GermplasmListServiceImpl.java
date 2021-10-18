@@ -10,7 +10,6 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
-import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -26,7 +25,6 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
@@ -559,25 +557,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public long countObservationsByVariables(final Integer listId, final List<Integer> variableIds) {
 		return this.daoFactory.getGermplasmListDataDetailDAO().countObservationsByListAndVariables(listId, variableIds);
-	}
-
-	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
-		final GermplasmListColumnCategory category) {
-		return this.buildColumn(termId, name, alias, category, null, null, null);
-	}
-
-	private GermplasmListMeasurementVariableDTO buildColumn(final int termId, final String name, final String alias,
-		final GermplasmListColumnCategory category, final VariableType variableType, final Integer datatypeId,
-		final List<ValueReference> possibleValues) {
-		final GermplasmListMeasurementVariableDTO column = new GermplasmListMeasurementVariableDTO();
-		column.setTermId(termId);
-		column.setName(name);
-		column.setAlias(alias);
-		column.setColumnCategory(category);
-		column.setVariableType(variableType);
-		column.setDataTypeId(datatypeId);
-		column.setPossibleValues(possibleValues);
-		return column;
 	}
 
 	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {
