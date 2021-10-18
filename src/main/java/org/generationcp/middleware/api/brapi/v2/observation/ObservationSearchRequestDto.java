@@ -10,12 +10,12 @@ public class ObservationSearchRequestDto {
 
 	private List<Integer> observationDbIds;
 	private List<String> observationUnitDbIds;
-	private List<Integer> germplasmDbIds;
+	private List<String> germplasmDbIds;
 	private List<Integer> observationVariableDbIds;
 	private List<Integer> studyDbIds;
 	private List<Integer> locationDbIds;
 	private List<Integer> trialDbIds;
-	private List<Integer> programDbIds;
+	private List<String> programDbIds;
 	private String seasonDbId;
 	private String observationUnitLevelName;
 	private String observationUnitLevelOrder;
@@ -41,11 +41,11 @@ public class ObservationSearchRequestDto {
 		this.observationUnitDbIds = observationUnitDbIds;
 	}
 
-	public List<Integer> getGermplasmDbIds() {
+	public List<String> getGermplasmDbIds() {
 		return this.germplasmDbIds;
 	}
 
-	public void setGermplasmDbIds(final List<Integer> germplasmDbIds) {
+	public void setGermplasmDbIds(final List<String> germplasmDbIds) {
 		this.germplasmDbIds = germplasmDbIds;
 	}
 
@@ -81,11 +81,11 @@ public class ObservationSearchRequestDto {
 		this.trialDbIds = trialDbIds;
 	}
 
-	public List<Integer> getProgramDbIds() {
+	public List<String> getProgramDbIds() {
 		return this.programDbIds;
 	}
 
-	public void setProgramDbIds(final List<Integer> programDbIds) {
+	public void setProgramDbIds(final List<String> programDbIds) {
 		this.programDbIds = programDbIds;
 	}
 
