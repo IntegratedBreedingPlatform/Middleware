@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface VariableServiceBrapi {
 
-    List<VariableDTO> getObservationVariables(String crop, VariableSearchRequestDTO requestDTO, Pageable pageable);
+    List<VariableDTO> getObservationVariables(VariableSearchRequestDTO requestDTO, Pageable pageable);
 
     long countObservationVariables(VariableSearchRequestDTO requestDTO);
 

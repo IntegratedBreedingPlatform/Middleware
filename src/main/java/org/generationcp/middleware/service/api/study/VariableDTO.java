@@ -5,10 +5,9 @@ import com.fasterxml.jackson.annotation.JsonView;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.generationcp.middleware.util.serializer.CategorySerializer;
+import org.generationcp.middleware.util.serializer.ScaleCategorySerializer;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -555,8 +554,8 @@ public class VariableDTO {
 
 	public static class ValidValues {
 
-		@JsonSerialize(using = CategorySerializer.class)
-		private List<CategoryDTO> categories = new ArrayList<>();
+		@JsonSerialize(using = ScaleCategorySerializer.class)
+		private List<ScaleCategoryDTO> categories = new ArrayList<>();
 		private Integer max;
 		private Integer min;
 
@@ -579,11 +578,11 @@ public class VariableDTO {
 			this.min = min;
 		}
 
-		public List<CategoryDTO> getCategories() {
+		public List<ScaleCategoryDTO> getCategories() {
 			return this.categories;
 		}
 
-		public void setCategories(final List<CategoryDTO> categories) {
+		public void setCategories(final List<ScaleCategoryDTO> categories) {
 			this.categories = categories;
 		}
 	}

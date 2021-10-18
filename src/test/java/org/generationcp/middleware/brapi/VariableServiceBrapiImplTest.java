@@ -119,7 +119,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		final VariableSearchRequestDTO searchRequestDTO = new VariableSearchRequestDTO();
 		searchRequestDTO.setObservationVariableDbIds(Collections.singletonList(categoricalVariable.getCvTermId().toString()));
 		final String cropName = "MAIZE";
-		final List<VariableDTO> variableDTOS = this.variableServiceBrapi.getObservationVariables(cropName, searchRequestDTO, null);
+		final List<VariableDTO> variableDTOS = this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
 		Assert.assertEquals(1, variableDTOS.size());
 		final VariableDTO dto = variableDTOS.get(0);
 		Assert.assertEquals(cropName, dto.getCrop());
@@ -159,7 +159,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		final VariableSearchRequestDTO searchRequestDTO = new VariableSearchRequestDTO();
 		searchRequestDTO.setObservationVariableDbIds(Collections.singletonList(variable.getCvTermId().toString()));
 		final List<VariableDTO> variableDTOS =
-			this.variableServiceBrapi.getObservationVariables(this.cropType.getCropName(), searchRequestDTO, null);
+			this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
 		final VariableDTO variableDTO = variableDTOS.get(0);
 		variableDTO.setStudyDbIds(Collections.singletonList(savedInstance.getStudyDbId()));
 
@@ -168,7 +168,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 
 		searchRequestDTO.setStudyDbId(Collections.singletonList(savedInstance.getStudyDbId()));
 		final List<VariableDTO> retrievedVariableByStudyId =
-			this.variableServiceBrapi.getObservationVariables(this.cropType.getCropName(), searchRequestDTO, null);
+			this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
 		Assert.assertEquals(1, retrievedVariableByStudyId.size());
 		Assert.assertEquals(variableDTO.getObservationVariableDbId(), retrievedVariableByStudyId.get(0).getObservationVariableDbId());
 	}
@@ -180,7 +180,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		final VariableSearchRequestDTO searchRequestDTO = new VariableSearchRequestDTO();
 		searchRequestDTO.setObservationVariableDbIds(Collections.singletonList(variable.getCvTermId().toString()));
 		final List<VariableDTO> variableDTOS =
-			this.variableServiceBrapi.getObservationVariables(this.cropType.getCropName(), searchRequestDTO, null);
+			this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
 		final VariableDTO variableDTO = variableDTOS.get(0);
 
 		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(10));
@@ -195,7 +195,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final List<VariableDTO> retrievedVariables =
-			this.variableServiceBrapi.getObservationVariables(this.cropType.getCropName(), searchRequestDTO, null);
+			this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
 		Assert.assertEquals(1, retrievedVariables.size());
 		final VariableDTO retrievedVariable = retrievedVariables.get(0);
 		Assert.assertEquals(variableDTO.getObservationVariableDbId(), retrievedVariable.getObservationVariableDbId());
@@ -247,7 +247,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		final VariableSearchRequestDTO searchRequestDTO = new VariableSearchRequestDTO();
 		searchRequestDTO.setObservationVariableDbIds(Collections.singletonList(variable.getCvTermId().toString()));
 		final List<VariableDTO> variableDTOS =
-			this.variableServiceBrapi.getObservationVariables(this.cropType.getCropName(), searchRequestDTO, null);
+			this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
 		final VariableDTO variableDTO = variableDTOS.get(0);
 		variableDTO.setStudyDbIds(Collections.singletonList(savedInstance.getStudyDbId()));
 
@@ -268,7 +268,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final List<VariableDTO> retrievedVariables =
-			this.variableServiceBrapi.getObservationVariables(this.cropType.getCropName(), searchRequestDTO, null);
+			this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
 		Assert.assertEquals(1, retrievedVariables.size());
 		final VariableDTO retrievedVariable = retrievedVariables.get(0);
 		Assert.assertEquals(variable.getCvTermId().toString(), retrievedVariable.getObservationVariableDbId());
@@ -290,7 +290,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		final VariableSearchRequestDTO searchRequestDTO = new VariableSearchRequestDTO();
 		searchRequestDTO.setObservationVariableDbIds(Collections.singletonList(variable.getCvTermId().toString()));
 		final List<VariableDTO> variableDTOS =
-			this.variableServiceBrapi.getObservationVariables(this.cropType.getCropName(), searchRequestDTO, null);
+			this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
 		final VariableDTO variableDTO = variableDTOS.get(0);
 
 		variableDTO.getScale().getValidValues().getCategories().get(0).setLabel(RandomStringUtils.randomAlphabetic(10));
@@ -300,7 +300,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final List<VariableDTO> retrievedVariables =
-			this.variableServiceBrapi.getObservationVariables(this.cropType.getCropName(), searchRequestDTO, null);
+			this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
 		Assert.assertEquals(1, retrievedVariables.size());
 		final VariableDTO retrievedVariable = retrievedVariables.get(0);
 		Assert.assertEquals(variableDTO.getScale().getValidValues().getCategories().get(0).getLabel(),
@@ -323,7 +323,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		final VariableSearchRequestDTO searchRequestDTO = new VariableSearchRequestDTO();
 		searchRequestDTO.setObservationVariableDbIds(Collections.singletonList(variable.getCvTermId().toString()));
 		final List<VariableDTO> variableDTOS =
-			this.variableServiceBrapi.getObservationVariables(this.cropType.getCropName(), searchRequestDTO, null);
+			this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
 		final VariableDTO variableDTO = variableDTOS.get(0);
 
 		variableDTO.setObservationVariableName(RandomStringUtils.randomAlphabetic(10));
@@ -339,7 +339,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final List<VariableDTO> retrievedVariables =
-			this.variableServiceBrapi.getObservationVariables(this.cropType.getCropName(), searchRequestDTO, null);
+			this.variableServiceBrapi.getObservationVariables(searchRequestDTO, null);
 		Assert.assertEquals(1, retrievedVariables.size());
 		final VariableDTO retrievedVariable = retrievedVariables.get(0);
 		Assert.assertEquals(variableDTO.getObservationVariableDbId(), retrievedVariable.getObservationVariableDbId());

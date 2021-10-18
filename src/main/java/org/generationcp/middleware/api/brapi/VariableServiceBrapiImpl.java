@@ -16,7 +16,7 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
-import org.generationcp.middleware.service.api.study.CategoryDTO;
+import org.generationcp.middleware.service.api.study.ScaleCategoryDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
@@ -56,12 +56,13 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	}
 
 	@Override
-	public List<VariableDTO> getObservationVariables(final String crop, final VariableSearchRequestDTO requestDTO,
+	public List<VariableDTO> getObservationVariables(final VariableSearchRequestDTO requestDTO,
 		final Pageable pageable) {
 		final List<VariableDTO> variableDTOS = this.daoFactory.getCvTermDao().getObservationVariables(requestDTO, pageable);
 		if (!CollectionUtils.isEmpty(variableDTOS)) {
-			final List<Integer> variableIds = new ArrayList<>(variableDTOS.stream().map(v -> Integer.valueOf(v.getObservationVariableDbId()))
-				.collect(Collectors.toSet()));
+			final List<Integer> variableIds =
+				new ArrayList<>(variableDTOS.stream().map(v -> Integer.valueOf(v.getObservationVariableDbId()))
+					.collect(Collectors.toSet()));
 			variableIds.addAll(variableDTOS.stream().map(variableDTO -> Integer.valueOf(variableDTO.getTrait().getTraitDbId()))
 				.collect(Collectors.toSet()));
 			variableIds.addAll(variableDTOS.stream().map(variableDTO -> Integer.valueOf(variableDTO.getScale().getScaleDbId()))
@@ -74,8 +75,6 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 					.collect(groupingBy(
 						ExternalReferenceDTO::getEntityId));
 			for (final VariableDTO dto : variableDTOS) {
-				dto.setCommonCropName(crop);
-				dto.setCrop(crop);
 				dto.setExternalReferences(externalReferencesMap.get(dto.getObservationVariableDbId()));
 				dto.getScale().setExternalReferences(externalReferencesMap.get(dto.getScale().getScaleDbId()));
 				dto.getMethod().setExternalReferences(externalReferencesMap.get(dto.getMethod().getMethodDbId()));
@@ -95,9 +94,18 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 		final Integer variableId = Integer.valueOf(variable.getObservationVariableDbId());
 		final boolean isVariableUsedInStudy = this.ontologyVariableDataManager.areVariablesUsedInStudy(Arrays.asList(variableId));
 		this.updateVariable(variable, isVariableUsedInStudy);
-		this.updateProperty(variable, isVariableUsedInStudy);
-		this.updateMethod(variable, isVariableUsedInStudy);
-		this.updateScale(variable, isVariableUsedInStudy);
+
+		// Update property
+		this.updateCVTerm(Integer.valueOf(variable.getTrait().getTraitDbId()),
+			isVariableUsedInStudy ? variable.getTrait().getTraitName() : StringUtils.EMPTY, variable.getTrait().getTraitDescription());
+		// Update method
+		this.updateCVTerm(Integer.valueOf(variable.getMethod().getMethodDbId()),
+			isVariableUsedInStudy ? variable.getMethod().getMethodName() : StringUtils.EMPTY, variable.getTrait().getDescription());
+		// Update scale
+		this.updateCVTerm(Integer.valueOf(variable.getScale().getScaleDbId()),
+			isVariableUsedInStudy ? variable.getScale().getScaleName() : StringUtils.EMPTY, StringUtils.EMPTY);
+
+		this.updateScaleMetaData(variable, isVariableUsedInStudy);
 
 		// Assign variable to studies
 		if (!CollectionUtils.isEmpty(variable.getStudyDbIds())) {
@@ -117,8 +125,8 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 			// if the variable is not used in study.
 			variableTerm.setName(variable.getObservationVariableName());
 			this.updatePropertyMethodScaleRelation(variable);
+			this.daoFactory.getCvTermDao().update(variableTerm);
 		}
-		this.daoFactory.getCvTermDao().update(variableTerm);
 	}
 
 	private void updatePropertyMethodScaleRelation(final VariableDTO variable) {
@@ -145,12 +153,12 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 		if (scaleRelation.isPresent()) {
 			final CVTermRelationship cvTermRelationship = scaleRelation.get();
 
-			final List<CVTermRelationship> dataTypeRelationShips = this.daoFactory.getCvTermRelationshipDao()
+			final List<CVTermRelationship> dataTypeRelationship = this.daoFactory.getCvTermRelationshipDao()
 				.getBySubjectIdAndTypeId(cvTermRelationship.getObjectId(), TermId.HAS_TYPE.getId());
 
 			// Update Datatype
-			if (!CollectionUtils.isEmpty(dataTypeRelationShips) && StringUtils.isNotEmpty(variable.getScale().getDataType())) {
-				final CVTermRelationship dataTypeRelationShip = dataTypeRelationShips.get(0);
+			if (!CollectionUtils.isEmpty(dataTypeRelationship) && StringUtils.isNotEmpty(variable.getScale().getDataType())) {
+				final CVTermRelationship dataTypeRelationShip = dataTypeRelationship.get(0);
 				dataTypeRelationShip.setSubjectId(Integer.valueOf(variable.getScale().getScaleDbId()));
 				this.daoFactory.getCvTermRelationshipDao().update(dataTypeRelationShip);
 			}
@@ -162,42 +170,24 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	}
 
-	private void updateProperty(final VariableDTO variable, final boolean isVariableUsedInStudy) {
-		final Integer propertyId = Integer.valueOf(variable.getTrait().getTraitDbId());
-		final CVTerm propertyTerm = this.daoFactory.getCvTermDao().getById(propertyId);
-		if (!isVariableUsedInStudy) {
-			// Updating of property name is only applicable
-			// if the variable is not used in study.
-			propertyTerm.setName(variable.getTrait().getTraitName());
+	private void updateCVTerm(final int cvtermId, final String name, final String definition) {
+		final CVTerm cvTerm = this.daoFactory.getCvTermDao().getById(cvtermId);
+		if (StringUtils.isNotEmpty(name)) {
+			cvTerm.setName(name);
 		}
-		propertyTerm.setDefinition(variable.getTrait().getTraitDescription());
-		this.daoFactory.getCvTermDao().update(propertyTerm);
+		if (StringUtils.isNotEmpty(definition)) {
+			cvTerm.setDefinition(definition);
+		}
+		this.daoFactory.getCvTermDao().update(cvTerm);
 	}
 
-	private void updateMethod(final VariableDTO variable, final boolean isVariableUsedInStudy) {
-		final Integer methodId = Integer.valueOf(variable.getMethod().getMethodDbId());
-		final CVTerm methodTerm = this.daoFactory.getCvTermDao().getById(methodId);
-		if (!isVariableUsedInStudy) {
-			// Updating of method name is only applicable
-			// if the variable is not used in study.
-			methodTerm.setName(variable.getMethod().getMethodName());
-		}
-		methodTerm.setDefinition(variable.getMethod().getDescription());
-		this.daoFactory.getCvTermDao().update(methodTerm);
-	}
-
-	private void updateScale(final VariableDTO variable, final boolean isVariableUsedInStudy) {
+	private void updateScaleMetaData(final VariableDTO variable, final boolean isVariableUsedInStudy) {
 		final Integer scaleId = Integer.valueOf(variable.getScale().getScaleDbId());
-		final CVTerm scaleTerm = this.daoFactory.getCvTermDao().getById(scaleId);
-
 		// Only update the categorical values and min, max if variable is not used in study
 		if (!isVariableUsedInStudy) {
-
-			// Updating of scale name, categories, min, max is only applicable
+			// Updating categories, min, max is only applicable
 			// if the variable is not used in study.
-			scaleTerm.setName(variable.getScale().getScaleName());
-
-			final List<CVTermRelationship> relationships = this.daoFactory.getCvTermRelationshipDao().getBySubject(scaleTerm.getCvTermId());
+			final List<CVTermRelationship> relationships = this.daoFactory.getCvTermRelationshipDao().getBySubject(scaleId);
 			final Optional<CVTermRelationship>
 				dataTypeRelationship = relationships.stream().filter(r -> r.getTypeId() == TermId.HAS_TYPE.getId()).findAny();
 			final DataType dataType = dataTypeRelationship.isPresent() ? DataType.getById(dataTypeRelationship.get().getObjectId()) : null;
@@ -210,15 +200,14 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 				final Map<String, CVTerm> categoricalValuesMap = this.daoFactory.getCvTermDao().getByIds(valueIds).stream()
 					.collect(Collectors.toMap(CVTerm::getName, Function.identity()));
 
-				for (final CategoryDTO categoryDTO : variable.getScale().getValidValues().getCategories()) {
-					if (categoricalValuesMap.containsKey(categoryDTO.getValue())) {
-						final CVTerm categoricalValueTerm = categoricalValuesMap.get(categoryDTO.getValue());
-						categoricalValueTerm.setDefinition(categoryDTO.getLabel());
+				for (final ScaleCategoryDTO scaleCategoryDTO : variable.getScale().getValidValues().getCategories()) {
+					if (categoricalValuesMap.containsKey(scaleCategoryDTO.getValue())) {
+						final CVTerm categoricalValueTerm = categoricalValuesMap.get(scaleCategoryDTO.getValue());
+						categoricalValueTerm.setDefinition(scaleCategoryDTO.getLabel());
 						this.daoFactory.getCvTermDao().update(categoricalValueTerm);
 					}
 				}
 			}
-
 			// Update min and max if datatype is numerical
 			if (dataType == DataType.NUMERIC_VARIABLE) {
 				final int maxTermId = TermId.MAX_VALUE.getId();
@@ -228,9 +217,6 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 				this.updateScaleMinMax(scaleId, minScale, minTermId);
 				this.updateScaleMinMax(scaleId, maxScale, maxTermId);
 			}
-
-			this.daoFactory.getCvTermDao().update(scaleTerm);
-
 		}
 
 	}
@@ -248,13 +234,13 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	private void addObservationVariableToStudy(final Integer studyDbId, final Integer observationVariableDbId,
 		final String observationVariableName) {
-		final Integer projectId =
+		final Integer plotDatasetId =
 			this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
 		final List<MeasurementVariable> studyMeasurementVariables =
-			this.datasetService.getObservationSetVariables(projectId, Arrays.asList(VariableType.TRAIT.getId()));
+			this.datasetService.getObservationSetVariables(plotDatasetId, Arrays.asList(VariableType.TRAIT.getId()));
 		// Check first if the variable already exists in study
 		if (studyMeasurementVariables.stream().noneMatch(o -> o.getTermId() == observationVariableDbId)) {
-			this.datasetService.addDatasetVariable(projectId, observationVariableDbId, VariableType.TRAIT, observationVariableName);
+			this.datasetService.addDatasetVariable(plotDatasetId, observationVariableDbId, VariableType.TRAIT, observationVariableName);
 		}
 	}
 }

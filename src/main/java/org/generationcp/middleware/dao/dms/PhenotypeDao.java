@@ -59,6 +59,7 @@ import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
@@ -1493,8 +1494,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		return !queryResults.isEmpty();
 	}
 
-	public List<ObservationDto> searchObservations(final ObservationSearchRequestDto observationSearchRequestDto, final Integer pageSize,
-		final Integer pageNumber) {
+	public List<ObservationDto> searchObservations(final ObservationSearchRequestDto observationSearchRequestDto, final Pageable pageable) {
 
 		try {
 			final SQLQuery sqlQuery =
@@ -1514,15 +1514,15 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			sqlQuery.setResultTransformer(Transformers.aliasToBean(ObservationDto.class));
 			this.addObservationSearchQueryParams(observationSearchRequestDto, sqlQuery);
 
-			if (pageNumber != null && pageSize != null) {
-				sqlQuery.setFirstResult(pageSize * (pageNumber - 1));
-				sqlQuery.setMaxResults(pageSize);
+			if (pageable != null) {
+				sqlQuery.setFirstResult(pageable.getPageSize() * (pageable.getPageNumber() - 1));
+				sqlQuery.setMaxResults(pageable.getPageSize());
 			}
 
 			return sqlQuery.list();
 		} catch (final HibernateException he) {
 			throw new MiddlewareQueryException(
-				"Unexpected error in executing searchObservationDto(observationSearchRequestDto = " + observationSearchRequestDto
+				"Unexpected error in executing searchObservations(observationSearchRequestDto = " + observationSearchRequestDto
 					+ ") query: " + he.getMessage(), he);
 		}
 
@@ -1554,17 +1554,17 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final StringBuilder sql = new StringBuilder();
 		sql.append("SELECT ");
 		sql.append("germplsm.germplsm_uuid AS germplasmDbId,");
-		sql.append("	names.nval AS germplasmName, ");
+		sql.append("names.nval AS germplasmName, ");
 		sql.append("p.phenotype_id AS observationDbId, ");
-		sql.append("	p.updated_date AS observationTimeStamp, ");
+		sql.append("p.updated_date AS observationTimeStamp, ");
 		sql.append("obs_unit.obs_unit_id AS observationUnitDbId, ");
-		sql.append("	'' AS observationUnitName, ");
+		sql.append("'' AS observationUnitName, ");
 		sql.append("p.observable_id AS observationVariableDbId, ");
-		sql.append("	cvterm.name AS observationVariableName, ");
+		sql.append("cvterm.name AS observationVariableName, ");
 		sql.append("instance.nd_geolocation_id AS studyDbId, ");
-		sql.append("	p.value AS value, ");
-		sql.append(" cvtermSeason.definition AS seasonName, ");
-		sql.append(" cvtermSeason.cvterm_id AS seasonDbId ");
+		sql.append("p.value AS value, ");
+		sql.append("cvtermSeason.definition AS seasonName, ");
+		sql.append("cvtermSeason.cvterm_id AS seasonDbId ");
 		this.addObservationSearchQueryJoins(sql);
 		this.addObservationSearchQueryFilter(observationSearchRequestDto, sql);
 		return sql.toString();
@@ -1573,18 +1573,18 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	private void addObservationSearchQueryJoins(final StringBuilder stringBuilder) {
 		stringBuilder.append("FROM ");
 		stringBuilder.append("phenotype p ");
-		stringBuilder.append("LEFT JOIN nd_experiment obs_unit ON p.nd_experiment_id = obs_unit.nd_experiment_id ");
-		stringBuilder.append("LEFT JOIN nd_geolocation instance ON instance.nd_geolocation_id = obs_unit.nd_geolocation_id ");
-		stringBuilder.append("LEFT JOIN stock ON obs_unit.stock_id = stock.stock_id ");
-		stringBuilder.append("LEFT JOIN germplsm ON stock.dbxref_id = germplsm.gid ");
-		stringBuilder.append("LEFT JOIN names ON stock.dbxref_id = names.gid AND names.nstat = 1 ");
-		stringBuilder.append("LEFT JOIN cvterm ON p.observable_id = cvterm.cvterm_id ");
-		stringBuilder.append("LEFT JOIN project plot ON plot.project_id = obs_unit.project_id ");
-		stringBuilder.append("LEFT JOIN project trial ON plot.study_id = trial.project_id ");
-		stringBuilder.append("LEFT JOIN nd_geolocationprop location_prop ON location_prop.nd_geolocation_id = instance.nd_geolocation_id ");
-		stringBuilder.append("	AND location_prop.type_id = " + TermId.LOCATION_ID.getId() + " ");
+		stringBuilder.append("INNER JOIN nd_experiment obs_unit ON p.nd_experiment_id = obs_unit.nd_experiment_id ");
+		stringBuilder.append("INNER JOIN nd_geolocation instance ON instance.nd_geolocation_id = obs_unit.nd_geolocation_id ");
+		stringBuilder.append("INNER JOIN stock ON obs_unit.stock_id = stock.stock_id ");
+		stringBuilder.append("INNER JOIN germplsm ON stock.dbxref_id = germplsm.gid ");
+		stringBuilder.append("INNER JOIN names ON stock.dbxref_id = names.gid AND names.nstat = 1 ");
+		stringBuilder.append("INNER JOIN cvterm ON p.observable_id = cvterm.cvterm_id ");
+		stringBuilder.append("INNER JOIN project plot ON plot.project_id = obs_unit.project_id ");
+		stringBuilder.append("INNER JOIN project trial ON plot.study_id = trial.project_id ");
+		stringBuilder.append("INNER JOIN nd_geolocationprop location_prop ON location_prop.nd_geolocation_id = instance.nd_geolocation_id ");
+		stringBuilder.append("AND location_prop.type_id = " + TermId.LOCATION_ID.getId() + " ");
 		stringBuilder.append("LEFT OUTER JOIN nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = instance.nd_geolocation_id ");
-		stringBuilder.append("	AND geopropSeason.type_id = " + TermId.SEASON_VAR.getId() + " ");
+		stringBuilder.append("AND geopropSeason.type_id = " + TermId.SEASON_VAR.getId() + " ");
 		stringBuilder.append("LEFT OUTER JOIN cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value ");
 
 		stringBuilder.append("WHERE 1=1 ");

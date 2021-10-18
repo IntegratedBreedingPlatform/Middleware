@@ -64,14 +64,14 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	@Override
 	public Image save(final ImageNewRequest imageNewRequest) {
 		final String observationUnitDbId = imageNewRequest.getObservationUnitDbId();
-		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitDbId);
+		final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitDbId);
 
-		if (experimentModel == null) {
+		if (!experimentModelOptional.isPresent()) {
 			throw new MiddlewareRequestException("", "filemetadata.observationunit.not.found", new String[] {observationUnitDbId});
 		}
 
 		final FileMetadata fileMetadata = new FileMetadata();
-		fileMetadata.setExperimentModel(experimentModel);
+		fileMetadata.setExperimentModel(experimentModelOptional.get());
 
 		final List<String> terms = imageNewRequest.getDescriptiveOntologyTerms();
 		if (!isEmpty(terms)) {
@@ -155,8 +155,8 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	 */
 	@Override
 	public String getFilePathForObservationUnit(final String observationUnitId, final String fileName) {
-		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId);
-		final DmsProject study = experimentModel.getProject().getStudy();
+		final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId);
+		final DmsProject study = experimentModelOptional.get().getProject().getStudy();
 		final String path = FILE_PATH_PREFIX_PROGRAMUUID + study.getProgramUUID()
 			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_STUDYID + study.getProjectId()
 			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_OBSUNITUUID + observationUnitId
@@ -214,11 +214,11 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		Preconditions.checkArgument(isBlank(observationUnitUUID) != isBlank(germplasmUUID));
 
 		if (!isBlank(observationUnitUUID)) {
-			final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitUUID);
-			if (experimentModel == null) {
+			final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitUUID);
+			if (!experimentModelOptional.isPresent()) {
 				throw new MiddlewareRequestException("", "filemetadata.observationunit.not.found", new String[] {observationUnitUUID});
 			}
-			fileMetadata.setExperimentModel(experimentModel);
+			fileMetadata.setExperimentModel(experimentModelOptional.get());
 		} else {
 			final Optional<Germplasm> germplasmOptional = this.daoFactory.getGermplasmDao().getGermplasmByGUIDs(singletonList(germplasmUUID))
 				.stream().findFirst();

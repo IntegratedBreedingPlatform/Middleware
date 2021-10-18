@@ -39,7 +39,7 @@ import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerI
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
-import org.generationcp.middleware.service.api.study.CategoryDTO;
+import org.generationcp.middleware.service.api.study.ScaleCategoryDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
@@ -1506,7 +1506,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public void addObservationVariableSearchParameters(final SQLQuery sqlQuery, final VariableSearchRequestDTO requestDTO) {
 		if(!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
-			sqlQuery.setParameterList("dataTypeIds", this.convertVariableDtoScaleToDataTypeIds(requestDTO.getDataTypes()));
+			sqlQuery.setParameterList("dataTypeIds", this.convertBrapiDataTypeToDataTypeIds(requestDTO.getDataTypes()));
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
@@ -1797,12 +1797,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	}
 
-	private List<CategoryDTO> getCategoryDTOS(final List<String> categoryValues) {
+	private List<ScaleCategoryDTO> getCategoryDTOS(final List<String> categoryValues) {
 		if(!CollectionUtils.isEmpty(categoryValues)) {
-			final List<CategoryDTO> categories = new ArrayList<>();
+			final List<ScaleCategoryDTO> categories = new ArrayList<>();
 			for (final String categoryValue: categoryValues) {
 				final String[] category = StringUtils.split(categoryValue, ",");
-				categories.add(new CategoryDTO(category[1], category[0]));
+				categories.add(new ScaleCategoryDTO(category[1], category[0]));
 			}
 			return categories;
 		}
@@ -1817,7 +1817,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 	}
 
-	protected List<String> convertVariableDtoScaleToDataTypeIds(final List<String> brapiDataTypeNames) {
+	protected List<String> convertBrapiDataTypeToDataTypeIds(final List<String> brapiDataTypeNames) {
 		final List<String> dataTypeIds = new ArrayList<>();
 		for(final String brapiDataTypeName: brapiDataTypeNames) {
 			final DataType dataType = DataType.getByBrapiName(brapiDataTypeName);
