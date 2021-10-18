@@ -7,12 +7,15 @@ import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static java.time.Duration.between;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static org.apache.commons.lang3.time.DurationFormatUtils.formatDurationHMS;
 import static org.generationcp.middleware.util.Debug.debug;
 
 /**
@@ -95,6 +98,7 @@ public class CopCalculation {
 			return this.sparseMatrix.get(g1.getGid(), g2.getGid());
 		}
 		debug("Calculating cop (gid1=%s-gid2=%s)", g1.getGid(), g2.getGid());
+		final Instant start = Instant.now();
 
 		double cop = COP_DEFAULT;
 
@@ -111,7 +115,7 @@ public class CopCalculation {
 			/*
 			 * TODO
 			 *  "..Although it is symmetrical in P and Q so that the parents of either could be used to obtain the right hand expansion.."
-			 *  however if we invert the parents here, it won't work. Why?
+			 *  however if we invert the parents here, it doesn't work
 			 */
 			final Pair<GermplasmTreeNode, GermplasmTreeNode> byOrder = this.sortByOrder(g1, g2);
 			final GermplasmTreeNode highOrder = byOrder.getLeft();
@@ -126,6 +130,10 @@ public class CopCalculation {
 			}
 
 		}
+
+		final Instant end = Instant.now();
+		debug("calculated cop (gid1=%s-gid2=%s), Duration: %s", g1.getGid(), g2.getGid(),
+			formatDurationHMS(between(start, end).toMillis()));
 
 		this.sparseMatrix.put(g1.getGid(), g2.getGid(), cop);
 		return cop;
