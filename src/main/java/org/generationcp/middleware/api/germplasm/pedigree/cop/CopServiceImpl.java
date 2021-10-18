@@ -1,7 +1,7 @@
 package org.generationcp.middleware.api.germplasm.pedigree.cop;
 
-import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import com.google.common.collect.TreeBasedTable;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeService;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -49,8 +49,13 @@ public class CopServiceImpl implements CopService {
 
 	@Override
 	public Table<Integer, Integer, Double> coefficientOfParentage(final List<Integer> gids) {
-		final Table<Integer, Integer, Double> matrix = HashBasedTable.create();
-		final CopCalculation copCalculation = new CopCalculation(matrix);
+		// TODO get from db
+		final TreeBasedTable<Integer, Integer, Double> matrix = TreeBasedTable.create();
+
+		// matrix copy because CopCalculation also stores intermediate results
+		final CopCalculation copCalculation = new CopCalculation(TreeBasedTable.create(matrix));
+
+		// Avoid query multiple times
 		final Map<Integer, GermplasmTreeNode> nodes = new HashMap<>();
 
 		// TODO verify/improve perf
@@ -83,7 +88,8 @@ public class CopServiceImpl implements CopService {
 						gid2Tree = nodes.get(gid2);
 					}
 
-					copCalculation.coefficientOfParentage(gid1Tree, gid2Tree);
+					final double cop = copCalculation.coefficientOfParentage(gid1Tree, gid2Tree);
+					matrix.put(gid1, gid2, cop);
 				}
 			}
 		}
