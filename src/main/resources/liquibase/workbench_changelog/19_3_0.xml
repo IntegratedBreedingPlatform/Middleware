@@ -21,7 +21,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 
-			# Insert INSERT CHILD PERMISSIONS FROM  GERMPLASM  AND MANAGE_GERMPLASM
+			# Insert inherited permissions of GERMPLASM and MANAGE GERMPLASM.
 
 			SET @import_germplasm_permission_id = (SELECT permission_id FROM permission where name = 'IMPORT_GERMPLASM');
 
@@ -99,6 +99,8 @@
 			SELECT DISTINCT(rp.role_id), @view_germplasm_change_history_permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
 				WHERE p.name in ('GERMPLASM', 'MANAGE_GERMPLASM')
 				GROUP BY rp.role_id;
+
+			# Delete GERMPLASM and MANAGE GERMPLASM permissions from roles that do not have Full permissions.
 
 			DELETE role_permission FROM role_permission
 				WHERE
