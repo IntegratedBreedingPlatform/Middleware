@@ -1,0 +1,115 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="cuenyad" id="v19.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			  <sqlCheck expectedResult="1">
+					SELECT count(1) > 0 FROM (
+										SELECT 1
+										FROM role_permission rp
+										INNER JOIN permission p ON rp.permission_id = p.permission_id
+										WHERE p.name IN ('GERMPLASM', 'MANAGE_GERMPLASM')
+										GROUP BY rp.role_id
+									) AS count;
+			  </sqlCheck>
+        </preConditions>
+		<comment>
+			Removing Merge germplasm permission for roles that do not have Full permissions.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			# Insert INSERT CHILD PERMISSIONS FROM  GERMPLASM  AND MANAGE_GERMPLASM
+
+			SET @import_germplasm_permission_id = (SELECT permission_id FROM permission where name = 'IMPORT_GERMPLASM');
+
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT DISTINCT(rp.role_id), @import_germplasm_permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE p.name in ('GERMPLASM', 'MANAGE_GERMPLASM')
+				GROUP BY rp.role_id;
+
+			SET @mg_inventory_permission_id = (SELECT permission_id FROM permission where name = 'MG_MANAGE_INVENTORY');
+
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT DISTINCT(rp.role_id), @mg_inventory_permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE p.name in ('GERMPLASM', 'MANAGE_GERMPLASM')
+				GROUP BY rp.role_id;
+
+			SET @search_germplasm_permission_id = (SELECT permission_id FROM permission where name = 'SEARCH_GERMPLASM');
+
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT DISTINCT(rp.role_id), @search_germplasm_permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE p.name in ('GERMPLASM', 'MANAGE_GERMPLASM')
+				GROUP BY rp.role_id;
+
+			SET @import_germplasm_updates_permission_id = (SELECT permission_id FROM permission where name = 'IMPORT_GERMPLASM_UPDATES');
+
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT DISTINCT(rp.role_id), @import_germplasm_updates_permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE p.name in ('GERMPLASM', 'MANAGE_GERMPLASM')
+				GROUP BY rp.role_id;
+
+			SET @germplasm_label_printing_permission_id = (SELECT permission_id FROM permission where name = 'GERMPLASM_LABEL_PRINTING');
+
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT DISTINCT(rp.role_id), @germplasm_label_printing_permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE p.name in ('GERMPLASM', 'MANAGE_GERMPLASM')
+				GROUP BY rp.role_id;
+
+			SET @edit_germplasm_permission_id = (SELECT permission_id FROM permission where name = 'EDIT_GERMPLASM');
+
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT DISTINCT(rp.role_id), @edit_germplasm_permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE p.name in ('GERMPLASM', 'MANAGE_GERMPLASM')
+				GROUP BY rp.role_id;
+
+			SET @delete_germplasm_permission_id = (SELECT permission_id FROM permission where name = 'DELETE_GERMPLASM');
+
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT DISTINCT(rp.role_id), @delete_germplasm_permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE p.name in ('GERMPLASM', 'MANAGE_GERMPLASM')
+				GROUP BY rp.role_id;
+
+			SET @code_germplasm_permission_id = (SELECT permission_id FROM permission where name = 'CODE_GERMPLASM');
+
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT DISTINCT(rp.role_id), @code_germplasm_permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE p.name in ('GERMPLASM', 'MANAGE_GERMPLASM')
+				GROUP BY rp.role_id;
+
+			SET @group_germplasm_permission_id = (SELECT permission_id FROM permission where name = 'GROUP_GERMPLASM');
+
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT DISTINCT(rp.role_id), @group_germplasm_permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE p.name in ('GERMPLASM', 'MANAGE_GERMPLASM')
+				GROUP BY rp.role_id;
+
+			SET @ungroup_germplasm_permission_id = (SELECT permission_id FROM permission where name = 'UNGROUP_GERMPLASM');
+
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT DISTINCT(rp.role_id), @ungroup_germplasm_permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE p.name in ('GERMPLASM', 'MANAGE_GERMPLASM')
+				GROUP BY rp.role_id;
+
+			SET @view_germplasm_change_history_permission_id = (SELECT permission_id FROM permission where name = 'VIEW_GERMPLASM_CHANGE_HISTORY');
+
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT DISTINCT(rp.role_id), @view_germplasm_change_history_permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+				WHERE p.name in ('GERMPLASM', 'MANAGE_GERMPLASM')
+				GROUP BY rp.role_id;
+
+			DELETE role_permission FROM role_permission
+				WHERE
+					permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name in ('GERMPLASM','MANAGE_GERMPLASM'))
+					AND role_id IN (SELECT subA.role_id FROM (SELECT rp.role_id AS role_id FROM role_permission rp
+										WHERE rp.role_id IN ( SELECT subB.rid FROM (
+												SELECT rp.role_id AS rid FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+													WHERE p.name in ('GERMPLASM','MANAGE_GERMPLASM')
+														GROUP BY rp.role_id ) AS subB ) ) AS subA
+									);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
