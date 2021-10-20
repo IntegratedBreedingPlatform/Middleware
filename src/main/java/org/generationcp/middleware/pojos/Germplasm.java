@@ -14,7 +14,7 @@ import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang.NullArgumentException;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;

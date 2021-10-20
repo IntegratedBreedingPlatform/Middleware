@@ -13,6 +13,8 @@ package org.generationcp.middleware.dao.dms;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
+import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelRelationship;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
@@ -39,6 +41,7 @@ import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRe
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
 import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.generationcp.middleware.util.Debug;
+import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -49,11 +52,14 @@ import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
+import org.hibernate.type.DateType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.io.IOException;
@@ -1381,14 +1387,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public List<Phenotype> getDatasetDraftData(final Integer datasetId) {
 		final List<Map<String, Object>> results = this.getSession().createSQLQuery("select {ph.*}, {e.*}, "
-			+ " (select exists( "
-			+ "     select 1 from formula where target_variable_id = ph.observable_id and active = 1"
-			+ " )) as isDerivedTrait "
-			+ " from phenotype ph"
-			+ " inner join nd_experiment e on ph.nd_experiment_id = e.nd_experiment_id"
-			+ " inner join project p on e.project_id = p.project_id "
-			+ " where p.project_id = :datasetId "
-			+ " and (ph.draft_value is not null or ph.draft_cvalue_id is not null)")
+				+ " (select exists( "
+				+ "     select 1 from formula where target_variable_id = ph.observable_id and active = 1"
+				+ " )) as isDerivedTrait "
+				+ " from phenotype ph"
+				+ " inner join nd_experiment e on ph.nd_experiment_id = e.nd_experiment_id"
+				+ " inner join project p on e.project_id = p.project_id "
+				+ " where p.project_id = :datasetId "
+				+ " and (ph.draft_value is not null or ph.draft_cvalue_id is not null)")
 			.addEntity("ph", Phenotype.class)
 			.addEntity("e", ExperimentModel.class)
 			.addScalar("isDerivedTrait", new BooleanType())
@@ -1486,6 +1492,190 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 
 		return !queryResults.isEmpty();
+	}
+
+	public List<ObservationDto> searchObservations(final ObservationSearchRequestDto observationSearchRequestDto, final Pageable pageable) {
+
+		try {
+			final SQLQuery sqlQuery =
+				this.getSession().createSQLQuery(this.createObservationSearchQueryString(observationSearchRequestDto));
+			sqlQuery.addScalar("germplasmDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("germplasmName", StringType.INSTANCE);
+			sqlQuery.addScalar("observationDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("observationTimeStamp", DateType.INSTANCE);
+			sqlQuery.addScalar("observationUnitDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("observationUnitName", StringType.INSTANCE);
+			sqlQuery.addScalar("observationVariableDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("observationVariableName", StringType.INSTANCE);
+			sqlQuery.addScalar("studyDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("value", StringType.INSTANCE);
+			sqlQuery.addScalar("seasonName", StringType.INSTANCE);
+			sqlQuery.addScalar("seasonDbId", StringType.INSTANCE);
+			sqlQuery.setResultTransformer(Transformers.aliasToBean(ObservationDto.class));
+			this.addObservationSearchQueryParams(observationSearchRequestDto, sqlQuery);
+
+			if (pageable != null) {
+				sqlQuery.setFirstResult(pageable.getPageSize() * (pageable.getPageNumber() - 1));
+				sqlQuery.setMaxResults(pageable.getPageSize());
+			}
+
+			return sqlQuery.list();
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				"Unexpected error in executing searchObservations(observationSearchRequestDto = " + observationSearchRequestDto
+					+ ") query: " + he.getMessage(), he);
+		}
+
+	}
+
+	public long countObservations(final ObservationSearchRequestDto observationSearchRequestDto) {
+		try {
+			final SQLQuery sqlQuery =
+				this.getSession().createSQLQuery(this.createObservationSearchQueryStringCount(observationSearchRequestDto));
+			this.addObservationSearchQueryParams(observationSearchRequestDto, sqlQuery);
+			return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+		} catch (final HibernateException he) {
+			throw new MiddlewareQueryException(
+				"Unexpected error in executing countObservations(observationSearchRequestDto = " + observationSearchRequestDto
+					+ ") query: " + he.getMessage(), he);
+		}
+	}
+
+	private String createObservationSearchQueryStringCount(final ObservationSearchRequestDto observationSearchRequestDto) {
+		final StringBuilder sql = new StringBuilder();
+		sql.append("SELECT COUNT(1) ");
+		this.addObservationSearchQueryJoins(sql);
+		this.addObservationSearchQueryFilter(observationSearchRequestDto, sql);
+
+		return sql.toString();
+	}
+
+	private String createObservationSearchQueryString(final ObservationSearchRequestDto observationSearchRequestDto) {
+		final StringBuilder sql = new StringBuilder();
+		sql.append("SELECT ");
+		sql.append("germplsm.germplsm_uuid AS germplasmDbId,");
+		sql.append("names.nval AS germplasmName, ");
+		sql.append("p.phenotype_id AS observationDbId, ");
+		sql.append("p.updated_date AS observationTimeStamp, ");
+		sql.append("obs_unit.obs_unit_id AS observationUnitDbId, ");
+		sql.append("'' AS observationUnitName, ");
+		sql.append("p.observable_id AS observationVariableDbId, ");
+		sql.append("cvterm.name AS observationVariableName, ");
+		sql.append("instance.nd_geolocation_id AS studyDbId, ");
+		sql.append("p.value AS value, ");
+		sql.append("cvtermSeason.definition AS seasonName, ");
+		sql.append("cvtermSeason.cvterm_id AS seasonDbId ");
+		this.addObservationSearchQueryJoins(sql);
+		this.addObservationSearchQueryFilter(observationSearchRequestDto, sql);
+		return sql.toString();
+	}
+
+	private void addObservationSearchQueryJoins(final StringBuilder stringBuilder) {
+		stringBuilder.append("FROM ");
+		stringBuilder.append("phenotype p ");
+		stringBuilder.append("INNER JOIN nd_experiment obs_unit ON p.nd_experiment_id = obs_unit.nd_experiment_id ");
+		stringBuilder.append("INNER JOIN nd_geolocation instance ON instance.nd_geolocation_id = obs_unit.nd_geolocation_id ");
+		stringBuilder.append("INNER JOIN stock ON obs_unit.stock_id = stock.stock_id ");
+		stringBuilder.append("INNER JOIN germplsm ON stock.dbxref_id = germplsm.gid ");
+		stringBuilder.append("INNER JOIN names ON stock.dbxref_id = names.gid AND names.nstat = 1 ");
+		stringBuilder.append("INNER JOIN cvterm ON p.observable_id = cvterm.cvterm_id ");
+		stringBuilder.append("INNER JOIN project plot ON plot.project_id = obs_unit.project_id ");
+		stringBuilder.append("INNER JOIN project trial ON plot.study_id = trial.project_id ");
+		stringBuilder.append("INNER JOIN nd_geolocationprop location_prop ON location_prop.nd_geolocation_id = instance.nd_geolocation_id ");
+		stringBuilder.append("AND location_prop.type_id = " + TermId.LOCATION_ID.getId() + " ");
+		stringBuilder.append("LEFT OUTER JOIN nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = instance.nd_geolocation_id ");
+		stringBuilder.append("AND geopropSeason.type_id = " + TermId.SEASON_VAR.getId() + " ");
+		stringBuilder.append("LEFT OUTER JOIN cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value ");
+
+		stringBuilder.append("WHERE 1=1 ");
+	}
+
+	private void addObservationSearchQueryParams(final ObservationSearchRequestDto observationSearchRequestDto, final SQLQuery sqlQuery) {
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationDbIds())) {
+			sqlQuery.setParameterList("observationDbIds", observationSearchRequestDto.getObservationDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationUnitDbIds())) {
+			sqlQuery.setParameterList("observationUnitDbIds", observationSearchRequestDto.getObservationUnitDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getGermplasmDbIds())) {
+			sqlQuery.setParameterList("germplasmDbIds", observationSearchRequestDto.getGermplasmDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationVariableDbIds())) {
+			sqlQuery.setParameterList("observationVariableDbIds", observationSearchRequestDto.getObservationVariableDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getStudyDbIds())) {
+			sqlQuery.setParameterList("studyDbIds", observationSearchRequestDto.getStudyDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getLocationDbIds())) {
+			sqlQuery.setParameterList("locationDbIds", observationSearchRequestDto.getLocationDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getTrialDbIds())) {
+			sqlQuery.setParameterList("trialDbIds", observationSearchRequestDto.getTrialDbIds());
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getProgramDbIds())) {
+			sqlQuery.setParameterList("programDbIds", observationSearchRequestDto.getProgramDbIds());
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceID())) {
+			sqlQuery.setParameter("referenceId", observationSearchRequestDto.getExternalReferenceID());
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceSource())) {
+			sqlQuery.setParameter("referenceSource", observationSearchRequestDto.getExternalReferenceSource());
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getSeasonDbId())) {
+			sqlQuery.setParameter("seasonDbId", observationSearchRequestDto.getSeasonDbId());
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getObservationTimeStampRangeStart())) {
+			sqlQuery.setParameter("observationTimeStampRangeStart", observationSearchRequestDto.getObservationTimeStampRangeStart());
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getObservationTimeStampRangeEnd())) {
+			sqlQuery.setParameter("observationTimeStampRangeEnd", observationSearchRequestDto.getObservationTimeStampRangeEnd());
+		}
+
+	}
+
+	private void addObservationSearchQueryFilter(final ObservationSearchRequestDto observationSearchRequestDto,
+		final StringBuilder stringBuilder) {
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationDbIds())) {
+			stringBuilder.append("AND p.phenotype_id in (:observationDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationUnitDbIds())) {
+			stringBuilder.append("AND obs_unit.obs_unit_id in (:observationUnitDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getGermplasmDbIds())) {
+			stringBuilder.append("AND germplsm.germplsm_uuid in (:germplasmDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getObservationVariableDbIds())) {
+			stringBuilder.append("AND p.observable_id in (:observationVariableDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getStudyDbIds())) {
+			stringBuilder.append("AND instance.nd_geolocation_id in (:studyDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getLocationDbIds())) {
+			stringBuilder.append("AND location_prop.value in (:locationDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getTrialDbIds())) {
+			stringBuilder.append("AND trial.project_id in (:trialDbIds) ");
+		}
+		if (!CollectionUtils.isEmpty(observationSearchRequestDto.getProgramDbIds())) {
+			stringBuilder.append("AND trial.program_uuid in (:programDbIds) ");
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceID())) {
+			stringBuilder.append("AND EXISTS (SELECT * FROM external_reference_phenotype pref ");
+			stringBuilder.append("WHERE p.phenotype_id = pref.phenotype_id AND pref.reference_id = :referenceId) ");
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getExternalReferenceSource())) {
+			stringBuilder.append("AND EXISTS (SELECT * FROM external_reference_phenotype pref ");
+			stringBuilder.append("WHERE p.phenotype_id = pref.phenotype_id AND pref.reference_source = :referenceSource) ");
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getSeasonDbId())) {
+			stringBuilder.append("AND cvtermSeason.cvterm_id = :seasonDbId ");
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getObservationTimeStampRangeStart())) {
+			stringBuilder.append("AND p.created_date >= :observationTimeStampRangeStart ");
+		}
+		if (!StringUtil.isEmpty(observationSearchRequestDto.getObservationTimeStampRangeEnd())) {
+			stringBuilder.append("AND p.created_date <= :observationTimeStampRangeEnd ");
+		}
 	}
 
 }

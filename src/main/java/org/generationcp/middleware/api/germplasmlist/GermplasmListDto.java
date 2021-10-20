@@ -3,18 +3,18 @@ package org.generationcp.middleware.api.germplasmlist;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.Date;
+
 @AutoProperty
 public class GermplasmListDto {
 
 	private Integer listId;
-
 	private String listName;
-
-	private String creationDate;
-
+	private Date creationDate;
 	private String description;
-
 	private String programUUID;
+	private boolean locked;
+	private Integer ownerId;
 
 	public GermplasmListDto() {
 
@@ -36,11 +36,11 @@ public class GermplasmListDto {
 		this.listName = listName;
 	}
 
-	public String getCreationDate() {
+	public Date getCreationDate() {
 		return this.creationDate;
 	}
 
-	public void setCreationDate(final String creationDate) {
+	public void setCreationDate(final Date creationDate) {
 		this.creationDate = creationDate;
 	}
 
@@ -58,6 +58,22 @@ public class GermplasmListDto {
 
 	public void setProgramUUID(final String programUUID) {
 		this.programUUID = programUUID;
+	}
+
+	public boolean isLocked() {
+		return locked;
+	}
+
+	public void setLocked(final boolean locked) {
+		this.locked = locked;
+	}
+
+	public Integer getOwnerId() {
+		return ownerId;
+	}
+
+	public void setOwnerId(final Integer ownerId) {
+		this.ownerId = ownerId;
 	}
 
 	@Override

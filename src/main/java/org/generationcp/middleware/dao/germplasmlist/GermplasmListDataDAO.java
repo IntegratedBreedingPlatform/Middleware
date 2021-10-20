@@ -9,10 +9,11 @@
  *
  *******************************************************************************/
 
-package org.generationcp.middleware.dao;
+package org.generationcp.middleware.dao.germplasmlist;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -59,7 +60,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 	private static final String GERMPLASM_DELETED_COLUMN = GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS + ".deleted";
 
-	private static final Integer STATUS_DELETED = 9;
+	public static final Integer STATUS_DELETED = 9;
 	public static final Integer STATUS_ACTIVE = 0;
 	public static final String SOURCE_UNKNOWN = "Unknown";
 
@@ -316,4 +317,12 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		}
 
 	}
+
+	public List<Integer> getGidsByListId(final Integer listId) {
+		String sql = "SELECT gid FROM listdata ld WHERE ld.listid = :listId";
+		final SQLQuery query = this.getSession().createSQLQuery(sql);
+		query.setParameter("listId", listId);
+		return query.list();
+	}
+
 }

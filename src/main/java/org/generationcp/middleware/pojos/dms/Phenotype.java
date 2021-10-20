@@ -12,22 +12,28 @@
 package org.generationcp.middleware.pojos.dms;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.generationcp.middleware.pojos.PhenotypeExternalReference;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 import javax.persistence.Transient;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -116,6 +122,10 @@ public class Phenotype implements Serializable {
 	// References cvterm
 	@Column(name = "draft_cvalue_id")
 	private Integer draftCValueId;
+
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "phenotype_id")
+	private List<PhenotypeExternalReference> externalReferences = new ArrayList<>();
 
 	@Transient
 	private boolean changed = false;
@@ -261,6 +271,14 @@ public class Phenotype implements Serializable {
 
 	public void setDerivedTrait(final Boolean derivedTrait) {
 		this.isDerivedTrait = derivedTrait;
+	}
+
+	public List<PhenotypeExternalReference> getExternalReferences() {
+		return externalReferences;
+	}
+
+	public void setExternalReferences(List<PhenotypeExternalReference> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	@Override

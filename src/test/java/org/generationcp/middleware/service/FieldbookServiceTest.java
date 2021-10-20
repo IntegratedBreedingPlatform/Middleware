@@ -5,7 +5,7 @@ import com.google.common.base.Optional;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.StudyReference;

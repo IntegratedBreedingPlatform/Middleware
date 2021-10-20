@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 	<changeSet author="cheryleigh" id="v19.2.0-1">
@@ -23,4 +23,274 @@
 		</comment>
 		<dropTable tableName="persons_migrated" />
 	</changeSet>
+
+    <changeSet author="mderamos" id="v19.2.0-3">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="external_reference_cvterm"/>
+            </not>
+        </preConditions>
+        <comment>
+            Create external_reference_cvterm table
+        </comment>
+        <createTable tableName="external_reference_cvterm">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="cvterm_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_external_reference_cvterm" references="cvterm(cvterm_id)"/>
+            </column>
+            <column name="reference_id" type="varchar(2000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reference_source" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="int" defaultValue="0">
+                <constraints nullable="false" />
+            </column>
+            <column name="modified_date" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="modified_by" type="int">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+    </changeSet>
+
+    <changeSet author="mderamos" id="v19.2.0-4">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="external_reference_phenotype"/>
+            </not>
+        </preConditions>
+        <comment>
+            Create external_reference_phenotype table
+        </comment>
+        <createTable tableName="external_reference_phenotype">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="phenotype_id" type="int">
+                <constraints nullable="false" foreignKeyName="fk_external_reference_phenotype" references="phenotype(phenotype_id)"/>
+            </column>
+            <column name="reference_id" type="varchar(2000)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="reference_source" type="varchar(255)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+                <constraints nullable="false"/>
+            </column>
+            <column name="created_by" type="int" defaultValue="0">
+                <constraints nullable="false" />
+            </column>
+            <column name="modified_date" type="timestamp">
+                <constraints nullable="true"/>
+            </column>
+            <column name="modified_by" type="int">
+                <constraints nullable="true" />
+            </column>
+        </createTable>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="v19.2.0-3">
+        <preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<tableExists tableName="list_data_details"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Create table 'list_data_details'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table list_data_details (
+				id            int auto_increment
+					primary key,
+				variable_id   int                                 not null,
+				lrecid        int                                 not null,
+				value         varchar(255)                        null,
+				cvalue_id     int                                 null,
+				created_by    int       default 0                 not null,
+				modified_by   int                                 null,
+				created_date  timestamp default CURRENT_TIMESTAMP not null,
+				modified_date timestamp                           null,
+				constraint list_entry_details_data_cvterm_cvterm_id_fk
+					foreign key (variable_id) references cvterm(cvterm_id),
+				constraint list_entry_details_data_cvterm_cvterm_id_fk_2
+					foreign key (cvalue_id) references cvterm(cvterm_id),
+				constraint list_entry_details_data_listdata_lrecid_fk
+					foreign key (lrecid) references listdata(lrecid)
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.2.0-4">
+        <preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<tableExists tableName="list_data_view"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Create table 'list_data_view'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table list_data_view (
+				id         int auto_increment primary key,
+				listid     int not null,
+				static_id  int null,
+				name_fldno int null,
+				cvterm_id  int null,
+				type_id    int null,
+				constraint list_data_view_cvterm_cvterm_id_fk
+					foreign key (type_id) references cvterm(cvterm_id),
+				constraint list_data_view_cvterm_cvterm_id_fk_2
+					foreign key (cvterm_id) references cvterm(cvterm_id),
+				constraint list_data_view_listnms_listid_fk
+					foreign key (listid) references listnms(listid)
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.2.0-5">
+        <preConditions onFail="MARK_RAN">
+			<and>
+				<not>
+					<tableExists tableName="list_data_default_view"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Create table 'list_data_default_view'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table list_data_default_view (
+				id   int auto_increment
+					primary key,
+				name varchar(255) null
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.2.0-6">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(*) FROM list_data_default_view;
+				</sqlCheck>
+			</and>
+        </preConditions>
+		<comment>
+			Add data to 'list_data_default_view' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO list_data_default_view (name)
+			VALUES ('ENTRY_NO'),
+				('GID'),
+				('DESIGNATION'),
+				('LOTS'),
+				('AVAILABLE'),
+				('UNIT');
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.2.0-7">
+		<preConditions onFail="MARK_RAN">
+			<and>
+            	<sqlCheck expectedResult="1">
+                	SELECT count(*) > 1 FROM listdataprops;
+            	</sqlCheck>
+				<not>
+					<tableExists tableName="listadataprops_migration_temporary"></tableExists>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Migrate 'listdataprops' table to 'list_data_view'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			# Create listadataprops_migration_temporary Table
+			CREATE TEMPORARY TABLE listadataprops_migration_temporary (
+				listdataprop_column_name varchar(255)         null,
+				static_column_term_id    int                  null,
+				is_default               tinyint(1) default 0 null
+			);
+
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('ENTRY_NO', 8230, 1);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('GID', 8240, 1);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('DESIGNATION', 8250, 1);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('LOTS', -3, 1);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('LOCATIONS', 2110, 0);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('METHOD NAME', 1701, 0);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('AVAILABLE', -4, 1);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('UNIT', -5, 1);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('METHOD ABBREV', 1702, 0);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('METHOD GROUP', 1704, 0);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('FGID', 1725, 0);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('CROSS-FEMALE PREFERRED NAME', 1723, 0);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('MGID', 1726, 0);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('CROSS-MALE PREFERRED NAME', 1724, 0);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('GROUP SOURCE GID', -8, 0);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('GROUP SOURCE', -9, 0);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('IMMEDIATE SOURCE GID', -6, 0);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('IMMEDIATE SOURCE', -7, 0);
+			INSERT INTO listadataprops_migration_temporary (listdataprop_column_name, static_column_term_id, is_default) VALUES ('GERMPLASM DATE', 1709, 0);
+
+			# Add static columns
+			INSERT INTO list_data_view (listid, static_id)
+				SELECT ld.listid, m.static_column_term_id
+					FROM listdataprops props
+					   INNER JOIN listadataprops_migration_temporary m ON m.listdataprop_column_name = props.column_name AND m.is_default = 0
+					   INNER JOIN listdata ld ON ld.lrecid = props.listdata_id
+					GROUP BY props.column_name, ld.listid
+					ORDER BY ld.listid;
+
+			# Add names
+			INSERT INTO list_data_view (listid, name_fldno)
+				SELECT ld.listid, u.fldno
+					FROM listdataprops props
+						INNER JOIN listdata ld ON ld.lrecid = props.listdata_id
+						INNER JOIN udflds u ON u.fname = props.column_name AND ftable = 'NAMES' AND ftype = 'NAME'
+						LEFT JOIN listadataprops_migration_temporary m ON m.listdataprop_column_name = props.column_name
+					WHERE m.listdataprop_column_name is null
+					GROUP BY props.column_name, ld.listid
+					ORDER BY ld.listid;
+
+			# Add descriptors
+			INSERT INTO list_data_view (listid, cvterm_id, type_id)
+				SELECT ld.listid, cv.cvterm_id, (case when (cp.value = 'Germplasm Attribute') then 1814 else 1813 end)
+					FROM listdataprops props
+						INNER JOIN listdata ld ON ld.lrecid = props.listdata_id
+						INNER JOIN cvterm cv ON cv.NAME = props.column_name AND cv.cv_id = 1040 AND is_obsolete = 0
+						INNER JOIN cvtermprop cp ON cv.cvterm_id = cp.cvterm_id AND cp.type_id = 1800
+						LEFT JOIN listadataprops_migration_temporary m ON m.listdataprop_column_name = props.column_name
+						LEFT JOIN udflds u ON u.fname = props.column_name AND ftable = 'NAMES' AND ftype = 'NAME'
+					WHERE m.listdataprop_column_name IS NULL AND u.fname is null AND (cp.value = 'Germplasm Attribute' OR cp.value = 'Germplasm Passport')
+					GROUP BY props.column_name,
+						ld.listid
+					ORDER BY ld.listid;
+
+			# Add default static columns
+			INSERT INTO list_data_view (listid, static_id)
+				SELECT view.listid, m.static_column_term_id
+					FROM list_data_view view
+						INNER JOIN listadataprops_migration_temporary m ON m.is_default = 1
+					GROUP BY view.listid, m.static_column_term_id
+					ORDER BY view.listid;
+
+			#Delete listadataprops_migration_temporary Table
+			DROP TABLE listadataprops_migration_temporary;
+
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

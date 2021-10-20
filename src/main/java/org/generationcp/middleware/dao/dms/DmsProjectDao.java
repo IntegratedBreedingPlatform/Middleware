@@ -20,6 +20,7 @@ import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
@@ -1998,12 +1999,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType) {
 		try {
-			final Query query = this.getSession().createSQLQuery("SELECT DISTINCT p.project_id"
+			final Query query = this.getSession().createSQLQuery("SELECT DISTINCT dataset.project_id"
 				+ " FROM project p "
 				+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id"
+				+ " INNER JOIN project dataset ON dataset.study_id = p.study_id"
 				+ " INNER JOIN project study ON p.study_id = study.project_id AND study.deleted != " + DELETED_STUDY
-				+ " WHERE nde.nd_geolocation_id = :environmentId"
-				+ " AND p.dataset_type_id = :datasetTypeId");
+				+ " WHERE nde.nd_geolocation_id = :environmentId AND nde.type_id = " + ExperimentType.TRIAL_ENVIRONMENT.getTermId()
+				+ " AND dataset.dataset_type_id = :datasetTypeId");
 			query.setParameter("environmentId", environmentId);
 			query.setParameter("datasetTypeId", datasetType.getId());
 			return (Integer) query.uniqueResult();

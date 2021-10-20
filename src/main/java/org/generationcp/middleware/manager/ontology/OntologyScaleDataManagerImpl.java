@@ -48,7 +48,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 	@Autowired
 	private TermDataManager termDataManager;
-		
+
 	private static final String SCALE_DOES_NOT_EXIST = "Scale does not exist";
 	private static final String TERM_IS_NOT_SCALE = "Term is not scale";
 	private static final String SCALE_EXIST_WITH_SAME_NAME = "Scale exist with same name";
@@ -149,9 +149,9 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 				} else if (Objects.equals(property.getTypeId(), TermId.MAX_VALUE.getId())) {
 					scale.setMaxValue(property.getValue());
 				} else if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
-					scale.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+					scale.setDateCreated(ISO8601DateParser.tryParseToDateTime(property.getValue()));
 				} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
-					scale.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+					scale.setDateLastModified(ISO8601DateParser.tryParseToDateTime(property.getValue()));
 				}
 			}
 
@@ -270,7 +270,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 	@Override
 	public void updateScale(Scale scale) {
-		
+
 		if (Objects.equals(scale.getDataType(), null)) {
 			throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);
 		}
