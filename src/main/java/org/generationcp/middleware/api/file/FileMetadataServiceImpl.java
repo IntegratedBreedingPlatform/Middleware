@@ -65,10 +65,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	public Image save(final ImageNewRequest imageNewRequest) {
 		final String observationUnitDbId = imageNewRequest.getObservationUnitDbId();
 		final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitDbId);
-
-		if (!experimentModelOptional.isPresent()) {
-			throw new MiddlewareRequestException("", "filemetadata.observationunit.not.found", new String[] {observationUnitDbId});
-		}
+		this.validateObservationUnit(experimentModelOptional, observationUnitDbId);
 
 		final FileMetadata fileMetadata = new FileMetadata();
 		fileMetadata.setExperimentModel(experimentModelOptional.get());
@@ -156,11 +153,12 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	@Override
 	public String getFilePathForObservationUnit(final String observationUnitId, final String fileName) {
 		final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId);
+		this.validateObservationUnit(experimentModelOptional, observationUnitId);
 		final DmsProject study = experimentModelOptional.get().getProject().getStudy();
 		final String path = FILE_PATH_PREFIX_PROGRAMUUID + study.getProgramUUID()
-			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_STUDYID + study.getProjectId()
-			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_OBSUNITUUID + observationUnitId
-			+ FILE_PATH_SLASH + fileName;
+				+ FILE_PATH_SLASH + FILE_PATH_PREFIX_STUDYID + study.getProjectId()
+				+ FILE_PATH_SLASH + FILE_PATH_PREFIX_OBSUNITUUID + observationUnitId
+				+ FILE_PATH_SLASH + fileName;
 		this.validatePathNotExists(path);
 		return path;
 	}
@@ -202,6 +200,12 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		}
 	}
 
+	private void validateObservationUnit(final Optional<ExperimentModel> experimentModelOptional, final String observationUnitId) {
+		if (!experimentModelOptional.isPresent()) {
+			throw new MiddlewareRequestException("", "filemetadata.observationunit.not.found", new String[] {observationUnitId});
+		}
+	}
+
 	@Override
 	public FileMetadataDTO save(
 		final FileMetadataDTO fileMetadataDTO,
@@ -215,9 +219,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 		if (!isBlank(observationUnitUUID)) {
 			final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitUUID);
-			if (!experimentModelOptional.isPresent()) {
-				throw new MiddlewareRequestException("", "filemetadata.observationunit.not.found", new String[] {observationUnitUUID});
-			}
+			this.validateObservationUnit(experimentModelOptional, observationUnitUUID);
 			fileMetadata.setExperimentModel(experimentModelOptional.get());
 		} else {
 			final Optional<Germplasm> germplasmOptional = this.daoFactory.getGermplasmDao().getGermplasmByGUIDs(singletonList(germplasmUUID))

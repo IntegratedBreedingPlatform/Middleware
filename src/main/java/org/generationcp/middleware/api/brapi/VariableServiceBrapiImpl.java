@@ -50,7 +50,8 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	}
 
 	@Override
-	public List<VariableDTO> getObservationVariables(final VariableSearchRequestDTO requestDTO,
+	public List<VariableDTO> getObservationVariables(
+		final VariableSearchRequestDTO requestDTO,
 		final Pageable pageable) {
 		final List<VariableDTO> variableDTOS = this.daoFactory.getCvTermDao().getObservationVariables(requestDTO, pageable);
 		if (!CollectionUtils.isEmpty(variableDTOS)) {
@@ -86,8 +87,9 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	@Override
 	public VariableDTO updateObservationVariable(final VariableDTO variable) {
 		final Integer variableId = Integer.valueOf(variable.getObservationVariableDbId());
-		final boolean isVariableUsedInStudy = this.ontologyVariableDataManager.areVariablesUsedInStudy(Arrays.asList(variableId));
-		if(!isVariableUsedInStudy) {
+		final boolean isVariableUsedInStudy = this.ontologyVariableDataManager
+			.areVariablesUsedInStudy(Arrays.asList(variableId));
+		if (!isVariableUsedInStudy) {
 			this.updateVariable(variable);
 		}
 
@@ -95,8 +97,8 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 		if (!CollectionUtils.isEmpty(variable.getStudyDbIds())) {
 			final List<Integer> plotDatasetIds = new ArrayList<>();
 			for (final String studyDbId : variable.getStudyDbIds()) {
-				this.addObservationVariableToStudy(Integer.valueOf(studyDbId), Integer.valueOf(variable.getObservationVariableDbId()),
-					variable.getObservationVariableName(), plotDatasetIds);
+				this.addObservationVariableToStudy(Integer.valueOf(studyDbId),
+					Integer.valueOf(variable.getObservationVariableDbId()), variable.getObservationVariableName(), plotDatasetIds);
 			}
 		}
 		return variable;
@@ -140,16 +142,18 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 		this.daoFactory.getCvTermRelationshipDao().update(cvTermRelationship);
 	}
 
-	private void addObservationVariableToStudy(final Integer studyDbId, final Integer observationVariableDbId,
+	private void addObservationVariableToStudy(
+		final Integer studyDbId, final Integer observationVariableDbId,
 		final String observationVariableName, final List<Integer> plotDatasetIds) {
-		final Integer plotDatasetId =
-				this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
-		if(!plotDatasetIds.contains(plotDatasetId)) {
+		final Integer plotDatasetId = this.daoFactory
+			.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		if (!plotDatasetIds.contains(plotDatasetId)) {
 			final List<MeasurementVariable> studyMeasurementVariables =
-					this.datasetService.getObservationSetVariables(plotDatasetId, Arrays.asList(VariableType.TRAIT.getId()));
+				this.datasetService.getObservationSetVariables(plotDatasetId, Arrays.asList(VariableType.TRAIT.getId()));
 			// Check first if the variable already exists in study
 			if (studyMeasurementVariables.stream().noneMatch(o -> o.getTermId() == observationVariableDbId)) {
-				this.datasetService.addDatasetVariable(plotDatasetId, observationVariableDbId, VariableType.TRAIT, observationVariableName);
+				this.datasetService
+					.addDatasetVariable(plotDatasetId, observationVariableDbId, VariableType.TRAIT, observationVariableName);
 			}
 			plotDatasetIds.add(plotDatasetId);
 		}
