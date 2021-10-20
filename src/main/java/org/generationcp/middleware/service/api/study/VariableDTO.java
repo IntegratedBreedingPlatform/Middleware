@@ -43,9 +43,7 @@ public class VariableDTO {
 
 	private String observationVariableDbId;
 	private String observationVariableName;
-	private String ontologyDbId;
-	private String ontologyName;
-	private OntologyReference ontologyReference;
+	private OntologyReference ontologyReference = new OntologyReference();
 	private Trait trait = new Trait();
 	private Method method = new Method();
 	private Scale scale = new Scale();
@@ -132,14 +130,6 @@ public class VariableDTO {
 		return this.observationVariableName;
 	}
 
-	public String getOntologyDbId() {
-		return this.ontologyDbId;
-	}
-
-	public String getOntologyName() {
-		return this.ontologyName;
-	}
-
 	public OntologyReference getOntologyReference() {
 		return this.ontologyReference;
 	}
@@ -216,14 +206,6 @@ public class VariableDTO {
 
 	public void setObservationVariableName(final String observationVariableName) {
 		this.observationVariableName = observationVariableName;
-	}
-
-	public void setOntologyDbId(final String ontologyDbId) {
-		this.ontologyDbId = ontologyDbId;
-	}
-
-	public void setOntologyName(final String ontologyName) {
-		this.ontologyName = ontologyName;
 	}
 
 	public void setOntologyReference(final OntologyReference ontologyReferenceObject) {

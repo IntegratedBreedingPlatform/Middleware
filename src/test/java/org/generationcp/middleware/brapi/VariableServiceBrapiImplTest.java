@@ -122,9 +122,9 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(1, variableDTOS.size());
 		final VariableDTO dto = variableDTOS.get(0);
 		Assert.assertEquals(categoricalVariable.getCvTermId().toString(), dto.getObservationVariableDbId());
-		Assert.assertEquals(categoricalVariable.getCvTermId().toString(), dto.getOntologyDbId());
+		Assert.assertEquals(categoricalVariable.getCvTermId().toString(), dto.getOntologyReference().getOntologyDbId());
 		Assert.assertEquals(vo.getAlias(), dto.getObservationVariableName());
-		Assert.assertEquals(categoricalVariable.getName(), dto.getOntologyName());
+		Assert.assertEquals(categoricalVariable.getName(), dto.getOntologyReference().getOntologyName());
 		Assert.assertNotNull(dto.getMethod());
 		Assert.assertNotNull(dto.getTrait());
 		Assert.assertNotNull(dto.getScale());

@@ -1728,9 +1728,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			variableDto.setName(observationVariableName);
 			variableDto.setObservationVariableDbId(String.valueOf(result.get(VARIABLE_ID)));
-			variableDto.setOntologyDbId(String.valueOf(result.get(VARIABLE_ID)));
+			variableDto.getOntologyReference().setOntologyDbId(String.valueOf(result.get(VARIABLE_ID)));
 			variableDto.setObservationVariableName(observationVariableName);
-			variableDto.setOntologyName(String.valueOf(result.get(VARIABLE_NAME)));
+			variableDto.getOntologyReference().setOntologyName(String.valueOf(result.get(VARIABLE_NAME)));
 			variableDto.setDate(result.get(VARIABLE_CREATION_DATE) != null ? String.valueOf(result.get(VARIABLE_CREATION_DATE)) : null);
 			variableDto.setDefaultValue(StringUtils.EMPTY);
 			final List<String> synonyms = result.get(VARIABLE_NAME_SYNONYMS) != null ?
