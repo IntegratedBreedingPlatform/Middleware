@@ -1071,9 +1071,9 @@ public class DatasetServiceImpl implements DatasetService {
 					 *  Low priority as this flow is not reachable now from BMS
 					 *  Import goes to draft data always
 					 */
-					final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId.toString());
+					final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId.toString());
 
-					final ArrayList<Phenotype> datasetPhenotypes = new ArrayList<>(experimentModel.getPhenotypes());
+					final ArrayList<Phenotype> datasetPhenotypes = new ArrayList<>(experimentModelOptional.get().getPhenotypes());
 					datasetPhenotypes.addAll(phenotypes);
 					this.setMeasurementDataAsOutOfSync(
 						formulasMap, //

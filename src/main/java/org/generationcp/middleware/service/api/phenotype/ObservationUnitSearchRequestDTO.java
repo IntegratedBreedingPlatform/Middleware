@@ -1,8 +1,12 @@
 package org.generationcp.middleware.service.api.phenotype;
 
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
+
 import java.io.Serializable;
 import java.util.List;
 
+@AutoProperty
 public class ObservationUnitSearchRequestDTO implements Serializable {
 
 	private List<String> germplasmDbIds;
@@ -130,5 +134,20 @@ public class ObservationUnitSearchRequestDTO implements Serializable {
 
 	public void setExternalReferenceSources(final List<String> externalReferenceSources) {
 		this.externalReferenceSources = externalReferenceSources;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 }

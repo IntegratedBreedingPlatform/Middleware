@@ -52,6 +52,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -60,6 +61,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -883,14 +885,23 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return observationUnitRows;
 	}
 
-	public ExperimentModel getByObsUnitId(final String obsUnitId) {
+	public Optional<ExperimentModel> getByObsUnitId(final String obsUnitId) {
+		final List<ExperimentModel> experimentModels = this.getByObsUnitIds(Arrays.asList(obsUnitId));
+		if (!CollectionUtils.isEmpty(experimentModels)) {
+			return Optional.of(experimentModels.get(0));
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	public List<ExperimentModel> getByObsUnitIds(final List<String> obsUnitIds) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("obsUnitId", obsUnitId));
-			return (ExperimentModel) criteria.uniqueResult();
+			criteria.add(Restrictions.in("obsUnitId", obsUnitIds));
+			return criteria.list();
 
 		} catch (final HibernateException e) {
-			final String message = "Error at getExperimentsByProjectIds query at ExperimentDao: " + e.getMessage();
+			final String message = "Error at getByObsUnitIds query at ExperimentDao: " + e.getMessage();
 			ExperimentDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}

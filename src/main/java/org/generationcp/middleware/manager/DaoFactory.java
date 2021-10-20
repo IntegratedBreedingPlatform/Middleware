@@ -1,18 +1,16 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.audit.germplasm.GermplasmAuditDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
+import org.generationcp.middleware.dao.CvTermExternalReferenceDAO;
 import org.generationcp.middleware.dao.ExperimentExternalReferenceDao;
 import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmExternalReferenceDAO;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
 import org.generationcp.middleware.dao.GermplasmStudySourceDAO;
 import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
@@ -22,6 +20,7 @@ import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.NamingConfigurationDAO;
+import org.generationcp.middleware.dao.PhenotypeExternalReferenceDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
@@ -33,6 +32,7 @@ import org.generationcp.middleware.dao.StudyInstanceExternalReferenceDao;
 import org.generationcp.middleware.dao.StudyTypeDAO;
 import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.dao.UserProgramTreeStateDAO;
+import org.generationcp.middleware.dao.audit.germplasm.GermplasmAuditDAO;
 import org.generationcp.middleware.dao.dms.DatasetTypeDAO;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
@@ -72,6 +72,8 @@ import org.generationcp.middleware.dao.gdms.QtlDAO;
 import org.generationcp.middleware.dao.gdms.QtlDetailsDAO;
 import org.generationcp.middleware.dao.gdms.TrackDataDAO;
 import org.generationcp.middleware.dao.gdms.TrackMarkerDAO;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDefaultViewDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataSearchDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataViewDAO;
@@ -551,6 +553,18 @@ public class DaoFactory {
 		final StudyExternalReferenceDao studyExternalReferenceDAO = new StudyExternalReferenceDao();
 		studyExternalReferenceDAO.setSession(this.sessionProvider.getSession());
 		return studyExternalReferenceDAO;
+	}
+
+	public CvTermExternalReferenceDAO getCvTermExternalReferenceDAO() {
+		final CvTermExternalReferenceDAO cvTermExternalReferenceDAO = new CvTermExternalReferenceDAO();
+		cvTermExternalReferenceDAO.setSession(this.sessionProvider.getSession());
+		return cvTermExternalReferenceDAO;
+	}
+
+	public PhenotypeExternalReferenceDAO getPhenotypeExternalReferenceDAO() {
+		final PhenotypeExternalReferenceDAO phenotypeExternalReferenceDAO = new PhenotypeExternalReferenceDAO();
+		phenotypeExternalReferenceDAO.setSession(this.sessionProvider.getSession());
+		return phenotypeExternalReferenceDAO;
 	}
 
 	public StudyInstanceExternalReferenceDao getStudyInstanceExternalReferenceDao() {
