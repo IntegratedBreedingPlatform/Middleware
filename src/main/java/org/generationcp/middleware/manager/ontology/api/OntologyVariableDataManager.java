@@ -20,7 +20,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
-import org.generationcp.middleware.service.api.study.VariableDTO;
 
 import java.util.List;
 
@@ -116,16 +115,6 @@ public interface OntologyVariableDataManager {
 	void deleteVariablesFromCache(List<Integer> variablesIds);
 
 	void fillVariableUsage(Variable variable);
-
-	List<VariableDTO> getVariablesByDatasetId(Integer datasetId, List<Integer> variableTypes,
-		Integer pageSize, Integer pageNumber);
-
-	long countVariablesByDatasetId(Integer datasetId, List<Integer> variableTypes);
-
-	List<VariableDTO> getAllVariables(List<Integer> variableTypes,
-		String cropname, Integer pageSize, Integer pageNumber);
-
-	long countAllVariables(List<Integer> variableTypes);
 
 	List<Variable> searchAttributeVariables(String query, String programUUID);
 

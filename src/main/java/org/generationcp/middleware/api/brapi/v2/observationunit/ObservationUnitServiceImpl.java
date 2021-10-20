@@ -47,6 +47,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -89,13 +90,14 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	public void update(final String observationUnitDbId, final ObservationUnitPatchRequestDTO requestDTO) {
 
 		final ExperimentDao experimentDao = this.daoFactory.getExperimentDao();
-		final ExperimentModel experimentModel = experimentDao.getByObsUnitId(observationUnitDbId);
+		final Optional<ExperimentModel> experimentModelOptional = experimentDao.getByObsUnitId(observationUnitDbId);
 
-		if (experimentModel == null) {
+		if (!experimentModelOptional.isPresent()) {
 			throw new MiddlewareRequestException("", "invalid.observation.unit.id");
 		}
 
 		try {
+			final ExperimentModel experimentModel = experimentModelOptional.get();
 			final String props = experimentModel.getJsonProps() != null ? experimentModel.getJsonProps() : "{}";
 			final Map<String, Object> propsMap = this.jacksonMapper.readValue(props, HashMap.class);
 			propsMap.put("geoCoordinates", requestDTO.getObservationUnitPosition().getGeoCoordinates());

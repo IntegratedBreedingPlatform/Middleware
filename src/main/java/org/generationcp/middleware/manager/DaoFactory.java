@@ -5,6 +5,7 @@ import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
+import org.generationcp.middleware.dao.CvTermExternalReferenceDAO;
 import org.generationcp.middleware.dao.ExperimentExternalReferenceDao;
 import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
@@ -19,6 +20,7 @@ import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.NamingConfigurationDAO;
+import org.generationcp.middleware.dao.PhenotypeExternalReferenceDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
@@ -552,6 +554,18 @@ public class DaoFactory {
 		final StudyExternalReferenceDao studyExternalReferenceDAO = new StudyExternalReferenceDao();
 		studyExternalReferenceDAO.setSession(this.sessionProvider.getSession());
 		return studyExternalReferenceDAO;
+	}
+
+	public CvTermExternalReferenceDAO getCvTermExternalReferenceDAO() {
+		final CvTermExternalReferenceDAO cvTermExternalReferenceDAO = new CvTermExternalReferenceDAO();
+		cvTermExternalReferenceDAO.setSession(this.sessionProvider.getSession());
+		return cvTermExternalReferenceDAO;
+	}
+
+	public PhenotypeExternalReferenceDAO getPhenotypeExternalReferenceDAO() {
+		final PhenotypeExternalReferenceDAO phenotypeExternalReferenceDAO = new PhenotypeExternalReferenceDAO();
+		phenotypeExternalReferenceDAO.setSession(this.sessionProvider.getSession());
+		return phenotypeExternalReferenceDAO;
 	}
 
 	public StudyInstanceExternalReferenceDao getStudyInstanceExternalReferenceDao() {

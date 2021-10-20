@@ -22,7 +22,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.StudyType;
@@ -39,7 +38,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 public class CvTermDaoTest extends IntegrationTestBase {
 
@@ -55,9 +53,9 @@ public class CvTermDaoTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		daoFactory = new DaoFactory(this.sessionProvder);
-		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, workbenchSessionProvider);
-		CvTermDaoTest.dao = daoFactory.getCvTermDao();
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
+		CvTermDaoTest.dao = this.daoFactory.getCvTermDao();
 	}
 
 	@Test
@@ -264,7 +262,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		final List<Integer> termIds = Arrays.asList(METHOD_APPLIED, METHOD_ASSIGNED, METHOD_ENUMERATED);
 		final List<CVTerm> nonObsoleteMethods = dao.getAllByCvId(termIds, CvId.METHODS, true);
 		Assert.assertNotNull(nonObsoleteMethods);
-		Assert.assertEquals("Methods " + termIds.toString() + " should all be non-obsolete", 3, nonObsoleteMethods.size());
+		Assert.assertEquals("Methods " + termIds + " should all be non-obsolete", 3, nonObsoleteMethods.size());
 		for (final CVTerm cvTerm : nonObsoleteMethods) {
 			Assert.assertEquals("All methods should have cv id " + CvId.METHODS.getId(), cvTerm.getCv().intValue(), CvId.METHODS.getId());
 			Assert.assertFalse("Method " + cvTerm.getCvTermId() + " should be non-obsolete", cvTerm.isObsolete());
@@ -295,48 +293,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetVariablesByDatasetId() {
-		// PH_M_cm
-		final int variableId1 = 20456;
-		// AleuCol_E_1to5
-		final int variableId2 = 51547;
-		// ASI_Cmp_day
-		final int variableId3 = 20308;
-
-		final DmsProject study = this.createProject("Study " + UUID.randomUUID().toString(), UUID.randomUUID().toString());
-		final DmsProject plotDataset =
-			this.testDataInitializer.createDmsProject("Plot Dataset", "Plot Dataset-Description", study, study,
-				DatasetTypeEnum.PLOT_DATA);
-		final DmsProject plantSubObsDataset =
-			this.testDataInitializer.createDmsProject("Plant Dataset", "Plant Dataset-Description", study, plotDataset,
-				DatasetTypeEnum.PLANT_SUBOBSERVATIONS);
-		this.testDataInitializer.addProjectProp(plotDataset, variableId1, "PH_M_cm", VariableType.TRAIT, "", 1);
-		this.testDataInitializer.addProjectProp(plantSubObsDataset, variableId2, "AleuCol_E_1to5", VariableType.TRAIT, "", 1);
-		this.testDataInitializer
-			.addProjectProp(plantSubObsDataset, variableId3, "ASI_Cmp_day", VariableType.OBSERVATION_UNIT, "", 2);
-
-		final int traitCount = (int) dao.countVariablesByDatasetId(plotDataset.getProjectId(), Lists
-			.newArrayList(VariableType.TRAIT.getId()));
-		final List<VariableDTO> variablesDTOs = dao.getVariablesByDatasetId(plotDataset.getProjectId(), Lists
-			.newArrayList(VariableType.TRAIT.getId()), traitCount,1);
-		// Only return the TRAIT variables associated to a study
-		Assert.assertEquals(traitCount, variablesDTOs.size());
-		Assert.assertEquals(String.valueOf(variableId1), variablesDTOs.get(0).getObservationVariableDbId());
-	}
-
-	@Test
-	public void testGetAllVariables() {
-		final int traitCount = (int) dao.countAllVariables(Lists
-			.newArrayList(VariableType.TRAIT.getId()));
-		final List<VariableDTO> variablesDTOs = dao.getAllVariables(Lists
-			.newArrayList(VariableType.TRAIT.getId()), traitCount, 1);
-		Assert.assertEquals(traitCount, variablesDTOs.size());
-	}
-
-	@Test
 	public void testConvertToVariableDTO() {
-
-		final boolean filterByStudyId = true;
 		final Map<String, Object> map = new HashMap<>();
 		map.put(CVTermDao.VARIABLE_ID, "123");
 		map.put(CVTermDao.VARIABLE_NAME, "variableName");
@@ -351,16 +308,16 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		map.put(CVTermDao.VARIABLE_PROPERTY_DESCRIPTION, "propertyDescription");
 		map.put(CVTermDao.VARIABLE_PROPERTY_ONTOLOGY_ID, "propertyOntology");
 		map.put(CVTermDao.VARIABLE_DATA_TYPE_ID, DataType.NUMERIC_VARIABLE.getId());
-		map.put(CVTermDao.VARIABLE_SCALE_CATEGORIES, "1|2|3|4|5");
-		map.put(CVTermDao.VARIABLE_SCALE_MIN_RANGE, new Double(100));
-		map.put(CVTermDao.VARIABLE_SCALE_MAX_RANGE, new Double(1000));
-		map.put(CVTermDao.VARIABLE_EXPECTED_MIN, new Double(1));
-		map.put(CVTermDao.VARIABLE_EXPECTED_MAX, new Double(10));
+		map.put(CVTermDao.VARIABLE_SCALE_CATEGORIES, "a,1|b,2|c,3|d,4|e,5");
+		map.put(CVTermDao.VARIABLE_SCALE_MIN_RANGE, new Integer(100));
+		map.put(CVTermDao.VARIABLE_SCALE_MAX_RANGE, new Integer(1000));
+		map.put(CVTermDao.VARIABLE_EXPECTED_MIN, new Integer(1));
+		map.put(CVTermDao.VARIABLE_EXPECTED_MAX, new Integer(10));
 		map.put(CVTermDao.VARIABLE_CREATION_DATE, "variableCreationDate");
 		map.put(CVTermDao.VARIABLE_TRAIT_CLASS, "traitClass");
 		map.put(CVTermDao.VARIABLE_FORMULA_DEFINITION, "formulaDefinition");
 
-		final List<VariableDTO> variableDTOs = dao.convertToVariableDTO(Lists.newArrayList(map), filterByStudyId);
+		final List<VariableDTO> variableDTOs = dao.convertToVariableDTO(Lists.newArrayList(map));
 		final VariableDTO variableDTO = variableDTOs.get(0);
 
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_ID), variableDTO.getObservationVariableDbId());
@@ -372,7 +329,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_PROPERTY), variableDTO.getTrait().getTraitName());
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_PROPERTY_ID), variableDTO.getTrait().getTraitDbId());
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_PROPERTY_DESCRIPTION), variableDTO.getTrait().getDescription());
-		Assert.assertEquals(map.get(CVTermDao.VARIABLE_TRAIT_CLASS), variableDTO.getTrait().getTraitClass());
+		Assert.assertEquals(map.get(CVTermDao.VARIABLE_TRAIT_CLASS), variableDTO.getTrait().getTraitClassAttribute());
 		Assert.assertEquals("Active", variableDTO.getTrait().getStatus());
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_PROPERTY_ONTOLOGY_ID), variableDTO.getTrait().getXref());
 
@@ -385,7 +342,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_SCALE_ID), variableDTO.getScale().getScaleDbId());
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_EXPECTED_MIN), variableDTO.getScale().getValidValues().getMin());
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_EXPECTED_MAX), variableDTO.getScale().getValidValues().getMax());
-		Assert.assertEquals(VariableDTO.Scale.NUMERICAL, variableDTO.getScale().getDataType());
+		Assert.assertEquals(DataType.NUMERIC_VARIABLE.getBrapiName(), variableDTO.getScale().getDataType());
 		Assert.assertEquals(4, variableDTO.getScale().getDecimalPlaces().intValue());
 		Assert.assertEquals(5, variableDTO.getScale().getValidValues().getCategories().size());
 		Assert.assertEquals(map.get(CVTermDao.VARIABLE_SCALE), variableDTO.getScale().getOntologyReference().getOntologyName());
@@ -400,13 +357,13 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testConvertDataTypeToVariableDtoScale() {
+	public void testGetDataTypeBrapiName() {
 
-		Assert.assertEquals(VariableDTO.Scale.NUMERICAL, dao.convertDataTypeToVariableDtoScale(DataType.NUMERIC_VARIABLE.getId()));
-		Assert.assertEquals(VariableDTO.Scale.DATE, dao.convertDataTypeToVariableDtoScale(DataType.DATE_TIME_VARIABLE.getId()));
-		Assert.assertEquals(VariableDTO.Scale.NOMINAL, dao.convertDataTypeToVariableDtoScale(DataType.CATEGORICAL_VARIABLE.getId()));
-		Assert.assertEquals(VariableDTO.Scale.TEXT, dao.convertDataTypeToVariableDtoScale(DataType.CHARACTER_VARIABLE.getId()));
-		Assert.assertEquals("", dao.convertDataTypeToVariableDtoScale(DataType.DATASET.getId()));
+		Assert.assertEquals(DataType.NUMERIC_VARIABLE.getBrapiName(), dao.getDataTypeBrapiName(DataType.NUMERIC_VARIABLE.getId()));
+		Assert.assertEquals(DataType.DATE_TIME_VARIABLE.getBrapiName(), dao.getDataTypeBrapiName(DataType.DATE_TIME_VARIABLE.getId()));
+		Assert.assertEquals(DataType.CATEGORICAL_VARIABLE.getBrapiName(), dao.getDataTypeBrapiName(DataType.CATEGORICAL_VARIABLE.getId()));
+		Assert.assertEquals(DataType.CHARACTER_VARIABLE.getBrapiName(), dao.getDataTypeBrapiName(DataType.CHARACTER_VARIABLE.getId()));
+		Assert.assertNull(dao.getDataTypeBrapiName(DataType.DATASET.getId()));
 
 	}
 
