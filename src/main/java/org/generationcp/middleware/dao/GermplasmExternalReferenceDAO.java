@@ -11,29 +11,16 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class GermplasmExternalReferenceDAO extends GenericDAO<GermplasmExternalReference, Integer> {
+public class GermplasmExternalReferenceDAO extends GenericExternalReferenceDAO<GermplasmExternalReference> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(GermplasmExternalReferenceDAO.class);
+	@Override
+	String getIdField() {
+		return "gid";
+	}
 
-	private static final String GET_EXTERNAL_REFERENCES =
-		"SELECT CAST(gid AS CHAR(255)) as entityId, reference_id as referenceID, reference_source referenceSource FROM external_reference_germplasm WHERE gid IN (:gids)";
-
-	public List<ExternalReferenceDTO> getExternalReferencesByGids(final List<Integer> gids) {
-
-		try {
-			final SQLQuery sqlQuery = this.getSession().createSQLQuery(GET_EXTERNAL_REFERENCES);
-
-			sqlQuery.addScalar("entityId").addScalar("referenceID").addScalar("referenceSource")
-				.setResultTransformer(new AliasToBeanResultTransformer(ExternalReferenceDTO.class));
-
-			sqlQuery.setParameterList("gids", gids);
-
-			return sqlQuery.list();
-		} catch (final HibernateException e) {
-			final String errorMessage = "Error with getExternalReferencesByGids(gids=" + gids + e.getMessage();
-			GermplasmExternalReferenceDAO.LOG.error(errorMessage, e);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
+	@Override
+	String getReferenceTable() {
+		return "external_reference_germplasm";
 	}
 
 }

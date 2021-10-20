@@ -48,7 +48,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 	@Autowired
 	private TermDataManager termDataManager;
-		
+
 	private static final String SCALE_DOES_NOT_EXIST = "Scale does not exist";
 	private static final String TERM_IS_NOT_SCALE = "Term is not scale";
 	private static final String SCALE_EXIST_WITH_SAME_NAME = "Scale exist with same name";
@@ -270,7 +270,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 
 	@Override
 	public void updateScale(Scale scale) {
-		
+
 		if (Objects.equals(scale.getDataType(), null)) {
 			throw new MiddlewareException(OntologyScaleDataManagerImpl.SCALE_DATA_TYPE_SHOULD_NOT_EMPTY);
 		}
