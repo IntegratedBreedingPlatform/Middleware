@@ -308,7 +308,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void shouldGetGermplasmLists_OK() {
+	public void testGetGermplasmLists_OK() {
 		//create germplasm
 		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
 		final Germplasm germplasm = this.createGermplasm(singleCrossMethod);
@@ -328,6 +328,16 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final List<GermplasmListDto>  updatedGermplasmListDtos = this.germplasmListService.getGermplasmLists(germplasm.getGid());
 
 		Assert.assertEquals(germplasmListDtos.size() + 1, updatedGermplasmListDtos.size());
+	}
+
+	@Test
+	public void testToggleGermplasmListStatus_OK() {
+		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List ",
+			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, GermplasmList.Status.LIST.getCode());
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+
+		assertTrue(this.germplasmListService.toggleGermplasmListStatus(germplasmList.getId()));
+		assertFalse(this.germplasmListService.toggleGermplasmListStatus(germplasmList.getId()));
 	}
 
 	private Germplasm createGermplasm(final Method method) {

@@ -21,6 +21,8 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchServiceImpl;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListServiceImpl;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataServiceImpl;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
@@ -384,6 +386,10 @@ public class ManagerFactory implements Serializable {
 
 	public ProgramFavoriteService getProgramFavoriteService() {
 		return new ProgramFavoriteServiceImpl(this.sessionProvider);
+	}
+
+	public GermplasmListDataService getGermplasmListDataService() {
+		return new GermplasmListDataServiceImpl(this.sessionProvider);
 	}
 
 }

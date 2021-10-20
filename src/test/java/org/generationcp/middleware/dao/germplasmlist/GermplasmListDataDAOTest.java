@@ -1,10 +1,11 @@
 
-package org.generationcp.middleware.dao;
+package org.generationcp.middleware.dao.germplasmlist;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.manager.Operation;
@@ -13,6 +14,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,6 +24,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertThat;
 
 public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
@@ -359,6 +364,16 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(germplasmListData1.getGroupName(), crossExpansion);
 		Assert.assertEquals(germplasmListData2.getGroupName(), crossExpansion);
 		Assert.assertEquals(germplasmListData3.getGroupName(), crossExpansion);
+	}
+
+	@Test
+	public void testGetGidsByListId() {
+		final Germplasm germplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final GermplasmListData germplasmListData = this.createTestListWithListData(germplasm);
+
+		final List<Integer> gidsByListId = this.germplasmListDataDAO.getGidsByListId(germplasmListData.getList().getId());
+		assertThat(gidsByListId, Matchers.hasSize(1));
+		assertThat(gidsByListId.get(0), is(germplasm.getGid()));
 	}
 
 }

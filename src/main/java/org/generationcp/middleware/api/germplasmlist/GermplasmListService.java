@@ -1,6 +1,8 @@
 package org.generationcp.middleware.api.germplasmlist;
 
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -52,5 +54,17 @@ public interface GermplasmListService {
 	void deleteProgramGermplasmLists(String programUUID);
 
 	long countGermplasmLists(List<Integer> gids);
+
+	List<GermplasmListSearchResponse> searchGermplasmList(GermplasmListSearchRequest request, Pageable pageable, String programUUID);
+
+	long countSearchGermplasmList(GermplasmListSearchRequest request, String programUUID);
+
+	/**
+	 * Lock the list if it's unlocked and vice versa.
+	 *
+	 * @param listId
+	 * @return {@link boolean} true if it's locked or false it's unlocked
+	 */
+	boolean toggleGermplasmListStatus(Integer listId);
 
 }

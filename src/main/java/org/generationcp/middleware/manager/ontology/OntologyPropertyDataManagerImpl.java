@@ -234,9 +234,9 @@ public class OntologyPropertyDataManagerImpl extends DataManager implements Onto
 				}
 
 				if (Objects.equals(property.getTypeId(), TermId.CREATION_DATE.getId())) {
-					ontologyProperty.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+					ontologyProperty.setDateCreated(ISO8601DateParser.tryParseToDateTime(property.getValue()));
 				} else if (Objects.equals(property.getTypeId(), TermId.LAST_UPDATE_DATE.getId())) {
-					ontologyProperty.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+					ontologyProperty.setDateLastModified(ISO8601DateParser.tryParseToDateTime(property.getValue()));
 				}
 			}
 

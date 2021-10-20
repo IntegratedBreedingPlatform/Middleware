@@ -3,6 +3,7 @@ package org.generationcp.middleware.data.initializer;
 import java.util.ArrayList;
 import java.util.List;
 
+import jnr.ffi.annotations.In;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.LotDetails;
@@ -243,8 +244,16 @@ public class GermplasmListTestDataInitializer {
 		return listDataInventory;
 	}
 
+
+
 	public static GermplasmList createGermplasmListTestData(final String name, final String description, final long date,
 			final String type, final int userId, final int status, final String programUUID, final Integer projectId) throws MiddlewareQueryException {
+		return createGermplasmListTestData(name, description, date, type, userId, status, programUUID, projectId, null, null);
+	}
+
+	public static GermplasmList createGermplasmListTestData(final String name, final String description, final long date,
+		final String type, final int userId, final int status, final String programUUID, final Integer projectId, final GermplasmList parentFolder,
+		final String notes) {
 		final GermplasmList list = new GermplasmList();
 		list.setName(name);
 		list.setDescription(description);
@@ -254,6 +263,8 @@ public class GermplasmListTestDataInitializer {
 		list.setStatus(status);
 		list.setProgramUUID(programUUID);
 		list.setProjectId(projectId);
+		list.setParent(parentFolder);
+		list.setNotes(notes);
 		return list;
 	}
 

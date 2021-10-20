@@ -451,21 +451,21 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				} else if (Objects.equals(typeId, TermId.MAX_VALUE.getId()) && Objects.equals(cvId, CvId.SCALES.getId())) {
 					sMap.get(cvTermId).setMaxValue(value);
 				} else if (Objects.equals(typeId, TermId.CREATION_DATE.getId()) && Objects.equals(cvId, CvId.METHODS.getId())) {
-					mMap.get(cvTermId).setDateCreated(ISO8601DateParser.tryParse(value));
+					mMap.get(cvTermId).setDateCreated(ISO8601DateParser.tryParseToDateTime(value));
 				} else if (Objects.equals(typeId, TermId.LAST_UPDATE_DATE.getId()) && Objects.equals(cvId, CvId.METHODS.getId())) {
-					mMap.get(cvTermId).setDateLastModified(ISO8601DateParser.tryParse(value));
+					mMap.get(cvTermId).setDateLastModified(ISO8601DateParser.tryParseToDateTime(value));
 				} else if (Objects.equals(typeId, TermId.CREATION_DATE.getId()) && Objects.equals(cvId, CvId.PROPERTIES.getId())) {
-					pMap.get(cvTermId).setDateCreated(ISO8601DateParser.tryParse(value));
+					pMap.get(cvTermId).setDateCreated(ISO8601DateParser.tryParseToDateTime(value));
 				} else if (Objects.equals(typeId, TermId.LAST_UPDATE_DATE.getId()) && Objects.equals(cvId, CvId.PROPERTIES.getId())) {
-					pMap.get(cvTermId).setDateLastModified(ISO8601DateParser.tryParse(value));
+					pMap.get(cvTermId).setDateLastModified(ISO8601DateParser.tryParseToDateTime(value));
 				} else if (Objects.equals(typeId, TermId.CREATION_DATE.getId()) && Objects.equals(cvId, CvId.SCALES.getId())) {
-					sMap.get(cvTermId).setDateCreated(ISO8601DateParser.tryParse(value));
+					sMap.get(cvTermId).setDateCreated(ISO8601DateParser.tryParseToDateTime(value));
 				} else if (Objects.equals(typeId, TermId.LAST_UPDATE_DATE.getId()) && Objects.equals(cvId, CvId.SCALES.getId())) {
-					sMap.get(cvTermId).setDateLastModified(ISO8601DateParser.tryParse(value));
+					sMap.get(cvTermId).setDateLastModified(ISO8601DateParser.tryParseToDateTime(value));
 				} else if (Objects.equals(typeId, TermId.CREATION_DATE.getId()) && Objects.equals(cvId, CvId.VARIABLES.getId())) {
-					map.get(cvTermId).setDateCreated(ISO8601DateParser.tryParse(value));
+					map.get(cvTermId).setDateCreated(ISO8601DateParser.tryParseToDateTime(value));
 				} else if (Objects.equals(typeId, TermId.LAST_UPDATE_DATE.getId()) && Objects.equals(cvId, CvId.VARIABLES.getId())) {
-					map.get(cvTermId).setDateLastModified(ISO8601DateParser.tryParse(value));
+					map.get(cvTermId).setDateLastModified(ISO8601DateParser.tryParseToDateTime(value));
 				}
 
 			}
@@ -528,9 +528,9 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 						variable.setAllowsFormula(true);
 					}
 				} else if (property.getTypeId() == TermId.CREATION_DATE.getId()) {
-					variable.setDateCreated(ISO8601DateParser.tryParse(property.getValue()));
+					variable.setDateCreated(ISO8601DateParser.tryParseToDateTime(property.getValue()));
 				} else if (property.getTypeId() == TermId.LAST_UPDATE_DATE.getId()) {
-					variable.setDateLastModified(ISO8601DateParser.tryParse(property.getValue()));
+					variable.setDateLastModified(ISO8601DateParser.tryParseToDateTime(property.getValue()));
 				} else if (property.getTypeId() == TermId.CROP_ONTOLOGY_ID.getId()) {
 					variable.getProperty().setCropOntologyId(property.getValue());
 				}
