@@ -233,7 +233,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		Map<String, Name> nameTypeMap = this.germplasmNameTypeMap.containsKey(germplasm)
 			? this.germplasmNameTypeMap.get(gid) : new HashMap<>();
 
-		if(nameTypeMap.containsKey(type)) {
+		if (nameTypeMap.containsKey(type)) {
 			return nameTypeMap.get(type);
 		}
 
@@ -313,7 +313,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	@Override
 	public void copyCodedNames(final Germplasm germplasm, final Germplasm sourceGermplasm) {
-		for(UserDefinedField codingNameType : this.getCodingNameTypes()) {
+		for (UserDefinedField codingNameType : this.getCodingNameTypes()) {
 			this.copyCodedName(germplasm, this.findNameByType(sourceGermplasm, codingNameType));
 		}
 	}
