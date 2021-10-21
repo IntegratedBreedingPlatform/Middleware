@@ -160,17 +160,6 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="clarysabel" id="v19.2.0-3">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1815;</sqlCheck>
-		</preConditions>
-		<comment>Add 'Entry Detail' variable type</comment>
-        <sql>
-			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
-			VALUES (1815, 1041, 'Entry Detail', 'Variables that describes list entries', null, 0, 0);
-        </sql>
-    </changeSet>
-
 	<changeSet author="lkovacic" id="v19.2.0-5">
         <preConditions onFail="MARK_RAN">
 			<and>
