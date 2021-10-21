@@ -473,7 +473,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public void removeListVariables(final Integer listId, final Set<Integer> variableIds) {
-		//TODO Confirm if RANK will be recalculated as part of this deletion when implemented
 		this.daoFactory.getGermplasmListDataDetailDAO().deleteByListIdAndVariableIds(listId, variableIds);
 		this.daoFactory.getGermplasmListDataViewDAO().deleteByListIdAndVariableIds(listId, variableIds);
 	}
