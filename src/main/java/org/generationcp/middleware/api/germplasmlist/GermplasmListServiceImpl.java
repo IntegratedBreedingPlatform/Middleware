@@ -525,9 +525,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public Integer saveListDataObservation(final Integer listId, final GermplasmListObservationRequestDto observationRequestDto) {
-		final GermplasmListDataDetail observation = this.daoFactory.getGermplasmListDataDetailDAO()
+		final Optional<GermplasmListDataDetail> observationOptional = this.daoFactory.getGermplasmListDataDetailDAO()
 			.getByListDataIdAndVariableId(observationRequestDto.getListDataId(), observationRequestDto.getVariableId());
-		if (observation != null) {
+		if (observationOptional.isPresent()) {
 			throw new MiddlewareRequestException("", "germplasm.list.data.details.exists", "");
 		}
 		final GermplasmListData germplasmListData =
