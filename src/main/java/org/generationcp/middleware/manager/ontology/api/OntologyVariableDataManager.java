@@ -90,21 +90,11 @@ public interface OntologyVariableDataManager {
 	 */
   	boolean isVariableUsedInStudy(int variableId);
 
-	/**
-	 * This function will give boolean flag if variable is used in any breeding Methods or not
-	 *
-	 * @param variableId variableId for which to retrieve usage flag
-	 * @return boolean return true if variable is used else false
-	 */
-	boolean isVariableUsedInBreedingMethods(int variableId);
-
 	boolean areVariablesUsedInStudy(List<Integer> variablesIds);
 
 	boolean areVariablesUsedInAttributes(List<Integer> variablesIds);
 
 	List<VariableOverrides> getVariableOverridesByVariableIds(List<Integer> variableIds);
-
-	VariableOverrides getVariableOverridesByVariableIdAndProgram(Integer variableId, String programUuid);
 
 	List<VariableOverridesDto> getVariableOverridesByAliasAndProgram(String alias, String programUuid);
 
