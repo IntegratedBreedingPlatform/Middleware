@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDetail, Integer> {
@@ -43,13 +44,12 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 		}
 	}
 
-	public GermplasmListDataDetail getByListDataIdAndVariableId(final Integer listDataId, final Integer variableId) {
+	public Optional<GermplasmListDataDetail> getByListDataIdAndVariableId(final Integer listDataId, final Integer variableId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(GermplasmListDataDetail.class);
 			criteria.add(Restrictions.eq("listData.id", listDataId));
 			criteria.add(Restrictions.eq("variableId", variableId));
-			final Object result = criteria.uniqueResult();
-			return (result == null) ? null : (GermplasmListDataDetail) result;
+			return Optional.ofNullable((GermplasmListDataDetail) criteria.uniqueResult());
 		} catch (final HibernateException e) {
 			final String errorMessage =
 				"Error with deleteByListIdAndVariableIds(" + listDataId + "," + variableId + ") query from GermplasmListDataDetailDAO: " + e
