@@ -97,4 +97,18 @@
 
 		</sql>
 	</changeSet>
+
+	<changeSet author="cuenyad" id="v19.2.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+            	SELECT count(*) > 0 FROM permission WHERE name = 'IMPORT_GERMPLASM_LISTS' and workbench_sidebar_category_link_id is not null;
+            </sqlCheck>
+        </preConditions>
+		<comment>
+			set workbench_sidebar_category_link_id null for Import Germplasm Lists permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE permission SET workbench_sidebar_category_link_id = NULL WHERE name = 'IMPORT_GERMPLASM_LISTS';
+		</sql>
+	</changeSet>
 </databaseChangeLog>
