@@ -164,10 +164,32 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			final List<Name> names = namesByGid.get(gid);
 			Preconditions.checkArgument(preferredName != null || names != null, "No name found for gid=" + gid);
 			final String designation = preferredName != null ? preferredName : names.get(0).getNval();
-			final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, entry.getEntryNo(),
+			GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, entry.getEntryNo(),
 				entry.getEntryCode(), entry.getSeedSource(), designation, entry.getGroupName(),
 				GermplasmListDataDAO.STATUS_ACTIVE, null);
-			this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+			germplasmListData = this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+
+			// save entry details
+			for (final Map.Entry<Integer, GermplasmListObservationDto> entryDetailSet : entry.getData().entrySet()) {
+				final GermplasmListObservationDto entryDetail = entryDetailSet.getValue();
+
+				// save variables
+				final GermplasmListDataView germplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(
+					germplasmList,
+					entryDetailSet.getKey(),
+					VariableType.ENTRY_DETAIL.getId()
+				).build();
+				this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
+
+				// save data
+				final GermplasmListDataDetail germplasmListDataDetail = new GermplasmListDataDetail(
+					germplasmListData,
+					entryDetailSet.getKey(),
+					entryDetail.getValue(),
+					entryDetail.getcValueId()
+				);
+				this.daoFactory.getGermplasmListDataDetailDAO().save(germplasmListDataDetail);
+			}
 		}
 
 		return request;

@@ -4,8 +4,10 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 public class GermplasmListGeneratorDTO {
 
@@ -16,6 +18,9 @@ public class GermplasmListGeneratorDTO {
 		private String entryCode;
 		private String seedSource;
 		private String groupName;
+
+		// <variableId:
+		private Map<Integer, GermplasmListObservationDto> data = Collections.emptyMap();
 
 		public Integer getEntryNo() {
 			return this.entryNo;
@@ -55,6 +60,14 @@ public class GermplasmListGeneratorDTO {
 
 		public void setGroupName(final String groupName) {
 			this.groupName = groupName;
+		}
+
+		public Map<Integer, GermplasmListObservationDto> getData() {
+			return data;
+		}
+
+		public void setData(final Map<Integer, GermplasmListObservationDto> data) {
+			this.data = data;
 		}
 	}
 
