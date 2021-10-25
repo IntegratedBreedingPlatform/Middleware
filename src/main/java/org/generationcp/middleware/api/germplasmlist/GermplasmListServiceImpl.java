@@ -511,7 +511,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public Optional<GermplasmListObservationDto> getGermplasmListObservation(final Integer observationId) {
+	public Optional<GermplasmListObservationDto> getListDataObservation(final Integer observationId) {
 		final GermplasmListDataDetail germplasmListDataDetail = this.daoFactory.getGermplasmListDataDetailDAO().getById(observationId);
 		if (germplasmListDataDetail != null) {
 			final GermplasmListObservationDto germplasmListObservationDto =

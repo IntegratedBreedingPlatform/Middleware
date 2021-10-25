@@ -79,7 +79,7 @@ public interface GermplasmListService {
 
 	Optional<GermplasmListDataDto> getGermplasmListData(Integer listDataId);
 
-	Optional<GermplasmListObservationDto> getGermplasmListObservation(Integer observationId);
+	Optional<GermplasmListObservationDto> getListDataObservation(Integer observationId);
 
 	Integer saveListDataObservation(Integer listId, GermplasmListObservationRequestDto observationRequestDto);
 
