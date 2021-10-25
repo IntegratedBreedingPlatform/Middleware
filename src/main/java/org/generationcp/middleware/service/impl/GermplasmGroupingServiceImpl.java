@@ -59,6 +59,8 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private UserDefinedField selHistAtFixationNameType;
 
+	private UserDefinedField selHistNameTypeForCode;
+
 	private List<UserDefinedField> codingNameTypes = new ArrayList<>();
 
 	private final DaoFactory daoFactory;
@@ -266,11 +268,6 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	 * usually does and will be accessible through the germplasm details screen
 	 * but will not be the name displayed in lists.
 	 */
-	private void addOrUpdateSelectionHistoryAtFixationName(final Germplasm germplasm, final Name nameToCopyFrom) {
-		this.addOrUpdateSelectionHistoryAtFixationName(germplasm, nameToCopyFrom,
-			this.getSelectionHistoryNameType(SELECTION_HISTORY_AT_FIXATION_NAME_CODE));
-	}
-
 	private void addOrUpdateSelectionHistoryAtFixationName(final Germplasm germplasm, final Name nameToCopyFrom,
 		final UserDefinedField nameType) {
 
@@ -419,11 +416,10 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private void copySelectionHistoryForCross(final Germplasm cross, final Germplasm previousCross) {
 
-		final Name previousCrossSelectionHistory =
-			this.getSelectionHistory(previousCross, GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE_FOR_CROSS);
+		final Name previousCrossSelectionHistory = this.findNameByType(previousCross, this.selHistNameTypeForCode);
 
 		if (previousCrossSelectionHistory != null) {
-			this.addOrUpdateSelectionHistoryAtFixationName(cross, previousCrossSelectionHistory);
+			this.addOrUpdateSelectionHistoryAtFixationName(cross, previousCrossSelectionHistory, this.selHistAtFixationNameType);
 			GermplasmGroupingServiceImpl.LOG.info("Selection history {} for cross with gid {} was copied from previous cross with gid {}.",
 				previousCrossSelectionHistory.getNval(), cross.getGid(), previousCross.getGid());
 		} else {
@@ -442,6 +438,9 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		final Set<Integer> hybridMethods) {
 		final GermplasmCache germplasmCache = new GermplasmCache(this.germplasmDataManager, 2);
 		final Set<Integer> gidsOfCrosses = germplasmIdMethodIdMap.keySet();
+		this.selHistNameTypeForCode = this.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_NAME_CODE_FOR_CROSS);
+		this.selHistAtFixationNameType = this.getSelectionHistoryNameType(SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
+
 		germplasmCache.initialiseCache(cropName, gidsOfCrosses, 2);
 		// We passed method is as map to optimize performance instead of retrieving cross to get the germplasm method
 		for (final Map.Entry<Integer, Integer> germplasmData : germplasmIdMethodIdMap.entrySet()) {
