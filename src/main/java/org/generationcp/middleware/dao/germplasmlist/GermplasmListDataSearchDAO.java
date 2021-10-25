@@ -244,6 +244,11 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 			whereClause.add("g.germplsm_uuid = :germplasmUUID ");
 		}
 
+		if (!StringUtils.isEmpty(request.getGroupId())) {
+			queryParams.put("groupId", request.getGroupId());
+			whereClause.add("g.mgid = :groupId ");
+		}
+
 		final SqlTextFilter designationFilter = request.getDesignationFilter();
 		if (designationFilter != null && !designationFilter.isEmpty()) {
 			final String value = designationFilter.getValue();
