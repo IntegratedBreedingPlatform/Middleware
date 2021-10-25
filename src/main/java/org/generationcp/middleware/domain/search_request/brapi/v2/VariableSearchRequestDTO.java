@@ -8,7 +8,6 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.List;
 
 @AutoProperty
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class VariableSearchRequestDTO extends SearchRequestDto {
 
     private List<String> dataTypes;
