@@ -7,6 +7,7 @@ import com.google.common.collect.Lists;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.ontology.OntologyVariableServiceImpl;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.domain.dms.NameType;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -69,6 +70,7 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
  * Implements {@link OntologyVariableDataManagerImpl}
+ * TODO migrate progressively to {@link OntologyVariableServiceImpl}
  */
 @Transactional
 public class OntologyVariableDataManagerImpl extends DataManager implements OntologyVariableDataManager {
