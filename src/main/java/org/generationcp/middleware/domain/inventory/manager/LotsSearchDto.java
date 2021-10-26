@@ -10,7 +10,6 @@ import java.util.Date;
 import java.util.List;
 
 @AutoProperty
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class LotsSearchDto extends SearchRequestDto {
 
 	private Integer status;

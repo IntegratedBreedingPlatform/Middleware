@@ -4,7 +4,50 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="mderamos" id="v19.3.0-1">
+	<changeSet author="cuenyad" id="v19.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			  <sqlCheck expectedResult="1">
+					SELECT count(1) > 0 FROM (
+										SELECT 1
+										FROM role_permission rp
+										INNER JOIN permission p ON rp.permission_id = p.permission_id
+										WHERE p.name IN ('GERMPLASM', 'MANAGE_GERMPLASM')
+										GROUP BY rp.role_id
+									) AS count;
+			  </sqlCheck>
+        </preConditions>
+		<comment>
+			Removing Merge germplasm permission for roles that do not have Full permissions.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			# Insert inherited permissions of GERMPLASM and MANAGE GERMPLASM.
+			INSERT INTO role_permission(role_id,permission_id)
+				SELECT rti.role_id, pti.permission_id FROM (SELECT DISTINCT(rp.role_id) AS role_id
+																FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+																	WHERE p.name IN ('GERMPLASM', 'MANAGE_GERMPLASM')
+																		GROUP BY rp.role_id
+				    										) rti
+				CROSS JOIN
+					(SELECT permission_id FROM permission
+						WHERE name IN ( 'IMPORT_GERMPLASM',  'MG_MANAGE_INVENTORY', 'SEARCH_GERMPLASM', 'IMPORT_GERMPLASM_UPDATES', 'GERMPLASM_LABEL_PRINTING', 'EDIT_GERMPLASM',
+										 'DELETE_GERMPLASM','CODE_GERMPLASM', 'GROUP_GERMPLASM', 'UNGROUP_GERMPLASM', 'VIEW_GERMPLASM_CHANGE_HISTORY')
+					) pti;
+
+			# Delete GERMPLASM and MANAGE GERMPLASM permissions from roles that do not have Full permissions.
+			DELETE role_permission FROM role_permission
+				WHERE
+					permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name in ('GERMPLASM','MANAGE_GERMPLASM'))
+					AND role_id IN (SELECT subA.role_id FROM (SELECT rp.role_id AS role_id FROM role_permission rp
+										WHERE rp.role_id IN ( SELECT subB.rid FROM (
+												SELECT rp.role_id AS rid FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+													WHERE p.name in ('GERMPLASM','MANAGE_GERMPLASM')
+														GROUP BY rp.role_id ) AS subB ) ) AS subA
+									);
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v19.3.0-2">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="1">
