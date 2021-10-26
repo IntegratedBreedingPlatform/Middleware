@@ -3,7 +3,7 @@ package org.generationcp.middleware.domain.labelprinting;
 public enum LabelPrintingType {
 
 	OBSERVATION_DATASET("ObservationDataset"), SUBOBSERVATION_DATASET("SubObservationDataset"),
-	LOT("Lot"), GERMPLASM("Germplasm");
+	LOT("Lot"), GERMPLASM("Germplasm"), GERMPLASM_LIST("Germplasm List");
 
 	private String code;
 
