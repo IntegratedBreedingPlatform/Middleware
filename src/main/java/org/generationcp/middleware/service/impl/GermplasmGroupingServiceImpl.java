@@ -61,7 +61,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	private UserDefinedField selHistNameTypeForCode;
 
-	private List<UserDefinedField> codingNameTypes = new ArrayList<>();
+	private final List<UserDefinedField> codingNameTypes = new ArrayList<>();
 
 	private final DaoFactory daoFactory;
 
@@ -230,28 +230,22 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	Name findNameByType(final Germplasm germplasm, final UserDefinedField nameType) {
-		Integer gid = germplasm.getGid();
-		String type = nameType.getFcode();
-		Map<String, Name> nameTypeMap = this.germplasmNameTypeMap.containsKey(germplasm)
-			? this.germplasmNameTypeMap.get(gid) : new HashMap<>();
-
-		if (nameTypeMap.containsKey(type)) {
-			return nameTypeMap.get(type);
-		}
-
-		final List<Name> names = germplasm.getNames();
-		Name matchingName = null;
-		if (!names.isEmpty() && nameType != null) {
-			for (final Name name : names) {
-				if (nameType.getFldno().equals(name.getTypeId())) {
-					matchingName = name;
-					break;
-				}
+		if (nameType != null) {
+			final Integer gid = germplasm.getGid();
+			final String type = nameType.getFcode();
+			this.germplasmNameTypeMap.putIfAbsent(gid, new HashMap<>());
+			final Map<String, Name> nameTypeMap = this.germplasmNameTypeMap.get(gid);
+			if (nameTypeMap.containsKey(type)) {
+				return nameTypeMap.get(type);
 			}
-		}
-		nameTypeMap.put(type, matchingName);
 
-		return matchingName;
+			final java.util.Optional<Name> nameOptional = germplasm.getNames().stream().filter(name -> nameType.getFldno().equals(name.getTypeId())).findFirst();
+			if (nameOptional.isPresent()) {
+				nameTypeMap.put(type, nameOptional.get());
+			}
+			return nameTypeMap.getOrDefault(type, null);
+		}
+		return null;
 	}
 
 	/**
@@ -310,19 +304,19 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	@Override
 	public void copyCodedNames(final Germplasm germplasm, final Germplasm sourceGermplasm) {
-		for (UserDefinedField codingNameType : this.getCodingNameTypes()) {
+		for (final UserDefinedField codingNameType : this.getCodingNameTypes()) {
 			this.copyCodedName(germplasm, this.findNameByType(sourceGermplasm, codingNameType));
 		}
 	}
 
 	private List<UserDefinedField> getCodingNameTypes() {
 		if (this.codingNameTypes.isEmpty()) {
-			codingNameTypes.add(this.getSelectionHistoryNameType(CODED_NAME_1));
-			codingNameTypes.add(this.getSelectionHistoryNameType(CODED_NAME_2));
-			codingNameTypes.add(this.getSelectionHistoryNameType(CODED_NAME_3));
+			this.codingNameTypes.add(this.getSelectionHistoryNameType(CODED_NAME_1));
+			this.codingNameTypes.add(this.getSelectionHistoryNameType(CODED_NAME_2));
+			this.codingNameTypes.add(this.getSelectionHistoryNameType(CODED_NAME_3));
 		}
 
-		return codingNameTypes;
+		return this.codingNameTypes;
 	}
 
 	private void copyCodedName(final Germplasm germplasm, final Name codedName) {
