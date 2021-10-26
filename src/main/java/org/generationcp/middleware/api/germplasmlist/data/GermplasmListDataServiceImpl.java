@@ -29,11 +29,10 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -80,17 +79,17 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			.anyMatch(c -> GermplasmListStaticColumns.CROSS.getTermId().equals(c.getStaticId()) || this.viewHasParentData(c));
 
 		if (hasCrossData) {
-			final Map<Integer, GermplasmListDataSearchResponse> rowsIndexedByGid = response
+			final Set<Integer> gids = response
 				.stream()
-				.collect(Collectors.toMap(r -> (Integer) r.getData().get(GermplasmListStaticColumns.GID.name()), Function.identity()));
+				.map(r -> (Integer) r.getData().get(GermplasmListStaticColumns.GID.name()))
+				.collect(Collectors.toSet());
 
 			final Map<Integer, String> pedigreeStringMap =
-				this.pedigreeService.getCrossExpansions(new HashSet(rowsIndexedByGid.keySet()), null, this.crossExpansionProperties);
+				this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
 
-			rowsIndexedByGid.entrySet().stream().forEach(e -> {
-				final Integer gid = e.getKey();
-				final GermplasmListDataSearchResponse row = e.getValue();
-				row.getData().put(GermplasmListStaticColumns.CROSS.getName(), pedigreeStringMap.get(gid));
+			response.forEach(r -> {
+				final Integer gid = (Integer) r.getData().get(GermplasmListStaticColumns.GID.name());
+				r.getData().put(GermplasmListStaticColumns.CROSS.getName(), pedigreeStringMap.get(gid));
 			});
 
 			final boolean hasParentsData = view
@@ -98,7 +97,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 				.anyMatch(this::viewHasParentData);
 
 			if (hasParentsData) {
-				this.addParentsFromPedigreeTable(rowsIndexedByGid);
+				this.addParentsFromPedigreeTable(gids, response);
 			}
 		}
 
@@ -241,15 +240,14 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		this.daoFactory.getGermplasmListDAO().save(germplasmList);
 	}
 
-	private void addParentsFromPedigreeTable(final Map<Integer, GermplasmListDataSearchResponse> rowsIndexedByGid) {
+	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<GermplasmListDataSearchResponse> response) {
 
 		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
 		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable =
-			this.pedigreeDataManager.generatePedigreeTable(rowsIndexedByGid.keySet(), level, false);
+			this.pedigreeDataManager.generatePedigreeTable(gids, level, false);
 
-		for (final Map.Entry<Integer, GermplasmListDataSearchResponse> entry : rowsIndexedByGid.entrySet()) {
-			final Integer gid = entry.getKey();
-			final GermplasmListDataSearchResponse row = entry.getValue();
+		response.forEach(row -> {
+			final Integer gid = (Integer) row.getData().get(GermplasmListStaticColumns.GID.name());
 
 			final Optional<Germplasm> femaleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.FGID.getName());
 			femaleParent.ifPresent(value -> {
@@ -268,7 +266,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 				row.getData().put(GermplasmListStaticColumns.MALE_PARENT_NAME.name(),
 					germplasm.getPreferredName().getNval());
 			}
-		}
+		});
 	}
 
 	private boolean viewHasParentData(final GermplasmListDataView column) {
