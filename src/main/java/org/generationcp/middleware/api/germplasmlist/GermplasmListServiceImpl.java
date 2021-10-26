@@ -60,6 +60,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toSet;
 
 @Transactional
 @Service
@@ -157,6 +158,17 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
 		request.setId(germplasmList.getId());
 
+		// save variables
+		final Set<Integer> variableIds = request.getEntries().stream().flatMap(e -> e.getData().keySet().stream()).collect(toSet());
+		for (final Integer variableId : variableIds) {
+			final GermplasmListDataView germplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(
+				germplasmList,
+				variableId,
+				VariableType.ENTRY_DETAIL.getId()
+			).build();
+			this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
+		}
+
 		// save germplasm list data
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			final Integer gid = entry.getGid();
@@ -172,14 +184,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			// save entry details
 			for (final Map.Entry<Integer, GermplasmListObservationDto> entryDetailSet : entry.getData().entrySet()) {
 				final GermplasmListObservationDto entryDetail = entryDetailSet.getValue();
-
-				// save variables
-				final GermplasmListDataView germplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(
-					germplasmList,
-					entryDetailSet.getKey(),
-					VariableType.ENTRY_DETAIL.getId()
-				).build();
-				this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
 
 				// save data
 				final GermplasmListDataDetail germplasmListDataDetail = new GermplasmListDataDetail(
@@ -277,7 +281,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Set<Integer> gids = addGermplasmEntriesModels
 			.stream()
 			.map(AddGermplasmEntryModel::getGid)
-			.collect(Collectors.toSet());
+			.collect(toSet());
 
 		final Map<Integer, String> crossExpansionsBulk =
 			this.pedigreeService.getCrossExpansionsBulk(gids, null, this.crossExpansionProperties);
@@ -310,7 +314,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Set<String> propertyNames = germplasmList.getListData().get(0).getProperties()
 			.stream()
 			.map(ListDataProperty::getColumn)
-			.collect(Collectors.toSet());
+			.collect(toSet());
 		this.addListDataProperties(germplasmListsData, propertyNames);
 	}
 
@@ -625,7 +629,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		//Check if there is an unknown property in order to get attr and names info only once
 		final Set<String> allKnownPropertyNames = Arrays.stream(GermplasmListDataPropertyName.values())
-			.map(GermplasmListDataPropertyName::getName).collect(Collectors.toSet());
+			.map(GermplasmListDataPropertyName::getName).collect(toSet());
 		final boolean anyUnknownProperty = propertyNames.stream().anyMatch(property -> !allKnownPropertyNames.contains(property));
 		final Map<String, Integer> attributeTypesMap;
 		final Map<String, Integer> nameTypesMap;
