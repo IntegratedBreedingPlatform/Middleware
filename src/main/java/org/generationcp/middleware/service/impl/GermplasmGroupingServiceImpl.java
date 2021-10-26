@@ -66,7 +66,6 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	private final DaoFactory daoFactory;
 
 	private final Map<Integer, String> germplasmSelHistNameMap = new HashMap<>();
-	private final Map<Integer, Map<String, Name>> germplasmNameTypeMap = new HashMap<>();
 
 	public GermplasmGroupingServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -231,19 +230,11 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 
 	Name findNameByType(final Germplasm germplasm, final UserDefinedField nameType) {
 		if (nameType != null) {
-			final Integer gid = germplasm.getGid();
-			final String type = nameType.getFcode();
-			this.germplasmNameTypeMap.putIfAbsent(gid, new HashMap<>());
-			final Map<String, Name> nameTypeMap = this.germplasmNameTypeMap.get(gid);
-			if (nameTypeMap.containsKey(type)) {
-				return nameTypeMap.get(type);
-			}
-
-			final java.util.Optional<Name> nameOptional = germplasm.getNames().stream().filter(name -> nameType.getFldno().equals(name.getTypeId())).findFirst();
+			final java.util.Optional<Name> nameOptional =
+				germplasm.getNames().stream().filter(name -> nameType.getFldno().equals(name.getTypeId())).findFirst();
 			if (nameOptional.isPresent()) {
-				nameTypeMap.put(type, nameOptional.get());
+				return nameOptional.get();
 			}
-			return nameTypeMap.getOrDefault(type, null);
 		}
 		return null;
 	}
