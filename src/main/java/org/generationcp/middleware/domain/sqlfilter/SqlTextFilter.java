@@ -29,7 +29,7 @@ public class SqlTextFilter {
 
 	@JsonIgnore
 	public boolean isEmpty() {
-		return this.value == null && this.type == null;
+		return !(this.value != null && this.type != null);
 	}
 
 }

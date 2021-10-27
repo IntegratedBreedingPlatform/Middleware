@@ -47,7 +47,8 @@ public enum VariableType {
 	OBSERVATION_UNIT(1812, "Observation Unit",
 		"Observation Unit Variables", PhenotypicType.UNASSIGNED),
 	GERMPLASM_PASSPORT(1813, "Germplasm Passport", "Germplasm Passport", PhenotypicType.UNASSIGNED),
-	GERMPLASM_ATTRIBUTE(1814, "Germplasm Attribute", "Germplasm Attribute", PhenotypicType.UNASSIGNED);
+	GERMPLASM_ATTRIBUTE(1814, "Germplasm Attribute", "Germplasm Attribute", PhenotypicType.UNASSIGNED),
+	ENTRY_DETAIL(1815, "Entry Detail", "Variables that describes list entries", PhenotypicType.UNASSIGNED);
 
 
 	private final Integer id;
