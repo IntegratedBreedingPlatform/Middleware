@@ -200,6 +200,62 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public void importUpdates(final GermplasmListGeneratorDTO request) {
+		final Integer listId = request.getId();
+		// TODO validate deleted
+		final GermplasmList germplasmList = this.getGermplasmListById(listId)
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+
+		// if variables not exist in list, add them
+
+		final Set<Integer> existingVariableIds = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId)
+			.stream().map(GermplasmListDataView::getCvtermId).collect(toSet());
+
+		final Set<Integer> variableIds = request.getEntries().stream().flatMap(e -> e.getData().keySet().stream())
+			.filter(variableId -> !existingVariableIds.contains(variableId))
+			.collect(toSet());
+
+		for (final Integer variableId : variableIds) {
+			final GermplasmListDataView germplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(
+				germplasmList,
+				variableId,
+				VariableType.ENTRY_DETAIL.getId()
+			).build();
+			this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
+		}
+
+		// if entry details not exist, create them, otherwise update them
+
+		final Table<Integer, Integer, GermplasmListDataDetail> table = this.daoFactory.getGermplasmListDataDetailDAO()
+			.getTableEntryIdToVariableId(listId);
+
+		final Map<Integer, GermplasmListData> germplasmListDataByEntryId = this.daoFactory.getGermplasmListDataDAO()
+			.getMapByEntryId(listId);
+
+		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
+			final GermplasmListData germplasmListData = germplasmListDataByEntryId.get(entry.getEntryNo());
+
+			for (final Map.Entry<Integer, GermplasmListObservationDto> entryDetailSet : entry.getData().entrySet()) {
+				final GermplasmListObservationDto entryDetail = entryDetailSet.getValue();
+
+				GermplasmListDataDetail germplasmListDataDetail = table.get(entry.getEntryNo(), entryDetail.getVariableId());
+				if (germplasmListDataDetail != null) {
+					germplasmListDataDetail.setValue(entryDetail.getValue());
+				} else {
+					germplasmListDataDetail = new GermplasmListDataDetail(
+						germplasmListData,
+						entryDetailSet.getKey(),
+						entryDetail.getValue(),
+						entryDetail.getcValueId()
+					);
+				}
+
+				this.daoFactory.getGermplasmListDataDetailDAO().saveOrUpdate(germplasmListDataDetail);
+			}
+		}
+	}
+
+	@Override
 	public List<GermplasmListData> addGermplasmListData(final List<GermplasmListData> data) {
 
 		final List<GermplasmListData> idGermplasmListDataSaved = new ArrayList<>();
