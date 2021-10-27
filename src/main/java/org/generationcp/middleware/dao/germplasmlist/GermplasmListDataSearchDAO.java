@@ -1,10 +1,10 @@
 package org.generationcp.middleware.dao.germplasmlist;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataViewModel;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
@@ -21,6 +21,7 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -38,6 +39,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 	private static final String MIXED_UNITS_LABEL = "Mixed";
 	// TODO: use name status
 	private static final Integer NAME_DELETED_STATUS = 9;
+	private static final String LIMIT_CLAUSE = " LIMIT 5000 ";
 
 	public GermplasmListDataSearchDAO(final Session session) {
 		super(session);
@@ -80,14 +82,17 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		"LEFT JOIN names groupSourceFilterName ON groupSourceFilterName.gid = g.gpid1 AND g.gnpgs < 0";
 	private static final String IMMEDIATE_SOURCE_NAME_FILTER_JOIN =
 		"LEFT JOIN names immediateSourceFilterName ON immediateSourceFilterName.gid = g.gpid2 AND g.gnpgs < 0";
-	private static final String FEMALE_PARENT_NAME_FILTER_JOIN =
-		"LEFT JOIN names femaleParentName ON femaleParentName.gid = g.gpid1 AND femaleParentName.nstat = 1";
-	private static final String MALE_PARENT_NAME_FILTER_JOIN =
-		"LEFT JOIN names maleParentName ON maleParentName.gid = g.gpid2 AND maleParentName.nstat = 1";
 
 	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId,
 		final List<GermplasmListDataViewModel> view,
 		final GermplasmListDataSearchRequest request, final Pageable pageable) {
+
+		final List<Integer> preFilteredGids = new ArrayList<>();
+		final boolean isPrefilterEmpty = this.addPreFilteredGids(request, preFilteredGids);
+
+		if (isPrefilterEmpty) {
+			return Collections.emptyList();
+		}
 
 		final Map<String, Object> queryParams = new HashMap<>();
 		queryParams.put("listId", listId);
@@ -130,7 +135,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		this.addLocationScalar(scalars, selects, joins, staticColumnIds);
 		this.addReferenceScalar(scalars, selects, joins, staticColumnIds);
 
-		final List<String> where = this.addFilters(joins, queryParams, request);
+		final List<String> where = this.addFilters(joins, queryParams, preFilteredGids, request);
 		final String whereClause = this.getWhereClause(where);
 		final String selectClause = selects.stream().collect(Collectors.joining(","));
 		final String joinClause = this.getJoinClause(joins);
@@ -150,6 +155,13 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 
 	public long countSearchGermplasmListData(final Integer listId, final GermplasmListDataSearchRequest request) {
 
+		final List<Integer> preFilteredGids = new ArrayList<>();
+		final boolean isPrefilterEmpty = this.addPreFilteredGids(request, preFilteredGids);
+
+		if (isPrefilterEmpty) {
+			return 0;
+		}
+
 		final Map<String, Object> queryParams = new HashMap<>();
 		queryParams.put("listId", listId);
 
@@ -158,7 +170,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 
 		this.addCountQueryJoins(joins, request);
 
-		final List<String> where = this.addFilters(joins, queryParams, request);
+		final List<String> where = this.addFilters(joins, queryParams, preFilteredGids, request);
 		final String joinClause = this.getJoinClause(joins);
 		final String whereClause = this.getWhereClause(where);
 		final String sql = this.formatQuery(COUNT_EXPRESSION, joinClause, whereClause, "", "");
@@ -223,7 +235,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 	}
 
 	private List<String> addFilters(final Set<String> joins, final Map<String, Object> queryParams,
-		final GermplasmListDataSearchRequest request) {
+		final List<Integer> preFilteredGids, final GermplasmListDataSearchRequest request) {
 		final List<String> whereClause = new ArrayList<>();
 		whereClause.add("listData.listid = :listId");
 		whereClause.add("listData.lrstatus <> " + GermplasmListDataDAO.STATUS_DELETED);
@@ -242,6 +254,11 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		if (!StringUtils.isEmpty(request.getGermplasmUUID())) {
 			queryParams.put("germplasmUUID", request.getGermplasmUUID());
 			whereClause.add("g.germplsm_uuid = :germplasmUUID ");
+		}
+
+		if (!StringUtils.isEmpty(request.getGroupId())) {
+			queryParams.put("groupId", request.getGroupId());
+			whereClause.add("g.mgid = :groupId ");
 		}
 
 		final SqlTextFilter designationFilter = request.getDesignationFilter();
@@ -273,28 +290,6 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 			whereClause.add(String.format("%s %s :%s", "groupSourceFilterName.nval", operator, "groupSourceName"));
 
 			joins.add(GROUP_SOURCE_NAME_FILTER_JOIN);
-		}
-
-		final SqlTextFilter femaleParentNameFilter = request.getFemaleParentName();
-		if (femaleParentNameFilter != null && !femaleParentNameFilter.isEmpty()) {
-			final String value = femaleParentNameFilter.getValue();
-			final SqlTextFilter.Type type = femaleParentNameFilter.getType();
-			final String operator = GenericDAO.getOperator(type);
-			queryParams.put("femaleParentName", GenericDAO.getParameter(type, value));
-			whereClause.add(String.format("%s %s :%s", "femaleParentName.nval", operator, "femaleParentName"));
-
-			joins.add(FEMALE_PARENT_NAME_FILTER_JOIN);
-		}
-
-		final SqlTextFilter maleParentNameFilter = request.getMaleParentName();
-		if (maleParentNameFilter != null && !maleParentNameFilter.isEmpty()) {
-			final String value = maleParentNameFilter.getValue();
-			final SqlTextFilter.Type type = maleParentNameFilter.getType();
-			final String operator = GenericDAO.getOperator(type);
-			queryParams.put("maleParentName", GenericDAO.getParameter(type, value));
-			whereClause.add(String.format("%s %s :%s", "maleParentName.nval", operator, "maleParentName"));
-
-			joins.add(MALE_PARENT_NAME_FILTER_JOIN);
 		}
 
 		if (!StringUtils.isEmpty(request.getBreedingMethodName())) {
@@ -365,6 +360,11 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 				queryParams.put(paramenterName, "%" + value + "%");
 				whereClause.add(String.format("%s.value LIKE :%s", alias, paramenterName));
 			});
+		}
+
+		if (!CollectionUtils.isEmpty(preFilteredGids)) {
+			whereClause.add("g.gid in (:preFilteredGids) ");
+			queryParams.put("preFilteredGids", preFilteredGids);
 		}
 
 		return whereClause;
@@ -579,6 +579,48 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		return joins
 			.stream()
 			.collect(Collectors.joining("\n"));
+	}
+
+	// TODO: refactor this. This code is the same as in GermplasmSearchDAO::addPreFilteredGids
+	private boolean addPreFilteredGids(final GermplasmListDataSearchRequest request, final List<Integer> prefilteredGids) {
+
+		final SqlTextFilter femaleParentName = request.getFemaleParentName();
+		if (femaleParentName != null) {
+			final SqlTextFilter.Type type = femaleParentName.getType();
+			final String value = femaleParentName.getValue();
+			final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
+				+ "   straight_join germplsm female_parent on n.gid = female_parent.gid \n" //
+				+ "   straight_join germplsm group_source on female_parent.gid = group_source.gpid1 and group_source.gnpgs > 0 \n" //
+				+ "   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n"  //
+				+ "                            or g.gnpgs > 0 and group_source.gid = g.gid \n" //
+				+ " where n.nstat != " + NAME_DELETED_STATUS + " and n.nval " + getOperator(type) + " :femaleParentName " + LIMIT_CLAUSE) //
+				.setParameter("femaleParentName", getParameter(type, value)) //
+				.list();
+			if (gids == null || gids.isEmpty()) {
+				return true;
+			}
+			prefilteredGids.addAll(gids);
+		}
+
+		final SqlTextFilter maleParentName = request.getMaleParentName();
+		if (maleParentName != null) {
+			final SqlTextFilter.Type type = maleParentName.getType();
+			final String value = maleParentName.getValue();
+			final List<Integer> gids = this.getSession().createSQLQuery("select g.gid from names n \n" //
+				+ "   straight_join germplsm male_parent on n.gid = male_parent.gid \n" //
+				+ "   straight_join germplsm group_source on male_parent.gid = group_source.gpid2 and group_source.gnpgs > 0 \n" //
+				+ "   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n" //
+				+ "                            or g.gnpgs > 0 and group_source.gid = g.gid \n" //
+				+ " where n.nstat != " + NAME_DELETED_STATUS + " and n.nval " + getOperator(type) + " :maleParentName " + LIMIT_CLAUSE) //
+				.setParameter("maleParentName", getParameter(type, value)) //
+				.list();
+			if (gids == null || gids.isEmpty()) {
+				return true;
+			}
+			prefilteredGids.addAll(gids);
+		}
+
+		return false;
 	}
 
 	private List<GermplasmListDataSearchResponse> mapToGermplasmListSearchResponse(final List<Object[]> results,

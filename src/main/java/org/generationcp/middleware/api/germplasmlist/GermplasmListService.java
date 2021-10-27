@@ -4,6 +4,7 @@ import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface GermplasmListService {
 
@@ -67,4 +69,23 @@ public interface GermplasmListService {
 	 */
 	boolean toggleGermplasmListStatus(Integer listId);
 
+	List<Integer> getListOntologyVariables(Integer listId, List<Integer> types);
+
+	void addVariableToList(Integer listId, GermplasmListVariableRequestDto germplasmListVariableRequestDto);
+
+	void removeListVariables(Integer listId, Set<Integer> variableIds);
+
+	List<Variable> getGermplasmListVariables(String programUUID, Integer listId, Integer variableTypeId);
+
+	Optional<GermplasmListDataDto> getGermplasmListData(Integer listDataId);
+
+	Optional<GermplasmListObservationDto> getListDataObservation(Integer observationId);
+
+	Integer saveListDataObservation(Integer listId, GermplasmListObservationRequestDto observationRequestDto);
+
+	void updateListDataObservation(Integer observationId, String value, Integer cValueId);
+
+	void deleteListDataObservation(Integer observationId);
+
+	long countObservationsByVariables(Integer listId, List<Integer> variableIds);
 }

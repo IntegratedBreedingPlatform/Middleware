@@ -583,6 +583,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		variable.setBreedingMethods((int) this.daoFactory.getMethodDAO().countByVariable(variable.getId()));
 
+		variable.setLists((int) this.daoFactory.getGermplasmListDataViewDAO().countListByVariableId(variable.getId()));
+
 		//setting variable observations, first observations will be null so set it to 0
 		Integer observations = 0;
 		for (final VariableType v : variable.getVariableTypes()) {
@@ -914,8 +916,12 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		return !query.list().isEmpty();
 	}
 
-	public boolean isVariableUsedInBreedingMethods(final int variableId) {
+	private boolean isVariableUsedInBreedingMethods(final int variableId) {
 		return this.daoFactory.getMethodDAO().countByVariable(variableId) > 0;
+	}
+
+	private boolean isVariableAssignedToLists(final int variableId) {
+		return this.daoFactory.getGermplasmListDataViewDAO().countListByVariableId(variableId) > 0;
 	}
 
 	@Override
@@ -1034,15 +1040,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public VariableOverrides getVariableOverridesByVariableIdAndProgram(final Integer variableId, final String programUuid) {
-		try {
-			return this.daoFactory.getVariableProgramOverridesDao().getByVariableAndProgram(variableId, programUuid);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Error at getByVariableAndProgram:" + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public List<VariableOverridesDto> getVariableOverridesByAliasAndProgram(final String alias, final String programUuid) {
 		return this.daoFactory.getVariableProgramOverridesDao().getByAliasAndProgram(alias, programUuid);
 	}
@@ -1097,6 +1094,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		return variableUsedInListdataProp ||
 			this.isVariableUsedInStudy(variableId) ||
 			this.areVariablesUsedInAttributes(Lists.newArrayList(variableId)) ||
-			this.isVariableUsedInBreedingMethods(variableId);
+			this.isVariableUsedInBreedingMethods(variableId) ||
+			this.isVariableAssignedToLists(variableId);
 	}
 }
