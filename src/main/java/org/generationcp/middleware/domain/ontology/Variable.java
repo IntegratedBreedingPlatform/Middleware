@@ -2,13 +2,9 @@
 package org.generationcp.middleware.domain.ontology;
 
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.pojos.derived_variables.Formula;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Debug;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -47,12 +43,13 @@ public class Variable extends Term {
   	private Boolean hasUsage;
 	private Integer germplasm;
 	private Integer breedingMethods;
+	private Integer lists;
 
 	public Variable() {
 		this.setVocabularyId(CvId.VARIABLES.getId());
 	}
 
-	public Variable(org.generationcp.middleware.domain.oms.Term term) {
+	public Variable(final org.generationcp.middleware.domain.oms.Term term) {
 		super(term);
 		this.setVocabularyId(CvId.VARIABLES.getId());
 	}
@@ -70,7 +67,7 @@ public class Variable extends Term {
 		return this.alias;
 	}
 
-	public void setAlias(String alias) {
+	public void setAlias(final String alias) {
 		this.alias = alias;
 	}
 
@@ -78,7 +75,7 @@ public class Variable extends Term {
 		return this.variableTypes;
 	}
 
-	public void addVariableType(VariableType type) {
+	public void addVariableType(final VariableType type) {
 		this.variableTypes.add(type);
 	}
 
@@ -86,7 +83,7 @@ public class Variable extends Term {
 		return this.method;
 	}
 
-	public void setMethod(Method method) {
+	public void setMethod(final Method method) {
 		this.method = method;
 	}
 
@@ -94,7 +91,7 @@ public class Variable extends Term {
 		return this.property;
 	}
 
-	public void setProperty(Property property) {
+	public void setProperty(final Property property) {
 		this.property = property;
 	}
 
@@ -102,7 +99,7 @@ public class Variable extends Term {
 		return this.scale;
 	}
 
-	public void setScale(Scale scale) {
+	public void setScale(final Scale scale) {
 		this.scale = scale;
 	}
 
@@ -110,7 +107,7 @@ public class Variable extends Term {
 		return formula;
 	}
 
-	public void setFormula(FormulaDto formula) {
+	public void setFormula(final FormulaDto formula) {
 		this.formula = formula;
 	}
 
@@ -129,7 +126,7 @@ public class Variable extends Term {
 		return this.observations;
 	}
 
-	public void setObservations(Integer observations) {
+	public void setObservations(final Integer observations) {
 		this.observations = observations;
 	}
 
@@ -137,7 +134,7 @@ public class Variable extends Term {
 		return this.minValue;
 	}
 
-	public void setMinValue(String minValue) {
+	public void setMinValue(final String minValue) {
 		this.minValue = minValue;
 	}
 
@@ -145,7 +142,7 @@ public class Variable extends Term {
 		return this.maxValue;
 	}
 
-	public void setMaxValue(String maxValue) {
+	public void setMaxValue(final String maxValue) {
 		this.maxValue = maxValue;
 	}
 
@@ -153,7 +150,7 @@ public class Variable extends Term {
 		return this.isFavorite;
 	}
 
-	public void setIsFavorite(Boolean isFavorite) {
+	public void setIsFavorite(final Boolean isFavorite) {
 		this.isFavorite = isFavorite;
 	}
 
@@ -164,7 +161,7 @@ public class Variable extends Term {
 		return this.studies;
 	}
 
-	public void setStudies(Integer studies) {
+	public void setStudies(final Integer studies) {
 		this.studies = studies;
 	}
 
@@ -172,7 +169,7 @@ public class Variable extends Term {
 		return this.hasPair;
 	}
 
-	public void setHasPair(Boolean hasPair) {
+	public void setHasPair(final Boolean hasPair) {
 		this.hasPair = hasPair;
 	}
 
@@ -180,7 +177,7 @@ public class Variable extends Term {
 		return hasUsage;
   	}
 
-  	public void setHasUsage(Boolean hasUsage) {
+	public void setHasUsage(final Boolean hasUsage) {
 		this.hasUsage = hasUsage;
   	}
 
@@ -208,17 +205,26 @@ public class Variable extends Term {
 		this.breedingMethods = breedingMethods;
 	}
 
+	public Integer getLists() {
+		return lists;
+	}
+
+	public void setLists(final Integer lists) {
+		this.lists = lists;
+	}
+
 	@Override
 	public String toString() {
 		return "Variable{" + "alias='" + this.alias + '\'' + ", variableTypes=" + this.variableTypes + ", property=" + this.property
 				+ ", method=" + this.method + ", scale=" + this.scale + ", isFavorite=" + this.isFavorite + ", minValue='" + this.minValue
 				+ '\'' + ", maxValue='" + this.maxValue + '\'' + ", observations=" + this.observations + ", studies=" + this.studies +
-				", datasets=" + this.datasets + ", germplasm=" + this.germplasm + ", breedingMethods=" + this.breedingMethods + "} "
+			", datasets=" + this.datasets + ", germplasm=" + this.germplasm + ", breedingMethods=" + this.breedingMethods + ", lists="
+			+ this.lists + "} "
 				+ super.toString();
 	}
 
 	@Override
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "Variable: ");
 		super.print(indent + 3);
 
@@ -272,6 +278,10 @@ public class Variable extends Term {
 
 		if (this.breedingMethods != null) {
 			Debug.println(indent + 3, "breedingMethods:" + this.breedingMethods);
+		}
+
+		if (this.lists != null) {
+			Debug.println(indent + 3, "lists:" + this.lists);
 		}
 	}
 

@@ -26,6 +26,8 @@ import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.GermplasmListDataDetail;
+import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -45,6 +47,7 @@ import org.springframework.util.CollectionUtils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -447,6 +450,112 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 		this.daoFactory.getGermplasmListDAO().save(germplasmList);
 		return germplasmList.isLockedList();
+	}
+
+	@Override
+	public List<Integer> getListOntologyVariables(final Integer listId, final List<Integer> types) {
+		final List<GermplasmListDataView> columns =
+			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
+		return columns.stream()
+			.filter(c -> c.getCvtermId() != null && (types == null || types.contains(c.getTypeId())))
+			.map(c -> c.getCvtermId())
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	public void addVariableToList(final Integer listId, final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
+		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
+		final GermplasmListDataView germplasmListDataView =
+			new GermplasmListDataView.GermplasmListDataVariableViewBuilder(germplasmList, germplasmListVariableRequestDto.getVariableId(),
+				germplasmListVariableRequestDto.getVariableTypeId()).build();
+		this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
+	}
+
+	@Override
+	public void removeListVariables(final Integer listId, final Set<Integer> variableIds) {
+		this.daoFactory.getGermplasmListDataDetailDAO().deleteByListIdAndVariableIds(listId, variableIds);
+		this.daoFactory.getGermplasmListDataViewDAO().deleteByListIdAndVariableIds(listId, variableIds);
+	}
+
+	@Override
+	public List<Variable> getGermplasmListVariables(final String programUUID, final Integer listId,
+		final Integer variableTypeId) {
+		final List<GermplasmListDataView> columns =
+			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
+		final List<Integer> variableIds = columns.stream().filter(
+			c -> c.getCvtermId() != null && (c.getTypeId().equals(variableTypeId)
+				|| variableTypeId == null)).map(c -> c.getCvtermId())
+			.collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(variableIds)) {
+			final VariableFilter variableFilter = new VariableFilter();
+			if (StringUtils.isNotEmpty(programUUID)) {
+				variableFilter.setProgramUuid(programUUID);
+			}
+			variableIds
+				.forEach(variableFilter::addVariableId);
+			return this.ontologyVariableDataManager.getWithFilter(variableFilter);
+		}
+		return Collections.emptyList();
+	}
+
+	@Override
+	public Optional<GermplasmListDataDto> getGermplasmListData(final Integer listDataId) {
+		final GermplasmListData germplasmListData = this.daoFactory.getGermplasmListDataDAO().getById(listDataId);
+		if (germplasmListData != null) {
+			final GermplasmListDataDto germplasmListDataDto =
+				new GermplasmListDataDto(germplasmListData.getListDataId(), germplasmListData.getList().getId(),
+					germplasmListData.getEntryId(), germplasmListData.getGid());
+			return Optional.of(germplasmListDataDto);
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<GermplasmListObservationDto> getListDataObservation(final Integer observationId) {
+		final GermplasmListDataDetail germplasmListDataDetail = this.daoFactory.getGermplasmListDataDetailDAO().getById(observationId);
+		if (germplasmListDataDetail != null) {
+			final GermplasmListObservationDto germplasmListObservationDto =
+				new GermplasmListObservationDto(observationId, germplasmListDataDetail.getListData().getListDataId(),
+					germplasmListDataDetail.getVariableId(), germplasmListDataDetail.getValue(),
+					germplasmListDataDetail.getCategoricalValueId());
+			return Optional.of(germplasmListObservationDto);
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public Integer saveListDataObservation(final Integer listId, final GermplasmListObservationRequestDto observationRequestDto) {
+		final Optional<GermplasmListDataDetail> observationOptional = this.daoFactory.getGermplasmListDataDetailDAO()
+			.getByListDataIdAndVariableId(observationRequestDto.getListDataId(), observationRequestDto.getVariableId());
+		if (observationOptional.isPresent()) {
+			throw new MiddlewareRequestException("", "germplasm.list.data.details.exists", "");
+		}
+		final GermplasmListData germplasmListData =
+			this.daoFactory.getGermplasmListDataDAO().getById(observationRequestDto.getListDataId());
+		final GermplasmListDataDetail germplasmListDataDetail =
+			new GermplasmListDataDetail(germplasmListData, observationRequestDto.getVariableId(), observationRequestDto.getValue(),
+				observationRequestDto.getcValueId());
+		this.daoFactory.getGermplasmListDataDetailDAO().save(germplasmListDataDetail);
+		return germplasmListDataDetail.getId();
+	}
+
+	@Override
+	public void updateListDataObservation(final Integer observationId, final String value, final Integer cValueId) {
+		final GermplasmListDataDetail germplasmListDataDetail = this.daoFactory.getGermplasmListDataDetailDAO().getById(observationId);
+		germplasmListDataDetail.setValue(value);
+		germplasmListDataDetail.setCategoricalValueId(cValueId);
+		this.daoFactory.getGermplasmListDataDetailDAO().update(germplasmListDataDetail);
+	}
+
+	@Override
+	public void deleteListDataObservation(final Integer observationId) {
+		final GermplasmListDataDetail germplasmListDataDetail = this.daoFactory.getGermplasmListDataDetailDAO().getById(observationId);
+		this.daoFactory.getGermplasmListDataDetailDAO().makeTransient(germplasmListDataDetail);
+	}
+
+	@Override
+	public long countObservationsByVariables(final Integer listId, final List<Integer> variableIds) {
+		return this.daoFactory.getGermplasmListDataDetailDAO().countObservationsByListAndVariables(listId, variableIds);
 	}
 
 	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {
