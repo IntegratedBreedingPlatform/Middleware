@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
@@ -244,20 +245,20 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 	private GermplasmListData createTestListWithListData(final Germplasm listDataGermplasm) {
 		final GermplasmList listDataGermplasmList = this.createTestList();
-		return this.createTestListDataForList(listDataGermplasm, listDataGermplasmList);
+		return this.createTestListDataForList(listDataGermplasm, listDataGermplasmList, GermplasmListDataDAOTest.TEST_ENTRY_ID);
 	}
 
 	private GermplasmListData createTestListDataForList(final Integer listId) {
 		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(listId, true);
 		final Germplasm listDataGermplasm = this.germplasmTestDataGenerator
 			.createGermplasmWithPreferredAndNonpreferredNames();
-		return this.createTestListDataForList(listDataGermplasm, germplasmList);
+		return this.createTestListDataForList(listDataGermplasm, germplasmList, GermplasmListDataDAOTest.TEST_ENTRY_ID);
 	}
 
 	private GermplasmListData createTestListDataForList(final Germplasm listDataGermplasm,
-		final GermplasmList listDataGermplasmList) {
+		final GermplasmList listDataGermplasmList, int entryNumber) {
 		final GermplasmListData listData = GermplasmListDataTestDataInitializer.createGermplasmListData(
-			listDataGermplasmList, listDataGermplasm.getGid(), GermplasmListDataDAOTest.TEST_ENTRY_ID);
+			listDataGermplasmList, listDataGermplasm.getGid(), entryNumber);
 		listData.setFemaleParent(new GermplasmParent(listDataGermplasm.getGpid1(), "", ""));
 		listData.addMaleParent(new GermplasmParent(listDataGermplasm.getGpid2(), "", ""));
 		this.germplasmListDataDAO.save(listData);
@@ -374,6 +375,237 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		final List<Integer> gidsByListId = this.germplasmListDataDAO.getGidsByListId(germplasmListData.getList().getId());
 		assertThat(gidsByListId, Matchers.hasSize(1));
 		assertThat(gidsByListId.get(0), is(germplasm.getGid()));
+	}
+
+	@Test
+	public void testReOrderEntries_moveEntryToSamePosition() {
+		int entryNumber = 1;
+		final GermplasmList germplasmList = this.createTestList();
+		final GermplasmListData entry1 =
+		this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+			germplasmList, entryNumber++);
+		final GermplasmListData entry2 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry3 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+
+		this.germplasmListDataDAO.reOrderEntries(germplasmList.getId(), Arrays.asList(entry2.getId()), 2);
+
+		this.sessionProvder.getSession().clear();
+		this.sessionProvder.getSession().flush();
+
+		final List<GermplasmListData> actualList = this.germplasmListDataDAO.getByListId(germplasmList.getId());
+		assertThat(actualList, hasSize(3));
+		assertThat(actualList.get(0).getId(), is(entry1.getListDataId()));
+		assertThat(actualList.get(0).getEntryId(), is(1));
+		assertThat(actualList.get(1).getId(), is(entry2.getListDataId()));
+		assertThat(actualList.get(1).getEntryId(), is(2));
+		assertThat(actualList.get(2).getId(), is(entry3.getListDataId()));
+		assertThat(actualList.get(2).getEntryId(), is(3));
+	}
+
+	@Test
+	public void testReOrderEntries_moveFirstEntryToLastPosition() {
+		int entryNumber = 1;
+		final GermplasmList germplasmList = this.createTestList();
+		final GermplasmListData entry1 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry2 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry3 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry4 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+
+		this.germplasmListDataDAO.reOrderEntries(germplasmList.getId(), Arrays.asList(entry1.getId()), 4);
+
+		this.sessionProvder.getSession().clear();
+		this.sessionProvder.getSession().flush();
+
+		final List<GermplasmListData> actualList = this.germplasmListDataDAO.getByListId(germplasmList.getId());
+		assertThat(actualList, hasSize(4));
+		assertThat(actualList.get(0).getId(), is(entry2.getListDataId()));
+		assertThat(actualList.get(0).getEntryId(), is(1));
+		assertThat(actualList.get(1).getId(), is(entry3.getListDataId()));
+		assertThat(actualList.get(1).getEntryId(), is(2));
+		assertThat(actualList.get(2).getId(), is(entry4.getListDataId()));
+		assertThat(actualList.get(2).getEntryId(), is(3));
+		assertThat(actualList.get(3).getId(), is(entry1.getListDataId()));
+		assertThat(actualList.get(3).getEntryId(), is(4));
+	}
+
+	@Test
+	public void testReOrderEntries_moveLastEntryToFirstPosition() {
+		int entryNumber = 1;
+		final GermplasmList germplasmList = this.createTestList();
+		final GermplasmListData entry1 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry2 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry3 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry4 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+
+		this.germplasmListDataDAO.reOrderEntries(germplasmList.getId(), Arrays.asList(entry4.getId()), 1);
+
+		this.sessionProvder.getSession().clear();
+		this.sessionProvder.getSession().flush();
+
+		final List<GermplasmListData> actualList = this.germplasmListDataDAO.getByListId(germplasmList.getId());
+		assertThat(actualList, hasSize(4));
+		assertThat(actualList.get(0).getId(), is(entry4.getListDataId()));
+		assertThat(actualList.get(0).getEntryId(), is(1));
+		assertThat(actualList.get(1).getId(), is(entry1.getListDataId()));
+		assertThat(actualList.get(1).getEntryId(), is(2));
+		assertThat(actualList.get(2).getId(), is(entry2.getListDataId()));
+		assertThat(actualList.get(2).getEntryId(), is(3));
+		assertThat(actualList.get(3).getId(), is(entry3.getListDataId()));
+		assertThat(actualList.get(3).getEntryId(), is(4));
+	}
+
+	/**
+		Select entries 3, 5 and 8 and move them to position 4
+	 */
+	@Test
+	public void testReOrderEntries_moveSeveralEntriesToMiddlePosition_1() {
+		int entryNumber = 1;
+		final GermplasmList germplasmList = this.createTestList();
+		final GermplasmListData entry1 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry2 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry3 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry4 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry5 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry6 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry7 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry8 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry9 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry10 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+
+		this.germplasmListDataDAO.reOrderEntries(germplasmList.getId(), Arrays.asList(entry3.getId(), entry5.getId(), entry8.getId()), 4);
+
+		this.sessionProvder.getSession().clear();
+		this.sessionProvder.getSession().flush();
+
+		final List<GermplasmListData> actualList = this.germplasmListDataDAO.getByListId(germplasmList.getId());
+		assertThat(actualList, hasSize(10));
+		assertThat(actualList.get(0).getId(), is(entry1.getListDataId()));
+		assertThat(actualList.get(0).getEntryId(), is(1));
+		assertThat(actualList.get(1).getId(), is(entry2.getListDataId()));
+		assertThat(actualList.get(1).getEntryId(), is(2));
+		assertThat(actualList.get(2).getId(), is(entry4.getListDataId()));
+		assertThat(actualList.get(2).getEntryId(), is(3));
+		assertThat(actualList.get(3).getId(), is(entry3.getListDataId()));
+		assertThat(actualList.get(3).getEntryId(), is(4));
+		assertThat(actualList.get(4).getId(), is(entry5.getListDataId()));
+		assertThat(actualList.get(4).getEntryId(), is(5));
+		assertThat(actualList.get(5).getId(), is(entry8.getListDataId()));
+		assertThat(actualList.get(5).getEntryId(), is(6));
+		assertThat(actualList.get(6).getId(), is(entry6.getListDataId()));
+		assertThat(actualList.get(6).getEntryId(), is(7));
+		assertThat(actualList.get(7).getId(), is(entry7.getListDataId()));
+		assertThat(actualList.get(7).getEntryId(), is(8));
+		assertThat(actualList.get(8).getId(), is(entry9.getListDataId()));
+		assertThat(actualList.get(8).getEntryId(), is(9));
+		assertThat(actualList.get(9).getId(), is(entry10.getListDataId()));
+		assertThat(actualList.get(9).getEntryId(), is(10));
+	}
+
+	/**
+	 * Select entries 4, 6 and 7 and move them to position 7
+	 */
+	@Test
+	public void testReOrderEntries_moveSeveralEntriesToMiddlePosition_2() {
+		int entryNumber = 1;
+		final GermplasmList germplasmList = this.createTestList();
+		final GermplasmListData entry1 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry2 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry3 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry4 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry5 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry6 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry7 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry8 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry9 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+		final GermplasmListData entry10 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
+
+		this.germplasmListDataDAO.reOrderEntries(germplasmList.getId(), Arrays.asList(entry4.getId(), entry6.getId(), entry7.getId()), 7);
+
+		this.sessionProvder.getSession().clear();
+		this.sessionProvder.getSession().flush();
+
+		final List<GermplasmListData> actualList = this.germplasmListDataDAO.getByListId(germplasmList.getId());
+		assertThat(actualList, hasSize(10));
+		assertThat(actualList.get(0).getId(), is(entry1.getListDataId()));
+		assertThat(actualList.get(0).getEntryId(), is(1));
+		assertThat(actualList.get(1).getId(), is(entry2.getListDataId()));
+		assertThat(actualList.get(1).getEntryId(), is(2));
+		assertThat(actualList.get(2).getId(), is(entry3.getListDataId()));
+		assertThat(actualList.get(2).getEntryId(), is(3));
+		assertThat(actualList.get(3).getId(), is(entry5.getListDataId()));
+		assertThat(actualList.get(3).getEntryId(), is(4));
+		assertThat(actualList.get(4).getId(), is(entry8.getListDataId()));
+		assertThat(actualList.get(4).getEntryId(), is(5));
+		assertThat(actualList.get(5).getId(), is(entry9.getListDataId()));
+		assertThat(actualList.get(5).getEntryId(), is(6));
+		assertThat(actualList.get(6).getId(), is(entry4.getListDataId()));
+		assertThat(actualList.get(6).getEntryId(), is(7));
+		assertThat(actualList.get(7).getId(), is(entry6.getListDataId()));
+		assertThat(actualList.get(7).getEntryId(), is(8));
+		assertThat(actualList.get(8).getId(), is(entry7.getListDataId()));
+		assertThat(actualList.get(8).getEntryId(), is(9));
+		assertThat(actualList.get(9).getId(), is(entry10.getListDataId()));
+		assertThat(actualList.get(9).getEntryId(), is(10));
 	}
 
 }

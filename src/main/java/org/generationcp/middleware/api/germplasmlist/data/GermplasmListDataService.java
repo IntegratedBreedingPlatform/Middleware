@@ -18,4 +18,8 @@ public interface GermplasmListDataService {
 
 	void updateGermplasmListDataView(Integer listId, List<GermplasmListDataUpdateViewDTO> view);
 
+	void reOrderEntries(Integer listId, List<Integer> selectedEntries, Integer entryNumberPosition);
+
+	long countByListId(Integer listId);
+
 }
