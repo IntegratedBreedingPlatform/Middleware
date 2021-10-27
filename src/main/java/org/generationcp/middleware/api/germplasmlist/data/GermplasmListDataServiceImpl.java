@@ -16,6 +16,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListDataDefaultView;
+import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -238,6 +239,11 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		}
 		germplasmList.setView(updatedView);
 		this.daoFactory.getGermplasmListDAO().save(germplasmList);
+	}
+
+	@Override
+	public List<GermplasmListDataDetail> getGermplasmListDataList(final Integer listId) {
+		return this.daoFactory.getGermplasmListDataDetailDAO().getByListId(listId);
 	}
 
 	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<GermplasmListDataSearchResponse> response) {
