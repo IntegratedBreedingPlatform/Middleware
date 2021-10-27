@@ -36,7 +36,7 @@ public enum PermissionsEnum {
 	LOT_LABEL_PRINTING,
 	QUERIES,
 	GERMPLASM_LABEL_PRINTING,
-	EXPORT_GERMPLASM_LISTS;
+	GERMPLASM_LIST_LABEL_PRINTING;
 
 	public static final String HAS_INVENTORY_VIEW = " or hasAnyAuthority('ADMIN'"
 		+ ",'CROP_MANAGEMENT'"
