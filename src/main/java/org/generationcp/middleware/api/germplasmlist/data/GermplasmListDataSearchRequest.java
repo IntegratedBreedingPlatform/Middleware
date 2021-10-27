@@ -16,6 +16,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	private List<Integer> entryNumbers;
 	private List<Integer> gids;
 	private String germplasmUUID;
+	private String groupId;
 	private SqlTextFilter designationFilter;
 	private SqlTextFilter immediateSourceName;
 	private SqlTextFilter groupSourceName;
@@ -58,6 +59,14 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 
 	public void setGermplasmUUID(final String germplasmUUID) {
 		this.germplasmUUID = germplasmUUID;
+	}
+
+	public String getGroupId() {
+		return groupId;
+	}
+
+	public void setGroupId(final String groupId) {
+		this.groupId = groupId;
 	}
 
 	public SqlTextFilter getDesignationFilter() {
