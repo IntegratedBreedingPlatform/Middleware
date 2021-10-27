@@ -30,6 +30,7 @@ import org.hibernate.criterion.Restrictions;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -129,6 +130,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		}
 	}
 
+	@Deprecated // TODO Remove IBP-5164
 	@SuppressWarnings("unchecked")
 	public List<GermplasmListData> getByIds(final List<Integer> entryIds) {
 
@@ -143,6 +145,18 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			GermplasmListDataDAO.STATUS_DELETED));
 		criteria.addOrder(Order.asc(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN));
 		return criteria.list();
+	}
+
+	public Map<Integer, GermplasmListData> getMapByEntryId(final Integer listId) {
+		final Criteria criteria = this.getSession().createCriteria(GermplasmListData.class);
+		criteria.add(Restrictions.eq("list.id", listId));
+		final List<GermplasmListData> list = criteria.list();
+
+		final Map<Integer, GermplasmListData> map = new LinkedHashMap<>();
+		for (final GermplasmListData listData : list) {
+			map.put(listData.getEntryId(), listData);
+		}
+		return map;
 	}
 
 	public GermplasmListData getByListIdAndEntryId(final Integer listId, final Integer entryId) {
