@@ -16,7 +16,6 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.domain.dms.Enumeration;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.StandardVariableSummary;
 import org.generationcp.middleware.domain.dms.VariableConstraints;
@@ -393,30 +392,6 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 
 	}
 
-	protected StandardVariable constructDummyStandardVariable() {
-
-		final StandardVariable standardVariable = new StandardVariable();
-
-		standardVariable.setName("TestVariable" + new Random().nextLong());
-		standardVariable.setDescription("For unit testing purposes");
-
-		final Term propertyTerm = this.ontologyDataManager.findTermByName("Yield", CvId.PROPERTIES);
-		standardVariable.setProperty(propertyTerm);
-
-		final Term scaleTerm = this.ontologyDataManager.findTermByName("g", CvId.SCALES);
-		standardVariable.setScale(scaleTerm);
-
-		final Term methodTerm = this.ontologyDataManager.findTermByName("Counting", CvId.METHODS);
-		standardVariable.setMethod(methodTerm);
-
-		final Term dataType = this.ontologyDataManager.getTermById(TermId.NUMERIC_VARIABLE.getId());
-		standardVariable.setDataType(dataType);
-
-		standardVariable.setPhenotypicType(PhenotypicType.VARIATE);
-
-		return standardVariable;
-	}
-
 	@Test
 	public void testFindStandardVariablesByNameOrSynonym() {
 		Set<StandardVariable> standardVariables =
@@ -524,9 +499,7 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 
 	@Test
 	public void testCountTermsByCvId() {
-		long count = this.ontologyDataManager.countTermsByCvId(CvId.METHODS);
-
-		count = this.ontologyDataManager.countTermsByCvId(CvId.PROPERTIES);
+		long count = this.ontologyDataManager.countTermsByCvId(CvId.PROPERTIES);
 		Assert.assertTrue(count != 0);
 
 		count = this.ontologyDataManager.countTermsByCvId(CvId.SCALES);
