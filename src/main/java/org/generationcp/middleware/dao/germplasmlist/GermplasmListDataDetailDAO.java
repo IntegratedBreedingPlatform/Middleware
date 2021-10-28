@@ -65,7 +65,7 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 			criteria.createAlias("listData", "listData");
 			criteria.createAlias("listData.list", "list");
 			criteria.add(Restrictions.eq("list.id", listId));
-			return  criteria.list();
+			return criteria.list();
 		} catch (final HibernateException e) {
 			final String errorMessage =
 				"Error with getByListId(" + listId + ") query from GermplasmListDataDetailDAO: " + e

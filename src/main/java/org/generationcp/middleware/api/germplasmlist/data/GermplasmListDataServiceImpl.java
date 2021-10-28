@@ -62,9 +62,8 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	}
 
 	@Override
-	public List<GermplasmListDataSearchResponse> searchGermplasmListData(final Integer listId,
-		final GermplasmListDataSearchRequest request,
-		final Pageable pageable) {
+	public List<GermplasmListDataSearchResponse> searchGermplasmListData(
+		final Integer listId, final GermplasmListDataSearchRequest request, final Pageable pageable) {
 
 		final List<GermplasmListDataView> view = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
 		final List<GermplasmListDataViewModel> viewModel = this.getView(view);
@@ -258,18 +257,22 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			final Optional<Germplasm> femaleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.FGID.getName());
 			femaleParent.ifPresent(value -> {
 				final Germplasm germplasm = value;
-				row.getData().put(GermplasmListStaticColumns.FEMALE_PARENT_GID.name(),
+				row.getData().put(
+					GermplasmListStaticColumns.FEMALE_PARENT_GID.name(),
 					germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN);
-				row.getData().put(GermplasmListStaticColumns.FEMALE_PARENT_NAME.name(),
+				row.getData().put(
+					GermplasmListStaticColumns.FEMALE_PARENT_NAME.name(),
 					germplasm.getPreferredName().getNval());
 			});
 
 			final Optional<Germplasm> maleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.MGID.getName());
 			if (maleParent.isPresent()) {
 				final Germplasm germplasm = maleParent.get();
-				row.getData().put(GermplasmListStaticColumns.MALE_PARENT_GID.name(),
+				row.getData().put(
+					GermplasmListStaticColumns.MALE_PARENT_GID.name(),
 					germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN);
-				row.getData().put(GermplasmListStaticColumns.MALE_PARENT_NAME.name(),
+				row.getData().put(
+					GermplasmListStaticColumns.MALE_PARENT_NAME.name(),
 					germplasm.getPreferredName().getNval());
 			}
 		});
