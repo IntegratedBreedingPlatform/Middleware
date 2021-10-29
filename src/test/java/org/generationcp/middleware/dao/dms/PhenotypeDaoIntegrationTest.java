@@ -409,7 +409,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		// Search by program
 		final ObservationUnitSearchRequestDTO dto = new ObservationUnitSearchRequestDTO();
 		dto.setProgramDbIds(Collections.singletonList(uniqueID));
-		final List<ObservationUnitDto> results = this.phenotypeDao.searchObservationUnits(1000, 1, dto);
+		final List<ObservationUnitDto> results = this.phenotypeDao.searchObservationUnits(1000, 0, dto);
 		Assert.assertNotNull(results);
 		Assert.assertEquals(NO_OF_GERMPLASM * 2, results.size());
 		for (final ObservationUnitDto result : results) {
