@@ -929,7 +929,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
 
 		if (pageNumber != null && pageSize != null) {
-			sqlQuery.setFirstResult(pageSize * (pageNumber - 1));
+			sqlQuery.setFirstResult(pageSize * pageNumber);
 			sqlQuery.setMaxResults(pageSize);
 		}
 
@@ -1055,7 +1055,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 				observation.setObservationVariableDbId(String.valueOf(result[2]));
 				observation.setObservationVariableName((String) result[3]);
-				observation.setObservationDbId(String.valueOf((Integer) result[1]));
+				observation.setObservationDbId(String.valueOf(result[1]));
 				observation.setValue((String) result[4]);
 				observation.setObservationTimeStamp((Date) result[6]);
 				// TODO
