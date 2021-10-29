@@ -64,10 +64,9 @@
 		<sql dbms="mysql" splitStatements="true">
 
 			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
-			SET @workbench_sidebar_category_link_id = (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'manage_germplasm_lists');
 
-			INSERT INTO permission (`name`, `description`, `parent_id`, `workbench_sidebar_category_link_id`)
-			VALUES ('GERMPLASM_LIST_LABEL_PRINTING', 'Export Germplasm List Data and Labels', @permission_id, @workbench_sidebar_category_link_id);
+			INSERT INTO permission (`name`, `description`, `parent_id`)
+			VALUES ('GERMPLASM_LIST_LABEL_PRINTING', 'Export Germplasm List Data and Labels', @permission_id);
 
 			SET @germplasm_list_label_printing_permission_id = (SELECT permission_id FROM permission where name = 'GERMPLASM_LIST_LABEL_PRINTING');
 
