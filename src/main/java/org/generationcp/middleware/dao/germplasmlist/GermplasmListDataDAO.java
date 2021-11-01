@@ -26,6 +26,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.Transformers;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -334,6 +335,87 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 	public List<Integer> getGidsByListId(final Integer listId) {
 		String sql = "SELECT gid FROM listdata ld WHERE ld.listid = :listId";
+		final SQLQuery query = this.getSession().createSQLQuery(sql);
+		query.setParameter("listId", listId);
+		return query.list();
+	}
+
+	public void reOrderEntries(final Integer listId, final List<Integer> selectedEntries, final Integer selectedPosition) {
+
+		// Get the value of the minimum and maximum entry number of the selected entries
+		final String selectedEntriesIntervalSQL = "SELECT MIN(entryid) AS min, MAX(entryid) AS max "
+			+ " FROM listdata "
+			+ " WHERE listid = :listId AND lrecid IN ( :selectedEntries )";
+		final SQLQuery selectedEntriesIntervalQuery = this.getSession().createSQLQuery(selectedEntriesIntervalSQL);
+		selectedEntriesIntervalQuery.addScalar("min");
+		selectedEntriesIntervalQuery.addScalar("max");
+		selectedEntriesIntervalQuery.setParameter("listId", listId);
+		selectedEntriesIntervalQuery.setParameterList("selectedEntries", selectedEntries);
+		selectedEntriesIntervalQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+		final Map<String, Integer> selectedEntriesResult = (Map<String, Integer>) selectedEntriesIntervalQuery.uniqueResult();
+
+		final int selectionMaxValue = selectedPosition + selectedEntries.size() - 1;
+		final int least = Math.min(selectedPosition, selectedEntriesResult.get("min"));
+		final int greatest = Math.max(selectionMaxValue, selectedEntriesResult.get("max"));
+
+		// This query has two main parts. The first select of the query obtains the new values of entry numbers for the entries that
+		// are going to be modified. The second select obtains which entries are going to be modified. To improve performance, this query is
+		// using intervals to define only the collection of entries that must be reordered. Also, take in mind that this query does not update
+		// any of the selected entries
+		final String updateAffectedEntriesSQL = "UPDATE listdata l\n"
+			+ "    JOIN (SELECT @row_number_in \\:= 0) i\n"
+			+ "    JOIN (SELECT @row_number_out \\:= 0) o\n"
+			+ "    INNER JOIN (\n"
+			+ "        SELECT to_modify.lrecid rec_id_mod, new_value.entryid\n"
+			+ "        FROM (\n"
+			+ "            SELECT entryid, (@row_number_in \\:= @row_number_in + 1) AS row_num\n"
+			+ "            FROM listdata\n"
+			+ "            WHERE listid = :listId AND\n"
+			+ "                (( entryid >= :least AND entryid < :selectedPosition)\n"
+			+ "                    OR ( entryid > :selectionMaxValue AND entryid <= :greatest)\n"
+			+ "                )\n"
+			+ "            ) AS new_value,\n"
+			+ "            (\n"
+			+ "            SELECT lrecid, (@row_number_out \\:= @row_number_out + 1) AS row_num\n"
+			+ "            FROM listdata\n"
+			+ "            WHERE listid = :listId AND entryid >= :least\n"
+			+ "              AND entryid <= :greatest\n"
+			+ "              AND\n"
+			+ "                    lrecid NOT IN (:selectedEntries)\n"
+			+ "                ORDER BY lrecid) AS to_modify\n"
+			+ "        WHERE new_value.row_num = to_modify.row_num) m\n"
+			+ "    ON m.rec_id_mod = l.lrecid\n"
+			+ "        AND l.listid = :listId\n"
+			+ "SET l.entryid = m.entryid";
+		final SQLQuery updateAffectedEntriesQuery = this.getSession().createSQLQuery(updateAffectedEntriesSQL);
+		updateAffectedEntriesQuery.setParameter("listId", listId);
+		updateAffectedEntriesQuery.setParameter("least", least);
+		updateAffectedEntriesQuery.setParameter("greatest", greatest);
+		updateAffectedEntriesQuery.setParameter("selectionMaxValue", selectionMaxValue);
+		updateAffectedEntriesQuery.setParameter("selectedPosition", selectedPosition);
+		updateAffectedEntriesQuery.setParameterList("selectedEntries", selectedEntries);
+		updateAffectedEntriesQuery.executeUpdate();
+
+		// Finally, we update the entry numbers of the selected entries.
+		final String updateSelectedEntriesSQL = "UPDATE listdata ld \n"
+			+ "    JOIN (SELECT @position \\:= :selectedPosition) r\n"
+			+ "    INNER JOIN (\n"
+			+ "        SELECT lrecid, entryid\n"
+			+ "        FROM listdata innerListData\n"
+			+ "        WHERE innerlistdata.listid = :listId AND innerlistdata.lrecid IN (:selectedEntries)\n"
+			+ "        ORDER BY innerlistdata.entryid ASC) AS tmp\n"
+			+ "    ON ld.lrecid = tmp.lrecid\n"
+			+ "SET ld.entryid = @position \\:= @position + 1\n"
+			+ "WHERE listid = :listId";
+		final SQLQuery updateSelectedEntriesQuery = this.getSession().createSQLQuery(updateSelectedEntriesSQL);
+		updateSelectedEntriesQuery.setParameter("listId", listId);
+		updateSelectedEntriesQuery.setParameter("selectedPosition", selectedPosition - 1);
+		updateSelectedEntriesQuery.setParameterList("selectedEntries", selectedEntries);
+		updateSelectedEntriesQuery.executeUpdate();
+	}
+
+	public List<Integer> getListDataIdsByListId(final Integer listId) {
+		String sql = "SELECT lrecid FROM listdata ld WHERE ld.listid = :listId";
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
 		query.setParameter("listId", listId);
 		return query.list();
