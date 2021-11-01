@@ -610,7 +610,7 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetLrecidsByListId() {
+	public void testGetListDataIdsByListId() {
 		final GermplasmList germplasmList = this.createTestList();
 		final GermplasmListData entry1 =
 			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
@@ -619,9 +619,9 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
 				germplasmList, 2);
 
-		final List<Integer> lrecidsByListId = this.germplasmListDataDAO.getLrecidsByListId(germplasmList.getId());
-		assertThat(lrecidsByListId, hasSize(2));
-		assertThat(lrecidsByListId, containsInAnyOrder(entry2.getId(), entry1.getId()));
+		final List<Integer> listDataIdsByListId = this.germplasmListDataDAO.getListDataIdsByListId(germplasmList.getId());
+		assertThat(listDataIdsByListId, hasSize(2));
+		assertThat(listDataIdsByListId, containsInAnyOrder(entry2.getId(), entry1.getId()));
 	}
 
 }

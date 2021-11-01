@@ -251,8 +251,8 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	}
 
 	@Override
-	public List<Integer> getLrecidsByListId(final Integer listId) {
-		return this.daoFactory.getGermplasmListDataDAO().getLrecidsByListId(listId);
+	public List<Integer> getListDataIdsByListId(final Integer listId) {
+		return this.daoFactory.getGermplasmListDataDAO().getListDataIdsByListId(listId);
 	}
 
 	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<GermplasmListDataSearchResponse> response) {
