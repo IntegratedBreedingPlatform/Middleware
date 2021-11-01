@@ -10,7 +10,7 @@ public class GermplasmListReorderEntriesRequest {
 
 	private List<Integer> selectedEntries;
 	private Integer entryNumberPosition;
-	private Boolean atTheEndPosition;
+	private Boolean endOfList;
 
 	public List<Integer> getSelectedEntries() {
 		return selectedEntries;
@@ -28,12 +28,12 @@ public class GermplasmListReorderEntriesRequest {
 		this.entryNumberPosition = entryNumberPosition;
 	}
 
-	public Boolean getAtTheEndPosition() {
-		return atTheEndPosition;
+	public Boolean getEndOfList() {
+		return endOfList;
 	}
 
-	public void setAtTheEndPosition(final Boolean atTheEndPosition) {
-		this.atTheEndPosition = atTheEndPosition;
+	public void setEndOfList(final Boolean endOfList) {
+		this.endOfList = endOfList;
 	}
 
 	@Override
