@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
@@ -382,8 +383,8 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		int entryNumber = 1;
 		final GermplasmList germplasmList = this.createTestList();
 		final GermplasmListData entry1 =
-		this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
-			germplasmList, entryNumber++);
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, entryNumber++);
 		final GermplasmListData entry2 =
 			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
 				germplasmList, entryNumber++);
@@ -475,7 +476,7 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	}
 
 	/**
-		Select entries 3, 5 and 8 and move them to position 4
+	 * Select entries 3, 5 and 8 and move them to position 4
 	 */
 	@Test
 	public void testReOrderEntries_moveSeveralEntriesToMiddlePosition_1() {
@@ -606,6 +607,21 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		assertThat(actualList.get(8).getEntryId(), is(9));
 		assertThat(actualList.get(9).getId(), is(entry10.getListDataId()));
 		assertThat(actualList.get(9).getEntryId(), is(10));
+	}
+
+	@Test
+	public void testGetLrecidsByListId() {
+		final GermplasmList germplasmList = this.createTestList();
+		final GermplasmListData entry1 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, 1);
+		final GermplasmListData entry2 =
+			this.createTestListDataForList(this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames(),
+				germplasmList, 2);
+
+		final List<Integer> lrecidsByListId = this.germplasmListDataDAO.getLrecidsByListId(germplasmList.getId());
+		assertThat(lrecidsByListId, hasSize(2));
+		assertThat(lrecidsByListId, containsInAnyOrder(entry2.getId(), entry1.getId()));
 	}
 
 }
