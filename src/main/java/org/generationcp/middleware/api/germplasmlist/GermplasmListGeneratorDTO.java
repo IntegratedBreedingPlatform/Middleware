@@ -19,7 +19,9 @@ public class GermplasmListGeneratorDTO {
 		private String seedSource;
 		private String groupName;
 
-		// <variableId:
+		/**
+		 * key: variableId
+		 */
 		private Map<Integer, GermplasmListObservationDto> data = Collections.emptyMap();
 
 		public Integer getEntryNo() {
