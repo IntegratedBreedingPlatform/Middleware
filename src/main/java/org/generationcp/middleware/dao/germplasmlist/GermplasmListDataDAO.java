@@ -344,6 +344,10 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		final int least = Math.min(selectedPosition, selectedEntriesResult.get("min"));
 		final int greatest = Math.max(selectionMaxValue, selectedEntriesResult.get("max"));
 
+		// This query has two main parts. The first select of the query obtains the new values of entry numbers for the entries that
+		// are going to be modified. The second select obtains which entries are going to be modified. To improve performance, this query is
+		// using intervals to define only the collection of entries that must be reordered. Also, take in mind that this query does not update
+		// any of the selected entries
 		final String updateAffectedEntriesSQL = "UPDATE listdata l\n"
 			+ "    JOIN (SELECT @row_number_in \\:= 0) i\n"
 			+ "    JOIN (SELECT @row_number_out \\:= 0) o\n"
@@ -378,6 +382,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		updateAffectedEntriesQuery.setParameterList("selectedEntries", selectedEntries);
 		updateAffectedEntriesQuery.executeUpdate();
 
+		// Finally, we update the entry numbers of the selected entries.
 		final String updateSelectedEntriesSQL = "UPDATE listdata ld \n"
 			+ "    JOIN (SELECT @position \\:= :selectedPosition) r\n"
 			+ "    INNER JOIN (\n"
@@ -393,7 +398,6 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		updateSelectedEntriesQuery.setParameter("selectedPosition", selectedPosition - 1);
 		updateSelectedEntriesQuery.setParameterList("selectedEntries", selectedEntries);
 		updateSelectedEntriesQuery.executeUpdate();
-
 	}
 
 	public List<Integer> getListDataIdsByListId(final Integer listId) {
