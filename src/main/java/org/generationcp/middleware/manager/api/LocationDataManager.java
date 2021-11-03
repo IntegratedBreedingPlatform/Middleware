@@ -58,33 +58,6 @@ public interface LocationDataManager {
 	long countAllLocations();
 
 	/**
-	 * Returns all crop-specific locations (locations with 'null' program unique id) and program specific
-	 * locations (locations that match the specified program unique id).
-	 *
-	 * @param programUUID
-	 * @return
-	 */
-	List<Location> getLocationsByUniqueID(String programUUID);
-
-	/**
-	 * Returns the number of Locations with names matching the given parameter.
-	 *
-	 * @param programUUID
-	 * @return Number of Locations
-	 */
-	long countLocationsByUniqueID(String programUUID);
-
-	/**
-	 * Returns the Location records with names matching the given parameter.
-	 *
-	 * @param name        - search string for the name of the locations
-	 * @param op          - can be EQUAL like LIKE
-	 * @param programUUID - uniqueID of the current program
-	 * @return List of Location POJOs
-	 */
-	List<Location> getLocationsByName(String name, Operation op, String programUUID);
-
-	/**
 	 * Returns the Location records with names matching the given parameter.
 	 *
 	 * @param name - search string for the name of the locations
@@ -92,19 +65,6 @@ public interface LocationDataManager {
 	 * @return List of Location POJOs
 	 */
 	List<Location> getLocationsByName(String name, Operation op);
-
-	/**
-	 * Returns the Location records with names matching the given parameter.
-	 *
-	 * @param name        - search string for the name of the locations
-	 * @param start       - the starting index of the sublist of results to be returned
-	 * @param numOfRows   - the number of rows to be included in the sublist of results
-	 *                    to be returned
-	 * @param op          - can be EQUAL like LIKE
-	 * @param programUUID - uniqueID of the current program
-	 * @return List of Location POJOs
-	 */
-	List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op, String programUUID);
 
 	/**
 	 * Returns the Location records with names matching the given parameter.
@@ -117,16 +77,6 @@ public interface LocationDataManager {
 	 * @return List of Location POJOs
 	 */
 	List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op);
-
-	/**
-	 * Returns the number of Locations with names matching the given parameter.
-	 *
-	 * @param name        - search string for the name of the locations
-	 * @param op          - can be EQUAL like LIKE
-	 * @param programUUID - uniqueID of the current program
-	 * @return Number of Locations
-	 */
-	long countLocationsByName(String name, Operation op, String programUUID);
 
 	/**
 	 * Returns the number of Locations with names matching the given parameter.
@@ -204,10 +154,9 @@ public interface LocationDataManager {
 	 * data is retrieved from both local and central databases.
 	 *
 	 * @param type        - search string for the type of the locations
-	 * @param programUUID - unique id of the current program
 	 * @return List of Location POJOs
 	 */
-	List<Location> getLocationsByType(Integer type, String programUUID);
+	List<Location> getLocationsByType(Integer type);
 
 	/**
 	 * Returns the Location records with type matching the given parameter. The
@@ -229,16 +178,6 @@ public interface LocationDataManager {
 	 * @return Number of Locations
 	 */
 	long countLocationsByType(Integer type);
-
-	/**
-	 * Returns the number of Locations with types matching the given parameter.
-	 * The data is retrieved from both local and central databases.
-	 *
-	 * @param type        - search string for the type of the locations
-	 * @param programUUID - unique id of the current program
-	 * @return Number of Locations
-	 */
-	long countLocationsByType(Integer type, String programUUID);
 
 	/**
 	 * Returns the udfld record identified by the given id.
@@ -386,21 +325,6 @@ public interface LocationDataManager {
 	List<Location> getAllProvinces();
 
 	/**
-	 * get all location records filtered by programUUID
-	 *
-	 * @param programUUID
-	 * @return list of locid
-	 */
-	List<Location> getProgramLocations(String programUUID);
-
-	/**
-	 * delete all location records filtered by programUUID
-	 *
-	 * @param programUUID
-	 */
-	void deleteProgramLocationsByUniqueId(String programUUID);
-
-	/**
 	 * Retrieves all locdes entries from both central and local by location id
 	 *
 	 * @return all locdes entries by location id
@@ -426,12 +350,11 @@ public interface LocationDataManager {
 	 * Return a List of Locations which represent the breeding locations stored
 	 * in the location table of IBDB.
 	 *
-	 * @param programUUID - uniqueID of current program
 	 * @return the breeding locations for program
 	 */
-	List<Location> getAllBreedingLocationsByUniqueID(String programUUID);
+	List<Location> getAllBreedingLocationsByUniqueID();
 
-	List<LocationDetails> getFilteredLocationsDetails(Integer countryId, Integer locationType, String locationName, String programUUID);
+	List<LocationDetails> getFilteredLocationsDetails(Integer countryId, Integer locationType, String locationName);
 
 	/**
 	 * Gets the user defined field id of name.

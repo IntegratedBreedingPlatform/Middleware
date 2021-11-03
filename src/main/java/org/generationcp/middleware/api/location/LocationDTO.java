@@ -15,7 +15,6 @@ public class LocationDTO {
 	private Double altitude;
 	private Integer countryId;
 	private Integer provinceId;
-	private String programUUID;
 
 	public Integer getId() {
 		return this.id;
@@ -87,14 +86,6 @@ public class LocationDTO {
 
 	public void setProvinceId(final Integer provinceId) {
 		this.provinceId = provinceId;
-	}
-
-	public String getProgramUUID() {
-		return this.programUUID;
-	}
-
-	public void setProgramUUID(final String programUUID) {
-		this.programUUID = programUUID;
 	}
 
 	@Override

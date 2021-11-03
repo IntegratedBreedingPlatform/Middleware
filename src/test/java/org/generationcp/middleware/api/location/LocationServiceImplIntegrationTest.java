@@ -32,25 +32,10 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountFilteredLocations() {
-		// If program UUID is not specified as filter, only locations with null program should be displayed
-		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		final long nullProgramLocationsCount = this.daoFactory.getLocationDAO().countLocationsWithNullProgramUUID();
-		final long count = this.locationService
-			.countFilteredLocations(locationSearchRequest);
-		Assert.assertThat(count, equalTo(nullProgramLocationsCount));
-
-	}
-
-	@Test
 	public void testGetFilteredLocations() {
 		final List<Location> locations = this.locationService
 			.getFilteredLocations(new LocationSearchRequest(), new PageRequest(0, 10));
 		Assert.assertThat(10, equalTo(locations.size()));
-		// If program UUID is not specified as filter, only locations with null program should be displayed
-		locations.forEach(location -> {
-			Assert.assertNull(location.getProgramUUID());
-		});
 	}
 
 	@Test
@@ -83,7 +68,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final String programUUID = UUID.randomUUID().toString();
 		final int cntryid = 1;
 		final Location location = LocationTestDataInitializer
-			.createLocation(null, RandomStringUtils.randomAlphabetic(10), 405, RandomStringUtils.randomAlphabetic(3), programUUID);
+			.createLocation(null, RandomStringUtils.randomAlphabetic(10), 405, RandomStringUtils.randomAlphabetic(3));
 		location.setCntryid(cntryid);
 		location.setLdefault(Boolean.FALSE);
 

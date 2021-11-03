@@ -31,24 +31,13 @@ public class LocationTestDataInitializer {
 		return location;
 	}
 
-	public static Location createLocation(final Integer locId, final String lname, final String programUUID) {
-		final Location location = new Location();
-		location.setLocid(locId);
-		location.setLname(lname);
-		location.setProgramUUID(programUUID);
-		return location;
-	}
-
 	public static Location createLocation(final Integer locId, final String lname, final Integer locationType,
-			final String locationAbbreviation, final String programUUID) {
+		final String locationAbbreviation) {
 		final Location location = new Location();
 		location.setLocid(locId);
 		location.setLname(lname);
 		location.setLtype(locationType);
 		location.setLabbr(locationAbbreviation);
-		if (programUUID != null) {
-			location.setProgramUUID(programUUID);
-		}
 		location.setNllp(0);
 		location.setSnl1id(0);
 		location.setSnl2id(0);

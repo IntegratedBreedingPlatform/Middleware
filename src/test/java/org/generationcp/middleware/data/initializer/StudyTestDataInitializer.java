@@ -333,7 +333,6 @@ public class StudyTestDataInitializer {
 		location.setSnl1id(1);
 		location.setSnl2id(1);
 		location.setSnl3id(1);
-		location.setProgramUUID(this.commonTestProject.getUniqueID());
 		location.setLdefault(Boolean.FALSE);
 
 		// add the location
