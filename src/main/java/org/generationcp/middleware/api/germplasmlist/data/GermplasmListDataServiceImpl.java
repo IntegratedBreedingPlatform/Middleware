@@ -245,6 +245,21 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		return this.daoFactory.getGermplasmListDataDetailDAO().getByListId(listId);
 	}
 
+	@Override
+	public void reOrderEntries(final Integer listId, final List<Integer> selectedEntries, final Integer entryNumberPosition) {
+		this.daoFactory.getGermplasmListDataDAO().reOrderEntries(listId, selectedEntries, entryNumberPosition);
+	}
+
+	@Override
+	public long countByListId(final Integer listId) {
+		return this.daoFactory.getGermplasmListDataDAO().countByListId(listId);
+	}
+
+	@Override
+	public List<Integer> getListDataIdsByListId(final Integer listId) {
+		return this.daoFactory.getGermplasmListDataDAO().getListDataIdsByListId(listId);
+	}
+
 	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<GermplasmListDataSearchResponse> response) {
 
 		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
