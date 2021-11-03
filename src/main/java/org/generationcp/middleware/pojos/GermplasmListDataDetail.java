@@ -39,7 +39,7 @@ public class GermplasmListDataDetail extends AbstractEntity implements Serializa
 	@Column(name = "cvalue_id")
 	private Integer categoricalValueId;
 
-	protected GermplasmListDataDetail() {
+	public GermplasmListDataDetail() {
 	}
 
 	public GermplasmListDataDetail(final GermplasmListData listData, final Integer variableId, final String value,
