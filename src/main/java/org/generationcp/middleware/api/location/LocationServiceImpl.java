@@ -86,8 +86,8 @@ public class LocationServiceImpl implements LocationService {
 	 * @return
 	 */
 	boolean doProceedWithFilteredSearch(final LocationSearchRequest locationSearchRequest) {
-		if (!StringUtils.isEmpty(locationSearchRequest.getProgramUUID()) && locationSearchRequest.getFavoritesOnly()) {
-			final List<Integer> favoriteProjectLocationIds = this.getFavoriteProjectLocationIds(locationSearchRequest.getProgramUUID());
+		if (!StringUtils.isEmpty(locationSearchRequest.getFavoriteProgramUUID())) {
+			final List<Integer> favoriteProjectLocationIds = this.getFavoriteProjectLocationIds(locationSearchRequest.getFavoriteProgramUUID());
 			if (CollectionUtils.isEmpty(favoriteProjectLocationIds)) {
 				return false;
 			}

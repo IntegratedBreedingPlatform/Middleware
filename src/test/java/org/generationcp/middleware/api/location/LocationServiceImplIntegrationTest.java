@@ -81,8 +81,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getProgramFavoriteDao().save(programFavorite);
 
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setProgramUUID(programUUID);
-		locationSearchRequest.setFavoritesOnly(true);
+		locationSearchRequest.setFavoriteProgramUUID(programUUID);
 
 		final List<Location> locations = this.locationService
 			.getFilteredLocations(locationSearchRequest, new PageRequest(0, 10));
