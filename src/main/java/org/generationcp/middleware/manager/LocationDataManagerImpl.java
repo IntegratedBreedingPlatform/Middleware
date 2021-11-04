@@ -399,11 +399,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<Location> getAllBreedingLocationsByUniqueID() {
-		return this.daoFactory.getLocationDAO().getBreedingLocations();
-	}
-
-	@Override
 	public List<LocationDetails> getFilteredLocationsDetails(final Integer countryId, final Integer locationType, final String locationName) {
 		return this.daoFactory.getLocationDAO().getFilteredLocations(countryId, locationType, locationName);
 	}
