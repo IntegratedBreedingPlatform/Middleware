@@ -52,7 +52,23 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 			return Optional.ofNullable((GermplasmListDataDetail) criteria.uniqueResult());
 		} catch (final HibernateException e) {
 			final String errorMessage =
-				"Error with deleteByListIdAndVariableIds(" + listDataId + "," + variableId + ") query from GermplasmListDataDetailDAO: " + e
+				"Error with getByListDataIdAndVariableId(" + listDataId + "," + variableId + ") query from GermplasmListDataDetailDAO: " + e
+					.getMessage();
+			GermplasmListDataDetailDAO.LOG.error(errorMessage);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
+	public List<GermplasmListDataDetail> getByListId(final Integer listId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(GermplasmListDataDetail.class);
+			criteria.createAlias("listData", "listData");
+			criteria.createAlias("listData.list", "list");
+			criteria.add(Restrictions.eq("list.id", listId));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			final String errorMessage =
+				"Error with getByListId(" + listId + ") query from GermplasmListDataDetailDAO: " + e
 					.getMessage();
 			GermplasmListDataDetailDAO.LOG.error(errorMessage);
 			throw new MiddlewareQueryException(errorMessage, e);
