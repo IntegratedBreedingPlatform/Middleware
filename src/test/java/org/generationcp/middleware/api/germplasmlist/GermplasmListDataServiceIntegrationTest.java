@@ -69,12 +69,15 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 
 		final List<GermplasmListDataUpdateViewDTO> updatedView = Arrays.asList(
 			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.ENTRY_NO.getTermId(), GermplasmListColumnCategory.STATIC),
-			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.DESIGNATION.getTermId(), GermplasmListColumnCategory.STATIC),
-			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.GERMPLASM_REFERENCE.getTermId(), GermplasmListColumnCategory.STATIC));
+			this.createGermplasmListDataUpdateViewDTO(
+				GermplasmListStaticColumns.DESIGNATION.getTermId(), GermplasmListColumnCategory.STATIC),
+			this.createGermplasmListDataUpdateViewDTO(
+				GermplasmListStaticColumns.GERMPLASM_REFERENCE.getTermId(), GermplasmListColumnCategory.STATIC));
 
 		this.germplasmListDataService.updateGermplasmListDataView(germplasmList.getId(), updatedView);
 
-		final List<GermplasmListDataView> currentUpdatedView = this.daoFactory.getGermplasmListDataViewDAO().getByListId(germplasmList.getId());
+		final List<GermplasmListDataView> currentUpdatedView =
+			this.daoFactory.getGermplasmListDataViewDAO().getByListId(germplasmList.getId());
 		assertThat(currentUpdatedView, hasSize(3));
 		assertThat(currentUpdatedView, CoreMatchers.hasItems(
 			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.ENTRY_NO.getTermId())),
@@ -83,7 +86,7 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 	}
 
 	@Test
-	public void testGetGermplasmListDataList_OK() {
+	public void testGetGermplasmListDataDetailList_OK() {
 
 		// Germplasm list
 		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + RandomStringUtils.randomAlphabetic(10),
@@ -118,14 +121,16 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 		this.germplasmListService.saveListDataObservation(germplasmList.getId(), germplasmListObservationRequestDto1);
 
 		this.sessionProvder.getSession().flush();
-		final List<GermplasmListDataDetail> germplasmListDataDetails = this.germplasmListDataService.getGermplasmListDataList(germplasmList.getId());
+		final List<GermplasmListDataDetail> germplasmListDataDetails =
+			this.germplasmListDataService.getGermplasmListDataDetailList(germplasmList.getId());
 		Assert.assertEquals(1, germplasmListDataDetails.size());
 		Assert.assertEquals(value, germplasmListDataDetails.get(0).getValue());
 		Assert.assertEquals(variable.getCvTermId(), germplasmListDataDetails.get(0).getVariableId());
 		Assert.assertEquals(data.getListDataId(), germplasmListDataDetails.get(0).getListData().getListDataId());
 	}
 
-	private GermplasmListDataUpdateViewDTO createGermplasmListDataUpdateViewDTO(final Integer id, final GermplasmListColumnCategory category) {
+	private GermplasmListDataUpdateViewDTO createGermplasmListDataUpdateViewDTO(
+		final Integer id, final GermplasmListColumnCategory category) {
 		final GermplasmListDataUpdateViewDTO dto = new GermplasmListDataUpdateViewDTO();
 		dto.setId(id);
 		dto.setCategory(category);
