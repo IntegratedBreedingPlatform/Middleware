@@ -341,7 +341,7 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 
 	private Location createLocation(final String name) {
 		final Location location = LocationTestDataInitializer.createLocation(null, name, 123,
-			RandomStringUtils.randomNumeric(8), null);
+			RandomStringUtils.randomNumeric(8));
 		this.locationDAO.saveOrUpdate(location);
 		return location;
 	}

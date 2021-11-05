@@ -25,9 +25,9 @@ public interface LotService {
 
 	String saveLot(CropType cropType, Integer userId, LotGeneratorInputDto lotDto);
 
-	void updateLots(String programUUID, List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotUpdateRequestDto);
+	void updateLots(List<ExtendedLotDto> lotDtos, LotUpdateRequestDto lotUpdateRequestDto);
 
-	List<String> saveLots(CropType cropType, String programUUID, Integer userId, List<LotItemDto> lotItemDtos);
+	List<String> saveLots(CropType cropType, Integer userId, List<LotItemDto> lotItemDtos);
 
 	List<LotDto> getLotsByStockIds(List<String> stockIds);
 

@@ -54,7 +54,6 @@ import java.util.Optional;
 @SuppressWarnings("unchecked")
 public class LocationDAO extends GenericDAO<Location, Integer> {
 
-	private static final String PROGRAM_UUID = "programUUID";
 	private static final String CLASS_NAME_LOCATION = "Location";
 	private static final String COUNTRY_ID = "cntryid";
 	private static final String COUNTRY = "country";
@@ -88,20 +87,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
-	public List<Location> getByNameAndProgramUUID(final String name, final Operation operation, final String programUUID) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Location.class);
-
-			this.addNameSearchCriteria(name, operation, criteria);
-			criteria.add(
-				Restrictions.or(Restrictions.eq(LocationDAO.PROGRAM_UUID, programUUID), Restrictions.isNull(LocationDAO.PROGRAM_UUID)));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getByName", "name|operation", name + "|" + operation, e.getMessage(), "Location"), e);
-		}
-	}
-
 	public List<Location> getByName(final String name, final Operation operation, final int start, final int numOfRows) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Location.class);
@@ -115,23 +100,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			throw new MiddlewareQueryException(
 				this.getLogExceptionMessage("getByName", LocationDAO.NAME_OR_OPERATION, name + "|" + operation, e.getMessage(),
 					LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-	}
-
-	public List<Location> getByNameAndProgramUUID(final String name, final Operation operation, final String programUUID, final int start,
-		final int numOfRows) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Location.class);
-
-			this.addNameSearchCriteria(name, operation, criteria);
-			criteria.add(
-				Restrictions.or(Restrictions.eq(LocationDAO.PROGRAM_UUID, programUUID), Restrictions.isNull(LocationDAO.PROGRAM_UUID)));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getByName", "name|operation", name + "|" + operation, e.getMessage(), "Location"), e);
 		}
 	}
 
@@ -149,25 +117,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			throw new MiddlewareQueryException(
 				this.getLogExceptionMessage("countByName", LocationDAO.NAME_OR_OPERATION, name + "|" + operation, e.getMessage(),
 					LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-		return 0;
-	}
-
-	public long countByNameAndProgramUUID(final String name, final Operation operation, final String programUUID) {
-		try {
-			if (name != null) {
-				final Criteria criteria = this.getSession().createCriteria(Location.class);
-				criteria.setProjection(Projections.rowCount());
-
-				this.addNameSearchCriteria(name, operation, criteria);
-				criteria.add(
-					Restrictions.or(Restrictions.eq(LocationDAO.PROGRAM_UUID, programUUID), Restrictions.isNull(LocationDAO.PROGRAM_UUID)));
-				return ((Long) criteria.uniqueResult()).longValue();
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("countByName", "name|operation|programUUID", name + "|" + operation + "|" + programUUID,
-					e.getMessage(), "Location"), e);
 		}
 		return 0;
 	}
@@ -328,14 +277,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 	private Criteria createFilterLocationCriteria(final LocationSearchRequest locationSearchRequest) {
 		final Criteria criteria = this.getSession().createCriteria(Location.class);
 
-		if (locationSearchRequest.getProgramUUID() != null) {
-			criteria.add(Restrictions.disjunction()
-				.add(Restrictions.eq(PROGRAM_UUID, locationSearchRequest.getProgramUUID()))
-				.add(Restrictions.isNull(PROGRAM_UUID)));
-		} else {
-			criteria.add(Restrictions.isNull(PROGRAM_UUID));
-		}
-
 		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationTypeIds())) {
 			criteria.add(Restrictions.in(LocationDAO.LTYPE, locationSearchRequest.getLocationTypeIds()));
 		}
@@ -353,24 +294,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			criteria.add(Restrictions.like("lname", locationSearchRequest.getLocationName(), MatchMode.START));
 		}
 		return criteria;
-	}
-
-	public List<Location> getByType(final Integer type, final String programUUID) {
-		try {
-			if (type != null) {
-				final Criteria criteria = this.getSession().createCriteria(Location.class);
-				criteria.add(Restrictions.eq(LocationDAO.LTYPE, type));
-				criteria.add(
-					Restrictions.or(Restrictions.eq(LocationDAO.PROGRAM_UUID, programUUID), Restrictions.isNull(LocationDAO.PROGRAM_UUID)));
-				criteria.addOrder(Order.asc(LocationDAO.LNAME));
-				return criteria.list();
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage(LocationDAO.GET_BY_TYPE, "type", String.valueOf(type), e.getMessage(),
-					LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-		return new ArrayList<>();
 	}
 
 	public List<Location> getByType(final Integer type, final int start, final int numOfRows) {
@@ -405,23 +328,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return 0;
 	}
 
-	public long countByType(final Integer type, final String programUUID) {
-		try {
-			if (type != null) {
-				final Criteria criteria = this.getSession().createCriteria(Location.class);
-				criteria.add(Restrictions.eq(LocationDAO.LTYPE, type));
-				criteria.add(
-					Restrictions.or(Restrictions.eq(LocationDAO.PROGRAM_UUID, programUUID), Restrictions.isNull(LocationDAO.PROGRAM_UUID)));
-				criteria.setProjection(Projections.rowCount());
-				return ((Long) criteria.uniqueResult()).longValue();
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("countByType", "type", String.valueOf(type), e.getMessage(),
-				LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-		return 0;
-	}
-
 	@SuppressWarnings("rawtypes")
 	public List<Location> getAllBreedingLocations() {
 		final List<Location> locationList = new ArrayList<>();
@@ -446,12 +352,10 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					final Double latitude = (Double) result[11];
 					final Double longitude = (Double) result[12];
 					final Double altitude = (Double) result[13];
-					final String programUUID = (String) result[14];
-					final Boolean ldefault = (Boolean) result[15];
+					final Boolean ldefault = (Boolean) result[14];
 
 					final Location location = new Location(locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, cntryid, lrplce);
 					location.setLdefault(ldefault);
-					location.setProgramUUID(programUUID);
 
 					final Georef georef = new Georef();
 					georef.setLocid(locid);
@@ -491,8 +395,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				+ "  g.lon as longitude," //
 				+ "  g.alt as altitude," //
 				+ "  l.cntryid as countryId," //
-				+ "  l.snl1id as provinceId," //
-				+ "  l.program_uuid as programUUID" //
+				+ "  l.snl1id as provinceId " //
 				+ " from location l" //
 				+ "  left join georef g on l.locid = g.locid" //
 				+ " where l.locid = :locationId");
@@ -500,7 +403,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query.toString());
 			sqlQuery.setParameter("locationId", locationId);
 			sqlQuery.addScalar("id").addScalar("name").addScalar("type").addScalar("abbreviation").addScalar("latitude")
-				.addScalar("longitude").addScalar("altitude").addScalar("countryId").addScalar("provinceId").addScalar("programUUID");
+				.addScalar("longitude").addScalar("altitude").addScalar("countryId").addScalar("provinceId");
 			sqlQuery.setResultTransformer(Transformers.aliasToBean(LocationDTO.class));
 
 			return (LocationDTO) sqlQuery.uniqueResult();
@@ -515,7 +418,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			final StringBuilder query = new StringBuilder().append("select l.lname as location_name,l.locid,l.ltype as ltype,")
 				.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
 				.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
-				.append(" ud.fname as location_type,").append(" ud.fdesc as location_description, l.program_uuid,")
+				.append(" ud.fname as location_type,").append(" ud.fdesc as location_description,")
 				.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id, l.ldefault")
 				.append(" from location l").append(" left join georef g on l.locid = g.locid")
 				.append(" left join cntry c on l.cntryid = c.cntryid").append(" left join udflds ud on ud.fldno = l.ltype")
@@ -743,50 +646,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return locations;
 	}
 
-	public List<Location> getByProgramUUID(final String programUUID) {
-		List<Location> locations = new ArrayList<>();
-
-		if (programUUID == null || programUUID.isEmpty()) {
-			return locations;
-		}
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Location.class);
-			criteria.add(
-				Restrictions.or(Restrictions.eq(LocationDAO.PROGRAM_UUID, programUUID), Restrictions.isNull(LocationDAO.PROGRAM_UUID)));
-			locations = criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getByProgramUUID", "programUUID", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-		return locations;
-	}
-
-	public List<Location> getByProgramUUIDAndExcludeLocationTypes(final String programUUID, final List<Integer> locationTypesToExclude) {
-
-		List<Location> locations = new ArrayList<>();
-
-		if (programUUID == null || programUUID.isEmpty()) {
-			return locations;
-		}
-
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Location.class);
-			criteria.add(
-				Restrictions.or(Restrictions.eq(LocationDAO.PROGRAM_UUID, programUUID), Restrictions.isNull(LocationDAO.PROGRAM_UUID)));
-			if (locationTypesToExclude != null && !locationTypesToExclude.isEmpty()) {
-				criteria.add(Restrictions.not(Restrictions.in(LocationDAO.LTYPE, locationTypesToExclude)));
-			}
-			locations = criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getByProgramUUIDAndExcludeLocationTypes", "", null, e.getMessage(),
-					LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-
-		return locations;
-	}
-
 	public long countByLocationAbbreviation(final String locationAbbreviation) {
 		try {
 			if (locationAbbreviation != null) {
@@ -801,32 +660,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					LocationDAO.CLASS_NAME_LOCATION), e);
 		}
 		return 0;
-	}
-
-	public long countByProgramUUID(final String programUUID) {
-		try {
-			if (programUUID != null) {
-				final Criteria criteria = this.getSession().createCriteria(Location.class);
-				criteria.add(
-					Restrictions.or(Restrictions.eq(LocationDAO.PROGRAM_UUID, programUUID), Restrictions.isNull(LocationDAO.PROGRAM_UUID)));
-				criteria.setProjection(Projections.rowCount());
-				return ((Long) criteria.uniqueResult()).longValue();
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("countByProgramUUID", "programUUID", programUUID, e.getMessage(),
-				LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-		return 0;
-	}
-
-	public List<Location> getProgramLocations(final String programUUID) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Location.class);
-			criteria.add(Restrictions.eq(LocationDAO.PROGRAM_UUID, programUUID));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getProgramLocations(" + programUUID + ") in LocationDao: " + e.getMessage(), e);
-		}
 	}
 
 	public List<Locdes> getLocdesByLocId(final Integer locationId) {
@@ -879,48 +712,34 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
-	public List<Location> getBreedingLocationsByProgramUUID(final String programUUID) {
-		List<Location> locations = new ArrayList<>();
-
-		if (programUUID == null || programUUID.isEmpty()) {
-			return locations;
-		}
-
+	public List<Location> getBreedingLocations() {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Location.class);
-			// filter by programUUID plus return also records with null
-			// programUUID (common historical data)
-			criteria.add(
-				Restrictions.or(Restrictions.eq(LocationDAO.PROGRAM_UUID, programUUID), Restrictions.isNull(LocationDAO.PROGRAM_UUID)));
 			// set location types for Breeding Location
 			criteria.add(Restrictions.in(LocationDAO.LTYPE, Arrays.asList(Location.BREEDING_LOCATION_TYPE_IDS)));
 			criteria.addOrder(Order.asc("lname"));
 
-			locations = criteria.list();
+			return criteria.list();
 		} catch (final HibernateException e) {
 			LocationDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
 				this.getLogExceptionMessage("getBreedingLocationsByProgramUUID", "", null, e.getMessage(), "Location"), e);
 
 		}
-		return locations;
-
 	}
 
-	public List<LocationDetails> getFilteredLocations(final Integer countryId, final Integer locationType, final String locationName,
-		final String programUUID) {
+	public List<LocationDetails> getFilteredLocations(final Integer countryId, final Integer locationType, final String locationName) {
 
 		try {
 
 			final StringBuilder queryString = new StringBuilder().append("SELECT l.lname as location_name,l.locid,l.ltype as ltype,")
 				.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
 				.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
-				.append(" ud.fname as location_type,").append(" ud.fdesc as location_description, l.program_uuid")
-				.append(" ,c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id, l.ldefault as ldefault")
+				.append(" ud.fname as location_type,").append(" ud.fdesc as location_description,")
+				.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id, l.ldefault as ldefault")
 				.append(" FROM location l").append(" LEFT JOIN georef g on l.locid = g.locid")
 				.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid").append(" LEFT JOIN udflds ud on ud.fldno = l.ltype")
-				.append(" ,location province ").append(" WHERE (l.program_uuid = '").append(programUUID).append("'")
-				.append(" or l.program_uuid is null) ").append(" and province.locid = l.snl1id ");
+				.append(" ,location province ").append(" WHERE province.locid = l.snl1id ");
 
 			if (countryId != null) {
 				queryString.append(" AND c.cntryid = ");
@@ -949,13 +768,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			throw new MiddlewareQueryException(
 				this.getLogExceptionMessage("getFilteredLocationsDetails", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
-	}
-
-	public long countLocationsWithNullProgramUUID() {
-		final Criteria criteria = this.getSession().createCriteria(Location.class);
-		criteria.add(Restrictions.isNull(LocationDAO.PROGRAM_UUID));
-		criteria.setProjection(Projections.rowCount());
-		return ((Long) criteria.uniqueResult()).longValue();
 	}
 
 	public long countLocations(final LocationSearchRequest locationSearchRequest) {
@@ -1058,10 +870,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			sqlQuery.setParameterList("locationId", locationSearchRequest.getLocationIds());
 		}
 
-		if (!StringUtils.isEmpty(locationSearchRequest.getProgramUUID())) {
-			sqlQuery.setParameter("programUUID", locationSearchRequest.getProgramUUID());
-		}
-
 		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationTypeIds())) {
 			sqlQuery.setParameterList("locationTypeIds", locationSearchRequest.getLocationTypeIds());
 		}
@@ -1082,13 +890,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationIds())) {
 			queryString.append("AND l.locid IN (:locationId) ");
-		}
-
-		if (locationSearchRequest.getProgramUUID() != null) {
-			queryString.append("AND (l.program_uuid = :programUUID OR l.program_uuid IS NULL) ");
-		} else {
-			queryString.append("AND l.program_uuid IS NULL ");
-
 		}
 
 		if (!CollectionUtils.isEmpty(locationSearchRequest.getLocationTypeIds())) {
@@ -1127,16 +928,4 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return Optional.empty();
 	}
 
-	public void deleteAllProgramLocations(final String programUUID) {
-		try {
-			final String sql = "DELETE l FROM location l WHERE l.program_uuid = :programUUID";
-			final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
-			sqlQuery.setParameter("programUUID", programUUID);
-			sqlQuery.executeUpdate();
-		} catch (final HibernateException e) {
-			final String message = "Error in deleteAllProgramLocations(" + programUUID + ") in LocationDAO: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
 }

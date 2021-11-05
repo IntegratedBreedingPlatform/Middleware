@@ -131,8 +131,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public List<Location> getLocationsByProgramUUID(final String programUUID) {
-		return this.locationDataManager.getLocationsByUniqueID(programUUID);
+	public List<Location> getAllLocations() {
+		return this.locationDataManager.getAllLocations();
 	}
 
 	@Override

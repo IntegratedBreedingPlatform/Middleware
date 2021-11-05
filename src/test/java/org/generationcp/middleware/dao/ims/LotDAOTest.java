@@ -260,7 +260,7 @@ public class LotDAOTest extends IntegrationTestBase {
 		final String lname = RandomStringUtils.randomAlphabetic(9);
 
 		final int cntryid = 1;
-		this.location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr, programUUID);
+		this.location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
 		this.location.setCntryid(cntryid);
 
 		final int provinceId = 1001;
