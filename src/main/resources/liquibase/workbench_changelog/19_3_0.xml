@@ -107,7 +107,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v19.3.0-3">
+	<changeSet author="cuenyad" id="v19.3.0-4">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="1">
