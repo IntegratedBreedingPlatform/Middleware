@@ -66,10 +66,6 @@ public class Location implements Serializable, Comparable<Location> {
 	@XmlElement(name = "locationId")
 	private Integer locid;
 
-	@Basic(optional = true)
-	@Column(name = "program_uuid")
-	private String programUUID;
-
 	@Basic(optional = false)
 	@Column(name = "ltype")
 	private Integer ltype;
@@ -125,7 +121,7 @@ public class Location implements Serializable, Comparable<Location> {
 	private String parentLocationAbbr;
 
 	public static final String GET_ALL_BREEDING_LOCATIONS =
-		"SELECT l.locid, l.ltype, l.nllp, l.lname, l.labbr, l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce, l.nnpid, g.lat, g.lon, g.alt, l.program_uuid, l.ldefault "
+		"SELECT l.locid, l.ltype, l.nllp, l.lname, l.labbr, l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce, l.nnpid, g.lat, g.lon, g.alt, l.ldefault "
 					+ "FROM location l left join georef g on l.locid = g.locid WHERE l.ltype IN (410, 411, 412) ORDER BY lname";
 	public static final String COUNT_ALL_BREEDING_LOCATIONS = "SELECT count(*) AS count FROM location WHERE ltype IN (410, 411, 412)";
 	public static final String GET_LOCATION_NAMES_BY_GIDS = "SELECT gid, g.glocn, lname " + "FROM germplsm g " + "LEFT JOIN location l "
@@ -160,14 +156,6 @@ public class Location implements Serializable, Comparable<Location> {
 
 	public void setLocid(final Integer locid) {
 		this.locid = locid;
-	}
-
-	public String getProgramUUID() {
-		return this.programUUID;
-	}
-
-	public void setProgramUUID(final String programUUID) {
-		this.programUUID = programUUID;
 	}
 
 	public Integer getLtype() {

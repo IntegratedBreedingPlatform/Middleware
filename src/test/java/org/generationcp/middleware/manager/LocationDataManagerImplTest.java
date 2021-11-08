@@ -17,7 +17,6 @@ import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
@@ -42,12 +41,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	private LocationDataManager manager;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-
-	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
-
-	private DaoFactory daoFactory;
 
 	private Project commonTestProject;
 
@@ -62,8 +56,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 		}
-
-		this.daoFactory = new DaoFactory(this.sessionProvder);
 	}
 
 	@Test
@@ -72,23 +64,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertNotNull(locationList);
 		Debug.println(IntegrationTestBase.INDENT, "testGetAllLocations(): ");
 		Debug.printObjects(IntegrationTestBase.INDENT, locationList);
-	}
-
-	@Test
-	public void testGetLocationsByUniqueID() {
-		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		final List<Location> locationList = this.manager.getLocationsByUniqueID(programUUID);
-		Assert.assertNotNull("Expecting to have returned results.", locationList);
-		Debug.println(IntegrationTestBase.INDENT, "testGetLocationsByUniqueID(): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, locationList);
-	}
-
-	@Test
-	public void testCountLocationsByUniqueID() {
-		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		final long count = this.manager.countLocationsByUniqueID(programUUID);
-		Assert.assertTrue("Expecting to have returned results.", count > 0);
-		Debug.println(IntegrationTestBase.INDENT, "testCountLocationsByUniqueID(" + programUUID + "): " + count);
 	}
 
 	@Test
@@ -197,12 +172,11 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		final String name = "AFGHANISTAN";
 		final int start = 0;
 		final int numOfRows = 5;
-		final String programUUID = this.commonTestProject.getUniqueID();
 
-		final List<Location> locationList = this.manager.getLocationsByName(name, Operation.EQUAL, programUUID);
+		final List<Location> locationList = this.manager.getLocationsByName(name, Operation.EQUAL);
 		Assert.assertNotNull("Expecting the location list returned is not null.", locationList);
 
-		final List<Location> locationList2 = this.manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL, programUUID);
+		final List<Location> locationList2 = this.manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL);
 		Assert.assertNotNull("Expecting the location list 2 returned is not null.", locationList2);
 	}
 
@@ -211,14 +185,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		final String name = "AFGHANISTAN";
 		final long count = this.manager.countLocationsByName(name, Operation.EQUAL);
 		Debug.println(IntegrationTestBase.INDENT, "testCountLocationByName(" + name + "): " + count);
-	}
-
-	@Test
-	public void testCountLocationsByNameWithProgramUUID() {
-		final String name = "AFGHANISTAN";
-		final String programUUID = this.commonTestProject.getUniqueID();
-		final long count = this.manager.countLocationsByName(name, Operation.EQUAL, programUUID);
-		Assert.assertTrue("Expecting the count returned is greated than 0", count > 0);
 	}
 
 	@Test
@@ -265,13 +231,12 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		final int start = 0;
 		final int numOfRows = 5;
 
-		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		final List<Location> locations = this.manager.getLocationsByType(type, programUUID);
+		final List<Location> locations = this.manager.getLocationsByType(type);
 		Assert.assertNotNull("Expecting to have returned results.", locations);
 		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByType(type=" + type + "): " + locations.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, locations);
 
-		final List<Location> locationsByProgramUUID = this.manager.getLocationsByType(type, programUUID);
+		final List<Location> locationsByProgramUUID = this.manager.getLocationsByType(type);
 		Assert.assertNotNull("Expecting to have returned results.", locationsByProgramUUID);
 		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByType(type=" + type + "): " + locations.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, locationsByProgramUUID);
@@ -287,11 +252,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	public void testCountLocationsByType() {
 		int type = 405; // Tested in rice db
 		long count = this.manager.countLocationsByType(type);
-		Debug.println(IntegrationTestBase.INDENT, "testCountLocationByType(type=" + type + "): " + count);
-
-		final String programUUID = "030850c4-41f8-4baf-81a3-03b99669e996";
-		type = 405;
-		count = this.manager.countLocationsByType(type, programUUID);
 		Debug.println(IntegrationTestBase.INDENT, "testCountLocationByType(type=" + type + "): " + count);
 	}
 
@@ -400,7 +360,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		final int locationId = 2;
 		final List<LocationDetails> locdetails = this.manager.getLocationDetailsByLocId(locationId, 0, 100);
 		Assert.assertNotNull(locdetails);
-		Assert.assertTrue(!locdetails.isEmpty());
+		Assert.assertFalse(locdetails.isEmpty());
 		Debug.println(IntegrationTestBase.INDENT, "testGetLocationDetailsByLocId(" + locationId + "): ");
 		Debug.printObjects(IntegrationTestBase.INDENT, locdetails);
 	}
@@ -431,7 +391,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetBlockInformation() {
-		final Integer blockId = -15;
+		final int blockId = -15;
 		final FieldmapBlockInfo result = this.manager.getBlockInformation(blockId);
 		Assert.assertNotNull(result);
 		Debug.println(3, result);
@@ -481,47 +441,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 			Assert.assertEquals(aculcoLoc.getGeoref().getAlt(), locationDetails.get(0).getAltitude());
 		}
 
-	}
-
-	@Test
-	public void getProgramLocationsAndDeleteByUniqueId() {
-		// create program locations
-		final String programUUID = this.commonTestProject.getUniqueID();
-		final int testLocationID1 = 100000;
-		final int testLocationID2 = 100001;
-		final Location testLocation1 = this.createLocationTestData(testLocationID1, programUUID);
-		final Location testLocation2 = this.createLocationTestData(testLocationID2, programUUID);
-		try {
-			this.manager.addLocation(testLocation1);
-			this.manager.addLocation(testLocation2);
-			// verify
-			List<Location> locationList = this.manager.getProgramLocations(programUUID);
-			Assert.assertEquals("There should be 2 program locations with programUUID[" + programUUID + "]", 2, locationList.size());
-			// delete locations
-			this.manager.deleteProgramLocationsByUniqueId(programUUID);
-			locationList = this.manager.getProgramLocations(programUUID);
-			Assert.assertTrue("There should be no program locations with programUUID[" + programUUID + "]", locationList.isEmpty());
-		} catch (final MiddlewareQueryException e) {
-			Assert.fail("Getting of Program Methods Failed ");
-		}
-	}
-
-	private Location createLocationTestData(final int id, final String programUUID) {
-		final Location location = new Location();
-		location.setProgramUUID(programUUID);
-		location.setLrplce(0);
-		location.setLname("TEST-LOCATION" + id);
-		location.setLabbr(RandomStringUtils.randomAlphabetic(4).toUpperCase());
-		location.setLtype(1);
-		location.setCntryid(1);
-		location.setLrplce(1);
-		location.setLtype(1);
-		location.setNllp(0);
-		location.setSnl1id(0);
-		location.setSnl2id(0);
-		location.setSnl3id(0);
-		location.setLdefault(Boolean.FALSE);
-		return location;
 	}
 
 	@Test

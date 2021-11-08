@@ -1,7 +1,7 @@
 <?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 	<changeSet author="cuenyad" id="v19.3.0-1">
@@ -66,13 +66,43 @@
 			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
 
 			INSERT INTO permission (`name`, `description`, `parent_id`)
-			VALUES ('REORDER_ENTRIES_GERMPLASM_LISTS', 'Reorder Entries', @permission_id);
+				VALUES ('REORDER_ENTRIES_GERMPLASM_LISTS', 'Reorder Entries', @permission_id);
 
 			SET @reorder_entries_germplasm_lists_permission_id = (SELECT permission_id FROM permission where name = 'REORDER_ENTRIES_GERMPLASM_LISTS');
 
 			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @reorder_entries_germplasm_lists_permission_id, '1');
 			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @reorder_entries_germplasm_lists_permission_id, '1');
 			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @reorder_entries_germplasm_lists_permission_id, '1');
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v19.3.0-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS'
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM permission WHERE name = 'GERMPLASM_LIST_LABEL_PRINTING'
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Add export Germplasm List data permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`)
+			VALUES ('GERMPLASM_LIST_LABEL_PRINTING', 'Export Germplasm List Data and Labels', @permission_id);
+
+			SET @germplasm_list_label_printing_permission_id = (SELECT permission_id FROM permission where name = 'GERMPLASM_LIST_LABEL_PRINTING');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @germplasm_list_label_printing_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @germplasm_list_label_printing_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @germplasm_list_label_printing_permission_id, '1');
 
 		</sql>
 	</changeSet>

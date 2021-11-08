@@ -1055,15 +1055,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(
-		final String variableId, final String variableValue,
-		final String programUUID) {
-
-		return this.daoFactory.getDmsProjectDAO().isVariableUsedInOtherPrograms(variableId, variableValue, programUUID);
-
-	}
-
-	@Override
 	public List<StudyTypeDto> getAllStudyTypes() {
 		return this.getStudyTypeBuilder().createStudyTypeDto(this.daoFactory.getStudyTypeDao().getAll());
 	}

@@ -616,16 +616,6 @@ public interface StudyDataManager {
 	 */
 	Map<Integer, List<SampleDTO>> getExperimentSamplesDTOMap(Integer studyId);
 
-	/**
-	 * Detect the usage of the specified variable in any programs except for the specified programUUID.
-	 *
-	 * @param variableId    - The term id of the variable (e.g. 8190 to look for variable LOCATION_NAME_ID)
-	 * @param variableValue - The value of the variable (e.g. 101 which is the location name id of the location "India")
-	 * @param programUUID
-	 * @return
-	 */
-	boolean isVariableUsedInStudyOrTrialEnvironmentInOtherPrograms(String variableId, String variableValue, String programUUID);
-
 	Map<String, Integer> getInstanceGeolocationIdsMap(Integer studyId);
 
 	List<StudyTypeDto> getAllStudyTypes();
