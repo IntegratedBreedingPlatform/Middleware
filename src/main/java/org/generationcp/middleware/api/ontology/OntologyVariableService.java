@@ -10,5 +10,5 @@ import java.util.Map;
  */
 public interface OntologyVariableService {
 
-	Map<Integer, Variable> getVariablesWithFilterById(final VariableFilter variableFilter);
+	Map<Integer, Variable> getVariablesWithFilterById(VariableFilter variableFilter);
 }
