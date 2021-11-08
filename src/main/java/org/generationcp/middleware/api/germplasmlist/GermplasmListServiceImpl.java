@@ -60,6 +60,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toSet;
 
 @Transactional
 @Service
@@ -157,6 +158,17 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
 		request.setId(germplasmList.getId());
 
+		// save variables
+		final Set<Integer> variableIds = request.getEntries().stream().flatMap(e -> e.getData().keySet().stream()).collect(toSet());
+		for (final Integer variableId : variableIds) {
+			final GermplasmListDataView germplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(
+				germplasmList,
+				variableId,
+				VariableType.ENTRY_DETAIL.getId()
+			).build();
+			this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
+		}
+
 		// save germplasm list data
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			final Integer gid = entry.getGid();
@@ -164,13 +176,83 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			final List<Name> names = namesByGid.get(gid);
 			Preconditions.checkArgument(preferredName != null || names != null, "No name found for gid=" + gid);
 			final String designation = preferredName != null ? preferredName : names.get(0).getNval();
-			final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, entry.getEntryNo(),
+			GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, entry.getEntryNo(),
 				entry.getEntryCode(), entry.getSeedSource(), designation, entry.getGroupName(),
 				GermplasmListDataDAO.STATUS_ACTIVE, null);
-			this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+			germplasmListData = this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+
+			// save entry details
+			for (final Map.Entry<Integer, GermplasmListObservationDto> entryDetailSet : entry.getData().entrySet()) {
+				final GermplasmListObservationDto entryDetail = entryDetailSet.getValue();
+
+				// save data
+				final GermplasmListDataDetail germplasmListDataDetail = new GermplasmListDataDetail(
+					germplasmListData,
+					entryDetailSet.getKey(),
+					entryDetail.getValue(),
+					entryDetail.getcValueId()
+				);
+				this.daoFactory.getGermplasmListDataDetailDAO().save(germplasmListDataDetail);
+			}
 		}
 
 		return request;
+	}
+
+	@Override
+	public void importUpdates(final GermplasmListGeneratorDTO request) {
+		final Integer listId = request.getId();
+		// TODO validate deleted
+		final GermplasmList germplasmList = this.getGermplasmListById(listId)
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+
+		// if variables not exist in list, add them
+
+		final Set<Integer> existingVariableIds = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId)
+			.stream().map(GermplasmListDataView::getCvtermId).collect(toSet());
+
+		final Set<Integer> variableIds = request.getEntries().stream().flatMap(e -> e.getData().keySet().stream())
+			.filter(variableId -> !existingVariableIds.contains(variableId))
+			.collect(toSet());
+
+		for (final Integer variableId : variableIds) {
+			final GermplasmListDataView germplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(
+				germplasmList,
+				variableId,
+				VariableType.ENTRY_DETAIL.getId()
+			).build();
+			this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
+		}
+
+		// if entry details not exist, create them, otherwise update them
+
+		final Table<Integer, Integer, GermplasmListDataDetail> table = this.daoFactory.getGermplasmListDataDetailDAO()
+			.getTableEntryIdToVariableId(listId);
+
+		final Map<Integer, GermplasmListData> germplasmListDataByEntryId = this.daoFactory.getGermplasmListDataDAO()
+			.getMapByEntryId(listId);
+
+		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
+			final GermplasmListData germplasmListData = germplasmListDataByEntryId.get(entry.getEntryNo());
+
+			for (final Map.Entry<Integer, GermplasmListObservationDto> entryDetailSet : entry.getData().entrySet()) {
+				final GermplasmListObservationDto entryDetail = entryDetailSet.getValue();
+
+				GermplasmListDataDetail germplasmListDataDetail = table.get(entry.getEntryNo(), entryDetail.getVariableId());
+				if (germplasmListDataDetail != null) {
+					germplasmListDataDetail.setValue(entryDetail.getValue());
+				} else {
+					germplasmListDataDetail = new GermplasmListDataDetail(
+						germplasmListData,
+						entryDetailSet.getKey(),
+						entryDetail.getValue(),
+						entryDetail.getcValueId()
+					);
+				}
+
+				this.daoFactory.getGermplasmListDataDetailDAO().saveOrUpdate(germplasmListDataDetail);
+			}
+		}
 	}
 
 	@Override
@@ -255,7 +337,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Set<Integer> gids = addGermplasmEntriesModels
 			.stream()
 			.map(AddGermplasmEntryModel::getGid)
-			.collect(Collectors.toSet());
+			.collect(toSet());
 
 		final Map<Integer, String> crossExpansionsBulk =
 			this.pedigreeService.getCrossExpansionsBulk(gids, null, this.crossExpansionProperties);
@@ -288,7 +370,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Set<String> propertyNames = germplasmList.getListData().get(0).getProperties()
 			.stream()
 			.map(ListDataProperty::getColumn)
-			.collect(Collectors.toSet());
+			.collect(toSet());
 		this.addListDataProperties(germplasmListsData, propertyNames);
 	}
 
@@ -603,7 +685,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		//Check if there is an unknown property in order to get attr and names info only once
 		final Set<String> allKnownPropertyNames = Arrays.stream(GermplasmListDataPropertyName.values())
-			.map(GermplasmListDataPropertyName::getName).collect(Collectors.toSet());
+			.map(GermplasmListDataPropertyName::getName).collect(toSet());
 		final boolean anyUnknownProperty = propertyNames.stream().anyMatch(property -> !allKnownPropertyNames.contains(property));
 		final Map<String, Integer> attributeTypesMap;
 		final Map<String, Integer> nameTypesMap;
