@@ -349,7 +349,7 @@ public class GermplasmImportRequest {
 		return namesMap;
 	}
 
-	public boolean isGermplasmPUIInList(final Collection<String> puiList){
+	public boolean isGermplasmPUIInList(final Collection<String> puiList) {
 		if (!puiList.contains(this.getGermplasmPUI())) {
 			final Optional<String> germplasmPUIFromNames = this.getGermplasmPUIFromSynonyms();
 			return puiList.contains(germplasmPUIFromNames.orElse(""));
@@ -368,7 +368,9 @@ public class GermplasmImportRequest {
 			puisList.add(this.getGermplasmPUI());
 		}
 		final Optional<String> germplasmPUIFromSynonym = this.getGermplasmPUIFromSynonyms();
-		germplasmPUIFromSynonym.ifPresent(puisList::add);
+		if (germplasmPUIFromSynonym.isPresent() && !puisList.contains(germplasmPUIFromSynonym.get())) {
+			puisList.add(germplasmPUIFromSynonym.get());
+		}
 		return puisList;
 	}
 
