@@ -10,7 +10,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.service.api.sample.SampleObservationDto;
-import org.generationcp.middleware.util.StringUtil;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -25,6 +24,7 @@ import org.hibernate.type.DateType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -471,26 +471,32 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	}
 
 	private void addSampleSearchParameters(final SQLQuery sqlQuery, final SampleSearchRequestDTO requestDTO) {
-		if(!StringUtil.isEmpty(requestDTO.getSampleDbId())) {
-			sqlQuery.setParameter("sampleDbId", requestDTO.getSampleDbId());
+		if(!CollectionUtils.isEmpty(requestDTO.getSampleDbIds())) {
+			sqlQuery.setParameterList("sampleDbId", requestDTO.getSampleDbIds());
 		}
-		if(!StringUtil.isEmpty(requestDTO.getObservationUnitDbId())) {
-			sqlQuery.setParameter("observationUnitDbId", requestDTO.getObservationUnitDbId());
+		if(!CollectionUtils.isEmpty(requestDTO.getObservationUnitDbIds())) {
+			sqlQuery.setParameterList("observationUnitDbId", requestDTO.getObservationUnitDbIds());
 		}
-		if(!StringUtil.isEmpty(requestDTO.getPlateDbId())) {
-			sqlQuery.setParameter("plateDbId", requestDTO.getPlateDbId());
+		if(!CollectionUtils.isEmpty(requestDTO.getPlateDbIds())) {
+			sqlQuery.setParameterList("plateDbId", requestDTO.getPlateDbIds());
 		}
-		if(!StringUtil.isEmpty(requestDTO.getGermplasmDbId())) {
-			sqlQuery.setParameter("germplasmDbId", requestDTO.getGermplasmDbId());
+		if(!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
+			sqlQuery.setParameterList("germplasmDbId", requestDTO.getGermplasmDbIds());
 		}
-		if(!StringUtil.isEmpty(requestDTO.getStudyDbId())) {
-			sqlQuery.setParameter("studyDbId", requestDTO.getStudyDbId());
+		if(!CollectionUtils.isEmpty(requestDTO.getStudyDbIds())) {
+			sqlQuery.setParameterList("studyDbId", requestDTO.getStudyDbIds());
 		}
-		if(!StringUtil.isEmpty(requestDTO.getExternalReferenceID())) {
-			sqlQuery.setParameter("referenceId", requestDTO.getExternalReferenceID());
+		if(!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
+			sqlQuery.setParameterList("referenceId", requestDTO.getExternalReferenceIDs());
 		}
-		if(!StringUtil.isEmpty(requestDTO.getExternalReferenceSource())) {
-			sqlQuery.setParameter("referenceSource", requestDTO.getExternalReferenceSource());
+		if(!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
+			sqlQuery.setParameterList("referenceSource", requestDTO.getExternalReferenceSources());
+		}
+		if(!CollectionUtils.isEmpty(requestDTO.getGermplasmNames())) {
+			sqlQuery.setParameterList("germplasmNames", requestDTO.getGermplasmNames());
+		}
+		if(!CollectionUtils.isEmpty(requestDTO.getStudyNames())) {
+			sqlQuery.setParameterList("studyNames", requestDTO.getStudyNames());
 		}
 	}
 
@@ -527,29 +533,39 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	}
 
 	private void appendSampleSeachFilters(final StringBuilder sql, final SampleSearchRequestDTO requestDTO) {
-		if(!StringUtil.isEmpty(requestDTO.getSampleDbId())) {
-			sql.append(" AND s.sample_bk = :sampleDbId");
+		if(!CollectionUtils.isEmpty(requestDTO.getSampleDbIds())) {
+			sql.append(" AND s.sample_bk in (:sampleDbId)");
 		}
-		if(!StringUtil.isEmpty(requestDTO.getObservationUnitDbId())) {
-			sql.append(" AND e.obs_unit_id = :observationUnitDbId");
+		if(!CollectionUtils.isEmpty(requestDTO.getObservationUnitDbIds())) {
+			sql.append(" AND e.obs_unit_id in (:observationUnitDbId)");
 		}
-		if(!StringUtil.isEmpty(requestDTO.getPlateDbId())) {
-			sql.append(" AND s.plate_id = :plateDbId");
+		if(!CollectionUtils.isEmpty(requestDTO.getPlateDbIds())) {
+			sql.append(" AND s.plate_id in (:plateDbId)");
 		}
-		if(!StringUtil.isEmpty(requestDTO.getGermplasmDbId())) {
-			sql.append(" AND g.germplsm_uuid = :germplasmDbId");
+		if(!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
+			sql.append(" AND g.germplsm_uuid in (:germplasmDbId)");
 		}
-		if(!StringUtil.isEmpty(requestDTO.getStudyDbId())) {
-			sql.append(" AND e.nd_geolocation_id = :studyDbId");
+		if(!CollectionUtils.isEmpty(requestDTO.getStudyDbIds())) {
+			sql.append(" AND e.nd_geolocation_id in (:studyDbId)");
 		}
-		if (!StringUtil.isEmpty(requestDTO.getExternalReferenceID())) {
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
 			sql.append(" AND EXISTS (SELECT * FROM external_reference_sample sref ");
-			sql.append(" WHERE s.sample_id = sref.sample_id AND sref.reference_id = :referenceId) ");
+			sql.append(" WHERE s.sample_id = sref.sample_id AND sref.reference_id in (:referenceId)) ");
 		}
 
-		if (!StringUtil.isEmpty(requestDTO.getExternalReferenceSource())) {
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
 			sql.append(" AND EXISTS (SELECT * FROM external_reference_sample sref ");
-			sql.append(" WHERE s.sample_id = sref.sample_id AND sref.reference_source = :referenceSource) ");
+			sql.append(" WHERE s.sample_id = sref.sample_id AND sref.reference_source in (:referenceSource)) ");
+		}
+
+		// Search preferred names
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmNames())) {
+			sql.append(" AND g.gid IN ( SELECT n.gid ");
+			sql.append(" FROM names n WHERE n.nstat = 1 AND n.nval in (:germplasmNames) ) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getStudyNames())) {
+			sql.append(" AND pmain.name in (:studyNames)");
 		}
 	}
 

@@ -21,6 +21,7 @@ import org.junit.Test;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.List;
 
 public class SampleServiceImplTest extends IntegrationTestBase {
@@ -68,13 +69,13 @@ public class SampleServiceImplTest extends IntegrationTestBase {
         final ExperimentModel model = experimentModels.get(0);
         final String germplasmUUID = model.getStock().getGermplasm().getGermplasmUUID();
         final SampleSearchRequestDTO requestDTO = new SampleSearchRequestDTO();
-        requestDTO.setSampleDbId(sample.getSampleBusinessKey());
-        requestDTO.setGermplasmDbId(germplasmUUID);
-        requestDTO.setObservationUnitDbId(model.getObsUnitId());
-        requestDTO.setPlateDbId(sample.getPlateId());
-        requestDTO.setStudyDbId(geolocation.getLocationId().toString());
-        requestDTO.setExternalReferenceID(sampleExternalReference.getReferenceId());
-        requestDTO.setExternalReferenceSource(sampleExternalReference.getSource());
+        requestDTO.setSampleDbIds(Collections.singletonList(sample.getSampleBusinessKey()));
+        requestDTO.setGermplasmDbIds(germplasmUUID != null ? Collections.singletonList(germplasmUUID) : Collections.emptyList());
+        requestDTO.setObservationUnitDbIds(Collections.singletonList(model.getObsUnitId()));
+        requestDTO.setPlateDbIds(Collections.singletonList(sample.getPlateId()));
+        requestDTO.setStudyDbIds(Collections.singletonList(geolocation.getLocationId().toString()));
+        requestDTO.setExternalReferenceIDs(Collections.singletonList(sampleExternalReference.getReferenceId()));
+        requestDTO.setExternalReferenceSources(Collections.singletonList(sampleExternalReference.getSource()));
 
         final List<SampleObservationDto> sampleDtos = this.sampleService.getSampleObservations(requestDTO, null);
         Assert.assertEquals(1, sampleDtos.size());
