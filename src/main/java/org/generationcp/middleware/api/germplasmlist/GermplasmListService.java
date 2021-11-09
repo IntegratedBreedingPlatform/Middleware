@@ -19,6 +19,8 @@ public interface GermplasmListService {
 	GermplasmListGeneratorDTO create(GermplasmListGeneratorDTO request, int status, String programUUID,
 		WorkbenchUser loggedInUser);
 
+	void importUpdates(GermplasmListGeneratorDTO request);
+
 	/**
 	 * Inserts a list of multiple {@code GermplasmListData} objects into the database.
 	 *

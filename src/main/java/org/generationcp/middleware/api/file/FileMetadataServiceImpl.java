@@ -261,8 +261,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		final List<CVTerm> cvTerms = fileMetadataList.stream().flatMap(fileMetadata -> fileMetadata.getVariables().stream())
 			.collect(toList());
 		cvTerms.forEach(cvTerm -> variableFilter.addVariableId(cvTerm.getCvTermId()));
-		final Map<Integer, Variable> variablesById = this.daoFactory.getCvTermDao().getVariablesWithFilter(variableFilter)
-			.stream().collect(toMap(Term::getId, identity()));
+		final Map<Integer, Variable> variablesById = this.daoFactory.getCvTermDao().getVariablesWithFilterById(variableFilter);
 
 		// map result
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();

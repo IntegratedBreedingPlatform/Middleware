@@ -13,6 +13,7 @@
 package org.generationcp.middleware.manager.ontology.api;
 
 import com.google.common.base.Optional;
+import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableOverridesDto;
@@ -25,7 +26,7 @@ import java.util.List;
 
 /**
  * This is the API for retrieving ontology variable data.
- *
+ * TODO migrate progressively to {@link OntologyVariableService}
  */
 public interface OntologyVariableDataManager {
 
