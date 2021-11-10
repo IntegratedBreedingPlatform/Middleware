@@ -96,4 +96,10 @@ public class LocationServiceImpl implements LocationService {
 		return true;
 	}
 
+	@Override
+	public void deleteLocation(final Integer locationId) {
+		final Location location = this.daoFactory.getLocationDAO().getById(locationId);
+		this.daoFactory.getLocationDAO().makeTransient(location);
+	}
+
 }

@@ -39,4 +39,6 @@ public interface LocationService {
 
 	List<org.generationcp.middleware.api.location.Location> getLocations(LocationSearchRequest locationSearchRequest, Pageable pageable);
 
+	void deleteLocation(final Integer locationId);
+
 }
