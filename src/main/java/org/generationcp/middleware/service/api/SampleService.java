@@ -33,8 +33,4 @@ public interface SampleService {
 	Boolean studyHasSamples(final Integer studyId);
 
 	Boolean studyEntryHasSamples(final Integer studyId, final Integer entryId);
-
-	List<SampleObservationDto> getSampleObservations(SampleSearchRequestDTO sampleSearchRequestDTO, Pageable pageable);
-
-	long countSampleObservations(SampleSearchRequestDTO sampleSearchRequestDTO);
 }

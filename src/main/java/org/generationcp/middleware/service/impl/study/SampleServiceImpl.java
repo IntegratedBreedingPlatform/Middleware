@@ -128,31 +128,6 @@ public class SampleServiceImpl implements SampleService {
 		return this.daoFactory.getSampleDao().studyEntryHasSamples(studyId, entryId);
 	}
 
-	@Override
-	public List<SampleObservationDto> getSampleObservations(final SampleSearchRequestDTO requestDTO, final Pageable pageable) {
-		final List<SampleObservationDto> sampleObservationDtos = this.daoFactory.getSampleDao().getSampleObservationDtos(requestDTO, pageable);
-		if (!CollectionUtils.isEmpty(sampleObservationDtos)) {
-			final List<Integer> sampleIds = new ArrayList<>(sampleObservationDtos.stream().map(SampleObservationDto::getSampleId)
-					.collect(Collectors.toSet()));
-			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
-					this.daoFactory.getSampleExternalReferenceDAO().getExternalReferences(sampleIds).stream()
-							.collect(groupingBy(
-									ExternalReferenceDTO::getEntityId));
-			final List<Integer> userIds = sampleObservationDtos.stream().map(SampleObservationDto::getTakenById).collect(Collectors.toList());
-			final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
-			for(final SampleObservationDto sample: sampleObservationDtos) {
-				sample.setExternalReferences(externalReferencesMap.get(sample.getSampleId().toString()));
-				sample.setTakenBy(userIDFullNameMap.get(sample.getTakenById()));
-			}
-		}
-		return sampleObservationDtos;
-	}
-
-	@Override
-	public long countSampleObservations(final SampleSearchRequestDTO sampleSearchRequestDTO) {
-		return this.daoFactory.getSampleDao().countSampleObservationDtos(sampleSearchRequestDTO);
-	}
-
 	void populateTakenBy(final List<SampleDTO> sampleDTOS) {
 		// Populate takenBy with full name of user from workbench database.
 		final List<Integer> userIds = sampleDTOS.stream().map(SampleDTO::getTakenByUserId).collect(Collectors.toList());

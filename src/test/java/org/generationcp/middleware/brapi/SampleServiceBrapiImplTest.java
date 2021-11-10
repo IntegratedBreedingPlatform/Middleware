@@ -1,4 +1,4 @@
-package org.generationcp.middleware.service.impl.study;
+package org.generationcp.middleware.brapi;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRequestDTO;
@@ -11,7 +11,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.api.brapi.SampleServiceBrapi;
 import org.generationcp.middleware.service.api.sample.SampleObservationDto;
 import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
@@ -24,7 +24,7 @@ import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.List;
 
-public class SampleServiceImplTest extends IntegrationTestBase {
+public class SampleServiceBrapiImplTest extends IntegrationTestBase {
 
     private static final SimpleDateFormat DATE_FORMAT = Util.getSimpleDateFormat("yyyy-MM-dd");
 
@@ -34,7 +34,7 @@ public class SampleServiceImplTest extends IntegrationTestBase {
     private DmsProject plot;
 
     @Resource
-    private SampleService sampleService;
+    private SampleServiceBrapi sampleServiceBrapi;
 
     @Before
     public void setUp() {
@@ -77,7 +77,7 @@ public class SampleServiceImplTest extends IntegrationTestBase {
         requestDTO.setExternalReferenceIDs(Collections.singletonList(sampleExternalReference.getReferenceId()));
         requestDTO.setExternalReferenceSources(Collections.singletonList(sampleExternalReference.getSource()));
 
-        final List<SampleObservationDto> sampleDtos = this.sampleService.getSampleObservations(requestDTO, null);
+        final List<SampleObservationDto> sampleDtos = this.sampleServiceBrapi.getSampleObservations(requestDTO, null);
         Assert.assertEquals(1, sampleDtos.size());
         final SampleObservationDto sampleObservationDto = sampleDtos.get(0);
         Assert.assertEquals(germplasmUUID, sampleObservationDto.getGermplasmDbId());
