@@ -528,4 +528,17 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		}
 		return map;
 	}
+
+	public boolean isLocationIdUsedInGermplasmNames(final Integer locationId) {
+		try {
+			final String sql = "SELECT count(1) FROM names WHERE nlocn = :locationId";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("locationId", locationId);
+			return ((BigInteger) query.uniqueResult()).longValue() > 0;
+		} catch (final HibernateException e) {
+			final String message = "Error with isLocationIdUsedInGermplasmNames(locationId=" + locationId + "): " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }

@@ -12,9 +12,6 @@ import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.SystemNameTypes;
 import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
-import org.generationcp.middleware.constant.SystemNameTypes;
-import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
@@ -1168,6 +1165,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public Optional<Germplasm> findOneByMethodId(final Integer breedingMethodDbId) {
 		return this.daoFactory.getGermplasmDao().findOneByMethodId(breedingMethodDbId);
+	}
+
+	@Override
+	public boolean isLocationIdUsedInGermplasms(final Integer locationId) {
+		return this.daoFactory.getGermplasmDao().isLocationIdUsedInGermplasms(locationId);
 	}
 
 	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Germplasm targetGermplasm) {

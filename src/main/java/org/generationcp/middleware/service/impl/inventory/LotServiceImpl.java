@@ -331,6 +331,13 @@ public class LotServiceImpl implements LotService {
 		this.closeLots(userId, lotIds);
 	}
 
+	@Override
+	public boolean isLocationIdUsedInLots(final Integer locationId) {
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setLocationIds(Arrays.asList(locationId));
+		return this.daoFactory.getLotDao().countSearchLots(lotsSearchDto) > 0;
+	}
+
 	public void setTransactionService(final TransactionService transactionService) {
 		this.transactionService = transactionService;
 	}

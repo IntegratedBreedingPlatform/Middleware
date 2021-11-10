@@ -306,4 +306,16 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
 	}
+
+	public boolean isLocationIdUsedInAttributes(final Integer locationId) {
+		try {
+			final String sql = "SELECT count(1) FROM ATRIBUTS WHERE alocn = :locationId";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("locationId", locationId);
+			return ((BigInteger) query.uniqueResult()).longValue() > 0;
+		} catch (final HibernateException e) {
+			final String message = "Error with isLocationIdUsedInAttributes(locationId=" + locationId + "): " + e.getMessage();
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }
