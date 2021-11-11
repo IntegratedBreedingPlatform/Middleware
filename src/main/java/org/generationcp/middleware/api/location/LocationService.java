@@ -41,4 +41,7 @@ public interface LocationService {
 
 	void deleteLocation(final Integer locationId);
 
+	Integer createLocation(LocationRequestDto locationRequestDto);
+
+	void updateLocation(Integer locationId, LocationRequestDto locationRequestDto);
 }
