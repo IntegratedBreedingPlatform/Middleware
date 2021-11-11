@@ -472,25 +472,25 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 	private void addSampleSearchParameters(final SQLQuery sqlQuery, final SampleSearchRequestDTO requestDTO) {
 		if(!CollectionUtils.isEmpty(requestDTO.getSampleDbIds())) {
-			sqlQuery.setParameterList("sampleDbId", requestDTO.getSampleDbIds());
+			sqlQuery.setParameterList("sampleDbIds", requestDTO.getSampleDbIds());
 		}
 		if(!CollectionUtils.isEmpty(requestDTO.getObservationUnitDbIds())) {
-			sqlQuery.setParameterList("observationUnitDbId", requestDTO.getObservationUnitDbIds());
+			sqlQuery.setParameterList("observationUnitDbIds", requestDTO.getObservationUnitDbIds());
 		}
 		if(!CollectionUtils.isEmpty(requestDTO.getPlateDbIds())) {
-			sqlQuery.setParameterList("plateDbId", requestDTO.getPlateDbIds());
+			sqlQuery.setParameterList("plateDbIds", requestDTO.getPlateDbIds());
 		}
 		if(!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
-			sqlQuery.setParameterList("germplasmDbId", requestDTO.getGermplasmDbIds());
+			sqlQuery.setParameterList("germplasmDbIds", requestDTO.getGermplasmDbIds());
 		}
 		if(!CollectionUtils.isEmpty(requestDTO.getStudyDbIds())) {
-			sqlQuery.setParameterList("studyDbId", requestDTO.getStudyDbIds());
+			sqlQuery.setParameterList("studyDbIds", requestDTO.getStudyDbIds());
 		}
 		if(!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
-			sqlQuery.setParameterList("referenceId", requestDTO.getExternalReferenceIDs());
+			sqlQuery.setParameterList("referenceIds", requestDTO.getExternalReferenceIDs());
 		}
 		if(!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
-			sqlQuery.setParameterList("referenceSource", requestDTO.getExternalReferenceSources());
+			sqlQuery.setParameterList("referenceSources", requestDTO.getExternalReferenceSources());
 		}
 		if(!CollectionUtils.isEmpty(requestDTO.getGermplasmNames())) {
 			sqlQuery.setParameterList("germplasmNames", requestDTO.getGermplasmNames());
@@ -525,6 +525,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 	private void appendSamplesFromQuery(final StringBuilder sql) {
 		sql.append("FROM sample s ");
 		sql.append(" INNER JOIN nd_experiment e ON e.nd_experiment_id = s.nd_experiment_id ");
+		sql.append(" INNER JOIN nd_geolocation geoloc ON geoloc.nd_geolocation_id = e.nd_geolocation_id ");
 		sql.append(" INNER JOIN nd_experimentprop eprop ON eprop.nd_experiment_id = e.nd_experiment_id AND eprop.type_id = " + TermId.PLOT_NO.getId());
 		sql.append(" INNER JOIN stock stock ON stock.stock_id = e.stock_id ");
 		sql.append(" INNER JOIN germplsm g ON g.gid = stock.dbxref_id ");
@@ -534,28 +535,28 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 
 	private void appendSampleSeachFilters(final StringBuilder sql, final SampleSearchRequestDTO requestDTO) {
 		if(!CollectionUtils.isEmpty(requestDTO.getSampleDbIds())) {
-			sql.append(" AND s.sample_bk in (:sampleDbId)");
+			sql.append(" AND s.sample_bk in (:sampleDbIds)");
 		}
 		if(!CollectionUtils.isEmpty(requestDTO.getObservationUnitDbIds())) {
-			sql.append(" AND e.obs_unit_id in (:observationUnitDbId)");
+			sql.append(" AND e.obs_unit_id in (:observationUnitDbIds)");
 		}
 		if(!CollectionUtils.isEmpty(requestDTO.getPlateDbIds())) {
-			sql.append(" AND s.plate_id in (:plateDbId)");
+			sql.append(" AND s.plate_id in (:plateDbIds)");
 		}
 		if(!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
-			sql.append(" AND g.germplsm_uuid in (:germplasmDbId)");
+			sql.append(" AND g.germplsm_uuid in (:germplasmDbIds)");
 		}
 		if(!CollectionUtils.isEmpty(requestDTO.getStudyDbIds())) {
-			sql.append(" AND e.nd_geolocation_id in (:studyDbId)");
+			sql.append(" AND e.nd_geolocation_id in (:studyDbIds)");
 		}
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
 			sql.append(" AND EXISTS (SELECT * FROM external_reference_sample sref ");
-			sql.append(" WHERE s.sample_id = sref.sample_id AND sref.reference_id in (:referenceId)) ");
+			sql.append(" WHERE s.sample_id = sref.sample_id AND sref.reference_id in (:referenceIds)) ");
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
 			sql.append(" AND EXISTS (SELECT * FROM external_reference_sample sref ");
-			sql.append(" WHERE s.sample_id = sref.sample_id AND sref.reference_source in (:referenceSource)) ");
+			sql.append(" WHERE s.sample_id = sref.sample_id AND sref.reference_source in (:referenceSources)) ");
 		}
 
 		// Search preferred names
@@ -565,7 +566,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getStudyNames())) {
-			sql.append(" AND pmain.name in (:studyNames)");
+			sql.append(" AND CONCAT(pmain.name, ' Environment Number ', geoloc.description) in (:studyNames)");
 		}
 	}
 

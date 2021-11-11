@@ -1,11 +1,10 @@
 package org.generationcp.middleware.domain.search_request.brapi.v2;
 
-import com.google.common.collect.Lists;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 @AutoProperty
@@ -22,32 +21,17 @@ public class SampleSearchRequestDTO extends SearchRequestDto {
 	private List<String> studyNames;
 
 	public SampleSearchRequestDTO() {
-		this.sampleDbIds = Lists.newArrayList();
-		this.observationUnitDbIds = Lists.newArrayList();
-		this.plateDbIds = Lists.newArrayList();
-		this.germplasmDbIds = Lists.newArrayList();
-		this.studyDbIds = Lists.newArrayList();
-		this.externalReferenceIDs = Lists.newArrayList();
-		this.externalReferenceSources = Lists.newArrayList();
-		this.germplasmNames = Lists.newArrayList();
-		this.studyNames = Lists.newArrayList();
 	}
 
 	public SampleSearchRequestDTO(final String sampleDbIds, final String observationUnitDbIds, final String plateDbIds,
-		final String germplasmDbIds, final String studyDbIds, final String externalReferenceIDs, final String externalReferenceSources,
-		final String germplasmNames, final String studyNames) {
-		this.sampleDbIds = StringUtils.isEmpty(sampleDbIds) ? Lists.newArrayList() : Lists.newArrayList(sampleDbIds);
-		this.observationUnitDbIds =
-			StringUtils.isEmpty(observationUnitDbIds) ? Lists.newArrayList() : Lists.newArrayList(observationUnitDbIds);
-		this.plateDbIds = StringUtils.isEmpty(plateDbIds) ? Lists.newArrayList() : Lists.newArrayList(plateDbIds);
-		this.germplasmDbIds = StringUtils.isEmpty(germplasmDbIds) ? Lists.newArrayList() : Lists.newArrayList(germplasmDbIds);
-		this.studyDbIds = StringUtils.isEmpty(studyDbIds) ? Lists.newArrayList() : Lists.newArrayList(studyDbIds);
-		this.externalReferenceIDs =
-			StringUtils.isEmpty(externalReferenceIDs) ? Lists.newArrayList() : Lists.newArrayList(externalReferenceIDs);
-		this.externalReferenceSources =
-			StringUtils.isEmpty(externalReferenceSources) ? Lists.newArrayList() : Lists.newArrayList(externalReferenceSources);
-		this.germplasmNames = StringUtils.isEmpty(germplasmNames) ? Lists.newArrayList() : Lists.newArrayList(germplasmNames);
-		this.studyNames = StringUtils.isEmpty(studyNames) ? Lists.newArrayList() : Lists.newArrayList(studyNames);
+		final String germplasmDbIds, final String studyDbIds, final String externalReferenceIDs, final String externalReferenceSources) {
+		this.sampleDbIds = Collections.singletonList(sampleDbIds);
+		this.observationUnitDbIds = Collections.singletonList(observationUnitDbIds);
+		this.plateDbIds = Collections.singletonList(plateDbIds);
+		this.germplasmDbIds = Collections.singletonList(germplasmDbIds);
+		this.studyDbIds = Collections.singletonList(studyDbIds);
+		this.externalReferenceIDs = Collections.singletonList(externalReferenceIDs);
+		this.externalReferenceSources = Collections.singletonList(externalReferenceSources);
 	}
 
 	public SampleSearchRequestDTO(final List<String> sampleDbIds, final List<String> observationUnitDbIds, final List<String> plateDbIds,
