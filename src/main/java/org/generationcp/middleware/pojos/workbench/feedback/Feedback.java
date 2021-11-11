@@ -2,14 +2,14 @@ package org.generationcp.middleware.pojos.workbench.feedback;
 
 import java.io.Serializable;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.IdClass;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -17,53 +17,54 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 
 @Entity
-@IdClass(FeedbackUserId.class)
 @Table(name = "feedback")
 public class Feedback implements Serializable {
 
-	private static final long serialVersionUID = 9081485395114816328L;
+	private static final long serialVersionUID = -1280259123688554742L;
 
 	@Id
-	@ManyToOne
-	@JoinColumn(name = "user_id", updatable = false, nullable = false)
-	private WorkbenchUser user;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "feedback_id")
+	private Integer id;
 
-	@Id
 	@Enumerated(value = EnumType.STRING)
 	@Column(name = "feature", updatable = false, nullable = false)
 	private FeedbackFeature feature;
 
-	@Column(name = "show_again", nullable = false)
-	private Boolean showAgain = true;
+	@Column(name = "enabled", nullable = false)
+	private boolean enabled = true;
 
 	private Feedback() {
 	}
 
-	public Feedback(final WorkbenchUser user, final FeedbackFeature feature) {
-		this.user = user;
+	public Feedback(final FeedbackFeature feature) {
 		this.feature = feature;
-		this.showAgain = Boolean.FALSE;
 	}
 
-	public WorkbenchUser getUser() {
-		return this.user;
+	public Integer getId() {
+		return id;
 	}
 
 	public FeedbackFeature getFeature() {
-		return this.feature;
+		return feature;
 	}
 
-	public Boolean getShowAgain() {
-		return this.showAgain;
+	public boolean isEnabled() {
+		return enabled;
 	}
 
-	public void dontShowAgain() {
-		this.showAgain = Boolean.FALSE;
+	public void enable() {
+		this.enabled = true;
+	}
+
+	public void disable() {
+		this.enabled = false;
 	}
 
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.user.getUserid()).append(this.feature.name()).hashCode();
+		return new HashCodeBuilder().append(this.id).hashCode();
 	}
 
 	@Override
@@ -74,14 +75,27 @@ public class Feedback implements Serializable {
 		if (obj == this) {
 			return true;
 		}
-		if (!(obj instanceof Feedback)) {
+		if (!(obj instanceof WorkbenchUser)) {
 			return false;
 		}
 
 		final Feedback otherObj = (Feedback) obj;
 
-		return new EqualsBuilder().append(this.user.getUserid(), otherObj.getUser().getUserid())
-				.append(this.feature.name(), otherObj.getFeature().name()).isEquals();
+		return new EqualsBuilder().append(this.id, otherObj.id).isEquals();
+	}
+
+	@Override
+	public String toString() {
+		final StringBuilder builder = new StringBuilder();
+		builder.append("Feedback [id=");
+		builder.append(this.id);
+		builder.append(", feature=");
+		builder.append(this.feature.name());
+		builder.append(", enabled=");
+		builder.append(this.enabled);
+
+		builder.append("]");
+		return builder.toString();
 	}
 
 }

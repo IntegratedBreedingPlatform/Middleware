@@ -9,8 +9,16 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 
 public class FeedbackUserId implements Serializable {
 
+	private Feedback feedback;
 	private WorkbenchUser user;
-	private FeedbackFeature feature;
+
+	public Feedback getFeedback() {
+		return this.feedback;
+	}
+
+	public void setFeedback(final Feedback feedback) {
+		this.feedback = feedback;
+	}
 
 	public WorkbenchUser getUser() {
 		return this.user;
@@ -20,17 +28,9 @@ public class FeedbackUserId implements Serializable {
 		this.user = user;
 	}
 
-	public FeedbackFeature getFeature() {
-		return this.feature;
-	}
-
-	public void setFeature(final FeedbackFeature feature) {
-		this.feature = feature;
-	}
-
 	@Override
 	public int hashCode() {
-		return new HashCodeBuilder().append(this.user.getUserid()).append(this.feature.name()).hashCode();
+		return new HashCodeBuilder().append(this.feedback.getId()).append(this.user.getUserid()).hashCode();
 	}
 
 	@Override
@@ -45,10 +45,10 @@ public class FeedbackUserId implements Serializable {
 			return false;
 		}
 
-		final Feedback otherObj = (Feedback) obj;
+		final FeedbackUser otherObj = (FeedbackUser) obj;
 
-		return new EqualsBuilder().append(this.user.getUserid(), otherObj.getUser().getUserid())
-				.append(this.feature.name(), otherObj.getFeature().name()).isEquals();
+		return new EqualsBuilder().append(this.feedback.getId(), otherObj.getFeedback().getId())
+				.append(this.user.getUserid(), otherObj.getUser().getUserid()).isEquals();
 	}
 
 }
