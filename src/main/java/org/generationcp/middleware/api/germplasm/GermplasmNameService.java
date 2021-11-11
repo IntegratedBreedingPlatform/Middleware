@@ -22,6 +22,6 @@ public interface GermplasmNameService {
 
 	boolean isNameTypeUsedAsGermplasmName(Integer nameTypeId);
 
-	boolean isLocationIdUsedInGermplasmNames(Integer locationId);
+	boolean isLocationIdUsedInGermplasmName(Integer locationId);
 
 }

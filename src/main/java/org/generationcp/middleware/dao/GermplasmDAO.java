@@ -2036,7 +2036,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public boolean isLocationIdUsedInGermplasms(final Integer locationId) {
+	public boolean isLocationIdUsedInGermplasm(final Integer locationId) {
 		try {
 			final String sql = "SELECT count(1) FROM germplsm WHERE glocn = :locationId";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);

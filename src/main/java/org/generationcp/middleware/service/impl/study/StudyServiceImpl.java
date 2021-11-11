@@ -181,7 +181,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	}
 
 	@Override
-	public boolean isLocationIdUsedInStudies(final Integer locationId) {
+	public boolean isLocationIdUsedInStudy(final Integer locationId) {
 		return this.daoFactory.getGeolocationPropertyDao()
 			.getGeolocationIdsByPropertyTypeAndValue(TermId.LOCATION_ID.getId(), locationId.toString()).size() > 0;
 	}

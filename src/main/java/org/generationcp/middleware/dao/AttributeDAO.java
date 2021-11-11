@@ -307,7 +307,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		}
 	}
 
-	public boolean isLocationIdUsedInAttributes(final Integer locationId) {
+	public boolean isLocationIdUsedInAttribute(final Integer locationId) {
 		try {
 			final String sql = "SELECT count(1) FROM ATRIBUTS WHERE alocn = :locationId";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);

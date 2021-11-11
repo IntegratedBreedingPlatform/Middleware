@@ -132,8 +132,8 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
-	public boolean isLocationIdUsedInGermplasmNames(final Integer locationId) {
-		return this.daoFactory.getNameDao().isLocationIdUsedInGermplasmNames(locationId);
+	public boolean isLocationIdUsedInGermplasmName(final Integer locationId) {
+		return this.daoFactory.getNameDao().isLocationIdUsedInGermplasmName(locationId);
 	}
 
 }

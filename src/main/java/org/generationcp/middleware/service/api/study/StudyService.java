@@ -51,6 +51,6 @@ public interface StudyService {
 
 	long countPlotsByGids(List<Integer> gids);
 
-	boolean isLocationIdUsedInStudies(Integer locationId);
+	boolean isLocationIdUsedInStudy(Integer locationId);
 
 }

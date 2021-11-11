@@ -87,8 +87,8 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 	}
 
 	@Override
-	public boolean isLocationIdUsedInAttributes(final Integer locationId) {
-		return this.daoFactory.getAttributeDAO().isLocationIdUsedInAttributes(locationId);
+	public boolean isLocationIdUsedInAttribute(final Integer locationId) {
+		return this.daoFactory.getAttributeDAO().isLocationIdUsedInAttribute(locationId);
 	}
 
 }
