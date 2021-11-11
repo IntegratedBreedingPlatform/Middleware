@@ -1,5 +1,6 @@
 package org.generationcp.middleware.domain.search_request.brapi.v2;
 
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -23,15 +24,15 @@ public class SampleSearchRequestDTO extends SearchRequestDto {
 	public SampleSearchRequestDTO() {
 	}
 
-	public SampleSearchRequestDTO(final String sampleDbIds, final String observationUnitDbIds, final String plateDbIds,
-		final String germplasmDbIds, final String studyDbIds, final String externalReferenceIDs, final String externalReferenceSources) {
-		this.sampleDbIds = Collections.singletonList(sampleDbIds);
-		this.observationUnitDbIds = Collections.singletonList(observationUnitDbIds);
-		this.plateDbIds = Collections.singletonList(plateDbIds);
-		this.germplasmDbIds = Collections.singletonList(germplasmDbIds);
-		this.studyDbIds = Collections.singletonList(studyDbIds);
-		this.externalReferenceIDs = Collections.singletonList(externalReferenceIDs);
-		this.externalReferenceSources = Collections.singletonList(externalReferenceSources);
+	public SampleSearchRequestDTO(final String sampleDbId, final String observationUnitDbId, final String plateDbId,
+		final String germplasmDbId, final String studyDbId, final String externalReferenceID, final String externalReferenceSource) {
+		this.sampleDbIds = StringUtils.isEmpty(sampleDbId) ? null : Collections.singletonList(sampleDbId);
+		this.observationUnitDbIds = StringUtils.isEmpty(observationUnitDbId) ? null : Collections.singletonList(observationUnitDbId);
+		this.plateDbIds = StringUtils.isEmpty(plateDbId) ? null : Collections.singletonList(plateDbId);
+		this.germplasmDbIds = StringUtils.isEmpty(germplasmDbId) ? null : Collections.singletonList(germplasmDbId);
+		this.studyDbIds = StringUtils.isEmpty(studyDbId) ? null : Collections.singletonList(studyDbId);
+		this.externalReferenceIDs = StringUtils.isEmpty(externalReferenceID) ? null : Collections.singletonList(externalReferenceID);
+		this.externalReferenceSources = StringUtils.isEmpty(externalReferenceSource) ? null : Collections.singletonList(externalReferenceSource);
 	}
 
 	public SampleSearchRequestDTO(final List<String> sampleDbIds, final List<String> observationUnitDbIds, final List<String> plateDbIds,
