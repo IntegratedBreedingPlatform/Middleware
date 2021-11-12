@@ -529,7 +529,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return map;
 	}
 
-	public boolean isLocationIdUsedInGermplasmName(final Integer locationId) {
+	public boolean isLocationUsedInGermplasmName(final Integer locationId) {
 		try {
 			final String sql = "SELECT count(1) FROM names WHERE nlocn = :locationId";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);

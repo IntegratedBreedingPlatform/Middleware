@@ -1168,8 +1168,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 	}
 
 	@Override
-	public boolean isLocationIdUsedInGermplasm(final Integer locationId) {
-		return this.daoFactory.getGermplasmDao().isLocationIdUsedInGermplasm(locationId);
+	public boolean isLocationUsedInGermplasm(final Integer locationId) {
+		return this.daoFactory.getGermplasmDao().isLocationUsedInGermplasm(locationId);
 	}
 
 	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Germplasm targetGermplasm) {

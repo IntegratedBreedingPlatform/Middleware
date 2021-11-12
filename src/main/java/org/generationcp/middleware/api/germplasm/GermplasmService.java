@@ -96,6 +96,6 @@ public interface GermplasmService {
 
 	Optional<Germplasm> findOneByMethodId(Integer breedingMethodDbId);
 
-	boolean isLocationIdUsedInGermplasm(Integer locationId);
+	boolean isLocationUsedInGermplasm(Integer locationId);
 
 }

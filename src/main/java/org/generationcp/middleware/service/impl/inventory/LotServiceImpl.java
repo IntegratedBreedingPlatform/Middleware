@@ -332,7 +332,7 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public boolean isLocationIdUsedInLot(final Integer locationId) {
+	public boolean isLocationUsedInLot(final Integer locationId) {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLocationIds(Arrays.asList(locationId));
 		return this.daoFactory.getLotDao().countSearchLots(lotsSearchDto) > 0;
