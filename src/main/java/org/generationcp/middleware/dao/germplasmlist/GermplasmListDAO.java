@@ -9,12 +9,15 @@
  *
  *******************************************************************************/
 
-package org.generationcp.middleware.dao;
+package org.generationcp.middleware.dao.germplasmlist;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
+import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -22,6 +25,7 @@ import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListMetadata;
+import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -38,6 +42,7 @@ import org.hibernate.criterion.Subqueries;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.BooleanType;
 import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +50,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Nullable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -64,8 +70,12 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	private static final String STATUS = "status";
 
+	// TODO: instead use GermplasmList.Status
+	@Deprecated
 	public static final Integer STATUS_DELETED = 9;
 
+	// TODO: instead use GermplasmList.Status
+	@Deprecated
 	static final Integer LOCKED_LIST_STATUS = 101;
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDAO.class);
@@ -138,9 +148,11 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			final StringBuilder queryString = new StringBuilder();
 			queryString.append("SELECT DISTINCT l.listid AS listId, ");
 			queryString.append("l.listname AS listName, ");
-			queryString.append("CAST(l.listdate AS CHAR(255)) AS creationDate, ");
+			queryString.append("STR_TO_DATE (convert(l.listdate,char), '%Y%m%d') AS  creationDate, ");
 			queryString.append("l.listdesc AS description, ");
-			queryString.append("l.program_uuid AS programUUID ");
+			queryString.append("l.program_uuid AS programUUID, ");
+			queryString.append("IF (l.liststatus = " + GermplasmList.Status.LOCKED_LIST.getCode() + ", true, false) AS locked, ");
+			queryString.append("l.listuid AS ownerId ");
 			queryString.append("FROM listnms l ");
 			queryString.append("INNER JOIN listdata ld ON ld.listid = l.listid ");
 			queryString.append("WHERE ld.gid = :gid AND l.liststatus != " + GermplasmListDAO.STATUS_DELETED);
@@ -151,6 +163,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			sqlQuery.addScalar("creationDate");
 			sqlQuery.addScalar("description");
 			sqlQuery.addScalar("programUUID");
+			sqlQuery.addScalar("locked", BooleanType.INSTANCE);
+			sqlQuery.addScalar("ownerId");
 			sqlQuery.setParameter("gid", gid);
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmListDto.class));
 			return sqlQuery.list();
@@ -800,6 +814,42 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message);
 		}
+	}
+
+	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest germplasmListSearchRequest,
+		final Pageable pageable, final String programUUID) {
+
+		final SQLQueryBuilder queryBuilder = GermplasmListSearchDAOQuery.getSelectQuery(germplasmListSearchRequest, pageable);
+		queryBuilder.setParameter("programUUID", programUUID);
+
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		queryBuilder.addParamsToQuery(query);
+
+		query.addScalar(GermplasmListSearchDAOQuery.LIST_ID_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.LIST_NAME_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.PARENT_FOLDER_NAME_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.DESCRIPTION_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.LIST_OWNER_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.LIST_TYPE_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.NUMBER_OF_ENTRIES_ALIAS, IntegerType.INSTANCE);
+		query.addScalar(GermplasmListSearchDAOQuery.LOCKED_ALIAS, BooleanType.INSTANCE);
+		query.addScalar(GermplasmListSearchDAOQuery.NOTES_ALIAS);
+		query.addScalar(GermplasmListSearchDAOQuery.CREATION_DATE_ALIAS);
+		query.setResultTransformer(Transformers.aliasToBean(GermplasmListSearchResponse.class));
+
+		GenericDAO.addPaginationToSQLQuery(query, pageable);
+
+		return (List<GermplasmListSearchResponse>) query.list();
+	}
+
+	public long countSearchGermplasmList(final GermplasmListSearchRequest germplasmListSearchRequest, final String programUUID) {
+		final SQLQueryBuilder queryBuilder = GermplasmListSearchDAOQuery.getCountQuery(germplasmListSearchRequest);
+		queryBuilder.setParameter("programUUID", programUUID);
+
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		queryBuilder.addParamsToQuery(query);
+
+		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
 }

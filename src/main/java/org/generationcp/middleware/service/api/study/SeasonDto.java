@@ -10,7 +10,11 @@ public class SeasonDto {
 
 	private String season;
 	private String seasonDbId;
-	private String year;
+	private Integer year;
+
+	public SeasonDto() {
+		// default constructor
+	}
 
 	public SeasonDto(final String season, final String seasonDbId) {
 		this.season = season;
@@ -33,11 +37,11 @@ public class SeasonDto {
 		this.seasonDbId = seasonDbId;
 	}
 
-	public String getYear() {
+	public Integer getYear() {
 		return this.year;
 	}
 
-	public void setYear(final String year) {
+	public void setYear(final Integer year) {
 		this.year = year;
 	}
 

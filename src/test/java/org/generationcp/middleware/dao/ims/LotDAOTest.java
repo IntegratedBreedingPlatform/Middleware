@@ -3,7 +3,7 @@ package org.generationcp.middleware.dao.ims;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.GermplasmListDAO;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -260,7 +260,7 @@ public class LotDAOTest extends IntegrationTestBase {
 		final String lname = RandomStringUtils.randomAlphabetic(9);
 
 		final int cntryid = 1;
-		this.location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr, programUUID);
+		this.location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
 		this.location.setCntryid(cntryid);
 
 		final int provinceId = 1001;

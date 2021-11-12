@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -79,9 +80,9 @@ public class SampleServiceImpl implements SampleService {
 	@Override
 	public List<SampleDTO> filter(final String obsUnitId, final Integer listId, final Pageable pageable) {
 		Integer ndExperimentId = null;
-		final ExperimentModel experiment = this.daoFactory.getExperimentDao().getByObsUnitId(obsUnitId);
-		if (experiment != null) {
-			ndExperimentId = experiment.getNdExperimentId();
+		final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(obsUnitId);
+		if (experimentModelOptional.isPresent()) {
+			ndExperimentId = experimentModelOptional.get().getNdExperimentId();
 		}
 		final List<SampleDTO> sampleDTOS = this.daoFactory.getSampleDao().filter(ndExperimentId, listId, pageable);
 		this.populateTakenBy(sampleDTOS);
@@ -92,9 +93,9 @@ public class SampleServiceImpl implements SampleService {
 	public long countFilter(final String obsUnitId, final Integer listId) {
 
 		Integer ndExperimentId = null;
-		final ExperimentModel experiment = this.daoFactory.getExperimentDao().getByObsUnitId(obsUnitId);
-		if (experiment != null) {
-			ndExperimentId = experiment.getNdExperimentId();
+		final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(obsUnitId);
+		if (experimentModelOptional.isPresent()) {
+			ndExperimentId = experimentModelOptional.get().getNdExperimentId();
 		}
 		return this.daoFactory.getSampleDao().countFilter(ndExperimentId, listId);
 	}

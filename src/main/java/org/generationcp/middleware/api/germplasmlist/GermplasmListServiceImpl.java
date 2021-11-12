@@ -6,8 +6,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.constant.ColumnLabels;
-import org.generationcp.middleware.dao.GermplasmListDataDAO;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -24,6 +26,8 @@ import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.GermplasmListDataDetail;
+import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -43,6 +47,7 @@ import org.springframework.util.CollectionUtils;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -55,6 +60,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toSet;
 
 @Transactional
 @Service
@@ -65,6 +71,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	private static final String TRUNCATED = "(truncated)";
 
 	private final DaoFactory daoFactory;
+
 
 	public enum GermplasmListDataPropertyName {
 
@@ -96,6 +103,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 	}
+
 
 	@Value("${germplasm.list.add.entries.limit}")
 	public int maxAddEntriesLimit;
@@ -150,6 +158,17 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
 		request.setId(germplasmList.getId());
 
+		// save variables
+		final Set<Integer> variableIds = request.getEntries().stream().flatMap(e -> e.getData().keySet().stream()).collect(toSet());
+		for (final Integer variableId : variableIds) {
+			final GermplasmListDataView germplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(
+				germplasmList,
+				variableId,
+				VariableType.ENTRY_DETAIL.getId()
+			).build();
+			this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
+		}
+
 		// save germplasm list data
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			final Integer gid = entry.getGid();
@@ -157,13 +176,83 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			final List<Name> names = namesByGid.get(gid);
 			Preconditions.checkArgument(preferredName != null || names != null, "No name found for gid=" + gid);
 			final String designation = preferredName != null ? preferredName : names.get(0).getNval();
-			final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, entry.getEntryNo(),
+			GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, entry.getEntryNo(),
 				entry.getEntryCode(), entry.getSeedSource(), designation, entry.getGroupName(),
 				GermplasmListDataDAO.STATUS_ACTIVE, null);
-			this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+			germplasmListData = this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+
+			// save entry details
+			for (final Map.Entry<Integer, GermplasmListObservationDto> entryDetailSet : entry.getData().entrySet()) {
+				final GermplasmListObservationDto entryDetail = entryDetailSet.getValue();
+
+				// save data
+				final GermplasmListDataDetail germplasmListDataDetail = new GermplasmListDataDetail(
+					germplasmListData,
+					entryDetailSet.getKey(),
+					entryDetail.getValue(),
+					entryDetail.getcValueId()
+				);
+				this.daoFactory.getGermplasmListDataDetailDAO().save(germplasmListDataDetail);
+			}
 		}
 
 		return request;
+	}
+
+	@Override
+	public void importUpdates(final GermplasmListGeneratorDTO request) {
+		final Integer listId = request.getId();
+		// TODO validate deleted
+		final GermplasmList germplasmList = this.getGermplasmListById(listId)
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+
+		// if variables not exist in list, add them
+
+		final Set<Integer> existingVariableIds = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId)
+			.stream().map(GermplasmListDataView::getCvtermId).collect(toSet());
+
+		final Set<Integer> variableIds = request.getEntries().stream().flatMap(e -> e.getData().keySet().stream())
+			.filter(variableId -> !existingVariableIds.contains(variableId))
+			.collect(toSet());
+
+		for (final Integer variableId : variableIds) {
+			final GermplasmListDataView germplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(
+				germplasmList,
+				variableId,
+				VariableType.ENTRY_DETAIL.getId()
+			).build();
+			this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
+		}
+
+		// if entry details not exist, create them, otherwise update them
+
+		final Table<Integer, Integer, GermplasmListDataDetail> table = this.daoFactory.getGermplasmListDataDetailDAO()
+			.getTableEntryIdToVariableId(listId);
+
+		final Map<Integer, GermplasmListData> germplasmListDataByEntryId = this.daoFactory.getGermplasmListDataDAO()
+			.getMapByEntryId(listId);
+
+		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
+			final GermplasmListData germplasmListData = germplasmListDataByEntryId.get(entry.getEntryNo());
+
+			for (final Map.Entry<Integer, GermplasmListObservationDto> entryDetailSet : entry.getData().entrySet()) {
+				final GermplasmListObservationDto entryDetail = entryDetailSet.getValue();
+
+				GermplasmListDataDetail germplasmListDataDetail = table.get(entry.getEntryNo(), entryDetail.getVariableId());
+				if (germplasmListDataDetail != null) {
+					germplasmListDataDetail.setValue(entryDetail.getValue());
+				} else {
+					germplasmListDataDetail = new GermplasmListDataDetail(
+						germplasmListData,
+						entryDetailSet.getKey(),
+						entryDetail.getValue(),
+						entryDetail.getcValueId()
+					);
+				}
+
+				this.daoFactory.getGermplasmListDataDetailDAO().saveOrUpdate(germplasmListDataDetail);
+			}
+		}
 	}
 
 	@Override
@@ -248,7 +337,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Set<Integer> gids = addGermplasmEntriesModels
 			.stream()
 			.map(AddGermplasmEntryModel::getGid)
-			.collect(Collectors.toSet());
+			.collect(toSet());
 
 		final Map<Integer, String> crossExpansionsBulk =
 			this.pedigreeService.getCrossExpansionsBulk(gids, null, this.crossExpansionProperties);
@@ -281,7 +370,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Set<String> propertyNames = germplasmList.getListData().get(0).getProperties()
 			.stream()
 			.map(ListDataProperty::getColumn)
-			.collect(Collectors.toSet());
+			.collect(toSet());
 		this.addListDataProperties(germplasmListsData, propertyNames);
 	}
 
@@ -298,7 +387,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public Optional<GermplasmList> getGermplasmListByParentAndName(final String germplasmListName, final Integer parentId,
 		final String programUUID) {
-		return Optional.ofNullable(this.daoFactory.getGermplasmListDAO().getGermplasmListByParentAndName(germplasmListName, parentId, programUUID));
+		return Optional
+			.ofNullable(this.daoFactory.getGermplasmListDAO().getGermplasmListByParentAndName(germplasmListName, parentId, programUUID));
 	}
 
 	@Override
@@ -352,7 +442,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.orElseThrow(() -> new MiddlewareRequestException("", "list.folder.not.found"));
 
 		final GermplasmList newParentFolder = (Objects.isNull(newParentFolderId)) ? null :
-			this.getGermplasmListById(newParentFolderId).orElseThrow(() -> new MiddlewareRequestException("", "list.parent.folder.not.found"));
+			this.getGermplasmListById(newParentFolderId)
+				.orElseThrow(() -> new MiddlewareRequestException("", "list.parent.folder.not.found"));
 
 		listToMove.setProgramUUID(programUUID);
 		listToMove.setParent(newParentFolder);
@@ -380,7 +471,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public void performGermplasmListEntriesDeletion(final List<Integer> gids) {
 		final List<Integer> germplasmListIds = this.daoFactory.getGermplasmListDAO().getListIdsByGIDs(gids);
-		if(org.apache.commons.collections.CollectionUtils.isNotEmpty(germplasmListIds)) {
+		if (org.apache.commons.collections.CollectionUtils.isNotEmpty(germplasmListIds)) {
 			final Map<Integer, List<GermplasmListData>> germplasmListDataMap = this.daoFactory.getGermplasmListDataDAO()
 				.getGermplasmDataListMapByListIds(germplasmListIds);
 			final List<GermplasmListData> germplasmListDataToBeDeleted = new ArrayList<>();
@@ -420,6 +511,135 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.daoFactory.getGermplasmListDAO().countByGIDs(gids);
 	}
 
+	@Override
+	public List<GermplasmListSearchResponse> searchGermplasmList(final GermplasmListSearchRequest request,
+		final Pageable pageable, final String programUUID) {
+		return this.daoFactory.getGermplasmListDAO().searchGermplasmList(request, pageable, programUUID);
+	}
+
+	@Override
+	public long countSearchGermplasmList(final GermplasmListSearchRequest request, final String programUUID) {
+		return this.daoFactory.getGermplasmListDAO().countSearchGermplasmList(request, programUUID);
+	}
+
+	@Override
+	public boolean toggleGermplasmListStatus(final Integer listId) {
+		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
+		if (germplasmList.isLockedList()) {
+			germplasmList.unlock();
+		} else {
+			germplasmList.lockList();
+		}
+		this.daoFactory.getGermplasmListDAO().save(germplasmList);
+		return germplasmList.isLockedList();
+	}
+
+	@Override
+	public List<Integer> getListOntologyVariables(final Integer listId, final List<Integer> types) {
+		final List<GermplasmListDataView> columns =
+			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
+		return columns.stream()
+			.filter(c -> c.getCvtermId() != null && (types == null || types.contains(c.getTypeId())))
+			.map(c -> c.getCvtermId())
+			.collect(Collectors.toList());
+	}
+
+	@Override
+	public void addVariableToList(final Integer listId, final GermplasmListVariableRequestDto germplasmListVariableRequestDto) {
+		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
+		final GermplasmListDataView germplasmListDataView =
+			new GermplasmListDataView.GermplasmListDataVariableViewBuilder(germplasmList, germplasmListVariableRequestDto.getVariableId(),
+				germplasmListVariableRequestDto.getVariableTypeId()).build();
+		this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
+	}
+
+	@Override
+	public void removeListVariables(final Integer listId, final Set<Integer> variableIds) {
+		this.daoFactory.getGermplasmListDataDetailDAO().deleteByListIdAndVariableIds(listId, variableIds);
+		this.daoFactory.getGermplasmListDataViewDAO().deleteByListIdAndVariableIds(listId, variableIds);
+	}
+
+	@Override
+	public List<Variable> getGermplasmListVariables(final String programUUID, final Integer listId,
+		final Integer variableTypeId) {
+		final List<GermplasmListDataView> columns =
+			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
+		final List<Integer> variableIds = columns.stream().filter(
+			c -> c.getCvtermId() != null && (c.getTypeId().equals(variableTypeId)
+				|| variableTypeId == null)).map(c -> c.getCvtermId())
+			.collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(variableIds)) {
+			final VariableFilter variableFilter = new VariableFilter();
+			if (StringUtils.isNotEmpty(programUUID)) {
+				variableFilter.setProgramUuid(programUUID);
+			}
+			variableIds
+				.forEach(variableFilter::addVariableId);
+			return this.ontologyVariableDataManager.getWithFilter(variableFilter);
+		}
+		return Collections.emptyList();
+	}
+
+	@Override
+	public Optional<GermplasmListDataDto> getGermplasmListData(final Integer listDataId) {
+		final GermplasmListData germplasmListData = this.daoFactory.getGermplasmListDataDAO().getById(listDataId);
+		if (germplasmListData != null) {
+			final GermplasmListDataDto germplasmListDataDto =
+				new GermplasmListDataDto(germplasmListData.getListDataId(), germplasmListData.getList().getId(),
+					germplasmListData.getEntryId(), germplasmListData.getGid());
+			return Optional.of(germplasmListDataDto);
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<GermplasmListObservationDto> getListDataObservation(final Integer observationId) {
+		final GermplasmListDataDetail germplasmListDataDetail = this.daoFactory.getGermplasmListDataDetailDAO().getById(observationId);
+		if (germplasmListDataDetail != null) {
+			final GermplasmListObservationDto germplasmListObservationDto =
+				new GermplasmListObservationDto(observationId, germplasmListDataDetail.getListData().getListDataId(),
+					germplasmListDataDetail.getVariableId(), germplasmListDataDetail.getValue(),
+					germplasmListDataDetail.getCategoricalValueId());
+			return Optional.of(germplasmListObservationDto);
+		}
+		return Optional.empty();
+	}
+
+	@Override
+	public Integer saveListDataObservation(final Integer listId, final GermplasmListObservationRequestDto observationRequestDto) {
+		final Optional<GermplasmListDataDetail> observationOptional = this.daoFactory.getGermplasmListDataDetailDAO()
+			.getByListDataIdAndVariableId(observationRequestDto.getListDataId(), observationRequestDto.getVariableId());
+		if (observationOptional.isPresent()) {
+			throw new MiddlewareRequestException("", "germplasm.list.data.details.exists", "");
+		}
+		final GermplasmListData germplasmListData =
+			this.daoFactory.getGermplasmListDataDAO().getById(observationRequestDto.getListDataId());
+		final GermplasmListDataDetail germplasmListDataDetail =
+			new GermplasmListDataDetail(germplasmListData, observationRequestDto.getVariableId(), observationRequestDto.getValue(),
+				observationRequestDto.getcValueId());
+		this.daoFactory.getGermplasmListDataDetailDAO().save(germplasmListDataDetail);
+		return germplasmListDataDetail.getId();
+	}
+
+	@Override
+	public void updateListDataObservation(final Integer observationId, final String value, final Integer cValueId) {
+		final GermplasmListDataDetail germplasmListDataDetail = this.daoFactory.getGermplasmListDataDetailDAO().getById(observationId);
+		germplasmListDataDetail.setValue(value);
+		germplasmListDataDetail.setCategoricalValueId(cValueId);
+		this.daoFactory.getGermplasmListDataDetailDAO().update(germplasmListDataDetail);
+	}
+
+	@Override
+	public void deleteListDataObservation(final Integer observationId) {
+		final GermplasmListDataDetail germplasmListDataDetail = this.daoFactory.getGermplasmListDataDetailDAO().getById(observationId);
+		this.daoFactory.getGermplasmListDataDetailDAO().makeTransient(germplasmListDataDetail);
+	}
+
+	@Override
+	public long countObservationsByVariables(final Integer listId, final List<Integer> variableIds) {
+		return this.daoFactory.getGermplasmListDataDetailDAO().countObservationsByListAndVariables(listId, variableIds);
+	}
+
 	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {
 		try {
 			for (final GermplasmListData data : germplasmListData) {
@@ -457,14 +677,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Map<Integer, Object> methodsByGids = this.getBreedingMethodData(propertyNames, gids);
 
 		//This is in order to improve performance in order to get pedigree info only once
-		final Table<Integer, String, Optional<Germplasm>> pedigreeTable = this.getPedigreeTable(propertyNames, listDataIndexedByGid.keySet());
+		final Table<Integer, String, Optional<Germplasm>> pedigreeTable =
+			this.getPedigreeTable(propertyNames, listDataIndexedByGid.keySet());
 
 		//This is in order to improve performance in order to get all germplasm only once
 		final List<Germplasm> germplasms = this.getGermplasms(propertyNames, gids);
 
 		//Check if there is an unknown property in order to get attr and names info only once
 		final Set<String> allKnownPropertyNames = Arrays.stream(GermplasmListDataPropertyName.values())
-			.map(GermplasmListDataPropertyName::getName).collect(Collectors.toSet());
+			.map(GermplasmListDataPropertyName::getName).collect(toSet());
 		final boolean anyUnknownProperty = propertyNames.stream().anyMatch(property -> !allKnownPropertyNames.contains(property));
 		final Map<String, Integer> attributeTypesMap;
 		final Map<String, Integer> nameTypesMap;
@@ -508,22 +729,26 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				}
 
 				if (GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName().equals(property)) {
-					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_NAME, methodsByGids, listDataIndexedByGid);
+					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_NAME, methodsByGids,
+						listDataIndexedByGid);
 					return;
 				}
 
 				if (GermplasmListDataPropertyName.BREEDING_METHOD_ABBREVIATION.getName().equals(property)) {
-					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_ABBREVIATION, methodsByGids, listDataIndexedByGid);
+					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_ABBREVIATION, methodsByGids,
+						listDataIndexedByGid);
 					return;
 				}
 
 				if (GermplasmListDataPropertyName.BREEDING_METHOD_NUMBER.getName().equals(property)) {
-					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_NUMBER, methodsByGids, listDataIndexedByGid);
+					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_NUMBER, methodsByGids,
+						listDataIndexedByGid);
 					return;
 				}
 
 				if (GermplasmListDataPropertyName.BREEDING_METHOD_GROUP.getName().equals(property)) {
-					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_GROUP, methodsByGids, listDataIndexedByGid);
+					this.addBreedingMethodPropertyValue(GermplasmListDataPropertyName.BREEDING_METHOD_GROUP, methodsByGids,
+						listDataIndexedByGid);
 					return;
 				}
 
@@ -533,7 +758,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				}
 
 				if (GermplasmListDataPropertyName.CROSS_FEMALE_PREFERRED_NAME.getName().equals(property)) {
-					this.addCrossFemaleDataPropertyValues(GermplasmListDataPropertyName.CROSS_FEMALE_PREFERRED_NAME, pedigreeTable, listDataIndexedByGid);
+					this.addCrossFemaleDataPropertyValues(GermplasmListDataPropertyName.CROSS_FEMALE_PREFERRED_NAME, pedigreeTable,
+						listDataIndexedByGid);
 					return;
 				}
 
@@ -543,7 +769,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				}
 
 				if (GermplasmListDataPropertyName.CROSS_MALE_PREFERRED_NAME.getName().equals(property)) {
-					this.addCrossMaleDataPropertyValues(GermplasmListDataPropertyName.CROSS_MALE_PREFERRED_NAME, pedigreeTable, listDataIndexedByGid);
+					this.addCrossMaleDataPropertyValues(GermplasmListDataPropertyName.CROSS_MALE_PREFERRED_NAME, pedigreeTable,
+						listDataIndexedByGid);
 					return;
 				}
 
@@ -607,7 +834,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			});
 	}
 
-	private void addBreedingMethodPropertyValue(final GermplasmListDataPropertyName propertyName, final Map<Integer, Object> methodsByGids, final Map<Integer, GermplasmListData> listDataIndexedByGid) {
+	private void addBreedingMethodPropertyValue(final GermplasmListDataPropertyName propertyName, final Map<Integer, Object> methodsByGids,
+		final Map<Integer, GermplasmListData> listDataIndexedByGid) {
 		final Supplier<Map<Integer, String>> valueSupplier = () -> methodsByGids
 			.entrySet()
 			.stream()
@@ -618,7 +846,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			listDataIndexedByGid);
 	}
 
-	private <T> void addListDataProperties(final String propertyName, final Supplier<Map<Integer, T>> valuesSupplier, final Map<Integer, GermplasmListData> listDataIndexedByGid) {
+	private <T> void addListDataProperties(final String propertyName, final Supplier<Map<Integer, T>> valuesSupplier,
+		final Map<Integer, GermplasmListData> listDataIndexedByGid) {
 		valuesSupplier.get()
 			.entrySet()
 			.forEach(entrySet -> this.addListDataProperty(listDataIndexedByGid.get(entrySet.getKey()),
@@ -677,7 +906,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private String getGermplasmGid(final Optional<Germplasm> germplasm) {
 		if (germplasm.isPresent()) {
-			if(germplasm.get().getGid()!=0) {
+			if (germplasm.get().getGid() != 0) {
 				return String.valueOf(germplasm.get().getGid());
 			} else {
 				return Name.UNKNOWN;

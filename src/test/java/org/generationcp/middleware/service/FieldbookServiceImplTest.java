@@ -15,17 +15,10 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.MeasurementRowTestDataInitializer;
-import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
-import org.generationcp.middleware.domain.etl.MeasurementData;
-import org.generationcp.middleware.domain.etl.MeasurementRow;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -37,7 +30,6 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
-import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -58,8 +50,6 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FieldbookServiceImplTest {
@@ -110,8 +100,6 @@ public class FieldbookServiceImplTest {
 		this.germplasms = this.createGermplasms();
 		this.listDataItems = this.createListDataItems();
 		this.germplasmAttributes = this.createGermplasmAttributes();
-		when(this.locationDataManager.getLocationsByUniqueID(FieldbookServiceImplTest.PROGRAM_UUID))
-			.thenReturn(new ArrayList<>());
 	}
 
 	@Test
@@ -136,16 +124,6 @@ public class FieldbookServiceImplTest {
 		final Integer out = this.fieldbookServiceImpl.saveGermplasmList("maize", this.listDataItems, germplasmList, false);
 		Assert.assertEquals("List Id should be 1", (Integer) 1, out);
 	}
-
-	@Test
-	public void getLocationsByProgramUUID() {
-		final List<Location> locations = this.fieldbookServiceImpl.getLocationsByProgramUUID(FieldbookServiceImplTest.PROGRAM_UUID);
-
-		Mockito.verify(this.locationDataManager, Mockito.times(1)).getLocationsByUniqueID(FieldbookServiceImplTest.PROGRAM_UUID);
-		Assert.assertNotNull("The return locations list should not be null", locations);
-	}
-
-
 
 	@Test
 	public void testAddLocation() {

@@ -20,6 +20,7 @@ import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
+import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
@@ -884,41 +885,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			DmsProjectDao.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-	}
-
-	/**
-	 * Detect the usage of the specified variable in any programs except for the specified programUUID.
-	 *
-	 * @param variableId    - The term id of the variable (e.g. 8190 to look for variable LOCATION_NAME_ID)
-	 * @param variableValue - The value of the variable (e.g. 101 which is the location name id of the location "India")
-	 * @param programUUID
-	 * @return
-	 */
-	public boolean isVariableUsedInOtherPrograms(final String variableId, final String variableValue, final String programUUID) {
-		Preconditions.checkNotNull(variableId);
-		Preconditions.checkNotNull(variableValue);
-
-		// Check if the variable is used in trial level and/or environment level of studies except for the specified programUUID.
-		final SQLQuery query = this.getSession().createSQLQuery(
-			"SELECT CASE WHEN\n            (EXISTS( SELECT project.* FROM\n                    projectprop INNER JOIN\n"
-				+ "                    project ON project.project_id = projectprop.project_id WHERE\n"
-				+ "                    projectprop.variable_id = :variableId AND projectprop.value = :variableValue\n"
-				+ "                        AND project.program_uuid <> :programUUID AND project.deleted = 0)) = 1 						OR "
-				+ "				(EXISTS( SELECT \n                    project.* FROM project\n"
-				+ "                        INNER JOIN\n"
-				+ "                    nd_experiment ON nd_experiment.project_id = project.project_id\n"
-				+ "                        INNER JOIN\n"
-				+ "                    nd_geolocationprop ON nd_experiment.nd_geolocation_id = nd_geolocationprop.nd_geolocation_id"
-				+ "                WHERE nd_geolocationprop.type_id = :variableId\n"
-				+ "                        AND nd_geolocationprop.value = :variableValue\n"
-				+ "                        AND project.program_uuid <> :programUUID AND project.deleted = 0)) = 1 THEN 1 ELSE 0\n"
-				+ "    END;");
-		query.setParameter("variableId", variableId);
-		query.setParameter("variableValue", variableValue);
-		query.setParameter("programUUID", programUUID);
-
-		return ((BigInteger) query.uniqueResult()).intValue() != 0;
-
 	}
 
 	/***
@@ -1998,12 +1964,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	public Integer getDatasetIdByEnvironmentIdAndDatasetType(final Integer environmentId, final DatasetTypeEnum datasetType) {
 		try {
-			final Query query = this.getSession().createSQLQuery("SELECT DISTINCT p.project_id"
+			final Query query = this.getSession().createSQLQuery("SELECT DISTINCT dataset.project_id"
 				+ " FROM project p "
 				+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id"
+				+ " INNER JOIN project dataset ON dataset.study_id = p.study_id"
 				+ " INNER JOIN project study ON p.study_id = study.project_id AND study.deleted != " + DELETED_STUDY
-				+ " WHERE nde.nd_geolocation_id = :environmentId"
-				+ " AND p.dataset_type_id = :datasetTypeId");
+				+ " WHERE nde.nd_geolocation_id = :environmentId AND nde.type_id = " + ExperimentType.TRIAL_ENVIRONMENT.getTermId()
+				+ " AND dataset.dataset_type_id = :datasetTypeId");
 			query.setParameter("environmentId", environmentId);
 			query.setParameter("datasetTypeId", datasetType.getId());
 			return (Integer) query.uniqueResult();

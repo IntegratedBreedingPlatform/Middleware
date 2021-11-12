@@ -564,7 +564,7 @@ public interface FieldbookService {
 
 	List<Location> getFavoriteLocationByLocationIDs(List<Integer> locationIds);
 
-	List<Location> getLocationsByProgramUUID(String programUUID);
+	List<Location> getAllLocations();
 
 	Workbook getStudyDataSet(int studyID);
 

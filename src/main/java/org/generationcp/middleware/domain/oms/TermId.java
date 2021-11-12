@@ -159,7 +159,10 @@ public enum TermId {
 	, TREATMENT_MEAN(1610), SUMMARY_STATISTIC(1620)
 
 	// added so that we can represent non existing terms and avoid returning null in case of retrieving term by a given ID
-	, NONEXISTENT(-1), SAMPLES(-2), GID_ACTIVE_LOTS_COUNT(-3), GID_AVAILABLE_BALANCE(-4), GID_UNIT(-5), STOCK_ID(-1727)
+	, NONEXISTENT(-1), SAMPLES(-2), GID_ACTIVE_LOTS_COUNT(-3), GID_AVAILABLE_BALANCE(-4), GID_UNIT(-5), STOCK_ID(-1727),
+
+	// germplasm list
+	IMMEDIATE_SOURCE_GID(-6), IMMEDIATE_SOURCE_NAME(-7), GROUP_SOURCE_GID(-8), GROUP_SOURCE_NAME(-9), GUID(-10), GERMPLASM_REFERENCE(-11)
 
 	//TODO : Should find a way not to hard code
 	, PROJECT_PREFIX(3001)

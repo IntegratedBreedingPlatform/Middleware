@@ -1,0 +1,32 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="clarysabel" id="v19.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1815;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Entry Detail' variable type</comment>
+        <sql>
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (1815, 1041, 'Entry Detail', 'Variables that describes list entries', null, 0, 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="v19.3.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="location" columnName="program_uuid_bkp"/>
+			</not>
+        </preConditions>
+		<comment>
+			Rename 'program_uuid' column of 'location' table to 'program_uuid_bkp'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE location CHANGE program_uuid program_uuid_bkp VARCHAR(36) NULL;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

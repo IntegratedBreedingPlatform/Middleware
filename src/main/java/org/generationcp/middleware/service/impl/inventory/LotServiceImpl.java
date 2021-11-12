@@ -122,7 +122,7 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public void updateLots(final String programUUID, final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotUpdateRequestDto) {
+	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotUpdateRequestDto) {
 		final List<Lot> lots =
 			this.daoFactory.getLotDao()
 				.filterByColumnValues("lotUuId", lotDtos.stream().map(ExtendedLotDto::getLotUUID).collect(
@@ -130,7 +130,7 @@ public class LotServiceImpl implements LotService {
 		if (lotUpdateRequestDto.getSingleInput() != null) {
 			this.updateLots(lots, lotUpdateRequestDto.getSingleInput());
 		} else {
-			this.updateLots(programUUID, lots, lotUpdateRequestDto.getMultiInput());
+			this.updateLots(lots, lotUpdateRequestDto.getMultiInput());
 		}
 	}
 
@@ -153,10 +153,10 @@ public class LotServiceImpl implements LotService {
 		}
 	}
 
-	private void updateLots(final String programUUID, final List<Lot> lots, final LotMultiUpdateRequestDto lotMultiUpdateRequestDto) {
+	private void updateLots(final List<Lot> lots, final LotMultiUpdateRequestDto lotMultiUpdateRequestDto) {
 		try {
 			final Map<String, Integer> locationsByLocationAbbrMap =
-				this.buildLocationsByLocationAbbrMap(programUUID, lotMultiUpdateRequestDto.getLotList().stream()
+				this.buildLocationsByLocationAbbrMap(lotMultiUpdateRequestDto.getLotList().stream()
 					.map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr)
 					.collect(Collectors.toList()));
 			final Map<String, Integer> unitMapByName = this.buildUnitsByNameMap();
@@ -186,11 +186,11 @@ public class LotServiceImpl implements LotService {
 		}
 	}
 
-	private Map<String, Integer> buildLocationsByLocationAbbrMap(final String programUUID, final List<String> locationAbbreviations) {
+	private Map<String, Integer> buildLocationsByLocationAbbrMap(final List<String> locationAbbreviations) {
 
 		final List<Location> locations =
 			this.daoFactory.getLocationDAO()
-				.filterLocations(new LocationSearchRequest(programUUID, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null, false),
+				.filterLocations(new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null),
 					null);
 		return locations.stream().collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
 	}
@@ -203,10 +203,10 @@ public class LotServiceImpl implements LotService {
 	}
 
 	@Override
-	public List<String> saveLots(final CropType cropType, final String programUUID, final Integer userId,
+	public List<String> saveLots(final CropType cropType, final Integer userId,
 		final List<LotItemDto> lotItemDtos) {
 		try {
-			final Map<String, Integer> locationsByLocationAbbrMap = this.buildLocationsByLocationAbbrMap(programUUID, lotItemDtos.stream()
+			final Map<String, Integer> locationsByLocationAbbrMap = this.buildLocationsByLocationAbbrMap(lotItemDtos.stream()
 				.map(LotItemDto::getStorageLocationAbbr)
 				.collect(Collectors.toList()));
 

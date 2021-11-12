@@ -12,9 +12,8 @@
 
 package org.generationcp.middleware.manager.ontology.api;
 
-import java.util.List;
-
 import com.google.common.base.Optional;
+import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableOverridesDto;
@@ -22,11 +21,12 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.VariableOverrides;
-import org.generationcp.middleware.service.api.study.VariableDTO;
+
+import java.util.List;
 
 /**
  * This is the API for retrieving ontology variable data.
- *
+ * TODO migrate progressively to {@link OntologyVariableService}
  */
 public interface OntologyVariableDataManager {
 
@@ -91,25 +91,15 @@ public interface OntologyVariableDataManager {
 	 */
   	boolean isVariableUsedInStudy(int variableId);
 
-	/**
-	 * This function will give boolean flag if variable is used in any breeding Methods or not
-	 *
-	 * @param variableId variableId for which to retrieve usage flag
-	 * @return boolean return true if variable is used else false
-	 */
-	boolean isVariableUsedInBreedingMethods(int variableId);
-
 	boolean areVariablesUsedInStudy(List<Integer> variablesIds);
 
 	boolean areVariablesUsedInAttributes(List<Integer> variablesIds);
 
-	public List<VariableOverrides> getVariableOverridesByVariableIds(List<Integer> variableIds);
+	List<VariableOverrides> getVariableOverridesByVariableIds(List<Integer> variableIds);
 
-	public VariableOverrides getVariableOverridesByVariableIdAndProgram(Integer variableId, String programUuid);
+	List<VariableOverridesDto> getVariableOverridesByAliasAndProgram(String alias, String programUuid);
 
-	public List<VariableOverridesDto> getVariableOverridesByAliasAndProgram(String alias, String programUuid);
-
-	public List<VariableType> getVariableTypes(Integer variableId);
+	List<VariableType> getVariableTypes(Integer variableId);
 
 	Optional<DataType> getDataType(Integer variableId);
 
@@ -117,19 +107,9 @@ public interface OntologyVariableDataManager {
 
 	void fillVariableUsage(Variable variable);
 
-	List<VariableDTO> getVariablesByDatasetId(Integer datasetId, List<Integer> variableTypes,
-		Integer pageSize, Integer pageNumber);
-
-	long countVariablesByDatasetId(Integer datasetId, List<Integer> variableTypes);
-
-	List<VariableDTO> getAllVariables(List<Integer> variableTypes,
-		String cropname, Integer pageSize, Integer pageNumber);
-
-	long countAllVariables(List<Integer> variableTypes);
-
 	List<Variable> searchAttributeVariables(String query, String programUUID);
 
 	boolean hasUsage(int variableId);
 
-	public boolean hasVariableAttributeGermplasmDeleted(int variableId);
+	boolean hasVariableAttributeGermplasmDeleted(int variableId);
 }

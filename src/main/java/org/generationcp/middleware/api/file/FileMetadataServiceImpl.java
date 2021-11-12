@@ -64,14 +64,11 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	@Override
 	public Image save(final ImageNewRequest imageNewRequest) {
 		final String observationUnitDbId = imageNewRequest.getObservationUnitDbId();
-		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitDbId);
-
-		if (experimentModel == null) {
-			throw new MiddlewareRequestException("", "filemetadata.observationunit.not.found", new String[] {observationUnitDbId});
-		}
+		final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitDbId);
+		this.validateObservationUnit(experimentModelOptional, observationUnitDbId);
 
 		final FileMetadata fileMetadata = new FileMetadata();
-		fileMetadata.setExperimentModel(experimentModel);
+		fileMetadata.setExperimentModel(experimentModelOptional.get());
 
 		final List<String> terms = imageNewRequest.getDescriptiveOntologyTerms();
 		if (!isEmpty(terms)) {
@@ -155,12 +152,13 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	 */
 	@Override
 	public String getFilePathForObservationUnit(final String observationUnitId, final String fileName) {
-		final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId);
-		final DmsProject study = experimentModel.getProject().getStudy();
+		final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId);
+		this.validateObservationUnit(experimentModelOptional, observationUnitId);
+		final DmsProject study = experimentModelOptional.get().getProject().getStudy();
 		final String path = FILE_PATH_PREFIX_PROGRAMUUID + study.getProgramUUID()
-			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_STUDYID + study.getProjectId()
-			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_OBSUNITUUID + observationUnitId
-			+ FILE_PATH_SLASH + fileName;
+				+ FILE_PATH_SLASH + FILE_PATH_PREFIX_STUDYID + study.getProjectId()
+				+ FILE_PATH_SLASH + FILE_PATH_PREFIX_OBSUNITUUID + observationUnitId
+				+ FILE_PATH_SLASH + fileName;
 		this.validatePathNotExists(path);
 		return path;
 	}
@@ -202,6 +200,12 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		}
 	}
 
+	private void validateObservationUnit(final Optional<ExperimentModel> experimentModelOptional, final String observationUnitId) {
+		if (!experimentModelOptional.isPresent()) {
+			throw new MiddlewareRequestException("", "filemetadata.observationunit.not.found", new String[] {observationUnitId});
+		}
+	}
+
 	@Override
 	public FileMetadataDTO save(
 		final FileMetadataDTO fileMetadataDTO,
@@ -214,11 +218,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		Preconditions.checkArgument(isBlank(observationUnitUUID) != isBlank(germplasmUUID));
 
 		if (!isBlank(observationUnitUUID)) {
-			final ExperimentModel experimentModel = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitUUID);
-			if (experimentModel == null) {
-				throw new MiddlewareRequestException("", "filemetadata.observationunit.not.found", new String[] {observationUnitUUID});
-			}
-			fileMetadata.setExperimentModel(experimentModel);
+			final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitUUID);
+			this.validateObservationUnit(experimentModelOptional, observationUnitUUID);
+			fileMetadata.setExperimentModel(experimentModelOptional.get());
 		} else {
 			final Optional<Germplasm> germplasmOptional = this.daoFactory.getGermplasmDao().getGermplasmByGUIDs(singletonList(germplasmUUID))
 				.stream().findFirst();
@@ -259,8 +261,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		final List<CVTerm> cvTerms = fileMetadataList.stream().flatMap(fileMetadata -> fileMetadata.getVariables().stream())
 			.collect(toList());
 		cvTerms.forEach(cvTerm -> variableFilter.addVariableId(cvTerm.getCvTermId()));
-		final Map<Integer, Variable> variablesById = this.daoFactory.getCvTermDao().getVariablesWithFilter(variableFilter)
-			.stream().collect(toMap(Term::getId, identity()));
+		final Map<Integer, Variable> variablesById = this.daoFactory.getCvTermDao().getVariablesWithFilterById(variableFilter);
 
 		// map result
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();

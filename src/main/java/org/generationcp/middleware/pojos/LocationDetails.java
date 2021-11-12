@@ -31,6 +31,7 @@ import java.util.Comparator;
  *
  * @author Aldrich Abrogena
  */
+// TODO: remove this class and instead use Location
 @Entity
 @Table(name = "location")
 // JAXB Element Tags for JSON output
@@ -101,10 +102,6 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	@Basic(optional = true)
 	@Column(name = "altitude")
 	private Double altitude;
-
-	@Basic(optional = true)
-	@Column(name = "program_uuid")
-	private String programUUID;
 
 	@Basic(optional = true)
 	@Column(name = "cntry_name")
@@ -282,14 +279,6 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		this.ltype = ltype;
 	}
 
-	public String getProgramUUID() {
-		return programUUID;
-	}
-
-	public void setProgramUUID(final String programUUID) {
-		this.programUUID = programUUID;
-	}
-
 	public String getProvinceName() {
 		return provinceName;
 	}
@@ -321,4 +310,5 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	public void setlDefault(final Boolean lDefault) {
 		this.lDefault = lDefault;
 	}
+
 }

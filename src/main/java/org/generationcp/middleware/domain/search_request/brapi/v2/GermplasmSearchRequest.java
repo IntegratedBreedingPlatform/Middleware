@@ -12,7 +12,6 @@ import org.pojomatic.annotations.AutoProperty;
 import java.util.List;
 
 @AutoProperty
-@JsonInclude(JsonInclude.Include.NON_NULL)
 public class GermplasmSearchRequest extends SearchRequestDto {
 
 	private int page;

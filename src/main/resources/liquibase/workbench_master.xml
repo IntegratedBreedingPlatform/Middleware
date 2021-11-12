@@ -60,5 +60,7 @@
 	<include file="workbench_changelog/18_4_0.xml" relativeToChangelogFile="true"/>
 	<include file="workbench_changelog/18_4_1.xml" relativeToChangelogFile="true"/>
 	<include file="workbench_changelog/19_1_0.xml" relativeToChangelogFile="true"/>
+	<include file="workbench_changelog/19_2_0.xml" relativeToChangelogFile="true"/>
+	<include file="workbench_changelog/19_3_0.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
 

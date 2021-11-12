@@ -1,0 +1,137 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="cuenyad" id="v19.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			  <sqlCheck expectedResult="1">
+					SELECT count(1) > 0 FROM (
+										SELECT 1
+										FROM role_permission rp
+										INNER JOIN permission p ON rp.permission_id = p.permission_id
+										WHERE p.name IN ('GERMPLASM', 'MANAGE_GERMPLASM')
+										GROUP BY rp.role_id
+									) AS count;
+			  </sqlCheck>
+        </preConditions>
+		<comment>
+			Removing Merge germplasm permission for roles that do not have Full permissions.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			# Insert inherited permissions of GERMPLASM and MANAGE GERMPLASM.
+			INSERT INTO role_permission(role_id,permission_id)
+				SELECT rti.role_id, pti.permission_id FROM (SELECT DISTINCT(rp.role_id) AS role_id
+																FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+																	WHERE p.name IN ('GERMPLASM', 'MANAGE_GERMPLASM')
+																		GROUP BY rp.role_id
+				    										) rti
+				CROSS JOIN
+					(SELECT permission_id FROM permission
+						WHERE name IN ( 'IMPORT_GERMPLASM',  'MG_MANAGE_INVENTORY', 'SEARCH_GERMPLASM', 'IMPORT_GERMPLASM_UPDATES', 'GERMPLASM_LABEL_PRINTING', 'EDIT_GERMPLASM',
+										 'DELETE_GERMPLASM','CODE_GERMPLASM', 'GROUP_GERMPLASM', 'UNGROUP_GERMPLASM', 'VIEW_GERMPLASM_CHANGE_HISTORY')
+					) pti;
+
+			# Delete GERMPLASM and MANAGE GERMPLASM permissions from roles that do not have Full permissions.
+			DELETE role_permission FROM role_permission
+				WHERE
+					permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name in ('GERMPLASM','MANAGE_GERMPLASM'))
+					AND role_id IN (SELECT subA.role_id FROM (SELECT rp.role_id AS role_id FROM role_permission rp
+										WHERE rp.role_id IN ( SELECT subB.rid FROM (
+												SELECT rp.role_id AS rid FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+													WHERE p.name in ('GERMPLASM','MANAGE_GERMPLASM')
+														GROUP BY rp.role_id ) AS subB ) ) AS subA
+									);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.3.0-2">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+                	SELECT count(*) FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS'
+            	</sqlCheck>
+				<sqlCheck expectedResult="0">
+                	SELECT count(*) FROM permission WHERE name = 'REORDER_ENTRIES_GERMPLASM_LISTS'
+            	</sqlCheck>
+			</and>
+        </preConditions>
+		<comment>
+			Add Reorder Entries permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`)
+				VALUES ('REORDER_ENTRIES_GERMPLASM_LISTS', 'Reorder Entries', @permission_id);
+
+			SET @reorder_entries_germplasm_lists_permission_id = (SELECT permission_id FROM permission where name = 'REORDER_ENTRIES_GERMPLASM_LISTS');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @reorder_entries_germplasm_lists_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @reorder_entries_germplasm_lists_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @reorder_entries_germplasm_lists_permission_id, '1');
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v19.3.0-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS'
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM permission WHERE name = 'GERMPLASM_LIST_LABEL_PRINTING'
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Add export Germplasm List data permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`)
+			VALUES ('GERMPLASM_LIST_LABEL_PRINTING', 'Export Germplasm List Data and Labels', @permission_id);
+
+			SET @germplasm_list_label_printing_permission_id = (SELECT permission_id FROM permission where name = 'GERMPLASM_LIST_LABEL_PRINTING');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @germplasm_list_label_printing_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @germplasm_list_label_printing_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @germplasm_list_label_printing_permission_id, '1');
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v19.3.0-4">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+                	SELECT count(*) FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS'
+            	</sqlCheck>
+				<sqlCheck expectedResult="0">
+                	SELECT count(*) FROM permission WHERE name = 'IMPORT_GERMPLASM_LIST_UPDATES'
+            	</sqlCheck>
+			</and>
+        </preConditions>
+		<comment>
+			Add Import Germplasm List updates permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
+			INSERT INTO permission (name, description, parent_id) VALUES ('IMPORT_GERMPLASM_LIST_UPDATES', 'Import Germplasm List Updates', @permission_id);
+
+			SET @import_germplasm_lists_update_permission_id = (SELECT permission_id FROM permission where name = 'IMPORT_GERMPLASM_LIST_UPDATES');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @import_germplasm_lists_update_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @import_germplasm_lists_update_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @import_germplasm_lists_update_permission_id, '1');
+
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

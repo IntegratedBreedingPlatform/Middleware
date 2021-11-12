@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.pojos;
 
+import org.generationcp.middleware.util.ISO8601DateParser;
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.SQLDelete;
@@ -18,6 +19,7 @@ import org.hibernate.annotations.SQLDelete;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -40,6 +42,7 @@ public class GermplasmList implements Serializable {
 	public static final String DELETE_GERMPLASM_LIST_BY_LISTID_PHYSICALLY = "deleteGermplasmListByListIdPhysically";
 	public static final String GERMPLASM_LIST_LIST_ID_COLUMN = "listid";
 
+	// TODO: move out of this class
 	// TODO db: use proper bit-value?
 	public enum Status {
 		LIST(1), // 0001
@@ -113,6 +116,9 @@ public class GermplasmList implements Serializable {
 	@OneToMany(mappedBy = "list", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
 	@OrderBy("entryId asc")
 	private List<GermplasmListData> listData = new ArrayList<>();
+
+	@OneToMany(mappedBy = "list", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	private List<GermplasmListDataView> view = new ArrayList<>();
 
 	@Transient
 	private String tabLabel;
@@ -343,6 +349,15 @@ public class GermplasmList implements Serializable {
 		this.listData.addAll(listData);
 	}
 
+	public List<GermplasmListDataView> getView() {
+		return this.view;
+	}
+
+	public void setView(final List<GermplasmListDataView> view) {
+		this.view.clear();
+		this.view.addAll(view);
+	}
+
 	@Override
 	public String toString() {
 		final StringBuilder builder = new StringBuilder();
@@ -431,4 +446,17 @@ public class GermplasmList implements Serializable {
 	public void setCreatedBy(final String createdBy) {
 		this.createdBy = createdBy;
 	}
+
+	public Date parseDate() {
+		return ISO8601DateParser.parseToDate(this.date);
+	}
+
+	public void lockList() {
+		this.status = Status.LOCKED_LIST.getCode();
+	}
+
+	public void unlock() {
+		this.status = Status.LIST.getCode();
+	}
+
 }
