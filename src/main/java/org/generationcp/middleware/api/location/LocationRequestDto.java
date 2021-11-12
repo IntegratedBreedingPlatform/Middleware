@@ -91,4 +91,11 @@ public class LocationRequestDto {
 	public String toString() {
 		return Pojomatic.toString(this);
 	}
+
+	public boolean allAttributesNull() {
+		return this.getName() == null && this.getAbbreviation() == null &&
+			this.getProvinceId() == null && this.getCountryId() == null &&
+			this.getAltitude() == null && this.getLatitude() == null &&
+			this.getLongitude() == null && this.getType() == null;
+	}
 }
