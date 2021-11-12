@@ -6,14 +6,15 @@ import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeServi
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.CopMatrix;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.time.Duration.between;
 import static org.apache.commons.lang3.time.DurationFormatUtils.formatDurationHMS;
@@ -48,12 +49,12 @@ public class CopServiceImpl implements CopService {
 	}
 
 	@Override
-	public Table<Integer, Integer, Double> coefficientOfParentage(final List<Integer> gids) {
-		// TODO get from db
-		final TreeBasedTable<Integer, Integer, Double> matrix = TreeBasedTable.create();
+	public Table<Integer, Integer, Double> coefficientOfParentage(final Set<Integer> gids) {
+		final TreeBasedTable<Integer, Integer, Double> matrix = this.daoFactory.getCopMatrixDao().getByGids(gids);
+		final TreeBasedTable<Integer, Integer, Double> matrixNew = TreeBasedTable.create();
 
 		// matrix copy because CopCalculation also stores intermediate results
-		final CopCalculation copCalculation = new CopCalculation(TreeBasedTable.create(matrix));
+		final CopCalculation copCalculation = new CopCalculation(matrix);
 
 		// Avoid query multiple times
 		final Map<Integer, GermplasmTreeNode> nodes = new HashMap<>();
@@ -89,10 +90,20 @@ public class CopServiceImpl implements CopService {
 					}
 
 					final double cop = copCalculation.coefficientOfParentage(gid1Tree, gid2Tree);
+					matrixNew.put(gid1, gid2, cop);
 					matrix.put(gid1, gid2, cop);
 				}
 			}
 		}
+
+		for (final Map.Entry<Integer, Map<Integer, Double>> rowEntrySet : matrixNew.rowMap().entrySet()) {
+			for (final Integer column : rowEntrySet.getValue().keySet()) {
+				final Integer row = rowEntrySet.getKey();
+				final CopMatrix copMatrix = new CopMatrix(row, column, matrixNew.get(row, column));
+				this.daoFactory.getCopMatrixDao().save(copMatrix);
+			}
+		}
+
 		return matrix;
 	}
 

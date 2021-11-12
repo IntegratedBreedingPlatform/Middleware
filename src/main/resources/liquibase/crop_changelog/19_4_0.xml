@@ -1,0 +1,26 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="nahuel" id="v19.4.0-1">
+		<preConditions>
+			<not>
+				<tableExists tableName="cop_matrix" />
+			</not>
+		</preConditions>
+		<comment>Create cop_matrix table: cop values for pair of gids</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table cop_matrix (
+				gid1 int not null,
+				gid2 int not null,
+				cop double null,
+				constraint pk_cop_gid1_gid2 primary key (gid1, gid2),
+				constraint fk_cop_germplsm_gid1 foreign key (gid1) references germplsm (gid),
+				constraint fk_cop_germplsm_gid2 foreign key (gid2) references germplsm (gid)
+			) comment 'coefficient of parentage matrix';
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

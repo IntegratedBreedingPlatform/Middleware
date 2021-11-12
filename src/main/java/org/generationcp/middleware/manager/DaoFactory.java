@@ -3,6 +3,7 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
+import org.generationcp.middleware.dao.CopMatrixDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.CvTermExternalReferenceDAO;
@@ -89,6 +90,7 @@ import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.pojos.CopMatrix;
 
 public class DaoFactory {
 
@@ -136,6 +138,10 @@ public class DaoFactory {
 		final CVTermRelationshipDao cvTermRelationshipDao = new CVTermRelationshipDao();
 		cvTermRelationshipDao.setSession(this.sessionProvider.getSession());
 		return cvTermRelationshipDao;
+	}
+
+	public CopMatrixDao getCopMatrixDao() {
+		return new CopMatrixDao(this.sessionProvider.getSession());
 	}
 
 	public LotDAO getLotDao() {

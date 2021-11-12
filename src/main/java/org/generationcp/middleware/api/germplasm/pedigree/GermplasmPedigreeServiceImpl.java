@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.germplasm.pedigree;
 
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -27,6 +28,10 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	@Override
 	public GermplasmTreeNode getGermplasmPedigreeTree(final Integer gid, final Integer level, final boolean includeDerivativeLines) {
 		final Germplasm root = this.daoFactory.getGermplasmDao().getById(gid);
+
+		if (root == null) {
+			throw new MiddlewareRequestException("", "error.record.not.found", "gid=" + gid);
+		}
 
 		final GermplasmTreeNode rootNode = new GermplasmTreeNode(root);
 		rootNode.setNumberOfGenerations(this.countGenerations(gid, includeDerivativeLines, level == null));
