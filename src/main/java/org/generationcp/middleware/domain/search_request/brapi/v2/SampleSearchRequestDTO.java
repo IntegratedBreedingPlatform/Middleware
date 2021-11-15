@@ -20,6 +20,8 @@ public class SampleSearchRequestDTO extends SearchRequestDto {
 	private List<String> externalReferenceSources;
 	private List<String> germplasmNames;
 	private List<String> studyNames;
+	private int page;
+	private int pageSize;
 
 	public SampleSearchRequestDTO() {
 	}
@@ -32,7 +34,8 @@ public class SampleSearchRequestDTO extends SearchRequestDto {
 		this.germplasmDbIds = StringUtils.isEmpty(germplasmDbId) ? null : Collections.singletonList(germplasmDbId);
 		this.studyDbIds = StringUtils.isEmpty(studyDbId) ? null : Collections.singletonList(studyDbId);
 		this.externalReferenceIDs = StringUtils.isEmpty(externalReferenceID) ? null : Collections.singletonList(externalReferenceID);
-		this.externalReferenceSources = StringUtils.isEmpty(externalReferenceSource) ? null : Collections.singletonList(externalReferenceSource);
+		this.externalReferenceSources =
+			StringUtils.isEmpty(externalReferenceSource) ? null : Collections.singletonList(externalReferenceSource);
 	}
 
 	public SampleSearchRequestDTO(final List<String> sampleDbIds, final List<String> observationUnitDbIds, final List<String> plateDbIds,
@@ -117,6 +120,22 @@ public class SampleSearchRequestDTO extends SearchRequestDto {
 
 	public void setStudyNames(final List<String> studyNames) {
 		this.studyNames = studyNames;
+	}
+
+	public int getPage() {
+		return this.page;
+	}
+
+	public void setPage(final int page) {
+		this.page = page;
+	}
+
+	public int getPageSize() {
+		return this.pageSize;
+	}
+
+	public void setPageSize(final int pageSize) {
+		this.pageSize = pageSize;
 	}
 
 	@Override
