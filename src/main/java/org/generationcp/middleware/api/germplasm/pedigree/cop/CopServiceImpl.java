@@ -54,7 +54,7 @@ public class CopServiceImpl implements CopService {
 		final TreeBasedTable<Integer, Integer, Double> matrixNew = TreeBasedTable.create();
 
 		// matrix copy because CopCalculation also stores intermediate results
-		final CopCalculation copCalculation = new CopCalculation(matrix);
+		final CopCalculation copCalculation = new CopCalculation(TreeBasedTable.create(matrix));
 
 		// Avoid query multiple times
 		final Map<Integer, GermplasmTreeNode> nodes = new HashMap<>();
