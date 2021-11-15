@@ -11,50 +11,38 @@ import java.util.Set;
 @AutoProperty
 public class LocationSearchRequest {
 
-	private String programUUID;
+	private String favoriteProgramUUID;
 	private Set<Integer> locationTypeIds = new HashSet<>();
 	private List<Integer> locationIds = new ArrayList<>();
 	private List<String> locationAbbreviations = new ArrayList<>();
 	private String locationTypeName;
 	private String locationName;
-	private boolean favoritesOnly;
 
 	public LocationSearchRequest() {
 
 	}
 
-	public LocationSearchRequest(final String programUUID, final Set<Integer> locationTypeIds, final String locationName,
-		final boolean favoritesOnly) {
-		this.programUUID = programUUID;
+	public LocationSearchRequest(final String favoriteProgramUUID, final Set<Integer> locationTypeIds, final String locationName) {
+		this.favoriteProgramUUID = favoriteProgramUUID;
 		this.locationTypeIds = locationTypeIds;
 		this.locationName = locationName;
-		this.favoritesOnly = favoritesOnly;
 	}
 
-	public LocationSearchRequest(final String programUUID, final Set<Integer> locationTypeIds, final List<Integer> locationIds,
-		final List<String> locationAbbreviations, final String locationName, final Boolean favoritesOnly) {
-		this.programUUID = programUUID;
+	public LocationSearchRequest(final String favoriteProgramUUID, final Set<Integer> locationTypeIds, final List<Integer> locationIds,
+		final List<String> locationAbbreviations, final String locationName) {
+		this.favoriteProgramUUID = favoriteProgramUUID;
 		this.locationTypeIds = locationTypeIds;
 		this.locationIds = locationIds;
 		this.locationAbbreviations = locationAbbreviations;
 		this.locationName = locationName;
-		this.favoritesOnly = favoritesOnly;
 	}
 
-	public boolean getFavoritesOnly() {
-		return this.favoritesOnly;
+	public String getFavoriteProgramUUID() {
+		return this.favoriteProgramUUID;
 	}
 
-	public void setFavoritesOnly(final boolean favoritesOnly) {
-		this.favoritesOnly = favoritesOnly;
-	}
-
-	public String getProgramUUID() {
-		return this.programUUID;
-	}
-
-	public void setProgramUUID(final String programUUID) {
-		this.programUUID = programUUID;
+	public void setFavoriteProgramUUID(final String favoriteProgramUUID) {
+		this.favoriteProgramUUID = favoriteProgramUUID;
 	}
 
 	public Set<Integer> getLocationTypeIds() {

@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.oms.Scale;
 import org.generationcp.middleware.domain.oms.StandardVariableReference;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Method;
@@ -62,11 +63,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static java.util.function.Function.identity;
+import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -102,6 +105,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	protected static final String VARIABLE_TRAIT_CLASS = "traitClass";
 	protected static final String VARIABLE_NAME_SYNONYMS = "synonyms";
 	protected static final String VARIABLE_FORMULA_DEFINITION = "formulaDefinition";
+	protected static final String VARIABLE_CATEGORY_ID = "categoryId";
+	protected static final String VARIABLE_CATEGORY_NAME = "categoryName";
+	protected static final String VARIABLE_CATEGORY_DESCRIPTION = "categoryDefinition";
 	// parameters
 	public static final String VARIABLE_TYPE_NAMES = "variableTypeNames";
 
@@ -182,7 +188,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				query.setResultTransformer(Transformers.aliasToBean(MeasurementVariable.class));
 				final List<MeasurementVariable> results = query.list();
 
-				return results.stream().collect(Collectors.toMap(MeasurementVariable::getName, Function.identity()));
+				return results.stream().collect(toMap(MeasurementVariable::getName, identity()));
 
 			}
 
@@ -278,7 +284,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				query.setResultTransformer(Transformers.aliasToBean(MeasurementVariable.class));
 				final List<MeasurementVariable> results = query.list();
 
-				return results.stream().collect(Collectors.toMap(MeasurementVariable::getName, Function.identity()));
+				return results.stream().collect(toMap(MeasurementVariable::getName, identity()));
 
 			}
 
@@ -1424,8 +1430,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return sql;
 	}
 
-	/*-------------------------    AREA FOR USED/CREATED METHOD FOR BMS-36:ONTOLOGY MANAGER REDESIGN -------------------------- */
-
 	public List<CVTerm> getAllByCvId(final Integer cvId, final boolean filterObsolete) {
 
 		final List<CVTerm> terms;
@@ -1954,7 +1958,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	 *  - complete migration (filters, scale details, etc)
 	 *  - https://ibplatform.atlassian.net/browse/IBP-4705
 	 */
-	public List<Variable> getVariablesWithFilter(final VariableFilter variableFilter) {
+	public Map<Integer, Variable> getVariablesWithFilterById(final VariableFilter variableFilter) {
 		try {
 			final String programUUID = variableFilter.getProgramUuid();
 
@@ -1962,15 +1966,19 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				+ " variable.cvterm_id as " + VARIABLE_ID + ", "  //
 				+ " variable.name as " + VARIABLE_NAME + ", "  //
 				+ " variable.definition as " + VARIABLE_DEFINITION + ", "  //
-				+ " method.mid as " + METHOD_ID + ", "  //
-				+ " method.mn as " + METHOD_NAME + ", "  //
-				+ " method.md as " + METHOD_DEFINITION + ", "  //
-				+ " property.pid as " + PROPERTY_ID + ", "  //
-				+ " property.pn as " + PROPERTY_NAME + ", "  //
-				+ " property.pd as " + PROPERTY_DEFINITION + ", "  //
-				+ " scale.sid as " + SCALE_ID + ", "  //
-				+ " scale.sn as " + SCALE_NAME + ", "  //
-				+ " scale.sd as " + SCALE_DEFINITION + ", "  //
+				+ " method.cvterm_id as " + METHOD_ID + ", "  //
+				+ " method.name as " + METHOD_NAME + ", "  //
+				+ " method.definition as " + METHOD_DEFINITION + ", "  //
+				+ " property.cvterm_id as " + PROPERTY_ID + ", "  //
+				+ " property.name as " + PROPERTY_NAME + ", "  //
+				+ " property.definition as " + PROPERTY_DEFINITION + ", "  //
+				+ " scale.cvterm_id as " + SCALE_ID + ", "  //
+				+ " scale.name as " + SCALE_NAME + ", "  //
+				+ " scale.definition as " + SCALE_DEFINITION + ", "  //
+				+ " dataType.cvterm_id as " + VARIABLE_DATA_TYPE_ID + ", "  //
+				+ " category.cvterm_id AS " + VARIABLE_CATEGORY_ID + ", "  //
+				+ " category.name AS " + VARIABLE_CATEGORY_NAME + ", "  //
+				+ " category.definition AS " + VARIABLE_CATEGORY_DESCRIPTION + ", "  //
 				+ " vo.alias  as " + VARIABLE_ALIAS + ", "  //
 				+ " vo.expected_min as " + VARIABLE_EXPECTED_MIN + ", "  //
 				+ " vo.expected_max as " + VARIABLE_EXPECTED_MAX //
@@ -1978,21 +1986,27 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				+ " inner join cvtermprop cpvartype on cpvartype.type_id = " + TermId.VARIABLE_TYPE.getId() //
 				+ "                                 and variable.cvterm_id = cpvartype.cvterm_id " //
 				+ " inner join cvterm variableType on variableType.name = cpvartype.value " //
-				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr " //
-				+ "   inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = " + TermId.HAS_METHOD.getId() //
-				+ "  ) method on method.vid = variable.cvterm_id " //
-				+ " left join (select pr.subject_id vid , p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr " //
-				+ "   inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = " + TermId.HAS_PROPERTY.getId() //
-				+ "  ) property on property.vid = variable.cvterm_id " //
-				+ " left join (select sr.subject_id vid , s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr " //
-				+ "  inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = " + TermId.HAS_SCALE.getId() //
-				+ " ) scale on scale.vid = variable.cvterm_id " //
+
+				+ " left join cvterm_relationship mr on variable.cvterm_id = mr.subject_id and mr.type_id = " + TermId.HAS_METHOD.getId() //
+				+ " left join cvterm method on mr.object_id = method.cvterm_id  " //
+
+				+ " left join cvterm_relationship pr on variable.cvterm_id = pr.subject_id and pr.type_id = " + TermId.HAS_PROPERTY.getId()
+				+ " left join cvterm property on pr.object_id = property.cvterm_id  " //
+
+				+ " left join cvterm_relationship sr on variable.cvterm_id = sr.subject_id and sr.type_id = " + TermId.HAS_SCALE.getId() //
+				+ " left join cvterm scale on sr.object_id = scale.cvterm_id  " //
+
+				+ " left join cvterm_relationship dr on scale.cvterm_id = dr.subject_id and dr.type_id = " + TermId.HAS_TYPE.getId() //
+				+ " left join cvterm dataType on dr.object_id = dataType.cvterm_id  " //
+
+				+ " left join cvterm_relationship cr on scale.cvterm_id = cr.subject_id and cr.type_id = " + TermId.HAS_VALUE.getId() //
+				+ " left join cvterm category on cr.object_id = category.cvterm_id "  //
+
 				+ " left join variable_overrides vo on vo.cvterm_id = variable.cvterm_id "
 				+ "                                 and (:programUUID is null || vo.program_uuid = :programUUID)" //
 				+ " where 1 = 1 ");
 
 			addVariableWithFilterParams(new SqlQueryParamBuilder(queryBuilder), variableFilter);
-			queryBuilder.append(" group by variable.cvterm_id ");
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
 			addVariableWithFilterParams(new SqlQueryParamBuilder(sqlQuery), variableFilter);
@@ -2010,40 +2024,64 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			sqlQuery.addScalar(SCALE_ID);
 			sqlQuery.addScalar(SCALE_NAME);
 			sqlQuery.addScalar(SCALE_DEFINITION);
+			sqlQuery.addScalar(VARIABLE_DATA_TYPE_ID);
 			sqlQuery.addScalar(VARIABLE_ALIAS);
 			sqlQuery.addScalar(VARIABLE_EXPECTED_MIN);
 			sqlQuery.addScalar(VARIABLE_EXPECTED_MAX);
+			sqlQuery.addScalar(VARIABLE_CATEGORY_ID);
+			sqlQuery.addScalar(VARIABLE_CATEGORY_NAME);
+			sqlQuery.addScalar(VARIABLE_CATEGORY_DESCRIPTION);
 
 			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) sqlQuery.list();
 
-			final List<Variable> variables = new ArrayList<>();
+			final Map<Integer, Variable> variables = new LinkedHashMap<>();
 			for (final Map<String, Object> item : queryResults) {
-				final Variable variable = new Variable(new Term(
-					Util.typeSafeObjectToInteger(item.get(VARIABLE_ID)),
-					(String) item.get(VARIABLE_NAME),
-					(String) item.get(VARIABLE_DEFINITION)));
-				variable.setMethod(new Method(new Term(
-					Util.typeSafeObjectToInteger(item.get(METHOD_ID)),
-					(String) item.get(METHOD_NAME),
-					(String) item.get(METHOD_DEFINITION))));
-				variable.setProperty(new org.generationcp.middleware.domain.ontology.Property(new Term(
-					Util.typeSafeObjectToInteger(item.get(PROPERTY_ID)),
-					(String) item.get(PROPERTY_NAME),
-					(String) item.get(PROPERTY_DEFINITION))));
-				variable.setScale(new org.generationcp.middleware.domain.ontology.Scale(new Term(
-					Util.typeSafeObjectToInteger(item.get(SCALE_ID)),
-					(String) item.get(SCALE_NAME),
-					(String) item.get(SCALE_DEFINITION))));
+				final Integer variableId = Util.typeSafeObjectToInteger(item.get(VARIABLE_ID));
 
-				final String alias = (String) item.get(VARIABLE_ALIAS);
-				final String expectedMin = (String) item.get(VARIABLE_EXPECTED_MIN);
-				final String expectedMax = (String) item.get(VARIABLE_EXPECTED_MAX);
+				if (!variables.containsKey(variableId)) {
 
-				variable.setAlias(alias);
-				variable.setMinValue(expectedMin);
-				variable.setMaxValue(expectedMax);
+					final Variable variable = new Variable(new Term(
+						variableId,
+						(String) item.get(VARIABLE_NAME),
+						(String) item.get(VARIABLE_DEFINITION)));
+					variable.setMethod(new Method(new Term(
+						Util.typeSafeObjectToInteger(item.get(METHOD_ID)),
+						(String) item.get(METHOD_NAME),
+						(String) item.get(METHOD_DEFINITION))));
+					variable.setProperty(new org.generationcp.middleware.domain.ontology.Property(new Term(
+						Util.typeSafeObjectToInteger(item.get(PROPERTY_ID)),
+						(String) item.get(PROPERTY_NAME),
+						(String) item.get(PROPERTY_DEFINITION))));
+					final org.generationcp.middleware.domain.ontology.Scale scale =
+						new org.generationcp.middleware.domain.ontology.Scale(new Term(
+							Util.typeSafeObjectToInteger(item.get(SCALE_ID)),
+							(String) item.get(SCALE_NAME),
+							(String) item.get(SCALE_DEFINITION)));
+					variable.setScale(scale);
+					scale.setDataType(DataType.getById((Integer) item.get(VARIABLE_DATA_TYPE_ID)));
 
-				variables.add(variable);
+					final String alias = (String) item.get(VARIABLE_ALIAS);
+					final String expectedMin = (String) item.get(VARIABLE_EXPECTED_MIN);
+					final String expectedMax = (String) item.get(VARIABLE_EXPECTED_MAX);
+
+					variable.setAlias(alias);
+					variable.setMinValue(expectedMin);
+					variable.setMaxValue(expectedMax);
+
+					variables.put(variableId, variable);
+				}
+
+				final Integer categoryId = (Integer) item.get(VARIABLE_CATEGORY_ID);
+				if (categoryId != null) {
+					final Variable variable = variables.get(variableId);
+					final TermSummary category = new TermSummary(
+						categoryId,
+						(String) item.get(VARIABLE_CATEGORY_NAME),
+						(String) item.get(VARIABLE_CATEGORY_DESCRIPTION));
+					variable.getScale().getCategories().add(category);
+
+				}
+
 			}
 
 			return variables;
@@ -2061,6 +2099,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			paramBuilder.append(" and variable.cvterm_id in (:variableIds) ");
 			paramBuilder.setParameterList("variableIds", variableFilter.getVariableIds());
 		}
+		// TODO Complete
 	}
 
 }

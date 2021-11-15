@@ -494,7 +494,7 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		final String lname = org.apache.commons.lang3.RandomStringUtils.randomAlphabetic(9);
 
 		final int cntryid = 1;
-		location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr, programUUID);
+		location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
 		location.setCntryid(cntryid);
 
 		final int provinceId = 1001;
