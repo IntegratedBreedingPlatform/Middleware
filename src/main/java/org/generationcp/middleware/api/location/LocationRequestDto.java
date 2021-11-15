@@ -1,7 +1,9 @@
 package org.generationcp.middleware.api.location;
 
 import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
+@AutoProperty
 public class LocationRequestDto {
 
 	private String name;
