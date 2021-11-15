@@ -1,6 +1,7 @@
 package org.generationcp.middleware.domain.germplasm;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -51,6 +52,8 @@ public class GermplasmDto {
 	private List<GermplasmNameDto> names;
 
 	private List<GermplasmAttributeDto> attributes;
+
+	private List<ExternalReferenceDTO> externalReferences;
 
 	public Integer getGid() {
 		return this.gid;
@@ -218,6 +221,14 @@ public class GermplasmDto {
 
 	public void setGermplasmPUI(final String germplasmPUI) {
 		this.germplasmPUI = germplasmPUI;
+	}
+
+	public List<ExternalReferenceDTO> getExternalReferences() {
+		return this.externalReferences;
+	}
+
+	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	@Override
