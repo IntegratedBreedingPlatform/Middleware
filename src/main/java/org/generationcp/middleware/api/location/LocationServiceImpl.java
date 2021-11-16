@@ -103,7 +103,7 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public Integer createLocation(final LocationRequestDto locationRequestDto) {
+	public LocationDTO createLocation(final LocationRequestDto locationRequestDto) {
 
 		final Integer countryId = locationRequestDto.getCountryId() != null ? locationRequestDto.getCountryId() : 0;
 		final Integer provinceId = locationRequestDto.getProvinceId() != null ? locationRequestDto.getProvinceId() : 0;
@@ -126,7 +126,7 @@ public class LocationServiceImpl implements LocationService {
 		}
 
 		final Location location = this.daoFactory.getLocationDAO().saveOrUpdate(newLocation);
-		return location.getLocid();
+		return new LocationDTO(location);
 	}
 
 	@Override
