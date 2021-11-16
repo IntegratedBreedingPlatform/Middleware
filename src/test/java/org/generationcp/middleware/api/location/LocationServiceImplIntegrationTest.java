@@ -97,15 +97,15 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testDeleteLocation() {
 		final LocationRequestDto locationRequestDto = this.buildLocationRequestDto();
 
-		final Integer newLocationId = this.locationService.createLocation(locationRequestDto);
-		final LocationDTO locationDTO = this.locationService.getLocation(newLocationId);
+		final LocationDTO newLocationDTO = this.locationService.createLocation(locationRequestDto);
+		final LocationDTO locationDTO = this.locationService.getLocation(newLocationDTO.getId());
 
-		Assert.assertThat(newLocationId, equalTo(locationDTO.getId()));
+		Assert.assertThat(newLocationDTO.getId(), equalTo(locationDTO.getId()));
 
-		this.locationService.deleteLocation(newLocationId);
+		this.locationService.deleteLocation(newLocationDTO.getId());
 		this.sessionProvder.getSession().flush();
 
-		final LocationDTO locationDTODeleted = this.locationService.getLocation(newLocationId);
+		final LocationDTO locationDTODeleted = this.locationService.getLocation(newLocationDTO.getId());
 		Assert.assertNull(locationDTODeleted);
 	}
 
@@ -113,12 +113,12 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testCreateLocation() {
 		final LocationRequestDto locationRequestDto = this.buildLocationRequestDto();
 
-		final Integer newLocationId = this.locationService.createLocation(locationRequestDto);
+		final LocationDTO newLocationDTO = this.locationService.createLocation(locationRequestDto);
 		this.sessionProvder.getSession().flush();
-		final LocationDTO locationDTO = this.locationService.getLocation(newLocationId);
+		final LocationDTO locationDTO = this.locationService.getLocation(newLocationDTO.getId());
 
 		Assert.assertNotNull(locationDTO);
-		Assert.assertThat("Expected same Location id", newLocationId, equalTo(locationDTO.getId()));
+		Assert.assertThat("Expected same Location id", newLocationDTO.getId(), equalTo(locationDTO.getId()));
 		Assert.assertThat("Expected same Location name", locationRequestDto.getName(), equalTo(locationDTO.getName()));
 		Assert.assertThat("Expected same Location Abbr", locationRequestDto.getAbbreviation(), equalTo(locationDTO.getAbbreviation()));
 		Assert.assertThat("Expected same Location type", locationRequestDto.getType(), equalTo(locationDTO.getType()));
@@ -134,8 +134,8 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testUpdateLocation() {
 		final LocationRequestDto locationRequestDto = this.buildLocationRequestDto();
 
-		final Integer newLocationId = this.locationService.createLocation(locationRequestDto);
-		final LocationDTO locationDTO = this.locationService.getLocation(newLocationId);
+		final LocationDTO newLocationDTO = this.locationService.createLocation(locationRequestDto);
+		final LocationDTO locationDTO = this.locationService.getLocation(newLocationDTO.getId());
 
 		locationRequestDto.setName(RandomStringUtils.randomAlphabetic(10));
 		locationRequestDto.setAbbreviation(RandomStringUtils.randomAlphabetic(5));
@@ -146,10 +146,10 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		locationRequestDto.setCountryId(new Random().nextInt());
 		locationRequestDto.setProvinceId(new Random().nextInt());
 
-		this.locationService.updateLocation(newLocationId, locationRequestDto);
+		this.locationService.updateLocation(newLocationDTO.getId(), locationRequestDto);
 
 		Assert.assertNotNull(locationDTO);
-		Assert.assertThat("Expected same Location id", newLocationId, equalTo(locationDTO.getId()));
+		Assert.assertThat("Expected same Location id", newLocationDTO.getId(), equalTo(locationDTO.getId()));
 		Assert.assertThat("Expected diferent Location name", locationRequestDto.getName(), not(equalTo(locationDTO.getName())));
 		Assert.assertThat("Expected diferent Location abbr", locationRequestDto.getAbbreviation(), not(equalTo(locationDTO.getAbbreviation())));
 		Assert.assertThat("Expected diferent Location type", locationRequestDto.getType(), not(equalTo(locationDTO.getType())));
