@@ -30,6 +30,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -253,7 +254,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final Germplasm addGermplasmEntry = this.createGermplasm(doubleCrossMethod);
 
 		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite = new SearchCompositeDto<>();
-		searchComposite.setItemIds(Sets.newHashSet(addGermplasmEntry.getGid()));
+		searchComposite.setItemIds(Collections.singletonList(addGermplasmEntry.getGid()));
 		this.germplasmListService.addGermplasmEntriesToList(germplasmList.getId(), searchComposite, PROGRAM_UUID);
 
 		this.sessionProvder.getSession().flush();

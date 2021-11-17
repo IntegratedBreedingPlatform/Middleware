@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.inventory;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Sets;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -253,7 +254,7 @@ public class PlantingServiceImpl implements PlantingService {
 		if (searchDTO.getItemIds() != null && !searchDTO.getItemIds().isEmpty()) {
 			final ObservationUnitsSearchDTO searchRequest = new ObservationUnitsSearchDTO();
 			final ObservationUnitsSearchDTO.Filter filter = searchRequest.new Filter();
-			filter.setFilteredNdExperimentIds(searchDTO.getItemIds());
+			filter.setFilteredNdExperimentIds(Sets.newHashSet(searchDTO.getItemIds()));
 			searchRequest.setFilter(filter);
 			searchDTO.setSearchRequest(searchRequest);
 		}

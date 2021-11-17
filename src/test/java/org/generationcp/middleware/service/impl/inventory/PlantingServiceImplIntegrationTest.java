@@ -151,7 +151,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getExperimentTransactionDao().save(experimentTransaction);
 		final PlantingRequestDto plantingRequestDto = new PlantingRequestDto();
 		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
-		searchCompositeDto.setItemIds(Collections.singleton(experiments.get(0).getId()));
+		searchCompositeDto.setItemIds(Collections.singletonList(experiments.get(0).getId()));
 		plantingRequestDto.setSelectedObservationUnits(searchCompositeDto);
 
 		final PlantingRequestDto.WithdrawalInstruction withdrawalInstruction = new PlantingRequestDto.WithdrawalInstruction();
@@ -187,7 +187,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final PlantingRequestDto plantingRequestDto = new PlantingRequestDto();
 		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
-		searchCompositeDto.setItemIds(Collections.singleton(experiments.get(0).getId()));
+		searchCompositeDto.setItemIds(Collections.singletonList(experiments.get(0).getId()));
 		plantingRequestDto.setSelectedObservationUnits(searchCompositeDto);
 
 		final PlantingRequestDto.WithdrawalInstruction withdrawalInstruction = new PlantingRequestDto.WithdrawalInstruction();
@@ -229,7 +229,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final PlantingRequestDto plantingRequestDto = new PlantingRequestDto();
 		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
-		searchCompositeDto.setItemIds(filteredByEntryNo.stream().map(Experiment::getId).collect(Collectors.toSet()));
+		searchCompositeDto.setItemIds(filteredByEntryNo.stream().map(Experiment::getId).collect(Collectors.toList()));
 		plantingRequestDto.setSelectedObservationUnits(searchCompositeDto);
 
 		final PlantingRequestDto.WithdrawalInstruction withdrawalInstruction = new PlantingRequestDto.WithdrawalInstruction();
@@ -274,7 +274,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final PlantingRequestDto plantingRequestDto = new PlantingRequestDto();
 		final SearchCompositeDto<ObservationUnitsSearchDTO, Integer> searchCompositeDto = new SearchCompositeDto<>();
-		searchCompositeDto.setItemIds(filteredByEntryNo.stream().map(Experiment::getId).collect(Collectors.toSet()));
+		searchCompositeDto.setItemIds(filteredByEntryNo.stream().map(Experiment::getId).collect(Collectors.toList()));
 		plantingRequestDto.setSelectedObservationUnits(searchCompositeDto);
 
 		final PlantingRequestDto.WithdrawalInstruction withdrawalInstruction = new PlantingRequestDto.WithdrawalInstruction();

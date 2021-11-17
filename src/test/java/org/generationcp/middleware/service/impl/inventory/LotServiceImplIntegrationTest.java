@@ -1,6 +1,5 @@
 package org.generationcp.middleware.service.impl.inventory;
 
-import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -150,7 +149,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		singleInput.setNotes("Test1");
 		lotUpdateRequestDto.setSingleInput(singleInput);
 
-		final Set<String> itemIds = Sets.newHashSet(this.lot.getLotUuId());
+		final List<String> itemIds = Collections.singletonList(this.lot.getLotUuId());
 		lotUpdateRequestDto.getSingleInput().setSearchComposite(new SearchCompositeDto());
 		lotUpdateRequestDto.getSingleInput().getSearchComposite().setItemIds(itemIds);
 		final LotsSearchDto searchDto = new LotsSearchDto();
@@ -169,7 +168,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		singleInput.setUnitId(8267);
 		lotUpdateRequestDto.setSingleInput(singleInput);
 
-		final Set<String> itemIds = Sets.newHashSet(this.lot.getLotUuId());
+		final List<String> itemIds = Collections.singletonList(this.lot.getLotUuId());
 		lotUpdateRequestDto.getSingleInput().setSearchComposite(new SearchCompositeDto());
 		lotUpdateRequestDto.getSingleInput().getSearchComposite().setItemIds(itemIds);
 		final LotsSearchDto searchDto = new LotsSearchDto();
