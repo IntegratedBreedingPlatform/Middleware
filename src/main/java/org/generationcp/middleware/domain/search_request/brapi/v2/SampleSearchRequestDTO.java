@@ -1,103 +1,155 @@
 package org.generationcp.middleware.domain.search_request.brapi.v2;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.Collections;
+import java.util.List;
+
 @AutoProperty
-@JsonInclude(JsonInclude.Include.NON_NULL)
-public class SampleSearchRequestDTO {
+public class SampleSearchRequestDTO extends SearchRequestDto {
 
-    private String sampleDbId;
-    private String observationUnitDbId;
-    private String plateDbId;
-    private String germplasmDbId;
-    private String studyDbId;
-    private String externalReferenceID;
-    private String externalReferenceSource;
+	private List<String> sampleDbIds;
+	private List<String> observationUnitDbIds;
+	private List<String> plateDbIds;
+	private List<String> germplasmDbIds;
+	private List<String> studyDbIds;
+	private List<String> externalReferenceIDs;
+	private List<String> externalReferenceSources;
+	private List<String> germplasmNames;
+	private List<String> studyNames;
+	private int page;
+	private int pageSize;
 
-    public SampleSearchRequestDTO() {
+	public SampleSearchRequestDTO() {
+	}
 
-    }
+	public SampleSearchRequestDTO(final String sampleDbId, final String observationUnitDbId, final String plateDbId,
+		final String germplasmDbId, final String studyDbId, final String externalReferenceID, final String externalReferenceSource) {
+		this.sampleDbIds = StringUtils.isEmpty(sampleDbId) ? null : Collections.singletonList(sampleDbId);
+		this.observationUnitDbIds = StringUtils.isEmpty(observationUnitDbId) ? null : Collections.singletonList(observationUnitDbId);
+		this.plateDbIds = StringUtils.isEmpty(plateDbId) ? null : Collections.singletonList(plateDbId);
+		this.germplasmDbIds = StringUtils.isEmpty(germplasmDbId) ? null : Collections.singletonList(germplasmDbId);
+		this.studyDbIds = StringUtils.isEmpty(studyDbId) ? null : Collections.singletonList(studyDbId);
+		this.externalReferenceIDs = StringUtils.isEmpty(externalReferenceID) ? null : Collections.singletonList(externalReferenceID);
+		this.externalReferenceSources =
+			StringUtils.isEmpty(externalReferenceSource) ? null : Collections.singletonList(externalReferenceSource);
+	}
 
-    public SampleSearchRequestDTO(final String sampleDbId, final String observationUnitDbId, final String plateDbId, final String germplasmDbId, final String studyDbId, final String externalReferenceID, final String externalReferenceSource) {
-        this.sampleDbId = sampleDbId;
-        this.observationUnitDbId = observationUnitDbId;
-        this.plateDbId = plateDbId;
-        this.germplasmDbId = germplasmDbId;
-        this.studyDbId = studyDbId;
-        this.externalReferenceID = externalReferenceID;
-        this.externalReferenceSource = externalReferenceSource;
-    }
+	public SampleSearchRequestDTO(final List<String> sampleDbIds, final List<String> observationUnitDbIds, final List<String> plateDbIds,
+		final List<String> germplasmDbIds, final List<String> studyDbIds, final List<String> externalReferenceIDs,
+		final List<String> externalReferenceSources) {
+		this.sampleDbIds = sampleDbIds;
+		this.observationUnitDbIds = observationUnitDbIds;
+		this.plateDbIds = plateDbIds;
+		this.germplasmDbIds = germplasmDbIds;
+		this.studyDbIds = studyDbIds;
+		this.externalReferenceIDs = externalReferenceIDs;
+		this.externalReferenceSources = externalReferenceSources;
+	}
 
-    public String getSampleDbId() {
-        return this.sampleDbId;
-    }
+	public List<String> getSampleDbIds() {
+		return this.sampleDbIds;
+	}
 
-    public void setSampleDbId(final String sampleDbId) {
-        this.sampleDbId = sampleDbId;
-    }
+	public void setSampleDbIds(final List<String> sampleDbIds) {
+		this.sampleDbIds = sampleDbIds;
+	}
 
-    public String getObservationUnitDbId() {
-        return this.observationUnitDbId;
-    }
+	public List<String> getObservationUnitDbIds() {
+		return this.observationUnitDbIds;
+	}
 
-    public void setObservationUnitDbId(final String observationUnitDbId) {
-        this.observationUnitDbId = observationUnitDbId;
-    }
+	public void setObservationUnitDbIds(final List<String> observationUnitDbIds) {
+		this.observationUnitDbIds = observationUnitDbIds;
+	}
 
-    public String getPlateDbId() {
-        return this.plateDbId;
-    }
+	public List<String> getPlateDbIds() {
+		return this.plateDbIds;
+	}
 
-    public void setPlateDbId(final String plateDbId) {
-        this.plateDbId = plateDbId;
-    }
+	public void setPlateDbIds(final List<String> plateDbIds) {
+		this.plateDbIds = plateDbIds;
+	}
 
-    public String getGermplasmDbId() {
-        return this.germplasmDbId;
-    }
+	public List<String> getGermplasmDbIds() {
+		return this.germplasmDbIds;
+	}
 
-    public void setGermplasmDbId(final String germplasmDbId) {
-        this.germplasmDbId = germplasmDbId;
-    }
+	public void setGermplasmDbIds(final List<String> germplasmDbIds) {
+		this.germplasmDbIds = germplasmDbIds;
+	}
 
-    public String getStudyDbId() {
-        return this.studyDbId;
-    }
+	public List<String> getStudyDbIds() {
+		return this.studyDbIds;
+	}
 
-    public void setStudyDbId(final String studyDbId) {
-        this.studyDbId = studyDbId;
-    }
+	public void setStudyDbIds(final List<String> studyDbIds) {
+		this.studyDbIds = studyDbIds;
+	}
 
-    public String getExternalReferenceID() {
-        return this.externalReferenceID;
-    }
+	public List<String> getExternalReferenceIDs() {
+		return this.externalReferenceIDs;
+	}
 
-    public void setExternalReferenceID(final String externalReferenceID) {
-        this.externalReferenceID = externalReferenceID;
-    }
+	public void setExternalReferenceIDs(final List<String> externalReferenceIDs) {
+		this.externalReferenceIDs = externalReferenceIDs;
+	}
 
-    public String getExternalReferenceSource() {
-        return this.externalReferenceSource;
-    }
+	public List<String> getExternalReferenceSources() {
+		return this.externalReferenceSources;
+	}
 
-    public void setExternalReferenceSource(final String externalReferenceSource) {
-        this.externalReferenceSource = externalReferenceSource;
-    }
+	public void setExternalReferenceSources(final List<String> externalReferenceSources) {
+		this.externalReferenceSources = externalReferenceSources;
+	}
 
-    @Override
-    public int hashCode() {
-        return Pojomatic.hashCode(this);
-    }
+	public List<String> getGermplasmNames() {
+		return this.germplasmNames;
+	}
 
-    @Override
-    public String toString() {
-        return Pojomatic.toString(this);
-    }
+	public void setGermplasmNames(final List<String> germplasmNames) {
+		this.germplasmNames = germplasmNames;
+	}
 
-    @Override
-    public boolean equals(final Object o) {
-        return Pojomatic.equals(this, o);
-    }
+	public List<String> getStudyNames() {
+		return this.studyNames;
+	}
+
+	public void setStudyNames(final List<String> studyNames) {
+		this.studyNames = studyNames;
+	}
+
+	public int getPage() {
+		return this.page;
+	}
+
+	public void setPage(final int page) {
+		this.page = page;
+	}
+
+	public int getPageSize() {
+		return this.pageSize;
+	}
+
+	public void setPageSize(final int pageSize) {
+		this.pageSize = pageSize;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
 }
