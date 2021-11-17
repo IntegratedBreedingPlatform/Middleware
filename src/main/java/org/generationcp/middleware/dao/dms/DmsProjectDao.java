@@ -118,6 +118,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String OBS_SET_VARIABLE_VALUE = "variableValue";
 	private static final String OBS_SET_SCALE_ID = "scaleId";
 
+	public static final String STUDY_NAME_BRAPI = "CONCAT(pmain.name, ' Environment Number ', geoloc.description)";
+
 	/**
 	 * Type of study is stored in project.study_type_id
 	 * Which folder the study is in is defined in project.parent_project_id
@@ -166,7 +168,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String GET_STUDY_METADATA_BY_GEOLOCATION_ID = " SELECT  "
 		+ "     geoloc.nd_geolocation_id AS studyDbId, "
 		+ "     pmain.project_id AS trialOrNurseryId, "
-		+ "		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS studyName, "
+		+ "     "+ STUDY_NAME_BRAPI + " AS studyName, "
 		+ "     study_type.study_type_id AS studyType, "
 		+ "     study_type.label AS studyTypeName, "
 		+ "     MAX(IF(geoprop.type_id = " + TermId.SEASON_VAR.getId() + ", "
@@ -1767,7 +1769,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private String createStudyInstanceQueryString(final StudySearchFilter studySearchFilter, final Pageable pageable) {
 		final StringBuilder sql = new StringBuilder(" SELECT  ");
 		sql.append("     geoloc.nd_geolocation_id AS studyDbId, ");
-		sql.append("		CONCAT(pmain.name, ' Environment Number ', geoloc.description) AS studyName, ");
+		sql.append("     " + STUDY_NAME_BRAPI + " AS studyName, ");
 		sql.append("     pmain.study_type_id AS studyTypeDbId, ");
 		sql.append("     studyType.label AS studyTypeName, ");
 		sql.append("     geopropSeason.value AS seasonDbId, ");

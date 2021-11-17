@@ -566,7 +566,7 @@ public class SampleDao extends GenericDAO<Sample, Integer> {
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getStudyNames())) {
-			sql.append(" AND CONCAT(pmain.name, ' Environment Number ', geoloc.description) in (:studyNames)");
+			sql.append(" AND " + DmsProjectDao.STUDY_NAME_BRAPI + " in (:studyNames)");
 		}
 	}
 
