@@ -34,4 +34,34 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="mderamos" id="v19.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS'
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM permission WHERE name = 'ADD_ENTRIES_TO_LIST'
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Add export Germplasm List data permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`)
+			VALUES ('ADD_ENTRIES_TO_LIST', 'Add entries', @permission_id);
+
+			SET @add_entries_to_list_permission_id = (SELECT permission_id FROM permission where name = 'ADD_ENTRIES_TO_LIST');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @add_entries_to_list_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @add_entries_to_list_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @add_entries_to_list_permission_id, '1');
+
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
