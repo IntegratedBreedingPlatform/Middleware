@@ -1,7 +1,6 @@
 package org.generationcp.middleware.api.brapi;
 
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
-import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v2.SampleSearchRequestDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -62,12 +61,4 @@ public class SampleServiceBrapiImpl implements SampleServiceBrapi {
 	public long countSampleObservations(final SampleSearchRequestDTO sampleSearchRequestDTO) {
 		return this.daoFactory.getSampleDao().countSampleObservationDtos(sampleSearchRequestDTO);
 	}
-
-	void populateTakenBy(final List<SampleDTO> sampleDTOS) {
-		// Populate takenBy with full name of user from workbench database.
-		final List<Integer> userIds = sampleDTOS.stream().map(SampleDTO::getTakenByUserId).collect(Collectors.toList());
-		final Map<Integer, String> userIDFullNameMap = this.userService.getUserIDFullNameMap(userIds);
-		sampleDTOS.forEach(sampleDTO -> sampleDTO.setTakenBy(userIDFullNameMap.get(sampleDTO.getTakenByUserId())));
-	}
-
 }
