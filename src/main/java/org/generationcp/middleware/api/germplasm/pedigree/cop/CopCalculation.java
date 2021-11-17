@@ -17,6 +17,7 @@ import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static org.apache.commons.lang3.time.DurationFormatUtils.formatDurationHMS;
 import static org.generationcp.middleware.util.Debug.debug;
+import static org.generationcp.middleware.util.Debug.info;
 
 /**
  * Coefficient of parentage (f): calculation utilities.
@@ -94,10 +95,11 @@ public class CopCalculation {
 			return COP_DEFAULT;
 		}
 		if (this.sparseMatrix.contains(g1.getGid(), g2.getGid())) {
-			debug("cop found: (gid1=%s-gid2=%s)", g1.getGid(), g2.getGid());
-			return this.sparseMatrix.get(g1.getGid(), g2.getGid());
+			final Double cop = this.sparseMatrix.get(g1.getGid(), g2.getGid());
+			debug("cop found: (gid1=%s-gid2=%s) = %s", g1.getGid(), g2.getGid(), cop);
+			return cop;
 		}
-		debug("Calculating cop (gid1=%s-gid2=%s)", g1.getGid(), g2.getGid());
+		info("calculating cop (gid1=%s-gid2=%s)", g1.getGid(), g2.getGid());
 		final Instant start = Instant.now();
 
 		double cop = COP_DEFAULT;
@@ -132,7 +134,7 @@ public class CopCalculation {
 		}
 
 		final Instant end = Instant.now();
-		debug("calculated cop (gid1=%s-gid2=%s), Duration: %s", g1.getGid(), g2.getGid(),
+		info("calculated cop (gid1=%s-gid2=%s) = %s, Duration: %s", g1.getGid(), g2.getGid(), cop,
 			formatDurationHMS(between(start, end).toMillis()));
 
 		this.sparseMatrix.put(g1.getGid(), g2.getGid(), cop);

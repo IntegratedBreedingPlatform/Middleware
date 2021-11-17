@@ -13,6 +13,10 @@ import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Note: see also {@link GermplasmPedigreeServiceAsyncImpl} (not a managed bean).
+ * When autowiring things here, make sure to add setters there
+ */
 public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 
 	private final DaoFactory daoFactory;

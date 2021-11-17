@@ -45,6 +45,7 @@ public class CopServiceImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCoefficientOfParentage_BaseCase() {
+		// TODO refactor, use api with list of gids params
 		assertThat(this.copService.coefficientOfParentage(this.E0.getGid(), this.F0.getGid()), is(0.0));
 		assertThat(this.copService.coefficientOfInbreeding(this.B1.getGid()), is(15 / 16.0));
 		assertThat(this.copService.coefficientOfParentage(this.B1.getGid(), this.B1.getGid()), is(31 / 32.0));
