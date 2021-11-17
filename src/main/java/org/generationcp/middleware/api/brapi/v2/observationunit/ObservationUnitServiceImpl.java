@@ -2,6 +2,10 @@ package org.generationcp.middleware.api.brapi.v2.observationunit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections.MapUtils;
+import org.apache.commons.collections.map.LinkedMap;
+import org.apache.commons.collections.map.MultiKeyMap;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
@@ -38,7 +42,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
@@ -65,6 +68,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	private static final String PLOT = "PLOT";
 	private static final String REP = "REP";
 	private static final String BLOCK = "BLOCK";
+	public static final String ENTRY_NO = "ENTRY_NO";
 
 	private final ObjectMapper jacksonMapper;
 
@@ -165,12 +169,16 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		});
 
 		final Map<Integer, List<StockModel>> stocks = this.daoFactory.getStockDao().getStocksByStudyIds(trialIds);
-		final Map<Integer, Map<String, StockModel>> stockMap = new HashMap<>();
+		final Map<Integer, MultiKeyMap> stockMap = new HashMap<>();
 
 		for (final Integer trialDbId : trialIds) {
 			if (stocks.containsKey(trialDbId)) {
-				stockMap.put(trialDbId, stocks.get(trialDbId).stream()
-					.collect(Collectors.toMap(s -> s.getGermplasm().getGermplasmUUID(), Function.identity(), (s1, s2) -> s1)));
+				final MultiKeyMap multiKeyMap = MultiKeyMap.decorate(new LinkedMap());
+				stocks.get(trialDbId).forEach((stockModel) -> {
+						multiKeyMap.put(stockModel.getGermplasm().getGermplasmUUID(), stockModel.getUniqueName(), stockModel);
+					}
+				);
+				stockMap.put(trialDbId, multiKeyMap);
 			}
 		}
 
@@ -205,23 +213,29 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		for (final ObservationUnitImportRequestDto dto : requestDtos) {
 			final Integer trialDbId = Integer.valueOf(dto.getTrialDbId());
 			final Integer studyDbId = Integer.valueOf(dto.getStudyDbId());
+			final Optional<String> entryNoOptional =
+				!MapUtils.isEmpty(dto.getAdditionalInfo()) ? Optional.ofNullable(dto.getAdditionalInfo().getOrDefault(ENTRY_NO, null)) :
+					Optional.empty();
 
 			this.addExperimentVariablesIfNecessary(dto, plotExperimentVariablesMap, trialIdPlotDatasetMap, variableNamesMap,
 				variableSynonymsMap);
-
-			if (!stockMap.containsKey(trialDbId) || !stockMap.get(trialDbId).containsKey(dto.getGermplasmDbId())) {
-
+			stockMap.putIfAbsent(trialDbId, MultiKeyMap.decorate(new LinkedMap()));
+			if (!stockMap.get(trialDbId)
+				.containsKey(dto.getGermplasmDbId(), entryNoOptional.isPresent() ? entryNoOptional.get() : StringUtils.EMPTY)) {
 				final StockModel stockModel =
 					this.createStockModel(germplasmDTOMap.get(dto.getGermplasmDbId()), stockMap, dto, trialDbId, entryTypes, entryTypesMap);
-				stockMap.putIfAbsent(trialDbId, new HashMap<>());
-				stockMap.get(trialDbId).put(dto.getGermplasmDbId(), stockModel);
+				stockMap.get(trialDbId).put(dto.getGermplasmDbId(), entryNoOptional.isPresent() ? entryNoOptional.get() :
+					StringUtils.EMPTY, stockModel);
 			}
 
 			final ExperimentModel experimentModel = new ExperimentModel();
 			experimentModel.setProject(trialIdPlotDatasetMap.get(trialDbId));
 			experimentModel.setGeoLocation(new Geolocation(studyDbId));
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-			experimentModel.setStock(stockMap.get(trialDbId).get(dto.getGermplasmDbId()));
+			experimentModel.setStock(
+				(StockModel) stockMap.get(trialDbId)
+					.get(dto.getGermplasmDbId(), entryNoOptional.isPresent() ? entryNoOptional.get() : StringUtils.EMPTY));
+
 			this.setJsonProps(experimentModel, dto);
 			ObservationUnitIDGenerator.generateObservationUnitIds(cropType, Collections.singletonList(experimentModel));
 			this.addExperimentProperties(experimentModel, dto, variableNamesMap, variableSynonymsMap, categoricalVariablesMap);
@@ -362,13 +376,24 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		return plotExperimentVariablesMap;
 	}
 
-	private StockModel createStockModel(final GermplasmDTO germplasmDTO, final Map<Integer, Map<String, StockModel>> stockMap,
+	private StockModel createStockModel(final GermplasmDTO germplasmDTO, final Map<Integer, MultiKeyMap> stockMap,
 		final ObservationUnitImportRequestDto dto, final Integer trialDbId, final Map<String, Integer> entryTypes,
 		final Map<String, Map<String, Integer>> entryTypesMap) {
 		final StockModel stockModel = new StockModel();
-		final int entryNo = !stockMap.containsKey(trialDbId) ? 1 : stockMap.get(trialDbId).size() + 1;
-		stockModel.setUniqueName(Integer.toString(entryNo));
-		stockModel.setValue(Integer.toString(entryNo));
+
+		final Optional<String> entryNoOptional =
+			!MapUtils.isEmpty(dto.getAdditionalInfo()) ? Optional.ofNullable(dto.getAdditionalInfo().getOrDefault(ENTRY_NO, null)) :
+				Optional.empty();
+
+		if (entryNoOptional.isPresent()) {
+			stockModel.setUniqueName(entryNoOptional.get());
+			stockModel.setValue(entryNoOptional.get());
+		} else {
+			final int entryNo = !stockMap.containsKey(trialDbId) ? 1 : stockMap.get(trialDbId).size() + 1;
+			stockModel.setUniqueName(Integer.toString(entryNo));
+			stockModel.setValue(Integer.toString(entryNo));
+		}
+
 		stockModel.setName(germplasmDTO.getGermplasmName());
 		stockModel.setProject(new DmsProject(Integer.valueOf(dto.getTrialDbId())));
 		stockModel.setIsObsolete(false);

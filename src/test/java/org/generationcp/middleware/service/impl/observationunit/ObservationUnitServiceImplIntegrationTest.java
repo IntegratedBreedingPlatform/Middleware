@@ -141,6 +141,10 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		observationUnitPosition.setGeoCoordinates(geoCoodinates);
 		dto.setObservationUnitPosition(observationUnitPosition);
 
+		final Map<String, String> additionalInfo = new HashMap<>();
+		additionalInfo.put("ENTRY_NO", "99");
+		dto.setAdditionalInfo(additionalInfo);
+
 		final List<String> observationDbIds =
 			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Collections.singletonList(dto));
 
@@ -166,6 +170,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		Assert.assertEquals(1, observationUnitDto.getExternalReferences().size());
 		Assert.assertEquals(externalReference.getReferenceID(), observationUnitDto.getExternalReferences().get(0).getReferenceID());
 		Assert.assertEquals(externalReference.getReferenceSource(), observationUnitDto.getExternalReferences().get(0).getReferenceSource());
+		Assert.assertEquals(dto.getAdditionalInfo().get("ENTRY_NO"), observationUnitDto.getAdditionalInfo().get("ENTRY_NO"));
 	}
 
 	@Test
