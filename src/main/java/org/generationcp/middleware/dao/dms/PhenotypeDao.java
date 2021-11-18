@@ -1152,6 +1152,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append(" AND EXISTS (SELECT * FROM external_reference_experiment exref ");
 			queryString.append(" WHERE nde.nd_experiment_id = exref.nd_experiment_id AND exref.reference_source IN (:referenceSources)) ");
 		}
+
+		queryString.append(" ORDER BY nde.nd_experiment_id ");
 	}
 
 	private static void addObservationUnitSearchQueryParams(final ObservationUnitSearchRequestDTO requestDTO, final SQLQuery sqlQuery) {
