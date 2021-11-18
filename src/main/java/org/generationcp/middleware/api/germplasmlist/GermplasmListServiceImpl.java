@@ -480,6 +480,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public void deleteGermplasmList(final Integer listId) {
+		final GermplasmList germplasmList = this.getGermplasmListById(listId)
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+		germplasmList.setStatus(GermplasmList.Status.DELETED.getCode());
+		this.daoFactory.getGermplasmListDAO().update(germplasmList);
+	}
+
+
+	@Override
 	public void performGermplasmListEntriesDeletion(final List<Integer> gids) {
 		final List<Integer> germplasmListIds = this.daoFactory.getGermplasmListDAO().getListIdsByGIDs(gids);
 		if (org.apache.commons.collections.CollectionUtils.isNotEmpty(germplasmListIds)) {
