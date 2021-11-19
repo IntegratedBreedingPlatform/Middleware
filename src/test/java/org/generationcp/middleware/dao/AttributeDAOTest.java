@@ -73,13 +73,13 @@ public class AttributeDAOTest extends IntegrationTestBase {
 
 		final CVTerm attributeType1 =
 			new CVTerm(null, CvId.VARIABLES.getId(), RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), null,
-				0, 0);
+				0, 0, 0);
 		final CVTerm attributeType2 =
 			new CVTerm(null, CvId.VARIABLES.getId(), RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), null,
-				0, 0);
+				0, 0, 0);
 		final CVTerm attributeType3 =
 			new CVTerm(null, CvId.VARIABLES.getId(), RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), null,
-				0, 0);
+				0, 0, 0);
 
 		this.cvTermDao.save(attributeType1);
 		this.cvTermDao.save(attributeType2);

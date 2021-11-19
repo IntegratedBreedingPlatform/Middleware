@@ -58,9 +58,9 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 			this.germplasmDao = new GermplasmDAO(session);
 		}
 
-		this.cvterm1 = new CVTerm(null, CvId.VARIABLES.getId(), randomAlphabetic(10), randomAlphabetic(10), null, 0, 0);
+		this.cvterm1 = new CVTerm(null, CvId.VARIABLES.getId(), randomAlphabetic(10), randomAlphabetic(10), null, 0, 0, 0);
 		this.cvTermDao.save(this.cvterm1);
-		this.cvterm2 = new CVTerm(null, CvId.VARIABLES.getId(), randomAlphabetic(10), randomAlphabetic(10), null, 0, 0);
+		this.cvterm2 = new CVTerm(null, CvId.VARIABLES.getId(), randomAlphabetic(10), randomAlphabetic(10), null, 0, 0, 0);
 		this.cvTermDao.save(this.cvterm2);
 
 		this.cropType = new CropType();
