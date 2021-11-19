@@ -16,4 +16,14 @@
         </sql>
     </changeSet>
 
+	<changeSet author="cuenyad" id="v19.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">SELECT count(1) > 0 FROM cvterm where cvterm_id &lt;= 100000 and cv_id != 1040 and is_system = 0</sqlCheck>
+		</preConditions>
+		<comment>Mark System variables</comment>
+        <sql>
+			update cvterm cv INNER JOIN cvterm cv1 ON cv.cvterm_id = cv1.cvterm_id  set cv.is_system = 1
+			where cv1.cvterm_id &lt;= 100000 and cv1.cv_id != 1040;
+        </sql>
+    </changeSet>
 </databaseChangeLog>
