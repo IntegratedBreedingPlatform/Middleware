@@ -45,7 +45,8 @@ import java.util.Map;
 public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBase {
 
 	public static final String ENTRY_NO = "ENTRY_NO";
-	@Resource]
+	
+	@Resource
 	private TrialServiceBrapi trialServiceBrapi;
 
 	@Resource
