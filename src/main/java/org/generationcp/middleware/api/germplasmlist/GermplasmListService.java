@@ -92,4 +92,6 @@ public interface GermplasmListService {
 	long countObservationsByVariables(Integer listId, List<Integer> variableIds);
 
 	void deleteGermplasmList(Integer listId);
+
+	void addGermplasmListToAnotherList(Integer destinationListId, Integer sourceListId, String programUUID);
 }

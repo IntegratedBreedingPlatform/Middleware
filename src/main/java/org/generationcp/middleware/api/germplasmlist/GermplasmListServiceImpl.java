@@ -5,7 +5,9 @@ import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.constant.ColumnLabels;
@@ -56,6 +58,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -324,6 +327,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				);
 		}
 
+		addGermplasmEntriesModelsToList(germplasmList, addGermplasmEntriesModels);
+	}
+
+	private void addGermplasmEntriesModelsToList(final GermplasmList germplasmList, final List<AddGermplasmEntryModel> addGermplasmEntriesModels) {
 		this.checkLimitToAddEntriesToExistingList(addGermplasmEntriesModels.size(), germplasmList);
 
 		//Get the entryId max value
@@ -372,6 +379,32 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.map(ListDataProperty::getColumn)
 			.collect(toSet());
 		this.addListDataProperties(germplasmListsData, propertyNames);
+	}
+
+	@Override
+	public void addGermplasmListToAnotherList(final Integer destinationListId, final Integer sourceListId, final String programUUID) {
+		final GermplasmList destinationGermplasmList = this.getGermplasmListById(destinationListId)
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+
+		this.getGermplasmListById(sourceListId)
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+
+		//Get the germplasm entries to add
+		final List<AddGermplasmEntryModel> addGermplasmEntriesModels = new ArrayList<>();
+		final GermplasmSearchRequest searchRequest = new GermplasmSearchRequest();
+		searchRequest.getAddedColumnsPropertyIds().add(ColumnLabels.PREFERRED_NAME.getName());
+
+		final Map<Integer, GermplasmSearchResponse> germplasmMap = this.germplasmSearchService.searchGermplasm(searchRequest, null, programUUID)
+			.stream().collect(Collectors.toMap(GermplasmSearchResponse::getGid, Function.identity()));
+
+		this.daoFactory.getGermplasmListDataDAO().getByListId(sourceListId)
+			.forEach(listData -> addGermplasmEntriesModels.add(new AddGermplasmEntryModel(
+				listData.getGid(),
+				germplasmMap.get(listData.getGid()).getGermplasmPeferredName(),
+				germplasmMap.get(listData.getGid()).getGroupId()
+			)));
+
+		this.addGermplasmEntriesModelsToList(destinationGermplasmList, addGermplasmEntriesModels);
 	}
 
 	@Override
