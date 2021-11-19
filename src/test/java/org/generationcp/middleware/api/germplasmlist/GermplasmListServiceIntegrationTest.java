@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.List;
@@ -497,6 +498,45 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final long count =
 			this.germplasmListService.countObservationsByVariables(germplasmList.getId(), Lists.newArrayList((Integer) variable.getId()));
 		assertEquals(count, 2l);
+	}
+
+	@Test
+	public void testDeleteGermplasmList_OK() {
+		final int randomInt = new Random().nextInt(100);
+		// Germplasm list
+		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt,
+			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+		this.sessionProvder.getSession().flush();
+		this.germplasmListService.deleteGermplasmList(germplasmList.getId());
+
+		final Optional<GermplasmList> deletedGermplasmList = this.germplasmListService.getGermplasmListById(germplasmList.getId());
+		assertTrue(deletedGermplasmList.isPresent());
+		Assert.assertEquals(GermplasmList.Status.DELETED.getCode(), deletedGermplasmList.get().getStatus().intValue());
+	}
+
+	@Test
+	public void testAddGermplasmListToAnotherList_OK() {
+		// Germplasm list
+		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + new Random().nextInt(100),
+			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+
+		// Source Germplasm list
+		final GermplasmList sourceGermplasmList = new GermplasmList(null, "Test Germplasm List " + new Random().nextInt(100),
+			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(sourceGermplasmList);
+		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
+		final Germplasm germplasm = this.createGermplasm(singleCrossMethod);
+		
+		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(this.createGermplasmListData(sourceGermplasmList, germplasm.getGid(), 1));
+		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(this.createGermplasmListData(sourceGermplasmList, germplasm.getGid(), 2));
+
+		this.sessionProvder.getSession().flush();
+
+		assertTrue(CollectionUtils.isEmpty(this.daoFactory.getGermplasmListDataDAO().getByListId(germplasmList.getId())));
+		this.germplasmListService.addGermplasmListToAnotherList(germplasmList.getId(), sourceGermplasmList.getId(), null);
+		Assert.assertEquals(2, this.daoFactory.getGermplasmListDataDAO().getByListId(germplasmList.getId()).size());
 	}
 
 	private void assertGermplasmListDataObservationOptionalPresent(final Integer listDataObservationId, final String value,

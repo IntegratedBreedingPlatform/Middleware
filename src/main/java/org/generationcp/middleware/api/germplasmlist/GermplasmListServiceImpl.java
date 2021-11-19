@@ -370,6 +370,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.addGermplasmListData(germplasmListsData);
 
 		if (CollectionUtils.isEmpty(germplasmListsData) ||
+			CollectionUtils.isEmpty(germplasmList.getListData()) ||
 			CollectionUtils.isEmpty(germplasmList.getListData().get(0).getProperties())) {
 			return;
 		}
