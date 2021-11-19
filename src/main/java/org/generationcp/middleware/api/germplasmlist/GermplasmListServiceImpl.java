@@ -640,6 +640,18 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return this.daoFactory.getGermplasmListDataDetailDAO().countObservationsByListAndVariables(listId, variableIds);
 	}
 
+	@Override
+	public void editListMetadata(final Integer listId, final GermplasmListMetadataRequest request) {
+		final GermplasmList germplasmList = this.getGermplasmListById(listId)
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+		germplasmList.setName(request.getName());
+		germplasmList.setDescription(request.getDescription());
+		germplasmList.setType(request.getType());
+		germplasmList.setDate(Long.valueOf(DATE_FORMAT.format(request.getDate())));
+		germplasmList.setNotes(request.getNotes());
+		this.daoFactory.getGermplasmListDAO().update(germplasmList);
+	}
+
 	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {
 		try {
 			for (final GermplasmListData data : germplasmListData) {
