@@ -366,10 +366,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			final StringBuilder sqlString = new StringBuilder()
 				.append("SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
-				.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ").append("FROM cvterm cvt ")
+				.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype, cvt.is_system  ").append("FROM cvterm cvt ")
 				.append("WHERE cvt.cv_id = :cvId and cvt.name = :nameOrSynonym ").append("UNION ")
 				.append("	SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
-				.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ")
+				.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype, cvt.is_system ")
 				.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
 				.append("AND cvt.cv_id = :cvId AND syn.synonym = :nameOrSynonym ");
 
@@ -388,9 +388,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				final Integer dbxrefId = (Integer) row[4];
 				final Integer isObsolete = (Integer) row[5];
 				final Integer isRelationshipType = (Integer) row[6];
+				final Integer isSystem = (Integer) row[7];
 
 				term = new CVTerm(cvtermId, cvtermCvId, cvtermName, cvtermDefinition, dbxrefId, isObsolete,
-					isRelationshipType);
+					isRelationshipType, isSystem);
 			}
 
 		} catch (final HibernateException e) {
@@ -408,7 +409,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			final StringBuilder sqlString = new StringBuilder()
 				.append("SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
-				.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ").append("FROM cvterm cvt ")
+				.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype, cvt.is_system  ").append("FROM cvterm cvt ")
 				.append("WHERE cvt.name = :nameOrSynonym ").append("UNION ")
 				.append("	SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
 				.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ")
@@ -429,9 +430,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				final Integer dbxrefId = (Integer) row[4];
 				final Integer isObsolete = (Integer) row[5];
 				final Integer isRelationshipType = (Integer) row[6];
+				final Integer isSystem = (Integer) row[7];
 
 				term = new CVTerm(cvtermId, cvtermCvId, cvtermName, cvtermDefinition, dbxrefId, isObsolete,
-					isRelationshipType);
+					isRelationshipType, isSystem);
 			}
 
 		} catch (final HibernateException e) {
@@ -738,7 +740,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		try {
 
 			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT cvterm_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype "
+				.createSQLQuery("SELECT cvterm_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, cvt.is_system  "
 					+ "FROM cvterm " + "WHERE cv_id = :cvId " + "ORDER BY cvterm_id, name ");
 			query.setParameter("cvId", cvId.getId());
 			this.setStartAndNumOfRows(query, start, numOfRows);
@@ -750,8 +752,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				final Integer dbxrefId = (Integer) row[3];
 				final Integer isObsolete = (Integer) row[4];
 				final Integer isRelationshipType = (Integer) row[5];
+				final Integer isSystem = (Integer) row[6];
 
-				terms.add(new CVTerm(termId, cvId.getId(), name, definition, dbxrefId, isObsolete, isRelationshipType));
+				terms.add(new CVTerm(termId, cvId.getId(), name, definition, dbxrefId, isObsolete, isRelationshipType, isSystem));
 
 			}
 
@@ -940,9 +943,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				final Integer dbxrefId = (Integer) row[4];
 				final Integer isObsolete = (Integer) row[5];
 				final Integer isRelationshipType = (Integer) row[6];
+				final Integer isSystem = (Integer) row[7];
 
 				term = new CVTerm(cvtermId, cvtermCvId, cvtermName, cvtermDefinition, dbxrefId, isObsolete,
-					isRelationshipType);
+					isRelationshipType, isSystem);
 			}
 
 		} catch (final HibernateException e) {
