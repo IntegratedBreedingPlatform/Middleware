@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
-import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.constant.ColumnLabels;
@@ -327,7 +326,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				);
 		}
 
-		addGermplasmEntriesModelsToList(germplasmList, addGermplasmEntriesModels);
+		this.addGermplasmEntriesModelsToList(germplasmList, addGermplasmEntriesModels);
 	}
 
 	private void addGermplasmEntriesModelsToList(final GermplasmList germplasmList, final List<AddGermplasmEntryModel> addGermplasmEntriesModels) {

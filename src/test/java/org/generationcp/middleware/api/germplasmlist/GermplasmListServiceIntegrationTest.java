@@ -424,7 +424,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
 		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
 
-		final Integer entryNumber = 1;
+		final int entryNumber = 1;
 		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
 		final Germplasm germplasm = this.createGermplasm(singleCrossMethod);
 		final GermplasmListData germplasmListData = this.createGermplasmListData(germplasmList, germplasm.getGid(), entryNumber);
