@@ -16,7 +16,7 @@
 			</and>
 		</preConditions>
 		<comment>
-			Add export Germplasm List data permission
+			Add ADD_GERMPLASM_LIST_ENTRIES permission
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 
@@ -46,7 +46,7 @@
 			</and>
 		</preConditions>
 		<comment>
-			Add export Germplasm List data permission
+			Add ADD_ENTRIES_TO_LIST permission
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 
@@ -76,7 +76,7 @@
 			</and>
 		</preConditions>
 		<comment>
-			Add export Germplasm List data permission
+			Add DELETE_GERMPLASM_LIST permission
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 
