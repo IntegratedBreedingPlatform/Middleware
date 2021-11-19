@@ -20,10 +20,12 @@ import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
 
 import static java.time.Duration.between;
+import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.time.DurationFormatUtils.formatDurationHMS;
 import static org.generationcp.middleware.util.Debug.debug;
@@ -47,6 +49,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 	 * Map gid -> bool (finished, not finished)
 	 */
 	private static final Map<Integer, Boolean> gidProcessingQueue = new ConcurrentHashMap<>();
+	private static final Map<Integer, UUID> gidProcessingToQueueUUID = new ConcurrentHashMap<>();
 
 	private static final boolean INCLUDE_DERIVATIVE_LINES = true;
 
@@ -137,7 +140,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 		} catch (final RuntimeException ex) {
 			LOG.error("Error in CopServiceAsyncImpl.calculateAsync(), gids=" + gids + ", message: " + ex.getMessage(), ex);
 		} finally {
-			gids.forEach(gidProcessingQueue::remove);
+			cleanup(gids);
 			semaphore.release();
 		}
 
@@ -149,12 +152,14 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 		if (!semaphore.tryAcquire()) {
 			throw new MiddlewareRequestException("", "cop.max.thread.error", COP_MAX_JOB_COUNT);
 		}
+		final UUID batchUUID = UUID.randomUUID();
 		for (final Integer gid : gids) {
 			if (null != gidProcessingQueue.putIfAbsent(gid, Boolean.FALSE)) {
-				gids.forEach(gidProcessingQueue::remove);
+				cleanup(gids);
 				semaphore.release();
 				throw new MiddlewareRequestException("", "cop.gids.in.queue", this.getProgress(gids));
 			}
+			gidProcessingToQueueUUID.put(gid, batchUUID);
 		}
 	}
 
@@ -170,9 +175,19 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 
 	@Override
 	public double getProgress(final Set<Integer> gids) {
-		// FIXME of gids in gidProcessingQueue, how many are are for this batch?
-		return gidProcessingQueue.entrySet().stream()
+		// From gids param, which job/queue they belong to
+		final Set<UUID> queueUUIDs = gidProcessingToQueueUUID.entrySet().stream()
 			.filter(e -> gids.contains(e.getKey()))
+			.map(Map.Entry::getValue)
+			.collect(toSet());
+		// all the gids from the filtered queues
+		final Set<Integer> gidsInQueue = gidProcessingToQueueUUID.entrySet().stream()
+			.filter(e -> queueUUIDs.contains(e.getValue()))
+			.map(Map.Entry::getKey)
+			.collect(toSet());
+
+		return gidProcessingQueue.entrySet().stream()
+			.filter(e -> gidsInQueue.contains(e.getKey()))
 			.map(Map.Entry::getValue)
 			.mapToInt(isFinished -> Boolean.TRUE.equals(isFinished) ? 1 : 0)
 			.summaryStatistics()
@@ -191,5 +206,10 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 			nodes.put(maleParentNode.getGid(), maleParentNode);
 			maleParentNode = maleParentNode.getMaleParentNode();
 		}
+	}
+
+	private static void cleanup(final Set<Integer> gids) {
+		gids.forEach(gidProcessingQueue::remove);
+		gids.forEach(gidProcessingToQueueUUID::remove);
 	}
 }
