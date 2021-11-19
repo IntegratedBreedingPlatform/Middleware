@@ -63,4 +63,35 @@
 
 		</sql>
 	</changeSet>
+
+	<changeSet author="mderamos" id="v19.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS'
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM permission WHERE name = 'DELETE_GERMPLASM_LIST'
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Add export Germplasm List data permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`)
+			VALUES ('DELETE_GERMPLASM_LIST', 'Delete list', @permission_id);
+
+			SET @delete_list_permission_id = (SELECT permission_id FROM permission where name = 'DELETE_GERMPLASM_LIST');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @delete_list_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @delete_list_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @delete_list_permission_id, '1');
+
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
