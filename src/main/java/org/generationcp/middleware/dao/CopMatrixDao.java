@@ -1,5 +1,7 @@
 package org.generationcp.middleware.dao;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
 import org.generationcp.middleware.pojos.CopMatrix;
 import org.hibernate.Session;
@@ -16,7 +18,7 @@ public class CopMatrixDao {
 		this.session = session;
 	}
 
-	public TreeBasedTable<Integer, Integer, Double> getByGids(Set<Integer> gids) {
+	public Table<Integer, Integer, Double> getByGids(Set<Integer> gids) {
 		//noinspection unchecked
 		final List<CopMatrix> results = this.session.createCriteria(CopMatrix.class)
 			.add(Restrictions.conjunction()
@@ -25,7 +27,7 @@ public class CopMatrixDao {
 				))
 			.list();
 
-		final TreeBasedTable<Integer, Integer, Double> matrix = TreeBasedTable.create();
+		final Table<Integer, Integer, Double> matrix = HashBasedTable.create();
 		for (final CopMatrix result : results) {
 			matrix.put(
 				result.getGermplasm1().getGid(),

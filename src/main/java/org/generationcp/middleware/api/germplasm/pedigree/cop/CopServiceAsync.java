@@ -1,6 +1,6 @@
 package org.generationcp.middleware.api.germplasm.pedigree.cop;
 
-import com.google.common.collect.TreeBasedTable;
+import com.google.common.collect.Table;
 
 import java.util.Set;
 
@@ -8,19 +8,22 @@ public interface CopServiceAsync {
 
 	void calculateAsync(
 		Set<Integer> gids,
-		TreeBasedTable<Integer, Integer, Double> matrix,
-		TreeBasedTable<Integer, Integer, Double> matrixNew
+		Table<Integer, Integer, Double> matrix
 	);
 
 	/**
 	 * Checks thread limit, put gids into queue
-	 * @param gids
 	 */
 	void prepareExecution(Set<Integer> gids);
 
 	/**
 	 * if any gid is being processed, show progress
-	 * @param gids
+	 * @return
 	 */
-	void checkIfThreadExists(Set<Integer> gids);
+	boolean threadExists(Set<Integer> gids);
+
+	/**
+	 * @return the percentage of progress done
+	 */
+	double getProgress(Set<Integer> gids);
 }

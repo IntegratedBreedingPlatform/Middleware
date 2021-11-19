@@ -1,10 +1,9 @@
 package org.generationcp.middleware.api.germplasm.pedigree.cop;
 
-import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
-import com.google.common.collect.TreeBasedTable;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeService;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,11 +45,35 @@ public class CopServiceImpl implements CopService {
 		return copCalculation.coefficientOfInbreeding(gidTree);
 	}
 
-	// TODO split into view/calculate
 	@Override
-	public Table<Integer, Integer, Double> coefficientOfParentage(final Set<Integer> gids) {
-		final TreeBasedTable<Integer, Integer, Double> matrix = this.daoFactory.getCopMatrixDao().getByGids(gids);
-		final TreeBasedTable<Integer, Integer, Double> matrixNew = TreeBasedTable.create();
+	public CopResponse coefficientOfParentage(final Set<Integer> gids) {
+		final Table<Integer, Integer, Double> matrix = this.daoFactory.getCopMatrixDao().getByGids(gids);
+
+		// if all cop values are calculated, return them
+		boolean requiresProcessing = false;
+		for (final Integer gid1 : gids) {
+			for (final Integer gid2 : gids) {
+				if (!(matrix.contains(gid1, gid2) || matrix.contains(gid2, gid1))) {
+					requiresProcessing = true;
+				}
+			}
+		}
+
+		if (!requiresProcessing) {
+			return new CopResponse(matrix);
+		}
+		if (this.copServiceAsync.threadExists(gids)) {
+			// FIXME some gids might not be in the queue
+			return new CopResponse(this.copServiceAsync.getProgress(gids));
+		}
+
+		// no thread nor matrix for gids
+		throw new MiddlewareRequestException("", "cop.no.queue.error");
+	}
+
+	@Override
+	public CopResponse calculateCoefficientOfParentage(final Set<Integer> gids) {
+		final Table<Integer, Integer, Double> matrix = this.daoFactory.getCopMatrixDao().getByGids(gids);
 
 		// if all cop values are calculated, return them
 		boolean requiresProcessing = false;
@@ -63,14 +86,16 @@ public class CopServiceImpl implements CopService {
 		}
 
 		if (requiresProcessing) {
-			this.copServiceAsync.checkIfThreadExists(gids);
+			if (this.copServiceAsync.threadExists(gids)) {
+				throw new MiddlewareRequestException("", "cop.gids.in.queue", this.copServiceAsync.getProgress(gids));
+			}
 
 			this.copServiceAsync.prepareExecution(gids);
-			this.copServiceAsync.calculateAsync(gids, matrix, matrixNew);
-			return ImmutableTable.of();
+			this.copServiceAsync.calculateAsync(gids, matrix);
+			return new CopResponse(this.copServiceAsync.getProgress(gids));
 		}
 
-		return matrix;
+		return new CopResponse(matrix);
 	}
 
 }

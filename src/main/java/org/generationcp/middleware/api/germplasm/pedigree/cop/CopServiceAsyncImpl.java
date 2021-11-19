@@ -1,5 +1,7 @@
 package org.generationcp.middleware.api.germplasm.pedigree.cop;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeService;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeServiceAsyncImpl;
@@ -40,13 +42,17 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 		COP_MAX_JOB_COUNT = !isBlank(envVar) ? Integer.parseInt(envVar) : COP_MAX_JOB_COUNT_DEFAULT;
 	}
 	public static final Semaphore semaphore = new Semaphore(COP_MAX_JOB_COUNT);
+
 	/**
 	 * Map gid -> bool (finished, not finished)
 	 */
 	private static final Map<Integer, Boolean> gidProcessingQueue = new ConcurrentHashMap<>();
 
-	private final GermplasmPedigreeService germplasmPedigreeService;
-	private final DaoFactory daoFactory;
+	private static final boolean INCLUDE_DERIVATIVE_LINES = true;
+
+
+	GermplasmPedigreeService germplasmPedigreeService;
+	DaoFactory daoFactory;
 
 	public CopServiceAsyncImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -64,16 +70,17 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 	@Async
 	public void calculateAsync(
 		final Set<Integer> gids,
-		final TreeBasedTable<Integer, Integer, Double> matrix,
-		final TreeBasedTable<Integer, Integer, Double> matrixNew
+		final Table<Integer, Integer, Double> matrix
 	) {
 
 		try {
+			final TreeBasedTable<Integer, Integer, Double> matrixNew = TreeBasedTable.create();
+
 			// Avoid query multiple times
 			final Map<Integer, GermplasmTreeNode> nodes = new HashMap<>();
 
 			// matrix copy because CopCalculation also stores intermediate results
-			final CopCalculation copCalculation = new CopCalculation(TreeBasedTable.create(matrix));
+			final CopCalculation copCalculation = new CopCalculation(HashBasedTable.create(matrix));
 
 			// TODO verify/improve perf
 			for (final Integer gid1 : gids) {
@@ -84,7 +91,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 						if (!nodes.containsKey(gid1)) {
 							info("retrieving pedigree: gid=%d", gid1);
 							final Instant start = Instant.now();
-							gid1Tree = this.germplasmPedigreeService.getGermplasmPedigreeTree(gid1, null, true);
+							gid1Tree = this.germplasmPedigreeService.getGermplasmPedigreeTree(gid1, null, INCLUDE_DERIVATIVE_LINES);
 							final Instant end = Instant.now();
 							debug("pedigree retrieved: gid=%d, Duration: %s", gid1, formatDurationHMS(between(start, end).toMillis()));
 							trackNodes(gid1Tree, nodes);
@@ -96,7 +103,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 						if (!nodes.containsKey(gid2)) {
 							info("retrieving pedigree: gid=%d", gid2);
 							final Instant start = Instant.now();
-							gid2Tree = this.germplasmPedigreeService.getGermplasmPedigreeTree(gid2, null, true);
+							gid2Tree = this.germplasmPedigreeService.getGermplasmPedigreeTree(gid2, null, INCLUDE_DERIVATIVE_LINES);
 							final Instant end = Instant.now();
 							debug("pedigree retrieved: gid=%d, Duration: %s", gid2, formatDurationHMS(between(start, end).toMillis()));
 							trackNodes(gid2Tree, nodes);
@@ -107,6 +114,13 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 						final double cop = copCalculation.coefficientOfParentage(gid1Tree, gid2Tree);
 						matrixNew.put(gid1, gid2, cop);
 						matrix.put(gid1, gid2, cop);
+
+						/*
+						 * Note:
+						 * Saving intermediate results has been tested here (calling a separate bean/method
+						 * with @Transactional(propagation = Propagation.REQUIRES_NEW)) but resulted in a significant
+						 * decrease of performance.
+						 */
 					}
 				}
 				// track progress
@@ -139,22 +153,28 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 			if (null != gidProcessingQueue.putIfAbsent(gid, Boolean.FALSE)) {
 				gids.forEach(gidProcessingQueue::remove);
 				semaphore.release();
-				throw new MiddlewareRequestException("", "cop.gids.in.queue", getProgress());
+				throw new MiddlewareRequestException("", "cop.gids.in.queue", this.getProgress(gids));
 			}
 		}
 	}
 
 	@Override
-	public void checkIfThreadExists(final Set<Integer> gids) {
+	public boolean threadExists(final Set<Integer> gids) {
 		for (final Integer gid : gids) {
 			if (null != gidProcessingQueue.get(gid)) {
-				throw new MiddlewareRequestException("", "cop.gids.in.queue", getProgress());
+				return true;
 			}
 		}
+		return false;
 	}
 
-	private static double getProgress() {
-		return gidProcessingQueue.values().stream().mapToInt(aBoolean -> Boolean.TRUE.equals(aBoolean) ? 1 : 0)
+	@Override
+	public double getProgress(final Set<Integer> gids) {
+		// FIXME of gids in gidProcessingQueue, how many are are for this batch?
+		return gidProcessingQueue.entrySet().stream()
+			.filter(e -> gids.contains(e.getKey()))
+			.map(Map.Entry::getValue)
+			.mapToInt(isFinished -> Boolean.TRUE.equals(isFinished) ? 1 : 0)
 			.summaryStatistics()
 			.getAverage() * 100;
 	}

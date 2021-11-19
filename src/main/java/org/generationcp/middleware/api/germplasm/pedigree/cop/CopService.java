@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.germplasm.pedigree.cop;
 
 import com.google.common.collect.Table;
 
+import java.util.Map;
 import java.util.Set;
 
 public interface CopService {
@@ -10,5 +11,13 @@ public interface CopService {
 
 	double coefficientOfInbreeding(int gid);
 
-	Table<Integer, Integer, Double> coefficientOfParentage(Set<Integer> gids);
+	/**
+	 * retrieve existing cop matrix if available. Does not trigger any calculation
+	 */
+	CopResponse coefficientOfParentage(Set<Integer> gids);
+
+	/**
+	 * retrieve existing cop matrix if available. Does not trigger any calculation
+	 */
+	CopResponse calculateCoefficientOfParentage(Set<Integer> gids);
 }
