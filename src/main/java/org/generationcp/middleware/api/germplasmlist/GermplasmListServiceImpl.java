@@ -43,7 +43,9 @@ import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -398,10 +400,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		//Get the germplasm entries to add
 		final List<AddGermplasmEntryModel> addGermplasmEntriesModels = new ArrayList<>();
-		final GermplasmSearchRequest searchRequest = new GermplasmSearchRequest();
-		searchRequest.getAddedColumnsPropertyIds().add(ColumnLabels.PREFERRED_NAME.getName());
+		PageRequest pageRequest = null;
+		if(searchComposite != null && searchComposite.getSearchRequest() != null
+			&& !CollectionUtils.isEmpty(searchComposite.getSearchRequest().getEntryNumbers())) {
+			pageRequest = new PageRequest(0, searchComposite.getSearchRequest().getEntryNumbers().size(),
+				new Sort(Sort.Direction.ASC, GermplasmListStaticColumns.ENTRY_NO.name()));
+		}
 
-		this.germplasmListDataService.searchGermplasmListData(sourceListId, searchComposite.getSearchRequest(), null)
+		this.germplasmListDataService.searchGermplasmListData(sourceListId, searchComposite.getSearchRequest(), pageRequest)
 			.forEach(response -> addGermplasmEntriesModels.add(new AddGermplasmEntryModel(
 				Integer.valueOf(response.getData().get(GermplasmListStaticColumns.GID.name()).toString()),
 				response.getData().get(GermplasmListStaticColumns.DESIGNATION.name()).toString(),
