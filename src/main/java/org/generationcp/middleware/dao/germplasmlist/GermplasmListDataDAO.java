@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao.germplasmlist;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -205,6 +206,25 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		final Query query = this.getSession().getNamedQuery(GermplasmListData.DELETE_BY_LIST_ID);
 		query.setInteger(GermplasmListDataDAO.GERMPLASM_LIST_DATA_LIST_ID_COLUMN, listId);
 		return query.executeUpdate();
+	}
+
+	public void deleteByListIdAndListDataIds(final Integer listId, final List<Integer> selectedEntries) {
+		Preconditions.checkNotNull(listId, "List id passed cannot be null.");
+		Preconditions.checkArgument(CollectionUtils.isNotEmpty(selectedEntries), "selectedEntries passed cannot be empty.");
+		try {
+			final Query query =
+				this.getSession().createQuery("DELETE FROM GermplasmListData WHERE list.id = :listId "
+					+ (CollectionUtils.isNotEmpty(selectedEntries) ? "AND id in (:selectedEntries)" : ""));
+			query.setParameter("listId", listId);
+			if (CollectionUtils.isNotEmpty(selectedEntries)) {
+				query.setParameterList("selectedEntries", selectedEntries);
+			}
+			query.executeUpdate();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error in deleteByListIdAndListDataIds=" + listId + "," + selectedEntries + " in GermplasmListDataDAO: "
+					+ e.getMessage(), e);
+		}
 	}
 
 	/**
@@ -412,6 +432,26 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		updateSelectedEntriesQuery.setParameter("selectedPosition", selectedPosition - 1);
 		updateSelectedEntriesQuery.setParameterList("selectedEntries", selectedEntries);
 		updateSelectedEntriesQuery.executeUpdate();
+	}
+
+	/**
+	 * Reset the entry numbers (entryId) based on the order of current entryid.
+	 * @param listId
+	 */
+	public void reOrderEntries(final Integer listId) {
+		final String sql = "UPDATE listdata ld \n"
+			+ "    JOIN (SELECT @position \\:= 0) r\n"
+			+ "    INNER JOIN (\n"
+			+ "        SELECT lrecid, entryid\n"
+			+ "        FROM listdata innerListData\n"
+			+ "        WHERE innerlistdata.listid = :listId \n"
+			+ "        ORDER BY innerlistdata.entryid ASC) AS tmp\n"
+			+ "    ON ld.lrecid = tmp.lrecid\n"
+			+ "SET ld.entryid = @position \\:= @position + 1\n"
+			+ "WHERE listid = :listId";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+		sqlQuery.setParameter("listId", listId);
+		sqlQuery.executeUpdate();
 	}
 
 	public List<Integer> getListDataIdsByListId(final Integer listId) {

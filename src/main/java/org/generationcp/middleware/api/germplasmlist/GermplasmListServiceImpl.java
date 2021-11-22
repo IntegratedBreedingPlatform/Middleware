@@ -565,8 +565,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final List<GermplasmListDataView> columns =
 			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
 		final List<Integer> variableIds = columns.stream().filter(
-			c -> c.getCvtermId() != null && (c.getTypeId().equals(variableTypeId)
-				|| variableTypeId == null)).map(c -> c.getCvtermId())
+				c -> c.getCvtermId() != null && (c.getTypeId().equals(variableTypeId)
+					|| variableTypeId == null)).map(c -> c.getCvtermId())
 			.collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(variableIds)) {
 			final VariableFilter variableFilter = new VariableFilter();
@@ -638,6 +638,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public long countObservationsByVariables(final Integer listId, final List<Integer> variableIds) {
 		return this.daoFactory.getGermplasmListDataDetailDAO().countObservationsByListAndVariables(listId, variableIds);
+	}
+
+	@Override
+	public void removeGermplasmEntriesFromList(final Integer germplasmListId, final List<Integer> selectedEntries) {
+		this.daoFactory.getGermplasmListDataDetailDAO().deleteByListIdAndListDataIds(germplasmListId, selectedEntries);
+		this.daoFactory.getGermplasmListDataDAO().deleteByListIdAndListDataIds(germplasmListId, selectedEntries);
+		this.daoFactory.getGermplasmListDataDAO().reOrderEntries(germplasmListId);
 	}
 
 	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {

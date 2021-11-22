@@ -25,7 +25,7 @@ public interface GermplasmListService {
 	 * Inserts a list of multiple {@code GermplasmListData} objects into the database.
 	 *
 	 * @param data - A list of {@code GermplasmListData} objects to be persisted to the database. {@code GermplasmListData}
-	 *                           objects must be valid.
+	 *             objects must be valid.
 	 * @return Returns the ids of the {@code GermplasmListData} records inserted in the database.
 	 */
 	List<GermplasmListData> addGermplasmListData(List<GermplasmListData> data);
@@ -90,4 +90,6 @@ public interface GermplasmListService {
 	void deleteListDataObservation(Integer observationId);
 
 	long countObservationsByVariables(Integer listId, List<Integer> variableIds);
+
+	void removeGermplasmEntriesFromList(Integer germplasmListId, List<Integer> selectedEntries);
 }
