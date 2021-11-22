@@ -7,6 +7,9 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.constant.ColumnLabels;
@@ -133,6 +136,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
+
+	@Autowired
+	private GermplasmListDataService germplasmListDataService;
 
 	public GermplasmListServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -382,7 +388,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public void addGermplasmListToAnotherList(final Integer destinationListId, final Integer sourceListId, final String programUUID) {
+	public void addGermplasmListToAnotherList(final Integer destinationListId, final Integer sourceListId, final String programUUID,
+		final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite) {
 		final GermplasmList destinationGermplasmList = this.getGermplasmListById(destinationListId)
 			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
 
@@ -394,14 +401,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final GermplasmSearchRequest searchRequest = new GermplasmSearchRequest();
 		searchRequest.getAddedColumnsPropertyIds().add(ColumnLabels.PREFERRED_NAME.getName());
 
-		final Map<Integer, GermplasmSearchResponse> germplasmMap = this.germplasmSearchService.searchGermplasm(searchRequest, null, programUUID)
-			.stream().collect(Collectors.toMap(GermplasmSearchResponse::getGid, Function.identity()));
-
-		this.daoFactory.getGermplasmListDataDAO().getByListId(sourceListId)
-			.forEach(listData -> addGermplasmEntriesModels.add(new AddGermplasmEntryModel(
-				listData.getGid(),
-				germplasmMap.get(listData.getGid()).getGermplasmPeferredName(),
-				germplasmMap.get(listData.getGid()).getGroupId()
+		this.germplasmListDataService.searchGermplasmListData(sourceListId, searchComposite.getSearchRequest(), null)
+			.forEach(response -> addGermplasmEntriesModels.add(new AddGermplasmEntryModel(
+				Integer.valueOf(response.getData().get(GermplasmListStaticColumns.GID.name()).toString()),
+				response.getData().get(GermplasmListStaticColumns.DESIGNATION.name()).toString(),
+				Integer.valueOf(response.getData().get(GermplasmListStaticColumns.GROUP_ID.name()).toString())
 			)));
 
 		this.addGermplasmEntriesModelsToList(destinationGermplasmList, addGermplasmEntriesModels);

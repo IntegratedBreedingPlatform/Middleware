@@ -535,7 +535,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		assertTrue(CollectionUtils.isEmpty(this.daoFactory.getGermplasmListDataDAO().getByListId(germplasmList.getId())));
-		this.germplasmListService.addGermplasmListToAnotherList(germplasmList.getId(), sourceGermplasmList.getId(), null);
+		this.germplasmListService.addGermplasmListToAnotherList(germplasmList.getId(), sourceGermplasmList.getId(), null, null);
 		Assert.assertEquals(2, this.daoFactory.getGermplasmListDataDAO().getByListId(germplasmList.getId()).size());
 	}
 
