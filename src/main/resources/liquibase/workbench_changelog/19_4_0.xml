@@ -4,7 +4,96 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="abatac" id="v19.4.0-1">
+	<changeSet author="mderamos" id="v19.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS'
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM permission WHERE name = 'ADD_GERMPLASM_LIST_ENTRIES'
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Add ADD_GERMPLASM_LIST_ENTRIES permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`)
+			VALUES ('ADD_GERMPLASM_LIST_ENTRIES', 'Add entries', @permission_id);
+
+			SET @add_entries_permission_id = (SELECT permission_id FROM permission where name = 'ADD_GERMPLASM_LIST_ENTRIES');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @add_entries_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @add_entries_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @add_entries_permission_id, '1');
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v19.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS'
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM permission WHERE name = 'ADD_ENTRIES_TO_LIST'
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Add ADD_ENTRIES_TO_LIST permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`)
+			VALUES ('ADD_ENTRIES_TO_LIST', 'Add to list', @permission_id);
+
+			SET @add_entries_to_list_permission_id = (SELECT permission_id FROM permission where name = 'ADD_ENTRIES_TO_LIST');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @add_entries_to_list_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @add_entries_to_list_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @add_entries_to_list_permission_id, '1');
+
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v19.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS'
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM permission WHERE name = 'DELETE_GERMPLASM_LIST'
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Add DELETE_GERMPLASM_LIST permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`)
+			VALUES ('DELETE_GERMPLASM_LIST', 'Delete list', @permission_id);
+
+			SET @delete_list_permission_id = (SELECT permission_id FROM permission where name = 'DELETE_GERMPLASM_LIST');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @delete_list_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @delete_list_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @delete_list_permission_id, '1');
+
+		</sql>
+	</changeSet>
+	<changeSet author="abatac" id="v19.4.0-4">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="1">
