@@ -2,7 +2,6 @@ package org.generationcp.middleware.dao;
 
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
-import com.google.common.collect.TreeBasedTable;
 import org.generationcp.middleware.pojos.CopMatrix;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
