@@ -7,6 +7,10 @@ import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -21,6 +25,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -56,6 +61,9 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
 	private GermplasmListService germplasmListService;
+
+	@Autowired
+	private GermplasmListDataService germplasmListDataService;
 
 	@Autowired
 	private GermplasmListManager germplasmListManager;
@@ -111,7 +119,8 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasmListUpdatedFolderId, is(germplasmListNewFolderId));
 
 		//Get the updated germplasm folder by id
-		final Optional<GermplasmList> updatedGermplasmListById = this.germplasmListService.getGermplasmListById(germplasmListUpdatedFolderId);
+		final Optional<GermplasmList> updatedGermplasmListById =
+			this.germplasmListService.getGermplasmListById(germplasmListUpdatedFolderId);
 		assertTrue(updatedGermplasmListById.isPresent());
 		final GermplasmList updatedGermplasmList = updatedGermplasmListById.get();
 		this.assertGermplasmList(updatedGermplasmList, germplasmListUpdatedFolderId, updatedFolderName);
@@ -120,7 +129,8 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		this.germplasmListService.deleteGermplasmListFolder(germplasmListUpdatedFolderId);
 
 		//Should not get the deleted germplasm folder
-		final Optional<GermplasmList> deletedGermplasmListById = this.germplasmListService.getGermplasmListById(germplasmListUpdatedFolderId);
+		final Optional<GermplasmList> deletedGermplasmListById =
+			this.germplasmListService.getGermplasmListById(germplasmListUpdatedFolderId);
 		assertFalse(deletedGermplasmListById.isPresent());
 	}
 
@@ -329,7 +339,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
 		final Germplasm germplasm = this.createGermplasm(singleCrossMethod);
 
-		final List<GermplasmListDto>  germplasmListDtos = this.germplasmListService.getGermplasmLists(germplasm.getGid());
+		final List<GermplasmListDto> germplasmListDtos = this.germplasmListService.getGermplasmLists(germplasm.getGid());
 
 		//create germplasm list
 		final int randomInt = new Random().nextInt(100);
@@ -341,7 +351,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final GermplasmListData germplasmListData = this.createGermplasmListData(germplasmList, germplasm.getGid(), 1);
 		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
 
-		final List<GermplasmListDto>  updatedGermplasmListDtos = this.germplasmListService.getGermplasmLists(germplasm.getGid());
+		final List<GermplasmListDto> updatedGermplasmListDtos = this.germplasmListService.getGermplasmLists(germplasm.getGid());
 
 		Assert.assertEquals(germplasmListDtos.size() + 1, updatedGermplasmListDtos.size());
 	}
@@ -530,7 +540,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
 		final Germplasm germplasm1 = this.createGermplasm(singleCrossMethod);
 		final Germplasm germplasm2 = this.createGermplasm(singleCrossMethod);
-		
+
 		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(this.createGermplasmListData(sourceGermplasmList, germplasm1.getGid(), 1));
 		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(this.createGermplasmListData(sourceGermplasmList, germplasm2.getGid(), 2));
 
@@ -573,6 +583,53 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		searchCompositeDto.setSearchRequest(germplasmListDataSearchRequest);
 		this.germplasmListService.addGermplasmListEntriesToAnotherList(germplasmList.getId(), sourceGermplasmList.getId(), null, searchCompositeDto);
 		Assert.assertEquals(3, this.daoFactory.getGermplasmListDataDAO().getByListId(germplasmList.getId()).size());
+	}
+
+	@Test
+	public void testShouldRemoveEntriesFromList() {
+		final int randomInt = new Random().nextInt(100);
+		// Germplasm list
+		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt,
+			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+
+		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
+		final Germplasm germplasm = this.createGermplasm(singleCrossMethod);
+		final GermplasmListData germplasmListData1 = this.createGermplasmListData(germplasmList, germplasm.getGid(), 1);
+		final GermplasmListData germplasmListData2 = this.createGermplasmListData(germplasmList, germplasm.getGid(), 2);
+		final GermplasmListData germplasmListData3 = this.createGermplasmListData(germplasmList, germplasm.getGid(), 3);
+		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData1);
+		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData2);
+		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData3);
+
+		// Entry Detail
+		final String variableName = RandomStringUtils.randomAlphabetic(20);
+		final StandardVariable variable = this.createEntryDetailVariable(variableName);
+
+		final GermplasmListVariableRequestDto germplasmListVariableRequestDto = new GermplasmListVariableRequestDto();
+		germplasmListVariableRequestDto.setVariableId(variable.getId());
+		germplasmListVariableRequestDto.setVariableTypeId(VariableType.ENTRY_DETAIL.getId());
+
+		this.germplasmListService.addVariableToList(germplasmList.getId(), germplasmListVariableRequestDto);
+
+		this.germplasmListService.saveListDataObservation(germplasmList.getId(),
+			new GermplasmListObservationRequestDto(germplasmListData1.getListDataId(), variable.getId(), "1", null));
+		this.germplasmListService.saveListDataObservation(germplasmList.getId(),
+			new GermplasmListObservationRequestDto(germplasmListData2.getListDataId(), variable.getId(), "2", null));
+		this.germplasmListService.saveListDataObservation(germplasmList.getId(),
+			new GermplasmListObservationRequestDto(germplasmListData3.getListDataId(), variable.getId(), "3", null));
+
+		this.germplasmListService.removeGermplasmEntriesFromList(germplasmList.getId(), Arrays.asList(germplasmListData2.getListDataId()));
+
+		final List<GermplasmListDataSearchResponse> germplasmListDataResponseList =
+			this.germplasmListDataService.searchGermplasmListData(germplasmList.getId(), new GermplasmListDataSearchRequest(), null);
+		final List<GermplasmListDataDetail> germplasmListDataDetailList =
+			this.germplasmListDataService.getGermplasmListDataDetailList(germplasmList.getId());
+		Assert.assertEquals(2, germplasmListDataResponseList.size());
+		Assert.assertEquals(2, germplasmListDataDetailList.size());
+		Assert.assertEquals(1, germplasmListDataResponseList.get(0).getData().get(GermplasmListStaticColumns.ENTRY_NO.getName()));
+		Assert.assertEquals(2, germplasmListDataResponseList.get(1).getData().get(GermplasmListStaticColumns.ENTRY_NO.getName()));
+
 	}
 
 	private void assertGermplasmListDataObservationOptionalPresent(final Integer listDataObservationId, final String value,

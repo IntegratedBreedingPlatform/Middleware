@@ -13,6 +13,7 @@ import java.util.Map;
 @AutoProperty
 public class GermplasmListDataSearchRequest extends SearchRequestDto {
 
+	private List<Integer> listDataIds;
 	private List<Integer> entryNumbers;
 	private List<Integer> gids;
 	private String germplasmUUID;
@@ -197,6 +198,14 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 		this.variablesFilters = variablesFilters;
 	}
 
+	public List<Integer> getListDataIds() {
+		return listDataIds;
+	}
+
+	public void setListDataIds(List<Integer> listDataIds) {
+		this.listDataIds = listDataIds;
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
@@ -211,5 +220,6 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	public boolean equals(final Object o) {
 		return Pojomatic.equals(this, o);
 	}
+
 
 }
