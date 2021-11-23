@@ -34,6 +34,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -209,12 +210,17 @@ public class DatasetServiceImpl implements DatasetService {
 			factorColumns.add(this.addTermIdColumn(TermId.SAMPLES, null, SUM_OF_SAMPLES, true));
 		}
 
-		// Other edge cases
-		// Let's consider it as a special case instead of getting ENVIRONMENT_DETAILS for plot dataset
+		final DmsProject environmentDataset =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
+		final CVTerm trialInstanceVariable = this.daoFactory.getCvTermDao().getById(TermId.TRIAL_INSTANCE_FACTOR.getId());
+		final Optional<ProjectProperty> variableAlias =
+			this.daoFactory.getProjectPropertyDAO().getByProjectId(environmentDataset.getProjectId()).stream()
+				.filter(prop -> TermId.TRIAL_INSTANCE_FACTOR.getId() == prop.getVariableId()).findFirst();
+
 		final MeasurementVariable trialInstanceCol = new MeasurementVariable();
-		trialInstanceCol.setName(ColumnLabels.TRIAL_INSTANCE.getName());
-		trialInstanceCol.setAlias(ColumnLabels.TRIAL_INSTANCE.getName());
-		trialInstanceCol.setTermId(ColumnLabels.TRIAL_INSTANCE.getTermId().getId());
+		trialInstanceCol.setName(trialInstanceVariable.getName());
+		trialInstanceCol.setAlias(variableAlias.isPresent()? variableAlias.get().getAlias() : trialInstanceVariable.getName());
+		trialInstanceCol.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		trialInstanceCol.setFactor(true);
 		factorColumns.add(0, trialInstanceCol);
 
