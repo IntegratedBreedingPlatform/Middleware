@@ -47,23 +47,23 @@ public class CopServiceImpl implements CopService {
 
 	@Override
 	public CopResponse coefficientOfParentage(final Set<Integer> gids) {
+		if (this.copServiceAsync.threadExists(gids)) {
+			return new CopResponse(this.copServiceAsync.getProgress(gids));
+		}
+
 		final Table<Integer, Integer, Double> matrix = this.daoFactory.getCopMatrixDao().getByGids(gids);
 
 		// if all cop values are calculated, return them
-		boolean requiresProcessing = false;
+		boolean someCopValuesExists = false;
 		for (final Integer gid1 : gids) {
 			for (final Integer gid2 : gids) {
-				if (!(matrix.contains(gid1, gid2) || matrix.contains(gid2, gid1))) {
-					requiresProcessing = true;
+				if (matrix.contains(gid1, gid2) || matrix.contains(gid2, gid1)) {
+					someCopValuesExists = true;
 				}
 			}
 		}
-
-		if (!requiresProcessing) {
+		if (someCopValuesExists) {
 			return new CopResponse(matrix);
-		}
-		if (this.copServiceAsync.threadExists(gids)) {
-			return new CopResponse(this.copServiceAsync.getProgress(gids));
 		}
 
 		// no thread nor matrix for gids
