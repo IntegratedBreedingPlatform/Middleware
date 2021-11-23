@@ -13,6 +13,7 @@ import org.generationcp.middleware.pojos.CopMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +23,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 
 import static java.time.Duration.between;
@@ -46,13 +48,21 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 	public static final Semaphore semaphore = new Semaphore(COP_MAX_JOB_COUNT);
 
 	/**
-	 * Map gid -> bool (finished, not finished)
+	 * Map gid -> bool (finished, not finished).
+	 * Tracks progress
 	 */
 	private static final Map<Integer, Boolean> gidProcessingQueue = new ConcurrentHashMap<>();
+	/**
+	 * Groups gids by job (used to group progress by batch)
+	 */
 	private static final Map<Integer, UUID> gidProcessingToQueueUUID = new ConcurrentHashMap<>();
+	/**
+	 * Used to cancel jobs
+	 */
+	private static final Map<Integer, Future<Boolean>> gidProcessingToFutureTask = new ConcurrentHashMap<>();
+
 
 	private static final boolean INCLUDE_DERIVATIVE_LINES = true;
-
 
 	GermplasmPedigreeService germplasmPedigreeService;
 	DaoFactory daoFactory;
@@ -64,14 +74,13 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 
 	/*
 	 * TODO
-	 *  - keep Future task list, Future.cancel (https://stackoverflow.com/a/38882801/1384743) by api
-	 *  - api to retrieve current progress
 	 *  - email on finish/error
 	 *  - progress considering tree height
+	 *  - API to list jobs (cancel by admin)
 	 */
 	@Override
 	@Async
-	public void calculateAsync(
+	public Future<Boolean> calculateAsync(
 		final Set<Integer> gids,
 		final Table<Integer, Integer, Double> matrix
 	) {
@@ -89,6 +98,10 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 			for (final Integer gid1 : gids) {
 				for (final Integer gid2 : gids) {
 					if (!(matrix.contains(gid1, gid2) || matrix.contains(gid2, gid1))) {
+
+						if (Thread.currentThread().isInterrupted()) {
+							return new AsyncResult<>(Boolean.FALSE);
+						}
 
 						final GermplasmTreeNode gid1Tree;
 						if (!nodes.containsKey(gid1)) {
@@ -137,13 +150,14 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 					this.daoFactory.getCopMatrixDao().save(copMatrix);
 				}
 			}
+
+			return new AsyncResult<>(Boolean.TRUE);
 		} catch (final RuntimeException ex) {
 			LOG.error("Error in CopServiceAsyncImpl.calculateAsync(), gids=" + gids + ", message: " + ex.getMessage(), ex);
+			return new AsyncResult<>(Boolean.FALSE);
 		} finally {
 			cleanup(gids);
-			semaphore.release();
 		}
-
 	}
 
 	@Override
@@ -156,7 +170,6 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 		for (final Integer gid : gids) {
 			if (null != gidProcessingQueue.putIfAbsent(gid, Boolean.FALSE)) {
 				cleanup(gids);
-				semaphore.release();
 				throw new MiddlewareRequestException("", "cop.gids.in.queue", this.getProgress(gids));
 			}
 			gidProcessingToQueueUUID.put(gid, batchUUID);
@@ -194,6 +207,25 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 			.getAverage() * 100;
 	}
 
+	@Override
+	public void trackFutureTask(final Set<Integer> gids, Future<Boolean> future) {
+		for (final Integer gid : gids) {
+			if (null != gidProcessingToFutureTask.putIfAbsent(gid, future)) {
+				cleanup(gids);
+				throw new MiddlewareRequestException("", "cop.runtime.error");
+			}
+		}
+	}
+
+	@Override
+	public void cancelJobs(final Set<Integer> gids) {
+		for (final Integer gid : gids) {
+			if (gidProcessingToFutureTask.containsKey(gid) && !gidProcessingToFutureTask.get(gid).isCancelled()) {
+				gidProcessingToFutureTask.get(gid).cancel(true);
+			}
+		}
+	}
+
 	private static void trackNodes(final GermplasmTreeNode gid1Tree, final Map<Integer, GermplasmTreeNode> nodes) {
 		nodes.put(gid1Tree.getGid(), gid1Tree);
 		GermplasmTreeNode femaleParentNode = gid1Tree.getFemaleParentNode();
@@ -211,5 +243,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 	private static void cleanup(final Set<Integer> gids) {
 		gids.forEach(gidProcessingQueue::remove);
 		gids.forEach(gidProcessingToQueueUUID::remove);
+		gids.forEach(gidProcessingToFutureTask::remove);
+		semaphore.release();
 	}
 }

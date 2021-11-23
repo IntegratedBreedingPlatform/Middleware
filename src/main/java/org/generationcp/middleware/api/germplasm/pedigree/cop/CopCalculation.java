@@ -4,6 +4,7 @@ import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +90,10 @@ public class CopCalculation {
 	 * @param g2
 	 */
 	public double coefficientOfParentage(final GermplasmTreeNode g1, final GermplasmTreeNode g2) {
+		if (Thread.currentThread().isInterrupted()) {
+			throw new MiddlewareRequestException("", "cop.async.interrupted");
+		}
+
 		if (g1 == null || g2 == null
 			|| g1.getGid() == null || g2.getGid() == null
 			|| g1.getGid() == 0 || g2.getGid() == 0) {

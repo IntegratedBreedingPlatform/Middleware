@@ -3,10 +3,11 @@ package org.generationcp.middleware.api.germplasm.pedigree.cop;
 import com.google.common.collect.Table;
 
 import java.util.Set;
+import java.util.concurrent.Future;
 
 public interface CopServiceAsync {
 
-	void calculateAsync(
+	Future<Boolean> calculateAsync(
 		Set<Integer> gids,
 		Table<Integer, Integer, Double> matrix
 	);
@@ -26,4 +27,14 @@ public interface CopServiceAsync {
 	 * @return the percentage of progress done
 	 */
 	double getProgress(Set<Integer> gids);
+
+	/**
+	 * Track task so that it can be cancelled in the future
+	 */
+	void trackFutureTask(Set<Integer> gids, Future<Boolean> future);
+
+	/**
+	 * cancel job/s for the specified gids
+	 */
+	void cancelJobs(Set<Integer> gids);
 }

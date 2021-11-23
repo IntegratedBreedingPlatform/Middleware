@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
+import java.util.concurrent.Future;
 
 @Service
 @Transactional
@@ -90,11 +91,17 @@ public class CopServiceImpl implements CopService {
 			}
 
 			this.copServiceAsync.prepareExecution(gids);
-			this.copServiceAsync.calculateAsync(gids, matrix);
+			final Future<Boolean> booleanFuture = this.copServiceAsync.calculateAsync(gids, matrix);
+			this.copServiceAsync.trackFutureTask(gids, booleanFuture);
 			return new CopResponse(this.copServiceAsync.getProgress(gids));
 		}
 
 		return new CopResponse(matrix);
+	}
+
+	@Override
+	public void cancelJobs(final Set<Integer> gids) {
+		this.copServiceAsync.cancelJobs(gids);
 	}
 
 }
