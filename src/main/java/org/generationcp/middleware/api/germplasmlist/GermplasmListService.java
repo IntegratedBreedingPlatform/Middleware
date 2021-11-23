@@ -94,6 +94,6 @@ public interface GermplasmListService {
 
 	void deleteGermplasmList(Integer listId);
 
-	void addGermplasmListToAnotherList(Integer destinationListId, Integer sourceListId, String programUUID,
+	void addGermplasmListEntriesToAnotherList(Integer destinationListId, Integer sourceListId, String programUUID,
 		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
 }

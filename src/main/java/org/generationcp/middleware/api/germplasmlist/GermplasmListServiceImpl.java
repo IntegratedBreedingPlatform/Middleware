@@ -390,7 +390,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public void addGermplasmListToAnotherList(final Integer destinationListId, final Integer sourceListId, final String programUUID,
+	public void addGermplasmListEntriesToAnotherList(final Integer destinationListId, final Integer sourceListId, final String programUUID,
 		final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite) {
 		final GermplasmList destinationGermplasmList = this.getGermplasmListById(destinationListId)
 			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
