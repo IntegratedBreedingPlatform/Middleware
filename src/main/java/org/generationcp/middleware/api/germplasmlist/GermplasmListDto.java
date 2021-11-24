@@ -15,6 +15,8 @@ public class GermplasmListDto {
 	private String programUUID;
 	private boolean locked;
 	private Integer ownerId;
+	private String notes;
+	private String type;
 
 	public GermplasmListDto() {
 
@@ -74,6 +76,22 @@ public class GermplasmListDto {
 
 	public void setOwnerId(final Integer ownerId) {
 		this.ownerId = ownerId;
+	}
+
+	public String getNotes() {
+		return notes;
+	}
+
+	public void setNotes(final String notes) {
+		this.notes = notes;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(final String type) {
+		this.type = type;
 	}
 
 	@Override
