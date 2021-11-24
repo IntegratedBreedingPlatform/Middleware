@@ -165,7 +165,7 @@ public class LocationServiceImpl implements LocationService {
 			location.setAltitude(locationRequestDto.getAltitude());
 		}
 
-		this.daoFactory.getLocationDAO().update(location);
+		this.daoFactory.getLocationDAO().saveOrUpdate(location);
 	}
 
 }
