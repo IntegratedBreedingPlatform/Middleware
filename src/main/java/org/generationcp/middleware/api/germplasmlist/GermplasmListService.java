@@ -98,4 +98,7 @@ public interface GermplasmListService {
 		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
 
 	void cloneGermplasmListEntries(Integer listId, GermplasmListGeneratorDTO listGeneratorDTO);
+
+	void editListMetadata(Integer listId, GermplasmListMetadataRequest request);
+
 }
