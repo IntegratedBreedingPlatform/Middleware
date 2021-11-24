@@ -5,7 +5,11 @@ import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.constant.ColumnLabels;
@@ -39,7 +43,9 @@ import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -56,6 +62,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -131,6 +138,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
+
+	@Autowired
+	private GermplasmListDataService germplasmListDataService;
 
 	public GermplasmListServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -324,6 +334,10 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				);
 		}
 
+		this.addGermplasmEntriesModelsToList(germplasmList, addGermplasmEntriesModels);
+	}
+
+	private void addGermplasmEntriesModelsToList(final GermplasmList germplasmList, final List<AddGermplasmEntryModel> addGermplasmEntriesModels) {
 		this.checkLimitToAddEntriesToExistingList(addGermplasmEntriesModels.size(), germplasmList);
 
 		//Get the entryId max value
@@ -363,6 +377,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.addGermplasmListData(germplasmListsData);
 
 		if (CollectionUtils.isEmpty(germplasmListsData) ||
+			CollectionUtils.isEmpty(germplasmList.getListData()) ||
 			CollectionUtils.isEmpty(germplasmList.getListData().get(0).getProperties())) {
 			return;
 		}
@@ -372,6 +387,34 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.map(ListDataProperty::getColumn)
 			.collect(toSet());
 		this.addListDataProperties(germplasmListsData, propertyNames);
+	}
+
+	@Override
+	public void addGermplasmListEntriesToAnotherList(final Integer destinationListId, final Integer sourceListId, final String programUUID,
+		final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite) {
+		final GermplasmList destinationGermplasmList = this.getGermplasmListById(destinationListId)
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+
+		this.getGermplasmListById(sourceListId)
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+
+		//Get the germplasm entries to add
+		final List<AddGermplasmEntryModel> addGermplasmEntriesModels = new ArrayList<>();
+		PageRequest pageRequest = null;
+		if(searchComposite != null && searchComposite.getSearchRequest() != null
+			&& !CollectionUtils.isEmpty(searchComposite.getSearchRequest().getEntryNumbers())) {
+			pageRequest = new PageRequest(0, searchComposite.getSearchRequest().getEntryNumbers().size(),
+				new Sort(Sort.Direction.ASC, GermplasmListStaticColumns.ENTRY_NO.name()));
+		}
+
+		this.germplasmListDataService.searchGermplasmListData(sourceListId, searchComposite.getSearchRequest(), pageRequest)
+			.forEach(response -> addGermplasmEntriesModels.add(new AddGermplasmEntryModel(
+				Integer.valueOf(response.getData().get(GermplasmListStaticColumns.GID.name()).toString()),
+				response.getData().get(GermplasmListStaticColumns.DESIGNATION.name()).toString(),
+				Integer.valueOf(response.getData().get(GermplasmListStaticColumns.GROUP_ID.name()).toString())
+			)));
+
+		this.addGermplasmEntriesModelsToList(destinationGermplasmList, addGermplasmEntriesModels);
 	}
 
 	@Override
@@ -638,6 +681,14 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public long countObservationsByVariables(final Integer listId, final List<Integer> variableIds) {
 		return this.daoFactory.getGermplasmListDataDetailDAO().countObservationsByListAndVariables(listId, variableIds);
+	}
+
+	@Override
+	public void deleteGermplasmList(final Integer listId) {
+		final GermplasmList germplasmList = this.getGermplasmListById(listId)
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+		germplasmList.setStatus(GermplasmList.Status.DELETED.getCode());
+		this.daoFactory.getGermplasmListDAO().update(germplasmList);
 	}
 
 	private void updateGermplasmListData(final List<GermplasmListData> germplasmListData) {
