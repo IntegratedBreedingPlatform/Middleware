@@ -12,6 +12,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.CopMatrix;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
@@ -67,6 +68,9 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 	GermplasmPedigreeService germplasmPedigreeService;
 	DaoFactory daoFactory;
 
+	@Value("${cop.btype}")
+	private int bType;
+
 	public CopServiceAsyncImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.germplasmPedigreeService = new GermplasmPedigreeServiceAsyncImpl(sessionProvider);
@@ -92,7 +96,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 			final Map<Integer, GermplasmTreeNode> nodes = new HashMap<>();
 
 			// matrix copy because CopCalculation also stores intermediate results
-			final CopCalculation copCalculation = new CopCalculation(HashBasedTable.create(matrix));
+			final CopCalculation copCalculation = new CopCalculation(HashBasedTable.create(matrix), this.bType);
 
 			// TODO verify/improve perf
 			for (final Integer gid1 : gids) {

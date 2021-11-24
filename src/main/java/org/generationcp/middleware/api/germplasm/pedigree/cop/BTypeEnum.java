@@ -10,6 +10,15 @@ enum BTypeEnum {
 		this.value = value;
 	}
 
+	public static BTypeEnum fromValue(final int bType) {
+		for (BTypeEnum bTypeEnum : BTypeEnum.values()) {
+			if (bTypeEnum.value == bType) {
+				return bTypeEnum;
+			}
+		}
+		return null;
+	}
+
 	public double getValue() {
 		return value;
 	}

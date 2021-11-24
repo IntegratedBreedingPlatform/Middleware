@@ -70,13 +70,16 @@ public class CopCalculation {
 	 * Named as in the paper just for consistency
 	 */
 	private final Table<Integer, Integer, Double> sparseMatrix;
+	private final BTypeEnum btype;
 
 	public CopCalculation() {
 		this.sparseMatrix = HashBasedTable.create();
+		this.btype = BTypeEnum.OTHER;
 	}
 
-	public CopCalculation(final Table<Integer, Integer, Double> sparseMatrix) {
+	public CopCalculation(final Table<Integer, Integer, Double> sparseMatrix, final int bType) {
 		this.sparseMatrix = sparseMatrix != null ? sparseMatrix : HashBasedTable.create();
+		this.btype = BTypeEnum.fromValue(bType);
 	}
 
 	/*
@@ -166,7 +169,7 @@ public class CopCalculation {
 
 	private double getBType(final GermplasmTreeNode g) {
 		// TODO get btype from method?
-		return BTypeEnum.SELF_POLINATING.getValue();
+		return this.btype.getValue();
 	}
 
 	private boolean isBTypeScenario(final GermplasmTreeNode g) {
