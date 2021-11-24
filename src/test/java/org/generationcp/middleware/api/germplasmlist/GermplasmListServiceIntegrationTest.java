@@ -32,7 +32,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
@@ -573,6 +575,40 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		searchCompositeDto.setSearchRequest(germplasmListDataSearchRequest);
 		this.germplasmListService.addGermplasmListEntriesToAnotherList(germplasmList.getId(), sourceGermplasmList.getId(), null, searchCompositeDto);
 		Assert.assertEquals(3, this.daoFactory.getGermplasmListDataDAO().getByListId(germplasmList.getId()).size());
+	}
+
+	@Test
+	public void testCloneGermplasmListEntries_OK() {
+		// Source Germplasm list
+		final int randNameSuffix =  new Random().nextInt(100);
+		final GermplasmList sourceGermplasmList = new GermplasmList(null, "Test Germplasm List " + randNameSuffix,
+			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(sourceGermplasmList);
+
+		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
+		final Germplasm germplasm1 = this.createGermplasm(singleCrossMethod);
+		final Germplasm germplasm2 = this.createGermplasm(singleCrossMethod);
+
+		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(this.createGermplasmListData(sourceGermplasmList, germplasm1.getGid(), 1));
+		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(this.createGermplasmListData(sourceGermplasmList, germplasm2.getGid(), 2));
+
+		// Germplasm List Generator (from request)
+		final GermplasmListGeneratorDTO targetList = new GermplasmListGeneratorDTO();
+		targetList.setName("Test Cloned Germplasm List " + randNameSuffix);
+		targetList.setDate(new Date());
+		targetList.setType("LST");
+		targetList.setDescription("Test Cloned Germplasm List");
+
+		this.germplasmListService.cloneGermplasmListEntries(sourceGermplasmList.getId(), targetList);
+
+		// verify if entries from source is cloned in the target and are in the proper order
+		assertEquals(2, targetList.getEntries().size());
+
+		final Map<Integer, GermplasmListData> sourceListMap =
+			this.daoFactory.getGermplasmListDataDAO().getMapByEntryId(sourceGermplasmList.getId());
+		targetList.getEntries().forEach(entry -> {
+			assertEquals(sourceListMap.get(entry.getEntryNo()).getGid(), entry.getGid());
+		});
 	}
 
 	private void assertGermplasmListDataObservationOptionalPresent(final Integer listDataObservationId, final String value,
