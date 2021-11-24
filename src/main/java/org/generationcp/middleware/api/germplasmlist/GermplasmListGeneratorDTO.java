@@ -102,6 +102,18 @@ public class GermplasmListGeneratorDTO {
 	// Retrieve entries from filter or list of selected ids
 	private SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite;
 
+	public GermplasmListGeneratorDTO() {
+	}
+
+	public GermplasmListGeneratorDTO(GermplasmListMetadataRequest request) {
+		this.name = request.getName();
+		this.description = request.getDescription();
+		this.type = request.getType();
+		this.date = request.getDate();
+		this.notes = request.getNotes();
+		this.parentFolderId = request.getParentFolderId();
+	}
+
 	public Integer getId() {
 		return this.id;
 	}

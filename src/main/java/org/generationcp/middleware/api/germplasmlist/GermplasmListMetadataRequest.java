@@ -15,6 +15,7 @@ public class GermplasmListMetadataRequest {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date date;
 	private String notes;
+	private String parentFolderId;
 
 	public GermplasmListMetadataRequest() {
 
@@ -67,6 +68,14 @@ public class GermplasmListMetadataRequest {
 
 	public void setNotes(final String notes) {
 		this.notes = notes;
+	}
+
+	public String getParentFolderId() {
+		return this.parentFolderId;
+	}
+
+	public void setParentFolderId(final String parentFolderId) {
+		this.parentFolderId = parentFolderId;
 	}
 
 	@Override
