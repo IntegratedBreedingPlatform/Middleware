@@ -172,14 +172,10 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final Map<Integer, MultiKeyMap> stockMap = new HashMap<>();
 
 		for (final Integer trialDbId : trialIds) {
-			if (stocks.containsKey(trialDbId)) {
-				final MultiKeyMap multiKeyMap = MultiKeyMap.decorate(new LinkedMap());
-				stocks.get(trialDbId).forEach((stockModel) -> {
-						multiKeyMap.put(stockModel.getGermplasm().getGermplasmUUID(), stockModel.getUniqueName(), stockModel);
-					}
-				);
-				stockMap.put(trialDbId, multiKeyMap);
-			}
+			stockMap.putIfAbsent(trialDbId, MultiKeyMap.decorate(new LinkedMap()));
+			stocks.getOrDefault(trialDbId, new ArrayList<>()).forEach(stockModel ->
+				stockMap.get(trialDbId).put(stockModel.getGermplasm().getGermplasmUUID(), stockModel.getUniqueName(), stockModel)
+			);
 		}
 
 		final Map<Integer, DmsProject> trialIdPlotDatasetMap =
@@ -219,13 +215,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 			this.addExperimentVariablesIfNecessary(dto, plotExperimentVariablesMap, trialIdPlotDatasetMap, variableNamesMap,
 				variableSynonymsMap);
-			stockMap.putIfAbsent(trialDbId, MultiKeyMap.decorate(new LinkedMap()));
+			// If combination of germplasmDbId and entryNumber (if specified) does not exist, create new stock
 			if (!stockMap.get(trialDbId)
-				.containsKey(dto.getGermplasmDbId(), entryNoOptional.isPresent() ? entryNoOptional.get() : StringUtils.EMPTY)) {
+				.containsKey(dto.getGermplasmDbId(), entryNoOptional.orElse(StringUtils.EMPTY))) {
 				final StockModel stockModel =
 					this.createStockModel(germplasmDTOMap.get(dto.getGermplasmDbId()), stockMap, dto, trialDbId, entryTypes, entryTypesMap);
-				stockMap.get(trialDbId).put(dto.getGermplasmDbId(), entryNoOptional.isPresent() ? entryNoOptional.get() :
-					StringUtils.EMPTY, stockModel);
+				stockMap.get(trialDbId).put(dto.getGermplasmDbId(), entryNoOptional.orElse(StringUtils.EMPTY), stockModel);
 			}
 
 			final ExperimentModel experimentModel = new ExperimentModel();
@@ -233,8 +228,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			experimentModel.setGeoLocation(new Geolocation(studyDbId));
 			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 			experimentModel.setStock(
-				(StockModel) stockMap.get(trialDbId)
-					.get(dto.getGermplasmDbId(), entryNoOptional.isPresent() ? entryNoOptional.get() : StringUtils.EMPTY));
+				(StockModel) stockMap.get(trialDbId).get(dto.getGermplasmDbId(), entryNoOptional.orElse(StringUtils.EMPTY)));
 
 			this.setJsonProps(experimentModel, dto);
 			ObservationUnitIDGenerator.generateObservationUnitIds(cropType, Collections.singletonList(experimentModel));

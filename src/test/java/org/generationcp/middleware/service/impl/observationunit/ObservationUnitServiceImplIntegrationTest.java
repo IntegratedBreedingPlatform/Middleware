@@ -141,7 +141,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 	}
 
 	@Test
-	public void testImportObservationUnits_WithoutEntryNo() {
+	public void testImportObservationUnits_SameGermplasm_WithoutEntryNo() {
 		final ObservationUnitImportRequestDto dto1 = this.createObservationUnitImportRequestDto();
 		final ObservationUnitImportRequestDto dto2 = this.createObservationUnitImportRequestDto();
 		final ObservationUnitImportRequestDto dto3 = this.createObservationUnitImportRequestDto();
@@ -167,7 +167,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 	}
 
 	@Test
-	public void testImportObservationUnits_EntryNoIsSpecifiedInAdditionalInfo() {
+	public void testImportObservationUnits_SameGermplasm_EntryNoIsSpecifiedInAdditionalInfo() {
 		final ObservationUnitImportRequestDto dto1 = this.createObservationUnitImportRequestDto();
 		final Map<String, String> additionalInfo = new HashMap<>();
 		additionalInfo.put(ENTRY_NO, "99");
