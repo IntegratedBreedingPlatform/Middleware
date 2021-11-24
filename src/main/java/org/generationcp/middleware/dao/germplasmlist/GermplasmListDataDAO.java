@@ -208,21 +208,16 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		return query.executeUpdate();
 	}
 
-	public void deleteByListIdAndListDataIds(final Integer listId, final List<Integer> selectedEntries) {
-		Preconditions.checkNotNull(listId, "List id passed cannot be null.");
-		Preconditions.checkArgument(CollectionUtils.isNotEmpty(selectedEntries), "selectedEntries passed cannot be empty.");
+	public void deleteByListDataIds(final List<Integer> listDataIds) {
+		Preconditions.checkArgument(CollectionUtils.isNotEmpty(listDataIds), "listDataIds passed cannot be empty.");
 		try {
 			final Query query =
-				this.getSession().createQuery("DELETE FROM GermplasmListData WHERE list.id = :listId "
-					+ (CollectionUtils.isNotEmpty(selectedEntries) ? "AND id in (:selectedEntries)" : ""));
-			query.setParameter("listId", listId);
-			if (CollectionUtils.isNotEmpty(selectedEntries)) {
-				query.setParameterList("selectedEntries", selectedEntries);
-			}
+				this.getSession().createQuery("DELETE FROM GermplasmListData WHERE id in (:listDataIds)");
+			query.setParameterList("listDataIds", listDataIds);
 			query.executeUpdate();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"Error in deleteByListIdAndListDataIds=" + listId + "," + selectedEntries + " in GermplasmListDataDAO: "
+				"Error in deleteByListDataIds(listDataIds=" + listDataIds + ") in GermplasmListDataDAO: "
 					+ e.getMessage(), e);
 		}
 	}
@@ -436,6 +431,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 	/**
 	 * Reset the entry numbers (entryId) based on the order of current entryid.
+	 *
 	 * @param listId
 	 */
 	public void reOrderEntries(final Integer listId) {

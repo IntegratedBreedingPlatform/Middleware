@@ -5,7 +5,6 @@ import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
@@ -62,7 +61,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -337,7 +335,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.addGermplasmEntriesModelsToList(germplasmList, addGermplasmEntriesModels);
 	}
 
-	private void addGermplasmEntriesModelsToList(final GermplasmList germplasmList, final List<AddGermplasmEntryModel> addGermplasmEntriesModels) {
+	private void addGermplasmEntriesModelsToList(final GermplasmList germplasmList,
+		final List<AddGermplasmEntryModel> addGermplasmEntriesModels) {
 		this.checkLimitToAddEntriesToExistingList(addGermplasmEntriesModels.size(), germplasmList);
 
 		//Get the entryId max value
@@ -401,7 +400,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		//Get the germplasm entries to add
 		final List<AddGermplasmEntryModel> addGermplasmEntriesModels = new ArrayList<>();
 		PageRequest pageRequest = null;
-		if(searchComposite != null && searchComposite.getSearchRequest() != null
+		if (searchComposite != null && searchComposite.getSearchRequest() != null
 			&& !CollectionUtils.isEmpty(searchComposite.getSearchRequest().getEntryNumbers())) {
 			pageRequest = new PageRequest(0, searchComposite.getSearchRequest().getEntryNumbers().size(),
 				new Sort(Sort.Direction.ASC, GermplasmListStaticColumns.ENTRY_NO.name()));
@@ -692,9 +691,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public void removeGermplasmEntriesFromList(final Integer germplasmListId, final List<Integer> selectedEntries) {
-		this.daoFactory.getGermplasmListDataDetailDAO().deleteByListIdAndListDataIds(germplasmListId, selectedEntries);
-		this.daoFactory.getGermplasmListDataDAO().deleteByListIdAndListDataIds(germplasmListId, selectedEntries);
+	public void removeGermplasmEntriesFromList(final Integer germplasmListId, final List<Integer> listDataIds) {
+		this.daoFactory.getGermplasmListDataDetailDAO().deleteByListDataIds(listDataIds);
+		this.daoFactory.getGermplasmListDataDAO().deleteByListDataIds(listDataIds);
 		this.daoFactory.getGermplasmListDataDAO().reOrderEntries(germplasmListId);
 	}
 

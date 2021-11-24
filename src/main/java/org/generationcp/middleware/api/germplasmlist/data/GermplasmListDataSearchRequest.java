@@ -221,5 +221,4 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 		return Pojomatic.equals(this, o);
 	}
 
-
 }
