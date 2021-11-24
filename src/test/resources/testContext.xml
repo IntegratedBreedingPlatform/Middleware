@@ -188,6 +188,10 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="sampleServiceBrapi" class="org.generationcp.middleware.api.brapi.SampleServiceBrapiImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
 	<bean id="daoFactory" class="org.generationcp.middleware.manager.DaoFactory">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>

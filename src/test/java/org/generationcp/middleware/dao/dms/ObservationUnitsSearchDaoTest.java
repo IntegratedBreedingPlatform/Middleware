@@ -3,14 +3,22 @@ package org.generationcp.middleware.dao.dms;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.*;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.Method;
+import org.generationcp.middleware.domain.ontology.Property;
+import org.generationcp.middleware.domain.ontology.Scale;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
-import org.generationcp.middleware.pojos.dms.*;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.Phenotype;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
@@ -24,12 +32,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
+	public static final String COL = "COL";
+	public static final String GID = "GID";
+	public static final String FIELDMAP_RANGE = "FIELDMAP RANGE";
+	public static final String FIELDMAP_COLUMN = "FIELDMAP COLUMN";
+	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
+	public static final String ENTRY_TYPE = "ENTRY_TYPE";
+	public static final String EXPT_DESIGN = "EXPT_DESIGN";
+	public static final String ENTRY_NO = "ENTRY_NO";
+	public static final String DESIGNATION = "DESIGNATION";
+	public static final String TRIAL_INSTANCE = "TRIAL_INSTANCE";
+	public static final String ENTRY_CODE = "ENTRY_CODE";
+	public static final String BLOCK_NO = "BLOCK_NO";
+	public static final String LOCATION_ID = "LOCATION_ID";
+	public static final String ROW = "ROW";
+	public static final String REP_NO = "REP_NO";
+	public static final String PLOT_NO = "PLOT_NO";
 	private ObservationUnitsSearchDao obsUnitSearchDao;
 
 	private IntegrationTestDataInitializer testDataInitializer;
@@ -136,23 +166,23 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 		assertEquals("1", dataMap.get(observationUnitVariableName).getValue());
 		assertNotNull(dataMap.get(traitName).getValue());
-		assertNull(dataMap.get(ObservationUnitsSearchDao.COL).getValue());
-		assertEquals(observationUnitRow.getGid().toString(), dataMap.get(ObservationUnitsSearchDao.GID).getValue());
-		assertNull(dataMap.get(ObservationUnitsSearchDao.FIELD_MAP_RANGE).getValue());
-		assertNull(dataMap.get(ObservationUnitsSearchDao.FIELD_MAP_COLUMN).getValue());
-		assertEquals(observationUnitRow.getObsUnitId(), dataMap.get(ObservationUnitsSearchDao.OBS_UNIT_ID).getValue());
+		assertNull(dataMap.get(COL).getValue());
+		assertEquals(observationUnitRow.getGid().toString(), dataMap.get(GID).getValue());
+		assertNull(dataMap.get(FIELDMAP_RANGE).getValue());
+		assertNull(dataMap.get(FIELDMAP_COLUMN).getValue());
+		assertEquals(observationUnitRow.getObsUnitId(), dataMap.get(OBS_UNIT_ID).getValue());
 		assertEquals(plotExperimentModel.getObsUnitId(), dataMap.get(ObservationUnitsSearchDao.PARENT_OBS_UNIT_ID).getValue());
-		assertNull(dataMap.get(ObservationUnitsSearchDao.ENTRY_TYPE).getValue());
-		assertNull(dataMap.get(ObservationUnitsSearchDao.EXPT_DESIGN).getValue());
-		assertEquals("1", dataMap.get(ObservationUnitsSearchDao.ENTRY_NO).getValue());
-		assertEquals(stock.getName(), dataMap.get(ObservationUnitsSearchDao.DESIGNATION).getValue());
-		assertEquals("1", dataMap.get(ObservationUnitsSearchDao.TRIAL_INSTANCE).getValue());
-		assertNull(dataMap.get(ObservationUnitsSearchDao.ENTRY_CODE).getValue());
-		assertNull(dataMap.get(ObservationUnitsSearchDao.BLOCK_NO).getValue());
-		assertEquals("India", dataMap.get(ObservationUnitsSearchDao.LOCATION_ID).getValue());
-		assertNull(dataMap.get(ObservationUnitsSearchDao.ROW).getValue());
-		assertNull(dataMap.get(ObservationUnitsSearchDao.REP_NO).getValue());
-		assertNull(dataMap.get(ObservationUnitsSearchDao.PLOT_NO).getValue());
+		assertNull(dataMap.get(ENTRY_TYPE).getValue());
+		assertNull(dataMap.get(EXPT_DESIGN).getValue());
+		assertEquals("1", dataMap.get(ENTRY_NO).getValue());
+		assertEquals(stock.getName(), dataMap.get(DESIGNATION).getValue());
+		assertEquals("1", dataMap.get(TRIAL_INSTANCE).getValue());
+		assertNull(dataMap.get(ENTRY_CODE).getValue());
+		assertNull(dataMap.get(BLOCK_NO).getValue());
+		assertEquals("India", dataMap.get(LOCATION_ID).getValue());
+		assertNull(dataMap.get(ROW).getValue());
+		assertNull(dataMap.get(REP_NO).getValue());
+		assertNull(dataMap.get(PLOT_NO).getValue());
 
 		final Map<String, ObservationUnitData> environmentDataMap = observationUnitRow.getEnvironmentVariables();
 
@@ -507,21 +537,21 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final List<String> filterColumns = observationUnitsSearchDTO.getFilterColumns();
 
 		// Add the columns we want the query to return.
-		filterColumns.add(ObservationUnitsSearchDao.TRIAL_INSTANCE);
-		filterColumns.add(ObservationUnitsSearchDao.GID);
-		filterColumns.add(ObservationUnitsSearchDao.DESIGNATION);
-		filterColumns.add(ObservationUnitsSearchDao.ENTRY_TYPE);
-		filterColumns.add(ObservationUnitsSearchDao.ENTRY_CODE);
-		filterColumns.add(ObservationUnitsSearchDao.ENTRY_NO);
-		filterColumns.add(ObservationUnitsSearchDao.REP_NO);
-		filterColumns.add(ObservationUnitsSearchDao.PLOT_NO);
-		filterColumns.add(ObservationUnitsSearchDao.BLOCK_NO);
-		filterColumns.add(ObservationUnitsSearchDao.ROW);
-		filterColumns.add(ObservationUnitsSearchDao.COL);
+		filterColumns.add(TRIAL_INSTANCE);
+		filterColumns.add(GID);
+		filterColumns.add(DESIGNATION);
+		filterColumns.add(ENTRY_TYPE);
+		filterColumns.add(ENTRY_CODE);
+		filterColumns.add(ENTRY_NO);
+		filterColumns.add(REP_NO);
+		filterColumns.add(PLOT_NO);
+		filterColumns.add(BLOCK_NO);
+		filterColumns.add(ROW);
+		filterColumns.add(COL);
 		filterColumns.add(ObservationUnitsSearchDao.SUM_OF_SAMPLES);
 		filterColumns.add(observationUnitVariableName);
-		filterColumns.add(ObservationUnitsSearchDao.FIELD_MAP_RANGE);
-		filterColumns.add(ObservationUnitsSearchDao.FIELD_MAP_COLUMN);
+		filterColumns.add(FIELDMAP_RANGE);
+		filterColumns.add(FIELDMAP_COLUMN);
 		filterColumns.add(traitName);
 
 		// Need to flush session to sync with underlying database before querying
@@ -536,21 +566,21 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 		final StockModel stock = plantExperimentModels.get(0).getStock();
 
-		assertEquals("1", dataMap.get(ObservationUnitsSearchDao.TRIAL_INSTANCE));
-		assertEquals(stock.getGermplasm().getGid(), dataMap.get(ObservationUnitsSearchDao.GID));
-		assertEquals(stock.getName(), dataMap.get(ObservationUnitsSearchDao.DESIGNATION));
-		assertNull(dataMap.get(ObservationUnitsSearchDao.ENTRY_TYPE));
-		assertNull(dataMap.get(ObservationUnitsSearchDao.ENTRY_CODE));
-		assertEquals("1", dataMap.get(ObservationUnitsSearchDao.ENTRY_NO));
-		assertNull(dataMap.get(ObservationUnitsSearchDao.REP_NO));
-		assertNull(dataMap.get(ObservationUnitsSearchDao.PLOT_NO));
-		assertNull(dataMap.get(ObservationUnitsSearchDao.BLOCK_NO));
-		assertNull(dataMap.get(ObservationUnitsSearchDao.ROW));
-		assertNull(dataMap.get(ObservationUnitsSearchDao.COL));
+		assertEquals("1", dataMap.get(TRIAL_INSTANCE));
+		assertEquals(stock.getGermplasm().getGid(), dataMap.get(GID));
+		assertEquals(stock.getName(), dataMap.get(DESIGNATION));
+		assertNull(dataMap.get(ENTRY_TYPE));
+		assertNull(dataMap.get(ENTRY_CODE));
+		assertEquals("1", dataMap.get(ENTRY_NO));
+		assertNull(dataMap.get(REP_NO));
+		assertNull(dataMap.get(PLOT_NO));
+		assertNull(dataMap.get(BLOCK_NO));
+		assertNull(dataMap.get(ROW));
+		assertNull(dataMap.get(COL));
 		assertEquals("-", dataMap.get(ObservationUnitsSearchDao.SUM_OF_SAMPLES));
 		assertEquals("1", dataMap.get(observationUnitVariableName));
-		assertNull(dataMap.get(ObservationUnitsSearchDao.FIELD_MAP_RANGE));
-		assertNull(dataMap.get(ObservationUnitsSearchDao.FIELD_MAP_COLUMN));
+		assertNull(dataMap.get(FIELDMAP_RANGE));
+		assertNull(dataMap.get(FIELDMAP_COLUMN));
 		assertNotNull(dataMap.get(traitName));
 
 	}
@@ -564,8 +594,8 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final List<MeasurementVariableDto> selectionAndTraits = Arrays.asList(trait1, trait2, trait3);
 
 		final Map<String, Object> dataMap = new HashMap<>();
-		dataMap.put(ObservationUnitsSearchDao.TRIAL_INSTANCE, "1");
-		dataMap.put(ObservationUnitsSearchDao.GID, 1);
+		dataMap.put(TRIAL_INSTANCE, "1");
+		dataMap.put(GID, 1);
 		dataMap.put(trait1.getName(), "1");
 		dataMap.put(trait2.getName(), "ABC");
 		dataMap.put(trait3.getName(), Phenotype.MISSING_VALUE);
@@ -576,8 +606,8 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 			this.obsUnitSearchDao.convertSelectionAndTraitColumnsValueType(listMap, selectionAndTraits);
 
 		final Map<String, Object> resultDataMap = result.get(0);
-		assertEquals("1", resultDataMap.get(ObservationUnitsSearchDao.TRIAL_INSTANCE));
-		assertEquals(1, resultDataMap.get(ObservationUnitsSearchDao.GID));
+		assertEquals("1", resultDataMap.get(TRIAL_INSTANCE));
+		assertEquals(1, resultDataMap.get(GID));
 		assertEquals(BigDecimal.valueOf(1), resultDataMap.get(trait1.getName()));
 		assertEquals("ABC", resultDataMap.get(trait2.getName()));
 		assertEquals(null, resultDataMap.get(trait3.getName()));

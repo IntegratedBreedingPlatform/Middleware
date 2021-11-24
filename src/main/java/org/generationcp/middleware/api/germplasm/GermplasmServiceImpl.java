@@ -12,9 +12,6 @@ import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.constant.SystemNameTypes;
 import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
-import org.generationcp.middleware.constant.SystemNameTypes;
-import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
@@ -975,6 +972,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (germplasmDto != null) {
 			germplasmDto.setNames(this.daoFactory.getNameDao().getGermplasmNamesByGids(Collections.singletonList(gid)));
 			germplasmDto.setGermplasmOrigin(this.daoFactory.getGermplasmStudySourceDAO().getGermplasmOrigin(gid));
+			germplasmDto.setExternalReferences(this.daoFactory.getGermplasmExternalReferenceDAO().getExternalReferences(Collections.singletonList(gid)));
 			final List<Progenitor> progenitors = this.daoFactory.getProgenitorDao().getByGID(gid);
 			germplasmDto.setOtherProgenitors(progenitors.stream().map(Progenitor::getProgenitorGid).collect(Collectors.toList()));
 			this.getCreatedByWorkbenchUserName(germplasmDto.getCreatedByUserId()).ifPresent(germplasmDto::setCreatedBy);
