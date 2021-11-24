@@ -365,6 +365,10 @@
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
+	<bean id="copServiceAsync" class="org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceAsyncImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 	<bean id="germplasmListDataService" class="org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
