@@ -5,7 +5,6 @@ import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
-import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
@@ -62,7 +61,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -387,6 +385,47 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.map(ListDataProperty::getColumn)
 			.collect(toSet());
 		this.addListDataProperties(germplasmListsData, propertyNames);
+	}
+
+	@Override
+	public void cloneGermplasmListEntries(final Integer listId, final GermplasmListGeneratorDTO listGeneratorDTO) {
+		final GermplasmList germplasmList = this.getGermplasmListById(listId)
+			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+
+		// copy list data
+		final List<GermplasmListGeneratorDTO.GermplasmEntryDTO> germplasmListEntries = new ArrayList<>();
+		germplasmList.getListData().forEach(listEntry -> germplasmListEntries.add(
+				new GermplasmListGeneratorDTO.GermplasmEntryDTO(listEntry.getEntryId(), listEntry.getGid(), listEntry.getEntryCode(),
+					listEntry.getSeedSource(), listEntry.getGroupName())
+			));
+
+		// retrieve source list variables
+		final Set<Integer> listVariables = this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId)
+			.stream().map(GermplasmListDataView::getCvtermId).collect(toSet());
+
+		// retrieve source list entry details
+		final Table<Integer, Integer, GermplasmListDataDetail> table = this.daoFactory.getGermplasmListDataDetailDAO()
+			.getTableEntryIdToVariableId(listId);
+
+		// clone source entries to new list
+		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : germplasmListEntries) {
+			Map<Integer, GermplasmListObservationDto> observationDtoMap = new HashMap<>();
+
+			for (Integer variableId : listVariables) {
+				GermplasmListDataDetail germplasmListDataDetail = table.get(entry.getEntryNo(), variableId);
+
+				if (germplasmListDataDetail != null && StringUtils.isNotEmpty(germplasmListDataDetail.getValue())) {
+					GermplasmListObservationDto observationDto = new GermplasmListObservationDto();
+					observationDto.setValue(germplasmListDataDetail.getValue());
+					observationDto.setVariableId(variableId);
+					observationDtoMap.put(variableId, observationDto);
+				}
+			}
+
+			entry.setData(observationDtoMap);
+		}
+
+		listGeneratorDTO.setEntries(germplasmListEntries);
 	}
 
 	@Override

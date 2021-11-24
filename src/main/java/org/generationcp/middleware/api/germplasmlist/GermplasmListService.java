@@ -96,4 +96,6 @@ public interface GermplasmListService {
 
 	void addGermplasmListEntriesToAnotherList(Integer destinationListId, Integer sourceListId, String programUUID,
 		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
+
+	void cloneGermplasmListEntries(Integer listId, GermplasmListGeneratorDTO listGeneratorDTO);
 }

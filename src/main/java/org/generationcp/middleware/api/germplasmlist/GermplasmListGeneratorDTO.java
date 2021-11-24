@@ -24,6 +24,19 @@ public class GermplasmListGeneratorDTO {
 		 */
 		private Map<Integer, GermplasmListObservationDto> data = Collections.emptyMap();
 
+		public GermplasmEntryDTO() {
+
+		}
+
+		public GermplasmEntryDTO(final Integer entryNo, final Integer gid, final String entryCode, final String seedSource,
+			final String groupName) {
+			this.entryNo = entryNo;
+			this.gid = gid;
+			this.entryCode = entryCode;
+			this.seedSource = seedSource;
+			this.groupName = groupName;
+		}
+
 		public Integer getEntryNo() {
 			return this.entryNo;
 		}
