@@ -142,6 +142,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			+ "        LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id \n"
 			+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
 			+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
+	public static final String ENTRY_NO = "ENTRY_NO";
 
 	public List<NumericTraitInfo> getNumericTraitInfoList(final List<Integer> environmentIds, final List<Integer> numericVariableIds) {
 		final List<NumericTraitInfo> numericTraitInfoList = new ArrayList<>();
@@ -999,7 +1000,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setEntryType((String) row[20]);
 				observationUnit.setEntryNumber((String) row[21]);
 
-				observationUnit.setAdditionalInfo(new HashMap<>());
+				final Map<String, String> additionalInfo = new HashMap<>();
+				additionalInfo.put(ENTRY_NO, (String) row[21]);
+				observationUnit.setAdditionalInfo(additionalInfo);
 				observationUnit.setLocationDbId(observationUnit.getStudyLocationDbId());
 				observationUnit.setLocationName(observationUnit.getStudyLocation());
 				observationUnit.setObservationUnitPUI("");
@@ -1149,6 +1152,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append(" AND EXISTS (SELECT * FROM external_reference_experiment exref ");
 			queryString.append(" WHERE nde.nd_experiment_id = exref.nd_experiment_id AND exref.reference_source IN (:referenceSources)) ");
 		}
+
+		queryString.append(" ORDER BY nde.nd_experiment_id ");
 	}
 
 	private static void addObservationUnitSearchQueryParams(final ObservationUnitSearchRequestDTO requestDTO, final SQLQuery sqlQuery) {
