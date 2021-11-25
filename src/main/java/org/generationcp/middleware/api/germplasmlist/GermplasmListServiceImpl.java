@@ -72,9 +72,10 @@ import static java.util.stream.Collectors.toSet;
 @Service
 public class GermplasmListServiceImpl implements GermplasmListService {
 
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
+	private final SimpleDateFormat dateFormat = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
 	private static final int MAX_CROSS_NAME_SIZE = 240;
 	private static final String TRUNCATED = "(truncated)";
+	public static final String LIST_NOT_FOUND = "list.not.found";
 
 	private final DaoFactory daoFactory;
 
@@ -161,7 +162,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final String description = request.getDescription() != null ? request.getDescription() : StringUtils.EMPTY;
 
 		// save list
-		GermplasmList germplasmList = new GermplasmList(null, request.getName(), Long.valueOf(DATE_FORMAT.format(request.getDate())),
+		GermplasmList germplasmList = new GermplasmList(null, request.getName(), Long.valueOf(dateFormat.format(request.getDate())),
 			request.getType(), currentUserId, description, parent, status, request.getNotes());
 		germplasmList.setProgramUUID(programUUID);
 		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
@@ -213,7 +214,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Integer listId = request.getId();
 		// TODO validate deleted
 		final GermplasmList germplasmList = this.getGermplasmListById(listId)
-			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+			.orElseThrow(() -> new MiddlewareRequestException("", LIST_NOT_FOUND));
 
 		// if variables not exist in list, add them
 
@@ -305,7 +306,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite, final String programUUID) {
 
 		final GermplasmList germplasmList = this.getGermplasmListById(germplasmListId)
-			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+			.orElseThrow(() -> new MiddlewareRequestException("", LIST_NOT_FOUND));
 
 		//Get the germplasm entries to add
 		final List<AddGermplasmEntryModel> addGermplasmEntriesModels = new ArrayList<>();
@@ -393,15 +394,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public void addGermplasmListEntriesToAnotherList(final Integer destinationListId, final Integer sourceListId, final String programUUID,
 		final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite) {
 		final GermplasmList destinationGermplasmList = this.getGermplasmListById(destinationListId)
-			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+			.orElseThrow(() -> new MiddlewareRequestException("", LIST_NOT_FOUND));
 
 		this.getGermplasmListById(sourceListId)
-			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+			.orElseThrow(() -> new MiddlewareRequestException("", LIST_NOT_FOUND));
 
 		//Get the germplasm entries to add
 		final List<AddGermplasmEntryModel> addGermplasmEntriesModels = new ArrayList<>();
 		PageRequest pageRequest = null;
-		if (searchComposite != null && searchComposite.getSearchRequest() != null
+		if (searchComposite.getSearchRequest() != null
 			&& !CollectionUtils.isEmpty(searchComposite.getSearchRequest().getEntryNumbers())) {
 			pageRequest = new PageRequest(0, searchComposite.getSearchRequest().getEntryNumbers().size(),
 				new Sort(Sort.Direction.ASC, GermplasmListStaticColumns.ENTRY_NO.name()));
@@ -583,7 +584,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
 		return columns.stream()
 			.filter(c -> c.getCvtermId() != null && (types == null || types.contains(c.getTypeId())))
-			.map(c -> c.getCvtermId())
+			.map(GermplasmListDataView::getCvtermId)
 			.collect(Collectors.toList());
 	}
 
@@ -609,7 +610,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			this.daoFactory.getGermplasmListDataViewDAO().getByListId(listId);
 		final List<Integer> variableIds = columns.stream().filter(
 				c -> c.getCvtermId() != null && (c.getTypeId().equals(variableTypeId)
-					|| variableTypeId == null)).map(c -> c.getCvtermId())
+					|| variableTypeId == null)).map(GermplasmListDataView::getCvtermId)
 			.collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(variableIds)) {
 			final VariableFilter variableFilter = new VariableFilter();
@@ -686,7 +687,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public void deleteGermplasmList(final Integer listId) {
 		final GermplasmList germplasmList = this.getGermplasmListById(listId)
-			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+			.orElseThrow(() -> new MiddlewareRequestException("", LIST_NOT_FOUND));
 		germplasmList.setStatus(GermplasmList.Status.DELETED.getCode());
 		this.daoFactory.getGermplasmListDAO().update(germplasmList);
 	}
@@ -918,7 +919,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				Objects.isNull(entrySet.getValue()) ? null : entrySet.getValue().toString()));
 	}
 
-	private <T> void addListDataProperty(final GermplasmListData listData, final String propertyName, final String value) {
+	private void addListDataProperty(final GermplasmListData listData, final String propertyName, final String value) {
 		final ListDataProperty listDataProperty = new ListDataProperty(
 			listData,
 			propertyName,
@@ -1071,7 +1072,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				.anyMatch(listDataProperty -> this.hasBreedingMethodProperty(listDataProperty.getColumn()))) {
 			throw new MiddlewareRequestException("",
 				"list.add.limit",
-				new String[] {String.valueOf(this.maxAddEntriesLimit)});
+				String.valueOf(this.maxAddEntriesLimit));
 		}
 	}
 
