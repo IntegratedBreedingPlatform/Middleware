@@ -23,12 +23,12 @@
 		<comment>Mark system variables</comment>
         <sql>
 			update cvterm cv INNER JOIN cvterm cv1 ON cv.cvterm_id = cv1.cvterm_id  set cv.is_system = 1
-			where cv1.name in ('PLOT_NUMBER_AP_text','INSTANCE_NUMBER_AP_text','REP_NUMBER_AP_text','PLANT_NUMBER_AP_text','PLOTCODE_AP_text');
-
-			update cvterm cv INNER JOIN cvterm cv1 ON cv.cvterm_id = cv1.cvterm_id  set cv.is_system = 1
-			where cv1.name in ('TRIAL_INSTANCE','LOCATION_ID','EXPT_DESIGN','FIELDMAP COLUMN'
-				,'FIELDMAP RANGE','OBS_UNIT_ID','COL','ROW','BLOCK_NO','PLOT_NO','REP_NO'
-				,'ENTRY_CODE','ENTRY_NO','DESIGNATION','GID','ENTRY_TYPE', 'PLOT_CODE', 'CHECK_INTERVAL', 'CHECK_PLAN', 'CHECK_START');
+			where cv1.name in ('TRIAL_INSTANCE','LOCATION_ID','LOCATION_NAME','EXPT_DESIGN','FIELDMAP COLUMN'
+				,'FIELDMAP RANGE','OBS_UNIT_ID','COL','ROW','BLOCK_NO','PLOT_NO','REP_NO','ENTRY_CODE'
+			    ,'ENTRY_NO','DESIGNATION','GID','MGID','FGID','GROUPGID','EXPT_DESIGN_SOURCE','DATASET_NAME'
+			    ,'DATASET_TITLE','LOCATION_NAME','DESIG','CROSS','ENTRY_TYPE', 'PLOT_CODE', 'CHECK_INTERVAL'
+			    ,'CHECK_PLAN','CHECK_START','PLOT_NUMBER_AP_text','INSTANCE_NUMBER_AP_text','REP_NUMBER_AP_text'
+			    ,'PLANT_NUMBER_AP_text','PLOTCODE_AP_text');
         </sql>
     </changeSet>
 </databaseChangeLog>
