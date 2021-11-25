@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
@@ -691,7 +692,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public void removeGermplasmEntriesFromList(final Integer germplasmListId, final List<Integer> listDataIds) {
+	public void removeGermplasmEntriesFromList(final Integer germplasmListId,
+		final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite) {
+		final Set<Integer> listDataIds =
+			!CollectionUtils.isEmpty(searchComposite.getItemIds()) ? searchComposite.getItemIds() :
+				this.germplasmListDataService.searchGermplasmListData(germplasmListId, searchComposite.getSearchRequest(), null).stream()
+					.map(GermplasmListDataSearchResponse::getListDataId).collect(Collectors.toSet());
 		this.daoFactory.getGermplasmListDataDetailDAO().deleteByListDataIds(listDataIds);
 		this.daoFactory.getGermplasmListDataDAO().deleteByListDataIds(listDataIds);
 		this.daoFactory.getGermplasmListDataDAO().reOrderEntries(germplasmListId);

@@ -112,21 +112,12 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 		return (Long) criteria.uniqueResult();
 	}
 
-	public void deleteByListDataIds(final List<Integer> listDataIds) {
+	public void deleteByListDataIds(final Set<Integer> listDataIds) {
 		Preconditions.checkArgument(CollectionUtils.isNotEmpty(listDataIds), "listDataIds passed cannot be empty.");
-		try {
-			final String query =
-				"DELETE ldd FROM list_data_details ldd INNER JOIN listdata ld "
-					+ "ON (ld.lrecid = ldd.lrecid) WHERE ld.lrecid IN (:listDataIds)";
-			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
-			sqlQuery.setParameterList("listDataIds", listDataIds);
-			sqlQuery.executeUpdate();
-		} catch (final HibernateException e) {
-			final String errorMessage =
-				"Error with deleteByListDataIds(listDataIds=" + listDataIds
-					+ ") query from GermplasmListDataDetailDAO " + e.getMessage();
-			GermplasmListDataDetailDAO.LOG.error(errorMessage);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
+		final String query =
+			"DELETE ldd FROM list_data_details ldd WHERE ldd.lrecid IN (:listDataIds)";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
+		sqlQuery.setParameterList("listDataIds", listDataIds);
+		sqlQuery.executeUpdate();
 	}
 }

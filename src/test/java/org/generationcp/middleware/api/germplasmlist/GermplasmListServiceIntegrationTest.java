@@ -620,7 +620,10 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		this.germplasmListService.saveListDataObservation(germplasmList.getId(),
 			new GermplasmListObservationRequestDto(germplasmListData3.getListDataId(), variable.getId(), "3", null));
 
-		this.germplasmListService.removeGermplasmEntriesFromList(germplasmList.getId(), Arrays.asList(germplasmListData2.getListDataId()));
+		// Remove by searchComposite.itemIds
+		final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite1 = new SearchCompositeDto<>();
+		searchComposite1.setItemIds(Sets.newHashSet(germplasmListData2.getListDataId()));
+		this.germplasmListService.removeGermplasmEntriesFromList(germplasmList.getId(), searchComposite1);
 
 		final List<GermplasmListDataSearchResponse> germplasmListDataResponseList =
 			this.germplasmListDataService.searchGermplasmListData(germplasmList.getId(), new GermplasmListDataSearchRequest(), null);
@@ -630,6 +633,22 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(2, germplasmListDataDetailList.size());
 		Assert.assertEquals(1, germplasmListDataResponseList.get(0).getData().get(GermplasmListStaticColumns.ENTRY_NO.getName()));
 		Assert.assertEquals(2, germplasmListDataResponseList.get(1).getData().get(GermplasmListStaticColumns.ENTRY_NO.getName()));
+
+		// Remove by searchComposite.searchRequest.entryNumbers
+		final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite2 = new SearchCompositeDto<>();
+		final GermplasmListDataSearchRequest germplasmListDataSearchRequest = new GermplasmListDataSearchRequest();
+		germplasmListDataSearchRequest.setEntryNumbers(Arrays.asList(2));
+		searchComposite2.setSearchRequest(germplasmListDataSearchRequest);
+		this.germplasmListService.removeGermplasmEntriesFromList(germplasmList.getId(), searchComposite2);
+
+		final List<GermplasmListDataSearchResponse> germplasmListDataResponseList2 =
+			this.germplasmListDataService.searchGermplasmListData(germplasmList.getId(), new GermplasmListDataSearchRequest(), null);
+		final List<GermplasmListDataDetail> germplasmListDataDetailList2 =
+			this.germplasmListDataService.getGermplasmListDataDetailList(germplasmList.getId());
+
+		Assert.assertEquals(1, germplasmListDataResponseList2.size());
+		Assert.assertEquals(1, germplasmListDataDetailList2.size());
+		Assert.assertEquals(1, germplasmListDataResponseList2.get(0).getData().get(GermplasmListStaticColumns.ENTRY_NO.getName()));
 
 	}
 

@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link GermplasmListData}.
@@ -208,18 +209,13 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		return query.executeUpdate();
 	}
 
-	public void deleteByListDataIds(final List<Integer> listDataIds) {
+	public void deleteByListDataIds(final Set<Integer> listDataIds) {
 		Preconditions.checkArgument(CollectionUtils.isNotEmpty(listDataIds), "listDataIds passed cannot be empty.");
-		try {
-			final Query query =
-				this.getSession().createQuery("DELETE FROM GermplasmListData WHERE id in (:listDataIds)");
-			query.setParameterList("listDataIds", listDataIds);
-			query.executeUpdate();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error in deleteByListDataIds(listDataIds=" + listDataIds + ") in GermplasmListDataDAO: "
-					+ e.getMessage(), e);
-		}
+		final Query query =
+			this.getSession().createQuery("DELETE FROM GermplasmListData WHERE id in (:listDataIds)");
+		query.setParameterList("listDataIds", listDataIds);
+		query.executeUpdate();
+
 	}
 
 	/**
