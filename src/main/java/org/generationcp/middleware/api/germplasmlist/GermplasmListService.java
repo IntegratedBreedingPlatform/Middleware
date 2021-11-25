@@ -22,15 +22,6 @@ public interface GermplasmListService {
 
 	void importUpdates(GermplasmListGeneratorDTO request);
 
-	/**
-	 * Inserts a list of multiple {@code GermplasmListData} objects into the database.
-	 *
-	 * @param data - A list of {@code GermplasmListData} objects to be persisted to the database. {@code GermplasmListData}
-	 *             objects must be valid.
-	 * @return Returns the ids of the {@code GermplasmListData} records inserted in the database.
-	 */
-	List<GermplasmListData> addGermplasmListData(List<GermplasmListData> data);
-
 	void addGermplasmEntriesToList(Integer germplasmListId, SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite,
 		final String programUUID);
 
