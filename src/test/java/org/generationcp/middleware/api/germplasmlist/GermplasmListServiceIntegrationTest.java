@@ -12,6 +12,7 @@ import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataServi
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StandardVariable;
+import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
@@ -36,6 +37,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -611,6 +613,26 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(1, germplasmListDataResponseList2.size());
 		Assert.assertEquals(1, germplasmListDataDetailList2.size());
 		Assert.assertEquals(1, germplasmListDataResponseList2.get(0).getData().get(GermplasmListStaticColumns.ENTRY_NO.getName()));
+
+	}
+
+
+	@Test
+	public void testEditListMetadata() {
+		final int randomInt = new Random().nextInt(100);
+		// Germplasm list
+		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt,
+			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+
+		final GermplasmListDto germplasmListDto = new GermplasmListDto();
+		germplasmListDto.setListId(germplasmList.getId());
+		germplasmListDto.setListName(RandomStringUtils.randomAlphabetic(20));
+		germplasmListDto.setDescription(RandomStringUtils.randomAlphabetic(20));
+		germplasmListDto.setNotes(RandomStringUtils.randomAlphabetic(55));
+		germplasmListDto.setCreationDate(new Date());
+		germplasmListDto.setListType(GermplasmListType.F1.name());
+		this.germplasmListService.editListMetadata(germplasmListDto);
 
 	}
 

@@ -162,7 +162,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final String description = request.getDescription() != null ? request.getDescription() : StringUtils.EMPTY;
 
 		// save list
-		GermplasmList germplasmList = new GermplasmList(null, request.getName(), Long.valueOf(dateFormat.format(request.getDate())),
+		GermplasmList germplasmList = new GermplasmList(null, request.getName(), Long.valueOf(this.dateFormat.format(request.getDate())),
 			request.getType(), currentUserId, description, parent, status, request.getNotes());
 		germplasmList.setProgramUUID(programUUID);
 		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
@@ -693,11 +693,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public void editListMetadata(final GermplasmListDto germplasmListDto) {
 		final GermplasmList germplasmList = this.getGermplasmListById(germplasmListDto.getListId())
-			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
+			.orElseThrow(() -> new MiddlewareRequestException("", LIST_NOT_FOUND));
 		germplasmList.setName(germplasmListDto.getListName());
 		germplasmList.setDescription(germplasmListDto.getDescription());
 		germplasmList.setType(germplasmList.getType());
-		germplasmList.setDate(Long.valueOf(DATE_FORMAT.format(germplasmListDto.getCreationDate())));
+		germplasmList.setDate(Long.valueOf(this.dateFormat.format(germplasmListDto.getCreationDate())));
 		germplasmList.setNotes(germplasmList.getNotes());
 		this.daoFactory.getGermplasmListDAO().update(germplasmList);
 	}
