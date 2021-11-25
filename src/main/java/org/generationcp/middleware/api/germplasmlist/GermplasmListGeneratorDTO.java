@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.germplasmlist;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.pojos.GermplasmList;
 
 import java.util.Collections;
 import java.util.Date;
@@ -116,6 +117,10 @@ public class GermplasmListGeneratorDTO {
 		this.date = request.getDate();
 		this.notes = request.getNotes();
 		this.parentFolderId = request.getParentFolderId();
+	}
+	public GermplasmListGeneratorDTO(GermplasmList list) {
+		this.id = list.getId();
+		this.name = list.getName();
 	}
 
 	public Integer getId() {

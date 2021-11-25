@@ -56,6 +56,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * DAO class for {@link GermplasmList}.
@@ -105,6 +106,24 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 			+ "WHERE liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
 			+ "      OR desig = :q OR listname = :q " + "      OR desig = :qNoSpaces "
 			+ "      OR desig = :qStandardized " + ")";
+
+	private static final String COPY_LISTDATA_TO_NEW_LIST = "INSERT INTO listdata (listid, gid, entryid, entrycd, source, desig, grpname, lrstatus, llrecid) "
+		+ "      SELECT :destListid, gid, entryid, entrycd, source, desig, grpname, lrstatus, llrecid "
+		+ "      FROM listdata "
+		+ "      WHERE listid = :srcListid ";
+
+	private static final String COPY_LIST_DATA_VIEW = "INSERT INTO list_data_view (listid, static_id, name_fldno, cvterm_id, type_id) "
+		+ "      SELECT :destListid, static_id, name_fldno, cvterm_id, type_id "
+		+ "      FROM list_data_view "
+		+ "      WHERE listid = :srcListid ";
+
+	private static final String COPY_LIST_DATA_DETAILS = "INSERT INTO list_data_details (variable_id, lrecid, value, cvalue_Id, created_by, created_date) "
+		+ "      SELECT variable_id, destld.lrecid, value, cvalue_Id, :createdBy, now() "
+		+ "      FROM listdata ld, list_data_details ldd, listdata destld "
+		+ "      WHERE ld.lrecid = ldd.lrecid "
+		+ "          AND ld.entryid = destld.entryid "
+		+ "          AND ld.listid = :srcListid "
+		+ "          AND destld.listid = :destListid ";
 
 	private static final String FILTER_BY_PROGRAM_UUID = " AND (program_uuid = :programUUID OR program_uuid IS NULL)";
 
@@ -857,4 +876,25 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
+	public void copyGermplasmListEntries (final Integer sourceListId, final Integer destListId, final Integer loggedInUser) {
+		try {
+			this.executeInsertListEntries(COPY_LISTDATA_TO_NEW_LIST, sourceListId, destListId, Optional.empty());
+			this.executeInsertListEntries(COPY_LIST_DATA_VIEW, sourceListId, destListId, Optional.empty());
+			this.executeInsertListEntries(COPY_LIST_DATA_DETAILS, sourceListId, destListId, Optional.of(loggedInUser));
+		} catch (final Exception e) {
+			final String message = "Error with copyGermplasmListEntries(sourceListId=" + sourceListId + " ): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
+	}
+
+	private void executeInsertListEntries(final String queryName, final Integer sourceListId, final Integer destListId, final Optional<Integer> loggedInUser) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryName);
+		sqlQuery.setParameter("srcListid", sourceListId);
+		sqlQuery.setParameter("destListid", destListId);
+		if (loggedInUser.isPresent()) {
+			sqlQuery.setParameter("createdBy", loggedInUser.get());
+		}
+		sqlQuery.executeUpdate();
+	}
 }

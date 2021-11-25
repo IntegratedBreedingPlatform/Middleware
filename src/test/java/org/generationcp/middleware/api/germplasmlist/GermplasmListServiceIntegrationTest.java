@@ -600,8 +600,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		targetList.setType("LST");
 		targetList.setDescription("Test Cloned Germplasm List");
 
-		this.germplasmListService.cloneGermplasmList(sourceGermplasmList.getId(), targetList,
-			new WorkbenchUser(USER_ID));
+		this.germplasmListService.cloneGermplasmList(sourceGermplasmList.getId(), targetList, USER_ID);
 
 		// verify if entries from source is cloned in the target and are in the proper order
 		assertEquals(2, targetList.getEntries().size());
