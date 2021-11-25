@@ -95,4 +95,7 @@ public interface GermplasmService {
 	List<GermplasmProgenyDto> getGermplasmProgenies(Integer gid);
 
 	Optional<Germplasm> findOneByMethodId(Integer breedingMethodDbId);
+
+	boolean isLocationUsedInGermplasm(Integer locationId);
+
 }

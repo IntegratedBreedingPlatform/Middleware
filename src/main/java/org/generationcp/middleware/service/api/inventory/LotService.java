@@ -37,4 +37,6 @@ public interface LotService {
 
 	void mergeLots(Integer userId, Integer keepLotId, LotsSearchDto lotsSearchDto);
 
+	boolean isLocationUsedInLot(Integer locationId);
+
 }

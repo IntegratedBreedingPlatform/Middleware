@@ -27,4 +27,6 @@ public interface GermplasmAttributeService {
 
 	Map<Integer, List<AttributeDTO>> getAttributesByGIDsMap(List<Integer> gids);
 
+	boolean isLocationUsedInAttribute(Integer locationId);
+
 }
