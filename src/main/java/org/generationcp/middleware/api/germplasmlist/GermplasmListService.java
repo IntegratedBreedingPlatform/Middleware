@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.springframework.data.domain.Pageable;
 
@@ -21,15 +20,6 @@ public interface GermplasmListService {
 		WorkbenchUser loggedInUser);
 
 	void importUpdates(GermplasmListGeneratorDTO request);
-
-	/**
-	 * Inserts a list of multiple {@code GermplasmListData} objects into the database.
-	 *
-	 * @param data - A list of {@code GermplasmListData} objects to be persisted to the database. {@code GermplasmListData}
-	 *                           objects must be valid.
-	 * @return Returns the ids of the {@code GermplasmListData} records inserted in the database.
-	 */
-	List<GermplasmListData> addGermplasmListData(List<GermplasmListData> data);
 
 	void addGermplasmEntriesToList(Integer germplasmListId, SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite,
 		final String programUUID);
@@ -97,6 +87,8 @@ public interface GermplasmListService {
 	void addGermplasmListEntriesToAnotherList(Integer destinationListId, Integer sourceListId, String programUUID,
 		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
 
-	void editListMetadata(GermplasmListDto germplasmListDto);
+	void removeGermplasmEntriesFromList(Integer germplasmListId,
+		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
 
+	void editListMetadata(GermplasmListDto germplasmListDto);
 }

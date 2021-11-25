@@ -94,6 +94,35 @@
 
 		</sql>
 	</changeSet>
+	<changeSet author="abatac" id="v19.4.0-4">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS'
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM permission WHERE name = 'REMOVE_ENTRIES_GERMPLASM_LISTS'
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Add Remove Entries Germplasm List permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`)
+			VALUES ('REMOVE_ENTRIES_GERMPLASM_LISTS', 'Remove entries', @permission_id);
+
+			SET @remove_entries_permission_id = (SELECT permission_id FROM permission where name = 'REMOVE_ENTRIES_GERMPLASM_LISTS');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @remove_entries_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @remove_entries_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @remove_entries_permission_id, '1');
+
+		</sql>
+	</changeSet>
 
 	<changeSet author="darla" id="v19.4.0-4">
 		<preConditions onFail="MARK_RAN">
@@ -123,4 +152,3 @@
 	</changeSet>
 
 </databaseChangeLog>
-
