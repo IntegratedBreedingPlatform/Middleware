@@ -102,6 +102,10 @@ public class GermplasmListGeneratorDTO {
 	// Retrieve entries from filter or list of selected ids
 	private SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite;
 
+	private int status;
+
+	private String programUUID;
+
 	public GermplasmListGeneratorDTO() {
 	}
 
@@ -185,5 +189,21 @@ public class GermplasmListGeneratorDTO {
 	public void setSearchComposite(
 		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite) {
 		this.searchComposite = searchComposite;
+	}
+
+	public int getStatus() {
+		return this.status;
+	}
+
+	public void setStatus(final int status) {
+		this.status = status;
+	}
+
+	public String getProgramUUID() {
+		return this.programUUID;
+	}
+
+	public void setProgramUUID(final String programUUID) {
+		this.programUUID = programUUID;
 	}
 }

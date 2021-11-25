@@ -17,8 +17,7 @@ import java.util.Set;
 
 public interface GermplasmListService {
 
-	GermplasmListGeneratorDTO create(GermplasmListGeneratorDTO request, int status, String programUUID,
-		WorkbenchUser loggedInUser);
+	GermplasmListGeneratorDTO create(GermplasmListGeneratorDTO request, WorkbenchUser loggedInUser);
 
 	void importUpdates(GermplasmListGeneratorDTO request);
 
@@ -97,7 +96,8 @@ public interface GermplasmListService {
 	void addGermplasmListEntriesToAnotherList(Integer destinationListId, Integer sourceListId, String programUUID,
 		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
 
-	void cloneGermplasmListEntries(Integer listId, GermplasmListGeneratorDTO listGeneratorDTO);
+	GermplasmListGeneratorDTO cloneGermplasmList(Integer listId, GermplasmListGeneratorDTO listGeneratorDTO,
+		WorkbenchUser loggedInUser);
 
 	void editListMetadata(Integer listId, GermplasmListMetadataRequest request);
 

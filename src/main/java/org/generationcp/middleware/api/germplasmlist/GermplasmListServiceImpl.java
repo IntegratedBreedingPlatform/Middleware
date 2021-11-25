@@ -145,8 +145,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request, final int status, final String programUUID,
-		final WorkbenchUser loggedInUser) {
+	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request, final WorkbenchUser loggedInUser) {
 
 		final List<Integer> gids = request.getEntries()
 			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
@@ -161,8 +160,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		// save list
 		GermplasmList germplasmList = new GermplasmList(null, request.getName(), Long.valueOf(DATE_FORMAT.format(request.getDate())),
-			request.getType(), currentUserId, description, parent, status, request.getNotes());
-		germplasmList.setProgramUUID(programUUID);
+			request.getType(), currentUserId, description, parent, request.getStatus(), request.getNotes());
+		germplasmList.setProgramUUID(request.getProgramUUID());
 		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
 		request.setId(germplasmList.getId());
 
@@ -416,7 +415,12 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public void cloneGermplasmListEntries(final Integer listId, final GermplasmListGeneratorDTO listGeneratorDTO) {
+	public GermplasmListGeneratorDTO cloneGermplasmList(final Integer listId, final GermplasmListGeneratorDTO listGeneratorDTO,
+		final WorkbenchUser loggedInUser) {
+		this.cloneGermplasmListEntries(listId, listGeneratorDTO);
+		return this.create(listGeneratorDTO, loggedInUser);
+	}
+	private void cloneGermplasmListEntries(final Integer listId, final GermplasmListGeneratorDTO listGeneratorDTO) {
 		final GermplasmList germplasmList = this.getGermplasmListById(listId)
 			.orElseThrow(() -> new MiddlewareRequestException("", "list.not.found"));
 

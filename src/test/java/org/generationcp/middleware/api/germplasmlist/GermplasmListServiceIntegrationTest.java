@@ -25,6 +25,7 @@ import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -599,7 +600,8 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		targetList.setType("LST");
 		targetList.setDescription("Test Cloned Germplasm List");
 
-		this.germplasmListService.cloneGermplasmListEntries(sourceGermplasmList.getId(), targetList);
+		this.germplasmListService.cloneGermplasmList(sourceGermplasmList.getId(), targetList,
+			new WorkbenchUser(USER_ID));
 
 		// verify if entries from source is cloned in the target and are in the proper order
 		assertEquals(2, targetList.getEntries().size());
