@@ -1,7 +1,9 @@
 package org.generationcp.middleware.dao.germplasmlist;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
@@ -110,4 +112,12 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 		return (Long) criteria.uniqueResult();
 	}
 
+	public void deleteByListDataIds(final Set<Integer> listDataIds) {
+		Preconditions.checkArgument(CollectionUtils.isNotEmpty(listDataIds), "listDataIds passed cannot be empty.");
+		final String query =
+			"DELETE ldd FROM list_data_details ldd WHERE ldd.lrecid IN (:listDataIds)";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
+		sqlQuery.setParameterList("listDataIds", listDataIds);
+		sqlQuery.executeUpdate();
+	}
 }
