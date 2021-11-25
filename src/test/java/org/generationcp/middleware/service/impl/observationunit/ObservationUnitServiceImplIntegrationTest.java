@@ -28,7 +28,6 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
-import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
@@ -45,6 +44,8 @@ import java.util.Map;
 
 public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBase {
 
+	public static final String ENTRY_NO = "ENTRY_NO";
+	
 	@Resource
 	private TrialServiceBrapi trialServiceBrapi;
 
@@ -106,40 +107,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 
 	@Test
 	public void testImportObservationUnits_AllInfoSaved() {
-		final ObservationUnitImportRequestDto dto = new ObservationUnitImportRequestDto();
-		dto.setTrialDbId(this.studySummary.getTrialDbId().toString());
-		dto.setStudyDbId(this.studyInstanceDto.getStudyDbId());
-		dto.setProgramDbId(this.commonTestProject.getUniqueID());
-		dto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
-		final ExternalReferenceDTO externalReference = new ExternalReferenceDTO();
-		externalReference.setReferenceID(RandomStringUtils.randomAlphabetic(20));
-		externalReference.setReferenceSource(RandomStringUtils.randomAlphabetic(20));
-		dto.setExternalReferences(Collections.singletonList(externalReference));
-
-		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
-		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
-		observationUnitPosition.setPositionCoordinateX("1");
-		observationUnitPosition.setPositionCoordinateY("2");
-		final ObservationLevelRelationship plotRelationship = new ObservationLevelRelationship();
-		plotRelationship.setLevelCode("1");
-		plotRelationship.setLevelName("PLOT");
-		final ObservationLevelRelationship repRelationship = new ObservationLevelRelationship();
-		repRelationship.setLevelCode("1");
-		repRelationship.setLevelName("REP");
-		final ObservationLevelRelationship blockRelationship = new ObservationLevelRelationship();
-		blockRelationship.setLevelCode("1");
-		blockRelationship.setLevelName("BLOCK");
-		observationUnitPosition.setObservationLevelRelationships(Arrays.asList(plotRelationship, repRelationship, blockRelationship));
-
-		final Map<String, Object> geoCoodinates = new HashMap<>();
-		geoCoodinates.put("type", "Feature");
-		final Map<String, Object> geometry = new HashMap<>();
-		geoCoodinates.put("type", "Point");
-		final List<Double> coordinates = Arrays.asList(new Double(-76.506042), new Double(42.417373), new Double(123));
-		geometry.put("coordinates", coordinates);
-		geoCoodinates.put("geometry", geometry);
-		observationUnitPosition.setGeoCoordinates(geoCoodinates);
-		dto.setObservationUnitPosition(observationUnitPosition);
+		final ObservationUnitImportRequestDto dto = this.createObservationUnitImportRequestDto();
 
 		final List<String> observationDbIds =
 			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Collections.singletonList(dto));
@@ -156,16 +124,81 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		Assert.assertEquals(dto.getStudyDbId(), observationUnitDto.getStudyDbId());
 		Assert.assertEquals(dto.getGermplasmDbId(), observationUnitDto.getGermplasmDbId());
 		Assert.assertTrue(
-			observationUnitPosition.getEntryType().equalsIgnoreCase(observationUnitDto.getObservationUnitPosition().getEntryType()));
-		Assert.assertEquals(observationUnitPosition.getPositionCoordinateX(),
+			dto.getObservationUnitPosition().getEntryType()
+				.equalsIgnoreCase(observationUnitDto.getObservationUnitPosition().getEntryType()));
+		Assert.assertEquals(dto.getObservationUnitPosition().getPositionCoordinateX(),
 			observationUnitDto.getObservationUnitPosition().getPositionCoordinateX());
-		Assert.assertEquals(observationUnitPosition.getPositionCoordinateY(),
+		Assert.assertEquals(dto.getObservationUnitPosition().getPositionCoordinateY(),
 			observationUnitDto.getObservationUnitPosition().getPositionCoordinateY());
 		Assert.assertEquals(3, observationUnitDto.getObservationUnitPosition().getObservationLevelRelationships().size());
 		Assert.assertNotNull(observationUnitDto.getObservationUnitPosition().getGeoCoordinates());
 		Assert.assertEquals(1, observationUnitDto.getExternalReferences().size());
-		Assert.assertEquals(externalReference.getReferenceID(), observationUnitDto.getExternalReferences().get(0).getReferenceID());
-		Assert.assertEquals(externalReference.getReferenceSource(), observationUnitDto.getExternalReferences().get(0).getReferenceSource());
+		Assert.assertEquals(dto.getExternalReferences().get(0).getReferenceID(),
+			observationUnitDto.getExternalReferences().get(0).getReferenceID());
+		Assert.assertEquals(dto.getExternalReferences().get(0).getReferenceSource(),
+			observationUnitDto.getExternalReferences().get(0).getReferenceSource());
+		Assert.assertEquals("1", observationUnitDto.getAdditionalInfo().get(ENTRY_NO));
+	}
+
+	@Test
+	public void testImportObservationUnits_SameGermplasm_WithoutEntryNo() {
+		final ObservationUnitImportRequestDto dto1 = this.createObservationUnitImportRequestDto();
+		final ObservationUnitImportRequestDto dto2 = this.createObservationUnitImportRequestDto();
+		final ObservationUnitImportRequestDto dto3 = this.createObservationUnitImportRequestDto();
+
+		final List<String> observationDbIds =
+			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Arrays.asList(dto1, dto2, dto3));
+
+		final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
+		searchRequestDTO.setObservationUnitDbIds(observationDbIds);
+		final List<ObservationUnitDto> observationUnitDtoList =
+			this.observationUnitService.searchObservationUnits(null, null, searchRequestDTO);
+
+		Assert.assertEquals(3, observationUnitDtoList.size());
+		final ObservationUnitDto observationUnitDto = observationUnitDtoList.get(0);
+		Assert.assertEquals(dto1.getGermplasmDbId(), observationUnitDto.getGermplasmDbId());
+		Assert.assertEquals("1", observationUnitDto.getAdditionalInfo().get(ENTRY_NO));
+		final ObservationUnitDto observationUnitDto2 = observationUnitDtoList.get(1);
+		Assert.assertEquals(dto2.getGermplasmDbId(), observationUnitDto2.getGermplasmDbId());
+		Assert.assertEquals("1", observationUnitDto2.getAdditionalInfo().get(ENTRY_NO));
+		final ObservationUnitDto observationUnitDto3 = observationUnitDtoList.get(2);
+		Assert.assertEquals(dto3.getGermplasmDbId(), observationUnitDto3.getGermplasmDbId());
+		Assert.assertEquals("1", observationUnitDto3.getAdditionalInfo().get(ENTRY_NO));
+	}
+
+	@Test
+	public void testImportObservationUnits_SameGermplasm_EntryNoIsSpecifiedInAdditionalInfo() {
+		final ObservationUnitImportRequestDto dto1 = this.createObservationUnitImportRequestDto();
+		final Map<String, String> additionalInfo = new HashMap<>();
+		additionalInfo.put(ENTRY_NO, "99");
+		dto1.setAdditionalInfo(additionalInfo);
+		final ObservationUnitImportRequestDto dto2 = this.createObservationUnitImportRequestDto();
+		final Map<String, String> additionalInfo2 = new HashMap<>();
+		additionalInfo2.put(ENTRY_NO, "100");
+		dto2.setAdditionalInfo(additionalInfo2);
+		final ObservationUnitImportRequestDto dto3 = this.createObservationUnitImportRequestDto();
+		final Map<String, String> additionalInfo3 = new HashMap<>();
+		additionalInfo3.put(ENTRY_NO, "101");
+		dto3.setAdditionalInfo(additionalInfo3);
+
+		final List<String> observationDbIds =
+			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Arrays.asList(dto1, dto2, dto3));
+
+		final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
+		searchRequestDTO.setObservationUnitDbIds(observationDbIds);
+		final List<ObservationUnitDto> observationUnitDtoList =
+			this.observationUnitService.searchObservationUnits(null, null, searchRequestDTO);
+
+		Assert.assertEquals(3, observationUnitDtoList.size());
+		final ObservationUnitDto observationUnitDto = observationUnitDtoList.get(0);
+		Assert.assertEquals(dto1.getGermplasmDbId(), observationUnitDto.getGermplasmDbId());
+		Assert.assertEquals(dto1.getAdditionalInfo().get(ENTRY_NO), observationUnitDto.getAdditionalInfo().get(ENTRY_NO));
+		final ObservationUnitDto observationUnitDto2 = observationUnitDtoList.get(1);
+		Assert.assertEquals(dto2.getGermplasmDbId(), observationUnitDto2.getGermplasmDbId());
+		Assert.assertEquals(dto2.getAdditionalInfo().get(ENTRY_NO), observationUnitDto2.getAdditionalInfo().get(ENTRY_NO));
+		final ObservationUnitDto observationUnitDto3 = observationUnitDtoList.get(2);
+		Assert.assertEquals(dto3.getGermplasmDbId(), observationUnitDto3.getGermplasmDbId());
+		Assert.assertEquals(dto3.getAdditionalInfo().get(ENTRY_NO), observationUnitDto3.getAdditionalInfo().get(ENTRY_NO));
 	}
 
 	@Test
@@ -287,6 +320,45 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		Assert.assertTrue(
 			observationUnitPosition.getEntryType().equalsIgnoreCase(observationUnitDto.getObservationUnitPosition().getEntryType()));
 		Assert.assertTrue(CollectionUtils.isEmpty(observationUnitDto.getObservationUnitPosition().getObservationLevelRelationships()));
+	}
+
+	private ObservationUnitImportRequestDto createObservationUnitImportRequestDto() {
+		final ObservationUnitImportRequestDto dto = new ObservationUnitImportRequestDto();
+		dto.setTrialDbId(this.studySummary.getTrialDbId().toString());
+		dto.setStudyDbId(this.studyInstanceDto.getStudyDbId());
+		dto.setProgramDbId(this.commonTestProject.getUniqueID());
+		dto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
+		final ExternalReferenceDTO externalReference = new ExternalReferenceDTO();
+		externalReference.setReferenceID(RandomStringUtils.randomAlphabetic(20));
+		externalReference.setReferenceSource(RandomStringUtils.randomAlphabetic(20));
+		dto.setExternalReferences(Collections.singletonList(externalReference));
+
+		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
+		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
+		observationUnitPosition.setPositionCoordinateX("1");
+		observationUnitPosition.setPositionCoordinateY("2");
+		final ObservationLevelRelationship plotRelationship = new ObservationLevelRelationship();
+		plotRelationship.setLevelCode("1");
+		plotRelationship.setLevelName("PLOT");
+		final ObservationLevelRelationship repRelationship = new ObservationLevelRelationship();
+		repRelationship.setLevelCode("1");
+		repRelationship.setLevelName("REP");
+		final ObservationLevelRelationship blockRelationship = new ObservationLevelRelationship();
+		blockRelationship.setLevelCode("1");
+		blockRelationship.setLevelName("BLOCK");
+		observationUnitPosition.setObservationLevelRelationships(Arrays.asList(plotRelationship, repRelationship, blockRelationship));
+
+		final Map<String, Object> geoCoodinates = new HashMap<>();
+		geoCoodinates.put("type", "Feature");
+		final Map<String, Object> geometry = new HashMap<>();
+		geoCoodinates.put("type", "Point");
+		final List<Double> coordinates = Arrays.asList(new Double(-76.506042), new Double(42.417373), new Double(123));
+		geometry.put("coordinates", coordinates);
+		geoCoodinates.put("geometry", geometry);
+		observationUnitPosition.setGeoCoordinates(geoCoodinates);
+		dto.setObservationUnitPosition(observationUnitPosition);
+
+		return dto;
 	}
 
 }
