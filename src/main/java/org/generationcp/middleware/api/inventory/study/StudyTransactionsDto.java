@@ -1,6 +1,8 @@
 package org.generationcp.middleware.api.inventory.study;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
+import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -22,6 +24,7 @@ public class StudyTransactionsDto extends TransactionDto {
 		this.observationUnits = new ArrayList<>();
 	}
 
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	public static class ObservationUnitDto {
 		private Integer ndExperimentId;
 		private Integer transactionId;
@@ -107,6 +110,7 @@ public class StudyTransactionsDto extends TransactionDto {
 	}
 
 	private List<ObservationUnitDto> observationUnits;
+	private ExperimentTransactionType experimentTransactionType;
 
 	public List<ObservationUnitDto> getObservationUnits() {
 		return this.observationUnits;
@@ -114,6 +118,14 @@ public class StudyTransactionsDto extends TransactionDto {
 
 	public void setObservationUnits(final List<ObservationUnitDto> observationUnits) {
 		this.observationUnits = observationUnits;
+	}
+
+	public ExperimentTransactionType getExperimentTransactionType() {
+		return experimentTransactionType;
+	}
+
+	public void setExperimentTransactionType(final ExperimentTransactionType experimentTransactionType) {
+		this.experimentTransactionType = experimentTransactionType;
 	}
 
 	@Override

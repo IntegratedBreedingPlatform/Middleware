@@ -2,28 +2,45 @@
 package org.generationcp.middleware.dao.ims;
 
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.DataSetupTest;
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
+import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.ims.ExperimentTransaction;
+import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.DataImportService;
+import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.service.impl.user.UserServiceImpl;
-import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -37,10 +54,36 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
+
 public class TransactionDAOTest extends IntegrationTestBase {
 
-	private TransactionDAO dao;
+	@Autowired
+	private GermplasmDataManager germplasmDataManager;
+
+	@Autowired
+	private GermplasmListManager germplasmListManager;
+
+	@Autowired
+	private InventoryDataManager inventoryDataManager;
+
+	@Autowired
+	private StudyDataManager studyDataManager;
+
+	@Autowired
+	private DataImportService dataImportService;
+
+	@Autowired
+	private FieldbookService middlewareFieldbookService;
+
+	@Autowired
+	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
+	private TransactionDAO transactionDAO;
 	private GermplasmListDataDAO germplasmListDataDAO;
+	private ExperimentTransactionDAO experimentTransactionDAO;
 
 	private static final int LIST_ID = 1;
 	private static final String STOCK_ID_PREFIX = "STOCK";
@@ -54,40 +97,56 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 	private List<GermplasmListData> germplasmListData;
 
-	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
-	private GermplasmListManager germplasmListManager;
-
-	@Autowired
-	private InventoryDataManager inventoryDataManager;
-
 	private InventoryDetailsTestDataInitializer inventoryDetailsTestDataInitializer;
-	private IntegrationTestDataInitializer testDataInitializer;
+	private DataSetupTest dataSetupTest;
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
+	private Project commonTestProject;
 
+	private Integer studyId;
+	private Integer observationDatasetId;
 	private Integer germplasmListId;
 	private final Map<Integer, Transaction> listDataIdTransactionMap = new HashMap<>();
 	private UserService userService;
 
 	@Before
 	public void setUp() throws Exception {
-		this.dao = new TransactionDAO();
-		this.dao.setSession(this.sessionProvder.getSession());
+		this.transactionDAO = new TransactionDAO();
+		this.transactionDAO.setSession(this.sessionProvder.getSession());
 
 		this.germplasmListDataDAO = new GermplasmListDataDAO();
 		this.germplasmListDataDAO.setSession(this.sessionProvder.getSession());
 
+		this.experimentTransactionDAO = new ExperimentTransactionDAO();
+		this.experimentTransactionDAO.setSession(this.sessionProvder.getSession());
+
 		this.germplasmListData = Lists.newArrayList();
 
 		this.inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
-		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
+
+		this.dataSetupTest = new DataSetupTest();
+		this.dataSetupTest.setDataImportService(this.dataImportService);
+		this.dataSetupTest.setGermplasmListManager(this.germplasmListManager);
+		this.dataSetupTest.setMiddlewareFieldbookService(this.middlewareFieldbookService);
+
+		if (this.commonTestProject == null) {
+			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
+		}
+
+		//		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.initializeGermplasms(1);
 		this.initializeGermplasmsListAndListData(this.germplasmMap);
 		this.initLotsAndTransactions(this.germplasmListId);
 
 		this.userService = new UserServiceImpl(this.workbenchSessionProvider);
 
+		if (this.germplasmTestDataGenerator == null) {
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, new NameDAO(this.sessionProvder
+					.getSession()));
+		}
+
+		if (this.studyId == null) {
+			this.createTestStudyWithObservationDataset();
+		}
 	}
 
 	public UserService getUserService() {
@@ -103,7 +162,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 		final List<Integer> lRecIDs = new ArrayList<>();
 		lRecIDs.add(1);
-		final Map<Integer, String> lRecIDStockIDMap = this.dao.retrieveStockIds(lRecIDs);
+		final Map<Integer, String> lRecIDStockIDMap = this.transactionDAO.retrieveStockIds(lRecIDs);
 		Assert.assertNotNull(lRecIDStockIDMap);
 	}
 
@@ -203,7 +262,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		transactionList.add(closedTransaction);
 		this.inventoryDataManager.addTransactions(transactionList);
 
-		final List<TransactionReportRow> transactionReportRows = this.dao.getTransactionDetailsForLot(lot.getId());
+		final List<TransactionReportRow> transactionReportRows = this.transactionDAO.getTransactionDetailsForLot(lot.getId());
 
 		for (final TransactionReportRow reportRow : transactionReportRows) {
 			if (LOT_DEPOSIT.equals(reportRow.getLotStatus())) {
@@ -279,7 +338,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		transactionsSearchDto.setTransactionTypes(Lists.newArrayList(TransactionType.DEPOSIT.getId()));
 		transactionsSearchDto.setCreatedByUsername(user.getName());
 
-		final List<TransactionDto> transactionDtos = this.dao.searchTransactions(transactionsSearchDto, null);
+		final List<TransactionDto> transactionDtos = this.transactionDAO.searchTransactions(transactionsSearchDto, null);
 
 		for (final TransactionDto transactionDto : transactionDtos) {
 			Assert.assertTrue(transactionDto.getLot().getDesignation().equalsIgnoreCase(germplasm.getPreferredName().getNval()));
@@ -298,4 +357,88 @@ public class TransactionDAOTest extends IntegrationTestBase {
 			Assert.assertTrue(transactionDto.getLot().getLocationAbbr().equalsIgnoreCase("AFG"));
 		}
 	}
+
+	@Test
+  public void testGetStudyTransactionByTransactionId() throws ParseException {
+		final CropType cropType = new CropType();
+		cropType.setUseUUID(false);
+
+		final Germplasm germplasm =
+				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1,
+						1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
+
+		final WorkbenchUser user = this.getUserService().getUserById(1);
+
+		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1,
+				TermId.SEED_AMOUNT_G.getId(), 0, 1, "Comments", "ABC-1");
+
+		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
+
+		final String sDate1 = "01/01/2015";
+		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
+		final double transactionAmount = 5.0d;
+		final String transactionNote = "Transaction deposit";
+		final Transaction depositTransaction =
+				InventoryDetailsTestDataInitializer.createTransaction(transactionAmount, 0, transactionNote, lot, 1,
+						1, 1, "LIST", TransactionType.DEPOSIT.getId());
+		depositTransaction.setType(TransactionType.DEPOSIT.getId());
+		depositTransaction.setTransactionDate(date1);
+		depositTransaction.setUserId(user.getUserid());
+
+		final List<Transaction> transactionList = new ArrayList<>();
+		transactionList.add(depositTransaction);
+		this.inventoryDataManager.addTransactions(transactionList);
+
+		final List<Experiment> experiments = this.studyDataManager.getExperiments(this.observationDatasetId, 0, 40);
+
+		final ExperimentTransaction experimentTransaction =
+				new ExperimentTransaction(new ExperimentModel(experiments.get(0).getId()), depositTransaction,
+						ExperimentTransactionType.PLANTING.getId());
+		this.experimentTransactionDAO.save(experimentTransaction);
+
+		final StudyTransactionsDto studyTransactionsDto =
+				this.transactionDAO.getStudyTransactionByTransactionId(depositTransaction.getId());
+		assertNotNull(studyTransactionsDto);
+		assertThat(studyTransactionsDto.getTransactionId(), is(depositTransaction.getId()));
+		assertThat(studyTransactionsDto.getCreatedByUsername(), is(ADMIN_NAME));
+		assertThat(studyTransactionsDto.getTransactionType(), is(TransactionType.DEPOSIT.getValue()));
+		assertThat(studyTransactionsDto.getTransactionStatus(), is(TransactionStatus.PENDING.getValue()));
+		assertThat(studyTransactionsDto.getAmount(), is(transactionAmount));
+		assertThat(studyTransactionsDto.getNotes(), is(transactionNote));
+		assertNotNull(studyTransactionsDto.getCreatedDate());
+		assertThat(studyTransactionsDto.getCreatedDate().toString(), is("2015-01-01"));
+		assertThat(studyTransactionsDto.getExperimentTransactionType(), is(ExperimentTransactionType.PLANTING));
+
+		final List<StudyTransactionsDto.ObservationUnitDto> observationUnits = studyTransactionsDto.getObservationUnits();
+		assertThat(observationUnits, Matchers.hasSize(1));
+
+		final StudyTransactionsDto.ObservationUnitDto observationUnitDto = observationUnits.get(0);
+		assertThat(observationUnitDto.getNdExperimentId(), is(experiments.get(0).getId()));
+		assertThat(observationUnitDto.getTransactionId(), is(depositTransaction.getId()));
+
+		final ExtendedLotDto actualLot = studyTransactionsDto.getLot();
+		assertNotNull(actualLot);
+		assertNotNull(actualLot.getDesignation());
+		assertThat(actualLot.getUnitName().toLowerCase(), is(TermId.SEED_AMOUNT_G.name().toLowerCase()));
+		assertThat(actualLot.getLotId(), is(lot.getId()));
+		assertThat(actualLot.getLotUUID(), is(lot.getLotUuId()));
+		assertThat(actualLot.getStockId(), is(lot.getStockId()));
+		assertThat(actualLot.getLocationId(), is(lot.getLocationId()));
+		assertThat(actualLot.getNotes(), is(lot.getComments()));
+		assertThat(actualLot.getGid(), is(germplasm.getGid()));
+		assertThat(actualLot.getGermplasmUUID(), is(germplasm.getGermplasmUUID()));
+	}
+
+	private void createTestStudyWithObservationDataset() {
+		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+
+		final Integer[] gids = this.germplasmTestDataGenerator
+				.createChildrenGermplasm(DataSetupTest.NUMBER_OF_GERMPLASM, "PREFF", parentGermplasm);
+
+		this.studyId = this.dataSetupTest.createNurseryForGermplasm(this.commonTestProject.getUniqueID(), gids, "ABCD");
+		this.observationDatasetId = studyDataManager.getDataSetsByType(this.studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0).getId();
+	}
+
+
 }

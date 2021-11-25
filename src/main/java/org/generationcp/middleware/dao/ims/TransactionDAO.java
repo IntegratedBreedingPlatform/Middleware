@@ -20,6 +20,8 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.ims.ExperimentTransaction;
 import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
 import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
@@ -718,6 +720,41 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 		}
 
 		return transactions;
+	}
+
+	public StudyTransactionsDto getStudyTransactionByTransactionId(final Integer transactionId) {
+
+		final StringBuilder sql = new StringBuilder(SEARCH_TRANSACTIONS_QUERY);
+		sql.append(" and tr.trnid = ").append(transactionId);
+		final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+		this.addSearchTransactionsQueryScalars(query);
+		query.setResultTransformer(new AliasToBeanConstructorResultTransformer(this.getStudyTransactionsDtoConstructor()));
+
+		final StudyTransactionsDto studyTransactionsDto = (StudyTransactionsDto) query.uniqueResult();
+
+		final Criteria criteria = this.getSession().createCriteria(ExperimentTransaction.class);
+		criteria.add(Restrictions.eq("transaction.id", transactionId));
+		final List<ExperimentTransaction> result = criteria.list();
+		if (CollectionUtils.isEmpty(result)) {
+			return studyTransactionsDto;
+		}
+
+		// We take the first value to get the experiment type because all of the experiment transaction are grouped by type
+		final ExperimentTransactionType experimentTransactionType = ExperimentTransactionType.getById(result.get(0).getType());
+		studyTransactionsDto.setExperimentTransactionType(experimentTransactionType);
+
+		final List<StudyTransactionsDto.ObservationUnitDto> observationUnitDtos = result.stream().map(experimentTransaction -> {
+			final Transaction transaction = experimentTransaction.getTransaction();
+			final ExperimentModel experiment = experimentTransaction.getExperiment();
+			final StudyTransactionsDto.ObservationUnitDto observationUnitDto = new StudyTransactionsDto.ObservationUnitDto();
+			observationUnitDto.setNdExperimentId(experiment.getNdExperimentId());
+			observationUnitDto.setTransactionId(transaction.getId());
+			observationUnitDto.setObsUnitId(experiment.getObsUnitId());
+			return observationUnitDto;
+		}).collect(Collectors.toList());
+
+		studyTransactionsDto.setObservationUnits(observationUnitDtos);
+		return studyTransactionsDto;
 	}
 
 	private StringBuilder buildStudyTransactionsQuery(
