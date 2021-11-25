@@ -201,44 +201,6 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void shouldAddGermplasmListData_OK() {
-		final Method method = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
-		final Germplasm germplasm = this.createGermplasm(method);
-
-		final int randomInt = new Random().nextInt(100);
-
-		// Germplasm list
-		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + randomInt,
-			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
-		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
-
-		assertThat(germplasmList.getListData(), hasSize(0));
-
-		// Germplasm list data
-		final GermplasmListData germplasmListData = this.createGermplasmListData(germplasmList, germplasm.getGid(), 1);
-		final List<GermplasmListData> germplasmListsData = Arrays.asList(germplasmListData);
-
-		assertNull(germplasmListData.getListDataId());
-
-		this.germplasmListService.addGermplasmListData(germplasmListsData);
-
-		assertNotNull(germplasmListData.getListDataId());
-
-		this.sessionProvder.getSession().flush();
-		this.sessionProvder.getSession().clear();
-
-		final Optional<GermplasmList> germplasmListById = this.germplasmListService.getGermplasmListById(germplasmList.getId());
-		assertTrue(germplasmListById.isPresent());
-
-		final GermplasmList actualGermplasmList = germplasmListById.get();
-		assertThat(actualGermplasmList.getListData(), hasSize(1));
-
-		final GermplasmListData actualGermplasmListData = actualGermplasmList.getListData().get(0);
-		assertNotNull(actualGermplasmListData);
-		assertThat(actualGermplasmListData.getListDataId(), is(germplasmListData.getListDataId()));
-	}
-
-	@Test
 	public void testAddGermplasmEntriesToList_WithSelectedItems_OK() {
 		final int randomInt = new Random().nextInt(100);
 
