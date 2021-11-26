@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasmlist;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -10,10 +11,11 @@ public class GermplasmListDto {
 
 	private Integer listId;
 	private String listName;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date creationDate;
 	private String description;
 	private String programUUID;
-	private boolean locked;
+	private Boolean locked;
 	private Integer ownerId;
 	private String listType;
 	private String notes;
@@ -62,11 +64,11 @@ public class GermplasmListDto {
 		this.programUUID = programUUID;
 	}
 
-	public boolean isLocked() {
+	public Boolean isLocked() {
 		return this.locked;
 	}
 
-	public void setLocked(final boolean locked) {
+	public void setLocked(final Boolean locked) {
 		this.locked = locked;
 	}
 
