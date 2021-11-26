@@ -110,11 +110,11 @@ public class GermplasmListGeneratorDTO {
 	public GermplasmListGeneratorDTO() {
 	}
 
-	public GermplasmListGeneratorDTO(GermplasmListMetadataRequest request) {
-		this.name = request.getName();
+	public GermplasmListGeneratorDTO(GermplasmListDto request) {
+		this.name = request.getListName();
 		this.description = request.getDescription();
-		this.type = request.getType();
-		this.date = request.getDate();
+		this.type = request.getListType();
+		this.date = request.getCreationDate();
 		this.notes = request.getNotes();
 		this.parentFolderId = request.getParentFolderId();
 	}
