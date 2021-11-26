@@ -3,6 +3,7 @@ package org.generationcp.middleware.domain.dms;
 
 import org.generationcp.middleware.util.Debug;
 
+@Deprecated
 public class LocationDto {
 
 	private Integer id;
