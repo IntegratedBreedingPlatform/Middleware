@@ -18,7 +18,13 @@
 
 	<changeSet author="cuenyad" id="v19.4.0-2">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">SELECT count(1) > 0 FROM cvterm where cvterm_id &lt;= 100000 and cv_id != 1040 and is_system = 0</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(1) > 0 FROM cvterm where is_system = 0 and name in ('TRIAL_INSTANCE','LOCATION_ID','LOCATION_NAME','EXPT_DESIGN','FIELDMAP COLUMN'
+				,'FIELDMAP RANGE','OBS_UNIT_ID','COL','ROW','BLOCK_NO','PLOT_NO','REP_NO','ENTRY_CODE'
+			    ,'ENTRY_NO','DESIGNATION','GID','MGID','FGID','GROUPGID','EXPT_DESIGN_SOURCE','DATASET_NAME'
+			    ,'DATASET_TITLE','LOCATION_NAME','DESIG','CROSS','ENTRY_TYPE', 'PLOT_CODE', 'CHECK_INTERVAL'
+			    ,'CHECK_PLAN','CHECK_START','PLOT_NUMBER_AP_text','INSTANCE_NUMBER_AP_text','REP_NUMBER_AP_text'
+			    ,'PLANT_NUMBER_AP_text','PLOTCODE_AP_text');
+			</sqlCheck>
 		</preConditions>
 		<comment>Mark system variables</comment>
         <sql>
