@@ -567,21 +567,22 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(this.createGermplasmListData(sourceGermplasmList, germplasm2.getGid(), 2));
 
 		// Germplasm List Generator (from request)
-		final GermplasmListGeneratorDTO targetList = new GermplasmListGeneratorDTO();
-		targetList.setName("Test Cloned Germplasm List " + randNameSuffix);
-		targetList.setDate(new Date());
-		targetList.setType("LST");
-		targetList.setDescription("Test Cloned Germplasm List");
+		final GermplasmListGeneratorDTO request = new GermplasmListGeneratorDTO();
+		request.setName("Test Cloned Germplasm List " + randNameSuffix);
+		request.setDate(new Date());
+		request.setType("LST");
+		request.setDescription("Test Cloned Germplasm List");
 
-		this.germplasmListService.cloneGermplasmList(sourceGermplasmList.getId(), targetList, USER_ID);
+		final GermplasmListGeneratorDTO clonedList = this.germplasmListService.cloneGermplasmList(sourceGermplasmList.getId(), request, USER_ID);
+		final List<GermplasmListData> clonedListEntries = this.daoFactory.getGermplasmListDataDAO().getByListId(clonedList.getId());
 
 		// verify if entries from source is cloned in the target and are in the proper order
-		assertEquals(2, targetList.getEntries().size());
+		Assert.assertEquals(2, clonedListEntries.size());
 
 		final Map<Integer, GermplasmListData> sourceListMap =
 			this.daoFactory.getGermplasmListDataDAO().getMapByEntryId(sourceGermplasmList.getId());
-		targetList.getEntries().forEach(entry -> {
-			assertEquals(sourceListMap.get(entry.getEntryNo()).getGid(), entry.getGid());
+		clonedListEntries.forEach(entry -> {
+			assertEquals(sourceListMap.get(entry.getEntryId()).getGid(), entry.getGid());
 		});
 	}
 
