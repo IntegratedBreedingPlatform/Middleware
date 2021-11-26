@@ -114,7 +114,7 @@ public class GermplasmListGeneratorDTO {
 		this.name = request.getListName();
 		this.description = request.getDescription();
 		this.type = request.getListType();
-		this.date = request.getCreationDate();
+		this.date = request.getListDate();
 		this.notes = request.getNotes();
 		this.parentFolderId = request.getParentFolderId();
 	}

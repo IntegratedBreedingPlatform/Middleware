@@ -10,6 +10,7 @@ public class GermplasmListDto {
 
 	private Integer listId;
 	private String listName;
+	private Date listDate;
 	private Date creationDate;
 	private String description;
 	private String programUUID;
@@ -37,6 +38,14 @@ public class GermplasmListDto {
 
 	public void setListName(final String listName) {
 		this.listName = listName;
+	}
+
+	public Date getListDate() {
+		return this.listDate;
+	}
+
+	public void setListDate(final Date listDate) {
+		this.listDate = listDate;
 	}
 
 	public Date getCreationDate() {
