@@ -15,8 +15,8 @@ public class GermplasmListDto {
 	private String programUUID;
 	private boolean locked;
 	private Integer ownerId;
+	private String listType;
 	private String notes;
-	private String type;
 
 	public GermplasmListDto() {
 
@@ -63,7 +63,7 @@ public class GermplasmListDto {
 	}
 
 	public boolean isLocked() {
-		return locked;
+		return this.locked;
 	}
 
 	public void setLocked(final boolean locked) {
@@ -71,27 +71,27 @@ public class GermplasmListDto {
 	}
 
 	public Integer getOwnerId() {
-		return ownerId;
+		return this.ownerId;
 	}
 
 	public void setOwnerId(final Integer ownerId) {
 		this.ownerId = ownerId;
 	}
 
+	public String getListType() {
+		return this.listType;
+	}
+
+	public void setListType(final String listType) {
+		this.listType = listType;
+	}
+
 	public String getNotes() {
-		return notes;
+		return this.notes;
 	}
 
 	public void setNotes(final String notes) {
 		this.notes = notes;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(final String type) {
-		this.type = type;
 	}
 
 	@Override
