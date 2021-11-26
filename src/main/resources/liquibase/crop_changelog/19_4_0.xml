@@ -10,7 +10,7 @@
 				<columnExists tableName="cvterm" columnName="is_system"/>
 			</not>
 		</preConditions>
-		<comment>Adding is_system_term column</comment>
+		<comment>Adding is_system column</comment>
         <sql>
 			ALTER TABLE cvterm ADD COLUMN is_system INT(11) NOT NULL DEFAULT '0' AFTER is_relationshiptype;
         </sql>
