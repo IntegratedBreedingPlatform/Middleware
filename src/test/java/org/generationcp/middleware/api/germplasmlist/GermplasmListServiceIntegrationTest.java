@@ -30,6 +30,7 @@ import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -633,6 +634,15 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		germplasmListDto.setCreationDate(new Date());
 		germplasmListDto.setListType(GermplasmListType.F1.name());
 		this.germplasmListService.editListMetadata(germplasmListDto);
+
+		final Optional<GermplasmList> updatedList = this.germplasmListService.getGermplasmListById(germplasmList.getId());
+		Assert.assertTrue(updatedList.isPresent());
+		final GermplasmList list = updatedList.get();
+		Assert.assertEquals(germplasmListDto.getListName(), list.getName());
+		Assert.assertEquals(germplasmListDto.getDescription(), list.getDescription());
+		Assert.assertEquals(germplasmListDto.getNotes(), list.getNotes());
+		Assert.assertEquals(germplasmListDto.getListType(), list.getType());
+		Assert.assertEquals(Long.valueOf(Util.convertDateToIntegerValue(germplasmListDto.getCreationDate())), list.getDate());
 
 	}
 

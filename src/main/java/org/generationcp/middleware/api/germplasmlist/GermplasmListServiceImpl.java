@@ -696,9 +696,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.orElseThrow(() -> new MiddlewareRequestException("", LIST_NOT_FOUND));
 		germplasmList.setName(germplasmListDto.getListName());
 		germplasmList.setDescription(germplasmListDto.getDescription());
-		germplasmList.setType(germplasmList.getType());
+		germplasmList.setType(germplasmListDto.getListType());
 		germplasmList.setDate(Long.valueOf(this.dateFormat.format(germplasmListDto.getCreationDate())));
-		germplasmList.setNotes(germplasmList.getNotes());
+		germplasmList.setNotes(germplasmListDto.getNotes());
 		this.daoFactory.getGermplasmListDAO().update(germplasmList);
 	}
 
