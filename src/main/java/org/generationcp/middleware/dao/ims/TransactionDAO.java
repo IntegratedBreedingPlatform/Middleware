@@ -20,6 +20,7 @@ import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.ims.ExperimentTransaction;
 import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
@@ -750,6 +751,10 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			observationUnitDto.setNdExperimentId(experiment.getNdExperimentId());
 			observationUnitDto.setTransactionId(transaction.getId());
 			observationUnitDto.setObsUnitId(experiment.getObsUnitId());
+
+			final DmsProject study = experiment.getProject().getStudy();
+			observationUnitDto.setStudyId(study.getProjectId());
+			observationUnitDto.setStudyName(study.getName());
 			return observationUnitDto;
 		}).collect(Collectors.toList());
 

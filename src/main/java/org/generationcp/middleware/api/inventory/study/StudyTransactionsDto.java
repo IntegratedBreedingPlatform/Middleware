@@ -35,6 +35,8 @@ public class StudyTransactionsDto extends TransactionDto {
 		private Integer repNo;
 		private Integer blockNo;
 		private String obsUnitId;
+		private Integer studyId;
+		private String studyName;
 
 		public Integer getNdExperimentId() {
 			return this.ndExperimentId;
@@ -106,6 +108,22 @@ public class StudyTransactionsDto extends TransactionDto {
 
 		public void setObsUnitId(final String obsUnitId) {
 			this.obsUnitId = obsUnitId;
+		}
+
+		public Integer getStudyId() {
+			return studyId;
+		}
+
+		public void setStudyId(final Integer studyId) {
+			this.studyId = studyId;
+		}
+
+		public String getStudyName() {
+			return studyName;
+		}
+
+		public void setStudyName(final String studyName) {
+			this.studyName = studyName;
 		}
 	}
 

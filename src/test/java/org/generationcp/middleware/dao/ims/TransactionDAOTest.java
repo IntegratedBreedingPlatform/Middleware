@@ -13,6 +13,7 @@ import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitial
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.domain.dms.Experiment;
+import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
@@ -132,7 +133,6 @@ public class TransactionDAOTest extends IntegrationTestBase {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 		}
 
-		//		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.initializeGermplasms(1);
 		this.initializeGermplasmsListAndListData(this.germplasmMap);
 		this.initLotsAndTransactions(this.germplasmListId);
@@ -397,6 +397,9 @@ public class TransactionDAOTest extends IntegrationTestBase {
 						ExperimentTransactionType.PLANTING.getId());
 		this.experimentTransactionDAO.save(experimentTransaction);
 
+		this.sessionProvder.getSession().flush();
+		this.sessionProvder.getSession().clear();
+
 		final StudyTransactionsDto studyTransactionsDto =
 				this.transactionDAO.getStudyTransactionByTransactionId(depositTransaction.getId());
 		assertNotNull(studyTransactionsDto);
@@ -416,6 +419,12 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final StudyTransactionsDto.ObservationUnitDto observationUnitDto = observationUnits.get(0);
 		assertThat(observationUnitDto.getNdExperimentId(), is(experiments.get(0).getId()));
 		assertThat(observationUnitDto.getTransactionId(), is(depositTransaction.getId()));
+		assertNotNull(observationUnitDto.getObsUnitId());
+		assertThat(observationUnitDto.getStudyId(), is(this.studyId));
+
+		final Study actualStudy = this.studyDataManager.getStudy(this.studyId);
+		assertNotNull(actualStudy);
+		assertThat(observationUnitDto.getStudyName(), is(actualStudy.getName()));
 
 		final ExtendedLotDto actualLot = studyTransactionsDto.getLot();
 		assertNotNull(actualLot);
@@ -439,6 +448,5 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		this.studyId = this.dataSetupTest.createNurseryForGermplasm(this.commonTestProject.getUniqueID(), gids, "ABCD");
 		this.observationDatasetId = studyDataManager.getDataSetsByType(this.studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0).getId();
 	}
-
 
 }
