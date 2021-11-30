@@ -707,8 +707,13 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 			final DetachedCriteria criteria = DetachedCriteria.forClass(GermplasmList.class);
 			criteria.add(Restrictions.eq(NAME, germplasmListName));
-			criteria.add(Restrictions.eq(PROGRAM_UUID, programUUID));
 			criteria.add(Restrictions.ne(STATUS, STATUS_DELETED));
+
+			if (programUUID == null) {
+				criteria.add(Restrictions.isNull(PROGRAM_UUID));
+			} else {
+				criteria.add(Restrictions.eq(PROGRAM_UUID, programUUID));
+			}
 
 			if (Objects.isNull(parentId)) {
 				criteria.add(Restrictions.isNull(PARENT));

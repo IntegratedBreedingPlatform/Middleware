@@ -1,5 +1,9 @@
 package org.generationcp.middleware.dao.germplasmlist;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
@@ -75,6 +79,26 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 		}
 	}
 
+	public Table<Integer, Integer, GermplasmListDataDetail> getTableEntryIdToVariableId(final Integer listId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(GermplasmListDataDetail.class, "listDataDetail");
+			criteria.createAlias("listDataDetail.listData", "listData");
+			criteria.createAlias("listData.list", "list");
+			criteria.add(Restrictions.eq("list.id", listId));
+			final List<GermplasmListDataDetail> list = criteria.list();
+
+			final Table<Integer, Integer, GermplasmListDataDetail> table = HashBasedTable.create();
+			for (final GermplasmListDataDetail detail : list) {
+				table.put(detail.getListData().getEntryId(), detail.getVariableId(), detail);
+			}
+			return table;
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error with getTableListDataIdToVariableId(" + listId + "): " + e.getMessage();
+			LOG.error(errorMessage);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
 	public long countObservationsByListAndVariables(final Integer listId, final List<Integer> variableIds) {
 		if (variableIds.isEmpty()) {
 			return 0l;
@@ -88,4 +112,12 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 		return (Long) criteria.uniqueResult();
 	}
 
+	public void deleteByListDataIds(final Set<Integer> listDataIds) {
+		Preconditions.checkArgument(CollectionUtils.isNotEmpty(listDataIds), "listDataIds passed cannot be empty.");
+		final String query =
+			"DELETE ldd FROM list_data_details ldd WHERE ldd.lrecid IN (:listDataIds)";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
+		sqlQuery.setParameterList("listDataIds", listDataIds);
+		sqlQuery.executeUpdate();
+	}
 }

@@ -14,10 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
 import java.util.List;
+import java.util.Random;
 import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.IsNot.not;
 
 public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 
@@ -32,25 +34,10 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountFilteredLocations() {
-		// If program UUID is not specified as filter, only locations with null program should be displayed
-		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		final long nullProgramLocationsCount = this.daoFactory.getLocationDAO().countLocationsWithNullProgramUUID();
-		final long count = this.locationService
-			.countFilteredLocations(locationSearchRequest);
-		Assert.assertThat(count, equalTo(nullProgramLocationsCount));
-
-	}
-
-	@Test
 	public void testGetFilteredLocations() {
 		final List<Location> locations = this.locationService
 			.getFilteredLocations(new LocationSearchRequest(), new PageRequest(0, 10));
 		Assert.assertThat(10, equalTo(locations.size()));
-		// If program UUID is not specified as filter, only locations with null program should be displayed
-		locations.forEach(location -> {
-			Assert.assertNull(location.getProgramUUID());
-		});
 	}
 
 	@Test
@@ -62,7 +49,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetLocationsByFilter(){
+	public void testGetLocationsByFilter() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("COUNTRY");
 		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
@@ -83,7 +70,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final String programUUID = UUID.randomUUID().toString();
 		final int cntryid = 1;
 		final Location location = LocationTestDataInitializer
-			.createLocation(null, RandomStringUtils.randomAlphabetic(10), 405, RandomStringUtils.randomAlphabetic(3), programUUID);
+			.createLocation(null, RandomStringUtils.randomAlphabetic(10), 405, RandomStringUtils.randomAlphabetic(3));
 		location.setCntryid(cntryid);
 		location.setLdefault(Boolean.FALSE);
 
@@ -96,8 +83,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getProgramFavoriteDao().save(programFavorite);
 
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setProgramUUID(programUUID);
-		locationSearchRequest.setFavoritesOnly(true);
+		locationSearchRequest.setFavoriteProgramUUID(programUUID);
 
 		final List<Location> locations = this.locationService
 			.getFilteredLocations(locationSearchRequest, new PageRequest(0, 10));
@@ -105,6 +91,88 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertThat(1, equalTo(locations.size()));
 		Assert.assertThat(location.getLocid(), equalTo(locations.get(0).getLocid()));
 
+	}
+
+	@Test
+	public void testDeleteLocation() {
+		final LocationRequestDto locationRequestDto = this.buildLocationRequestDto();
+
+		final LocationDTO newLocationDTO = this.locationService.createLocation(locationRequestDto);
+		final LocationDTO locationDTO = this.locationService.getLocation(newLocationDTO.getId());
+
+		Assert.assertThat(newLocationDTO.getId(), equalTo(locationDTO.getId()));
+
+		this.locationService.deleteLocation(newLocationDTO.getId());
+		this.sessionProvder.getSession().flush();
+
+		final LocationDTO locationDTODeleted = this.locationService.getLocation(newLocationDTO.getId());
+		Assert.assertNull(locationDTODeleted);
+	}
+
+	@Test
+	public void testCreateLocation() {
+		final LocationRequestDto locationRequestDto = this.buildLocationRequestDto();
+
+		final LocationDTO newLocationDTO = this.locationService.createLocation(locationRequestDto);
+		this.sessionProvder.getSession().flush();
+		final LocationDTO locationDTO = this.locationService.getLocation(newLocationDTO.getId());
+
+		Assert.assertNotNull(locationDTO);
+		Assert.assertThat("Expected same Location id", newLocationDTO.getId(), equalTo(locationDTO.getId()));
+		Assert.assertThat("Expected same Location name", locationRequestDto.getName(), equalTo(locationDTO.getName()));
+		Assert.assertThat("Expected same Location Abbr", locationRequestDto.getAbbreviation(), equalTo(locationDTO.getAbbreviation()));
+		Assert.assertThat("Expected same Location type", locationRequestDto.getType(), equalTo(locationDTO.getType()));
+
+		Assert.assertThat("Expected same altitude", locationRequestDto.getAltitude(), equalTo(locationDTO.getAltitude()));
+		Assert.assertThat("Expected same latitude", locationRequestDto.getLatitude(), equalTo(locationDTO.getLatitude()));
+		Assert.assertThat("Expected same longitude", locationRequestDto.getLongitude(), equalTo(locationDTO.getLongitude()));
+		Assert.assertThat("Expected same country id", locationRequestDto.getCountryId(), equalTo(locationDTO.getCountryId()));
+		Assert.assertThat("Expected same province id", locationRequestDto.getProvinceId(), equalTo(locationDTO.getProvinceId()));
+	}
+
+	@Test
+	public void testUpdateLocation() {
+		final LocationRequestDto locationRequestDto = this.buildLocationRequestDto();
+
+		final LocationDTO newLocationDTO = this.locationService.createLocation(locationRequestDto);
+		final LocationDTO locationDTO = this.locationService.getLocation(newLocationDTO.getId());
+
+		locationRequestDto.setName(RandomStringUtils.randomAlphabetic(10));
+		locationRequestDto.setAbbreviation(RandomStringUtils.randomAlphabetic(5));
+		locationRequestDto.setType(new Random().nextInt());
+		locationRequestDto.setAltitude(new Random().nextDouble());
+		locationRequestDto.setLongitude(new Random().nextDouble());
+		locationRequestDto.setLatitude(new Random().nextDouble());
+		locationRequestDto.setCountryId(new Random().nextInt());
+		locationRequestDto.setProvinceId(new Random().nextInt());
+
+		this.locationService.updateLocation(newLocationDTO.getId(), locationRequestDto);
+
+		Assert.assertNotNull(locationDTO);
+		Assert.assertThat("Expected same Location id", newLocationDTO.getId(), equalTo(locationDTO.getId()));
+		Assert.assertThat("Expected diferent Location name", locationRequestDto.getName(), not(equalTo(locationDTO.getName())));
+		Assert.assertThat("Expected diferent Location abbr", locationRequestDto.getAbbreviation(), not(equalTo(locationDTO.getAbbreviation())));
+		Assert.assertThat("Expected diferent Location type", locationRequestDto.getType(), not(equalTo(locationDTO.getType())));
+
+		Assert.assertThat("Expected diferent altitude", locationRequestDto.getAltitude(), not(equalTo(locationDTO.getAltitude())));
+		Assert.assertThat("Expected diferent latitude", locationRequestDto.getLatitude(), not(equalTo(locationDTO.getLatitude())));
+		Assert.assertThat("Expected diferent longitude", locationRequestDto.getLongitude(), not(equalTo(locationDTO.getLongitude())));
+		Assert.assertThat("Expected diferent country id", locationRequestDto.getCountryId(), not(equalTo(locationDTO.getCountryId())));
+		Assert.assertThat("Expected diferent province id", locationRequestDto.getProvinceId(), not(equalTo(locationDTO.getProvinceId())));
+
+	}
+
+	private LocationRequestDto buildLocationRequestDto() {
+		final LocationRequestDto locationRequestDto = new LocationRequestDto();
+		locationRequestDto.setType(new Random().nextInt());
+		locationRequestDto.setName(RandomStringUtils.randomAlphabetic(10));
+		locationRequestDto.setAbbreviation(RandomStringUtils.randomAlphabetic(5));
+		locationRequestDto.setCountryId(new Random().nextInt());
+		locationRequestDto.setProvinceId(new Random().nextInt());
+		locationRequestDto.setAltitude(new Random().nextDouble());
+		locationRequestDto.setLatitude(new Random().nextDouble());
+		locationRequestDto.setLongitude(new Random().nextDouble());
+		return locationRequestDto;
 	}
 
 }

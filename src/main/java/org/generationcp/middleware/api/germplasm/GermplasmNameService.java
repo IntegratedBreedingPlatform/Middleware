@@ -21,4 +21,7 @@ public interface GermplasmNameService {
 	List<String> getExistingGermplasmPUIs(List<String> germplasmPUIs);
 
 	boolean isNameTypeUsedAsGermplasmName(Integer nameTypeId);
+
+	boolean isLocationUsedInGermplasmName(Integer locationId);
+
 }

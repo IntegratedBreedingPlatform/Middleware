@@ -75,11 +75,6 @@ public class LocationServiceImpl implements LocationService {
 		return this.daoFactory.getLocationDAO().getLocations(locationSearchRequest, pageable);
 	}
 
-	@Override
-	public void deleteProgramLocations(final String programUUID) {
-		this.daoFactory.getLocationDAO().deleteAllProgramLocations(programUUID);
-	}
-
 	/**
 	 * Return true if proceed with searching by filter when
 	 * 1) filtering by favorites and at least one favorite exists OR
@@ -91,14 +86,86 @@ public class LocationServiceImpl implements LocationService {
 	 * @return
 	 */
 	boolean doProceedWithFilteredSearch(final LocationSearchRequest locationSearchRequest) {
-		if (!StringUtils.isEmpty(locationSearchRequest.getProgramUUID()) && locationSearchRequest.getFavoritesOnly()) {
-			final List<Integer> favoriteProjectLocationIds = this.getFavoriteProjectLocationIds(locationSearchRequest.getProgramUUID());
+		if (!StringUtils.isEmpty(locationSearchRequest.getFavoriteProgramUUID())) {
+			final List<Integer> favoriteProjectLocationIds = this.getFavoriteProjectLocationIds(locationSearchRequest.getFavoriteProgramUUID());
 			if (CollectionUtils.isEmpty(favoriteProjectLocationIds)) {
 				return false;
 			}
 			locationSearchRequest.getLocationIds().addAll(favoriteProjectLocationIds);
 		}
 		return true;
+	}
+
+	@Override
+	public void deleteLocation(final Integer locationId) {
+		final Location location = this.daoFactory.getLocationDAO().getById(locationId);
+		this.daoFactory.getLocationDAO().makeTransient(location);
+	}
+
+	@Override
+	public LocationDTO createLocation(final LocationRequestDto locationRequestDto) {
+
+		final Integer countryId = locationRequestDto.getCountryId() != null ? locationRequestDto.getCountryId() : 0;
+		final Integer provinceId = locationRequestDto.getProvinceId() != null ? locationRequestDto.getProvinceId() : 0;
+
+		final Location newLocation = new Location(null, locationRequestDto.getType(),
+			0, locationRequestDto.getName(), locationRequestDto.getAbbreviation(),
+			0, 0, provinceId, countryId, 0);
+		newLocation.setLdefault(false);
+
+		if (locationRequestDto.getLatitude() != null) {
+			newLocation.setLatitude(locationRequestDto.getLatitude());
+		}
+
+		if (locationRequestDto.getLongitude() != null) {
+			newLocation.setLongitude(locationRequestDto.getLongitude());
+		}
+
+		if (locationRequestDto.getAltitude() != null) {
+			newLocation.setAltitude(locationRequestDto.getAltitude());
+		}
+
+		final Location location = this.daoFactory.getLocationDAO().saveOrUpdate(newLocation);
+		return new LocationDTO(location);
+	}
+
+	@Override
+	public void updateLocation(final Integer locationId, final LocationRequestDto locationRequestDto) {
+		final Location location = this.daoFactory.getLocationDAO().getById(locationId);
+
+		if (StringUtils.isNotBlank(locationRequestDto.getName())) {
+			location.setLname(locationRequestDto.getName());
+		}
+
+		if (StringUtils.isNotBlank(locationRequestDto.getAbbreviation())) {
+			location.setLabbr(locationRequestDto.getAbbreviation());
+		}
+
+		if (locationRequestDto.getType() != null) {
+			location.setLtype(locationRequestDto.getType());
+		}
+
+		if (locationRequestDto.getCountryId() != null) {
+			location.setCntryid(locationRequestDto.getCountryId());
+		}
+
+		if (locationRequestDto.getProvinceId() != null) {
+			location.setSnl1id(locationRequestDto.getProvinceId());
+		}
+
+		if (locationRequestDto.getLatitude() != null) {
+			location.setLatitude(locationRequestDto.getLatitude());
+		}
+
+		if (locationRequestDto.getLongitude() != null) {
+			location.setLongitude(locationRequestDto.getLongitude());
+		}
+
+		if (locationRequestDto.getAltitude() != null) {
+			location.setAltitude(locationRequestDto.getAltitude());
+		}
+
+		this.daoFactory.getLocationDAO().saveOrUpdate(location);
 	}
 
 }

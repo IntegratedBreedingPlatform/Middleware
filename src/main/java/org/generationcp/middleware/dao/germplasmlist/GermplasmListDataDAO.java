@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao.germplasmlist;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -31,8 +32,10 @@ import org.hibernate.transform.Transformers;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link GermplasmListData}.
@@ -130,6 +133,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		}
 	}
 
+	@Deprecated // TODO Remove IBP-5164
 	@SuppressWarnings("unchecked")
 	public List<GermplasmListData> getByIds(final List<Integer> entryIds) {
 
@@ -144,6 +148,18 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 			GermplasmListDataDAO.STATUS_DELETED));
 		criteria.addOrder(Order.asc(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN));
 		return criteria.list();
+	}
+
+	public Map<Integer, GermplasmListData> getMapByEntryId(final Integer listId) {
+		final Criteria criteria = this.getSession().createCriteria(GermplasmListData.class);
+		criteria.add(Restrictions.eq("list.id", listId));
+		final List<GermplasmListData> list = criteria.list();
+
+		final Map<Integer, GermplasmListData> map = new LinkedHashMap<>();
+		for (final GermplasmListData listData : list) {
+			map.put(listData.getEntryId(), listData);
+		}
+		return map;
 	}
 
 	public GermplasmListData getByListIdAndEntryId(final Integer listId, final Integer entryId) {
@@ -191,6 +207,15 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		final Query query = this.getSession().getNamedQuery(GermplasmListData.DELETE_BY_LIST_ID);
 		query.setInteger(GermplasmListDataDAO.GERMPLASM_LIST_DATA_LIST_ID_COLUMN, listId);
 		return query.executeUpdate();
+	}
+
+	public void deleteByListDataIds(final Set<Integer> listDataIds) {
+		Preconditions.checkArgument(CollectionUtils.isNotEmpty(listDataIds), "listDataIds passed cannot be empty.");
+		final Query query =
+			this.getSession().createQuery("DELETE FROM GermplasmListData WHERE id in (:listDataIds)");
+		query.setParameterList("listDataIds", listDataIds);
+		query.executeUpdate();
+
 	}
 
 	/**
@@ -398,6 +423,27 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		updateSelectedEntriesQuery.setParameter("selectedPosition", selectedPosition - 1);
 		updateSelectedEntriesQuery.setParameterList("selectedEntries", selectedEntries);
 		updateSelectedEntriesQuery.executeUpdate();
+	}
+
+	/**
+	 * Reset the entry numbers (entryId) based on the order of current entryid.
+	 *
+	 * @param listId
+	 */
+	public void reOrderEntries(final Integer listId) {
+		final String sql = "UPDATE listdata ld \n"
+			+ "    JOIN (SELECT @position \\:= 0) r\n"
+			+ "    INNER JOIN (\n"
+			+ "        SELECT lrecid, entryid\n"
+			+ "        FROM listdata innerListData\n"
+			+ "        WHERE innerlistdata.listid = :listId \n"
+			+ "        ORDER BY innerlistdata.entryid ASC) AS tmp\n"
+			+ "    ON ld.lrecid = tmp.lrecid\n"
+			+ "SET ld.entryid = @position \\:= @position + 1\n"
+			+ "WHERE listid = :listId";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+		sqlQuery.setParameter("listId", listId);
+		sqlQuery.executeUpdate();
 	}
 
 	public List<Integer> getListDataIdsByListId(final Integer listId) {
