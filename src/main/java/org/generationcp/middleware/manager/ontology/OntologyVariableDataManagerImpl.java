@@ -370,7 +370,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				}
 
 				variable.setScale(sMap.get(scaleId));
-				variable.setIsSystem(Util.typeSafeObjectToInteger(items[12]) > 0);
+				variable.setIsSystem((Boolean)items[12]);
 
 				// Alias, Expected Min Value, Expected Max Value
 				final String pAlias = (String) items[13];
