@@ -15,7 +15,7 @@ public class GermplasmListDto {
 	private Date creationDate;
 	private String description;
 	private String programUUID;
-	private boolean locked;
+	private Boolean locked;
 	private Integer ownerId;
 	private String listType;
 	private String notes;
@@ -65,11 +65,11 @@ public class GermplasmListDto {
 		this.programUUID = programUUID;
 	}
 
-	public boolean isLocked() {
+	public Boolean isLocked() {
 		return this.locked;
 	}
 
-	public void setLocked(final boolean locked) {
+	public void setLocked(final Boolean locked) {
 		this.locked = locked;
 	}
 
