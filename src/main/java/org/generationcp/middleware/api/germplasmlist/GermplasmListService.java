@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.springframework.data.domain.Pageable;
 
@@ -90,4 +89,6 @@ public interface GermplasmListService {
 
 	void removeGermplasmEntriesFromList(Integer germplasmListId,
 		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
+
+	void editListMetadata(GermplasmListDto germplasmListDto);
 }
