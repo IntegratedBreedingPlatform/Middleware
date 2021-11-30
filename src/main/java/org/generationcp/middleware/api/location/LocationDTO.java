@@ -1,13 +1,17 @@
 package org.generationcp.middleware.api.location;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.generationcp.middleware.pojos.Location;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class LocationDTO extends LocationRequestDto {
 
 	private Integer id;
+	private String countryName;
+	private String provinceName;
 
 	public LocationDTO(){
 	}
@@ -18,11 +22,16 @@ public class LocationDTO extends LocationRequestDto {
 		this.setType(location.getLtype());
 		this.setName(location.getLname());
 		this.setAbbreviation(location.getLabbr());
-		this.setCountryId(location.getCntryid());
 		this.setProvinceId(location.getSnl1id());
 		this.setAltitude(location.getAltitude());
 		this.setLatitude(location.getLatitude());
 		this.setLongitude(location.getLongitude());
+
+		final Location country = location.getCountry();
+		if (country != null) {
+			this.setCountryId(country.getLocid());
+			this.setCountryName(country.getLname());
+		}
 	}
 
 	public Integer getId() {
@@ -31,6 +40,22 @@ public class LocationDTO extends LocationRequestDto {
 
 	public void setId(final Integer id) {
 		this.id = id;
+	}
+
+	public String getCountryName() {
+		return countryName;
+	}
+
+	public void setCountryName(final String countryName) {
+		this.countryName = countryName;
+	}
+
+	public String getProvinceName() {
+		return provinceName;
+	}
+
+	public void setProvinceName(final String provinceName) {
+		this.provinceName = provinceName;
 	}
 
 	@Override

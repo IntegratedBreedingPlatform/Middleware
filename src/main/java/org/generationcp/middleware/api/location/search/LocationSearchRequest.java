@@ -17,6 +17,8 @@ public class LocationSearchRequest {
 	private List<String> locationAbbreviations = new ArrayList<>();
 	private String locationTypeName;
 	private String locationName;
+	private Set<Integer> countryIds = new HashSet<>();
+	private Set<Integer> provinceIds = new HashSet<>();
 
 	public LocationSearchRequest() {
 
@@ -83,6 +85,22 @@ public class LocationSearchRequest {
 
 	public void setLocationTypeName(final String locationType) {
 		this.locationTypeName = locationType;
+	}
+
+	public Set<Integer> getCountryIds() {
+		return this.countryIds;
+	}
+
+	public void setCountryIds(final Set<Integer> countryIds) {
+		this.countryIds = countryIds;
+	}
+
+	public Set<Integer> getProvinceIds() {
+		return this.provinceIds;
+	}
+
+	public void setProvinceIds(final Set<Integer> provinceIds) {
+		this.provinceIds = provinceIds;
 	}
 
 	@Override

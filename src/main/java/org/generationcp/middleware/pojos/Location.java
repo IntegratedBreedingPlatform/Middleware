@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Basic;
@@ -21,6 +23,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
@@ -95,9 +98,10 @@ public class Location implements Serializable, Comparable<Location> {
 	@Column(name = "snl1id")
 	private Integer snl1id;
 
-	@Basic(optional = false)
-	@Column(name = "cntryid")
-	private Integer cntryid;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "cntryid")
+	@NotFound(action = NotFoundAction.IGNORE)
+	private Location country;
 
 	@Basic(optional = false)
 	@Column(name = "lrplce")
@@ -136,7 +140,7 @@ public class Location implements Serializable, Comparable<Location> {
 
 	public Location(final Integer locid, final Integer ltype, final Integer nllp, final String lname, final String labbr,
 		final Integer snl3id, final Integer snl2id, final Integer snl1id,
-		final Integer cntryid, final Integer lrplce) {
+		final Location country, final Integer lrplce) {
 		super();
 		this.locid = locid;
 		this.ltype = ltype;
@@ -146,7 +150,7 @@ public class Location implements Serializable, Comparable<Location> {
 		this.snl3id = snl3id;
 		this.snl2id = snl2id;
 		this.snl1id = snl1id;
-		this.cntryid = cntryid;
+		this.country = country;
 		this.lrplce = lrplce;
 	}
 
@@ -166,12 +170,12 @@ public class Location implements Serializable, Comparable<Location> {
 		this.ltype = ltype;
 	}
 
-	public Integer getCntryid() {
-		return this.cntryid;
+	public Location getCountry() {
+		return country;
 	}
 
-	public void setCntryid(final Integer cntryid) {
-		this.cntryid = cntryid;
+	public void setCountry(final Location country) {
+		this.country = country;
 	}
 
 	public Integer getNllp() {
@@ -366,8 +370,6 @@ public class Location implements Serializable, Comparable<Location> {
 		builder.append(this.snl2id);
 		builder.append(", snl1id=");
 		builder.append(this.snl1id);
-		builder.append(", cntryid=");
-		builder.append(this.cntryid);
 		builder.append(", lrplce=");
 		builder.append(this.lrplce);
 		builder.append(", latitude=");

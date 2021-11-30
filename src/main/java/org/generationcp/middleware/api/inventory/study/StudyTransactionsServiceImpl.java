@@ -32,4 +32,10 @@ public class StudyTransactionsServiceImpl implements StudyTransactionsService {
 
 		return this.daoFactory.getTransactionDAO().searchStudyTransactions(studyId, studyTransactionsRequest, pageable);
 	}
+
+	@Override
+	public StudyTransactionsDto getStudyTransactionByTransactionId(final Integer transactionId) {
+		return this.daoFactory.getTransactionDAO().getStudyTransactionByTransactionId(transactionId);
+	}
+
 }

@@ -71,10 +71,7 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		this.germplasmAuditDAO = new GermplasmAuditDAO(this.sessionProvder.getSession());
-
-		this.locationDAO = new LocationDAO();
-		this.locationDAO.setSession(this.sessionProvder.getSession());
-
+		this.locationDAO = new LocationDAO(this.sessionProvder.getSession());
 		this.userDefinedFieldDAO = new UserDefinedFieldDAO(this.sessionProvder.getSession());
 
 		this.methodDAO = new MethodDAO();

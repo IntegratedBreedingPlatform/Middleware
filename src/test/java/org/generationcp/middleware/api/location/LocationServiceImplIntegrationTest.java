@@ -67,11 +67,11 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetFilteredLocations_FavoritesOnly() {
 
+		final Location country = this.daoFactory.getLocationDAO().getById(1);
 		final String programUUID = UUID.randomUUID().toString();
-		final int cntryid = 1;
 		final Location location = LocationTestDataInitializer
 			.createLocation(null, RandomStringUtils.randomAlphabetic(10), 405, RandomStringUtils.randomAlphabetic(3));
-		location.setCntryid(cntryid);
+		location.setCountry(country);
 		location.setLdefault(Boolean.FALSE);
 
 		this.daoFactory.getLocationDAO().saveOrUpdate(location);
@@ -167,7 +167,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		locationRequestDto.setType(new Random().nextInt());
 		locationRequestDto.setName(RandomStringUtils.randomAlphabetic(10));
 		locationRequestDto.setAbbreviation(RandomStringUtils.randomAlphabetic(5));
-		locationRequestDto.setCountryId(new Random().nextInt());
+		locationRequestDto.setCountryId(1);
 		locationRequestDto.setProvinceId(new Random().nextInt());
 		locationRequestDto.setAltitude(new Random().nextDouble());
 		locationRequestDto.setLatitude(new Random().nextDouble());

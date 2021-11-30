@@ -323,8 +323,10 @@ public class StudyTestDataInitializer {
 	}
 
 	public Integer addTestLocation(final String locationName) {
+		final Location country = this.locationDataManager.getLocationByID(1);
+
 		final Location location = new Location();
-		location.setCntryid(1);
+		location.setCountry(country);
 		location.setLabbr(RandomStringUtils.randomAlphabetic(4).toUpperCase());
 		location.setLname(locationName);
 		location.setLrplce(1);

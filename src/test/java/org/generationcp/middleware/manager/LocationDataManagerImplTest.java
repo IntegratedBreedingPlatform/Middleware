@@ -96,11 +96,12 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountByLocationAbbreviation() {
+		final Location country = this.manager.getLocationByID(1);
 		final String labbr = "LABBRR";
 		final long count = this.manager.countByLocationAbbreviation(labbr);
 
 		final Location location = new Location();
-		location.setCntryid(1);
+		location.setCountry(country);
 		location.setLabbr(labbr);
 		location.setLname("ADDED LOCATION");
 		location.setLrplce(1);
@@ -257,8 +258,9 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddLocation() throws MiddlewareQueryException {
+		final Location country = this.manager.getLocationByID(1);
 		final Location location = new Location();
-		location.setCntryid(1);
+		location.setCountry(country);
 		location.setLabbr("");
 		location.setLname("TEST-LOCATION-1");
 		location.setLrplce(1);
@@ -278,10 +280,12 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testAddLocations() throws MiddlewareQueryException {
 
+		final Location country = this.manager.getLocationByID(1);
+
 		final List<Location> locations = new ArrayList<>();
 
 		final Location location1 = new Location();
-		location1.setCntryid(1);
+		location1.setCountry(country);
 		location1.setLabbr(RandomStringUtils.randomAlphabetic(4).toUpperCase());
 		location1.setLname("TEST-LOCATION-2");
 		location1.setLrplce(1);
@@ -293,7 +297,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		location1.setLdefault(Boolean.FALSE);
 
 		final Location location2 = new Location();
-		location2.setCntryid(1);
+		location2.setCountry(country);
 		location2.setLabbr(RandomStringUtils.randomAlphabetic(4).toUpperCase());
 		location2.setLname("TEST-LOCATION-3");
 		location2.setLrplce(1);
@@ -492,7 +496,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
 		for (final Location location : locationList) {
 			Assert.assertEquals("Location should have a countryId = " + LocationDataManagerImplTest.PHILIPPINES_CNTRYID,
-				LocationDataManagerImplTest.PHILIPPINES_CNTRYID, location.getCntryid());
+				LocationDataManagerImplTest.PHILIPPINES_CNTRYID, location.getCountry().getLocid());
 		}
 	}
 

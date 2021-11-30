@@ -1,0 +1,37 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v20.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1)
+				FROM INFORMATION_SCHEMA.COLUMNS c
+				WHERE TABLE_NAME = 'location'
+				AND COLUMN_NAME = 'cntryid'
+				AND COLUMN_DEFAULT = 0
+				AND IS_NULLABLE = 'NO'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<comment>Make 'location.cntryid' nullable</comment>
+        <sql>
+			alter table location modify cntryid int null;
+        </sql>
+    </changeSet>
+
+	<changeSet author="lkovacic" id="v20.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				select count(1) > 0 from location where cntryid = 0;
+			</sqlCheck>
+		</preConditions>
+		<comment>Set 'location.cntryid' to null where values equals to '0'</comment>
+		<sql>
+			update location set cntryid = null where cntryid = 0;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

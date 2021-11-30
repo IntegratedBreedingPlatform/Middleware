@@ -47,8 +47,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		final Session session = this.sessionProvder.getSession();
-		this.locationDAO = new LocationDAO();
-		this.locationDAO.setSession(session);
+		this.locationDAO = new LocationDAO(this.sessionProvder.getSession());
 	}
 
 	@Test
@@ -181,8 +180,9 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		// Country ID 1 = "Democratic Republic of Afghanistan"
 		final int cntryid = 1;
+		final Location country = this.locationDAO.getById(cntryid);
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
-		location.setCntryid(cntryid);
+		location.setCountry(country);
 		// Province Badakhshan
 		final int provinceId = 1001;
 		location.setSnl1id(provinceId);
@@ -211,14 +211,14 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetLocationDTO() {
 
-		final String programUUID = RandomStringUtils.randomAlphabetic(16);
+		final Location country = this.locationDAO.getById(1);
+
 		final int ltype = 405;
 		final String labbr = RandomStringUtils.randomAlphabetic(7);
 		final String lname = RandomStringUtils.randomAlphabetic(9);
 
-		final int cntryid = 1;
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
-		location.setCntryid(cntryid);
+		location.setCountry(country);
 
 		final int provinceId = 1001;
 		location.setSnl1id(provinceId);
@@ -226,10 +226,13 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		this.locationDAO.saveOrUpdate(location);
 
+		this.sessionProvder.getSession().flush();
+
 		final LocationDTO locationDTO = this.locationDAO.getLocationDTO(location.getLocid());
 
 		Assert.assertThat(locationDTO.getName(), is(location.getLname()));
 		Assert.assertThat(locationDTO.getAbbreviation(), is(location.getLabbr()));
+		Assert.assertThat(locationDTO.getCountryId(), is(country.getLocid()));
 	}
 
 	@Test
@@ -241,8 +244,9 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		// Country ID 1 = "Democratic Republic of Afghanistan"
 		final int cntryid = 1;
+		final Location country = this.locationDAO.getById(cntryid);
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
-		location.setCntryid(cntryid);
+		location.setCountry(country);
 		// Province Badakhshan
 		final int provinceId = 1001;
 		location.setSnl1id(provinceId);
@@ -250,7 +254,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		this.locationDAO.saveOrUpdate(location);
 		final Location province = this.locationDAO.getById(1001);
-		final Location country = this.locationDAO.getById(1);
 
 		final List<LocationDetails> result = this.locationDAO.getFilteredLocations(cntryid, ltype, lname);
 		final LocationDetails locationDetails = result.get(0);
@@ -259,7 +262,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(location.getLocid(), locationDetails.getLocid());
 		Assert.assertEquals(ltype, locationDetails.getLtype().intValue());
 		Assert.assertEquals(labbr, locationDetails.getLocationAbbreviation());
-		Assert.assertEquals(cntryid, locationDetails.getCntryid().intValue());
+		Assert.assertEquals(country.getLocid(), locationDetails.getCntryid());
 		Assert.assertEquals(country.getLname(), locationDetails.getCountryName());
 		Assert.assertEquals(province.getLname(), locationDetails.getProvinceName());
 		Assert.assertEquals(provinceId, locationDetails.getProvinceId().intValue());
@@ -401,8 +404,9 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final String labbr = RandomStringUtils.randomAlphabetic(6);
 		final String lname = RandomStringUtils.randomAlphabetic(10);
 
+		final Location country = this.locationDAO.getById(1);
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, 0, labbr);
-		location.setCntryid(0);
+		location.setCountry(country);
 		location.setLdefault(Boolean.FALSE);
 		this.locationDAO.saveOrUpdate(location);
 

@@ -189,9 +189,7 @@ public class DaoFactory {
 	}
 
 	public LocationDAO getLocationDAO() {
-		final LocationDAO locationDao = new LocationDAO();
-		locationDao.setSession(this.sessionProvider.getSession());
-		return locationDao;
+		return  new LocationDAO(this.sessionProvider.getSession());
 	}
 
 	public MethodDAO getMethodDAO() {

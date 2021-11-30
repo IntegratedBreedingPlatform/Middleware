@@ -640,13 +640,13 @@ public class WorkbookTestDataInitializer {
 		final Location location1 = new Location(WorkbookTestDataInitializer.LOCATION_ID_1, WorkbookTestDataInitializer.LTYPE,
 			WorkbookTestDataInitializer.NLLP, WorkbookTestDataInitializer.LNAME + " 1", WorkbookTestDataInitializer.LABBR1,
 			WorkbookTestDataInitializer.SNL3ID, WorkbookTestDataInitializer.SNL2ID, WorkbookTestDataInitializer.SNL1ID,
-			WorkbookTestDataInitializer.CNTRYID, WorkbookTestDataInitializer.LRPLCE);
+			new Location(1), WorkbookTestDataInitializer.LRPLCE);
 		location1.setLdefault(Boolean.FALSE);
 		locations.add(location1);
 		final Location location2 = new Location(WorkbookTestDataInitializer.LOCATION_ID_2, WorkbookTestDataInitializer.LTYPE,
 			WorkbookTestDataInitializer.NLLP, WorkbookTestDataInitializer.LNAME + " 2", WorkbookTestDataInitializer.LABBR2,
 			WorkbookTestDataInitializer.SNL3ID, WorkbookTestDataInitializer.SNL2ID, WorkbookTestDataInitializer.SNL1ID,
-			WorkbookTestDataInitializer.CNTRYID, WorkbookTestDataInitializer.LRPLCE);
+				new Location(1), WorkbookTestDataInitializer.LRPLCE);
 		location2.setLdefault(Boolean.FALSE);
 		locations.add(location2);
 		return locations;

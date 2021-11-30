@@ -143,8 +143,7 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		this.personDao = new PersonDAO();
 		this.personDao.setSession(this.sessionProvder.getSession());
 
-		this.locationDAO = new LocationDAO();
-		this.locationDAO.setSession(this.sessionProvder.getSession());
+		this.locationDAO = new LocationDAO(this.sessionProvder.getSession());
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.workbenchUser = this.testDataInitializer.createUserForTesting();
@@ -488,14 +487,14 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void createLocationForSearchLotTest() {
-		final String programUUID = org.apache.commons.lang3.RandomStringUtils.randomAlphabetic(16);
+		final Location country = this.locationDAO.getById(1);
+
 		final int ltype = 405;
 		final String labbr = org.apache.commons.lang3.RandomStringUtils.randomAlphabetic(7);
 		final String lname = org.apache.commons.lang3.RandomStringUtils.randomAlphabetic(9);
 
-		final int cntryid = 1;
 		location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
-		location.setCntryid(cntryid);
+		location.setCountry(country);
 
 		final int provinceId = 1001;
 		location.setSnl1id(provinceId);

@@ -42,7 +42,7 @@ public class LocationTestDataInitializer {
 		location.setSnl1id(0);
 		location.setSnl2id(0);
 		location.setSnl3id(0);
-		location.setCntryid(0);
+		location.setCountry(null);
 		location.setLrplce(0);
 		location.setLdefault(Boolean.FALSE);
 

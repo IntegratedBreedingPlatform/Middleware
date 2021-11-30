@@ -65,8 +65,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	public void setUp() throws Exception {
 		this.lotDAO = new LotDAO();
 		this.lotDAO.setSession(this.sessionProvder.getSession());
-		this.locationDAO = new LocationDAO();
-		this.locationDAO.setSession(this.sessionProvder.getSession());
+		this.locationDAO = new LocationDAO(this.sessionProvder.getSession());
 		this.germplasmListDAO = new GermplasmListDAO();
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
 		this.cropType = new CropType();
@@ -254,14 +253,14 @@ public class LotDAOTest extends IntegrationTestBase {
 	}
 
 	private void createLocationForSearchLotTest() {
-		final String programUUID = RandomStringUtils.randomAlphabetic(16);
+		final Location country = this.locationDAO.getById(1);
+
 		final int ltype = 405;
 		final String labbr = RandomStringUtils.randomAlphabetic(7);
 		final String lname = RandomStringUtils.randomAlphabetic(9);
 
-		final int cntryid = 1;
 		this.location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
-		this.location.setCntryid(cntryid);
+		this.location.setCountry(country);
 
 		final int provinceId = 1001;
 		this.location.setSnl1id(provinceId);
