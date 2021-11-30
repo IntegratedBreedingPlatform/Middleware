@@ -26,6 +26,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
+import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -553,18 +554,13 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testCloneGermplasmListEntries_OK() {
-		// Source Germplasm list
+		// Create source germplasm list
 		final int randNameSuffix = new Random().nextInt(100);
 		final GermplasmList sourceGermplasmList = new GermplasmList(null, "Test Germplasm List " + randNameSuffix,
 			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
 		this.daoFactory.getGermplasmListDAO().saveOrUpdate(sourceGermplasmList);
 
-		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
-		final Germplasm germplasm1 = this.createGermplasm(singleCrossMethod);
-		final Germplasm germplasm2 = this.createGermplasm(singleCrossMethod);
-
-		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(this.createGermplasmListData(sourceGermplasmList, germplasm1.getGid(), 1));
-		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(this.createGermplasmListData(sourceGermplasmList, germplasm2.getGid(), 2));
+		final StandardVariable variable = this.setupSourceListEntries(sourceGermplasmList);
 
 		// Germplasm List Generator (from request)
 		final GermplasmListGeneratorDTO request = new GermplasmListGeneratorDTO();
@@ -573,17 +569,65 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		request.setType("LST");
 		request.setDescription("Test Cloned Germplasm List");
 
-		final GermplasmListGeneratorDTO clonedList = this.germplasmListService.cloneGermplasmList(sourceGermplasmList.getId(), request, USER_ID);
-		final List<GermplasmListData> clonedListEntries = this.daoFactory.getGermplasmListDataDAO().getByListId(clonedList.getId());
+		// Clone source list to new list
+		final GermplasmListGeneratorDTO clonedList =
+			this.germplasmListService.cloneGermplasmList(sourceGermplasmList.getId(), request, USER_ID);
+		this.assertGermplasmListCloned(sourceGermplasmList, variable, clonedList);
+	}
 
-		// verify if entries from source is cloned in the target and are in the proper order
+	private StandardVariable setupSourceListEntries(final GermplasmList sourceGermplasmList) {
+		// add entries to source list
+		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
+		final Germplasm germplasm1 = this.createGermplasm(singleCrossMethod);
+		final Germplasm germplasm2 = this.createGermplasm(singleCrossMethod);
+		final GermplasmListData germplasmListData1 = this.createGermplasmListData(sourceGermplasmList, germplasm1.getGid(), 1);
+		final GermplasmListData germplasmListData2 = this.createGermplasmListData(sourceGermplasmList, germplasm2.getGid(), 2);
+		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData1);
+		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData2);
+
+		// Add View and Entry Details to source
+		final String variableName = RandomStringUtils.randomAlphabetic(20);
+		final StandardVariable variable = this.createEntryDetailVariable(variableName);
+
+		final GermplasmListVariableRequestDto germplasmListVariableRequestDto = new GermplasmListVariableRequestDto();
+		germplasmListVariableRequestDto.setVariableId(variable.getId());
+		germplasmListVariableRequestDto.setVariableTypeId(VariableType.ENTRY_DETAIL.getId());
+
+		this.germplasmListService.addVariableToList(sourceGermplasmList.getId(), germplasmListVariableRequestDto);
+
+		final Integer listDataObservation1 = this.germplasmListService.saveListDataObservation(sourceGermplasmList.getId(),
+			new GermplasmListObservationRequestDto(germplasmListData1.getListDataId(), variable.getId(), "1", null));
+		final Integer listDataObservation2 = this.germplasmListService.saveListDataObservation(sourceGermplasmList.getId(),
+			new GermplasmListObservationRequestDto(germplasmListData2.getListDataId(), variable.getId(), "2", null));
+		return variable;
+	}
+
+	private void assertGermplasmListCloned(final GermplasmList sourceGermplasmList, final StandardVariable variable,
+		final GermplasmListGeneratorDTO clonedList) {
+		final Integer clonedListId = clonedList.getId();
+		final List<GermplasmListData> clonedListEntries = this.daoFactory.getGermplasmListDataDAO().getByListId(clonedListId);
+
+		// verify if entries from source are cloned in the target and are in the proper order
 		Assert.assertEquals(2, clonedListEntries.size());
 
 		final Map<Integer, GermplasmListData> sourceListMap =
 			this.daoFactory.getGermplasmListDataDAO().getMapByEntryId(sourceGermplasmList.getId());
 		clonedListEntries.forEach(entry -> {
 			assertEquals(sourceListMap.get(entry.getEntryId()).getGid(), entry.getGid());
+
+			// verify if corresponding germplasm list data details were copied
+			final Optional<GermplasmListDataDetail> observationOptional = this.daoFactory.getGermplasmListDataDetailDAO()
+				.getByListDataIdAndVariableId(entry.getId(), variable.getId());
+			Assert.assertTrue(observationOptional.isPresent());
+			// as set above, variable values are equal to its entry no for simplicity
+			Assert.assertEquals(entry.getEntryId().toString(), observationOptional.get().getValue());
 		});
+
+		// verify if germplasm list data view were copied
+		final List<GermplasmListDataView> view = this.daoFactory.getGermplasmListDataViewDAO().getByListId(clonedListId);
+		Assert.assertEquals(1, view.size());
+		Assert.assertNotNull(view.get(0).getCvtermId());
+		Assert.assertEquals(variable.getId(), view.get(0).getCvtermId().intValue());
 	}
 
 	public void testShouldRemoveEntriesFromList() {
