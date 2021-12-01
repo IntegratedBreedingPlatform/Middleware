@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.germplasmlist;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -20,9 +21,26 @@ public class GermplasmListDto {
 	private String listType;
 	private String notes;
 	private String parentFolderId;
+	private int status;
 
 	public GermplasmListDto() {
 
+	}
+
+	public GermplasmListDto(final GermplasmListGeneratorDTO germplasmListGeneratorDTO) {
+		this.setListName(germplasmListGeneratorDTO.getName());
+		this.setDescription(germplasmListGeneratorDTO.getDescription());
+		this.setListType(germplasmListGeneratorDTO.getType());
+		this.setCreationDate(germplasmListGeneratorDTO.getDate());
+		this.setNotes(germplasmListGeneratorDTO.getNotes());
+		this.setParentFolderId(germplasmListGeneratorDTO.getParentFolderId());
+		this.setProgramUUID(germplasmListGeneratorDTO.getProgramUUID());
+		this.setStatus(germplasmListGeneratorDTO.getStatus());
+	}
+
+	public GermplasmListDto(final GermplasmList list) {
+		this.listId = list.getId();
+		this.listName = list.getName();
 	}
 
 	public Integer getListId() {
@@ -103,6 +121,14 @@ public class GermplasmListDto {
 
 	public void setParentFolderId(final String parentFolderId) {
 		this.parentFolderId = parentFolderId;
+	}
+
+	public int getStatus() {
+		return this.status;
+	}
+
+	public void setStatus(final int status) {
+		this.status = status;
 	}
 
 	@Override

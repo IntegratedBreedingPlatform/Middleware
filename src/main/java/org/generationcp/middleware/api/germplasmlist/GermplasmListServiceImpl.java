@@ -155,7 +155,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.stream().collect(groupingBy(n -> n.getGermplasm().getGid()));
 
 		// save list
-		GermplasmList germplasmList = createGermplasmList(request, loggedInUser);
+		final GermplasmList germplasmList = this.createGermplasmList(new GermplasmListDto(request), loggedInUser);
 
 		// save variables
 		final Set<Integer> variableIds = request.getEntries().stream().flatMap(e -> e.getData().keySet().stream()).collect(toSet());
@@ -198,16 +198,16 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return request;
 	}
 
-	private GermplasmList createGermplasmList(final GermplasmListGeneratorDTO request, final Integer currentUserId) {
+	private GermplasmList createGermplasmList(final GermplasmListDto request, final Integer currentUserId) {
 		final GermplasmList parent = request.getParentFolderId() != null ?
 			this.daoFactory.getGermplasmListDAO().getById(Integer.valueOf(request.getParentFolderId()), false) : null;
 		final String description = request.getDescription() != null ? request.getDescription() : StringUtils.EMPTY;
 
-		GermplasmList germplasmList = new GermplasmList(null, request.getName(), Long.valueOf(this.dateFormat.format(request.getDate())),
-			request.getType(), currentUserId, description, parent, request.getStatus(), request.getNotes());
+		GermplasmList germplasmList = new GermplasmList(null, request.getListName(), Long.valueOf(this.dateFormat.format(request.getCreationDate())),
+			request.getListType(), currentUserId, description, parent, request.getStatus(), request.getNotes());
 		germplasmList.setProgramUUID(request.getProgramUUID());
 		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
-		request.setId(germplasmList.getId());
+		request.setListId(germplasmList.getId());
 		return germplasmList;
 	}
 
@@ -427,12 +427,16 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public GermplasmListGeneratorDTO cloneGermplasmList(final Integer listId, final GermplasmListGeneratorDTO listGeneratorDTO,
+	public GermplasmListDto cloneGermplasmList(final Integer listId, final GermplasmListDto listDto,
 		final Integer loggedInUser) {
-		final GermplasmList destList = this.createGermplasmList(listGeneratorDTO, loggedInUser);
-		this.daoFactory.getGermplasmListDAO().copyGermplasmListEntries(listId, destList.getId(), loggedInUser);
+		final GermplasmList destinationList = this.createGermplasmList(listDto, loggedInUser);
+		final Integer destinationListId = destinationList.getId();
 
-		return new GermplasmListGeneratorDTO(destList);
+		this.daoFactory.getGermplasmListDataDAO().copyEntries(listId, destinationListId);
+		this.daoFactory.getGermplasmListDataViewDAO().copyEntries(listId, destinationListId);
+		this.daoFactory.getGermplasmListDataDetailDAO().copyEntries(listId, destinationListId, loggedInUser);
+
+		return listDto;
 	}
 
 	@Override

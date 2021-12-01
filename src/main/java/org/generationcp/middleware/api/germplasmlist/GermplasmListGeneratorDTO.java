@@ -3,7 +3,6 @@ package org.generationcp.middleware.api.germplasmlist;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
-import org.generationcp.middleware.pojos.GermplasmList;
 
 import java.util.Collections;
 import java.util.Date;
@@ -24,19 +23,6 @@ public class GermplasmListGeneratorDTO {
 		 * key: variableId
 		 */
 		private Map<Integer, GermplasmListObservationDto> data = Collections.emptyMap();
-
-		public GermplasmEntryDTO() {
-
-		}
-
-		public GermplasmEntryDTO(final Integer entryNo, final Integer gid, final String entryCode, final String seedSource,
-			final String groupName) {
-			this.entryNo = entryNo;
-			this.gid = gid;
-			this.entryCode = entryCode;
-			this.seedSource = seedSource;
-			this.groupName = groupName;
-		}
 
 		public Integer getEntryNo() {
 			return this.entryNo;
@@ -79,7 +65,7 @@ public class GermplasmListGeneratorDTO {
 		}
 
 		public Map<Integer, GermplasmListObservationDto> getData() {
-			return data;
+			return this.data;
 		}
 
 		public void setData(final Map<Integer, GermplasmListObservationDto> data) {
@@ -108,19 +94,6 @@ public class GermplasmListGeneratorDTO {
 	private String programUUID;
 
 	public GermplasmListGeneratorDTO() {
-	}
-
-	public GermplasmListGeneratorDTO(GermplasmListDto request) {
-		this.name = request.getListName();
-		this.description = request.getDescription();
-		this.type = request.getListType();
-		this.date = request.getCreationDate();
-		this.notes = request.getNotes();
-		this.parentFolderId = request.getParentFolderId();
-	}
-	public GermplasmListGeneratorDTO(GermplasmList list) {
-		this.id = list.getId();
-		this.name = list.getName();
 	}
 
 	public Integer getId() {

@@ -564,14 +564,14 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final StandardVariable variable = this.setupSourceListEntries(sourceGermplasmList);
 
 		// Germplasm List Generator (from request)
-		final GermplasmListGeneratorDTO request = new GermplasmListGeneratorDTO();
-		request.setName("Test Cloned Germplasm List " + randNameSuffix);
-		request.setDate(new Date());
-		request.setType("LST");
+		final GermplasmListDto request = new GermplasmListDto();
+		request.setListName("Test Cloned Germplasm List " + randNameSuffix);
+		request.setCreationDate(new Date());
+		request.setListType("LST");
 		request.setDescription("Test Cloned Germplasm List");
 
 		// Clone source list to new list
-		final GermplasmListGeneratorDTO clonedList =
+		final GermplasmListDto clonedList =
 			this.germplasmListService.cloneGermplasmList(sourceGermplasmList.getId(), request, USER_ID);
 		this.assertGermplasmListCloned(sourceGermplasmList, variable, clonedList);
 	}
@@ -604,8 +604,8 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void assertGermplasmListCloned(final GermplasmList sourceGermplasmList, final StandardVariable variable,
-		final GermplasmListGeneratorDTO clonedList) {
-		final Integer clonedListId = clonedList.getId();
+		final GermplasmListDto clonedList) {
+		final Integer clonedListId = clonedList.getListId();
 		final List<GermplasmListData> clonedListEntries = this.daoFactory.getGermplasmListDataDAO().getByListId(clonedListId);
 
 		// verify if entries from source are cloned in the target and are in the proper order
