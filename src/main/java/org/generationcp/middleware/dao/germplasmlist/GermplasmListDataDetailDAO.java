@@ -24,6 +24,14 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDataDetailDAO.class);
 
+	private static final String COPY_LIST_DATA_DETAILS = "INSERT INTO list_data_details (variable_id, lrecid, value, cvalue_Id, created_by, created_date) "
+		+ "      SELECT variable_id, destld.lrecid, value, cvalue_Id, :createdBy, now() "
+		+ "      FROM listdata ld, list_data_details ldd, listdata destld "
+		+ "      WHERE ld.lrecid = ldd.lrecid "
+		+ "          AND ld.entryid = destld.entryid "
+		+ "          AND ld.listid = :srcListid "
+		+ "          AND destld.listid = :destListid ";
+
 	public GermplasmListDataDetailDAO() {
 	}
 
@@ -119,5 +127,19 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
 		sqlQuery.setParameterList("listDataIds", listDataIds);
 		sqlQuery.executeUpdate();
+	}
+
+	public void copyEntries (final Integer sourceListId, final Integer destListId, final Integer loggedInUser) {
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(COPY_LIST_DATA_DETAILS);
+			sqlQuery.setParameter("srcListid", sourceListId);
+			sqlQuery.setParameter("destListid", destListId);
+			sqlQuery.setParameter("createdBy", loggedInUser);
+			sqlQuery.executeUpdate();
+		} catch (final Exception e) {
+			final String message = "Error with copyEntries(sourceListId=" + sourceListId + " ): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
 	}
 }
