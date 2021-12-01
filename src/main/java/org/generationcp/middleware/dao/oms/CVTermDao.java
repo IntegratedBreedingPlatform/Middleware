@@ -412,7 +412,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype, cvt.is_system  ").append("FROM cvterm cvt ")
 				.append("WHERE cvt.name = :nameOrSynonym ").append("UNION ")
 				.append("	SELECT DISTINCT cvt.cvterm_id, cvt.cv_id, cvt.name, cvt.definition ")
-				.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype  ")
+				.append(", cvt.dbxref_id, cvt.is_obsolete, cvt.is_relationshiptype, cvt.is_system  ")
 				.append("FROM cvterm cvt INNER JOIN cvtermsynonym syn ON  syn.cvterm_id = cvt.cvterm_id ")
 				.append("AND syn.synonym = :nameOrSynonym ");
 
