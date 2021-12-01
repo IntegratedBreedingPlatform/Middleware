@@ -740,7 +740,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		try {
 
 			final SQLQuery query = this.getSession()
-				.createSQLQuery("SELECT cvterm_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, cvt.is_system  "
+				.createSQLQuery("SELECT cvterm_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system  "
 					+ "FROM cvterm " + "WHERE cv_id = :cvId " + "ORDER BY cvterm_id, name ");
 			query.setParameter("cvId", cvId.getId());
 			this.setStartAndNumOfRows(query, start, numOfRows);
@@ -752,7 +752,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				final Integer dbxrefId = (Integer) row[3];
 				final Integer isObsolete = (Integer) row[4];
 				final Integer isRelationshipType = (Integer) row[5];
-				final Boolean isSystem = row[6] != null && ((Byte) row[6]) == 1 ? Boolean.TRUE : Boolean.FALSE;
+				final Boolean isSystem = row[6] != null && (Boolean) row[6] ? Boolean.TRUE : Boolean.FALSE;
 
 				terms.add(new CVTerm(termId, cvId.getId(), name, definition, dbxrefId, isObsolete, isRelationshipType, isSystem));
 
@@ -943,7 +943,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				final Integer dbxrefId = (Integer) row[4];
 				final Integer isObsolete = (Integer) row[5];
 				final Integer isRelationshipType = (Integer) row[6];
-				final Boolean isSystem = row[7] != null && ((Byte) row[7]) == 1 ? Boolean.TRUE : Boolean.FALSE;
+				final Boolean isSystem = row[7] != null && (Boolean) row[7] ? Boolean.TRUE : Boolean.FALSE;
 
 				term = new CVTerm(cvtermId, cvtermCvId, cvtermName, cvtermDefinition, dbxrefId, isObsolete,
 					isRelationshipType, isSystem);
