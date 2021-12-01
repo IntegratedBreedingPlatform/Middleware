@@ -1488,6 +1488,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		cvTerm.setDefinition(definition);
 		cvTerm.setIsObsolete(false);
 		cvTerm.setIsRelationshipType(false);
+		cvTerm.setIsSystem(false);
 		return this.save(cvTerm);
 	}
 
