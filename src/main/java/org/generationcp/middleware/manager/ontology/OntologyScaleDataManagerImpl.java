@@ -253,7 +253,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 					String label = c.getName().trim();
 					String value = c.getDefinition().trim();
 
-					CVTerm category = new CVTerm(null, cv.getCvId(), label, value, null, 0, 0, 0);
+					CVTerm category = new CVTerm(null, cv.getCvId(), label, value, null, 0, 0, false);
 					daoFactory.getCvTermDao().save(category);
 					daoFactory.getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
 				}
@@ -429,7 +429,7 @@ public class OntologyScaleDataManagerImpl extends DataManager implements Ontolog
 					}
 
 					if (category == null) {
-						category = new CVTerm(null, cvId, label, value, null, 0, 0, 0);
+						category = new CVTerm(null, cvId, label, value, null, 0, 0, false);
 						daoFactory.getCvTermDao().save(category);
 						daoFactory.getCvTermRelationshipDao().save(scale.getId(), TermId.HAS_VALUE.getId(), category.getCvTermId());
 					}
