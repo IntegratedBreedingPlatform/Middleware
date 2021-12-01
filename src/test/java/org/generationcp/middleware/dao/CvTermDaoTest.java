@@ -77,7 +77,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		term.setCv(cv.getCvId());
 		term.setIsObsolete(false);
 		term.setIsRelationshipType(false);
-
+		term.setIsSystem(false);
 		CvTermDaoTest.cvTermDao.save(term);
 
 		final CVTerm cvTerm = CvTermDaoTest.cvTermDao.getByName(term.getName());
@@ -141,7 +141,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 		term.setCv(cv.getCvId());
 		term.setIsObsolete(false);
 		term.setIsRelationshipType(false);
-
+		term.setIsSystem(false);
 		CvTermDaoTest.cvTermDao.save(term);
 
 		final CVTerm cvTerm = CvTermDaoTest.cvTermDao.getByNameAndCvId(term.getName(), cv.getCvId());
