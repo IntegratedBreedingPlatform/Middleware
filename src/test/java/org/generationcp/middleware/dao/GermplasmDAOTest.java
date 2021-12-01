@@ -1241,7 +1241,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			this.daoFactory.getCvTermDao().getByNameAndCvId(attributeType, CvId.VARIABLES.getId());
 
 		if (cvTerm == null) {
-			cvTerm = new CVTerm(null, CvId.VARIABLES.getId(), attributeType, attributeType, null, 0, 0, 0);
+			cvTerm = new CVTerm(null, CvId.VARIABLES.getId(), attributeType, attributeType, null, 0, 0, false);
 			this.daoFactory.getCvTermDao().save(cvTerm);
 		}
 
