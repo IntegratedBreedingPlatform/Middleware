@@ -24,6 +24,7 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_cvterm
@@ -89,14 +90,16 @@ public class CVTerm implements Serializable {
 	@Column(name = "is_relationshiptype")
 	private Integer isRelationshipType;
 
-	@Column(name = "is_system")
-	private Integer isSystem;
+	@Type(type = "org.hibernate.type.NumericBooleanType")
+	@Basic(optional = false)
+	@Column(name = "is_system", columnDefinition = "TINYINT")
+	private Boolean isSystem;
 
 	public CVTerm() {
 	}
 
 	public CVTerm(final Integer cvTermId, final Integer cv, final String name, final String definition, final Integer dbxRefId, final Integer isObsolete,
-			final Integer isRelationshipType, final Integer isSystem) {
+			final Integer isRelationshipType, final Boolean isSystem) {
 		super();
 		this.cvTermId = cvTermId;
 		this.cvId = cv;
@@ -166,11 +169,11 @@ public class CVTerm implements Serializable {
 	}
 
 	public Boolean getIsSystem() {
-		return this.isSystem > 0;
+		return this.isSystem;
 	}
 
 	public void setIsSystem(final Boolean isSystem) {
-		this.isSystem = isSystem ? 1 : 0;
+		this.isSystem = isSystem;
 	}
 
 	@Override
