@@ -388,7 +388,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				final Integer dbxrefId = (Integer) row[4];
 				final Integer isObsolete = (Integer) row[5];
 				final Integer isRelationshipType = (Integer) row[6];
-				final Integer isSystem = (Integer) row[7];
+				final Boolean isSystem = (Boolean) row[7];
 
 				term = new CVTerm(cvtermId, cvtermCvId, cvtermName, cvtermDefinition, dbxrefId, isObsolete,
 					isRelationshipType, isSystem);
@@ -430,7 +430,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				final Integer dbxrefId = (Integer) row[4];
 				final Integer isObsolete = (Integer) row[5];
 				final Integer isRelationshipType = (Integer) row[6];
-				final Integer isSystem = (Integer) row[7];
+				final Boolean isSystem = (Boolean) row[7];
 
 				term = new CVTerm(cvtermId, cvtermCvId, cvtermName, cvtermDefinition, dbxrefId, isObsolete,
 					isRelationshipType, isSystem);
@@ -752,7 +752,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				final Integer dbxrefId = (Integer) row[3];
 				final Integer isObsolete = (Integer) row[4];
 				final Integer isRelationshipType = (Integer) row[5];
-				final Integer isSystem = (Integer) row[6];
+				final Boolean isSystem = (Boolean) row[6];
 
 				terms.add(new CVTerm(termId, cvId.getId(), name, definition, dbxrefId, isObsolete, isRelationshipType, isSystem));
 
@@ -943,7 +943,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				final Integer dbxrefId = (Integer) row[4];
 				final Integer isObsolete = (Integer) row[5];
 				final Integer isRelationshipType = (Integer) row[6];
-				final Integer isSystem = (Integer) row[7];
+				final Boolean isSystem = (Boolean) row[7];
 
 				term = new CVTerm(cvtermId, cvtermCvId, cvtermName, cvtermDefinition, dbxrefId, isObsolete,
 					isRelationshipType, isSystem);
