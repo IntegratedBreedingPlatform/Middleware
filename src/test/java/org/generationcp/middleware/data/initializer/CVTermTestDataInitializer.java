@@ -25,7 +25,7 @@ public class CVTermTestDataInitializer {
 		term.setCv(cvId);
 		term.setIsObsolete(false);
 		term.setIsRelationshipType(false);
-
+		term.setIsSystem(false);
 		return term;
 	}
 }
