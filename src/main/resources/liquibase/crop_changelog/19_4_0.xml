@@ -25,7 +25,7 @@
 		<comment>Mark system variables</comment>
         <sql>
 			update cvterm cv INNER JOIN cvterm cv1 ON cv.cvterm_id = cv1.cvterm_id  set cv.is_system = 1
-			where cv1.cvterm_id in (1725,1726,8135,8150,8155,8165,8170,8190,8200,8201,8210,8220,8230,
+			where cv1.cvterm_id in (28344,28345,8135,8150,8155,8165,8170,8180,8189,8190,8200,8201,8210,8220,8230,
 				8240,8250,8255,8300,8330,8350,8377,8400,8410,8411,8412,8413,8581,8582);
 
 			update cvterm cv INNER JOIN cvterm cv1 ON cv.cvterm_id = cv1.cvterm_id  set cv.is_system = 1
