@@ -327,7 +327,7 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 	}
 
 	private CVTerm createAttribute(final String type, final String name) {
-		CVTerm cvTerm = new CVTerm(null, CvId.VARIABLES.getId(), name, type, null, 0, 0);
+		CVTerm cvTerm = new CVTerm(null, CvId.VARIABLES.getId(), name, type, null, 0, 0, false);
 		this.cvTermDao.save(cvTerm);
 
 		this.cvTermPropertyDao.save(

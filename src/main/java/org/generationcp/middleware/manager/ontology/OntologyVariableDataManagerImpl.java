@@ -316,7 +316,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			// this query will get variables using filter
 			final SQLQuery query = this.getActiveSession()
 				.createSQLQuery(
-					"select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, "
+					"select v.cvterm_id vid, v.name vn, v.definition vd, vmr.mid, vmr.mn, vmr.md, vpr.pid, vpr.pn, vpr.pd, vsr.sid, vsr.sn, vsr.sd, v.is_system is_system, "
 						+ selectQueryProgramUUIDDependant
 						+ "from cvterm v "
 						+ "left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
@@ -325,7 +325,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 						+ leftJoinsProgramUUIDDependant
 						+ "WHERE (v.cv_id = 1040) " + filterClause)
 				.addScalar("vid").addScalar("vn").addScalar("vd").addScalar("pid").addScalar("pn").addScalar("pd").addScalar("mid")
-				.addScalar("mn").addScalar("md").addScalar("sid").addScalar("sn").addScalar("sd").addScalar("p_alias")
+				.addScalar("mn").addScalar("md").addScalar("sid").addScalar("sn").addScalar("sd").addScalar("is_system").addScalar("p_alias")
 				.addScalar("p_min_value")
 				.addScalar("p_max_value").addScalar("fid");
 
@@ -370,17 +370,18 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				}
 
 				variable.setScale(sMap.get(scaleId));
+				variable.setIsSystem((Boolean)items[12]);
 
 				// Alias, Expected Min Value, Expected Max Value
-				final String pAlias = (String) items[12];
-				final String pExpMin = (String) items[13];
-				final String pExpMax = (String) items[14];
+				final String pAlias = (String) items[13];
+				final String pExpMin = (String) items[14];
+				final String pExpMax = (String) items[15];
 
 				variable.setAlias(pAlias);
 				variable.setMinValue((StringUtils.isEmpty(pExpMin)) ? null : pExpMin);
 				variable.setMaxValue((StringUtils.isEmpty(pExpMax)) ? null : pExpMax);
 
-				variable.setIsFavorite(items[15] != null);
+				variable.setIsFavorite(items[16] != null);
 				map.put(variable.getId(), variable);
 			}
 
@@ -506,7 +507,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			this.checkTermIsVariable(term);
 
 			final Variable variable = new Variable(Term.fromCVTerm(term));
-
+			variable.setIsSystem(term.getIsSystem());
 			// load scale, method and property data
 			final List<CVTermRelationship> relationships = this.daoFactory.getCvTermRelationshipDao().getBySubject(term.getCvTermId());
 			for (final CVTermRelationship r : relationships) {
