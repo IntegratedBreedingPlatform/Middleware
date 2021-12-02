@@ -135,7 +135,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			if (country != null) {
 				final Integer countryId = country.getCntryid();
 				final Criteria criteria = this.getSession().createCriteria(Location.class);
-				criteria.add(Restrictions.eq(LocationDAO.COUNTRY_ID, countryId));
+				criteria.add(Restrictions.eq("country.locid", countryId));
 				criteria.addOrder(Order.asc(LocationDAO.LNAME));
 				return criteria.list();
 			}
@@ -152,7 +152,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			if (country != null && type != null) {
 				final Integer countryId = country.getCntryid();
 				final Criteria criteria = this.getSession().createCriteria(Location.class);
-				criteria.add(Restrictions.eq(LocationDAO.COUNTRY_ID, countryId));
+				criteria.add(Restrictions.eq("country.locid", countryId));
 				criteria.add(Restrictions.eq(LocationDAO.LTYPE, type));
 				criteria.addOrder(Order.asc(LocationDAO.LNAME));
 				return criteria.list();
@@ -176,7 +176,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(Location.class);
 
 			if (countryId != null) {
-				criteria.add(Restrictions.eq(LocationDAO.COUNTRY_ID, countryId));
+				criteria.add(Restrictions.eq("country.locid", countryId));
 			}
 
 			if (type != null && 0 != type.intValue()) {
@@ -202,7 +202,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			if (country != null) {
 				final Integer countryId = country.getCntryid();
 				final Criteria criteria = this.getSession().createCriteria(Location.class);
-				criteria.add(Restrictions.eq(LocationDAO.COUNTRY_ID, countryId));
+				criteria.add(Restrictions.eq("country.locid", countryId));
 				criteria.setFirstResult(start);
 				criteria.setMaxResults(numOfRows);
 				return criteria.list();
@@ -220,7 +220,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			if (country != null) {
 				final Integer countryId = country.getCntryid();
 				final Criteria criteria = this.getSession().createCriteria(Location.class);
-				criteria.add(Restrictions.eq(LocationDAO.COUNTRY_ID, countryId));
+				criteria.add(Restrictions.eq("country.locid", countryId));
 				criteria.setProjection(Projections.rowCount());
 				return ((Long) criteria.uniqueResult()).longValue();
 			}
