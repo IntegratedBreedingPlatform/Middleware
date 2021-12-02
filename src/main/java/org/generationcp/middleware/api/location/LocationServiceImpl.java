@@ -105,18 +105,14 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public LocationDTO createLocation(final LocationRequestDto locationRequestDto) {
 
-		final Location country;
-		if (locationRequestDto.getCountryId() != null) {
-			country = this.daoFactory.getLocationDAO().getById(locationRequestDto.getCountryId());
-		} else {
-			country = null;
-		}
-
-		final Integer provinceId = locationRequestDto.getProvinceId() != null ? locationRequestDto.getProvinceId() : 0;
+		final Location country = (locationRequestDto.getCountryId() == null) ? null :
+			this.daoFactory.getLocationDAO().getById(locationRequestDto.getCountryId());
+		final Location province = (locationRequestDto.getProvinceId() == null) ? null :
+				this.daoFactory.getLocationDAO().getById(locationRequestDto.getProvinceId());
 
 		final Location newLocation = new Location(null, locationRequestDto.getType(),
 			0, locationRequestDto.getName(), locationRequestDto.getAbbreviation(),
-			0, 0, provinceId, country, 0);
+			0, 0, province, country, 0);
 		newLocation.setLdefault(false);
 
 		if (locationRequestDto.getLatitude() != null) {
@@ -157,7 +153,8 @@ public class LocationServiceImpl implements LocationService {
 		}
 
 		if (locationRequestDto.getProvinceId() != null) {
-			location.setSnl1id(locationRequestDto.getProvinceId());
+			final Location province = this.daoFactory.getLocationDAO().getById(locationRequestDto.getProvinceId());
+			location.setProvince(province);
 		}
 
 		if (locationRequestDto.getLatitude() != null) {

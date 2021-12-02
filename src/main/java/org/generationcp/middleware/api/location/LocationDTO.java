@@ -22,7 +22,6 @@ public class LocationDTO extends LocationRequestDto {
 		this.setType(location.getLtype());
 		this.setName(location.getLname());
 		this.setAbbreviation(location.getLabbr());
-		this.setProvinceId(location.getSnl1id());
 		this.setAltitude(location.getAltitude());
 		this.setLatitude(location.getLatitude());
 		this.setLongitude(location.getLongitude());
@@ -31,6 +30,12 @@ public class LocationDTO extends LocationRequestDto {
 		if (country != null) {
 			this.setCountryId(country.getLocid());
 			this.setCountryName(country.getLname());
+		}
+
+		final Location province = location.getProvince();
+		if (province != null) {
+			this.setProvinceId(province.getLocid());
+			this.setProvinceName(province.getLname());
 		}
 	}
 

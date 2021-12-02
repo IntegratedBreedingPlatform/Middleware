@@ -168,7 +168,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		locationRequestDto.setName(RandomStringUtils.randomAlphabetic(10));
 		locationRequestDto.setAbbreviation(RandomStringUtils.randomAlphabetic(5));
 		locationRequestDto.setCountryId(1);
-		locationRequestDto.setProvinceId(new Random().nextInt());
+		locationRequestDto.setProvinceId(1001);
 		locationRequestDto.setAltitude(new Random().nextDouble());
 		locationRequestDto.setLatitude(new Random().nextDouble());
 		locationRequestDto.setLongitude(new Random().nextDouble());

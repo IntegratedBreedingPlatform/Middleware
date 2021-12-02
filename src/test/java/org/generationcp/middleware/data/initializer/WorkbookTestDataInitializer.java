@@ -639,14 +639,14 @@ public class WorkbookTestDataInitializer {
 		final List<Location> locations = new ArrayList<>();
 		final Location location1 = new Location(WorkbookTestDataInitializer.LOCATION_ID_1, WorkbookTestDataInitializer.LTYPE,
 			WorkbookTestDataInitializer.NLLP, WorkbookTestDataInitializer.LNAME + " 1", WorkbookTestDataInitializer.LABBR1,
-			WorkbookTestDataInitializer.SNL3ID, WorkbookTestDataInitializer.SNL2ID, WorkbookTestDataInitializer.SNL1ID,
-			new Location(1), WorkbookTestDataInitializer.LRPLCE);
+			WorkbookTestDataInitializer.SNL3ID, WorkbookTestDataInitializer.SNL2ID, new Location(WorkbookTestDataInitializer.SNL1ID),
+			new Location(WorkbookTestDataInitializer.CNTRYID), WorkbookTestDataInitializer.LRPLCE);
 		location1.setLdefault(Boolean.FALSE);
 		locations.add(location1);
 		final Location location2 = new Location(WorkbookTestDataInitializer.LOCATION_ID_2, WorkbookTestDataInitializer.LTYPE,
 			WorkbookTestDataInitializer.NLLP, WorkbookTestDataInitializer.LNAME + " 2", WorkbookTestDataInitializer.LABBR2,
-			WorkbookTestDataInitializer.SNL3ID, WorkbookTestDataInitializer.SNL2ID, WorkbookTestDataInitializer.SNL1ID,
-				new Location(1), WorkbookTestDataInitializer.LRPLCE);
+			WorkbookTestDataInitializer.SNL3ID, WorkbookTestDataInitializer.SNL2ID, new Location(WorkbookTestDataInitializer.SNL1ID),
+				new Location(WorkbookTestDataInitializer.CNTRYID), WorkbookTestDataInitializer.LRPLCE);
 		location2.setLdefault(Boolean.FALSE);
 		locations.add(location2);
 		return locations;

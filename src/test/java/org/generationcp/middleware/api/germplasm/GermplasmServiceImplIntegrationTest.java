@@ -2573,11 +2573,11 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private Location createLocation() {
-		final Location country = this.daoFactory.getLocationDAO().getById(1);
+		final Location location1 = this.daoFactory.getLocationDAO().getById(1);
 		final Location location = new Location(null, 1,
 			1, RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(8),
-			1, 1, 1,
-				country, 1);
+			1, 1, location1,
+				location1, 1);
 		location.setLdefault(false);
 		this.daoFactory.getLocationDAO().saveOrUpdate(location);
 		this.sessionProvder.getSession().flush();

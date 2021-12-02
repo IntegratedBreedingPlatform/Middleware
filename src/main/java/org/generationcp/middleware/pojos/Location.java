@@ -94,9 +94,10 @@ public class Location implements Serializable, Comparable<Location> {
 	@Column(name = "snl2id")
 	private Integer snl2id;
 
-	@Basic(optional = false)
-	@Column(name = "snl1id")
-	private Integer snl1id;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "snl1id")
+	@NotFound(action = NotFoundAction.IGNORE)
+	private Location province;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "cntryid")
@@ -139,7 +140,7 @@ public class Location implements Serializable, Comparable<Location> {
 	}
 
 	public Location(final Integer locid, final Integer ltype, final Integer nllp, final String lname, final String labbr,
-		final Integer snl3id, final Integer snl2id, final Integer snl1id,
+		final Integer snl3id, final Integer snl2id, final Location province,
 		final Location country, final Integer lrplce) {
 		super();
 		this.locid = locid;
@@ -149,7 +150,7 @@ public class Location implements Serializable, Comparable<Location> {
 		this.labbr = labbr;
 		this.snl3id = snl3id;
 		this.snl2id = snl2id;
-		this.snl1id = snl1id;
+		this.province = province;
 		this.country = country;
 		this.lrplce = lrplce;
 	}
@@ -218,12 +219,12 @@ public class Location implements Serializable, Comparable<Location> {
 		this.snl2id = snl2id;
 	}
 
-	public Integer getSnl1id() {
-		return this.snl1id;
+	public Location getProvince() {
+		return province;
 	}
 
-	public void setSnl1id(final Integer snl1id) {
-		this.snl1id = snl1id;
+	public void setProvince(final Location province) {
+		this.province = province;
 	}
 
 	public Integer getLrplce() {
@@ -368,8 +369,6 @@ public class Location implements Serializable, Comparable<Location> {
 		builder.append(this.snl3id);
 		builder.append(", snl2id=");
 		builder.append(this.snl2id);
-		builder.append(", snl1id=");
-		builder.append(this.snl1id);
 		builder.append(", lrplce=");
 		builder.append(this.lrplce);
 		builder.append(", latitude=");

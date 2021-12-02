@@ -496,8 +496,8 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
 		location.setCountry(country);
 
-		final int provinceId = 1001;
-		location.setSnl1id(provinceId);
+		final Location province = this.locationDAO.getById(1001);
+		location.setProvince(province);
 		location.setLdefault(Boolean.FALSE);
 
 		locationDAO.saveOrUpdate(location);

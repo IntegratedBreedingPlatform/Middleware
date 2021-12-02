@@ -24,13 +24,66 @@
 
 	<changeSet author="lkovacic" id="v20.1.0-2">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				select count(1) > 0 from location where cntryid = 0;
-			</sqlCheck>
+			<and>
+				<sqlCheck expectedResult="1">
+					select count(1) > 0 from location where cntryid = 0;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT count(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'location'
+					AND COLUMN_NAME = 'cntryid'
+					AND COLUMN_DEFAULT IS NULL
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+
 		</preConditions>
 		<comment>Set 'location.cntryid' to null where values equals to '0'</comment>
 		<sql>
 			update location set cntryid = null where cntryid = 0;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v20.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1)
+				FROM INFORMATION_SCHEMA.COLUMNS c
+				WHERE TABLE_NAME = 'location'
+				AND COLUMN_NAME = 'snl1id'
+				AND COLUMN_DEFAULT = 0
+				AND IS_NULLABLE = 'NO'
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<comment>Make 'location.snl1id' nullable</comment>
+		<sql>
+			alter table location modify snl1id int null;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v20.1.0-4">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					select count(1) > 0 from location where snl1id = 0;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT count(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'location'
+					AND COLUMN_NAME = 'snl1id'
+					AND COLUMN_DEFAULT IS NULL
+					AND IS_NULLABLE = 'YES'
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Set 'location.snl1id' to null where values equals to '0'</comment>
+		<sql>
+			update location set snl1id = null where snl1id = 0;
 		</sql>
 	</changeSet>
 

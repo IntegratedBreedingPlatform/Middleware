@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -51,6 +52,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * DAO class for {@link Location}.
@@ -353,7 +355,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			final Session session = this.getSession();
 			final SQLQuery query = session.createSQLQuery(Location.GET_ALL_BREEDING_LOCATIONS);
 			final List<Object[]> results = query.list();
-			final Map<Integer, Location> countriesIndexedByIds = this.getCountriesIndexedByIds(results);
+			final Map<Integer, Location> locationsIndexedByIds = this.getProvincesAndCountriesIndexedByIds(results);
 
 			for (final Object o : results) {
 				final Object[] result = (Object[]) o;
@@ -373,8 +375,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					final Double altitude = (Double) result[13];
 					final Boolean ldefault = (Boolean) result[14];
 
-					final Location country = this.getCountry(cntryid, countriesIndexedByIds);
-					final Location location = new Location(locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, country, lrplce);
+					final Location province = this.getLocation(snl1id, locationsIndexedByIds);
+					final Location country = this.getLocation(cntryid, locationsIndexedByIds);
+					final Location location = new Location(locid, ltype, nllp, lname, labbr, snl3id, snl2id, province, country, lrplce);
 					location.setLdefault(ldefault);
 
 					final Georef georef = new Georef();
@@ -405,6 +408,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
+	// TODO: add country and province as location entities in LocationDTO
 	public LocationDTO getLocationDTO(final Integer locationId) {
 		try {
 			final StringBuilder query = new StringBuilder("select l.locid as id," //
@@ -571,7 +575,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			query.setParameter("dval", dval);
 
 			final List<Object[]> results = query.list();
-			final Map<Integer, Location> countriesIndexedByIds = this.getCountriesIndexedByIds(results);
+			final Map<Integer, Location> locationsIndexedByIds = this.getProvincesAndCountriesIndexedByIds(results);
 
 			if (!results.isEmpty()) {
 				for (final Object[] row : results) {
@@ -586,8 +590,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					final Integer cntryid = (Integer) row[8];
 					final Integer lrplce = (Integer) row[9];
 
-					final Location country = this.getCountry(cntryid, countriesIndexedByIds);
-					locations.add(new Location(locid, ltype, nllp, lname, labbr, snl3id, snl2id, snl1id, country, lrplce));
+					final Location province = this.getLocation(snl1id, locationsIndexedByIds);
+					final Location country = this.getLocation(cntryid, locationsIndexedByIds);
+					locations.add(new Location(locid, ltype, nllp, lname, labbr, snl3id, snl2id, province, country, lrplce));
 
 				}
 			}
@@ -950,18 +955,21 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return Optional.empty();
 	}
 
-	private Map<Integer, Location> getCountriesIndexedByIds(final List<Object[]> results) {
-		final Set<Integer> countryIds =
-				results.stream().map(result -> (Integer) ((Object[]) result)[8]).filter(Objects::nonNull).collect(Collectors.toSet());
-		final List<Location> countries = this.getByIds(new ArrayList<>(countryIds));
-		return countries.stream().collect(Collectors.toMap(Location::getLocid, Function.identity()));
+	private Map<Integer, Location> getProvincesAndCountriesIndexedByIds(final List<Object[]> results) {
+		// Get all ids of provinces(position 7) and countries(position 8)  and return a flatten set of them
+		final Set<Integer> locationIds = results.stream()
+				.map(result -> Stream.of((Integer) result[7], (Integer) result[8]).filter(Objects::nonNull)
+						.collect(Collectors.toSet()))
+				.collect(HashSet::new, Set::addAll, Set::addAll);
+		final List<Location> locations = this.getByIds(new ArrayList<>(locationIds));
+		return locations.stream().collect(Collectors.toMap(Location::getLocid, Function.identity()));
 	}
 
-	private Location getCountry(final Integer countryId, final Map<Integer, Location> countriesIndexedByIds) {
-		if (countryId == null) {
+	private Location getLocation(final Integer locationId, final Map<Integer, Location> locationIndexedByIds) {
+		if (locationId == null) {
 			return null;
 		}
-		return countriesIndexedByIds.get(countryId);
+		return locationIndexedByIds.get(locationId);
 	}
 
 }

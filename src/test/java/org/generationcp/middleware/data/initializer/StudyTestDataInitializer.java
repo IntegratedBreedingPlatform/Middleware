@@ -324,6 +324,7 @@ public class StudyTestDataInitializer {
 
 	public Integer addTestLocation(final String locationName) {
 		final Location country = this.locationDataManager.getLocationByID(1);
+		final Location province = this.locationDataManager.getLocationByID(1001);
 
 		final Location location = new Location();
 		location.setCountry(country);
@@ -332,7 +333,7 @@ public class StudyTestDataInitializer {
 		location.setLrplce(1);
 		location.setLtype(1);
 		location.setNllp(1);
-		location.setSnl1id(1);
+		location.setProvince(province);
 		location.setSnl2id(1);
 		location.setSnl3id(1);
 		location.setLdefault(Boolean.FALSE);

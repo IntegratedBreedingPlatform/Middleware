@@ -97,6 +97,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testCountByLocationAbbreviation() {
 		final Location country = this.manager.getLocationByID(1);
+		final Location province = this.manager.getLocationByID(1001);
 		final String labbr = "LABBRR";
 		final long count = this.manager.countByLocationAbbreviation(labbr);
 
@@ -107,7 +108,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		location.setLrplce(1);
 		location.setLtype(1);
 		location.setNllp(1);
-		location.setSnl1id(1);
+		location.setProvince(province);
 		location.setSnl2id(1);
 		location.setSnl3id(1);
 		location.setLdefault(Boolean.FALSE);
@@ -259,6 +260,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testAddLocation() throws MiddlewareQueryException {
 		final Location country = this.manager.getLocationByID(1);
+		final Location province = this.manager.getLocationByID(1001);
 		final Location location = new Location();
 		location.setCountry(country);
 		location.setLabbr("");
@@ -266,7 +268,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		location.setLrplce(1);
 		location.setLtype(1);
 		location.setNllp(1);
-		location.setSnl1id(1);
+		location.setProvince(province);
 		location.setSnl2id(1);
 		location.setSnl3id(1);
 		location.setLdefault(Boolean.FALSE);
@@ -281,6 +283,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	public void testAddLocations() throws MiddlewareQueryException {
 
 		final Location country = this.manager.getLocationByID(1);
+		final Location province = this.manager.getLocationByID(1001);
 
 		final List<Location> locations = new ArrayList<>();
 
@@ -291,7 +294,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		location1.setLrplce(1);
 		location1.setLtype(1);
 		location1.setNllp(1);
-		location1.setSnl1id(1);
+		location1.setProvince(province);
 		location1.setSnl2id(1);
 		location1.setSnl3id(1);
 		location1.setLdefault(Boolean.FALSE);
@@ -303,7 +306,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		location2.setLrplce(1);
 		location2.setLtype(1);
 		location2.setNllp(1);
-		location2.setSnl1id(1);
+		location2.setProvince(province);
 		location2.setSnl2id(1);
 		location2.setSnl3id(1);
 		location2.setLdefault(Boolean.FALSE);
@@ -361,7 +364,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetLocationDetailsByLocId() {
-		final int locationId = 2;
+		final int locationId = 1001;
 		final List<LocationDetails> locdetails = this.manager.getLocationDetailsByLocId(locationId, 0, 100);
 		Assert.assertNotNull(locdetails);
 		Assert.assertFalse(locdetails.isEmpty());
