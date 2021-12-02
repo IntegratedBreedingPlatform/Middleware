@@ -192,8 +192,7 @@
 			  </sqlCheck>
         </preConditions>
 		<comment>
-			Removing ADD_GERMPLASM_LIST_ENTRIES, ADD_ENTRIES_TO_LIST, DELETE_GERMPLASM_LIST,
-			REMOVE_ENTRIES_GERMPLASM_LISTS, CLONE_GERMPLASM_LIST and EDIT_LIST_METADATA permissions for roles that do not have Full permissions.
+			Removing DELETE_GERMPLASM_LIST permission for roles that do not have Full permissions.
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 
