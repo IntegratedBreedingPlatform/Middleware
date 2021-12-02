@@ -32,7 +32,7 @@ public class CvTermSaver extends Saver {
 	public Term save(String name, String definition, CvId cvId) throws MiddlewareException, MiddlewareQueryException {
 		this.validateInputFields(name, definition);
 		CVTermDao dao = daoFactory.getCvTermDao();
-		CVTerm cvTerm = this.create(name, definition, cvId.getId(), false, false);
+		CVTerm cvTerm = this.create(name, definition, cvId.getId(), false, false, false);
 		dao.save(cvTerm);
 
 		return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
@@ -54,13 +54,14 @@ public class CvTermSaver extends Saver {
 		return new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
 	}
 
-	public CVTerm create(String name, String definition, int cvId, boolean isObsolete, boolean isRelationshipType) {
+	public CVTerm create(String name, String definition, int cvId, boolean isObsolete, boolean isRelationshipType, boolean isSystem) {
 		CVTerm cvTerm = new CVTerm();
 		cvTerm.setName(name);
 		cvTerm.setDefinition(definition);
 		cvTerm.setCv(cvId);
 		cvTerm.setIsObsolete(isObsolete);
 		cvTerm.setIsRelationshipType(isRelationshipType);
+		cvTerm.setIsSystem(isSystem);
 		return cvTerm;
 	}
 
