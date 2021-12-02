@@ -7,7 +7,6 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.pojos.GermplasmList;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -16,8 +15,7 @@ import java.util.Set;
 
 public interface GermplasmListService {
 
-	GermplasmListGeneratorDTO create(GermplasmListGeneratorDTO request, int status, String programUUID,
-		WorkbenchUser loggedInUser);
+	GermplasmListGeneratorDTO create(GermplasmListGeneratorDTO request, Integer loggedInUserId);
 
 	void importUpdates(GermplasmListGeneratorDTO request);
 
@@ -86,6 +84,9 @@ public interface GermplasmListService {
 
 	void addGermplasmListEntriesToAnotherList(Integer destinationListId, Integer sourceListId, String programUUID,
 		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
+
+	GermplasmListDto cloneGermplasmList(Integer listId, GermplasmListDto germplasmListDto,
+		Integer loggedInUserId);
 
 	void removeGermplasmEntriesFromList(Integer germplasmListId,
 		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
