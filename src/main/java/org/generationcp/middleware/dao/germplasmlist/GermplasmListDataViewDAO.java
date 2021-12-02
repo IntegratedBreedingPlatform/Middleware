@@ -22,6 +22,11 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDataViewDAO.class);
 
+	private static final String COPY_LIST_DATA_VIEW = "INSERT INTO list_data_view (listid, static_id, name_fldno, cvterm_id, type_id) "
+		+ "      SELECT :destListid, static_id, name_fldno, cvterm_id, type_id "
+		+ "      FROM list_data_view "
+		+ "      WHERE listid = :srcListid ";
+
 	public GermplasmListDataViewDAO(final Session session) {
 		super(session);
 	}
@@ -64,4 +69,16 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 		}
 	}
 
+	public void copyEntries (final Integer sourceListId, final Integer destListId) {
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(COPY_LIST_DATA_VIEW);
+			sqlQuery.setParameter("srcListid", sourceListId);
+			sqlQuery.setParameter("destListid", destListId);
+			sqlQuery.executeUpdate();
+		} catch (final Exception e) {
+			final String message = "Error with copyEntries(sourceListId=" + sourceListId + " ): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
+	}
 }

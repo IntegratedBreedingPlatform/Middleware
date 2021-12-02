@@ -8,8 +8,8 @@ public enum ExperimentTransactionType {
 	PLANTING("Planting", 1),
 	HARVESTING("Harvesting", 2);
 
-	private final Integer id;
 	private String value;
+	private final Integer id;
 
 	private static final List<ExperimentTransactionType> LIST;
 
@@ -33,4 +33,12 @@ public enum ExperimentTransactionType {
 	public static List<ExperimentTransactionType> getAll() {
 		return LIST;
 	}
+
+	public static ExperimentTransactionType getById(final int id) {
+		return Arrays.stream(ExperimentTransactionType.values())
+				.filter(type -> type.id == id)
+				.findFirst()
+				.orElseThrow(() -> new IllegalStateException(String.format("There is no a experiment transaction type with id %s.", id)));
+	}
+
 }

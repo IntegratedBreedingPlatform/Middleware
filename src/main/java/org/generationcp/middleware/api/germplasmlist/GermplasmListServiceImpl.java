@@ -36,7 +36,6 @@ import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.Util;
@@ -147,8 +146,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request, final int status, final String programUUID,
-		final WorkbenchUser loggedInUser) {
+	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request, final Integer loggedInUserId) {
 
 		final List<Integer> gids = request.getEntries()
 			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
@@ -156,17 +154,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Map<Integer, List<Name>> namesByGid = this.daoFactory.getNameDao().getNamesByGids(gids)
 			.stream().collect(groupingBy(n -> n.getGermplasm().getGid()));
 
-		final Integer currentUserId = loggedInUser.getUserid();
-		final GermplasmList parent = request.getParentFolderId() != null ?
-			this.daoFactory.getGermplasmListDAO().getById(Integer.valueOf(request.getParentFolderId()), false) : null;
-		final String description = request.getDescription() != null ? request.getDescription() : StringUtils.EMPTY;
-
 		// save list
-		GermplasmList germplasmList = new GermplasmList(null, request.getName(), Long.valueOf(this.dateFormat.format(request.getDate())),
-			request.getType(), currentUserId, description, parent, status, request.getNotes());
-		germplasmList.setProgramUUID(programUUID);
-		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
-		request.setId(germplasmList.getId());
+		final GermplasmList germplasmList = this.createGermplasmList(new GermplasmListDto(request), loggedInUserId);
 
 		// save variables
 		final Set<Integer> variableIds = request.getEntries().stream().flatMap(e -> e.getData().keySet().stream()).collect(toSet());
@@ -207,6 +196,19 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 
 		return request;
+	}
+
+	private GermplasmList createGermplasmList(final GermplasmListDto request, final Integer currentUserId) {
+		final GermplasmList parent = request.getParentFolderId() != null ?
+			this.daoFactory.getGermplasmListDAO().getById(Integer.valueOf(request.getParentFolderId()), false) : null;
+		final String description = request.getDescription() != null ? request.getDescription() : StringUtils.EMPTY;
+
+		GermplasmList germplasmList = new GermplasmList(null, request.getListName(), Long.valueOf(this.dateFormat.format(request.getCreationDate())),
+			request.getListType(), currentUserId, description, parent, request.getStatus(), request.getNotes());
+		germplasmList.setProgramUUID(request.getProgramUUID());
+		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+		request.setListId(germplasmList.getId());
+		return germplasmList;
 	}
 
 	@Override
@@ -422,6 +424,19 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			)));
 
 		this.addGermplasmEntriesModelsToList(destinationGermplasmList, addGermplasmEntriesModels);
+	}
+
+	@Override
+	public GermplasmListDto cloneGermplasmList(final Integer listId, final GermplasmListDto listDto,
+		final Integer loggedInUserId) {
+		final GermplasmList destinationList = this.createGermplasmList(listDto, loggedInUserId);
+		final Integer destinationListId = destinationList.getId();
+
+		this.daoFactory.getGermplasmListDataDAO().copyEntries(listId, destinationListId);
+		this.daoFactory.getGermplasmListDataViewDAO().copyEntries(listId, destinationListId);
+		this.daoFactory.getGermplasmListDataDetailDAO().copyEntries(listId, destinationListId, loggedInUserId);
+
+		return listDto;
 	}
 
 	@Override
