@@ -28,6 +28,8 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -41,6 +43,8 @@ import java.util.Set;
  * DAO class for {@link GermplasmListData}.
  */
 public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDataDAO.class);
 
 	private static final String GERMPLASM_LIST_DATA_LIST_ID_COLUMN = "listId";
 
@@ -67,6 +71,11 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	public static final Integer STATUS_DELETED = 9;
 	public static final Integer STATUS_ACTIVE = 0;
 	public static final String SOURCE_UNKNOWN = "Unknown";
+
+	private static final String COPY_LISTDATA_TO_NEW_LIST = "INSERT INTO listdata (listid, gid, entryid, entrycd, source, desig, grpname, lrstatus, llrecid) "
+		+ "      SELECT :destListid, gid, entryid, entrycd, source, desig, grpname, lrstatus, llrecid "
+		+ "      FROM listdata "
+		+ "      WHERE listid = :srcListid ";
 
 	@SuppressWarnings("unchecked")
 	public List<GermplasmListData> getByListId(final Integer id) {
@@ -345,7 +354,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	}
 
 	public List<Integer> getGidsByListId(final Integer listId) {
-		String sql = "SELECT gid FROM listdata ld WHERE ld.listid = :listId";
+		final String sql = "SELECT gid FROM listdata ld WHERE ld.listid = :listId";
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
 		query.setParameter("listId", listId);
 		return query.list();
@@ -447,10 +456,22 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	}
 
 	public List<Integer> getListDataIdsByListId(final Integer listId) {
-		String sql = "SELECT lrecid FROM listdata ld WHERE ld.listid = :listId";
+		final String sql = "SELECT lrecid FROM listdata ld WHERE ld.listid = :listId";
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
 		query.setParameter("listId", listId);
 		return query.list();
 	}
 
+	public void copyEntries (final Integer sourceListId, final Integer destListId) {
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(COPY_LISTDATA_TO_NEW_LIST);
+			sqlQuery.setParameter("srcListid", sourceListId);
+			sqlQuery.setParameter("destListid", destListId);
+			sqlQuery.executeUpdate();
+		} catch (final Exception e) {
+			final String message = "Error with copyEntries(sourceListId=" + sourceListId + " ): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
+	}
 }
