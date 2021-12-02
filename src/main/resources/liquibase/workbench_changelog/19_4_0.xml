@@ -178,4 +178,32 @@
 
 		</sql>
 	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.4.0-7">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM workbench_sidebar_category_link
+						WHERE tool_name = 'manage_germplasm_lists' AND sidebar_link_title = 'Germplasm Lists Beta';
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM permission WHERE workbench_sidebar_category_link_id =
+						(SELECT sidebar_category_link_id FROM workbench_sidebar_category_link WHERE tool_name = 'bm_list_manager_main');
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Rename 'Germplasm List Beta' module to 'Germplasm Lists'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			<!-- Rename the new germplas lists module -->
+			UPDATE workbench_sidebar_category_link SET sidebar_link_title = 'Germplasm Lists' WHERE tool_name = 'manage_germplasm_lists';
+
+			<!-- Hide de old germplas lists module -->
+			UPDATE permission SET workbench_sidebar_category_link_id = null WHERE workbench_sidebar_category_link_id =
+				(SELECT sidebar_category_link_id FROM workbench_sidebar_category_link WHERE tool_name = 'bm_list_manager_main');
+
+			UPDATE permission SET description = 'Germplasm Lists' WHERE name = 'MANAGE_GERMPLASM_LISTS';
+		</sql>
+	</changeSet>
 </databaseChangeLog>
