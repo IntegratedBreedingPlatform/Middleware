@@ -151,4 +151,54 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="abatac" id="v19.4.0-6">
+		<preConditions onFail="MARK_RAN">
+			  <sqlCheck expectedResult="1">
+					SELECT count(1) > 0
+					FROM (
+						SELECT 1
+						FROM role_permission rp
+								 INNER JOIN permission p ON rp.permission_id = p.permission_id
+						WHERE p.name IN ('LISTS', 'MANAGE_GERMPLASM_LISTS')
+						GROUP BY rp.role_id
+					) AS count;
+			  </sqlCheck>
+        </preConditions>
+		<comment>
+			Removing ADD_GERMPLASM_LIST_ENTRIES, ADD_ENTRIES_TO_LIST, DELETE_GERMPLASM_LIST,
+			REMOVE_ENTRIES_GERMPLASM_LISTS, CLONE_GERMPLASM_LIST and EDIT_LIST_METADATA permissions for roles that do not have Full permissions.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			# Insert inherited permissions of LISTS and MANAGE_GERMPLASM_LISTS.
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT rti.role_id, pti.permission_id
+			FROM (SELECT DISTINCT(rp.role_id) AS role_id
+				  FROM role_permission rp
+						   INNER JOIN permission p ON rp.permission_id = p.permission_id
+				  WHERE p.name IN ('LISTS', 'MANAGE_GERMPLASM_LISTS')
+				  GROUP BY rp.role_id
+			) rti
+					 CROSS JOIN
+			(SELECT permission_id
+			 FROM permission
+			 WHERE name IN ('SAMPLES_LISTS', 'GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS', 'IMPORT_GERMPLASM_LISTS',
+			                'GERMPLASM_LIST_LABEL_PRINTING', 'IMPORT_GERMPLASM_LIST_UPDATES', 'REORDER_ENTRIES_GERMPLASM_LISTS')
+			) pti;
+
+			# Delete ADD_GERMPLASM_LIST_ENTRIES, ADD_ENTRIES_TO_LIST, DELETE_GERMPLASM_LIST,
+			# REMOVE_ENTRIES_GERMPLASM_LISTS, CLONE_GERMPLASM_LIST and EDIT_LIST_METADATA from roles that do not have Full permissions.
+			DELETE role_permission FROM role_permission
+				WHERE
+					permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name in ('LISTS', 'MANAGE_GERMPLASM_LISTS'))
+					AND role_id IN (SELECT subA.role_id FROM (SELECT rp.role_id AS role_id FROM role_permission rp
+										WHERE rp.role_id IN ( SELECT subB.rid FROM (
+												SELECT rp.role_id AS rid FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
+													WHERE p.name in ('LISTS', 'MANAGE_GERMPLASM_LISTS')
+														GROUP BY rp.role_id ) AS subB ) ) AS subA
+									);
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
+
