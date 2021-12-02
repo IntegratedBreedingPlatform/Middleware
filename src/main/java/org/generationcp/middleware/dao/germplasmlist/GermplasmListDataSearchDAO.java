@@ -241,6 +241,11 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		whereClause.add("listData.lrstatus <> " + GermplasmListDataDAO.STATUS_DELETED);
 		whereClause.add("g.deleted = 0");
 
+		if (!CollectionUtils.isEmpty(request.getListDataIds())) {
+			queryParams.put("listDataIds", request.getListDataIds());
+			whereClause.add("listData.lrecid IN (:listDataIds) ");
+		}
+
 		if (!CollectionUtils.isEmpty(request.getEntryNumbers())) {
 			queryParams.put("entryNumbers", request.getEntryNumbers());
 			whereClause.add("listData.entryId IN (:entryNumbers) ");

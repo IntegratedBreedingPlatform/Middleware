@@ -13,6 +13,7 @@ import java.util.Map;
 @AutoProperty
 public class GermplasmListDataSearchRequest extends SearchRequestDto {
 
+	private List<Integer> listDataIds;
 	private List<Integer> entryNumbers;
 	private List<Integer> gids;
 	private String germplasmUUID;
@@ -38,7 +39,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	private Map<Integer, Object> variablesFilters;
 
 	public List<Integer> getEntryNumbers() {
-		return entryNumbers;
+		return this.entryNumbers;
 	}
 
 	public void setEntryNumbers(final List<Integer> entryNumbers) {
@@ -46,7 +47,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public List<Integer> getGids() {
-		return gids;
+		return this.gids;
 	}
 
 	public void setGids(final List<Integer> gids) {
@@ -54,7 +55,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public String getGermplasmUUID() {
-		return germplasmUUID;
+		return this.germplasmUUID;
 	}
 
 	public void setGermplasmUUID(final String germplasmUUID) {
@@ -62,7 +63,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public String getGroupId() {
-		return groupId;
+		return this.groupId;
 	}
 
 	public void setGroupId(final String groupId) {
@@ -70,7 +71,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public SqlTextFilter getDesignationFilter() {
-		return designationFilter;
+		return this.designationFilter;
 	}
 
 	public void setDesignationFilter(final SqlTextFilter designationFilter) {
@@ -78,7 +79,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public SqlTextFilter getImmediateSourceName() {
-		return immediateSourceName;
+		return this.immediateSourceName;
 	}
 
 	public void setImmediateSourceName(final SqlTextFilter immediateSourceName) {
@@ -86,7 +87,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public SqlTextFilter getGroupSourceName() {
-		return groupSourceName;
+		return this.groupSourceName;
 	}
 
 	public void setGroupSourceName(final SqlTextFilter groupSourceName) {
@@ -94,7 +95,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public SqlTextFilter getFemaleParentName() {
-		return femaleParentName;
+		return this.femaleParentName;
 	}
 
 	public void setFemaleParentName(final SqlTextFilter femaleParentName) {
@@ -102,7 +103,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public SqlTextFilter getMaleParentName() {
-		return maleParentName;
+		return this.maleParentName;
 	}
 
 	public void setMaleParentName(final SqlTextFilter maleParentName) {
@@ -110,7 +111,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public String getBreedingMethodName() {
-		return breedingMethodName;
+		return this.breedingMethodName;
 	}
 
 	public void setBreedingMethodName(final String breedingMethodName) {
@@ -118,7 +119,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public String getBreedingMethodAbbreviation() {
-		return breedingMethodAbbreviation;
+		return this.breedingMethodAbbreviation;
 	}
 
 	public void setBreedingMethodAbbreviation(final String breedingMethodAbbreviation) {
@@ -126,7 +127,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public String getBreedingMethodGroup() {
-		return breedingMethodGroup;
+		return this.breedingMethodGroup;
 	}
 
 	public void setBreedingMethodGroup(final String breedingMethodGroup) {
@@ -134,7 +135,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public String getLocationName() {
-		return locationName;
+		return this.locationName;
 	}
 
 	public void setLocationName(final String locationName) {
@@ -142,7 +143,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public String getLocationAbbreviation() {
-		return locationAbbreviation;
+		return this.locationAbbreviation;
 	}
 
 	public void setLocationAbbreviation(final String locationAbbreviation) {
@@ -150,7 +151,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public Date getGermplasmDateFrom() {
-		return germplasmDateFrom;
+		return this.germplasmDateFrom;
 	}
 
 	public void setGermplasmDateFrom(final Date germplasmDateFrom) {
@@ -158,7 +159,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public Date getGermplasmDateTo() {
-		return germplasmDateTo;
+		return this.germplasmDateTo;
 	}
 
 	public void setGermplasmDateTo(final Date germplasmDateTo) {
@@ -166,7 +167,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public String getReference() {
-		return reference;
+		return this.reference;
 	}
 
 	public void setReference(final String reference) {
@@ -174,7 +175,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public Map<Integer, Object> getNamesFilters() {
-		return namesFilters;
+		return this.namesFilters;
 	}
 
 	public void setNamesFilters(final Map<Integer, Object> namesFilters) {
@@ -182,7 +183,7 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public Map<Integer, Object> getDescriptorsFilters() {
-		return descriptorsFilters;
+		return this.descriptorsFilters;
 	}
 
 	public void setDescriptorsFilters(final Map<Integer, Object> descriptorsFilters) {
@@ -190,11 +191,19 @@ public class GermplasmListDataSearchRequest extends SearchRequestDto {
 	}
 
 	public Map<Integer, Object> getVariablesFilters() {
-		return variablesFilters;
+		return this.variablesFilters;
 	}
 
 	public void setVariablesFilters(final Map<Integer, Object> variablesFilters) {
 		this.variablesFilters = variablesFilters;
+	}
+
+	public List<Integer> getListDataIds() {
+		return this.listDataIds;
+	}
+
+	public void setListDataIds(final List<Integer> listDataIds) {
+		this.listDataIds = listDataIds;
 	}
 
 	@Override

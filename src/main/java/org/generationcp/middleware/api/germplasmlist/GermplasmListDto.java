@@ -1,5 +1,7 @@
 package org.generationcp.middleware.api.germplasmlist;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -10,14 +12,35 @@ public class GermplasmListDto {
 
 	private Integer listId;
 	private String listName;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date creationDate;
 	private String description;
 	private String programUUID;
-	private boolean locked;
+	private Boolean locked;
 	private Integer ownerId;
+	private String listType;
+	private String notes;
+	private String parentFolderId;
+	private Integer status;
 
 	public GermplasmListDto() {
 
+	}
+
+	public GermplasmListDto(final GermplasmListGeneratorDTO germplasmListGeneratorDTO) {
+		this.setListName(germplasmListGeneratorDTO.getName());
+		this.setDescription(germplasmListGeneratorDTO.getDescription());
+		this.setListType(germplasmListGeneratorDTO.getType());
+		this.setCreationDate(germplasmListGeneratorDTO.getDate());
+		this.setNotes(germplasmListGeneratorDTO.getNotes());
+		this.setParentFolderId(germplasmListGeneratorDTO.getParentFolderId());
+		this.setProgramUUID(germplasmListGeneratorDTO.getProgramUUID());
+		this.setStatus(germplasmListGeneratorDTO.getStatus());
+	}
+
+	public GermplasmListDto(final GermplasmList list) {
+		this.listId = list.getId();
+		this.listName = list.getName();
 	}
 
 	public Integer getListId() {
@@ -60,20 +83,52 @@ public class GermplasmListDto {
 		this.programUUID = programUUID;
 	}
 
-	public boolean isLocked() {
-		return locked;
+	public Boolean isLocked() {
+		return this.locked;
 	}
 
-	public void setLocked(final boolean locked) {
+	public void setLocked(final Boolean locked) {
 		this.locked = locked;
 	}
 
 	public Integer getOwnerId() {
-		return ownerId;
+		return this.ownerId;
 	}
 
 	public void setOwnerId(final Integer ownerId) {
 		this.ownerId = ownerId;
+	}
+
+	public String getListType() {
+		return this.listType;
+	}
+
+	public void setListType(final String listType) {
+		this.listType = listType;
+	}
+
+	public String getNotes() {
+		return this.notes;
+	}
+
+	public void setNotes(final String notes) {
+		this.notes = notes;
+	}
+
+	public String getParentFolderId() {
+		return this.parentFolderId;
+	}
+
+	public void setParentFolderId(final String parentFolderId) {
+		this.parentFolderId = parentFolderId;
+	}
+
+	public Integer getStatus() {
+		return this.status;
+	}
+
+	public void setStatus(final Integer status) {
+		this.status = status;
 	}
 
 	@Override

@@ -2035,4 +2035,17 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
+
+	public boolean isLocationUsedInGermplasm(final Integer locationId) {
+		try {
+			final String sql = "SELECT count(1) FROM germplsm WHERE glocn = :locationId";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("locationId", locationId);
+			return ((BigInteger) query.uniqueResult()).longValue() > 0;
+		} catch (final HibernateException e) {
+			final String message = "Error with isLocationIdUsedInGermplasms(locationId=" + locationId + "): " + e.getMessage();
+			GermplasmDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
 }

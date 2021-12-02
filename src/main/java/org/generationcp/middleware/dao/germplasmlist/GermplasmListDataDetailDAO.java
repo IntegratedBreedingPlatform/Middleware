@@ -1,7 +1,9 @@
 package org.generationcp.middleware.dao.germplasmlist;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
@@ -21,6 +23,14 @@ import java.util.Set;
 public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDetail, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDataDetailDAO.class);
+
+	private static final String COPY_LIST_DATA_DETAILS = "INSERT INTO list_data_details (variable_id, lrecid, value, cvalue_Id, created_by, created_date) "
+		+ "      SELECT variable_id, destld.lrecid, value, cvalue_Id, :createdBy, now() "
+		+ "      FROM listdata ld, list_data_details ldd, listdata destld "
+		+ "      WHERE ld.lrecid = ldd.lrecid "
+		+ "          AND ld.entryid = destld.entryid "
+		+ "          AND ld.listid = :srcListid "
+		+ "          AND destld.listid = :destListid ";
 
 	public GermplasmListDataDetailDAO() {
 	}
@@ -110,4 +120,26 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 		return (Long) criteria.uniqueResult();
 	}
 
+	public void deleteByListDataIds(final Set<Integer> listDataIds) {
+		Preconditions.checkArgument(CollectionUtils.isNotEmpty(listDataIds), "listDataIds passed cannot be empty.");
+		final String query =
+			"DELETE ldd FROM list_data_details ldd WHERE ldd.lrecid IN (:listDataIds)";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
+		sqlQuery.setParameterList("listDataIds", listDataIds);
+		sqlQuery.executeUpdate();
+	}
+
+	public void copyEntries (final Integer sourceListId, final Integer destListId, final Integer loggedInUser) {
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(COPY_LIST_DATA_DETAILS);
+			sqlQuery.setParameter("srcListid", sourceListId);
+			sqlQuery.setParameter("destListid", destListId);
+			sqlQuery.setParameter("createdBy", loggedInUser);
+			sqlQuery.executeUpdate();
+		} catch (final Exception e) {
+			final String message = "Error with copyEntries(sourceListId=" + sourceListId + " ): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
+	}
 }
