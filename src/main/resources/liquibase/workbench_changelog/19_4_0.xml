@@ -230,14 +230,7 @@
 			# Remove LISTS and MANAGE_GERMPLASM_LISTS from roles that do not have Full permissions.
 			# All sub-permissions added above are enabled except for DELETE_GERMPLASM_LIST
 			DELETE role_permission FROM role_permission
-				WHERE
-					permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name in ('LISTS', 'MANAGE_GERMPLASM_LISTS'))
-					AND role_id IN (SELECT subA.role_id FROM (SELECT rp.role_id AS role_id FROM role_permission rp
-										WHERE rp.role_id IN ( SELECT subB.rid FROM (
-												SELECT rp.role_id AS rid FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
-													WHERE p.name in ('LISTS', 'MANAGE_GERMPLASM_LISTS')
-														GROUP BY rp.role_id ) AS subB ) ) AS subA
-									);
+			WHERE permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name in ('LISTS', 'MANAGE_GERMPLASM_LISTS'));
 		</sql>
 	</changeSet>
 
