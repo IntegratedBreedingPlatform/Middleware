@@ -66,6 +66,7 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toSet;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Transactional
 @Service
@@ -246,6 +247,13 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			final GermplasmListData germplasmListData = germplasmListDataByEntryId.get(entry.getEntryNo());
+
+			// Temporary workaround to allow users to edit ENTRY_CODE
+			final String entryCode = entry.getEntryCode();
+			if (!isBlank(entryCode)) {
+				germplasmListData.setEntryCode(entryCode);
+				this.daoFactory.getGermplasmListDataDAO().update(germplasmListData);
+			}
 
 			for (final Map.Entry<Integer, GermplasmListObservationDto> entryDetailSet : entry.getData().entrySet()) {
 				final GermplasmListObservationDto entryDetail = entryDetailSet.getValue();
