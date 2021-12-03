@@ -41,6 +41,7 @@ public class Variable extends Term {
 	private Integer studies;
 	private Boolean hasPair;
   	private Boolean hasUsage;
+	private Boolean isSystem;
 	private Integer germplasm;
 	private Integer breedingMethods;
 	private Integer lists;
@@ -213,13 +214,21 @@ public class Variable extends Term {
 		this.lists = lists;
 	}
 
+	public Boolean getIsSystem() {
+		return this.isSystem;
+	}
+
+	public void setIsSystem(final Boolean system) {
+		this.isSystem = system;
+	}
+
 	@Override
 	public String toString() {
 		return "Variable{" + "alias='" + this.alias + '\'' + ", variableTypes=" + this.variableTypes + ", property=" + this.property
 				+ ", method=" + this.method + ", scale=" + this.scale + ", isFavorite=" + this.isFavorite + ", minValue='" + this.minValue
 				+ '\'' + ", maxValue='" + this.maxValue + '\'' + ", observations=" + this.observations + ", studies=" + this.studies +
 			", datasets=" + this.datasets + ", germplasm=" + this.germplasm + ", breedingMethods=" + this.breedingMethods + ", lists="
-			+ this.lists + "} "
+			+ this.lists + ", isSystem=" + this.isSystem + "} "
 				+ super.toString();
 	}
 
