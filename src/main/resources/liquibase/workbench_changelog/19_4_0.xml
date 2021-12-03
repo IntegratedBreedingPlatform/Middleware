@@ -196,8 +196,24 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 
-			# Insert inherited permissions of LISTS and MANAGE_GERMPLASM_LISTS.
-			# This includes all sub-permissions of LISTS and MANAGE_GERMPLASM_LISTS except for DELETE_GERMPLASM_LIST
+			# Insert inherited permissions of LISTS
+			# This includes all sub-permissions of LISTS except for MANAGE_GERMPLASM_LISTS
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT rti.role_id, pti.permission_id
+			FROM (SELECT DISTINCT(rp.role_id) AS role_id
+				  FROM role_permission rp
+						   INNER JOIN permission p ON rp.permission_id = p.permission_id
+				  WHERE p.name IN ('LISTS')
+				  GROUP BY rp.role_id
+			) rti
+					 CROSS JOIN
+			(SELECT permission_id FROM permission
+			 where parent_id IN (SELECT permission_id FROM permission WHERE name = 'LISTS')
+				 and name not in ('MANAGE_GERMPLASM_LISTS')
+			) pti;
+
+			# Insert inherited permissions of MANAGE_GERMPLASM_LISTS.
+			# This includes all sub-permissions of MANAGE_GERMPLASM_LISTS except for DELETE_GERMPLASM_LIST
 			INSERT INTO role_permission(role_id,permission_id)
 			SELECT rti.role_id, pti.permission_id
 			FROM (SELECT DISTINCT(rp.role_id) AS role_id
@@ -207,12 +223,9 @@
 				  GROUP BY rp.role_id
 			) rti
 					 CROSS JOIN
-			(SELECT permission_id
-			 FROM permission
-			 WHERE name IN ('SAMPLES_LISTS', 'GERMPLASM_LISTS', 'SEARCH_GERMPLASM_LISTS', 'IMPORT_GERMPLASM_LISTS',
-			                'GERMPLASM_LIST_LABEL_PRINTING', 'IMPORT_GERMPLASM_LIST_UPDATES', 'REORDER_ENTRIES_GERMPLASM_LISTS',
-							'ADD_GERMPLASM_LIST_ENTRIES', 'ADD_ENTRIES_TO_LIST', 'REMOVE_ENTRIES_GERMPLASM_LISTS', 'CLONE_GERMPLASM_LIST', 'EDIT_LIST_METADATA')
-			) pti;
+			(SELECT permission_id FROM permission
+			 where parent_id IN (SELECT permission_id FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS')
+				 and name not in ('DELETE_GERMPLASM_LIST')) pti;
 
 			# Remove LISTS and MANAGE_GERMPLASM_LISTS from roles that do not have Full permissions.
 			# All sub-permissions added above are enabled except for DELETE_GERMPLASM_LIST
