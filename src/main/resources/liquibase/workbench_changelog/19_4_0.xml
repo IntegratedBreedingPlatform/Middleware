@@ -181,8 +181,8 @@
 
 	<changeSet author="lkovacic" id="v19.4.0-7">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT count(*) FROM permission WHERE name = 'GERMPLASM_LISTS'
+			<sqlCheck expectedResult="2">
+				SELECT count(*) FROM permission WHERE name IN('GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS');
 			</sqlCheck>
 		</preConditions>
 		<comment>
