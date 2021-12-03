@@ -444,13 +444,14 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
 				.append(" ud.fname as location_type,").append(" ud.fdesc as location_description,")
 				.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id, l.ldefault")
-				.append(" from location l").append(" left join georef g on l.locid = g.locid")
-				.append(" left join cntry c on l.cntryid = c.cntryid").append(" left join udflds ud on ud.fldno = l.ltype")
-				.append(" ,location province");
+				.append(" from location l")
+				.append(" left join georef g on l.locid = g.locid")
+				.append(" left join cntry c on l.cntryid = c.cntryid")
+				.append(" left join udflds ud on ud.fldno = l.ltype")
+				.append(" left join location province on l.snl1id = province.locid");
 
 			if (locationId != null) {
 				query.append(" where l.locid = :id");
-				query.append(" AND province.locid = l.snl1id");
 
 				final SQLQuery sqlQuery = this.getSession().createSQLQuery(query.toString());
 				sqlQuery.setParameter("id", locationId);
@@ -764,24 +765,28 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
 				.append(" ud.fname as location_type,").append(" ud.fdesc as location_description,")
 				.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id, l.ldefault as ldefault")
-				.append(" FROM location l").append(" LEFT JOIN georef g on l.locid = g.locid")
-				.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid").append(" LEFT JOIN udflds ud on ud.fldno = l.ltype")
-				.append(" ,location province ").append(" WHERE province.locid = l.snl1id ");
+				.append(" FROM location l")
+				.append(" LEFT JOIN georef g on l.locid = g.locid")
+				.append(" LEFT JOIN cntry c on l.cntryid = c.cntryid")
+				.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype")
+				.append(" LEFT JOIN location province on l.snl1id = province.locid");
 
+			List<String> whereClause = new ArrayList<>();
 			if (countryId != null) {
-				queryString.append(" AND c.cntryid = ");
-				queryString.append(countryId);
+				whereClause.add(String.format("c.cntryid = %s", countryId));
 			}
 
 			if (locationType != null) {
-				queryString.append(" AND l.ltype = ");
-				queryString.append(locationType);
+				whereClause.add(String.format("l.ltype = %s", locationType));
 			}
 
 			if (locationName != null && !locationName.isEmpty()) {
-				queryString.append(" AND l.lname REGEXP '");
-				queryString.append(locationName);
-				queryString.append("' ");
+				whereClause.add(String.format("l.lname REGEXP '%s'", locationName));
+			}
+
+			if (!CollectionUtils.isEmpty(whereClause)) {
+				final String where = whereClause.stream().collect(Collectors.joining(" AND "));
+				queryString.append(" WHERE ").append(where);
 			}
 
 			queryString.append(" ORDER BY UPPER(l.lname) ");
