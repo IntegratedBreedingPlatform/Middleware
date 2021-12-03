@@ -180,7 +180,7 @@ public class StandardVariableSaver extends Saver {
 			cvTerm.setDefinition(stdVar.getDescription());
 			cvTerm.setIsObsolete(false);
 			cvTerm.setIsRelationshipType(false);
-
+			cvTerm.setIsSystem(false);
 			daoFactory.getCvTermDao().save(cvTerm);
 		}
 
@@ -194,6 +194,7 @@ public class StandardVariableSaver extends Saver {
 		cvTerm.setDefinition(enumeration.getDescription());
 		cvTerm.setIsObsolete(false);
 		cvTerm.setIsRelationshipType(false);
+		cvTerm.setIsSystem(false);
 		daoFactory.getCvTermDao().save(cvTerm);
 		return cvTerm;
 	}

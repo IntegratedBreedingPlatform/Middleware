@@ -24,6 +24,7 @@ import javax.persistence.UniqueConstraint;
 
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Type;
 
 /**
  * http://gmod.org/wiki/Chado_Tables#Table:_cvterm
@@ -89,11 +90,16 @@ public class CVTerm implements Serializable {
 	@Column(name = "is_relationshiptype")
 	private Integer isRelationshipType;
 
+	@Type(type = "org.hibernate.type.NumericBooleanType")
+	@Basic(optional = false)
+	@Column(name = "is_system", columnDefinition = "TINYINT")
+	private Boolean isSystem;
+
 	public CVTerm() {
 	}
 
 	public CVTerm(final Integer cvTermId, final Integer cv, final String name, final String definition, final Integer dbxRefId, final Integer isObsolete,
-			final Integer isRelationshipType) {
+			final Integer isRelationshipType, final Boolean isSystem) {
 		super();
 		this.cvTermId = cvTermId;
 		this.cvId = cv;
@@ -102,6 +108,7 @@ public class CVTerm implements Serializable {
 		this.dbxRefId = dbxRefId;
 		this.isObsolete = isObsolete;
 		this.isRelationshipType = isRelationshipType;
+		this.isSystem = isSystem;
 	}
 
 	public Integer getCvTermId() {
@@ -161,6 +168,14 @@ public class CVTerm implements Serializable {
 		this.isRelationshipType = isRelationshipType ? 1 : 0;
 	}
 
+	public Boolean getIsSystem() {
+		return this.isSystem;
+	}
+
+	public void setIsSystem(final Boolean isSystem) {
+		this.isSystem = isSystem;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -171,6 +186,7 @@ public class CVTerm implements Serializable {
 		result = prime * result + (this.definition == null ? 0 : this.definition.hashCode());
 		result = prime * result + (this.isObsolete == null ? 0 : this.isObsolete.hashCode());
 		result = prime * result + (this.isRelationshipType == null ? 0 : this.isRelationshipType.hashCode());
+		result = prime * result + (this.isSystem == null ? 0 : this.isSystem.hashCode());
 		result = prime * result + (this.name == null ? 0 : this.name.hashCode());
 		return result;
 	}
@@ -229,6 +245,13 @@ public class CVTerm implements Serializable {
 		} else if (!this.isRelationshipType.equals(other.isRelationshipType)) {
 			return false;
 		}
+		if (this.isSystem == null) {
+			if (other.isSystem != null) {
+				return false;
+			}
+		} else if (!this.isSystem.equals(other.isSystem)) {
+			return false;
+		}
 		if (this.name == null) {
 			if (other.name != null) {
 				return false;
@@ -256,6 +279,8 @@ public class CVTerm implements Serializable {
 		builder.append(this.isObsolete);
 		builder.append(", isRelationshipType=");
 		builder.append(this.isRelationshipType);
+		builder.append(", isSystem=");
+		builder.append(this.isSystem);
 		builder.append("]");
 		return builder.toString();
 	}

@@ -1069,6 +1069,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		cvTerm.setCv(1040);
 		cvTerm.setIsObsolete(false);
 		cvTerm.setIsRelationshipType(false);
+		cvTerm.setIsSystem(false);
 		this.cvTermDao.save(cvTerm);
 		this.sessionProvder.getSession().flush();
 		this.cvTermDao.refresh(cvTerm);
