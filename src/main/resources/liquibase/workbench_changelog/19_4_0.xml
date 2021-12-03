@@ -179,7 +179,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v19.4.0-7">
+	<changeSet author="lkovacic" id="v19.4.0-8">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="2">
 				SELECT count(*) FROM permission WHERE name IN('GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS');
@@ -205,7 +205,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="abatac" id="v19.4.0-8">
+	<changeSet author="abatac" id="v19.4.0-7">
 		<preConditions onFail="MARK_RAN">
 			  <sqlCheck expectedResult="1">
 					SELECT count(1) > 0
