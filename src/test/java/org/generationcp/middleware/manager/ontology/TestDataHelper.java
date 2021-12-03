@@ -36,6 +36,7 @@ public class TestDataHelper {
 		term.setCv(cvId.getId());
 		term.setIsObsolete(isObsolete);
 		term.setIsRelationshipType(isRelationshipType);
+		term.setIsSystem(false);
 		return term;
 	}
 
