@@ -179,6 +179,32 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="v19.4.0-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="2">
+				SELECT count(*) FROM permission WHERE name IN('GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS');
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Rename 'Germplasm List Beta' module to 'Germplasm Lists' and remove old germplasm list module permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			<!-- Rename the new germplasm lists module -->
+			UPDATE workbench_sidebar_category_link SET sidebar_link_title = 'Germplasm Lists' WHERE tool_name = 'manage_germplasm_lists';
+
+			SET @new_germplasm_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS');
+			UPDATE permission SET description = 'Germplasm Lists' WHERE permission_id = @new_germplasm_list_permission_id;
+
+			<!-- update old germplasm list module roles with the new germplasm list module -->
+			SET @old_germplasm_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_LISTS');
+			UPDATE role_permission SET permission_id = @new_germplasm_list_permission_id WHERE permission_id = @old_germplasm_list_permission_id;
+
+			<!-- Remove old germplasm list permission -->
+			DELETE FROM role_type_permission WHERE permission_id = @old_germplasm_list_permission_id;
+			DELETE FROM permission WHERE permission_id = @old_germplasm_list_permission_id;
+		</sql>
+	</changeSet>
+
 	<changeSet author="abatac" id="v19.4.0-7">
 		<preConditions onFail="MARK_RAN">
 			  <sqlCheck expectedResult="1">
@@ -232,32 +258,6 @@
 			# All sub-permissions added above are enabled except for DELETE_GERMPLASM_LIST
 			DELETE role_permission FROM role_permission
 			WHERE permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name in ('LISTS', 'MANAGE_GERMPLASM_LISTS'));
-		</sql>
-	</changeSet>
-
-	<changeSet author="lkovacic" id="v19.4.0-8">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="2">
-				SELECT count(*) FROM permission WHERE name IN('GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS');
-			</sqlCheck>
-		</preConditions>
-		<comment>
-			Rename 'Germplasm List Beta' module to 'Germplasm Lists' and remove old germplasm list module permission
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			<!-- Rename the new germplasm lists module -->
-			UPDATE workbench_sidebar_category_link SET sidebar_link_title = 'Germplasm Lists' WHERE tool_name = 'manage_germplasm_lists';
-
-			SET @new_germplasm_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS');
-			UPDATE permission SET description = 'Germplasm Lists' WHERE permission_id = @new_germplasm_list_permission_id;
-
-			<!-- update old germplasm list module roles with the new germplasm list module -->
-			SET @old_germplasm_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_LISTS');
-			UPDATE role_permission SET permission_id = @new_germplasm_list_permission_id WHERE permission_id = @old_germplasm_list_permission_id;
-
-			<!-- Remove old germplasm list permission -->
-			DELETE FROM role_type_permission WHERE permission_id = @old_germplasm_list_permission_id;
-			DELETE FROM permission WHERE permission_id = @old_germplasm_list_permission_id;
 		</sql>
 	</changeSet>
 
