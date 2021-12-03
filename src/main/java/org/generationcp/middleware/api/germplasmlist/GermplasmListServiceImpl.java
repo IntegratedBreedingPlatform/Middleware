@@ -395,7 +395,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.stream()
 			.map(ListDataProperty::getColumn)
 			.collect(toSet());
-		this.addListDataProperties(germplasmListsData, propertyNames);
+
+		// TODO: remove once we finally deprecate the old germplasm list module
+//		this.addListDataProperties(germplasmListsData, propertyNames);
 	}
 
 	@Override
