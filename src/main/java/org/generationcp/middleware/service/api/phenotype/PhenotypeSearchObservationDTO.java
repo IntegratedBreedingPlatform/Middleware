@@ -1,7 +1,9 @@
 package org.generationcp.middleware.service.api.phenotype;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import liquibase.util.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.SeasonDto;
@@ -46,6 +48,9 @@ public class PhenotypeSearchObservationDTO {
 
 	@JsonView(BrapiView.BrapiV2.class)
 	private String uploadedBy;
+
+	@JsonIgnore
+	private Integer ndExperimentId;
 
 	public Map<String, String> getAdditionalInfo() {
 		return this.additionalInfo;
@@ -165,6 +170,34 @@ public class PhenotypeSearchObservationDTO {
 
 	public void setValue(final String value) {
 		this.value = value;
+	}
+
+	public Integer getNdExperimentId() {
+		return this.ndExperimentId;
+	}
+
+	public void setNdExperimentId(final Integer ndExperimentId) {
+		this.ndExperimentId = ndExperimentId;
+	}
+
+	@JsonIgnore
+	public void setSeasonName(final String seasonName) {
+		if(StringUtils.isNotEmpty(seasonName)) {
+			if (this.season == null) {
+				this.season = new SeasonDto();
+			}
+			this.season.setSeason(seasonName);
+		}
+	}
+
+	@JsonIgnore
+	public void setSeasonDbId(final String seasonDbId) {
+		if(StringUtils.isNotEmpty(seasonDbId)) {
+			if (this.season == null) {
+				this.season = new SeasonDto();
+			}
+			this.season.setSeasonDbId(seasonDbId);
+		}
 	}
 
 	@Override
