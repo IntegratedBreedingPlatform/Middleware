@@ -117,14 +117,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	@Override
 	public List<ObservationUnitDto> searchObservationUnits(final Integer pageSize, final Integer pageNumber,
 		final ObservationUnitSearchRequestDTO requestDTO) {
-		return this.searchObservationUnits(pageSize, pageNumber, requestDTO, false);
-	}
-
-	@Override
-	public List<ObservationUnitDto> searchObservationUnits(final Integer pageSize, final Integer pageNumber,
-		final ObservationUnitSearchRequestDTO requestDTO, final boolean retrieveObservationDetails) {
-		final List<ObservationUnitDto> dtos = this.daoFactory.getPhenotypeDAO().searchObservationUnits(pageSize, pageNumber, requestDTO,
-			retrieveObservationDetails);
+		final List<ObservationUnitDto> dtos = this.daoFactory.getPhenotypeDAO().searchObservationUnits(pageSize, pageNumber, requestDTO);
 		if (!CollectionUtils.isEmpty(dtos)) {
 			final List<Integer> experimentIds = dtos.stream().map(ObservationUnitDto::getExperimentId).collect(Collectors.toList());
 

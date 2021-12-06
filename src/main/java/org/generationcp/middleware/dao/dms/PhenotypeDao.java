@@ -929,11 +929,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 	public List<ObservationUnitDto> searchObservationUnits(
 		final Integer pageSize, final Integer pageNumber, final ObservationUnitSearchRequestDTO requestDTO) {
-		return this.searchObservationUnits(pageSize, pageNumber, requestDTO, false);
-	}
-
-	public List<ObservationUnitDto> searchObservationUnits(
-		final Integer pageSize, final Integer pageNumber, final ObservationUnitSearchRequestDTO requestDTO, final boolean retrieveObservationDetails) {
 		final StringBuilder queryString = new StringBuilder(PhenotypeQuery.PHENOTYPE_SEARCH);
 
 		addObservationUnitSearchFilter(requestDTO, queryString);
@@ -1054,42 +1049,15 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnitsByNdExpId.put(ndExperimentId, observationUnit);
 			}
 
-			if (retrieveObservationDetails) {
-				final List<PhenotypeSearchObservationDTO> observationDetailsResult = this.retrieveObservationDetails(observationUnitsByNdExpId.keySet());
+			final List<PhenotypeSearchObservationDTO> observationDetailsResult = this.retrieveObservationDetails(observationUnitsByNdExpId.keySet());
 
-				for (final PhenotypeSearchObservationDTO result : observationDetailsResult) {
-					final Integer ndExperimentId = result.getNdExperimentId();
-					// TODO
-					result.setCollector(StringUtils.EMPTY);
+			for (final PhenotypeSearchObservationDTO result : observationDetailsResult) {
+				final Integer ndExperimentId = result.getNdExperimentId();
+				// TODO
+				result.setCollector(StringUtils.EMPTY);
 
-					final ObservationUnitDto observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
-					observationUnit.getObservations().add(result);
-				}
-			} else {
-				// Get observations (Traits)
-				final SQLQuery observationsQuery = this.getSession().createSQLQuery(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATIONS);
-				observationsQuery.setParameterList("ndExperimentIds", observationUnitsByNdExpId.keySet());
-				observationsQuery.addScalar("expid").addScalar("phen_id").addScalar("cvterm_id").addScalar("cvterm_name", new StringType())
-					.addScalar("value", new StringType()).addScalar("crop_ontology_id", new StringType())
-					.addScalar("updated_date");
-				final List<Object[]> observationResults = observationsQuery.list();
-
-				for (final Object[] result : observationResults) {
-					final Integer ndExperimentId = (Integer) result[0];
-
-					final PhenotypeSearchObservationDTO observation = new PhenotypeSearchObservationDTO();
-
-					observation.setObservationVariableDbId(String.valueOf(result[2]));
-					observation.setObservationVariableName((String) result[3]);
-					observation.setObservationDbId(String.valueOf(result[1]));
-					observation.setValue((String) result[4]);
-					observation.setObservationTimeStamp((Date) result[6]);
-					// TODO
-					observation.setCollector(StringUtils.EMPTY);
-
-					final ObservationUnitDto observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
-					observationUnit.getObservations().add(observation);
-				}
+				final ObservationUnitDto observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
+				observationUnit.getObservations().add(result);
 			}
 
 			// Get treatment factors

@@ -23,18 +23,6 @@ public interface ObservationUnitService {
 	List<ObservationUnitDto> searchObservationUnits(Integer pageSize, Integer pageNumber, ObservationUnitSearchRequestDTO requestDTO);
 
 	/**
-	 * Retrieves Observation units given certain search parameters
-	 * specified in https://brapi.docs.apiary.io/#reference/phenotypes/phenotype-search V1.1
-	 *
-	 * @param pageSize
-	 * @param pageNumber
-	 * @param requestDTO
-	 * @return List of observation units
-	 */
-	List<ObservationUnitDto> searchObservationUnits(Integer pageSize, Integer pageNumber, ObservationUnitSearchRequestDTO requestDTO,
-		boolean retrieveObservationDetails);
-
-	/**
 	 * Retrieves a count of how many observation units match with the search parameters
 	 *
 	 * @param requestDTO
