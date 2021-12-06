@@ -21,7 +21,7 @@ public class GermplasmListDto {
 	private String listType;
 	private String notes;
 	private String parentFolderId;
-	private int status;
+	private Integer status;
 
 	public GermplasmListDto() {
 
@@ -123,11 +123,11 @@ public class GermplasmListDto {
 		this.parentFolderId = parentFolderId;
 	}
 
-	public int getStatus() {
+	public Integer getStatus() {
 		return this.status;
 	}
 
-	public void setStatus(final int status) {
+	public void setStatus(final Integer status) {
 		this.status = status;
 	}
 

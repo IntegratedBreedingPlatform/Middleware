@@ -178,4 +178,87 @@
 
 		</sql>
 	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.4.0-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="2">
+				SELECT count(*) FROM permission WHERE name IN('GERMPLASM_LISTS', 'MANAGE_GERMPLASM_LISTS');
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Rename 'Germplasm List Beta' module to 'Germplasm Lists' and remove old germplasm list module permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			<!-- Rename the new germplasm lists module -->
+			UPDATE workbench_sidebar_category_link SET sidebar_link_title = 'Germplasm Lists' WHERE tool_name = 'manage_germplasm_lists';
+
+			SET @new_germplasm_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS');
+			UPDATE permission SET description = 'Germplasm Lists' WHERE permission_id = @new_germplasm_list_permission_id;
+
+			<!-- update old germplasm list module roles with the new germplasm list module -->
+			SET @old_germplasm_list_permission_id = (SELECT permission_id FROM permission WHERE name = 'GERMPLASM_LISTS');
+			UPDATE role_permission SET permission_id = @new_germplasm_list_permission_id WHERE permission_id = @old_germplasm_list_permission_id;
+
+			<!-- Remove old germplasm list permission -->
+			DELETE FROM role_type_permission WHERE permission_id = @old_germplasm_list_permission_id;
+			DELETE FROM permission WHERE permission_id = @old_germplasm_list_permission_id;
+		</sql>
+	</changeSet>
+
+	<changeSet author="abatac" id="v19.4.0-7">
+		<preConditions onFail="MARK_RAN">
+			  <sqlCheck expectedResult="1">
+					SELECT count(1) > 0
+					FROM (
+						SELECT 1
+						FROM role_permission rp
+								 INNER JOIN permission p ON rp.permission_id = p.permission_id
+						WHERE p.name IN ('LISTS', 'MANAGE_GERMPLASM_LISTS')
+						GROUP BY rp.role_id
+					) AS count;
+			  </sqlCheck>
+        </preConditions>
+		<comment>
+			Removing DELETE_GERMPLASM_LIST permission for roles that do not have Full permissions.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+
+			# Insert inherited permissions of LISTS
+			# This includes all sub-permissions of LISTS except for MANAGE_GERMPLASM_LISTS
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT rti.role_id, pti.permission_id
+			FROM (SELECT DISTINCT(rp.role_id) AS role_id
+				  FROM role_permission rp
+						   INNER JOIN permission p ON rp.permission_id = p.permission_id
+				  WHERE p.name IN ('LISTS')
+				  GROUP BY rp.role_id
+			) rti
+					 CROSS JOIN
+			(SELECT permission_id FROM permission
+			 where parent_id IN (SELECT permission_id FROM permission WHERE name = 'LISTS')
+				 and name not in ('MANAGE_GERMPLASM_LISTS')
+			) pti;
+
+			# Insert inherited permissions of MANAGE_GERMPLASM_LISTS.
+			# This includes all sub-permissions of MANAGE_GERMPLASM_LISTS except for DELETE_GERMPLASM_LIST
+			INSERT INTO role_permission(role_id,permission_id)
+			SELECT rti.role_id, pti.permission_id
+			FROM (SELECT DISTINCT(rp.role_id) AS role_id
+				  FROM role_permission rp
+						   INNER JOIN permission p ON rp.permission_id = p.permission_id
+				  WHERE p.name IN ('LISTS', 'MANAGE_GERMPLASM_LISTS')
+				  GROUP BY rp.role_id
+			) rti
+					 CROSS JOIN
+			(SELECT permission_id FROM permission
+			 where parent_id IN (SELECT permission_id FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS')
+				 and name not in ('DELETE_GERMPLASM_LIST')) pti;
+
+			# Remove LISTS and MANAGE_GERMPLASM_LISTS from roles that do not have Full permissions.
+			# All sub-permissions added above are enabled except for DELETE_GERMPLASM_LIST
+			DELETE role_permission FROM role_permission
+			WHERE permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name in ('LISTS', 'MANAGE_GERMPLASM_LISTS'));
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
