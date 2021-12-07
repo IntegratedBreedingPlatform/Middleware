@@ -1,0 +1,24 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="clarysabel" id="v19.4.1-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM workbench_sidebar_category_link WHERE tool_name = 'manage_germplasm_lists' and rank = 3
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Reorder list menu
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE workbench_sidebar_category_link SET rank = 1 WHERE tool_name = 'manage_germplasm_lists';
+			UPDATE workbench_sidebar_category_link SET rank = 3 WHERE tool_name = 'bm_list_manager_main';
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
