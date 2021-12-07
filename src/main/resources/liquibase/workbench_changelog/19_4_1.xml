@@ -6,11 +6,9 @@
 
 	<changeSet author="clarysabel" id="v19.4.1-1">
 		<preConditions onFail="MARK_RAN">
-			<and>
-				<sqlCheck expectedResult="1">
-					SELECT count(*) FROM workbench_sidebar_category_link WHERE tool_name = 'manage_germplasm_lists' and rank = 3
-				</sqlCheck>
-			</and>
+			<sqlCheck expectedResult="1">
+				SELECT count(*) FROM workbench_sidebar_category_link WHERE tool_name = 'manage_germplasm_lists' and rank = 3
+			</sqlCheck>
 		</preConditions>
 		<comment>
 			Reorder list menu
