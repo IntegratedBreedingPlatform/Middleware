@@ -431,16 +431,6 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertNotNull(results);
 		Assert.assertEquals(NO_OF_GERMPLASM * 2, results.size());
 		for (final ObservationUnitDto result : results) {
-			Assert.assertEquals(2, result.getObservations().size());
-			for (final PhenotypeSearchObservationDTO observation : result.getObservations()) {
-				final boolean isFirstTrait = observation.getObservationVariableDbId().equals(this.trait.getCvTermId().toString());
-				Assert.assertEquals(isFirstTrait ? this.trait.getCvTermId() : trait2.getCvTermId(),
-					Integer.valueOf(observation.getObservationVariableDbId()));
-				Assert.assertEquals(isFirstTrait ? this.trait.getName() : trait2.getName(), observation.getObservationVariableName());
-				Assert.assertNotNull(observation.getObservationDbId());
-				Assert.assertNotNull(observation.getObservationTimeStamp());
-				Assert.assertNotNull(observation.getValue());
-			}
 			final boolean isFirstStudy = result.getStudyName().equals(this.study.getName() + "_1");
 			Assert.assertEquals(isFirstStudy ? this.study.getName() + "_1" : study2.getName() + "_1", result.getStudyName());
 			Assert.assertNull(result.getPlantNumber());

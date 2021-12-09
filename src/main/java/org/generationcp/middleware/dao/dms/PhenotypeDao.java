@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.dms;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
@@ -72,6 +73,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * DAO class for {@link Phenotype}.
@@ -1049,17 +1053,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnitsByNdExpId.put(ndExperimentId, observationUnit);
 			}
 
-			final List<PhenotypeSearchObservationDTO> observationDetailsResult = this.retrieveObservationDetails(observationUnitsByNdExpId.keySet());
-
-			for (final PhenotypeSearchObservationDTO result : observationDetailsResult) {
-				final Integer ndExperimentId = result.getNdExperimentId();
-				// TODO
-				result.setCollector(StringUtils.EMPTY);
-
-				final ObservationUnitDto observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
-				observationUnit.getObservations().add(result);
-			}
-
 			// Get treatment factors
 			final SQLQuery treatmentFactorsQuery = this.getSession().createSQLQuery(PhenotypeQuery.TREATMENT_FACTORS_SEARCH_OBSERVATIONS);
 			treatmentFactorsQuery.setParameterList("ndExperimentIds", observationUnitsByNdExpId.keySet());
@@ -1550,7 +1543,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		sql.append("SELECT ");
 		sql.append("germplsm.germplsm_uuid AS germplasmDbId,");
 		sql.append("names.nval AS germplasmName, ");
-		sql.append("p.nd_experiment_id AS ndExperimentId, ");
 		sql.append("p.phenotype_id AS observationDbId, ");
 		sql.append("p.updated_date AS observationTimeStamp, ");
 		sql.append("obs_unit.obs_unit_id AS observationUnitDbId, ");
@@ -1672,19 +1664,5 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		if (!StringUtil.isEmpty(observationSearchRequestDto.getObservationTimeStampRangeEnd())) {
 			stringBuilder.append("AND p.created_date <= :observationTimeStampRangeEnd ");
 		}
-	}
-
-	private List<PhenotypeSearchObservationDTO> retrieveObservationDetails(final Set<Integer> ndExperimentIds) {
-		final StringBuilder sql = new StringBuilder();
-		sql.append(this.createObservationSearchQueryString(new ObservationSearchRequestDto()));
-		sql.append("AND p.nd_experiment_id in (:ndExperimentIds) ");
-
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql.toString());
-		this.addScalarToObservationSearchQuery(sqlQuery);
-		sqlQuery.addScalar("ndExperimentId", IntegerType.INSTANCE);
-		sqlQuery.setParameterList("ndExperimentIds", ndExperimentIds);
-		sqlQuery.setResultTransformer(Transformers.aliasToBean(PhenotypeSearchObservationDTO.class));
-
-		return sqlQuery.list();
 	}
 }

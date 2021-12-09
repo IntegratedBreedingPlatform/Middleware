@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.service.api.BrapiView;
 import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.pojomatic.Pojomatic;
@@ -49,8 +50,27 @@ public class PhenotypeSearchObservationDTO {
 	@JsonView(BrapiView.BrapiV2.class)
 	private String uploadedBy;
 
-	@JsonIgnore
-	private Integer ndExperimentId;
+	public PhenotypeSearchObservationDTO() {
+
+	}
+
+	public PhenotypeSearchObservationDTO(final ObservationDto observationDto) {
+		this.observationDbId = observationDto.getObservationDbId();
+		this.observationVariableDbId = observationDto.getObservationVariableDbId();
+		this.observationVariableName = observationDto.getObservationVariableName();
+		this.observationTimeStamp = observationDto.getObservationTimeStamp();
+		this.season = observationDto.getSeason();
+		this.collector = observationDto.getCollector();
+		this.value = observationDto.getValue();
+		this.additionalInfo = observationDto.getAdditionalInfo();
+		this.externalReferences = observationDto.getExternalReferences();
+		this.germplasmDbId = observationDto.getGermplasmDbId();
+		this.germplasmName = observationDto.getGermplasmName();
+		this.observationUnitDbId = observationDto.getObservationUnitDbId();
+		this.observationUnitName = observationDto.getObservationUnitName();
+		this.studyDbId = observationDto.getStudyDbId();
+		this.uploadedBy = observationDto.getUploadedBy();
+	}
 
 	public Map<String, String> getAdditionalInfo() {
 		return this.additionalInfo;
@@ -170,14 +190,6 @@ public class PhenotypeSearchObservationDTO {
 
 	public void setValue(final String value) {
 		this.value = value;
-	}
-
-	public Integer getNdExperimentId() {
-		return this.ndExperimentId;
-	}
-
-	public void setNdExperimentId(final Integer ndExperimentId) {
-		this.ndExperimentId = ndExperimentId;
 	}
 
 	@JsonIgnore
