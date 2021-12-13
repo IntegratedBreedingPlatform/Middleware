@@ -303,8 +303,7 @@
 							 INNER JOIN permission p ON rp.permission_id = p.permission_id
 					 WHERE
 							 p.name IN ('SEARCH_GERMPLASM')
-					 GROUP BY rp.role_id
-					 HAVING COUNT(DISTINCT p.permission_id) = 1) AS role
+					 GROUP BY rp.role_id) AS role
             </sqlCheck>
         </preConditions>
         <comment>Adding MG_ADD_ENTRIES_TO_LIST permission in role_permission with SEARCH_GERMPLASM permission</comment>
@@ -313,8 +312,7 @@
 			INSERT INTO role_permission(role_id,permission_id)
 			SELECT DISTINCT(rp.role_id), @permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
 			WHERE p.name in ('SEARCH_GERMPLASM')
-			GROUP BY rp.role_id
-			HAVING COUNT(DISTINCT p.permission_id) = 1;
+			GROUP BY rp.role_id;
         </sql>
     </changeSet>
 </databaseChangeLog>
