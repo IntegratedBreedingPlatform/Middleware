@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.api.phenotype;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import liquibase.util.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
@@ -20,6 +21,7 @@ public class PhenotypeSearchObservationDTO {
 	private String observationVariableDbId;
 	private String observationVariableName;
 
+	@JsonSerialize(as = Date.class)
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
 	private Date observationTimeStamp;
 	private SeasonDto season;
