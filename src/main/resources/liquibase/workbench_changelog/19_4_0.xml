@@ -302,21 +302,19 @@
 						 role_permission rp
 							 INNER JOIN permission p ON rp.permission_id = p.permission_id
 					 WHERE
-							 p.name IN ('IMPORT_GERMPLASM','MG_MANAGE_INVENTORY','SEARCH_GERMPLASM','IMPORT_GERMPLASM_UPDATES','GERMPLASM_LABEL_PRINTING',
-										'EDIT_GERMPLASM','CODE_GERMPLASM','GROUP_GERMPLASM','UNGROUP_GERMPLASM','VIEW_GERMPLASM_CHANGE_HISTORY','MERGE_GERMPLASM')
+							 p.name IN ('SEARCH_GERMPLASM')
 					 GROUP BY rp.role_id
-					 HAVING COUNT(DISTINCT p.permission_id) = 11) AS role
+					 HAVING COUNT(DISTINCT p.permission_id) = 1) AS role
             </sqlCheck>
         </preConditions>
-        <comment>Regroup MG_ADD_ENTRIES_TO_LIST permission for Manage Germplasm in role_permission table</comment>
+        <comment>Adding MG_ADD_ENTRIES_TO_LIST permission in role_permission with SEARCH_GERMPLASM permission</comment>
         <sql dbms="mysql" splitStatements="true">
 			set @permission_id = (SELECT permission_id FROM permission WHERE name ='MG_ADD_ENTRIES_TO_LIST');
 			INSERT INTO role_permission(role_id,permission_id)
 			SELECT DISTINCT(rp.role_id), @permission_id FROM role_permission rp INNER JOIN permission p ON rp.permission_id = p.permission_id
-			WHERE p.name in ('IMPORT_GERMPLASM','MG_MANAGE_INVENTORY','SEARCH_GERMPLASM','IMPORT_GERMPLASM_UPDATES','GERMPLASM_LABEL_PRINTING',
-							 'EDIT_GERMPLASM','CODE_GERMPLASM','GROUP_GERMPLASM','UNGROUP_GERMPLASM','VIEW_GERMPLASM_CHANGE_HISTORY','MERGE_GERMPLASM')
+			WHERE p.name in ('SEARCH_GERMPLASM')
 			GROUP BY rp.role_id
-			HAVING COUNT(DISTINCT p.permission_id) = 11;
+			HAVING COUNT(DISTINCT p.permission_id) = 1;
         </sql>
     </changeSet>
 </databaseChangeLog>
