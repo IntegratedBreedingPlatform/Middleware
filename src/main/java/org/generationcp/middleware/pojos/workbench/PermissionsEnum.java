@@ -38,14 +38,6 @@ public enum PermissionsEnum {
 	GERMPLASM_LABEL_PRINTING,
 	GERMPLASM_LIST_LABEL_PRINTING;
 
-	public static final String HAS_INVENTORY_VIEW = " or hasAnyAuthority('ADMIN'"
-		+ ",'CROP_MANAGEMENT'"
-		+ ",'MANAGE_INVENTORY'"
-		+ ",'MANAGE_LOTS'"
-		+ ",'MANAGE_TRANSACTIONS'"
-		+ ",'VIEW_LOTS'"
-		+ ",'VIEW_TRANSACTIONS')";
-
 	/**
 	 * Indicates a group of permissions that enables access to the manage studies module
 	 * Enabling some services that are immediately called on load, in order to avoid
@@ -78,22 +70,6 @@ public enum PermissionsEnum {
 		+ ", 'GERMPLASM'"
 		+ ", 'MANAGE_GERMPLASM'"
 		+ ", 'IMPORT_GERMPLASM')";
-
-	public static final String HAS_MODIFY_ATTRIBUTES = " or hasAnyAuthority('ADMIN'"
-		+ ", 'GERMPLASM'"
-		+ ", 'MANAGE_GERMPLASM'"
-		+ ", 'EDIT_GERMPLASM'"
-		+ ", 'MODIFY_ATTRIBUTES')";
-
-	public static final String HAS_MANAGE_FILES = " or hasAnyAuthority('ADMIN'"
-		+ ", 'STUDIES'"
-		+ ", 'MANAGE_STUDIES'"
-		+ ", 'MS_MANAGE_OBSERVATION_UNITS'"
-		+ ", 'MS_MANAGE_FILES'"
-		+ ", 'GERMPLASM'"
-		+ ", 'MANAGE_GERMPLASM'"
-		+ ", 'EDIT_GERMPLASM'"
-		+ ", 'MG_MANAGE_FILES')";
 
 	public static final List<String> SITE_ADMIN_PERMISSIONS = Arrays.asList(SITE_ADMIN.name(), ADMINISTRATION.name(), ADMIN.name());
 }

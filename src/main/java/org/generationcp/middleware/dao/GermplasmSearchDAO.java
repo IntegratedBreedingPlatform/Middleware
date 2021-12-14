@@ -1380,24 +1380,31 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		final Map<String, String> attributes = germplasmSearchRequest.getAttributes();
 		if (attributes != null && !attributes.isEmpty()) {
 			final StringBuilder queryBuilder = new StringBuilder();
-			queryBuilder.append(" select distinct a.gid from atributs a  where ");
+			queryBuilder.append(" select distinct a.gid from atributs a ");
 			final Iterator<Map.Entry<String, String>> iterator = attributes.entrySet().iterator();
+			int i = 0;
 			while (iterator.hasNext()) {
 				final Map.Entry<String, String> entry = iterator.next();
-				queryBuilder.append(String.format("a.gid in (select a.gid from atributs a \n"
-					+ " INNER JOIN cvterm cv on a.atype = cv.cvterm_id \n"
-					+ " INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id "
-					+ " LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID " //
-					+ " INNER JOIN cvterm vartype on vartype.name = cp.value and vartype.cvterm_id in ("
-					+ VariableType.GERMPLASM_PASSPORT.getId() + ","
-					+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ") " //
-						+ " WHERE ( cv.name = :attributeKey%s  or vo.alias = :attributeKey%s ) and a.aval like :attributeValue%<s )",
-					entry.getKey(), entry.getKey()));
-				if (iterator.hasNext()) {
-					queryBuilder.append(" and ");
-				}
+				// String.format relative indexing (%<s): argument for the previous format specifier is re-used
+				queryBuilder.append(String.format(
+					" inner join ( " //
+						+ "    select a.gid " //
+						+ "    from atributs a " //
+						+ "      INNER JOIN cvterm cv on a.atype = cv.cvterm_id " //
+						+ "      INNER JOIN cvtermprop cp ON cp.type_id = %s and cv.cvterm_id = cp.cvterm_id " //
+						+ "      LEFT JOIN variable_overrides vo ON vo.cvterm_id = cv.cvterm_id AND vo.program_uuid = :programUUID " //
+						+ "      INNER JOIN cvterm vartype on vartype.name = cp.value and vartype.cvterm_id in (%s, %s) " //
+						+ "    WHERE (cv.name = :attributeKey%s or vo.alias = :attributeKey%<s) and a.aval like :attributeValue%<s " //
+						+ "    %s " //
+						+ ") T%s on T%<s.gid = a.gid ", //
+					TermId.VARIABLE_TYPE.getId(), //
+					VariableType.GERMPLASM_PASSPORT.getId(), //
+					VariableType.GERMPLASM_ATTRIBUTE.getId(), //
+					entry.getKey(), //
+					LIMIT_CLAUSE, //
+					i++ //
+				));
 			}
-			queryBuilder.append(LIMIT_CLAUSE);
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
 			sqlQuery.setParameter("programUUID", programUUID);

@@ -7,8 +7,11 @@ import org.apache.commons.collections.map.LinkedMap;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.GermplasmServiceBrapi;
+import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
+import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -38,6 +41,7 @@ import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFac
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
+import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -80,6 +84,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	@Resource
 	private VariableDataValidatorFactory variableDataValidatorFactory;
+
+	@Resource
+	private ObservationServiceBrapi observationService;
 
 	private final HibernateSessionProvider sessionProvider;
 	private final DaoFactory daoFactory;
@@ -131,9 +138,17 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			final Map<Integer, List<ObservationLevelRelationship>> observationRelationshipsMap = relationships.stream().collect(groupingBy(
 				ObservationLevelRelationship::getExperimentId));
 
+			final ObservationSearchRequestDto observationSearchRequest = new ObservationSearchRequestDto();
+			observationSearchRequest.setObservationUnitDbIds(dtos.stream().map(ObservationUnitDto::getObservationUnitDbId).collect(Collectors.toList()));
+			final List<ObservationDto> observationDtos = this.observationService.searchObservations(observationSearchRequest, null);
+			final Map<String, List<PhenotypeSearchObservationDTO>> phenotypeObservationsMap = observationDtos.stream()
+				.map(observation -> new PhenotypeSearchObservationDTO(observation))
+				.collect(groupingBy(PhenotypeSearchObservationDTO::getObservationUnitDbId));
+
 			for (final ObservationUnitDto dto : dtos) {
 				dto.setExternalReferences(externalReferencesMap.get(dto.getExperimentId().toString()));
 				dto.getObservationUnitPosition().setObservationLevelRelationships(observationRelationshipsMap.get(dto.getExperimentId()));
+				dto.setObservations(phenotypeObservationsMap.get(dto.getObservationUnitDbId()));
 			}
 		}
 

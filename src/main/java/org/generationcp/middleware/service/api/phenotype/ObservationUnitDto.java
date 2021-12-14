@@ -2,13 +2,11 @@ package org.generationcp.middleware.service.api.phenotype;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitPosition;
 import org.generationcp.middleware.api.brapi.v2.observationunit.Treatment;
 import org.generationcp.middleware.service.api.BrapiView;
-import org.generationcp.middleware.util.serializer.ObservationSerializer;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -73,7 +71,6 @@ public class ObservationUnitDto {
 	@JsonView({BrapiView.BrapiV1_2.class, BrapiView.BrapiV1_3.class})
 	private String entryNumber;
 
-	@JsonSerialize(using = ObservationSerializer.class)
 	private List<PhenotypeSearchObservationDTO> observations;
 
 	@JsonView(BrapiView.BrapiV1_2.class)
@@ -117,6 +114,7 @@ public class ObservationUnitDto {
 
 
 	protected static class ObservationUnitXRef {
+
 		private String id;
 		private String source;
 
