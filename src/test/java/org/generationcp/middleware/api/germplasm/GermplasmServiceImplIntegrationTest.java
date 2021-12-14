@@ -8,11 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.file.FileMetadataFilterRequest;
 import org.generationcp.middleware.constant.SystemNameTypes;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
-import org.generationcp.middleware.constant.SystemNameTypes;
-import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
-import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
@@ -38,7 +35,6 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -57,6 +53,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -65,11 +62,12 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.util.Util;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -119,12 +117,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
 	private StudyEntryService studyEntryService;
-
-	@Autowired
-	private LotService lotService;
-
-	@Autowired
-	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Autowired
 	private LocationDataManager locationDataManager;
@@ -2436,8 +2428,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		// Set the closeLots to true
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false)));
+				Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
+						new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
@@ -2450,7 +2442,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(lotsOfTargetGermplasm.size(), equalTo(0));
 
 		final List<Lot> lotsOfGermplasmMerged =
-			this.daoFactory.getLotDao().getByGids(Arrays.asList(germplasmToMerge1.getGid(), germplasmToMerge2.getGid()));
+				this.daoFactory.getLotDao().getByGids(Arrays.asList(germplasmToMerge1.getGid(), germplasmToMerge2.getGid()));
 		assertThat(lotsOfGermplasmMerged.size(), equalTo(2));
 		assertThat(lotsOfGermplasmMerged.get(0).getStatus(), equalTo(LotStatus.CLOSED.getIntValue()));
 		assertThat(lotsOfGermplasmMerged.get(1).getStatus(), equalTo(LotStatus.CLOSED.getIntValue()));
@@ -2531,6 +2523,61 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(progenies.get(child3.getGid()).getDesignation(), equalTo(name3.getNval()));
 		assertThat(progenies.get(child4.getGid()).getDesignation(), equalTo(name4.getNval()));
 		assertThat(progenies.get(child5.getGid()).getDesignation(), equalTo(name5.getNval()));
+	}
+
+	@Test
+	public void testMergeGermplasm_TransferAssociatedFilesToTarget() {
+
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+
+		final Germplasm targetGermplasm = this.createGermplasm(method, UUID.randomUUID().toString(), null, 0, 0, 0, null, null);
+
+		final Germplasm germplasmToMerge1 = this.createGermplasm(method, UUID.randomUUID().toString(), null, 0, 0, 0, null, null);
+		final FileMetadata fileMetadata1 = this.createFileMetadata(germplasmToMerge1);
+		final Lot lot1 = this.addLot(germplasmToMerge1.getGid());
+		this.addTransaction(lot1);
+
+		final Germplasm germplasmToMerge2 = this.createGermplasm(method, UUID.randomUUID().toString(), null, 0, 0, 0, null, null);
+		final FileMetadata fileMetadata2 = this.createFileMetadata(germplasmToMerge2);
+		final Lot lot2 = this.addLot(germplasmToMerge2.getGid());
+		this.addTransaction(lot2);
+
+		this.sessionProvder.getSession().flush();
+
+		final FileMetadataFilterRequest fileMetadataFilterRequestByTargetGermplasmUUID = new FileMetadataFilterRequest();
+		fileMetadataFilterRequestByTargetGermplasmUUID.setGermplasmUUID(targetGermplasm.getGermplasmUUID());
+		assertThat(this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID,  null),
+				hasSize(0));
+
+		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
+		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
+		// Set the closeLots to true
+		germplasmMergeRequestDto.setNonSelectedGermplasm(
+				Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
+						new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false)));
+		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
+
+		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
+
+		this.sessionProvder.getSession().flush();
+		this.sessionProvder.getSession().refresh(lot1);
+		this.sessionProvder.getSession().refresh(lot2);
+
+		final List<Lot> lotsOfTargetGermplasm = this.daoFactory.getLotDao().getByGids(Arrays.asList(targetGermplasm.getGid()));
+		assertThat(lotsOfTargetGermplasm.size(), equalTo(0));
+
+		final List<Lot> lotsOfGermplasmMerged =
+				this.daoFactory.getLotDao().getByGids(Arrays.asList(germplasmToMerge1.getGid(), germplasmToMerge2.getGid()));
+		assertThat(lotsOfGermplasmMerged.size(), equalTo(2));
+		assertThat(lotsOfGermplasmMerged.get(0).getStatus(), equalTo(LotStatus.CLOSED.getIntValue()));
+		assertThat(lotsOfGermplasmMerged.get(1).getStatus(), equalTo(LotStatus.CLOSED.getIntValue()));
+
+		final List<FileMetadata> fileMetadataSearchResponse =
+				this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID, null);
+		assertThat(fileMetadataSearchResponse, hasSize(2));
+		assertThat(fileMetadataSearchResponse, CoreMatchers.hasItems(
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata1.getFileUUID())),
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata2.getFileUUID()))));
 	}
 
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
@@ -2748,6 +2795,13 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getProjectPropertyDAO().save(entryTypeProp);
 
 		return study;
+	}
+
+	private FileMetadata createFileMetadata(final Germplasm germplasm) {
+		final FileMetadata fileMetadata = new FileMetadata();
+		fileMetadata.setGermplasm(germplasm);
+		fileMetadata.setFileUUID(UUID.randomUUID().toString());
+		return this.daoFactory.getFileMetadataDAO().save(fileMetadata);
 	}
 
 }

@@ -5,12 +5,14 @@ import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -25,6 +27,10 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 		+ "    left join variable_overrides vo on vo.cvterm_id = variable.cvterm_id " //
 		+ "              and (:programUUID is null || vo.program_uuid = :programUUID) " //
 		+ " where 1 = 1 ";
+
+	public FileMetadataDAO(final Session session) {
+		super(session);
+	}
 
 	public FileMetadata getByFileUUID(final String fileUUID) {
 		return (FileMetadata) this.getSession().createCriteria(this.getPersistentClass())
@@ -162,6 +168,14 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 		this.getSession().createSQLQuery("delete from file_metadata "
 			+ " where file_metadata.file_id in (:fileMetadataIds)")
 			.setParameterList("fileMetadataIds", fileMetadataIds)
+			.executeUpdate();
+	}
+
+	public void updateGid(final Integer gid, final Set<Integer> targetGids) {
+		final String sql = "UPDATE file_metadata SET gid = :gid WHERE gid IN (:targetGids)";
+		this.getSession().createSQLQuery(sql)
+			.setParameter("gid", gid)
+			.setParameterList("targetGids", targetGids)
 			.executeUpdate();
 	}
 

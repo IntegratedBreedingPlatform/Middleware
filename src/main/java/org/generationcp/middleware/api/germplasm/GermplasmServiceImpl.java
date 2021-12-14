@@ -7,6 +7,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
@@ -132,6 +133,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private StudyEntryService studyEntryService;
+
+	@Autowired
+	private FileMetadataService fileMetadataService;
 
 	private final GermplasmMethodValidator germplasmMethodValidator;
 
@@ -1148,6 +1152,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		// Delete all non-selected germplasm that were merged
 		this.daoFactory.getGermplasmDao().deleteGermplasm(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId());
+
+		this.fileMetadataService.updateGid(germplasmMergeRequestDto.getTargetGermplasmId(),
+				new HashSet(gidsNonSelectedGermplasm));
 	}
 
 	@Override
@@ -1346,4 +1353,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public void setGermplasmNameTypeService(final GermplasmNameTypeService germplasmNameTypeService) {
 		this.germplasmNameTypeService = germplasmNameTypeService;
 	}
+
+	public void setFileMetadataService(final FileMetadataService fileMetadataService) {
+		this.fileMetadataService = fileMetadataService;
+	}
+
 }

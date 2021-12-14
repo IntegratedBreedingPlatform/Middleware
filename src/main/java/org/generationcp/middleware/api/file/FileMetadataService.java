@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Set;
 
 public interface FileMetadataService {
 
@@ -33,4 +34,7 @@ public interface FileMetadataService {
 	void detachFiles(List<Integer> variableIds, Integer datasetId, String germplasmUUID);
 
 	void removeFiles(List<Integer> variableIds, Integer datasetId, String germplasmUUID);
+
+	void updateGid(final Integer gid, final Set<Integer> targetGids);
+
 }

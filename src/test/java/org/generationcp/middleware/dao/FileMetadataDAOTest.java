@@ -15,7 +15,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static java.util.Collections.singletonList;
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
@@ -47,8 +49,7 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 		final Session session = this.sessionProvder.getSession();
 
 		if (this.fileMetadataDAO == null) {
-			this.fileMetadataDAO = new FileMetadataDAO();
-			this.fileMetadataDAO.setSession(session);
+			this.fileMetadataDAO = new FileMetadataDAO(session);
 		}
 		if (this.cvTermDao == null) {
 			this.cvTermDao = new CVTermDao();
@@ -144,4 +145,20 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 		));
 		assertThat(fileUntouched.getGermplasm().getGermplasmUUID(), is(this.germplasm1.getGermplasmUUID()));
 	}
+
+	@Test
+  public void testUpdateGid() {
+		assertThat(this.fileMetadataDAO.filterByColumnValue("germplasm.gid", this.germplasm1.getGid()), hasSize(3));
+
+		final Germplasm germplasm = GermplasmTestDataInitializer
+				.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDao.save(germplasm);
+		final Set<Integer> targetGids = new HashSet();
+		targetGids.add(this.germplasm1.getGid());
+		this.fileMetadataDAO.updateGid(germplasm.getGid(), targetGids);
+
+		assertThat(this.fileMetadataDAO.filterByColumnValue("germplasm.gid", this.germplasm1.getGid()), hasSize(0));
+		assertThat(this.fileMetadataDAO.filterByColumnValue("germplasm.gid", germplasm.getGid()), hasSize(3));
+	}
+
 }
