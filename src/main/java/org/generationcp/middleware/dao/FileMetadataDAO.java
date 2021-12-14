@@ -171,10 +171,10 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			.executeUpdate();
 	}
 
-	public void updateGid(final Integer gid, final Set<Integer> targetGids) {
+	public void updateGid(final Integer newGid, final Set<Integer> targetGids) {
 		final String sql = "UPDATE file_metadata SET gid = :gid WHERE gid IN (:targetGids)";
 		this.getSession().createSQLQuery(sql)
-			.setParameter("gid", gid)
+			.setParameter("gid", newGid)
 			.setParameterList("targetGids", targetGids)
 			.executeUpdate();
 	}

@@ -35,6 +35,6 @@ public interface FileMetadataService {
 
 	void removeFiles(List<Integer> variableIds, Integer datasetId, String germplasmUUID);
 
-	void updateGid(final Integer gid, final Set<Integer> targetGids);
+	void updateGid(final Integer newGid, final Set<Integer> targetGids);
 
 }
