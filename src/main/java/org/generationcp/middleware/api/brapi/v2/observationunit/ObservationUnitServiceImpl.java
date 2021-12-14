@@ -140,7 +140,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 			final ObservationSearchRequestDto observationSearchRequest = new ObservationSearchRequestDto();
 			observationSearchRequest.setObservationUnitDbIds(dtos.stream().map(ObservationUnitDto::getObservationUnitDbId).collect(Collectors.toList()));
-			final List<ObservationDto> observationDtos = observationService.searchObservations(observationSearchRequest, null);
+			final List<ObservationDto> observationDtos = this.observationService.searchObservations(observationSearchRequest, null);
 			final Map<String, List<PhenotypeSearchObservationDTO>> phenotypeObservationsMap = observationDtos.stream()
 				.map(observation -> new PhenotypeSearchObservationDTO(observation))
 				.collect(groupingBy(PhenotypeSearchObservationDTO::getObservationUnitDbId));

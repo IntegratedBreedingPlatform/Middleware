@@ -52,7 +52,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
