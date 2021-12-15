@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.dms;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
@@ -72,6 +73,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 /**
  * DAO class for {@link Phenotype}.
@@ -1049,31 +1053,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnitsByNdExpId.put(ndExperimentId, observationUnit);
 			}
 
-			// Get observations (Traits)
-			final SQLQuery observationsQuery = this.getSession().createSQLQuery(PhenotypeQuery.PHENOTYPE_SEARCH_OBSERVATIONS);
-			observationsQuery.setParameterList("ndExperimentIds", observationUnitsByNdExpId.keySet());
-			observationsQuery.addScalar("expid").addScalar("phen_id").addScalar("cvterm_id").addScalar("cvterm_name", new StringType())
-				.addScalar("value", new StringType()).addScalar("crop_ontology_id", new StringType())
-				.addScalar("updated_date");
-			final List<Object[]> observationResults = observationsQuery.list();
-
-			for (final Object[] result : observationResults) {
-				final Integer ndExperimentId = (Integer) result[0];
-
-				final PhenotypeSearchObservationDTO observation = new PhenotypeSearchObservationDTO();
-
-				observation.setObservationVariableDbId(String.valueOf(result[2]));
-				observation.setObservationVariableName((String) result[3]);
-				observation.setObservationDbId(String.valueOf(result[1]));
-				observation.setValue((String) result[4]);
-				observation.setObservationTimeStamp((Date) result[6]);
-				// TODO
-				observation.setCollector(StringUtils.EMPTY);
-
-				final ObservationUnitDto observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
-				observationUnit.getObservations().add(observation);
-			}
-
 			// Get treatment factors
 			final SQLQuery treatmentFactorsQuery = this.getSession().createSQLQuery(PhenotypeQuery.TREATMENT_FACTORS_SEARCH_OBSERVATIONS);
 			treatmentFactorsQuery.setParameterList("ndExperimentIds", observationUnitsByNdExpId.keySet());
@@ -1504,18 +1483,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		try {
 			final SQLQuery sqlQuery =
 				this.getSession().createSQLQuery(this.createObservationSearchQueryString(observationSearchRequestDto));
-			sqlQuery.addScalar("germplasmDbId", StringType.INSTANCE);
-			sqlQuery.addScalar("germplasmName", StringType.INSTANCE);
-			sqlQuery.addScalar("observationDbId", StringType.INSTANCE);
-			sqlQuery.addScalar("observationTimeStamp", DateType.INSTANCE);
-			sqlQuery.addScalar("observationUnitDbId", StringType.INSTANCE);
-			sqlQuery.addScalar("observationUnitName", StringType.INSTANCE);
-			sqlQuery.addScalar("observationVariableDbId", StringType.INSTANCE);
-			sqlQuery.addScalar("observationVariableName", StringType.INSTANCE);
-			sqlQuery.addScalar("studyDbId", StringType.INSTANCE);
-			sqlQuery.addScalar("value", StringType.INSTANCE);
-			sqlQuery.addScalar("seasonName", StringType.INSTANCE);
-			sqlQuery.addScalar("seasonDbId", StringType.INSTANCE);
+			this.addScalarToObservationSearchQuery(sqlQuery);
 			sqlQuery.setResultTransformer(Transformers.aliasToBean(ObservationDto.class));
 			this.addObservationSearchQueryParams(observationSearchRequestDto, sqlQuery);
 
@@ -1531,6 +1499,21 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 					+ ") query: " + he.getMessage(), he);
 		}
 
+	}
+
+	private void addScalarToObservationSearchQuery(final SQLQuery sqlQuery) {
+		sqlQuery.addScalar("germplasmDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("germplasmName", StringType.INSTANCE);
+		sqlQuery.addScalar("observationDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("observationTimeStamp", DateType.INSTANCE);
+		sqlQuery.addScalar("observationUnitDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("observationUnitName", StringType.INSTANCE);
+		sqlQuery.addScalar("observationVariableDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("observationVariableName", StringType.INSTANCE);
+		sqlQuery.addScalar("studyDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("value", StringType.INSTANCE);
+		sqlQuery.addScalar("seasonName", StringType.INSTANCE);
+		sqlQuery.addScalar("seasonDbId", StringType.INSTANCE);
 	}
 
 	public long countObservations(final ObservationSearchRequestDto observationSearchRequestDto) {
@@ -1682,5 +1665,4 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			stringBuilder.append("AND p.created_date <= :observationTimeStampRangeEnd ");
 		}
 	}
-
 }

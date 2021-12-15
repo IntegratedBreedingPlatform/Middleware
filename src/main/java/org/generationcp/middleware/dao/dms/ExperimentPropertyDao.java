@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Collections.emptyMap;
+import static org.springframework.util.CollectionUtils.isEmpty;
+
 /**
  * DAO class for {@link ExperimentProperty}.
  */
@@ -567,8 +570,11 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		return (ExperimentProperty) criteria.uniqueResult();
 	}
 
-	public Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocations(
-		final Set<String> geolocationIds) {
+	public Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocations(final Set<String> geolocationIds) {
+		if (isEmpty(geolocationIds)) {
+			return emptyMap();
+		}
+
 		final StringBuilder sql = new StringBuilder()
 			.append("SELECT e.nd_geolocation_id AS studyDbId, eprop.value AS levelCode ")
 			.append(" FROM nd_experiment e INNER JOIN nd_experimentprop eprop on e.nd_experiment_id = eprop.nd_experiment_id ")
