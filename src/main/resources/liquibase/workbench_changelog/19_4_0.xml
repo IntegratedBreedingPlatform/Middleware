@@ -280,7 +280,7 @@
 			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM');
 
 			INSERT INTO permission (`name`, `description`, `parent_id`)
-			VALUES ('MG_ADD_ENTRIES_TO_LIST', 'Add to list', @permission_id);
+			VALUES ('MG_ADD_ENTRIES_TO_LIST', 'Add entries to list', @permission_id);
 
 			SET @mg_add_entries_to_list_permission_id = (SELECT permission_id FROM permission where name = 'MG_ADD_ENTRIES_TO_LIST');
 
@@ -315,4 +315,21 @@
 			GROUP BY rp.role_id;
         </sql>
     </changeSet>
+
+	<changeSet author="cuenyad" id="v19.4.0-10">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM permission WHERE name = 'ADD_ENTRIES_TO_LIST'
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			update description of ADD_ENTRIES_TO_LIST permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'ADD_ENTRIES_TO_LIST');
+			update permission set description = 'Add entries to another list' where permission_id = @permission_id
+		</sql>
+	</changeSet>
 </databaseChangeLog>
