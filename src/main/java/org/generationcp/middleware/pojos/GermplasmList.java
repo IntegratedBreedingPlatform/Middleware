@@ -428,7 +428,7 @@ public class GermplasmList implements Serializable {
 	}
 
 	public boolean isLockedList() {
-		return (this.getStatus() != null ? this.getStatus() >= 100 : false);
+		return (this.getStatus() != null ? this.getStatus() >= Status.LOCKED.getCode() : false);
 	}
 
 	public String getTabLabel() {
