@@ -78,7 +78,7 @@ public class GermplasmListSearchDAOQuery {
 		+ " list.listdesc AS " + DESCRIPTION_ALIAS + ", "
 		+ " user.uname AS " + LIST_OWNER_ALIAS + ", "
 		+ " list.listtype AS " + LIST_TYPE_ALIAS + ", "
-		+ " IF (list.liststatus = " + GermplasmList.Status.LOCKED_LIST.getCode() + ", true, false) AS " + LOCKED_ALIAS + ", "
+		+ " IF (list.liststatus >= 100, true, false) AS " + LOCKED_ALIAS + ", "
 		+ " list.notes AS " + NOTES_ALIAS + ", "
 		+ " STR_TO_DATE (convert(list.listdate,char), '%Y%m%d') AS " + CREATION_DATE_ALIAS + ", "
 		+ " list.program_uuid AS " + PROGRAM_UUID_ALIAS;
