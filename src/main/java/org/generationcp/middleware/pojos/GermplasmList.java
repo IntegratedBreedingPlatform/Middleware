@@ -47,8 +47,8 @@ public class GermplasmList implements Serializable {
 	public enum Status {
 		LIST(1), // 0001
 		FOLDER(0), // 0000
-		// Unused
-		// LOCKED(100), // 0100
+		// Unused/Obsolete, used only for reading legacy data.
+		LOCKED(100), // 0100
 		LOCKED_LIST(101), // 0101
 		DELETED(9);
 
