@@ -71,25 +71,6 @@ public class PhenotypeQuery {
 		+ " WHERE ph.nd_experiment_id = nde.nd_experiment_id AND cvt.cvterm_id in (:cvTermIds))" //
 		;
 
-	public static final String PHENOTYPE_SEARCH_OBSERVATIONS = "SELECT " //
-		+ "  ph.nd_experiment_id as expid, " //
-		+ "  ph.phenotype_id as phen_id, " //
-		+ "  cvt.cvterm_id as cvterm_id, " //
-		+ "  cvt.name as cvterm_name, " //
-		+ "  ph.value as value , " //
-		+ "  cvp.value as crop_ontology_id, "
-		+ "  ph.updated_date as updated_date "
-		+ " FROM " //
-		+ "  phenotype ph  " //
-		+ "  INNER JOIN cvterm cvt ON ph.observable_id = cvt.cvterm_id " //
-		+ "  INNER JOIN nd_experiment ndep ON ph.nd_experiment_id = ndep.nd_experiment_id " //
-		+ "  INNER JOIN projectprop pp ON pp.project_id = ndep.project_id " //
-		+ "                            AND pp.variable_id = ph.observable_id " //
-		+ "                            AND pp.type_id = " + VariableType.TRAIT.getId() //
-		+ "  LEFT JOIN cvtermprop cvp on (cvp.cvterm_id = cvt.cvterm_id and cvp.type_id = " + TermId.CROP_ONTOLOGY_ID.getId() + ")"
-		+ " WHERE ph.nd_experiment_id in (:ndExperimentIds) " //
-		;
-
 	public static final String TREATMENT_FACTORS_SEARCH_OBSERVATIONS = "SELECT DISTINCT "
 		+ "    CVT.NAME AS factor, pp.value AS modality, nde.nd_experiment_id as nd_experiment_id "
 		+ "FROM "

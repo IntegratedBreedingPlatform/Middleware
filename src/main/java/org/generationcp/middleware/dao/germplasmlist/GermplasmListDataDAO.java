@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao.germplasmlist;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -27,6 +28,8 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -34,11 +37,14 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * DAO class for {@link GermplasmListData}.
  */
 public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer> {
+
+	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDataDAO.class);
 
 	private static final String GERMPLASM_LIST_DATA_LIST_ID_COLUMN = "listId";
 
@@ -65,6 +71,11 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	public static final Integer STATUS_DELETED = 9;
 	public static final Integer STATUS_ACTIVE = 0;
 	public static final String SOURCE_UNKNOWN = "Unknown";
+
+	private static final String COPY_LISTDATA_TO_NEW_LIST = "INSERT INTO listdata (listid, gid, entryid, entrycd, source, desig, grpname, lrstatus, llrecid) "
+		+ "      SELECT :destListid, gid, entryid, entrycd, source, desig, grpname, lrstatus, llrecid "
+		+ "      FROM listdata "
+		+ "      WHERE listid = :srcListid ";
 
 	@SuppressWarnings("unchecked")
 	public List<GermplasmListData> getByListId(final Integer id) {
@@ -207,6 +218,15 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		return query.executeUpdate();
 	}
 
+	public void deleteByListDataIds(final Set<Integer> listDataIds) {
+		Preconditions.checkArgument(CollectionUtils.isNotEmpty(listDataIds), "listDataIds passed cannot be empty.");
+		final Query query =
+			this.getSession().createQuery("DELETE FROM GermplasmListData WHERE id in (:listDataIds)");
+		query.setParameterList("listDataIds", listDataIds);
+		query.executeUpdate();
+
+	}
+
 	/**
 	 * This will return all items of a cross list along with data of parents.
 	 * Note that we're getting the name of the parents from its preferred name which is indicated by name record with nstat = 1
@@ -334,7 +354,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	}
 
 	public List<Integer> getGidsByListId(final Integer listId) {
-		String sql = "SELECT gid FROM listdata ld WHERE ld.listid = :listId";
+		final String sql = "SELECT gid FROM listdata ld WHERE ld.listid = :listId";
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
 		query.setParameter("listId", listId);
 		return query.list();
@@ -414,11 +434,44 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		updateSelectedEntriesQuery.executeUpdate();
 	}
 
+	/**
+	 * Reset the entry numbers (entryId) based on the order of current entryid.
+	 *
+	 * @param listId
+	 */
+	public void reOrderEntries(final Integer listId) {
+		final String sql = "UPDATE listdata ld \n"
+			+ "    JOIN (SELECT @position \\:= 0) r\n"
+			+ "    INNER JOIN (\n"
+			+ "        SELECT lrecid, entryid\n"
+			+ "        FROM listdata innerListData\n"
+			+ "        WHERE innerlistdata.listid = :listId \n"
+			+ "        ORDER BY innerlistdata.entryid ASC) AS tmp\n"
+			+ "    ON ld.lrecid = tmp.lrecid\n"
+			+ "SET ld.entryid = @position \\:= @position + 1\n"
+			+ "WHERE listid = :listId";
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql);
+		sqlQuery.setParameter("listId", listId);
+		sqlQuery.executeUpdate();
+	}
+
 	public List<Integer> getListDataIdsByListId(final Integer listId) {
-		String sql = "SELECT lrecid FROM listdata ld WHERE ld.listid = :listId";
+		final String sql = "SELECT lrecid FROM listdata ld WHERE ld.listid = :listId";
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
 		query.setParameter("listId", listId);
 		return query.list();
 	}
 
+	public void copyEntries (final Integer sourceListId, final Integer destListId) {
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(COPY_LISTDATA_TO_NEW_LIST);
+			sqlQuery.setParameter("srcListid", sourceListId);
+			sqlQuery.setParameter("destListid", destListId);
+			sqlQuery.executeUpdate();
+		} catch (final Exception e) {
+			final String message = "Error with copyEntries(sourceListId=" + sourceListId + " ): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
+	}
 }

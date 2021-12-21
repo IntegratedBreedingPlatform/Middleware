@@ -17,6 +17,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.GermplasmDAO;
+import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ProjectDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
@@ -36,10 +37,12 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -49,7 +52,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,11 +77,15 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 
 	private GeolocationDao geolocationDao;
 
+	private GeolocationPropertyDao geolocPropDao;
+
 	private ExperimentDao experimentDao;
 
 	private StockDao stockDao;
 
 	private GermplasmDAO germplasmDao;
+
+	private NameDAO germplasmNameDao;
 
 	private DmsProjectDao dmsProjectDao;
 
@@ -110,8 +116,17 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.geolocationDao.setSession(this.sessionProvder.getSession());
 		}
 
+		if (this.geolocPropDao == null) {
+			this.geolocPropDao = new GeolocationPropertyDao();
+			this.geolocPropDao.setSession(this.sessionProvder.getSession());
+		}
+
 		if (this.germplasmDao == null) {
 			this.germplasmDao = new GermplasmDAO(this.sessionProvder.getSession());
+		}
+
+		if (this.germplasmNameDao == null) {
+			this.germplasmNameDao = new NameDAO(this.sessionProvder.getSession());
 		}
 
 		if (this.experimentDao == null) {
@@ -200,6 +215,8 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			germplasm.setGid(null);
 			GermplasmGuidGenerator.generateGermplasmGuids(this.crop, Collections.singletonList(germplasm));
 			this.germplasmDao.save(germplasm);
+			final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid());
+			this.germplasmNameDao.save(germplasmName);
 			this.germplasm.add(germplasm);
 		}
 	}
@@ -413,16 +430,6 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertNotNull(results);
 		Assert.assertEquals(NO_OF_GERMPLASM * 2, results.size());
 		for (final ObservationUnitDto result : results) {
-			Assert.assertEquals(2, result.getObservations().size());
-			for (final PhenotypeSearchObservationDTO observation : result.getObservations()) {
-				final boolean isFirstTrait = observation.getObservationVariableDbId().equals(this.trait.getCvTermId().toString());
-				Assert.assertEquals(isFirstTrait ? this.trait.getCvTermId() : trait2.getCvTermId(),
-					Integer.valueOf(observation.getObservationVariableDbId()));
-				Assert.assertEquals(isFirstTrait ? this.trait.getName() : trait2.getName(), observation.getObservationVariableName());
-				Assert.assertNotNull(observation.getObservationDbId());
-				Assert.assertNotNull(observation.getObservationTimeStamp());
-				Assert.assertNotNull(observation.getValue());
-			}
 			final boolean isFirstStudy = result.getStudyName().equals(this.study.getName() + "_1");
 			Assert.assertEquals(isFirstStudy ? this.study.getName() + "_1" : study2.getName() + "_1", result.getStudyName());
 			Assert.assertNull(result.getPlantNumber());
@@ -516,6 +523,13 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription("1");
 		this.geolocationDao.saveOrUpdate(geolocation);
+
+		final GeolocationProperty prop = new GeolocationProperty();
+		prop.setGeolocation(geolocation);
+		prop.setType(TermId.LOCATION_ID.getId());
+		prop.setRank(1);
+		prop.setValue(geolocation.getLocationId().toString());
+		this.geolocPropDao.save(prop);
 
 		for (final Germplasm germplasm : this.germplasm) {
 			final StockModel stockModel = new StockModel();

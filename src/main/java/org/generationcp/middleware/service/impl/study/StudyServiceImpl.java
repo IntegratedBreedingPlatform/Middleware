@@ -180,6 +180,12 @@ public class StudyServiceImpl extends Service implements StudyService {
 		return this.daoFactory.getStockDao().countPlotsByGids(gids);
 	}
 
+	@Override
+	public boolean isLocationUsedInStudy(final Integer locationId) {
+		return this.daoFactory.getGeolocationPropertyDao()
+			.getGeolocationIdsByPropertyTypeAndValue(TermId.LOCATION_ID.getId(), locationId.toString()).size() > 0;
+	}
+
 	public void setStudyDataManager(final StudyDataManager studyDataManager) {
 		this.studyDataManager = studyDataManager;
 	}

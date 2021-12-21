@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao.germplasmlist;
 
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
@@ -22,6 +23,11 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmListDataViewDAO.class);
 
+	private static final String COPY_LIST_DATA_VIEW = "INSERT INTO list_data_view (listid, static_id, name_fldno, cvterm_id, type_id) "
+		+ "      SELECT :destListid, static_id, name_fldno, cvterm_id, type_id "
+		+ "      FROM list_data_view "
+		+ "      WHERE listid = :srcListid ";
+
 	public GermplasmListDataViewDAO(final Session session) {
 		super(session);
 	}
@@ -37,6 +43,7 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.createAlias("list", "l");
 			criteria.add(Restrictions.eq("cvtermId", variableId));
+			criteria.add(Restrictions.not(Restrictions.eq("l.status", GermplasmList.Status.DELETED.getCode())));
 			criteria.setProjection(Projections.countDistinct("l.id"));
 			return ((Long) criteria.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
@@ -64,4 +71,16 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 		}
 	}
 
+	public void copyEntries (final Integer sourceListId, final Integer destListId) {
+		try {
+			final SQLQuery sqlQuery = this.getSession().createSQLQuery(COPY_LIST_DATA_VIEW);
+			sqlQuery.setParameter("srcListid", sourceListId);
+			sqlQuery.setParameter("destListid", destListId);
+			sqlQuery.executeUpdate();
+		} catch (final Exception e) {
+			final String message = "Error with copyEntries(sourceListId=" + sourceListId + " ): " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message);
+		}
+	}
 }
