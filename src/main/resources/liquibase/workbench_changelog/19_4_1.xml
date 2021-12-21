@@ -26,7 +26,7 @@
             </sqlCheck>
         </preConditions>
 		<comment>
-			Add Manage Metadata sidebar item.
+			Add about page tool
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO workbench_tool (`name`, `group_name`, `title`, `version`, `tool_type`, `path`, `parameter`, `user_tool`)
