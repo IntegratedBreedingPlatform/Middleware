@@ -19,4 +19,21 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="cuenyad" id="v19.4.1-2">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+                SELECT count(*) FROM release_note where version = '20.0'
+            </sqlCheck>
+		</preConditions>
+        <comment>Add release note for version 20.0</comment>
+		<sql dbms="mysql" splitStatements="true">
+			-- Disable release note for v19
+			UPDATE release_note SET enabled = 0 WHERE version = '19.0';
+			-- Add release note for version 20.0
+			INSERT INTO release_note (version, release_date, has_coming_soon, enabled, file_name) VALUES ('20.0', CURRENT_TIMESTAMP, 0, 1, '20.0');
+			-- Show again the release notes for all user
+			UPDATE release_note_user SET show_again = 1;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
