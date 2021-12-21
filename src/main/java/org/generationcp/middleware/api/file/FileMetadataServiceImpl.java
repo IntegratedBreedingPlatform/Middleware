@@ -300,8 +300,13 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public void updateGid(final Integer newGid, final Set<Integer> targetGids) {
-		this.daoFactory.getFileMetadataDAO().updateGid(newGid, targetGids);
+	public void updateGid(final Integer newGid, final List<String> targetFileUUIDs) {
+		this.daoFactory.getFileMetadataDAO().updateGid(newGid, targetFileUUIDs);
+	}
+
+	@Override
+	public List<FileMetadata> getByGids(final List<Integer> gids) {
+		return this.daoFactory.getFileMetadataDAO().getByGids(gids);
 	}
 
 	void setDaoFactory(final DaoFactory daoFactory) {

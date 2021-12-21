@@ -2,10 +2,10 @@ package org.generationcp.middleware.api.file;
 
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
+import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
-import java.util.Set;
 
 public interface FileMetadataService {
 
@@ -35,6 +35,8 @@ public interface FileMetadataService {
 
 	void removeFiles(List<Integer> variableIds, Integer datasetId, String germplasmUUID);
 
-	void updateGid(final Integer newGid, final Set<Integer> targetGids);
+	void updateGid(Integer newGid, List<String> targetFileUUIDs);
+
+	List<FileMetadata> getByGids(List<Integer> gids);
 
 }

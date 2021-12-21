@@ -12,7 +12,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.List;
-import java.util.Set;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -171,12 +170,18 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			.executeUpdate();
 	}
 
-	public void updateGid(final Integer newGid, final Set<Integer> targetGids) {
-		final String sql = "UPDATE file_metadata SET gid = :gid WHERE gid IN (:targetGids)";
+	public void updateGid(final Integer newGid, final List<String> targetFileUUIDs) {
+		final String sql = "UPDATE file_metadata SET gid = :gid WHERE file_uuid IN (:targetFileUUIDs)";
 		this.getSession().createSQLQuery(sql)
-			.setParameter("gid", newGid)
-			.setParameterList("targetGids", targetGids)
-			.executeUpdate();
+				.setParameter("gid", newGid)
+				.setParameterList("targetFileUUIDs", targetFileUUIDs)
+				.executeUpdate();
+	}
+
+	public List<FileMetadata> getByGids(final List<Integer> gids) {
+		return this.getSession().createCriteria(this.getPersistentClass())
+				.add(Restrictions.in("germplasm.gid", gids))
+				.list();
 	}
 
 }

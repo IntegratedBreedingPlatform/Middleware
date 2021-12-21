@@ -50,6 +50,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -78,6 +79,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -1134,16 +1136,21 @@ public class GermplasmServiceImpl implements GermplasmService {
 			this.migrateNames(gidsNonSelectedGermplasm, targetGermplasm);
 		}
 
+		final List<Integer> nonSelectedGermplasmDescriptorTypeIds = new ArrayList<>();
 		if (germplasmMergeRequestDto.getMergeOptions().isMigrateAttributesData()) {
 			// Migrate attributes from non-selected germplasm to the target germplasm
-			this.migrateAttributes(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId(),
-				VariableType.GERMPLASM_ATTRIBUTE.getId());
+			final Set<Integer> attributesTypeIds =
+					this.migrateAttributes(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId(),
+							VariableType.GERMPLASM_ATTRIBUTE.getId());
+			nonSelectedGermplasmDescriptorTypeIds.addAll(attributesTypeIds);
 		}
 
 		if (germplasmMergeRequestDto.getMergeOptions().isMigratePassportData()) {
 			// Migrate passport from non-selected germplasm to the target germplasm
-			this.migrateAttributes(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId(),
-				VariableType.GERMPLASM_PASSPORT.getId());
+			final Set<Integer> passportTypeIds =
+					this.migrateAttributes(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId(),
+							VariableType.GERMPLASM_PASSPORT.getId());
+			nonSelectedGermplasmDescriptorTypeIds.addAll(passportTypeIds);
 		}
 
 		// Migrate lots from non-selected germplasm to the target germplasm
@@ -1153,8 +1160,18 @@ public class GermplasmServiceImpl implements GermplasmService {
 		// Delete all non-selected germplasm that were merged
 		this.daoFactory.getGermplasmDao().deleteGermplasm(gidsNonSelectedGermplasm, germplasmMergeRequestDto.getTargetGermplasmId());
 
-		this.fileMetadataService.updateGid(germplasmMergeRequestDto.getTargetGermplasmId(),
-				new HashSet(gidsNonSelectedGermplasm));
+		if (germplasmMergeRequestDto.getMergeOptions().isMigrateFiles()) {
+				final List<FileMetadata> files = this.fileMetadataService.getByGids(gidsNonSelectedGermplasm);
+			 	final List<String> fileUUIDs =  files.stream()
+						.filter(fileMetadataDTO -> CollectionUtils.isEmpty(fileMetadataDTO.getVariables()) ||
+								(!CollectionUtils.isEmpty(nonSelectedGermplasmDescriptorTypeIds) &&
+										fileMetadataDTO.getVariables().stream().anyMatch(cvTerm -> nonSelectedGermplasmDescriptorTypeIds.contains(cvTerm.getCvTermId()))))
+						.map(FileMetadata::getFileUUID)
+						.collect(Collectors.toList());
+			 	if (!CollectionUtils.isEmpty(fileUUIDs)) {
+					this.fileMetadataService.updateGid(germplasmMergeRequestDto.getTargetGermplasmId(), fileUUIDs);
+				}
+		}
 	}
 
 	@Override
@@ -1202,7 +1219,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 		}
 	}
 
-	private void migrateAttributes(final List<Integer> gidsNonSelectedGermplasm, final Integer targetGermplasmId,
+	/**
+	 * @param gidsNonSelectedGermplasm
+	 * @param targetGermplasmId
+	 * @param variableTypeId
+	 * @return {@link Set} with all the attributes that the target and the non selected germplasms has
+	 */
+	private Set<Integer> migrateAttributes(final List<Integer> gidsNonSelectedGermplasm, final Integer targetGermplasmId,
 		final Integer variableTypeId) {
 		final AttributeDAO attributeDAO = this.daoFactory.getAttributeDAO();
 		final List<Attribute> attributesOfTargetGermplasm =
@@ -1211,6 +1234,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 			attributeDAO.getByGIDsAndVariableType(gidsNonSelectedGermplasm, variableTypeId);
 		final List<Integer> existingAttributeTypeIds =
 			attributesOfTargetGermplasm.stream().map(Attribute::getTypeId).collect(Collectors.toList());
+		final List<Integer> nonSelectedMergeableGermplasmAttributesTypeIds = new ArrayList<>();
 		for (final Attribute attribute : attributesOfNonSelectedGermplasm) {
 			if (!existingAttributeTypeIds.contains(attribute.getTypeId())) {
 				final Attribute attributeToSave =
@@ -1220,7 +1244,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 				attributeDAO.makeTransient(attribute);
 				existingAttributeTypeIds.add(attributeToSave.getTypeId());
 			}
+
+			nonSelectedMergeableGermplasmAttributesTypeIds.add(attribute.getTypeId());
 		}
+		return Stream.concat(existingAttributeTypeIds.stream(), nonSelectedMergeableGermplasmAttributesTypeIds.stream())
+				.collect(Collectors.toSet());
 	}
 
 	private void migrateLots(final List<GermplasmMergeRequestDto.NonSelectedGermplasm> nonSelectedGermplasmList,

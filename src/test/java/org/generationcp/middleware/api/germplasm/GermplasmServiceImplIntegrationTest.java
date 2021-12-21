@@ -2195,22 +2195,31 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testMergeGermplasm_MigrateAttributes() {
+	public void testMergeGermplasm_MigrateAttributesAndTheirFiles() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
-		final Germplasm targetGermplasm = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
+		final Germplasm targetGermplasm = this.createGermplasm(method, RandomStringUtils.randomAlphabetic(10), null, 0, 0, 0, null, null);
 		// Add  NOTE attribute to the target germplasm
 		final CVTerm note = this.daoFactory.getCvTermDao().getByNameAndCvId(NOTE, CvId.VARIABLES.getId());
 		final Attribute noteAttribute =
 			this.addAttribute(targetGermplasm, note.getCvTermId(), RandomStringUtils.randomAlphabetic(10));
 
-		final Germplasm germplasmToMerge = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
+		final Germplasm germplasmToMerge = this.createGermplasm(method, RandomStringUtils.randomAlphabetic(10), null, 0, 0, 0, null, null);
 		// Add ACQ_DATE_AA_text attribute to the germplasm to be merged
 		final CVTerm acqDate = this.daoFactory.getCvTermDao().getByNameAndCvId("ACQ_DATE_AA_text", CvId.VARIABLES.getId());
 		final Attribute acqDateAttribute =
 			this.addAttribute(germplasmToMerge, acqDate.getCvTermId(), RandomStringUtils.randomAlphabetic(10));
+		// Add two files associated to variables and one file detached
+		final FileMetadata fileMetadata1 = this.createFileMetadata(germplasmToMerge, note);
+		final FileMetadata fileMetadata2 = this.createFileMetadata(germplasmToMerge, acqDate);
+		final FileMetadata fileMetadata3 = this.createFileMetadata(germplasmToMerge, null);
 
 		this.sessionProvder.getSession().refresh(targetGermplasm);
+
+		final FileMetadataFilterRequest fileMetadataFilterRequestByTargetGermplasmUUID = new FileMetadataFilterRequest();
+		fileMetadataFilterRequestByTargetGermplasmUUID.setGermplasmUUID(targetGermplasm.getGermplasmUUID());
+		assertThat(this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID,  null),
+				hasSize(0));
 
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
@@ -2220,11 +2229,15 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		// If migrateAttributesData is false, migration of attributes should not execute
 		germplasmMergeRequestDto.getMergeOptions().setMigrateAttributesData(false);
+		germplasmMergeRequestDto.getMergeOptions().setMigrateFiles(false);
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
 		this.sessionProvder.getSession().flush();
 		Assert.assertEquals(1, this.daoFactory.getAttributeDAO().getByGID(targetGermplasm.getGid()).size());
+		assertThat(this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID,  null),
+				hasSize(0));
 
 		germplasmMergeRequestDto.getMergeOptions().setMigrateAttributesData(true);
+		germplasmMergeRequestDto.getMergeOptions().setMigrateFiles(true);
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
 		this.sessionProvder.getSession().flush();
 
@@ -2237,6 +2250,13 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			n -> n.getTypeId().equals(acqDateAttribute.getTypeId()) && n.getAval()
 				.equals(acqDateAttribute.getAval())));
 
+		final List<FileMetadata> fileMetadataSearchResponse =
+				this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID, null);
+		assertThat(fileMetadataSearchResponse, hasSize(3));
+		assertThat(fileMetadataSearchResponse, CoreMatchers.hasItems(
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata1.getFileUUID())),
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata2.getFileUUID())),
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata3.getFileUUID()))));
 	}
 
 	@Test
@@ -2282,22 +2302,31 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testMergeGermplasm_MigratePassport() {
+	public void testMergeGermplasm_MigratePassportAndTheirFiles() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
-		final Germplasm targetGermplasm = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
+		final Germplasm targetGermplasm = this.createGermplasm(method, RandomStringUtils.randomAlphabetic(10), null, 0, 0, 0, null, null);
 		// Add ANCEST_AP_text attribute to the target germplasm
 		final CVTerm ancest_ap_text = this.daoFactory.getCvTermDao().getByNameAndCvId("ANCEST_AP_text", CvId.VARIABLES.getId());
 		final Attribute ancestApTextAttribute =
 			this.addAttribute(targetGermplasm, ancest_ap_text.getCvTermId(), RandomStringUtils.randomAlphabetic(10));
 
-		final Germplasm germplasmToMerge = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
+		final Germplasm germplasmToMerge = this.createGermplasm(method, RandomStringUtils.randomAlphabetic(10), null, 0, 0, 0, null, null);
 		// Add COLL_DAT_AP_text attribute to the germplasm to be merged
 		final CVTerm coll_dat_ap_text = this.daoFactory.getCvTermDao().getByNameAndCvId("COLL_DAT_AP_text", CvId.VARIABLES.getId());
 		final Attribute collDatApTextAttribute =
 			this.addAttribute(germplasmToMerge, coll_dat_ap_text.getCvTermId(), RandomStringUtils.randomAlphabetic(10));
+		// Add two files associated to variables and one file detached
+		final FileMetadata fileMetadata1 = this.createFileMetadata(germplasmToMerge, ancest_ap_text);
+		final FileMetadata fileMetadata2 = this.createFileMetadata(germplasmToMerge, coll_dat_ap_text);
+		final FileMetadata fileMetadata3 = this.createFileMetadata(germplasmToMerge, null);
 
 		this.sessionProvder.getSession().refresh(targetGermplasm);
+
+		final FileMetadataFilterRequest fileMetadataFilterRequestByTargetGermplasmUUID = new FileMetadataFilterRequest();
+		fileMetadataFilterRequestByTargetGermplasmUUID.setGermplasmUUID(targetGermplasm.getGermplasmUUID());
+		assertThat(this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID,  null),
+				hasSize(0));
 
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
@@ -2307,11 +2336,15 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		// If migratePassportData is false, migration of attributes should not execute
 		germplasmMergeRequestDto.getMergeOptions().setMigratePassportData(false);
+		germplasmMergeRequestDto.getMergeOptions().setMigrateFiles(false);
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
 		this.sessionProvder.getSession().flush();
 		Assert.assertEquals(1, this.daoFactory.getAttributeDAO().getByGID(targetGermplasm.getGid()).size());
+		assertThat(this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID,  null),
+				hasSize(0));
 
 		germplasmMergeRequestDto.getMergeOptions().setMigratePassportData(true);
+		germplasmMergeRequestDto.getMergeOptions().setMigrateFiles(true);
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
 		this.sessionProvder.getSession().flush();
 		final GermplasmDto targetGermplasmDto = this.germplasmService.getGermplasmDtoById(targetGermplasm.getGid());
@@ -2329,6 +2362,13 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			n -> n.getTypeId().equals(collDatApTextAttribute.getTypeId()) && n.getAval()
 				.equals(collDatApTextAttribute.getAval())));
 
+		final List<FileMetadata> fileMetadataSearchResponse =
+				this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID, null);
+		assertThat(fileMetadataSearchResponse, hasSize(3));
+		assertThat(fileMetadataSearchResponse, CoreMatchers.hasItems(
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata1.getFileUUID())),
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata2.getFileUUID())),
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata3.getFileUUID()))));
 	}
 
 	@Test
@@ -2526,23 +2566,28 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testMergeGermplasm_TransferAssociatedFilesToTarget() {
+	public void testMergeGermplasm_TransferOnlyDetachedFilesToTarget() {
 
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
-		final Germplasm targetGermplasm = this.createGermplasm(method, UUID.randomUUID().toString(), null, 0, 0, 0, null, null);
+		final Germplasm targetGermplasm = this.createGermplasm(method, RandomStringUtils.randomAlphabetic(10), null, 0, 0, 0, null, null);
+		final Germplasm germplasmToMerge = this.createGermplasm(method, RandomStringUtils.randomAlphabetic(10), null, 0, 0, 0, null, null);
 
-		final Germplasm germplasmToMerge1 = this.createGermplasm(method, UUID.randomUUID().toString(), null, 0, 0, 0, null, null);
-		final FileMetadata fileMetadata1 = this.createFileMetadata(germplasmToMerge1);
-		final Lot lot1 = this.addLot(germplasmToMerge1.getGid());
-		this.addTransaction(lot1);
+		// Add ANCEST_AP_text attribute to the target germplasm
+		final CVTerm ancest_ap_text = this.daoFactory.getCvTermDao().getByNameAndCvId("ANCEST_AP_text", CvId.VARIABLES.getId());
+		final Attribute ancestApTextAttribute =
+				this.addAttribute(germplasmToMerge, ancest_ap_text.getCvTermId(), RandomStringUtils.randomAlphabetic(10));
 
-		final Germplasm germplasmToMerge2 = this.createGermplasm(method, UUID.randomUUID().toString(), null, 0, 0, 0, null, null);
-		final FileMetadata fileMetadata2 = this.createFileMetadata(germplasmToMerge2);
-		final Lot lot2 = this.addLot(germplasmToMerge2.getGid());
-		this.addTransaction(lot2);
+		// Add  NOTE attribute to the target germplasm
+		final CVTerm note = this.daoFactory.getCvTermDao().getByNameAndCvId(NOTE, CvId.VARIABLES.getId());
+		final Attribute noteAttribute =
+				this.addAttribute(germplasmToMerge, note.getCvTermId(), RandomStringUtils.randomAlphabetic(10));
+		// Add two files associated to variables and one file detached
+		final FileMetadata fileMetadata1 = this.createFileMetadata(germplasmToMerge, ancest_ap_text);
+		final FileMetadata fileMetadata2 = this.createFileMetadata(germplasmToMerge, note);
+		final FileMetadata fileMetadata3 = this.createFileMetadata(germplasmToMerge, null);
 
-		this.sessionProvder.getSession().flush();
+		this.sessionProvder.getSession().refresh(targetGermplasm);
 
 		final FileMetadataFilterRequest fileMetadataFilterRequestByTargetGermplasmUUID = new FileMetadataFilterRequest();
 		fileMetadataFilterRequestByTargetGermplasmUUID.setGermplasmUUID(targetGermplasm.getGermplasmUUID());
@@ -2551,33 +2596,22 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
-		// Set the closeLots to true
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-				Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
-						new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false)));
+				Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge.getGid(), false, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 
+		// If migratePassportData and migrateAttributesData is false, migration of attributes should not execute
+		germplasmMergeRequestDto.getMergeOptions().setMigratePassportData(false);
+		germplasmMergeRequestDto.getMergeOptions().setMigrateAttributesData(false);
+		germplasmMergeRequestDto.getMergeOptions().setMigrateFiles(true);
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
-
 		this.sessionProvder.getSession().flush();
-		this.sessionProvder.getSession().refresh(lot1);
-		this.sessionProvder.getSession().refresh(lot2);
-
-		final List<Lot> lotsOfTargetGermplasm = this.daoFactory.getLotDao().getByGids(Arrays.asList(targetGermplasm.getGid()));
-		assertThat(lotsOfTargetGermplasm.size(), equalTo(0));
-
-		final List<Lot> lotsOfGermplasmMerged =
-				this.daoFactory.getLotDao().getByGids(Arrays.asList(germplasmToMerge1.getGid(), germplasmToMerge2.getGid()));
-		assertThat(lotsOfGermplasmMerged.size(), equalTo(2));
-		assertThat(lotsOfGermplasmMerged.get(0).getStatus(), equalTo(LotStatus.CLOSED.getIntValue()));
-		assertThat(lotsOfGermplasmMerged.get(1).getStatus(), equalTo(LotStatus.CLOSED.getIntValue()));
+		Assert.assertEquals(0, this.daoFactory.getAttributeDAO().getByGID(targetGermplasm.getGid()).size());
 
 		final List<FileMetadata> fileMetadataSearchResponse =
 				this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID, null);
-		assertThat(fileMetadataSearchResponse, hasSize(2));
-		assertThat(fileMetadataSearchResponse, CoreMatchers.hasItems(
-				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata1.getFileUUID())),
-				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata2.getFileUUID()))));
+		assertThat(fileMetadataSearchResponse, hasSize(1));
+		assertThat(fileMetadataSearchResponse.get(0).getFileUUID(), is(fileMetadata3.getFileUUID()));
 	}
 
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
@@ -2797,10 +2831,13 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		return study;
 	}
 
-	private FileMetadata createFileMetadata(final Germplasm germplasm) {
+	private FileMetadata createFileMetadata(final Germplasm germplasm, final CVTerm variable) {
 		final FileMetadata fileMetadata = new FileMetadata();
 		fileMetadata.setGermplasm(germplasm);
 		fileMetadata.setFileUUID(UUID.randomUUID().toString());
+		if (variable != null) {
+			fileMetadata.setVariables(Arrays.asList(variable));
+		}
 		return this.daoFactory.getFileMetadataDAO().save(fileMetadata);
 	}
 
