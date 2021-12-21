@@ -1,0 +1,19 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="corina" id="v19.4.1-1">
+        <preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(*) > 0 FROM listnms WHERE SUBSTRING(listdate,5,4)='0000';
+				</sqlCheck>
+	        </preConditions>
+        <comment> Correct invalid listdate values. IBP-5327 </comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE listnms SET listdate=CAST(CONCAT(SUBSTRING(listdate,1,4),'0101') AS UNSIGNED) WHERE SUBSTRING(listdate,5,4)='0000';
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
