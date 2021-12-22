@@ -5,7 +5,6 @@ import org.apache.commons.codec.binary.Hex;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -31,11 +30,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import static java.util.Collections.singletonList;
-import static java.util.function.Function.identity;
 import static java.util.stream.Collectors.toList;
-import static java.util.stream.Collectors.toMap;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
@@ -299,6 +297,16 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		Preconditions.checkArgument((datasetId == null) != isBlank(germplasmUUID));
 
 		this.daoFactory.getFileMetadataDAO().removeFiles(variableIds, datasetId, germplasmUUID);
+	}
+
+	@Override
+	public void updateGid(final Integer newGid, final List<String> targetFileUUIDs) {
+		this.daoFactory.getFileMetadataDAO().updateGid(newGid, targetFileUUIDs);
+	}
+
+	@Override
+	public List<FileMetadata> getByGids(final List<Integer> gids) {
+		return this.daoFactory.getFileMetadataDAO().getByGids(gids);
 	}
 
 	void setDaoFactory(final DaoFactory daoFactory) {

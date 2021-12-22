@@ -8,7 +8,7 @@
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *******************************************************************************/
 
-package org.generationcp.middleware.dao.oms;
+package org.generationcp.middleware.dao;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Ordering;
@@ -19,10 +19,6 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
-import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.GermplasmSearchDAO;
-import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -30,7 +26,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
-import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -109,6 +104,8 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private Germplasm groupSource;
 	private Germplasm descendant;
 
+	private String nameType;
+
 	@Before
 	public void setUp() throws Exception {
 		if (this.dao == null) {
@@ -138,10 +135,13 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		this.mockSortState(null, null);
 
 		this.programUUID = ContextHolder.getCurrentProgram();
+
+		// Get Name type ID = 1
+		this.nameType = this.userDefinedFieldDao.getById(1).getFcode();
 	}
 
 	@Test
-	public void testSearchGermplasmExactMatchGID() {
+	public void testSearchGermplasm_ExactMatchGID() {
 		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
 		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
 		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
@@ -150,7 +150,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmExactMatchGermplasmName() {
+	public void testSearchGermplasm_ExactMatchGermplasmName() {
 		final GermplasmSearchRequest request =
 			this.createSearchRequest(this.preferredName.getNval(), SqlTextFilter.Type.EXACTMATCH);
 		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
@@ -162,7 +162,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmStartsWithGermplasmName() {
+	public void testSearchGermplasm_StartsWithGermplasmName() {
 
 		final Germplasm germplasm =
 			GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 12, 13, 1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
@@ -179,7 +179,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmContainsGermplasmName() {
+	public void testSearchGermplasm_ContainsGermplasmName() {
 		final GermplasmSearchRequest request =
 			this.createSearchRequest(this.preferredName.getNval(), SqlTextFilter.Type.CONTAINS);
 		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(request, this.pageable, this.programUUID);
@@ -190,7 +190,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmIncludeParents() {
+	public void testSearchGermplasm_IncludeParents() {
 
 		final Germplasm parentGermplasm =
 			GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
@@ -221,7 +221,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmIncludePedigreeGenerative() {
+	public void testSearchGermplasm_IncludePedigreeGenerative() {
 		this.createPedigree();
 
 		final GermplasmSearchRequest request = this.createSearchRequest(this.descendant.getGid());
@@ -244,7 +244,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmIncludePedigreeGenerativeLevelTwo() {
+	public void testSearchGermplasm_IncludePedigreeGenerativeLevelTwo() {
 		this.createPedigree();
 
 		final GermplasmSearchRequest request = this.createSearchRequest(this.descendant.getGid());
@@ -267,7 +267,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmIncludePedigreeDerivative() {
+	public void testSearchGermplasm_IncludePedigreeDerivative() {
 		this.createPedigree();
 
 		final GermplasmSearchRequest request = this.createSearchRequest(this.descendant.getGid());
@@ -290,7 +290,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmIncludePedigreeBoth() {
+	public void testSearchGermplasm_IncludePedigreeBoth() {
 		this.createPedigree();
 
 		final GermplasmSearchRequest request = this.createSearchRequest(this.descendant.getGid());
@@ -313,7 +313,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmIncludePedigreeBothLevelThree() {
+	public void testSearchGermplasm_IncludePedigreeBothLevelThree() {
 		this.createPedigree();
 
 		final GermplasmSearchRequest request = this.createSearchRequest(this.descendant.getGid());
@@ -336,7 +336,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmIncludeMGMembers() {
+	public void testSearchGermplasm_IncludeMGMembers() {
 		final GermplasmSearchRequest request = this.createSearchRequest(this.germplasmGID);
 		request.setIncludeGroupMembers(true);
 
@@ -356,7 +356,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmWithAllAddedColumns() {
+	public void testSearchGermplasm_WithAllAddedColumns() {
 
 		final GermplasmSearchRequest searchParameter = this.createSearchRequest(this.germplasmGID);
 
@@ -390,7 +390,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmWithImmediateSourceGIDAndName() {
+	public void testSearchGermplasm_WithImmediateSourceGIDAndName() {
 		//Create a new germplasm with -1 gnpgs
 		final Germplasm germplasm = GermplasmTestDataInitializer
 			.createGermplasm(this.germplasmDate, this.femaleParentGID, this.maleParentGID, -1, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID,
@@ -417,7 +417,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmWithGermplasmDetailsColumnsOnly() {
+	public void testSearchGermplasm_WithGermplasmDetailsColumnsOnly() {
 
 		final GermplasmSearchRequest searchParameter = this.createSearchRequest(this.germplasmGID);
 
@@ -439,7 +439,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmWithMethodDetailsColumnsOnly() {
+	public void testSearchGermplasm_WithMethodDetailsColumnsOnly() {
 
 		final GermplasmSearchRequest searchParameter = this.createSearchRequest(this.germplasmGID);
 
@@ -461,7 +461,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmWithParentDetailsColumnsOnly() {
+	public void testSearchGermplasm_WithParentDetailsColumnsOnly() {
 
 		final GermplasmSearchRequest searchParameter = this.createSearchRequest(this.germplasmGID);
 
@@ -484,7 +484,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmWithAttributeTypeAddedColumnOnly() {
+	public void testSearchGermplasm_WithAttributeTypeAddedColumnOnly() {
 
 		final GermplasmSearchRequest searchParameter = this.createSearchRequest(this.germplasmGID);
 
@@ -503,7 +503,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmWithGermplasmNameTypeAddedColumnOnly() {
+	public void testSearchGermplasm_WithGermplasmNameTypeAddedColumnOnly() {
 
 		final GermplasmSearchRequest searchParameter = this.createSearchRequest(this.germplasmGID);
 
@@ -904,7 +904,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmAttributeTypeSortAscending() {
+	public void testSearchGermplasm_AttributeTypeSortAscending() {
 
 		final GermplasmSearchRequest searchParameter =
 			this.createSearchRequest("GermplasmForSorting", SqlTextFilter.Type.STARTSWITH);
@@ -928,7 +928,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmAttributeTypeSortDescending() {
+	public void testSearchGermplasm_AttributeTypeSortDescending() {
 
 		final GermplasmSearchRequest searchParameter =
 			this.createSearchRequest("GermplasmForSorting", SqlTextFilter.Type.STARTSWITH);
@@ -952,7 +952,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmNameTypeSortAscending() {
+	public void testSearchGermplasm_NameTypeSortAscending() {
 
 		final GermplasmSearchRequest searchParameter =
 			this.createSearchRequest("GermplasmForSorting", SqlTextFilter.Type.STARTSWITH);
@@ -976,7 +976,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmNameTypeSortDescending() {
+	public void testSearchGermplasm_NameTypeSortDescending() {
 
 		final GermplasmSearchRequest searchParameter =
 			this.createSearchRequest("GermplasmForSorting", SqlTextFilter.Type.STARTSWITH);
@@ -1020,7 +1020,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmNamesSortDescending() {
+	public void testSearchGermplasm_NamesSortDescending() {
 
 		final GermplasmSearchRequest searchParameter =
 			this.createSearchRequest("GermplasmForSorting", SqlTextFilter.Type.STARTSWITH);
@@ -1040,7 +1040,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmGIDSortAscending() {
+	public void testSearchGermplasm_GIDSortAscending() {
 
 		final GermplasmSearchRequest searchParameter =
 			this.createSearchRequest("GermplasmForSorting", SqlTextFilter.Type.STARTSWITH);
@@ -1060,7 +1060,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmGIDSortDescending() {
+	public void testSearchGermplasm_GIDSortDescending() {
 
 		final GermplasmSearchRequest searchParameter =
 			this.createSearchRequest("GermplasmForSorting", SqlTextFilter.Type.STARTSWITH);
@@ -1080,7 +1080,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmGroupIdSortAscending() {
+	public void testSearchGermplasm_GroupIdSortAscending() {
 
 		final GermplasmSearchRequest searchParameter =
 			this.createSearchRequest("GermplasmForSorting", SqlTextFilter.Type.STARTSWITH);
@@ -1100,7 +1100,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmGroupIdSortDescending() {
+	public void testSearchGermplasm_GroupIdSortDescending() {
 
 		final GermplasmSearchRequest searchParameter =
 			this.createSearchRequest("GermplasmForSorting", SqlTextFilter.Type.STARTSWITH);
@@ -1120,7 +1120,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmLotSortAscending() {
+	public void testSearchGermplasm_LotSortAscending() {
 
 		final GermplasmSearchRequest searchParameter =
 			this.createSearchRequest("GermplasmForSorting", SqlTextFilter.Type.STARTSWITH);
@@ -1140,7 +1140,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmLotSortDescending() {
+	public void testSearchGermplasm_LotSortDescending() {
 
 		final GermplasmSearchRequest searchParameter =
 			this.createSearchRequest("GermplasmForSorting", SqlTextFilter.Type.STARTSWITH);
@@ -1160,7 +1160,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmBalanceSortAscending() {
+	public void testSearchGermplasm_BalanceSortAscending() {
 
 		final GermplasmSearchRequest searchParameter =
 			this.createSearchRequest("GermplasmForSorting", SqlTextFilter.Type.STARTSWITH);
@@ -1180,7 +1180,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmBalanceSortDescending() {
+	public void testSearchGermplasm_BalanceSortDescending() {
 
 		final GermplasmSearchRequest searchParameter =
 			this.createSearchRequest("GermplasmForSorting", SqlTextFilter.Type.STARTSWITH);
@@ -1200,7 +1200,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSearchGermplasmByList() {
+	public void testSearchGermplasm_FilterByList() {
 
 		final GermplasmList germplasmList = GermplasmListTestDataInitializer.createGermplasmList(null, false);
 		final int germplasmListId = this.germplasmListManager.addGermplasmList(germplasmList);
@@ -1298,6 +1298,136 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		Assert.assertEquals("The count should be zero because the gid in the list doesn't exist.", 0, (int) result);
 
+	}
+
+	@Test
+	public void testAddPreFilteredGids_NoMatchFemaleParentName() {
+		final GermplasmSearchRequest request = new GermplasmSearchRequest();
+		final SqlTextFilter nameFilter = new SqlTextFilter();
+		nameFilter.setType(SqlTextFilter.Type.EXACTMATCH);
+		nameFilter.setValue(RandomStringUtils.randomAlphabetic(20));
+		request.setNameFilter(nameFilter);
+		request.setFemaleParentName(nameFilter);
+		final List<Integer> preFilteredGids = new ArrayList<>();
+		Assert.assertTrue(this.dao.addPreFilteredGids(request, preFilteredGids, this.programUUID));
+		Assert.assertTrue(preFilteredGids.isEmpty());
+	}
+
+	@Test
+	public void testAddPreFilteredGids_MatchByFemaleParentName() {
+		final GermplasmSearchRequest request = new GermplasmSearchRequest();
+		final SqlTextFilter nameFilter = new SqlTextFilter();
+		nameFilter.setType(SqlTextFilter.Type.EXACTMATCH);
+		nameFilter.setValue(this.femaleParentPreferredName.getNval());
+		request.setNameFilter(nameFilter);
+		request.setFemaleParentName(nameFilter);
+		final List<Integer> preFilteredGids = new ArrayList<>();
+		Assert.assertFalse(this.dao.addPreFilteredGids(request, preFilteredGids, this.programUUID));
+		Assert.assertEquals(2, preFilteredGids.size());
+		Assert.assertTrue(preFilteredGids.contains(this.germplasmGID));
+	}
+
+	@Test
+	public void testAddPreFilteredGids_NoMatchMaleParentName() {
+		final GermplasmSearchRequest request = new GermplasmSearchRequest();
+		final SqlTextFilter nameFilter = new SqlTextFilter();
+		nameFilter.setType(SqlTextFilter.Type.EXACTMATCH);
+		nameFilter.setValue(RandomStringUtils.randomAlphabetic(20));
+		request.setNameFilter(nameFilter);
+		request.setMaleParentName(nameFilter);
+		final List<Integer> preFilteredGids = new ArrayList<>();
+		Assert.assertTrue(this.dao.addPreFilteredGids(request, preFilteredGids, this.programUUID));
+		Assert.assertTrue(preFilteredGids.isEmpty());
+	}
+
+	@Test
+	public void testAddPreFilteredGids_MatchByMaleParentName() {
+		final GermplasmSearchRequest request = new GermplasmSearchRequest();
+		final SqlTextFilter nameFilter = new SqlTextFilter();
+		nameFilter.setType(SqlTextFilter.Type.EXACTMATCH);
+		nameFilter.setValue(this.maleParentPreferredName.getNval());
+		request.setNameFilter(nameFilter);
+		request.setMaleParentName(nameFilter);
+		final List<Integer> preFilteredGids = new ArrayList<>();
+		Assert.assertFalse(this.dao.addPreFilteredGids(request, preFilteredGids, this.programUUID));
+		Assert.assertEquals(2, preFilteredGids.size());
+		Assert.assertTrue(preFilteredGids.contains(this.germplasmGID));
+	}
+
+	@Test
+	public void testAddPreFilteredGids_NoMatchGroupSourceName() {
+		final GermplasmSearchRequest request = new GermplasmSearchRequest();
+		final SqlTextFilter nameFilter = new SqlTextFilter();
+		nameFilter.setType(SqlTextFilter.Type.EXACTMATCH);
+		nameFilter.setValue(RandomStringUtils.randomAlphabetic(20));
+		request.setNameFilter(nameFilter);
+		request.setGroupSourceName(nameFilter);
+		final List<Integer> preFilteredGids = new ArrayList<>();
+		Assert.assertTrue(this.dao.addPreFilteredGids(request, preFilteredGids, this.programUUID));
+		Assert.assertTrue(preFilteredGids.isEmpty());
+	}
+
+	@Test
+	public void testAddPreFilteredGids_NoMatchImmediateSourceName() {
+		final GermplasmSearchRequest request = new GermplasmSearchRequest();
+		final SqlTextFilter nameFilter = new SqlTextFilter();
+		nameFilter.setType(SqlTextFilter.Type.EXACTMATCH);
+		nameFilter.setValue(RandomStringUtils.randomAlphabetic(20));
+		request.setNameFilter(nameFilter);
+		request.setImmediateSourceName(nameFilter);
+		final List<Integer> preFilteredGids = new ArrayList<>();
+		Assert.assertTrue(this.dao.addPreFilteredGids(request, preFilteredGids, this.programUUID));
+		Assert.assertTrue(preFilteredGids.isEmpty());
+	}
+
+	@Test
+	public void testAddPreFilteredGids_MatchByNameType() {
+		final GermplasmSearchRequest request = new GermplasmSearchRequest();
+		request.setNameTypes(Collections.singletonMap(this.nameType, this.preferredName.getNval()));
+		final List<Integer> preFilteredGids = new ArrayList<>();
+		Assert.assertFalse(this.dao.addPreFilteredGids(request, preFilteredGids, this.programUUID));
+		Assert.assertEquals(1, preFilteredGids.size());
+		Assert.assertEquals(this.germplasmGID, preFilteredGids.get(0));
+	}
+
+	@Test
+	public void testAddPreFilteredGids_MultipleNameFiltersWithIntersection() {
+		final GermplasmSearchRequest request = new GermplasmSearchRequest();
+		// Filter 1 - male parent preferred name
+		final SqlTextFilter nameFilter = new SqlTextFilter();
+		nameFilter.setType(SqlTextFilter.Type.EXACTMATCH);
+		nameFilter.setValue(this.maleParentPreferredName.getNval());
+		request.setNameFilter(nameFilter);
+		request.setMaleParentName(nameFilter);
+
+		// Filter 2 - filter by name type which will yield 1 common GID with matches from Filter 1
+		request.setNameTypes(Collections.singletonMap(this.nameType, this.preferredName.getNval()));
+		final List<Integer> preFilteredGids = new ArrayList<>();
+		Assert.assertFalse(this.dao.addPreFilteredGids(request, preFilteredGids, this.programUUID));
+		Assert.assertEquals(1, preFilteredGids.size());
+		Assert.assertEquals(this.germplasmGID, preFilteredGids.get(0));
+	}
+
+	@Test
+	public void testAddPreFilteredGids_MultipleNameFiltersNoIntersection() {
+		final GermplasmSearchRequest request = new GermplasmSearchRequest();
+		// Filter 1 - male parent preferred name
+		final SqlTextFilter nameFilter = new SqlTextFilter();
+		nameFilter.setType(SqlTextFilter.Type.EXACTMATCH);
+		nameFilter.setValue(this.maleParentPreferredName.getNval());
+		request.setNameFilter(nameFilter);
+		request.setMaleParentName(nameFilter);
+
+		// Filter 2 - get by name type but the match will yield no intersection with matches from Filter 1
+		final Germplasm germplasm = GermplasmTestDataInitializer
+			.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1,
+				"MethodName", "LocationName");
+		final Integer tempFemaleParentGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		request.setNameTypes(Collections.singletonMap(this.nameType, germplasm.getPreferredName().getNval()));
+
+		final List<Integer> preFilteredGids = new ArrayList<>();
+		Assert.assertTrue(this.dao.addPreFilteredGids(request, preFilteredGids, this.programUUID));
+		Assert.assertTrue(preFilteredGids.isEmpty());
 	}
 
 	private void initializeGermplasms() {
@@ -1573,8 +1703,8 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		this.germplasmDataDM.addGermplasm(this.descendant, this.descendant.getPreferredName(), this.cropType);
 	}
 
-	private GermplasmSearchRequest getGermplasmSearchRequest(Set<Integer> gids) {
-		GermplasmSearchRequest searchRequest = new GermplasmSearchRequest();
+	private GermplasmSearchRequest getGermplasmSearchRequest(final Set<Integer> gids) {
+		final GermplasmSearchRequest searchRequest = new GermplasmSearchRequest();
 		searchRequest.setGids(new ArrayList<>(gids));
 
 		return searchRequest;

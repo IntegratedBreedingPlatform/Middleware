@@ -20,6 +20,21 @@
 	</changeSet>
 
 	<changeSet author="cuenyad" id="v19.4.1-2">
+		<preConditions onFail="MARK_RAN">
+			  <sqlCheck expectedResult="0">
+                SELECT count(*) FROM workbench_tool WHERE name = 'about'
+            </sqlCheck>
+        </preConditions>
+		<comment>
+			Add about page tool
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_tool (`name`, `group_name`, `title`, `version`, `tool_type`, `path`, `parameter`, `user_tool`)
+			VALUES ('about', 'about', 'About', '19.4', 'WEB', '/ibpworkbench/controller/jhipster#about', '', 0);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v19.4.1-6">
         <preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
                 SELECT count(*) FROM release_note where version = '20.0'
