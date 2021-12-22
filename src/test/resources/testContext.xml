@@ -369,5 +369,8 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="fileMetadataService" class="org.generationcp.middleware.api.file.FileMetadataServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
 
 </beans>
