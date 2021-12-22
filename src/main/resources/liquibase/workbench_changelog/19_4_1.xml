@@ -62,6 +62,7 @@
 
 		</sql>
 	</changeSet>
+
 	<changeSet author="cuenyad" id="v19.4.1-4">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
