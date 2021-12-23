@@ -8,11 +8,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
+import org.generationcp.middleware.api.file.FileMetadataFilterRequest;
 import org.generationcp.middleware.constant.SystemNameTypes;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
-import org.generationcp.middleware.constant.SystemNameTypes;
-import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
-import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
@@ -38,7 +35,6 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -57,6 +53,7 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StudyType;
+import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -65,11 +62,12 @@ import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.util.Util;
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -119,12 +117,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
 	private StudyEntryService studyEntryService;
-
-	@Autowired
-	private LotService lotService;
-
-	@Autowired
-	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Autowired
 	private LocationDataManager locationDataManager;
@@ -2203,22 +2195,31 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testMergeGermplasm_MigrateAttributes() {
+	public void testMergeGermplasm_MigrateAttributesAndTheirFiles() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
-		final Germplasm targetGermplasm = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
+		final Germplasm targetGermplasm = this.createGermplasm(method, RandomStringUtils.randomAlphabetic(10), null, 0, 0, 0, null, null);
 		// Add  NOTE attribute to the target germplasm
 		final CVTerm note = this.daoFactory.getCvTermDao().getByNameAndCvId(NOTE, CvId.VARIABLES.getId());
 		final Attribute noteAttribute =
 			this.addAttribute(targetGermplasm, note.getCvTermId(), RandomStringUtils.randomAlphabetic(10));
 
-		final Germplasm germplasmToMerge = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
+		final Germplasm germplasmToMerge = this.createGermplasm(method, RandomStringUtils.randomAlphabetic(10), null, 0, 0, 0, null, null);
 		// Add ACQ_DATE_AA_text attribute to the germplasm to be merged
 		final CVTerm acqDate = this.daoFactory.getCvTermDao().getByNameAndCvId("ACQ_DATE_AA_text", CvId.VARIABLES.getId());
 		final Attribute acqDateAttribute =
 			this.addAttribute(germplasmToMerge, acqDate.getCvTermId(), RandomStringUtils.randomAlphabetic(10));
+		// Add two files associated to variables and one file detached
+		final FileMetadata fileMetadata1 = this.createFileMetadata(germplasmToMerge, note);
+		final FileMetadata fileMetadata2 = this.createFileMetadata(germplasmToMerge, acqDate);
+		final FileMetadata fileMetadata3 = this.createFileMetadata(germplasmToMerge, null);
 
 		this.sessionProvder.getSession().refresh(targetGermplasm);
+
+		final FileMetadataFilterRequest fileMetadataFilterRequestByTargetGermplasmUUID = new FileMetadataFilterRequest();
+		fileMetadataFilterRequestByTargetGermplasmUUID.setGermplasmUUID(targetGermplasm.getGermplasmUUID());
+		assertThat(this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID,  null),
+				hasSize(0));
 
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
@@ -2228,11 +2229,15 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		// If migrateAttributesData is false, migration of attributes should not execute
 		germplasmMergeRequestDto.getMergeOptions().setMigrateAttributesData(false);
+		germplasmMergeRequestDto.getMergeOptions().setMigrateFiles(false);
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
 		this.sessionProvder.getSession().flush();
 		Assert.assertEquals(1, this.daoFactory.getAttributeDAO().getByGID(targetGermplasm.getGid()).size());
+		assertThat(this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID,  null),
+				hasSize(0));
 
 		germplasmMergeRequestDto.getMergeOptions().setMigrateAttributesData(true);
+		germplasmMergeRequestDto.getMergeOptions().setMigrateFiles(true);
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
 		this.sessionProvder.getSession().flush();
 
@@ -2245,6 +2250,13 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			n -> n.getTypeId().equals(acqDateAttribute.getTypeId()) && n.getAval()
 				.equals(acqDateAttribute.getAval())));
 
+		final List<FileMetadata> fileMetadataSearchResponse =
+				this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID, null);
+		assertThat(fileMetadataSearchResponse, hasSize(3));
+		assertThat(fileMetadataSearchResponse, CoreMatchers.hasItems(
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata1.getFileUUID())),
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata2.getFileUUID())),
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata3.getFileUUID()))));
 	}
 
 	@Test
@@ -2290,22 +2302,31 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testMergeGermplasm_MigratePassport() {
+	public void testMergeGermplasm_MigratePassportAndTheirFiles() {
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
-		final Germplasm targetGermplasm = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
+		final Germplasm targetGermplasm = this.createGermplasm(method, RandomStringUtils.randomAlphabetic(10), null, 0, 0, 0, null, null);
 		// Add ANCEST_AP_text attribute to the target germplasm
 		final CVTerm ancest_ap_text = this.daoFactory.getCvTermDao().getByNameAndCvId("ANCEST_AP_text", CvId.VARIABLES.getId());
 		final Attribute ancestApTextAttribute =
 			this.addAttribute(targetGermplasm, ancest_ap_text.getCvTermId(), RandomStringUtils.randomAlphabetic(10));
 
-		final Germplasm germplasmToMerge = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
+		final Germplasm germplasmToMerge = this.createGermplasm(method, RandomStringUtils.randomAlphabetic(10), null, 0, 0, 0, null, null);
 		// Add COLL_DAT_AP_text attribute to the germplasm to be merged
 		final CVTerm coll_dat_ap_text = this.daoFactory.getCvTermDao().getByNameAndCvId("COLL_DAT_AP_text", CvId.VARIABLES.getId());
 		final Attribute collDatApTextAttribute =
 			this.addAttribute(germplasmToMerge, coll_dat_ap_text.getCvTermId(), RandomStringUtils.randomAlphabetic(10));
+		// Add two files associated to variables and one file detached
+		final FileMetadata fileMetadata1 = this.createFileMetadata(germplasmToMerge, ancest_ap_text);
+		final FileMetadata fileMetadata2 = this.createFileMetadata(germplasmToMerge, coll_dat_ap_text);
+		final FileMetadata fileMetadata3 = this.createFileMetadata(germplasmToMerge, null);
 
 		this.sessionProvder.getSession().refresh(targetGermplasm);
+
+		final FileMetadataFilterRequest fileMetadataFilterRequestByTargetGermplasmUUID = new FileMetadataFilterRequest();
+		fileMetadataFilterRequestByTargetGermplasmUUID.setGermplasmUUID(targetGermplasm.getGermplasmUUID());
+		assertThat(this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID,  null),
+				hasSize(0));
 
 		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
@@ -2315,11 +2336,15 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		// If migratePassportData is false, migration of attributes should not execute
 		germplasmMergeRequestDto.getMergeOptions().setMigratePassportData(false);
+		germplasmMergeRequestDto.getMergeOptions().setMigrateFiles(false);
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
 		this.sessionProvder.getSession().flush();
 		Assert.assertEquals(1, this.daoFactory.getAttributeDAO().getByGID(targetGermplasm.getGid()).size());
+		assertThat(this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID,  null),
+				hasSize(0));
 
 		germplasmMergeRequestDto.getMergeOptions().setMigratePassportData(true);
+		germplasmMergeRequestDto.getMergeOptions().setMigrateFiles(true);
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
 		this.sessionProvder.getSession().flush();
 		final GermplasmDto targetGermplasmDto = this.germplasmService.getGermplasmDtoById(targetGermplasm.getGid());
@@ -2337,6 +2362,13 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			n -> n.getTypeId().equals(collDatApTextAttribute.getTypeId()) && n.getAval()
 				.equals(collDatApTextAttribute.getAval())));
 
+		final List<FileMetadata> fileMetadataSearchResponse =
+				this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID, null);
+		assertThat(fileMetadataSearchResponse, hasSize(3));
+		assertThat(fileMetadataSearchResponse, CoreMatchers.hasItems(
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata1.getFileUUID())),
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata2.getFileUUID())),
+				Matchers.hasProperty("fileUUID", Matchers.is(fileMetadata3.getFileUUID()))));
 	}
 
 	@Test
@@ -2436,8 +2468,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
 		// Set the closeLots to true
 		germplasmMergeRequestDto.setNonSelectedGermplasm(
-			Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
-				new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false)));
+				Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge1.getGid(), false, false),
+						new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge2.getGid(), false, false)));
 		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
 
 		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
@@ -2450,7 +2482,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(lotsOfTargetGermplasm.size(), equalTo(0));
 
 		final List<Lot> lotsOfGermplasmMerged =
-			this.daoFactory.getLotDao().getByGids(Arrays.asList(germplasmToMerge1.getGid(), germplasmToMerge2.getGid()));
+				this.daoFactory.getLotDao().getByGids(Arrays.asList(germplasmToMerge1.getGid(), germplasmToMerge2.getGid()));
 		assertThat(lotsOfGermplasmMerged.size(), equalTo(2));
 		assertThat(lotsOfGermplasmMerged.get(0).getStatus(), equalTo(LotStatus.CLOSED.getIntValue()));
 		assertThat(lotsOfGermplasmMerged.get(1).getStatus(), equalTo(LotStatus.CLOSED.getIntValue()));
@@ -2531,6 +2563,55 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(progenies.get(child3.getGid()).getDesignation(), equalTo(name3.getNval()));
 		assertThat(progenies.get(child4.getGid()).getDesignation(), equalTo(name4.getNval()));
 		assertThat(progenies.get(child5.getGid()).getDesignation(), equalTo(name5.getNval()));
+	}
+
+	@Test
+	public void testMergeGermplasm_TransferOnlyDetachedFilesToTarget() {
+
+		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+
+		final Germplasm targetGermplasm = this.createGermplasm(method, RandomStringUtils.randomAlphabetic(10), null, 0, 0, 0, null, null);
+		final Germplasm germplasmToMerge = this.createGermplasm(method, RandomStringUtils.randomAlphabetic(10), null, 0, 0, 0, null, null);
+
+		// Add ANCEST_AP_text attribute to the target germplasm
+		final CVTerm ancest_ap_text = this.daoFactory.getCvTermDao().getByNameAndCvId("ANCEST_AP_text", CvId.VARIABLES.getId());
+		final Attribute ancestApTextAttribute =
+				this.addAttribute(germplasmToMerge, ancest_ap_text.getCvTermId(), RandomStringUtils.randomAlphabetic(10));
+
+		// Add  NOTE attribute to the target germplasm
+		final CVTerm note = this.daoFactory.getCvTermDao().getByNameAndCvId(NOTE, CvId.VARIABLES.getId());
+		final Attribute noteAttribute =
+				this.addAttribute(germplasmToMerge, note.getCvTermId(), RandomStringUtils.randomAlphabetic(10));
+		// Add two files associated to variables and one file detached
+		final FileMetadata fileMetadata1 = this.createFileMetadata(germplasmToMerge, ancest_ap_text);
+		final FileMetadata fileMetadata2 = this.createFileMetadata(germplasmToMerge, note);
+		final FileMetadata fileMetadata3 = this.createFileMetadata(germplasmToMerge, null);
+
+		this.sessionProvder.getSession().refresh(targetGermplasm);
+
+		final FileMetadataFilterRequest fileMetadataFilterRequestByTargetGermplasmUUID = new FileMetadataFilterRequest();
+		fileMetadataFilterRequestByTargetGermplasmUUID.setGermplasmUUID(targetGermplasm.getGermplasmUUID());
+		assertThat(this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID,  null),
+				hasSize(0));
+
+		final GermplasmMergeRequestDto germplasmMergeRequestDto = new GermplasmMergeRequestDto();
+		germplasmMergeRequestDto.setTargetGermplasmId(targetGermplasm.getGid());
+		germplasmMergeRequestDto.setNonSelectedGermplasm(
+				Arrays.asList(new GermplasmMergeRequestDto.NonSelectedGermplasm(germplasmToMerge.getGid(), false, false)));
+		germplasmMergeRequestDto.setMergeOptions(new GermplasmMergeRequestDto.MergeOptions());
+
+		// If migratePassportData and migrateAttributesData is false, migration of attributes should not execute
+		germplasmMergeRequestDto.getMergeOptions().setMigratePassportData(false);
+		germplasmMergeRequestDto.getMergeOptions().setMigrateAttributesData(false);
+		germplasmMergeRequestDto.getMergeOptions().setMigrateFiles(true);
+		this.germplasmService.mergeGermplasm(germplasmMergeRequestDto, RandomStringUtils.randomAlphabetic(10));
+		this.sessionProvder.getSession().flush();
+		Assert.assertEquals(0, this.daoFactory.getAttributeDAO().getByGID(targetGermplasm.getGid()).size());
+
+		final List<FileMetadata> fileMetadataSearchResponse =
+				this.daoFactory.getFileMetadataDAO().search(fileMetadataFilterRequestByTargetGermplasmUUID, this.programUUID, null);
+		assertThat(fileMetadataSearchResponse, hasSize(1));
+		assertThat(fileMetadataSearchResponse.get(0).getFileUUID(), is(fileMetadata3.getFileUUID()));
 	}
 
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
@@ -2749,6 +2830,16 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getProjectPropertyDAO().save(entryTypeProp);
 
 		return study;
+	}
+
+	private FileMetadata createFileMetadata(final Germplasm germplasm, final CVTerm variable) {
+		final FileMetadata fileMetadata = new FileMetadata();
+		fileMetadata.setGermplasm(germplasm);
+		fileMetadata.setFileUUID(UUID.randomUUID().toString());
+		if (variable != null) {
+			fileMetadata.setVariables(Arrays.asList(variable));
+		}
+		return this.daoFactory.getFileMetadataDAO().save(fileMetadata);
 	}
 
 }

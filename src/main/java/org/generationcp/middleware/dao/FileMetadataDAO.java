@@ -5,6 +5,7 @@ import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.springframework.data.domain.Pageable;
@@ -25,6 +26,10 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 		+ "    left join variable_overrides vo on vo.cvterm_id = variable.cvterm_id " //
 		+ "              and (:programUUID is null || vo.program_uuid = :programUUID) " //
 		+ " where 1 = 1 ";
+
+	public FileMetadataDAO(final Session session) {
+		super(session);
+	}
 
 	public FileMetadata getByFileUUID(final String fileUUID) {
 		return (FileMetadata) this.getSession().createCriteria(this.getPersistentClass())
@@ -163,6 +168,20 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			+ " where file_metadata.file_id in (:fileMetadataIds)")
 			.setParameterList("fileMetadataIds", fileMetadataIds)
 			.executeUpdate();
+	}
+
+	public void updateGid(final Integer newGid, final List<String> targetFileUUIDs) {
+		final String sql = "UPDATE file_metadata SET gid = :gid WHERE file_uuid IN (:targetFileUUIDs)";
+		this.getSession().createSQLQuery(sql)
+				.setParameter("gid", newGid)
+				.setParameterList("targetFileUUIDs", targetFileUUIDs)
+				.executeUpdate();
+	}
+
+	public List<FileMetadata> getByGids(final List<Integer> gids) {
+		return this.getSession().createCriteria(this.getPersistentClass())
+				.add(Restrictions.in("germplasm.gid", gids))
+				.list();
 	}
 
 }
