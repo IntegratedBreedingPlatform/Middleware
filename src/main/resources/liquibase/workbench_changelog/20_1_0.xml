@@ -40,7 +40,7 @@
 			# Create new permission for the moment so that it shows in the side menu
 			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'program_settings_manager');
 			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
-			select 'MANAGE_PROGRAM_SETTINGS_BETA', description, parent_id, @sidebar_category_link_id
+			select 'MANAGE_PROGRAM_SETTINGS_BETA', 'Manage Program Settings Beta', parent_id, @sidebar_category_link_id
 			from permission where name = 'MANAGE_PROGRAM_SETTINGS';
 
 			SET @manage_program_settings_beta_permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_PROGRAM_SETTINGS_BETA');
