@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearc
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataViewModel;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.dao.util.DAOQueryUtils;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListData;

@@ -7,7 +7,7 @@ import java.util.Set;
 
 public interface ProgramFavoriteService {
 
-	void addProgramFavorites(String programUUID, ProgramFavorite.FavoriteType favoriteType, Set<Integer> entityIds);
+	List<ProgramFavoriteDTO> addProgramFavorites(String programUUID, ProgramFavorite.FavoriteType favoriteType, Set<Integer> entityIds);
 
 	void deleteAllProgramFavorites(String programUUID);
 

@@ -42,7 +42,7 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 		try {
 
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("entityType", type.getName()));
+			criteria.add(Restrictions.eq("entityType", type));
 			criteria.add(Restrictions.eq("uniqueID", programUUID));
 
 			return criteria.list();
@@ -61,7 +61,7 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 			criteria.add(Restrictions.eq("uniqueID", programUUID));
-			criteria.add(Restrictions.eq("entityType", type.getName()));
+			criteria.add(Restrictions.eq("entityType", type));
 			criteria.add(Restrictions.eq("entityId", entityId));
 
 			final List<ProgramFavorite> result = criteria.list();
@@ -78,7 +78,7 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 		try {
 
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("entityType", type.getName()));
+			criteria.add(Restrictions.eq("entityType", type));
 			criteria.add(Restrictions.eq("uniqueID", programUUID));
 			criteria.setMaxResults(max);
 
@@ -95,7 +95,7 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 		try {
 
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("entityType", favoriteType.getName()));
+			criteria.add(Restrictions.eq("entityType", favoriteType));
 			criteria.add(Restrictions.eq("uniqueID", programUUID));
 
 			if(CollectionUtils.isNotEmpty(entityIds)){

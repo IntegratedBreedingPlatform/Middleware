@@ -1,17 +1,25 @@
 package org.generationcp.middleware.api.location;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.generationcp.middleware.api.program.ProgramFavoriteDTO;
+import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
+
+import java.util.List;
 
 @AutoProperty
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class LocationDTO extends LocationRequestDto {
 
 	private Integer id;
+	private String locationTypeName;
 	private String countryName;
+	private String countryCode;
 	private String provinceName;
+
+	private List<ProgramFavoriteDTO> programFavorites;
 
 	public LocationDTO(){
 	}
@@ -26,10 +34,11 @@ public class LocationDTO extends LocationRequestDto {
 		this.setLatitude(location.getLatitude());
 		this.setLongitude(location.getLongitude());
 
-		final Location country = location.getCountry();
+		final Country country = location.getCountry();
 		if (country != null) {
-			this.setCountryId(country.getLocid());
-			this.setCountryName(country.getLname());
+			this.setCountryId(country.getCntryid());
+			this.setCountryName(country.getIsoabbr());
+			this.setCountryCode(country.getIsothree());
 		}
 
 		final Location province = location.getProvince();
@@ -47,6 +56,14 @@ public class LocationDTO extends LocationRequestDto {
 		this.id = id;
 	}
 
+	public String getLocationTypeName() {
+		return locationTypeName;
+	}
+
+	public void setLocationTypeName(final String locationTypeName) {
+		this.locationTypeName = locationTypeName;
+	}
+
 	public String getCountryName() {
 		return countryName;
 	}
@@ -55,12 +72,28 @@ public class LocationDTO extends LocationRequestDto {
 		this.countryName = countryName;
 	}
 
+	public String getCountryCode() {
+		return countryCode;
+	}
+
+	public void setCountryCode(final String countryCode) {
+		this.countryCode = countryCode;
+	}
+
 	public String getProvinceName() {
 		return provinceName;
 	}
 
 	public void setProvinceName(final String provinceName) {
 		this.provinceName = provinceName;
+	}
+
+	public List<ProgramFavoriteDTO> getProgramFavorites() {
+		return programFavorites;
+	}
+
+	public void setProgramFavorites(final List<ProgramFavoriteDTO> programFavorites) {
+		this.programFavorites = programFavorites;
 	}
 
 	@Override

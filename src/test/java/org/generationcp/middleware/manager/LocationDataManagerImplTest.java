@@ -96,7 +96,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountByLocationAbbreviation() {
-		final Location country = this.manager.getLocationByID(1);
+		final Country country = this.manager.getCountryById(1);
 		final Location province = this.manager.getLocationByID(1001);
 		final String labbr = "LABBRR";
 		final long count = this.manager.countByLocationAbbreviation(labbr);
@@ -259,7 +259,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddLocation() throws MiddlewareQueryException {
-		final Location country = this.manager.getLocationByID(1);
+		final Country country = this.manager.getCountryById(1);
 		final Location province = this.manager.getLocationByID(1001);
 		final Location location = new Location();
 		location.setCountry(country);
@@ -282,7 +282,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testAddLocations() throws MiddlewareQueryException {
 
-		final Location country = this.manager.getLocationByID(1);
+		final Country country = this.manager.getCountryById(1);
 		final Location province = this.manager.getLocationByID(1001);
 
 		final List<Location> locations = new ArrayList<>();
@@ -499,7 +499,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
 		for (final Location location : locationList) {
 			Assert.assertEquals("Location should have a countryId = " + LocationDataManagerImplTest.PHILIPPINES_CNTRYID,
-				LocationDataManagerImplTest.PHILIPPINES_CNTRYID, location.getCountry().getLocid());
+				LocationDataManagerImplTest.PHILIPPINES_CNTRYID, location.getCountry().getCntryid());
 		}
 	}
 

@@ -4,6 +4,8 @@ package org.generationcp.middleware.pojos.dms;
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -26,15 +28,6 @@ public class ProgramFavorite {
 			return this.name;
 		}
 
-		public static FavoriteType getByName(final String name) {
-			for (final FavoriteType type : FavoriteType.values()) {
-				if (type.getName().equalsIgnoreCase(name)) {
-					return type;
-				}
-			}
-			return null;
-		}
-
 	}
 
 	@Id
@@ -49,7 +42,8 @@ public class ProgramFavorite {
 
 	@Basic(optional = false)
 	@Column(name = "entity_type")
-	private String entityType;
+	@Enumerated(EnumType.STRING)
+	private FavoriteType entityType;
 
 	@Basic(optional = false)
 	@Column(name = "entity_id")
@@ -60,7 +54,7 @@ public class ProgramFavorite {
 
 	public ProgramFavorite(final String uniqueID, final FavoriteType favoriteType, final Integer entityId) {
 		this.uniqueID = uniqueID;
-		this.entityType = favoriteType.getName();
+		this.entityType = favoriteType;
 		this.entityId = entityId;
 	}
 
@@ -68,15 +62,11 @@ public class ProgramFavorite {
 		return this.programFavoriteId;
 	}
 
-	public void setProgramFavoriteId(final Integer programFavoriteId) {
-		this.programFavoriteId = programFavoriteId;
-	}
-
-	public String getEntityType() {
+	public FavoriteType getEntityType() {
 		return this.entityType;
 	}
 
-	public void setEntityType(final String entityType) {
+	public void setEntityType(final FavoriteType entityType) {
 		this.entityType = entityType;
 	}
 
