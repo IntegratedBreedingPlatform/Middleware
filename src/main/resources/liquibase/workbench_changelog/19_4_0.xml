@@ -260,5 +260,4 @@
 			WHERE permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name in ('LISTS', 'MANAGE_GERMPLASM_LISTS'));
 		</sql>
 	</changeSet>
-
 </databaseChangeLog>
