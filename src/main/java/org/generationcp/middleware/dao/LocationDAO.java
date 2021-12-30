@@ -521,14 +521,14 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	public List<Location> getLocationsByDTypeAndLType(final String dval, final Integer dType, final Integer lType) {
 		try {
-			final DetachedCriteria locationCriteria = DetachedCriteria.forClass(Location.class);
-			locationCriteria.setProjection(Property.forName("locid"));
-			locationCriteria.add(Restrictions.eq("ltype", lType));
+			final DetachedCriteria locdesCriteria = DetachedCriteria.forClass(Locdes.class);
+			locdesCriteria.setProjection(Property.forName("locationId"));
+			locdesCriteria.add(Restrictions.eq("typeId", dType));
+			locdesCriteria.add(Restrictions.eq("dval", dval));
 
-			return this.getSession().createCriteria(Locdes.class, "locdes")
-					.add(Restrictions.eq("locdes.typeId", dType))
-					.add(Property.forName("locationId").in(locationCriteria))
-					.add(Restrictions.eq("locdes.dval", dval))
+			return this.getSession().createCriteria(Location.class, "location")
+					.add(Restrictions.eq("location.ltype", lType))
+					.add(Property.forName("location.locid").in(locdesCriteria))
 					.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
