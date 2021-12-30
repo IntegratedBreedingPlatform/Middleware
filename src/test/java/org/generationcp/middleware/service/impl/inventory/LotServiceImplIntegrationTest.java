@@ -193,6 +193,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		lot.setUnitName("SEED_AMOUNT_kg");
 		lot.setNotes("Test3");
 		lot.setNewLotUID(newLotUID);
+		lot.setStorageLocationAbbr("ARG");
 		lotList.add(lot);
 		multiInput.setLotList(lotList);
 		lotUpdateRequestDto.setMultiInput(multiInput);
