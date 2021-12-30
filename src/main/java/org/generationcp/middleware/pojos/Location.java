@@ -102,7 +102,7 @@ public class Location implements Serializable, Comparable<Location> {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "cntryid")
 	@NotFound(action = NotFoundAction.IGNORE)
-	private Location country;
+	private Country country;
 
 	@Basic(optional = false)
 	@Column(name = "lrplce")
@@ -125,9 +125,6 @@ public class Location implements Serializable, Comparable<Location> {
 	@Transient
 	private String parentLocationAbbr;
 
-	public static final String GET_ALL_BREEDING_LOCATIONS =
-		"SELECT l.locid, l.ltype, l.nllp, l.lname, l.labbr, l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce, l.nnpid, g.lat, g.lon, g.alt, l.ldefault "
-					+ "FROM location l left join georef g on l.locid = g.locid WHERE l.ltype IN (410, 411, 412) ORDER BY lname";
 	public static final String COUNT_ALL_BREEDING_LOCATIONS = "SELECT count(*) AS count FROM location WHERE ltype IN (410, 411, 412)";
 	public static final String GET_LOCATION_NAMES_BY_GIDS = "SELECT gid, g.glocn, lname " + "FROM germplsm g " + "LEFT JOIN location l "
 			+ "ON g.glocn = l.locid " + "WHERE gid IN (:gids)";
@@ -141,7 +138,7 @@ public class Location implements Serializable, Comparable<Location> {
 
 	public Location(final Integer locid, final Integer ltype, final Integer nllp, final String lname, final String labbr,
 		final Integer snl3id, final Integer snl2id, final Location province,
-		final Location country, final Integer lrplce) {
+		final Country country, final Integer lrplce) {
 		super();
 		this.locid = locid;
 		this.ltype = ltype;
@@ -171,11 +168,11 @@ public class Location implements Serializable, Comparable<Location> {
 		this.ltype = ltype;
 	}
 
-	public Location getCountry() {
+	public Country getCountry() {
 		return country;
 	}
 
-	public void setCountry(final Location country) {
+	public void setCountry(final Country country) {
 		this.country = country;
 	}
 

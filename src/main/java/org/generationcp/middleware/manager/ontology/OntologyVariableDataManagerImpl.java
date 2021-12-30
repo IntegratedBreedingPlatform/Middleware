@@ -663,7 +663,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		if (variableInfo.isFavorite() != null && variableInfo.isFavorite()) {
 			final ProgramFavorite programFavorite = new ProgramFavorite();
 			programFavorite.setEntityId(variableInfo.getId());
-			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE.getName());
+			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE);
 			programFavorite.setUniqueID(variableInfo.getProgramUuid());
 			this.daoFactory.getProgramFavoriteDao().save(programFavorite);
 		}
@@ -800,7 +800,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		if (isFavorite && !programFavoriteOptional.isPresent()) {
 			final ProgramFavorite programFavorite = new ProgramFavorite();
 			programFavorite.setEntityId(variableInfo.getId());
-			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE.getName());
+			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE);
 			programFavorite.setUniqueID(variableInfo.getProgramUuid());
 			this.daoFactory.getProgramFavoriteDao().save(programFavorite);
 		} else if (!isFavorite && programFavoriteOptional.isPresent()) {

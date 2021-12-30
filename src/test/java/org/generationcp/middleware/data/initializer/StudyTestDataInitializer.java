@@ -26,6 +26,7 @@ import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
 import org.generationcp.middleware.operation.saver.StockSaver;
 import org.generationcp.middleware.operation.saver.StudySaver;
+import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -323,7 +324,7 @@ public class StudyTestDataInitializer {
 	}
 
 	public Integer addTestLocation(final String locationName) {
-		final Location country = this.locationDataManager.getLocationByID(1);
+		final Country country = this.locationDataManager.getCountryById(1);
 		final Location province = this.locationDataManager.getLocationByID(1001);
 
 		final Location location = new Location();

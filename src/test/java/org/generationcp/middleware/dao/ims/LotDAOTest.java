@@ -3,8 +3,9 @@ package org.generationcp.middleware.dao.ims;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
+import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.LocationDAO;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
@@ -14,6 +15,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
+import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -35,10 +37,9 @@ import java.util.Set;
 public class LotDAOTest extends IntegrationTestBase {
 
 	private LotDAO lotDAO;
-
 	private LocationDAO locationDAO;
-
 	private GermplasmListDAO germplasmListDAO;
+	private CountryDAO countryDAO;
 
 	@Autowired
 	private GermplasmListManager manager;
@@ -68,6 +69,9 @@ public class LotDAOTest extends IntegrationTestBase {
 		this.locationDAO = new LocationDAO(this.sessionProvder.getSession());
 		this.germplasmListDAO = new GermplasmListDAO();
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
+		this.countryDAO = new CountryDAO();
+		this.countryDAO.setSession(this.sessionProvder.getSession());
+
 		this.cropType = new CropType();
 		this.cropType.setUseUUID(false);
 		this.createLocationForSearchLotTest();
@@ -253,7 +257,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	}
 
 	private void createLocationForSearchLotTest() {
-		final Location country = this.locationDAO.getById(1);
+		final Country country = this.countryDAO.getById(1);
 
 		final int ltype = 405;
 		final String labbr = RandomStringUtils.randomAlphabetic(7);
