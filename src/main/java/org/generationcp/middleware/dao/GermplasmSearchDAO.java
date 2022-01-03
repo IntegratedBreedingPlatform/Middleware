@@ -602,8 +602,8 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		germplasm.setMethodCode(this.getValueOfAddedColumns(METHOD_ABBREVIATION, row, addedColumnsPropertyIds, indexOffset));
 		germplasm.setMethodNumber(this.getValueOfAddedColumns(METHOD_NUMBER, row, addedColumnsPropertyIds, indexOffset));
 		germplasm.setMethodGroup(this.getValueOfAddedColumns(METHOD_GROUP, row, addedColumnsPropertyIds, indexOffset));
-		germplasm.setGermplasmPeferredName(this.getValueOfAddedColumns(PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
-		germplasm.setGermplasmPeferredId(this.getValueOfAddedColumns(PREFERRED_ID, row, addedColumnsPropertyIds, indexOffset));
+		germplasm.setGermplasmPreferredName(this.getValueOfAddedColumns(PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
+		germplasm.setGermplasmPreferredId(this.getValueOfAddedColumns(PREFERRED_ID, row, addedColumnsPropertyIds, indexOffset));
 		germplasm.setFemaleParentPreferredID(this.getValueOfAddedColumns(FEMALE_PARENT_ID, row, addedColumnsPropertyIds, indexOffset));
 		germplasm.setFemaleParentPreferredName(
 			this.getValueOfAddedColumns(FEMALE_PARENT_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
