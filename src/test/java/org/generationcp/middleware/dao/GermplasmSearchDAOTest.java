@@ -537,7 +537,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
-			list.add(g.getGermplasmPeferredId());
+			list.add(g.getGermplasmPreferredId());
 		}
 
 		// Check if the list is in ascending order
@@ -560,7 +560,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
-			list.add(g.getGermplasmPeferredId());
+			list.add(g.getGermplasmPreferredId());
 		}
 
 		// Check if the list is in ascending order
@@ -583,7 +583,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
-			list.add(g.getGermplasmPeferredName());
+			list.add(g.getGermplasmPreferredName());
 		}
 
 		// Check if the list is in ascending order
@@ -607,7 +607,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		final List<String> list = new ArrayList<>();
 		for (final GermplasmSearchResponse g : results) {
-			list.add(g.getGermplasmPeferredName());
+			list.add(g.getGermplasmPreferredName());
 		}
 
 		// Check if the list is in descending order
@@ -1612,16 +1612,16 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		if (propertyIds.contains(GermplasmSearchDAO.PREFERRED_ID)) {
 			Assert.assertEquals("Result germplasm should contain Preferred ID", this.preferredId.getNval(),
-				germplasm.getGermplasmPeferredId());
+				germplasm.getGermplasmPreferredId());
 		} else {
-			Assert.assertTrue("Result germplasm should not contain Preferred ID", StringUtils.isEmpty(germplasm.getGermplasmPeferredId()));
+			Assert.assertTrue("Result germplasm should not contain Preferred ID", StringUtils.isEmpty(germplasm.getGermplasmPreferredId()));
 		}
 		if (propertyIds.contains(GermplasmSearchDAO.PREFERRED_NAME)) {
 			Assert.assertEquals("Result germplasm should contain Preferred Name", this.preferredName.getNval(),
-				germplasm.getGermplasmPeferredName());
+				germplasm.getGermplasmPreferredName());
 		} else {
 			Assert.assertTrue("Result germplasm should not contain Preferred Name",
-				StringUtils.isEmpty(germplasm.getGermplasmPeferredName()));
+				StringUtils.isEmpty(germplasm.getGermplasmPreferredName()));
 		}
 		if (propertyIds.contains(GermplasmSearchDAO.GERMPLASM_DATE)) {
 			Assert.assertEquals("Result germplasm should contain Germplasm Date", String.valueOf(this.germplasmDate),
