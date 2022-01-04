@@ -80,7 +80,7 @@ public class LocationSearchDAOQuery {
   private final static String PROVINCE_JOIN_QUERY = " LEFT JOIN location province ON province.locid = l.snl1id ";
   private final static String PROGRAM_FAVORITE_JOIN_QUERY =
       " LEFT JOIN program_favorites pf on pf.entity_id = l.locid" + " AND entity_type = '"
-          + ProgramFavorite.FavoriteType.LOCATION.getName() + "' AND program_uuid = '%s' ";
+          + ProgramFavorite.FavoriteType.LOCATION.name() + "' AND program_uuid = '%s' ";
 
   private static final String COUNT_EXPRESSION = " COUNT(l.locid) ";
 

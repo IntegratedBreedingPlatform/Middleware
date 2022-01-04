@@ -16,17 +16,10 @@ import javax.persistence.Table;
 public class ProgramFavorite {
 
 	public enum FavoriteType {
-		LOCATION("LOCATION"), METHOD("METHODS"), VARIABLE("VARIABLES");
 
-		private final String name;
-
-		FavoriteType(final String name) {
-			this.name = name;
-		}
-
-		public String getName() {
-			return this.name;
-		}
+		LOCATION,
+		METHODS,
+		VARIABLES;
 
 	}
 
