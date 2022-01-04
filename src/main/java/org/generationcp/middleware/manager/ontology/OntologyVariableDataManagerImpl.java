@@ -556,7 +556,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 			// Get favorite from ProgramFavoriteDAO
 			final java.util.Optional<ProgramFavorite> programFavorite = this.daoFactory.getProgramFavoriteDao().getProgramFavorite(
-				programUuid, ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
+				programUuid, ProgramFavorite.FavoriteType.VARIABLES, term.getCvTermId());
 			variable.setIsFavorite(programFavorite.isPresent());
 
 			final int unknownUsage = -1;
@@ -663,7 +663,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		if (variableInfo.isFavorite() != null && variableInfo.isFavorite()) {
 			final ProgramFavorite programFavorite = new ProgramFavorite();
 			programFavorite.setEntityId(variableInfo.getId());
-			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE);
+			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLES);
 			programFavorite.setUniqueID(variableInfo.getProgramUuid());
 			this.daoFactory.getProgramFavoriteDao().save(programFavorite);
 		}
@@ -787,7 +787,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 		// Updating favorite to true if alias is defined
 		final java.util.Optional<ProgramFavorite> programFavoriteOptional = this.daoFactory.getProgramFavoriteDao().getProgramFavorite(
-			variableInfo.getProgramUuid(), ProgramFavorite.FavoriteType.VARIABLE, term.getCvTermId());
+			variableInfo.getProgramUuid(), ProgramFavorite.FavoriteType.VARIABLES, term.getCvTermId());
 
 		final String previousAlias = variableOverrides == null ? null : variableOverrides.getAlias();
 		final String newAlias = "".equals(variableInfo.getAlias()) ? null : variableInfo.getAlias();
@@ -800,7 +800,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 		if (isFavorite && !programFavoriteOptional.isPresent()) {
 			final ProgramFavorite programFavorite = new ProgramFavorite();
 			programFavorite.setEntityId(variableInfo.getId());
-			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLE);
+			programFavorite.setEntityType(ProgramFavorite.FavoriteType.VARIABLES);
 			programFavorite.setUniqueID(variableInfo.getProgramUuid());
 			this.daoFactory.getProgramFavoriteDao().save(programFavorite);
 		} else if (!isFavorite && programFavoriteOptional.isPresent()) {
