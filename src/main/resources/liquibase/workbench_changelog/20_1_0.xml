@@ -62,12 +62,12 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO workbench_tool (`name`, `group_name`, `title`, `version`, `tool_type`, `path`, `parameter`, `user_tool`)
-			VALUES ('crop_settings_manager', 'crop_settings_manager', 'Crop Settings Manage', '1.0', 'WEB', '/ibpworkbench/controller/jhipster#crop-settings-manager', '', 0);
+			VALUES ('crop_settings_manager', 'crop_settings_manager', 'Manage Crop Settings', '1.0', 'WEB', '/ibpworkbench/controller/jhipster#crop-settings-manager', '', 0);
 
 			SET @sidebar_category_id = (SELECT sidebar_category_id FROM workbench_sidebar_category where sidebar_category_name = 'crop_administration');
 
 			INSERT INTO workbench_sidebar_category_link (`tool_name`, `sidebar_category_id`, `sidebar_link_name`, `sidebar_link_title`, `rank`)
-			VALUES ('crop_settings_manager', @sidebar_category_id, 'crop_settings_manager', 'Crop Settings Manage', 2);
+			VALUES ('crop_settings_manager', @sidebar_category_id, 'crop_settings_manager', 'Manage Crop Settings', 2);
 
 			SET @workbench_sidebar_category_link_id =  (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'crop_settings_manager');
 			UPDATE PERMISSION SET name = 'MANAGE_CROP_SETTINGS', description = 'Manage Crop Settings', workbench_sidebar_category_link_id = @workbench_sidebar_category_link_id WHERE (name = 'MANAGE_CROP_METADATA');
