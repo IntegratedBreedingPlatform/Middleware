@@ -48,7 +48,7 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 			return criteria.list();
 
 		} catch (final HibernateException e) {
-			final String message = "Error in getProgramFavorites(" + type.getName() + ") in ProgramFavoriteDao: " + e.getMessage();
+			final String message = "Error in getProgramFavorites(" + type.name() + ") in ProgramFavoriteDao: " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
@@ -68,7 +68,7 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 			return result.size() > 0 ? Optional.of(result.get(0)) : Optional.empty();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getProgramFavorites(" + type.getName() + ") in ProgramFavoriteDao: "
+			throw new MiddlewareQueryException("Error in getProgramFavorites(" + type.name() + ") in ProgramFavoriteDao: "
 					+ e.getMessage(), e);
 		}
 	}
@@ -85,7 +85,7 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 			return criteria.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getProgramFavorites(" + type.getName() + "," + max + ") in ProgramFavoriteDao: "
+			throw new MiddlewareQueryException("Error in getProgramFavorites(" + type.name() + "," + max + ") in ProgramFavoriteDao: "
 					+ e.getMessage(), e);
 		}
 	}
@@ -105,7 +105,7 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 			return criteria.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getProgramFavorites(" + favoriteType.getName() + "," + entityIds.toArray() + ") in ProgramFavoriteDao: "
+			throw new MiddlewareQueryException("Error in getProgramFavorites(" + favoriteType.name() + "," + entityIds.toArray() + ") in ProgramFavoriteDao: "
 				+ e.getMessage(), e);
 		}
 	}
