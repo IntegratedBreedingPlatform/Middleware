@@ -204,6 +204,17 @@ public class LocationSearchDAOQuery {
       sqlQueryBuilder.setParameter("locationAbbrs", request.getLocationAbbreviations());
     }
 
+    if (!CollectionUtils.isEmpty(request.getCountryIds())) {
+      sqlQueryBuilder.append("AND l.cntryid IN (:contryIds) ");
+      sqlQueryBuilder.setParameter("contryIds", request.getCountryIds());
+    }
+
+    if (!CollectionUtils.isEmpty(request.getProvinceIds())) {
+      sqlQueryBuilder.append("AND l.snl1id IN (:provinceId) ");
+      sqlQueryBuilder.setParameter("provinceId", request.getProvinceIds());
+    }
+
+
     final SqlTextFilter locationNameFilter = request.getLocationNameFilter();
     if (locationNameFilter != null && !locationNameFilter.isEmpty()) {
       final String value = locationNameFilter.getValue();
