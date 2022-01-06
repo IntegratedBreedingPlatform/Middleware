@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.api.user;
 
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
+import org.generationcp.middleware.domain.workbench.UserSearchRequest;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropPerson;
@@ -293,12 +294,12 @@ public interface UserService {
 
 	List<Integer> getActiveUserIDsWithAccessToTheProgram(Long projectId);
 
-	List<ProgramMemberDto> getProgramMembers(String programUUID, Pageable pageable);
+	List<ProgramMemberDto> getProgramMembers(String programUUID, UserSearchRequest userSearchRequest, Pageable pageable);
 
-	long countAllProgramMembers(String programUUID);
+	long countAllProgramMembers(String programUUID, final UserSearchRequest userSearchRequest);
 
-	List<UserDto> getProgramMembersEligibleUsers(String programUUID, Pageable pageable);
+	List<UserDto> getProgramMembersEligibleUsers(String programUUID, UserSearchRequest userSearchRequest, Pageable pageable);
 
-	long countProgramMembersEligibleUsers(String programUUID);
+	long countProgramMembersEligibleUsers(String programUUID, UserSearchRequest userSearchRequest);
 
 }
