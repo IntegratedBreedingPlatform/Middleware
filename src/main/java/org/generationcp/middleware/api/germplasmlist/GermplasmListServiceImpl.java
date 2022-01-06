@@ -335,7 +335,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			this.germplasmSearchService.searchGermplasm(searchRequest, null, programUUID)
 				.forEach(germplasmSearchResponse -> addGermplasmEntriesModels.add(new AddGermplasmEntryModel(
 					germplasmSearchResponse.getGid(),
-					germplasmSearchResponse.getGermplasmPeferredName(),
+					germplasmSearchResponse.getGermplasmPreferredName(),
 					germplasmSearchResponse.getGroupId()
 				)));
 
