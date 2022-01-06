@@ -176,31 +176,31 @@ public class LocationSearchDAOQuery {
 
   private static void addFilters(final SQLQueryBuilder sqlQueryBuilder, final LocationSearchRequest request) {
     if (!StringUtils.isEmpty(request.getLocationTypeName())) {
-      sqlQueryBuilder.append("AND ud.fname = :locationType ");
+      sqlQueryBuilder.append(" AND ud.fname = :locationType ");
       sqlQueryBuilder.setParameter("locationType", request.getLocationTypeName());
     }
     if (!CollectionUtils.isEmpty(request.getLocationIds())) {
-      sqlQueryBuilder.append("AND l.locid IN (:locationId) ");
+      sqlQueryBuilder.append(" AND l.locid IN (:locationId) ");
       sqlQueryBuilder.setParameter("locationId", request.getLocationIds());
     }
 
     if (!StringUtils.isEmpty(request.getCountryName())) {
-      sqlQueryBuilder.append("AND c.isoabbr LIKE :countryName ");
+      sqlQueryBuilder.append(" AND c.isoabbr LIKE :countryName ");
       sqlQueryBuilder.setParameter("countryName", "%" + request.getCountryName() + "%");
     }
 
     if (!StringUtils.isEmpty(request.getProvinceName())) {
-      sqlQueryBuilder.append("AND province.lname LIKE :provinceName ");
+      sqlQueryBuilder.append(" AND province.lname LIKE :provinceName ");
       sqlQueryBuilder.setParameter("provinceName", "%" + request.getProvinceName() + "%");
     }
 
     if (!CollectionUtils.isEmpty(request.getLocationTypeIds())) {
-      sqlQueryBuilder.append("AND l.ltype IN (:locationTypeIds) ");
+      sqlQueryBuilder.append(" AND l.ltype IN (:locationTypeIds) ");
       sqlQueryBuilder.setParameter("locationTypeIds", request.getLocationTypeIds());
     }
 
     if (!CollectionUtils.isEmpty(request.getLocationAbbreviations())) {
-      sqlQueryBuilder.append("AND l.labbr IN (:locationAbbrs) ");
+      sqlQueryBuilder.append(" AND l.labbr IN (:locationAbbrs) ");
       sqlQueryBuilder.setParameter("locationAbbrs", request.getLocationAbbreviations());
     }
 
@@ -210,7 +210,7 @@ public class LocationSearchDAOQuery {
       final SqlTextFilter.Type type = locationNameFilter.getType();
       final String operator = GenericDAO.getOperator(type);
 
-      sqlQueryBuilder.append(" AND l.lname ").append(operator).append(":name");
+      sqlQueryBuilder.append(" AND l.lname ").append(operator).append(" :name");
       sqlQueryBuilder.setParameter("name", GenericDAO.getParameter(type, value));
     }
 
