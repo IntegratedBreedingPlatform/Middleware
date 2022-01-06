@@ -34,15 +34,7 @@ public class LocationSearchRequest {
 
 	}
 
-	public LocationSearchRequest(final String favoriteProgramUUID, final Set<Integer> locationTypeIds, final SqlTextFilter locationNameFilter) {
-		this.favoriteProgramUUID = favoriteProgramUUID;
-		this.locationTypeIds = locationTypeIds;
-		this.locationNameFilter = locationNameFilter;
-	}
-
-	public LocationSearchRequest(final String favoriteProgramUUID, final Set<Integer> locationTypeIds, final List<Integer> locationIds,
-		final List<String> locationAbbreviations, final SqlTextFilter locationNameFilter) {
-		this.favoriteProgramUUID = favoriteProgramUUID;
+	public LocationSearchRequest(final Set<Integer> locationTypeIds, final List<Integer> locationIds, final List<String> locationAbbreviations, final SqlTextFilter locationNameFilter) {
 		this.locationTypeIds = locationTypeIds;
 		this.locationIds = locationIds;
 		this.locationAbbreviations = locationAbbreviations;
