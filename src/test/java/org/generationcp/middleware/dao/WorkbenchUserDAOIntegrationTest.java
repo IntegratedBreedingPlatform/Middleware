@@ -70,14 +70,14 @@ public class WorkbenchUserDAOIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testCountAllProgramEligibleUsers_Ok() {
 		this.prepareTestData();
-		final long count = this.workbenchUserDAO.countAllProgramEligibleUsers(project1.getUniqueID());
+		final long count = this.workbenchUserDAO.countAllProgramEligibleUsers(project1.getUniqueID(), null);
 		assertThat(count, is(1L));
 	}
 
 	@Test
 	public void testGetAllProgramEligibleUsers_Ok() {
 		this.prepareTestData();
-		final List<UserDto> users = this.workbenchUserDAO.getAllProgramEligibleUsers(project1.getUniqueID(), null);
+		final List<UserDto> users = this.workbenchUserDAO.getAllProgramEligibleUsers(project1.getUniqueID(), null, null);
 		assertThat(users, hasSize(1));
 		final UserDto userDto = users.get(0);
 		assertThat(userDto.getUserId(), equalTo(user4.getUserid()));
@@ -90,14 +90,14 @@ public class WorkbenchUserDAOIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testCountAllProgramMembers_Ok() {
 		this.prepareTestData();
-		final long count = this.workbenchUserDAO.countAllProgramMembers(project1.getUniqueID());
+		final long count = this.workbenchUserDAO.countAllProgramMembers(project1.getUniqueID(), null);
 		assertThat(count, is(4L));
 	}
 
 	@Test
 	public void testGetAllProgramMembers_Ok() {
 		this.prepareTestData();
-		final List<ProgramMemberDto> members = this.workbenchUserDAO.getProgramMembers(project1.getUniqueID(), null);
+		final List<ProgramMemberDto> members = this.workbenchUserDAO.getProgramMembers(project1.getUniqueID(), null, null);
 		assertThat(members, hasSize(4));
 		members.forEach(m -> {
 			final WorkbenchUser user = workbenchUserMap.get(m.getUserId());

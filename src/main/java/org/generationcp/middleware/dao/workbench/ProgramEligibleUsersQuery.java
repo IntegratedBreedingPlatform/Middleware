@@ -2,11 +2,15 @@ package org.generationcp.middleware.dao.workbench;
 
 import com.google.common.base.Joiner;
 import org.generationcp.middleware.domain.workbench.RoleType;
+import org.generationcp.middleware.domain.workbench.UserSearchRequest;
+import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class ProgramEligibleUsersQuery {
 
@@ -45,8 +49,7 @@ public class ProgramEligibleUsersQuery {
 		+ "INNER JOIN crop_persons cp ON cp.personid = p.personid " //
 		+ "WHERE u.ustatus = 0 AND cp.crop_name = (select i.crop_type from workbench_project i where i.project_uuid = :programUUID) " //
 		+ "AND u.userid NOT IN (" + GET_ACTIVE_USER_IDS_WITH_ACCESS_TO_A_PROGRAM //
-		+ "  ) " //
-		+ "%s"; //to add order
+		+ "  ) ";
 
 	private static final String SELECT_CLAUSE =
 		"u.userid AS " + USER_ID + ", u.uname as " + USERNAME + ", p.fname as " + FIRST_NAME + ", p.lname as " + LAST_NAME
@@ -70,14 +73,38 @@ public class ProgramEligibleUsersQuery {
 		}
 	}
 
-	public static String getSelectQuery(final Pageable pageable) {
-		return String
-			.format(BASE_SQL, SELECT_CLAUSE, getSortClause(pageable));
+	public static SQLQueryBuilder getSelectQuery(final Pageable pageable, final UserSearchRequest userSearchRequest) {
+		final SQLQueryBuilder queryBuilder = new SQLQueryBuilder(String.format(BASE_SQL, SELECT_CLAUSE));
+		addUserFilters(queryBuilder, userSearchRequest);
+		queryBuilder.append(getSortClause(pageable));
+		return queryBuilder;
 	}
 
-	public static String getCountQuery() {
-		return String
-			.format(BASE_SQL, "COUNT(1) ", "");
+	public static SQLQueryBuilder getCountQuery(final UserSearchRequest userSearchRequest) {
+		final SQLQueryBuilder queryBuilder = new SQLQueryBuilder(String.format(BASE_SQL, "COUNT(1) "));
+		addUserFilters(queryBuilder, userSearchRequest);
+		return queryBuilder;
+	}
+
+	private static void addUserFilters(final SQLQueryBuilder builder, final UserSearchRequest userSearchRequest) {
+		if (userSearchRequest == null) {
+			return;
+		}
+		final String username = userSearchRequest.getUsername();
+		if (!isBlank(username)) {
+			builder.append(" and u.uname like :username ");
+			builder.setParameter("username", "%" + username + "%");
+		}
+		final String fullName = userSearchRequest.getFullName();
+		if (!isBlank(fullName)) {
+			builder.append(" and concat_ws(' ', p.fname, p.lname) like :fullName ");
+			builder.setParameter("fullName", "%" + fullName + "%");
+		}
+		final String email = userSearchRequest.getEmail();
+		if (!isBlank(email)) {
+			builder.append(" and p.pemail like :email ");
+			builder.setParameter("email", "%" + email + "%");
+		}
 	}
 
 }
