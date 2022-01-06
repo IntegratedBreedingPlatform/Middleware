@@ -5,6 +5,7 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchReques
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.util.DAOQueryUtils;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
+import org.generationcp.middleware.pojos.MethodClass;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.generationcp.middleware.util.Util;
@@ -13,6 +14,8 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class BreedingMethodSearchDAOQuery {
 
@@ -78,7 +81,8 @@ public class BreedingMethodSearchDAOQuery {
       + " m.count AS " + COUNT_ALIAS + ", "
       + " m.suffix AS " + SUFFIX_ALIAS;
 
-  private final static String METHOD_CLASS_JOIN_QUERY = " LEFT JOIN cvterm term on term.cvterm_id = m.geneq ";
+  private final static String METHOD_CLASS_JOIN_QUERY = " LEFT JOIN cvterm term on term.cvterm_id = m.geneq "
+      + " AND term.cvterm_id IN (%s) ";
   private final static String PROGRAM_FAVORITE_JOIN_QUERY =
       " LEFT JOIN program_favorites pf on pf.entity_id = m.mid AND entity_type = '"
           + ProgramFavorite.FavoriteType.METHODS.name() + "' AND program_uuid = '%s' ";
@@ -143,7 +147,9 @@ public class BreedingMethodSearchDAOQuery {
 
   private static String getSelectQueryJoins(final String programUUID) {
     final StringBuilder joins = new StringBuilder();
-    joins.append(METHOD_CLASS_JOIN_QUERY);
+    final String methodClassTerms = MethodClass.getIds().stream().map(Objects::toString).collect(Collectors.joining(","));
+    joins.append(String.format(METHOD_CLASS_JOIN_QUERY, methodClassTerms));
+
     if (!StringUtils.isEmpty(programUUID)) {
       joins.append(getProgramFavoriteJoinQuery(programUUID));
     }
