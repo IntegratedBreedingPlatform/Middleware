@@ -97,39 +97,20 @@ public class LocationServiceImpl implements LocationService {
 	public void updateLocation(final Integer locationId, final LocationRequestDto locationRequestDto) {
 		final Location location = this.daoFactory.getLocationDAO().getById(locationId);
 
-		if (StringUtils.isNotBlank(locationRequestDto.getName())) {
 			location.setLname(locationRequestDto.getName());
-		}
-
-		if (StringUtils.isNotBlank(locationRequestDto.getAbbreviation())) {
 			location.setLabbr(locationRequestDto.getAbbreviation());
-		}
-
-		if (locationRequestDto.getType() != null) {
 			location.setLtype(locationRequestDto.getType());
-		}
 
-		if (locationRequestDto.getCountryId() != null) {
 			final Country country = this.daoFactory.getCountryDao().getById(locationRequestDto.getCountryId());
 			location.setCountry(country);
-		}
 
-		if (locationRequestDto.getProvinceId() != null) {
 			final Location province = this.daoFactory.getLocationDAO().getById(locationRequestDto.getProvinceId());
 			location.setProvince(province);
-		}
 
-		if (locationRequestDto.getLatitude() != null) {
 			location.setLatitude(locationRequestDto.getLatitude());
-		}
-
-		if (locationRequestDto.getLongitude() != null) {
 			location.setLongitude(locationRequestDto.getLongitude());
-		}
-
-		if (locationRequestDto.getAltitude() != null) {
 			location.setAltitude(locationRequestDto.getAltitude());
-		}
+
 
 		this.daoFactory.getLocationDAO().saveOrUpdate(location);
 	}
