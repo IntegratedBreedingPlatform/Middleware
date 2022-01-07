@@ -294,6 +294,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			locationDTO.setCountryCode((String) row.get(LocationSearchDAOQuery.COUNTRY_CODE_ALIAS));
 			locationDTO.setProvinceId((Integer) row.get(LocationSearchDAOQuery.PROVINCE_ID_ALIAS));
 			locationDTO.setProvinceName((String) row.get(LocationSearchDAOQuery.PROVINCE_NAME_ALIAS));
+			locationDTO.setDefaultLocation((Boolean) row.get(LocationSearchDAOQuery.LOCATION_DEFAULT_ALIAS));
 
 			final Integer programFavoriteId = (Integer) row.get(LocationSearchDAOQuery.FAVORITE_PROGRAM_ID_ALIAS);
 			if (programFavoriteId != null) {
