@@ -11,19 +11,25 @@
 
 package org.generationcp.middleware.dao;
 
-import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.breedingmethod.BreedingMethodDTO;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodSearchRequest;
+import org.generationcp.middleware.api.program.ProgramFavoriteDTO;
+import org.generationcp.middleware.dao.breedingmethod.BreedingMethodSearchDAOQuery;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
+import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
+import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,11 +37,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link Method}.
@@ -55,6 +64,9 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			+ "\t or suffix like CONCAT('%[ATTRFP.',:variableId,']%') "
 			+ "\t or suffix like CONCAT('%[ATTRMP.',:variableId,']%') ";
 
+	public MethodDAO(final Session session) {
+		super(session);
+	}
 
 	@SuppressWarnings("unchecked")
 	public List<Method> getMethodsByIds(final List<Integer> ids) {
@@ -362,56 +374,55 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		return methodsCodes;
 	}
 
-	public List<Method> filterMethods(final BreedingMethodSearchRequest methodSearchRequest, final Pageable pageable) {
+	public List<BreedingMethodDTO> searchBreedingMethods(final BreedingMethodSearchRequest methodSearchRequest,
+			final Pageable pageable, final String programUUID) {
+		final SQLQueryBuilder queryBuilder = BreedingMethodSearchDAOQuery.getSelectQuery(methodSearchRequest, pageable,
+				programUUID);
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		queryBuilder.addParamsToQuery(query);
+		queryBuilder.addScalarsToQuery(query);
 
-		try {
-			final Criteria criteria = this.setCriteriaFilteredMethods(methodSearchRequest);
-			criteria.addOrder(Order.asc(MethodDAO.METHOD_NAME));
-			if (!Objects.isNull(pageable)) {
-				GenericDAO.addPagination(criteria, pageable);
+		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+		GenericDAO.addPaginationToSQLQuery(query, pageable);
+
+		final List<Map<String, Object>> results = query.list();
+
+		return results.stream().map(row -> {
+			final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO();
+			breedingMethodDTO.setMid((Integer) row.get(BreedingMethodSearchDAOQuery.ID_ALIAS));
+			breedingMethodDTO.setCode((String) row.get(BreedingMethodSearchDAOQuery.ABBREVIATION_ALIAS));
+			breedingMethodDTO.setName((String) row.get(BreedingMethodSearchDAOQuery.NAME_ALIAS));
+			breedingMethodDTO.setDescription((String) row.get(BreedingMethodSearchDAOQuery.DESCRIPTION_ALIAS));
+			breedingMethodDTO.setType((String) row.get(BreedingMethodSearchDAOQuery.TYPE_ALIAS));
+			breedingMethodDTO.setGroup((String) row.get(BreedingMethodSearchDAOQuery.GROUP_ALIAS));
+			breedingMethodDTO.setMethodClass((Integer) row.get(BreedingMethodSearchDAOQuery.CLASS_ID_ALIAS));
+			breedingMethodDTO.setMethodClassName((String) row.get(BreedingMethodSearchDAOQuery.CLASS_NAME_ALIAS));
+			breedingMethodDTO.setNumberOfProgenitors((Integer) row.get(BreedingMethodSearchDAOQuery.NUMBER_OF_PROGENITORS_ALIAS));
+			breedingMethodDTO.setSeparator((String) row.get(BreedingMethodSearchDAOQuery.SEPARATOR_ALIAS));
+			breedingMethodDTO.setPrefix((String) row.get(BreedingMethodSearchDAOQuery.PREFIX_ALIAS));
+			breedingMethodDTO.setCount((String) row.get(BreedingMethodSearchDAOQuery.COUNT_ALIAS));
+			breedingMethodDTO.setSuffix((String) row.get(BreedingMethodSearchDAOQuery.SUFFIX_ALIAS));
+			breedingMethodDTO.setDate((Date) row.get(BreedingMethodSearchDAOQuery.DATE_ALIAS));
+			final Integer programFavoriteId = (Integer) row.get(BreedingMethodSearchDAOQuery.FAVORITE_PROGRAM_ID_ALIAS);
+			if (programFavoriteId != null) {
+				final ProgramFavoriteDTO programFavoriteDTO =
+						new ProgramFavoriteDTO(programFavoriteId, ProgramFavorite.FavoriteType.LOCATION, breedingMethodDTO.getMid(),
+								(String) row.get(BreedingMethodSearchDAOQuery.FAVORITE_PROGRAM_UUID_ALIAS));
+				breedingMethodDTO.setProgramFavorites(Arrays.asList(programFavoriteDTO));
 			}
-			return criteria.list();
-		} catch (final Exception e) {
-			MethodDAO.LOG.error(this.getLogExceptionMessage("filterMethods", "", null, e.getMessage(), "Method"), e);
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("filterMethods", "", null, e.getMessage(), "Method"),
-				e);
-		}
+
+			return breedingMethodDTO;
+		}).collect(Collectors.toList());
 	}
 
-	public Long countFilteredMethods(final BreedingMethodSearchRequest methodSearchRequest) {
-		try {
-			final Criteria criteria = this.setCriteriaFilteredMethods(methodSearchRequest);
-			criteria.setProjection(Projections.rowCount());
-			return ((Long) criteria.uniqueResult()).longValue();
-		} catch (final Exception e) {
-			MethodDAO.LOG.error(this.getLogExceptionMessage("countFilterMethods", "", null, e.getMessage(), "Method"), e);
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("filterMethods", "", null, e.getMessage(), "Method"),
-				e);
-		}
-	}
+	public Long countSearchBreedingMethods(final BreedingMethodSearchRequest methodSearchRequest,
+			final String programUUID) {
+		final SQLQueryBuilder queryBuilder = BreedingMethodSearchDAOQuery.getCountQuery(methodSearchRequest, programUUID);
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		queryBuilder.addParamsToQuery(query);
 
-	private Criteria setCriteriaFilteredMethods(final BreedingMethodSearchRequest methodSearchRequest) {
-		final Criteria criteria = this.getSession().createCriteria(Method.class);
-
-		final List<Integer> methodIds = methodSearchRequest.getMethodIds();
-		if (!CollectionUtils.isEmpty(methodIds)) {
-			criteria.add(Restrictions.in("mid", methodIds));
-		}
-
-		final List<String> methodAbbreviations = methodSearchRequest.getMethodAbbreviations();
-		if (!CollectionUtils.isEmpty(methodAbbreviations)) {
-			criteria.add(Restrictions.in("mcode", methodAbbreviations));
-		}
-
-		final List<String> methodTypes = methodSearchRequest.getMethodTypes();
-		if (!CollectionUtils.isEmpty(methodTypes)) {
-			criteria.add(Restrictions.in("mtype", methodTypes));
-		}
-		final List<String> methodNames = methodSearchRequest.getMethodNames();
-		if (!CollectionUtils.isEmpty(methodNames)) {
-			criteria.add(Restrictions.in("mname", methodNames));
-		}
-		return criteria;
+		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
 	public long countByVariable(final int variableId){

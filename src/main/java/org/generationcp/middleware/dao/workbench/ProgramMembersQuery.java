@@ -2,11 +2,15 @@ package org.generationcp.middleware.dao.workbench;
 
 import com.google.common.base.Joiner;
 import org.generationcp.middleware.domain.workbench.RoleType;
+import org.generationcp.middleware.domain.workbench.UserSearchRequest;
+import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 public class ProgramMembersQuery {
 
@@ -52,8 +56,7 @@ public class ProgramMembersQuery {
 		+ "                                     inner join role r2 on ur1.role_id = r2.id " //
 		+ "                                      where r2.role_type_id = " + RoleType.INSTANCE.getId()
 		+ " and ur1.userid = u.userid))) and " //
-		+ "  u.ustatus = 0 and cp.crop_name = (select wpi.crop_type from workbench_project wpi where wpi.project_uuid = :programUUID) "
-		+ " %s"; // use of ORDER_EXPRESSION -> It's not needed for the count query
+		+ "  u.ustatus = 0 and cp.crop_name = (select wpi.crop_type from workbench_project wpi where wpi.project_uuid = :programUUID) ";
 
 	private static final String PROGRAM_MEMBERS_SELECT_CLAUSE =
 		" distinct u.userid as " + USER_ID + ",  u.uname as " + USERNAME + ", p.fname as " + FIRST_NAME + ", " //
@@ -70,7 +73,7 @@ public class ProgramMembersQuery {
 			final StringBuilder query = new StringBuilder();
 			final List<String> sorts = new ArrayList<>();
 			for (final Sort.Order order : pageable.getSort()) {
-				sorts.add(order.getProperty().replace(".", "") + " " + order.getDirection().toString());
+				sorts.add(order.getProperty() + " " + order.getDirection().toString());
 			}
 			if (!sorts.isEmpty()) {
 				query.append(" ORDER BY ").append(Joiner.on(",").join(sorts));
@@ -81,12 +84,38 @@ public class ProgramMembersQuery {
 		}
 	}
 
-	public static String getSelectQuery(final Pageable pageable) {
-		return String.format(PROGRAM_MEMBERS_BASE_QUERY, PROGRAM_MEMBERS_SELECT_CLAUSE, getSortClause(pageable));
+	public static SQLQueryBuilder getSelectQuery(
+		final Pageable pageable, final UserSearchRequest userSearchRequest) {
+		final SQLQueryBuilder queryBuilder = new SQLQueryBuilder(String.format(PROGRAM_MEMBERS_BASE_QUERY, PROGRAM_MEMBERS_SELECT_CLAUSE));
+		addUserFilters(queryBuilder, userSearchRequest);
+		queryBuilder.append(getSortClause(pageable));
+		return queryBuilder;
 	}
 
-	public static String getCountQuery() {
-		return String.format(PROGRAM_MEMBERS_BASE_QUERY, COUNT_EXPRESSION, "");
+	public static SQLQueryBuilder getCountQuery(final UserSearchRequest userSearchRequest) {
+		final SQLQueryBuilder queryBuilder = new SQLQueryBuilder(String.format(PROGRAM_MEMBERS_BASE_QUERY, COUNT_EXPRESSION));
+		addUserFilters(queryBuilder, userSearchRequest);
+		return queryBuilder;
 	}
 
+	private static void addUserFilters(final SQLQueryBuilder builder, final UserSearchRequest userSearchRequest) {
+		if (userSearchRequest == null) {
+			return;
+		}
+		final String username = userSearchRequest.getUsername();
+		if (!isBlank(username)) {
+			builder.append(" and u.uname like :username ");
+			builder.setParameter("username", "%" + username + "%");
+		}
+		final String fullName = userSearchRequest.getFullName();
+		if (!isBlank(fullName)) {
+			builder.append(" and concat_ws(' ', p.fname, p.lname) like :fullName ");
+			builder.setParameter("fullName", "%" + fullName + "%");
+		}
+		final String roleName = userSearchRequest.getRoleName();
+		if (!isBlank(roleName)) {
+			builder.append(" and r.name like :roleName ");
+			builder.setParameter("roleName", "%" + roleName + "%");
+		}
+	}
 }

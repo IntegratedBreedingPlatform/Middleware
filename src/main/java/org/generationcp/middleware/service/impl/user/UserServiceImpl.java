@@ -5,6 +5,7 @@ import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
+import org.generationcp.middleware.domain.workbench.UserSearchRequest;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -486,25 +487,25 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final Pageable pageable) {
-		return this.workbenchDaoFactory.getWorkbenchUserDAO().getProgramMembers(programUUID, pageable);
+	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final UserSearchRequest userSearchRequest,
+		final Pageable pageable) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getProgramMembers(programUUID, userSearchRequest, pageable);
 	}
 
 	@Override
-	public long countAllProgramMembers(final String programUUID) {
-		return this.workbenchDaoFactory.getWorkbenchUserDAO().countAllProgramMembers(programUUID);
+	public long countAllProgramMembers(final String programUUID, final UserSearchRequest userSearchRequest) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().countAllProgramMembers(programUUID, userSearchRequest);
 	}
 
 	@Override
-	public List<UserDto> getProgramMembersEligibleUsers(final String programUUID, final Pageable pageable) {
-		return this.workbenchDaoFactory.getWorkbenchUserDAO()
-			.getAllProgramEligibleUsers(programUUID, pageable);
+	public List<UserDto> getProgramMembersEligibleUsers(final String programUUID, final UserSearchRequest userSearchRequest,
+		final Pageable pageable) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().getAllProgramEligibleUsers(programUUID, userSearchRequest, pageable);
 	}
 
 	@Override
-	public long countProgramMembersEligibleUsers(final String programUUID) {
-		return this.workbenchDaoFactory.getWorkbenchUserDAO()
-			.countAllProgramEligibleUsers(programUUID);
+	public long countProgramMembersEligibleUsers(final String programUUID, final UserSearchRequest userSearchRequest) {
+		return this.workbenchDaoFactory.getWorkbenchUserDAO().countAllProgramEligibleUsers(programUUID, userSearchRequest);
 	}
 
 	private UserRole buildNewUserRole(final WorkbenchUser user, final UserRoleDto userRoleDto) {
