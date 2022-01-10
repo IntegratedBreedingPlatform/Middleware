@@ -102,9 +102,9 @@
 				information_schema.routines
 				WHERE
 				routine_schema = DATABASE()
-				AND specific_name = 'getNumberInName';
+				AND specific_name = 'GetNumberInName';
 			</sqlCheck>
 		</preConditions>
-		<dropProcedure procedureName="getNumberInName"/>
+		<dropProcedure procedureName="GetNumberInName"/>
 	</changeSet>
 </databaseChangeLog>
