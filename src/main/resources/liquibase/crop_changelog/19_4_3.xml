@@ -94,17 +94,8 @@
 	</changeSet>
 
 	<changeSet  author="mderamos"  id="19.4.3-7">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT
-				COUNT(*)
-				FROM
-				information_schema.routines
-				WHERE
-				routine_schema = DATABASE()
-				AND specific_name = 'GetNumberInName';
-			</sqlCheck>
-		</preConditions>
-		<dropProcedure procedureName="GetNumberInName"/>
+		<sql dbms="mysql" splitStatements="false">
+			DROP FUNCTION IF EXISTS GetNumberInName
+		</sql>
 	</changeSet>
 </databaseChangeLog>
