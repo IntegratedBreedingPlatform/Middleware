@@ -80,7 +80,7 @@ public class ReleaseNoteServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(actualReleaseNote.getId(), is(expectedReleaseNote.getId()));
 
 		//Mark the release note so it won't be shown again
-		this.releaseNoteService.dontShowAgain(this.userId);
+		this.releaseNoteService.showAgain(this.userId, false);
 
 		//Should not return the release note 'cause the user don't want to see it again
 		assertFalse(this.releaseNoteService.shouldShowReleaseNote(this.userId));

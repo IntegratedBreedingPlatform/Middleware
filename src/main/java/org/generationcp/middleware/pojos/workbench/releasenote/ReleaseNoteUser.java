@@ -61,8 +61,8 @@ public class ReleaseNoteUser implements Serializable {
 		return this.showAgain;
 	}
 
-	public void dontShowAgain() {
-		this.showAgain = Boolean.FALSE;
+	public void setShowAgain(final boolean showAgain) {
+		this.showAgain = showAgain;
 	}
 
 	@Override

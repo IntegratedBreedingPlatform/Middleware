@@ -59,10 +59,10 @@ public class ReleaseNoteServiceImpl implements ReleaseNoteService {
 	}
 
 	@Override
-	public void dontShowAgain(final Integer userId) {
+	public void showAgain(final Integer userId, final boolean showAgain) {
 		this.getLatestReleaseNote().ifPresent(releaseNote ->
 			this.getReleaseNoteUser(releaseNote.getId(), userId).ifPresent(releaseNoteUser -> {
-				releaseNoteUser.dontShowAgain();
+				releaseNoteUser.setShowAgain(showAgain);
 				this.workbenchDaoFactory.getReleaseNoteUserDAO().save(releaseNoteUser);
 		}));
 	}
