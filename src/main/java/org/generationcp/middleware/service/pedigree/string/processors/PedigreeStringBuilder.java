@@ -14,6 +14,8 @@ import com.google.common.base.Preconditions;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 
+import static org.generationcp.middleware.util.Debug.debug;
+
 /**
  * Enables us to construct a Pedigree string from a germplasm and its ancestor history.
  *
@@ -35,7 +37,7 @@ public class PedigreeStringBuilder {
 			final Germplasm germplasm = germplasmNode.getGermplasm();
 	
 			if(germplasmNode != null && germplasmNode.getGermplasm() != null && germplasmNode.getGermplasm().getGid() != null) {
-				LOG.debug("Building pedigree tree for germlasm with gid - '{}'", germplasmNode.getGermplasm().getGid());
+				debug("Building pedigree tree for germlasm with gid - '{}'", germplasmNode.getGermplasm().getGid());
 			}
 	
 			final Optional<PedigreeString> fixedLineName = PedigreeStringGeneratorUtil.getFixedLineName(germplasmNode, fixedLineNameResolver);
@@ -56,7 +58,7 @@ public class PedigreeStringBuilder {
 			final BreedingMethodProcessor methodProcessor = BreedingMethodFactory.getMethodProcessor(germplasmNode);
 			return methodProcessor.processGermplasmNode(germplasmNode, level, fixedLineNameResolver, originatesFromComplexCross);
 		} finally {
-			monitor.stop();
+			debug("" + monitor.stop());
 		}
 	}
 
