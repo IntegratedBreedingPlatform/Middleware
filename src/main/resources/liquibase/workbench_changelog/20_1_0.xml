@@ -51,4 +51,35 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="cuenyad" id="v20.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM workbench_tool WHERE name = 'crop_settings_manager'
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM workbench_tool WHERE name = 'manage_metadata'
+				</sqlCheck>
+			</and>
+        </preConditions>
+		<comment>
+			Replace Manage Metadata by crop settings manager sidebar item.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_tool (`name`, `group_name`, `title`, `version`, `tool_type`, `path`, `parameter`, `user_tool`)
+			VALUES ('crop_settings_manager', 'crop_settings_manager', 'Manage Crop Settings', '1.0', 'WEB', '/ibpworkbench/controller/jhipster#crop-settings-manager', '', 0);
+
+			SET @sidebar_category_id = (SELECT sidebar_category_id FROM workbench_sidebar_category where sidebar_category_name = 'crop_administration');
+
+			INSERT INTO workbench_sidebar_category_link (`tool_name`, `sidebar_category_id`, `sidebar_link_name`, `sidebar_link_title`, `rank`)
+			VALUES ('crop_settings_manager', @sidebar_category_id, 'crop_settings_manager', 'Manage Crop Settings', 2);
+
+			SET @workbench_sidebar_category_link_id =  (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'crop_settings_manager');
+			UPDATE PERMISSION SET name = 'MANAGE_CROP_SETTINGS', description = 'Manage Crop Settings', workbench_sidebar_category_link_id = @workbench_sidebar_category_link_id WHERE (name = 'MANAGE_CROP_METADATA');
+
+			DELETE FROM workbench_sidebar_category_link WHERE tool_name = 'manage_metadata';
+			DELETE FROM workbench_tool WHERE name = 'manage_metadata';
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

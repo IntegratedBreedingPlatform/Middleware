@@ -26,39 +26,16 @@ public class BreedingMethodMapper {
 	}
 
 	public void mapForUpdate(final BreedingMethodNewRequest from, final Method to) {
-		if (!isBlank(from.getCode())) {
 			to.setMcode(from.getCode().toUpperCase());
-		}
-		if (!isBlank(from.getName())) {
 			to.setMname(from.getName());
-		}
-		if (!isBlank(from.getDescription())) {
 			to.setMdesc(from.getDescription());
-		}
-		if (!isBlank(from.getType())) {
 			to.setMtype(from.getType());
-		}
-		if (!isBlank(from.getGroup())) {
 			to.setMgrp(from.getGroup());
-		}
-		if (from.getMethodClass() != null) {
 			to.setGeneq(from.getMethodClass());
-		}
-		if (from.getNumberOfProgenitors() != null) {
 			to.setMprgn(from.getNumberOfProgenitors());
-		}
-
-		if (!isBlank(from.getSeparator())) {
 			to.setSeparator(from.getSeparator());
-		}
-		if (!isBlank(from.getPrefix())) {
 			to.setPrefix(from.getPrefix());
-		}
-		if (!isBlank(from.getCount())) {
 			to.setCount(from.getCount());
-		}
-		if (!isBlank(from.getSuffix())) {
 			to.setSuffix(from.getSuffix());
-		}
 	}
 }
