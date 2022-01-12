@@ -403,7 +403,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			breedingMethodDTO.setPrefix((String) row.get(BreedingMethodSearchDAOQuery.PREFIX_ALIAS));
 			breedingMethodDTO.setCount((String) row.get(BreedingMethodSearchDAOQuery.COUNT_ALIAS));
 			breedingMethodDTO.setSuffix((String) row.get(BreedingMethodSearchDAOQuery.SUFFIX_ALIAS));
-			breedingMethodDTO.setDate((Date) row.get(BreedingMethodSearchDAOQuery.DATE_ALIAS));
+			breedingMethodDTO.setCreationDate((Date) row.get(BreedingMethodSearchDAOQuery.DATE_ALIAS));
 			final Integer programFavoriteId = (Integer) row.get(BreedingMethodSearchDAOQuery.FAVORITE_PROGRAM_ID_ALIAS);
 			if (programFavoriteId != null) {
 				final ProgramFavoriteDTO programFavoriteDTO =
