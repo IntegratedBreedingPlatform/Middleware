@@ -315,8 +315,6 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 	}
 
 	private Map<Integer, Location> getLocationsMap(final List<Integer> locationDbIds) {
-		final LocationSearchRequest request = new LocationSearchRequest();
-		request.setLocationIds(locationDbIds);
 		return locationDbIds.isEmpty() ?
 			Collections.emptyMap() : this.daoFactory.getLocationDAO().getByIds(locationDbIds).stream()
 			.collect(Collectors.toMap(Location::getLocid, Function.identity()));
