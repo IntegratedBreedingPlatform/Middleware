@@ -14,7 +14,7 @@ public class BreedingMethodDTO extends BreedingMethodNewRequest {
 	private Integer mid;
 	private Boolean isBulkingMethod;
 	private Boolean isFavorite;
-	private Date date;
+	private Date creationDate;
 	private String methodClassName;
 
 	private List<ProgramFavoriteDTO> programFavorites;
@@ -65,12 +65,12 @@ public class BreedingMethodDTO extends BreedingMethodNewRequest {
 		isFavorite = favorite;
 	}
 
-	public Date getDate() {
-		return date;
+	public Date getCreationDate() {
+		return creationDate;
 	}
 
-	public void setDate(final Date date) {
-		this.date = date;
+	public void setCreationDate(final Date creationDate) {
+		this.creationDate = creationDate;
 	}
 
 	public String getMethodClassName() {
