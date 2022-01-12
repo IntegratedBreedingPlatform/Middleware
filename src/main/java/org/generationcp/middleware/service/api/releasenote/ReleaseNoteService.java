@@ -10,6 +10,6 @@ public interface ReleaseNoteService {
 
 	Optional<ReleaseNote> getLatestReleaseNote();
 
-	void dontShowAgain(Integer userId);
+	void showAgain(Integer userId, boolean showAgain);
 
 }

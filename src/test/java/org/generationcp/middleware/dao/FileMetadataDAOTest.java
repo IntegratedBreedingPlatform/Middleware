@@ -15,6 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static java.util.Collections.singletonList;
@@ -47,8 +48,7 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 		final Session session = this.sessionProvder.getSession();
 
 		if (this.fileMetadataDAO == null) {
-			this.fileMetadataDAO = new FileMetadataDAO();
-			this.fileMetadataDAO.setSession(session);
+			this.fileMetadataDAO = new FileMetadataDAO(session);
 		}
 		if (this.cvTermDao == null) {
 			this.cvTermDao = new CVTermDao();
@@ -144,4 +144,22 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 		));
 		assertThat(fileUntouched.getGermplasm().getGermplasmUUID(), is(this.germplasm1.getGermplasmUUID()));
 	}
+
+	@Test
+  public void testGetByGidsAndUpdateGid() {
+		assertThat(this.fileMetadataDAO.getByGids(Arrays.asList(this.germplasm1.getGid())), hasSize(3));
+
+		final Germplasm germplasm = GermplasmTestDataInitializer
+				.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmDao.save(germplasm);
+		final List<String> targetFileUUIDs = new ArrayList();
+		targetFileUUIDs.add(this.fileMetadata1.getFileUUID());
+		targetFileUUIDs.add(this.fileMetadata2.getFileUUID());
+		targetFileUUIDs.add(this.fileMetadata3.getFileUUID());
+		this.fileMetadataDAO.updateGid(germplasm.getGid(), targetFileUUIDs);
+
+		assertThat(this.fileMetadataDAO.getByGids(Arrays.asList(this.germplasm1.getGid())), hasSize(0));
+		assertThat(this.fileMetadataDAO.getByGids(Arrays.asList(germplasm.getGid())), hasSize(3));
+	}
+
 }
