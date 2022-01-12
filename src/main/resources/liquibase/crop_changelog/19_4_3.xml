@@ -98,4 +98,16 @@
 			DROP FUNCTION IF EXISTS GetNumberInName
 		</sql>
 	</changeSet>
+
+	<changeSet author="corina" id="v19.4.3-8">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) > 0 FROM listnms WHERE SUBSTRING(listdate,5,4)='0000';
+			</sqlCheck>
+		</preConditions>
+        <comment> Correct invalid listdate values. IBP-5327 </comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE listnms SET listdate=CAST(CONCAT(SUBSTRING(listdate,1,4),'0101') AS UNSIGNED) WHERE SUBSTRING(listdate,5,4)='0000';
+		</sql>
+	</changeSet>
 </databaseChangeLog>
