@@ -31,7 +31,7 @@ public interface LocationService {
 	 */
 	long countFilteredLocations(LocationSearchRequest locationSearchRequest, final String programUUID);
 
-  List<org.generationcp.middleware.api.location.Location> getLocations(LocationSearchRequest locationSearchRequest, Pageable pageable);
+	List<org.generationcp.middleware.api.location.Location> getLocations(LocationSearchRequest locationSearchRequest, Pageable pageable);
 
 	void deleteLocation(Integer locationId);
 
