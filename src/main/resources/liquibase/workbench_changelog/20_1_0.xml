@@ -53,9 +53,14 @@
 
 	<changeSet author="cuenyad" id="v20.1.0-3">
 		<preConditions onFail="MARK_RAN">
-			  <sqlCheck expectedResult="0">
-                SELECT count(*) FROM workbench_tool WHERE name = 'crop_settings_manager'
-            </sqlCheck>
+			<and>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM workbench_tool WHERE name = 'crop_settings_manager'
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM workbench_tool WHERE name = 'manage_metadata'
+				</sqlCheck>
+			</and>
         </preConditions>
 		<comment>
 			Replace Manage Metadata by crop settings manager sidebar item.
