@@ -54,8 +54,10 @@ import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.Util;
 import org.generationcp.middleware.util.VariableValueUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,6 +140,12 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private FileMetadataService fileMetadataService;
+
+	@Autowired
+	private PedigreeService pedigreeService;
+
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
 
 	private final GermplasmMethodValidator germplasmMethodValidator;
 
@@ -337,7 +345,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final Map<Integer, List<GermplasmNameDto>> namesByGid = names.stream().collect(
 				groupingBy(GermplasmNameDto::getGid, HashMap::new, Collectors.toCollection(ArrayList::new))
 			);
-			germplasmDtos.forEach(g -> g.setNames(namesByGid.get(g.getGid())));
+
+			final Map<Integer, String> crossExpansionsBulk =
+				this.pedigreeService.getCrossExpansionsBulk(new HashSet<>(gids), null, this.crossExpansionProperties);
+
+			germplasmDtos.forEach(g -> {
+				g.setNames(namesByGid.get(g.getGid()));
+				g.setPedigreeString(crossExpansionsBulk.get(g.getGid()));
+			});
 		}
 
 		return germplasmDtos;
