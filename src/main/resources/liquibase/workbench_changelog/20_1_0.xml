@@ -58,7 +58,7 @@
             </sqlCheck>
         </preConditions>
 		<comment>
-			Add crop settings manager sidebar item.
+			Replace Manage Metadata by crop settings manager sidebar item.
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO workbench_tool (`name`, `group_name`, `title`, `version`, `tool_type`, `path`, `parameter`, `user_tool`)
@@ -71,21 +71,8 @@
 
 			SET @workbench_sidebar_category_link_id =  (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'crop_settings_manager');
 			UPDATE PERMISSION SET name = 'MANAGE_CROP_SETTINGS', description = 'Manage Crop Settings', workbench_sidebar_category_link_id = @workbench_sidebar_category_link_id WHERE (name = 'MANAGE_CROP_METADATA');
-		</sql>
-	</changeSet>
 
-	<changeSet author="cuenyad" id="v20.1.0-4">
-		<preConditions onFail="MARK_RAN">
-			  <sqlCheck expectedResult="1">
-                SELECT count(*) FROM workbench_tool WHERE name = 'manage_metadata'
-            </sqlCheck>
-        </preConditions>
-		<comment>
-			Delete Manage Metadata sidebar item
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
 			DELETE FROM workbench_sidebar_category_link WHERE tool_name = 'manage_metadata';
-
 			DELETE FROM workbench_tool WHERE name = 'manage_metadata';
 		</sql>
 	</changeSet>
