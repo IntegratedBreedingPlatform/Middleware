@@ -260,49 +260,4 @@
 			WHERE permission_id IN (SELECT p.permission_id FROM permission p WHERE p.name in ('LISTS', 'MANAGE_GERMPLASM_LISTS'));
 		</sql>
 	</changeSet>
-
-	<changeSet author="lkovacic" id="v19.4.0-9">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<tableExists tableName="feedback"></tableExists>
-			</not>
-		</preConditions>
-		<comment>
-			Create 'feedback' table
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			create table feedback (
-			feedback_id int auto_increment
-			primary key,
-			feature             varchar(50)          not null,
-			enabled             tinyint(1) default 1 not null,
-			constraint feedback_feature_uindex
-			unique (feature)
-			);
-		</sql>
-	</changeSet>
-
-	<changeSet author="lkovacic" id="v19.4.0-10">
-		<preConditions onFail="MARK_RAN">
-			<not>
-				<tableExists tableName="feedback_user"></tableExists>
-			</not>
-		</preConditions>
-		<comment>
-			Create 'feedback_user' table
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			create table feedback_user (
-			feedback_id int                  not null,
-			user_id     int                  not null,
-			show_again  tinyint(1) default 1 not null,
-			primary key (user_id, feedback_id),
-			constraint feedback_users_userid_fk
-			foreign key (user_id) references users (userid),
-			constraint feedback_user_feedback_feedback_id_fk
-			foreign key (feedback_id) references feedback (feedback_id)
-			);
-		</sql>
-	</changeSet>
-
 </databaseChangeLog>

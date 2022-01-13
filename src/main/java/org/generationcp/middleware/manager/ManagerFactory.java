@@ -13,6 +13,8 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
+import org.generationcp.middleware.api.file.FileMetadataService;
+import org.generationcp.middleware.api.file.FileMetadataServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
@@ -390,6 +392,10 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmListDataService getGermplasmListDataService() {
 		return new GermplasmListDataServiceImpl(this.sessionProvider);
+	}
+
+	public FileMetadataService getFileMetadataService() {
+		return new FileMetadataServiceImpl(this.sessionProvider);
 	}
 
 }
