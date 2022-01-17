@@ -370,8 +370,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.map(AddGermplasmEntryModel::getGid)
 			.collect(toSet());
 
+		final Integer level = germplasmList.getGenerationLevel();
 		final Map<Integer, String> crossExpansionsBulk =
-			this.pedigreeService.getCrossExpansionsBulk(gids, null, this.crossExpansionProperties);
+			this.pedigreeService.getCrossExpansionsBulk(gids, level, this.crossExpansionProperties);
 
 		final Map<Integer, String> plotCodeValuesIndexedByGids = this.germplasmService.getPlotCodeValues(gids);
 

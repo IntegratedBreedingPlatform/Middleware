@@ -113,6 +113,9 @@ public class GermplasmList implements Serializable {
 	@Column(name = "notes")
 	private String notes;
 
+	@Column(name = "generation_level")
+	private Integer generationLevel;
+
 	@OneToMany(mappedBy = "list", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
 	@OrderBy("entryId asc")
 	private List<GermplasmListData> listData = new ArrayList<>();
@@ -338,6 +341,14 @@ public class GermplasmList implements Serializable {
 
 	public void setNotes(final String notes) {
 		this.notes = notes;
+	}
+
+	public Integer getGenerationLevel() {
+		return generationLevel;
+	}
+
+	public void setGenerationLevel(final Integer generationLevel) {
+		this.generationLevel = generationLevel;
 	}
 
 	public List<GermplasmListData> getListData() {

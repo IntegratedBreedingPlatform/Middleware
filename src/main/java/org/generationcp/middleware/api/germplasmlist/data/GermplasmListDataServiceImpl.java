@@ -227,6 +227,10 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 
 	@Override
 	public void fillWithCrossExpansion(final Integer listId, final Integer level) {
+		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
+		germplasmList.setGenerationLevel(level);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+
 		final List<GermplasmListData> germplasmListData = this.daoFactory.getGermplasmListDataDAO().getByListId(listId);
 		final Set<Integer> gids = germplasmListData.stream().map(GermplasmListData::getGid).collect(toSet());
 
