@@ -15,6 +15,7 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListDataDefaultView;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
@@ -241,6 +242,20 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		}
 		germplasmList.setView(updatedView);
 		this.daoFactory.getGermplasmListDAO().save(germplasmList);
+	}
+
+	@Override
+	public void fillWithCrossExpansion(final Integer listId, final Integer level) {
+		final List<GermplasmListData> germplasmListData = this.daoFactory.getGermplasmListDataDAO().getByListId(listId);
+		final Set<Integer> gids = germplasmListData.stream().map(GermplasmListData::getGid).collect(toSet());
+
+		final Map<Integer, String> pedigreeStringMap =
+			this.pedigreeService.getCrossExpansionsBulk(gids, level, this.crossExpansionProperties);
+
+		for (final GermplasmListData entry : germplasmListData) {
+			entry.setGroupName(pedigreeStringMap.get(entry.getGid()));
+			this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(entry);
+		}
 	}
 
 	@Override
