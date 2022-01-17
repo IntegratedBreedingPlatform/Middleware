@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -78,31 +77,13 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			return response;
 		}
 
-		final boolean hasCrossData = view
-			.stream()
-			.anyMatch(c -> GermplasmListStaticColumns.CROSS.getTermId().equals(c.getStaticId()) || this.viewHasParentData(c));
-
-		if (hasCrossData) {
+		if (view.stream().anyMatch(this::viewHasParentData)) {
 			final Set<Integer> gids = response
 				.stream()
 				.map(r -> (Integer) r.getData().get(GermplasmListStaticColumns.GID.name()))
-				.collect(Collectors.toSet());
+				.collect(toSet());
 
-			final Map<Integer, String> pedigreeStringMap =
-				this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
-
-			response.forEach(r -> {
-				final Integer gid = (Integer) r.getData().get(GermplasmListStaticColumns.GID.name());
-				r.getData().put(GermplasmListStaticColumns.CROSS.getName(), pedigreeStringMap.get(gid));
-			});
-
-			final boolean hasParentsData = view
-				.stream()
-				.anyMatch(this::viewHasParentData);
-
-			if (hasParentsData) {
-				this.addParentsFromPedigreeTable(gids, response);
-			}
+			this.addParentsFromPedigreeTable(gids, response);
 		}
 
 		return response;
