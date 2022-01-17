@@ -205,7 +205,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final String description = request.getDescription() != null ? request.getDescription() : StringUtils.EMPTY;
 
 		GermplasmList germplasmList = new GermplasmList(null, request.getListName(), Long.valueOf(this.dateFormat.format(request.getCreationDate())),
-			request.getListType(), currentUserId, description, parent, request.getStatus(), request.getNotes());
+			request.getListType(), currentUserId, description, parent, request.getStatus(), request.getNotes(), null);
 		germplasmList.setProgramUUID(request.getProgramUUID());
 		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
 		request.setListId(germplasmList.getId());
@@ -438,11 +438,18 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public GermplasmListDto cloneGermplasmList(final Integer listId, final GermplasmListDto listDto,
-		final Integer loggedInUserId) {
+	public GermplasmListDto cloneGermplasmList(final Integer listId, final GermplasmListDto listDto, final Integer loggedInUserId) {
+
+		// copy info from request
 		final GermplasmList destinationList = this.createGermplasmList(listDto, loggedInUserId);
 		final Integer destinationListId = destinationList.getId();
 
+		// copy other fields not coming in request
+		final GermplasmList originList = this.daoFactory.getGermplasmListDAO().getById(listId);
+		destinationList.setGenerationLevel(originList.getGenerationLevel());
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(destinationList);
+
+		// copy data
 		this.daoFactory.getGermplasmListDataDAO().copyEntries(listId, destinationListId);
 		this.daoFactory.getGermplasmListDataViewDAO().copyEntries(listId, destinationListId);
 		this.daoFactory.getGermplasmListDataDetailDAO().copyEntries(listId, destinationListId, loggedInUserId);
