@@ -10,12 +10,19 @@ import org.generationcp.middleware.pojos.workbench.feedback.Feedback;
 import org.generationcp.middleware.pojos.workbench.feedback.FeedbackFeature;
 import org.generationcp.middleware.pojos.workbench.feedback.FeedbackUser;
 import org.generationcp.middleware.service.api.feedback.FeedbackService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
 public class FeedbackServiceImpl implements FeedbackService {
+
+	@Value("#{new Boolean('${feedback.enabled}')}")
+	private boolean feedbackEnabled;
+
+	@Value("${feedback.show.after.feature.views}")
+	private int showFeedbackAfterFeatureViews;
 
   private final WorkbenchDaoFactory workbenchDaoFactory;
 
@@ -25,6 +32,10 @@ public class FeedbackServiceImpl implements FeedbackService {
 
   @Override
   public boolean shouldShowFeedback(final FeedbackFeature feature) {
+  	if (!this.feedbackEnabled) {
+  		return false;
+		}
+
     final Optional<Feedback> optionalFeedback = this.getFeedback(feature);
     if (!optionalFeedback.isPresent()) {
       return false;
@@ -32,19 +43,32 @@ public class FeedbackServiceImpl implements FeedbackService {
 
     final Feedback feedback = optionalFeedback.get();
     final Optional<FeedbackUser> optionalFeedbackUser = this.getFeedbackUser(feedback);
+    final FeedbackUser feedbackUser;
     if (!optionalFeedbackUser.isPresent()) {
-      return true;
+      feedbackUser = this.createFeedback(feedback);
+			this.workbenchDaoFactory.getFeedbackUserDAO().save(feedbackUser);
+			// We check here if the feature should be shown just in case that the amount of feature views is set to 1
+			return this.checkFeedbackShouldBeShown(feedbackUser);
     }
-    return optionalFeedbackUser.get().getShowAgain();
+
+		feedbackUser = optionalFeedbackUser.get();
+    if (!feedbackUser.getShowAgain()) {
+    	return false;
+		}
+
+		feedbackUser.hasSeen();
+    this.workbenchDaoFactory.getFeedbackUserDAO().save(feedbackUser);
+
+    return this.checkFeedbackShouldBeShown(feedbackUser);
   }
 
   @Override
   public void dontShowAgain(final FeedbackFeature feature) {
   	this.getFeedback(feature).ifPresent(feedback -> {
-			final FeedbackUser feedbackUser =
-					this.getFeedbackUser(feedback).orElseGet(() -> this.createFeedback(feedback));
-			feedbackUser.dontShowAgain();
-			this.workbenchDaoFactory.getFeedbackUserDAO().save(feedbackUser);
+			this.getFeedbackUser(feedback).ifPresent(feedbackUser -> {
+				feedbackUser.dontShowAgain();
+				this.workbenchDaoFactory.getFeedbackUserDAO().save(feedbackUser);
+			});
 		});
   }
 
@@ -63,5 +87,9 @@ public class FeedbackServiceImpl implements FeedbackService {
     return this.workbenchDaoFactory.getFeedbackUserDAO()
         .getByFeedbackAndUserId(feedback, ContextHolder.getLoggedInUserId());
   }
+
+  private boolean checkFeedbackShouldBeShown(final FeedbackUser feedbackUser) {
+  	return (feedbackUser.getViews() >= this.showFeedbackAfterFeatureViews);
+	}
 
 }

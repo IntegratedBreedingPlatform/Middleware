@@ -31,8 +31,11 @@ public class FeedbackUser implements Serializable {
 	@JoinColumn(name = "user_id", updatable = false, nullable = false)
 	private WorkbenchUser user;
 
+	@Column(name = "views", nullable = false)
+	private Integer views;
+
 	@Column(name = "show_again", nullable = false)
-	private Boolean showAgain = true;
+	private Boolean showAgain;
 
 	private FeedbackUser() {
 	}
@@ -40,7 +43,8 @@ public class FeedbackUser implements Serializable {
 	public FeedbackUser(final Feedback feedback, final WorkbenchUser user) {
 		this.feedback = feedback;
 		this.user = user;
-		this.showAgain = Boolean.FALSE;
+		this.showAgain = Boolean.TRUE;
+		this.views = 1;
 	}
 
 	public WorkbenchUser getUser() {
@@ -57,6 +61,14 @@ public class FeedbackUser implements Serializable {
 
 	public void dontShowAgain() {
 		this.showAgain = Boolean.FALSE;
+	}
+
+	public Integer getViews() {
+		return views;
+	}
+
+	public void hasSeen() {
+		this.views += 1;
 	}
 
 	@Override
