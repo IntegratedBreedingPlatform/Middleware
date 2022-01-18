@@ -11,7 +11,7 @@
 			</sqlCheck>
 		</preConditions>
 		<comment>
-			Add Lock/unlock lists not owned by user permission
+			Update description of DELETE_GERMPLASM_LIST permission
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE PERMISSION SET name = 'DELETE_GERMPLASM_LIST', description = 'Delete lists not owned by user' WHERE (name = 'DELETE_GERMPLASM_LIST');
