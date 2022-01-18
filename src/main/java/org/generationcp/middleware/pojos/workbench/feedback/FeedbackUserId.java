@@ -41,7 +41,7 @@ public class FeedbackUserId implements Serializable {
 		if (obj == this) {
 			return true;
 		}
-		if (!(obj instanceof CropPerson)) {
+		if (!(obj instanceof FeedbackUserId)) {
 			return false;
 		}
 

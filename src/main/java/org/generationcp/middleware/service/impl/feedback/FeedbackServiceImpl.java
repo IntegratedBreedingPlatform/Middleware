@@ -19,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FeedbackServiceImpl implements FeedbackService {
 
 	@Value("#{new Boolean('${feedback.enabled}')}")
-	private boolean feedbackEnabled;
+	private boolean feedbackFeatureEnabled;
 
 	@Value("${feedback.show.after.feature.views}")
 	private int showFeedbackAfterFeatureViews;
@@ -32,7 +32,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 
 	@Override
 	public boolean shouldShowFeedback(final FeedbackFeature feature) {
-		if (!this.feedbackEnabled) {
+		if (!this.feedbackFeatureEnabled) {
 			return false;
 		}
 

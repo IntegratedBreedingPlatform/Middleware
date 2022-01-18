@@ -75,7 +75,7 @@ public class Feedback implements Serializable {
 		if (obj == this) {
 			return true;
 		}
-		if (!(obj instanceof WorkbenchUser)) {
+		if (!(obj instanceof Feedback)) {
 			return false;
 		}
 

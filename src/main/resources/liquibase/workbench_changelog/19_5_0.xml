@@ -4,7 +4,7 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="lkovacic" id="v20.1.0-1">
+	<changeSet author="lkovacic" id="v19.5.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="feedback"></tableExists>
@@ -25,7 +25,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v20.1.0-2">
+	<changeSet author="lkovacic" id="v19.5.0-2">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<tableExists tableName="feedback"></tableExists>
@@ -42,7 +42,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v20.1.0-3">
+	<changeSet author="lkovacic" id="v19.5.0-3">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<tableExists tableName="feedback"></tableExists>
