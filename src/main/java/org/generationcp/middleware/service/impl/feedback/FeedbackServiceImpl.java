@@ -42,6 +42,10 @@ public class FeedbackServiceImpl implements FeedbackService {
 		}
 
 		final Feedback feedback = optionalFeedback.get();
+		if (!feedback.isEnabled()) {
+			return false;
+		}
+
 		final Optional<FeedbackUser> optionalFeedbackUser = this.getFeedbackUser(feedback);
 		final FeedbackUser feedbackUser;
 		if (!optionalFeedbackUser.isPresent()) {
