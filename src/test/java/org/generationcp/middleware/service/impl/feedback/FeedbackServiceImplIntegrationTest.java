@@ -56,7 +56,7 @@ public class FeedbackServiceImplIntegrationTest extends IntegrationTestBase {
 
 	public WorkbenchUser createUser() {
 		final Person person = new Person(RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10),
-				RandomStringUtils.randomAlphabetic(10));
+			RandomStringUtils.randomAlphabetic(10));
 		person.setEmail(RandomStringUtils.randomAlphabetic(10));
 		person.setContact(RandomStringUtils.randomAlphabetic(10));
 		person.setExtension(RandomStringUtils.randomAlphabetic(10));
@@ -73,8 +73,8 @@ public class FeedbackServiceImplIntegrationTest extends IntegrationTestBase {
 		this.personDAO.save(person);
 
 		final WorkbenchUser user =
-				new WorkbenchUser(null, 1, 0, 1, 1, RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), person,
-						20150101, 20150101);
+			new WorkbenchUser(null, 1, 0, 1, 1, RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), person,
+				20150101, 20150101);
 
 		return this.workbenchUserDAO.save(user);
 	}

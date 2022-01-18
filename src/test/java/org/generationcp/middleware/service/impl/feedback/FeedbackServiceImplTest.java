@@ -244,5 +244,4 @@ public class FeedbackServiceImplTest {
 		Mockito.verifyNoMoreInteractions(this.workbenchUserDAO);
 	}
 
-
 }

@@ -91,7 +91,7 @@ public class FeedbackUser implements Serializable {
 		final FeedbackUser otherObj = (FeedbackUser) obj;
 
 		return new EqualsBuilder().append(this.feedback.getId(), otherObj.getFeedback().getId())
-				.append(this.user.getUserid(), otherObj.getUser().getUserid()).isEquals();
+			.append(this.user.getUserid(), otherObj.getUser().getUserid()).isEquals();
 	}
 
 }
