@@ -6,7 +6,9 @@
 
 	<changeSet author="nahuel" id="v19.5.0-1">
 		<preConditions onFail="MARK_RAN">
-
+			<not>
+				<columnExists tableName="listnms" columnName="generation_level" />
+			</not>
 		</preConditions>
 		<comment>
 			Add generation_level column: indicates preferred cross expansion (pedigree) level for the entire list
