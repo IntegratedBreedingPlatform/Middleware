@@ -73,8 +73,6 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
-	private static final int MAX_CROSS_NAME_SIZE = 240;
-	private static final String TRUNCATED = "(truncated)";
 	public static final String LIST_NOT_FOUND = "list.not.found";
 
 	private final DaoFactory daoFactory;
@@ -288,13 +286,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		try {
 			final List<Integer> deletedListEntryIds = new ArrayList<>();
 			data.forEach(germplasmListData -> {
-				String groupName = germplasmListData.getGroupName();
-				if (groupName.length() > MAX_CROSS_NAME_SIZE) {
-					groupName = groupName.substring(0, MAX_CROSS_NAME_SIZE - 1);
-					groupName = groupName + TRUNCATED;
-					germplasmListData.setGroupName(groupName);
-				}
-
+				germplasmListData.truncateGroupNameIfNeeded();
 				final GermplasmListData recordSaved = this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
 				idGermplasmListDataSaved.add(recordSaved);
 				if (!Objects.isNull(germplasmListData.getStatus()) && germplasmListData.getStatus() == 9) {

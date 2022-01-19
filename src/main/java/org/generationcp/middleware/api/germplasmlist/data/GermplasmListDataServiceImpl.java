@@ -239,6 +239,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 
 		for (final GermplasmListData entry : germplasmListData) {
 			entry.setGroupName(pedigreeStringMap.get(entry.getGid()));
+			entry.truncateGroupNameIfNeeded();
 			this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(entry);
 		}
 	}
