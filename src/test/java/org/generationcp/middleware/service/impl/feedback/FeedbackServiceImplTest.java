@@ -64,7 +64,7 @@ public class FeedbackServiceImplTest {
 
 		ReflectionTestUtils.setField(this.feedbackService, "workbenchDaoFactory", this.workbenchDaoFactory);
 		ReflectionTestUtils.setField(this.feedbackService, "showFeedbackAfterFeatureViews", SHOW_FEEDBACK_AFTER_VIEWS);
-		ReflectionTestUtils.setField(this.feedbackService, "feedbackEnabled", true);
+		ReflectionTestUtils.setField(this.feedbackService, "feedbackFeatureEnabled", true);
 	}
 
 	@Test
@@ -124,7 +124,7 @@ public class FeedbackServiceImplTest {
 
 	@Test
 	public void testShouldShowFeedback_feedbackNotEnabledGlobally() {
-		ReflectionTestUtils.setField(this.feedbackService, "feedbackEnabled", false);
+		ReflectionTestUtils.setField(this.feedbackService, "feedbackFeatureEnabled", false);
 
 		final boolean shouldShowFeedback = this.feedbackService.shouldShowFeedback(FEEDBACK_FEATURE);
 		assertFalse(shouldShowFeedback);
