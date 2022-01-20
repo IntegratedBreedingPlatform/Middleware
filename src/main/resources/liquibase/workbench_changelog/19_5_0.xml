@@ -87,4 +87,47 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="cuenyad" id="v19.5.0-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(*) FROM permission WHERE name = 'DELETE_GERMPLASM_LIST'
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Update description of DELETE_GERMPLASM_LIST permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE PERMISSION SET description = 'Delete lists not owned by user' WHERE (name = 'DELETE_GERMPLASM_LIST');
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v19.5.0-6">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM permission WHERE name = 'MANAGE_GERMPLASM_LISTS'
+				</sqlCheck>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM permission WHERE name = 'LOCK_UNLOCK_GERMPLASM_LIST'
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Add Lock/unlock lists not owned by user permission
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_GERMPLASM_LISTS');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`)
+			VALUES ('LOCK_UNLOCK_GERMPLASM_LIST', 'Lock/unlock lists not owned by user', @permission_id);
+
+			SET @lock_unlock_permisison_id = (SELECT permission_id FROM permission where name = 'LOCK_UNLOCK_GERMPLASM_LIST');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @lock_unlock_permisison_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @lock_unlock_permisison_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @lock_unlock_permisison_id, '1');
+
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
