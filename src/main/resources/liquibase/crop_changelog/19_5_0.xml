@@ -1,0 +1,23 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="nahuel" id="v19.5.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="listnms" columnName="generation_level" />
+			</not>
+		</preConditions>
+		<comment>
+			Add generation_level column: indicates preferred cross expansion (pedigree) level for the entire list
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			# a property to complement (or potentially migrate) the stored pedigree in listdata.grpname
+			alter table listnms
+				add generation_level int null comment 'cross expansion (pedigree) level';
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
