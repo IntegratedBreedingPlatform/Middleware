@@ -15,6 +15,7 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListDataDefaultView;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
@@ -34,8 +35,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 @Transactional
 @Service
@@ -74,31 +77,13 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			return response;
 		}
 
-		final boolean hasCrossData = view
-			.stream()
-			.anyMatch(c -> GermplasmListStaticColumns.CROSS.getTermId().equals(c.getStaticId()) || this.viewHasParentData(c));
-
-		if (hasCrossData) {
+		if (view.stream().anyMatch(this::viewHasParentData)) {
 			final Set<Integer> gids = response
 				.stream()
 				.map(r -> (Integer) r.getData().get(GermplasmListStaticColumns.GID.name()))
-				.collect(Collectors.toSet());
+				.collect(toSet());
 
-			final Map<Integer, String> pedigreeStringMap =
-				this.pedigreeService.getCrossExpansions(gids, null, this.crossExpansionProperties);
-
-			response.forEach(r -> {
-				final Integer gid = (Integer) r.getData().get(GermplasmListStaticColumns.GID.name());
-				r.getData().put(GermplasmListStaticColumns.CROSS.getName(), pedigreeStringMap.get(gid));
-			});
-
-			final boolean hasParentsData = view
-				.stream()
-				.anyMatch(this::viewHasParentData);
-
-			if (hasParentsData) {
-				this.addParentsFromPedigreeTable(gids, response);
-			}
+			this.addParentsFromPedigreeTable(gids, response);
 		}
 
 		return response;
@@ -116,7 +101,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		final List<GermplasmListColumnDTO> columns = GermplasmListStaticColumns.getColumnsSortedByRank()
 			.map(column -> new GermplasmListColumnDTO(column.getTermId(), column.getName(), GermplasmListColumnCategory.STATIC,
 				selectedColumnIds.contains(column.getTermId())))
-			.collect(Collectors.toList());
+			.collect(toList());
 
 		final List<Integer> gids = this.daoFactory.getGermplasmListDataDAO().getGidsByListId(listId);
 		final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().getNameTypesByGIDList(gids);
@@ -125,7 +110,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 				.stream()
 				.map(nameType -> new GermplasmListColumnDTO(nameType.getFldno(), nameType.getFcode(), GermplasmListColumnCategory.NAMES,
 					selectedColumnIds.contains(nameType.getFldno())))
-				.collect(Collectors.toList());
+				.collect(toList());
 			columns.addAll(nameColumns);
 		}
 
@@ -150,7 +135,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 					return new GermplasmListColumnDTO(variable.getId(), variable.getName(), variable.getAlias(), typeId,
 						GermplasmListColumnCategory.VARIABLE, selectedColumnIds.contains(variable.getId()));
 				})
-				.collect(Collectors.toList());
+				.collect(toList());
 			columns.addAll(germplasmAttributeColumns);
 		}
 		return columns;
@@ -171,7 +156,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		if (view.size() == entryDetailsColumnIds.size()) {
 			final List<GermplasmListMeasurementVariableDTO> defaultStaticColumns = this.transformDefaultStaticColumns();
 			final List<GermplasmListMeasurementVariableDTO> variableColumns = this.getVariableColumns(entryDetailsColumnIds, programUUID);
-			return Stream.concat(defaultStaticColumns.stream(), variableColumns.stream()).collect(Collectors.toList());
+			return Stream.concat(defaultStaticColumns.stream(), variableColumns.stream()).collect(toList());
 		}
 
 		final List<GermplasmListMeasurementVariableDTO> header = new ArrayList<>();
@@ -179,7 +164,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			.stream()
 			.filter(GermplasmListDataView::isStaticColumn)
 			.map(GermplasmListDataView::getStaticId)
-			.collect(Collectors.toList());
+			.collect(toList());
 		if (!CollectionUtils.isEmpty(staticIds)) {
 			final List<GermplasmListMeasurementVariableDTO> staticColumns = staticIds
 				.stream()
@@ -189,7 +174,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 					return new GermplasmListMeasurementVariableDTO(staticColumn.getTermId(), staticColumn.getName(), staticColumn.name(),
 						GermplasmListColumnCategory.STATIC);
 				})
-				.collect(Collectors.toList());
+				.collect(toList());
 			header.addAll(staticColumns);
 		}
 
@@ -197,7 +182,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			.stream()
 			.filter(GermplasmListDataView::isNameColumn)
 			.map(GermplasmListDataView::getNameFldno)
-			.collect(Collectors.toList());
+			.collect(toList());
 		if (!CollectionUtils.isEmpty(nameTypeIds)) {
 			final List<UserDefinedField> nameTypes = this.daoFactory.getUserDefinedFieldDAO().filterByColumnValues("fldno", nameTypeIds);
 			final List<GermplasmListMeasurementVariableDTO> nameColumns = nameTypes
@@ -205,7 +190,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 				.sorted(Comparator.comparing(UserDefinedField::getFcode))
 				.map(nameType -> new GermplasmListMeasurementVariableDTO(nameType.getFldno(), nameType.getFname(), nameType.getFcode(),
 					GermplasmListColumnCategory.NAMES))
-				.collect(Collectors.toList());
+				.collect(toList());
 			header.addAll(nameColumns);
 		}
 
@@ -213,7 +198,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			.stream()
 			.filter(GermplasmListDataView::isVariableColumn)
 			.map(GermplasmListDataView::getCvtermId)
-			.collect(Collectors.toList());
+			.collect(toList());
 		final List<GermplasmListMeasurementVariableDTO> variableColumns = this.getVariableColumns(variableIds, programUUID);
 		if (!CollectionUtils.isEmpty(variableColumns)) {
 			header.addAll(variableColumns);
@@ -227,17 +212,36 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		final List<GermplasmListDataView> entryDetailColumns = germplasmList.getView()
 			.stream()
 			.filter(GermplasmListDataView::isEntryDetailColumn)
-			.collect(Collectors.toList());
+			.collect(toList());
 
 		final List<GermplasmListDataView> updatedView = view
 			.stream()
 			.map(updateColumn -> GermplasmListDataViewFactory.create(germplasmList, updateColumn))
-			.collect(Collectors.toList());
+			.collect(toList());
 		if (!CollectionUtils.isEmpty(entryDetailColumns)) {
 			updatedView.addAll(entryDetailColumns);
 		}
 		germplasmList.setView(updatedView);
 		this.daoFactory.getGermplasmListDAO().save(germplasmList);
+	}
+
+	@Override
+	public void fillWithCrossExpansion(final Integer listId, final Integer level) {
+		final GermplasmList germplasmList = this.daoFactory.getGermplasmListDAO().getById(listId);
+		germplasmList.setGenerationLevel(level);
+		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+
+		final List<GermplasmListData> germplasmListData = this.daoFactory.getGermplasmListDataDAO().getByListId(listId);
+		final Set<Integer> gids = germplasmListData.stream().map(GermplasmListData::getGid).collect(toSet());
+
+		final Map<Integer, String> pedigreeStringMap =
+			this.pedigreeService.getCrossExpansionsBulk(gids, level, this.crossExpansionProperties);
+
+		for (final GermplasmListData entry : germplasmListData) {
+			entry.setGroupName(pedigreeStringMap.get(entry.getGid()));
+			entry.truncateGroupNameIfNeeded();
+			this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(entry);
+		}
 	}
 
 	@Override
@@ -307,26 +311,26 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		}
 
 		final List<GermplasmListDataView> entryDetailsColumns =
-			view.stream().filter(GermplasmListDataView::isEntryDetailColumn).collect(Collectors.toList());
+			view.stream().filter(GermplasmListDataView::isEntryDetailColumn).collect(toList());
 		// Check if there are only entry details in view
 		if (view.size() == entryDetailsColumns.size()) {
 			final List<GermplasmListDataViewModel> defaultView = this.transformDefaultView();
 			final List<GermplasmListDataViewModel> entryDetailsModels =
-				entryDetailsColumns.stream().map(GermplasmListDataViewModel::new).collect(Collectors.toList());
-			return Stream.concat(defaultView.stream(), entryDetailsModels.stream()).collect(Collectors.toList());
+				entryDetailsColumns.stream().map(GermplasmListDataViewModel::new).collect(toList());
+			return Stream.concat(defaultView.stream(), entryDetailsModels.stream()).collect(toList());
 		}
 
 		return view
 			.stream()
 			.map(GermplasmListDataViewModel::new)
-			.collect(Collectors.toList());
+			.collect(toList());
 	}
 
 	private List<GermplasmListDataViewModel> transformDefaultView() {
 		return this.getDefaultColumns()
 			.stream()
 			.map(column -> GermplasmListDataViewModel.buildStaticGermplasmListDataViewModel(column.getTermId()))
-			.collect(Collectors.toList());
+			.collect(toList());
 	}
 
 	private List<Integer> getSelectedGermplasmListColumns(final List<GermplasmListDataView> view) {
@@ -337,7 +341,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		final List<Integer> selectedColumnIds = view
 			.stream()
 			.map(GermplasmListDataView::getColumnId)
-			.collect(Collectors.toList());
+			.collect(toList());
 
 		final List<Integer> entryDetailsColumnsIds = this.getEntryDetailsColumnsIds(view);
 		// Check if there are only entry details added. If it's the case, add the default columns
@@ -351,7 +355,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		return this.getDefaultColumns()
 			.stream()
 			.map(GermplasmListStaticColumns::getTermId)
-			.collect(Collectors.toList());
+			.collect(toList());
 	}
 
 	private List<GermplasmListMeasurementVariableDTO> transformDefaultStaticColumns() {
@@ -359,7 +363,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			.stream()
 			.map(column -> new GermplasmListMeasurementVariableDTO(column.getTermId(), column.getName(), column.name(),
 				GermplasmListColumnCategory.STATIC))
-			.collect(Collectors.toList());
+			.collect(toList());
 	}
 
 	private List<GermplasmListStaticColumns> getDefaultColumns() {
@@ -369,7 +373,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 				.stream()
 				.map(GermplasmListDataDefaultView::getName)
 				.sorted(Comparator.comparingInt(GermplasmListStaticColumns::getRank))
-				.collect(Collectors.toList());
+				.collect(toList());
 		}
 		return this.defaultColumns;
 	}
@@ -379,7 +383,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			.stream()
 			.filter(GermplasmListDataView::isEntryDetailColumn)
 			.map(GermplasmListDataView::getCvtermId)
-			.collect(Collectors.toList());
+			.collect(toList());
 	}
 
 	/**
@@ -420,7 +424,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 						entryDetailsColumns.add(measurementVariableDTO);
 					}
 				});
-			return Stream.concat(descriptorColumns.stream(), entryDetailsColumns.stream()).collect(Collectors.toList());
+			return Stream.concat(descriptorColumns.stream(), entryDetailsColumns.stream()).collect(toList());
 		}
 		return new ArrayList<>();
 	}
