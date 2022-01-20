@@ -33,6 +33,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import static org.generationcp.middleware.util.Debug.debug;
+
 /**
  * Default algorithm for generating pedigree strings.
  *
@@ -207,17 +209,17 @@ public class PedigreeServiceImpl implements PedigreeService {
 
 			Preconditions.checkNotNull(gid);
 			Preconditions.checkArgument(gid > 0);
-			LOG.debug(String.format("Building ancestory tree for gid - '%d'", gid));
+			debug("Building ancestory tree for gid - '%d'", gid);
 	
 			// Build the pedigree tree
 			final AncestryTreeService ancestryTreeService = new AncestryTreeService(germplasmAncestryCache, this.methodCropBasedCache, this.getCropName());
 			final GermplasmNode gidAncestryTree = ancestryTreeService.buildAncestryTree(gid, numberOfLevelsToTraverse + 3);
 	
-			LOG.debug(String.format("Traversing '%d' number of levels.", numberOfLevelsToTraverse));
+			debug("Traversing '%d' number of levels.", numberOfLevelsToTraverse);
 	
 			final PedigreeStringBuilder pedigreeString = new PedigreeStringBuilder();
 	
-			LOG.debug(String.format("Building pedigree string for gid '%d'.", gid));
+			debug("Building pedigree string for gid '%d'.", gid);
 	
 			return pedigreeString.buildPedigreeString(gidAncestryTree, numberOfLevelsToTraverse,
 					new FixedLineNameResolver(crossExpansionProperties, this.pedigreeDataManagerFactory, this.nameTypeBasedCache,

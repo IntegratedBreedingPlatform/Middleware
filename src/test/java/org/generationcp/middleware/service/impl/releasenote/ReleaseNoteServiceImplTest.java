@@ -162,7 +162,7 @@ public class ReleaseNoteServiceImplTest {
 		final ReleaseNoteUser releaseNoteUser = Mockito.mock(ReleaseNoteUser.class, Mockito.CALLS_REAL_METHODS);
 		Mockito.when(this.releaseNoteUserDAO.getByReleaseNoteIdAndUserId(releaseNote.getId(), USER_ID)).thenReturn(Optional.of(releaseNoteUser));
 
-		this.releaseNoteService.dontShowAgain(USER_ID);
+		this.releaseNoteService.showAgain(USER_ID, false);
 
 		Mockito.verify(this.releaseNoteUserDAO).save(this.releaseNoteUserArgumentCaptor.capture());
 		final ReleaseNoteUser actualReleaseNoteUser = this.releaseNoteUserArgumentCaptor.getValue();

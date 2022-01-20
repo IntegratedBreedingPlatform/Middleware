@@ -367,13 +367,13 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	 * This variable is populated when the user tries to search germplasm list.
 	 */
 	@Transient
-	private String germplasmPeferredName = null;
+	private String germplasmPreferredName = null;
 
 	/**
 	 * This variable is populated when the user tries to search germplasm list.
 	 */
 	@Transient
-	private String germplasmPeferredId = null;
+	private String germplasmPreferredId = null;
 
 	/**
 	 * This variable is populated when the user tries to search germplasm list.
@@ -789,12 +789,12 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		this.methodGroup = methodGroup;
 	}
 
-	public String getGermplasmPeferredName() {
-		return this.germplasmPeferredName;
+	public String getGermplasmPreferredName() {
+		return this.germplasmPreferredName;
 	}
 
-	public void setGermplasmPeferredName(final String germplasmPeferredName) {
-		this.germplasmPeferredName = germplasmPeferredName;
+	public void setGermplasmPreferredName(final String germplasmPreferredName) {
+		this.germplasmPreferredName = germplasmPreferredName;
 	}
 
 	public String getFemaleParentPreferredName() {
@@ -837,12 +837,12 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		this.methodCode = methodCode;
 	}
 
-	public String getGermplasmPeferredId() {
-		return this.germplasmPeferredId;
+	public String getGermplasmPreferredId() {
+		return this.germplasmPreferredId;
 	}
 
-	public void setGermplasmPeferredId(final String germplasmPeferredId) {
-		this.germplasmPeferredId = germplasmPeferredId;
+	public void setGermplasmPreferredId(final String germplasmPreferredId) {
+		this.germplasmPreferredId = germplasmPreferredId;
 	}
 
 	public String getGermplasmNamesString() {

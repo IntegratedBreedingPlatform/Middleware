@@ -1519,7 +1519,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			for (final Object[] result : results) {
 				final Germplasm existingCross = new Germplasm();
 				existingCross.setGid((Integer) result[0]);
-				existingCross.setGermplasmPeferredName((String) result[1]);
+				existingCross.setGermplasmPreferredName((String) result[1]);
 				existingCrosses.add(existingCross);
 			}
 			return existingCrosses;
