@@ -985,7 +985,11 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, DatasetServiceImpl.MEASUREMENT_VARIABLE_TYPES);
 
 		if (!measurementVariableList.isEmpty()) {
-
+			final Map<String, MeasurementVariable> mappedVariables = new HashMap<>();
+			measurementVariableList.forEach(measurementVariable -> {
+				mappedVariables.putIfAbsent(measurementVariable.getName(), measurementVariable);
+				mappedVariables.putIfAbsent(measurementVariable.getAlias(), measurementVariable);
+			});
 			final List<String> observationUnitIds = new ArrayList<>(table.rowKeySet());
 
 			final Map<String, ObservationUnitRow> currentData =
@@ -1001,11 +1005,7 @@ public class DatasetServiceImpl implements DatasetService {
 				for (final String variableName : table.columnKeySet()) {
 					String importedVariableValue = table.get(observationUnitId, variableName);
 
-					final MeasurementVariable measurementVariable =
-						(MeasurementVariable) CollectionUtils.find(measurementVariableList, object -> {
-							final MeasurementVariable variable = (MeasurementVariable) object;
-							return variable.getAlias().equalsIgnoreCase(variableName);
-						});
+					final MeasurementVariable measurementVariable = mappedVariables.get(variableName);
 
 					// If allowDateAndCharacterBlankValue is true, allow to import blank value of Date and Character datatypes,
 					// otherwise, just ignore blank values.
