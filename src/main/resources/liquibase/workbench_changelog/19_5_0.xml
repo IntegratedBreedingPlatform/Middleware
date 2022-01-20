@@ -14,7 +14,7 @@
 			Update description of DELETE_GERMPLASM_LIST permission
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			UPDATE PERMISSION SET name = 'DELETE_GERMPLASM_LIST', description = 'Delete lists not owned by user' WHERE (name = 'DELETE_GERMPLASM_LIST');
+			UPDATE PERMISSION SET description = 'Delete lists not owned by user' WHERE (name = 'DELETE_GERMPLASM_LIST');
 		</sql>
 	</changeSet>
 
