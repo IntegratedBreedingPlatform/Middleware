@@ -4,7 +4,90 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="cuenyad" id="v19.5.0-1">
+	<changeSet author="lkovacic" id="v19.5.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="feedback"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create 'feedback' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table feedback (
+				feedback_id int auto_increment
+				primary key,
+				feature             varchar(50)          not null,
+				enabled             tinyint(1) default 1 not null,
+				constraint feedback_feature_uindex
+				unique (feature)
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.5.0-2">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="feedback"></tableExists>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM feedback WHERE feature = 'GERMPLASM_LIST'
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Add 'germplasm list' feature to 'feedback' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO feedback (feature, enabled) VALUES ('GERMPLASM_LIST', true);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.5.0-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="feedback"></tableExists>
+				<not>
+					<tableExists tableName="feedback_user"></tableExists>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Create 'feedback_user' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table feedback_user (
+				feedback_id int                  not null,
+				user_id     int                  not null,
+				views       int        default 1 not null,
+				show_again  tinyint(1) default 1 not null,
+				primary key (user_id, feedback_id),
+				constraint feedback_users_userid_fk
+				foreign key (user_id) references users (userid),
+				constraint feedback_user_feedback_feedback_id_fk
+				foreign key (feedback_id) references feedback (feedback_id)
+			);
+		</sql>
+	</changeSet>
+
+
+	<changeSet author="cuenyad" id="v19.5.0-4">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+                SELECT count(*) FROM release_note where version = '20.0'
+            </sqlCheck>
+		</preConditions>
+        <comment>Add release note for version 20.0</comment>
+		<sql dbms="mysql" splitStatements="true">
+			-- Disable release note for v19
+			UPDATE release_note SET enabled = 0 WHERE version = '19.0';
+			-- Add release note for version 20.0
+			INSERT INTO release_note (version, release_date, has_coming_soon, enabled, file_name) VALUES ('20.0', CURRENT_TIMESTAMP, 0, 1, '20.0');
+			-- Show again the release notes for all user
+			UPDATE release_note_user SET show_again = 1;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v19.5.0-5">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT count(*) FROM permission WHERE name = 'DELETE_GERMPLASM_LIST'
@@ -18,7 +101,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v19.5.0-2">
+	<changeSet author="cuenyad" id="v19.5.0-6">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="1">

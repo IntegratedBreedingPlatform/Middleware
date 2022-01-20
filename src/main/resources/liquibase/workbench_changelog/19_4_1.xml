@@ -105,4 +105,5 @@
 			update permission set description = 'Add entries to another list' where permission_id = @permission_id
 		</sql>
 	</changeSet>
+
 </databaseChangeLog>
