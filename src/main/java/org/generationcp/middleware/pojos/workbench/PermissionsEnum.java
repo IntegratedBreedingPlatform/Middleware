@@ -36,7 +36,9 @@ public enum PermissionsEnum {
 	LOT_LABEL_PRINTING,
 	QUERIES,
 	GERMPLASM_LABEL_PRINTING,
-	GERMPLASM_LIST_LABEL_PRINTING;
+	GERMPLASM_LIST_LABEL_PRINTING,
+	DELETE_GERMPLASM_LIST,
+	LOCK_UNLOCK_GERMPLASM_LIST;
 
 	/**
 	 * Indicates a group of permissions that enables access to the manage studies module
