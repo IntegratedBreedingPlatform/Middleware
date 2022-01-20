@@ -23,7 +23,7 @@
 	<changeSet author="lkovacic" id="v19.5.0-2">
 		<preConditions onFail="MARK_RAN">
 			<and>
-				<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'ENTRY_SOURCE';</sqlCheck>
+				<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'ENTRY_SOURCE' and cv_id=1040 and is_obsolete = 0 ;</sqlCheck>
 			</and>
 		</preConditions>
 
