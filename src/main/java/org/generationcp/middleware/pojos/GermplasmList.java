@@ -113,6 +113,9 @@ public class GermplasmList implements Serializable {
 	@Column(name = "notes")
 	private String notes;
 
+	@Column(name = "generation_level")
+	private Integer generationLevel;
+
 	@OneToMany(mappedBy = "list", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
 	@OrderBy("entryId asc")
 	private List<GermplasmListData> listData = new ArrayList<>();
@@ -149,7 +152,7 @@ public class GermplasmList implements Serializable {
 	}
 
 	public GermplasmList(final Integer id, final String name, final Long date, final String type, final Integer userId,
-			final String description, final GermplasmList parent, final Integer status, final String notes) {
+		final String description, final GermplasmList parent, final Integer status, final String notes, final Integer generationLevel) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -160,6 +163,7 @@ public class GermplasmList implements Serializable {
 		this.parent = parent;
 		this.status = status;
 		this.notes = notes;
+		this.generationLevel = generationLevel;
 	}
 
 	public GermplasmList(final Integer id, final String name, final Long date, final String type, final Integer userId,
@@ -338,6 +342,14 @@ public class GermplasmList implements Serializable {
 
 	public void setNotes(final String notes) {
 		this.notes = notes;
+	}
+
+	public Integer getGenerationLevel() {
+		return generationLevel;
+	}
+
+	public void setGenerationLevel(final Integer generationLevel) {
+		this.generationLevel = generationLevel;
 	}
 
 	public List<GermplasmListData> getListData() {
