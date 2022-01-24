@@ -497,8 +497,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public Integer updateGermplasmListFolder(final Integer userId, final String folderName, final Integer folderId,
-		final String programUUID) {
+	public Integer updateGermplasmListFolder(final String folderName, final Integer folderId) {
 
 		final GermplasmList folder =
 			this.getGermplasmListById(folderId).orElseThrow(() -> new MiddlewareException("Folder does not exist"));
@@ -519,6 +518,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final GermplasmList newParentFolder = (Objects.isNull(newParentFolderId)) ? null :
 			this.getGermplasmListById(newParentFolderId)
 				.orElseThrow(() -> new MiddlewareRequestException("", "list.parent.folder.not.found"));
+
+		//Locking list when moving a from program to any crop folder
+		if (StringUtils.isEmpty(programUUID) && !StringUtils.isEmpty(listToMove.getProgramUUID()) && !GermplasmList.FOLDER_TYPE.equals(listToMove.getType())) {
+			listToMove.setStatus(GermplasmList.Status.LOCKED_LIST.getCode());
+		}
 
 		listToMove.setProgramUUID(programUUID);
 		listToMove.setParent(newParentFolder);

@@ -118,7 +118,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		//Update germplasm folder
 		final String updatedFolderName = "updatedFolderName";
 		final Integer germplasmListUpdatedFolderId =
-			this.germplasmListService.updateGermplasmListFolder(USER_ID, updatedFolderName, germplasmListNewFolderId, PROGRAM_UUID);
+			this.germplasmListService.updateGermplasmListFolder(updatedFolderName, germplasmListNewFolderId);
 		assertNotNull(germplasmListUpdatedFolderId);
 		assertThat(germplasmListUpdatedFolderId, is(germplasmListNewFolderId));
 
