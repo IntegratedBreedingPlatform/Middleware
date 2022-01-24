@@ -497,8 +497,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public Integer updateGermplasmListFolder(final Integer userId, final String folderName, final Integer folderId,
-		final String programUUID) {
+	public Integer updateGermplasmListFolder(final String folderName, final Integer folderId) {
 
 		final GermplasmList folder =
 			this.getGermplasmListById(folderId).orElseThrow(() -> new MiddlewareException("Folder does not exist"));
