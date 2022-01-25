@@ -47,8 +47,8 @@ public class GermplasmList implements Serializable {
 	public enum Status {
 		LIST(1), // 0001
 		FOLDER(0), // 0000
-		// Unused
-		// LOCKED(100), // 0100
+		// Unused/Obsolete, used only for reading legacy data.
+		LOCKED(100), // 0100
 		LOCKED_LIST(101), // 0101
 		DELETED(9);
 
@@ -113,6 +113,9 @@ public class GermplasmList implements Serializable {
 	@Column(name = "notes")
 	private String notes;
 
+	@Column(name = "generation_level")
+	private Integer generationLevel;
+
 	@OneToMany(mappedBy = "list", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
 	@OrderBy("entryId asc")
 	private List<GermplasmListData> listData = new ArrayList<>();
@@ -149,7 +152,7 @@ public class GermplasmList implements Serializable {
 	}
 
 	public GermplasmList(final Integer id, final String name, final Long date, final String type, final Integer userId,
-			final String description, final GermplasmList parent, final Integer status, final String notes) {
+		final String description, final GermplasmList parent, final Integer status, final String notes, final Integer generationLevel) {
 		super();
 		this.id = id;
 		this.name = name;
@@ -160,6 +163,7 @@ public class GermplasmList implements Serializable {
 		this.parent = parent;
 		this.status = status;
 		this.notes = notes;
+		this.generationLevel = generationLevel;
 	}
 
 	public GermplasmList(final Integer id, final String name, final Long date, final String type, final Integer userId,
@@ -340,6 +344,14 @@ public class GermplasmList implements Serializable {
 		this.notes = notes;
 	}
 
+	public Integer getGenerationLevel() {
+		return generationLevel;
+	}
+
+	public void setGenerationLevel(final Integer generationLevel) {
+		this.generationLevel = generationLevel;
+	}
+
 	public List<GermplasmListData> getListData() {
 		return this.listData;
 	}
@@ -428,7 +440,7 @@ public class GermplasmList implements Serializable {
 	}
 
 	public boolean isLockedList() {
-		return (this.getStatus() != null ? this.getStatus() >= 100 : false);
+		return (this.getStatus() != null ? this.getStatus() >= Status.LOCKED.getCode() : false);
 	}
 
 	public String getTabLabel() {

@@ -123,6 +123,8 @@ public class GermplasmMergeRequestDto {
 
 		private boolean migrateNameTypes = false;
 
+		private boolean migrateFiles = false;
+
 		public boolean isMigratePassportData() {
 			return this.migratePassportData;
 		}
@@ -145,6 +147,14 @@ public class GermplasmMergeRequestDto {
 
 		public void setMigrateNameTypes(final boolean migrateNameTypes) {
 			this.migrateNameTypes = migrateNameTypes;
+		}
+
+		public boolean isMigrateFiles() {
+			return migrateFiles;
+		}
+
+		public void setMigrateFiles(final boolean migrateFiles) {
+			this.migrateFiles = migrateFiles;
 		}
 
 		@Override

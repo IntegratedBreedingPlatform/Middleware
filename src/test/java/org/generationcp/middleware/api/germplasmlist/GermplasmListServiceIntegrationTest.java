@@ -118,7 +118,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		//Update germplasm folder
 		final String updatedFolderName = "updatedFolderName";
 		final Integer germplasmListUpdatedFolderId =
-			this.germplasmListService.updateGermplasmListFolder(USER_ID, updatedFolderName, germplasmListNewFolderId, PROGRAM_UUID);
+			this.germplasmListService.updateGermplasmListFolder(updatedFolderName, germplasmListNewFolderId);
 		assertNotNull(germplasmListUpdatedFolderId);
 		assertThat(germplasmListUpdatedFolderId, is(germplasmListNewFolderId));
 
@@ -243,12 +243,29 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final GermplasmList actualGermplasmList = germplasmListById.get();
 		assertThat(actualGermplasmList.getListData(), hasSize(2));
 
-		this.assertGermplasmListDataAndProperty(actualGermplasmList.getListData().get(0),
-			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
-			singleCrossMethod.getMname());
-		this.assertGermplasmListDataAndProperty(actualGermplasmList.getListData().get(1),
-			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
-			doubleCrossMethod.getMname());
+//		this.assertGermplasmListDataAndProperty(actualGermplasmList.getListData().get(0),
+//			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
+//			singleCrossMethod.getMname());
+
+		final GermplasmListData actualEntry1 = actualGermplasmList.getListData().get(0);
+		assertNotNull(actualEntry1);
+		assertNotNull(actualEntry1.getListDataId());
+
+		final List<ListDataProperty> properties = actualEntry1.getProperties();
+		assertThat(properties, hasSize(1));
+		assertThat(properties.get(0).getColumn(), is(GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName()));
+		assertThat(properties.get(0).getValue(), is(singleCrossMethod.getMname()));
+
+
+//		this.assertGermplasmListDataAndProperty(actualGermplasmList.getListData().get(1),
+//			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
+//			doubleCrossMethod.getMname());
+
+		final GermplasmListData actualEntry2 = actualGermplasmList.getListData().get(1);
+		assertNotNull(actualEntry2);
+		assertNotNull(actualEntry2.getListDataId());
+
+		assertThat(actualEntry2.getProperties(), hasSize(0));
 	}
 
 	@Test
@@ -291,12 +308,20 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final GermplasmList actualGermplasmList = germplasmListById.get();
 		assertThat(actualGermplasmList.getListData(), hasSize(2));
 
-		this.assertGermplasmListDataAndProperty(actualGermplasmList.getListData().get(0),
-			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
-			singleCrossMethod.getMname());
-		this.assertGermplasmListDataAndProperty(actualGermplasmList.getListData().get(1),
-			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
-			doubleCrossMethod.getMname());
+		final GermplasmListData actualEntry1 = actualGermplasmList.getListData().get(0);
+		assertNotNull(actualEntry1);
+		assertNotNull(actualEntry1.getListDataId());
+
+		final List<ListDataProperty> properties = actualEntry1.getProperties();
+		assertThat(properties, hasSize(1));
+		assertThat(properties.get(0).getColumn(), is(GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName()));
+		assertThat(properties.get(0).getValue(), is(singleCrossMethod.getMname()));
+
+		final GermplasmListData actualEntry2 = actualGermplasmList.getListData().get(1);
+		assertNotNull(actualEntry2);
+		assertNotNull(actualEntry2.getListDataId());
+
+		assertThat(actualEntry2.getProperties(), hasSize(0));
 	}
 
 	@Test
@@ -770,17 +795,6 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		assertThat(germplasmList.getType(), is(GermplasmList.FOLDER_TYPE));
 		assertThat(germplasmList.getProgramUUID(), is(PROGRAM_UUID));
 		assertThat(germplasmList.getStatus(), is(GermplasmList.Status.FOLDER.getCode()));
-	}
-
-	private void assertGermplasmListDataAndProperty(final GermplasmListData actualGermplasmListData,
-		final String expectedPropertyName, final String expectedPropertyValue) {
-		assertNotNull(actualGermplasmListData);
-		assertNotNull(actualGermplasmListData.getListDataId());
-
-		final List<ListDataProperty> properties = actualGermplasmListData.getProperties();
-		assertThat(properties, hasSize(1));
-		assertThat(properties.get(0).getColumn(), is(expectedPropertyName));
-		assertThat(properties.get(0).getValue(), is(expectedPropertyValue));
 	}
 
 	private StandardVariable createEntryDetailVariable(final String name) {

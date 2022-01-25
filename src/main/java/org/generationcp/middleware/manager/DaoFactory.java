@@ -597,9 +597,7 @@ public class DaoFactory {
 	}
 
 	public FileMetadataDAO getFileMetadataDAO() {
-		final FileMetadataDAO fileMetadataDAO = new FileMetadataDAO();
-		fileMetadataDAO.setSession(this.sessionProvider.getSession());
-		return fileMetadataDAO;
+		return new FileMetadataDAO(this.sessionProvider.getSession());
 	}
 
 	public GermplasmListDataViewDAO getGermplasmListDataViewDAO() {
