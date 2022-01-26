@@ -3,7 +3,57 @@
 				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
-	
-	
+
+	<changeSet author="nahuel" id="v19.5.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="listnms" columnName="generation_level" />
+			</not>
+		</preConditions>
+		<comment>
+			Add generation_level column: indicates preferred cross expansion (pedigree) level for the entire list
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			# a property to complement (or potentially migrate) the stored pedigree in listdata.grpname
+			alter table listnms
+				add generation_level int null comment 'cross expansion (pedigree) level';
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v19.5.0-2">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'ENTRY_SOURCE' and cv_id=1040 and is_obsolete = 0 ;</sqlCheck>
+			</and>
+		</preConditions>
+
+		<comment>Add "ENTRY_SOURCE" variable and migrate 'listdata.source' values as list entry details</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (1040, 'ENTRY_SOURCE', 'Entry Source', null, 0, 0);
+
+			SET @cvterm_id  = (SELECT LAST_INSERT_ID());
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			VALUES
+			(1200, @cvterm_id, 2208),
+			(1210, @cvterm_id, 4030),
+			(1220, @cvterm_id, 6020);
+
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES
+			(@cvterm_id, 1800,'Entry Detail', 0),
+			(@cvterm_id, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			INSERT INTO list_data_view (listid, cvterm_id, type_id)
+				SELECT listid, @cvterm_id, 1815 FROM listdata WHERE SOURCE NOT IN ('', '-') GROUP BY listid;
+
+			INSERT INTO list_data_details (variable_id, lrecid, value, created_by, created_date)
+				SELECT @cvterm_id, ld.lrecid, ld.source, l.listuid, CURRENT_TIMESTAMP() from listdata ld
+					INNER JOIN listnms l on ld.listid = l.listid
+				WHERE source NOT IN ('', '-');
+        </sql>
+    </changeSet>
+
 
 </databaseChangeLog>

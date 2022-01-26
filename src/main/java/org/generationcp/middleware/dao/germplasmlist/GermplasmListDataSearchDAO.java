@@ -379,6 +379,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		selectClause.add(this.addSelectExpression(scalars, "listData.lrecid", LIST_DATA_ID_ALIAS));
 		selectClause.add(this.addSelectExpression(scalars, "listData.entryid", GermplasmListStaticColumns.ENTRY_NO.name()));
 		selectClause.add(this.addSelectExpression(scalars, "listData.entrycd", GermplasmListStaticColumns.ENTRY_CODE.name()));
+		selectClause.add(this.addSelectExpression(scalars, "listData.grpname", GermplasmListStaticColumns.CROSS.name()));
 		selectClause.add(this.addSelectExpression(scalars, "g.gid", GermplasmListStaticColumns.GID.name()));
 		selectClause.add(this.addSelectExpression(scalars, "g.mgid", GermplasmListStaticColumns.GROUP_ID.name()));
 		selectClause.add(this.addSelectExpression(scalars, "g.germplsm_uuid", GermplasmListStaticColumns.GUID.name()));
@@ -540,7 +541,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 
 	private String addSelectExpression(final List<String> scalars, final String expression, final String columnAlias) {
 		scalars.add(columnAlias);
-		return String.format("%s AS %s", expression, columnAlias);
+		return String.format("%s AS `%s`", expression, columnAlias);
 	}
 
 	private String formatQuery(final String selectExpression, final String joinClause, final String whereClause, final String groupClause,

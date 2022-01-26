@@ -373,4 +373,8 @@
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
+	<bean id="feedbackService" class="org.generationcp.middleware.service.impl.feedback.FeedbackServiceImpl">
+		<constructor-arg name="sessionProvider" ref="workbenchSessionProvider"/>
+	</bean>
+
 </beans>

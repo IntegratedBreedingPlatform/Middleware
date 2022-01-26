@@ -57,6 +57,9 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	// string contants for name of queries
 	public static final String DELETE_BY_LIST_ID = "deleteGermplasmListDataByListId";
 
+	public static final int MAX_CROSS_NAME_SIZE = 240;
+	public static final String CROSS_NAME_TRUNCATED_SUFFIX = "(truncated)";
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
@@ -251,6 +254,15 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	public void setGroupName(final String groupName) {
 		this.groupName = groupName;
+	}
+
+	public void truncateGroupNameIfNeeded() {
+		String groupName = getGroupName();
+		if (groupName.length() > MAX_CROSS_NAME_SIZE) {
+			groupName = groupName.substring(0, MAX_CROSS_NAME_SIZE - 1);
+			groupName = groupName + CROSS_NAME_TRUNCATED_SUFFIX;
+			setGroupName(groupName);
+		}
 	}
 
 	public Integer getStatus() {
