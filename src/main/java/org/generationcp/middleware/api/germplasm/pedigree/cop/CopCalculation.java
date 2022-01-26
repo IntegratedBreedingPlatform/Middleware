@@ -113,6 +113,7 @@ public class CopCalculation {
 		double cop = COP_DEFAULT;
 
 		final Optional<GermplasmTreeNode> commonDerivativeAncestor = this.getCommonDerivativeAncestor(g1, g2);
+
 		if (g1.getGid().equals(g2.getGid())) {
 			// Equation 3
 			cop = (1 + this.coefficientOfInbreeding(g1)) / 2.0;
@@ -184,6 +185,9 @@ public class CopCalculation {
 		GermplasmTreeNode source = g.getMaleParentNode();
 		if (source == null) {
 			return UNKNOWN_INBREEDING_GENERATIONS;
+		}
+		if (this.isGenerative(g)) {
+			return 0;
 		}
 
 		int count = 1;
