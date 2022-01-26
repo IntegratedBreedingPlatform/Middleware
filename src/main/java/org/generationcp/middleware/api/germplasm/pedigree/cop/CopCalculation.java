@@ -9,9 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
-import java.util.HashSet;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static java.time.Duration.between;
 import static java.util.Optional.empty;
@@ -194,7 +194,9 @@ public class CopCalculation {
 		return count;
 	}
 
-	/*
+	/**
+	 * Search in both pedigrees until it find a common ancestor or if one is ancestor of the other.
+	 *
 	 * TODO
 	 *  - unit test separately
 	 */
@@ -204,28 +206,28 @@ public class CopCalculation {
 		}
 		// source, aka immediate parent
 		GermplasmTreeNode source1 = g1;
-		final Set<GermplasmTreeNode> pedigree1 = new HashSet<>();
-		pedigree1.add(g1);
+		final Map<Integer, GermplasmTreeNode> pedigree1 = new HashMap<>();
+		pedigree1.put(g1.getGid(), g1);
 		while (source1.getMaleParentNode() != null && source1.getNumberOfProgenitors() < 0) {
 			source1 = source1.getMaleParentNode();
-			if (source1 == g2) {
+			if (source1.getGid().equals(g2.getGid())) {
 				return of(g2);
 			}
-			pedigree1.add(source1);
+			pedigree1.put(source1.getGid(), source1);
 		}
 		GermplasmTreeNode source2 = g2;
-		final Set<GermplasmTreeNode> pedigree2 = new HashSet<>();
-		pedigree2.add(g2);
+		final Map<Integer, GermplasmTreeNode> pedigree2 = new HashMap<>();
+		pedigree2.put(g2.getGid(), g2);
 		while (source2.getMaleParentNode() != null && source2.getNumberOfProgenitors() < 0) {
-			if (pedigree1.contains(source2)) {
+			if (pedigree1.containsKey(source2.getGid())) {
 				return of(source2);
 			}
 			source2 = source2.getMaleParentNode();
-			pedigree2.add(source2);
+			pedigree2.put(source2.getGid(), source2);
 		}
-		for (final GermplasmTreeNode p1 : pedigree1) {
-			if (pedigree2.contains(p1)) {
-				return of(p1);
+		for (final Map.Entry<Integer, GermplasmTreeNode> e : pedigree1.entrySet()) {
+			if (pedigree2.containsKey(e.getKey())) {
+				return of(e.getValue());
 			}
 		}
 
