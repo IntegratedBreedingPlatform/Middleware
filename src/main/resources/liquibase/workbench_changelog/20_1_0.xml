@@ -1,0 +1,50 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="mderamos" id="v20.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*) FROM workbench_tool WHERE name = 'brapi_sync'
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Add BrAPI sync sidebar item.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO workbench_tool (`name`, `group_name`, `title`, `version`, `tool_type`, `path`, `parameter`, `user_tool`)
+			VALUES ('brapi_sync', 'brapi_sync', 'BrAPI sync (beta)', '1.0', 'WEB', '/ibpworkbench/controller/brapi-sync', '', 0);
+
+			SET @sidebar_category_id = (SELECT sidebar_category_id FROM workbench_sidebar_category where sidebar_category_name = 'crop_administration');
+
+			INSERT INTO workbench_sidebar_category_link (`tool_name`, `sidebar_category_id`, `sidebar_link_name`, `sidebar_link_title`, `rank`)
+			VALUES ('brapi_sync', @sidebar_category_id, 'brapi_sync', 'BrAPI sync (beta)', 3);
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v20.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*) FROM permission where name = 'BRAPI_SYNC'
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			add BRAPI_SYNC permission under CROP_MANAGEMENT.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET @permission_id = (SELECT permission_id FROM permission where name = 'CROP_MANAGEMENT');
+			SET @workbench_sidebar_category_link_id =  (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link where tool_name = 'brapi_sync');
+
+			INSERT INTO permission (`name`, `description`, `parent_id`, `workbench_sidebar_category_link_id`)
+			VALUES ('BRAPI_SYNC', 'BrAPI sync', @permission_id , @workbench_sidebar_category_link_id);
+
+			SET @brapi_sync_permission_id = (SELECT permission_id FROM permission where name = 'BRAPI_SYNC');
+
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @brapi_sync_permission_id, '1');
+			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @brapi_sync_permission_id, '1');
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
