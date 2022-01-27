@@ -4,26 +4,39 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 	
-		<changeSet author="rowena" id="v19.5.1-1">
+	<changeSet author="rowena" id="v19.5.1-1">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 FROM germplsm g INNER JOIN location l1  INNER JOIN location l2  WHERE  g.glocn = l1.locid  AND l1.locid > l2.locid AND l1.lname = l2.lname AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id
               </sqlCheck>
         </preConditions>
-        <comment> check if there are germplasms using duplicate locatio_id;  Replace the duplicates with the GID of the minimum location ID of the duplicate</comment>
+        <comment> check if there are germplasms using duplicate location_id. Replace the duplicates with the locid of the minimum location ID of the duplicate</comment>
 		<sql dbms="mysql" splitStatements="true">
 	      	UPDATE germplsm g INNER JOIN location l1  INNER JOIN location l2   SET glocn = l2.locid   WHERE  g.glocn = l1.locid  AND l1.locid < l2.locid AND l1.lname = l2.lname  AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id ;
 		</sql>
 	</changeSet>
-		<changeSet author="rowena" id="v19.5.1-2">
+	
+	<changeSet author="rowena" id="v19.5.1-2">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
-                SELECT COUNT(*) > 0 FROM location WHERE labbr IS NULL;
+                SELECT COUNT(*) > 0 FROM location l1  INNER JOIN location l2  WHERE  l1.locid < l2.locid  AND l1.lname = l2.lname AND l1.ltype= l2.ltype  AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
             </sqlCheck>
         </preConditions>
         <comment> Delete duplicates and retain the minimum location ID</comment>
 		<sql dbms="mysql" splitStatements="true">
-	      	DELETE l1 FROM location l1  INNER JOIN location l2  WHERE  l1.locid < l2.locid  AND l1.lname = l2.lname AND l1.ltype= l2.ltype  AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
+	      	DELETE l2 FROM location l1 INNER JOIN location l2  WHERE  l1.locid < l2.locid  AND l1.lname = l2.lname AND l1.ltype= l2.ltype  AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
+		</sql>
+	</changeSet>
+	
+		<changeSet author="corina" id="v19.5.1-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) > 0 FROM listnms WHERE listtype='FOLDER' AND lhierarchy=0 AND program_uuid IS NULL;
+            </sqlCheck>
+        </preConditions>
+        <comment>Set historical list folders to use lhierarchy = NULL</comment>
+		<sql dbms="mysql" splitStatements="true">
+	      	   UPDATE listnms SET lhierarchy=NULL WHERE listtype='FOLDER' AND lhierarchy=0 AND program_uuid IS NULL;
 		</sql>
 	</changeSet>
 
