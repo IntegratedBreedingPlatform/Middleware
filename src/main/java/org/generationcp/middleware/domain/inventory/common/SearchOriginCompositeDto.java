@@ -45,6 +45,6 @@ public class SearchOriginCompositeDto {
 	}
 
 	public enum SearchOrigin {
-		MANAGE_STUDY_SOURCE, GERMPLASM_SEARCH;
+		MANAGE_STUDY_SOURCE, GERMPLASM_SEARCH, MANAGE_STUDY_PLOT;
 	}
 }
