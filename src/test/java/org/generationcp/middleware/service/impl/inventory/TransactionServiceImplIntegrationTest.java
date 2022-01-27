@@ -170,7 +170,6 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		final Map<String, Double> instructions = new HashMap<>();
 		instructions.put(unitName, 20D);
 		lotDepositRequestDto.setDepositsPerUnit(instructions);
-		lotDepositRequestDto.setSourceStudyId(this.studyId);
 
 		final List<Integer> lotIds = Collections.singletonList(lot.getId());
 		this.transactionService.depositLots(userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED, null, null);
