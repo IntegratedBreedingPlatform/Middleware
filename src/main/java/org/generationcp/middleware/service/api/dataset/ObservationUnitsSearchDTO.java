@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.dataset;
 
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -12,7 +13,7 @@ import java.util.Set;
 
 @SuppressWarnings("unused") // Used in POST body
 @AutoProperty
-public class ObservationUnitsSearchDTO {
+public class ObservationUnitsSearchDTO extends SearchRequestDto {
 
 	private List<MeasurementVariableDto> environmentDetails;
 	private List<MeasurementVariableDto> environmentConditions;
