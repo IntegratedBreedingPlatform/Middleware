@@ -62,6 +62,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -420,22 +421,27 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				new Sort(Sort.Direction.ASC, GermplasmListStaticColumns.ENTRY_NO.name()));
 		}
 
+		final List<GermplasmListDataSearchResponse> responseList =
+			this.germplasmListDataService.searchGermplasmListData(sourceListId, searchComposite.getSearchRequest(), pageRequest);
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
 		germplasmSearchRequest.setGids(
-			this.germplasmListDataService.searchGermplasmListData(sourceListId, searchComposite.getSearchRequest(), pageRequest)
+			responseList
 				.stream().map(response -> Integer.valueOf(response.getData().get(GermplasmListStaticColumns.GID.name()).toString()))
 				.collect(Collectors.toList()));
-		final List<GermplasmSearchResponse> germplasmResponse =
-			this.daoFactory.getGermplasmSearchDAO().searchGermplasm(germplasmSearchRequest, null, programUUID);
-		final List<AddGermplasmEntryModel> addGermplasmEntriesModels = germplasmResponse
-			.stream().map(response -> new AddGermplasmEntryModel(
-				response.getGid(),
-				response.getGermplasmPreferredName(),
-				response.getGroupId()
-			))
+		final Map<Integer, GermplasmSearchResponse> germplasmResponseMap =
+			this.daoFactory.getGermplasmSearchDAO().searchGermplasm(germplasmSearchRequest, null, programUUID)
+				.stream().collect(Collectors.toMap(GermplasmSearchResponse::getGid, Function.identity()));
+		final List<AddGermplasmEntryModel> addGermplasmEntriesModels = responseList
+			.stream().map(response -> this.constructGermplasmEntryModel(germplasmResponseMap,
+				Integer.valueOf(response.getData().get(GermplasmListStaticColumns.GID.name()).toString())))
 			.collect(Collectors.toList());
 
 		this.addGermplasmEntriesModelsToList(destinationGermplasmList, addGermplasmEntriesModels);
+	}
+
+	private AddGermplasmEntryModel constructGermplasmEntryModel(final Map<Integer, GermplasmSearchResponse> germplasmResponseMap, final Integer gid) {
+		return new AddGermplasmEntryModel(
+			gid, germplasmResponseMap.get(gid).getGermplasmPreferredName(), germplasmResponseMap.get(gid).getGroupId());
 	}
 
 	@Override
