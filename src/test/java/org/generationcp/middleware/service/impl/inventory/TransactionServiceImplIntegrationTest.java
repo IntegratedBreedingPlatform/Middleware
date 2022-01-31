@@ -2,6 +2,8 @@ package org.generationcp.middleware.service.impl.inventory;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDepositRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -170,7 +172,12 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		final Map<String, Double> instructions = new HashMap<>();
 		instructions.put(unitName, 20D);
 		lotDepositRequestDto.setDepositsPerUnit(instructions);
-
+		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
+		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY_SOURCE);
+		searchOriginCompositeDto.setSearchRequestId(1);
+		final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<SearchOriginCompositeDto, Integer>();
+		searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
+		lotDepositRequestDto.setSearchComposite(searchCompositeDto);
 		final List<Integer> lotIds = Collections.singletonList(lot.getId());
 		this.transactionService.depositLots(userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED, null, null);
 
@@ -187,12 +194,17 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testDepositLots_WithSourceTypeAndSourceId_Ok() {
+	public void testDepositLots_With_study_source_as_search_origin_Ok() {
 		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
 		final Map<String, Double> instructions = new HashMap<>();
 		instructions.put(unitName, 20D);
 		lotDepositRequestDto.setDepositsPerUnit(instructions);
-
+		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
+		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY_SOURCE);
+		searchOriginCompositeDto.setSearchRequestId(1);
+		final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<SearchOriginCompositeDto, Integer>();
+		searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
+		lotDepositRequestDto.setSearchComposite(searchCompositeDto);
 		final List<Integer> lotIds = Collections.singletonList(lot.getId());
 		this.transactionService.depositLots(userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED,
 			TransactionSourceType.SPLIT_LOT, lot.getId());
