@@ -5,6 +5,7 @@ import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
+import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataSearchResponse;
@@ -202,8 +203,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			this.daoFactory.getGermplasmListDAO().getById(Integer.valueOf(request.getParentFolderId()), false) : null;
 		final String description = request.getDescription() != null ? request.getDescription() : StringUtils.EMPTY;
 
-		GermplasmList germplasmList = new GermplasmList(null, request.getListName(), Long.valueOf(this.dateFormat.format(request.getCreationDate())),
-			request.getListType(), currentUserId, description, parent, request.getStatus(), request.getNotes(), null);
+		GermplasmList germplasmList =
+			new GermplasmList(null, request.getListName(), Long.valueOf(this.dateFormat.format(request.getCreationDate())),
+				request.getListType(), currentUserId, description, parent, request.getStatus(), request.getNotes(), null);
 		germplasmList.setProgramUUID(request.getProgramUUID());
 		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
 		request.setListId(germplasmList.getId());
@@ -411,7 +413,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.orElseThrow(() -> new MiddlewareRequestException("", LIST_NOT_FOUND));
 
 		//Get the germplasm entries to add
-		final List<AddGermplasmEntryModel> addGermplasmEntriesModels = new ArrayList<>();
 		PageRequest pageRequest = null;
 		if (searchComposite.getSearchRequest() != null
 			&& !CollectionUtils.isEmpty(searchComposite.getSearchRequest().getEntryNumbers())) {
@@ -419,12 +420,20 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				new Sort(Sort.Direction.ASC, GermplasmListStaticColumns.ENTRY_NO.name()));
 		}
 
-		this.germplasmListDataService.searchGermplasmListData(sourceListId, searchComposite.getSearchRequest(), pageRequest)
-			.forEach(response -> addGermplasmEntriesModels.add(new AddGermplasmEntryModel(
-				Integer.valueOf(response.getData().get(GermplasmListStaticColumns.GID.name()).toString()),
-				response.getData().get(GermplasmListStaticColumns.DESIGNATION.name()).toString(),
-				Integer.valueOf(response.getData().get(GermplasmListStaticColumns.GROUP_ID.name()).toString())
-			)));
+		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
+		germplasmSearchRequest.setGids(
+			this.germplasmListDataService.searchGermplasmListData(sourceListId, searchComposite.getSearchRequest(), pageRequest)
+				.stream().map(response -> Integer.valueOf(response.getData().get(GermplasmListStaticColumns.GID.name()).toString()))
+				.collect(Collectors.toList()));
+		final List<GermplasmSearchResponse> germplasmResponse =
+			this.daoFactory.getGermplasmSearchDAO().searchGermplasm(germplasmSearchRequest, null, programUUID);
+		final List<AddGermplasmEntryModel> addGermplasmEntriesModels = germplasmResponse
+			.stream().map(response -> new AddGermplasmEntryModel(
+				response.getGid(),
+				response.getGermplasmPreferredName(),
+				response.getGroupId()
+			))
+			.collect(Collectors.toList());
 
 		this.addGermplasmEntriesModelsToList(destinationGermplasmList, addGermplasmEntriesModels);
 	}
@@ -520,7 +529,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				.orElseThrow(() -> new MiddlewareRequestException("", "list.parent.folder.not.found"));
 
 		//Locking list when moving a from program to any crop folder
-		if (StringUtils.isEmpty(programUUID) && !StringUtils.isEmpty(listToMove.getProgramUUID()) && !GermplasmList.FOLDER_TYPE.equals(listToMove.getType())) {
+		if (StringUtils.isEmpty(programUUID) && !StringUtils.isEmpty(listToMove.getProgramUUID()) && !GermplasmList.FOLDER_TYPE.equals(
+			listToMove.getType())) {
 			listToMove.setStatus(GermplasmList.Status.LOCKED_LIST.getCode());
 		}
 
