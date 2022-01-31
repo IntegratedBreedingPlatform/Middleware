@@ -210,31 +210,34 @@ public class TransactionServiceImpl implements TransactionService {
 		final List<ExtendedLotDto> lots = this.lotService.searchLots(lotsSearchDto, null);
 
 		final SearchCompositeDto<SearchOriginCompositeDto, Integer> searchComposite = lotDepositRequestDto.getSearchComposite();
-		final SearchOriginCompositeDto.SearchOrigin searchOrigin = searchComposite.getSearchRequest().getSearchOrigin();
 		Map<Integer, ExperimentModel> germplasmExperimentModelMap = new HashMap<>();
-		switch (searchOrigin) {
-			case MANAGE_STUDY_SOURCE:
-				germplasmExperimentModelMap = this.daoFactory.getGermplasmStudySourceDAO()
-					.getByGids(lots.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet())).stream()
-					.collect(Collectors.toMap(a -> a.getGermplasm().getGid(), b -> b.getExperimentModel()));
-				break;
-			case MANAGE_STUDY_PLOT:
-				final ObservationUnitsSearchDTO observationUnitsSearchDTO = (ObservationUnitsSearchDTO) this.searchRequestService
-					.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(), ObservationUnitsSearchDTO.class);
-				final DatasetDTO datasetDTO = this.studyDatasetService.getDataset(observationUnitsSearchDTO.getDatasetId());
-				final List<ObservationUnitRow> observationUnitRows =
-					this.studyDatasetService.getObservationUnitRows(datasetDTO.getParentDatasetId(),
-						observationUnitsSearchDTO.getDatasetId(), observationUnitsSearchDTO, null);
 
-				final Map<Integer, ExperimentModel> finalGermplasmExperimentModelMap = germplasmExperimentModelMap;
-				observationUnitRows.forEach(observationUnitRow -> {
-						finalGermplasmExperimentModelMap.put(observationUnitRow.getGid(),
-							this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitRow.getObsUnitId()).get());
-					}
-				);
-				break;
-			default:
-				break;
+		if (searchComposite != null) {
+			final SearchOriginCompositeDto.SearchOrigin searchOrigin = searchComposite.getSearchRequest().getSearchOrigin();
+			switch (searchOrigin) {
+				case MANAGE_STUDY_SOURCE:
+					germplasmExperimentModelMap = this.daoFactory.getGermplasmStudySourceDAO()
+						.getByGids(lots.stream().map(ExtendedLotDto::getGid).collect(Collectors.toSet())).stream()
+						.collect(Collectors.toMap(a -> a.getGermplasm().getGid(), b -> b.getExperimentModel()));
+					break;
+				case MANAGE_STUDY_PLOT:
+					final ObservationUnitsSearchDTO observationUnitsSearchDTO = (ObservationUnitsSearchDTO) this.searchRequestService
+						.getSearchRequest(searchComposite.getSearchRequest().getSearchRequestId(), ObservationUnitsSearchDTO.class);
+					final DatasetDTO datasetDTO = this.studyDatasetService.getDataset(observationUnitsSearchDTO.getDatasetId());
+					final List<ObservationUnitRow> observationUnitRows =
+						this.studyDatasetService.getObservationUnitRows(datasetDTO.getParentDatasetId(),
+							observationUnitsSearchDTO.getDatasetId(), observationUnitsSearchDTO, null);
+
+					final Map<Integer, ExperimentModel> finalGermplasmExperimentModelMap = germplasmExperimentModelMap;
+					observationUnitRows.forEach(observationUnitRow -> {
+							finalGermplasmExperimentModelMap.put(observationUnitRow.getGid(),
+								this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitRow.getObsUnitId()).get());
+						}
+					);
+					break;
+				default:
+					break;
+			}
 		}
 
 		for (final ExtendedLotDto extendedLotDto : lots) {
@@ -251,17 +254,10 @@ public class TransactionServiceImpl implements TransactionService {
 			}
 			daoFactory.getTransactionDAO().save(transaction);
 
-
-			switch (searchOrigin) {
-				case MANAGE_STUDY_SOURCE:
-				case MANAGE_STUDY_PLOT:
-					// Create experiment transaction records when lot and deposit are created in the context of study.
-					this.createExperimentTransaction(extendedLotDto.getGid(), germplasmExperimentModelMap, transaction,
-						ExperimentTransactionType.HARVESTING);
-					break;
-				default:
-					break;
-
+			if (!germplasmExperimentModelMap.isEmpty()) {
+				// Create experiment transaction records when lot and deposit are created in the context of study.
+				this.createExperimentTransaction(extendedLotDto.getGid(), germplasmExperimentModelMap, transaction,
+					ExperimentTransactionType.HARVESTING);
 			}
 		}
 
