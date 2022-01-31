@@ -212,7 +212,7 @@ public class TransactionServiceImpl implements TransactionService {
 		final SearchCompositeDto<SearchOriginCompositeDto, Integer> searchComposite = lotDepositRequestDto.getSearchComposite();
 		Map<Integer, ExperimentModel> germplasmExperimentModelMap = new HashMap<>();
 
-		if (searchComposite != null) {
+		if (searchComposite != null && lotDepositRequestDto.getSearchComposite().getItemIds() == null) {
 			final SearchOriginCompositeDto.SearchOrigin searchOrigin = searchComposite.getSearchRequest().getSearchOrigin();
 			switch (searchOrigin) {
 				case MANAGE_STUDY_SOURCE:
