@@ -312,19 +312,15 @@ public interface GermplasmListManager {
 	 */
 	List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId, String programUUID);
 
-	GermplasmList getLastSavedGermplasmListByUserId(Integer userID, String programUUID);
-
 	/**
-	 * Returns a list of {@code GermplasmList} child records given a parent id. Retrieval from the database is done by batch (as specified
-	 * in batchSize) to reduce the load in instances where there is a large volume of child folders to be retrieved. Though retrieval is by
-	 * batch, this method still returns all of the child folders as a single list.
+	 * Returns a list of {@code GermplasmList} child records given a parent id.
 	 *
 	 * @param parentId    - the ID of the parent to retrieve the child lists
-	 * @param programUUID - the program UUID of the program where to retrieve the child lists
-	 * @param batchSize   - the number of records to be retrieved per iteration
 	 * @return Returns a List of GermplasmList POJOs for the child lists
 	 */
-	List<GermplasmList> getGermplasmListByParentFolderIdBatched(Integer parentId, String programUUID, int batchSize);
+	List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId);
+
+	GermplasmList getLastSavedGermplasmListByUserId(Integer userID, String programUUID);
 
 	/**
 	 * Return a List of UserDefinedField POJOs representing records from the udflds table of IBDB which are the types of germplasm lists.

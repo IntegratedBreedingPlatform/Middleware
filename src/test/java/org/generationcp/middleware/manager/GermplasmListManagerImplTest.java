@@ -43,7 +43,6 @@ import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.collection.IsEmptyCollection.empty;
 import static org.hamcrest.core.Is.is;
 
 public class GermplasmListManagerImplTest extends IntegrationTestBase {
@@ -330,7 +329,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	public void testGetGermplasmListByParentFolderIdBatched() {
 		final int batchSize = 1;
 		final List<GermplasmList> results =
-			this.manager.getGermplasmListByParentFolderIdBatched(this.parentId, GermplasmListManagerImplTest.PROGRAM_UUID, batchSize);
+			this.manager.getGermplasmListByParentFolderId(this.parentId, GermplasmListManagerImplTest.PROGRAM_UUID);
 		Assert.assertNotNull(results);
 		Assert.assertTrue(!results.isEmpty());
 		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmListByParentFolderIdBatched(): ");
