@@ -357,7 +357,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.stream()
 			.mapToInt(GermplasmListData::getEntryId)
 			.max()
-			.orElse(1);
+			.orElse(0);
 		final AtomicInteger lastEntryNo = new AtomicInteger(maxEntryNo);
 
 		final Set<Integer> gids = addGermplasmEntriesModels
