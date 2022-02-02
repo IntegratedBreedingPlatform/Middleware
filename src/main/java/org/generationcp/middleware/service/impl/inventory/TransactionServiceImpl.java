@@ -11,12 +11,10 @@ import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
-import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.SearchRequestService;
-import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.ims.ExperimentTransaction;
 import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
@@ -228,10 +226,15 @@ public class TransactionServiceImpl implements TransactionService {
 						this.studyDatasetService.getObservationUnitRows(datasetDTO.getParentDatasetId(),
 							observationUnitsSearchDTO.getDatasetId(), observationUnitsSearchDTO, null);
 
+
+					Map<String, ExperimentModel> subObsExperimentalMap = this.daoFactory.getExperimentDao()
+						.getByObsUnitIds(observationUnitRows.stream().map(ObservationUnitRow::getObsUnitId).collect(
+							Collectors.toList())).stream().collect(Collectors.toMap(ExperimentModel::getObsUnitId, Function.identity()));
+
 					final Map<Integer, ExperimentModel> finalGermplasmExperimentModelMap = germplasmExperimentModelMap;
 					observationUnitRows.forEach(observationUnitRow -> {
 							finalGermplasmExperimentModelMap.put(observationUnitRow.getGid(),
-								this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitRow.getObsUnitId()).get());
+								subObsExperimentalMap.get(observationUnitRow.getObsUnitId()));
 						}
 					);
 					break;
