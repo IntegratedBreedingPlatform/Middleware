@@ -535,7 +535,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				.orElseThrow(() -> new MiddlewareRequestException("", "list.parent.folder.not.found"));
 
 		//Locking list when moving a from program to any crop folder
-		if (programUUID == null) {
+		if (!StringUtils.isEmpty(listToMove.getProgramUUID()) && programUUID == null) {
 			listToMove.setStatus(GermplasmList.Status.LOCKED_LIST.getCode());
 		}
 
