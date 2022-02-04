@@ -17,6 +17,8 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.lang.String.format;
+
 /**
  * The Class Debug. Used to print debug information.
  */
@@ -172,4 +174,13 @@ public class Debug {
 		Debug.printObjects(0, objects);
 	}
 
+	/**
+	 * Set BMSAPI/src/main/resources/logback.xml root level="DEBUG"
+	 * TODO jvm -Dlogback.debug=true not working?
+	 */
+	public static void debug(final String message, final Object... args) {
+		if (LOG.isDebugEnabled()) {
+			LOG.debug(format(message, args));
+		}
+	}
 }

@@ -25,6 +25,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
+import static org.generationcp.middleware.pojos.GermplasmListData.CROSS_NAME_TRUNCATED_SUFFIX;
+import static org.generationcp.middleware.pojos.GermplasmListData.MAX_CROSS_NAME_SIZE;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -236,6 +239,20 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 			Assert.assertEquals("Male Parent designation should be " + parentGermplasm.getPreferredName().getNval(),
 				parentGermplasm.getPreferredName().getNval(), currentGermplasmListData.getMaleParents().get(0).getDesignation());
 		}
+	}
+
+	@Test
+	public void testTruncateGroupName() {
+		final GermplasmListData listData = this.createTestListWithListData();
+		final String groupName = randomAlphanumeric(MAX_CROSS_NAME_SIZE + 1);
+		listData.setGroupName(groupName);
+		listData.truncateGroupNameIfNeeded();
+
+		// should not thrown exception
+		this.germplasmListDataDAO.saveOrUpdate(listData);
+
+		Assert.assertThat(listData.getGroupName(), is(groupName.substring(0, MAX_CROSS_NAME_SIZE - 1) + CROSS_NAME_TRUNCATED_SUFFIX));
+
 	}
 
 	private GermplasmListData createTestListWithListData() {
