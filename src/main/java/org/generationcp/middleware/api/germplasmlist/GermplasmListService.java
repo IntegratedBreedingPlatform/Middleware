@@ -34,7 +34,7 @@ public interface GermplasmListService {
 
 	Integer createGermplasmListFolder(Integer userId, String folderName, Integer parentId, String programUUID);
 
-	Integer updateGermplasmListFolder(Integer userId, String folderName, Integer folderId, String programUUID);
+	Integer updateGermplasmListFolder(String folderName, Integer folderId);
 
 	Integer moveGermplasmListFolder(Integer germplasmListId, Integer newParentFolderId, String programUUID);
 

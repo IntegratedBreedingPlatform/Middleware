@@ -22,6 +22,7 @@ public class GermplasmListDto {
 	private String notes;
 	private String parentFolderId;
 	private Integer status;
+	private Integer generationLevel;
 
 	public GermplasmListDto() {
 
@@ -129,6 +130,14 @@ public class GermplasmListDto {
 
 	public void setStatus(final Integer status) {
 		this.status = status;
+	}
+
+	public Integer getGenerationLevel() {
+		return generationLevel;
+	}
+
+	public void setGenerationLevel(final Integer generationLevel) {
+		this.generationLevel = generationLevel;
 	}
 
 	@Override
