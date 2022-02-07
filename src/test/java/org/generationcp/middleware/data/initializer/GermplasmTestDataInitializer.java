@@ -7,6 +7,7 @@ import org.generationcp.middleware.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class GermplasmTestDataInitializer {
@@ -16,12 +17,14 @@ public class GermplasmTestDataInitializer {
 	public static Germplasm createGermplasmWithPreferredName() {
 		final Name name = new Name(null, null, 1, 1, GermplasmTestDataInitializer.PREFERRED_NAME, 0, 0, 0);
 		final Germplasm germplasm = new Germplasm(null, 1, 0, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
 		return germplasm;
 	}
 
 	public static Germplasm createGermplasmWithPreferredName(final String preferredName) {
 		final Name name = new Name(null, null, 1, 1, preferredName, 0, 0, 0);
 		final Germplasm germplasm = new Germplasm(null, 1, 0, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(), name);
+		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
 		return germplasm;
 	}
 
@@ -42,6 +45,7 @@ public class GermplasmTestDataInitializer {
 		germplasm.setMethodName("MethodName");
 		germplasm.setLocationName("LocationName");
 		germplasm.setPreferredName(GermplasmTestDataInitializer.createGermplasmName(id));
+		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
 		return germplasm;
 	}
 
