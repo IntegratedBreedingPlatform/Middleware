@@ -1,0 +1,31 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+  <changeSet author="lkovacic" id="v20.4.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8300 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+            </sqlCheck>
+        </preConditions>
+        <comment>Change 'ENTRY_CODE' variable type to entry detail</comment>
+    <sql dbms="mysql" splitStatements="true">
+             UPDATE cvtermprop SET value = 'Entry Detail' WHERE cvterm_id = 8300 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+    </sql>
+  </changeSet>
+
+  <changeSet author="lkovacic" id="v20.4.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8300 AND type_id = 1804;
+            </sqlCheck>
+        </preConditions>
+        <comment>Change 'ENTRY_CODE' variable type to entry detail in 'projectprop' table</comment>
+    <sql dbms="mysql" splitStatements="true">
+             UPDATE projectprop SET type_id = 1815 WHERE variable_id = 8300 AND type_id = 1804;
+    </sql>
+  </changeSet>
+
+</databaseChangeLog>

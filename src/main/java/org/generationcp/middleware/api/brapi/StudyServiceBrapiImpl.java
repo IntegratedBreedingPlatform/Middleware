@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -314,10 +315,8 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 	}
 
 	private Map<Integer, Location> getLocationsMap(final List<Integer> locationDbIds) {
-		final LocationSearchRequest request = new LocationSearchRequest();
-		request.setLocationIds(locationDbIds);
 		return locationDbIds.isEmpty() ?
-			Collections.emptyMap() : this.daoFactory.getLocationDAO().filterLocations(request, null).stream()
+			Collections.emptyMap() : this.daoFactory.getLocationDAO().getByIds(locationDbIds).stream()
 			.collect(Collectors.toMap(Location::getLocid, Function.identity()));
 	}
 

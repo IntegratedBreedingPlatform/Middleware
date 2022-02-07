@@ -3,6 +3,7 @@ package org.generationcp.middleware.dao.germplasmlist;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.dao.util.DAOQueryUtils;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.util.SQLQueryBuilder;

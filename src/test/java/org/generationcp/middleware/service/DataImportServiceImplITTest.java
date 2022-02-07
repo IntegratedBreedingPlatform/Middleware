@@ -70,9 +70,7 @@ public class DataImportServiceImplITTest extends IntegrationTestBase {
 		this.cropType.setPlotCodePrefix(this.cropPrefix);
 
 		this.germplasmDAO = new GermplasmDAO(this.sessionProvder.getSession());
-
-		this.locationDAO = new LocationDAO();
-		this.locationDAO.setSession(this.sessionProvder.getSession());
+		this.locationDAO = new LocationDAO(this.sessionProvder.getSession());
 	}
 
 	@Ignore

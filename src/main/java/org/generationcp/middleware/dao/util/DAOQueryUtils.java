@@ -1,4 +1,4 @@
-package org.generationcp.middleware.dao.germplasmlist;
+package org.generationcp.middleware.dao.util;
 
 import org.apache.commons.lang3.StringUtils;
 import org.hibernate.SQLQuery;
@@ -12,7 +12,7 @@ import java.util.stream.StreamSupport;
 
 public class DAOQueryUtils {
 
-	static String getOrderClause(final Function<String, String> sortValueFunction, final Pageable pageable) {
+	public static String getOrderClause(final Function<String, String> sortValueFunction, final Pageable pageable) {
 		if (pageable != null && pageable.getSort() != null) {
 			final String orderClause = StreamSupport.stream(pageable.getSort().spliterator(), false)
 				.map(order -> String.format(" %s %s ", sortValueFunction.apply(order.getProperty()), order.getDirection()))
