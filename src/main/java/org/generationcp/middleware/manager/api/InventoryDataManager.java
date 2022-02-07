@@ -11,12 +11,9 @@
 
 package org.generationcp.middleware.manager.api;
 
-import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
@@ -25,7 +22,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * This is the API for retrieving information about Lots and Transactions.
@@ -43,6 +39,8 @@ public interface InventoryDataManager {
 	 * @param numOfRows - the number of rows to be included in the sublist of results to be returned
 	 * @return List of Lot POJOs
 	 */
+	// TODO: remove it. This is only used for test purpose.
+	@Deprecated
 	List<Lot> getLotsByEntityType(String type, int start, int numOfRows);
 
 	/**
@@ -52,6 +50,8 @@ public interface InventoryDataManager {
 	 * @param lot the lot
 	 * @return Returns the id of the {@code Lot} record added
 	 */
+	// TODO: remove it. This is only used for test purpose.
+	@Deprecated
 	Integer addLot(Lot lot);
 
 	/**
@@ -61,16 +61,9 @@ public interface InventoryDataManager {
 	 * @param lots the lots
 	 * @return Returns the ids of the {@code Lot} records added
 	 */
+	// TODO: remove it. This is only used for test purpose.
+	@Deprecated
 	List<Integer> addLots(List<Lot> lots);
-
-	/**
-	 * Given a List of valid Lot objects, each of them representing an existing record in the database, update the records to the changes
-	 * contained in the given objects.
-	 *
-	 * @param lots the lots
-	 * @return Returns the ids of the updated {@code Lot} records
-	 */
-	List<Integer> updateLots(List<Lot> lots);
 
 	/**
 	 * Given a valid Transaction record, add it as a new record to the database.
@@ -78,6 +71,8 @@ public interface InventoryDataManager {
 	 * @param transaction the transaction
 	 * @return Returns the id of the {@code Transaction} record added
 	 */
+	// TODO: remove it. This is only used for test purpose.
+	@Deprecated
 	Integer addTransaction(Transaction transaction);
 
 	/**
@@ -96,16 +91,9 @@ public interface InventoryDataManager {
 	 * @return Returns the id of the updated {@code Transaction} record
 	 * @throws MiddlewareQueryException the middleware query exception
 	 */
+	// TODO: remove it. This is only used for test purpose.
+	@Deprecated
 	Integer updateTransaction(Transaction transaction);
-
-	/**
-	 * Givan a List of valid Transaction objects, update their corresponding records in the database. Note that the Lot of the Transactions
-	 * can not be changed.
-	 *
-	 * @param transactions the transactions
-	 * @return Returns the ids of the updated {@code Transaction} records
-	 */
-	List<Integer> updateTransactions(List<Transaction> transactions);
 
 	/**
 	 * Returns the Transaction object which represents the record identified by the given id.
@@ -113,15 +101,9 @@ public interface InventoryDataManager {
 	 * @param id the id
 	 * @return the Transaction of the given id
 	 */
+	// TODO: remove it. This is only used for test purpose.
+	@Deprecated
 	Transaction getTransactionById(Integer id);
-
-	/**
-	 * Return all Transaction records associated with the Lot identified by the given parameter.
-	 *
-	 * @param id the id
-	 * @return Set of Transaction POJOs representing the records
-	 */
-	Set<Transaction> getTransactionsByLotId(Integer id);
 
 	/**
 	 * Gets the all transactions.
@@ -130,6 +112,8 @@ public interface InventoryDataManager {
 	 * @param numOfRows the num of rows
 	 * @return the all transactions
 	 */
+	// TODO: remove it. This is only used for test purpose.
+	@Deprecated
 	List<Transaction> getAllTransactions(int start, int numOfRows);
 
 	/**
@@ -141,14 +125,6 @@ public interface InventoryDataManager {
 	 * @return
 	 */
 	List<ListEntryLotDetails> getLotDetailsForListEntry(Integer listId, Integer recordId, Integer gid);
-
-	/**
-	 * Gets number of lots with available balance for germplasm
-	 *
-	 * @param gid
-	 * @return
-	 */
-	Integer countLotsWithAvailableBalanceForGermplasm(Integer gid);
 
 	/**
 	 * Return list of lots with aggregate inventory information for given germplasm
@@ -170,21 +146,8 @@ public interface InventoryDataManager {
 	 */
 	List<GermplasmListData> getLotCountsForList(Integer listId, int start, int numOfRows);
 
-	/**
-	 * Return the germplasm entries of given entry IDs of specific list with lot counts such as # of lots with available balance and # of
-	 * lots with reserved seed per entry
-	 *
-	 * @param entryIds
-	 * @return
-	 */
-	List<GermplasmListData> getLotCountsForListEntries(List<Integer> entryIds);
-
-	/**
-	 * Adds in inventory related information into an existing {@link GermplasmList}
-	 * @param germplasmList Existing germplasm list that we want to add inventory data too.
-	 */
-	void populateLotCountsIntoExistingList(GermplasmList germplasmList);
-
+	// TODO: remove it. This is only used for test purpose.
+	@Deprecated
 	Lot getLotById(Integer id);
 
 	/**
@@ -195,14 +158,6 @@ public interface InventoryDataManager {
 	 * @return List of TransactionReportRow objects
 	 */
     List<TransactionReportRow> getTransactionDetailsForLot(Integer lotId);
-
-	/**
-	 * This method will retrieve available balance for germplasm along with its scale
-	 *
-	 * @param germplasms
-	 * @return List of Germplasm with inventoryInfo
-	 */
-	List<Germplasm> getAvailableBalanceForGermplasms(List<Germplasm> germplasms);
 
 	/**
 	 * Returns the Map of gid and related stockIds.

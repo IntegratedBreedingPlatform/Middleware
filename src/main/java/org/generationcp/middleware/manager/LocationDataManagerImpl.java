@@ -64,11 +64,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public long countAllLocations() {
-		return this.countAll(this.daoFactory.getLocationDAO());
-	}
-
-	@Override
 	public List<Location> getLocationsByName(final String name, final Operation op) {
 		final List<Location> locations = new ArrayList<>();
 		locations.addAll(this.daoFactory.getLocationDAO().getByName(name, op));
@@ -78,41 +73,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Location> getLocationsByName(final String name, final int start, final int numOfRows, final Operation op) {
 		return this.daoFactory.getLocationDAO().getByName(name, op, start, numOfRows);
-	}
-
-	@Override
-	public long countLocationsByName(final String name, final Operation op) {
-		return this.daoFactory.getLocationDAO().countByName(name, op);
-	}
-
-	@Override
-	public List<Location> getLocationsByCountry(final Country country) {
-		return this.daoFactory.getLocationDAO().getByCountry(country);
-	}
-
-	@Override
-	public List<Location> getLocationsByCountry(final Country country, final int start, final int numOfRows) {
-		return this.daoFactory.getLocationDAO().getByCountry(country, start, numOfRows);
-	}
-
-	@Override
-	public long countLocationsByCountry(final Country country) {
-		return this.daoFactory.getLocationDAO().countByCountry(country);
-	}
-
-	@Override
-	public List<Location> getLocationsByType(final Integer type) {
-		return this.daoFactory.getLocationDAO().getByType(type);
-	}
-
-	@Override
-	public List<Location> getLocationsByType(final Integer type, final int start, final int numOfRows) {
-		return this.daoFactory.getLocationDAO().getByType(type, start, numOfRows);
-	}
-
-	@Override
-	public long countLocationsByType(final Integer type) {
-		return this.daoFactory.getLocationDAO().countByType(type);
 	}
 
 	@Override
@@ -184,28 +144,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<Integer> addLocation(final List<Location> locations) {
-
-		final List<Integer> idLocationsSaved = new ArrayList<>();
-		try {
-
-			final LocationDAO dao = this.daoFactory.getLocationDAO();
-
-			for (final Location location : locations) {
-				final Location recordSaved = dao.saveOrUpdate(location);
-				idLocationsSaved.add(recordSaved.getLocid());
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while saving Locations: LocationDataManager.addLocation(locations=" + locations + "): " + e
-					.getMessage(), e);
-		}
-		return idLocationsSaved;
-	}
-
-	@Override
 	public int addLocationAndLocdes(final Location location, final Locdes locdes) {
 
 		Integer idLocationSaved = null;
@@ -234,16 +172,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public List<Location> getLocationsByCountryAndType(final Country country, final Integer type) {
-		return this.daoFactory.getLocationDAO().getByCountryAndType(country, type);
-	}
-
-	@Override
-	public List<Location> getLocationsByNameCountryAndType(final String name, final Country country, final Integer type) {
-		return this.daoFactory.getLocationDAO().getByNameCountryAndType(name, country, type);
-	}
-
-	@Override
 	public List<LocationDetails> getLocationDetailsByLocId(final Integer locationId, final int start, final int numOfRows) {
 		return this.daoFactory.getLocationDAO().getLocationDetails(locationId, start, numOfRows);
 	}
@@ -251,11 +179,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Location> getAllBreedingLocations() {
 		return this.daoFactory.getLocationDAO().getAllBreedingLocations();
-	}
-
-	@Override
-	public Long countAllBreedingLocations() {
-		return this.daoFactory.getLocationDAO().countAllBreedingLocations();
 	}
 
 	@Override

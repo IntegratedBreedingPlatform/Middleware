@@ -33,7 +33,6 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.ontology.VariableCache;
 import org.generationcp.middleware.operation.builder.TermBuilder;
 import org.generationcp.middleware.pojos.ErrorCode;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.pojos.oms.CVTermSynonym;
@@ -89,11 +88,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	}
 
 	@Override
-	public StandardVariableSummary getStandardVariableSummary(final Integer standardVariableId) {
-		return this.getStandardVariableBuilder().getStandardVariableSummary(standardVariableId);
-	}
-
-	@Override
 	public void addStandardVariable(final StandardVariable stdVariable, final String programUUID) {
 
 		final Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
@@ -141,79 +135,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
 		}
-	}
-
-	@Override
-	public void addStandardVariable(final List<StandardVariable> stdVariableList) {
-
-		try {
-			for (final StandardVariable stdVariable : stdVariableList) {
-				this.getStandardVariableSaver().save(stdVariable);
-			}
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Error in addStandardVariable " + e.getMessage(), e);
-		}
-
-	}
-
-	@Override
-	public void addStandardVariableForMigrator(final StandardVariable stdVariable, final String programUUID) {
-		final Term existingStdVar = this.findTermByName(stdVariable.getName(), CvId.VARIABLES);
-		if (existingStdVar != null) {
-			throw new MiddlewareQueryException(String.format(
-				"Error in addStandardVariableForMigrator, Variable with name \"%s\" already exists", stdVariable.getName()));
-		}
-
-		try {
-			// check if scale, property and method exists first
-			final Term scale = this.findTermByName(stdVariable.getScale().getName(), CvId.SCALES);
-			if (scale == null) {
-				stdVariable.setScale(this.getTermSaver().save(stdVariable.getScale().getName(), stdVariable.getScale().getDefinition(),
-					CvId.SCALES));
-				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
-					OntologyDataManagerImpl.LOG.debug("new scale with id = " + stdVariable.getScale().getId());
-				}
-			} else if (stdVariable.getScale().getId() == 0) {
-				stdVariable.setScale(scale);
-			}
-
-			final Term property = this.findTermByName(stdVariable.getProperty().getName(), CvId.PROPERTIES);
-			if (property == null) {
-				stdVariable.setProperty(this.getTermSaver().save(stdVariable.getProperty().getName(),
-					stdVariable.getProperty().getDefinition(), CvId.PROPERTIES));
-				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
-					OntologyDataManagerImpl.LOG.debug("new property with id = " + stdVariable.getProperty().getId());
-				}
-			} else if (stdVariable.getProperty().getId() == 0) {
-				stdVariable.setProperty(property);
-			}
-
-			final Term method = this.findTermByName(stdVariable.getMethod().getName(), CvId.METHODS);
-			if (method == null) {
-				stdVariable.setMethod(this.getTermSaver().save(stdVariable.getMethod().getName(), stdVariable.getMethod().getDefinition(),
-					CvId.METHODS));
-				if (OntologyDataManagerImpl.LOG.isDebugEnabled()) {
-					OntologyDataManagerImpl.LOG.debug("new method with id = " + stdVariable.getMethod().getId());
-				}
-			} else if (stdVariable.getMethod().getId() == 0) {
-				stdVariable.setMethod(method);
-			}
-
-			// FIXME: Need to pass through programUUID
-			final StandardVariable existingStandardVariable =
-				this.findStandardVariableByTraitScaleMethodNames(stdVariable.getProperty().getName(), stdVariable.getScale().getName(),
-					stdVariable.getMethod().getName(), programUUID);
-			if (existingStandardVariable == null) {
-				this.getStandardVariableSaver().save(stdVariable);
-			} else {
-				stdVariable.setId(existingStandardVariable.getId());
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("Error in addStandardVariableForMigrator " + e.getMessage(), e);
-		}
-
 	}
 
 	/**
@@ -280,39 +201,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public List<Term> getAllTermsByCvId(final CvId cvId) {
 		return this.getTermBuilder().getTermsByCvId(cvId);
-	}
-
-	@Override
-	public long countTermsByCvId(final CvId cvId) {
-		return this.daoFactory.getCvTermDao().countTermsByCvId(cvId);
-	}
-
-	@Override
-	public List<Term> getMethodsForTrait(final Integer traitId) {
-		final List<Term> methodTerms = new ArrayList<>();
-		final Set<Integer> methodIds = new HashSet<>();
-		final List<Integer> localMethodIds = this.daoFactory.getCvTermDao().findMethodTermIdsByTrait(traitId);
-		if (localMethodIds != null) {
-			methodIds.addAll(localMethodIds);
-		}
-		for (final Integer termId : methodIds) {
-			methodTerms.add(this.getTermBuilder().get(termId));
-		}
-		return methodTerms;
-	}
-
-	@Override
-	public List<Term> getScalesForTrait(final Integer traitId) {
-		final List<Term> scaleTerms = new ArrayList<>();
-		final Set<Integer> scaleIds = new HashSet<>();
-		final List<Integer> localMethodIds = this.daoFactory.getCvTermDao().findScaleTermIdsByTrait(traitId);
-		if (localMethodIds != null) {
-			scaleIds.addAll(localMethodIds);
-		}
-		for (final Integer termId : scaleIds) {
-			scaleTerms.add(this.getTermBuilder().get(termId));
-		}
-		return scaleTerms;
 	}
 
 	@Override
@@ -407,11 +295,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 	@Override
 	public Map<String, List<StandardVariable>> getStandardVariablesInProjects(final List<String> headers, final String programUUID) {
 		return this.getStandardVariableBuilder().getStandardVariablesInProjects(headers, programUUID);
-	}
-
-	@Override
-	public List<ProjectProperty> getProjectPropertiesByProjectId(final int projectId) {
-		return this.daoFactory.getProjectPropertyDAO().getByProjectId(projectId);
 	}
 
 	@Override
@@ -580,13 +463,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 
 		return property;
-	}
-
-	@Override
-	public long countIsAOfProperties() {
-		long count = 0;
-		count += this.daoFactory.getCvTermDao().countIsAOfTermsByCvId(CvId.PROPERTIES);
-		return count;
 	}
 
 	@Override
@@ -985,11 +861,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 
 		return isSeedAmountVar;
-	}
-
-	@Override
-	public Integer getCVIdByName(final String name) {
-		return this.daoFactory.getCvDao().getIdByName(name);
 	}
 
 	@Override

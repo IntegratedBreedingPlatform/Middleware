@@ -15,14 +15,11 @@ import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
-import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.report.TransactionReportRow;
@@ -37,7 +34,6 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * Implementation of the InventoryDataManager interface. Most of the functions in this class only use the connection to the local instance,
@@ -81,11 +77,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	@Override
 	public List<Integer> addLots(final List<Lot> lots) {
 		return this.addOrUpdateLot(lots, Operation.ADD);
-	}
-
-	@Override
-	public List<Integer> updateLots(final List<Lot> lots) {
-		return this.addOrUpdateLot(lots, Operation.UPDATE);
 	}
 
 	private List<Integer> addOrUpdateLot(final List<Lot> lots, final Operation operation) {
@@ -135,11 +126,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 		return !ids.isEmpty() ? ids.get(0) : null;
 	}
 
-	@Override
-	public List<Integer> updateTransactions(final List<org.generationcp.middleware.pojos.ims.Transaction> transactions) {
-		return this.addOrUpdateTransaction(transactions, Operation.UPDATE);
-	}
-
 	private List<Integer> addOrUpdateTransaction(final List<org.generationcp.middleware.pojos.ims.Transaction> transactions, final Operation operation) {
 		final List<Integer> idTransactionsSaved = new ArrayList<>();
 		try {
@@ -169,12 +155,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	@Override
-	public Set<org.generationcp.middleware.pojos.ims.Transaction> getTransactionsByLotId(final Integer id) {
-		final Lot lot = this.daoFactory.getLotDao().getById(id, false);
-		return lot.getTransactions();
-	}
-
-	@Override
 	public List<org.generationcp.middleware.pojos.ims.Transaction> getAllTransactions(final int start, final int numOfRows) {
 		return this.daoFactory.getTransactionDAO().getAll(start, numOfRows);
 	}
@@ -195,23 +175,8 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	@Override
-	public void populateLotCountsIntoExistingList(final GermplasmList germplasmList) {
-		this.getListInventoryBuilder().retrieveLotCountsForList(germplasmList.getListData());
-	}
-	
-	@Override
-	public Integer countLotsWithAvailableBalanceForGermplasm(final Integer gid) {
-		return this.getListInventoryBuilder().countLotsWithAvailableBalanceForGermplasm(gid);
-	}
-
-	@Override
 	public List<LotDetails> getLotDetailsForGermplasm(final Integer gid) {
 		return this.getListInventoryBuilder().retrieveInventoryLotsForGermplasm(gid);
-	}
-
-	@Override
-	public List<GermplasmListData> getLotCountsForListEntries(final List<Integer> entryIds) {
-		return this.getListInventoryBuilder().retrieveLotCountsForListEntries(entryIds);
 	}
 
 	@Override
@@ -239,27 +204,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 			}
 		}
 		return transactionDetailsForLot;
-	}
-
-	@Override
-	public List<Germplasm> getAvailableBalanceForGermplasms(final List<Germplasm> germplasms) {
-		final List<Integer> gids = new ArrayList<>();
-
-		for(final Germplasm germplasm : germplasms) {
-			gids.add(germplasm.getGid());
-			germplasm.setInventoryInfo(new GermplasmInventory(germplasm.getGid()));
-		}
-
-		final Map<Integer, Object[]> availableBalanceCountAndTotalLotsCount =
-			this.daoFactory.getLotDao().getAvailableBalanceCountAndTotalLotsCount(gids);
-
-		for(final Germplasm germplasm : germplasms) {
-			final Object[] availableBalanceValues = availableBalanceCountAndTotalLotsCount.get(germplasm.getGid());
-			this.getListInventoryBuilder().setAvailableBalanceAndScale(germplasm.getInventoryInfo(), availableBalanceValues);
-		}
-
-		this.getListInventoryBuilder().setAvailableBalanceScaleForGermplasm(germplasms);
-		return germplasms;
 	}
 
 	@Override

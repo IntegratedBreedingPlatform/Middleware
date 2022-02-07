@@ -148,46 +148,6 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testUpdateTransactions() {
-		// Assumption: There are more than 2 transactions of lot_id = 1
-		final List<Transaction> transactions = this.manager.getAllTransactions(0, 2);
-
-		if (transactions.size() == 2) {
-			Debug.println(IntegrationTestBase.INDENT, "BEFORE: ");
-			Debug.printObjects(IntegrationTestBase.INDENT * 2, transactions);
-			final String oldComment = transactions.get(0).getComments();
-
-			for (final Transaction transaction : transactions) {
-				// Update comment
-				String newComment = transaction.getComments() + " UPDATED " + (int) (Math.random() * 100);
-				if (newComment.length() > 255) {
-					newComment = newComment.substring(newComment.length() - 255);
-				}
-				transaction.setComments(newComment);
-
-				// Invert status
-				transaction.setStatus(transaction.getStatus() ^ 1);
-			}
-			this.manager.updateTransactions(transactions);
-
-			Assert.assertFalse(oldComment.equals(transactions.get(0).getComments()));
-			Debug.println(IntegrationTestBase.INDENT, "AFTER: ");
-			Debug.printObjects(IntegrationTestBase.INDENT * 2, transactions);
-		} else {
-			Debug.println(IntegrationTestBase.INDENT, "At least two TRANSACTION entries are required in this test");
-		}
-	}
-
-	@Test
-	public void testGetTransactionsByLotId() {
-		final Set<Transaction> transactions = this.manager.getTransactionsByLotId(this.lotId);
-		Assert.assertTrue(transactions != null);
-		Assert.assertTrue(!transactions.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGetTransactionsByLotId(" + this.lotId + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, new ArrayList<Transaction>(transactions));
-	}
-
-	@Test
 	public void testGetTransactionById() {
 		final Integer id = 1;
 		final Transaction transactionid = this.manager.getTransactionById(id);
@@ -209,34 +169,11 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetLotCountsForGermplasmListEntries() throws MiddlewareQueryException {
-		final int listid = 1;
-		final List<Integer> entryIds = new ArrayList<Integer>();
-		entryIds.add(1);
-		entryIds.add(2);
-		entryIds.add(3);
-		final List<GermplasmListData> listEntries = this.manager.getLotCountsForListEntries(entryIds);
-		for (final GermplasmListData entry : listEntries) {
-			final ListDataInventory inventory = entry.getInventoryInfo();
-			if (inventory != null) {
-				System.out.println(inventory);
-			}
-		}
-	}
-
-	@Test
 	public void testGetLotsForGermplasmListEntry() throws MiddlewareQueryException {
 		final List<ListEntryLotDetails> lots = this.manager.getLotDetailsForListEntry(-543041, -507029, -88175);
 		for (final ListEntryLotDetails lot : lots) {
 			Debug.print(lot);
 		}
-	}
-
-	@Test
-	public void testGetLotCountsForGermplasm() throws MiddlewareQueryException {
-		final int gid = -644052;
-		final Integer count = this.manager.countLotsWithAvailableBalanceForGermplasm(gid);
-		Debug.print("GID=" + gid + ", lotCount=" + count);
 	}
 
 	@Test
@@ -252,29 +189,6 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 	@Test
 	public void testGetLotById() throws MiddlewareQueryException {
 		Assert.assertNotNull(this.manager.getLotById(1));
-	}
-
-	@Test
-	public void testGetAvailableBalanceForGermplasms() {
-		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
-				"LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
-
-		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
-		this.manager.addLots(Lists.<Lot>newArrayList(lot));
-
-		final Transaction transaction = InventoryDetailsTestDataInitializer
-			.createTransaction(
-				2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST", TransactionType.DEPOSIT.getId());
-		this.manager.addTransactions(Lists.<Transaction>newArrayList(transaction));
-
-		final List<Germplasm> availableBalanceForGermplasms =
-				this.manager.getAvailableBalanceForGermplasms(Lists.<Germplasm>newArrayList(germplasm));
-
-		Assert.assertEquals(1, availableBalanceForGermplasms.size());
-		Assert.assertEquals(1, availableBalanceForGermplasms.get(0).getInventoryInfo().getActualInventoryLotCount().intValue());
-		Assert.assertEquals("2.0", availableBalanceForGermplasms.get(0).getInventoryInfo().getTotalAvailableBalance().toString());
-		Assert.assertEquals("g", availableBalanceForGermplasms.get(0).getInventoryInfo().getScaleForGermplsm());
 	}
 
 	@Test

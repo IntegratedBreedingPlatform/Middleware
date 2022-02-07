@@ -360,16 +360,6 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	}
 
 	@Test
-	public void testGetCategoricalValue() throws Exception {
-		this.createTestVariableWithCategoricalValue();
-		final Scale scale = this.scaleManager.getScaleById(this.testScale.getId(), true);
-		final TermSummary categorical = scale.getCategories().get(0);
-		Assert.assertEquals("Unable to retrieve the categorical value of a variable", categorical.getDefinition(), this.variableManager
-				.retrieveVariableCategoricalValue(this.testProject.getUniqueID(), this.testVariableInfo.getId(), categorical.getId()));
-
-	}
-
-	@Test
 	public void testIsVariableUsedReturnsFalse() throws Exception {
 		final boolean hasUsage = this.variableManager.isVariableUsedInStudy(this.testVariableInfo.getId());
 		Assert.assertFalse("Variable should have no usage", hasUsage);

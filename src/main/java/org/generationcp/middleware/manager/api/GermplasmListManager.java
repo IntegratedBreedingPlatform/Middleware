@@ -80,14 +80,6 @@ public interface GermplasmListManager {
 	long countGermplasmListByName(String name, Operation operation);
 
 	/**
-	 * Returns the number of Germplasm List records that have the given status.
-	 *
-	 * @param status
-	 * @return The count of Germplasm lists based on the given status.
-	 */
-	long countGermplasmListByStatus(Integer status);
-
-	/**
 	 * Returns the germplasm lists that are associated with the specified GID.
 	 *
 	 * @param gid       - the Germplasm ID associated with the Germplasm Lists to be returned.
@@ -129,15 +121,6 @@ public interface GermplasmListManager {
 	 * @return List of GermplasmListData POJOs
 	 */
 	List<GermplasmListData> getGermplasmListDataByListIdAndGID(Integer listId, Integer gid);
-
-	/**
-	 * Returns the germplasm list entry which is identified by the given parameters.
-	 *
-	 * @param listId
-	 * @param entryId
-	 * @return List of GermplasmListData POJOs
-	 */
-	GermplasmListData getGermplasmListDataByListIdAndEntryId(Integer listId, Integer entryId);
 
 	/**
 	 * Returns the germplasm list entry which is identified by the given parameters.
@@ -222,14 +205,6 @@ public interface GermplasmListManager {
 	/**
 	 * Removes the corresponding {@code GermplasmList} record and all related Data from the database given the List ID.
 	 *
-	 * @param listId - {@code GermplasmList} ID of the Germplasm List record to be deleted.
-	 * @return Returns the number of {@code GermplasmList} records deleted from the database.
-	 */
-	int deleteGermplasmListByListId(Integer listId);
-
-	/**
-	 * Removes the corresponding {@code GermplasmList} record and all related Data from the database given the List ID.
-	 *
 	 * <b>WARNING</b>: this method physically removes records from the DB<br/>
 	 *
 	 * @param listId - {@code GermplasmList} ID of the Germplasm List record to be deleted.
@@ -259,16 +234,6 @@ public interface GermplasmListManager {
 	List<Integer> addGermplasmListData(List<GermplasmListData> germplasmListDatas);
 
 	/**
-	 * This method has {@link Isolation#READ_UNCOMMITTED} as isolation level in order to fix an issue (IBP-4537) for foreign key constraint failing.
-	 * Do not use it unless it's really necessary.
-	 *
-	 *
-	 * @param germplasmListDatas
-	 * @return a {@link List} of {@link GermplasmListData#getId()}
-	 */
-	List<Integer> addGermplasmListDataWithReadUncommittedIsolation(List<GermplasmListData> germplasmListDatas);
-
-	/**
 	 * Updates the database with the {@code GermplasmListData} objects specified.
 	 *
 	 * @param germplasmListDatas - A list of {@code GermplasmListData} objects to be updated in the database. Must be valid
@@ -276,15 +241,6 @@ public interface GermplasmListManager {
 	 * @return Returns the ids of the updated {@code GermplasmListData} records
 	 */
 	List<Integer> updateGermplasmListData(List<GermplasmListData> germplasmListDatas);
-
-	/**
-	 * Removes the corresponding {@code GermplasmListData} record from the database given its List ID and Entry ID.
-	 *
-	 * @param listId - {@code GermplasmList} ID of the Germplasm List Data to be deleted.
-	 * @param lrecId - {@code GermplasmListData} Entry ID of the Germplasm List Data to be deleted.
-	 * @return Returns the number of {@code GermplasmListData} records deleted from the database.
-	 */
-	int deleteGermplasmListDataByListIdLrecId(Integer listId, Integer lrecId);
 
 	/**
 	 * Removes the corresponding {@code GermplasmListData} records from the database given their List ID.
@@ -341,42 +297,6 @@ public interface GermplasmListManager {
 	List<UserDefinedField> getGermplasmNameTypes();
 
 	/**
-	 * Search for germplasm lists given a search term Q
-	 *
-	 * @param q string
-	 * @param o operation
-	 * @return - List of germplasm lists
-	 */
-	List<GermplasmList> searchForGermplasmList(String q, Operation o);
-
-	/**
-	 * Search for germplasm lists given a search term Q under a specific program
-	 *
-	 * @param q           string
-	 * @param programUUID string
-	 * @param o           operation
-	 * @return - List of germplasm lists
-	 */
-	List<GermplasmList> searchForGermplasmList(String q, String programUUID, Operation o);
-
-	/**
-	 * Inserts or updates the ListDataProperty records (columns) corresponding to the ListDataColumn records
-	 *
-	 * @param listDataCollection
-	 * @return the list of ListDataInfo objects with the listDataColumnId field of each ListDataColumn filled up if the corresponding
-	 * ListDataProperty object was successfully inserted or updated
-	 */
-	List<ListDataInfo> saveListDataColumns(List<ListDataInfo> listDataCollection);
-
-	/**
-	 * Retrieves list of distinct column names from ListDataProperty for given list Returns empty list if no related column found.
-	 *
-	 * @param listId - id of list to retrieve columns for
-	 * @return GermplasmListNewColumnsInfo of the additional columns for the given list
-	 */
-	GermplasmListNewColumnsInfo getAdditionalColumnsForList(Integer listId);
-
-	/**
 	 * @param listID
 	 * @return
 	 */
@@ -385,38 +305,10 @@ public interface GermplasmListManager {
 	List<GermplasmList> getAllGermplasmListsByProgramUUID(String currentProgramUUID);
 
 	/**
-	 * Returns the number of germplasm lists that are associated with the specified GID and programUUID.
-	 *
-	 * @param gid         - the Germplasm ID associated with the Germplasm Lists to be returned.
-	 * @param programUUID - the unique id of the the current program the user is in.
-	 * @return The count of Germplasm Lists associated with the given Germplasm ID/
-	 */
-	long countGermplasmListByGIDandProgramUUID(Integer gid, String programUUID);
-
-	/**
-	 * Returns the germplasm lists that are associated with the specified GID and programUUID.
-	 *
-	 * @param gid         - the Germplasm ID associated with the Germplasm Lists to be returned.
-	 * @param start       - start number of page
-	 * @param numOfRows   - number of rows per page
-	 * @param programUUID - the unique id of the the current program the user is in.
-	 * @return The count of Germplasm Lists associated with the given Germplasm ID/
-	 */
-	List<GermplasmList> getGermplasmListByGIDandProgramUUID(Integer gid, int start, int numOfRows, String programUUID);
-
-	/**
 	 * @param listIds a list of listid for which we want the corresponding germplasm list
 	 * @return the resultant germplasm list
 	 */
 	List<GermplasmList> getAllGermplasmListsByIds(List<Integer> listIds);
-
-	/**
-	 * Given a List of valid Germplasm objects, deleteGermplasms the corresponding records in the database.
-	 *
-	 * @param germplasms a list germplasm ID that need to delete
-	 * @throws MiddlewareQueryException the middleware query exception
-	 */
-	List<Integer> deleteGermplasms(final List<Integer> germplasms);
 
 	void populateGermplasmListCreatedByName(List<GermplasmList> germplasmLists);
 
