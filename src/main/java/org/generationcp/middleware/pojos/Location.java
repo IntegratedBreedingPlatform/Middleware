@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos;
 
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Basic;
@@ -21,6 +23,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
@@ -91,13 +94,15 @@ public class Location implements Serializable, Comparable<Location> {
 	@Column(name = "snl2id")
 	private Integer snl2id;
 
-	@Basic(optional = false)
-	@Column(name = "snl1id")
-	private Integer snl1id;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "snl1id")
+	@NotFound(action = NotFoundAction.IGNORE)
+	private Location province;
 
-	@Basic(optional = false)
-	@Column(name = "cntryid")
-	private Integer cntryid;
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "cntryid")
+	@NotFound(action = NotFoundAction.IGNORE)
+	private Country country;
 
 	@Basic(optional = false)
 	@Column(name = "lrplce")
@@ -120,9 +125,6 @@ public class Location implements Serializable, Comparable<Location> {
 	@Transient
 	private String parentLocationAbbr;
 
-	public static final String GET_ALL_BREEDING_LOCATIONS =
-		"SELECT l.locid, l.ltype, l.nllp, l.lname, l.labbr, l.snl3id, l.snl2id, l.snl1id, l.cntryid, l.lrplce, l.nnpid, g.lat, g.lon, g.alt, l.ldefault "
-					+ "FROM location l left join georef g on l.locid = g.locid WHERE l.ltype IN (410, 411, 412) ORDER BY lname";
 	public static final String COUNT_ALL_BREEDING_LOCATIONS = "SELECT count(*) AS count FROM location WHERE ltype IN (410, 411, 412)";
 	public static final String GET_LOCATION_NAMES_BY_GIDS = "SELECT gid, g.glocn, lname " + "FROM germplsm g " + "LEFT JOIN location l "
 			+ "ON g.glocn = l.locid " + "WHERE gid IN (:gids)";
@@ -135,8 +137,8 @@ public class Location implements Serializable, Comparable<Location> {
 	}
 
 	public Location(final Integer locid, final Integer ltype, final Integer nllp, final String lname, final String labbr,
-		final Integer snl3id, final Integer snl2id, final Integer snl1id,
-		final Integer cntryid, final Integer lrplce) {
+		final Integer snl3id, final Integer snl2id, final Location province,
+		final Country country, final Integer lrplce) {
 		super();
 		this.locid = locid;
 		this.ltype = ltype;
@@ -145,8 +147,8 @@ public class Location implements Serializable, Comparable<Location> {
 		this.labbr = labbr;
 		this.snl3id = snl3id;
 		this.snl2id = snl2id;
-		this.snl1id = snl1id;
-		this.cntryid = cntryid;
+		this.province = province;
+		this.country = country;
 		this.lrplce = lrplce;
 	}
 
@@ -166,12 +168,12 @@ public class Location implements Serializable, Comparable<Location> {
 		this.ltype = ltype;
 	}
 
-	public Integer getCntryid() {
-		return this.cntryid;
+	public Country getCountry() {
+		return country;
 	}
 
-	public void setCntryid(final Integer cntryid) {
-		this.cntryid = cntryid;
+	public void setCountry(final Country country) {
+		this.country = country;
 	}
 
 	public Integer getNllp() {
@@ -214,12 +216,12 @@ public class Location implements Serializable, Comparable<Location> {
 		this.snl2id = snl2id;
 	}
 
-	public Integer getSnl1id() {
-		return this.snl1id;
+	public Location getProvince() {
+		return province;
 	}
 
-	public void setSnl1id(final Integer snl1id) {
-		this.snl1id = snl1id;
+	public void setProvince(final Location province) {
+		this.province = province;
 	}
 
 	public Integer getLrplce() {
@@ -364,10 +366,6 @@ public class Location implements Serializable, Comparable<Location> {
 		builder.append(this.snl3id);
 		builder.append(", snl2id=");
 		builder.append(this.snl2id);
-		builder.append(", snl1id=");
-		builder.append(this.snl1id);
-		builder.append(", cntryid=");
-		builder.append(this.cntryid);
 		builder.append(", lrplce=");
 		builder.append(this.lrplce);
 		builder.append(", latitude=");

@@ -5,6 +5,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.junit.Assert;
@@ -35,8 +36,8 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetFilteredLocations() {
-		final List<Location> locations = this.locationService
-			.getFilteredLocations(new LocationSearchRequest(), new PageRequest(0, 10));
+		final List<LocationDTO> locations = this.locationService
+			.searchLocations(new LocationSearchRequest(), new PageRequest(0, 10), null);
 		Assert.assertThat(10, equalTo(locations.size()));
 	}
 
@@ -44,7 +45,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testCountLocationsByFilterNotRecoveredLocation() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYOE");
-		final long countLocation = this.locationService.countFilteredLocations(locationSearchRequest);
+		final long countLocation = this.locationService.countFilteredLocations(locationSearchRequest, null);
 		assertThat("Expected country location size equals to zero", 0 == countLocation);
 	}
 
@@ -67,11 +68,11 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetFilteredLocations_FavoritesOnly() {
 
+		final Country country = this.daoFactory.getCountryDao().getById(1);
 		final String programUUID = UUID.randomUUID().toString();
-		final int cntryid = 1;
 		final Location location = LocationTestDataInitializer
 			.createLocation(null, RandomStringUtils.randomAlphabetic(10), 405, RandomStringUtils.randomAlphabetic(3));
-		location.setCntryid(cntryid);
+		location.setCountry(country);
 		location.setLdefault(Boolean.FALSE);
 
 		this.daoFactory.getLocationDAO().saveOrUpdate(location);
@@ -79,17 +80,18 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final ProgramFavorite programFavorite = new ProgramFavorite();
 		programFavorite.setUniqueID(programUUID);
 		programFavorite.setEntityId(location.getLocid());
-		programFavorite.setEntityType("LOCATION");
+		programFavorite.setEntityType(ProgramFavorite.FavoriteType.LOCATION);
 		this.daoFactory.getProgramFavoriteDao().save(programFavorite);
 
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setFavoriteProgramUUID(programUUID);
+		locationSearchRequest.setFilterFavoriteProgramUUID(true);
 
-		final List<Location> locations = this.locationService
-			.getFilteredLocations(locationSearchRequest, new PageRequest(0, 10));
+		final List<LocationDTO> locations = this.locationService
+			.searchLocations(locationSearchRequest, new PageRequest(0, 10), programUUID);
 
 		Assert.assertThat(1, equalTo(locations.size()));
-		Assert.assertThat(location.getLocid(), equalTo(locations.get(0).getLocid()));
+		Assert.assertThat(location.getLocid(), equalTo(locations.get(0).getId()));
 
 	}
 
@@ -167,8 +169,8 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		locationRequestDto.setType(new Random().nextInt());
 		locationRequestDto.setName(RandomStringUtils.randomAlphabetic(10));
 		locationRequestDto.setAbbreviation(RandomStringUtils.randomAlphabetic(5));
-		locationRequestDto.setCountryId(new Random().nextInt());
-		locationRequestDto.setProvinceId(new Random().nextInt());
+		locationRequestDto.setCountryId(1);
+		locationRequestDto.setProvinceId(1001);
 		locationRequestDto.setAltitude(new Random().nextDouble());
 		locationRequestDto.setLatitude(new Random().nextDouble());
 		locationRequestDto.setLongitude(new Random().nextDouble());

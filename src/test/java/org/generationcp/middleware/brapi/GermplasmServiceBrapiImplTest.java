@@ -646,18 +646,6 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 		return method;
 	}
 
-	private Location createLocation() {
-		final Location location = new Location(null, 1,
-			1, RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(8),
-			1, 1, 1,
-			1, 1);
-		location.setLdefault(false);
-		this.daoFactory.getLocationDAO().saveOrUpdate(location);
-		this.sessionProvder.getSession().flush();
-		this.daoFactory.getLocationDAO().refresh(location);
-		return location;
-	}
-
 	private Name addName(final Germplasm germplasm, final Integer nameId, final String nameVal, final Integer locId, final String date,
 		final int preferred) {
 		final Name name = new Name(null, germplasm, nameId, preferred, nameVal, locId, Integer.valueOf(date), 0);

@@ -19,6 +19,7 @@ import com.google.common.collect.Maps;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.PersonDAO;
@@ -40,6 +41,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
+import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -90,6 +92,7 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 	private StudyTypeDAO studyTypeDAO;
 	private PersonDAO personDao;
 	private LocationDAO locationDAO;
+	private CountryDAO countryDAO;
 	private DmsProject project;
 	private List<StockModel> testStocks;
 	private List<ExperimentModel> experiments;
@@ -143,8 +146,10 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		this.personDao = new PersonDAO();
 		this.personDao.setSession(this.sessionProvder.getSession());
 
-		this.locationDAO = new LocationDAO();
-		this.locationDAO.setSession(this.sessionProvder.getSession());
+		this.locationDAO = new LocationDAO(this.sessionProvder.getSession());
+
+		this.countryDAO = new CountryDAO();
+		this.countryDAO.setSession(this.sessionProvder.getSession());
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.workbenchUser = this.testDataInitializer.createUserForTesting();
@@ -488,17 +493,17 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void createLocationForSearchLotTest() {
-		final String programUUID = org.apache.commons.lang3.RandomStringUtils.randomAlphabetic(16);
+		final Country country = this.countryDAO.getById(1);
+
 		final int ltype = 405;
 		final String labbr = org.apache.commons.lang3.RandomStringUtils.randomAlphabetic(7);
 		final String lname = org.apache.commons.lang3.RandomStringUtils.randomAlphabetic(9);
 
-		final int cntryid = 1;
 		location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
-		location.setCntryid(cntryid);
+		location.setCountry(country);
 
-		final int provinceId = 1001;
-		location.setSnl1id(provinceId);
+		final Location province = this.locationDAO.getById(1001);
+		location.setProvince(province);
 		location.setLdefault(Boolean.FALSE);
 
 		locationDAO.saveOrUpdate(location);

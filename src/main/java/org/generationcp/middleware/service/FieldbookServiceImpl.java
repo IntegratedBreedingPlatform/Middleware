@@ -467,7 +467,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			final String parentCode) {
 
 		final Integer lType = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locCode);
-		final Location location = new Location(null, lType, 0, locationName, null, 0, 0, 0, 0, 0);
+		final Location location = new Location(null, lType, 0, locationName, null, 0, 0, null, null, 0);
 
 		final Integer dType = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, parentCode);
 		final Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentId), 0, 0);
