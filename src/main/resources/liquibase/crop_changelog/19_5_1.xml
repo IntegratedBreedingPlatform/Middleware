@@ -1,0 +1,23 @@
+﻿<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+		
+	<changeSet author="corina" id="v19.5.1-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) > 0
+				FROM listnms
+				WHERE listtype = 'FOLDER' AND lhierarchy = 0 AND program_uuid IS NULL;
+            </sqlCheck>
+        </preConditions>
+        <comment>Set historical list folders to use lhierarchy = NULL</comment>
+		<sql dbms="mysql" splitStatements="true">
+	      	   UPDATE listnms
+			   SET lhierarchy=NULL
+			   WHERE listtype = 'FOLDER' AND lhierarchy = 0 AND program_uuid IS NULL;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
