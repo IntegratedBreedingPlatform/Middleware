@@ -207,11 +207,6 @@ public class InventoryDataManagerImpl extends DataManager implements InventoryDa
 	}
 
 	@Override
-	public Map<Integer, String> retrieveStockIds(final List<Integer> gids){
-		return this.daoFactory.getTransactionDAO().retrieveStockIds(gids);
-	}
-
-	@Override
 	public void generateLotIds(final CropType crop, final List<Lot> lots) {
 		UIDGenerator.<Lot>generate(crop, lots, UID_ROOT, SUFFIX_LENGTH,
 			new UIDGenerator.UIDAdapter<Lot>() {

@@ -11,27 +11,18 @@
 
 package org.generationcp.middleware.manager;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
-import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
-import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.utils.test.Debug;
@@ -44,19 +35,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 
 	@Autowired
 	private InventoryDataManager manager;
-
-	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
-	private GermplasmListManager germplasmListManager;
 
 	GermplasmListTestDataInitializer germplasmListTestDataInitializer;
 
@@ -191,40 +175,4 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		Assert.assertNotNull(this.manager.getLotById(1));
 	}
 
-	@Test
-	public void testRetrieveStockIds() {
-		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
-				"LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
-
-
-		final GermplasmList germplasmList = this.germplasmListTestDataInitializer.createGermplasmList(
-				"GermplasmList", Integer.valueOf(1),
-				"GermplasmList" + " Desc", null, 1, "programUUID");
-		this.germplasmListManager.addGermplasmList(germplasmList);
-
-		final GermplasmListData germplasmListData =
-				GermplasmListDataTestDataInitializer.createGermplasmListData(germplasmList, germplasmId, 2);
-		this.germplasmListManager.addGermplasmListData(germplasmListData);
-
-		final Lot lotOne = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "First Lot for Gemrplasm",
-			"InventoryId");
-		final Lot lotTwo = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Second Lot for Gemrplasm",
-			"InventoryId");
-		this.manager.addLots(Lists.newArrayList(lotOne, lotTwo));
-
-
-		final Transaction depositTransactionForLotOne =  InventoryDetailsTestDataInitializer
-				.createTransaction(5.0, TransactionStatus.PENDING.getIntValue(), TransactionType.DEPOSIT.getValue(), lotOne, 1, 1, germplasmListData.getId(), "LIST", TransactionType.DEPOSIT.getId());
-		final Transaction depositTransactionForLotTwo =  InventoryDetailsTestDataInitializer
-				.createTransaction(5.0, TransactionStatus.PENDING.getIntValue(), TransactionType.DEPOSIT.getValue(), lotTwo, 1, 1, germplasmListData.getId(), "LIST", TransactionType.DEPOSIT.getId());
-		this.manager.addTransactions(Lists.<Transaction>newArrayList(depositTransactionForLotOne, depositTransactionForLotTwo));
-
-
-		final Map<Integer, String> germplsmWiseStockID = this.manager.retrieveStockIds(Lists.newArrayList(germplasmId));
-
-		Assert.assertNotNull(germplsmWiseStockID);
-		Assert.assertEquals(depositTransactionForLotOne.getLot().getStockId() + ", " + depositTransactionForLotTwo.getLot().getStockId()
-			, germplsmWiseStockID.get(germplasmId));
-	}
 }

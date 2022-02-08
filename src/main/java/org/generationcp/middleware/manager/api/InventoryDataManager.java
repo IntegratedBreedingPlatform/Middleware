@@ -21,7 +21,6 @@ import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.pojos.workbench.CropType;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * This is the API for retrieving information about Lots and Transactions.
@@ -158,14 +157,6 @@ public interface InventoryDataManager {
 	 * @return List of TransactionReportRow objects
 	 */
     List<TransactionReportRow> getTransactionDetailsForLot(Integer lotId);
-
-	/**
-	 * Returns the Map of gid and related stockIds.
-	 *
-	 * @param gids
-	 * @return Map of stockIDs per gid
-	 */
-	Map<Integer, String> retrieveStockIds(List<Integer> gids);
 
 	void generateLotIds(final CropType crop, final List<Lot> lots);
 }
