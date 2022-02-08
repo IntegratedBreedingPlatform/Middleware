@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 
@@ -38,9 +39,10 @@ public class BreedingMethodValidator implements VariableValueValidator {
 					return false;
 				}
 			} else if (SCALE_BM_NAME.equals(scaleId)) {
-				request.setMethodNames(Collections.singletonList(value));
+				final SqlTextFilter nameFilter = new SqlTextFilter(value, SqlTextFilter.Type.EXACTMATCH);
+				request.setNameFilter(nameFilter);
 			}
-			return this.breedingMethodService.countBreedingMethods(request) > 0;
+			return this.breedingMethodService.countSearchBreedingMethods(request, null) > 0;
 		}
 		return true;
 	}

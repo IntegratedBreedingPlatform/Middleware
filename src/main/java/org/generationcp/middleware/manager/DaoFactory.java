@@ -193,9 +193,7 @@ public class DaoFactory {
 	}
 
 	public MethodDAO getMethodDAO() {
-		final MethodDAO methodDAO = new MethodDAO();
-		methodDAO.setSession(this.sessionProvider.getSession());
-		return methodDAO;
+		return new MethodDAO(this.sessionProvider.getSession());
 	}
 
 	public PhenotypeDao getPhenotypeDAO() {

@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.breedingmethod;
 import com.google.common.collect.ImmutableSet;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
+import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodClass;
@@ -36,14 +37,16 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 	private ProgramFavoriteService programFavoriteService;
 
 	private BreedingMethodServiceImpl breedingMethodService;
+	private MethodDAO methodDAO;
 
 	@Before
 	public void setUp() {
 		this.breedingMethodService = new BreedingMethodServiceImpl(this.sessionProvder);
+		this.methodDAO = new MethodDAO(this.sessionProvder.getSession());
 	}
 
 	@Test
-	public void testGetBreedingMethodsFilteredByFavorites_Ok() {
+	public void testSearchBreedingMethodsFilteredByFavorites_Ok() {
 
 		final List<Method> allMethods = this.germplasmDataManager.getAllMethods();
 		assertNotNull(allMethods);
@@ -56,25 +59,25 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 
 		//Should get only the favorite breeding method
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
-		searchRequest.setProgramUUID(programUUID);
-		searchRequest.setFavoritesOnly(true);
-		final List<BreedingMethodDTO> favoriteBreedingMethods = this.breedingMethodService.getBreedingMethods(searchRequest, null);
+		searchRequest.setFavoriteProgramUUID(programUUID);
+		searchRequest.setFilterFavoriteProgramUUID(true);
+		final List<BreedingMethodDTO> favoriteBreedingMethods = this.breedingMethodService.searchBreedingMethods(searchRequest, null, programUUID);
 		assertNotNull(favoriteBreedingMethods);
 		assertThat(favoriteBreedingMethods, hasSize(1));
 		assertThat(favoriteBreedingMethods.get(0).getCode(), is(favoriteBreedingMethod.getMcode()));
 	}
 
 	@Test
-	public void testGetBreedingMethodsByCodes_Ok() {
+	public void testSearchBreedingMethodsByCodes_Ok() {
 		final String newMethodCode = "NEWMETHO";
 
 		final Method newMethod = new Method(null, "NEW", "S", newMethodCode, "New Method", "New Method", 0, 0, 0, 0, 0, 0, 0, 0);
-		this.germplasmDataManager.addMethod(newMethod);
+		this.methodDAO.save(newMethod);
 
 		//Should get all methods without program and also the method previously created
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
 		searchRequest.setMethodAbbreviations(Collections.singletonList(newMethodCode));
-		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(searchRequest, null);
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.searchBreedingMethods(searchRequest, null, null);
 		assertNotNull(breedingMethods);
 		assertThat(breedingMethods.size(), is(1));
 		assertThat(breedingMethods, hasItem(hasProperty("code", is(newMethodCode))));
