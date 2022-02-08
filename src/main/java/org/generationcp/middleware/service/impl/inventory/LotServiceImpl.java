@@ -190,7 +190,7 @@ public class LotServiceImpl implements LotService {
 
 		final List<LocationDTO> locations =
 			this.daoFactory.getLocationDAO()
-				.searchLocations(new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null),
+				.searchLocations(new LocationSearchRequest(STORAGE_LOCATION_TYPE, null, locationAbbreviations, null),
 					null, null);
 		return locations.stream().collect(Collectors.toMap(LocationDTO::getAbbreviation, LocationDTO::getId));
 	}

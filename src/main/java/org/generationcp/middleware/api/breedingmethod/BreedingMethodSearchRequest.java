@@ -1,40 +1,41 @@
 package org.generationcp.middleware.api.breedingmethod;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @AutoProperty
 public class BreedingMethodSearchRequest {
 
-	/**
-	 * Used to get program favorites
-	 */
-	private String programUUID;
+	private String favoriteProgramUUID;
 	private List<String> methodTypes = new ArrayList<>();
 	private List<Integer> methodIds = new ArrayList<>();
 	private List<String> methodAbbreviations = new ArrayList<>();
-	private List<String> methodNames = new ArrayList<>();
-	private boolean favoritesOnly;
+	private SqlTextFilter nameFilter;
+	private Boolean filterFavoriteProgramUUID;
+	private String description;
+	private List<String> groups = new ArrayList<>();
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date methodDateFrom;
+	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+	private Date methodDateTo;
+	private List<Integer> methodClassIds = new ArrayList<>();
 
 	public BreedingMethodSearchRequest() {
 
 	}
 
-	public BreedingMethodSearchRequest(final String programUUID, final List<String> methodAbbreviations, final boolean favoritesOnly) {
-		this.programUUID = programUUID;
-		this.methodAbbreviations = methodAbbreviations;
-		this.favoritesOnly = favoritesOnly;
+	public String getFavoriteProgramUUID() {
+		return this.favoriteProgramUUID;
 	}
 
-	public String getProgramUUID() {
-		return this.programUUID;
-	}
-
-	public void setProgramUUID(final String programUUID) {
-		this.programUUID = programUUID;
+	public void setFavoriteProgramUUID(final String favoriteProgramUUID) {
+		this.favoriteProgramUUID = favoriteProgramUUID;
 	}
 
 	public List<String> getMethodTypes() {
@@ -61,20 +62,60 @@ public class BreedingMethodSearchRequest {
 		this.methodAbbreviations = methodAbbreviations;
 	}
 
-	public boolean isFavoritesOnly() {
-		return this.favoritesOnly;
+	public SqlTextFilter getNameFilter() {
+		return nameFilter;
 	}
 
-	public void setFavoritesOnly(final boolean favoritesOnly) {
-		this.favoritesOnly = favoritesOnly;
+	public void setNameFilter(final SqlTextFilter nameFilter) {
+		this.nameFilter = nameFilter;
 	}
 
-	public List<String> getMethodNames() {
-		return this.methodNames;
+	public Boolean getFilterFavoriteProgramUUID() {
+		return filterFavoriteProgramUUID;
 	}
 
-	public void setMethodNames(final List<String> methodNames) {
-		this.methodNames = methodNames;
+	public void setFilterFavoriteProgramUUID(final Boolean filterFavoriteProgramUUID) {
+		this.filterFavoriteProgramUUID = filterFavoriteProgramUUID;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
+	}
+
+	public List<String> getGroups() {
+		return groups;
+	}
+
+	public void setGroups(final List<String> groups) {
+		this.groups = groups;
+	}
+
+	public Date getMethodDateFrom() {
+		return methodDateFrom;
+	}
+
+	public void setMethodDateFrom(final Date methodDateFrom) {
+		this.methodDateFrom = methodDateFrom;
+	}
+
+	public Date getMethodDateTo() {
+		return methodDateTo;
+	}
+
+	public void setMethodDateTo(final Date methodDateTo) {
+		this.methodDateTo = methodDateTo;
+	}
+
+	public List<Integer> getMethodClassIds() {
+		return methodClassIds;
+	}
+
+	public void setMethodClassIds(final List<Integer> methodClassIds) {
+		this.methodClassIds = methodClassIds;
 	}
 
 	@Override
