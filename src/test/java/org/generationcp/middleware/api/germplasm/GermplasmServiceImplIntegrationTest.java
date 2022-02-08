@@ -37,6 +37,7 @@ import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
+import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -2654,10 +2655,12 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private Location createLocation() {
+		final Location province = this.daoFactory.getLocationDAO().getById(1);
+		final Country country = this.daoFactory.getCountryDao().getById(1);
 		final Location location = new Location(null, 1,
 			1, RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(8),
-			1, 1, 1,
-			1, 1);
+			1, 1, province,
+				country, 1);
 		location.setLdefault(false);
 		this.daoFactory.getLocationDAO().saveOrUpdate(location);
 		this.sessionProvder.getSession().flush();

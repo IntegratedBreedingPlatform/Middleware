@@ -1,29 +1,23 @@
 package org.generationcp.middleware.dao;
 
-import com.google.common.base.Predicate;
-import com.google.common.collect.Collections2;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
+import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
-import org.generationcp.middleware.util.StringUtil;
 import org.hamcrest.MatcherAssert;
-import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.PageRequest;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
@@ -43,12 +37,13 @@ public class LocationDAOTest extends IntegrationTestBase {
 	private static final String PROGRAM_UUID3 = "asdfg-54321";
 
 	private LocationDAO locationDAO;
+	private CountryDAO countryDAO;
 
 	@Before
 	public void setUp() throws Exception {
-		final Session session = this.sessionProvder.getSession();
-		this.locationDAO = new LocationDAO();
-		this.locationDAO.setSession(session);
+		this.locationDAO = new LocationDAO(this.sessionProvder.getSession());
+		this.countryDAO = new CountryDAO();
+		this.countryDAO.setSession(this.sessionProvder.getSession());
 	}
 
 	@Test
@@ -159,7 +154,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void testCountLocations() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("COUNTRY");
-		final long countLocation = this.locationDAO.countLocations(locationSearchRequest);
+		final long countLocation = this.locationDAO.countSearchLocation(locationSearchRequest, null);
 		MatcherAssert.assertThat("Expected country location size > zero", countLocation > 0);
 	}
 
@@ -167,7 +162,7 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void testCountLocationsNotFoundLocation() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
-		final long countLocation = this.locationDAO.countLocations(locationSearchRequest);
+		final long countLocation = this.locationDAO.countSearchLocation(locationSearchRequest, null);
 		MatcherAssert.assertThat("Expected country location size equals to zero by this locationType = 000100000405", countLocation == 0);
 
 	}
@@ -181,18 +176,19 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		// Country ID 1 = "Democratic Republic of Afghanistan"
 		final int cntryid = 1;
+		final Country country = this.countryDAO.getById(cntryid);
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
-		location.setCntryid(cntryid);
+		location.setCountry(country);
 		// Province Badakhshan
 		final int provinceId = 1001;
-		location.setSnl1id(provinceId);
+		final Location province = this.locationDAO.getById(provinceId);
+		location.setProvince(province);
 		location.setLdefault(Boolean.FALSE);
 
 		this.locationDAO.saveOrUpdate(location);
 
 		final List<LocationDetails> result = this.locationDAO.getLocationDetails(location.getLocid(), 0, Integer.MAX_VALUE);
 		final LocationDetails locationDetails = result.get(0);
-		final Location province = this.locationDAO.getById(provinceId);
 
 		Assert.assertEquals(lname, locationDetails.getLocationName());
 		Assert.assertEquals(location.getLocid(), locationDetails.getLocid());
@@ -211,25 +207,28 @@ public class LocationDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetLocationDTO() {
 
-		final String programUUID = RandomStringUtils.randomAlphabetic(16);
+		final Country country = this.countryDAO.getById(1);
+
 		final int ltype = 405;
 		final String labbr = RandomStringUtils.randomAlphabetic(7);
 		final String lname = RandomStringUtils.randomAlphabetic(9);
 
-		final int cntryid = 1;
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
-		location.setCntryid(cntryid);
+		location.setCountry(country);
 
-		final int provinceId = 1001;
-		location.setSnl1id(provinceId);
+		final Location province = this.locationDAO.getById(1001);
+		location.setProvince(province);
 		location.setLdefault(Boolean.FALSE);
 
 		this.locationDAO.saveOrUpdate(location);
+
+		this.sessionProvder.getSession().flush();
 
 		final LocationDTO locationDTO = this.locationDAO.getLocationDTO(location.getLocid());
 
 		Assert.assertThat(locationDTO.getName(), is(location.getLname()));
 		Assert.assertThat(locationDTO.getAbbreviation(), is(location.getLabbr()));
+		Assert.assertThat(locationDTO.getCountryId(), is(country.getCntryid()));
 	}
 
 	@Test
@@ -241,16 +240,16 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		// Country ID 1 = "Democratic Republic of Afghanistan"
 		final int cntryid = 1;
+		final Country country = this.countryDAO.getById(cntryid);
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
-		location.setCntryid(cntryid);
+		location.setCountry(country);
 		// Province Badakhshan
 		final int provinceId = 1001;
-		location.setSnl1id(provinceId);
+		final Location province = this.locationDAO.getById(provinceId);
+		location.setProvince(province);
 		location.setLdefault(Boolean.FALSE);
 
 		this.locationDAO.saveOrUpdate(location);
-		final Location province = this.locationDAO.getById(1001);
-		final Location country = this.locationDAO.getById(1);
 
 		final List<LocationDetails> result = this.locationDAO.getFilteredLocations(cntryid, ltype, lname);
 		final LocationDetails locationDetails = result.get(0);
@@ -259,8 +258,8 @@ public class LocationDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(location.getLocid(), locationDetails.getLocid());
 		Assert.assertEquals(ltype, locationDetails.getLtype().intValue());
 		Assert.assertEquals(labbr, locationDetails.getLocationAbbreviation());
-		Assert.assertEquals(cntryid, locationDetails.getCntryid().intValue());
-		Assert.assertEquals(country.getLname(), locationDetails.getCountryName());
+		Assert.assertEquals(country.getCntryid(), locationDetails.getCntryid());
+		Assert.assertEquals(country.getIsoabbr(), locationDetails.getCountryName());
 		Assert.assertEquals(province.getLname(), locationDetails.getProvinceName());
 		Assert.assertEquals(provinceId, locationDetails.getProvinceId().intValue());
 
@@ -329,14 +328,14 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		// Page 1
 		final PageRequest pageRequest = new PageRequest(0, 10);
-		final List<Location> locations =
-			this.locationDAO.filterLocations(locationSearchRequest, pageRequest);
+		final List<LocationDTO> locations =
+			this.locationDAO.searchLocations(locationSearchRequest, pageRequest, null);
 		Assert.assertThat(pageRequest.getPageSize(), equalTo(locations.size()));
 
 		// Page 2
 		final PageRequest pageRequest2 = new PageRequest(1, 10);
-		final List<Location> locations2 =
-			this.locationDAO.filterLocations(locationSearchRequest, pageRequest2);
+		final List<LocationDTO> locations2 =
+			this.locationDAO.searchLocations(locationSearchRequest, pageRequest2, null);
 		Assert.assertThat(pageRequest2.getPageSize(), equalTo(locations2.size()));
 		Assert.assertThat(locations, not(equalTo(locations2)));
 
@@ -346,11 +345,14 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void testFilterLocations_SearchByLocationName() {
 		final String locationName = "Philippines";
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
-		locationSearchRequest.setLocationName(locationName);
-		final List<Location> locations =
+		final SqlTextFilter locationNameFilter = new SqlTextFilter();
+		locationNameFilter.setValue(locationName);
+		locationNameFilter.setType(SqlTextFilter.Type.EXACTMATCH);
+		locationSearchRequest.setLocationNameFilter(locationNameFilter);
+		final List<LocationDTO> locations =
 			this.locationDAO
-				.filterLocations(locationSearchRequest, new PageRequest(0, 10));
-		Assert.assertThat(locationName, equalTo(locations.get(0).getLname()));
+				.searchLocations(locationSearchRequest, new PageRequest(0, 10), null);
+		Assert.assertThat(locationName, equalTo(locations.get(0).getName()));
 
 	}
 
@@ -359,13 +361,13 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final Integer locationType = 405;
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeIds(Collections.singleton(locationType));
-		final List<Location> locations =
+		final List<LocationDTO> locations =
 			this.locationDAO
-				.filterLocations(locationSearchRequest,
-					new PageRequest(0, 10));
+				.searchLocations(locationSearchRequest,
+					new PageRequest(0, 10), null);
 
 		locations.stream().forEach((location) -> {
-			Assert.assertThat(locationType, equalTo(location.getLtype()));
+			Assert.assertThat(locationType, equalTo(location.getType()));
 		});
 	}
 
@@ -375,12 +377,12 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final Integer locationId = 171;
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationIds(Collections.singletonList(locationId));
-		final List<Location> locations =
+		final List<LocationDTO> locations =
 			this.locationDAO
-				.filterLocations(locationSearchRequest,
-					new PageRequest(0, 10));
+				.searchLocations(locationSearchRequest,
+					new PageRequest(0, 10), null);
 
-		Assert.assertThat(locationId, equalTo(locations.get(0).getLocid()));
+		Assert.assertThat(locationId, equalTo(locations.get(0).getId()));
 	}
 
 	@Test
@@ -389,20 +391,21 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final String locationAbbreviation = "PHL";
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationAbbreviations(Collections.singletonList(locationAbbreviation));
-		final List<Location> locations =
+		final List<LocationDTO> locations =
 			this.locationDAO
-				.filterLocations(locationSearchRequest,
-					new PageRequest(0, 10));
+				.searchLocations(locationSearchRequest,
+					new PageRequest(0, 10), null);
 
-		Assert.assertThat(locationAbbreviation, equalTo(locations.get(0).getLabbr()));
+		Assert.assertThat(locationAbbreviation, equalTo(locations.get(0).getAbbreviation()));
 	}
 
 	private Location saveTestLocation() {
 		final String labbr = RandomStringUtils.randomAlphabetic(6);
 		final String lname = RandomStringUtils.randomAlphabetic(10);
 
+		final Country country = this.countryDAO.getById(1);
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, 0, labbr);
-		location.setCntryid(0);
+		location.setCountry(country);
 		location.setLdefault(Boolean.FALSE);
 		this.locationDAO.saveOrUpdate(location);
 

@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -20,14 +21,14 @@ public class ProgramFavoriteServiceImpl implements ProgramFavoriteService {
 	}
 
 	@Override
-	public void addProgramFavorites(final String programUUID, final ProgramFavorite.FavoriteType favoriteType, final Set<Integer> entityIds) {
-		entityIds.forEach(entityId -> {
+	public List<ProgramFavoriteDTO> addProgramFavorites(final String programUUID, final ProgramFavorite.FavoriteType favoriteType, final Set<Integer> entityIds) {
+		return entityIds.stream().map(entityId -> {
 			final ProgramFavorite favorite = new ProgramFavorite();
 			favorite.setEntityId(entityId);
-			favorite.setEntityType(favoriteType.getName());
+			favorite.setEntityType(favoriteType);
 			favorite.setUniqueID(programUUID);
-			this.daoFactory.getProgramFavoriteDao().save(favorite);
-		});
+			return this.daoFactory.getProgramFavoriteDao().save(favorite);
+		}).map(ProgramFavoriteMapper.INSTANCE).collect(Collectors.toList());
 	}
 
 	@Override

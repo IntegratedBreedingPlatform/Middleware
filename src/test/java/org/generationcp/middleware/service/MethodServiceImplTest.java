@@ -37,8 +37,7 @@ public class MethodServiceImplTest extends IntegrationTestBase {
 		}
 
 		this.methodService = new MethodServiceImpl(this.sessionProvder);
-		this.methodDAO = new MethodDAO();
-		this.methodDAO.setSession(this.sessionProvder.getSession());
+		this.methodDAO = new MethodDAO(this.sessionProvder.getSession());
 	}
 
 	@Test
