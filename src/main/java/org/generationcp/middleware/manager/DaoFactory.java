@@ -14,7 +14,6 @@ import org.generationcp.middleware.dao.GermplasmExternalReferenceDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
 import org.generationcp.middleware.dao.GermplasmStudySourceDAO;
 import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
-import org.generationcp.middleware.dao.ListDataPropertyDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.LocdesDAO;
 import org.generationcp.middleware.dao.MethodDAO;
@@ -328,12 +327,6 @@ public class DaoFactory {
 		final BibrefDAO bibrefDAO = new BibrefDAO();
 		bibrefDAO.setSession(this.sessionProvider.getSession());
 		return bibrefDAO;
-	}
-
-	public ListDataPropertyDAO getListDataPropertyDAO() {
-		final ListDataPropertyDAO listDataPropertyDAO = new ListDataPropertyDAO();
-		listDataPropertyDAO.setSession(this.sessionProvider.getSession());
-		return listDataPropertyDAO;
 	}
 
 	public StudyTypeDAO getStudyTypeDao() {

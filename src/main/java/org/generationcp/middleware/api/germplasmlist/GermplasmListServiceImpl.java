@@ -70,27 +70,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private final DaoFactory daoFactory;
 
-
-	public enum GermplasmListDataPropertyName {
-
-		BREEDING_METHOD_NAME("METHOD NAME"),
-		BREEDING_METHOD_ABBREVIATION("METHOD ABBREV"),
-		BREEDING_METHOD_NUMBER("METHOD NUMBER"),
-		BREEDING_METHOD_GROUP("METHOD GROUP");
-
-		private final String name;
-
-		GermplasmListDataPropertyName(final String name) {
-			this.name = name;
-		}
-
-		public String getName() {
-			return this.name;
-		}
-
-	}
-
-
 	@Value("${germplasm.list.add.entries.limit}")
 	public int maxAddEntriesLimit;
 
@@ -323,7 +302,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private void addGermplasmEntriesModelsToList(final GermplasmList germplasmList,
 		final List<AddGermplasmEntryModel> addGermplasmEntriesModels) {
-		this.checkLimitToAddEntriesToExistingList(addGermplasmEntriesModels.size(), germplasmList);
+		this.checkLimitToAddEntriesToExistingList(addGermplasmEntriesModels.size());
 
 		//Get the entryId max value
 		final int maxEntryNo = germplasmList.getListData()
@@ -753,19 +732,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		}
 	}
 
-	private boolean hasBreedingMethodProperty(final String property) {
-		return GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName().equals(property) ||
-			GermplasmListDataPropertyName.BREEDING_METHOD_ABBREVIATION.getName().equals(property) ||
-			GermplasmListDataPropertyName.BREEDING_METHOD_NUMBER.getName().equals(property) ||
-			GermplasmListDataPropertyName.BREEDING_METHOD_GROUP.getName().equals(property);
-	}
-
-	private void checkLimitToAddEntriesToExistingList(final int entriesToAddSize, final GermplasmList actualGermplasmList) {
-		if (entriesToAddSize > this.maxAddEntriesLimit &&
-			!CollectionUtils.isEmpty(actualGermplasmList.getListData()) &&
-			!CollectionUtils.isEmpty(actualGermplasmList.getListData().get(0).getProperties()) &&
-			actualGermplasmList.getListData().get(0).getProperties().stream()
-				.anyMatch(listDataProperty -> this.hasBreedingMethodProperty(listDataProperty.getColumn()))) {
+	private void checkLimitToAddEntriesToExistingList(final int entriesToAddSize) {
+		// TODO: review this condition because later was added due to performance issues. Please, cheack at: https://ibplatform.atlassian.net/browse/IBP-4184
+		if (entriesToAddSize > this.maxAddEntriesLimit) {
 			throw new MiddlewareRequestException("",
 				"list.add.limit",
 				String.valueOf(this.maxAddEntriesLimit));

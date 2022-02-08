@@ -1074,11 +1074,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	 */
 	@Override
 	public boolean hasUsage(final int variableId) {
-		// Temporal condition to avoid delete variable when it exists in listdataprops.
-		final boolean variableUsedInListdataProp = this.daoFactory.getListDataPropertyDAO().isOntologyVariableInUse(variableId);
-
-		return variableUsedInListdataProp ||
-			this.isVariableUsedInStudy(variableId) ||
+		return this.isVariableUsedInStudy(variableId) ||
 			this.areVariablesUsedInAttributes(Lists.newArrayList(variableId)) ||
 			this.isVariableUsedInBreedingMethods(variableId) ||
 			this.isVariableAssignedToLists(variableId);

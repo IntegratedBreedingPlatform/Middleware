@@ -11,15 +11,11 @@
 
 package org.generationcp.middleware.manager.api;
 
-import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
-import org.generationcp.middleware.domain.gms.ListDataInfo;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.springframework.transaction.annotation.Isolation;
 
 import java.util.List;
 import java.util.Map;
