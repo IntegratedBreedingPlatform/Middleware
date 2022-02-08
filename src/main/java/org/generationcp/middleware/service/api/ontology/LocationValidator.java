@@ -6,6 +6,7 @@ import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
@@ -36,9 +37,10 @@ public class LocationValidator implements VariableValueValidator {
 					return false;
 				}
 			} else if (SCALE_LOC_NAME.equals(scaleId)) {
-				request.setLocationName(value);
+				final SqlTextFilter locationNameFilter = new SqlTextFilter(value, SqlTextFilter.Type.STARTSWITH);
+				request.setLocationNameFilter(locationNameFilter);
 			}
-			return this.locationService.countFilteredLocations(request) > 0;
+			return this.locationService.countFilteredLocations(request, null) > 0;
 		}
 		return true;
 	}

@@ -60,7 +60,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 		final Optional<String> programOptional = ContextHolder.getCurrentProgramOptional();
 		final Optional<ProgramFavorite> programFavorite = programOptional.isPresent()
 			? this.daoFactory.getProgramFavoriteDao().getProgramFavorite(
-			programOptional.get(), ProgramFavorite.FavoriteType.METHOD, breedingMethodDbId)
+			programOptional.get(), ProgramFavorite.FavoriteType.METHODS, breedingMethodDbId)
 			: Optional.empty();
 
 		if (!Objects.isNull(methodEntity)) {
@@ -160,7 +160,7 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 
 	private List<Integer> getFavoriteProjectMethodsIds(final String programUUID) {
 		return this.daoFactory.getProgramFavoriteDao()
-			.getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, programUUID)
+			.getProgramFavorites(ProgramFavorite.FavoriteType.METHODS, Integer.MAX_VALUE, programUUID)
 			.stream()
 			.map(ProgramFavorite::getEntityId)
 			.collect(Collectors.toList());

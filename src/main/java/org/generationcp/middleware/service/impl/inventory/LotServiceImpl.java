@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.inventory;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
@@ -23,7 +24,6 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
@@ -188,11 +188,11 @@ public class LotServiceImpl implements LotService {
 
 	private Map<String, Integer> buildLocationsByLocationAbbrMap(final List<String> locationAbbreviations) {
 
-		final List<Location> locations =
+		final List<LocationDTO> locations =
 			this.daoFactory.getLocationDAO()
-				.filterLocations(new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null),
-					null);
-		return locations.stream().collect(Collectors.toMap(Location::getLabbr, Location::getLocid));
+				.searchLocations(new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null),
+					null, null);
+		return locations.stream().collect(Collectors.toMap(LocationDTO::getAbbreviation, LocationDTO::getId));
 	}
 
 	private Map<String, Integer> buildUnitsByNameMap() {

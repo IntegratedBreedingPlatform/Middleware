@@ -96,17 +96,19 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testCountByLocationAbbreviation() {
+		final Country country = this.manager.getCountryById(1);
+		final Location province = this.manager.getLocationByID(1001);
 		final String labbr = "LABBRR";
 		final long count = this.manager.countByLocationAbbreviation(labbr);
 
 		final Location location = new Location();
-		location.setCntryid(1);
+		location.setCountry(country);
 		location.setLabbr(labbr);
 		location.setLname("ADDED LOCATION");
 		location.setLrplce(1);
 		location.setLtype(1);
 		location.setNllp(1);
-		location.setSnl1id(1);
+		location.setProvince(province);
 		location.setSnl2id(1);
 		location.setSnl3id(1);
 		location.setLdefault(Boolean.FALSE);
@@ -257,14 +259,16 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testAddLocation() throws MiddlewareQueryException {
+		final Country country = this.manager.getCountryById(1);
+		final Location province = this.manager.getLocationByID(1001);
 		final Location location = new Location();
-		location.setCntryid(1);
+		location.setCountry(country);
 		location.setLabbr("");
 		location.setLname("TEST-LOCATION-1");
 		location.setLrplce(1);
 		location.setLtype(1);
 		location.setNllp(1);
-		location.setSnl1id(1);
+		location.setProvince(province);
 		location.setSnl2id(1);
 		location.setSnl3id(1);
 		location.setLdefault(Boolean.FALSE);
@@ -278,28 +282,31 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testAddLocations() throws MiddlewareQueryException {
 
+		final Country country = this.manager.getCountryById(1);
+		final Location province = this.manager.getLocationByID(1001);
+
 		final List<Location> locations = new ArrayList<>();
 
 		final Location location1 = new Location();
-		location1.setCntryid(1);
+		location1.setCountry(country);
 		location1.setLabbr(RandomStringUtils.randomAlphabetic(4).toUpperCase());
 		location1.setLname("TEST-LOCATION-2");
 		location1.setLrplce(1);
 		location1.setLtype(1);
 		location1.setNllp(1);
-		location1.setSnl1id(1);
+		location1.setProvince(province);
 		location1.setSnl2id(1);
 		location1.setSnl3id(1);
 		location1.setLdefault(Boolean.FALSE);
 
 		final Location location2 = new Location();
-		location2.setCntryid(1);
+		location2.setCountry(country);
 		location2.setLabbr(RandomStringUtils.randomAlphabetic(4).toUpperCase());
 		location2.setLname("TEST-LOCATION-3");
 		location2.setLrplce(1);
 		location2.setLtype(1);
 		location2.setNllp(1);
-		location2.setSnl1id(1);
+		location2.setProvince(province);
 		location2.setSnl2id(1);
 		location2.setSnl3id(1);
 		location2.setLdefault(Boolean.FALSE);
@@ -357,7 +364,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetLocationDetailsByLocId() {
-		final int locationId = 2;
+		final int locationId = 1001;
 		final List<LocationDetails> locdetails = this.manager.getLocationDetailsByLocId(locationId, 0, 100);
 		Assert.assertNotNull(locdetails);
 		Assert.assertFalse(locdetails.isEmpty());
@@ -492,7 +499,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
 		for (final Location location : locationList) {
 			Assert.assertEquals("Location should have a countryId = " + LocationDataManagerImplTest.PHILIPPINES_CNTRYID,
-				LocationDataManagerImplTest.PHILIPPINES_CNTRYID, location.getCntryid());
+				LocationDataManagerImplTest.PHILIPPINES_CNTRYID, location.getCountry().getCntryid());
 		}
 	}
 

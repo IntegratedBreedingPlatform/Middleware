@@ -5,19 +5,16 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -46,54 +43,19 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public List<Location> getFilteredLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
-		if (this.doProceedWithFilteredSearch(locationSearchRequest)) {
-			return this.daoFactory.getLocationDAO().filterLocations(locationSearchRequest, pageable);
-		}
-		return Collections.emptyList();
-
+	public List<LocationDTO> searchLocations(final LocationSearchRequest locationSearchRequest,
+			final Pageable pageable, final String programUUID) {
+		return this.daoFactory.getLocationDAO().searchLocations(locationSearchRequest, pageable, programUUID);
 	}
 
 	@Override
-	public long countFilteredLocations(final LocationSearchRequest locationSearchRequest) {
-		if (this.doProceedWithFilteredSearch(locationSearchRequest)) {
-			return this.daoFactory.getLocationDAO().countLocations(locationSearchRequest);
-		}
-		return 0L;
-	}
-
-	@Override
-	public List<Integer> getFavoriteProjectLocationIds(final String programUUID) {
-		final List<ProgramFavorite> programFavorites =
-			this.daoFactory.getProgramFavoriteDao()
-				.getProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, Integer.MAX_VALUE, programUUID);
-		return programFavorites.stream().map(ProgramFavorite::getEntityId).collect(Collectors.toList());
+	public long countFilteredLocations(final LocationSearchRequest locationSearchRequest, final String programUUID) {
+		return this.daoFactory.getLocationDAO().countSearchLocation(locationSearchRequest, programUUID);
 	}
 
 	@Override
 	public List<org.generationcp.middleware.api.location.Location> getLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
 		return this.daoFactory.getLocationDAO().getLocations(locationSearchRequest, pageable);
-	}
-
-	/**
-	 * Return true if proceed with searching by filter when
-	 * 1) filtering by favorites and at least one favorite exists OR
-	 * 2) not filtering by favorites.
-	 *
-	 * If filtering by favorites but none exists, do not proceed with filtered search from LocationDAO
-	 *
-	 * @param locationSearchRequest
-	 * @return
-	 */
-	boolean doProceedWithFilteredSearch(final LocationSearchRequest locationSearchRequest) {
-		if (!StringUtils.isEmpty(locationSearchRequest.getFavoriteProgramUUID())) {
-			final List<Integer> favoriteProjectLocationIds = this.getFavoriteProjectLocationIds(locationSearchRequest.getFavoriteProgramUUID());
-			if (CollectionUtils.isEmpty(favoriteProjectLocationIds)) {
-				return false;
-			}
-			locationSearchRequest.getLocationIds().addAll(favoriteProjectLocationIds);
-		}
-		return true;
 	}
 
 	@Override
@@ -105,12 +67,14 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public LocationDTO createLocation(final LocationRequestDto locationRequestDto) {
 
-		final Integer countryId = locationRequestDto.getCountryId() != null ? locationRequestDto.getCountryId() : 0;
-		final Integer provinceId = locationRequestDto.getProvinceId() != null ? locationRequestDto.getProvinceId() : 0;
+		final Country country = (locationRequestDto.getCountryId() == null) ? null :
+			this.daoFactory.getCountryDao().getById(locationRequestDto.getCountryId());
+		final Location province = (locationRequestDto.getProvinceId() == null) ? null :
+				this.daoFactory.getLocationDAO().getById(locationRequestDto.getProvinceId());
 
 		final Location newLocation = new Location(null, locationRequestDto.getType(),
 			0, locationRequestDto.getName(), locationRequestDto.getAbbreviation(),
-			0, 0, provinceId, countryId, 0);
+			0, 0, province, country, 0);
 		newLocation.setLdefault(false);
 
 		if (locationRequestDto.getLatitude() != null) {
@@ -146,11 +110,13 @@ public class LocationServiceImpl implements LocationService {
 		}
 
 		if (locationRequestDto.getCountryId() != null) {
-			location.setCntryid(locationRequestDto.getCountryId());
+			final Country country = this.daoFactory.getCountryDao().getById(locationRequestDto.getCountryId());
+			location.setCountry(country);
 		}
 
 		if (locationRequestDto.getProvinceId() != null) {
-			location.setSnl1id(locationRequestDto.getProvinceId());
+			final Location province = this.daoFactory.getLocationDAO().getById(locationRequestDto.getProvinceId());
+			location.setProvince(province);
 		}
 
 		if (locationRequestDto.getLatitude() != null) {
