@@ -9,7 +9,16 @@ public class SqlTextFilter {
 	}
 
 	private String value;
-	private Type type = Type.STARTSWITH;
+	private Type type;
+
+	public SqlTextFilter() {
+		this.type = Type.STARTSWITH;
+	}
+
+	public SqlTextFilter(final String value, final Type type) {
+		this.value = value;
+		this.type = type;
+	}
 
 	public String getValue() {
 		return this.value;

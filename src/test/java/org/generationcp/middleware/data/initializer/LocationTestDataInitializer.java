@@ -39,10 +39,10 @@ public class LocationTestDataInitializer {
 		location.setLtype(locationType);
 		location.setLabbr(locationAbbreviation);
 		location.setNllp(0);
-		location.setSnl1id(0);
+		location.setProvince(null);
 		location.setSnl2id(0);
 		location.setSnl3id(0);
-		location.setCntryid(0);
+		location.setCountry(null);
 		location.setLrplce(0);
 		location.setLdefault(Boolean.FALSE);
 

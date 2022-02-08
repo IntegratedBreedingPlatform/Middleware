@@ -90,13 +90,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 	private static final String PROJECT_ID = "projectId";
 
 	private static final String TRAIT_IDS = "traitIds";
-
-	/**
-	 * Workaround for KSU Field-book BrAPI v1 interface expecting some value in observationUnit import
-	 * https://github.com/PhenoApps/Field-Book/issues/280
-	 */
-	private static final String XY_DEFAULT = "1";
-
 	private static final Logger LOG = LoggerFactory.getLogger(PhenotypeDao.class);
 
 	private static final String GET_OBSERVATIONS = "SELECT p.observable_id, s.dbxref_id, e.nd_geolocation_id, p.value "
@@ -985,12 +978,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setStudyName((String) row[9]);
 				observationUnit.setProgramName((String) row[10]);
 
-				String x = row[16] != null ? (String) row[16] : null; // COL
-				String y = row[17] != null ? (String) row[17] : null; // ROW
-				if (StringUtils.isBlank(x) || StringUtils.isBlank(y)) {
-					x = row[11] != null ? (String) row[11] : XY_DEFAULT; // fieldMapRow
-					y = row[12] != null ? (String) row[12] : XY_DEFAULT; // fieldMapCol
-				}
+				final String x = row[11] != null ? (String) row[11] : null; // fieldMapRow
+				final String y = row[12] != null ? (String) row[12] : null; // fieldMapCol
+
 				observationUnit.setX(x);
 				observationUnit.setY(y);
 				observationUnit.setPositionCoordinateX(x);
@@ -1569,9 +1559,11 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		stringBuilder.append("INNER JOIN cvterm ON p.observable_id = cvterm.cvterm_id ");
 		stringBuilder.append("INNER JOIN project plot ON plot.project_id = obs_unit.project_id ");
 		stringBuilder.append("INNER JOIN project trial ON plot.study_id = trial.project_id ");
-		stringBuilder.append("INNER JOIN nd_geolocationprop location_prop ON location_prop.nd_geolocation_id = instance.nd_geolocation_id ");
+		stringBuilder.append(
+			"INNER JOIN nd_geolocationprop location_prop ON location_prop.nd_geolocation_id = instance.nd_geolocation_id ");
 		stringBuilder.append("AND location_prop.type_id = " + TermId.LOCATION_ID.getId() + " ");
-		stringBuilder.append("LEFT OUTER JOIN nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = instance.nd_geolocation_id ");
+		stringBuilder.append(
+			"LEFT OUTER JOIN nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = instance.nd_geolocation_id ");
 		stringBuilder.append("AND geopropSeason.type_id = " + TermId.SEASON_VAR.getId() + " ");
 		stringBuilder.append("LEFT OUTER JOIN cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value ");
 

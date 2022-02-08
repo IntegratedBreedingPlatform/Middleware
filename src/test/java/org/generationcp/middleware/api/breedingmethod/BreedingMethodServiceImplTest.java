@@ -12,7 +12,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.Mockito;
-import org.mockito.internal.verification.Times;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
@@ -92,8 +91,8 @@ public class BreedingMethodServiceImplTest {
 		Mockito.when(this.methodDAO.filterMethods(searchRequest, null))
 			.thenReturn(methods);
 
-		final ProgramFavorite programFavorite = new ProgramFavorite(PROGRAM_UUID, ProgramFavorite.FavoriteType.METHOD, method.getMid());
-		Mockito.when(this.programFavoriteDAO.getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, PROGRAM_UUID))
+		final ProgramFavorite programFavorite = new ProgramFavorite(PROGRAM_UUID, ProgramFavorite.FavoriteType.METHODS, method.getMid());
+		Mockito.when(this.programFavoriteDAO.getProgramFavorites(ProgramFavorite.FavoriteType.METHODS, Integer.MAX_VALUE, PROGRAM_UUID))
 			.thenReturn(Arrays.asList(programFavorite));
 
 		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.getBreedingMethods(searchRequest, null);
@@ -108,7 +107,7 @@ public class BreedingMethodServiceImplTest {
 		assertThat(searchRequest.getMethodIds(), hasSize(1));
 		assertThat(searchRequest.getMethodIds().get(0), is(programFavorite.getEntityId()));
 
-		Mockito.verify(this.programFavoriteDAO).getProgramFavorites(ProgramFavorite.FavoriteType.METHOD, Integer.MAX_VALUE, PROGRAM_UUID);
+		Mockito.verify(this.programFavoriteDAO).getProgramFavorites(ProgramFavorite.FavoriteType.METHODS, Integer.MAX_VALUE, PROGRAM_UUID);
 	}
 
 	private void assertBreedingMethodDTO(final BreedingMethodDTO actualBreedingMethodDTO, final Method method) {
