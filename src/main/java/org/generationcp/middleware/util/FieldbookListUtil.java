@@ -1,15 +1,11 @@
 
 package org.generationcp.middleware.util;
 
-import java.util.ArrayList;
+import org.generationcp.middleware.pojos.Method;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-
-import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.Method;
 
 public class FieldbookListUtil {
 
