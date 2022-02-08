@@ -31,31 +31,4 @@ public class FieldbookListUtil {
 		});
 	}
 
-	public static void populateStockIdInGermplasmListData(final List<GermplasmListData> data , InventoryDataManager inventoryDataManager) {
-		final List<Integer> gids = new ArrayList<>();
-		if (data != null && !data.isEmpty()) {
-			for (final GermplasmListData germplasmListData : data) {
-				gids.add(germplasmListData.getGid());
-			}
-		}
-
-		Map<Integer, String> stockIds = inventoryDataManager.retrieveStockIds(gids);
-
-		if (data != null && !data.isEmpty()) {
-			for (final GermplasmListData listData : data) {
-				String stockIdValue = "";
-				if (stockIds != null) {
-					for (final Integer gid : stockIds.keySet()) {
-						if (listData.getGid().equals(gid)) {
-							stockIdValue = stockIds.get(gid);
-							break;
-						}
-					}
-				}
-				listData.setStockIDs(stockIdValue);
-			}
-		}
-	}
-
-
 }

@@ -50,25 +50,4 @@ public class FieldbookListUtilTest {
 		return methodName;
 	}
 
-	@Test
-	public void testPopulateStockIdInGermplasmListData() throws Exception {
-		GermplasmList germplasmList = GermplasmListTestDataInitializer
-				.createGermplasmList(1);
-
-		Map<Integer, String> mockData = Maps.newHashMap();
-		mockData.put(101, "StockID101, StockID102");
-
-		InventoryDataManager inventoryDataManager = Mockito.mock(InventoryDataManager.class);
-
-		Mockito.when(inventoryDataManager.retrieveStockIds(Mockito.anyListOf(Integer.class))).thenReturn(mockData);
-		GermplasmListData germplasmListData = GermplasmListDataTestDataInitializer.createGermplasmListData(germplasmList, 101, 1);
-
-		FieldbookListUtil.populateStockIdInGermplasmListData(Lists.newArrayList(germplasmListData),inventoryDataManager);
-
-		Assert.assertNotNull("StockID field should not be null after populating it");
-		Assert.assertEquals(mockData.get(101), germplasmListData.getStockIDs());
-
-
-	}
-
 }
