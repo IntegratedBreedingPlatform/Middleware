@@ -12,18 +12,15 @@
 
 package org.generationcp.middleware.dao;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
-import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.text.SimpleDateFormat;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -111,38 +108,6 @@ public class NameDAOTest extends IntegrationTestBase {
 		Assert.assertEquals("Given the test data, there should only be 1 item in the list.", 1, names.size());
 		Assert.assertTrue("Given the test data, the first name should be " + NameDAOTest.PREFERRED_NAME,
 				names.get(0).getNval().equals(NameDAOTest.PREFERRED_NAME));
-	}
-
-	@Test
-	public void testGetNamesByTypeAndGIDList() {
-		final Germplasm germplasm1 = this.createGermplasmTestData(20190910);
-		final Germplasm germplasm2 = this.createGermplasmTestData(20190914);
-		NameDAOTest.germplasmDAO.save(germplasm1);
-		NameDAOTest.germplasmDAO.save(germplasm2);
-		final Name germplasm1Name1 = this.createNameTestData(20190910, germplasm1.getGid(), 0, RandomStringUtils.randomAlphabetic(20),
-				GermplasmNameType.DERIVATIVE_NAME);
-		final Name germplasm1Name2 = this.createNameTestData(20190910, germplasm1.getGid(), 0, RandomStringUtils.randomAlphabetic(20),
-				GermplasmNameType.LINE_NAME);
-		final Name germplasm2Name1 = this.createNameTestData(20190910, germplasm2.getGid(), 0, RandomStringUtils.randomAlphabetic(20),
-				GermplasmNameType.DERIVATIVE_NAME);
-		NameDAOTest.nameDAO.save(germplasm1Name1);
-		NameDAOTest.nameDAO.save(germplasm1Name2);
-		NameDAOTest.nameDAO.save(germplasm2Name1);
-
-		List<Name> names = NameDAOTest.nameDAO.getNamesByTypeAndGIDList(GermplasmNameType.DERIVATIVE_NAME.getUserDefinedFieldID(),
-				Arrays.asList(germplasm1.getGid(), germplasm2.getGid()));
-		Assert.assertNotNull(names);
-		Assert.assertEquals(2, names.size());
-
-		names = NameDAOTest.nameDAO.getNamesByTypeAndGIDList(GermplasmNameType.LINE_NAME.getUserDefinedFieldID(),
-				Arrays.asList(germplasm1.getGid(), germplasm2.getGid()));
-		Assert.assertNotNull(names);
-		Assert.assertEquals(1, names.size());
-
-		names = NameDAOTest.nameDAO.getNamesByTypeAndGIDList(GermplasmNameType.CROSS_NAME.getUserDefinedFieldID(),
-				Arrays.asList(germplasm1.getGid(), germplasm2.getGid()));
-		Assert.assertNotNull(names);
-		Assert.assertTrue(names.isEmpty());
 	}
 
 	@Test

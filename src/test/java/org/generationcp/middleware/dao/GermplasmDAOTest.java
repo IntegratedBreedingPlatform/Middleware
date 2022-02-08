@@ -164,7 +164,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 1, -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmDataDM.addGermplasm(parentGermplsm, parentGermplsm.getPreferredName(), this.cropType);
 
-		final List<org.generationcp.middleware.pojos.Method> maintenanceMethods = this.daoFactory.getMethodDAO().getByType("MAN", 1, 1);
+		final List<org.generationcp.middleware.pojos.Method> maintenanceMethods = this.daoFactory.getMethodDAO().getByType("MAN");
 
 		final Germplasm maintenanceChildrenGermplsm = GermplasmTestDataInitializer
 			.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, maintenanceMethods.get(0).getMid(), 0, 1, 1,
@@ -1110,26 +1110,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		dto.setGermplasmDbIds(Collections.singletonList(RandomStringUtils.randomAlphanumeric(10)));
 		Assert.assertThat(this.daoFactory.getGermplasmDao().buildCountGermplasmDTOsQuery(dto),
 			is("SELECT COUNT(1) FROM (  SELECT g.gid  FROM germplsm g  WHERE g.deleted = 0 AND g.grplce = 0  AND g.germplsm_uuid IN (:germplasmDbIds) ) as T "));
-	}
-
-	@Test
-	public void testCountGermplasmDTOs_UnfilteredSearch() {
-		final GermplasmSearchRequest dto = new GermplasmSearchRequest();
-		final long allCount = this.daoFactory.getGermplasmDao().countAll();
-		if (allCount < 5000) {
-			// Save a deleted germplasm
-			final Germplasm deletedGermplasm =
-				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 1, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-			deletedGermplasm.setDeleted(true);
-			this.daoFactory.getGermplasmDao().save(deletedGermplasm);
-
-			final long nonDeletedGermplasmCount = this.daoFactory.getGermplasmDao().countNonDeletedGermplasm();
-			Assert.assertThat(this.daoFactory.getGermplasmDao().countGermplasmDTOs(dto), is(nonDeletedGermplasmCount));
-			// 5000 is the count limit if the germplasm db size is equal to or more than that
-		} else {
-			Assert.assertThat(this.daoFactory.getGermplasmDao().countGermplasmDTOs(dto), is(5000L));
-		}
-
 	}
 
 	@Test
