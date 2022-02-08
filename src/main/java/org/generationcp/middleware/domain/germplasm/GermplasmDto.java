@@ -43,6 +43,11 @@ public class GermplasmDto {
 
 	private Integer gpid2;
 
+	/**
+	 * a.k.a crossExpansion
+ 	 */
+	private String pedigreeString;
+
 	private Integer numberOfProgenitors;
 
 	private List<Integer> otherProgenitors;
@@ -189,6 +194,14 @@ public class GermplasmDto {
 
 	public void setGpid2(final Integer gpid2) {
 		this.gpid2 = gpid2;
+	}
+
+	public String getPedigreeString() {
+		return pedigreeString;
+	}
+
+	public void setPedigreeString(final String pedigreeString) {
+		this.pedigreeString = pedigreeString;
 	}
 
 	public Integer getNumberOfProgenitors() {

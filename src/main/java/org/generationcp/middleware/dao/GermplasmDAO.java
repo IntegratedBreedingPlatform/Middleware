@@ -1550,6 +1550,12 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public long countGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto) {
 		final StringBuilder queryBuilder =
 			new StringBuilder(" select count(1) from germplsm g ");
+
+		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs())) {
+			queryBuilder.append(" left join (select p.gid, p.nval from names p INNER JOIN udflds u ");
+			queryBuilder.append(" ON u.fldno = p.ntype AND u.ftable = 'NAMES' and u.ftype='NAME' and u.fcode = 'PUI' and p.nstat <> 9) pui on pui.gid = g.gid ");
+		}
+
 		this.addGermplasmMatchesFilter(new SqlQueryParamBuilder(queryBuilder), germplasmMatchRequestDto);
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
 		this.addGermplasmMatchesFilter(new SqlQueryParamBuilder(sqlQuery), germplasmMatchRequestDto);

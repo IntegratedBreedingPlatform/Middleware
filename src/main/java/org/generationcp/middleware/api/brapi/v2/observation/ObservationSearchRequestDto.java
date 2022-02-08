@@ -11,7 +11,7 @@ public class ObservationSearchRequestDto {
 	private List<Integer> observationDbIds;
 	private List<String> observationUnitDbIds;
 	private List<String> germplasmDbIds;
-	private List<Integer> observationVariableDbIds;
+	private List<String> observationVariableDbIds;
 	private List<Integer> studyDbIds;
 	private List<Integer> locationDbIds;
 	private List<Integer> trialDbIds;
@@ -49,11 +49,11 @@ public class ObservationSearchRequestDto {
 		this.germplasmDbIds = germplasmDbIds;
 	}
 
-	public List<Integer> getObservationVariableDbIds() {
+	public List<String> getObservationVariableDbIds() {
 		return this.observationVariableDbIds;
 	}
 
-	public void setObservationVariableDbIds(final List<Integer> observationVariableDbIds) {
+	public void setObservationVariableDbIds(final List<String> observationVariableDbIds) {
 		this.observationVariableDbIds = observationVariableDbIds;
 	}
 
