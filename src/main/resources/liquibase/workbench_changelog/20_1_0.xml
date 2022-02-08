@@ -15,7 +15,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO workbench_tool (`name`, `group_name`, `title`, `version`, `tool_type`, `path`, `parameter`, `user_tool`)
-			VALUES ('brapi_sync', 'brapi_sync', 'BrAPI sync (beta)', '1.0', 'WEB', '/ibpworkbench/controller/brapi-sync', '', 0);
+			VALUES ('brapi_sync', 'brapi_sync', 'BrAPI sync (beta)', '1.0', 'WEB', '/ibpworkbench/controller/pages/brapi-sync/', '', 0);
 
 			SET @sidebar_category_id = (SELECT sidebar_category_id FROM workbench_sidebar_category where sidebar_category_name = 'crop_administration');
 
