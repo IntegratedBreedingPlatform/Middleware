@@ -1,8 +1,12 @@
 package org.generationcp.middleware.api.breedingmethod;
 
+import org.generationcp.middleware.api.program.ProgramFavoriteDTO;
 import org.generationcp.middleware.pojos.Method;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
+
+import java.util.Date;
+import java.util.List;
 
 @AutoProperty
 public class BreedingMethodDTO extends BreedingMethodNewRequest {
@@ -10,6 +14,10 @@ public class BreedingMethodDTO extends BreedingMethodNewRequest {
 	private Integer mid;
 	private Boolean isBulkingMethod;
 	private Boolean isFavorite;
+	private Date creationDate;
+	private String methodClassName;
+
+	private List<ProgramFavoriteDTO> programFavorites;
 
 	public BreedingMethodDTO() {
 	}
@@ -30,7 +38,7 @@ public class BreedingMethodDTO extends BreedingMethodNewRequest {
 		this.setCount(method.getCount());
 		this.setSuffix(method.getSuffix());
 
-		this.mid = method.getMid();
+		this.setMid(method.getMid());
 	}
 
 	public Integer getMid() {
@@ -55,6 +63,30 @@ public class BreedingMethodDTO extends BreedingMethodNewRequest {
 
 	public void setFavorite(final Boolean favorite) {
 		isFavorite = favorite;
+	}
+
+	public Date getCreationDate() {
+		return creationDate;
+	}
+
+	public void setCreationDate(final Date creationDate) {
+		this.creationDate = creationDate;
+	}
+
+	public String getMethodClassName() {
+		return methodClassName;
+	}
+
+	public void setMethodClassName(final String methodClassName) {
+		this.methodClassName = methodClassName;
+	}
+
+	public List<ProgramFavoriteDTO> getProgramFavorites() {
+		return programFavorites;
+	}
+
+	public void setProgramFavorites(final List<ProgramFavoriteDTO> programFavorites) {
+		this.programFavorites = programFavorites;
 	}
 
 	@Override
