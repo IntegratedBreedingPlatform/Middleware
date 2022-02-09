@@ -15,7 +15,6 @@ public class GermplasmListGeneratorDTO {
 
 		private Integer entryNo;
 		private Integer gid;
-		private String entryCode;
 		private String seedSource;
 		private String groupName;
 
@@ -38,14 +37,6 @@ public class GermplasmListGeneratorDTO {
 
 		public void setGid(final Integer gid) {
 			this.gid = gid;
-		}
-
-		public String getEntryCode() {
-			return this.entryCode;
-		}
-
-		public void setEntryCode(final String entryCode) {
-			this.entryCode = entryCode;
 		}
 
 		public String getSeedSource() {

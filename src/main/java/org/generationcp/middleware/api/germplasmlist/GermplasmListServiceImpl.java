@@ -177,7 +177,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			Preconditions.checkArgument(preferredName != null || names != null, "No name found for gid=" + gid);
 			final String designation = preferredName != null ? preferredName : names.get(0).getNval();
 			GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, entry.getEntryNo(),
-				entry.getEntryCode(), entry.getSeedSource(), designation, entry.getGroupName(),
+				null, entry.getSeedSource(), designation, entry.getGroupName(),
 				GermplasmListDataDAO.STATUS_ACTIVE, null);
 			germplasmListData = this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 
@@ -248,13 +248,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			final GermplasmListData germplasmListData = germplasmListDataByEntryId.get(entry.getEntryNo());
-
-			// Temporary workaround to allow users to edit ENTRY_CODE
-			final String entryCode = entry.getEntryCode();
-			if (!isBlank(entryCode)) {
-				germplasmListData.setEntryCode(entryCode);
-				this.daoFactory.getGermplasmListDataDAO().update(germplasmListData);
-			}
 
 			for (final Map.Entry<Integer, GermplasmListObservationDto> entryDetailSet : entry.getData().entrySet()) {
 				final GermplasmListObservationDto entryDetail = entryDetailSet.getValue();
