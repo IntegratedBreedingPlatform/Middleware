@@ -74,8 +74,7 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 		this.locationDAO = new LocationDAO(this.sessionProvder.getSession());
 		this.userDefinedFieldDAO = new UserDefinedFieldDAO(this.sessionProvder.getSession());
 
-		this.methodDAO = new MethodDAO();
-		this.methodDAO.setSession(this.sessionProvder.getSession());
+		this.methodDAO = new MethodDAO(this.sessionProvder.getSession());
 
 		this.cvTermDao = new CVTermDao();
 		this.cvTermDao.setSession(this.sessionProvder.getSession());
