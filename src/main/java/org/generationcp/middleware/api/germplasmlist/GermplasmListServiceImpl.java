@@ -36,7 +36,6 @@ import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -69,9 +68,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public static final String LIST_NOT_FOUND = "list.not.found";
 
 	private final DaoFactory daoFactory;
-
-	@Value("${germplasm.list.add.entries.limit}")
-	public int maxAddEntriesLimit;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -302,7 +298,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private void addGermplasmEntriesModelsToList(final GermplasmList germplasmList,
 		final List<AddGermplasmEntryModel> addGermplasmEntriesModels) {
-		this.checkLimitToAddEntriesToExistingList(addGermplasmEntriesModels.size());
 
 		//Get the entryId max value
 		final int maxEntryNo = germplasmList.getListData()
@@ -729,15 +724,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				"Error encountered while deleting Germplasm List Data: GermplasmListServiceImpl.deleteGermplasmListData(germplasmListData="
 					+ germplasmListData + "): " + e.getMessage(),
 				e);
-		}
-	}
-
-	private void checkLimitToAddEntriesToExistingList(final int entriesToAddSize) {
-		// TODO: review this condition because later was added due to performance issues. Please, cheack at: https://ibplatform.atlassian.net/browse/IBP-4184
-		if (entriesToAddSize > this.maxAddEntriesLimit) {
-			throw new MiddlewareRequestException("",
-				"list.add.limit",
-				String.valueOf(this.maxAddEntriesLimit));
 		}
 	}
 
