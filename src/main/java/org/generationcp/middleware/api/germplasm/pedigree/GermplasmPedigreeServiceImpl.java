@@ -210,7 +210,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 						this.addNodeForKnownParents(node, level, germplasm.getFemaleParent(), true);
 					}
 				} else {
-					// Get and add the source germplasm, if it is unknown
+					// Get and add the source germplasm, if it is known
 					if (maleGid != 0) {
 						this.addMaleParentNode(node, level, germplasm.getMaleParent(), false);
 						// Use female parent to continue traversal if source is unknown
@@ -288,7 +288,15 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 			if (!includeDerivativeLine) {
 				maxPedigreeLevel = this.getMaxGenerationCountFromParent(germplasm.getFemaleParent(), false);
 			} else {
-				maxPedigreeLevel = this.getMaxGenerationCountFromParent(germplasm.getMaleParent(), true);
+				final Germplasm parent;
+				if (germplasm.getMaleParent() != null) {
+					parent = germplasm.getMaleParent();
+				} else {
+					// incomplete pedigree records, try to get pedigree level from group source
+					// TODO create test
+					parent = germplasm.getFemaleParent();
+				}
+				maxPedigreeLevel = this.getMaxGenerationCountFromParent(parent, true);
 			}
 		} else if (germplasm.getGnpgs() >= 2) {
 			maxPedigreeLevel = this.getMaxGenerationCountFromBothParents(germplasm, includeDerivativeLine);
