@@ -1,6 +1,7 @@
 package org.generationcp.middleware.domain.inventory.manager;
 
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.inventory.common.SearchOriginCompositeDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -15,7 +16,7 @@ public class LotDepositRequestDto {
 
 	private String notes;
 
-	private Integer sourceStudyId;
+	private SearchCompositeDto<SearchOriginCompositeDto, Integer> searchComposite;
 
 	public SearchCompositeDto<Integer, String> getSelectedLots() {
 		return selectedLots;
@@ -41,12 +42,13 @@ public class LotDepositRequestDto {
 		this.notes = notes;
 	}
 
-	public Integer getSourceStudyId() {
-		return this.sourceStudyId;
+	public SearchCompositeDto<SearchOriginCompositeDto, Integer> getSearchComposite() {
+		return this.searchComposite;
 	}
 
-	public void setSourceStudyId(final Integer sourceStudyId) {
-		this.sourceStudyId = sourceStudyId;
+	public void setSearchComposite(
+		final SearchCompositeDto<SearchOriginCompositeDto, Integer> searchComposite) {
+		this.searchComposite = searchComposite;
 	}
 
 	@Override
