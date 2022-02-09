@@ -65,6 +65,7 @@ public class CopCalculation {
 
 	private static final double COP_DEFAULT = 0.0;
 	private static final int UNKNOWN_INBREEDING_GENERATIONS = 4;
+	private static final int UNKNOWN_GID = 0;
 
 	/**
 	 * Named as in the paper just for consistency
@@ -160,7 +161,7 @@ public class CopCalculation {
 			return this.getBType(g);
 		}
 
-		final double fg = g.getFemaleParentNode() != null && g.getMaleParentNode() != null
+		final double fg = !isUnknown(g.getFemaleParentNode()) && !isUnknown(g.getMaleParentNode())
 			? this.coefficientOfParentage(g.getFemaleParentNode(), g.getMaleParentNode())
 			: COP_DEFAULT;
 
@@ -177,13 +178,16 @@ public class CopCalculation {
 		// TODO complete
 		//  "if Z traces back to a single progenitor, such as a mutant strain"
 
-		// "If the progenitors of a strain are unknown"
-		return this.isGenerative(g) && (g.getFemaleParentNode() == null || g.getMaleParentNode() == null);
+		/*
+		 * "If the progenitors of a strain are unknown"
+		 * if only male parent (immediate source) is unknown => handle later by UNKNOWN_INBREEDING_GENERATIONS
+		 */
+		return this.isDerivative(g) && isUnknown(g.getFemaleParentNode()) && (isUnknown(g.getMaleParentNode()));
 	}
 
 	private int countInbreedingGenerations(final GermplasmTreeNode g) {
 		GermplasmTreeNode source = g.getMaleParentNode();
-		if (source == null) {
+		if (isUnknown(source)) {
 			return UNKNOWN_INBREEDING_GENERATIONS;
 		}
 		if (this.isGenerative(g)) {
@@ -191,7 +195,7 @@ public class CopCalculation {
 		}
 
 		int count = 1;
-		while (source != null && this.isDerivative(source)) {
+		while (!isUnknown(source) && this.isDerivative(source) && !isUnknown(source.getMaleParentNode())) {
 			count++;
 			source = source.getMaleParentNode();
 		}
@@ -212,7 +216,7 @@ public class CopCalculation {
 		GermplasmTreeNode source1 = g1;
 		final Map<Integer, GermplasmTreeNode> pedigree1 = new HashMap<>();
 		pedigree1.put(g1.getGid(), g1);
-		while (source1.getMaleParentNode() != null && source1.getNumberOfProgenitors() < 0) {
+		while (!isUnknown(source1.getMaleParentNode()) && source1.getNumberOfProgenitors() < 0) {
 			source1 = source1.getMaleParentNode();
 			if (source1.getGid().equals(g2.getGid())) {
 				return of(g2);
@@ -222,7 +226,7 @@ public class CopCalculation {
 		GermplasmTreeNode source2 = g2;
 		final Map<Integer, GermplasmTreeNode> pedigree2 = new HashMap<>();
 		pedigree2.put(g2.getGid(), g2);
-		while (source2.getMaleParentNode() != null && source2.getNumberOfProgenitors() < 0) {
+		while (!isUnknown(source2.getMaleParentNode()) && source2.getNumberOfProgenitors() < 0) {
 			if (pedigree1.containsKey(source2.getGid())) {
 				return of(source2);
 			}
@@ -248,11 +252,11 @@ public class CopCalculation {
 		final GermplasmTreeNode groupSource = g.getFemaleParentNode();
 		// source, aka immediate parent
 		GermplasmTreeNode source = g.getMaleParentNode();
-		if (groupSource != null) {
+		if (!isUnknown(groupSource)) {
 			return of(Pair.of(groupSource.getFemaleParentNode(), groupSource.getMaleParentNode()));
-		} else if (source != null) {
-			while (source != null) {
-				if (this.isGenerative(source) && source.getMaleParentNode() != null && source.getFemaleParentNode() != null) {
+		} else if (!isUnknown(source)) {
+			while (!isUnknown(source)) {
+				if (this.isGenerative(source) && !isUnknown(source.getMaleParentNode()) && !isUnknown(source.getFemaleParentNode())) {
 					return of(Pair.of(source.getFemaleParentNode(), source.getMaleParentNode()));
 				} else {
 					source = source.getMaleParentNode();
@@ -271,7 +275,11 @@ public class CopCalculation {
 	}
 
 	private boolean hasUnknownParents(final GermplasmTreeNode g) {
-		return this.isGenerative(g) && (g.getMaleParentNode() == null || g.getFemaleParentNode() == null);
+		return this.isGenerative(g) && (isUnknown(g.getMaleParentNode()) || isUnknown(g.getFemaleParentNode()));
+	}
+
+	private static boolean isUnknown(final GermplasmTreeNode node) {
+		return node == null || node.getGid() == UNKNOWN_GID;
 	}
 
 	private Pair<GermplasmTreeNode, GermplasmTreeNode> sortByOrder(final GermplasmTreeNode g1, final GermplasmTreeNode g2) {
