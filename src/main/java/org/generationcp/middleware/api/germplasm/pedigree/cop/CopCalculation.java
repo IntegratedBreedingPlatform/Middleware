@@ -61,8 +61,6 @@ import static org.generationcp.middleware.util.Debug.info;
  */
 public class CopCalculation {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CopCalculation.class);
-
 	private static final double COP_DEFAULT = 0.0;
 	private static final int UNKNOWN_INBREEDING_GENERATIONS = 4;
 	private static final int UNKNOWN_GID = 0;
@@ -125,15 +123,19 @@ public class CopCalculation {
 			cop = COP_DEFAULT;
 		} else {
 			/*
-			 * TODO
+			 * from paper:
 			 *  "..Although it is symmetrical in P and Q so that the parents of either could be used to obtain the right hand expansion.."
-			 *  however if we invert the parents here, it doesn't work
+			 *  ..expanding the strain with the highest order .. ensures that when the terminal ancestors are reached,
+			 *  the computations involve COP values between the same strain, or unrelated strains or crosses between unrelated strains,
+			 *  all of which are easily calculated"
 			 */
 			final Pair<GermplasmTreeNode, GermplasmTreeNode> byOrder = this.sortByOrder(g1, g2);
 			final GermplasmTreeNode highOrder = byOrder.getLeft();
 			final GermplasmTreeNode lowOrder = byOrder.getRight();
 
-			final Optional<Pair<GermplasmTreeNode, GermplasmTreeNode>> parents = this.getParents(highOrder);
+			// TODO other progenitors: (1/m) ∑ fPQi
+			//  https://github.com/IntegratedBreedingPlatform/AWSApps/blob/80756ceae4ccf6d330d8c9a8e9f02dcedeaffa50/COP/ibp_smart-module-lambda-import-master/sm-lambda-import/cop_src/cop/algorithm_v2.py#L43
+			final Optional<Pair<GermplasmTreeNode, GermplasmTreeNode>> parents = this.getCrossParents(highOrder);
 			if (parents.isPresent()) {
 				final GermplasmTreeNode fp = parents.get().getLeft();
 				final GermplasmTreeNode mp = parents.get().getRight();
@@ -165,7 +167,15 @@ public class CopCalculation {
 			? this.coefficientOfParentage(g.getFemaleParentNode(), g.getMaleParentNode())
 			: COP_DEFAULT;
 
-		// Equation 2
+		/*
+		 * Equation 2
+		 *
+		 * If generative, then generations = 0
+		 * => F(g) = 1 - (1 - fg) / 2^0 = fg
+		 *
+		 * Unknown inbreeding generations:
+		 * 1 - (1 - 0) / 2^4 = 0.9375
+		 */
 		return 1 - ((1 - fg) / Math.pow(2.0, this.countInbreedingGenerations(g)));
 	}
 
@@ -242,7 +252,7 @@ public class CopCalculation {
 		return empty();
 	}
 
-	private Optional<Pair<GermplasmTreeNode, GermplasmTreeNode>> getParents(final GermplasmTreeNode g) {
+	private Optional<Pair<GermplasmTreeNode, GermplasmTreeNode>> getCrossParents(final GermplasmTreeNode g) {
 		if (this.hasUnknownParents(g)) {
 			return empty();
 		}
