@@ -28,4 +28,28 @@
     </sql>
   </changeSet>
 
+  <changeSet author="cuenyad" id="v20.4.0-3">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(1) > 0 FROM  list_data_details WHERE variable_id = 8300;
+            </sqlCheck>
+        </preConditions>
+        <comment>Migrate ENTRY_CODE from listdata to list_data_details table as entry details variable</comment>
+        <sql dbms="mysql" splitStatements="true">
+             <!-- Migrate ENTRY_CODE from listdata to list_data_details -->
+             INSERT INTO list_data_details(variable_id, lrecid, value, created_by)
+             SELECT 8300, r.lrecid, r.entrycd, 1 FROM listdata r;
+
+             <!-- Insert ENTRY_CODE variable to list_data_view -->
+             INSERT INTO list_data_view(listid,cvterm_id,type_id)
+             SELECT distinct(ld.listid), 8300, 1815 FROM listnms ld;
+
+             <!-- Remove ENTRY_CODE as default view -->
+             DELETE FROM list_data_default_view WHERE name = 'ENTRY_CODE';
+
+             <!-- Remove ENTRY_CODE as static column -->
+			 DELETE FROM list_data_view WHERE static_id = 8300;
+        </sql>
+  </changeSet>
+
 </databaseChangeLog>
