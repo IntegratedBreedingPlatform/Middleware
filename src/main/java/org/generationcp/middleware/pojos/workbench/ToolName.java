@@ -20,7 +20,6 @@ import java.util.List;
  *
  */
 public enum ToolName {
-	BM_LIST_MANAGER_MAIN("bm_list_manager_main"),
 	BREEDING_VIEW("breeding_view"),
 	BV_SSA("breeding_view_wb"),
 	BV_GXE("breeding_gxe"),
