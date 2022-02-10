@@ -37,12 +37,8 @@
         <comment>Migrate ENTRY_CODE from listdata to list_data_details table as entry details variable</comment>
         <sql dbms="mysql" splitStatements="true">
              <!-- Migrate ENTRY_CODE from listdata to list_data_details -->
-             INSERT INTO list_data_details(variable_id, lrecid, value, created_by)
-             SELECT 8300, r.lrecid, r.entrycd, 1 FROM listdata r;
-
-             <!-- Insert ENTRY_CODE variable to list_data_view -->
-             INSERT INTO list_data_view(listid,cvterm_id,type_id)
-             SELECT distinct(ld.listid), 8300, 1815 FROM listnms ld;
+            INSERT INTO list_data_details(variable_id, lrecid, value, created_by)
+            SELECT 8300, r.lrecid, r.entrycd, ln.listuid FROM listdata r inner join listnms ln on ln.listid = r.listid;
 
              <!-- Remove ENTRY_CODE as default view -->
              DELETE FROM list_data_default_view WHERE name = 'ENTRY_CODE';
