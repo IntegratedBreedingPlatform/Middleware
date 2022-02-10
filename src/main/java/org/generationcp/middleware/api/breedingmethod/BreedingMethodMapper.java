@@ -11,7 +11,11 @@ public class BreedingMethodMapper {
 		to.setMname(from.getName());
 		to.setMdesc(from.getDescription());
 		to.setMtype(from.getType());
-		to.setMgrp(from.getGroup());
+		if (!isBlank(from.getGroup())) {
+			to.setMgrp(from.getGroup());
+		} else {
+			to.setMgrp(Method.METHOD_DEFAULT);
+		}
 		to.setGeneq(from.getMethodClass());
 		to.setMprgn(from.getNumberOfProgenitors());
 		to.setLmid(Method.LOCAL_METHOD_ID_DEFAULT);

@@ -69,6 +69,7 @@ public class Method implements Serializable, Cloneable {
 	public static final Integer METHOD_ATTRIBUTE_DEFAULT = 0;
 	public static final Integer NO_FEMALE_PARENTS_DEFAULT = 0;
 	public static final Integer METHOD_REFERENCE_DEFAULT = 0;
+	public static final String METHOD_DEFAULT = "";
 
 	public static final String GET_ALL = "getAllMethods";
 	
