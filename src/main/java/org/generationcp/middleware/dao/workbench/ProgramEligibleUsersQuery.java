@@ -73,34 +73,34 @@ public class ProgramEligibleUsersQuery {
 		}
 	}
 
-	public static SQLQueryBuilder getSelectQuery(final Pageable pageable, final UserSearchRequest userSearchRequest) {
+	public static SQLQueryBuilder getSelectQuery(final Pageable pageable, final ProgramEligibleUsersSearchRequest searchRequest) {
 		final SQLQueryBuilder queryBuilder = new SQLQueryBuilder(String.format(BASE_SQL, SELECT_CLAUSE));
-		addUserFilters(queryBuilder, userSearchRequest);
+		addUserFilters(queryBuilder, searchRequest);
 		queryBuilder.append(getSortClause(pageable));
 		return queryBuilder;
 	}
 
-	public static SQLQueryBuilder getCountQuery(final UserSearchRequest userSearchRequest) {
+	public static SQLQueryBuilder getCountQuery(final ProgramEligibleUsersSearchRequest searchRequest) {
 		final SQLQueryBuilder queryBuilder = new SQLQueryBuilder(String.format(BASE_SQL, "COUNT(1) "));
-		addUserFilters(queryBuilder, userSearchRequest);
+		addUserFilters(queryBuilder, searchRequest);
 		return queryBuilder;
 	}
 
-	private static void addUserFilters(final SQLQueryBuilder builder, final UserSearchRequest userSearchRequest) {
-		if (userSearchRequest == null) {
+	private static void addUserFilters(final SQLQueryBuilder builder, final ProgramEligibleUsersSearchRequest searchRequest) {
+		if (searchRequest == null) {
 			return;
 		}
-		final String username = userSearchRequest.getUsername();
+		final String username = searchRequest.getUsername();
 		if (!isBlank(username)) {
 			builder.append(" and u.uname like :username ");
 			builder.setParameter("username", "%" + username + "%");
 		}
-		final String fullName = userSearchRequest.getFullName();
+		final String fullName = searchRequest.getFullName();
 		if (!isBlank(fullName)) {
 			builder.append(" and concat_ws(' ', p.fname, p.lname) like :fullName ");
 			builder.setParameter("fullName", "%" + fullName + "%");
 		}
-		final String email = userSearchRequest.getEmail();
+		final String email = searchRequest.getEmail();
 		if (!isBlank(email)) {
 			builder.append(" and p.pemail like :email ");
 			builder.setParameter("email", "%" + email + "%");

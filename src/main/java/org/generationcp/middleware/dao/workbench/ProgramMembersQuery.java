@@ -2,7 +2,6 @@ package org.generationcp.middleware.dao.workbench;
 
 import com.google.common.base.Joiner;
 import org.generationcp.middleware.domain.workbench.RoleType;
-import org.generationcp.middleware.domain.workbench.UserSearchRequest;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -85,34 +84,34 @@ public class ProgramMembersQuery {
 	}
 
 	public static SQLQueryBuilder getSelectQuery(
-		final Pageable pageable, final UserSearchRequest userSearchRequest) {
+		final Pageable pageable, final ProgramMembersSearchRequest searchRequest) {
 		final SQLQueryBuilder queryBuilder = new SQLQueryBuilder(String.format(PROGRAM_MEMBERS_BASE_QUERY, PROGRAM_MEMBERS_SELECT_CLAUSE));
-		addUserFilters(queryBuilder, userSearchRequest);
+		addUserFilters(queryBuilder, searchRequest);
 		queryBuilder.append(getSortClause(pageable));
 		return queryBuilder;
 	}
 
-	public static SQLQueryBuilder getCountQuery(final UserSearchRequest userSearchRequest) {
+	public static SQLQueryBuilder getCountQuery(final ProgramMembersSearchRequest searchRequest) {
 		final SQLQueryBuilder queryBuilder = new SQLQueryBuilder(String.format(PROGRAM_MEMBERS_BASE_QUERY, COUNT_EXPRESSION));
-		addUserFilters(queryBuilder, userSearchRequest);
+		addUserFilters(queryBuilder, searchRequest);
 		return queryBuilder;
 	}
 
-	private static void addUserFilters(final SQLQueryBuilder builder, final UserSearchRequest userSearchRequest) {
-		if (userSearchRequest == null) {
+	private static void addUserFilters(final SQLQueryBuilder builder, final ProgramMembersSearchRequest searchRequest) {
+		if (searchRequest == null) {
 			return;
 		}
-		final String username = userSearchRequest.getUsername();
+		final String username = searchRequest.getUsername();
 		if (!isBlank(username)) {
 			builder.append(" and u.uname like :username ");
 			builder.setParameter("username", "%" + username + "%");
 		}
-		final String fullName = userSearchRequest.getFullName();
+		final String fullName = searchRequest.getFullName();
 		if (!isBlank(fullName)) {
 			builder.append(" and concat_ws(' ', p.fname, p.lname) like :fullName ");
 			builder.setParameter("fullName", "%" + fullName + "%");
 		}
-		final String roleName = userSearchRequest.getRoleName();
+		final String roleName = searchRequest.getRoleName();
 		if (!isBlank(roleName)) {
 			builder.append(" and r.name like :roleName ");
 			builder.setParameter("roleName", "%" + roleName + "%");
