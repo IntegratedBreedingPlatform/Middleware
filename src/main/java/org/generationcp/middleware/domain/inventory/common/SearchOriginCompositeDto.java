@@ -1,6 +1,5 @@
 package org.generationcp.middleware.domain.inventory.common;
 
-import com.fasterxml.jackson.annotation.JsonValue;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -46,6 +45,6 @@ public class SearchOriginCompositeDto {
 	}
 
 	public enum SearchOrigin {
-		MANAGE_STUDY, GERMPLASM_SEARCH;
+		MANAGE_STUDY_SOURCE, GERMPLASM_SEARCH, MANAGE_STUDY_PLOT;
 	}
 }
