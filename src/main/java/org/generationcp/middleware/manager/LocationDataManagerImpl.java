@@ -359,4 +359,8 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return this.daoFactory.getLocationDAO().getDefaultLocationByType(id);
 	}
 
+	@Override
+	public List<Locdes> getLocdes(final Integer locId, final String dvla) {
+		return this.daoFactory.getLocDesDao().getLocdes(locId, dvla);
+	}
 }

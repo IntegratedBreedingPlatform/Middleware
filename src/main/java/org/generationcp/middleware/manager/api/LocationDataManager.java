@@ -251,4 +251,5 @@ public interface LocationDataManager {
 
 	Location getDefaultLocationByType(LocationType locationType);
 
+	List<Locdes> getLocdes(Integer locId, String dvla);
 }
