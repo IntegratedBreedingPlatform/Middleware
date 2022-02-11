@@ -27,7 +27,6 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
-import org.generationcp.middleware.pojos.ListDataProperty;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -220,12 +219,6 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final GermplasmListData germplasmListData = this.createGermplasmListData(germplasmList, existingGermplasmEntry.getGid(), 1);
 		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
 
-		final ListDataProperty existingEntryProperty = new ListDataProperty(germplasmListData.getListDataId(),
-			germplasmListData,
-			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
-			existingGermplasmEntry.getMethod().getMname());
-		this.daoFactory.getListDataPropertyDAO().save(existingEntryProperty);
-
 		//Create entry to add into existing list
 		final Method doubleCrossMethod = this.daoFactory.getMethodDAO().getByCode(DOUBLE_CROSS_METHOD);
 		final Germplasm addGermplasmEntry = this.createGermplasm(doubleCrossMethod);
@@ -243,29 +236,13 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final GermplasmList actualGermplasmList = germplasmListById.get();
 		assertThat(actualGermplasmList.getListData(), hasSize(2));
 
-//		this.assertGermplasmListDataAndProperty(actualGermplasmList.getListData().get(0),
-//			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
-//			singleCrossMethod.getMname());
-
 		final GermplasmListData actualEntry1 = actualGermplasmList.getListData().get(0);
 		assertNotNull(actualEntry1);
 		assertNotNull(actualEntry1.getListDataId());
 
-		final List<ListDataProperty> properties = actualEntry1.getProperties();
-		assertThat(properties, hasSize(1));
-		assertThat(properties.get(0).getColumn(), is(GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName()));
-		assertThat(properties.get(0).getValue(), is(singleCrossMethod.getMname()));
-
-
-//		this.assertGermplasmListDataAndProperty(actualGermplasmList.getListData().get(1),
-//			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
-//			doubleCrossMethod.getMname());
-
 		final GermplasmListData actualEntry2 = actualGermplasmList.getListData().get(1);
 		assertNotNull(actualEntry2);
 		assertNotNull(actualEntry2.getListDataId());
-
-		assertThat(actualEntry2.getProperties(), hasSize(0));
 	}
 
 	@Test
@@ -282,12 +259,6 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final Germplasm existingGermplasmEntry = this.createGermplasm(singleCrossMethod);
 		final GermplasmListData germplasmListData = this.createGermplasmListData(germplasmList, existingGermplasmEntry.getGid(), 1);
 		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(germplasmListData);
-
-		final ListDataProperty existingEntryProperty = new ListDataProperty(germplasmListData.getListDataId(),
-			germplasmListData,
-			GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName(),
-			existingGermplasmEntry.getMethod().getMname());
-		this.daoFactory.getListDataPropertyDAO().save(existingEntryProperty);
 
 		//Create entry to add into existing list
 		final Method doubleCrossMethod = this.daoFactory.getMethodDAO().getByCode(DOUBLE_CROSS_METHOD);
@@ -312,16 +283,9 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		assertNotNull(actualEntry1);
 		assertNotNull(actualEntry1.getListDataId());
 
-		final List<ListDataProperty> properties = actualEntry1.getProperties();
-		assertThat(properties, hasSize(1));
-		assertThat(properties.get(0).getColumn(), is(GermplasmListServiceImpl.GermplasmListDataPropertyName.BREEDING_METHOD_NAME.getName()));
-		assertThat(properties.get(0).getValue(), is(singleCrossMethod.getMname()));
-
 		final GermplasmListData actualEntry2 = actualGermplasmList.getListData().get(1);
 		assertNotNull(actualEntry2);
 		assertNotNull(actualEntry2.getListDataId());
-
-		assertThat(actualEntry2.getProperties(), hasSize(0));
 	}
 
 	@Test

@@ -225,8 +225,6 @@ public class GMSPojosSimpleTest extends IntegrationTestBase {
 		for (Object obj : results) {
 			Assert.assertTrue(obj instanceof GermplasmListData);
 			Assert.assertTrue(obj != null);
-			GermplasmListData data = (GermplasmListData) obj;
-			data.print(IntegrationTestBase.INDENT);
 		}
 	}
 }

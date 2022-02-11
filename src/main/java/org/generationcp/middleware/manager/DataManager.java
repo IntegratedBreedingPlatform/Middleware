@@ -33,7 +33,6 @@ import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.operation.saver.ExperimentPropertySaver;
 import org.generationcp.middleware.operation.saver.GeolocationPropertySaver;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
-import org.generationcp.middleware.operation.saver.ListDataPropertySaver;
 import org.generationcp.middleware.operation.saver.LocdesSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.ProjectPropertySaver;
@@ -284,10 +283,6 @@ public abstract class DataManager {
 
 	protected final ExperimentPropertySaver getExperimentPropertySaver() {
 		return new ExperimentPropertySaver(this.sessionProvider);
-	}
-
-	protected final ListDataPropertySaver getListDataPropertySaver() {
-		return new ListDataPropertySaver(this.sessionProvider);
 	}
 
 	protected final LocdesSaver getLocdesSaver() {

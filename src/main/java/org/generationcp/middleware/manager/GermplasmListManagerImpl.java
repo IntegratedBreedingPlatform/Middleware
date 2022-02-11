@@ -17,12 +17,9 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
-import org.generationcp.middleware.domain.gms.GermplasmListNewColumnsInfo;
-import org.generationcp.middleware.domain.gms.ListDataInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
@@ -35,14 +32,12 @@ import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
 import org.generationcp.middleware.service.api.user.UserService;
 import org.generationcp.middleware.util.cache.FunctionBasedGuavaCacheLoader;
 import org.hibernate.HibernateException;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -129,11 +124,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public long countGermplasmListByStatus(final Integer status) {
-		return this.daoFactory.getGermplasmListDAO().countByStatus(status);
-	}
-
-	@Override
 	public List<GermplasmList> getGermplasmListByGID(final Integer gid, final int start, final int numOfRows) {
 		return this.daoFactory.getGermplasmListDAO().getByGID(gid, start, numOfRows);
 	}
@@ -142,11 +132,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	public long countGermplasmListByGID(final Integer gid) {
 
 		return this.daoFactory.getGermplasmListDAO().countByGID(gid);
-	}
-
-	@Override
-	public long countGermplasmListByGIDandProgramUUID(final Integer gid, final String programUUID) {
-		return this.daoFactory.getGermplasmListDAO().countByGIDandProgramUUID(gid, programUUID);
 	}
 
 	@Override
@@ -162,11 +147,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public List<GermplasmListData> getGermplasmListDataByListIdAndGID(final Integer listId, final Integer gid) {
 		return Arrays.asList(this.daoFactory.getGermplasmListDataDAO().getByListIdAndGid(listId, gid));
-	}
-
-	@Override
-	public GermplasmListData getGermplasmListDataByListIdAndEntryId(final Integer listId, final Integer entryId) {
-		return this.daoFactory.getGermplasmListDataDAO().getByListIdAndEntryId(listId, entryId);
 	}
 
 	@Override
@@ -232,12 +212,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public int deleteGermplasmListByListId(final Integer listId) {
-		final GermplasmList germplasmList = this.getGermplasmListById(listId);
-		return this.deleteGermplasmList(germplasmList);
-	}
-
-	@Override
 	public int deleteGermplasmListByListIdPhysically(final Integer listId) {
 		Preconditions.checkNotNull(listId, "List id passed cannot be null.");
 		this.deleteGermplasmListDataByListId(listId);
@@ -289,12 +263,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public List<Integer> addGermplasmListData(final List<GermplasmListData> germplasmListDatas) {
-		return this.addOrUpdateGermplasmListData(germplasmListDatas, Operation.ADD);
-	}
-
-	@Override
-	@Transactional(isolation = Isolation.READ_UNCOMMITTED)
-	public List<Integer> addGermplasmListDataWithReadUncommittedIsolation(final List<GermplasmListData> germplasmListDatas) {
 		return this.addOrUpdateGermplasmListData(germplasmListDatas, Operation.ADD);
 	}
 
@@ -353,11 +321,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 					+ listId + "): " + e.getMessage(),
 				e);
 		}
-	}
-
-	@Override
-	public int deleteGermplasmListDataByListIdLrecId(final Integer listId, final Integer lrecId) {
-		return this.deleteGermplasmListData(Collections.singletonList(this.getGermplasmListDataByListIdAndLrecId(listId, lrecId)));
 	}
 
 	@Override
@@ -489,32 +452,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public List<GermplasmList> searchForGermplasmList(final String q, final Operation o) {
-		return this.searchForGermplasmList(q, null, o);
-	}
-
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	@Override
-	public List<GermplasmList> searchForGermplasmList(final String q, final String programUUID, final Operation o) {
-		final List<GermplasmList> results = new ArrayList<>();
-		results.addAll(this.daoFactory.getGermplasmListDAO().searchForGermplasmLists(q, programUUID, o));
-		return results;
-	}
-
-	@Override
-	public List<ListDataInfo> saveListDataColumns(final List<ListDataInfo> listDataCollection) {
-		return this.getListDataPropertySaver().saveProperties(listDataCollection);
-	}
-
-	@Override
-	public GermplasmListNewColumnsInfo getAdditionalColumnsForList(final Integer listId) {
-		return this.daoFactory.getListDataPropertyDAO().getPropertiesForList(listId);
-	}
-
-	@Override
 	public List<GermplasmListData> retrieveGermplasmListDataWithParents(final Integer listID) {
 		// Retrieve each cross with gpid1 and gpid2 parents info
 		final List<GermplasmListData> dataList =
@@ -539,13 +476,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public List<GermplasmList> getGermplasmListByGIDandProgramUUID(
-		final Integer gid, final int start, final int numOfRows,
-		final String programUUID) {
-		return this.daoFactory.getGermplasmListDAO().getByGIDandProgramUUID(gid, start, numOfRows, programUUID);
-	}
-
-	@Override
 	public List<GermplasmList> getAllGermplasmListsByProgramUUID(final String programUUID) {
 		return this.daoFactory.getGermplasmListDAO().getListsByProgramUUID(programUUID);
 	}
@@ -553,21 +483,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public List<GermplasmList> getAllGermplasmListsByIds(final List<Integer> listIds) {
 		return this.daoFactory.getGermplasmListDAO().getAllGermplasmListsById(listIds);
-	}
-
-	@Override
-	public List<Integer> deleteGermplasms(final List<Integer> germplasms) {
-
-		final List<Integer> notDeletableGermplasmList = this.validateGermplasmForDeletion(germplasms);
-
-		final List<Integer> gidsDelete = new ArrayList<>(CollectionUtils.disjunction(germplasms, notDeletableGermplasmList));
-
-		if (!gidsDelete.isEmpty()) {
-			this.germplasmListService.performGermplasmListEntriesDeletion(gidsDelete);
-			this.daoFactory.getGermplasmDao().deleteGermplasm(gidsDelete);
-		}
-
-		return gidsDelete;
 	}
 
 	private List<Integer> validateGermplasmForDeletion(final List<Integer> germplasm) {

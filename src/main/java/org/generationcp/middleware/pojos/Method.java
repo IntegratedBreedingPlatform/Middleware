@@ -462,14 +462,7 @@ public class Method implements Serializable, Cloneable {
 
 	@Transient
 	public Boolean isBulkingMethod() {
-		if (this.geneq != null) {
-			if (Method.BULKED_CLASSES.contains(this.geneq)) {
-				return true;
-			} else if (Method.NON_BULKED_CLASSES.contains(this.geneq)) {
-				return false;
-			}
-		}
-		return null;
+		return MethodHelper.isBulkingMethod(this.geneq);
 	}
 
 	@Transient
