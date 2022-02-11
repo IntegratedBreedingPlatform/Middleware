@@ -17,6 +17,7 @@ import org.generationcp.middleware.api.program.ProgramFavoriteDTO;
 import org.generationcp.middleware.dao.breedingmethod.BreedingMethodSearchDAOQuery;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.MethodHelper;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.hibernate.Criteria;
@@ -404,6 +405,8 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			breedingMethodDTO.setCount((String) row.get(BreedingMethodSearchDAOQuery.COUNT_ALIAS));
 			breedingMethodDTO.setSuffix((String) row.get(BreedingMethodSearchDAOQuery.SUFFIX_ALIAS));
 			breedingMethodDTO.setCreationDate((Date) row.get(BreedingMethodSearchDAOQuery.DATE_ALIAS));
+			breedingMethodDTO.setIsBulkingMethod(MethodHelper.isBulkingMethod(breedingMethodDTO.getMethodClass()));
+
 			final Integer programFavoriteId = (Integer) row.get(BreedingMethodSearchDAOQuery.FAVORITE_PROGRAM_ID_ALIAS);
 			if (programFavoriteId != null) {
 				final ProgramFavoriteDTO programFavoriteDTO =
