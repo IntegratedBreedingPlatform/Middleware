@@ -17,7 +17,9 @@ public interface BreedingMethodService {
 
 	void delete(Integer breedingMethodDbId);
 
-	List<BreedingMethodDTO> getBreedingMethods(BreedingMethodSearchRequest methodSearchRequest, Pageable pageable);
+	List<BreedingMethodDTO> searchBreedingMethods(BreedingMethodSearchRequest methodSearchRequest, Pageable pageable,
+			String programUUID);
 
-	Long countBreedingMethods(BreedingMethodSearchRequest methodSearchRequest);
+	Long countSearchBreedingMethods(BreedingMethodSearchRequest methodSearchRequest, String programUUID);
+	
 }

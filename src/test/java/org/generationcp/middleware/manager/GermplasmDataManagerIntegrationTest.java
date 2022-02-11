@@ -130,8 +130,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		}
 
 		if (this.methodDAO == null) {
-			this.methodDAO = new MethodDAO();
-			this.methodDAO.setSession(this.sessionProvder.getSession());
+			this.methodDAO = new MethodDAO(this.sessionProvder.getSession());
 		}
 
 

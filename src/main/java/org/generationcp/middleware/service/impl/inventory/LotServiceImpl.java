@@ -40,14 +40,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -190,7 +193,7 @@ public class LotServiceImpl implements LotService {
 
 		final List<LocationDTO> locations =
 			this.daoFactory.getLocationDAO()
-				.searchLocations(new LocationSearchRequest(null, STORAGE_LOCATION_TYPE, null, locationAbbreviations, null),
+				.searchLocations(new LocationSearchRequest(STORAGE_LOCATION_TYPE, null, locationAbbreviations, null),
 					null, null);
 		return locations.stream().collect(Collectors.toMap(LocationDTO::getAbbreviation, LocationDTO::getId));
 	}
@@ -206,9 +209,14 @@ public class LotServiceImpl implements LotService {
 	public List<String> saveLots(final CropType cropType, final Integer userId,
 		final List<LotItemDto> lotItemDtos) {
 		try {
-			final Map<String, Integer> locationsByLocationAbbrMap = this.buildLocationsByLocationAbbrMap(lotItemDtos.stream()
+			final List<String> locationAbbreviations = lotItemDtos.stream()
 				.map(LotItemDto::getStorageLocationAbbr)
-				.collect(Collectors.toList()));
+				.filter(Objects::nonNull)
+				.collect(Collectors.toList());
+
+			final Map<String, Integer> locationsByLocationAbbrMap = CollectionUtils.isEmpty(locationAbbreviations) ?
+				new HashMap<>() :
+				this.buildLocationsByLocationAbbrMap(locationAbbreviations);
 
 			final Map<String, Integer> unitsByNameMap = this.buildUnitsByNameMap();
 
