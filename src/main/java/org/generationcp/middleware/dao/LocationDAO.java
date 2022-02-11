@@ -589,4 +589,34 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return Optional.empty();
 	}
 
+	public boolean blockIdIsUsedInFieldMap(final List<Integer> blockIds) {
+		try {
+
+			final StringBuilder queryString = new StringBuilder().append("SELECT ");
+			queryString.append("count(blk.value)");
+			queryString.append(" FROM ");
+			queryString.append(" 	nd_experiment nde ");
+			queryString.append("        INNER JOIN ");
+			queryString.append("    project proj ON proj.project_id = nde.project_id ");
+			queryString.append("        INNER JOIN ");
+			queryString.append("    project st ON st.project_id = proj.study_id ");
+			queryString.append("        INNER JOIN ");
+			queryString.append("    nd_experiment geo ON nde.nd_experiment_id = geo.nd_experiment_id ");
+			queryString.append("        AND geo.type_id = 1155 ");
+			queryString.append("        LEFT JOIN ");
+			queryString.append("    nd_geolocationprop blk ON blk.nd_geolocation_id = geo.nd_geolocation_id ");
+			queryString.append("        AND blk.type_id = 8583 ");
+			queryString.append(" WHERE  blk.value in(:blockIds) ");
+			queryString.append(" AND st.deleted = 0;");
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("blockIds", blockIds);
+			return ((BigInteger) query.uniqueResult()).longValue() > 0;
+		} catch (HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("blockIdIsUsedInFieldMap", "blockIds", String.valueOf(blockIds), e.getMessage(), "Location"),
+				e);
+		}
+	}
 }

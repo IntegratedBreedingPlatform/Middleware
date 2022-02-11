@@ -6,6 +6,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -121,5 +123,10 @@ public class LocationServiceImpl implements LocationService {
 	public boolean existsLocationAsCountry(final Integer locationId) {
 		final Country country = this.daoFactory.getCountryDao().getById(locationId);
 		return country != null;
+	}
+
+	@Override
+	public boolean blockIdIsUsedInFieldMap(final List<Integer> blockIds) {
+		return this.daoFactory.getLocationDAO().blockIdIsUsedInFieldMap(blockIds);
 	}
 }
