@@ -66,6 +66,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
@@ -165,7 +166,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 				final StringBuilder sqlString =
 					new StringBuilder().append(
-						"SELECT UPPER(cvt.name) AS name, cvt.cvterm_id AS termId, dataType.object_id As dataTypeId, hasScale.object_id as scaleId ")
+							"SELECT UPPER(cvt.name) AS name, cvt.cvterm_id AS termId, dataType.object_id As dataTypeId, hasScale.object_id as scaleId ")
 						.append(" FROM cvterm cvt ")
 						.append(" INNER JOIN cvterm_relationship hasScale ON hasScale.subject_id = cvt.cvterm_id AND hasScale.type_id = "
 							+ TermId.HAS_SCALE.getId() + " ")
@@ -2107,4 +2108,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		// TODO Complete
 	}
 
+	public List<CVTerm> getTermsByNameAndCvId(final Set<String> methodNames, final int cvId) {
+		final Criteria criteria = this.getSession().createCriteria(CVTerm.class);
+		criteria.add(Restrictions.in("name", methodNames));
+		criteria.add(Restrictions.eq("cvId", cvId));
+		return criteria.list();
+	}
 }
