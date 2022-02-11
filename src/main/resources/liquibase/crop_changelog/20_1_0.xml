@@ -87,4 +87,14 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="v20.1.0-5">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="listdataprops"></tableExists>
+		</preConditions>
+		<comment>Rename table 'listdataprops' to 'listdataprops_bkp'</comment>
+		<sql>
+			RENAME table listdataprops TO listdataprops_bkp;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

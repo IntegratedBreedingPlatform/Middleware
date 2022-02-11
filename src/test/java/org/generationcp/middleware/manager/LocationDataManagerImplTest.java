@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.manager;
 
-import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
@@ -44,9 +43,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	private Project commonTestProject;
-
-	private final static Integer COUNTRY_LTYPEID = 405;
-	private final static Integer PHILIPPINES_CNTRYID = 171;
 
 	@Before
 	public void setUp() throws Exception {
@@ -147,12 +143,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountAllLocations() {
-		final long count = this.manager.countAllLocations();
-		Debug.println(IntegrationTestBase.INDENT, "testCountAllLocations(): " + count);
-	}
-
-	@Test
 	public void testGetLocationsByName() {
 		final String name = "AFGHANISTAN";
 		final int start = 0;
@@ -183,81 +173,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountLocationsByName() {
-		final String name = "AFGHANISTAN";
-		final long count = this.manager.countLocationsByName(name, Operation.EQUAL);
-		Debug.println(IntegrationTestBase.INDENT, "testCountLocationByName(" + name + "): " + count);
-	}
-
-	@Test
-	public void testGetLocationsByCountry() throws MiddlewareQueryException {
-		final Integer id = 171; // Tested in rice db. 171 = Philippines
-		final Country country = this.manager.getCountryById(id);
-		final int start = 0;
-		final int numOfRows = 5;
-
-		final List<Location> locations = this.manager.getLocationsByCountry(country);
-		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByCountry(country=" + country + "): " + locations.size());
-		Debug.printObjects(IntegrationTestBase.INDENT, locations);
-
-		final List<Location> locationList = this.manager.getLocationsByCountry(country, start, numOfRows);
-		Debug.println(IntegrationTestBase.INDENT,
-			"testGetLocationByCountry(country=" + country + ", start=" + start + ", numOfRows=" + numOfRows + "): " + locationList
-				.size());
-		Debug.printObjects(IntegrationTestBase.INDENT, locationList);
-	}
-
-	@Test
-	public void testGetLocationsByCountryAndType() throws MiddlewareQueryException {
-		final Integer id = 1; // Tested in rice db. 171 = Philippines
-		final Country country = this.manager.getCountryById(id);
-		final int type = 405;
-
-		final List<Location> locations = this.manager.getLocationsByCountryAndType(country, type);
-		Debug.println(IntegrationTestBase.INDENT,
-			"testGetLocationByCountryAndType(country=" + country + "): type= " + type + ":" + locations.size());
-		Debug.printObjects(IntegrationTestBase.INDENT, locations);
-	}
-
-	@Test
-	public void testCountLocationsByCountry() {
-		final Integer id = 171; // Tested in rice db. 171 = Philippines
-		final Country country = this.manager.getCountryById(id);
-		final long count = this.manager.countLocationsByCountry(country);
-		Debug.println(IntegrationTestBase.INDENT, "testCountLocationByCountry(country=" + country + "): " + count);
-	}
-
-	@Test
-	public void testGetLocationsByType() throws MiddlewareQueryException {
-		final int type = 405; // Tested in rice db
-		final int start = 0;
-		final int numOfRows = 5;
-
-		final List<Location> locations = this.manager.getLocationsByType(type);
-		Assert.assertNotNull("Expecting to have returned results.", locations);
-		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByType(type=" + type + "): " + locations.size());
-		Debug.printObjects(IntegrationTestBase.INDENT, locations);
-
-		final List<Location> locationsByProgramUUID = this.manager.getLocationsByType(type);
-		Assert.assertNotNull("Expecting to have returned results.", locationsByProgramUUID);
-		Debug.println(IntegrationTestBase.INDENT, "testGetLocationByType(type=" + type + "): " + locations.size());
-		Debug.printObjects(IntegrationTestBase.INDENT, locationsByProgramUUID);
-
-		final List<Location> locationList = this.manager.getLocationsByType(type, start, numOfRows);
-		Assert.assertNotNull("Expecting to have returned results.", locationList);
-		Debug.println(IntegrationTestBase.INDENT,
-			"testGetLocationByType(type=" + type + ", start=" + start + ", numOfRows=" + numOfRows + "): " + locationList.size());
-		Debug.printObjects(IntegrationTestBase.INDENT, locations);
-	}
-
-	@Test
-	public void testCountLocationsByType() {
-		int type = 405; // Tested in rice db
-		long count = this.manager.countLocationsByType(type);
-		Debug.println(IntegrationTestBase.INDENT, "testCountLocationByType(type=" + type + "): " + count);
-	}
-
-	@Test
 	public void testAddLocation() throws MiddlewareQueryException {
 		final Country country = this.manager.getCountryById(1);
 		final Location province = this.manager.getLocationByID(1001);
@@ -280,49 +195,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddLocations() throws MiddlewareQueryException {
-
-		final Country country = this.manager.getCountryById(1);
-		final Location province = this.manager.getLocationByID(1001);
-
-		final List<Location> locations = new ArrayList<>();
-
-		final Location location1 = new Location();
-		location1.setCountry(country);
-		location1.setLabbr(RandomStringUtils.randomAlphabetic(4).toUpperCase());
-		location1.setLname("TEST-LOCATION-2");
-		location1.setLrplce(1);
-		location1.setLtype(1);
-		location1.setNllp(1);
-		location1.setProvince(province);
-		location1.setSnl2id(1);
-		location1.setSnl3id(1);
-		location1.setLdefault(Boolean.FALSE);
-
-		final Location location2 = new Location();
-		location2.setCountry(country);
-		location2.setLabbr(RandomStringUtils.randomAlphabetic(4).toUpperCase());
-		location2.setLname("TEST-LOCATION-3");
-		location2.setLrplce(1);
-		location2.setLtype(1);
-		location2.setNllp(1);
-		location2.setProvince(province);
-		location2.setSnl2id(1);
-		location2.setSnl3id(1);
-		location2.setLdefault(Boolean.FALSE);
-
-		locations.add(location1);
-		locations.add(location2);
-
-		// add the location
-		final List<Integer> locationsAdded = this.manager.addLocation(locations);
-
-		Debug.println(IntegrationTestBase.INDENT, "testAddLocations() Locations added: " + locationsAdded.size());
-		Debug.println(IntegrationTestBase.INDENT, this.manager.getLocationsByName("TEST-LOCATION-2", 0, 5, Operation.EQUAL));
-		Debug.println(IntegrationTestBase.INDENT, this.manager.getLocationsByName("TEST-LOCATION-3", 0, 5, Operation.EQUAL));
-	}
-
-	@Test
 	public void testGetUserDefinedFieldByFieldTable() throws MiddlewareQueryException {
 		final String tableName = "LOCATION";
 		final String fieldType = "LTYPE";
@@ -336,12 +208,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	public void testGetAllBreedingLocations() throws MiddlewareQueryException {
 		final List<Location> locations = this.manager.getAllBreedingLocations();
 		Debug.println(IntegrationTestBase.INDENT, "getAllBreedingLocations()  " + locations);
-	}
-
-	@Test
-	public void testCountAllBreedingLocations() throws MiddlewareQueryException {
-		final Long locationCount = this.manager.countAllBreedingLocations();
-		Debug.println(IntegrationTestBase.INDENT, "countAllBreedingLocations() - Total Count = " + locationCount);
 	}
 
 	@Test
@@ -448,72 +314,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 			Assert.assertEquals(aculcoLoc.getGeoref().getAlt(), locationDetails.get(0).getAltitude());
 		}
 
-	}
-
-	@Test
-	public void testGetLocationsByNameCountryAndType_NullFilter() throws MiddlewareQueryException {
-		final String locationName = "";
-		final Country country = null;
-		final Integer locationTypeId = null;
-		final List<Location> locationList = this.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
-		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
-	}
-
-	@Test
-	public void testGetLocationsByNameCountryAndType_NullFilterWithZeroLocationTypeId() throws MiddlewareQueryException {
-		final String locationName = "";
-		final Country country = null;
-		final Integer locationTypeId = 0;
-		final List<Location> locationList = this.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
-		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
-		boolean hasLocationWithNonZeroLtypeId = false;
-		for (final Location location : locationList) {
-			if (location.getLtype() != null && 0 != location.getLtype()) {
-				hasLocationWithNonZeroLtypeId = true;
-				break;
-			}
-		}
-		Assert.assertTrue("Location list should contain items with non-zero lytpeId", hasLocationWithNonZeroLtypeId);
-	}
-
-	@Test
-	public void testGetLocationsByNameCountryAndType_WithNonZeroLocationTypeId() throws MiddlewareQueryException {
-		final String locationName = "";
-		final Country country = null;
-		final List<Location> locationList =
-			this.manager.getLocationsByNameCountryAndType(locationName, country, LocationDataManagerImplTest.COUNTRY_LTYPEID);
-		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
-		for (final Location location : locationList) {
-			Assert.assertEquals("Location should have a lytpeId = " + LocationDataManagerImplTest.COUNTRY_LTYPEID,
-				LocationDataManagerImplTest.COUNTRY_LTYPEID, location.getLtype());
-		}
-	}
-
-	@Test
-	public void testGetLocationsByNameCountryAndType_WithNonZeroCountryId() throws MiddlewareQueryException {
-		final String locationName = "";
-		final Country country = new Country();
-		country.setCntryid(LocationDataManagerImplTest.PHILIPPINES_CNTRYID);
-		final Integer locationTypeId = null;
-		final List<Location> locationList = this.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
-		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
-		for (final Location location : locationList) {
-			Assert.assertEquals("Location should have a countryId = " + LocationDataManagerImplTest.PHILIPPINES_CNTRYID,
-				LocationDataManagerImplTest.PHILIPPINES_CNTRYID, location.getCountry().getCntryid());
-		}
-	}
-
-	@Test
-	public void testGetLocationsByNameCountryAndType_WithNonEmptyLocationName() throws MiddlewareQueryException {
-		final String locationName = "Phil";
-		final Country country = null;
-		final Integer locationTypeId = null;
-		final List<Location> locationList = this.manager.getLocationsByNameCountryAndType(locationName, country, locationTypeId);
-		Assert.assertFalse("Location list should not be empty", locationList.isEmpty());
-		for (final Location location : locationList) {
-			Assert.assertTrue("Location should have a location name having the keyword " + locationName,
-				location.getLname().toLowerCase().contains(locationName.toLowerCase()));
-		}
 	}
 
 	@Test

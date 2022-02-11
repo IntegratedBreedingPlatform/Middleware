@@ -874,23 +874,6 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public String retrieveVariableCategoricalValue(final String programUuid, final Integer variableId, final Integer categoricalValueId) {
-		if (variableId == null || categoricalValueId == null) {
-			return null;
-		}
-
-		final Variable variable = this.getVariable(programUuid, variableId, true);
-		for (final TermSummary summary : variable.getScale().getCategories()) {
-			if (summary.getId().equals(categoricalValueId)) {
-				return summary.getDefinition();
-			}
-		}
-
-		return null;
-
-	}
-
-	@Override
 	public String retrieveVariableCategoricalNameValue(final String programUuid, final Integer variableId, final Integer categoricalValueId,
 		final boolean removeBraces) {
 
@@ -1091,11 +1074,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	 */
 	@Override
 	public boolean hasUsage(final int variableId) {
-		// Temporal condition to avoid delete variable when it exists in listdataprops.
-		final boolean variableUsedInListdataProp = this.daoFactory.getListDataPropertyDAO().isOntologyVariableInUse(variableId);
-
-		return variableUsedInListdataProp ||
-			this.isVariableUsedInStudy(variableId) ||
+		return this.isVariableUsedInStudy(variableId) ||
 			this.areVariablesUsedInAttributes(Lists.newArrayList(variableId)) ||
 			this.isVariableUsedInBreedingMethods(variableId) ||
 			this.isVariableAssignedToLists(variableId);
