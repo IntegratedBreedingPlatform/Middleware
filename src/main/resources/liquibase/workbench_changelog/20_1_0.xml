@@ -54,47 +54,21 @@
 			</sqlCheck>
 		</preConditions>
 		<comment>
-			Add Manage Program Settings Beta sidebar item.
+			Add new Manage Program Settings sidebar item.
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO workbench_tool (`name`, `group_name`, `title`, `version`, `tool_type`, `path`, `parameter`, `user_tool`)
-			VALUES ('program_settings_manager', 'program_settings_manager', 'Manage Program Settings Beta', '1.0', 'WEB', '/ibpworkbench/controller/jhipster#program-settings-manager', '', 0);
+			VALUES ('program_settings_manager', 'program_settings_manager', 'Manage Program Settings', '1.0', 'WEB', '/ibpworkbench/controller/jhipster#program-settings-manager', '', 0);
 
+			set @sidebar_category_id = (select sidebar_category_id from workbench_sidebar_category where sidebar_category_name = 'program_administration');
 			INSERT INTO workbench_sidebar_category_link (`tool_name`, `sidebar_category_id`, `sidebar_link_name`, `sidebar_link_title`, `rank`)
-			VALUES ('program_settings_manager', 7, 'program_settings_manager', 'Manage Program Settings Beta', 2);
+			VALUES ('program_settings_manager', @sidebar_category_id, 'program_settings_manager', 'Manage Program Settings', 1);
+
+			update permission set workbench_sidebar_category_link_id = last_insert_id() where name = 'MANAGE_PROGRAM_SETTINGS';
 		</sql>
 	</changeSet>
 
-	<changeSet author="nahuel" id="v20.1.0-2">
-		<preConditions onFail="MARK_RAN">
-			<and>
-				<sqlCheck expectedResult="1">
-					SELECT count(*) FROM workbench_tool WHERE name = 'program_settings_manager'
-				</sqlCheck>
-				<sqlCheck expectedResult="0">
-					SELECT count(*) FROM permission where name = 'MANAGE_PROGRAM_SETTINGS_BETA'
-				</sqlCheck>
-			</and>
-		</preConditions>
-		<comment>
-			Create placeholder permission for new Manage Program Settings Beta
-		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			# Create new permission for the moment so that it shows in the side menu
-			set @sidebar_category_link_id = (select sidebar_category_link_id from workbench_sidebar_category_link where tool_name = 'program_settings_manager');
-			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
-			select 'MANAGE_PROGRAM_SETTINGS_BETA', 'Manage Program Settings Beta', parent_id, @sidebar_category_link_id
-			from permission where name = 'MANAGE_PROGRAM_SETTINGS';
-
-			SET @manage_program_settings_beta_permission_id = (SELECT permission_id FROM permission where name = 'MANAGE_PROGRAM_SETTINGS_BETA');
-
-			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @manage_program_settings_beta_permission_id, '1');
-			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @manage_program_settings_beta_permission_id, '1');
-			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @manage_program_settings_beta_permission_id, '1');
-		</sql>
-	</changeSet>
-
-	<changeSet author="cuenyad" id="v20.1.0-3">
+	<changeSet author="cuenyad" id="v20.1.0-2">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="0">
