@@ -42,20 +42,24 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 		}
 		return new ArrayList<Locdes>();
 	}
-    //TODO: unificate getByLocation and getByDval querys in one.
-	@SuppressWarnings("unchecked")
-	public List<Locdes> getByDval(String dval) throws MiddlewareQueryException {
+
+	public List<Locdes> getLocdes(final Integer locId, final String dval) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Locdes.class);
-			criteria.add(Restrictions.eq("dval", dval));
+			if (locId != null) {
+				criteria.add(Restrictions.eq("locationId", locId));
+			}
+			if (StringUtils.isNotBlank(dval)) {
+				criteria.add(Restrictions.eq("dval", dval));
+
+			}
 			return criteria.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getByValue(value=" + dval + ") query from Locdes: " + e.getMessage(), e);
+			this.logAndThrowException("Error with getLocdes(locId=" + locId + "dval=" + dval + ") query from Locdes: " + e.getMessage(), e);
 		}
 		return new ArrayList<Locdes>();
 	}
 
-	
 	@SuppressWarnings("unchecked")
 	public List<Locdes> getAllLocationDescriptionsByFilters(final String fcode,final String[] dval) throws MiddlewareQueryException {
 		try {
