@@ -42,7 +42,7 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 		}
 		return new ArrayList<Locdes>();
 	}
-
+    //TODO: unificate getByLocation and getByDval querys in one.
 	@SuppressWarnings("unchecked")
 	public List<Locdes> getByDval(String dval) throws MiddlewareQueryException {
 		try {
