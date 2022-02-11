@@ -16,6 +16,7 @@ import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -112,7 +113,7 @@ public class Location implements Serializable, Comparable<Location> {
 	@Column(name = "ldefault", columnDefinition = "TINYINT")
 	private Boolean ldefault;
 
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
 	@JoinColumn(name = "locid")
 	private Georef georef;
 
