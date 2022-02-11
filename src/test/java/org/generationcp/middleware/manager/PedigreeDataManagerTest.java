@@ -33,25 +33,6 @@ public class PedigreeDataManagerTest extends IntegrationTestBase {
 	private PedigreeDataManager pedigreeManager;
 
 	@Test
-	public void testGetGermplasmDescendants() throws Exception {
-		Integer gid = Integer.valueOf(1);
-		List<Object[]> germplsmList = this.pedigreeManager.getDescendants(gid, 0, 20);
-
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmDescendants(" + gid + "): ");
-		for (Object[] object : germplsmList) {
-			Debug.println(IntegrationTestBase.INDENT, "  progenitor number: " + object[0]);
-			Debug.println(IntegrationTestBase.INDENT, "   " + object[1]);
-		}
-	}
-
-	@Test
-	public void testCountGermplasmDescendants() throws Exception {
-		Integer gid = Integer.valueOf(1);
-		long count = this.pedigreeManager.countDescendants(gid);
-		Debug.println(IntegrationTestBase.INDENT, "testCountGermplasmDescendants(" + gid + "):" + count);
-	}
-
-	@Test
 	public void testGetProgenitorByGID() throws Exception {
 		Integer gid = Integer.valueOf(779745);
 		Integer pNo = Integer.valueOf(10);
@@ -92,20 +73,6 @@ public class PedigreeDataManagerTest extends IntegrationTestBase {
 		return outputString.toString();
 	}
 
-	@Test
-	public void testGetDescendants() throws Exception {
-		Integer id = Integer.valueOf(2);
-		List<Object[]> results = this.pedigreeManager.getDescendants(id, 0, 100);
-		Assert.assertNotNull(results);
-		Assert.assertFalse(results.isEmpty());
-		for (Object[] result : results) {
-			Debug.println(IntegrationTestBase.INDENT, result[0]);
-			Debug.println(IntegrationTestBase.INDENT, result[1]);
-		}
-	}
-
-
-
 	private void printNode(GermplasmPedigreeTreeNode node, int level) {
 		StringBuffer tabs = new StringBuffer();
 
@@ -128,14 +95,6 @@ public class PedigreeDataManagerTest extends IntegrationTestBase {
 		Germplasm result = this.pedigreeManager.getParentByGIDAndProgenitorNumber(gid, progenitorNumber);
 		Assert.assertNotNull(result);
 		Debug.println(IntegrationTestBase.INDENT, "testGetParentByGIDAndProgenitorNumber(): " + result);
-	}
-
-	@Test
-	public void testCountDescendants() throws Exception {
-		Integer gid = 10; // change gid value
-		long count = this.pedigreeManager.countDescendants(gid);
-		Assert.assertNotNull(count);
-		Debug.println(IntegrationTestBase.INDENT, "testCountDescendants(" + gid + "):" + count);
 	}
 
 }

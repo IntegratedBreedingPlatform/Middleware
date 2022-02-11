@@ -235,33 +235,6 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public Map<Integer, String> getPreferredIdsByGIDs(final List<Integer> gids) {
-		final Map<Integer, String> toreturn = new HashMap<>();
-		for (final Integer gid : gids) {
-			toreturn.put(gid, null);
-		}
-
-		try {
-			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PREFERRED_IDS_BY_GIDS);
-			query.setParameterList("gids", gids);
-
-			final List<Object> results = query.list();
-			for (final Object result : results) {
-				final Object[] resultArray = (Object[]) result;
-				final Integer gid = (Integer) resultArray[0];
-				final String preferredId = (String) resultArray[1];
-				toreturn.put(gid, preferredId);
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with getPreferredIdsByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
-			NameDAO.LOG.error(message);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-		return toreturn;
-	}
-
-	@SuppressWarnings("unchecked")
 	public Map<Integer, String> getPreferredNamesByGIDs(final List<Integer> gids) {
 		final Map<Integer, String> toreturn = new HashMap<>();
 		for (final Integer gid : gids) {
@@ -378,50 +351,6 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		}
 	}
 
-	public Map<Integer, String> getSourcePreferredNamesByGids(final List<Integer> gids) {
-		final Map<Integer, String> map;
-
-		if (gids == null || gids.isEmpty()) {
-			return new HashMap<>();
-		}
-
-		try {
-			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_GROUP_SOURCE_PREFERRED_NAME_IDS_BY_GIDS);
-			query.setParameterList("gids", gids);
-
-			map = this.createGidAndPreferredNameMap(query.list());
-
-		} catch (final HibernateException e) {
-			final String message = "Error with getSourcePreferredNamesByGids(gids=" + gids + ") query from Name " + e.getMessage();
-			NameDAO.LOG.error(message);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-		return map;
-
-	}
-
-	public Map<Integer, String> getImmediatePreferredNamesByGids(final List<Integer> gids) {
-		final Map<Integer, String> map;
-
-		if (gids == null || gids.isEmpty()) {
-			return new HashMap<>();
-		}
-
-		try {
-			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_IMMEDIATE_SOURCE_PREFERRED_NAME_IDS_BY_GIDS);
-			query.setParameterList("gids", gids);
-
-			map = this.createGidAndPreferredNameMap(query.list());
-
-		} catch (final HibernateException e) {
-			final String message = "Error with getImmediatePreferredNamesByGids(gids=" + gids + ") query from Name " + e.getMessage();
-			NameDAO.LOG.error(message);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return map;
-	}
-
 	public List<String> getNamesByGidsAndPrefixes(final List<Integer> gids, final List<String> prefixes) {
 		try {
 			final StringBuilder sql = new StringBuilder();
@@ -444,26 +373,6 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Name> getNamesByTypeAndGIDList(final Integer nameType, final List<Integer> gidList) {
-		List<Name> returnList = new ArrayList<>();
-		if (gidList != null && !gidList.isEmpty()) {
-			try {
-				final String sql = "SELECT {n.*}" + " FROM names n" + " WHERE n.ntype = :nameType" + " AND n.gid in (:gidList)";
-				final SQLQuery query = this.getSession().createSQLQuery(sql);
-				query.addEntity("n", Name.class);
-				query.setParameter("nameType", nameType);
-				query.setParameterList("gidList", gidList);
-				returnList = query.list();
-			} catch (final HibernateException e) {
-				final String message = "Error with getNamesByTypeAndGIDList(nameType=" + nameType + ", gidList=" + gidList + "): " + e.getMessage();
-				NameDAO.LOG.error(message);
-				throw new MiddlewareQueryException(message, e);
-			}
-		}
-		return returnList;
 	}
 
 	public List<String> getExistingGermplasmPUIs(final List<String> germplasmPUIList) {
@@ -515,18 +424,6 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			NameDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-	}
-
-	private Map<Integer, String> createGidAndPreferredNameMap(final List<Object> list) {
-		final Map<Integer, String> map = new HashMap<>();
-
-		for (final Object result : list) {
-			final Object[] resultArray = (Object[]) result;
-			final Integer gid = (Integer) resultArray[0];
-			final String name = (String) resultArray[1];
-			map.put(gid, name);
-		}
-		return map;
 	}
 
 	public boolean isLocationUsedInGermplasmName(final Integer locationId) {

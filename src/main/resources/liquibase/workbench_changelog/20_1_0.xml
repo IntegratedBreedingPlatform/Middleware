@@ -47,4 +47,30 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="20.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM workbench_tool WHERE name = 'bm_list_manager_main';
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Remove old germplasm list tool
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			SET @oldGermplasmCategoryLinkId =
+				(select sidebar_category_link_id from workbench_sidebar_category_link where tool_name  = 'bm_list_manager_main');
+
+			<!-- At this point old germplasm module permission should have been removed. Just for fail-safe, we delete just in case
+			that someone manually added the permissions and prevent a FK error -->
+			DELETE role_permission FROM role_permission INNER JOIN permission p ON role_permission.permission_id = p.permission_id
+				WHERE p.workbench_sidebar_category_link_id = @oldGermplasmCategoryLinkId;
+
+			DELETE FROM permission WHERE workbench_sidebar_category_link_id = @oldGermplasmCategoryLinkId;
+
+			DELETE FROM workbench_tool WHERE name = 'bm_list_manager_main';
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

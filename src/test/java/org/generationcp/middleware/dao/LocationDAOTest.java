@@ -15,7 +15,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -25,17 +24,6 @@ import static org.hamcrest.Matchers.not;
 
 public class LocationDAOTest extends IntegrationTestBase {
 
-	private static final String ABBR = "ABBR";
-	private static final String LOCATION = "LOCATION";
-	private static final int NON_BREEDING_LOC_TYPE = 22;
-	private static final int HISTORICAL_LOC_ID = 10;
-	private static final int[] PROGRAM1_BREEDING_LOC_IDS = {20, 21};
-	private static final int[] PROGRAM2_BREEDING_LOC_IDS = {30, 31, 32};
-
-	private static final String PROGRAM_UUID1 = "abcde-12345";
-	private static final String PROGRAM_UUID2 = "qwerty-09876";
-	private static final String PROGRAM_UUID3 = "asdfg-54321";
-
 	private LocationDAO locationDAO;
 	private CountryDAO countryDAO;
 
@@ -44,83 +32,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 		this.locationDAO = new LocationDAO(this.sessionProvder.getSession());
 		this.countryDAO = new CountryDAO();
 		this.countryDAO.setSession(this.sessionProvder.getSession());
-	}
-
-	@Test
-	public void testGetBreedingLocations() {
-		this.createTestLocationsForPrograms();
-
-		/*
-		 * For program 1, verify there are breeding locations returned
-		 */
-		final List<Location> programOneLocations =
-			this.locationDAO.getBreedingLocations();
-		Assert.assertTrue("Expecting breeding locations for program with ID " + LocationDAOTest.PROGRAM_UUID1,
-			programOneLocations.size() > 0);
-
-		/*
-		 * For program 2, verify there are breeding locations returned
-		 */
-		final List<Location> programTwoLocations =
-			this.locationDAO.getBreedingLocations();
-		Assert.assertTrue("Expecting breeding locations for program with ID " + LocationDAOTest.PROGRAM_UUID2,
-			programTwoLocations.size() > 0);
-
-		/*
-		 * For program 3, verify there are breeding locations returned
-		 */
-		final List<Location> programThreeLocations =
-			this.locationDAO.getBreedingLocations();
-		Assert.assertTrue("Expecting breeding locations for program with ID " + LocationDAOTest.PROGRAM_UUID3,
-			programThreeLocations.size() > 0);
-	}
-
-	private void createTestLocationsForPrograms() {
-		final List<Location> locations = new ArrayList<>();
-
-		// add historical breeding location (null program uuid)
-		locations.add(LocationTestDataInitializer
-			.createLocation(LocationDAOTest.HISTORICAL_LOC_ID, LocationDAOTest.LOCATION + LocationDAOTest.HISTORICAL_LOC_ID,
-				Location.BREEDING_LOCATION_TYPE_IDS[0], LocationDAOTest.ABBR + LocationDAOTest.HISTORICAL_LOC_ID));
-
-		// Add locations for Program 1 - 2 breeding locations, 1 non-breeding
-		// location
-		Integer id = LocationDAOTest.PROGRAM1_BREEDING_LOC_IDS[0];
-		locations.add(LocationTestDataInitializer
-			.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[0], LocationDAOTest.ABBR + id
-			));
-		id = LocationDAOTest.PROGRAM1_BREEDING_LOC_IDS[1];
-		locations.add(LocationTestDataInitializer
-			.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[1], LocationDAOTest.ABBR + id
-			));
-		locations.add(LocationTestDataInitializer
-			.createLocation(22, LocationDAOTest.LOCATION + 22, LocationDAOTest.NON_BREEDING_LOC_TYPE, LocationDAOTest.ABBR + 22
-			));
-
-		// Add locations for Program 2 - 3 breeding locations, 2 non-breeding
-		// location
-		id = LocationDAOTest.PROGRAM2_BREEDING_LOC_IDS[0];
-		locations.add(LocationTestDataInitializer
-			.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[0], LocationDAOTest.ABBR + id
-			));
-		id = LocationDAOTest.PROGRAM2_BREEDING_LOC_IDS[1];
-		locations.add(LocationTestDataInitializer
-			.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[1], LocationDAOTest.ABBR + id
-			));
-		id = LocationDAOTest.PROGRAM2_BREEDING_LOC_IDS[2];
-		locations.add(LocationTestDataInitializer
-			.createLocation(id, LocationDAOTest.LOCATION + id, Location.BREEDING_LOCATION_TYPE_IDS[2], LocationDAOTest.ABBR + id
-			));
-		locations.add(LocationTestDataInitializer
-			.createLocation(33, LocationDAOTest.LOCATION + 33, LocationDAOTest.NON_BREEDING_LOC_TYPE, LocationDAOTest.ABBR + 33
-			));
-		locations.add(LocationTestDataInitializer
-			.createLocation(34, LocationDAOTest.LOCATION + 34, LocationDAOTest.NON_BREEDING_LOC_TYPE, LocationDAOTest.ABBR + 34
-			));
-
-		for (final Location location : locations) {
-			this.locationDAO.save(location);
-		}
 	}
 
 	@Test
