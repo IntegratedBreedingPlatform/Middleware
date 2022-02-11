@@ -38,4 +38,6 @@ public interface LocationService {
 	LocationDTO createLocation(LocationRequestDto locationRequestDto);
 
 	void updateLocation(Integer locationId, LocationRequestDto locationRequestDto);
+
+	public boolean existsLocationAsCountry(final Integer locationId);
 }

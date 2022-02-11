@@ -1,7 +1,6 @@
 package org.generationcp.middleware.api.location;
 
 import com.google.common.collect.ImmutableSet;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -9,11 +8,13 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Transactional
@@ -61,6 +62,7 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public void deleteLocation(final Integer locationId) {
 		final Location location = this.daoFactory.getLocationDAO().getById(locationId);
+		this.daoFactory.getGeolocationDao().deleteGeolocations(Arrays.asList(locationId));
 		this.daoFactory.getLocationDAO().makeTransient(location);
 	}
 
@@ -115,4 +117,9 @@ public class LocationServiceImpl implements LocationService {
 		this.daoFactory.getLocationDAO().saveOrUpdate(location);
 	}
 
+	@Override
+	public boolean existsLocationAsCountry(final Integer locationId) {
+		final Country country = this.daoFactory.getCountryDao().getById(locationId);
+		return country != null;
+	}
 }
