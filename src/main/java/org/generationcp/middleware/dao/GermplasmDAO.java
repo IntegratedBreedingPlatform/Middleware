@@ -1835,7 +1835,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	public boolean isLocationUsedInGermplasm(final Integer locationId) {
 		try {
-			final String sql = "SELECT count(1) FROM germplsm WHERE glocn = :locationId";
+			final String sql = "SELECT count(1) FROM germplsm g WHERE  g.deleted = 0 and g.grplce = 0 and g.glocn = :locationId";
 			final SQLQuery query = this.getSession().createSQLQuery(sql);
 			query.setParameter("locationId", locationId);
 			return ((BigInteger) query.uniqueResult()).longValue() > 0;
