@@ -606,8 +606,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			queryString.append("        LEFT JOIN ");
 			queryString.append("    nd_geolocationprop blk ON blk.nd_geolocation_id = geo.nd_geolocation_id ");
 			queryString.append("        AND blk.type_id = 8583 ");
-			queryString.append(" WHERE  blk.value in(:blockIds) ");
-			queryString.append(" AND st.deleted = 0;");
+			queryString.append(" WHERE  blk.value in(:blockIds); ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("blockIds", blockIds);
