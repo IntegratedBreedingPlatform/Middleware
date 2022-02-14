@@ -15,4 +15,5 @@ public interface ProgramFavoriteService {
 
 	List<ProgramFavorite> getProgramFavorites(String programUUID, ProgramFavorite.FavoriteType favoriteType, Set<Integer> entityIds);
 
+	void deleteProgramFavorites(ProgramFavorite.FavoriteType favoriteType, Set<Integer>  entityIds);
 }
