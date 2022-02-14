@@ -23,7 +23,6 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Property;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.oms.TermSummary;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -104,40 +103,6 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 		for (final StandardVariableSummary summary : summaries) {
 			Assert.assertTrue(ids.contains(summary.getId()));
 		}
-	}
-
-	@Test
-	public void testGetStandardVariableSummary() {
-		// First create a new Standardvariable
-		final StandardVariable testStandardVariable = this.createStandardVariable("TestVariable");
-
-		// Load summary from the view based method
-		final StandardVariableSummary summary = this.ontologyDataManager.getStandardVariableSummary(testStandardVariable.getId());
-		Assert.assertNotNull(summary);
-
-		// Make sure that the summary data loaded from view matches with details
-		// data loaded using the usual method.
-		this.assertVariableDataMatches(testStandardVariable, summary);
-
-	}
-
-	private void assertVariableDataMatches(final StandardVariable standardVariable, final StandardVariableSummary summary) {
-		Assert.assertEquals(new Integer(standardVariable.getId()), summary.getId());
-		Assert.assertEquals(standardVariable.getName(), summary.getName());
-		Assert.assertEquals(standardVariable.getDescription(), summary.getDescription());
-
-		this.assertTermDataMatches(standardVariable.getProperty(), summary.getProperty());
-		this.assertTermDataMatches(standardVariable.getMethod(), summary.getMethod());
-		this.assertTermDataMatches(standardVariable.getScale(), summary.getScale());
-		this.assertTermDataMatches(standardVariable.getDataType(), summary.getDataType());
-
-		Assert.assertEquals(standardVariable.getPhenotypicType(), summary.getPhenotypicType());
-	}
-
-	private void assertTermDataMatches(final Term termDetails, final TermSummary termSummary) {
-		Assert.assertEquals(new Integer(termDetails.getId()), termSummary.getId());
-		Assert.assertEquals(termDetails.getName(), termSummary.getName());
-		Assert.assertEquals(termDetails.getDefinition(), termSummary.getDefinition());
 	}
 
 	@Test
@@ -498,35 +463,6 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 	}
 
 	@Test
-	public void testCountTermsByCvId() {
-		long count = this.ontologyDataManager.countTermsByCvId(CvId.PROPERTIES);
-		Assert.assertTrue(count != 0);
-
-		count = this.ontologyDataManager.countTermsByCvId(CvId.SCALES);
-		Assert.assertTrue(count != 0);
-
-	}
-
-	@Test
-	public void testGetMethodsForTrait() {
-		final StandardVariable standardVariable = this.createStandardVariable("testVariable");
-
-		final List<Term> terms = this.ontologyDataManager.getMethodsForTrait(standardVariable.getProperty().getId());
-
-		Assert.assertFalse(terms.isEmpty());
-
-	}
-
-	@Test
-	public void testGetScalesForTrait() {
-		final StandardVariable standardVariable = this.createStandardVariable("testVariable");
-
-		final List<Term> terms = this.ontologyDataManager.getScalesForTrait(standardVariable.getProperty().getId());
-
-		Assert.assertFalse(terms.isEmpty());
-	}
-
-	@Test
 	public void testAddTerm() {
 		final String name = "Test Method " + new Random().nextInt(10000);
 		final String definition = "Test Definition";
@@ -613,12 +549,6 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 			term.print(IntegrationTestBase.INDENT);
 		}
 
-	}
-
-	@Test
-	public void testCountIsAOfProperties() {
-		final long asOf = this.ontologyDataManager.countIsAOfProperties();
-		Assert.assertTrue(asOf != 0);
 	}
 
 	@Test
@@ -908,12 +838,6 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 		// Check that the variable got deleted
 		final Term term = this.ontologyDataManager.getTermById(standardVariable.getId());
 		Assert.assertNull("Expected the standard variable deleted but it is still there!", term);
-	}
-
-	@Test
-	public void testGetCVIdByName() throws MiddlewareQueryException {
-		final Integer cvId = this.ontologyDataManager.getCVIdByName("Variables");
-		Assert.assertEquals(1040, cvId.intValue());
 	}
 
 	private StandardVariable createStandardVariable(final String name) {

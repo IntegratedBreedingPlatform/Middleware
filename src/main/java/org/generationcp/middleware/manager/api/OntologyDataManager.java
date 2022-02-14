@@ -70,15 +70,6 @@ public interface OntologyDataManager {
 	List<StandardVariableSummary> getStandardVariableSummaries(List<Integer> standardVariableIds);
 
 	/**
-	 * Gets summary for a standard variable identified by given id. Returns {@code null} if no match is found.
-	 *
-	 * @param standardVariableId
-	 * @return
-	 * @
-	 */
-	StandardVariableSummary getStandardVariableSummary(Integer standardVariableId);
-
-	/**
 	 * Find standard variables by name or synonym.
 	 *
 	 * @param nameOrSynonym the name or synonym
@@ -95,20 +86,14 @@ public interface OntologyDataManager {
 	void addStandardVariable(StandardVariable stdVariable, String programUUID);
 
 	/**
-	 * Adds a StandardVariable to the database. Must provide the property, method, scale, dataType, and storedIn info. Otherwise, it will
-	 * throw an exception.
-	 *
-	 * @param stdVariableList the std variable
-	 */
-	void addStandardVariable(List<StandardVariable> stdVariableList);
-
-	/**
 	 * Adds a new Method to the database. Creates a new cvterm entry in the local database. Returns a negative id.
 	 *
 	 * @param name       the name
 	 * @param definition the definition
 	 * @return the term
 	 */
+	// TODO: remove it. It's only used for test purpose
+	@Deprecated
 	Term addMethod(String name, String definition);
 
 	/**
@@ -139,22 +124,6 @@ public interface OntologyDataManager {
 		throws MiddlewareException;
 
 	/**
-	 * Retrieve method given the traitId.
-	 *
-	 * @param traitId the trait id
-	 * @return List<Term>
-	 */
-	List<Term> getMethodsForTrait(Integer traitId);
-
-	/**
-	 * Retrieve scales given the traitId.
-	 *
-	 * @param traitId the trait id
-	 * @return List<Term>
-	 */
-	List<Term> getScalesForTrait(Integer traitId);
-
-	/**
 	 * Returns the list of Term entries based on the given CvId. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
 	 * <p>
 	 * This can be used to get all scales, all traits, all trait methods, all properties, all methods and all variables.
@@ -163,16 +132,6 @@ public interface OntologyDataManager {
 	 * @return the all terms by cv id
 	 */
 	List<Term> getAllTermsByCvId(CvId cvId);
-
-	/**
-	 * Returns the count of entries based on the given CvId. The CvId can be CvId.PROPERTIES, CvId.METHODS, CvId.SCALES, CvId.VARIABLES.
-	 * <p>
-	 * This can be used to count all scales, all traits, all trait methods, all properties, all methods and all variables.
-	 *
-	 * @param cvId the cv id
-	 * @return the long
-	 */
-	long countTermsByCvId(CvId cvId);
 
 	/**
 	 * Returns Term based on the given name and cvid.
@@ -250,14 +209,6 @@ public interface OntologyDataManager {
 	 * @return the list
 	 */
 	List<Term> findTermsByNameOrSynonym(String nameOrSynonym, CvId cvId);
-
-	/**
-	 * Returns the count of Term entries based on possible "is a" of properties.
-	 *
-	 * @return count of is_a Term objects
-	 */
-
-	long countIsAOfProperties();
 
 	/**
 	 * Adds a new property to the database that adds the property term and it's is a relationship) Creates a new cvterm entry in the local
@@ -532,14 +483,6 @@ public interface OntologyDataManager {
 	boolean isSeedAmountVariable(String variateProperty);
 
 	/**
-	 * Returns the cv id by name
-	 *
-	 * @param name of cv
-	 * @return cv_id
-	 */
-	Integer getCVIdByName(String name);
-
-	/**
 	 * Returns Term based on the given name and cv id.
 	 *
 	 * @param name the name
@@ -547,16 +490,5 @@ public interface OntologyDataManager {
 	 * @return Term
 	 */
 	Term findTermByName(String name, int cvId);
-
-	/**
-	 * This is specifically for use in Database Migrator. Adds a StandardVariable to the database. Must provide the property, method, scale,
-	 * dataType, and storedIn info. Otherwise, it will throw an exception.
-	 *
-	 * @param stdVariable the std variable
-	 * @param programUUID
-	 */
-	void addStandardVariableForMigrator(StandardVariable stdVariable, String programUUID);
-
-	List<ProjectProperty> getProjectPropertiesByProjectId(int projectId);
 
 }

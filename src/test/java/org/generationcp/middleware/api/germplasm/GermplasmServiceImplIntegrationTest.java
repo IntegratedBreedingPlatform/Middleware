@@ -432,24 +432,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void test_getPlotCodeValue_OK() {
-		final String plotCodeValue = UUID.randomUUID().toString();
-		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0, null);
-
-		final CVTerm plotCodeVariable =
-			this.daoFactory.getCvTermDao().getByNameAndCvId("PLOTCODE_AP_text", CvId.VARIABLES.getId());
-
-		this.daoFactory.getAttributeDAO()
-			.save(new Attribute(null, germplasm.getGid(), plotCodeVariable.getCvTermId(), plotCodeValue, null,
-				germplasm.getLocationId(),
-				0, germplasm.getGdate()));
-
-		final String actualPlotCodeValue = this.germplasmService.getPlotCodeValue(germplasm.getGid());
-		assertThat(actualPlotCodeValue, is(plotCodeValue));
-	}
-
-	@Test
 	public void test_getPlotCodeValues_OK() {
 		final String plotCodeValue = UUID.randomUUID().toString();
 

@@ -28,8 +28,6 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 	private Germplasm crossWithUnknownParent;
 
 	private Germplasm crossWithKnownParents;
-	
-	private Germplasm germplasmWithPolyCrosses;
 
 	private Germplasm maternalGrandParent1;
 	private Germplasm maternalGrandParent2;
@@ -187,45 +185,5 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.maleParent.getGid(), maleGermplasm.getGid());
 		Assert.assertEquals(this.maleParent.getPreferredName().getNval(), maleGermplasm.getPreferredName().getNval());
 	}
-	
-	@Test
-	public void tesUpdateProgenitor() {
-		this.germplasmWithPolyCrosses = GermplasmTestDataInitializer.createGermplasm(1);
-		this.germplasmManager.save(this.germplasmWithPolyCrosses);
-		this.sessionProvder.getSession().flush();
-		final Integer gid = this.germplasmWithPolyCrosses.getGid();
-
-		// Change gpid2
-		Germplasm newGermplasm = GermplasmTestDataInitializer.createGermplasm(1);
-		this.germplasmManager.save(newGermplasm);
-		this.sessionProvder.getSession().flush();
-		Integer newProgenitorId = newGermplasm.getGid();
-		Assert.assertNotEquals(0, this.germplasmWithPolyCrosses.getGpid2().intValue());
-		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 2);
-		this.sessionProvder.getSession().flush();
-		Assert.assertEquals(newProgenitorId, this.germplasmManager.getGermplasmByGID(gid).getGpid2());
-
-		// New progenitor record should be created
-		final Integer progenitorGid = this.crossWithUnknownParent.getGid();
-		this.pedigreeManager.updateProgenitor(gid, progenitorGid, 3);
-		this.sessionProvder.getSession().flush();
-		List<Germplasm> progenitors = this.germplasmManager.getProgenitorsByGIDWithPrefName(gid);
-		Assert.assertEquals(1, progenitors.size());
-		Assert.assertEquals(progenitorGid, progenitors.get(0).getGid());
-		
-		
-		// Update existing progenitor record
-		newGermplasm = GermplasmTestDataInitializer.createGermplasm(1);
-		this.germplasmManager.save(newGermplasm);
-		this.sessionProvder.getSession().flush();
-		newProgenitorId = newGermplasm.getGid();
-		this.pedigreeManager.updateProgenitor(gid, newProgenitorId, 3);
-		this.sessionProvder.getSession().flush();
-
-		progenitors = this.germplasmManager.getProgenitorsByGIDWithPrefName(gid);
-		Assert.assertEquals(1, progenitors.size());
-		Assert.assertEquals(newProgenitorId, progenitors.get(0).getGid());
-	}
-	
 
 }

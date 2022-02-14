@@ -17,6 +17,7 @@ import org.generationcp.middleware.api.program.ProgramFavoriteDTO;
 import org.generationcp.middleware.dao.breedingmethod.BreedingMethodSearchDAOQuery;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Method;
+import org.generationcp.middleware.pojos.MethodHelper;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.hibernate.Criteria;
@@ -27,7 +28,6 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -92,18 +92,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Method> getAllMethodOrderByMname() {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.addOrder(Order.asc(METHOD_NAME));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("getAllMethodOrderByMname", "", null, e.getMessage(), "Method"),
-				e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<Method> getByType(final String type) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(Method.class);
@@ -112,96 +100,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsByType", "type", type, e.getMessage(), "Method"), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Method> getByType(final String type, final int start, final int numOfRows) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.eq("mtype", type));
-			criteria.addOrder(Order.asc(METHOD_NAME));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsByType", "type", type, e.getMessage(), "Method"), e);
-		}
-	}
-
-	public long countByType(final String type) throws MiddlewareQueryException {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.eq("mtype", type));
-			criteria.setProjection(Projections.rowCount());
-			return ((Long) criteria.uniqueResult()).longValue(); // count
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("countMethodsByType", "type", type, e.getMessage(), "Method"),
-				e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Method> getByGroup(final String group) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.eq("mgrp", group));
-			criteria.addOrder(Order.asc(METHOD_NAME));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsByGroup", "group", group, e.getMessage(), "Method"),
-				e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Method> getByGroupIncludesGgroup(final String group) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			final Criterion group1 = Restrictions.eq("mgrp", group);
-			final Criterion group2 = Restrictions.eq("mgrp", "G");
-			final LogicalExpression orExp = Restrictions.or(group1, group2);
-			criteria.add(orExp);
-			criteria.addOrder(Order.asc(METHOD_NAME));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsByGroup", "group", group, e.getMessage(), "Method"),
-				e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Method> getByGroup(final String group, final int start, final int numOfRows) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.eq("mgrp", group));
-			criteria.addOrder(Order.asc(METHOD_NAME));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsByGroup", "group", group, e.getMessage(), "Method"),
-				e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Method> getByGroupAndType(final String group, final String type) {
-		try {
-
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			final Criterion group1 = Restrictions.eq("mgrp", group);
-			final Criterion group2 = Restrictions.eq("mgrp", "G");
-			final LogicalExpression orExp = Restrictions.or(group1, group2);
-			final Criterion filterType = Restrictions.eq("mtype", type);
-			final LogicalExpression andExp = Restrictions.and(orExp, filterType);
-
-			criteria.add(andExp);
-			criteria.addOrder(Order.asc(METHOD_NAME));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getMethodsByGroupAndType", "group|type", group + "|" + type, e.getMessage(), "Method"), e);
 		}
 	}
 
@@ -251,18 +149,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
 				this.getLogExceptionMessage("getAllMethodsNotGenerative", "", null, e.getMessage(), "Method"), e);
-		}
-	}
-
-	public long countByGroup(final String group) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-			criteria.add(Restrictions.eq("mgrp", group));
-			criteria.setProjection(Projections.rowCount());
-			return ((Long) criteria.uniqueResult()).longValue(); // count
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(this.getLogExceptionMessage("countMethodsByGroup", "group", group, e.getMessage(), "Method"),
-				e);
 		}
 	}
 
@@ -350,18 +236,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 		return sql;
 	}
 
-	public List<Method> getFavoriteMethodsByMethodType(final String methodType, final String programUUID) {
-		try {
-			final Query query = this.getSession().getNamedQuery(Method.GET_FAVORITE_METHODS_BY_TYPE);
-			query.setParameter("mType", methodType);
-			query.setParameter("programUUID", programUUID);
-			return query.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getFavoriteMethodsByMethodType", "", null, e.getMessage(), "Method"), e);
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<String> getMethodCodeByMethodIds(final Set<Integer> methodIds) {
 		final List<String> methodsCodes = new ArrayList<String>();
@@ -404,6 +278,8 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			breedingMethodDTO.setCount((String) row.get(BreedingMethodSearchDAOQuery.COUNT_ALIAS));
 			breedingMethodDTO.setSuffix((String) row.get(BreedingMethodSearchDAOQuery.SUFFIX_ALIAS));
 			breedingMethodDTO.setCreationDate((Date) row.get(BreedingMethodSearchDAOQuery.DATE_ALIAS));
+			breedingMethodDTO.setIsBulkingMethod(MethodHelper.isBulkingMethod(breedingMethodDTO.getMethodClass()));
+
 			final Integer programFavoriteId = (Integer) row.get(BreedingMethodSearchDAOQuery.FAVORITE_PROGRAM_ID_ALIAS);
 			if (programFavoriteId != null) {
 				final ProgramFavoriteDTO programFavoriteDTO =

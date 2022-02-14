@@ -11,15 +11,17 @@
 
 package org.generationcp.middleware.pojos;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
+import org.generationcp.middleware.domain.inventory.ListDataInventory;
+import org.generationcp.middleware.interfaces.GermplasmExportSource;
+import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.NotFound;
+import org.hibernate.annotations.NotFoundAction;
 
 import javax.persistence.Basic;
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -27,19 +29,12 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-
-import org.generationcp.middleware.domain.inventory.ListDataInventory;
-import org.generationcp.middleware.interfaces.GermplasmExportSource;
-import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
-import org.generationcp.middleware.util.Debug;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.NotFound;
-import org.hibernate.annotations.NotFoundAction;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * POJO for listdata table.
@@ -100,9 +95,6 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	@Basic(optional = true)
 	@Column(name = "llrecid")
 	private Integer localRecordId;
-
-	@OneToMany(mappedBy = "listData", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
-	private List<ListDataProperty> properties = new ArrayList<>();
 
 	@OneToOne
 	@JoinColumn(name = "gid", nullable = false, insertable = false, updatable = false)
@@ -299,14 +291,6 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		this.localRecordId = localRecordId;
 	}
 
-	public List<ListDataProperty> getProperties() {
-		return this.properties;
-	}
-
-	public void setProperties(final List<ListDataProperty> properties) {
-		this.properties = properties;
-	}
-
 	public ListDataInventory getInventoryInfo() {
 		return this.inventoryInfo;
 	}
@@ -406,15 +390,6 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 			return false;
 		}
 		return true;
-	}
-
-	public void print(final int indent) {
-		Debug.println(indent, this.toString());
-		if (this.properties != null) {
-			for (final ListDataProperty property : this.properties) {
-				property.print(indent + 3);
-			}
-		}
 	}
 
 	@Override

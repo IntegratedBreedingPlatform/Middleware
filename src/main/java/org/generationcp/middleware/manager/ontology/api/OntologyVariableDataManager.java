@@ -71,8 +71,6 @@ public interface OntologyVariableDataManager {
 	 */
 	void deleteVariable(Integer variableId);
 
-	String retrieveVariableCategoricalValue(String programUuid, Integer variableId, Integer categoricalValueId);
-
 	/** This function will retrieve categorical name values.
 	 *
 	 * @param programUuid as the unique id of the program
