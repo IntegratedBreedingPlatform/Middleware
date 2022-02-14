@@ -282,6 +282,24 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
+	public List<LocationDTO> getAllCountries() {
+		final List<LocationDTO> locationDTOs = new ArrayList<>();
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(Location.GET_ALL_COUNTRY);
+			query.addEntity(Location.class);
+			List<Location> Locations = query.list();
+			Locations.stream().forEach((location) -> {
+				final LocationDTO locationDTO = new LocationDTO(location);
+				locationDTOs.add(locationDTO);
+			});
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("getAllCountries", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+		return locationDTOs;
+	}
+
 	public List<Location> getLocationByIds(final Collection<Integer> ids) {
 
 		if (ids == null || ids.isEmpty()) {

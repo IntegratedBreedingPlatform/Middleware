@@ -149,4 +149,9 @@ public class LocationServiceImpl implements LocationService {
 	public boolean blockIdIsUsedInFieldMap(final List<Integer> blockIds) {
 		return this.daoFactory.getLocationDAO().blockIdIsUsedInFieldMap(blockIds);
 	}
+
+	@Override
+	public List<LocationDTO> getCountries() {
+		return this.daoFactory.getLocationDAO().getAllCountries();
+	}
 }
