@@ -26,8 +26,6 @@ public interface GermplasmNameTypeService {
 
 	List<GermplasmNameTypeDTO> getNameTypesByGIDList(List<Integer> gidList);
 
-	boolean isNameTypeUsedInListDataProp(String nameType);
-
 	void updateNameType(Integer nameTypeId, GermplasmNameTypeRequestDTO germplasmNameTypeRequestDTO);
 
 	void deleteNameType(Integer nameTypeId);

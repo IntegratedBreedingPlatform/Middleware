@@ -265,6 +265,10 @@
         <aop:scoped-proxy />
     </bean>
 
+	<bean id="searchRequestService" factory-bean="managerFactory" factory-method="getSearchRequestService"
+		  scope="request">
+		<aop:scoped-proxy />
+	</bean>
 
 	<bean id="transactionService" class="org.generationcp.middleware.service.impl.inventory.TransactionServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>

@@ -30,7 +30,6 @@
         <mapping class="org.generationcp.middleware.pojos.GermplasmListDataDefaultView"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmListDataDetail"/>
         <mapping class="org.generationcp.middleware.pojos.Person"/>
-        <mapping class="org.generationcp.middleware.pojos.ListDataProperty"/>
 
         <mapping class="org.generationcp.middleware.pojos.ims.Lot"/>
         <mapping class="org.generationcp.middleware.pojos.ims.Transaction"/>

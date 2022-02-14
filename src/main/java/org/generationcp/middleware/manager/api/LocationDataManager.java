@@ -51,13 +51,6 @@ public interface LocationDataManager {
 	List<Location> getAllLocations();
 
 	/**
-	 * Returns number of all Locations.
-	 *
-	 * @return the number of all Locations
-	 */
-	long countAllLocations();
-
-	/**
 	 * Returns the Location records with names matching the given parameter.
 	 *
 	 * @param name - search string for the name of the locations
@@ -79,105 +72,12 @@ public interface LocationDataManager {
 	List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op);
 
 	/**
-	 * Returns the number of Locations with names matching the given parameter.
-	 *
-	 * @param name - search string for the name of the locations
-	 * @param op   - can be EQUAL like LIKE
-	 * @return Number of Locations
-	 */
-	long countLocationsByName(String name, Operation op);
-
-	/**
 	 * Returns all country records.
 	 *
 	 * @return List of Location POJOs
 	 * @ the middleware query exception
 	 */
 	List<Country> getAllCountry();
-
-	/**
-	 * Returns all the Location records with country matching the given
-	 * parameter. The data is retrieved from both local and central databases.
-	 *
-	 * @param country - search string for the country of the locations
-	 * @return List of Location POJOs
-	 */
-	List<Location> getLocationsByCountry(Country country);
-
-	/**
-	 * Returns all the Location records with country and location type matching
-	 * the given parameter. The data is retrieved from both local and central
-	 * databases.
-	 *
-	 * @param country - search string for the country of the locations
-	 * @param type    - search string for the locations type
-	 * @return List of Location POJOs
-	 */
-	List<Location> getLocationsByCountryAndType(Country country, Integer type);
-
-	/**
-	 * Returns all the Location records with name, country and location type
-	 * matching the given parameter. The data is retrieved from both local and
-	 * central databases.
-	 *
-	 * @param name    the name
-	 * @param country the country
-	 * @param type    the type
-	 * @return the locations by name country and type
-	 */
-	List<Location> getLocationsByNameCountryAndType(String name, Country country, Integer type);
-
-	/**
-	 * Returns the Location records with country matching the given parameter.
-	 * The data is retrieved from both local and central databases.
-	 *
-	 * @param country   - search string for the country of the locations
-	 * @param start     - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results
-	 *                  to be returned
-	 * @return List of Location POJOs
-	 */
-	List<Location> getLocationsByCountry(Country country, int start, int numOfRows);
-
-	/**
-	 * Returns the number of Locations with countries matching the given
-	 * parameter. The data is retrieved from both local and central databases.
-	 *
-	 * @param country - search string for the country of the locations
-	 * @return Number of Locations
-	 * @ the middleware query exception
-	 */
-	long countLocationsByCountry(Country country);
-
-	/**
-	 * Returns the Location records with type matching the given parameter. The
-	 * data is retrieved from both local and central databases.
-	 *
-	 * @param type        - search string for the type of the locations
-	 * @return List of Location POJOs
-	 */
-	List<Location> getLocationsByType(Integer type);
-
-	/**
-	 * Returns the Location records with type matching the given parameter. The
-	 * data is retrieved from both local and central databases.
-	 *
-	 * @param type      - search string for the type of the locations
-	 * @param start     - the starting index of the sublist of results to be returned
-	 * @param numOfRows - the number of rows to be included in the sublist of results
-	 *                  to be returned
-	 * @return List of Location POJOs
-	 */
-	List<Location> getLocationsByType(Integer type, int start, int numOfRows);
-
-	/**
-	 * Returns the number of Locations with types matching the given parameter.
-	 * The data is retrieved from both local and central databases.
-	 *
-	 * @param type - search string for the type of the locations
-	 * @return Number of Locations
-	 */
-	long countLocationsByType(Integer type);
 
 	/**
 	 * Returns the udfld record identified by the given id.
@@ -242,16 +142,6 @@ public interface LocationDataManager {
 	Integer addLocation(Location location);
 
 	/**
-	 * Inserts a single {@code Location} object into the database.
-	 *
-	 * @param locations - The {@code Location} object to be persisted to the database.
-	 *                  Must be a valid {@code Location} object.
-	 * @return Returns the ids of the {@code Location} records inserted in the
-	 * database.
-	 */
-	List<Integer> addLocation(List<Location> locations);
-
-	/**
 	 * Adds location and locdes.
 	 *
 	 * @param location the location
@@ -269,16 +159,6 @@ public interface LocationDataManager {
 	 * @return the all breeding locations
 	 */
 	List<Location> getAllBreedingLocations();
-
-	/**
-	 * Count all breeding locations.
-	 * <p/>
-	 * Return the total count of Locations which represent the breeding
-	 * locations stored in the location table of IBDB.
-	 *
-	 * @return the long
-	 */
-	Long countAllBreedingLocations();
 
 	/**
 	 * Gets the locations by the given IDs.
