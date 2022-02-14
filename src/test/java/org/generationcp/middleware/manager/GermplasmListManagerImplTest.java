@@ -303,17 +303,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetGermplasmListByParentFolderIdBatched() {
-		final int batchSize = 1;
-		final List<GermplasmList> results =
-			this.manager.getGermplasmListByParentFolderId(this.parentId, GermplasmListManagerImplTest.PROGRAM_UUID);
-		Assert.assertNotNull(results);
-		Assert.assertTrue(!results.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGetGermplasmListByParentFolderIdBatched(): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, results);
-	}
-
-	@Test
 	public void testGetGermplasmListDataByListIdAndLrecId() {
 		final GermplasmListData data = this.manager.getGermplasmListDataByListIdAndLrecId(this.listId, this.lrecId);
 		Assert.assertNotNull("It should not be null", data);
