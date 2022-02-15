@@ -44,23 +44,6 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 		return new ArrayList<Locdes>();
 	}
 
-	public List<Locdes> getLocdes(final Integer locId, final String dval) throws MiddlewareQueryException {
-		try {
-			Criteria criteria = this.getSession().createCriteria(Locdes.class);
-			if (locId != null) {
-				criteria.add(Restrictions.eq("locationId", locId));
-			}
-			if (StringUtils.isNotBlank(dval)) {
-				criteria.add(Restrictions.eq("dval", dval));
-
-			}
-			return criteria.list();
-		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getLocdes(locId=" + locId + "dval=" + dval + ") query from Locdes: " + e.getMessage(), e);
-		}
-		return new ArrayList<Locdes>();
-	}
-
 	public List<Locdes> getLocdes(final List<Integer> locIds, final List<String> dvals) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Locdes.class);
