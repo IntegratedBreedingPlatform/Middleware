@@ -27,6 +27,7 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
@@ -635,6 +636,16 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			throw new MiddlewareQueryException(
 				this.getLogExceptionMessage("blockIdIsUsedInFieldMap", "blockIds", String.valueOf(blockIds), e.getMessage(), "Location"),
 				e);
+		}
+	}
+
+	public void deleteByLocationIds(List<Integer> locids){
+		try {
+			final Query query = this.getSession().createQuery("delete from Location where locid in (:locids) ");
+			query.setParameterList("locids", locids);
+			query.executeUpdate();
+		} catch (final HibernateException e) {
+			this.logAndThrowException("Error with deleteByLocationIds(locids=" + locids + ") query from location: " + e.getMessage(), e);
 		}
 	}
 }
