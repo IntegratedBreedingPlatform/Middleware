@@ -347,20 +347,23 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Override
 	public List<GermplasmList> getGermplasmListByParentFolderId(final Integer parentId, final String programUUID) {
-
 		return this.daoFactory.getGermplasmListDAO().getByParentFolderId(parentId, programUUID);
+	}
+
+	/**
+	 * Returns a list of {@code GermplasmList} child records given a parent id.
+	 *
+	 * @param parentId - the ID of the parent to retrieve the child lists
+	 * @return Returns a List of GermplasmList POJOs for the child lists
+	 */
+	@Override
+	public List<GermplasmList> getGermplasmListByParentFolderId(final Integer parentId) {
+		return this.daoFactory.getGermplasmListDAO().getByParentFolderId(parentId);
 	}
 
 	@Override
 	public GermplasmList getLastSavedGermplasmListByUserId(final Integer userID, final String programUUID) {
 		return this.daoFactory.getGermplasmListDAO().getLastCreatedByUserID(userID, programUUID);
-	}
-
-	@Override
-	public List<GermplasmList> getGermplasmListByParentFolderIdBatched(
-		final Integer parentId, final String programUUID,
-		final int batchSize) {
-		return this.daoFactory.getGermplasmListDAO().getByParentFolderId(parentId, programUUID);
 	}
 
 	@SuppressWarnings({"rawtypes", "deprecation"})

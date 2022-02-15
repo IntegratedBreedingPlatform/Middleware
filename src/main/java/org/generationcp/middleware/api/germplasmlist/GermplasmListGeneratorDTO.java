@@ -1,15 +1,13 @@
 package org.generationcp.middleware.api.germplasmlist;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-public class GermplasmListGeneratorDTO {
+public class GermplasmListGeneratorDTO extends GermplasmListBasicInfoDTO{
 
 	public static class GermplasmEntryDTO {
 
@@ -64,83 +62,12 @@ public class GermplasmListGeneratorDTO {
 		}
 	}
 
-	// for response
-	private Integer id;
-	private String name;
-	private String description;
-	private String type;
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-	private Date date;
-	private String notes;
-
-	private String parentFolderId;
-
 	// for direct import scenarios
 	private List<GermplasmEntryDTO> entries;
 	// Retrieve entries from filter or list of selected ids
 	private SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite;
 
-	private int status;
-
-	private String programUUID;
-
 	public GermplasmListGeneratorDTO() {
-	}
-
-	public Integer getId() {
-		return this.id;
-	}
-
-	public void setId(final Integer id) {
-		this.id = id;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public void setName(final String name) {
-		this.name = name;
-	}
-
-	public String getDescription() {
-		return this.description;
-	}
-
-	public void setDescription(final String description) {
-		this.description = description;
-	}
-
-	public String getType() {
-		return this.type;
-	}
-
-	public void setType(final String type) {
-		this.type = type;
-	}
-
-	public Date getDate() {
-		return this.date;
-	}
-
-	public void setDate(final Date date) {
-		this.date = date;
-	}
-
-	public String getNotes() {
-		return this.notes;
-	}
-
-	public void setNotes(final String notes) {
-		this.notes = notes;
-	}
-
-	public String getParentFolderId() {
-		return this.parentFolderId;
-	}
-
-	public void setParentFolderId(final String parentFolderId) {
-		this.parentFolderId = parentFolderId;
 	}
 
 	public List<GermplasmEntryDTO> getEntries() {
@@ -160,19 +87,5 @@ public class GermplasmListGeneratorDTO {
 		this.searchComposite = searchComposite;
 	}
 
-	public int getStatus() {
-		return this.status;
-	}
 
-	public void setStatus(final int status) {
-		this.status = status;
-	}
-
-	public String getProgramUUID() {
-		return this.programUUID;
-	}
-
-	public void setProgramUUID(final String programUUID) {
-		this.programUUID = programUUID;
-	}
 }
