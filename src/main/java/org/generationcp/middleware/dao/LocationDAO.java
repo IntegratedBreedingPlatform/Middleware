@@ -189,7 +189,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				+ "  g.lon as longitude," //
 				+ "  g.alt as altitude," //
 				+ "  l.cntryid as countryId," //
-				+ "  l.snl1id as provinceId " //
+				+ "  l.snl1id as provinceId, " //
+				+ "  l.ldefault as defaultLocation " //
 				+ " from location l" //
 				+ "  left join georef g on l.locid = g.locid" //
 				+ " where l.locid = :locationId");
@@ -197,7 +198,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query.toString());
 			sqlQuery.setParameter("locationId", locationId);
 			sqlQuery.addScalar("id").addScalar("name").addScalar("type").addScalar("abbreviation").addScalar("latitude")
-				.addScalar("longitude").addScalar("altitude").addScalar("countryId").addScalar("provinceId");
+				.addScalar("longitude").addScalar("altitude").addScalar("countryId").addScalar("provinceId").addScalar("defaultLocation");
 			sqlQuery.setResultTransformer(Transformers.aliasToBean(LocationDTO.class));
 
 			return (LocationDTO) sqlQuery.uniqueResult();
