@@ -25,10 +25,11 @@ public class StockSaverTest {
 
 	private enum StockVariable {
 
-		ENTRY_NO(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.toString(), PhenotypicType.GERMPLASM, "1"), GID(TermId.GID.getId(), TermId.GID
-				.toString(), PhenotypicType.GERMPLASM, "4"), DESIG(TermId.DESIG.getId(), TermId.DESIG.toString(), PhenotypicType.GERMPLASM,
-				"SDFTY"), ENTRY_CODE(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.toString(), PhenotypicType.GERMPLASM, "CODE1"), GERMPLASM_1(
-				1, "GERMPLASM_1", PhenotypicType.GERMPLASM, "3"), GERMPLASM_2(2, "GERMPLASM_2", PhenotypicType.GERMPLASM, "4");
+		ENTRY_NO(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.toString(), PhenotypicType.GERMPLASM, "1"),
+		GID(TermId.GID.getId(), TermId.GID.toString(), PhenotypicType.GERMPLASM, "4"),
+		DESIG(TermId.DESIG.getId(), TermId.DESIG.toString(), PhenotypicType.GERMPLASM,"SDFTY"),
+		GERMPLASM_1(1, "GERMPLASM_1", PhenotypicType.GERMPLASM, "3"),
+		GERMPLASM_2(2, "GERMPLASM_2", PhenotypicType.GERMPLASM, "4");
 
 		private int id;
 		private String name;
@@ -71,8 +72,7 @@ public class StockSaverTest {
 		assertNotNull(this.stockModel);
 		assertEquals(StockVariable.ENTRY_NO.getValue(), this.stockModel.getUniqueName());
 		assertEquals(StockVariable.GID.getValue(), this.stockModel.getGermplasm().getGid().toString());
-		assertEquals(StockVariable.DESIG.getValue(), this.stockModel.getName().toString());
-		assertEquals(StockVariable.ENTRY_CODE.getValue(), this.stockModel.getValue());
+		assertEquals(StockVariable.DESIG.getValue(), this.stockModel.getName());
 		assertNotNull(this.stockModel.getProperties());
 		assertEquals(2, this.stockModel.getProperties().size());
 		for (StockProperty property : this.stockModel.getProperties()) {

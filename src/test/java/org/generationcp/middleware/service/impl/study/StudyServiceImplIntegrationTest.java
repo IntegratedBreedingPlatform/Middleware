@@ -109,7 +109,6 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName(org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(10));
-		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		stockModel.setName(org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(10));
 		stockModel.setIsObsolete(false);
 
@@ -118,7 +117,6 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmDao().save(germplasm);
 
 		stockModel.setGermplasm(germplasm);
-		stockModel.setValue(org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(5));
 		stockModel.setProject(newStudy);
 		this.daoFactory.getStockDao().saveOrUpdate(stockModel);
 		this.sessionProvder.getSession().flush();

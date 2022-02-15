@@ -214,14 +214,6 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStockIdsByProperty_UsingValue() {
-		final StockModel testStock = this.testStocks.get(0);
-		final List<Integer> stockIds = this.stockDao.getStockIdsByProperty("value", testStock.getValue());
-		Assert.assertNotNull(stockIds);
-		Assert.assertEquals(testStock.getStockId(), stockIds.get(0));
-	}
-
-	@Test
 	public void testGetStocksByIds() {
 		final List<Integer> ids = new ArrayList<>();
 		for (final StockModel stock : this.testStocks){
@@ -464,11 +456,9 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 	private StockModel createTestStock(final DmsProject study, final Germplasm germplasm) {
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(10));
-		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		stockModel.setName(RandomStringUtils.randomAlphanumeric(10));
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
-		stockModel.setValue(RandomStringUtils.randomAlphanumeric(5));
 		stockModel.setProject(study);
 		int i=1;
 		for (final MeasurementVariable measurementVariable: this.germplasmDescriptors) {

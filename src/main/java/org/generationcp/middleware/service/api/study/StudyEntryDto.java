@@ -17,8 +17,6 @@ public class StudyEntryDto implements Serializable {
 
 	private Integer entryNumber;
 
-	private String entryCode;
-
 	private Integer gid;
 
 	private String designation;
@@ -41,18 +39,17 @@ public class StudyEntryDto implements Serializable {
 		this.designation = designation;
 	}
 
-	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final String entryCode, final Integer gid, final String designation) {
+	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final Integer gid, final String designation) {
 		this.entryId = entryId;
 		this.entryNumber = entryNumber;
-		this.entryCode = entryCode;
 		this.gid = gid;
 		this.designation = designation;
 	}
 
-	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final String entryCode, final Integer gid, final String designation, final Integer lotCount, final String availableBalance, final String unit){
+	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final Integer gid,
+		final String designation, final Integer lotCount, final String availableBalance, final String unit){
 		this.entryId = entryId;
 		this.entryNumber = entryNumber;
-		this.entryCode = entryCode;
 		this.gid = gid;
 		this.designation = designation;
 		this.lotCount = lotCount;
@@ -90,14 +87,6 @@ public class StudyEntryDto implements Serializable {
 
 	public void setEntryNumber(final Integer entryNumber) {
 		this.entryNumber = entryNumber;
-	}
-
-	public String getEntryCode() {
-		return this.entryCode;
-	}
-
-	public void setEntryCode(final String entryCode) {
-		this.entryCode = entryCode;
 	}
 
 	public Integer getLotCount() {

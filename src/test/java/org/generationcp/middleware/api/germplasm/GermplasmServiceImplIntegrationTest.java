@@ -1876,8 +1876,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final StockModel stockModel =
 			new StockModel(null, null, RandomStringUtils.randomAlphabetic(5), RandomStringUtils.randomAlphabetic(5),
-				RandomStringUtils.randomAlphabetic(5), RandomStringUtils.randomAlphabetic(5),
-				SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId(), false);
+				RandomStringUtils.randomAlphabetic(5),
+				false);
 		stockModel.setGermplasm(germplasm);
 		stockModel.setProject(dmsProject);
 		this.daoFactory.getStockDao().save(stockModel);
@@ -2762,7 +2762,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		studyEntryDto.setGid(gid);
 		studyEntryDto.setEntryNumber(i);
 		studyEntryDto.setDesignation("DESIGNATION" + i);
-		studyEntryDto.setEntryCode("ENTRY_CODE" + gid);
 
 		studyEntryDto.getProperties()
 			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), "CROSS" + i));
@@ -2772,6 +2771,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		studyEntryDto.getProperties()
 			.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(),
 				"SEED_SOURCE" + i));
+		studyEntryDto.getProperties()
+			.put(TermId.ENTRY_CODE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_CODE.getId(), "ENTRY_CODE" + gid));
 
 		return studyEntryDto;
 	}

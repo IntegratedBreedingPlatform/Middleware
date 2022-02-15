@@ -146,7 +146,6 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(oldEntry.getProperties().get(TermId.ENTRY_TYPE.getId()).getValue(),
 			newEntry.getProperties().get(TermId.ENTRY_TYPE.getId()).getValue());
 		Assert.assertEquals(oldEntry.getEntryNumber(), newEntry.getEntryNumber());
-		Assert.assertEquals(oldEntry.getEntryCode(), newEntry.getEntryCode());
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
@@ -232,7 +231,8 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals(StudyEntryServiceImplTest.SEEDSOURCE + index, dto.getProperties().get(TermId.SEED_SOURCE.getId()).getValue());
 		Assert.assertEquals(StudyEntryServiceImplTest.CROSS + index, dto.getProperties().get(TermId.CROSS.getId()).getValue());
 		Assert.assertEquals(gid, dto.getGid());
-		Assert.assertEquals(StudyEntryServiceImplTest.ENTRYCODE + gid, dto.getEntryCode());
+		// TODO: assert entry code from properties
+//		Assert.assertEquals(StudyEntryServiceImplTest.ENTRYCODE + gid, dto.getEntryCode());
 		Assert.assertNotNull(dto.getEntryId());
 	}
 
@@ -254,7 +254,6 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 		studyEntryDto.setGid(gid);
 		studyEntryDto.setEntryNumber(i);
 		studyEntryDto.setDesignation(StudyEntryServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + i);
-		studyEntryDto.setEntryCode(StudyEntryServiceImplTest.ENTRYCODE + gid);
 
 		studyEntryDto.getProperties()
 			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), StudyEntryServiceImplTest.CROSS + i));
@@ -264,6 +263,10 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 		studyEntryDto.getProperties()
 			.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(),
 				StudyEntryServiceImplTest.SEEDSOURCE + i));
+		studyEntryDto.getProperties()
+			.put(TermId.ENTRY_CODE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_CODE.getId(),
+				String.valueOf(StudyEntryServiceImplTest.ENTRYCODE + gid)));
+
 
 		return studyEntryDto;
 	}

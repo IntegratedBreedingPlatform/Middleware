@@ -148,18 +148,6 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreateGermplasmFactorForEntryCode() {
-
-		final StockModel stockModel = this.createStockModel();
-		final DMSVariableType variableType = this.createDMSVariableType(TermId.ENTRY_CODE);
-
-		final Variable variable = builder.createGermplasmFactor(stockModel, variableType);
-
-		Assert.assertNotNull(variable);
-		Assert.assertEquals(stockModel.getValue(), variable.getValue());
-	}
-
-	@Test
 	public void testCreateGermplasmFactorForEntryType() {
 
 		final StockModel stockModel = this.createStockModel();
@@ -205,7 +193,8 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		verifyFactorVariable(iterator.next(), TermId.ENTRY_NO.getId(), stockModel.getUniqueName());
 		verifyFactorVariable(iterator.next(), TermId.GID.getId(), String.valueOf(stockModel.getGermplasm().getGid()));
 		verifyFactorVariable(iterator.next(), TermId.DESIG.getId(), stockModel.getName());
-		verifyFactorVariable(iterator.next(), TermId.ENTRY_CODE.getId(), stockModel.getValue());
+//		TODO: assert that entry code now is property
+//		verifyFactorVariable(iterator.next(), TermId.ENTRY_CODE.getId(), stockModel.getValue());
 		verifyFactorVariable(iterator.next(), TermId.ENTRY_TYPE.getId(), stockModel.getProperties().iterator().next().getValue());
 	}
 	
@@ -247,7 +236,6 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(20));
 		stockModel.setGermplasm(new Germplasm(new Random().nextInt(Integer.MAX_VALUE)));
 		stockModel.setName(RandomStringUtils.randomAlphanumeric(20));
-		stockModel.setValue(RandomStringUtils.randomAlphanumeric(20));
 
 		final Set<StockProperty> stockProperties = new HashSet<>();
 		final StockProperty stockProperty = new StockProperty();

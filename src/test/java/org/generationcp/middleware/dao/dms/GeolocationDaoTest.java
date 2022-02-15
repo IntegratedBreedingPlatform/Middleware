@@ -322,7 +322,6 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 			final StockModel stockModel = new StockModel();
 			stockModel.setName("Germplasm " + RandomStringUtils.randomAlphanumeric(5));
 			stockModel.setIsObsolete(false);
-			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 			stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(10));
 			stockModel.setGermplasm(germplasm);
 			stockModel.setProject(this.study);

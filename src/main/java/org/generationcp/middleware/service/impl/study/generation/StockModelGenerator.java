@@ -19,7 +19,6 @@ public class StockModelGenerator {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setIsObsolete(false);
-		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 
 		for (final ObservationUnitData data : dataList) {
 			final Integer variableId = data.getVariableId();
@@ -44,7 +43,7 @@ public class StockModelGenerator {
 				stockModel.setName(value);
 
 			} else if (TermId.ENTRY_CODE.getId() == variableId) {
-				stockModel.setValue(value);
+				// TODO: add entry code as property
 
 			} else if (variable != null && VariableType.GERMPLASM_DESCRIPTOR.equals(variable.getVariableType()) && TermId.OBS_UNIT_ID.getId() != variableId) {
 				this.addProperty(stockModel, new StockProperty(variableId, value));

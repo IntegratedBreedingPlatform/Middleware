@@ -525,7 +525,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS entry_no, "
 				+ "  s.dbxref_id AS gid, "
 				+ "  s.name AS designation, "
-				+ "  s.value AS entryCode, "
 				+ "  COUNT(DISTINCT (l.lotid)) AS lotCount, "
 				+ "  IF(COUNT(DISTINCT IFNULL(l.scaleid, 'null')) = 1, IFNULL((SELECT SUM(CASE WHEN imt.trnstat = "
 				+ TransactionStatus.CONFIRMED.getIntValue()
@@ -565,7 +564,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			query.addScalar("entry_no", new IntegerType());
 			query.addScalar("gid", new IntegerType());
 			query.addScalar("designation", new StringType());
-			query.addScalar("entryCode", new StringType());
 			query.addScalar("lotCount", new IntegerType());
 			query.addScalar("availableBalance", new StringType());
 			query.addScalar("unit", new StringType());
@@ -587,7 +585,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			for (final Map<String, Object> row : results) {
 				final Integer entryId = (Integer) row.get("entryId");
 				final Integer entryNumber = (Integer) row.get("entry_no");
-				final String entryCode = (String) row.get("entryCode");
 				final Integer gid = (Integer) row.get("gid");
 				final String designation = (String) row.get("designation");
 				final Integer lotCount = (Integer) row.get("lotCount");
@@ -595,7 +592,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				final String unit = (String) row.get("unit");
 
 				final StudyEntryDto studyEntryDto =
-					new StudyEntryDto(entryId, entryNumber, entryCode, gid, designation, lotCount, availableBalance, unit);
+					new StudyEntryDto(entryId, entryNumber, gid, designation, lotCount, availableBalance, unit);
 				final Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 				for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
 					final StudyEntryPropertyData studyEntryPropertyData =
@@ -608,7 +605,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				//and table cells. In the near future this block should be removed
 				this.addFixedVariableIfPresent(TermId.GID, String.valueOf(studyEntryDto.getGid()), studyEntrySearchDto, properties);
 				this.addFixedVariableIfPresent(TermId.DESIG, studyEntryDto.getDesignation(), studyEntrySearchDto, properties);
-				this.addFixedVariableIfPresent(TermId.ENTRY_CODE, studyEntryDto.getEntryCode(), studyEntrySearchDto, properties);
 				this.addFixedVariableIfPresent(TermId.ENTRY_NO, String.valueOf(studyEntryDto.getEntryNumber()), studyEntrySearchDto,
 					properties);
 

@@ -22,7 +22,6 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -383,8 +382,8 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		workbook.getStudyDetails().setId(1);
 
 		final Random random = new Random();
-		final StockModel stock = new StockModel(random.nextInt(), random.nextInt(), RandomStringUtils.randomAlphabetic(10), "1", RandomStringUtils.randomAlphabetic(10),
-				RandomStringUtils.randomAlphabetic(10), SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId(), false);
+		final StockModel stock = new StockModel(random.nextInt(), random.nextInt(), RandomStringUtils.randomAlphabetic(10), "1",
+			RandomStringUtils.randomAlphabetic(10), false);
 		workbook.setObservations(MeasurementRowTestDataInitializer.
 			createMeasurementRowList(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), "1",
 				MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), "1")));

@@ -336,9 +336,6 @@ public class ExperimentBuilder extends Builder {
 		if (standardVariable.getId() == TermId.DESIG.getId()) {
 			return new Variable(variableType, stockModel.getName());
 		}
-		if (standardVariable.getId() == TermId.ENTRY_CODE.getId()) {
-			return new Variable(variableType, stockModel.getValue());
-		}
 		final String val = this.findStockValue(variableType.getId(), stockModel.getProperties());
 
 		if (standardVariable.getId() == TermId.ENTRY_TYPE.getId()) {

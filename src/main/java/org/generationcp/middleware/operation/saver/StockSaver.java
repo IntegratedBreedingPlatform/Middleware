@@ -82,7 +82,8 @@ public class StockSaver extends Saver {
 
 				} else if (TermId.ENTRY_CODE.getId() == variableId) {
 					stockModel = this.getStockObject(stockModel);
-					stockModel.setValue(value);
+					// TODO: add entry_code as property
+//					stockModel.setValue(value);
 
 				} else if (TermId.OBS_UNIT_ID.getId() == variableId) {
 					continue;
@@ -119,7 +120,8 @@ public class StockSaver extends Saver {
 		if (stockModel == null) {
 			stockModel = new StockModel();
 			stockModel.setIsObsolete(false);
-			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
+			// TODO: should set entry code as property?
+//			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		}
 		return stockModel;
 	}

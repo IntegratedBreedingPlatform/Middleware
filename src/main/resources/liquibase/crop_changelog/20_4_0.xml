@@ -48,4 +48,66 @@
         </sql>
   </changeSet>
 
+	<changeSet author="lkovacic" id="v20.4.0-4">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+				SELECT COUNT(1) > 0
+				FROM project p
+						 INNER JOIN projectprop pp ON p.project_id = pp.project_id AND p.dataset_type_id = 4
+						 INNER JOIN stock s ON p.parent_project_id = s.project_id
+						 INNER JOIN stockprop sp ON s.stock_id = sp.stock_id
+				WHERE pp.variable_id = 8300 AND sp.type_id = 8300;
+            </sqlCheck>
+		</preConditions>
+		<comment>Entry_code migration as stock property</comment>
+		<sql>
+			<!-- Only migrate the entry_code that the user added in the study -->
+			INSERT INTO stockprop(stock_id, type_id, value)
+				SELECT stock_id, 8300, s.value FROM project p
+						 INNER JOIN projectprop pp ON p.project_id = pp.project_id AND p.dataset_type_id = 4
+						 INNER JOIN stock s ON p.parent_project_id = s.project_id
+				WHERE pp.variable_id = 8300;
+		</sql>
+	</changeSet>
+
+    <changeSet author="lkovacic" id="v20.4.0-5">
+        <preConditions onFail="MARK_RAN">
+			<columnExists tableName="stock" columnName="value" />
+		</preConditions>
+		<comment>Rename column 'value' to 'value_bkp' in table 'stock'</comment>
+		<sql>
+			ALTER TABLE stock CHANGE value value_bkp varchar(255) null;
+		</sql>
+	</changeSet>
+
+    <changeSet author="lkovacic" id="v20.4.0-6">
+        <preConditions onFail="MARK_RAN">
+			<columnExists tableName="stock" columnName="type_id" />
+		</preConditions>
+		<comment>Rename column 'type_id' to 'type_id_bkp' in table 'stock' and make it nullable</comment>
+		<sql>
+			ALTER TABLE stock CHANGE type_id type_id_bkp int null;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v20.4.0-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*)
+				FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE TABLE_NAME = 'stock'
+				  AND CONSTRAINT_NAME = 'stock_idx1'
+				  AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<comment>Drop unique index 'stock_idx1' in 'stock' table</comment>
+		<sql>
+			DROP INDEX stock_idx1 ON stock;
+		</sql>
+	</changeSet>
+
+	<!-- TODO: add column stock_prop.cvalue_id. This columns will has the value of a categorical entry type.
+			Also, we need to migrate the values of stockprop.value which corresponds to a categorical value. I.e: all values of the type_id = 8255
+	-->
+
 </databaseChangeLog>

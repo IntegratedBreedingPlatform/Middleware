@@ -190,7 +190,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		stock.setUniqueName("1");
 		stock.setIsObsolete(false);
 		stock.setProject(new DmsProject(TEST_PROJECT_ID));
-		stock.setTypeId(TermId.ENTRY_CODE.getId());
 		this.daoFactory.getStockDao().save(stock);
 
 		final List<Germplasm> germplasmEntries =
@@ -712,7 +711,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
-		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		stockModel.setName("Germplasm 1");
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);

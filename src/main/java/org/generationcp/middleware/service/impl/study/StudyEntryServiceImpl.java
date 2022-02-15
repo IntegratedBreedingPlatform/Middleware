@@ -177,7 +177,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			final StudyEntryDto studyEntryDto = new StudyEntryDto();
 			studyEntryDto.setEntryNumber(Integer.valueOf(stockToReplace.getUniqueName()));
 			studyEntryDto.setGid(germplasm.getGid());
-			studyEntryDto.setEntryCode(stockToReplace.getValue());
 			studyEntryDto.setDesignation(germplasm.getPreferredName());
 
 			// If germplasm descriptors exist for previous entry, copy ENTRY_TYPE value and set cross expansion and MGID of new germplasm
