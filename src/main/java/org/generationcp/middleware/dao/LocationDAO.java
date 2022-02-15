@@ -18,6 +18,7 @@ import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.program.ProgramFavoriteDTO;
 import org.generationcp.middleware.dao.location.LocationSearchDAOQuery;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
@@ -622,10 +623,10 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			queryString.append("    project st ON st.project_id = proj.study_id ");
 			queryString.append("        INNER JOIN ");
 			queryString.append("    nd_experiment geo ON nde.nd_experiment_id = geo.nd_experiment_id ");
-			queryString.append("        AND geo.type_id = 1155 ");
+			queryString.append("        AND geo.type_id = " + TermId.PLOT_EXPERIMENT.getId() + " " );
 			queryString.append("        LEFT JOIN ");
 			queryString.append("    nd_geolocationprop blk ON blk.nd_geolocation_id = geo.nd_geolocation_id ");
-			queryString.append("        AND blk.type_id = 8583 ");
+			queryString.append("        AND blk.type_id = " + TermId.BLOCK_ID.getId() + " " );
 			queryString.append(" WHERE  blk.value in(:blockIds); ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
