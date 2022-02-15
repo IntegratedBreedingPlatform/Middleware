@@ -64,11 +64,11 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public void deleteLocation(final Integer locationId) {
 		final Location location = this.daoFactory.getLocationDAO().getById(locationId);
-		List<Locdes> Blocks = null;
+		List<Locdes> blocks = null;
 		if (location.getLtype() == 415) { // Field
 			//Get the Blocks
-			Blocks = daoFactory.getLocDesDao().getLocdes(null, locationId.toString());
-			Blocks.forEach((locdes) -> {
+			blocks = daoFactory.getLocDesDao().getLocdes(null, locationId.toString());
+			blocks.forEach((locdes) -> {
 					this.daoFactory.getLocDesDao().makeTransient(locdes);
 					final Location blockLocation = this.daoFactory.getLocationDAO().getById(locdes.getLocationId());
 					this.daoFactory.getLocationDAO().makeTransient(blockLocation);
@@ -79,8 +79,8 @@ public class LocationServiceImpl implements LocationService {
 			fields.forEach(locdes -> this.daoFactory.getLocDesDao().makeTransient(locdes));
 		}
 		if (location.getLtype() == 416) { // Block
-			Blocks = daoFactory.getLocDesDao().getLocdes(locationId, null);
-			Blocks.forEach(locdes -> {
+			blocks = daoFactory.getLocDesDao().getLocdes(locationId, null);
+			blocks.forEach(locdes -> {
 				this.daoFactory.getLocDesDao().saveOrUpdate(locdes);
 			});
 		}
