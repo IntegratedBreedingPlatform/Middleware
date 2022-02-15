@@ -104,7 +104,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			.stream().collect(groupingBy(n -> n.getGermplasm().getGid()));
 
 		// save list
-		final GermplasmList germplasmList = this.createGermplasmList(new GermplasmListDto(request), loggedInUserId);
+		final GermplasmList germplasmList = this.createGermplasmList(request, loggedInUserId);
 
 		// save variables
 		final Set<Integer> variableIds = request.getEntries().stream().flatMap(e -> e.getData().keySet().stream()).collect(toSet());
@@ -147,7 +147,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		return request;
 	}
 
-	private GermplasmList createGermplasmList(final GermplasmListDto request, final Integer currentUserId) {
+	private GermplasmList createGermplasmList(final GermplasmListBasicInfoDTO request, final Integer currentUserId) {
 		final GermplasmList parent = request.getParentFolderId() != null ?
 			this.daoFactory.getGermplasmListDAO().getById(Integer.valueOf(request.getParentFolderId()), false) : null;
 		final String description = request.getDescription() != null ? request.getDescription() : StringUtils.EMPTY;
@@ -163,7 +163,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	@Override
 	public void importUpdates(final GermplasmListGeneratorDTO request) {
-		final Integer listId = request.getId();
+		final Integer listId = request.getListId();
 		// TODO validate deleted
 		final GermplasmList germplasmList = this.getGermplasmListById(listId)
 			.orElseThrow(() -> new MiddlewareRequestException("", LIST_NOT_FOUND));
@@ -468,8 +468,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				.orElseThrow(() -> new MiddlewareRequestException("", "list.parent.folder.not.found"));
 
 		//Locking list when moving a from program to any crop folder
-		if (StringUtils.isEmpty(programUUID) && !StringUtils.isEmpty(listToMove.getProgramUUID()) && !GermplasmList.FOLDER_TYPE.equals(
-			listToMove.getType())) {
+		if (!StringUtils.isEmpty(listToMove.getProgramUUID()) && programUUID == null && !listToMove.getType().equals("FOLDER")) {
 			listToMove.setStatus(GermplasmList.Status.LOCKED_LIST.getCode());
 		}
 
