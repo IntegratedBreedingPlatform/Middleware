@@ -39,7 +39,7 @@ public interface LocationService {
 
 	void updateLocation(Integer locationId, LocationRequestDto locationRequestDto);
 
-	boolean existsLocationAsCountry(Integer locationId);
+	boolean isDefaultCountryLocation(Integer locationId);
 
 	boolean blockIdIsUsedInFieldMap(List<Integer> blockIds);
 

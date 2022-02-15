@@ -140,7 +140,7 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public boolean existsLocationAsCountry(final Integer locationId) {
+	public boolean isDefaultCountryLocation(final Integer locationId) {
 		final Country country = this.daoFactory.getCountryDao().getById(locationId);
 		return country != null;
 	}
