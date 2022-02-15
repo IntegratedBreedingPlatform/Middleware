@@ -7,6 +7,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -64,26 +65,47 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public void deleteLocation(final Integer locationId) {
 		final Location location = this.daoFactory.getLocationDAO().getById(locationId);
-		List<Locdes> blocks = null;
-		if (location.getLtype() == 415) { // Field
-			//Get the Blocks
-			blocks = daoFactory.getLocDesDao().getLocdes(null, locationId.toString());
-			blocks.forEach((locdes) -> {
-					this.daoFactory.getLocDesDao().makeTransient(locdes);
-					final Location blockLocation = this.daoFactory.getLocationDAO().getById(locdes.getLocationId());
-					this.daoFactory.getLocationDAO().makeTransient(blockLocation);
-				}
-			);
+		List<Integer> blockIds = null;
+		if (location.getLtype() == LocdesType.FIELD.getId()) {
+			// Get the Blocks
+			blockIds = daoFactory.getLocDesDao().getLocdes(null, Arrays.asList(location.getLocid().toString()))
+				.stream().map(Locdes::getLocationId).collect(Collectors.toList());
 
-			final List<Locdes> fields = daoFactory.getLocDesDao().getLocdes(locationId, null);
-			fields.forEach(locdes -> this.daoFactory.getLocDesDao().makeTransient(locdes));
+			// Delete Block
+			this.daoFactory.getLocDesDao().deleteByLocationIds(blockIds);
+			this.daoFactory.getLocationDAO().deleteByLocationIds(blockIds);
+
+			// Delete Field
+			final List<Integer> fieldIds = daoFactory.getLocDesDao().getLocdes(Arrays.asList(location.getLocid()), null)
+				.stream().map(Locdes::getLocationId).collect(Collectors.toList());
+			this.daoFactory.getLocDesDao().deleteByLocationIds(fieldIds);
+		} else if (location.getLtype() == LocdesType.BLOCK.getId()) {
+			blockIds = daoFactory.getLocDesDao().getLocdes(Arrays.asList(location.getLocid()), null)
+				.stream().map(Locdes::getLocationId).collect(Collectors.toList());
+
+			// Delete Block
+			this.daoFactory.getLocDesDao().deleteByLocationIds(blockIds);
+
+		} else {
+			final List<Locdes> fieldParentLocation = daoFactory.getLocDesDao().getLocdes(null, Arrays.asList(location.getLocid().toString()));
+			if (!fieldParentLocation.isEmpty()) {
+				final List<String> fieldParentIds =
+					fieldParentLocation.stream().map(Locdes::getLocationId).map(Object::toString).collect(Collectors.toList());
+				blockIds = daoFactory.getLocDesDao().getLocdes(null, fieldParentIds).stream().map(Locdes::getLocationId)
+					.collect(Collectors.toList());
+
+				// Delete Block
+				this.daoFactory.getLocDesDao().deleteByLocationIds(blockIds);
+				this.daoFactory.getLocationDAO().deleteByLocationIds(blockIds);
+
+				// Delete Field
+				final List<Integer> fieldIds = fieldParentLocation.stream().map(Locdes::getLocationId).collect(Collectors.toList());
+				this.daoFactory.getLocDesDao().deleteByLocationIds(fieldIds);
+				this.daoFactory.getLocationDAO().deleteByLocationIds(fieldIds);
+
+			}
 		}
-		if (location.getLtype() == 416) { // Block
-			blocks = daoFactory.getLocDesDao().getLocdes(locationId, null);
-			blocks.forEach(locdes -> {
-				this.daoFactory.getLocDesDao().saveOrUpdate(locdes);
-			});
-		}
+
 		this.daoFactory.getGeolocationDao().deleteGeolocations(Arrays.asList(locationId));
 		this.daoFactory.getLocationDAO().makeTransient(location);
 	}
