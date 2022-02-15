@@ -11,6 +11,7 @@ import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -105,7 +107,8 @@ public class LocationServiceImpl implements LocationService {
 
 			}
 		}
-
+		final Set<Integer> entityIds = ImmutableSet.of(locationId);
+		this.daoFactory.getProgramFavoriteDao().deleteProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, entityIds);
 		this.daoFactory.getGeolocationDao().deleteGeolocations(Arrays.asList(locationId));
 		this.daoFactory.getLocationDAO().makeTransient(location);
 	}

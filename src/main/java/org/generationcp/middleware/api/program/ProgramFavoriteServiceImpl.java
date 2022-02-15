@@ -46,9 +46,4 @@ public class ProgramFavoriteServiceImpl implements ProgramFavoriteService {
 		return this.daoFactory.getProgramFavoriteDao().getProgramFavorites(programUUID, favoriteType, entityIds);
 	}
 
-	@Override
-	public void deleteProgramFavorites(final ProgramFavorite.FavoriteType favoriteType, final Set<Integer> entityIds) {
-		this.daoFactory.getProgramFavoriteDao().deleteProgramFavorites(favoriteType, entityIds);
-	}
-
 }
