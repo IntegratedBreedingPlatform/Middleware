@@ -67,9 +67,9 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public void deleteLocation(final Integer locationId) {
 		final Location location = this.daoFactory.getLocationDAO().getById(locationId);
-		if (location.getLtype().equals(LocdesType.FIELD.getId())) {
+		if (LocdesType.FIELD.getId().equals(location.getLtype())) {
 			this.deleteFieldLocation(Arrays.asList(location.getLocid()));
-		} else if (location.getLtype().equals(LocdesType.BLOCK.getId())) {
+		} else if (LocdesType.BLOCK.getId().equals(location.getLtype())) {
 			this.deleteBlockLocation(Arrays.asList(location.getLocid()));
 		} else {
 			final List<Locdes> fieldTypeLocations =
