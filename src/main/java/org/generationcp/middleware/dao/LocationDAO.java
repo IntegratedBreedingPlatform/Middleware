@@ -573,8 +573,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 					.withCountryName(String.valueOf(result.get(LocationSearchDAOQuery.COUNTRY_NAME_ALIAS)))
 					.withName(String.valueOf(result.get(LocationSearchDAOQuery.LOCATION_NAME_ALIAS)))
 					.withCoordinates(coordinate)
-					.withLatitude(longitude)
-					.withLongitude(latitude)
+					.withLatitude(latitude)
+					.withLongitude(longitude)
 					.withAltitude(altitude);
 			if (!location.getLocationType().equalsIgnoreCase(LocationDAO.COUNTRY)) {
 				final Map<String, String> additionalInfo = new HashMap<>();
