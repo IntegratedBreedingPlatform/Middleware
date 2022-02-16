@@ -17,13 +17,23 @@ package org.generationcp.middleware.pojos;
  */
 public enum LocdesType {
 
-	ROWS_IN_BLOCK("COL_IN_BLK"), RANGES_IN_BLOCK("RANGE_IN_BLK"), PLANTING_ORDER("PLOT_LYOUT"), ROWS_IN_PLOT("ROWS_IN_PLOT"), MACHINE_ROW_CAPACITY(
-			"MACHINE_CAP"), DELETED_PLOTS("DELETED_PLOT"), FIELD_PARENT("FIELD_PARENT"), BLOCK_PARENT("BLOCK_PARENT");
+	ROWS_IN_BLOCK("COL_IN_BLK", 306),
+	RANGES_IN_BLOCK("RANGE_IN_BLK", 307),
+	PLANTING_ORDER("PLOT_LYOUT", 309),
+	ROWS_IN_PLOT("ROWS_IN_PLOT", 308),
+	MACHINE_ROW_CAPACITY("MACHINE_CAP", 310),
+	DELETED_PLOTS("DELETED_PLOT", 311),
+	FIELD_PARENT("FIELD_PARENT", 312),
+	BLOCK_PARENT("BLOCK_PARENT", 313),
+	FIELD("FIELD", 415),
+	BLOCK("BLOCK", 416);
 
 	private String code;
+	private Integer id;
 
-	private LocdesType(String code) {
+	private LocdesType(final String code, final Integer id) {
 		this.code = code;
+		this.id = id;
 	}
 
 	public String getCode() {
@@ -34,4 +44,11 @@ public enum LocdesType {
 		this.code = code;
 	}
 
+	public Integer getId() {
+		return this.id;
+	}
+
+	public void setId(final Integer id) {
+		this.id = id;
+	}
 }

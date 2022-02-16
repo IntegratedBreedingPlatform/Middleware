@@ -125,7 +125,7 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public Optional<ProgramDTO> getProgram(final String cropName, final String programName) {
+	public Optional<ProgramDTO> getProgramByCropAndName(final String cropName, final String programName) {
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(cropName);
 		if (cropType == null) {
 			return Optional.empty();
@@ -135,6 +135,19 @@ public class ProgramServiceImpl implements ProgramService {
 			final WorkbenchUser loggedInUser = this.daoFactory.getWorkbenchUserDAO().getById(ContextHolder.getLoggedInUserId());
 			final ProgramDTO programDTO = new ProgramDTO(project);
 			programDTO.setCreatedBy(loggedInUser.getName());
+			return Optional.of(programDTO);
+		} else {
+			return Optional.empty();
+		}
+	}
+
+	@Override
+	public Optional<ProgramDTO> getProgramByUUID(final String programUUID) {
+		final Project project = this.daoFactory.getProjectDAO().getByUuid(programUUID);
+		if (project != null) {
+			final WorkbenchUser owner = this.daoFactory.getWorkbenchUserDAO().getById(project.getUserId());
+			final ProgramDTO programDTO = new ProgramDTO(project);
+			programDTO.setCreatedBy(owner.getName());
 			return Optional.of(programDTO);
 		} else {
 			return Optional.empty();

@@ -18,6 +18,7 @@ import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.program.ProgramFavoriteDTO;
 import org.generationcp.middleware.dao.location.LocationSearchDAOQuery;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
@@ -27,6 +28,7 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
@@ -189,7 +191,8 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				+ "  g.lon as longitude," //
 				+ "  g.alt as altitude," //
 				+ "  l.cntryid as countryId," //
-				+ "  l.snl1id as provinceId " //
+				+ "  l.snl1id as provinceId, " //
+				+ "  l.ldefault as defaultLocation " //
 				+ " from location l" //
 				+ "  left join georef g on l.locid = g.locid" //
 				+ " where l.locid = :locationId");
@@ -197,7 +200,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query.toString());
 			sqlQuery.setParameter("locationId", locationId);
 			sqlQuery.addScalar("id").addScalar("name").addScalar("type").addScalar("abbreviation").addScalar("latitude")
-				.addScalar("longitude").addScalar("altitude").addScalar("countryId").addScalar("provinceId");
+				.addScalar("longitude").addScalar("altitude").addScalar("countryId").addScalar("provinceId").addScalar("defaultLocation");
 			sqlQuery.setResultTransformer(Transformers.aliasToBean(LocationDTO.class));
 
 			return (LocationDTO) sqlQuery.uniqueResult();
@@ -280,6 +283,24 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			throw new MiddlewareQueryException(
 				this.getLogExceptionMessage("getAllProvinces", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
 		}
+	}
+
+	public List<LocationDTO> getAllCountries() {
+		final List<LocationDTO> locationDTOs = new ArrayList<>();
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(Location.GET_ALL_COUNTRY);
+			query.addEntity(Location.class);
+			List<Location> Locations = query.list();
+			Locations.stream().forEach((location) -> {
+				final LocationDTO locationDTO = new LocationDTO(location);
+				locationDTOs.add(locationDTO);
+			});
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("getAllCountries", "", null, e.getMessage(), LocationDAO.CLASS_NAME_LOCATION), e);
+		}
+		return locationDTOs;
 	}
 
 	public List<Location> getLocationByIds(final Collection<Integer> ids) {
@@ -589,4 +610,43 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		return Optional.empty();
 	}
 
+	public boolean blockIdIsUsedInFieldMap(final List<Integer> blockIds) {
+		try {
+
+			final StringBuilder queryString = new StringBuilder().append("SELECT ");
+			queryString.append("count(blk.value)");
+			queryString.append(" FROM ");
+			queryString.append(" 	nd_experiment nde ");
+			queryString.append("        INNER JOIN ");
+			queryString.append("    project proj ON proj.project_id = nde.project_id ");
+			queryString.append("        INNER JOIN ");
+			queryString.append("    project st ON st.project_id = proj.study_id ");
+			queryString.append("        INNER JOIN ");
+			queryString.append("    nd_experiment geo ON nde.nd_experiment_id = geo.nd_experiment_id ");
+			queryString.append("        AND geo.type_id = " + TermId.PLOT_EXPERIMENT.getId() + " " );
+			queryString.append("        LEFT JOIN ");
+			queryString.append("    nd_geolocationprop blk ON blk.nd_geolocation_id = geo.nd_geolocation_id ");
+			queryString.append("        AND blk.type_id = " + TermId.BLOCK_ID.getId() + " " );
+			queryString.append(" WHERE  blk.value in(:blockIds); ");
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("blockIds", blockIds);
+			return ((BigInteger) query.uniqueResult()).longValue() > 0;
+		} catch (HibernateException e) {
+			LocationDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("blockIdIsUsedInFieldMap", "blockIds", String.valueOf(blockIds), e.getMessage(), "Location"),
+				e);
+		}
+	}
+
+	public void deleteByLocationIds(List<Integer> locids){
+		try {
+			final Query query = this.getSession().createQuery("delete from Location where locid in (:locids) ");
+			query.setParameterList("locids", locids);
+			query.executeUpdate();
+		} catch (final HibernateException e) {
+			this.logAndThrowException("Error with deleteByLocationIds(locids=" + locids + ") query from location: " + e.getMessage(), e);
+		}
+	}
 }
