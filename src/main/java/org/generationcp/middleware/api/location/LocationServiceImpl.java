@@ -1,20 +1,26 @@
 package org.generationcp.middleware.api.location;
 
 import com.google.common.collect.ImmutableSet;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 @Service
@@ -61,6 +67,49 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public void deleteLocation(final Integer locationId) {
 		final Location location = this.daoFactory.getLocationDAO().getById(locationId);
+		List<Integer> blockIds = null;
+		if (location.getLtype() == LocdesType.FIELD.getId()) {
+			// Get the Blocks
+			blockIds = daoFactory.getLocDesDao().getLocdes(null, Arrays.asList(location.getLocid().toString()))
+				.stream().map(Locdes::getLocationId).collect(Collectors.toList());
+
+			// Delete Block
+			this.daoFactory.getLocDesDao().deleteByLocationIds(blockIds);
+			this.daoFactory.getLocationDAO().deleteByLocationIds(blockIds);
+
+			// Delete Field
+			final List<Integer> fieldIds = daoFactory.getLocDesDao().getLocdes(Arrays.asList(location.getLocid()), null)
+				.stream().map(Locdes::getLocationId).collect(Collectors.toList());
+			this.daoFactory.getLocDesDao().deleteByLocationIds(fieldIds);
+		} else if (location.getLtype() == LocdesType.BLOCK.getId()) {
+			blockIds = daoFactory.getLocDesDao().getLocdes(Arrays.asList(location.getLocid()), null)
+				.stream().map(Locdes::getLocationId).collect(Collectors.toList());
+
+			// Delete Block
+			this.daoFactory.getLocDesDao().deleteByLocationIds(blockIds);
+
+		} else {
+			final List<Locdes> fieldParentLocation = daoFactory.getLocDesDao().getLocdes(null, Arrays.asList(location.getLocid().toString()));
+			if (!fieldParentLocation.isEmpty()) {
+				final List<String> fieldParentIds =
+					fieldParentLocation.stream().map(Locdes::getLocationId).map(Object::toString).collect(Collectors.toList());
+				blockIds = daoFactory.getLocDesDao().getLocdes(null, fieldParentIds).stream().map(Locdes::getLocationId)
+					.collect(Collectors.toList());
+
+				// Delete Block
+				this.daoFactory.getLocDesDao().deleteByLocationIds(blockIds);
+				this.daoFactory.getLocationDAO().deleteByLocationIds(blockIds);
+
+				// Delete Field
+				final List<Integer> fieldIds = fieldParentLocation.stream().map(Locdes::getLocationId).collect(Collectors.toList());
+				this.daoFactory.getLocDesDao().deleteByLocationIds(fieldIds);
+				this.daoFactory.getLocationDAO().deleteByLocationIds(fieldIds);
+
+			}
+		}
+		final Set<Integer> entityIds = ImmutableSet.of(locationId);
+		this.daoFactory.getProgramFavoriteDao().deleteProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, entityIds);
+		this.daoFactory.getGeolocationDao().deleteGeolocations(Arrays.asList(locationId));
 		this.daoFactory.getLocationDAO().makeTransient(location);
 	}
 
@@ -97,41 +146,37 @@ public class LocationServiceImpl implements LocationService {
 	public void updateLocation(final Integer locationId, final LocationRequestDto locationRequestDto) {
 		final Location location = this.daoFactory.getLocationDAO().getById(locationId);
 
-		if (StringUtils.isNotBlank(locationRequestDto.getName())) {
 			location.setLname(locationRequestDto.getName());
-		}
-
-		if (StringUtils.isNotBlank(locationRequestDto.getAbbreviation())) {
 			location.setLabbr(locationRequestDto.getAbbreviation());
-		}
-
-		if (locationRequestDto.getType() != null) {
 			location.setLtype(locationRequestDto.getType());
-		}
 
-		if (locationRequestDto.getCountryId() != null) {
 			final Country country = this.daoFactory.getCountryDao().getById(locationRequestDto.getCountryId());
 			location.setCountry(country);
-		}
 
-		if (locationRequestDto.getProvinceId() != null) {
 			final Location province = this.daoFactory.getLocationDAO().getById(locationRequestDto.getProvinceId());
 			location.setProvince(province);
-		}
 
-		if (locationRequestDto.getLatitude() != null) {
 			location.setLatitude(locationRequestDto.getLatitude());
-		}
-
-		if (locationRequestDto.getLongitude() != null) {
 			location.setLongitude(locationRequestDto.getLongitude());
-		}
-
-		if (locationRequestDto.getAltitude() != null) {
 			location.setAltitude(locationRequestDto.getAltitude());
-		}
+
 
 		this.daoFactory.getLocationDAO().saveOrUpdate(location);
 	}
 
+	@Override
+	public boolean isDefaultCountryLocation(final Integer locationId) {
+		final Country country = this.daoFactory.getCountryDao().getById(locationId);
+		return country != null;
+	}
+
+	@Override
+	public boolean blockIdIsUsedInFieldMap(final List<Integer> blockIds) {
+		return this.daoFactory.getLocationDAO().blockIdIsUsedInFieldMap(blockIds);
+	}
+
+	@Override
+	public List<LocationDTO> getCountries() {
+		return this.daoFactory.getLocationDAO().getAllCountries();
+	}
 }

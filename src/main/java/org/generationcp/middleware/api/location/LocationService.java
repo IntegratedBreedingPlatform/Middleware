@@ -29,7 +29,7 @@ public interface LocationService {
 	 * @param programUUID
    * @return
 	 */
-	long countFilteredLocations(LocationSearchRequest locationSearchRequest, final String programUUID);
+	long countFilteredLocations(LocationSearchRequest locationSearchRequest, String programUUID);
 
 	List<org.generationcp.middleware.api.location.Location> getLocations(LocationSearchRequest locationSearchRequest, Pageable pageable);
 
@@ -38,4 +38,10 @@ public interface LocationService {
 	LocationDTO createLocation(LocationRequestDto locationRequestDto);
 
 	void updateLocation(Integer locationId, LocationRequestDto locationRequestDto);
+
+	boolean isDefaultCountryLocation(Integer locationId);
+
+	boolean blockIdIsUsedInFieldMap(List<Integer> blockIds);
+
+	List<LocationDTO> getCountries();
 }

@@ -1,5 +1,7 @@
 package org.generationcp.middleware.service.api.user;
 
+import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
+import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
@@ -22,7 +24,7 @@ public interface UserService {
 	 * @param userId - the user id to match
 	 * @return the user matching the given id
 	 */
-	WorkbenchUser getUserById(final Integer userId);
+	WorkbenchUser getUserById(Integer userId);
 
 	List<WorkbenchUser> getUsersByIds(List<Integer> userIds);
 
@@ -37,15 +39,15 @@ public interface UserService {
 	 */
 	List<WorkbenchUser> getUserByName(String name, int start, int numOfRows, Operation op);
 
-	WorkbenchUser getUserByFullname(final String fullname);
+	WorkbenchUser getUserByFullname(String fullname);
 
-	Long countUsersByFullname(final String fullname);
+	Long countUsersByFullname(String fullname);
 
-	Map<Integer, String> getUserIDFullNameMap(final List<Integer> userIds);
+	Map<Integer, String> getUserIDFullNameMap(List<Integer> userIds);
 
 	Map<Integer, String> getAllUserIDFullNameMap();
 
-	List<WorkbenchUser> getUsersByCrop(final String cropName);
+	List<WorkbenchUser> getUsersByCrop(String cropName);
 
 	/**
 	 * Returns all the Workbench users.
@@ -131,7 +133,7 @@ public interface UserService {
 	 */
 	boolean isSuperAdminUser(Integer userId);
 
-	List<UserDto> getUsersByPersonIds(final List<Integer> personIds);
+	List<UserDto> getUsersByPersonIds(List<Integer> personIds);
 
 	/**
 	 * Gets the person by id.
@@ -287,18 +289,18 @@ public interface UserService {
 
 	Map<Integer, String> getPersonNamesByPersonIds(List<Integer> personIds);
 
-	WorkbenchUser getUserWithAuthorities(final String userName, final String cropName, final String programUuid);
+	WorkbenchUser getUserWithAuthorities(String userName, String cropName, String programUuid);
 
 	List<WorkbenchUser> getUsersWithRole(int id);
 
 	List<Integer> getActiveUserIDsWithAccessToTheProgram(Long projectId);
 
-	List<ProgramMemberDto> getProgramMembers(String programUUID, Pageable pageable);
+	List<ProgramMemberDto> getProgramMembers(String programUUID, ProgramMembersSearchRequest userSearchRequest, Pageable pageable);
 
-	long countAllProgramMembers(String programUUID);
+	long countAllProgramMembers(String programUUID, ProgramMembersSearchRequest userSearchRequest);
 
-	List<UserDto> getProgramMembersEligibleUsers(String programUUID, Pageable pageable);
+	List<UserDto> getProgramMembersEligibleUsers(String programUUID, ProgramEligibleUsersSearchRequest searchRequest, Pageable pageable);
 
-	long countProgramMembersEligibleUsers(String programUUID);
+	long countProgramMembersEligibleUsers(String programUUID, ProgramEligibleUsersSearchRequest searchRequest);
 
 }
