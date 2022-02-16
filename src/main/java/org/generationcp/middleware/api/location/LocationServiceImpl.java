@@ -73,7 +73,7 @@ public class LocationServiceImpl implements LocationService {
 			this.deleteBlockLocation(Arrays.asList(location.getLocid()));
 		} else {
 			final List<Locdes> fieldTypeLocations =
-				daoFactory.getLocDesDao().getLocdes(null, Arrays.asList(location.getLocid().toString()));
+				this.daoFactory.getLocDesDao().getLocdes(null, Arrays.asList(location.getLocid().toString()));
 			if (!fieldTypeLocations.isEmpty()) {
 				this.deleteFieldLocation(fieldTypeLocations.stream().map(Locdes::getLocationId).collect(Collectors.toList()));
 				// Delete Field Location
@@ -89,7 +89,7 @@ public class LocationServiceImpl implements LocationService {
 
 	private void deleteBlockLocation(final List<Integer> locationIds) {
 		// Get the Block Parents
-		final List<Integer> blockParentIds = daoFactory.getLocDesDao().getLocdes(locationIds, null)
+		final List<Integer> blockParentIds = this.daoFactory.getLocDesDao().getLocdes(locationIds, null)
 			.stream().map(Locdes::getLocationId).collect(Collectors.toList());
 
 		// Delete Block Parents
@@ -98,7 +98,7 @@ public class LocationServiceImpl implements LocationService {
 
 	private void deleteFieldLocation(final List<Integer> locationIds) {
 		// Get the Block Parents
-		final List<Integer> blockParentIds = daoFactory.getLocDesDao().getLocdes(null, locationIds.stream()
+		final List<Integer> blockParentIds = this.daoFactory.getLocDesDao().getLocdes(null, locationIds.stream()
 				.map(Object::toString).collect(Collectors.toList()))
 			.stream().map(Locdes::getLocationId).collect(Collectors.toList());
 
@@ -109,7 +109,7 @@ public class LocationServiceImpl implements LocationService {
 		}
 
 		// Delete Field Parents
-		final List<Integer> fieldParentIds = daoFactory.getLocDesDao().getLocdes(locationIds, null)
+		final List<Integer> fieldParentIds = this.daoFactory.getLocDesDao().getLocdes(locationIds, null)
 			.stream().map(Locdes::getLocationId).collect(Collectors.toList());
 		this.daoFactory.getLocDesDao().deleteByLocationIds(fieldParentIds);
 	}
