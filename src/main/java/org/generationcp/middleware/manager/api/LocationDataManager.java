@@ -247,8 +247,9 @@ public interface LocationDataManager {
 	 * @param locationAbbreviation
 	 * @return
 	 */
-	long countByLocationAbbreviation(final String locationAbbreviation);
+	long countByLocationAbbreviation(String locationAbbreviation);
 
 	Location getDefaultLocationByType(LocationType locationType);
 
+	List<Locdes> getLocdes(List<Integer> locIds, List<String> dvals);
 }

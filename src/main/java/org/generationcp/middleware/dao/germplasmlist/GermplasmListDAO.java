@@ -405,6 +405,33 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return new ArrayList<>();
 	}
 
+	/**
+	 * Gets the germplasm list children.
+	 *
+	 * @param parentId
+	 *            the parent id
+	 * @return the germplasm list children
+	 */
+	@SuppressWarnings("unchecked")
+	public List<GermplasmList> getByParentFolderId(final Integer parentId) {
+		try {
+			if (parentId != null) {
+				final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
+				criteria.add(Restrictions.eq("parent.id", parentId));
+				criteria.add(Restrictions.ne(GermplasmListDAO.STATUS, GermplasmListDAO.STATUS_DELETED));
+
+				criteria.addOrder(Order.asc("name"));
+				return criteria.list();
+			}
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error with getByParentFolderId(parentId=" + parentId
+				+ ") query from GermplasmList: " + e.getMessage();
+			GermplasmListDAO.LOG.error(errorMessage);
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+		return new ArrayList<>();
+	}
+
 	@Nullable
 	public GermplasmList getLastCreatedByUserID(final Integer userID, final String programUUID) {
 		try {

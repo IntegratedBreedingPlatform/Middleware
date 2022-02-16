@@ -16,6 +16,7 @@ import org.hibernate.annotations.NotFoundAction;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -52,6 +53,10 @@ import java.io.Serializable;
 public class Location implements Serializable, Comparable<Location> {
 
 	private static final long serialVersionUID = 1L;
+
+	public static final String GET_ALL_COUNTRY =
+		"select l.* from location l, udflds u where l.ltype = u.fldno and u.ftable='LOCATION' and u.fcode='COUNTRY' "
+			+ "and exists (select 1 from cntry c where c.cntryid =l.cntryid) order by l.lname";
 
 	public static final String GET_PROVINCE_BY_COUNTRY =
 			"select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV'  and l.cntryid = (:countryId) order by l.lname";
@@ -112,7 +117,7 @@ public class Location implements Serializable, Comparable<Location> {
 	@Column(name = "ldefault", columnDefinition = "TINYINT")
 	private Boolean ldefault;
 
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
 	@JoinColumn(name = "locid")
 	private Georef georef;
 

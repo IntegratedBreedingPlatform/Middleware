@@ -26,7 +26,9 @@ public interface ProgramService {
 
 	Project addProgram(Project project);
 
-	Optional<ProgramDTO> getProgram(String cropName, String programName);
+	Optional<ProgramDTO> getProgramByCropAndName(String cropName, String programName);
+
+	Optional<ProgramDTO> getProgramByUUID(String programUUID);
 
 	void deleteProgramAndDependencies(String programUUID);
 

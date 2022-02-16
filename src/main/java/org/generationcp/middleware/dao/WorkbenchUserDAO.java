@@ -2,6 +2,8 @@ package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersQuery;
+import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
+import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.dao.workbench.ProgramMembersQuery;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -10,6 +12,7 @@ import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -388,16 +391,19 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return users;
 	}
 
-	public long countAllProgramEligibleUsers(final String programUUID) {
-		final SQLQuery query = this.getSession().createSQLQuery(ProgramEligibleUsersQuery.getCountQuery());
+	public long countAllProgramEligibleUsers(final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest) {
+		final SQLQueryBuilder queryBuilder = ProgramEligibleUsersQuery.getCountQuery(searchRequest);
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
 		query.setParameter("programUUID", programUUID);
+		queryBuilder.addParamsToQuery(query);
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
-	public List<UserDto> getAllProgramEligibleUsers(final String programUUID, final Pageable pageable) {
+	public List<UserDto> getAllProgramEligibleUsers(final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest,
+		final Pageable pageable) {
 		try {
-			final String sql = ProgramEligibleUsersQuery.getSelectQuery(pageable);
-			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			final SQLQueryBuilder queryBuilder = ProgramEligibleUsersQuery.getSelectQuery(pageable, searchRequest);
+			final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
 			query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 			query.addScalar(ProgramEligibleUsersQuery.USER_ID);
 			query.addScalar(ProgramEligibleUsersQuery.USERNAME);
@@ -405,7 +411,9 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			query.addScalar(ProgramEligibleUsersQuery.LAST_NAME);
 			query.addScalar(ProgramEligibleUsersQuery.EMAIL);
 
-			query.setParameter("programUUID", programUUID);
+			queryBuilder.setParameter("programUUID", programUUID);
+			queryBuilder.addParamsToQuery(query);
+
 			addPaginationToSQLQuery(query, pageable);
 			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) query.list();
 
@@ -425,9 +433,11 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 	}
 
-	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final Pageable pageable) {
+	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final ProgramMembersSearchRequest searchRequest,
+		final Pageable pageable) {
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery(ProgramMembersQuery.getSelectQuery(pageable));
+			final SQLQueryBuilder queryBuilder = ProgramMembersQuery.getSelectQuery(pageable, searchRequest);
+			final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
 			query.setParameter("programUUID", programUUID);
 			query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 			query.addScalar(ProgramMembersQuery.USER_ID);
@@ -441,6 +451,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			query.addScalar(ProgramMembersQuery.ROLE_TYPE_NAME);
 			query.addScalar(ProgramMembersQuery.ROLE_ACTIVE);
 
+			queryBuilder.addParamsToQuery(query);
 			GenericDAO.addPaginationToSQLQuery(query, pageable);
 
 			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) query.list();
@@ -464,9 +475,11 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 	}
 
-	public long countAllProgramMembers(final String programUUID) {
-		final SQLQuery query = this.getSession().createSQLQuery(ProgramMembersQuery.getCountQuery());
-		query.setParameter("programUUID", programUUID);
+	public long countAllProgramMembers(final String programUUID, final ProgramMembersSearchRequest searchRequest) {
+		final SQLQueryBuilder queryBuilder = ProgramMembersQuery.getCountQuery(searchRequest);
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		queryBuilder.setParameter("programUUID", programUUID);
+		queryBuilder.addParamsToQuery(query);
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
