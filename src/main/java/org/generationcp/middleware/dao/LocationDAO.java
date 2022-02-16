@@ -290,7 +290,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		try {
 			final SQLQuery query = this.getSession().createSQLQuery(Location.GET_ALL_COUNTRY);
 			query.addEntity(Location.class);
-			List<Location> Locations = query.list();
+			final List<Location> Locations = query.list();
 			Locations.stream().forEach((location) -> {
 				final LocationDTO locationDTO = new LocationDTO(location);
 				locationDTOs.add(locationDTO);
@@ -496,7 +496,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				.append(" LEFT JOIN udflds ud on ud.fldno = l.ltype")
 				.append(" LEFT JOIN location province on l.snl1id = province.locid");
 
-			List<String> whereClause = new ArrayList<>();
+			final List<String> whereClause = new ArrayList<>();
 			if (countryId != null) {
 				whereClause.add(String.format("c.cntryid = %s", countryId));
 			}
@@ -632,7 +632,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
 			query.setParameterList("blockIds", blockIds);
 			return ((BigInteger) query.uniqueResult()).longValue() > 0;
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			LocationDAO.LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(
 				this.getLogExceptionMessage("blockIdIsUsedInFieldMap", "blockIds", String.valueOf(blockIds), e.getMessage(), "Location"),
@@ -640,7 +640,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
-	public void deleteByLocationIds(List<Integer> locids){
+	public void deleteByLocationIds(final List<Integer> locids) {
 		try {
 			final Query query = this.getSession().createQuery("delete from Location where locid in (:locids) ");
 			query.setParameterList("locids", locids);
