@@ -33,7 +33,7 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 
 	
 	@SuppressWarnings("unchecked")
-	public List<Locdes> getByLocation(Integer locId) throws MiddlewareQueryException {
+	public List<Locdes> getByLocation(final Integer locId) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Locdes.class);
 			criteria.add(Restrictions.eq("locationId", locId));

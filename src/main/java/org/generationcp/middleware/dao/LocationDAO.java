@@ -640,7 +640,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		}
 	}
 
-	public void deleteByLocationIds(List<Integer> locids) {
+	public void deleteByLocationIds(final List<Integer> locids) {
 		try {
 			final Query query = this.getSession().createQuery("delete from Location where locid in (:locids) ");
 			query.setParameterList("locids", locids);
