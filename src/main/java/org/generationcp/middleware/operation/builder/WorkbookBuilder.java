@@ -60,6 +60,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class WorkbookBuilder extends Builder {
 
@@ -157,6 +158,7 @@ public class WorkbookBuilder extends Builder {
 		variables = this.removeTrialDatasetVariables(variables, trialEnvironmentVariables);
 		final Set<MeasurementVariable> conditions = this.buildConditionVariables(conditionVariables, trialEnvironmentVariables);
 		final List<MeasurementVariable> factors = this.buildFactors(variables);
+		final List<MeasurementVariable> entryDetails = this.buildEntryDetails(variables);
 		final Set<MeasurementVariable> constants = this.buildStudyMeasurementVariables(constantVariables, false, true);
 		constants.addAll(this.buildStudyMeasurementVariables(trialConstantVariables, false, false));
 		final List<MeasurementVariable> variates = this.buildVariates(variables, new ArrayList<>(constants));
@@ -207,6 +209,7 @@ public class WorkbookBuilder extends Builder {
 
 		workbook.setStudyDetails(studyDetails);
 		workbook.setFactors(factors);
+		workbook.setEntryDetails(entryDetails);
 		workbook.setVariates(variates);
 		workbook.setConditions(new ArrayList<>(conditions));
 		workbook.setConstants(new ArrayList<>(constants));
@@ -713,6 +716,16 @@ public class WorkbookBuilder extends Builder {
 		return factors;
 	}
 
+	private List<MeasurementVariable> buildEntryDetails(final VariableTypeList variables) {
+		if (variables != null) {
+			return variables.getVariableTypes().stream()
+				.filter(variableType -> variableType.getVariableType() == VariableType.ENTRY_DETAIL)
+				.map(variableType -> this.getMeasurementVariableTransformer().transform(variableType, false, false))
+				.collect(Collectors.toList());
+		}
+		return new ArrayList<>();
+	}
+
 	private List<MeasurementVariable> removeConstantsFromVariates(
 		final List<MeasurementVariable> variates,
 		final List<MeasurementVariable> constants) {
@@ -952,4 +965,5 @@ public class WorkbookBuilder extends Builder {
 			treatmentVariable.setValues(values);
 		}
 	}
+
 }

@@ -89,21 +89,11 @@ public class Workbook {
 
 	private Integer plotsIdNotfound;
 
+	private List<MeasurementVariable> entryDetails;
+
 	public Workbook() {
 		this.reset();
 		this.trialObservations = new ArrayList<>();
-	}
-
-	public Workbook(final StudyDetails studyDetails, final List<MeasurementVariable> conditions, final List<MeasurementVariable> factors,
-			final List<MeasurementVariable> constants, final List<MeasurementVariable> variates, final List<MeasurementRow> observations) {
-		this.studyDetails = studyDetails;
-		this.conditions = conditions;
-		this.factors = factors;
-		this.constants = constants;
-		this.variates = variates;
-		this.observations = observations;
-		this.trialObservations = new ArrayList<>();
-		this.reset();
 	}
 
 	// TODO : rename reset method to something more indicative of its actual purpose : clearDerivedVariables maybe.
@@ -122,6 +112,7 @@ public class Workbook {
 		this.studyConstants = null;
 		this.trialConditions = null;
 		this.trialConstants = null;
+		this.entryDetails = null;
 		this.treatmentFactors = null;
 		this.hasExistingDataOverwrite = false;
 		this.hasOutOfBoundsData = false;
@@ -1055,5 +1046,13 @@ public class Workbook {
 
 	public void setPlotsIdNotfound(final Integer plotsIdNotfound) {
 		this.plotsIdNotfound = plotsIdNotfound;
+	}
+
+	public List<MeasurementVariable> getEntryDetails() {
+		return entryDetails;
+	}
+
+	public void setEntryDetails(final List<MeasurementVariable> entryDetails) {
+		this.entryDetails = entryDetails;
 	}
 }

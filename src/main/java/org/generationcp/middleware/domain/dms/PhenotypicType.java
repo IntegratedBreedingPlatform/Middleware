@@ -36,6 +36,7 @@ public enum PhenotypicType {
 	VARIATE(Arrays.asList(TermId.OBSERVATION_VARIATE.getId(), TermId.CATEGORICAL_VARIATE.getId()), Arrays.asList("STUDY", "PLOT", "TRIAL"),
 			"VARIATE"),
 
+	// TODO: should be labelList a list with an empty string just like DATASET?
 	UNASSIGNED(new ArrayList<>(), new ArrayList<>(), "UNASSIGNED");
 
 	private List<Integer> typeStorages;

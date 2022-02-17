@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -131,10 +132,10 @@ public class MeasurementVariableTransformer extends Transformer {
 	}
 
 	private String getLabelBasedOnRole(final PhenotypicType role) {
-		if (role == null) {
+		// TODO: define if org.generationcp.middleware.domain.dms.PhenotypicType.labelList for EntryDetails should be a list with an empty string. If it's the case, then remove the CollectionUtils.isEmpty condition
+		if (role == null || CollectionUtils.isEmpty(role.getLabelList())) {
 			return "";
 		}
-
 		return role.getLabelList().get(0);
 	}
 }
