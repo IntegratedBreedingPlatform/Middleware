@@ -41,7 +41,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	private static final Logger LOG = LoggerFactory.getLogger(ObservationUnitsSearchDao.class);
 	private static final List<Integer> STANDARD_DATASET_VARIABLE_IDS = Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId(), TermId.EXPERIMENT_DESIGN_FACTOR
-		.getId(), TermId.GID.getId(), TermId.DESIG.getId(), TermId.ENTRY_TYPE.getId(), TermId.ENTRY_CODE.getId(), TermId.ENTRY_NO.getId(), TermId.REP_NO
+		.getId(), TermId.GID.getId(), TermId.DESIG.getId(), TermId.ENTRY_TYPE.getId(), TermId.ENTRY_NO.getId(), TermId.REP_NO
 		.getId(), TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId(), TermId.ROW.getId(), TermId.COL.getId(), TermId.FIELDMAP_RANGE.getId(), TermId.FIELDMAP_COLUMN
 		.getId(), TermId.OBS_UNIT_ID.getId());
 	private static final String SUM_OF_SAMPLES_ID = "-2";
@@ -62,7 +62,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
 		factorsFilterMap.put(String.valueOf(TermId.DESIG.getId()), "s.name");
 		factorsFilterMap.put(String.valueOf(TermId.ENTRY_NO.getId()), "s.uniquename");
-		factorsFilterMap.put(String.valueOf(TermId.ENTRY_CODE.getId()), "s.value");
 		factorsFilterMap.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), "gl.description");
 		factorsFilterMap.put(SUM_OF_SAMPLES_ID,
 			"EXISTS ( SELECT 1 FROM sample AS sp WHERE nde.nd_experiment_id = sp.nd_experiment_id HAVING count(sample_id)");
@@ -99,7 +98,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		mainVariablesMap.put(String.valueOf(TermId.GID.getId()), "    s.dbxref_id AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.DESIG.getId()), "    s.name AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.ENTRY_NO.getId()), "    s.uniquename AS '%s'");
-		mainVariablesMap.put(String.valueOf(TermId.ENTRY_CODE.getId()), "    s.value AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.REP_NO.getId()),
 			"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ndep.type_id = 8210) AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.PLOT_NO.getId()),
@@ -489,7 +487,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.GID.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.DESIG.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.ENTRY_NO.getId()));
-		createSQLQuery.addScalar(standardVariableNames.get(TermId.ENTRY_CODE.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.REP_NO.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.PLOT_NO.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.BLOCK_NO.getId()));
