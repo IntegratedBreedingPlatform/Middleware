@@ -1,0 +1,31 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="cuenyad" id="v20.2.0-1">
+		<preConditions onFail="MARK_RAN">
+				<columnExists tableName="location" columnName="program_uuid_bkp"/>
+        </preConditions>
+		<comment>
+			Delete 'program_uuid_bkp' column of 'location' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE location DROP COLUMN program_uuid_bkp;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v20.2.0-2">
+		<preConditions onFail="MARK_RAN">
+				<columnExists tableName="methods" columnName="program_uuid_bkp"/>
+        </preConditions>
+		<comment>
+			Delete 'program_uuid_bkp' column of 'location' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE methods DROP COLUMN program_uuid_bkp;
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
