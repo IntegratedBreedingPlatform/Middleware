@@ -903,6 +903,22 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 			paramBuilder.setParameterList("preFilteredGids", preFilteredGids);
 		}
 
+		final SqlTextFilter externalReferenceSource = germplasmSearchRequest.getExternalReferenceSource();
+		if (externalReferenceSource != null) {
+			final SqlTextFilter.Type type = externalReferenceSource.getType();
+			paramBuilder.append(" and g.gid in (select exref.gid from external_reference_germplasm exref ");
+			paramBuilder.append(" where exref.reference_source " + getOperator(type) + " :exrefSource) " );
+			paramBuilder.setParameter("exrefSource", getParameter(type, externalReferenceSource.getValue()));
+		}
+
+		final SqlTextFilter externalReferenceId = germplasmSearchRequest.getExternalReferenceId();
+		if (externalReferenceId != null) {
+			final SqlTextFilter.Type type = externalReferenceId.getType();
+			paramBuilder.append(" and g.gid in (select exref.gid from external_reference_germplasm exref ");
+			paramBuilder.append(" where exref.reference_id " + getOperator(type) + " :exrefId) " );
+			paramBuilder.setParameter("exrefId", getParameter(type, externalReferenceId.getValue()));
+		}
+
 		paramBuilder.append(" group by g.gid having 1 = 1 ");
 
 		// Post-group-by filtering section
