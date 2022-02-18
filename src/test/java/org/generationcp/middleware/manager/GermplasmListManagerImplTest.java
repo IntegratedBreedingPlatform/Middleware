@@ -14,7 +14,6 @@ import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -37,9 +36,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
 
 public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
@@ -78,6 +74,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	private Germplasm testGermplasm;
 	private DataSetupTest dataSetupTest;
+	private DaoFactory daoFactory;
 
 	@Before
 	public void setUpBefore() {
@@ -151,9 +148,10 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 			GermplasmListDataTestDataInitializer.createGermplasmListData(testGermplasmList, this.testGermplasm.getGid(), 2);
 		this.manager.addGermplasmListData(listData);
 
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.dataManager, new NameDAO(this.sessionProvder
-				.getSession()));
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.dataManager, daoFactory);
 		}
 
 	}

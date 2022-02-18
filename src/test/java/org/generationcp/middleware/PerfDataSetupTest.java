@@ -2,10 +2,10 @@
 package org.generationcp.middleware;
 
 import org.generationcp.middleware.api.program.ProgramService;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -60,11 +60,15 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PerfDataSetupTest.class);
 
+	private DaoFactory daoFactory;
+
 	@Before
 	public void setUp() {
+		if (this.daoFactory == null) {
+			this.daoFactory = new DaoFactory(this.sessionProvder);
+		}
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager, new NameDAO(this.sessionProvder
-				.getSession()));
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager, daoFactory);
 		}
 	}
 

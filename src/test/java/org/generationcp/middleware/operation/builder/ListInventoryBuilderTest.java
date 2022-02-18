@@ -16,6 +16,7 @@ import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
@@ -114,6 +115,11 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 	public void testSetAvailableBalanceScaleForGermplasm() throws Exception {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
 				"LocationName");
+		this.daoFactory.getGermplasmDao().save(germplasm);
+		this.daoFactory.getGermplasmDao().refresh(germplasm);
+		final Name name = germplasm.getPreferredName();
+		name.setGermplasm(germplasm);
+		this.daoFactory.getNameDao().save(name);
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		germplasm.setInventoryInfo(new GermplasmInventory(germplasmId));
 

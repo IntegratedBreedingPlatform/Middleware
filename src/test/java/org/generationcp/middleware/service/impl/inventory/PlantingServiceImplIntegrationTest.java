@@ -7,7 +7,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -120,8 +119,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, new NameDAO(this.sessionProvder
-				.getSession()));
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, daoFactory);
 		}
 
 		if (this.studyId == null) {

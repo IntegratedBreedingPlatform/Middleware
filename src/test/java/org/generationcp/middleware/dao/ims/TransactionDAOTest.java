@@ -7,7 +7,6 @@ import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -19,6 +18,7 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -82,6 +82,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
+	private DaoFactory daoFactory;
 	private LotDAO lotDAO;
 	private TransactionDAO transactionDAO;
 	private GermplasmListDataDAO germplasmListDataDAO;
@@ -112,18 +113,11 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		this.lotDAO = new LotDAO();
-		this.lotDAO.setSession(this.sessionProvder.getSession());
-
-		this.transactionDAO = new TransactionDAO();
-		this.transactionDAO.setSession(this.sessionProvder.getSession());
-
-		this.germplasmListDataDAO = new GermplasmListDataDAO();
-		this.germplasmListDataDAO.setSession(this.sessionProvder.getSession());
-
-		this.experimentTransactionDAO = new ExperimentTransactionDAO();
-		this.experimentTransactionDAO.setSession(this.sessionProvder.getSession());
-
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+		this.lotDAO = daoFactory.getLotDao();
+		this.transactionDAO = daoFactory.getTransactionDAO();
+		this.germplasmListDataDAO = this.daoFactory.getGermplasmListDataDAO();
+		this.experimentTransactionDAO = this.daoFactory.getExperimentTransactionDao();
 		this.germplasmListData = Lists.newArrayList();
 
 		this.inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
@@ -144,8 +138,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		this.userService = new UserServiceImpl(this.workbenchSessionProvider);
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, new NameDAO(this.sessionProvder
-					.getSession()));
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, daoFactory);
 		}
 
 		if (this.studyId == null) {
