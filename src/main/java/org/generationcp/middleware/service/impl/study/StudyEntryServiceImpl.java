@@ -50,11 +50,10 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	private final DaoFactory daoFactory;
 
 	private static final List<Integer> FIXED_GERMPLASM_DESCRIPTOR_IDS = Lists
-		.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId());
+		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId());
 
 	private static final List<Integer> REMOVABLE_GERMPLASM_DESCRIPTOR_IDS = Lists
-		.newArrayList(TermId.ENTRY_CODE.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(),
-			TermId.OBS_UNIT_ID.getId());
+		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.OBS_UNIT_ID.getId());
 
 	public StudyEntryServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -80,22 +79,22 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			this.datasetService.getDatasets(studyId, new HashSet<>(Collections.singletonList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
 				.getDatasetId();
 
-		final List<MeasurementVariable> entryDescriptors =
-			this.datasetService.getObservationSetVariables(plotDatasetId, Lists
-				.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId()));
+		final List<MeasurementVariable> entryVariables =
+			this.datasetService.getObservationSetVariables(plotDatasetId,
+				Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
 
-		final List<MeasurementVariable> fixedEntryDescriptors =
-			entryDescriptors.stream().filter(d -> FIXED_GERMPLASM_DESCRIPTOR_IDS.contains(d.getTermId())).collect(
+		final List<MeasurementVariable> fixedEntryVariables =
+			entryVariables.stream().filter(d -> FIXED_GERMPLASM_DESCRIPTOR_IDS.contains(d.getTermId())).collect(
 				Collectors.toList());
 
 		//Remove the ones that are stored in stock and that in the future will not be descriptors
 		final List<MeasurementVariable> variableEntryDescriptors =
-			entryDescriptors.stream().filter(d -> !REMOVABLE_GERMPLASM_DESCRIPTOR_IDS.contains(d.getTermId())).collect(
+			entryVariables.stream().filter(d -> !REMOVABLE_GERMPLASM_DESCRIPTOR_IDS.contains(d.getTermId())).collect(
 				Collectors.toList());
 
 		return
 			this.daoFactory.getStockDao()
-				.getStudyEntries(new StudyEntrySearchDto(studyId, fixedEntryDescriptors, variableEntryDescriptors, filter), pageable);
+				.getStudyEntries(new StudyEntrySearchDto(studyId, fixedEntryVariables, variableEntryDescriptors, filter), pageable);
 	}
 
 	@Override
