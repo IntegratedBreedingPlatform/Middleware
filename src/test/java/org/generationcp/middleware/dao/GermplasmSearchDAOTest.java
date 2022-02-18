@@ -26,6 +26,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
@@ -85,6 +86,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private CropType cropType;
 	private Pageable pageable;
 	private String programUUID;
+	private DaoFactory daoFactory;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataDM;
@@ -108,6 +110,9 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
+		if (this.daoFactory == null) {
+			this.daoFactory = new DaoFactory(this.sessionProvder);
+		}
 		if (this.dao == null) {
 			this.dao = new GermplasmSearchDAO(this.sessionProvder.getSession());
 
@@ -1477,7 +1482,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		attribute.setAval(this.attributeValue);
 		attribute.setAdate(this.germplasmDate);
 
-		this.germplasmDataDM.addGermplasmAttribute(attribute);
+		this.daoFactory.getAttributeDAO().saveOrUpdate(attribute);
 
 		final Lot lot = new Lot();
 		lot.setEntityType("GERMPLSM");
@@ -1557,7 +1562,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			attribute.setAval("Attribute of " + tempGermplasmGid);
 			attribute.setAdate(tempGermplasmDate);
 
-			this.germplasmDataDM.addGermplasmAttribute(attribute);
+			this.daoFactory.getAttributeDAO().saveOrUpdate(attribute);
 
 		}
 

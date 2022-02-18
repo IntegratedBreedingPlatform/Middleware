@@ -1268,7 +1268,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		if (attributeField == null) {
 			attributeField = new UserDefinedField(null, "NAMES", "NAME", nameType, "", "", "", 0, 0, 0, 0);
-			this.germplasmDataDM.addUserDefinedField(attributeField);
+			this.daoFactory.getUserDefinedFieldDAO().saveOrUpdate(attributeField);
 		}
 
 		final Name name = GermplasmTestDataInitializer.createGermplasmName(germplasmGID, RandomStringUtils.randomAlphanumeric(50));
@@ -1317,7 +1317,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		attribute.setAval(RandomStringUtils.randomAlphanumeric(50));
 		attribute.setAdate(germplasm.getGdate());
 
-		this.germplasmDataDM.addGermplasmAttribute(attribute);
+		this.daoFactory.getAttributeDAO().saveOrUpdate(attribute);
 		return attribute;
 	}
 
