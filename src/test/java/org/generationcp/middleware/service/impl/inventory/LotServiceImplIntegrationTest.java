@@ -29,6 +29,7 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.Util;
+import org.generationcp.middleware.util.uid.UIDGenerator;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +46,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 
@@ -59,11 +63,17 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private Lot lot;
 
+	private CropType crop;
+
 	private Integer storageLocationId;
 
 	private static final int GROUP_ID = 0;
 
 	private static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
+
+	private static final String UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
+	private static final int CROP_PREFIX_LENGTH = 10;
+	private static final String SUFFIX_REGEX = "[a-zA-Z0-9]{" + LotServiceImpl.SUFFIX_LENGTH + "}";
 
 	@Autowired
 	private GermplasmDataManager germplasmDataManager;
@@ -76,6 +86,10 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() {
+		this.crop = new CropType();
+		this.crop.setPlotCodePrefix(RandomStringUtils.randomAlphanumeric(CROP_PREFIX_LENGTH));
+		this.crop.setUseUUID(true);
+
 		this.transactionService = new TransactionServiceImpl(this.sessionProvder);
 		this.lotService = new LotServiceImpl(this.sessionProvder);
 		this.daoFactory = new DaoFactory(this.sessionProvder);
@@ -277,6 +291,38 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(closedLotsSearch.get(0).getStatus(), is(LotStatus.CLOSED.name()));
 		assertThat(closedLotsSearch.get(1).getStatus(), is(LotStatus.CLOSED.name()));
 	}
+
+
+	@Test
+	public void testGenerateLotIds_WithExistingUUID() {
+		final Lot lot = new Lot();
+		final String existingLotId = RandomStringUtils.randomAlphanumeric(20);
+		lot.setLotUuId(existingLotId);
+		this.lotService.generateLotIds(this.crop, Arrays.asList(lot));
+		assertEquals(existingLotId, lot.getLotUuId());
+	}
+
+	@Test
+	public void testGenerateLotIds_UseUUID() {
+		final Lot lot = new Lot();
+		this.lotService.generateLotIds(this.crop, Arrays.asList(lot));
+		assertNotNull(lot.getLotUuId());
+		assertTrue(lot.getLotUuId().matches(UUID_REGEX));
+	}
+
+	@Test
+	public void testGenerateLotIds_UseCustomID() {
+		this.crop.setUseUUID(false);
+		final Lot lot = new Lot();
+		this.lotService.generateLotIds(this.crop, Arrays.asList(lot));
+		final String lotId = lot.getLotUuId();
+		assertNotNull(lotId);
+		assertFalse(lotId.matches(UUID_REGEX));
+		assertEquals(this.crop.getPlotCodePrefix() + UIDGenerator.UID_ROOT.LOT.getRoot(), lotId.substring(0, CROP_PREFIX_LENGTH + 1));
+		final String suffix = lotId.substring(CROP_PREFIX_LENGTH + 1);
+		assertTrue(suffix.matches(SUFFIX_REGEX));
+	}
+
 
 	private void createGermplasm() {
 		final CropType cropType = new CropType();

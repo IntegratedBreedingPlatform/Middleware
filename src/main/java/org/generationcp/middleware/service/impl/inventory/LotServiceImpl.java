@@ -21,7 +21,6 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -33,6 +32,7 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.generationcp.middleware.util.Util;
+import org.generationcp.middleware.util.uid.UIDGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,15 +58,15 @@ import java.util.stream.Collectors;
 @Transactional
 public class LotServiceImpl implements LotService {
 
+	private static final UIDGenerator.UID_ROOT UID_ROOT = UIDGenerator.UID_ROOT.LOT;
+	public static final int SUFFIX_LENGTH = 8;
+
 	private static final Logger LOG = LoggerFactory.getLogger(LotServiceImpl.class);
 
 	private DaoFactory daoFactory;
 
 	@Value("${export.lot.max.total.results}")
 	public int maxTotalResults;
-
-	@Autowired
-	private InventoryDataManager inventoryDataManager;
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -118,7 +118,7 @@ public class LotServiceImpl implements LotService {
 		//FIXME check if source has to be always 0
 		lot.setSource(0);
 		lot.setScaleId(lotDto.getUnitId());
-		this.inventoryDataManager.generateLotIds(cropType, Lists.newArrayList(lot));
+		this.generateLotIds(cropType, Lists.newArrayList(lot));
 		this.daoFactory.getLotDao().save(lot);
 
 		return lot.getLotUuId();
@@ -244,7 +244,7 @@ public class LotServiceImpl implements LotService {
 					lot.setScaleId(unitsByNameMap.get(lotItemDto.getUnitName()));
 				}
 
-				this.inventoryDataManager.generateLotIds(cropType, Lists.newArrayList(lot));
+				this.generateLotIds(cropType, Lists.newArrayList(lot));
 				final Lot savedLot = this.daoFactory.getLotDao().save(lot);
 				lotUUIDs.add(savedLot.getLotUuId());
 
@@ -344,6 +344,23 @@ public class LotServiceImpl implements LotService {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLocationIds(Arrays.asList(locationId));
 		return this.daoFactory.getLotDao().countSearchLots(lotsSearchDto) > 0;
+	}
+
+	@Override
+	public void generateLotIds(final CropType crop, final List<Lot> lots) {
+		UIDGenerator.<Lot>generate(crop, lots, UID_ROOT, SUFFIX_LENGTH,
+			new UIDGenerator.UIDAdapter<Lot>() {
+
+				@Override
+				public String getUID(final Lot entry) {
+					return entry.getLotUuId();
+				}
+
+				@Override
+				public void setUID(final Lot entry, final String uid) {
+					entry.setLotUuId(uid);
+				}
+			});
 	}
 
 	public void setTransactionService(final TransactionService transactionService) {

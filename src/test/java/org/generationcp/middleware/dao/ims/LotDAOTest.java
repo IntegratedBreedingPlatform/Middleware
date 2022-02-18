@@ -40,6 +40,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	private LocationDAO locationDAO;
 	private GermplasmListDAO germplasmListDAO;
 	private CountryDAO countryDAO;
+	private TransactionDAO transactionDAO;
 
 	@Autowired
 	private GermplasmListManager manager;
@@ -71,6 +72,9 @@ public class LotDAOTest extends IntegrationTestBase {
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
 		this.countryDAO = new CountryDAO();
 		this.countryDAO.setSession(this.sessionProvder.getSession());
+		this.transactionDAO = new TransactionDAO();
+		this.transactionDAO.setSession(this.sessionProvder.getSession());
+
 
 		this.cropType = new CropType();
 		this.cropType.setUseUUID(false);
@@ -85,12 +89,12 @@ public class LotDAOTest extends IntegrationTestBase {
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
-		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
+		this.lotDAO.save(lot);
 
 		final Transaction transaction = InventoryDetailsTestDataInitializer
 			.createTransaction(
 				2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST", TransactionType.DEPOSIT.getId());
-		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction));
+		this.transactionDAO.save(transaction);
 
 		final List<Object[]> scalesForGermplsms = this.lotDAO.retrieveLotScalesForGermplasms(Lists.newArrayList(germplasmId));
 
@@ -108,11 +112,11 @@ public class LotDAOTest extends IntegrationTestBase {
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
-		this.inventoryDataManager.addLots(Lists.newArrayList(lot));
+		this.lotDAO.save(lot);
 
 		final Transaction transaction = InventoryDetailsTestDataInitializer.createTransaction(5.0, 1,
 			TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
-		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction));
+		this.transactionDAO.save(transaction);
 
 		final Map<Integer, Object[]> availableBalanceCountAndTotalLotsCount =
 				this.lotDAO.getAvailableBalanceCountAndTotalLotsCount(Lists.newArrayList(germplasmId));
@@ -136,12 +140,12 @@ public class LotDAOTest extends IntegrationTestBase {
 		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
-		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
+		this.lotDAO.save(lot);
 
 		Transaction transaction =
 				InventoryDetailsTestDataInitializer.createTransaction(5.0, 1, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
 		transaction.setType(TransactionType.DEPOSIT.getId());
-		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction));
+		this.transactionDAO.save(transaction);
 
 		final List<Lot> lotAggregateDataForGermplasm = this.lotDAO.getLotAggregateDataForGermplasm(germplasmId);
 
@@ -173,7 +177,7 @@ public class LotDAOTest extends IntegrationTestBase {
 
 		final Lot lot =
 			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
-		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
+		this.lotDAO.save(lot);
 
 		final Transaction transaction =
 			InventoryDetailsTestDataInitializer
@@ -181,7 +185,7 @@ public class LotDAOTest extends IntegrationTestBase {
 					TransactionType.DEPOSIT.getId());
 		InventoryDetailsTestDataInitializer
 			.createTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
-		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction));
+		this.transactionDAO.save(transaction);
 
 		final Set<Integer> gids = this.lotDAO.getGermplasmsWithOpenLots(Lists.newArrayList(germplasm.getGid()));
 
@@ -196,7 +200,7 @@ public class LotDAOTest extends IntegrationTestBase {
 
 		final Lot lot =
 			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 1, 1, "Comments", "InventoryId");
-		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
+		this.lotDAO.save(lot);
 
 		final Transaction transaction =
 			InventoryDetailsTestDataInitializer
@@ -204,7 +208,7 @@ public class LotDAOTest extends IntegrationTestBase {
 					TransactionType.DEPOSIT.getId());
 		InventoryDetailsTestDataInitializer
 			.createTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
-		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction));
+		this.transactionDAO.save(transaction);
 
 		final Set<Integer> gids = this.lotDAO.getGermplasmsWithOpenLots(Lists.newArrayList(germplasm.getGid()));
 
@@ -298,9 +302,13 @@ public class LotDAOTest extends IntegrationTestBase {
 		transaction3 = InventoryDetailsTestDataInitializer
 			.createTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot3, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
 
-		this.inventoryDataManager.addLots(Lists.newArrayList(this.lot1, this.lot2, this.lot3));
+		this.lotDAO.save(lot1);
+		this.lotDAO.save(lot2);
+		this.lotDAO.save(lot3);
 
-		this.inventoryDataManager.addTransactions(Lists.newArrayList(this.transaction1, this.transaction2, this.transaction3));
+		this.transactionDAO.save(transaction1);
+		this.transactionDAO.save(transaction2);
+		this.transactionDAO.save(transaction3);
 
 		this.germplasmList = this.germplasmListDAO.save(GermplasmListTestDataInitializer
 				.createGermplasmListTestData(RandomStringUtils.randomAlphabetic(6), RandomStringUtils.randomAlphabetic(6), 20141103, LST, 9999, 0,

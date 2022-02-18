@@ -7,6 +7,7 @@ import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
 import org.generationcp.middleware.domain.inventory.manager.LotSearchMetadata;
 import org.generationcp.middleware.domain.inventory.manager.LotUpdateRequestDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.springframework.data.domain.Pageable;
 
@@ -14,6 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface LotService {
+
+	void generateLotIds(final CropType crop, final List<Lot> lots);
 
 	List<ExtendedLotDto> searchLots(LotsSearchDto lotsSearchDto, Pageable pageable);
 

@@ -1491,14 +1491,14 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		lot.setEntityId(this.germplasmGID);
 		lot.setStatus(0);
 		lot.setStockId(RandomStringUtils.randomAlphabetic(35));
-		this.inventoryDataManager.addLot(lot);
+		this.daoFactory.getLotDao().save(lot);
 
 		final Transaction transaction = new Transaction();
 		transaction.setQuantity(100.0);
 		transaction.setStatus(TransactionStatus.CONFIRMED.getIntValue());
 		transaction.setLot(lot);
 		transaction.setType(TransactionType.DEPOSIT.getId());
-		this.inventoryDataManager.addTransaction(transaction);
+		this.daoFactory.getTransactionDAO().save(transaction);
 
 		final Germplasm mgMember = GermplasmTestDataInitializer
 			.createGermplasm(this.germplasmDate, this.femaleParentGID, this.maleParentGID, 2, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID,
