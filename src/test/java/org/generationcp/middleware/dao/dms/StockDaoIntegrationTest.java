@@ -40,7 +40,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Country;
@@ -112,9 +111,6 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 	private static final String GERMPLASM = "GERMPLSM";
 
 	private static final String LIST = "LIST";
-
-	@Autowired
-	private InventoryDataManager inventoryDataManager;
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
