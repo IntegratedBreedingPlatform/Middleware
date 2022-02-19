@@ -1,6 +1,7 @@
 package org.generationcp.middleware.operation.builder;
 
 import com.beust.jcommander.internal.Lists;
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -10,9 +11,7 @@ import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -24,7 +23,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,23 +37,20 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 	private static List<Integer> gids;
 	private CropType cropType;
 
-	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
-	private InventoryDataManager inventoryDataManager;
-
 	private GermplasmList germplasmList;
 
-	InventoryDetailsTestDataInitializer inventoryDetailsTestDataInitializer;
+	private InventoryDetailsTestDataInitializer inventoryDetailsTestDataInitializer;
 
 	private DaoFactory daoFactory;
+
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	@Before
 	public void setUp() {
 		if (this.daoFactory == null) {
 			this.daoFactory = new DaoFactory(this.sessionProvder);
 		}
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 		this.inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
 		listInventoryBuilder = new ListInventoryBuilder(this.sessionProvder);
 		germplasmListManager = new GermplasmListManagerImpl(this.sessionProvder);
@@ -120,7 +115,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		final Name name = germplasm.getPreferredName();
 		name.setGermplasm(germplasm);
 		this.daoFactory.getNameDao().save(name);
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		germplasm.setInventoryInfo(new GermplasmInventory(germplasmId));
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
@@ -142,7 +137,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		for (final Integer gid : gids) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(gid);
 			germplasm.setMgid(GROUP_ID);
-			this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+			this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		}
 	}
 

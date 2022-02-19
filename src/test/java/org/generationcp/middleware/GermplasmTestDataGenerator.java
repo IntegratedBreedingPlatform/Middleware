@@ -1,30 +1,39 @@
 
 package org.generationcp.middleware;
 
-import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.workbench.CropType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GermplasmTestDataGenerator {
 	private static final Integer TEST_METHOD_ID = 101;
 	public static final String TEST_METHOD_NAME = "Single cross";
 
-	private final NameDAO nameDAO;
-	private final GermplasmDAO germplasmDAO;
+	private final DaoFactory daoFactory;
 
-	public GermplasmTestDataGenerator(final GermplasmDataManager germplasmDataManager, final DaoFactory daoFactory) {
-//		this.germplasmDataManager = manager;
-		this.nameDAO = daoFactory.getNameDao();
-		this.germplasmDAO = daoFactory.getGermplasmDao();
+	public GermplasmTestDataGenerator(final DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
+
+	public Integer addGermplasm(final Germplasm germplasm, final Name preferredName, final CropType cropType) {
+		if (preferredName.getNstat() == null) {
+			preferredName.setNstat(1);
+		}
+		GermplasmGuidGenerator.generateGermplasmGuids(cropType, Arrays.asList(germplasm));
+		preferredName.setGermplasm(germplasm);
+		germplasm.getNames().clear();
+		germplasm.getNames().add(preferredName);
+		this.daoFactory.getGermplasmDao().save(germplasm);
+
+		return germplasm.getGid();
 	}
 
 	public Germplasm createGermplasmWithPreferredAndNonpreferredNames() {
@@ -35,16 +44,12 @@ public class GermplasmTestDataGenerator {
 		final Name preferredName = germplasm.getPreferredName();
 		preferredName.setGermplasm(germplasm);
 
-		this.germplasmDAO.save(germplasm);
-		this.germplasmDAO.refresh(germplasm);
-
-
-
-		//		this.germplasmDataManager.addGermplasm(germplasm, preferredName, cropType);
-		this.nameDAO.save(preferredName);
+		this.daoFactory.getGermplasmDao().save(germplasm);
+		this.daoFactory.getGermplasmDao().refresh(germplasm);
+		this.daoFactory.getNameDao().save(preferredName);
 		final Name otherName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid(), "Other Name ");
 		otherName.setNstat(0);
-		this.nameDAO.save(otherName);
+		this.daoFactory.getNameDao().save(otherName);
 		return germplasm;
 	}
 
@@ -59,9 +64,9 @@ public class GermplasmTestDataGenerator {
 		germplasm.setGpid2(parentGermplasm.getGid());
 		germplasm.setMethodId(GermplasmTestDataGenerator.TEST_METHOD_ID);
 
-		this.germplasmDAO.save(germplasm);
-		this.germplasmDAO.refresh(germplasm);
-		this.nameDAO.save(preferredName);
+		this.daoFactory.getGermplasmDao().save(germplasm);
+		this.daoFactory.getGermplasmDao().refresh(germplasm);
+		this.daoFactory.getNameDao().save(preferredName);
 
 		return germplasm;
 	}
@@ -86,7 +91,7 @@ public class GermplasmTestDataGenerator {
 			final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName(prefix + i);
 			final Name preferredName = germplasm.getPreferredName();
 			preferredName.setGermplasm(germplasm);
-			this.germplasmDAO.save(germplasm);
+			this.daoFactory.getGermplasmDao().save(germplasm);
 
 			gids[i] = germplasm.getGid();
 		}
@@ -103,7 +108,7 @@ public class GermplasmTestDataGenerator {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName(prefix + i);
 			final Name preferredName = germplasm.getPreferredName();
 			preferredName.setGermplasm(germplasm);
-			this.germplasmDAO.save(germplasm);
+			this.daoFactory.getGermplasmDao().save(germplasm);
 
 			germplasms.add(germplasm);
 		}
@@ -114,7 +119,7 @@ public class GermplasmTestDataGenerator {
 		final CropType cropType = new CropType();
 		cropType.setUseUUID(false);
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasmWithPreferredName(prefix);
-		this.germplasmDAO.save(germplasm);
+		this.daoFactory.getGermplasmDao().save(germplasm);
 
 		return germplasm;
 	}

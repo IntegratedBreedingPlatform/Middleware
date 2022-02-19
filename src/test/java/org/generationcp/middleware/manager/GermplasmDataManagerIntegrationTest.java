@@ -121,7 +121,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 		}
 
 		if (this.commonTestProject == null) {

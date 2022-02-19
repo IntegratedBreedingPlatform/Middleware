@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao.ims;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.LocationDAO;
@@ -12,9 +13,8 @@ import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInit
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -45,11 +45,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	@Autowired
 	private GermplasmListManager manager;
 
-	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
-	private InventoryDataManager inventoryDataManager;
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	private Lot lot1, lot2, lot3;
 	private Transaction transaction1, transaction2, transaction3;
@@ -57,6 +53,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	private Germplasm germplasm1, germplasm2;
 	private GermplasmList germplasmList;
 	private CropType cropType;
+	private DaoFactory daoFactory;
 
 	private static final String GERMPLASM = "GERMPLSM";
 
@@ -65,16 +62,13 @@ public class LotDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		this.lotDAO = new LotDAO();
-		this.lotDAO.setSession(this.sessionProvder.getSession());
-		this.locationDAO = new LocationDAO(this.sessionProvder.getSession());
-		this.germplasmListDAO = new GermplasmListDAO();
-		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
-		this.countryDAO = new CountryDAO();
-		this.countryDAO.setSession(this.sessionProvder.getSession());
-		this.transactionDAO = new TransactionDAO();
-		this.transactionDAO.setSession(this.sessionProvder.getSession());
-
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+		this.lotDAO = this.daoFactory.getLotDao();
+		this.locationDAO = this.daoFactory.getLocationDAO();
+		this.germplasmListDAO = this.daoFactory.getGermplasmListDAO();
+		this.countryDAO = this.daoFactory.getCountryDao();
+		this.transactionDAO = this.daoFactory.getTransactionDAO();
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 
 		this.cropType = new CropType();
 		this.cropType.setUseUUID(false);
@@ -86,7 +80,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	public void testRetrieveLotScalesForGermplasms() {
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.lotDAO.save(lot);
@@ -109,7 +103,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	public void testGetAvailableBalanceCountAndTotalLotsCount() {
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.lotDAO.save(lot);
@@ -137,7 +131,7 @@ public class LotDAOTest extends IntegrationTestBase {
 
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
 		this.lotDAO.save(lot);
@@ -173,7 +167,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	public void testGetGermplasmsWithOpenLots() {
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot =
 			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
@@ -196,7 +190,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	public void testGetGermplasmsWithNoOpenLots() {
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final Lot lot =
 			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 1, 1, "Comments", "InventoryId");
@@ -281,10 +275,10 @@ public class LotDAOTest extends IntegrationTestBase {
 	private void createDataForSearchLotsTest() {
 
 		this.germplasm1 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId1 = this.germplasmDataManager.addGermplasm(this.germplasm1, this.germplasm1.getPreferredName(), this.cropType);
+		final Integer germplasmId1 = this.germplasmTestDataGenerator.addGermplasm(this.germplasm1, this.germplasm1.getPreferredName(), this.cropType);
 
 		this.germplasm2 = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId2 = this.germplasmDataManager.addGermplasm(this.germplasm2, this.germplasm2.getPreferredName(), this.cropType);
+		final Integer germplasmId2 = this.germplasmTestDataGenerator.addGermplasm(this.germplasm2, this.germplasm2.getPreferredName(), this.cropType);
 
 		this.lot1 = InventoryDetailsTestDataInitializer
 				.createLot(1, GERMPLASM, germplasmId1, this.location.getLocid(), 8264, 0, 1, "Comments", RandomStringUtils.randomAlphabetic(35));

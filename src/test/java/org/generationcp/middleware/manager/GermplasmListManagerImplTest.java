@@ -17,7 +17,6 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -51,9 +50,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	private GermplasmListManager manager;
 
 	@Autowired
-	private GermplasmDataManager dataManager;
-
-	@Autowired
 	private DataImportService dataImportService;
 
 	@Autowired
@@ -78,6 +74,12 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Before
 	public void setUpBefore() {
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+
+		if (this.germplasmTestDataGenerator == null) {
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+		}
+
 		final GermplasmListTestDataInitializer germplasmListTDI = new GermplasmListTestDataInitializer();
 		this.dataSetupTest = new DataSetupTest();
 		this.dataSetupTest.setDataImportService(this.dataImportService);
@@ -87,7 +89,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 		final CropType cropType = new CropType();
 		cropType.setUseUUID(false);
-		this.dataManager.addGermplasm(this.testGermplasm, this.testGermplasm.getPreferredName(), cropType);
+		this.germplasmTestDataGenerator.addGermplasm(this.testGermplasm, this.testGermplasm.getPreferredName(), cropType);
 
 
 		final GermplasmList germplasmListOther = germplasmListTDI
@@ -148,11 +150,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 			GermplasmListDataTestDataInitializer.createGermplasmListData(testGermplasmList, this.testGermplasm.getGid(), 2);
 		this.manager.addGermplasmListData(listData);
 
-		this.daoFactory = new DaoFactory(this.sessionProvder);
-
-		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.dataManager, daoFactory);
-		}
 
 	}
 

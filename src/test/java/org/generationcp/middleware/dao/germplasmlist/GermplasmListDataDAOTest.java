@@ -56,7 +56,7 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager, daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 	}
 
 	@Test

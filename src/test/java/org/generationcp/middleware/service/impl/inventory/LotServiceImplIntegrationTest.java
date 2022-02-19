@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.impl.inventory;
 
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -14,7 +15,6 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -76,13 +76,12 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	private static final String SUFFIX_REGEX = "[a-zA-Z0-9]{" + LotServiceImpl.SUFFIX_LENGTH + "}";
 
 	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
 	private LocationDataManager locationDataManager;
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
+
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	@Before
 	public void setUp() {
@@ -95,6 +94,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.lotService.setTransactionService(this.transactionService);
 		this.lotService.setOntologyVariableDataManager(this.ontologyVariableDataManager);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 		this.createGermplasm();
 		this.userId = this.findAdminUser();
 		this.resolveStorageLocation();
@@ -329,7 +329,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		cropType.setUseUUID(false);
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(Integer.MIN_VALUE);
 		germplasm.setMgid(GROUP_ID);
-		this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
+		this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 		this.gid = germplasm.getGid();
 	}
 

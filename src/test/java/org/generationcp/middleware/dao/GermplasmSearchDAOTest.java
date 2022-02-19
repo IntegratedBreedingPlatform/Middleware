@@ -16,6 +16,7 @@ import org.apache.commons.lang.math.RandomUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchResponse;
@@ -27,9 +28,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Attribute;
@@ -89,16 +88,12 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private DaoFactory daoFactory;
 
 	@Autowired
-	private GermplasmDataManager germplasmDataDM;
-
-	@Autowired
-	private InventoryDataManager inventoryDataManager;
-
-	@Autowired
 	private GermplasmListManager germplasmListManager;
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
+
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	// pedigree tests
 	private Germplasm greatGrandParentGermplasm;
@@ -126,6 +121,10 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		}
 		if (this.nameDAO == null) {
 			this.nameDAO = new NameDAO(this.sessionProvder.getSession());
+		}
+
+		if (this.germplasmTestDataGenerator == null) {
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 		}
 
 		this.cropType = new CropType();
@@ -172,7 +171,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm =
 			GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 12, 13, 1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		germplasm.getPreferredName().setNval("GermplasmName");
-		this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
 		final GermplasmSearchRequest request =
 			this.createSearchRequest(germplasm.getPreferredName().getNval(), SqlTextFilter.Type.STARTSWITH);
@@ -200,12 +199,12 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		final Germplasm parentGermplasm =
 			GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer parentGermplasmId =
-			this.germplasmDataDM.addGermplasm(parentGermplasm, parentGermplasm.getPreferredName(), this.cropType);
+			this.germplasmTestDataGenerator.addGermplasm(parentGermplasm, parentGermplasm.getPreferredName(), this.cropType);
 
 		final Germplasm childGermplasm = GermplasmTestDataInitializer
 			.createGermplasm(this.germplasmDate, parentGermplasm.getGid(), 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		final Integer childGermplasmId =
-			this.germplasmDataDM.addGermplasm(childGermplasm, childGermplasm.getPreferredName(), this.cropType);
+			this.germplasmTestDataGenerator.addGermplasm(childGermplasm, childGermplasm.getPreferredName(), this.cropType);
 
 		final GermplasmSearchRequest request = this.createSearchRequest(childGermplasm.getGid());
 		final GermplasmSearchRequest.IncludePedigree includePedigree = new GermplasmSearchRequest.IncludePedigree();
@@ -402,7 +401,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 				1, 1,
 				"MethodName", "LocationName");
 
-		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final Integer gid = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		final GermplasmSearchRequest searchParameter = this.createSearchRequest(gid);
 
 		final List<String> propertyIds = new LinkedList<>();
@@ -1427,7 +1426,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm = GermplasmTestDataInitializer
 			.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1,
 				"MethodName", "LocationName");
-		final Integer tempFemaleParentGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final Integer tempFemaleParentGID = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		request.setNameTypes(Collections.singletonMap(this.nameType, germplasm.getPreferredName().getNval()));
 
 		final List<Integer> preFilteredGids = new ArrayList<>();
@@ -1438,12 +1437,12 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private void initializeGermplasms() {
 		final Germplasm fParent =
 			GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		this.femaleParentGID = this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName(), this.cropType);
+		this.femaleParentGID = this.germplasmTestDataGenerator.addGermplasm(fParent, fParent.getPreferredName(), this.cropType);
 		this.femaleParentPreferredName = fParent.getPreferredName();
 
 		final Germplasm mParent =
 			GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		this.maleParentGID = this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName(), this.cropType);
+		this.maleParentGID = this.germplasmTestDataGenerator.addGermplasm(mParent, mParent.getPreferredName(), this.cropType);
 		this.maleParentPreferredName = mParent.getPreferredName();
 
 		final Germplasm germplasm = GermplasmTestDataInitializer
@@ -1452,7 +1451,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 				"MethodName", "LocationName");
 
 		// Create Germplasm and add Preferred Name
-		this.germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		this.germplasmGID = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		this.preferredName = germplasm.getPreferredName();
 
 		// Add Preferred Id, nstat = 8 means the name is preferred Id
@@ -1504,7 +1503,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			.createGermplasm(this.germplasmDate, this.femaleParentGID, this.maleParentGID, 2, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID,
 				1, 1,
 				"MethodName", "LocationName");
-		this.germplasmDataDM.addGermplasm(mgMember, mgMember.getPreferredName(), this.cropType);
+		this.germplasmTestDataGenerator.addGermplasm(mgMember, mgMember.getPreferredName(), this.cropType);
 
 	}
 
@@ -1519,12 +1518,12 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			final Germplasm fParent = GermplasmTestDataInitializer
 				.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1,
 					"MethodName" + random, "LocationName" + random);
-			final Integer tempFemaleParentGID = this.germplasmDataDM.addGermplasm(fParent, fParent.getPreferredName(), this.cropType);
+			final Integer tempFemaleParentGID = this.germplasmTestDataGenerator.addGermplasm(fParent, fParent.getPreferredName(), this.cropType);
 
 			final Germplasm mParent = GermplasmTestDataInitializer
 				.createGermplasm(tempGermplasmDate, 1, 2, 2, 0, 0, 1, GermplasmSearchDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1,
 					"MethodName" + random, "LocationName" + random);
-			final Integer tempMaleParentGID = this.germplasmDataDM.addGermplasm(mParent, mParent.getPreferredName(), this.cropType);
+			final Integer tempMaleParentGID = this.germplasmTestDataGenerator.addGermplasm(mParent, mParent.getPreferredName(), this.cropType);
 
 			final Germplasm germplasm = GermplasmTestDataInitializer
 				.createGermplasm(tempGermplasmDate, tempFemaleParentGID, tempMaleParentGID, 2, 0, 0, 1,
@@ -1533,7 +1532,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 			// Create Germplasm and add Preferred Name
 			germplasm.getPreferredName().setNval("GermplasmForSorting" + random);
-			final Integer tempGermplasmGid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+			final Integer tempGermplasmGid = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 			testGermplasmGIDs.add(tempGermplasmGid);
 
 			// Add Preferred Id, nstat = 8 means the name is preferred Id
@@ -1689,23 +1688,23 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private void createPedigree() {
 		this.greatGrandParentGermplasm =
 			GermplasmTestDataInitializer.createGermplasm(this.germplasmDate, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		this.germplasmDataDM.addGermplasm(this.greatGrandParentGermplasm, this.greatGrandParentGermplasm.getPreferredName(), this.cropType);
+		this.germplasmTestDataGenerator.addGermplasm(this.greatGrandParentGermplasm, this.greatGrandParentGermplasm.getPreferredName(), this.cropType);
 
 		this.grandParentGermplasm = GermplasmTestDataInitializer
 			.createGermplasm(this.germplasmDate, this.greatGrandParentGermplasm.getGid(), 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName",
 				"LocationName");
-		this.germplasmDataDM.addGermplasm(this.grandParentGermplasm, this.grandParentGermplasm.getPreferredName(), this.cropType);
+		this.germplasmTestDataGenerator.addGermplasm(this.grandParentGermplasm, this.grandParentGermplasm.getPreferredName(), this.cropType);
 
 		this.groupSource = GermplasmTestDataInitializer
 			.createGermplasm(this.germplasmDate, this.grandParentGermplasm.getGid(), 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName",
 				"LocationName");
-		this.germplasmDataDM.addGermplasm(this.groupSource, this.groupSource.getPreferredName(), this.cropType);
+		this.germplasmTestDataGenerator.addGermplasm(this.groupSource, this.groupSource.getPreferredName(), this.cropType);
 
 		this.descendant = GermplasmTestDataInitializer
 			.createGermplasm(this.germplasmDate, this.groupSource.getGid(), this.groupSource.getGid(), -1, 0, 0, 1, 1, 0, 1, 1,
 				"MethodName",
 				"LocationName");
-		this.germplasmDataDM.addGermplasm(this.descendant, this.descendant.getPreferredName(), this.cropType);
+		this.germplasmTestDataGenerator.addGermplasm(this.descendant, this.descendant.getPreferredName(), this.cropType);
 	}
 
 	private GermplasmSearchRequest getGermplasmSearchRequest(final Set<Integer> gids) {

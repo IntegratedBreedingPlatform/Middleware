@@ -230,18 +230,6 @@ public interface GermplasmDataManager {
 	Integer addMethod(Method method);
 
 	/**
-	 * Given a valid Germplasm object with a matching valid Name object to be set as its preferred name, add a new Germplasm record and a
-	 * new Name record for the given parameters.
-	 *
-	 * @param germplasm     the germplasm
-	 * @param preferredName the preferred name
-	 * @return the id of the {@code Germplasm} record added
-	 */
-	// TODO: we need to remove this method. It's used only for test purpose.
-	@Deprecated
-	Integer addGermplasm(Germplasm germplasm, Name preferredName, CropType cropType);
-
-	/**
 	 * Given a map of valid Germplasm and Name objects, add new records for the given parameters.
 	 * <p>
 	 * The Name objects matching each Germplasm object in the map will be set as the preferred name of the Germplasm objects.
@@ -251,7 +239,6 @@ public interface GermplasmDataManager {
 	 *
 	 * @return the ids of the {@code Germplasm} records added
 	 */
-	@Deprecated
 	List<Integer> addGermplasm(List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples, CropType cropType);
 
 	/**

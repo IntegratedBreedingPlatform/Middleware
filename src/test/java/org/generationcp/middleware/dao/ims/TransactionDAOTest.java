@@ -7,7 +7,6 @@ import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
@@ -19,9 +18,7 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDt
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -62,13 +59,7 @@ import static org.junit.Assert.assertThat;
 public class TransactionDAOTest extends IntegrationTestBase {
 
 	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
 	private GermplasmListManager germplasmListManager;
-
-	@Autowired
-	private InventoryDataManager inventoryDataManager;
 
 	@Autowired
 	private StudyDataManager studyDataManager;
@@ -85,7 +76,6 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	private DaoFactory daoFactory;
 	private LotDAO lotDAO;
 	private TransactionDAO transactionDAO;
-	private GermplasmListDataDAO germplasmListDataDAO;
 	private ExperimentTransactionDAO experimentTransactionDAO;
 
 	private static final int LIST_ID = 1;
@@ -116,10 +106,11 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.lotDAO = daoFactory.getLotDao();
 		this.transactionDAO = daoFactory.getTransactionDAO();
-		this.germplasmListDataDAO = this.daoFactory.getGermplasmListDataDAO();
 		this.experimentTransactionDAO = this.daoFactory.getExperimentTransactionDao();
 		this.germplasmListData = Lists.newArrayList();
-
+		if (this.germplasmTestDataGenerator == null) {
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+		}
 		this.inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
 
 		this.dataSetupTest = new DataSetupTest();
@@ -136,10 +127,6 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		this.initLotsAndTransactions(this.germplasmListId);
 
 		this.userService = new UserServiceImpl(this.workbenchSessionProvider);
-
-		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, daoFactory);
-		}
 
 		if (this.studyId == null) {
 			this.createTestStudyWithObservationDataset();
@@ -168,7 +155,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		cropType.setUseUUID(false);
 		for (int i = 1; i <= noOfEntries; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(i);
-			final Integer gidAfterAdd = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
+			final Integer gidAfterAdd = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 			this.germplasmMap.put(gidAfterAdd, germplasm);
 		}
 	}
@@ -223,7 +210,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		cropType.setUseUUID(false);
 		final Germplasm germplasm =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 
 		final WorkbenchUser user = this.getUserService().getUserById(1);
 
@@ -281,7 +268,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1,
 				1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 
 		final WorkbenchUser user = this.getUserService().getUserById(1);
 
@@ -352,7 +339,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1,
 						1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 
 		final WorkbenchUser user = this.getUserService().getUserById(1);
 

@@ -119,7 +119,7 @@ public class DataSetupTest extends IntegrationTestBase {
     public void setUp() {
         if (this.germplasmTestDataGenerator == null) {
             this.daoFactory = new DaoFactory(this.sessionProvder);
-            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager, daoFactory);
+            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
         }
     }
 

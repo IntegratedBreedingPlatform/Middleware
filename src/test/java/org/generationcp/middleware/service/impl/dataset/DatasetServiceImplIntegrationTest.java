@@ -92,7 +92,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
             this.daoFactory =new DaoFactory(this.sessionProvder);
         }
         if (this.germplasmTestDataGenerator == null) {
-            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, daoFactory);
+            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
         }
 
         if (this.studyId == null) {

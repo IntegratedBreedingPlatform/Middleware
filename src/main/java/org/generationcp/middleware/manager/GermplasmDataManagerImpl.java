@@ -13,7 +13,6 @@ package org.generationcp.middleware.manager;
 import com.google.common.collect.ImmutableSet;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.AttributeDAO;
@@ -243,16 +242,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	@Deprecated
 	public Location getLocationByID(final Integer id) {
 		return this.daoFactory.getLocationDAO().getById(id, false);
-	}
-
-	@Override
-	public Integer addGermplasm(final Germplasm germplasm, final Name preferredName, final CropType cropType) {
-		final List<Triple<Germplasm, Name, List<Progenitor>>> tripleList = new ArrayList<>();
-		final List<Progenitor> progenitors = new ArrayList<>();
-		final Triple<Germplasm, Name, List<Progenitor>> triple = new ImmutableTriple<>(germplasm, preferredName, progenitors);
-		tripleList.add(triple);
-		final List<Integer> ids = this.addGermplasm(tripleList, cropType);
-		return !ids.isEmpty() ? ids.get(0) : null;
 	}
 
 	@Override
