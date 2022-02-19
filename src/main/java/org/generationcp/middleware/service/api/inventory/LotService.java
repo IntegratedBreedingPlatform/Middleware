@@ -16,7 +16,7 @@ import java.util.Map;
 
 public interface LotService {
 
-	void generateLotIds(final CropType crop, final List<Lot> lots);
+	void generateLotIds(CropType crop, List<Lot> lots);
 
 	List<ExtendedLotDto> searchLots(LotsSearchDto lotsSearchDto, Pageable pageable);
 
