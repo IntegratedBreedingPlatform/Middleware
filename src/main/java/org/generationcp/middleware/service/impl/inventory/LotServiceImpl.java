@@ -348,7 +348,7 @@ public class LotServiceImpl implements LotService {
 
 	@Override
 	public void generateLotIds(final CropType crop, final List<Lot> lots) {
-		UIDGenerator.<Lot>generate(crop, lots, UID_ROOT, SUFFIX_LENGTH,
+		UIDGenerator.generate(crop, lots, UID_ROOT, SUFFIX_LENGTH,
 			new UIDGenerator.UIDAdapter<Lot>() {
 
 				@Override
