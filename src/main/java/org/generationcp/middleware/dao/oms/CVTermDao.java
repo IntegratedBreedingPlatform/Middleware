@@ -1956,6 +1956,14 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 	}
 
+	public List<CVTerm> getTermsByNameAndCvId(final List<String> methodNames, final int cvId) {
+		final Criteria criteria = this.getSession().createCriteria(CVTerm.class);
+		criteria.add(Restrictions.in("name", methodNames));
+		criteria.add(Restrictions.eq("cvId", cvId));
+		return criteria.list();
+	}
+
+
 	/***
 	 * Continues
 	 * {@link OntologyVariableDataManagerImpl#getWithFilter(org.generationcp.middleware.manager.ontology.daoElements.VariableFilter)}
