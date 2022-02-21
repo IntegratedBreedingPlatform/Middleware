@@ -83,7 +83,6 @@ public class LocationServiceImpl implements LocationService {
 		}
 		final Set<Integer> entityIds = ImmutableSet.of(locationId);
 		this.daoFactory.getProgramFavoriteDao().deleteProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, entityIds);
-		this.daoFactory.getGeolocationDao().deleteGeolocations(Arrays.asList(locationId));
 		this.daoFactory.getLocationDAO().makeTransient(location);
 	}
 

@@ -33,6 +33,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Name;
@@ -70,6 +71,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 	private UserDefinedFieldDAO userDefinedFieldDao;
 	private GermplasmDAO germplasmDao;
 	private NameDAO nameDAO;
+	private GermplasmExternalReferenceDAO germplasmExternalReferenceDAO;
 
 	private Integer germplasmGID;
 	private Integer femaleParentGID;
@@ -121,6 +123,10 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 		}
 		if (this.nameDAO == null) {
 			this.nameDAO = new NameDAO(this.sessionProvder.getSession());
+		}
+		if (this.germplasmExternalReferenceDAO == null) {
+			this.germplasmExternalReferenceDAO = new GermplasmExternalReferenceDAO();
+			this.germplasmExternalReferenceDAO.setSession(this.sessionProvder.getSession());
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
@@ -418,6 +424,57 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		this.assertAddedGermplasmFields(results.get(0), propertyIds);
 
+	}
+
+	@Test
+	public void testSearchGermplasm_WithGermplasmExternalReferenceSource() {
+		//Create a new germplasm with -1 gnpgs
+		final Germplasm germplasm = GermplasmTestDataInitializer
+			.createGermplasm(this.germplasmDate, this.femaleParentGID, this.maleParentGID, -1, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID,
+				1, 1, "MethodName", "LocationName");
+
+		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final GermplasmSearchRequest searchParameter = this.createSearchRequest(gid);
+
+		final GermplasmExternalReference germplasmExternalReference = this.createGermplasmExternalReference(germplasm);
+
+		final SqlTextFilter externalReferenceSourceFilter = new SqlTextFilter();
+		externalReferenceSourceFilter.setType(SqlTextFilter.Type.EXACTMATCH);
+		externalReferenceSourceFilter.setValue(germplasmExternalReference.getSource());
+		searchParameter.setExternalReferenceSource(externalReferenceSourceFilter);
+
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
+		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
+	}
+
+	@Test
+	public void testSearchGermplasm_WithGermplasmExternalReferenceId() {
+		//Create a new germplasm with -1 gnpgs
+		final Germplasm germplasm = GermplasmTestDataInitializer
+			.createGermplasm(this.germplasmDate, this.femaleParentGID, this.maleParentGID, -1, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID,
+				1, 1, "MethodName", "LocationName");
+
+		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final GermplasmSearchRequest searchParameter = this.createSearchRequest(gid);
+
+		final GermplasmExternalReference germplasmExternalReference = this.createGermplasmExternalReference(germplasm);
+
+		final SqlTextFilter externalReferenceIdFilter = new SqlTextFilter();
+		externalReferenceIdFilter.setType(SqlTextFilter.Type.EXACTMATCH);
+		externalReferenceIdFilter.setValue(germplasmExternalReference.getReferenceId());
+		searchParameter.setExternalReferenceId(externalReferenceIdFilter);
+
+		final List<GermplasmSearchResponse> results = this.dao.searchGermplasm(searchParameter, this.pageable, this.programUUID);
+		Assert.assertEquals("The results should contain only one germplasm since the gid is unique.", 1, results.size());
+	}
+
+	private GermplasmExternalReference createGermplasmExternalReference(final Germplasm germplasm) {
+		final GermplasmExternalReference germplasmExternalReference = new GermplasmExternalReference();
+		germplasmExternalReference.setGermplasm(germplasm);
+		germplasmExternalReference.setSource(RandomStringUtils.randomAlphabetic(200));
+		germplasmExternalReference.setReferenceId(RandomStringUtils.randomAlphabetic(500));
+		this.germplasmExternalReferenceDAO.save(germplasmExternalReference);
+		return germplasmExternalReference;
 	}
 
 	@Test
