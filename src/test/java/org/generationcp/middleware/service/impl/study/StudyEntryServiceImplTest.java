@@ -5,7 +5,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -62,8 +61,7 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	public void setup() {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager, new NameDAO(this.sessionProvder
-			.getSession()));
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 
 	}
 

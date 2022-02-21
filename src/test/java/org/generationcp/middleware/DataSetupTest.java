@@ -2,7 +2,6 @@
 package org.generationcp.middleware;
 
 import org.generationcp.middleware.api.program.ProgramService;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
@@ -11,6 +10,7 @@ import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -72,6 +72,8 @@ public class DataSetupTest extends IntegrationTestBase {
 	@Autowired
 	private ProgramService programService;
 
+    private DaoFactory daoFactory;
+
     private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
     public static final int NUMBER_OF_GERMPLASM = 20;
@@ -100,8 +102,6 @@ public class DataSetupTest extends IntegrationTestBase {
 
     private static final String SCALE_TEXT = "Text";
     private static final String ENUMERATED = "ENUMERATED";
-    private static final String DESCRIBED = "Described";
-    private static final String DATE = "Date (yyyymmdd)";
     private static final String OBSERVED = "Observed";
 
     private static final String GID = "GID";
@@ -118,8 +118,8 @@ public class DataSetupTest extends IntegrationTestBase {
     @Before
     public void setUp() {
         if (this.germplasmTestDataGenerator == null) {
-            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager, new NameDAO(this.sessionProvder
-                .getSession()));
+            this.daoFactory = new DaoFactory(this.sessionProvder);
+            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
         }
     }
 

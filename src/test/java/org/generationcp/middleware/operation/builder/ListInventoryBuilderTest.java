@@ -1,6 +1,7 @@
 package org.generationcp.middleware.operation.builder;
 
 import com.beust.jcommander.internal.Lists;
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -8,13 +9,13 @@ import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInit
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.LotDetails;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
@@ -22,7 +23,6 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,18 +37,20 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 	private static List<Integer> gids;
 	private CropType cropType;
 
-	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
-	private InventoryDataManager inventoryDataManager;
-
 	private GermplasmList germplasmList;
 
-	InventoryDetailsTestDataInitializer inventoryDetailsTestDataInitializer;
+	private InventoryDetailsTestDataInitializer inventoryDetailsTestDataInitializer;
+
+	private DaoFactory daoFactory;
+
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	@Before
 	public void setUp() {
+		if (this.daoFactory == null) {
+			this.daoFactory = new DaoFactory(this.sessionProvder);
+		}
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 		this.inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
 		listInventoryBuilder = new ListInventoryBuilder(this.sessionProvder);
 		germplasmListManager = new GermplasmListManagerImpl(this.sessionProvder);
@@ -80,7 +82,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 
 		final List<Lot> lots = this.inventoryDetailsTestDataInitializer.createLots(listGid, this.germplasmList.getId(), 8234, 9007);
 
-		this.inventoryDataManager.addLots(lots);
+		lots.forEach(l -> this.daoFactory.getLotDao().save(l));
 
 		final Transaction initialTransaction = this.inventoryDetailsTestDataInitializer
 			.createTransaction(5.0, 1, "Initial inventory", lots.get(0), 1, this.germplasmList.getId(),
@@ -90,9 +92,8 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 			.createTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
 				"LIST", TransactionType.WITHDRAWAL.getId());
 
-		this.inventoryDataManager.addTransaction(initialTransaction);
-		this.inventoryDataManager.addTransaction(reservationTransaction);
-
+		this.daoFactory.getTransactionDAO().save(initialTransaction);
+		this.daoFactory.getTransactionDAO().save(reservationTransaction);
 		final List<LotDetails> lotDetails = listInventoryBuilder.retrieveInventoryLotsForGermplasm(listGid.get(0));
 
 		Assert.assertEquals(1, lotDetails.size());
@@ -109,15 +110,20 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 	public void testSetAvailableBalanceScaleForGermplasm() throws Exception {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
 				"LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		this.daoFactory.getGermplasmDao().save(germplasm);
+		this.daoFactory.getGermplasmDao().refresh(germplasm);
+		final Name name = germplasm.getPreferredName();
+		name.setGermplasm(germplasm);
+		this.daoFactory.getNameDao().save(name);
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		germplasm.setInventoryInfo(new GermplasmInventory(germplasmId));
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
-		this.inventoryDataManager.addLots(com.google.common.collect.Lists.<Lot>newArrayList(lot));
+		this.daoFactory.getLotDao().save(lot);
 
 		final Transaction transaction = InventoryDetailsTestDataInitializer
 				.createTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST", TransactionType.DEPOSIT.getId());
-		this.inventoryDataManager.addTransactions(com.google.common.collect.Lists.<Transaction>newArrayList(transaction));
+		this.daoFactory.getTransactionDAO().save(transaction);
 
 		final List<Germplasm> germplasmList = Lists.newArrayList(germplasm);
 		listInventoryBuilder.setAvailableBalanceScaleForGermplasm(germplasmList);
@@ -131,7 +137,7 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		for (final Integer gid : gids) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(gid);
 			germplasm.setMgid(GROUP_ID);
-			this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+			this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		}
 	}
 

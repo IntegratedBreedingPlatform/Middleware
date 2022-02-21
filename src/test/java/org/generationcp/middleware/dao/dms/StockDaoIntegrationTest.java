@@ -24,6 +24,8 @@ import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.dao.PersonDAO;
 import org.generationcp.middleware.dao.StudyTypeDAO;
+import org.generationcp.middleware.dao.ims.LotDAO;
+import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -38,7 +40,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Country;
@@ -93,6 +94,8 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 	private PersonDAO personDao;
 	private LocationDAO locationDAO;
 	private CountryDAO countryDAO;
+	private TransactionDAO transactionDAO;
+	private LotDAO lotDAO;
 	private DmsProject project;
 	private List<StockModel> testStocks;
 	private List<ExperimentModel> experiments;
@@ -108,9 +111,6 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 	private static final String GERMPLASM = "GERMPLSM";
 
 	private static final String LIST = "LIST";
-
-	@Autowired
-	private InventoryDataManager inventoryDataManager;
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -150,6 +150,12 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 
 		this.countryDAO = new CountryDAO();
 		this.countryDAO.setSession(this.sessionProvder.getSession());
+
+		this.lotDAO = new LotDAO();
+		this.lotDAO.setSession(this.sessionProvder.getSession());
+
+		this.transactionDAO = new TransactionDAO();
+		this.transactionDAO.setSession(this.sessionProvder.getSession());
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.workbenchUser = this.testDataInitializer.createUserForTesting();
@@ -355,9 +361,15 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		final Transaction transaction4 = InventoryDetailsTestDataInitializer
 			.createTransaction(50.0, TransactionStatus.CONFIRMED.getIntValue(), TransactionType.DEPOSIT.getValue(), lot4, adminUserId, 1, 1, LIST, TransactionType.DEPOSIT.getId());
 
-		this.inventoryDataManager.addLots(Lists.newArrayList(lot1, lot2, lot3, lot4));
+		this.lotDAO.save(lot1);
+		this.lotDAO.save(lot2);
+		this.lotDAO.save(lot3);
+		this.lotDAO.save(lot4);
+		this.transactionDAO.save(transaction1);
+		this.transactionDAO.save(transaction2);
+		this.transactionDAO.save(transaction3);
+		this.transactionDAO.save(transaction4);
 
-		this.inventoryDataManager.addTransactions(Lists.newArrayList(transaction1, transaction2, transaction3, transaction4));
 
 		//Assertions
 		final List<StudyEntryDto> studyEntryDtos = this.stockDao
