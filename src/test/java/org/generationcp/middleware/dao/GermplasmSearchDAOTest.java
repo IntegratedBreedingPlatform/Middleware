@@ -433,7 +433,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			.createGermplasm(this.germplasmDate, this.femaleParentGID, this.maleParentGID, -1, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID,
 				1, 1, "MethodName", "LocationName");
 
-		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final Integer gid = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		final GermplasmSearchRequest searchParameter = this.createSearchRequest(gid);
 
 		final GermplasmExternalReference germplasmExternalReference = this.createGermplasmExternalReference(germplasm);
@@ -454,7 +454,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 			.createGermplasm(this.germplasmDate, this.femaleParentGID, this.maleParentGID, -1, 0, 0, 1, 1, GermplasmSearchDAOTest.GROUP_ID,
 				1, 1, "MethodName", "LocationName");
 
-		final Integer gid = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final Integer gid = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 		final GermplasmSearchRequest searchParameter = this.createSearchRequest(gid);
 
 		final GermplasmExternalReference germplasmExternalReference = this.createGermplasmExternalReference(germplasm);
