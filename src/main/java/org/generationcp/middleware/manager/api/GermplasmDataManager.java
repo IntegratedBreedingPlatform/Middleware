@@ -112,14 +112,6 @@ public interface GermplasmDataManager {
 	List<Name> getNamesByGID(Integer gid, Integer status, GermplasmNameType type);
 
 	/**
-	 * Returns the preferred name of the Germplasm identified by the gid parameter.
-	 *
-	 * @param gid - id of the Germplasm
-	 * @return {@code Name} POJO of the Germplasm's preferred name. Returns
-	 */
-	Name getPreferredNameByGID(Integer gid);
-
-	/**
 	 * Returns the value (NVAL field) of preferred name of the Germplasm identified by the gid parameter.
 	 *
 	 * @param gid - id of the Germplasm
@@ -238,46 +230,6 @@ public interface GermplasmDataManager {
 	Integer addMethod(Method method);
 
 	/**
-	 * Stores in the database the given valid Attribute object.
-	 *
-	 * @param attribute the attribute
-	 * @return the id of {@code Attribute} records stored in the database
-	 */
-	// TODO: we need to remove this method. It's used only for test purpose.
-	@Deprecated
-	Integer addGermplasmAttribute(Attribute attribute);
-
-	/**
-	 * Stores in the database all the given valid Attributes object contained in the parameter.
-	 *
-	 * @param attributes - List of Attribute objects
-	 * @return the ids of the Attribute records stored in the database
-	 */
-	List<Integer> addGermplasmAttribute(List<Attribute> attributes);
-
-	/**
-	 * Returns the attribute record identified by the given id.
-	 *
-	 * @param id the id
-	 * @return The attribute record corresponding to the given id.
-	 */
-	// TODO: we need to remove this method. It's used only for test purpose.
-	@Deprecated
-	Attribute getAttributeById(Integer id);
-
-	/**
-	 * Given a valid Germplasm object with a matching valid Name object to be set as its preferred name, add a new Germplasm record and a
-	 * new Name record for the given parameters.
-	 *
-	 * @param germplasm     the germplasm
-	 * @param preferredName the preferred name
-	 * @return the id of the {@code Germplasm} record added
-	 */
-	// TODO: we need to remove this method. It's used only for test purpose.
-	@Deprecated
-	Integer addGermplasm(Germplasm germplasm, Name preferredName, CropType cropType);
-
-	/**
 	 * Given a map of valid Germplasm and Name objects, add new records for the given parameters.
 	 * <p>
 	 * The Name objects matching each Germplasm object in the map will be set as the preferred name of the Germplasm objects.
@@ -285,32 +237,9 @@ public interface GermplasmDataManager {
 	 * Note that you need to assign temporary ids for the Germplasm objects so that they can serve as the keys for the Map. The function
 	 * will replace these temp ids with the correct ones for storing in the database.
 	 *
-	 * @param germplasmNameMap the germplasm name map
 	 * @return the ids of the {@code Germplasm} records added
 	 */
-	// TODO: we need to remove this method. It's used only for test purpose.
-	@Deprecated
 	List<Integer> addGermplasm(List<Triple<Germplasm, Name, List<Progenitor>>> germplasmTriples, CropType cropType);
-
-	/**
-	 * Given a UserDefinedField object, add new record for the given parameter.
-	 *
-	 * @param field - the UserDefinedField object
-	 * @return the id of the new UserDefinedField record added
-	 */
-	// TODO: we need to remove this method. It's used only for test purpose.
-	@Deprecated
-	Integer addUserDefinedField(UserDefinedField field);
-
-	/**
-	 * Given a Attribute object, add new record for the given parameter.
-	 *
-	 * @param attr - the Attribute object
-	 * @return the id of the new Attribute record added
-	 */
-	// TODO: we need to remove this method. It's used only for test purpose.
-	@Deprecated
-	Integer addAttribute(Attribute attr);
 
 	/**
 	 * Given a list of Attribute objects, add new records for the given parameter.
@@ -455,10 +384,6 @@ public interface GermplasmDataManager {
 	 * @return Attribute value that matches with variableId and gid
 	 */
 	String getAttributeValue(Integer gid, Integer variableId);
-
-	// TODO: we need to remove this method. It's used only for test purpose.
-	@Deprecated
-	void save(Germplasm germplasm);
 
 	Germplasm getUnknownGermplasmWithPreferredName();
 
