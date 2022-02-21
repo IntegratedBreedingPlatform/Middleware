@@ -21,7 +21,7 @@
 				<columnExists tableName="methods" columnName="program_uuid_bkp"/>
         </preConditions>
 		<comment>
-			Delete 'program_uuid_bkp' column of 'location' table
+			Delete 'program_uuid_bkp' column of 'methods' table
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE methods DROP COLUMN program_uuid_bkp;
