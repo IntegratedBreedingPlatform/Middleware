@@ -80,6 +80,8 @@ public class GermplasmSearchRequest extends SearchRequestDto {
 	private Boolean inProgramListOnly;
 	private Map<String, String> attributes;
 	private Map<String, String> nameTypes;
+	private SqlTextFilter externalReferenceSource;
+	private SqlTextFilter externalReferenceId;
 
 	// Include associated gids
 
@@ -356,6 +358,22 @@ public class GermplasmSearchRequest extends SearchRequestDto {
 
 	public void setAddedColumnsPropertyIds(final List<String> addedColumnsPropertyIds) {
 		this.addedColumnsPropertyIds = addedColumnsPropertyIds;
+	}
+
+	public SqlTextFilter getExternalReferenceSource() {
+		return this.externalReferenceSource;
+	}
+
+	public void setExternalReferenceSource(final SqlTextFilter externalReferenceSource) {
+		this.externalReferenceSource = externalReferenceSource;
+	}
+
+	public SqlTextFilter getExternalReferenceId() {
+		return this.externalReferenceId;
+	}
+
+	public void setExternalReferenceId(final SqlTextFilter externalReferenceId) {
+		this.externalReferenceId = externalReferenceId;
 	}
 
 	@Override
