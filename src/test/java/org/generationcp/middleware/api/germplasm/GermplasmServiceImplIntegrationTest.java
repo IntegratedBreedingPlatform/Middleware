@@ -2764,15 +2764,15 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		studyEntryDto.setDesignation("DESIGNATION" + i);
 
 		studyEntryDto.getProperties()
-			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), "CROSS" + i));
+			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), "CROSS" + i, null));
 		studyEntryDto.getProperties()
 			.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(),
-				String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
+				null, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()));
 		studyEntryDto.getProperties()
 			.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(),
-				"SEED_SOURCE" + i));
+				"SEED_SOURCE" + i, null));
 		studyEntryDto.getProperties()
-			.put(TermId.ENTRY_CODE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_CODE.getId(), "ENTRY_CODE" + gid));
+			.put(TermId.ENTRY_CODE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_CODE.getId(), "ENTRY_CODE" + gid, null));
 
 		return studyEntryDto;
 	}

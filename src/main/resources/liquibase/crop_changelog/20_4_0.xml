@@ -106,8 +106,65 @@
 		</sql>
 	</changeSet>
 
-	<!-- TODO: add column stock_prop.cvalue_id. This columns will has the value of a categorical entry type.
-			Also, we need to migrate the values of stockprop.value which corresponds to a categorical value. I.e: all values of the type_id = 8255
-	-->
+	<changeSet author="lkovacic" id="v20.4.0-8">
+		<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8255 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+				</sqlCheck>
+		</preConditions>
+		<comment>Change 'ENTRY_TYPE' variable type to entry detail</comment>
+		<sql dbms="mysql" splitStatements="true">
+				 UPDATE cvtermprop SET value = 'Entry Detail' WHERE cvterm_id = 8255 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v20.4.0-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8255 AND type_id = 1804;
+			</sqlCheck>
+		</preConditions>
+		<comment>Change 'ENTRY_TYPE' variable type to entry detail in 'projectprop' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+				 UPDATE projectprop SET type_id = 1815 WHERE variable_id = 8255 AND type_id = 1804;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v20.4.0-10">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="stockprop" columnName="cvalue_id"/>
+			</not>
+		</preConditions>
+		<comment>Add column 'cvalue_id' to 'stockprop' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE stockprop ADD cvalue_id INT NULL;
+
+			ALTER TABLE stockprop
+			  ADD CONSTRAINT stockprop_cvterm_cvterm_id_fk FOREIGN KEY (cvalue_id)
+			  REFERENCES cvterm (cvterm_id);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v20.4.0-11">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="stockprop" columnName="cvalue_id"/>
+		</preConditions>
+		<comment>Migrate categorical variable values to 'cvalue_id' column</comment>
+		<sql dbms="mysql" splitStatements="true">
+			<!-- TODO: review this query -->
+			UPDATE stockprop
+				SET cvalue_id = value, value = NULL
+				WHERE type_id IN (SELECT inn.typeid
+								   FROM (SELECT DISTINCT( sp.type_id ) AS typeId
+										   FROM stockprop sp
+												  INNER JOIN cvterm_relationship cr
+														  ON sp.type_id = cr.subject_id
+															 AND cr.type_id = 1220
+												  INNER JOIN cvterm_relationship cr2
+														  ON cr.object_id = cr2.subject_id
+															 AND cr2.type_id = 1190) AS inn);
+		</sql>
+	</changeSet>
 
 </databaseChangeLog>

@@ -198,8 +198,10 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final Optional<StockProperty> entryType =
 			stock.getProperties().stream().filter(prop -> variableId.equals(prop.getTypeId())).findFirst();
 		entryType.ifPresent(stockProperty -> {
+			// TODO: Fix value/categoricalValueId
+			final Integer categoricalValueId = null;
 				studyEntryDto.getProperties().put(variableId,
-					new StudyEntryPropertyData(null, stockProperty.getTypeId(), value.isPresent() ? value.get() : stockProperty.getValue()));
+					new StudyEntryPropertyData(null, stockProperty.getTypeId(), value.isPresent() ? value.get() : stockProperty.getValue(), categoricalValueId));
 			}
 		);
 	}

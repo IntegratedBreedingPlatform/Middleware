@@ -156,7 +156,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final Variable variable = builder.createGermplasmFactor(stockModel, variableType);
 
 		Assert.assertNotNull(variable);
-		Assert.assertEquals(stockModel.getProperties().iterator().next().getValue(), variable.getValue());
+		Assert.assertEquals(stockModel.getProperties().iterator().next().getCategoricalValueId().toString(), variable.getValue());
 	}
 
 	@Test
@@ -176,7 +176,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final StockModel stockModel = this.createStockModel();
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setStock(stockModel);
-		final Map<Integer, StockModel> stockMap = new HashMap<Integer, StockModel>();
+		final Map<Integer, StockModel> stockMap = new HashMap<>();
 		stockMap.put(stockModel.getStockId(), stockModel);
 		final VariableTypeList variableTypes = new VariableTypeList();
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_NO));
@@ -184,25 +184,25 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		variableTypes.add(this.createDMSVariableType(TermId.DESIG));
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_CODE));
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_TYPE));
-		
+
 		final VariableList factors = new VariableList();
 		builder.addGermplasmFactors(factors, experimentModel, variableTypes, stockMap);
 		final List<Variable> variables = factors.getVariables();
-		Assert.assertEquals(5, variables.size());
+		Assert.assertEquals(4, variables.size());
 		final Iterator<Variable> iterator = variables.iterator();
 		verifyFactorVariable(iterator.next(), TermId.ENTRY_NO.getId(), stockModel.getUniqueName());
 		verifyFactorVariable(iterator.next(), TermId.GID.getId(), String.valueOf(stockModel.getGermplasm().getGid()));
 		verifyFactorVariable(iterator.next(), TermId.DESIG.getId(), stockModel.getName());
-//		TODO: assert that entry code now is property
-//		verifyFactorVariable(iterator.next(), TermId.ENTRY_CODE.getId(), stockModel.getValue());
-		verifyFactorVariable(iterator.next(), TermId.ENTRY_TYPE.getId(), stockModel.getProperties().iterator().next().getValue());
+		// TODO: assert that entry code now is property
+//		verifyFactorVariable(iterator.next(), TermId.ENTRY_CODE.getId(), stockModel.getProperties().iterator().next().getValue());
+		verifyFactorVariable(iterator.next(), TermId.ENTRY_TYPE.getId(), String.valueOf(stockModel.getProperties().iterator().next().getCategoricalValueId()));
 	}
 	
 	@Test
 	public void testAddGermplasmFactors_NoStock() {
 		final StockModel stockModel = this.createStockModel();
 		final ExperimentModel experimentModel = new ExperimentModel();
-		final Map<Integer, StockModel> stockMap = new HashMap<Integer, StockModel>();
+		final Map<Integer, StockModel> stockMap = new HashMap<>();
 		stockMap.put(stockModel.getStockId(), stockModel);
 		final VariableTypeList variableTypes = new VariableTypeList();
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_NO));
@@ -217,6 +217,11 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 	}
 	
 	private void verifyFactorVariable(final Variable variable, final int id, final String value) {
+		Assert.assertEquals(id, variable.getVariableType().getId());
+		Assert.assertEquals(value, variable.getValue());
+	}
+
+	private void verifyEntryDetailVariable(final Variable variable, final int id, final String value) {
 		Assert.assertEquals(id, variable.getVariableType().getId());
 		Assert.assertEquals(value, variable.getValue());
 	}
@@ -238,10 +243,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		stockModel.setName(RandomStringUtils.randomAlphanumeric(20));
 
 		final Set<StockProperty> stockProperties = new HashSet<>();
-		final StockProperty stockProperty = new StockProperty();
-		stockProperty.setStock(stockModel);
-		stockProperty.setValue(RandomStringUtils.randomAlphanumeric(20));
-		stockProperty.setTypeId(TermId.ENTRY_TYPE.getId());
+		final StockProperty stockProperty = new StockProperty(stockModel, TermId.ENTRY_TYPE.getId(), null, new Random().nextInt(Integer.MAX_VALUE));
 		stockProperties.add(stockProperty);
 
 		stockModel.setProperties(stockProperties);

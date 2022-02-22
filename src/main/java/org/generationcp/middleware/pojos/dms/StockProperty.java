@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.pojos.dms;
 
+import com.google.common.base.Preconditions;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -56,13 +58,20 @@ public class StockProperty implements Serializable {
 	@Column(name = "value")
 	private String value;
 
-	public StockProperty() {
+	@Column(name = "cvalue_id")
+	private Integer categoricalValueId;
+
+	private StockProperty() {
 
 	}
 
-	public StockProperty (final Integer variableId, final String value) {
+	public StockProperty (final StockModel stockModel, final Integer variableId, final String value, final Integer categoricalValueId) {
+		Preconditions.checkArgument(!(value == null && categoricalValueId == null), "stock property not have set a value nor a categorical value");
+
+		this.setStock(stockModel);
 		this.setTypeId(variableId);
 		this.setValue(value);
+		this.setCategoricalValueId(categoricalValueId);
 	}
 
 	public Integer getStockPropId() {
@@ -97,6 +106,22 @@ public class StockProperty implements Serializable {
 		this.value = value;
 	}
 
+	public Integer getCategoricalValueId() {
+		return categoricalValueId;
+	}
+
+	public void setCategoricalValueId(final Integer categoricalValueId) {
+		this.categoricalValueId = categoricalValueId;
+	}
+
+	// TODO: review property name
+	public String getPropertyValue() {
+		if (this.value == null) {
+			return String.valueOf(this.categoricalValueId);
+		}
+		return this.value;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -105,6 +130,7 @@ public class StockProperty implements Serializable {
 		result = prime * result + (this.stockPropId == null ? 0 : this.stockPropId.hashCode());
 		result = prime * result + (this.typeId == null ? 0 : this.typeId.hashCode());
 		result = prime * result + (this.value == null ? 0 : this.value.hashCode());
+		result = prime * result + (this.categoricalValueId == null ? 0 : this.categoricalValueId.hashCode());
 		return result;
 	}
 
@@ -146,6 +172,13 @@ public class StockProperty implements Serializable {
 				return false;
 			}
 		} else if (!this.value.equals(other.value)) {
+			return false;
+		}
+		if (this.categoricalValueId == null) {
+			if (other.categoricalValueId != null) {
+				return false;
+			}
+		} else if (!this.categoricalValueId.equals(other.categoricalValueId)) {
 			return false;
 		}
 		return true;

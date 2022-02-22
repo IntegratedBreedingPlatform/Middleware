@@ -62,10 +62,7 @@ public class StockBuilderTest {
 		stockModel.setName(RandomStringUtils.randomAlphanumeric(20));
 
 		final Set<StockProperty> stockProperties = new HashSet<>();
-		final StockProperty stockProperty = new StockProperty();
-		stockProperty.setStock(stockModel);
-		stockProperty.setValue(RandomStringUtils.randomAlphanumeric(20));
-		stockProperty.setTypeId(TermId.ENTRY_TYPE.getId());
+		final StockProperty stockProperty = new StockProperty(stockModel, TermId.ENTRY_TYPE.getId(), null, new Random().nextInt(Integer.MAX_VALUE));
 		stockProperties.add(stockProperty);
 
 		stockModel.setProperties(stockProperties);

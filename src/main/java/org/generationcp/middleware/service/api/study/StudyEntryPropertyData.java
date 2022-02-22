@@ -13,6 +13,7 @@ public class StudyEntryPropertyData implements Serializable {
 	private Integer studyEntryPropertyId;
 	private Integer variableId;
 	private String value;
+	private Integer categoricalValueId;
 
 	public StudyEntryPropertyData() {
 	}
@@ -21,10 +22,12 @@ public class StudyEntryPropertyData implements Serializable {
 		this.value = value;
 	}
 
-	public StudyEntryPropertyData(final Integer studyEntryPropertyId, final Integer variableId, final String value) {
+	public StudyEntryPropertyData(final Integer studyEntryPropertyId, final Integer variableId, final String value,
+		final Integer categoricalValueId) {
 		this.studyEntryPropertyId = studyEntryPropertyId;
 		this.variableId = variableId;
 		this.value = value;
+		this.categoricalValueId = categoricalValueId;
 	}
 
 	public Integer getStudyEntryPropertyId() {
@@ -49,6 +52,22 @@ public class StudyEntryPropertyData implements Serializable {
 
 	public void setVariableId(final Integer variableId) {
 		this.variableId = variableId;
+	}
+
+	public Integer getCategoricalValueId() {
+		return categoricalValueId;
+	}
+
+	public void setCategoricalValueId(final Integer categoricalValueId) {
+		this.categoricalValueId = categoricalValueId;
+	}
+
+	// TODO: review this method name
+	public String getPropertyValue() {
+		if (this.value == null) {
+			return String.valueOf(this.categoricalValueId);
+		}
+		return this.value;
 	}
 
 	@Override

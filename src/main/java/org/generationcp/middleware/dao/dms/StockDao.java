@@ -18,6 +18,7 @@ import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
@@ -39,6 +40,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.type.IntegerType;
+import org.hibernate.type.ObjectType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -533,17 +535,16 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "  FROM ims_transaction imt INNER JOIN ims_lot lo ON lo.lotid = imt.lotid WHERE lo.eid = l.eid),0), 'Mixed') AS availableBalance, "
 				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, IFNULL(c.name,'-'), 'Mixed') AS unit ");
 
-			final String entryClause = ",MAX(IF(cvterm_variable.name = '%s', sp.value, NULL)) AS '%s',"
-				+ " MAX(IF(cvterm_variable.name = '%s', sp.stockprop_id, NULL)) AS '%s',"
-				+ " MAX(IF(cvterm_variable.name = '%s', sp.type_id, NULL)) AS '%s' ,"
-				+ " MAX(IF(cvterm_variable.name = '%s', sp.value, NULL)) AS '%s' ";
+			final String entryClause = ",MAX(IF(cvterm_variable.name = '%1$s', sp.value, NULL)) AS '%1$s',"
+				+ " MAX(IF(cvterm_variable.name = '%1$s', sp.stockprop_id, NULL)) AS '%1$s_PropertyId',"
+				+ " MAX(IF(cvterm_variable.name = '%1$s', sp.type_id, NULL)) AS '%1$s_variableId' ,"
+				+ " MAX(IF(cvterm_variable.name = '%1$s', sp.%2$s, NULL)) AS '%1$s_value' ";
 
 			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
 				final String entryName = entryDescriptor.getName();
-				sqlQuery.append(String.format(entryClause, entryName, entryName, entryName, entryName + "_PropertyId",
-					entryName, entryName + "_variableId",
-					entryName, entryName + "_value"
-				));
+				final String valueColumnReference =
+					(entryDescriptor.getDataType().equals(DataType.CATEGORICAL_VARIABLE.getName())) ? "cvalue_id" : "value";
+				sqlQuery.append(String.format(entryClause, entryName, valueColumnReference));
 			}
 
 			sqlQuery.append(" FROM stock s "
@@ -571,7 +572,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				final String entryName = entryDescriptor.getName();
 				query.addScalar(entryName + "_propertyId", new IntegerType());
 				query.addScalar(entryName + "_variableId", new IntegerType());
-				query.addScalar(entryName + "_value", new StringType());
+				query.addScalar(entryName + "_value", new ObjectType());
 			}
 
 			query.setParameter("studyId", studyEntrySearchDto.getStudyId());
@@ -595,10 +596,21 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					new StudyEntryDto(entryId, entryNumber, gid, designation, lotCount, availableBalance, unit);
 				final Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 				for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
+					final String value;
+					final Integer categoricalValueId;
+					if (entryDescriptor.getDataType().equals(DataType.CATEGORICAL_VARIABLE.getName())) {
+						value = null;
+						categoricalValueId = (Integer) row.get(entryDescriptor.getName() + "_value");
+					} else {
+						value = (String) row.get(entryDescriptor.getName() + "_value");
+						categoricalValueId = null;
+					}
+
 					final StudyEntryPropertyData studyEntryPropertyData =
 						new StudyEntryPropertyData((Integer) row.get(entryDescriptor.getName() + "_propertyId"),
 							(Integer) row.get(entryDescriptor.getName() + "_variableId"),
-							(String) row.get(entryDescriptor.getName() + "_value"));
+							value,
+							categoricalValueId);
 					properties.put(entryDescriptor.getTermId(), studyEntryPropertyData);
 				}
 				//These elements should not be listed as germplasm descriptors, this is a way to match values between column

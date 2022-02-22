@@ -330,10 +330,7 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 		experiment.setStock(getStock());
 		this.experimentDao.save(experiment);
 		
-		final StockProperty prop = new StockProperty();
-		prop.setStock(getStock());
-		prop.setTypeId(this.variable.getCvTermId());
-		prop.setValue(String.valueOf(this.categories.get(3).getCvTermId()));
+		final StockProperty prop = new StockProperty(this.getStock(), this.variable.getCvTermId(), String.valueOf(this.categories.get(3).getCvTermId()), null);
 		this.stockPropDao.save(prop);
 
 	}

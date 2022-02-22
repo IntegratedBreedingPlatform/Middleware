@@ -411,9 +411,6 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		germplasm.setGermplasmUUID(germplasmDTO.getGermplasmDbId());
 		stockModel.setGermplasm(germplasm);
 
-		final Set<StockProperty> properties = new HashSet<>();
-		final StockProperty stockProperty = new StockProperty();
-		stockProperty.setStock(stockModel);
 		Integer entryType = entryTypes.get(dto.getObservationUnitPosition().getEntryType().toUpperCase());
 		if (entryType == null) {
 			if (!entryTypesMap.containsKey(dto.getProgramDbId())) {
@@ -423,8 +420,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			}
 			entryType = entryTypesMap.get(dto.getProgramDbId()).get(dto.getObservationUnitPosition().getEntryType().toUpperCase());
 		}
-		stockProperty.setValue(entryType.toString());
-		stockProperty.setTypeId(TermId.ENTRY_TYPE.getId());
+
+		final StockProperty stockProperty = new StockProperty(stockModel, TermId.ENTRY_TYPE.getId(), null, entryType);
+		final Set<StockProperty> properties = new HashSet<>();
 		properties.add(stockProperty);
 		stockModel.setProperties(properties);
 		this.daoFactory.getStockDao().save(stockModel);
@@ -479,4 +477,5 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			}
 		}
 	}
+
 }

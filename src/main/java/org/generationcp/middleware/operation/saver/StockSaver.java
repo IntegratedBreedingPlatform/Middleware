@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -128,17 +129,22 @@ public class StockSaver extends Saver {
 
 	private void addProperty(final StockModel stockModel, final StockProperty property) {
 		if (stockModel.getProperties() == null) {
-			stockModel.setProperties(new HashSet<StockProperty>());
+			stockModel.setProperties(new HashSet<>());
 		}
 		property.setStock(stockModel);
 		stockModel.getProperties().add(property);
 	}
 
 	private StockProperty createProperty(final Variable variable) {
-		final StockProperty property = new StockProperty();
-		property.setTypeId(variable.getVariableType().getId());
-		property.setValue(variable.getValue());
-
-		return property;
+		final String value;
+		final Integer categoricalValueId;
+		if (variable.getVariableType().getStandardVariable().getDataType().getName().equals(DataType.CATEGORICAL_VARIABLE.getName())) {
+			value = null;
+			categoricalValueId = Integer.valueOf(variable.getValue());
+		} else {
+			value = variable.getValue();
+			categoricalValueId = null;
+		}
+		return new StockProperty(null, variable.getVariableType().getId(), value, categoricalValueId);
 	}
 }

@@ -74,6 +74,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -473,12 +474,12 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		stockModel.setGermplasm(germplasm);
 		stockModel.setProject(study);
 		int i=1;
+		final Set<StockProperty> properties = new HashSet<>();
 		for (final MeasurementVariable measurementVariable: this.germplasmDescriptors) {
-			final StockProperty stockProperty = new StockProperty();
-			stockProperty.setValue(String.valueOf(i));
-			stockProperty.setTypeId(measurementVariable.getTermId());
-			stockProperty.setStock(stockModel);
+			final StockProperty stockProperty = new StockProperty(stockModel, measurementVariable.getTermId(), String.valueOf(i), null);
+			properties.add(stockProperty);
 		}
+		stockModel.setProperties(properties);
 		this.stockDao.saveOrUpdate(stockModel);
 		this.testStocks.add(stockModel);
 		return stockModel;

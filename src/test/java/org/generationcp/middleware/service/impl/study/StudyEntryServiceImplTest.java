@@ -254,16 +254,16 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 		studyEntryDto.setDesignation(StudyEntryServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + i);
 
 		studyEntryDto.getProperties()
-			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), StudyEntryServiceImplTest.CROSS + i));
+			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), StudyEntryServiceImplTest.CROSS + i, null));
 		studyEntryDto.getProperties()
 			.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(),
-				String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
+				null, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()));
 		studyEntryDto.getProperties()
 			.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(),
-				StudyEntryServiceImplTest.SEEDSOURCE + i));
+				StudyEntryServiceImplTest.SEEDSOURCE + i, null));
 		studyEntryDto.getProperties()
 			.put(TermId.ENTRY_CODE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_CODE.getId(),
-				String.valueOf(StudyEntryServiceImplTest.ENTRYCODE + gid)));
+				StudyEntryServiceImplTest.ENTRYCODE + gid, null));
 
 
 		return studyEntryDto;
