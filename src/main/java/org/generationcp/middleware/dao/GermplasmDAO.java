@@ -1353,11 +1353,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public long countGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto) {
 		final StringBuilder queryBuilder =
 			new StringBuilder(" select count(1) from germplsm g ");
-
-		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs())) {
-			queryBuilder.append(" left join (select p.gid, p.nval from names p INNER JOIN udflds u ");
-			queryBuilder.append(" ON u.fldno = p.ntype AND u.ftable = 'NAMES' and u.ftype='NAME' and u.fcode = 'PUI' and p.nstat <> 9) pui on pui.gid = g.gid ");
-		}
+		// If PUIS or other names were specified, pre-filter the GIDs matching by these names first to optimize performance
+		this.prefilterGidsByNamesMatch(germplasmMatchRequestDto);
 
 		this.addGermplasmMatchesFilter(new SqlQueryParamBuilder(queryBuilder), germplasmMatchRequestDto);
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
@@ -1368,6 +1365,27 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final String message = "Error with countGermplasmMatches " + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	private void prefilterGidsByNamesMatch(final GermplasmMatchRequestDto germplasmMatchRequestDto) {
+		final Set<Integer> matchedGids = new HashSet<>();
+		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs())) {
+			final List<Integer> gids = this.getSession().createSQLQuery("select p.gid from names p " //
+				+ "   INNER JOIN udflds u ON u.fldno = p.ntype AND u.ftable = 'NAMES' and u.ftype='NAME' and u.fcode = 'PUI' and p.nstat <> 9 " //
+				+ " where p.nval IN (:puiList) " ) //
+				.setParameterList("puiList", germplasmMatchRequestDto.getGermplasmPUIs()) //
+				.list();
+			matchedGids.addAll(gids);
+		}
+		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getNames())) {
+			final List<Integer> gids = this.getSession().createSQLQuery("select gid from names n where n.nval in (:nameList) and n.nstat <> 9")
+				.setParameterList("nameList", germplasmMatchRequestDto.getNames()) //
+				.list();
+			matchedGids.addAll(gids);
+		}
+		if (!CollectionUtils.isEmpty(matchedGids)) {
+			germplasmMatchRequestDto.getGids().addAll(matchedGids);
 		}
 	}
 
@@ -1383,6 +1401,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public List<GermplasmDto> findGermplasmMatches(final GermplasmMatchRequestDto germplasmMatchRequestDto, final Pageable pageable) {
 		final StringBuilder queryBuilder =
 			new StringBuilder(FIND_GERMPLASM_MATCHES_MAIN_QUERY);
+		// If PUIS or other names were specified, pre-filter the GIDs matching by these names first to optimize performance
+		this.prefilterGidsByNamesMatch(germplasmMatchRequestDto);
 		this.addGermplasmMatchesFilter(new SqlQueryParamBuilder(queryBuilder), germplasmMatchRequestDto);
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
 		this.addScalarsToFindGermplasmMatchesQuery(sqlQuery);
@@ -1406,38 +1426,18 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	private void addGermplasmMatchesFilter(final SqlQueryParamBuilder sqlQueryParamBuilder,
 		final GermplasmMatchRequestDto germplasmMatchRequestDto) {
 		sqlQueryParamBuilder.append(" where g.deleted = 0 AND g.grplce = 0");
-		sqlQueryParamBuilder.append(" and ( ");
-
-		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs())) {
-			sqlQueryParamBuilder.append(" pui.nval in (:puiList) ");
-			sqlQueryParamBuilder.setParameterList("puiList", germplasmMatchRequestDto.getGermplasmPUIs());
-		}
-
-		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getNames())) {
-			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs())) {
-				sqlQueryParamBuilder.append(" or ");
-			}
-
-			sqlQueryParamBuilder.append(" g.gid in (select gid from names n where n.nval in (:nameList) and n.nstat <> 9) ");
-			sqlQueryParamBuilder.setParameterList("nameList", germplasmMatchRequestDto.getNames());
-		}
+		sqlQueryParamBuilder.append(" and ( 1 = 1 ");
 
 		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmUUIDs())) {
-			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs()) ||
-				!CollectionUtils.isEmpty(germplasmMatchRequestDto.getNames())) {
-				sqlQueryParamBuilder.append(" or ");
-			}
 
-			sqlQueryParamBuilder.append(" g.germplsm_uuid in (:guidList) ");
+			sqlQueryParamBuilder.append(" AND g.germplsm_uuid in (:guidList) ");
 			sqlQueryParamBuilder.setParameterList("guidList", germplasmMatchRequestDto.getGermplasmUUIDs());
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGids())) {
-			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs()) ||
-				!CollectionUtils.isEmpty(germplasmMatchRequestDto.getNames()) ||
-				!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmUUIDs())) {
-				sqlQueryParamBuilder.append(" or ");
-			}
+			// If GUUID filter specified beforehand, use "OR" operator to get union of matches
+			final String operator = !CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmUUIDs())? " or " : " and ";
+			sqlQueryParamBuilder.append(operator);
 
 			sqlQueryParamBuilder.append(" g.gid in (:gidList) ");
 			sqlQueryParamBuilder.setParameterList("gidList", germplasmMatchRequestDto.getGids());

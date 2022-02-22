@@ -1,5 +1,6 @@
 package org.generationcp.middleware.domain.germplasm.importation;
 
+import com.google.common.collect.Lists;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 import org.springframework.util.CollectionUtils;
@@ -9,13 +10,13 @@ import java.util.List;
 @AutoProperty
 public class GermplasmMatchRequestDto {
 
-	private List<String> germplasmPUIs;
+	private List<String> germplasmPUIs = Lists.newArrayList();
 
-	private List<String> germplasmUUIDs;
+	private List<String> germplasmUUIDs = Lists.newArrayList();
 
-	private List<String> names;
+	private List<String> names = Lists.newArrayList();
 
-	private List<Integer> gids;
+	private List<Integer> gids = Lists.newArrayList();
 
 	public List<String> getGermplasmPUIs() {
 		return this.germplasmPUIs;
@@ -34,7 +35,7 @@ public class GermplasmMatchRequestDto {
 	}
 
 	public List<String> getGermplasmUUIDs() {
-		return germplasmUUIDs;
+		return this.germplasmUUIDs;
 	}
 
 	public void setGermplasmUUIDs(final List<String> germplasmUUIDs) {
