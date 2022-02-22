@@ -19,6 +19,7 @@ public class CopServiceImplTest extends IntegrationTestBase {
 	private Germplasm Q2;
 	private Germplasm E0;
 	private Germplasm F0;
+	private Germplasm E0F0;
 	private Germplasm B1;
 	private Germplasm A0;
 	private Germplasm A0B1;
@@ -43,6 +44,9 @@ public class CopServiceImplTest extends IntegrationTestBase {
 		this.createPedigree();
 	}
 
+	/**
+	 * @see CopCalculation
+	 */
 	@Test
 	public void testCoefficientOfParentage_BaseCase() {
 		// TODO refactor, use api with list of gids params
@@ -61,7 +65,8 @@ public class CopServiceImplTest extends IntegrationTestBase {
 	private void createPedigree() {
 		this.E0 = createGermplasm("E0", 0, 0, 0);
 		this.F0 = createGermplasm("F0", 0, 0, 0);
-		this.B1 = createGermplasm("B1", -1, E0.getGid(), 0);
+		this.E0F0 = createGermplasm("E0F0", 2, E0.getGid(), F0.getGid());
+		this.B1 = createGermplasm("B1", -1, E0F0.getGid(), 0);
 		this.A0 = createGermplasm("A0", 0, 0, 0);
 		this.A0B1 = createGermplasm("A0B1", 2, A0.getGid(), B1.getGid());
 		this.Z2P1 = createGermplasm("Z2P1", -1, A0B1.getGid(), A0B1.getGid());
@@ -78,6 +83,40 @@ public class CopServiceImplTest extends IntegrationTestBase {
 		this.P3P1 = createGermplasm("P3P1", -1, B1R2.getGid(), P3P2.getGid());
 		this.P3 = createGermplasm("P3", -1, B1R2.getGid(), P3P1.getGid());
 	}
+
+	@Test
+	public void testCoefficientOfParentage_SameParents() {
+		final Germplasm p1 = this.createGermplasm("P1", 0, 0, 0);
+		final Germplasm p2 = this.createGermplasm("P2", 0, 0, 0);
+		final Germplasm c1 = this.createGermplasm("C1", 2, p1.getGid(), p2.getGid());
+		final Germplasm c2 = this.createGermplasm("C2", 2, p1.getGid(), p2.getGid());
+
+		assertThat(this.copService.coefficientOfParentage(c1.getGid(), c2.getGid()), is(1/4d));
+
+	}
+
+	@Test
+	public void testCoefficientOfParentage_CrossWithParent() {
+		final Germplasm p1 = this.createGermplasm("P1", 0, 0, 0);
+		final Germplasm p2 = this.createGermplasm("P2", 0, 0, 0);
+		final Germplasm c1 = this.createGermplasm("C1", 2, p1.getGid(), p2.getGid());
+
+		assertThat(this.copService.coefficientOfParentage(c1.getGid(), p1.getGid()), is(1/4d));
+	}
+
+	@Test
+	public void testCoefficientOfParentage_CrossWithGrandParents() {
+		final Germplasm p1 = this.createGermplasm("P1", 0, 0, 0);
+		final Germplasm p2 = this.createGermplasm("P2", 0, 0, 0);
+		final Germplasm p3 = this.createGermplasm("P3", 0, 0, 0);
+		final Germplasm p4 = this.createGermplasm("P4", 0, 0, 0);
+		final Germplasm c1 = this.createGermplasm("C1", 2, p1.getGid(), p2.getGid());
+		final Germplasm c2 = this.createGermplasm("C2", 2, p3.getGid(), p4.getGid());
+		final Germplasm d1 = this.createGermplasm("D1", 2, c1.getGid(), c2.getGid());
+
+		assertThat(this.copService.coefficientOfParentage(d1.getGid(), p1.getGid()), is(1/8d));
+	}
+
 
 	private Germplasm createGermplasm(final String name, final int gnpgs, final int gpid1, final int gpid2) {
 		final Name preferredName = new Name();

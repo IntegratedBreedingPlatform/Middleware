@@ -35,6 +35,8 @@ public class CopServiceImpl implements CopService {
 		final GermplasmTreeNode gid1Tree = this.germplasmPedigreeService.getGermplasmPedigreeTree(gid1, null, true);
 		final GermplasmTreeNode gid2Tree = this.germplasmPedigreeService.getGermplasmPedigreeTree(gid2, null, true);
 		final CopCalculation copCalculation = new CopCalculation();
+		copCalculation.populateOrder(gid1Tree, 0);
+		copCalculation.populateOrder(gid2Tree, 0);
 		return copCalculation.coefficientOfParentage(gid1Tree, gid2Tree);
 	}
 
@@ -43,6 +45,7 @@ public class CopServiceImpl implements CopService {
 	public double coefficientOfInbreeding(final int gid) {
 		final GermplasmTreeNode gidTree = this.germplasmPedigreeService.getGermplasmPedigreeTree(gid, null, true);
 		final CopCalculation copCalculation = new CopCalculation();
+		copCalculation.populateOrder(gidTree, 0);
 		return copCalculation.coefficientOfInbreeding(gidTree);
 	}
 

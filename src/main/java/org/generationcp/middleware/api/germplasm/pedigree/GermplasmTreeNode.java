@@ -26,6 +26,11 @@ public class GermplasmTreeNode {
 
 	private Integer numberOfGenerations;
 
+	/**
+	 * in COP: the largest number of generative steps from the current ancestor to a terminal ancestor via any of its progenitors
+	 */
+	private Integer order = 0;
+
 	private List<GermplasmTreeNode> otherProgenitors = new ArrayList<>();
 
 	public GermplasmTreeNode(final Integer gid, final String preferredName, final Integer numberOfProgenitors, final String methodName, final String methodCode) {
@@ -115,6 +120,14 @@ public class GermplasmTreeNode {
 
 	public void setNumberOfGenerations(final Integer numberOfGenerations) {
 		this.numberOfGenerations = numberOfGenerations;
+	}
+
+	public Integer getOrder() {
+		return order;
+	}
+
+	public void setOrder(final Integer order) {
+		this.order = order;
 	}
 
 	@Override

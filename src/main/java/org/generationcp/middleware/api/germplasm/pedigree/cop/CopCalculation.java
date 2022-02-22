@@ -5,8 +5,6 @@ import com.google.common.collect.Table;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
 import java.util.HashMap;
@@ -16,6 +14,7 @@ import java.util.Optional;
 import static java.time.Duration.between;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.time.DurationFormatUtils.formatDurationHMS;
 import static org.generationcp.middleware.util.Debug.debug;
 import static org.generationcp.middleware.util.Debug.info;
@@ -73,7 +72,7 @@ public class CopCalculation {
 
 	public CopCalculation() {
 		this.sparseMatrix = HashBasedTable.create();
-		this.btype = BTypeEnum.OTHER;
+		this.btype = BTypeEnum.CROSS_FERTILIZING;
 	}
 
 	public CopCalculation(final Table<Integer, Integer, Double> sparseMatrix, final int bType) {
@@ -106,45 +105,84 @@ public class CopCalculation {
 			debug("cop found: (gid1=%s-gid2=%s) = %s", g1.getGid(), g2.getGid(), cop);
 			return cop;
 		}
+		if (this.sparseMatrix.contains(g2.getGid(), g1.getGid())) {
+			final Double cop = this.sparseMatrix.get(g2.getGid(), g1.getGid());
+			debug("cop found: (gid2=%s-gid1=%s) = %s", g2.getGid(), g1.getGid(), cop);
+			return cop;
+		}
 		info("calculating cop (gid1=%s-gid2=%s)", g1.getGid(), g2.getGid());
 		final Instant start = Instant.now();
 
 		double cop = COP_DEFAULT;
 
-		final Optional<GermplasmTreeNode> commonDerivativeAncestor = this.getCommonDerivativeAncestor(g1, g2);
+		/*
+		 * Case: coefficient of inbreeding
+		 */
 
 		if (g1.getGid().equals(g2.getGid())) {
 			// Equation 3
 			cop = (1 + this.coefficientOfInbreeding(g1)) / 2.0;
-		} else if (commonDerivativeAncestor.isPresent()) {
-			final GermplasmTreeNode g = commonDerivativeAncestor.get();
-			cop = this.coefficientOfParentage(g, g);
-		} else if (this.hasUnknownParents(g1) || this.hasUnknownParents(g2)) {
-			cop = COP_DEFAULT;
-		} else {
-			/*
-			 * from paper:
-			 *  "..Although it is symmetrical in P and Q so that the parents of either could be used to obtain the right hand expansion.."
-			 *  ..expanding the strain with the highest order .. ensures that when the terminal ancestors are reached,
-			 *  the computations involve COP values between the same strain, or unrelated strains or crosses between unrelated strains,
-			 *  all of which are easily calculated"
-			 */
-			final Pair<GermplasmTreeNode, GermplasmTreeNode> byOrder = this.sortByOrder(g1, g2);
-			final GermplasmTreeNode highOrder = byOrder.getLeft();
-			final GermplasmTreeNode lowOrder = byOrder.getRight();
-
-			// TODO other progenitors: (1/m) ∑ fPQi
-			//  https://github.com/IntegratedBreedingPlatform/AWSApps/blob/80756ceae4ccf6d330d8c9a8e9f02dcedeaffa50/COP/ibp_smart-module-lambda-import-master/sm-lambda-import/cop_src/cop/algorithm_v2.py#L43
-			final Optional<Pair<GermplasmTreeNode, GermplasmTreeNode>> parents = this.getCrossParents(highOrder);
-			if (parents.isPresent()) {
-				final GermplasmTreeNode fp = parents.get().getLeft();
-				final GermplasmTreeNode mp = parents.get().getRight();
-				// Equation 1
-				cop = (this.coefficientOfParentage(fp, lowOrder) + this.coefficientOfParentage(mp, lowOrder)) / 2.0;
-			}
-
+			return this.finish(g1, g2, start, cop);
 		}
 
+		/*
+		 * Case: For strains which are sister lines derived from the same group,
+		 * the effect of inbreeding depends on the inbreeding coefficient of the most recent common ancestor
+		 */
+
+		final Optional<GermplasmTreeNode> commonDerivativeAncestor = this.getCommonDerivativeAncestor(g1, g2);
+
+		if (commonDerivativeAncestor.isPresent()) {
+			final GermplasmTreeNode g = commonDerivativeAncestor.get();
+			// ends up in coefficientOfInbreeding(), plus common validations of coefficientOfParentage()
+			cop = this.coefficientOfParentage(g, g);
+			return this.finish(g1, g2, start, cop);
+		}
+
+		/*
+		 * Below here, only generative steps are considered
+		 */
+
+		final Optional<GermplasmTreeNode> g01 = this.getGroupSource(g1);
+		final Optional<GermplasmTreeNode> g02 = this.getGroupSource(g2);
+
+		if (!g01.isPresent() || !g02.isPresent()) {
+			cop = COP_DEFAULT;
+			return this.finish(g1, g2, start, cop);
+		}
+
+		if (this.hasUnknownCrossParents(g01.get()) && this.hasUnknownCrossParents(g02.get())) {
+			cop = COP_DEFAULT;
+			return this.finish(g1, g2, start, cop);
+		}
+
+		/*
+		 * Case: the basic relationship between COP values for strains in one generation and those in a previous one
+		 *
+		 *  "..Although it is symmetrical in P and Q so that the parents of either could be used to obtain the right hand expansion.."
+		 *  ..expanding the strain with the highest order .. ensures that when the terminal ancestors are reached,
+		 *  the computations involve COP values between the same strain, or unrelated strains or crosses between unrelated strains,
+		 *  all of which are easily calculated"
+		 */
+		final Pair<GermplasmTreeNode, GermplasmTreeNode> byOrder = this.sortByOrder(g1, g2, g01.get(), g02.get());
+		final GermplasmTreeNode highOrder = byOrder.getLeft();
+		final GermplasmTreeNode lowOrder = byOrder.getRight();
+
+		// TODO other progenitors: (1/m) ∑ fPQi
+		//  https://github.com/IntegratedBreedingPlatform/AWSApps/blob/80756ceae4ccf6d330d8c9a8e9f02dcedeaffa50/COP/ibp_smart-module-lambda-import-master/sm-lambda-import/cop_src/cop/algorithm_v2.py#L43
+		final Optional<Pair<GermplasmTreeNode, GermplasmTreeNode>> parents = this.getCrossParents(highOrder);
+		if (parents.isPresent()) {
+			final GermplasmTreeNode fp = parents.get().getLeft();
+			final GermplasmTreeNode mp = parents.get().getRight();
+
+			// Equation 1
+			cop = (this.coefficientOfParentage(fp, lowOrder) + this.coefficientOfParentage(mp, lowOrder)) / 2.0;
+		}
+
+		return this.finish(g1, g2, start, cop);
+	}
+
+	private double finish(final GermplasmTreeNode g1, final GermplasmTreeNode g2, final Instant start, final double cop) {
 		final Instant end = Instant.now();
 		info("calculated cop (gid1=%s-gid2=%s) = %s, Duration: %s", g1.getGid(), g2.getGid(), cop,
 			formatDurationHMS(between(start, end).toMillis()));
@@ -159,12 +197,14 @@ public class CopCalculation {
 	 * @param g
 	 */
 	public double coefficientOfInbreeding(final GermplasmTreeNode g) {
-		if (this.isBTypeScenario(g)) {
+		final Optional<GermplasmTreeNode> g0 = this.getGroupSource(g);
+
+		if (this.isBTypeScenario(g, g0)) {
 			return this.getBType(g);
 		}
 
-		final double fg = !isUnknown(g.getFemaleParentNode()) && !isUnknown(g.getMaleParentNode())
-			? this.coefficientOfParentage(g.getFemaleParentNode(), g.getMaleParentNode())
+		final double fg = g0.isPresent() && !isUnknown(g0.get().getFemaleParentNode()) && !isUnknown(g0.get().getMaleParentNode())
+			? this.coefficientOfParentage(g0.get().getFemaleParentNode(), g0.get().getMaleParentNode())
 			: COP_DEFAULT;
 
 		/*
@@ -179,20 +219,76 @@ public class CopCalculation {
 		return 1 - ((1 - fg) / Math.pow(2.0, this.countInbreedingGenerations(g)));
 	}
 
+	/**
+	 * The largest number of generative steps from the current ancestor to a terminal ancestor via any of its progenitors
+	 * <pre>
+	 * TODO
+	 *  "Ancestors produced by derivative or maintenance methods have the same order as their group strains."
+	 *  only node and group source set for now (they're the only ones used in {@link #sortByOrder}
+	 * </pre>
+	 * @param node
+	 * @return max order of parent subtree + 1
+	 */
+	public int populateOrder(final GermplasmTreeNode node, final int orderParam) {
+		final Optional<GermplasmTreeNode> groupSource = this.getGroupSource(node);
+		if (!groupSource.isPresent()) {
+			return orderParam;
+		}
+		int order = orderParam;
+		order = Math.max(
+			populateOrder(groupSource.get().getFemaleParentNode(), order),
+			populateOrder(groupSource.get().getMaleParentNode(), order)
+		);
+		order = Math.max(order, groupSource.get().getOrder());
+		node.setOrder(order);
+		groupSource.get().setOrder(order);
+		return order + 1;
+	}
+
 	private double getBType(final GermplasmTreeNode g) {
 		// TODO get btype from method?
 		return this.btype.getValue();
 	}
 
-	private boolean isBTypeScenario(final GermplasmTreeNode g) {
-		// TODO complete
-		//  "if Z traces back to a single progenitor, such as a mutant strain"
+	/**
+	 * "BTYPE to implement some assumptions in the case of incomplete pedigree records.
+	 * The user should set BTYPE = 1 for self-pollinating species and 0 otherwise.
+	 * If the progenitors of a strain are unknown, then FZ is set to BTYPE.
+	 * This occurs most frequently when Z is derived from a landrace or traditional cultivar
+	 * and corresponds to an assumption of full inbreeding for self-pollinating crops and no inbreeding for others.
+	 * Similarly, if Z traces back to a single progenitor, such as a mutant strain, then FZ = BTYPE."
+	 *
+	 * @param g
+	 * @param g0 group source
+	 * @return
+	 */
+	private boolean isBTypeScenario(final GermplasmTreeNode g, final Optional<GermplasmTreeNode> g0) {
+		if (!g0.isPresent()) {
+			return true;
+		}
+
+		final GermplasmTreeNode source = g0.get();
+
+		/*
+		 * TODO verify
+		 * "if Z traces back to a single progenitor, such as a mutant strain"
+		 * According to Graham: "refers to gpid1 >0 gpid2 = 0 and gnpgs = 1. with method for mutation"
+		 */
+		if (source.getNumberOfProgenitors() == 1 && !isUnknown(source.getFemaleParentNode()) && isUnknown(source.getMaleParentNode())) {
+			return true;
+		}
 
 		/*
 		 * "If the progenitors of a strain are unknown"
+		 */
+		if (isUnknown(source.getFemaleParentNode()) && isUnknown(source.getMaleParentNode())) {
+			return true;
+		}
+
+		/*
 		 * if only male parent (immediate source) is unknown => handle later by UNKNOWN_INBREEDING_GENERATIONS
 		 */
-		return this.isDerivative(g) && isUnknown(g.getFemaleParentNode()) && (isUnknown(g.getMaleParentNode()));
+		return false;
 	}
 
 	private int countInbreedingGenerations(final GermplasmTreeNode g) {
@@ -209,14 +305,32 @@ public class CopCalculation {
 			count++;
 			source = source.getMaleParentNode();
 		}
+		/*
+		 * TODO verify case with (some) known generations. E.g:
+		 *  A
+		 *  |
+		 *  UNKNOWN
+		 *  |
+		 *  B
+		 *  |
+		 *  C
+		 *  |
+		 *  D
+		 */
+		if (this.isDerivative(source)) {
+			return UNKNOWN_INBREEDING_GENERATIONS;
+		}
+
 		return count;
 	}
 
 	/**
 	 * Search in both pedigrees until it find a common ancestor or if one is ancestor of the other.
-	 *
+	 * <pre>
 	 * TODO
 	 *  - unit test separately
+	 *  - improve perf
+	 * </pre>
 	 */
 	private Optional<GermplasmTreeNode> getCommonDerivativeAncestor(final GermplasmTreeNode g1, final GermplasmTreeNode g2) {
 		if (g1.getGid().equals(g2.getGid()) || this.isGenerative(g1) || this.isGenerative(g2)) {
@@ -253,7 +367,7 @@ public class CopCalculation {
 	}
 
 	private Optional<Pair<GermplasmTreeNode, GermplasmTreeNode>> getCrossParents(final GermplasmTreeNode g) {
-		if (this.hasUnknownParents(g)) {
+		if (this.hasUnknownCrossParents(g)) {
 			return empty();
 		}
 		if (this.isGenerative(g)) {
@@ -276,6 +390,47 @@ public class CopCalculation {
 		return empty();
 	}
 
+	/**
+	 * CopCalculation processes full pedigrees (with derivative lines)
+	 * This method gets the group source (child of a cross) if the the line is derivative
+	 */
+	private Optional<GermplasmTreeNode> getGroupSource(final GermplasmTreeNode g) {
+		final GermplasmTreeNode g0;
+		if (isDerivative(g)) {
+			final GermplasmTreeNode groupSource = g.getFemaleParentNode();
+			GermplasmTreeNode source = g.getMaleParentNode();
+			if (!isUnknown(groupSource)) {
+				g0 = groupSource;
+			} else if (!isUnknown(source)) {
+				while (isDerivative(source) && !isUnknown(source.getMaleParentNode())) {
+					source = source.getMaleParentNode();
+				}
+				if (isGenerative(source)) {
+					g0 = source;
+				} else if (isDerivative(source) && !isUnknown(source.getFemaleParentNode())) {
+					/*
+					 * Case: UNKNOWN source (break in the records) but group source is known.
+					 * E.g:
+					 *   A   B
+					 *     C
+					 *     |
+					 *  UNKNOWN
+					 *     |
+					 *     D
+					 */
+					g0 = source.getFemaleParentNode();
+				} else {
+					return empty();
+				}
+			} else {
+				return empty();
+			}
+		} else {
+			g0 = g;
+		}
+		return ofNullable(g0);
+	}
+
 	private boolean isGenerative(final GermplasmTreeNode g) {
 		return g != null && g.getNumberOfProgenitors() != null && g.getNumberOfProgenitors() > 0;
 	}
@@ -285,22 +440,46 @@ public class CopCalculation {
 	}
 
 	private boolean hasUnknownParents(final GermplasmTreeNode g) {
-		return this.isGenerative(g) && (isUnknown(g.getMaleParentNode()) || isUnknown(g.getFemaleParentNode()));
+		return isUnknown(g.getMaleParentNode()) || isUnknown(g.getFemaleParentNode());
+	}
+
+	private boolean hasUnknownCrossParents(final GermplasmTreeNode g) {
+		return this.isGenerative(g) && this.hasUnknownParents(g);
 	}
 
 	private static boolean isUnknown(final GermplasmTreeNode node) {
 		return node == null || node.getGid() == UNKNOWN_GID;
 	}
 
-	private Pair<GermplasmTreeNode, GermplasmTreeNode> sortByOrder(final GermplasmTreeNode g1, final GermplasmTreeNode g2) {
-		final Optional<Integer> g1Order = Optional.ofNullable(g1.getNumberOfGenerations());
-		final Optional<Integer> g2Order = Optional.ofNullable(g2.getNumberOfGenerations());
+	/**
+	 * TODO explain g0
+	 *
+	 * @param g1
+	 * @param g2
+	 * @param g01 the group source of g1
+	 * @param g02 the group source of g2
+	 * @return Pair of (highest order, lowest order)
+	 */
+	private Pair<GermplasmTreeNode, GermplasmTreeNode> sortByOrder(
+		final GermplasmTreeNode g1,
+		final GermplasmTreeNode g2,
+		final GermplasmTreeNode g01,
+		final GermplasmTreeNode g02
+	) {
+
+		if (this.hasUnknownParents(g02)) {
+			return Pair.of(g01, g2);
+		} else if (this.hasUnknownParents(g01)) {
+			return Pair.of(g02, g1);
+		}
+		final Optional<Integer> g1Order = Optional.ofNullable(g01.getOrder());
+		final Optional<Integer> g2Order = Optional.ofNullable(g02.getOrder());
 		if (!g2Order.isPresent()) {
-			return Pair.of(g1, g2);
+			return Pair.of(g01, g2);
 		} else if (!g1Order.isPresent()) {
-			return Pair.of(g2, g1);
+			return Pair.of(g02, g1);
 		}
 
-		return g1Order.get() > g2Order.get() ? Pair.of(g1, g2) : Pair.of(g2, g1);
+		return g1Order.get() > g2Order.get() ? Pair.of(g01, g2) : Pair.of(g02, g1);
 	}
 }

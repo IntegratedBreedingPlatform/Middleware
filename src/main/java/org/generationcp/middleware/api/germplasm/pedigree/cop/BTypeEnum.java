@@ -1,8 +1,14 @@
 package org.generationcp.middleware.api.germplasm.pedigree.cop;
 
 enum BTypeEnum {
-	SELF_POLINATING(1),
-	OTHER(0);
+	/**
+	 * homozygous, Fully inbreed, self pollinating
+	 */
+	SELF_FERTILIZING(1),
+	/**
+	 * heterozygous, No inbreeding
+	 */
+	CROSS_FERTILIZING(0);
 
 	private final double value;
 
