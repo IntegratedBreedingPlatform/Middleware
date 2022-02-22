@@ -8,16 +8,20 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.google.common.collect.Lists.newArrayList;
 import static java.time.Duration.between;
+import static java.util.Collections.emptyList;
 import static java.util.Optional.empty;
 import static java.util.Optional.of;
 import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.time.DurationFormatUtils.formatDurationHMS;
 import static org.generationcp.middleware.util.Debug.debug;
 import static org.generationcp.middleware.util.Debug.info;
+import static org.springframework.util.CollectionUtils.isEmpty;
 
 /**
  * Coefficient of parentage (f): calculation utilities.
@@ -168,15 +172,13 @@ public class CopCalculation {
 		final GermplasmTreeNode highOrder = byOrder.getLeft();
 		final GermplasmTreeNode lowOrder = byOrder.getRight();
 
-		// TODO other progenitors: (1/m) ∑ fPQi
-		//  https://github.com/IntegratedBreedingPlatform/AWSApps/blob/80756ceae4ccf6d330d8c9a8e9f02dcedeaffa50/COP/ibp_smart-module-lambda-import-master/sm-lambda-import/cop_src/cop/algorithm_v2.py#L43
-		final Optional<Pair<GermplasmTreeNode, GermplasmTreeNode>> parents = this.getCrossParents(highOrder);
-		if (parents.isPresent()) {
-			final GermplasmTreeNode fp = parents.get().getLeft();
-			final GermplasmTreeNode mp = parents.get().getRight();
-
-			// Equation 1
-			cop = (this.coefficientOfParentage(fp, lowOrder) + this.coefficientOfParentage(mp, lowOrder)) / 2.0;
+		final List<GermplasmTreeNode> parents = this.getCrossParents(highOrder);
+		if (!isEmpty(parents)) {
+			// Equation 1 for multiple parents: (1/m) ∑ fPQi
+			for (final GermplasmTreeNode parent : parents) {
+				cop += this.coefficientOfParentage(parent, lowOrder);
+			}
+			cop /= parents.size();
 		}
 
 		return this.finish(g1, g2, start, cop);
@@ -239,6 +241,12 @@ public class CopCalculation {
 			populateOrder(groupSource.get().getFemaleParentNode(), order),
 			populateOrder(groupSource.get().getMaleParentNode(), order)
 		);
+		final List<GermplasmTreeNode> otherProgenitors = groupSource.get().getOtherProgenitors();
+		if (!isEmpty(otherProgenitors)) {
+			for (final GermplasmTreeNode otherProgenitor : otherProgenitors) {
+				order = Math.max(order, populateOrder(otherProgenitor, order));
+			}
+		}
 		order = Math.max(order, groupSource.get().getOrder());
 		node.setOrder(order);
 		groupSource.get().setOrder(order);
@@ -366,33 +374,29 @@ public class CopCalculation {
 		return empty();
 	}
 
-	private Optional<Pair<GermplasmTreeNode, GermplasmTreeNode>> getCrossParents(final GermplasmTreeNode g) {
+	/**
+	 *
+	 * @param g a group source
+	 * @return
+	 */
+	private List<GermplasmTreeNode> getCrossParents(final GermplasmTreeNode g) {
 		if (this.hasUnknownCrossParents(g)) {
-			return empty();
+			return emptyList();
 		}
 		if (this.isGenerative(g)) {
-			return of(Pair.of(g.getFemaleParentNode(), g.getMaleParentNode()));
-		}
-		final GermplasmTreeNode groupSource = g.getFemaleParentNode();
-		// source, aka immediate parent
-		GermplasmTreeNode source = g.getMaleParentNode();
-		if (!isUnknown(groupSource)) {
-			return of(Pair.of(groupSource.getFemaleParentNode(), groupSource.getMaleParentNode()));
-		} else if (!isUnknown(source)) {
-			while (!isUnknown(source)) {
-				if (this.isGenerative(source) && !isUnknown(source.getMaleParentNode()) && !isUnknown(source.getFemaleParentNode())) {
-					return of(Pair.of(source.getFemaleParentNode(), source.getMaleParentNode()));
-				} else {
-					source = source.getMaleParentNode();
-				}
+			final List<GermplasmTreeNode> nodes = newArrayList(g.getFemaleParentNode(), g.getMaleParentNode());
+			if (!isEmpty(g.getOtherProgenitors())) {
+				nodes.addAll(g.getOtherProgenitors());
 			}
+			return nodes;
 		}
-		return empty();
+		return emptyList();
 	}
 
 	/**
 	 * CopCalculation processes full pedigrees (with derivative lines)
-	 * This method gets the group source (child of a cross) if the the line is derivative
+	 * This method gets the group source (child of a cross) if the the line is derivative,
+	 * or the latest known ancestor.
 	 */
 	private Optional<GermplasmTreeNode> getGroupSource(final GermplasmTreeNode g) {
 		final GermplasmTreeNode g0;
@@ -405,9 +409,7 @@ public class CopCalculation {
 				while (isDerivative(source) && !isUnknown(source.getMaleParentNode())) {
 					source = source.getMaleParentNode();
 				}
-				if (isGenerative(source)) {
-					g0 = source;
-				} else if (isDerivative(source) && !isUnknown(source.getFemaleParentNode())) {
+				if (isDerivative(source) && !isUnknown(source.getFemaleParentNode())) {
 					/*
 					 * Case: UNKNOWN source (break in the records) but group source is known.
 					 * E.g:
@@ -420,7 +422,11 @@ public class CopCalculation {
 					 */
 					g0 = source.getFemaleParentNode();
 				} else {
-					return empty();
+					/*
+					 * either we found the child of a cross,
+					 * or there are no more ancestors to traverse.
+					 */
+					g0 = source;
 				}
 			} else {
 				return empty();
@@ -452,13 +458,12 @@ public class CopCalculation {
 	}
 
 	/**
-	 * TODO explain g0
 	 *
 	 * @param g1
 	 * @param g2
 	 * @param g01 the group source of g1
 	 * @param g02 the group source of g2
-	 * @return Pair of (highest order, lowest order)
+	 * @return Pair of (highest order, lowest order). The highest order is always the group source
 	 */
 	private Pair<GermplasmTreeNode, GermplasmTreeNode> sortByOrder(
 		final GermplasmTreeNode g1,
