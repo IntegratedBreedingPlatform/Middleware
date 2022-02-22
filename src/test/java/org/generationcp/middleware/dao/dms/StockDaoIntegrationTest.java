@@ -196,44 +196,6 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStockIdsByProperty_UsingDbxrefId() {
-		final StockModel testStock = this.testStocks.get(0);
-		final Integer gid = testStock.getGermplasm().getGid();
-		final List<Integer> stockIds = this.stockDao.getStockIdsByProperty(StockDao.DBXREF_ID, gid.toString());
-		Assert.assertNotNull(stockIds);
-		Assert.assertEquals(testStock.getStockId(), stockIds.get(0));
-	}
-
-	@Test
-	public void testGetStockIdsByProperty_UsingUniqueName() {
-		final StockModel testStock = this.testStocks.get(0);
-		final List<Integer> stockIds = this.stockDao.getStockIdsByProperty("uniqueName", testStock.getUniqueName());
-		Assert.assertNotNull(stockIds);
-		Assert.assertEquals(testStock.getStockId(), stockIds.get(0));
-	}
-
-	@Test
-	public void testGetStockIdsByProperty_UsingName() {
-		final StockModel testStock = this.testStocks.get(0);
-		final List<Integer> stockIds = this.stockDao.getStockIdsByProperty("name", testStock.getName());
-		Assert.assertNotNull(stockIds);
-		Assert.assertEquals(testStock.getStockId(), stockIds.get(0));
-	}
-
-	@Test
-	public void testGetStocksByIds() {
-		final List<Integer> ids = new ArrayList<>();
-		for (final StockModel stock : this.testStocks){
-			ids.add(stock.getStockId());
-		}
-		final Map<Integer, StockModel> stocksMap = this.stockDao.getStocksByIds(ids);
-		Assert.assertEquals(TEST_COUNT, stocksMap.size());
-		for (final StockModel stock : this.testStocks){
-			Assert.assertEquals(stock, stocksMap.get(stock.getStockId()));
-		}
-	}
-
-	@Test
 	public void testCountStocks() {
 		final CVTerm variateTerm = createVariate();
 		for (final ExperimentModel experiment : experiments) {

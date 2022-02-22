@@ -40,7 +40,6 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.type.IntegerType;
-import org.hibernate.type.ObjectType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,30 +80,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			+ "                       left join cvterm c1 ON c1.cvterm_id = l1.scaleid where s1.dbxref_id = s.dbxref_id group by l1.eid"
 			+ "             having unit1");
 	}};
-
-	static final String DBXREF_ID = "dbxrefId";
-
-	@SuppressWarnings("unchecked")
-	public List<Integer> getStockIdsByProperty(final String columnName, final String value) {
-		final List<Integer> stockIds;
-		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			if (DBXREF_ID.equals(columnName)) {
-				criteria.add(Restrictions.eq("germplasm.gid", Integer.valueOf(value)));
-			} else {
-				criteria.add(Restrictions.eq(columnName, value));
-			}
-			criteria.setProjection(Projections.property("stockId"));
-
-			stockIds = criteria.list();
-
-		} catch (final HibernateException e) {
-			final String errorMessage = "Error in getStockIdsByProperty=" + value + StockDao.IN_STOCK_DAO + e.getMessage();
-			LOG.error(errorMessage, e);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-		return stockIds;
-	}
 
 	public long countStudiesByGids(final List<Integer> gids) {
 
@@ -366,27 +341,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<Integer, StockModel> getStocksByIds(final List<Integer> ids) {
-		final Map<Integer, StockModel> stockModels = new HashMap<>();
-		try {
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.in("stockId", ids));
-			final List<StockModel> stocks = criteria.list();
-
-			for (final StockModel stock : stocks) {
-				stockModels.put(stock.getStockId(), stock);
-			}
-
-		} catch (final HibernateException e) {
-			final String errorMessage = "Error in getStocksByIds=" + ids + StockDao.IN_STOCK_DAO + e.getMessage();
-			LOG.error(errorMessage, e);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-
-		return stockModels;
 	}
 
 	@SuppressWarnings("unchecked")
