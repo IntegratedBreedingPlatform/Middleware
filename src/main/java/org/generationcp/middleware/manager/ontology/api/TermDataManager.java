@@ -15,6 +15,7 @@ package org.generationcp.middleware.manager.ontology.api;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermRelationship;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 
 import java.util.List;
 import java.util.Set;
@@ -30,6 +31,8 @@ public interface TermDataManager {
 	 * Returns term by id
 	 */
 	Term getTermById(Integer termId);
+
+	List<Term> getTermByIds(List<Integer> termIds) throws MiddlewareException;
 
 	/**
 	 * Returns term by name and cvId

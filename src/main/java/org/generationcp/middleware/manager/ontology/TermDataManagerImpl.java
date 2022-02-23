@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Transactional
 public class TermDataManagerImpl extends DataManager implements TermDataManager {
@@ -36,6 +37,11 @@ public class TermDataManagerImpl extends DataManager implements TermDataManager 
 	@Override
 	public Term getTermById(final Integer termId) throws MiddlewareException {
 		return Term.fromCVTerm(daoFactory.getCvTermDao().getById(termId));
+	}
+
+	@Override
+	public List<Term> getTermByIds(final List<Integer> termIds) throws MiddlewareException {
+		return daoFactory.getCvTermDao().getByIds(termIds).stream().map(Term::fromCVTerm).collect(Collectors.toList());
 	}
 
 	@Override

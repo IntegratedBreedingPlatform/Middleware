@@ -37,18 +37,18 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 	}
 
 	@Override
-	public List<Variable> createAnalysisVariables(final List<Integer> variableIds, final List<String> analysisNames,
+	public List<Integer> createAnalysisVariables(final List<Integer> variableIds, final List<String> analysisNames,
 		final String variableType) {
 
 		final List<Integer> createdAnalysisVariables = new ArrayList<>();
 		final VariableFilter variableFilter = new VariableFilter();
 		variableIds.stream().forEach(variableFilter::addVariableId);
-		// Get the existing traits
+		// Get the existing trait variables
 		final Map<Integer, Variable> variablesMap = this.daoFactory.getCvTermDao().getVariablesWithFilterById(variableFilter);
-		// Create ontology methods for analysis names if not yet present
+		// Create ontology methods for analysis names if not yet present, will also return methods if already present
 		final Map<String, CVTerm> methodsMap = this.createOntologyMethodsIfNecessary(analysisNames);
-		// Check if the analysis variables of traits are already present
-		final MultiKeyMap existingVariableMethodsMap = this.daoFactory.getCvTermRelationshipDao()
+		// Check if the analysis variables associated to trait variables are already present
+		final MultiKeyMap existingAnalysisMethodsOfTraitsMap = this.daoFactory.getCvTermRelationshipDao()
 			.retrieveAnalysisMethodsOfTraits(variableIds, methodsMap.values().stream().map(CVTerm::getCvTermId).collect(
 				Collectors.toList()));
 
@@ -56,29 +56,38 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 		for (final Map.Entry<Integer, Variable> variableEntry : variablesMap.entrySet()) {
 			for (final String analysisName : analysisNames) {
 				final CVTerm method = methodsMap.get(analysisName);
-				if (existingVariableMethodsMap.containsKey(variableEntry.getKey(), method.getCvTermId())) {
-					createdAnalysisVariables.add((Integer) existingVariableMethodsMap.get(variableEntry.getKey(), method.getCvTermId()));
-				} else {
+				// If analysis variable already exists for specific trait, do not create new, just return the existing id of analysis variable
+				if (existingAnalysisMethodsOfTraitsMap.containsKey(variableEntry.getKey(), method.getCvTermId())) {
+					createdAnalysisVariables.add(
+						(Integer) existingAnalysisMethodsOfTraitsMap.get(variableEntry.getKey(), method.getCvTermId()));
+				} else { // else, create new analysis variable
 					createdAnalysisVariables.add(
 						this.createAnalysisStandardVariable(variableEntry.getValue(), method, variableType));
 				}
 			}
 		}
-
-		/** Return the analysis variables created as {@link Variable} **/
-		final VariableFilter analsysisVariableFilter = new VariableFilter();
-		createdAnalysisVariables.stream().forEach(analsysisVariableFilter::addVariableId);
-		return this.daoFactory.getCvTermDao().getVariablesWithFilterById(analsysisVariableFilter).values().stream()
-			.collect(Collectors.toList());
+		return createdAnalysisVariables;
 	}
 
 	private Integer createAnalysisStandardVariable(final Variable traitVariable, final CVTerm method, final String variableType) {
-		// Create traitVariable
+		String analysisVariableName = traitVariable.getName() + "_" + method.getName();
+
+		/** It's possible that the analysisVariableName to be saved is already used by other variables,
+		 * in that case append _1 to the name to make sure it's unique. This is the same logic found in
+		 * {@link org.generationcp.commons.service.impl.BreedingViewImportServiceImpl#createAnalysisVariable(org.generationcp.middleware.domain.dms.DMSVariableType, java.lang.String, org.generationcp.middleware.domain.oms.Term, java.lang.String, int, boolean)}
+		 **/
+		final CVTerm existingTerm = this.daoFactory.getCvTermDao().getByNameAndCvId(analysisVariableName, CvId.VARIABLES.getId());
+		if (existingTerm != null) {
+			analysisVariableName += "_1";
+		}
+
+		// Create analysis variable
 		final CVTerm cvTermVariable = this.daoFactory.getCvTermDao()
-			.save(traitVariable.getName() + "_" + method.getName(), traitVariable.getDefinition(), CvId.VARIABLES);
+			.save(analysisVariableName, traitVariable.getDefinition(), CvId.VARIABLES);
 		// Assign Property, Scale, Method
 		this.daoFactory.getCvTermRelationshipDao()
 			.save(cvTermVariable.getCvTermId(), TermId.HAS_PROPERTY.getId(), traitVariable.getProperty().getId());
+		// Assuming that the analyzed trait's scale is numeric
 		this.daoFactory.getCvTermRelationshipDao()
 			.save(cvTermVariable.getCvTermId(), TermId.HAS_SCALE.getId(), traitVariable.getScale().getId());
 		this.daoFactory.getCvTermRelationshipDao().save(cvTermVariable.getCvTermId(), TermId.HAS_METHOD.getId(), method.getCvTermId());
@@ -90,22 +99,24 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 		return cvTermVariable.getCvTermId();
 	}
 
-	private Map<String, CVTerm> createOntologyMethodsIfNecessary(final List<String> methodNames) {
+	private Map<String, CVTerm> createOntologyMethodsIfNecessary(final List<String> analysisNames) {
 
+		// Get the existing methods
 		final Map<String, CVTerm> methodsMap = new CaseInsensitiveMap();
-		this.daoFactory.getCvTermDao().getTermsByNameAndCvId(methodNames, CvId.METHODS.getId()).stream().forEach(method -> methodsMap.put(
+		this.daoFactory.getCvTermDao().getTermsByNameAndCvId(analysisNames, CvId.METHODS.getId()).stream().forEach(method -> methodsMap.put(
 			method.getName(), method));
 
-		for (final String methodName : methodNames) {
-			if (!methodsMap.containsKey(methodName)) {
+		for (final String analysisName : analysisNames) {
+			// Create analysis method if not yet present
+			if (!methodsMap.containsKey(analysisName)) {
 				final CVTerm newMethod = new CVTerm();
-				newMethod.setName(methodName);
-				newMethod.setDefinition(methodName + " - system generated method");
+				newMethod.setName(analysisName);
+				newMethod.setDefinition(analysisName + " - system generated method");
 				newMethod.setCv(CvId.METHODS.getId());
 				newMethod.setIsObsolete(false);
 				newMethod.setIsRelationshipType(false);
 				newMethod.setIsSystem(false);
-				methodsMap.putIfAbsent(methodName, this.daoFactory.getCvTermDao().save(newMethod));
+				methodsMap.putIfAbsent(analysisName, this.daoFactory.getCvTermDao().save(newMethod));
 			}
 		}
 		return methodsMap;
