@@ -1,4 +1,4 @@
-﻿<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
@@ -70,24 +70,6 @@
 			DELETE FROM permission WHERE workbench_sidebar_category_link_id = @oldGermplasmCategoryLinkId;
 
 			DELETE FROM workbench_tool WHERE name = 'bm_list_manager_main';
-		</sql>
-	</changeSet>
-	
-		<changeSet author="rowena" id="20.1.0-4">
-        <preConditions onFail="MARK_RAN">
-            <sqlCheck expectedResult="1">
-                SELECT COUNT(*) > 0
-				FROM germplsm g
-						 INNER JOIN location l1
-						 INNER JOIN location l2
-				WHERE g.glocn = l1.locid AND l1.locid > l2.locid AND l1.lname = l2.lname AND l1.ltype = l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid = l1.snl1id
-              </sqlCheck>
-        </preConditions>
-        <comment> check if there are germplasm using duplicate location_id. Replace the duplicates with the locid of the minimum location ID of the duplicate</comment>
-		<sql dbms="mysql" splitStatements="true">
-	      	UPDATE germplsm g INNER JOIN location l1 INNER JOIN location l2
-			SET glocn = l1.locid
-			WHERE g.glocn = l1.locid AND l1.locid &lt; l2.locid AND l1.lname = l2.lname AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
 		</sql>
 	</changeSet>
 
