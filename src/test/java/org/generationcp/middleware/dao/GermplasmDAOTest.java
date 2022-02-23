@@ -1265,6 +1265,32 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testCountGermplasmMatches_FilterByPUI_Names() {
+		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		final Germplasm germplasm3 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+
+		this.daoFactory.getGermplasmDao().save(germplasm1);
+		this.daoFactory.getGermplasmDao().save(germplasm2);
+		this.daoFactory.getGermplasmDao().save(germplasm3);
+
+		final UserDefinedField puiUserDefinedField = this.daoFactory.getUserDefinedFieldDAO()
+			.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), "PUI");
+		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, "PUI1", 0, 0, 0);
+		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, "PUI2", 0, 0, 0);
+		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, "PUI3", 0, 0, 0);
+
+		this.daoFactory.getNameDao().save(name1);
+		this.daoFactory.getNameDao().save(name2);
+		this.daoFactory.getNameDao().save(name3);
+
+		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
+		germplasmMatchRequestDto.setGermplasmPUIs(Collections.singletonList(name1.getNval()));
+		germplasmMatchRequestDto.setNames(Arrays.asList(name2.getNval(), name3.getNval()));
+		Assert.assertEquals(3l, this.daoFactory.getGermplasmDao().countGermplasmMatches(germplasmMatchRequestDto));
+	}
+
+	@Test
 	public void testCountGermplasmMatches_FilterByUUID() {
 		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
@@ -1308,10 +1334,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(name3);
 
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
-		germplasmMatchRequestDto.setGermplasmPUIs(Arrays.asList(name1.getNval(), name2.getNval(), name3.getNval()));
-		germplasmMatchRequestDto.setGermplasmUUIDs(
-			Arrays.asList(germplasm1.getGermplasmUUID(), germplasm2.getGermplasmUUID(), germplasm3.getGermplasmUUID()));
-		germplasmMatchRequestDto.setGids(Lists.newArrayList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
+		germplasmMatchRequestDto.setGermplasmPUIs(Collections.singletonList(name1.getNval()));
+		germplasmMatchRequestDto.setGermplasmUUIDs(Collections.singletonList(germplasm2.getGermplasmUUID()));
+		germplasmMatchRequestDto.setGids(Lists.newArrayList(germplasm3.getGid()));
 		Assert.assertEquals(3l, this.daoFactory.getGermplasmDao().countGermplasmMatches(germplasmMatchRequestDto));
 	}
 
@@ -1420,6 +1445,35 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testFindGermplasmMatches_FilterByPUI_Names() {
+		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		final Germplasm germplasm3 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+
+		this.daoFactory.getGermplasmDao().save(germplasm1);
+		this.daoFactory.getGermplasmDao().save(germplasm2);
+		this.daoFactory.getGermplasmDao().save(germplasm3);
+
+		final UserDefinedField puiUserDefinedField = this.daoFactory.getUserDefinedFieldDAO()
+			.getByTableTypeAndCode(UDTableType.NAMES_NAME.getTable(), UDTableType.NAMES_NAME.getType(), "PUI");
+		final Name name1 = new Name(null, germplasm1, puiUserDefinedField.getFldno(), 0, "PUI1", 0, 0, 0);
+		final Name name2 = new Name(null, germplasm2, puiUserDefinedField.getFldno(), 0, "PUI2", 0, 0, 0);
+		final Name name3 = new Name(null, germplasm3, puiUserDefinedField.getFldno(), 0, "PUI3", 0, 0, 0);
+
+		this.daoFactory.getNameDao().save(name1);
+		this.daoFactory.getNameDao().save(name2);
+		this.daoFactory.getNameDao().save(name3);
+
+		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
+		germplasmMatchRequestDto.setGermplasmPUIs(Collections.singletonList(name1.getNval()));
+		germplasmMatchRequestDto.setNames(Arrays.asList(name2.getNval(), name3.getNval()));
+		final List<GermplasmDto> germplasmMatches = this.daoFactory.getGermplasmDao().findGermplasmMatches(germplasmMatchRequestDto, null);
+		Assert.assertEquals(3, germplasmMatches.size());
+		Assert.assertTrue(germplasmMatches.stream().map(GermplasmDto::getGid).collect(Collectors.toList())
+			.containsAll(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid())));
+	}
+
+	@Test
 	public void testFindGermplasmMatches_FilterByUUID() {
 		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
@@ -1470,15 +1524,14 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.daoFactory.getNameDao().save(name3);
 
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
-		germplasmMatchRequestDto.setGermplasmPUIs(Arrays.asList(name1.getNval(), name2.getNval(), name3.getNval()));
-		germplasmMatchRequestDto.setGermplasmUUIDs(
-			Arrays.asList(germplasm1.getGermplasmUUID(), germplasm2.getGermplasmUUID(), germplasm3.getGermplasmUUID()));
-		final List<Integer> gids = Lists.newArrayList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid());
-		germplasmMatchRequestDto.setGids(gids);
+		germplasmMatchRequestDto.setGermplasmPUIs(Collections.singletonList(name1.getNval()));
+		germplasmMatchRequestDto.setGermplasmUUIDs(Collections.singletonList(germplasm2.getGermplasmUUID()));
+		germplasmMatchRequestDto.setGids(Lists.newArrayList(germplasm3.getGid()));
 
 		final List<GermplasmDto> germplasmMatches = this.daoFactory.getGermplasmDao().findGermplasmMatches(germplasmMatchRequestDto, null);
 		Assert.assertEquals(3, germplasmMatches.size());
-		Assert.assertTrue(germplasmMatches.stream().map(GermplasmDto::getGid).collect(Collectors.toList()).containsAll(gids));
+		Assert.assertTrue(germplasmMatches.stream().map(GermplasmDto::getGid).collect(Collectors.toList())
+			.containsAll(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid())));
 	}
 
 	private Name saveGermplasmName(final Integer germplasmGID, final String nameType) {
