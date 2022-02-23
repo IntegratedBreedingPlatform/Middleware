@@ -782,31 +782,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return 0;
 	}
 
-	public List<Integer> findMethodTermIdsByTrait(final Integer traitId) {
-		try {
-			// Standard variable has the combination of property-scale-method
-			final StringBuilder queryString = new StringBuilder();
-			queryString.append("SELECT DISTINCT cvrm.object_id ");
-			queryString.append("FROM cvterm_relationship cvr ");
-			queryString.append(
-				"INNER JOIN cvterm_relationship cvrp ON cvr.subject_id = cvrp.subject_id AND cvrp.type_id = 1200 ");
-			queryString.append(
-				"INNER JOIN cvterm_relationship cvrs ON cvr.subject_id = cvrs.subject_id AND cvrs.type_id = 1220 ");
-			queryString.append(
-				"INNER JOIN cvterm_relationship cvrm ON cvr.subject_id = cvrm.subject_id AND cvrm.type_id = 1210 ");
-			queryString.append("WHERE cvrp.object_id = :traitId");
-
-			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
-			query.setInteger("traitId", traitId);
-
-			return query.list();
-
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error at findMethodTermIdsByTrait :" + e.getMessage(), e);
-		}
-		return new ArrayList<>();
-	}
-
 	public List<Integer> findScaleTermIdsByTrait(final Integer traitId) {
 		try {
 			// Standard variable has the combination of property-scale-method

@@ -7,8 +7,6 @@ import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
-import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
@@ -19,9 +17,8 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -62,13 +59,7 @@ import static org.junit.Assert.assertThat;
 public class TransactionDAOTest extends IntegrationTestBase {
 
 	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
 	private GermplasmListManager germplasmListManager;
-
-	@Autowired
-	private InventoryDataManager inventoryDataManager;
 
 	@Autowired
 	private StudyDataManager studyDataManager;
@@ -82,8 +73,9 @@ public class TransactionDAOTest extends IntegrationTestBase {
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
+	private DaoFactory daoFactory;
+	private LotDAO lotDAO;
 	private TransactionDAO transactionDAO;
-	private GermplasmListDataDAO germplasmListDataDAO;
 	private ExperimentTransactionDAO experimentTransactionDAO;
 
 	private static final int LIST_ID = 1;
@@ -111,17 +103,14 @@ public class TransactionDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
-		this.transactionDAO = new TransactionDAO();
-		this.transactionDAO.setSession(this.sessionProvder.getSession());
-
-		this.germplasmListDataDAO = new GermplasmListDataDAO();
-		this.germplasmListDataDAO.setSession(this.sessionProvder.getSession());
-
-		this.experimentTransactionDAO = new ExperimentTransactionDAO();
-		this.experimentTransactionDAO.setSession(this.sessionProvder.getSession());
-
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+		this.lotDAO = daoFactory.getLotDao();
+		this.transactionDAO = daoFactory.getTransactionDAO();
+		this.experimentTransactionDAO = this.daoFactory.getExperimentTransactionDao();
 		this.germplasmListData = Lists.newArrayList();
-
+		if (this.germplasmTestDataGenerator == null) {
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+		}
 		this.inventoryDetailsTestDataInitializer = new InventoryDetailsTestDataInitializer();
 
 		this.dataSetupTest = new DataSetupTest();
@@ -138,11 +127,6 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		this.initLotsAndTransactions(this.germplasmListId);
 
 		this.userService = new UserServiceImpl(this.workbenchSessionProvider);
-
-		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, new NameDAO(this.sessionProvder
-					.getSession()));
-		}
 
 		if (this.studyId == null) {
 			this.createTestStudyWithObservationDataset();
@@ -171,7 +155,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		cropType.setUseUUID(false);
 		for (int i = 1; i <= noOfEntries; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(i);
-			final Integer gidAfterAdd = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
+			final Integer gidAfterAdd = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 			this.germplasmMap.put(gidAfterAdd, germplasm);
 		}
 	}
@@ -192,21 +176,17 @@ public class TransactionDAOTest extends IntegrationTestBase {
 				this.inventoryDetailsTestDataInitializer.createLots(new ArrayList<>(this.germplasmMap.keySet()), germplasmListId, UNIT_ID,
 						LOCATION_ID);
 
-		final List<Integer> lotIds = this.inventoryDataManager.addLots(lots);
-
-		lots.clear();
-
 		final Map<Integer, Integer> lotIdLrecIdMap = new HashMap<>();
 		final Map<Integer, Integer> gidLotIdMap = new HashMap<>();
 
+		lots.forEach( l -> {
+			this.lotDAO.save(l);
+			gidLotIdMap.put(l.getEntityId(), l.getId());
+		});
+
+		lots.clear();
+
 		this.germplasmListData = this.germplasmListManager.getGermplasmListDataByListId(germplasmListId);
-
-		for (final Integer lotId : lotIds) {
-			final Lot lot = this.inventoryDataManager.getLotById(lotId);
-			lots.add(lot);
-			gidLotIdMap.put(lot.getEntityId(), lotId);
-		}
-
 
 		for (final GermplasmListData listEntry : this.germplasmListData) {
 			final Integer gid = listEntry.getGermplasmId();
@@ -217,12 +197,10 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final List<Transaction> listTransaction =
 				this.inventoryDetailsTestDataInitializer.createReservedTransactions(lots, this.germplasmListId, lotIdLrecIdMap, STOCK_ID_PREFIX);
 
-		final List<Integer> transactionIds = this.inventoryDataManager.addTransactions(listTransaction);
-
-		for (final Integer transactionId : transactionIds) {
-			final Transaction transaction = this.inventoryDataManager.getTransactionById(transactionId);
-			this.listDataIdTransactionMap.put(transaction.getSourceRecordId(), transaction);
-		}
+		listTransaction.forEach(t -> {
+			this.transactionDAO.save(t);
+			this.listDataIdTransactionMap.put(t.getSourceRecordId(), t);
+		});
 
 	}
 
@@ -232,13 +210,13 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		cropType.setUseUUID(false);
 		final Germplasm germplasm =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 
 		final WorkbenchUser user = this.getUserService().getUserById(1);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments",
 			"InventoryId");
-		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
+		this.lotDAO.save(lot);
 
 		final String sDate1 = "01/01/2015";
 		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
@@ -257,10 +235,8 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		closedTransaction.setTransactionDate(date2);
 		closedTransaction.setUserId(user.getUserid());
 
-		final List<Transaction> transactionList = new ArrayList<>();
-		transactionList.add(depositTransaction);
-		transactionList.add(closedTransaction);
-		this.inventoryDataManager.addTransactions(transactionList);
+		this.transactionDAO.save(depositTransaction);
+		this.transactionDAO.save(closedTransaction);
 
 		final List<TransactionReportRow> transactionReportRows = this.transactionDAO.getTransactionDetailsForLot(lot.getId());
 
@@ -292,14 +268,14 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1,
 				1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 
 		final WorkbenchUser user = this.getUserService().getUserById(1);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1,
 			8264, 0, 1, "Comments", "ABC-1");
 
-		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
+		this.lotDAO.save(lot);
 
 		final String sDate1 = "01/01/2015";
 		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
@@ -318,11 +294,8 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		closedTransaction.setType(TransactionType.DISCARD.getId());
 		closedTransaction.setTransactionDate(date2);
 		closedTransaction.setUserId(user.getUserid());
-
-		final List<Transaction> transactionList = new ArrayList<>();
-		transactionList.add(depositTransaction);
-		transactionList.add(closedTransaction);
-		this.inventoryDataManager.addTransactions(transactionList);
+		this.transactionDAO.save(depositTransaction);
+		this.transactionDAO.save(closedTransaction);
 		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
 		transactionsSearchDto.setDesignation(germplasm.getPreferredName().getNval());
 		transactionsSearchDto.setGids(Lists.newArrayList(germplasmId));
@@ -366,14 +339,14 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1,
 						1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmDataManager.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 
 		final WorkbenchUser user = this.getUserService().getUserById(1);
 
 		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1,
 				TermId.SEED_AMOUNT_G.getId(), 0, 1, "Comments", "ABC-1");
 
-		this.inventoryDataManager.addLots(com.google.common.collect.Lists.newArrayList(lot));
+		this.lotDAO.save(lot);
 
 		final String sDate1 = "01/01/2015";
 		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
@@ -385,10 +358,7 @@ public class TransactionDAOTest extends IntegrationTestBase {
 		depositTransaction.setType(TransactionType.DEPOSIT.getId());
 		depositTransaction.setTransactionDate(date1);
 		depositTransaction.setUserId(user.getUserid());
-
-		final List<Transaction> transactionList = new ArrayList<>();
-		transactionList.add(depositTransaction);
-		this.inventoryDataManager.addTransactions(transactionList);
+		this.transactionDAO.save(depositTransaction);
 
 		final List<Experiment> experiments = this.studyDataManager.getExperiments(this.observationDatasetId, 0, 40);
 

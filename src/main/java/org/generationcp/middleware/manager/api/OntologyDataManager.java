@@ -26,7 +26,6 @@ import org.generationcp.middleware.domain.oms.TraitClass;
 import org.generationcp.middleware.domain.oms.TraitClassReference;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.dms.ProjectProperty;
 
 import java.util.List;
 import java.util.Map;
@@ -84,17 +83,6 @@ public interface OntologyDataManager {
 	 * @param stdVariable the std variable
 	 */
 	void addStandardVariable(StandardVariable stdVariable, String programUUID);
-
-	/**
-	 * Adds a new Method to the database. Creates a new cvterm entry in the local database. Returns a negative id.
-	 *
-	 * @param name       the name
-	 * @param definition the definition
-	 * @return the term
-	 */
-	// TODO: remove it. It's only used for test purpose
-	@Deprecated
-	Term addMethod(String name, String definition);
 
 	/**
 	 * Find method by id.
