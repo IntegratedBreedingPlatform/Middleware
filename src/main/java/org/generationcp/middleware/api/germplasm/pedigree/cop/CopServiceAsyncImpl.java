@@ -132,7 +132,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 						}
 
 						copCalculation.populateOrder(gid1Tree, 0);
-						copCalculation.populateOrder(gid1Tree, 0);
+						copCalculation.populateOrder(gid2Tree, 0);
 						final double cop = copCalculation.coefficientOfParentage(gid1Tree, gid2Tree);
 						matrixNew.put(gid1, gid2, cop);
 						matrix.put(gid1, gid2, cop);
