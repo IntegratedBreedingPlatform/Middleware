@@ -154,7 +154,7 @@
 		<sql dbms="mysql" splitStatements="true">
 			<!-- TODO: review this query -->
 			UPDATE stockprop
-				SET cvalue_id = value, value = NULL
+				SET cvalue_id = value, value = (SELECT name FROM cvterm WHERE cvterm_id = cvalue_id)
 				WHERE type_id IN (SELECT inn.typeid
 								   FROM (SELECT DISTINCT( sp.type_id ) AS typeId
 										   FROM stockprop sp
