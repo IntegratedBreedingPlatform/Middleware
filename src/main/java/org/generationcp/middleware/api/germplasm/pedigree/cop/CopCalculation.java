@@ -152,15 +152,10 @@ public class CopCalculation {
 		 * Below here, only generative steps are considered
 		 */
 
-		final Optional<GermplasmTreeNode> g01 = this.getGroupSource(g1);
-		final Optional<GermplasmTreeNode> g02 = this.getGroupSource(g2);
+		final GermplasmTreeNode g01 = this.getGroupSource(g1);
+		final GermplasmTreeNode g02 = this.getGroupSource(g2);
 
-		if (!g01.isPresent() || !g02.isPresent()) {
-			cop = COP_DEFAULT;
-			return this.finish(g1, g2, start, cop);
-		}
-
-		if (this.hasUnknownCrossParents(g01.get()) && this.hasUnknownCrossParents(g02.get())) {
+		if (this.hasUnknownCrossParents(g01) && this.hasUnknownCrossParents(g02)) {
 			cop = COP_DEFAULT;
 			return this.finish(g1, g2, start, cop);
 		}
@@ -173,7 +168,7 @@ public class CopCalculation {
 		 *  the computations involve COP values between the same strain, or unrelated strains or crosses between unrelated strains,
 		 *  all of which are easily calculated"
 		 */
-		final Pair<GermplasmTreeNode, GermplasmTreeNode> byOrder = this.sortByOrder(g1, g2, g01.get(), g02.get());
+		final Pair<GermplasmTreeNode, GermplasmTreeNode> byOrder = this.sortByOrder(g1, g2, g01, g02);
 		final GermplasmTreeNode highOrder = byOrder.getLeft();
 		final GermplasmTreeNode lowOrder = byOrder.getRight();
 
@@ -204,15 +199,18 @@ public class CopCalculation {
 	 * @param g
 	 */
 	public double coefficientOfInbreeding(final GermplasmTreeNode g) {
-		final Optional<GermplasmTreeNode> g0 = this.getGroupSource(g);
+		final GermplasmTreeNode g0 = this.getGroupSource(g);
 
 		if (this.isBTypeScenario(g, g0)) {
 		 	// FIXME BTYPE=2 produces COP > 1
 			return this.getBType(g);
 		}
 
-		final double fg = g0.isPresent() && !isUnknown(g0.get().getFemaleParentNode()) && !isUnknown(g0.get().getMaleParentNode())
-			? this.coefficientOfParentage(g0.get().getFemaleParentNode(), g0.get().getMaleParentNode())
+		/*
+		 * TODO implement COPZ
+		 */
+		final double fg = !isUnknown(g0.getFemaleParentNode()) && !isUnknown(g0.getMaleParentNode())
+			? this.coefficientOfParentage(g0.getFemaleParentNode(), g0.getMaleParentNode())
 			: COP_DEFAULT;
 
 		/*
@@ -238,29 +236,29 @@ public class CopCalculation {
 	 * @return max order of parent subtree + 1
 	 */
 	public int populateOrder(final GermplasmTreeNode node, final int orderParam) {
-		final Optional<GermplasmTreeNode> groupSource = this.getGroupSource(node);
-		if (!groupSource.isPresent()) {
+		if (isUnknown(node)) {
 			return orderParam;
 		}
+		final GermplasmTreeNode groupSource = this.getGroupSource(node);
 		int order = orderParam;
 		order = Math.max(
-			populateOrder(groupSource.get().getFemaleParentNode(), order),
-			populateOrder(groupSource.get().getMaleParentNode(), order)
+			populateOrder(groupSource.getFemaleParentNode(), order),
+			populateOrder(groupSource.getMaleParentNode(), order)
 		);
-		final List<GermplasmTreeNode> otherProgenitors = groupSource.get().getOtherProgenitors();
+		final List<GermplasmTreeNode> otherProgenitors = groupSource.getOtherProgenitors();
 		if (!isEmpty(otherProgenitors)) {
 			for (final GermplasmTreeNode otherProgenitor : otherProgenitors) {
 				order = Math.max(order, populateOrder(otherProgenitor, order));
 			}
 		}
-		order = Math.max(order, groupSource.get().getOrder());
+		order = Math.max(order, groupSource.getOrder());
 		node.setOrder(order);
-		groupSource.get().setOrder(order);
+		groupSource.setOrder(order);
 		return order + 1;
 	}
 
 	private double getBType(final GermplasmTreeNode g) {
-		// TODO get btype from method?
+		// TODO COPZ: get btype from method?
 		return this.btype.getValue();
 	}
 
@@ -272,30 +270,22 @@ public class CopCalculation {
 	 * and corresponds to an assumption of full inbreeding for self-pollinating crops and no inbreeding for others.
 	 * Similarly, if Z traces back to a single progenitor, such as a mutant strain, then FZ = BTYPE."
 	 *
-	 * @param g
-	 * @param g0 group source
-	 * @return
 	 */
-	private boolean isBTypeScenario(final GermplasmTreeNode g, final Optional<GermplasmTreeNode> g0) {
-		if (!g0.isPresent()) {
-			return true;
-		}
-
-		final GermplasmTreeNode source = g0.get();
-
+	private boolean isBTypeScenario(final GermplasmTreeNode g, final GermplasmTreeNode groupSource) {
 		/*
 		 * TODO verify
 		 * "if Z traces back to a single progenitor, such as a mutant strain"
 		 * According to Graham: "refers to gpid1 >0 gpid2 = 0 and gnpgs = 1. with method for mutation"
 		 */
-		if (source.getNumberOfProgenitors() == 1 && !isUnknown(source.getFemaleParentNode()) && isUnknown(source.getMaleParentNode())) {
+		if (groupSource.getNumberOfProgenitors() == 1
+			&& !isUnknown(groupSource.getFemaleParentNode()) && isUnknown(groupSource.getMaleParentNode())) {
 			return true;
 		}
 
 		/*
 		 * "If the progenitors of a strain are unknown"
 		 */
-		if (isUnknown(source.getFemaleParentNode()) && isUnknown(source.getMaleParentNode())) {
+		if (isUnknown(groupSource.getFemaleParentNode()) && isUnknown(groupSource.getMaleParentNode())) {
 			return true;
 		}
 
@@ -408,7 +398,7 @@ public class CopCalculation {
 	 * This method gets the group source (child of a cross) if the the line is derivative,
 	 * or the latest known ancestor or itself if there are no ancestors.
 	 */
-	private Optional<GermplasmTreeNode> getGroupSource(final GermplasmTreeNode g) {
+	private GermplasmTreeNode getGroupSource(final GermplasmTreeNode g) {
 		final GermplasmTreeNode g0;
 		if (isDerivative(g)) {
 			final GermplasmTreeNode groupSource = g.getFemaleParentNode();
@@ -447,7 +437,7 @@ public class CopCalculation {
 		} else {
 			g0 = g;
 		}
-		return ofNullable(g0);
+		return g0;
 	}
 
 	private boolean isGenerative(final GermplasmTreeNode g) {
