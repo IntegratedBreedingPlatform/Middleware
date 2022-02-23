@@ -11,12 +11,12 @@ import java.util.List;
 public class GermplasmMatchRequestDto {
 
 	private List<String> germplasmPUIs = Lists.newArrayList();
-
 	private List<String> germplasmUUIDs = Lists.newArrayList();
-
 	private List<String> names = Lists.newArrayList();
-
 	private List<Integer> gids = Lists.newArrayList();
+	private List<String> locations;
+	private List<String> methods;
+	private List<String> nameTypes;
 
 	public List<String> getGermplasmPUIs() {
 		return this.germplasmPUIs;
@@ -50,6 +50,30 @@ public class GermplasmMatchRequestDto {
 		this.gids = gids;
 	}
 
+	public List<String> getLocations() {
+		return this.locations;
+	}
+
+	public void setLocations(final List<String> locations) {
+		this.locations = locations;
+	}
+
+	public List<String> getMethods() {
+		return this.methods;
+	}
+
+	public void setMethods(final List<String> methods) {
+		this.methods = methods;
+	}
+
+	public List<String> getNameTypes() {
+		return this.nameTypes;
+	}
+
+	public void setNameTypes(final List<String> nameTypes) {
+		this.nameTypes = nameTypes;
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
@@ -66,10 +90,20 @@ public class GermplasmMatchRequestDto {
 	}
 
 	public boolean isValid() {
-		if (CollectionUtils.isEmpty(this.germplasmPUIs) && CollectionUtils.isEmpty(this.germplasmUUIDs) && CollectionUtils.isEmpty(this.gids) && CollectionUtils.isEmpty(this.names)) {
+		// GID, GUUID, PUI and NAMES are the MAIN match parameters; hence lack of any of these renders request invalid
+		// Location, Name type and method will merely restrict any initial matches from the main filters
+		if (CollectionUtils.isEmpty(this.germplasmPUIs) && CollectionUtils.isEmpty(this.germplasmUUIDs) && CollectionUtils
+			.isEmpty(this.gids) && CollectionUtils.isEmpty(this.names)) {
 			return false;
 		}
 		return true;
 	}
+
+	public boolean restrictingFiltersSpecified() {
+		// Location and method filters will merely restrict any initial matches from the main filters
+		return !CollectionUtils.isEmpty(this.locations) || !CollectionUtils.isEmpty(this.methods);
+	}
+
+
 
 }
