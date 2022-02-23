@@ -64,7 +64,7 @@ public class StudyEntryPropertyData implements Serializable {
 
 	// TODO: review this method name
 	public String getPropertyValue() {
-		if (this.value == null) {
+		if (this.categoricalValueId != null) {
 			return String.valueOf(this.categoricalValueId);
 		}
 		return this.value;

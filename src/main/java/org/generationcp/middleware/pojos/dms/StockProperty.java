@@ -116,7 +116,7 @@ public class StockProperty implements Serializable {
 
 	// TODO: review property name
 	public String getPropertyValue() {
-		if (this.value == null) {
+		if (this.categoricalValueId != null) {
 			return String.valueOf(this.categoricalValueId);
 		}
 		return this.value;
