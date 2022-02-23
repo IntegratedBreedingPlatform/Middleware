@@ -396,7 +396,7 @@ public class CopCalculation {
 	/**
 	 * CopCalculation processes full pedigrees (with derivative lines)
 	 * This method gets the group source (child of a cross) if the the line is derivative,
-	 * or the latest known ancestor.
+	 * or the latest known ancestor or itself if there are no ancestors.
 	 */
 	private Optional<GermplasmTreeNode> getGroupSource(final GermplasmTreeNode g) {
 		final GermplasmTreeNode g0;
@@ -429,7 +429,10 @@ public class CopCalculation {
 					g0 = source;
 				}
 			} else {
-				return empty();
+				/*
+				 * No known parents
+				 */
+				g0 = g;
 			}
 		} else {
 			g0 = g;
