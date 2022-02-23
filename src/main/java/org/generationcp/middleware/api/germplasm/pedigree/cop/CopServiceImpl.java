@@ -31,10 +31,10 @@ public class CopServiceImpl implements CopService {
 
 	// FIXME used for testing. refactor tests
 	@Override
-	public double coefficientOfParentage(final int gid1, final int gid2) {
+	public double coefficientOfParentage(final int gid1, final int gid2, final BTypeEnum btype) {
 		final GermplasmTreeNode gid1Tree = this.germplasmPedigreeService.getGermplasmPedigreeTree(gid1, null, true);
 		final GermplasmTreeNode gid2Tree = this.germplasmPedigreeService.getGermplasmPedigreeTree(gid2, null, true);
-		final CopCalculation copCalculation = new CopCalculation();
+		final CopCalculation copCalculation = new CopCalculation(btype);
 		copCalculation.populateOrder(gid1Tree, 0);
 		copCalculation.populateOrder(gid2Tree, 0);
 		return copCalculation.coefficientOfParentage(gid1Tree, gid2Tree);
@@ -42,9 +42,9 @@ public class CopServiceImpl implements CopService {
 
 	// FIXME used for testing. refactor tests
 	@Override
-	public double coefficientOfInbreeding(final int gid) {
+	public double coefficientOfInbreeding(final int gid, final BTypeEnum btype) {
 		final GermplasmTreeNode gidTree = this.germplasmPedigreeService.getGermplasmPedigreeTree(gid, null, true);
-		final CopCalculation copCalculation = new CopCalculation();
+		final CopCalculation copCalculation = new CopCalculation(btype);
 		copCalculation.populateOrder(gidTree, 0);
 		return copCalculation.coefficientOfInbreeding(gidTree);
 	}

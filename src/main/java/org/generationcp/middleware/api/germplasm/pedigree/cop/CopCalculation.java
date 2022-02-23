@@ -79,6 +79,11 @@ public class CopCalculation {
 		this.btype = BTypeEnum.CROSS_FERTILIZING;
 	}
 
+	public CopCalculation(final BTypeEnum btype) {
+		this.sparseMatrix = HashBasedTable.create();
+		this.btype = btype;
+	}
+
 	public CopCalculation(final Table<Integer, Integer, Double> sparseMatrix, final int bType) {
 		this.sparseMatrix = sparseMatrix != null ? sparseMatrix : HashBasedTable.create();
 		this.btype = BTypeEnum.fromValue(bType);
@@ -202,6 +207,7 @@ public class CopCalculation {
 		final Optional<GermplasmTreeNode> g0 = this.getGroupSource(g);
 
 		if (this.isBTypeScenario(g, g0)) {
+		 	// FIXME BTYPE=2 produces COP > 1
 			return this.getBType(g);
 		}
 
@@ -294,8 +300,12 @@ public class CopCalculation {
 		}
 
 		/*
-		 * if only male parent (immediate source) is unknown => handle later by UNKNOWN_INBREEDING_GENERATIONS
+		 * if only male parent (immediate source) is unknown => handle later by UNKNOWN_INBREEDING_GENERATIONS if btype=2.
 		 */
+		if (isUnknown(g.getMaleParentNode()) && !BTypeEnum.SELF_FERTILIZING_F4.equals(this.btype)) {
+			return true;
+		}
+
 		return false;
 	}
 

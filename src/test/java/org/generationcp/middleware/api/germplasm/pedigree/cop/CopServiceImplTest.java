@@ -13,6 +13,8 @@ import static org.junit.Assert.assertThat;
 
 public class CopServiceImplTest extends IntegrationTestBase {
 
+	private static final BTypeEnum BTYPE_DEFAULT = BTypeEnum.CROSS_FERTILIZING;
+
 	private DaoFactory daoFactory;
 
 	private Germplasm P3;
@@ -35,6 +37,8 @@ public class CopServiceImplTest extends IntegrationTestBase {
 	private Germplasm P3P2;
 	private Germplasm P3P1;
 
+	private BTypeEnum btype = BTYPE_DEFAULT;
+
 	@Autowired
 	private CopService copService;
 
@@ -42,6 +46,7 @@ public class CopServiceImplTest extends IntegrationTestBase {
 	public void setup() {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.createPedigree();
+		this.btype = BTYPE_DEFAULT;
 	}
 
 	/**
@@ -49,14 +54,16 @@ public class CopServiceImplTest extends IntegrationTestBase {
 	 */
 	@Test
 	public void testCoefficientOfParentage_BaseCase() {
+		this.btype = BTypeEnum.SELF_FERTILIZING_F4;
+
 		// TODO refactor, use api with list of gids params
-		assertThat(this.copService.coefficientOfParentage(this.E0.getGid(), this.F0.getGid()), is(0.0));
-		assertThat(this.copService.coefficientOfInbreeding(this.B1.getGid()), is(15 / 16.0));
-		assertThat(this.copService.coefficientOfParentage(this.B1.getGid(), this.B1.getGid()), is(31 / 32.0));
-		assertThat(this.copService.coefficientOfInbreeding(this.Z2.getGid()), is(3 / 4.0));
-		assertThat(this.copService.coefficientOfParentage(this.R2.getGid(), this.Q2.getGid()), is(7 / 8.0));
-		assertThat(this.copService.coefficientOfParentage(this.B1.getGid(), this.Q2.getGid()), is(31 / 64.0));
-		assertThat(this.copService.coefficientOfParentage(this.P3.getGid(), this.Q2.getGid()), is(87 / 128.0));
+		assertThat(this.copService.coefficientOfParentage(this.E0.getGid(), this.F0.getGid(), this.btype), is(0.0));
+		assertThat(this.copService.coefficientOfInbreeding(this.B1.getGid(), this.btype), is(15 / 16.0));
+		assertThat(this.copService.coefficientOfParentage(this.B1.getGid(), this.B1.getGid(), this.btype), is(31 / 32.0));
+		assertThat(this.copService.coefficientOfInbreeding(this.Z2.getGid(), this.btype), is(3 / 4.0));
+		assertThat(this.copService.coefficientOfParentage(this.R2.getGid(), this.Q2.getGid(), this.btype), is(7 / 8.0));
+		assertThat(this.copService.coefficientOfParentage(this.B1.getGid(), this.Q2.getGid(), this.btype), is(31 / 64.0));
+		assertThat(this.copService.coefficientOfParentage(this.P3.getGid(), this.Q2.getGid(), this.btype), is(87 / 128.0));
 	}
 
 	/**
@@ -91,7 +98,7 @@ public class CopServiceImplTest extends IntegrationTestBase {
 		final Germplasm c1 = this.createGermplasm("C1", 2, p1.getGid(), p2.getGid());
 		final Germplasm c2 = this.createGermplasm("C2", 2, p1.getGid(), p2.getGid());
 
-		assertThat(this.copService.coefficientOfParentage(c1.getGid(), c2.getGid()), is(1/4d));
+		assertThat(this.copService.coefficientOfParentage(c1.getGid(), c2.getGid(), this.btype), is(1/4d));
 
 	}
 
@@ -101,7 +108,7 @@ public class CopServiceImplTest extends IntegrationTestBase {
 		final Germplasm p2 = this.createGermplasm("P2", 0, 0, 0);
 		final Germplasm c1 = this.createGermplasm("C1", 2, p1.getGid(), p2.getGid());
 
-		assertThat(this.copService.coefficientOfParentage(c1.getGid(), p1.getGid()), is(1/4d));
+		assertThat(this.copService.coefficientOfParentage(c1.getGid(), p1.getGid(), this.btype), is(1/4d));
 	}
 
 	@Test
@@ -114,7 +121,7 @@ public class CopServiceImplTest extends IntegrationTestBase {
 		final Germplasm c2 = this.createGermplasm("C2", 2, p3.getGid(), p4.getGid());
 		final Germplasm d1 = this.createGermplasm("D1", 2, c1.getGid(), c2.getGid());
 
-		assertThat(this.copService.coefficientOfParentage(d1.getGid(), p1.getGid()), is(1/8d));
+		assertThat(this.copService.coefficientOfParentage(d1.getGid(), p1.getGid(), this.btype), is(1/8d));
 	}
 
 
