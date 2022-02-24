@@ -328,6 +328,7 @@ public class WorkbookBuilder extends Builder {
 		final Set<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(study.getConditions(), true, true);
 		final Set<MeasurementVariable> constants = this.buildStudyMeasurementVariables(study.getConstants(), false, true);
 		final List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
+		final List<MeasurementVariable> entryDetails = this.buildEntryDetails(variables);
 		if (dataSetId != null) {
 			this.setTreatmentFactorValues(treatmentFactors, dataSetId);
 		}
@@ -393,6 +394,7 @@ public class WorkbookBuilder extends Builder {
 		workbook.setConditions(new ArrayList<>(conditions));
 		workbook.setConstants(new ArrayList<>(constants));
 		workbook.setTreatmentFactors(treatmentFactors);
+		workbook.setEntryDetails(entryDetails);
 		workbook.setExperimentalDesignVariables(experimentalDesignVariables);
 		return workbook;
 	}
