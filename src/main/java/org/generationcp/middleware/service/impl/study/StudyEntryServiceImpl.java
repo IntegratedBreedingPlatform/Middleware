@@ -132,9 +132,10 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public void saveStudyEntrues(final Integer studyId, final List<Integer> gids) {
+	public void saveStudyEntries(final Integer studyId, final List<Integer> gids, final Integer entryTypeId) {
+		final Term entryType = this.ontologyDataManager.getTermById(entryTypeId.intValue());
 		final Integer nextEntryNumber = this.getNextEntryNumber(studyId);
-		this.daoFactory.getStockDao().createStudyEntries(studyId, nextEntryNumber, gids);
+		this.daoFactory.getStockDao().createStudyEntries(studyId, nextEntryNumber, gids, entryType.getId(), entryType.getName());
 	}
 
 	@Override
