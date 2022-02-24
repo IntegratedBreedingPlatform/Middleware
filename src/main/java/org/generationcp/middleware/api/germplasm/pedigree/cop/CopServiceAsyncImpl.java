@@ -234,15 +234,15 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 
 	private static void trackNodes(final GermplasmTreeNode gid1Tree, final Map<Integer, GermplasmTreeNode> nodes) {
 		nodes.put(gid1Tree.getGid(), gid1Tree);
-		GermplasmTreeNode femaleParentNode = gid1Tree.getFemaleParentNode();
-		while (femaleParentNode != null) {
+		final GermplasmTreeNode femaleParentNode = gid1Tree.getFemaleParentNode();
+		if (femaleParentNode != null) {
 			nodes.put(femaleParentNode.getGid(), femaleParentNode);
-			femaleParentNode = femaleParentNode.getFemaleParentNode();
+			trackNodes(femaleParentNode, nodes);
 		}
-		GermplasmTreeNode maleParentNode = gid1Tree.getMaleParentNode();
-		while (maleParentNode != null) {
+		final GermplasmTreeNode maleParentNode = gid1Tree.getMaleParentNode();
+		if (maleParentNode != null) {
 			nodes.put(maleParentNode.getGid(), maleParentNode);
-			maleParentNode = maleParentNode.getMaleParentNode();
+			trackNodes(maleParentNode, nodes);
 		}
 	}
 
