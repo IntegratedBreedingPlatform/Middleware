@@ -11,9 +11,6 @@
 
 package org.generationcp.middleware.dao.oms;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -23,9 +20,11 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * DAO class for {@link CVTermProperty}.
- *
  */
 public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
 
@@ -49,7 +48,7 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
 		}
 		try {
 			Criteria criteria =
-					this.getSession().createCriteria(this.getPersistentClass()).add(GenericDAO.buildInCriterion("cvTermId", cvTermIds));
+				this.getSession().createCriteria(this.getPersistentClass()).add(GenericDAO.buildInCriterion("cvTermId", cvTermIds));
 			return criteria.list();
 		} catch (HibernateException e) {
 			throw new MiddlewareQueryException("Error at getByCvTermIds query on CVTermDao", e);
@@ -60,10 +59,10 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
 		try {
 
 			Query query =
-					this.getSession()
+				this.getSession()
 					.createSQLQuery(
-							"select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where t.is_obsolete =0 and t.cv_id = "
-									+ cvId).addEntity(CVTermProperty.class);
+						"select p.* from cvtermprop p inner join cvterm t on p.cvterm_id = t.cvterm_id where t.is_obsolete =0 and t.cv_id = "
+							+ cvId).addEntity(CVTermProperty.class);
 
 			return query.list();
 
@@ -85,6 +84,18 @@ public class CvTermPropertyDao extends GenericDAO<CVTermProperty, Integer> {
 			this.logAndThrowException("Error at getByCvTermId=" + cvTermId + " query on CVTermPropertyDao: " + e.getMessage(), e);
 		}
 		return properties;
+	}
+
+	public List<CVTermProperty> getByCvTermIdsAndType(final List<Integer> cvTermIds, final int typeId) throws MiddlewareQueryException {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.in("cvTermId", cvTermIds));
+			criteria.add(Restrictions.eq("typeId", typeId));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"Error at getByCvTermIdsAndType=" + cvTermIds + " query on CVTermPropertyDao: " + e.getMessage(), e);
+		}
 	}
 
 	@SuppressWarnings("unchecked")

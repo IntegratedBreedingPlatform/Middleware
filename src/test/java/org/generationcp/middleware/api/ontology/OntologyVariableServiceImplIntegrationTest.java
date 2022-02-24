@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.ontology;
 
+import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -10,6 +11,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -166,6 +168,23 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 
 	}
 
+	@Test
+	public void testGetVariableTypesOfVariables() {
+		final Variable traitVariable1 = this.createTestVariable("testVariable1");
+		final Variable traitVariable2 = this.createTestVariable("testVariable2");
+		final Variable traitVariable3 = this.createTestVariable("testVariable3");
+
+		final Multimap<Integer, VariableType> result = this.ontologyVariableService.getVariableTypesOfVariables(
+			Arrays.asList(traitVariable1.getId(), traitVariable2.getId(), traitVariable3.getId()));
+
+		assertTrue(result.get(traitVariable1.getId()).contains(VariableType.TRAIT));
+		assertTrue(result.get(traitVariable1.getId()).contains(VariableType.SELECTION_METHOD));
+		assertTrue(result.get(traitVariable2.getId()).contains(VariableType.TRAIT));
+		assertTrue(result.get(traitVariable2.getId()).contains(VariableType.SELECTION_METHOD));
+		assertTrue(result.get(traitVariable3.getId()).contains(VariableType.TRAIT));
+		assertTrue(result.get(traitVariable3.getId()).contains(VariableType.SELECTION_METHOD));
+	}
+
 	private Variable createTestVariable(final String variableName) {
 		// Create traitVariable
 		final CVTerm cvTermVariable = this.daoFactory.getCvTermDao()
@@ -175,16 +194,20 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		this.daoFactory.getCvTermRelationshipDao().save(scale.getCvTermId(), TermId.HAS_TYPE.getId(), DataType.NUMERIC_VARIABLE.getId());
 		final CVTerm method = this.daoFactory.getCvTermDao().save(RandomStringUtils.randomAlphanumeric(10), "", CvId.METHODS);
 		final CVTerm numericDataType = this.daoFactory.getCvTermDao().getById(DataType.NUMERIC_VARIABLE.getId());
+
 		// Assign Property, Scale, Method
 		this.daoFactory.getCvTermRelationshipDao()
 			.save(cvTermVariable.getCvTermId(), TermId.HAS_PROPERTY.getId(), property.getCvTermId());
 		this.daoFactory.getCvTermRelationshipDao()
 			.save(cvTermVariable.getCvTermId(), TermId.HAS_SCALE.getId(), scale.getCvTermId());
 		this.daoFactory.getCvTermRelationshipDao().save(cvTermVariable.getCvTermId(), TermId.HAS_METHOD.getId(), method.getCvTermId());
-		// Assign trait Variable type
+
+		// Assign TRAIT and SELECTION_METHOD Variable types
 		this.daoFactory.getCvTermPropertyDao()
-			.save(cvTermVariable.getCvTermId(), TermId.VARIABLE_TYPE.getId(), VariableType.TRAIT.getName(), 0);
-		final Variable variable = new Variable();
+			.save(new CVTermProperty(null, cvTermVariable.getCvTermId(), TermId.VARIABLE_TYPE.getId(), VariableType.TRAIT.getName(), 0));
+		this.daoFactory.getCvTermPropertyDao()
+			.save(new CVTermProperty(null, cvTermVariable.getCvTermId(), TermId.VARIABLE_TYPE.getId(),
+				VariableType.SELECTION_METHOD.getName(), 0));
 
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addVariableId(cvTermVariable.getCvTermId());

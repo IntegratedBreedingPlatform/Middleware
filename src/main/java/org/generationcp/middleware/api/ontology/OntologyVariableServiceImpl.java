@@ -1,15 +1,19 @@
 package org.generationcp.middleware.api.ontology;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +71,17 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 			}
 		}
 		return createdAnalysisVariables;
+	}
+
+	@Override
+	public Multimap<Integer, VariableType> getVariableTypesOfVariables(final List<Integer> variableIds) {
+		final Multimap<Integer, VariableType> variableTypesMultimap = ArrayListMultimap.create();
+		final List<CVTermProperty> properties =
+			this.daoFactory.getCvTermPropertyDao().getByCvTermIdsAndType(variableIds, TermId.VARIABLE_TYPE.getId());
+		for (final CVTermProperty property : properties) {
+			variableTypesMultimap.put(property.getCvTermId(), VariableType.getByName(property.getValue()));
+		}
+		return variableTypesMultimap;
 	}
 
 	private Integer createAnalysisStandardVariable(final Variable traitVariable, final CVTerm method, final String variableType) {
