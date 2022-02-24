@@ -259,15 +259,6 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 
 	}
 
-	@Test
-	public void testAddMethod() {
-		final String name = "Test Method " + new Random().nextInt(10000);
-		final String definition = "Test Definition";
-		Term term = this.ontologyDataManager.addMethod(name, definition);
-		Assert.assertTrue(term.getId() > 0);
-		term = this.ontologyDataManager.getTermById(term.getId());
-	}
-
 	/**
 	 * This tests an expected property of the ontology data manager to return a non empty map, even for entries that cannot be matched to a
 	 * standard variable in the database
@@ -415,7 +406,12 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 		// add a method to local
 		final String name = "Test Method " + new Random().nextInt(10000);
 		final String definition = "Test Definition";
-		term = this.ontologyDataManager.addMethod(name, definition);
+
+		CVTerm cvTerm = this.create(name, definition, CvId.METHODS.getId(), false, false, false);
+		cvTermDao.save(cvTerm);
+
+		term = new Term(cvTerm.getCvTermId(), cvTerm.getName(), cvTerm.getDefinition());
+
 		// term does exist in local
 
 		term = this.ontologyDataManager.findMethodById(term.getId());
@@ -856,5 +852,16 @@ public class OntologyDataManagerImplIntegrationTest extends IntegrationTestBase 
 		this.ontologyDataManager.addStandardVariable(standardVariable, PROGRAM_UUID);
 
 		return standardVariable;
+	}
+
+	private CVTerm create(String name, String definition, int cvId, boolean isObsolete, boolean isRelationshipType, boolean isSystem) {
+		CVTerm cvTerm = new CVTerm();
+		cvTerm.setName(name);
+		cvTerm.setDefinition(definition);
+		cvTerm.setCv(cvId);
+		cvTerm.setIsObsolete(isObsolete);
+		cvTerm.setIsRelationshipType(isRelationshipType);
+		cvTerm.setIsSystem(isSystem);
+		return cvTerm;
 	}
 }

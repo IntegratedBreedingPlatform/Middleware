@@ -5,9 +5,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -44,6 +44,8 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	@Autowired
 	private GermplasmDataManager germplasmManager;
 
+	private DaoFactory daoFactory;
+
 	@Before
 	public void setUp() {
 		this.germplasmListDataDAO = new GermplasmListDataDAO();
@@ -52,8 +54,9 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 		this.germplasmListDataDAO.setSession(this.sessionProvder.getSession());
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
 
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager, new NameDAO(this.sessionProvder
-			.getSession()));
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 	}
 
 	@Test

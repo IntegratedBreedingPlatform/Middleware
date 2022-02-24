@@ -33,7 +33,7 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 
 	
 	@SuppressWarnings("unchecked")
-	public List<Locdes> getByLocation(Integer locId) throws MiddlewareQueryException {
+	public List<Locdes> getByLocation(final Integer locId) throws MiddlewareQueryException {
 		try {
 			Criteria criteria = this.getSession().createCriteria(Locdes.class);
 			criteria.add(Restrictions.eq("locationId", locId));
@@ -56,9 +56,10 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 			}
 			return criteria.list();
 		} catch (HibernateException e) {
-			this.logAndThrowException("Error with getLocdes(locIds=" + locIds + "dvals=" + dvals + ") query from Locdes: " + e.getMessage(), e);
+			final String message = "Error with getLocdes(locIds=" + locIds + "dvals=" + dvals + ") in LocdesDAO: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
-		return new ArrayList<Locdes>();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -129,7 +130,9 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 				.setParameterList("locids", locids)
 				.executeUpdate();
 		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with deleteByLocationIds(locids=" + locids + ") query from Locdes: " + e.getMessage(), e);
+			final String message = "Error with deleteByLocationIds(locids=" + locids + ") in LocdesDAO: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 }

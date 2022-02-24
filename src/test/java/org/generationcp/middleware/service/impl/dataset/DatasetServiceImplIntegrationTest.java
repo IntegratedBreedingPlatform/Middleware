@@ -5,10 +5,10 @@ import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -25,7 +25,13 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by clarysabel on 11/13/17.
@@ -66,6 +72,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
     private Integer plotDatasetId;
     private List<Integer> instanceIds;
     private Integer subObsDatasetId;
+    private DaoFactory daoFactory;
 
 
     @Before
@@ -81,9 +88,11 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
             this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
         }
 
+        if (this.daoFactory == null) {
+            this.daoFactory =new DaoFactory(this.sessionProvder);
+        }
         if (this.germplasmTestDataGenerator == null) {
-            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, new NameDAO(this.sessionProvder
-                .getSession()));
+            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
         }
 
         if (this.studyId == null) {

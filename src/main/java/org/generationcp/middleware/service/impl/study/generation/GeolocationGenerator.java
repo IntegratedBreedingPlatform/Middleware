@@ -1,15 +1,12 @@
 package org.generationcp.middleware.service.impl.study.generation;
 
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class GeolocationGenerator {
 

@@ -1,14 +1,14 @@
 package org.generationcp.middleware.data.initializer;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Name;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class GermplasmDataManagerDataInitializer {
 
@@ -16,27 +16,9 @@ public class GermplasmDataManagerDataInitializer {
     public static final Integer TEST_MALE_PARENT_GID = 2;
     public static final Integer TEST_FEMALE_PARENT_GID = 3;
     public static final Integer NSTAT_PREFERRED_VALUE = 1;
-    public static final Integer TEST_USER_ID = 1;
     public static final Integer TEST_LOCATION_ID = 1;
     public static final String MALE_SELECTION_HISTORY = "maleSelectionHistory";
 
-    public static Map<Integer, Map<GermplasmNameType, Name>> createGermplasmParentNameMap() {
-        final Map<Integer, Map<GermplasmNameType, Name>> nameMap = new HashMap<>();
-
-        Map<GermplasmNameType, Name> nameTypeMap = new HashMap<>();
-        nameTypeMap.put(GermplasmNameType.LINE_NAME, createGermplasmName(TEST_GID, "gid"));
-        nameMap.put(TEST_GID, nameTypeMap);
-
-        nameTypeMap = new HashMap<>();
-        nameTypeMap.put(GermplasmNameType.LINE_NAME, createGermplasmName(TEST_FEMALE_PARENT_GID, "femaleParent"));
-        nameMap.put(TEST_FEMALE_PARENT_GID, nameTypeMap);
-
-        nameTypeMap = new HashMap<>();
-        nameTypeMap.put(GermplasmNameType.LINE_NAME, createGermplasmName(TEST_MALE_PARENT_GID, "maleParent"));
-        nameMap.put(TEST_MALE_PARENT_GID, nameTypeMap);
-
-        return nameMap;
-    }
 
     public static List<Germplasm> createGermplasmList() {
         final List<Germplasm> germplasmList = new ArrayList<>();

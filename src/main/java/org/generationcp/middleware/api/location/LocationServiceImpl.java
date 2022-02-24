@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.location;
 
 import com.google.common.collect.ImmutableSet;
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -10,7 +11,6 @@ import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -67,50 +67,50 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public void deleteLocation(final Integer locationId) {
 		final Location location = this.daoFactory.getLocationDAO().getById(locationId);
-		List<Integer> blockIds = null;
-		if (location.getLtype() == LocdesType.FIELD.getId()) {
-			// Get the Blocks
-			blockIds = daoFactory.getLocDesDao().getLocdes(null, Arrays.asList(location.getLocid().toString()))
-				.stream().map(Locdes::getLocationId).collect(Collectors.toList());
-
-			// Delete Block
-			this.daoFactory.getLocDesDao().deleteByLocationIds(blockIds);
-			this.daoFactory.getLocationDAO().deleteByLocationIds(blockIds);
-
-			// Delete Field
-			final List<Integer> fieldIds = daoFactory.getLocDesDao().getLocdes(Arrays.asList(location.getLocid()), null)
-				.stream().map(Locdes::getLocationId).collect(Collectors.toList());
-			this.daoFactory.getLocDesDao().deleteByLocationIds(fieldIds);
-		} else if (location.getLtype() == LocdesType.BLOCK.getId()) {
-			blockIds = daoFactory.getLocDesDao().getLocdes(Arrays.asList(location.getLocid()), null)
-				.stream().map(Locdes::getLocationId).collect(Collectors.toList());
-
-			// Delete Block
-			this.daoFactory.getLocDesDao().deleteByLocationIds(blockIds);
-
+		if (LocdesType.FIELD.getId().equals(location.getLtype())) {
+			this.deleteFieldLocation(Arrays.asList(location.getLocid()));
+		} else if (LocdesType.BLOCK.getId().equals(location.getLtype())) {
+			this.deleteBlockLocation(Arrays.asList(location.getLocid()));
 		} else {
-			final List<Locdes> fieldParentLocation = daoFactory.getLocDesDao().getLocdes(null, Arrays.asList(location.getLocid().toString()));
-			if (!fieldParentLocation.isEmpty()) {
-				final List<String> fieldParentIds =
-					fieldParentLocation.stream().map(Locdes::getLocationId).map(Object::toString).collect(Collectors.toList());
-				blockIds = daoFactory.getLocDesDao().getLocdes(null, fieldParentIds).stream().map(Locdes::getLocationId)
-					.collect(Collectors.toList());
-
-				// Delete Block
-				this.daoFactory.getLocDesDao().deleteByLocationIds(blockIds);
-				this.daoFactory.getLocationDAO().deleteByLocationIds(blockIds);
-
-				// Delete Field
-				final List<Integer> fieldIds = fieldParentLocation.stream().map(Locdes::getLocationId).collect(Collectors.toList());
-				this.daoFactory.getLocDesDao().deleteByLocationIds(fieldIds);
-				this.daoFactory.getLocationDAO().deleteByLocationIds(fieldIds);
-
+			final List<Locdes> fieldTypeLocations =
+				this.daoFactory.getLocDesDao().getLocdes(null, Arrays.asList(location.getLocid().toString()));
+			if (!fieldTypeLocations.isEmpty()) {
+				this.deleteFieldLocation(fieldTypeLocations.stream().map(Locdes::getLocationId).collect(Collectors.toList()));
+				// Delete Field Location
+				this.daoFactory.getLocationDAO()
+					.deleteByLocationIds(fieldTypeLocations.stream().map(Locdes::getLocationId).collect(Collectors.toList()));
 			}
 		}
 		final Set<Integer> entityIds = ImmutableSet.of(locationId);
 		this.daoFactory.getProgramFavoriteDao().deleteProgramFavorites(ProgramFavorite.FavoriteType.LOCATION, entityIds);
-		this.daoFactory.getGeolocationDao().deleteGeolocations(Arrays.asList(locationId));
 		this.daoFactory.getLocationDAO().makeTransient(location);
+	}
+
+	private void deleteBlockLocation(final List<Integer> locationIds) {
+		// Get the Block Parents
+		final List<Integer> blockParentIds = this.daoFactory.getLocDesDao().getLocdes(locationIds, null)
+			.stream().map(Locdes::getLocationId).collect(Collectors.toList());
+
+		// Delete Block Parents
+		this.daoFactory.getLocDesDao().deleteByLocationIds(blockParentIds);
+	}
+
+	private void deleteFieldLocation(final List<Integer> locationIds) {
+		// Get the Block Parents
+		final List<Integer> blockParentIds = this.daoFactory.getLocDesDao().getLocdes(null, locationIds.stream()
+				.map(Object::toString).collect(Collectors.toList()))
+			.stream().map(Locdes::getLocationId).collect(Collectors.toList());
+
+		// Delete Blocks & Block Parents
+		if (!CollectionUtils.isEmpty(blockParentIds)) {
+			this.daoFactory.getLocDesDao().deleteByLocationIds(blockParentIds);
+			this.daoFactory.getLocationDAO().deleteByLocationIds(blockParentIds);
+		}
+
+		// Delete Field Parents
+		final List<Integer> fieldParentIds = this.daoFactory.getLocDesDao().getLocdes(locationIds, null)
+			.stream().map(Locdes::getLocationId).collect(Collectors.toList());
+		this.daoFactory.getLocDesDao().deleteByLocationIds(fieldParentIds);
 	}
 
 	@Override
