@@ -14,9 +14,14 @@ public interface CopService {
 	CopResponse coefficientOfParentage(Set<Integer> gids);
 
 	/**
-	 * retrieve existing cop matrix if available. Does not trigger any calculation
+	 * retrieve existing cop matrix if available
 	 */
 	CopResponse calculateCoefficientOfParentage(Set<Integer> gids);
+
+	/**
+	 * retrieve existing cop matrix if available
+	 */
+	CopResponse calculateCoefficientOfParentage(Integer listId);
 
 	/**
 	 * cancel job/s for the specified gids

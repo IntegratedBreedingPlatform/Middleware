@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
@@ -100,6 +102,12 @@ public class CopServiceImpl implements CopService {
 		}
 
 		return new CopResponse(matrix);
+	}
+
+	@Override
+	public CopResponse calculateCoefficientOfParentage(final Integer listId) {
+		final Set<Integer> gids = new LinkedHashSet<>(this.daoFactory.getGermplasmListDataDAO().getGidsByListId(listId));
+		return this.calculateCoefficientOfParentage(gids);
 	}
 
 	@Override
