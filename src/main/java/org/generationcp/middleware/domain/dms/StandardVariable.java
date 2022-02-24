@@ -366,6 +366,13 @@ public class StandardVariable implements Serializable {
 		return false;
 	}
 
+	public boolean isCategorical() {
+		if (this.dataType != null && this.dataType.getId() == TermId.CATEGORICAL_VARIABLE.getId()) {
+			return true;
+		}
+		return false;
+	}
+
 	public void setVariableTypes(final Set<VariableType> variableTypes) {
 		this.variableTypes = variableTypes;
 	}
