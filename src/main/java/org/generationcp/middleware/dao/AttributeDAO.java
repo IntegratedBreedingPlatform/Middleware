@@ -13,8 +13,11 @@ package org.generationcp.middleware.dao;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.TermRelationshipId;
+import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.hibernate.HibernateException;
@@ -23,6 +26,9 @@ import org.hibernate.SQLQuery;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
+import org.hibernate.type.DateType;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
@@ -41,6 +47,15 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
 	private static final String COUNT_ATTRIBUTE_WITH_GERMPLASM_DELETED =
 		"SELECT COUNT(A.ATYPE) FROM ATRIBUTS A INNER JOIN GERMPLSM G ON G.GID = A.GID AND G.DELETED = 1 WHERE A.ATYPE = :variableId";
+
+	private static final String ATTRIBUTE_VALUE_SELECT =
+		"SELECT a.aid, cv.cvterm_id AS attributeDbId, "
+			+ "IFNULL(vpo.alias, cv.name) AS attributeName, "
+			+ "a.aid AS attributeValueDbId, "
+			+ "a.adate AS determinedDate, "
+			+ "g.germplsm_uuid AS germplasmDbId, "
+			+ "names.nval AS germplasmName, "
+			+ "a.aval AS value ";
 
 	@SuppressWarnings("unchecked")
 	public List<Attribute> getByGID(final Integer gid) {
@@ -113,6 +128,41 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			}
 		}
 		return returnList;
+	}
+
+	public long countAttributeValueDtos(final AttributeValueSearchRequestDto attributeValueSearchRequestDto, final String programUUID) {
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT cv.cvterm_id) ");
+		this.appendAttributeValuesFromQuery(sql);
+		this.appendAttributeValueSeachFilters(sql, attributeValueSearchRequestDto);
+
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql.toString());
+		this.addAttributeValueSearchParameters(sqlQuery, attributeValueSearchRequestDto);
+		sqlQuery.setParameter("programUUID", programUUID);
+
+		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+	}
+
+	public List<AttributeValueDto> getAttributeValueDtos(final AttributeValueSearchRequestDto attributeValueSearchRequestDto,
+		final Pageable pageable,
+		final String programUUID) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createAttributeValuesQueryString(attributeValueSearchRequestDto));
+		sqlQuery.setParameter("programUUID", programUUID);
+		if (pageable != null) {
+			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
+			sqlQuery.setMaxResults(pageable.getPageSize());
+		}
+		this.addAttributeValueSearchParameters(sqlQuery, attributeValueSearchRequestDto);
+
+		sqlQuery.addScalar("aid", IntegerType.INSTANCE);
+		sqlQuery.addScalar("attributeDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("attributeName", StringType.INSTANCE);
+		sqlQuery.addScalar("attributeValueDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("determinedDate", DateType.INSTANCE);
+		sqlQuery.addScalar("germplasmDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("germplasmName", StringType.INSTANCE);
+		sqlQuery.addScalar("value", StringType.INSTANCE);
+		sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(AttributeValueDto.class));
+		return sqlQuery.list();
 	}
 
 	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId,
@@ -316,6 +366,138 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		} catch (final HibernateException e) {
 			final String message = "Error with isLocationIdUsedInAttributes(locationId=" + locationId + "): " + e.getMessage();
 			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	private String createAttributeValuesQueryString(final AttributeValueSearchRequestDto attributeValueSearchRequestDto) {
+		final StringBuilder sql = new StringBuilder();
+		sql.append(ATTRIBUTE_VALUE_SELECT);
+		this.appendAttributeValuesFromQuery(sql);
+		this.appendAttributeValueSeachFilters(sql, attributeValueSearchRequestDto);
+		return sql.toString();
+	}
+
+	private void appendAttributeValuesFromQuery(final StringBuilder sql) {
+		sql.append("FROM atributs a ");
+		sql.append(" INNER JOIN germplsm g ON g.gid = a.gid ");
+		sql.append(" INNER JOIN names ON names.gid = a.gid AND names.nstat = 1 ");
+		sql.append(" INNER JOIN cvterm cv ON a.atype = cv.cvterm_id ");
+		sql.append(" LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = cv.cvterm_id AND vpo.program_uuid = :programUUID  ");
+		sql.append(" WHERE 1=1 ");
+	}
+
+	private void appendAttributeValueSeachFilters(final StringBuilder sql, final AttributeValueSearchRequestDto requestDTO) {
+		if (!CollectionUtils.isEmpty(requestDTO.getAttributeDbIds())) {
+			sql.append(" AND cv.cvterm_id IN (:attributeDbIds)");
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getAttributeNames())) {
+			sql.append(" AND IFNULL(vpo.alias, cv.name) IN (:attributeNames)");
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getAttributeValueDbIds())) {
+			sql.append(" AND a.aid IN (:attributeValueDbIds)");
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
+			sql.append(" AND g.germplsm_uuid IN (:germplasmDbIds)");
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
+			sql.append(" AND EXISTS (SELECT * FROM external_reference_atributs ref ");
+			sql.append(" WHERE a.aid = ref.aid AND ref.reference_id IN (:referenceIds)) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
+			sql.append(" AND EXISTS (SELECT * FROM external_reference_atributs ref ");
+			sql.append(" WHERE a.aid = ref.aid AND ref.reference_source IN (:referenceSources)) ");
+		}
+
+		// Search preferred names
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmNames())) {
+			sql.append(" AND g.gid IN ( SELECT n.gid ");
+			sql.append(" FROM names n WHERE n.nstat = 1 AND n.nval in (:germplasmNames) ) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getMethodDbIds())) {
+			sql.append(" AND cv.cvterm_id IN (  SELECT mr.subject_id ");
+			sql.append(
+				"						FROM cvterm_relationship mr INNER JOIN cvterm m ON m.cvterm_id = mr.object_id AND mr.type_id = ");
+			sql.append(TermRelationshipId.HAS_METHOD.getId() + " AND m.cvterm_id IN (:methodDbIds) ) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getOntologyDbIds())) {
+			sql.append(" AND cv.cvterm_id IN (:ontologyDbIds) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getScaleDbIds())) {
+			sql.append(" AND cv.cvterm_id IN (  SELECT sr.subject_id ");
+			sql.append(
+				"						FROM cvterm_relationship sr INNER JOIN cvterm s ON s.cvterm_id = sr.object_id AND sr.type_id = ");
+			sql.append(TermRelationshipId.HAS_SCALE.getId() + " AND s.cvterm_id IN (:scaleDbIds) ) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getTraitDbIds())) {
+			sql.append(" AND cv.cvterm_id IN (  SELECT tr.subject_id ");
+			sql.append(
+				"						FROM cvterm_relationship tr INNER JOIN cvterm t ON t.cvterm_id = tr.object_id AND tr.type_id = ");
+			sql.append(TermRelationshipId.IS_A.getId() + " AND t.cvterm_id IN (:traitDbIds) ) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getTraitClasses())) {
+			sql.append(" AND cv.cvterm_id IN (  SELECT tr.subject_id ");
+			sql.append(
+				"						FROM cvterm_relationship tr INNER JOIN cvterm t ON t.cvterm_id = tr.object_id AND tr.type_id = ");
+			sql.append(TermRelationshipId.IS_A.getId() + " AND t.name IN (:traitClasses) ) ");
+		}
+	}
+
+	private void addAttributeValueSearchParameters(final SQLQuery sqlQuery, final AttributeValueSearchRequestDto requestDTO) {
+		if (!CollectionUtils.isEmpty(requestDTO.getAttributeDbIds())) {
+			sqlQuery.setParameterList("attributeDbIds", requestDTO.getAttributeDbIds());
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getAttributeNames())) {
+			sqlQuery.setParameterList("attributeNames", requestDTO.getAttributeNames());
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getAttributeValueDbIds())) {
+			sqlQuery.setParameterList("attributeValueDbIds", requestDTO.getAttributeValueDbIds());
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
+			sqlQuery.setParameterList("dataTypes", requestDTO.getDataTypes());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
+			sqlQuery.setParameterList("germplasmDbIds", requestDTO.getGermplasmDbIds());
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
+			sqlQuery.setParameterList("externalReferenceIDs", requestDTO.getExternalReferenceIDs());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
+			sqlQuery.setParameterList("externalReferenceSources", requestDTO.getExternalReferenceSources());
+		}
+
+		// Search preferred names
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmNames())) {
+			sqlQuery.setParameterList("germplasmNames", requestDTO.getGermplasmNames());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getMethodDbIds())) {
+			sqlQuery.setParameterList("methodDbIds", requestDTO.getMethodDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getOntologyDbIds())) {
+			sqlQuery.setParameterList("ontologyDbIds", requestDTO.getOntologyDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getScaleDbIds())) {
+			sqlQuery.setParameterList("scaleDbIds", requestDTO.getScaleDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getTraitDbIds())) {
+			sqlQuery.setParameterList("traitDbIds", requestDTO.getTraitDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getTraitClasses())) {
+			sqlQuery.setParameterList("traitClasses", requestDTO.getTraitClasses());
 		}
 	}
 }
