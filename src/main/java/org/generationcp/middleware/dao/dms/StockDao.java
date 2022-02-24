@@ -526,6 +526,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			query.addScalar("unit", new StringType());
 			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
 				final String entryName = entryDescriptor.getName();
+				query.addScalar(entryName, new StringType());
 				query.addScalar(entryName + "_propertyId", new IntegerType());
 				query.addScalar(entryName + "_variableId", new IntegerType());
 				query.addScalar(entryName + "_value", new StringType());
@@ -555,8 +556,9 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 					final String value;
 					final Integer categoricalValueId;
 					if (entryDescriptor.getDataType().equals(DataType.CATEGORICAL_VARIABLE.getName())) {
-						value = null;
-						categoricalValueId = Integer.valueOf((String) row.get(entryDescriptor.getName() + "_value"));
+						value = (String) row.get(entryDescriptor.getName());
+						categoricalValueId = row.get(entryDescriptor.getName() + "_value") != null ?
+							Integer.valueOf((String) row.get(entryDescriptor.getName() + "_value")) : null;
 					} else {
 						value = (String) row.get(entryDescriptor.getName() + "_value");
 						categoricalValueId = null;
