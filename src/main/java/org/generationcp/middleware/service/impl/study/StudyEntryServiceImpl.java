@@ -2,6 +2,7 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
@@ -27,9 +28,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +49,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
+
+	@Resource
+	private GermplasmListService germplasmListService;
 
 	private final DaoFactory daoFactory;
 
@@ -118,16 +124,17 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public List<StudyEntryDto> saveStudyEntries(final Integer studyId, final List<StudyEntryDto> studyEntryDtoList) {
-		final List<Integer> entryIds = new ArrayList<>();
-		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
-			final StockModel entry = new StockModel(studyId, studyEntryDto);
-			this.daoFactory.getStockDao().saveOrUpdate(entry);
-			entryIds.add(entry.getStockId());
-		}
-		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
-		filter.setEntryIds(entryIds);
-		return this.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
+	public void saveStudyEntries(final Integer studyId, final Integer listId) {
+		// Check if the germplasm list has already the ENTRY_TYPE variable. Otherwise, we add entry default with a default value
+		final List<Integer> listVariables =
+			this.germplasmListService.getListOntologyVariables(listId, Arrays.asList(TermId.ENTRY_TYPE.getId()));
+		this.daoFactory.getStockDao().createStudyEntries(studyId, listId, CollectionUtils.isEmpty(listVariables));
+	}
+
+	@Override
+	public void saveStudyEntrues(final Integer studyId, final List<Integer> gids) {
+		final Integer nextEntryNumber = this.getNextEntryNumber(studyId);
+		this.daoFactory.getStockDao().createStudyEntries(studyId, nextEntryNumber, gids);
 	}
 
 	@Override

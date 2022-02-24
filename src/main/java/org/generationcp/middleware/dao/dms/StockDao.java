@@ -17,6 +17,7 @@ import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -55,6 +56,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link StockModel}.
@@ -702,6 +704,45 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
+	}
+
+	public void createStudyEntries(final Integer studyId, final Integer listId, final boolean addEntryTypeProperty) {
+		final String insertStockQuery = "INSERT INTO stock(dbxref_id, name, uniquename, project_id) "
+			+ "SELECT ld.gid, (SELECT n.nval FROM names n WHERE nstat = 1 AND n.gid = ld.gid), entryid, " + studyId + " FROM listdata ld WHERE ld.listid = " + listId;
+		this.getSession().createSQLQuery(insertStockQuery).executeUpdate();
+
+		final String insertStockPropertyQuery = "INSERT INTO stockprop(stock_id, type_id, value, cvalue_id) "
+			+ "SELECT s.stock_id, ld.variable_id, ld.value, ld.cvalue_id FROM list_data_details ld "
+			+ "		INNER JOIN listdata l ON ld.lrecid = l.lrecid "
+			+ "     INNER JOIN stock s ON l.entryid = s.uniquename "
+			+ " WHERE l.listid = "  + listId + " AND s.project_id = " + studyId;
+		this.getSession().createSQLQuery(insertStockPropertyQuery).executeUpdate();
+
+		// Add entry type with a default value
+		if (addEntryTypeProperty) {
+			final String insertEntryTypeProperty = "INSERT INTO stockprop(stock_id, type_id, value, cvalue_id) "
+				+ "SELECT stock_id, " + TermId.ENTRY_TYPE.getId() + ", '" + SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue() + "', "
+				+ SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() + "  "
+				+ "		FROM stock WHERE project_id = " + studyId;
+			this.getSession().createSQLQuery(insertEntryTypeProperty).executeUpdate();
+		}
+
+	}
+
+	public void createStudyEntries(final Integer studyId, final Integer startingEntryNumber, final List<Integer> gids) {
+		final String gidsClause = gids.stream().map(Object::toString).collect(Collectors.joining(","));
+		final String insertStockQuery = "INSERT INTO stock(dbxref_id, name, uniquename, project_id) "
+			+ "SELECT g.gid, (SELECT n.nval FROM names n WHERE n.nstat = 1 AND n.gid = g.gid), (@entryNumber := @entryNumber + 1), " + studyId   
+			+ " 	FROM germplasm g  "
+			+ "		JOIN (SELECT @entryNumber := " + startingEntryNumber + ") entryNumber" 
+			+ "WHERE g.gid IN (" + gidsClause +")";
+		this.getSession().createSQLQuery(insertStockQuery).executeUpdate();
+
+		final String insertEntryTypeProperty = "INSERT INTO stockprop(stock_id, type_id, value, cvalue_id) "
+			+ "SELECT stock_id, " + TermId.ENTRY_TYPE.getId() + ", '" + SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue() + "', "
+			+ SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() + "  "
+			+ "		FROM stock WHERE project_id = " + studyId + " AND uniquiname >= " + startingEntryNumber;
+		this.getSession().createSQLQuery(insertEntryTypeProperty).executeUpdate();
 	}
 
 }
