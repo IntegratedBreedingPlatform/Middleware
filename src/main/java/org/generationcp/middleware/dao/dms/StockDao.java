@@ -729,19 +729,20 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 
 	}
 
-	public void createStudyEntries(final Integer studyId, final Integer startingEntryNumber, final List<Integer> gids) {
+	public void createStudyEntries(final Integer studyId, final Integer startingEntryNumber, final List<Integer> gids,
+		final Integer entryTypeId, final String entryTypeValue) {
 		final String gidsClause = gids.stream().map(Object::toString).collect(Collectors.joining(","));
 		final String insertStockQuery = "INSERT INTO stock(dbxref_id, name, uniquename, project_id) "
-			+ "SELECT g.gid, (SELECT n.nval FROM names n WHERE n.nstat = 1 AND n.gid = g.gid), (@entryNumber := @entryNumber + 1), " + studyId   
-			+ " 	FROM germplasm g  "
-			+ "		JOIN (SELECT @entryNumber := " + startingEntryNumber + ") entryNumber" 
-			+ "WHERE g.gid IN (" + gidsClause +")";
+			+ "SELECT g.gid, (SELECT n.nval FROM names n WHERE n.nstat = 1 AND n.gid = g.gid), (@entryNumber \\:= @entryNumber + 1), " + studyId
+			+ " 	FROM germplsm g  "
+			+ "		JOIN (SELECT @entryNumber \\:= " + (startingEntryNumber - 1) + ") entryNumber "
+			+ "WHERE g.gid IN (" + gidsClause + ")";
 		this.getSession().createSQLQuery(insertStockQuery).executeUpdate();
 
 		final String insertEntryTypeProperty = "INSERT INTO stockprop(stock_id, type_id, value, cvalue_id) "
-			+ "SELECT stock_id, " + TermId.ENTRY_TYPE.getId() + ", '" + SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue() + "', "
-			+ SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() + "  "
-			+ "		FROM stock WHERE project_id = " + studyId + " AND uniquiname >= " + startingEntryNumber;
+			+ "SELECT stock_id, " + TermId.ENTRY_TYPE.getId() + ", '" + entryTypeValue + "', "
+			+ entryTypeId + "  "
+			+ "		FROM stock WHERE project_id = " + studyId + " AND uniquename >= " + startingEntryNumber;
 		this.getSession().createSQLQuery(insertEntryTypeProperty).executeUpdate();
 	}
 

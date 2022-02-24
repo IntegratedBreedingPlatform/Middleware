@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.generationcp.middleware.dao.GenericDAO;
@@ -69,19 +68,21 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 		}
 	}
 
-	public boolean updateByStockIdsAndTypeId(final List<Integer> stockIds, final Integer typeId, final String value) {
+	public boolean updateByStockIdsAndTypeId(final List<Integer> stockIds, final Integer typeId, final String entryTypeId,
+		final String value) {
 		try {
 			this.getSession().flush();
 
-			final String queryString = "UPDATE stockprop SET value = :value WHERE type_id = :typeId AND stock_id IN (:stockIds)";
+			final String queryString = "UPDATE stockprop SET value = :value, cvalue_id = :entryTypeId WHERE type_id = :typeId AND stock_id IN (:stockIds)";
 			final SQLQuery query = this.getSession().createSQLQuery(queryString);
 			query.setParameter("value", value);
+			query.setParameter("entryTypeId", entryTypeId);
 			query.setParameter("typeId", typeId);
 			query.setParameterList("stockIds", stockIds);
 			return query.executeUpdate() > 0;
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in updateByStockIdsAndTypeId(" + stockIds + ", " + typeId  + ", " + value
+			throw new MiddlewareQueryException("Error in updateByStockIdsAndTypeId(" + stockIds + ", " + typeId  + ", " + entryTypeId
 				+ ") in StockPropertyDao: "	+ e.getMessage(), e);
 		}
 	}

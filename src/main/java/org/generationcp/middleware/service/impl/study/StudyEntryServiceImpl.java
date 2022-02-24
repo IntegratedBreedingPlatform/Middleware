@@ -133,7 +133,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public void saveStudyEntries(final Integer studyId, final List<Integer> gids, final Integer entryTypeId) {
-		final Term entryType = this.ontologyDataManager.getTermById(entryTypeId.intValue());
+		final Term entryType = this.ontologyDataManager.getTermById(Integer.valueOf(entryTypeId));
 		final Integer nextEntryNumber = this.getNextEntryNumber(studyId);
 		this.daoFactory.getStockDao().createStudyEntries(studyId, nextEntryNumber, gids, entryType.getId(), entryType.getName());
 	}
@@ -216,9 +216,11 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public void updateStudyEntriesProperty(final StudyEntryPropertyBatchUpdateRequest studyEntryPropertyBatchUpdateRequest) {
+		final Term entryType = this.ontologyDataManager.getTermById(Integer.valueOf(studyEntryPropertyBatchUpdateRequest.getValue()));
+
 		this.daoFactory.getStockPropertyDao().updateByStockIdsAndTypeId(
 			new ArrayList<>(studyEntryPropertyBatchUpdateRequest.getSearchComposite().getItemIds()),
-			studyEntryPropertyBatchUpdateRequest.getVariableId(), studyEntryPropertyBatchUpdateRequest.getValue());
+			studyEntryPropertyBatchUpdateRequest.getVariableId(), studyEntryPropertyBatchUpdateRequest.getValue(), entryType.getName());
 	}
 
 	@Override
