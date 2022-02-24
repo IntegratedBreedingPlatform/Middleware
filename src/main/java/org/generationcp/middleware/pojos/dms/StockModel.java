@@ -108,7 +108,6 @@ public class StockModel implements Serializable {
 		this.isObsolete = isObsolete;
 	}
 
-	@Deprecated
 	public StockModel(final Integer studyId, final StudyEntryDto studyEntryDto) {
 		this.setProject(new DmsProject(studyId));
 		this.setName(studyEntryDto.getDesignation());

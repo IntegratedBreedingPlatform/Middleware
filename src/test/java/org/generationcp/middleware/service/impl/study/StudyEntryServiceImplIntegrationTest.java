@@ -11,8 +11,9 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -32,7 +33,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 /**
  * The class <code>StudyGermplasmListServiceImplTest</code> contains tests for the class <code>{@link StudyEntryServiceImpl}</code>.
@@ -40,7 +45,6 @@ import java.util.Random;
 public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private static final Integer NUMBER_OF_GERMPLASM = 5;
-	private static final Integer GERMPLASM_LIST_ID = new Random().nextInt(Integer.MAX_VALUE);
 
 	private static final String GERMPLASM_PREFERRED_NAME_PREFIX = DataSetupTest.GERMPLSM_PREFIX + "PR-";
 	private static final String ENTRYCODE = "ENTRYCODE-";
@@ -81,32 +85,54 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudyEntries() {
+	public void testSaveStudyEntries_shouldAddDefaultEntryType() {
 		final DmsProject study = this.createStudy();
-		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
+		final Germplasm germplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 
-		final Integer gid = gids.get(0);
-		final int index = NUMBER_OF_GERMPLASM + 1;
-		this.service.saveStudyEntries(study.getProjectId(), GERMPLASM_LIST_ID);
+		final GermplasmList
+			germplasmList = new GermplasmList(null, RandomStringUtils.randomAlphabetic(10), 20222302L, GermplasmList.LIST_TYPE, this.findAdminUser(), "", null, GermplasmList.Status.LIST.getCode());
+		this.daoFactory.getGermplasmListDAO().save(germplasmList);
 
-		Assert.assertEquals(1, addedStudyEntries.size());
-		final StudyEntryDto dto = addedStudyEntries.get(0);
-		this.verifyStudyEntryDetails(gid, index, dto);
-		Assert.assertEquals(index, this.service.countStudyEntries(study.getProjectId()));
+		final String designation = RandomStringUtils.randomAlphabetic(10);
+		final GermplasmListData
+			germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "1", "Unknown", designation, "LNAME", 0, null);
+		this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+
+		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+
+		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		assertThat(studyEntries, hasSize(1));
+
+		final StudyEntryDto studyEntryDto = studyEntries.get(0);
+		assertNotNull(studyEntryDto.getEntryId());
+		assertThat(studyEntryDto.getEntryNumber(), is(1));
+		assertThat(studyEntryDto.getGid(), is(germplasm.getGid()));
+		assertThat(studyEntryDto.getDesignation(), is(germplasm.getPreferredName().getNval()));
+
+		// TODO: assert properties once we finally move / remove the
+//		assertThat(studyEntryDto.getProperties(), hasSize(1));
 	}
 
 	@Test
 	public void testGetNextEntryNumber() {
 		final DmsProject study = this.createStudy();
-		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
+		final Germplasm germplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 
-		final Integer gid = gids.get(0);
-		final int index = NUMBER_OF_GERMPLASM + 1;
-		final StudyEntryDto studyEntryDto = this.createTestStudyEntry(index, gid);
-		final List<StudyEntryDto> addedStudyEntries =
-			this.service.saveStudyEntries(study.getProjectId(), , Collections.singletonList(studyEntryDto));
+		final GermplasmList
+			germplasmList = new GermplasmList(null, RandomStringUtils.randomAlphabetic(10), 20222302L, GermplasmList.LIST_TYPE, this.findAdminUser(), "", null, GermplasmList.Status.LIST.getCode());
+		this.daoFactory.getGermplasmListDAO().save(germplasmList);
+
+		final String designation = RandomStringUtils.randomAlphabetic(10);
+		final GermplasmListData
+			germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "1", "Unknown", designation, "LNAME", 0, null);
+		this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+
+		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+
+		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+
 		final Integer nextEntryNumber = this.service.getNextEntryNumber(study.getProjectId());
-		final int expectedValue = addedStudyEntries.get(0).getEntryNumber() + 1;
+		final int expectedValue = studyEntries.get(0).getEntryNumber() + 1;
 		Assert.assertEquals(Integer.toString(expectedValue), nextEntryNumber.toString());
 	}
 
