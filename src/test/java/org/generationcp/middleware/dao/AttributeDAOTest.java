@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
@@ -10,7 +11,6 @@ import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -26,9 +26,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AttributeDAOTest extends IntegrationTestBase {
 
@@ -47,8 +45,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 
 	private DaoFactory daoFactory;
 
-	@Autowired
-	private GermplasmDataManager germplasmDataDM;
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	@Before
 	public void setup() {
@@ -67,6 +64,10 @@ public class AttributeDAOTest extends IntegrationTestBase {
 
 		if (this.germplasmDao == null) {
 			this.germplasmDao = new GermplasmDAO(session);
+		}
+
+		if (this.germplasmTestDataGenerator == null) {
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 		}
 
 		if (CollectionUtils.isEmpty(this.gids) || CollectionUtils.isEmpty(this.guids)) {
@@ -175,7 +176,9 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1,
 				0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final Integer germplasmGID = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+
+		// atributs
 		final String value = RandomStringUtils.randomAlphanumeric(50);
 		final Attribute attribute = this.saveAttribute(germplasm, NOTE_ATTRIBUTE, value);
 
@@ -197,7 +200,9 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	public void testCountAttributeValues() {
 		final Germplasm germplasm =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final Integer germplasmGID = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+
+		// atributs
 		final String value = RandomStringUtils.randomAlphanumeric(50);
 		final Attribute attribute = this.saveAttribute(germplasm, NOTE_ATTRIBUTE, value);
 
@@ -222,7 +227,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		attribute.setAval(value);
 		attribute.setAdate(germplasm.getGdate());
 
-		this.germplasmDataDM.addGermplasmAttribute(attribute);
+		this.daoFactory.getAttributeDAO().saveOrUpdate(attribute);
 		return attribute;
 	}
 
