@@ -14,11 +14,9 @@ import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.GermplasmDAO;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -38,9 +36,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-
 public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	private static final String TEST_LIST_1_PARENT = "Test List #1 Parent";
@@ -53,9 +48,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private GermplasmListManager manager;
-
-	@Autowired
-	private GermplasmDataManager dataManager;
 
 	@Autowired
 	private DataImportService dataImportService;
@@ -78,9 +70,16 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 	private Germplasm testGermplasm;
 	private DataSetupTest dataSetupTest;
+	private DaoFactory daoFactory;
 
 	@Before
 	public void setUpBefore() {
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+
+		if (this.germplasmTestDataGenerator == null) {
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+		}
+
 		final GermplasmListTestDataInitializer germplasmListTDI = new GermplasmListTestDataInitializer();
 		this.dataSetupTest = new DataSetupTest();
 		this.dataSetupTest.setDataImportService(this.dataImportService);
@@ -90,7 +89,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 		final CropType cropType = new CropType();
 		cropType.setUseUUID(false);
-		this.dataManager.addGermplasm(this.testGermplasm, this.testGermplasm.getPreferredName(), cropType);
+		this.germplasmTestDataGenerator.addGermplasm(this.testGermplasm, this.testGermplasm.getPreferredName(), cropType);
 
 
 		final GermplasmList germplasmListOther = germplasmListTDI
@@ -151,10 +150,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 			GermplasmListDataTestDataInitializer.createGermplasmListData(testGermplasmList, this.testGermplasm.getGid(), 2);
 		this.manager.addGermplasmListData(listData);
 
-		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.dataManager, new NameDAO(this.sessionProvder
-				.getSession()));
-		}
 
 	}
 

@@ -37,16 +37,22 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 	private Germplasm maleParent;
 
 	private NameDAO nameDAO;
+
+	private DaoFactory daoFactory;
 	
 	@Before
 	public void setup() {
+
+		if (this.daoFactory == null) {
+			this.daoFactory = new DaoFactory(this.sessionProvder);
+		}
 		if (this.nameDAO == null) {
 			this.nameDAO = new NameDAO(this.sessionProvder.getSession());
 		}
 
 		if (this.maternalGrandParent1 == null){
 			this.maternalGrandParent1 = GermplasmTestDataInitializer.createGermplasm(1);
-			this.germplasmManager.save(this.maternalGrandParent1);
+			this.daoFactory.getGermplasmDao().save(this.maternalGrandParent1);
 			this.maternalGrandParent1.getPreferredName().setGermplasm(this.maternalGrandParent1);
 			this.nameDAO.save(this.maternalGrandParent1.getPreferredName());
 
@@ -54,7 +60,7 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 
 		if (this.maternalGrandParent2 == null){
 			this.maternalGrandParent2 = GermplasmTestDataInitializer.createGermplasm(1);
-			this.germplasmManager.save(this.maternalGrandParent2);
+			this.daoFactory.getGermplasmDao().save(this.maternalGrandParent2);
 			this.maternalGrandParent2.getPreferredName().setGermplasm(this.maternalGrandParent2);
 			this.nameDAO.save(this.maternalGrandParent2.getPreferredName());
 		}
@@ -63,7 +69,7 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 			this.femaleParent = GermplasmTestDataInitializer.createGermplasm(1);
 			this.femaleParent.setGpid1(this.maternalGrandParent1.getGid());
 			this.femaleParent.setGpid2(this.maternalGrandParent2.getGid());
-			this.germplasmManager.save(this.femaleParent);
+			this.daoFactory.getGermplasmDao().save(this.femaleParent);
 			this.femaleParent.getPreferredName().setGermplasm(this.femaleParent);
 			this.nameDAO.save(this.femaleParent.getPreferredName());
 
@@ -71,7 +77,7 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 
 		if (this.maleParent == null){
 			this.maleParent = GermplasmTestDataInitializer.createGermplasm(1);
-			this.germplasmManager.save(this.maleParent);
+			this.daoFactory.getGermplasmDao().save(this.maleParent);
 			this.maleParent.getPreferredName().setGermplasm(this.maleParent);
 			this.nameDAO.save(this.maleParent.getPreferredName());
 
@@ -81,14 +87,14 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 			this.crossWithUnknownParent.setGpid1(this.femaleParent.getGid());
 			// Set male parent as Unknown
 			this.crossWithUnknownParent.setGpid2(0);
-			this.germplasmManager.save(this.crossWithUnknownParent);
+			this.daoFactory.getGermplasmDao().save(this.crossWithUnknownParent);
 		}
 
 		if (this.crossWithKnownParents == null) {
 			this.crossWithKnownParents = GermplasmTestDataInitializer.createGermplasm(1);
 			this.crossWithKnownParents.setGpid1(this.femaleParent.getGid());
 			this.crossWithKnownParents.setGpid2(this.maleParent.getGid());
-			this.germplasmManager.save(this.crossWithKnownParents);
+			this.daoFactory.getGermplasmDao().save(this.crossWithKnownParents);
 		}
 
 		
@@ -112,7 +118,7 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testGeneratePedigreeTreeWithUnknownMaleParentIncludingDerivativeLines() {
 		this.crossWithUnknownParent.setGnpgs(-1);
-		this.germplasmManager.save(this.crossWithUnknownParent);
+		this.daoFactory.getGermplasmDao().save(this.crossWithUnknownParent);
 
 		final GermplasmPedigreeTree tree = this.pedigreeManager.generatePedigreeTree(this.crossWithUnknownParent.getGid(), 3, true);
 		Assert.assertEquals(this.crossWithUnknownParent, tree.getRoot().getGermplasm());
@@ -143,7 +149,7 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 	public void testGeneratePedigreeTreeWithUnknownFemaleParent() {
 		this.crossWithUnknownParent.setGpid1(0);
 		this.crossWithUnknownParent.setGpid2(this.maleParent.getGid());
-		this.germplasmManager.save(this.crossWithUnknownParent);
+		this.daoFactory.getGermplasmDao().save(this.crossWithUnknownParent);
 
 		final GermplasmPedigreeTree tree = this.pedigreeManager.generatePedigreeTree(this.crossWithUnknownParent.getGid(), 2);
 		Assert.assertEquals(this.crossWithUnknownParent, tree.getRoot().getGermplasm());
@@ -162,7 +168,7 @@ public class PedigreeDataManagerImplTest extends IntegrationTestBase {
 	public void testGeneratePedigreeTreeWithTwoUnknownParents() {
 		//  Make both parents unknown
 		this.crossWithUnknownParent.setGpid1(0);
-		this.germplasmManager.save(this.crossWithUnknownParent);
+		this.daoFactory.getGermplasmDao().save(this.crossWithUnknownParent);
 
 		final GermplasmPedigreeTree tree = this.pedigreeManager.generatePedigreeTree(this.crossWithUnknownParent.getGid(), 2);
 		Assert.assertEquals(this.crossWithUnknownParent, tree.getRoot().getGermplasm());

@@ -1,18 +1,18 @@
 
 package org.generationcp.middleware.dao.germplasmlist;
 
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
-import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
@@ -68,9 +68,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	private GermplasmListManager manager;
 
 	@Autowired
-	private GermplasmDataManager dataManager;
-
-	@Autowired
 	private OntologyDataManager ontologyManager;
 
 	@Autowired
@@ -81,12 +78,13 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	private GermplasmListDAO germplasmListDAO;
 	private GermplasmListDataDAO germplasmListDataDAO;
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	private GermplasmList list;
 	private Germplasm germplasm;
 	private Project commonTestProject;
 
-	private StudyReference studyReference;
+	private DaoFactory daoFactory;
 	private StudyTestDataInitializer studyTDI;
 
 	private CropType cropType;
@@ -103,8 +101,11 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+
 		this.germplasmListDAO = new GermplasmListDAO();
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 
 		this.germplasmListDataDAO = new GermplasmListDataDAO();
 		this.germplasmListDataDAO.setSession(this.sessionProvder.getSession());
@@ -131,7 +132,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		this.studyTDI = new StudyTestDataInitializer(studyDataManager, this.ontologyManager, this.commonTestProject,
 			this.locationManager, this.sessionProvder);
 
-		this.studyReference = this.studyTDI.addTestStudy("ABCD");
 
 	}
 
@@ -924,7 +924,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm =
 			new Germplasm(null, UNKNOWN_GENERATIVE_METHOD_ID, 0, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(),
 				name);
-		this.dataManager.addGermplasm(germplasm, name, this.cropType);
+		this.germplasmTestDataGenerator.addGermplasm(germplasm, name, this.cropType);
 		return germplasm;
 	}
 

@@ -137,15 +137,6 @@ public class OntologyDataManagerImpl extends DataManager implements OntologyData
 		}
 	}
 
-	/**
-	 * @deprecated
-	 */
-	@Deprecated
-	@Override
-	public Term addMethod(final String name, final String definition) {
-		return this.addTerm(name, definition, CvId.METHODS);
-	}
-
 	@Override
 	public Set<StandardVariable> findStandardVariablesByNameOrSynonym(final String nameOrSynonym, final String programUUID) {
 		final Set<StandardVariable> standardVariables = new HashSet<>();
