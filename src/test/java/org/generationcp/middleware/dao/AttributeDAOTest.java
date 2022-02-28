@@ -173,15 +173,11 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		Mockito.when(pageable.getPageNumber()).thenReturn(0);
 
 		final Germplasm germplasm =
-			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1,
+				0, 1, 1, "MethodName", "LocationName");
 		final Integer germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
-
-		final Map<String, String> fields = new HashMap<>();
-		// atributs
-		fields.put(NOTE_ATTRIBUTE, "");
-		for (final Map.Entry<String, String> attributEntry : fields.entrySet()) {
-			final Attribute attribute = this.saveAttribute(germplasm, attributEntry.getKey());
-		}
+		final String value = RandomStringUtils.randomAlphanumeric(50);
+		final Attribute attribute = this.saveAttribute(germplasm, NOTE_ATTRIBUTE, value);
 
 		final AttributeValueSearchRequestDto request = new AttributeValueSearchRequestDto();
 		request.setGermplasmDbIds(Collections.singletonList(germplasm.getGermplasmUUID()));
@@ -190,13 +186,28 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(1, result.size());
 		Assert.assertTrue(result.stream().allMatch(cVTerm -> cVTerm.getAttributeName().equalsIgnoreCase(NOTE_ATTRIBUTE.toUpperCase())));
 		Assert.assertEquals(NOTE_ATTRIBUTE, result.get(0).getAttributeName());
+		Assert.assertEquals(value, result.get(0).getValue());
+		Assert.assertEquals(germplasm.getGermplasmUUID(), result.get(0).getGermplasmDbId());
+		Assert.assertEquals(Integer.toString(attribute.getTypeId()), result.get(0).getAttributeDbId());
+		Assert.assertEquals(Integer.toString(attribute.getAid()), result.get(0).getAttributeValueDbId());
+		Assert.assertEquals(germplasm.getPreferredName().getNval(), result.get(0).getGermplasmName());
 	}
 
 	@Test
 	public void testCountAttributeValues() {
+		final Germplasm germplasm =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer germplasmGID = this.germplasmDataDM.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+		final String value = RandomStringUtils.randomAlphanumeric(50);
+		final Attribute attribute = this.saveAttribute(germplasm, NOTE_ATTRIBUTE, value);
+
+		final AttributeValueSearchRequestDto request = new AttributeValueSearchRequestDto();
+		request.setGermplasmDbIds(Collections.singletonList(germplasm.getGermplasmUUID()));
+
+		Assert.assertEquals(1, this.daoFactory.getAttributeDAO().countAttributeValueDtos(request, "1"));
 	}
 
-	private Attribute saveAttribute(final Germplasm germplasm, final String attributeType) {
+	private Attribute saveAttribute(final Germplasm germplasm, final String attributeType, final String value) {
 		CVTerm cvTerm =
 			this.daoFactory.getCvTermDao().getByNameAndCvId(attributeType, CvId.VARIABLES.getId());
 
@@ -208,7 +219,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		final Attribute attribute = new Attribute();
 		attribute.setGermplasmId(germplasm.getGid());
 		attribute.setTypeId(cvTerm.getCvTermId());
-		attribute.setAval(RandomStringUtils.randomAlphanumeric(50)); //TODO add this to assertion
+		attribute.setAval(value);
 		attribute.setAdate(germplasm.getGdate());
 
 		this.germplasmDataDM.addGermplasmAttribute(attribute);
