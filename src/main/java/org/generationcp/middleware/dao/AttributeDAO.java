@@ -403,7 +403,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		}
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
 			sql.append(" AND EXISTS (SELECT * FROM external_reference_atributs ref ");
-			sql.append(" WHERE a.aid = ref.aid AND ref.reference_id IN (:referenceIds)) ");
+			sql.append(" WHERE a.aid = ref.aid AND ref.reference_id IN (:referenceIDs)) ");
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
@@ -468,11 +468,11 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			sqlQuery.setParameterList("germplasmDbIds", requestDTO.getGermplasmDbIds());
 		}
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
-			sqlQuery.setParameterList("externalReferenceIDs", requestDTO.getExternalReferenceIDs());
+			sqlQuery.setParameterList("referenceIDs", requestDTO.getExternalReferenceIDs());
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
-			sqlQuery.setParameterList("externalReferenceSources", requestDTO.getExternalReferenceSources());
+			sqlQuery.setParameterList("referenceSources", requestDTO.getExternalReferenceSources());
 		}
 
 		// Search preferred names
