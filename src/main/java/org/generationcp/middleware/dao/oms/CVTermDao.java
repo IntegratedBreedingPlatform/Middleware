@@ -66,6 +66,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import static java.util.function.Function.identity;
@@ -1456,6 +1457,18 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return terms;
 	}
 
+	public List<CVTerm> getByNamesAndCvId(final Set<String> termNames, final CvId cvId) {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+			criteria.add(Restrictions.in("name", termNames));
+			criteria.add(Restrictions.eq("cvId", cvId.getId()));
+			criteria.add(Restrictions.eq("isObsolete", 0));
+			return criteria.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getByNamesAndCvId=" + termNames + "," + cvId + " query on CVTermDao", e);
+		}
+	}
+
 	public CVTerm save(final String name, final String definition, final CvId cvId) {
 		final CVTerm cvTerm = new CVTerm();
 		cvTerm.setCv(cvId.getId());
@@ -2089,5 +2102,4 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 		// TODO Complete
 	}
-
 }
