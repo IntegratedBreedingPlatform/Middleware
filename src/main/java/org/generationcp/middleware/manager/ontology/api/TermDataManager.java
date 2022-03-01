@@ -32,8 +32,6 @@ public interface TermDataManager {
 	 */
 	Term getTermById(Integer termId);
 
-	List<Term> getTermByIds(List<Integer> termIds) throws MiddlewareException;
-
 	/**
 	 * Returns term by name and cvId
 	 */

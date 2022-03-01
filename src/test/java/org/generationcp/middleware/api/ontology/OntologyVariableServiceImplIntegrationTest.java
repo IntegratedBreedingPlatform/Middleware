@@ -46,14 +46,14 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		final Variable traitVariable =
 			this.createTestVariable("testVariable");
 		final List<String> analysisNames = Arrays.asList(BLUES, BLUPS);
-		final List<Integer> creatednAnalysisVariableIds =
+		final List<Integer> createdAnalysisVariableIds =
 			this.ontologyVariableService.createAnalysisVariables(Arrays.asList(traitVariable.getId()), analysisNames,
 				VariableType.ANALYSIS.getName());
 
-		assertEquals(2, creatednAnalysisVariableIds.size());
+		assertEquals(2, createdAnalysisVariableIds.size());
 
 		final VariableFilter variableFilter = new VariableFilter();
-		creatednAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
+		createdAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
 		final List<Variable> result = this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().stream().collect(
 			Collectors.toList());
 
@@ -70,12 +70,12 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 			VariableType.ANALYSIS.getName());
 
 		// Create analysis variables again
-		final List<Integer> creatednAnalysisVariableIds =
+		final List<Integer> createdAnalysisVariableIds =
 			this.ontologyVariableService.createAnalysisVariables(Arrays.asList(traitVariable.getId()), analysisNames,
 				VariableType.ANALYSIS.getName());
 
 		final VariableFilter variableFilter = new VariableFilter();
-		creatednAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
+		createdAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
 		final List<Variable> result = this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().stream().collect(
 			Collectors.toList());
 
@@ -88,12 +88,12 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 	public void testCreateAnalysisVariablesForSummary() {
 		final Variable traitVariable = this.createTestVariable("testVariable");
 		final List<String> analysisNames = Arrays.asList(HERITABILITY, PVALUE, CV);
-		final List<Integer> creatednAnalysisVariableIds =
+		final List<Integer> createdAnalysisVariableIds =
 			this.ontologyVariableService.createAnalysisVariables(Arrays.asList(traitVariable.getId()), analysisNames,
 				VariableType.ANALYSIS_SUMMARY.getName());
 
 		final VariableFilter variableFilter = new VariableFilter();
-		creatednAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
+		createdAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
 		final List<Variable> result = this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().stream().collect(
 			Collectors.toList());
 
@@ -112,12 +112,12 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 			VariableType.ANALYSIS_SUMMARY.getName());
 
 		// Create analysis variables again
-		final List<Integer> creatednAnalysisVariableIds =
+		final List<Integer> createdAnalysisVariableIds =
 			this.ontologyVariableService.createAnalysisVariables(Arrays.asList(traitVariable.getId()), analysisNames,
 				VariableType.ANALYSIS_SUMMARY.getName());
 
 		final VariableFilter variableFilter = new VariableFilter();
-		creatednAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
+		createdAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
 		final List<Variable> result = this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().stream().collect(
 			Collectors.toList());
 
@@ -134,13 +134,13 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		final Variable traitVariable3 = this.createTestVariable("testVariable3");
 
 		final List<String> analysisNames = Arrays.asList(BLUES, BLUPS);
-		final List<Integer> creatednAnalysisVariableIds =
+		final List<Integer> createdAnalysisVariableIds =
 			this.ontologyVariableService.createAnalysisVariables(
 				Arrays.asList(traitVariable1.getId(), traitVariable2.getId(), traitVariable3.getId()),
 				analysisNames,
 				VariableType.ANALYSIS.getName());
 
-		assertEquals(6, creatednAnalysisVariableIds.size());
+		assertEquals(6, createdAnalysisVariableIds.size());
 	}
 
 	@Test
@@ -150,16 +150,16 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		final Variable traitVariable = this.createTestVariable("testVariable");
 
 		final List<String> analysisNames = Arrays.asList(BLUES);
-		final List<Integer> creatednAnalysisVariableIds =
+		final List<Integer> createdAnalysisVariableIds =
 			this.ontologyVariableService.createAnalysisVariables(
 				Arrays.asList(traitVariable.getId()),
 				analysisNames,
 				VariableType.ANALYSIS.getName());
 
-		assertEquals(1, creatednAnalysisVariableIds.size());
+		assertEquals(1, createdAnalysisVariableIds.size());
 
 		final VariableFilter variableFilter = new VariableFilter();
-		creatednAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
+		createdAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
 		final List<Variable> result = this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().stream().collect(
 			Collectors.toList());
 

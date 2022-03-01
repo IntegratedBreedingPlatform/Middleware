@@ -40,11 +40,6 @@ public class TermDataManagerImpl extends DataManager implements TermDataManager 
 	}
 
 	@Override
-	public List<Term> getTermByIds(final List<Integer> termIds) throws MiddlewareException {
-		return daoFactory.getCvTermDao().getByIds(termIds).stream().map(Term::fromCVTerm).collect(Collectors.toList());
-	}
-
-	@Override
 	public Term getTermByNameAndCvId(final String name, final int cvId) throws MiddlewareException {
 		return Term.fromCVTerm(daoFactory.getCvTermDao().getByNameAndCvId(name, cvId));
 	}
