@@ -6,6 +6,7 @@ import com.google.common.collect.TreeBasedTable;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeService;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmPedigreeServiceAsyncImpl;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
+import org.generationcp.middleware.dao.CopMatrixDao;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -32,7 +33,6 @@ import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.time.DurationFormatUtils.formatDurationHMS;
 import static org.generationcp.middleware.util.Debug.debug;
-import static org.generationcp.middleware.util.Debug.info;
 
 @Service
 @Transactional
@@ -116,11 +116,12 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 
 						final GermplasmTreeNode gid1Tree;
 						if (!nodes.containsKey(gid1)) {
-							info("retrieving pedigree: gid=%d", gid1);
+							debug("retrieving pedigree: gid=%d", gid1);
 							final Instant start = Instant.now();
 							gid1Tree = this.germplasmPedigreeService.getGermplasmPedigreeTree(gid1, LEVEL, INCLUDE_DERIVATIVE_LINES);
 							final Instant end = Instant.now();
 							debug("pedigree retrieved: gid=%d, Duration: %s", gid1, formatDurationHMS(between(start, end).toMillis()));
+							copCalculation.populateOrder(gid1Tree, 0);
 							trackNodes(gid1Tree, nodes);
 						} else {
 							gid1Tree = nodes.get(gid1);
@@ -128,18 +129,17 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 
 						final GermplasmTreeNode gid2Tree;
 						if (!nodes.containsKey(gid2)) {
-							info("retrieving pedigree: gid=%d", gid2);
+							debug("retrieving pedigree: gid=%d", gid2);
 							final Instant start = Instant.now();
 							gid2Tree = this.germplasmPedigreeService.getGermplasmPedigreeTree(gid2, LEVEL, INCLUDE_DERIVATIVE_LINES);
 							final Instant end = Instant.now();
 							debug("pedigree retrieved: gid=%d, Duration: %s", gid2, formatDurationHMS(between(start, end).toMillis()));
+							copCalculation.populateOrder(gid2Tree, 0);
 							trackNodes(gid2Tree, nodes);
 						} else {
 							gid2Tree = nodes.get(gid2);
 						}
 
-						copCalculation.populateOrder(gid1Tree, 0);
-						copCalculation.populateOrder(gid2Tree, 0);
 						final double cop = copCalculation.coefficientOfParentage(gid1Tree, gid2Tree);
 						matrixNew.put(gid1, gid2, cop);
 						matrix.put(gid1, gid2, cop);
@@ -156,11 +156,12 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 				gidProcessingQueue.put(gid1, Boolean.TRUE);
 			}
 
+			final CopMatrixDao copMatrixDao = this.daoFactory.getCopMatrixDao();
 			for (final Map.Entry<Integer, Map<Integer, Double>> rowEntrySet : matrixNew.rowMap().entrySet()) {
 				for (final Integer column : rowEntrySet.getValue().keySet()) {
 					final Integer row = rowEntrySet.getKey();
 					final CopMatrix copMatrix = new CopMatrix(row, column, matrixNew.get(row, column));
-					this.daoFactory.getCopMatrixDao().save(copMatrix);
+					copMatrixDao.save(copMatrix);
 				}
 			}
 

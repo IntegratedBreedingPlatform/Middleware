@@ -119,7 +119,7 @@ public class CopCalculation {
 			debug("cop found: (gid2=%s-gid1=%s) = %s", g2.getGid(), g1.getGid(), cop);
 			return cop;
 		}
-		info("calculating cop (gid1=%s-gid2=%s)", g1.getGid(), g2.getGid());
+		debug("calculating cop (gid1=%s-gid2=%s)", g1.getGid(), g2.getGid());
 		final Instant start = Instant.now();
 
 		double cop = COP_DEFAULT;
@@ -337,7 +337,7 @@ public class CopCalculation {
 	 * <pre>
 	 * TODO
 	 *  - unit test separately
-	 *  - improve perf
+	 *  - improve perf, memoize
 	 * </pre>
 	 */
 	private Optional<GermplasmTreeNode> getCommonDerivativeAncestor(final GermplasmTreeNode g1, final GermplasmTreeNode g2) {
