@@ -11,7 +11,6 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -27,6 +26,7 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestBase {
 
@@ -251,8 +251,11 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 			analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
 
 			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
-		} catch (final MiddlewareException e) {
-			assertEquals("Variable with same property, scale and method already exists in the database.", e.getMessage());
+			fail("Should throw an exception");
+		} catch (final Exception e) {
+			assertEquals(String.format("Variable (%s) with same property (%s), scale (%s) and method (%s) already exists in the database.",
+				existingAnalysisVariable.getId(), traitVariable.getProperty().getName(), traitVariable.getScale().getName(),
+				bluesMethod.getName()), e.getMessage());
 		}
 	}
 

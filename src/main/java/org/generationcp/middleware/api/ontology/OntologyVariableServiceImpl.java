@@ -107,7 +107,10 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 					.stream().map(p -> VariableType.getByName(p.getValue())).collect(
 						Collectors.toList());
 			if (analysisVariableVariableTypes.stream().noneMatch(SUPPORTED_VARIABLE_TYPES::contains)) {
-				throw new MiddlewareException("Variable with same property, scale and method already exists in the database.");
+				throw new MiddlewareException(
+					String.format("Variable (%s) with same property (%s), scale (%s) and method (%s) already exists in the database.",
+						analysisVariableId, traitVariable.getProperty().getName(), traitVariable.getScale().getName(),
+						method.getName()));
 			}
 		} else {
 			String analysisVariableName = traitVariable.getName() + "_" + method.getName();
