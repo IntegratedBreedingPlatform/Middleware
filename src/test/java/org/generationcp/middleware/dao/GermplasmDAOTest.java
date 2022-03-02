@@ -28,6 +28,7 @@ import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -110,7 +111,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	@Before
 	public void setUp() throws Exception {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		if (!this.testDataSetup) {
 			this.updateInventory();
@@ -1202,7 +1203,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCountGermplasmMatches_FilterByGids_RestrictByLocation() {
+	public void testCountGermplasmMatches_FilterByGids_RestrictByLocationName() {
 		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Location location = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList("DSS")).get(0);
 		germplasm1.setLocationId(location.getLocid());
@@ -1215,7 +1216,25 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGids(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
-		germplasmMatchRequestDto.setLocations(Collections.singletonList(location.getLabbr()));
+		germplasmMatchRequestDto.setLocationName(new SqlTextFilter(location.getLname(), SqlTextFilter.Type.EXACTMATCH));
+		Assert.assertEquals(1l, this.daoFactory.getGermplasmDao().countGermplasmMatches(germplasmMatchRequestDto));
+	}
+
+	@Test
+	public void testCountGermplasmMatches_FilterByGids_RestrictByLocationAbbreviation() {
+		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		final Location location = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList("DSS")).get(0);
+		germplasm1.setLocationId(location.getLocid());
+		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		final Germplasm germplasm3 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+
+		this.daoFactory.getGermplasmDao().save(germplasm1);
+		this.daoFactory.getGermplasmDao().save(germplasm2);
+		this.daoFactory.getGermplasmDao().save(germplasm3);
+
+		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
+		germplasmMatchRequestDto.setGids(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
+		germplasmMatchRequestDto.setLocationAbbreviation(new SqlTextFilter(location.getLabbr(), SqlTextFilter.Type.CONTAINS));
 		Assert.assertEquals(1l, this.daoFactory.getGermplasmDao().countGermplasmMatches(germplasmMatchRequestDto));
 	}
 
@@ -1439,7 +1458,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testFindGermplasmMatches_FilterByGids_RestrictByLocation() {
+	public void testFindGermplasmMatches_FilterByGids_RestrictByLocationName() {
 		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Location location = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList("DSS")).get(0);
 		germplasm1.setLocationId(location.getLocid());
@@ -1452,7 +1471,27 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
 		germplasmMatchRequestDto.setGids(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
-		germplasmMatchRequestDto.setLocations(Collections.singletonList(location.getLabbr()));
+		germplasmMatchRequestDto.setLocationName(new SqlTextFilter(location.getLname(), SqlTextFilter.Type.EXACTMATCH));
+		final List<GermplasmDto> germplasmMatches = this.daoFactory.getGermplasmDao().findGermplasmMatches(germplasmMatchRequestDto, null);
+		Assert.assertEquals(1, germplasmMatches.size());
+		Assert.assertEquals(germplasm1.getGid(), germplasmMatches.get(0).getGid());
+	}
+
+	@Test
+	public void testFindGermplasmMatches_FilterByGids_RestrictByLocationAbbreviation() {
+		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		final Location location = this.daoFactory.getLocationDAO().getByAbbreviations(Collections.singletonList("DSS")).get(0);
+		germplasm1.setLocationId(location.getLocid());
+		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+		final Germplasm germplasm3 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
+
+		this.daoFactory.getGermplasmDao().save(germplasm1);
+		this.daoFactory.getGermplasmDao().save(germplasm2);
+		this.daoFactory.getGermplasmDao().save(germplasm3);
+
+		final GermplasmMatchRequestDto germplasmMatchRequestDto = new GermplasmMatchRequestDto();
+		germplasmMatchRequestDto.setGids(Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid()));
+		germplasmMatchRequestDto.setLocationAbbreviation(new SqlTextFilter(location.getLabbr(), SqlTextFilter.Type.CONTAINS));
 		final List<GermplasmDto> germplasmMatches = this.daoFactory.getGermplasmDao().findGermplasmMatches(germplasmMatchRequestDto, null);
 		Assert.assertEquals(1, germplasmMatches.size());
 		Assert.assertEquals(germplasm1.getGid(), germplasmMatches.get(0).getGid());

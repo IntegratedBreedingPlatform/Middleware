@@ -34,6 +34,7 @@ import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
@@ -1475,9 +1476,17 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				sqlQueryParamBuilder.append(" and m.mcode in (:methodsList) ");
 				sqlQueryParamBuilder.setParameterList("methodsList", germplasmMatchRequestDto.getMethods());
 			}
-			if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getLocations())) {
-				sqlQueryParamBuilder.append(" and l.labbr in (:locationsList) ");
-				sqlQueryParamBuilder.setParameterList("locationsList", germplasmMatchRequestDto.getLocations());
+			final SqlTextFilter locationNameFilter = germplasmMatchRequestDto.getLocationName();
+			if (locationNameFilter != null) {
+				final SqlTextFilter.Type type = locationNameFilter.getType();
+				sqlQueryParamBuilder.append(" and l.lname " + getOperator(type) + " :locationName ");
+				sqlQueryParamBuilder.setParameter("locationName",  getParameter(type, locationNameFilter.getValue()));
+			}
+			final SqlTextFilter locationAbbrevationFilter = germplasmMatchRequestDto.getLocationAbbreviation();
+			if (locationAbbrevationFilter != null) {
+				final SqlTextFilter.Type type = locationAbbrevationFilter.getType();
+				sqlQueryParamBuilder.append(" and l.labbr " + getOperator(type) + " :locationAbbr ");
+				sqlQueryParamBuilder.setParameter("locationAbbr",  getParameter(type, locationAbbrevationFilter.getValue()));
 			}
 		}
 

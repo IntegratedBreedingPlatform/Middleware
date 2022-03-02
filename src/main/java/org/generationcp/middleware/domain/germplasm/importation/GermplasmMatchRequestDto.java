@@ -1,6 +1,7 @@
 package org.generationcp.middleware.domain.germplasm.importation;
 
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 import org.springframework.util.CollectionUtils;
@@ -14,7 +15,8 @@ public class GermplasmMatchRequestDto {
 	private List<String> germplasmUUIDs = Lists.newArrayList();
 	private List<String> names = Lists.newArrayList();
 	private List<Integer> gids = Lists.newArrayList();
-	private List<String> locations;
+	private SqlTextFilter locationName;
+	private SqlTextFilter locationAbbreviation;
 	private List<String> methods;
 	private List<String> nameTypes;
 
@@ -50,12 +52,20 @@ public class GermplasmMatchRequestDto {
 		this.gids = gids;
 	}
 
-	public List<String> getLocations() {
-		return this.locations;
+	public SqlTextFilter getLocationName() {
+		return this.locationName;
 	}
 
-	public void setLocations(final List<String> locations) {
-		this.locations = locations;
+	public void setLocationName(final SqlTextFilter locationName) {
+		this.locationName = locationName;
+	}
+
+	public SqlTextFilter getLocationAbbreviation() {
+		return this.locationAbbreviation;
+	}
+
+	public void setLocationAbbreviation(final SqlTextFilter locationAbbreviation) {
+		this.locationAbbreviation = locationAbbreviation;
 	}
 
 	public List<String> getMethods() {
@@ -101,7 +111,7 @@ public class GermplasmMatchRequestDto {
 
 	public boolean restrictingFiltersSpecified() {
 		// Location and method filters will merely restrict any initial matches from the main filters
-		return !CollectionUtils.isEmpty(this.locations) || !CollectionUtils.isEmpty(this.methods);
+		return this.locationAbbreviation != null || this.locationName != null || !CollectionUtils.isEmpty(this.methods);
 	}
 
 
