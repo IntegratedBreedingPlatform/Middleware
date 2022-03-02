@@ -14,8 +14,10 @@ package org.generationcp.middleware.dao;
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
+import org.generationcp.middleware.dao.util.VariableUtils;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -396,8 +398,17 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		if (!CollectionUtils.isEmpty(requestDTO.getAttributeValueDbIds())) {
 			sql.append(" AND a.aid IN (:attributeValueDbIds)");
 		}
+
 		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
+			sql.append(" AND cv.cvterm_id IN (  SELECT vrsr.subject_id ");
+			sql.append(
+				"						FROM cvterm_relationship vrsr INNER JOIN cvterm s ON s.cvterm_id = vrsr.object_id AND vrsr.type_id = ");
+			sql.append(TermRelationshipId.HAS_SCALE.getId() + " ");
+			sql.append(
+				" 						INNER JOIN cvterm_relationship drsr ON drsr.subject_id = vrsr.object_id AND drsr.type_id = ");
+			sql.append(TermRelationshipId.HAS_TYPE.getId() + " AND drsr.object_id IN (:dataTypeIds) ) ");
 		}
+
 		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
 			sql.append(" AND g.germplsm_uuid IN (:germplasmDbIds)");
 		}
@@ -461,7 +472,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			sqlQuery.setParameterList("attributeValueDbIds", requestDTO.getAttributeValueDbIds());
 		}
 		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
-			sqlQuery.setParameterList("dataTypes", requestDTO.getDataTypes());
+			sqlQuery.setParameterList("dataTypeIds", VariableUtils.convertBrapiDataTypeToDataTypeIds(requestDTO.getDataTypes()));
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {

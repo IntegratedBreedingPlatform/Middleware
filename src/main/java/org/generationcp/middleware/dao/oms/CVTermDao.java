@@ -13,6 +13,7 @@ package org.generationcp.middleware.dao.oms;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.dao.util.VariableUtils;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -1502,7 +1503,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public void addObservationVariableSearchParameters(final SQLQuery sqlQuery, final VariableSearchRequestDTO requestDTO) {
 		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
-			sqlQuery.setParameterList("dataTypeIds", this.convertBrapiDataTypeToDataTypeIds(requestDTO.getDataTypes()));
+			sqlQuery.setParameterList("dataTypeIds", VariableUtils.convertBrapiDataTypeToDataTypeIds(requestDTO.getDataTypes()));
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
@@ -1818,17 +1819,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		} else {
 			return StringUtils.EMPTY;
 		}
-	}
-
-	protected List<String> convertBrapiDataTypeToDataTypeIds(final List<String> brapiDataTypeNames) {
-		final List<String> dataTypeIds = new ArrayList<>();
-		for (final String brapiDataTypeName : brapiDataTypeNames) {
-			final DataType dataType = DataType.getByBrapiName(brapiDataTypeName);
-			if (dataType != null) {
-				dataTypeIds.add(dataType.getId().toString());
-			}
-		}
-		return dataTypeIds;
 	}
 
 	/**
