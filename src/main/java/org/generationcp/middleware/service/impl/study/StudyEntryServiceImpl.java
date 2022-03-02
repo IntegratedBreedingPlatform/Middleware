@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
@@ -18,6 +19,8 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -28,17 +31,16 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -125,10 +127,29 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public void saveStudyEntries(final Integer studyId, final Integer listId) {
-		// Check if the germplasm list has already the ENTRY_TYPE variable. Otherwise, we add entry default with a default value
-		final List<Integer> listVariables =
-			this.germplasmListService.getListOntologyVariables(listId, Arrays.asList(TermId.ENTRY_TYPE.getId()));
-		this.daoFactory.getStockDao().createStudyEntries(studyId, listId, CollectionUtils.isEmpty(listVariables));
+		final DmsProject plotDataDataset =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+		// Filter all entry details project variable that the project currently has because entry details are going to be added later
+		final List<ProjectProperty> projectProperties = plotDataDataset.getProperties()
+			.stream()
+			.filter(projectProperty -> !VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()))
+			.collect(Collectors.toList());
+
+		// Add germplasm list entry details as project properties
+		final AtomicInteger projectPropertyInitialRank = new AtomicInteger(plotDataDataset.getNextPropertyRank());
+		final List<Variable> germplasmListVariables = this.germplasmListService.getGermplasmListVariables(null, listId, null);
+		final List<ProjectProperty> entryDetailsProjectProperties = germplasmListVariables.stream()
+			.map(variable -> new ProjectProperty(plotDataDataset, VariableType.ENTRY_DETAIL.getId(), null,
+				projectPropertyInitialRank.getAndIncrement(), variable.getId(), variable.getName()))
+			.collect(Collectors.toList());
+		projectProperties.addAll(entryDetailsProjectProperties);
+
+		plotDataDataset.setProperties(projectProperties);
+		this.daoFactory.getDmsProjectDAO().save(plotDataDataset);
+
+		final boolean listHasEntryType =
+			germplasmListVariables.stream().anyMatch(variable -> variable.getId() == TermId.ENTRY_TYPE.getId());
+		this.daoFactory.getStockDao().createStudyEntries(studyId, listId, !listHasEntryType);
 	}
 
 	@Override
@@ -225,4 +246,5 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public Boolean hasUnassignedEntries(final int studyId) {
 		return this.daoFactory.getStockDao().hasUnassignedEntries(studyId);
 	}
+
 }

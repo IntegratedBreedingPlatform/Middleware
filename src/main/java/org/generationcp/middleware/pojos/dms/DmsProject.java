@@ -11,7 +11,6 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.StudyExternalReference;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.annotations.Cache;
@@ -84,9 +83,9 @@ public class DmsProject implements Serializable {
 	/**
 	 * List of Project Properties
 	 */
-	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+	@OneToMany(mappedBy = "project", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
 	@BatchSize(size = 1000)
-	private List<ProjectProperty> properties;
+	private List<ProjectProperty> properties = new ArrayList<>();
 
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	@Basic(optional = false)
@@ -198,7 +197,8 @@ public class DmsProject implements Serializable {
 	}
 
 	public void setProperties(final List<ProjectProperty> properties) {
-		this.properties = properties;
+		this.properties.clear();
+		this.properties.addAll(properties);
 	}
 
 	public boolean getDeleted() {
@@ -360,4 +360,13 @@ public class DmsProject implements Serializable {
 		}
 		this.properties.add(property);
 	}
+
+
+	public int getNextPropertyRank() {
+		 return this.getProperties().stream()
+			 .map(ProjectProperty::getRank)
+			 .max(Integer::compareTo)
+			 .orElse(0) + 1;
+	}
+
 }

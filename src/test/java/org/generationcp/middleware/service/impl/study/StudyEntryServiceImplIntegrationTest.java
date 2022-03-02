@@ -33,6 +33,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -91,9 +92,11 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final GermplasmList
 			germplasmList = new GermplasmList(null, RandomStringUtils.randomAlphabetic(10), 20222302L, GermplasmList.LIST_TYPE, this.findAdminUser(), "", null, GermplasmList.Status.LIST.getCode());
+
 		this.daoFactory.getGermplasmListDAO().save(germplasmList);
 
 		final String designation = RandomStringUtils.randomAlphabetic(10);
+		// TODO: create an entry details and add it to a germplasm view. Then assert that the entry details is a project property
 		final GermplasmListData
 			germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "1", "Unknown", designation, "LNAME", 0, null);
 		this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
@@ -109,8 +112,10 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(studyEntryDto.getGid(), is(germplasm.getGid()));
 		assertThat(studyEntryDto.getDesignation(), is(germplasm.getPreferredName().getNval()));
 
-		// TODO: assert properties once we finally move / remove the
-//		assertThat(studyEntryDto.getProperties(), hasSize(1));
+		final Map<Integer, StudyEntryPropertyData> properties = studyEntryDto.getProperties();
+		// Despite germplasm list doesn't have ENTRY_TYPE as entry variable, it must be present in the study as a property because it's mandatory
+		this.assertStudyEntryProperty(properties.get(TermId.ENTRY_TYPE.getId()), TermId.ENTRY_TYPE,
+			SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue(), SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
 	}
 
 	@Test
@@ -343,6 +348,14 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 			experimentModel.setStock(stock);
 			this.daoFactory.getExperimentDao().save(experimentModel);
 		}
+	}
+
+	private void assertStudyEntryProperty(final StudyEntryPropertyData entryPropertyData, final TermId termId, final String value, final Integer categoricalValueId) {
+		assertNotNull(entryPropertyData);
+		assertNotNull(entryPropertyData.getStudyEntryPropertyId());
+		assertThat(entryPropertyData.getVariableId(), is(termId.getId()));
+		assertThat(entryPropertyData.getValue(), is(value));
+		assertThat(entryPropertyData.getCategoricalValueId(), is(categoricalValueId));
 	}
 
 }
