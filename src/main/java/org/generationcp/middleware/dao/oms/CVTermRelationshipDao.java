@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.dao.oms;
 
+import org.apache.commons.collections.map.LinkedMap;
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -278,8 +280,10 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		final SQLQuery query = this.getSession().createSQLQuery(
 			"SELECT DISTINCT v.name category "
 				+ " FROM cvterm_relationship scale_values "
-				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id and scale_values.subject_id = :scaleId and scale_values.type_id = " + TermId.HAS_VALUE.getId()
-				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE.getId()
+				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id and scale_values.subject_id = :scaleId and scale_values.type_id = "
+				+ TermId.HAS_VALUE.getId()
+				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = "
+				+ TermId.HAS_SCALE.getId()
 				+ " WHERE EXISTS ( "
 				+ "     SELECT 1    	 "
 				+ "     FROM atributs a "
@@ -433,6 +437,36 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 			}
 		}
 		return map;
+	}
+
+	public MultiKeyMap retrieveAnalysisMethodsOfTraits(final List<Integer> traitVariableIds,
+		final List<Integer> analysisMethodIds) {
+		try {
+			final String sqlQuery = "select\n"
+				+ "cr.subject_id as originalVariableId,\n"
+				+ "cr.object_id as analysisVariableId,\n"
+				+ "mr.object_id as analysisVariableMethodId\n"
+				+ "from cvterm_relationship cr\n"
+				+ "INNER JOIN cvterm_relationship mr ON cr.object_id = mr.subject_id AND mr.type_id = " + TermId.HAS_METHOD.getId()
+				+ " AND mr.object_id in (:analysisMethodIds)\n"
+				+ "WHERE cr.type_id = " + TermId.HAS_ANALYSIS_VARIABLE.getId() + " and cr.subject_id IN (:traitVariableIds)";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sqlQuery);
+			query.setParameterList("traitVariableIds", traitVariableIds);
+			query.setParameterList("analysisMethodIds", analysisMethodIds);
+			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+			final MultiKeyMap returnValue = MultiKeyMap.decorate(new LinkedMap());
+			final List<Map<String, Integer>> results = query.list();
+			for (final Map<String, Integer> row : results) {
+				returnValue.put(row.get("originalVariableId"), row.get("analysisVariableMethodId"), row.get("analysisVariableId"));
+			}
+			return returnValue;
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with retrieveAnalysisMethodsOfTraits=" + traitVariableIds
+				+ ", " + analysisMethodIds + " query from CVTermRelationship: " + e.getMessage(), e);
+		}
 	}
 
 }
