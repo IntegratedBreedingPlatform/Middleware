@@ -15,7 +15,7 @@ public interface OntologyVariableService {
 
 	Map<Integer, Variable> getVariablesWithFilterById(VariableFilter variableFilter);
 
-	List<Integer> createAnalysisVariables(List<Integer> variableIds, List<String> analysisNames, String variableType);
+	List<Integer> createAnalysisVariables(AnalysisVariablesImportRequest analysisVariablesImportRequest);
 
 	Multimap<Integer, VariableType> getVariableTypesOfVariables(List<Integer> variableIds);
 }

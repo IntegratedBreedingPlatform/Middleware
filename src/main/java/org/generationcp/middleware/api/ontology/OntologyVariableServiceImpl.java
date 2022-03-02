@@ -47,8 +47,11 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 	}
 
 	@Override
-	public List<Integer> createAnalysisVariables(final List<Integer> variableIds, final List<String> analysisNames,
-		final String variableType) {
+	public List<Integer> createAnalysisVariables(final AnalysisVariablesImportRequest analysisVariablesImportRequest) {
+
+		final List<Integer> variableIds = analysisVariablesImportRequest.getVariableIds();
+		final List<String> analysisMethodNames = analysisVariablesImportRequest.getAnalysisMethodNames();
+		final String variableType = analysisVariablesImportRequest.getVariableType();
 
 		final List<Integer> analysisVariableIds = new ArrayList<>();
 		final VariableFilter variableFilter = new VariableFilter();
@@ -56,7 +59,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 		// Get the existing trait variables
 		final Map<Integer, Variable> variablesMap = this.daoFactory.getCvTermDao().getVariablesWithFilterById(variableFilter);
 		// Create ontology methods for analysis names if not yet present, will also return methods if already present
-		final Map<String, CVTerm> methodsMap = this.createOntologyMethodsIfNecessary(analysisNames);
+		final Map<String, CVTerm> methodsMap = this.createOntologyMethodsIfNecessary(analysisMethodNames);
 		// Check if the analysis variables associated to trait variables are already present
 		final MultiKeyMap existingAnalysisMethodsOfTraitsMap = this.daoFactory.getCvTermRelationshipDao()
 			.retrieveAnalysisMethodsOfTraits(variableIds, methodsMap.values().stream().map(CVTerm::getCvTermId).collect(
@@ -64,7 +67,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 
 		// Create analysis variable for every trait and analysis methods combination
 		for (final Map.Entry<Integer, Variable> variableEntry : variablesMap.entrySet()) {
-			for (final String analysisName : analysisNames) {
+			for (final String analysisName : analysisMethodNames) {
 				final CVTerm method = methodsMap.get(analysisName);
 				// If analysis variable already exists for specific trait, do not create new, just return the existing id of analysis variable
 				if (existingAnalysisMethodsOfTraitsMap.containsKey(variableEntry.getKey(), method.getCvTermId())) {
