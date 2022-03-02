@@ -1,7 +1,7 @@
 package org.generationcp.middleware.api.analysis;
 
+import com.google.common.collect.ImmutableMap;
 import org.generationcp.middleware.domain.dms.ExperimentType;
-import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -21,10 +21,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class AnalysisServiceImpl implements AnalysisService {
+
+	public static final Map<Integer, VariableType> MEANS_DATASET_DMSPROJECT_PROPERTIES = ImmutableMap.<Integer, VariableType>builder()
+		.put(TermId.DATASET_NAME.getId(), VariableType.STUDY_DETAIL)
+		.put(TermId.DATASET_TITLE.getId(), VariableType.STUDY_DETAIL)
+		.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), VariableType.ENVIRONMENT_DETAIL)
+		.put(TermId.ENTRY_TYPE.getId(), VariableType.GERMPLASM_DESCRIPTOR)
+		.put(TermId.GID.getId(), VariableType.GERMPLASM_DESCRIPTOR)
+		.put(TermId.DESIG.getId(), VariableType.GERMPLASM_DESCRIPTOR)
+		.put(TermId.ENTRY_NO.getId(), VariableType.GERMPLASM_DESCRIPTOR)
+		.put(TermId.OBS_UNIT_ID.getId(), VariableType.GERMPLASM_DESCRIPTOR).build();
 
 	private final DaoFactory daoFactory;
 
@@ -38,49 +49,33 @@ public class AnalysisServiceImpl implements AnalysisService {
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(meansRequestDto.getStudyId());
 		final Set<String> analysisVariableNames =
 			meansRequestDto.getData().stream().map(o -> o.getValues().keySet()).flatMap(Set::stream).collect(Collectors.toSet());
-
 		final Map<String, CVTerm> analaysisVariablesMap =
 			this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisVariableNames, CvId.VARIABLES).stream().collect(Collectors.toMap(
 				CVTerm::getName, Function.identity()));
 
 		// Create means dataset
+		final DmsProject meansDataset = this.createMeansDataset(study);
+		// Add necessary dataset project properties
+		this.addMeansDatasetProperties(meansDataset, analaysisVariablesMap);
+		// Save means experiment and means values
+		this.saveMeansExperimentAndValues(meansDataset, analaysisVariablesMap, meansRequestDto);
+	}
+
+	private DmsProject createMeansDataset(final DmsProject study) {
 		final DmsProject meansDataset = new DmsProject();
 		meansDataset.setDatasetType(new DatasetType(DatasetTypeEnum.MEANS_DATA.getId()));
 		meansDataset.setName(study.getName() + "-MEANS");
 		meansDataset.setDescription(study.getName() + "-MEANS");
 		meansDataset.setParent(study);
+		meansDataset.setStudy(study);
 		meansDataset.setDeleted(false);
 		meansDataset.setProgramUUID(study.getProgramUUID());
 		this.daoFactory.getDmsProjectDAO().save(meansDataset);
+		return meansDataset;
+	}
 
-		final ProjectProperty datasetNameProperty = new ProjectProperty();
-		datasetNameProperty.setProject(meansDataset);
-		datasetNameProperty.setAlias(TermId.DATASET_NAME.name());
-		datasetNameProperty.setVariableId(TermId.DATASET_NAME.getId());
-		datasetNameProperty.setDescription("Dataset name (local)");
-		datasetNameProperty.setRank(1);
-		datasetNameProperty.setTypeId(VariableType.STUDY_DETAIL.getId());
-		this.daoFactory.getProjectPropertyDAO().save(datasetNameProperty);
-
-		final ProjectProperty datasetTitleProperty = new ProjectProperty();
-		datasetTitleProperty.setProject(meansDataset);
-		datasetTitleProperty.setAlias(TermId.DATASET_TITLE.name());
-		datasetTitleProperty.setVariableId(TermId.DATASET_TITLE.getId());
-		datasetTitleProperty.setDescription("Dataset title (local)");
-		datasetTitleProperty.setRank(1);
-		datasetTitleProperty.setTypeId(VariableType.STUDY_DETAIL.getId());
-		this.daoFactory.getProjectPropertyDAO().save(datasetTitleProperty);
-
-		for (final Map.Entry<String, CVTerm> entry : analaysisVariablesMap.entrySet()) {
-			final ProjectProperty property = new ProjectProperty();
-			property.setProject(meansDataset);
-			property.setAlias(entry.getValue().getName());
-			property.setVariableId(entry.getValue().getCvTermId());
-			property.setRank(1);
-			property.setTypeId(VariableType.ANALYSIS.getId());
-			this.daoFactory.getProjectPropertyDAO().save(property);
-		}
-
+	private void saveMeansExperimentAndValues(final DmsProject meansDataset, final Map<String, CVTerm> analaysisVariablesMap,
+		final MeansRequestDto meansRequestDto) {
 		final Map<String, StockModel>
 			stockModelMap = this.daoFactory.getStockDao().getStocksForStudy(meansRequestDto.getStudyId()).stream()
 			.collect(Collectors.toMap(StockModel::getUniqueName, Function.identity()));
@@ -103,7 +98,30 @@ public class AnalysisServiceImpl implements AnalysisService {
 			experimentModel.setPhenotypes(phenotypes);
 			this.daoFactory.getExperimentDao().save(experimentModel);
 		}
+	}
 
+	private void addMeansDatasetProperties(final DmsProject meansDataset, final Map<String, CVTerm> analaysisVariablesMap) {
+		final AtomicInteger rank = new AtomicInteger();
+
+		final List<CVTerm> cvTerms = this.daoFactory.getCvTermDao().getByIds(new ArrayList<>(MEANS_DATASET_DMSPROJECT_PROPERTIES.keySet()));
+		cvTerms.forEach(term -> this.addProjectProperty(meansDataset, term.getCvTermId(), term.getName(),
+			MEANS_DATASET_DMSPROJECT_PROPERTIES.get(term.getCvTermId()), rank.incrementAndGet()));
+
+		for (final Map.Entry<String, CVTerm> entry : analaysisVariablesMap.entrySet()) {
+			this.addProjectProperty(meansDataset, entry.getValue().getCvTermId(), entry.getValue().getName(), VariableType.ANALYSIS,
+				rank.incrementAndGet());
+		}
+	}
+
+	private void addProjectProperty(final DmsProject meansDataset, final Integer variableId, final String variableName,
+		final VariableType variableType, final Integer rank) {
+		final ProjectProperty projectProperty = new ProjectProperty();
+		projectProperty.setProject(meansDataset);
+		projectProperty.setAlias(variableName);
+		projectProperty.setVariableId(variableId);
+		projectProperty.setRank(rank);
+		projectProperty.setTypeId(variableType.getId());
+		this.daoFactory.getProjectPropertyDAO().save(projectProperty);
 	}
 
 }
