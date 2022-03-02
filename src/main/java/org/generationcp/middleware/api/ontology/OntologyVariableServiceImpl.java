@@ -3,12 +3,14 @@ package org.generationcp.middleware.api.ontology;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
@@ -19,6 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,6 +33,8 @@ import java.util.stream.Collectors;
 @Service
 public class OntologyVariableServiceImpl implements OntologyVariableService {
 
+	public static final List<VariableType> SUPPORTED_VARIABLE_TYPES =
+		ListUtils.unmodifiableList(Arrays.asList(VariableType.ANALYSIS, VariableType.ANALYSIS_SUMMARY));
 	private final DaoFactory daoFactory;
 
 	public OntologyVariableServiceImpl(final HibernateSessionProvider sessionProvider) {
@@ -86,34 +91,55 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 	}
 
 	private Integer createAnalysisStandardVariable(final Variable traitVariable, final CVTerm method, final String variableType) {
-		String analysisVariableName = traitVariable.getName() + "_" + method.getName();
 
-		/** It's possible that the analysisVariableName to be saved is already used by other variables,
-		 * in that case append _1 to the name to make sure it's unique. This is the same logic found in
-		 * {@link org.generationcp.commons.service.impl.BreedingViewImportServiceImpl#createAnalysisVariable(org.generationcp.middleware.domain.dms.DMSVariableType, java.lang.String, org.generationcp.middleware.domain.oms.Term, java.lang.String, int, boolean)}
-		 **/
-		final List<Integer> existingTerms =
-			this.daoFactory.getCvTermDao().getTermsByNameOrSynonym(analysisVariableName, CvId.VARIABLES.getId());
-		if (CollectionUtils.isNotEmpty(existingTerms)) {
-			analysisVariableName += "_1";
+		// Try to look for existing variable with same Property, Scale and Method.
+		// If it exists, reuse it. Only variable with Analysis or Analysis Summary variable type can be reused.
+		Integer analysisVariableId = this.daoFactory.getCvTermDao()
+			.getStandadardVariableIdByPropertyScaleMethod(traitVariable.getProperty().getId(), traitVariable.getScale().getId(),
+				method.getCvTermId(), "");
+
+		if (analysisVariableId != null) {
+			final List<VariableType> analysisVariableVariableTypes =
+				this.daoFactory.getCvTermPropertyDao().getByCvTermAndType(analysisVariableId, TermId.VARIABLE_TYPE.getId())
+					.stream().map(p -> VariableType.getByName(p.getValue())).collect(
+						Collectors.toList());
+			if (analysisVariableVariableTypes.stream().noneMatch(SUPPORTED_VARIABLE_TYPES::contains)) {
+				throw new MiddlewareException("Variable with same property, scale and method already exists in the database.");
+			}
+		} else {
+			String analysisVariableName = traitVariable.getName() + "_" + method.getName();
+
+			/** It's possible that the analysisVariableName to be saved is already used by other variables,
+			 * in that case append _1 to the name to make sure it's unique. This is the same logic found in
+			 * {@link org.generationcp.commons.service.impl.BreedingViewImportServiceImpl#createAnalysisVariable(org.generationcp.middleware.domain.dms.DMSVariableType, java.lang.String, org.generationcp.middleware.domain.oms.Term, java.lang.String, int, boolean)}
+			 **/
+			final List<Integer> existingTerms =
+				this.daoFactory.getCvTermDao().getTermsByNameOrSynonym(analysisVariableName, CvId.VARIABLES.getId());
+			if (CollectionUtils.isNotEmpty(existingTerms)) {
+				analysisVariableName += "_1";
+			}
+
+			// Create analysis variable
+			final CVTerm analysisVariable = this.daoFactory.getCvTermDao()
+				.save(analysisVariableName, traitVariable.getDefinition(), CvId.VARIABLES);
+			// Assign Property, Scale, Method
+			this.daoFactory.getCvTermRelationshipDao()
+				.save(analysisVariable.getCvTermId(), TermId.HAS_PROPERTY.getId(), traitVariable.getProperty().getId());
+			// Assuming that the analyzed trait's scale is numeric
+			this.daoFactory.getCvTermRelationshipDao()
+				.save(analysisVariable.getCvTermId(), TermId.HAS_SCALE.getId(), traitVariable.getScale().getId());
+			this.daoFactory.getCvTermRelationshipDao()
+				.save(analysisVariable.getCvTermId(), TermId.HAS_METHOD.getId(), method.getCvTermId());
+			// Assign variable type
+			this.daoFactory.getCvTermPropertyDao().save(analysisVariable.getCvTermId(), TermId.VARIABLE_TYPE.getId(), variableType, 0);
+			analysisVariableId = analysisVariable.getCvTermId();
 		}
 
-		// Create analysis variable
-		final CVTerm analysisVariable = this.daoFactory.getCvTermDao()
-			.save(analysisVariableName, traitVariable.getDefinition(), CvId.VARIABLES);
-		// Assign Property, Scale, Method
+		// Link the analysis variable to the analyzed trait
 		this.daoFactory.getCvTermRelationshipDao()
-			.save(analysisVariable.getCvTermId(), TermId.HAS_PROPERTY.getId(), traitVariable.getProperty().getId());
-		// Assuming that the analyzed trait's scale is numeric
-		this.daoFactory.getCvTermRelationshipDao()
-			.save(analysisVariable.getCvTermId(), TermId.HAS_SCALE.getId(), traitVariable.getScale().getId());
-		this.daoFactory.getCvTermRelationshipDao().save(analysisVariable.getCvTermId(), TermId.HAS_METHOD.getId(), method.getCvTermId());
-		// Assign variable type
-		this.daoFactory.getCvTermPropertyDao().save(analysisVariable.getCvTermId(), TermId.VARIABLE_TYPE.getId(), variableType, 0);
-		// Link the new analysis variable to the analyzed trait
-		this.daoFactory.getCvTermRelationshipDao()
-			.save(traitVariable.getId(), TermId.HAS_ANALYSIS_VARIABLE.getId(), analysisVariable.getCvTermId());
-		return analysisVariable.getCvTermId();
+			.save(traitVariable.getId(), TermId.HAS_ANALYSIS_VARIABLE.getId(), analysisVariableId);
+
+		return analysisVariableId;
 	}
 
 	private Map<String, CVTerm> createOntologyMethodsIfNecessary(final List<String> analysisNames) {

@@ -1,13 +1,17 @@
 package org.generationcp.middleware.api.ontology;
 
 import com.google.common.collect.Multimap;
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.Method;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.CVTerm;
@@ -185,14 +189,67 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		assertTrue(result.get(traitVariable3.getId()).contains(VariableType.SELECTION_METHOD));
 	}
 
+	@Test
+	public void testCreateAnalysisVariables_VariableWithSamePropertyScaleAndMethodAlreadyExists() {
+		final Variable traitVariable =
+			this.createTestVariable("testVariable");
+		// Create an existing analysis variable with ANALYSIS variable type
+		final CVTerm bluesMethod = this.createMethod(BLUES);
+		final Variable existingAnalysisVariable =
+			this.createExistingAnalysisVariable("testVariable_BLUEs", traitVariable.getProperty(), traitVariable.getScale(),
+				Method.fromCVTerm(bluesMethod), Arrays.asList(
+					VariableType.ANALYSIS));
+
+		final List<String> analysisNames = Arrays.asList(BLUES);
+		final List<Integer> createdAnalysisVariableIds =
+			this.ontologyVariableService.createAnalysisVariables(Arrays.asList(traitVariable.getId()), analysisNames,
+				VariableType.ANALYSIS.getName());
+
+		final VariableFilter variableFilter = new VariableFilter();
+		createdAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
+		final List<Variable> result = this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().stream().collect(
+			Collectors.toList());
+		final MultiKeyMap existingAnalysisMethodsOfTraitsMap = this.daoFactory.getCvTermRelationshipDao()
+			.retrieveAnalysisMethodsOfTraits(Arrays.asList(traitVariable.getId()), Arrays.asList(bluesMethod.getCvTermId()));
+
+		assertEquals(1, result.size());
+		assertEquals(existingAnalysisVariable.getId(), result.get(0).getId());
+		assertTrue(existingAnalysisMethodsOfTraitsMap.containsKey(traitVariable.getId(), bluesMethod.getCvTermId()));
+	}
+
+	@Test
+	public void testCreateAnalysisVariables_VariableWithSamePropertyScaleAndMethodAlreadyExists_ButVariableTypeIsNonAnalysis() {
+		final Variable traitVariable =
+			this.createTestVariable("testVariable");
+		// Create an existing analysis variable but has TRAIT variable type
+		final CVTerm bluesMethod = this.createMethod(BLUES);
+		final Variable existingAnalysisVariable =
+			this.createExistingAnalysisVariable("testVariable_BLUEs", traitVariable.getProperty(), traitVariable.getScale(),
+				Method.fromCVTerm(bluesMethod), Arrays.asList(
+					VariableType.TRAIT));
+		try {
+			final List<String> analysisNames = Arrays.asList(BLUES);
+			this.ontologyVariableService.createAnalysisVariables(Arrays.asList(traitVariable.getId()), analysisNames,
+				VariableType.ANALYSIS.getName());
+		} catch (final MiddlewareException e) {
+			assertEquals("Variable with same property, scale and method already exists in the database.", e.getMessage());
+		}
+	}
+
 	private Variable createTestVariable(final String variableName) {
+		return this.createTestVariable(variableName, RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10),
+			RandomStringUtils.randomAlphanumeric(10), Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD));
+	}
+
+	private Variable createTestVariable(final String variableName, final String propertyName, final String scaleName,
+		final String methodName, final List<VariableType> variableTypes) {
 		// Create traitVariable
 		final CVTerm cvTermVariable = this.daoFactory.getCvTermDao()
 			.save(variableName, RandomStringUtils.randomAlphanumeric(10), CvId.VARIABLES);
-		final CVTerm property = this.daoFactory.getCvTermDao().save(RandomStringUtils.randomAlphanumeric(10), "", CvId.PROPERTIES);
-		final CVTerm scale = this.daoFactory.getCvTermDao().save(RandomStringUtils.randomAlphanumeric(10), "", CvId.SCALES);
+		final CVTerm property = this.daoFactory.getCvTermDao().save(propertyName, "", CvId.PROPERTIES);
+		final CVTerm scale = this.daoFactory.getCvTermDao().save(scaleName, "", CvId.SCALES);
 		this.daoFactory.getCvTermRelationshipDao().save(scale.getCvTermId(), TermId.HAS_TYPE.getId(), DataType.NUMERIC_VARIABLE.getId());
-		final CVTerm method = this.daoFactory.getCvTermDao().save(RandomStringUtils.randomAlphanumeric(10), "", CvId.METHODS);
+		final CVTerm method = this.daoFactory.getCvTermDao().save(methodName, "", CvId.METHODS);
 		final CVTerm numericDataType = this.daoFactory.getCvTermDao().getById(DataType.NUMERIC_VARIABLE.getId());
 
 		// Assign Property, Scale, Method
@@ -203,11 +260,36 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		this.daoFactory.getCvTermRelationshipDao().save(cvTermVariable.getCvTermId(), TermId.HAS_METHOD.getId(), method.getCvTermId());
 
 		// Assign TRAIT and SELECTION_METHOD Variable types
-		this.daoFactory.getCvTermPropertyDao()
-			.save(new CVTermProperty(null, cvTermVariable.getCvTermId(), TermId.VARIABLE_TYPE.getId(), VariableType.TRAIT.getName(), 0));
-		this.daoFactory.getCvTermPropertyDao()
-			.save(new CVTermProperty(null, cvTermVariable.getCvTermId(), TermId.VARIABLE_TYPE.getId(),
-				VariableType.SELECTION_METHOD.getName(), 0));
+		for (final VariableType variableType : variableTypes) {
+			this.daoFactory.getCvTermPropertyDao()
+				.save(new CVTermProperty(null, cvTermVariable.getCvTermId(), TermId.VARIABLE_TYPE.getId(), variableType.getName(), 0));
+		}
+
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addVariableId(cvTermVariable.getCvTermId());
+		return this.daoFactory.getCvTermDao().getVariablesWithFilterById(variableFilter).values().stream().findFirst().get();
+
+	}
+
+	private Variable createExistingAnalysisVariable(final String variableName, final Term property, final Term scale,
+		final Term method, final List<VariableType> variableTypes) {
+		// Create traitVariable
+		final CVTerm cvTermVariable = this.daoFactory.getCvTermDao()
+			.save(variableName, RandomStringUtils.randomAlphanumeric(10), CvId.VARIABLES);
+		final CVTerm numericDataType = this.daoFactory.getCvTermDao().getById(DataType.NUMERIC_VARIABLE.getId());
+
+		// Assign Property, Scale, Method
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(cvTermVariable.getCvTermId(), TermId.HAS_PROPERTY.getId(), property.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(cvTermVariable.getCvTermId(), TermId.HAS_SCALE.getId(), scale.getId());
+		this.daoFactory.getCvTermRelationshipDao().save(cvTermVariable.getCvTermId(), TermId.HAS_METHOD.getId(), method.getId());
+
+		// Assign TRAIT and SELECTION_METHOD Variable types
+		for (final VariableType variableType : variableTypes) {
+			this.daoFactory.getCvTermPropertyDao()
+				.save(new CVTermProperty(null, cvTermVariable.getCvTermId(), TermId.VARIABLE_TYPE.getId(), variableType.getName(), 0));
+		}
 
 		final VariableFilter variableFilter = new VariableFilter();
 		variableFilter.addVariableId(cvTermVariable.getCvTermId());
@@ -224,6 +306,14 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		assertEquals(trait.getScale().getName(), variable.get().getScale().getName());
 		assertEquals(trait.getScale().getDataType(), variable.get().getScale().getDataType());
 		assertTrue(variable.get().getMethod().getName().equalsIgnoreCase(analysisName));
+	}
+
+	private CVTerm createMethod(final String methodName) {
+		final CVTerm method = this.daoFactory.getCvTermDao().getByNameAndCvId(methodName, CvId.METHODS.getId());
+		if (method == null) {
+			return this.daoFactory.getCvTermDao().save(methodName, "", CvId.METHODS);
+		}
+		return method;
 	}
 
 }
