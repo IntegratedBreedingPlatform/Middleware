@@ -40,7 +40,11 @@ import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerI
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.service.api.study.MethodDTO;
+import org.generationcp.middleware.service.api.study.OntologyReferenceDTO;
 import org.generationcp.middleware.service.api.study.ScaleCategoryDTO;
+import org.generationcp.middleware.service.api.study.ScaleDTO;
+import org.generationcp.middleware.service.api.study.TraitDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
@@ -1740,7 +1744,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				Arrays.asList(StringUtils.split(String.valueOf(result.get(VARIABLE_NAME_SYNONYMS)), ",")) : new ArrayList<>();
 			variableDto.setSynonyms(synonyms);
 
-			final VariableDTO.Trait trait = variableDto.getTrait();
+			final TraitDTO trait = variableDto.getTrait();
 			trait.setName(String.valueOf(result.get(VARIABLE_PROPERTY)));
 			trait.setTraitName(String.valueOf(result.get(VARIABLE_PROPERTY)));
 			trait.setTraitDbId(String.valueOf(result.get(VARIABLE_PROPERTY_ID)));
@@ -1750,12 +1754,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			trait.setStatus("Active");
 			trait.setXref(String.valueOf(result.get(VARIABLE_PROPERTY_ONTOLOGY_ID)));
 
-			final VariableDTO.OntologyReference traitOntologyReference =
+			final OntologyReferenceDTO traitOntologyReference =
 				variableDto.getTrait().getOntologyReference();
 			traitOntologyReference.setOntologyDbId(String.valueOf(result.get(VARIABLE_PROPERTY_ONTOLOGY_ID)));
 			traitOntologyReference.setOntologyName(String.valueOf(result.get(VARIABLE_PROPERTY)));
 
-			final VariableDTO.Scale scale = variableDto.getScale();
+			final ScaleDTO scale = variableDto.getScale();
 			scale.setName(String.valueOf(result.get(VARIABLE_SCALE)));
 			scale.setScaleName(String.valueOf(result.get(VARIABLE_SCALE)));
 			scale.setScaleDbId(String.valueOf(result.get(VARIABLE_SCALE_ID)));
@@ -1776,19 +1780,19 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				Arrays.asList(StringUtils.split(String.valueOf(result.get(VARIABLE_SCALE_CATEGORIES)), "|")) : new ArrayList<>();
 			scale.getValidValues().setCategories(this.getCategoryDTOS(categoryValues));
 
-			final VariableDTO.OntologyReference scaleOntologyReference =
+			final OntologyReferenceDTO scaleOntologyReference =
 				variableDto.getScale().getOntologyReference();
 			scaleOntologyReference.setOntologyName(String.valueOf(result.get(VARIABLE_SCALE)));
 			scaleOntologyReference.setOntologyDbId(String.valueOf(result.get(VARIABLE_SCALE_ID)));
 
-			final VariableDTO.Method method = variableDto.getMethod();
+			final MethodDTO method = variableDto.getMethod();
 			method.setName(String.valueOf(result.get(VARIABLE_METHOD)));
 			method.setMethodName(String.valueOf(result.get(VARIABLE_METHOD)));
 			method.setMethodDbId(String.valueOf(result.get(VARIABLE_METHOD_ID)));
 			method.setDescription(String.valueOf(result.get(VARIABLE_METHOD_DESCRIPTION)));
 			method.setFormula(String.valueOf(result.get(VARIABLE_FORMULA_DEFINITION)));
 
-			final VariableDTO.OntologyReference methodOntologyReference =
+			final OntologyReferenceDTO methodOntologyReference =
 				variableDto.getMethod().getOntologyReference();
 			methodOntologyReference.setOntologyName(String.valueOf(result.get(VARIABLE_METHOD)));
 			methodOntologyReference.setOntologyDbId(String.valueOf(result.get(VARIABLE_METHOD_ID)));
