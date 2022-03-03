@@ -384,4 +384,8 @@
 	<bean id="attributeValueService" class="org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
+
+	<bean id="ontologyVariableService" class="org.generationcp.middleware.api.ontology.OntologyVariableServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
 </beans>
