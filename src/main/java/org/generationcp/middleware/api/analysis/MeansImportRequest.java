@@ -3,7 +3,7 @@ package org.generationcp.middleware.api.analysis;
 import java.util.List;
 import java.util.Map;
 
-public class MeansRequestDto {
+public class MeansImportRequest {
 
 	private int studyId;
 	private List<MeansData> data;
