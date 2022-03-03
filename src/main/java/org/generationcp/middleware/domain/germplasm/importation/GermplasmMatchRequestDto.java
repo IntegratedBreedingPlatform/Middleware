@@ -100,13 +100,10 @@ public class GermplasmMatchRequestDto {
 	}
 
 	public boolean isValid() {
-		// GID, GUUID, PUI and NAMES are the MAIN match parameters; hence lack of any of these renders request invalid
+		// GID, GUUID, PUI and NAMES are the MAIN match parameters; hence lack of these renders request invalid
 		// Location, Name type and method will merely restrict any initial matches from the main filters
-		if (CollectionUtils.isEmpty(this.germplasmPUIs) && CollectionUtils.isEmpty(this.germplasmUUIDs) && CollectionUtils
-			.isEmpty(this.gids) && CollectionUtils.isEmpty(this.names)) {
-			return false;
-		}
-		return true;
+		return !CollectionUtils.isEmpty(this.germplasmPUIs) || !CollectionUtils.isEmpty(this.germplasmUUIDs) || !CollectionUtils
+			.isEmpty(this.gids) || !CollectionUtils.isEmpty(this.names);
 	}
 
 	public boolean restrictingFiltersSpecified() {
