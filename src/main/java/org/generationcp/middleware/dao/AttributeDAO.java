@@ -17,7 +17,6 @@ import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
 import org.generationcp.middleware.dao.util.VariableUtils;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -38,6 +37,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link Attribute}.
@@ -55,9 +55,12 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			+ "IFNULL(vpo.alias, cv.name) AS attributeName, "
 			+ "a.aid AS attributeValueDbId, "
 			+ "a.adate AS determinedDate, "
+			+ "a.alocn AS locationDbId, "
 			+ "g.germplsm_uuid AS germplasmDbId, "
 			+ "names.nval AS germplasmName, "
 			+ "a.aval AS value ";
+
+	public static final String ADDTL_INFO_LOCATION = "locationDbId";
 
 	@SuppressWarnings("unchecked")
 	public List<Attribute> getByGID(final Integer gid) {
@@ -156,6 +159,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		this.addAttributeValueSearchParameters(sqlQuery, attributeValueSearchRequestDto);
 
 		sqlQuery.addScalar("aid", IntegerType.INSTANCE);
+		sqlQuery.addScalar("locationDbId", StringType.INSTANCE);
 		sqlQuery.addScalar("attributeDbId", StringType.INSTANCE);
 		sqlQuery.addScalar("attributeName", StringType.INSTANCE);
 		sqlQuery.addScalar("attributeValueDbId", StringType.INSTANCE);
@@ -164,7 +168,23 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		sqlQuery.addScalar("germplasmName", StringType.INSTANCE);
 		sqlQuery.addScalar("value", StringType.INSTANCE);
 		sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(AttributeValueDto.class));
-		return sqlQuery.list();
+
+		final List<AttributeValueDto> results = sqlQuery.list();
+
+		if (results != null && !results.isEmpty()) {
+			results.stream().map(
+					attributeValue -> this.addAdditionalInfoToAttributeValue(attributeValue))
+				.collect(Collectors.toList());
+		}
+
+		return results;
+	}
+
+	private AttributeValueDto addAdditionalInfoToAttributeValue(final AttributeValueDto attributeValue) {
+		final Map<String, String> additionalInfo = new HashMap<>();
+		additionalInfo.put(ADDTL_INFO_LOCATION, attributeValue.getLocationDbId());
+		attributeValue.setAdditionalInfo(additionalInfo);
+		return attributeValue;
 	}
 
 	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId,

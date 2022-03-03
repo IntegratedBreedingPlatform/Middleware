@@ -20,7 +20,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
@@ -67,7 +66,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 		}
 
 		if (CollectionUtils.isEmpty(this.gids) || CollectionUtils.isEmpty(this.guids)) {
@@ -194,6 +193,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		Assert.assertEquals(Integer.toString(attribute.getTypeId()), result.get(0).getAttributeDbId());
 		Assert.assertEquals(Integer.toString(attribute.getAid()), result.get(0).getAttributeValueDbId());
 		Assert.assertEquals(germplasm.getPreferredName().getNval(), result.get(0).getGermplasmName());
+		Assert.assertEquals(Collections.singletonMap(AttributeDAO.ADDTL_INFO_LOCATION, "1"), result.get(0).getAdditionalInfo());
 	}
 
 	@Test
@@ -226,6 +226,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		attribute.setTypeId(cvTerm.getCvTermId());
 		attribute.setAval(value);
 		attribute.setAdate(germplasm.getGdate());
+		attribute.setLocationId(1);
 
 		this.daoFactory.getAttributeDAO().saveOrUpdate(attribute);
 		return attribute;

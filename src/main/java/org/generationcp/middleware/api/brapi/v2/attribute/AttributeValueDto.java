@@ -17,6 +17,9 @@ public class AttributeValueDto {
 	@JsonIgnore
 	private Integer aid;
 
+	@JsonIgnore
+	private String locationDbId;
+
 	private Map<String, String> additionalInfo;
 	private String attributeValueDbId;
 	private String attributeDbId;
@@ -109,6 +112,14 @@ public class AttributeValueDto {
 
 	public void setAid(final Integer aid) {
 		this.aid = aid;
+	}
+
+	public String getLocationDbId() {
+		return this.locationDbId;
+	}
+
+	public void setLocationDbId(final String locationDbId) {
+		this.locationDbId = locationDbId;
 	}
 
 	@Override
