@@ -36,7 +36,6 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
-import org.generationcp.middleware.exceptions.InvalidBrapiDatatypeException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
@@ -1471,12 +1470,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public long countObservationVariables(final VariableSearchRequestDTO requestDTO) {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createCountObservationVariablesQueryString(requestDTO));
-		try {
-			this.addObservationVariableSearchParameters(sqlQuery, requestDTO);
-			return ((BigInteger) sqlQuery.uniqueResult()).longValue();
-		} catch (final InvalidBrapiDatatypeException e) {
-			return 0;
-		}
+		this.addObservationVariableSearchParameters(sqlQuery, requestDTO);
+		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
 	private String createCountObservationVariablesQueryString(final VariableSearchRequestDTO requestDTO) {
@@ -1496,22 +1491,19 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
 			sqlQuery.setMaxResults(pageable.getPageSize());
 		}
-		try {
-			this.addObservationVariableSearchParameters(sqlQuery, requestDTO);
-			this.appendObservationVariablesScalar(sqlQuery);
-			if (pageable != null) {
-				sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
-				sqlQuery.setMaxResults(pageable.getPageSize());
-			}
-			sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-			return this.convertToVariableDTO(sqlQuery.list());
-		} catch (final InvalidBrapiDatatypeException e) {
-			return Collections.EMPTY_LIST;
+
+		this.addObservationVariableSearchParameters(sqlQuery, requestDTO);
+		this.appendObservationVariablesScalar(sqlQuery);
+		if (pageable != null) {
+			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
+			sqlQuery.setMaxResults(pageable.getPageSize());
 		}
+		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+		return this.convertToVariableDTO(sqlQuery.list());
 	}
 
-	public void addObservationVariableSearchParameters(final SQLQuery sqlQuery, final VariableSearchRequestDTO requestDTO) throws
-		InvalidBrapiDatatypeException {
+	public void addObservationVariableSearchParameters(final SQLQuery sqlQuery, final VariableSearchRequestDTO requestDTO) {
 		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
 			sqlQuery.setParameterList("dataTypeIds", VariableUtils.convertBrapiDataTypeToDataTypeIds(requestDTO.getDataTypes()));
 		}
