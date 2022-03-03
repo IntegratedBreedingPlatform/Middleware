@@ -467,17 +467,25 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getTraitDbIds())) {
-			sql.append(" AND cv.cvterm_id IN (  SELECT tr.subject_id ");
+			sql.append(" AND cv.cvterm_id IN (  SELECT vrpr.subject_id ");
 			sql.append(
-				"						FROM cvterm_relationship tr INNER JOIN cvterm t ON t.cvterm_id = tr.object_id AND tr.type_id = ");
-			sql.append(TermRelationshipId.IS_A.getId() + " AND t.cvterm_id IN (:traitDbIds) ) ");
+				"						FROM cvterm_relationship vrpr INNER JOIN cvterm p ON p.cvterm_id = vrpr.object_id AND vrpr.type_id = ");
+			sql.append(TermRelationshipId.HAS_PROPERTY.getId() + " ");
+			sql.append(
+				" 						INNER JOIN cvterm_relationship trpr ON trpr.subject_id = vrpr.object_id AND trpr.type_id = ");
+			sql.append(TermRelationshipId.IS_A.getId() + " AND trpr.object_id IN (:traitDbIds) ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getTraitClasses())) {
-			sql.append(" AND cv.cvterm_id IN (  SELECT tr.subject_id ");
+			sql.append(" AND cv.cvterm_id IN (  SELECT vrpr2.subject_id ");
 			sql.append(
-				"						FROM cvterm_relationship tr INNER JOIN cvterm t ON t.cvterm_id = tr.object_id AND tr.type_id = ");
-			sql.append(TermRelationshipId.IS_A.getId() + " AND t.name IN (:traitClasses) ) ");
+				"						FROM cvterm_relationship vrpr2 INNER JOIN cvterm p2 ON p2.cvterm_id = vrpr2.object_id AND vrpr2.type_id = ");
+			sql.append(TermRelationshipId.HAS_PROPERTY.getId() + " ");
+			sql.append(
+				" 						INNER JOIN cvterm_relationship trpr2 ON trpr2.subject_id = vrpr2.object_id AND trpr2.type_id = ");
+			sql.append(TermRelationshipId.IS_A.getId() + " ");
+			sql.append(
+				"						INNER JOIN cvterm trait ON trait.cvterm_id = trpr2.object_id AND trait.name IN (:traitClasses) )");
 		}
 	}
 
