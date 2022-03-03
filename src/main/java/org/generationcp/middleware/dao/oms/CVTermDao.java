@@ -1471,9 +1471,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return this.save(cvTerm);
 	}
 
-	public long countObservationVariables(final VariableSearchRequestDTO requestDTO) {
+	public long countObservationVariables(final VariableSearchRequestDTO requestDTO, final List<String> variableTypes) {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createCountObservationVariablesQueryString(requestDTO));
-		this.addObservationVariableSearchParameters(sqlQuery, requestDTO);
+		this.addObservationVariableSearchParameters(sqlQuery, requestDTO, variableTypes);
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
@@ -1486,15 +1486,14 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return sql.toString();
 	}
 
-	public List<VariableDTO> getObservationVariables(
-		final VariableSearchRequestDTO requestDTO,
-		final Pageable pageable) {
+	public List<VariableDTO> getObservationVariables(final VariableSearchRequestDTO requestDTO,	final Pageable pageable,
+		final List<String> variableTypes) {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createObservationVariablesQuery(requestDTO));
 		if (pageable != null) {
 			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
 			sqlQuery.setMaxResults(pageable.getPageSize());
 		}
-		this.addObservationVariableSearchParameters(sqlQuery, requestDTO);
+		this.addObservationVariableSearchParameters(sqlQuery, requestDTO, variableTypes);
 		this.appendObservationVariablesScalar(sqlQuery);
 		if (pageable != null) {
 			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
@@ -1504,7 +1503,13 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return this.convertToVariableDTO(sqlQuery.list());
 	}
 
-	public void addObservationVariableSearchParameters(final SQLQuery sqlQuery, final VariableSearchRequestDTO requestDTO) {
+	public void addObservationVariableSearchParameters(final SQLQuery sqlQuery, final VariableSearchRequestDTO requestDTO,
+		final List<String> variableTypes) {
+
+		if(!CollectionUtils.isEmpty(variableTypes)) {
+			sqlQuery.setParameterList("variableTypes", variableTypes);
+		}
+
 		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
 			sqlQuery.setParameterList("dataTypeIds", this.convertBrapiDataTypeToDataTypeIds(requestDTO.getDataTypes()));
 		}
@@ -1554,6 +1559,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		final StringBuilder stringBuilder = new StringBuilder(" SELECT DISTINCT ");
 		stringBuilder.append("   vo.alias AS " + VARIABLE_ALIAS + ", ");
 		stringBuilder.append("   variable.cvterm_id AS " + VARIABLE_ID + ", ");
+		stringBuilder.append("   variable.definition AS " + VARIABLE_DEFINITION + ", ");
 		stringBuilder.append("   variable.name AS " + VARIABLE_NAME + ", ");
 		stringBuilder.append("   scale.name AS " + VARIABLE_SCALE + ", ");
 		stringBuilder.append("   scale.cvterm_id AS " + VARIABLE_SCALE_ID + ", ");
@@ -1638,7 +1644,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		// To get Min and Max override values per program
 		stringBuilder.append("	  LEFT JOIN variable_overrides vo ON vo.id = (SELECT MIN(vos.id) ");
 		stringBuilder.append("		FROM variable_overrides vos WHERE variable.cvterm_id = vos.cvterm_id) ");
-		stringBuilder.append(" WHERE variableType.value = '" + VariableType.TRAIT.getName() + "' ");
+		stringBuilder.append(" WHERE variableType.value IN :variableTypes ");
 	}
 
 	public void appendObservationVariableSeachFilters(final StringBuilder stringBuilder, final VariableSearchRequestDTO requestDTO) {
@@ -1697,6 +1703,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		sqlQuery
 			.addScalar(VARIABLE_ALIAS)
 			.addScalar(VARIABLE_ID)
+			.addScalar(VARIABLE_DEFINITION)
 			.addScalar(VARIABLE_NAME)
 			.addScalar(VARIABLE_SCALE)
 			.addScalar(VARIABLE_SCALE_ID)
@@ -1735,6 +1742,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			variableDto.setName(observationVariableName);
 			variableDto.setObservationVariableDbId(String.valueOf(result.get(VARIABLE_ID)));
+			variableDto.setDefinition(String.valueOf(result.get(VARIABLE_DEFINITION)));
 			variableDto.getOntologyReference().setOntologyDbId(String.valueOf(result.get(VARIABLE_ID)));
 			variableDto.setObservationVariableName(observationVariableName);
 			variableDto.getOntologyReference().setOntologyName(String.valueOf(result.get(VARIABLE_NAME)));

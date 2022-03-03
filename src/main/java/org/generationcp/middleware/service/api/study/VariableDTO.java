@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.api.study;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.BrapiView;
@@ -16,6 +17,9 @@ public class VariableDTO {
 
 	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private String commonCropName;
+
+	@JsonIgnore
+	private String definition;
 
 	private List<String> contextOfUse = new ArrayList<>();
 
@@ -65,6 +69,14 @@ public class VariableDTO {
 
 	public String getCommonCropName() {
 		return this.commonCropName;
+	}
+
+	public String getDefinition() {
+		return definition;
+	}
+
+	public void setDefinition(final String definition) {
+		this.definition = definition;
 	}
 
 	public void setCommonCropName(final String commonCropName) {
