@@ -381,4 +381,8 @@
 		<constructor-arg name="sessionProvider" ref="workbenchSessionProvider"/>
 	</bean>
 
+	<bean id="ontologyVariableService" class="org.generationcp.middleware.api.ontology.OntologyVariableServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 </beans>
