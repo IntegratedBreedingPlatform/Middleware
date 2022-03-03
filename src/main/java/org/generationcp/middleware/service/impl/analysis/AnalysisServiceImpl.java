@@ -1,6 +1,7 @@
-package org.generationcp.middleware.api.analysis;
+package org.generationcp.middleware.service.impl.analysis;
 
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -16,6 +17,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.service.api.analysis.AnalysisService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -91,11 +93,13 @@ public class AnalysisServiceImpl implements AnalysisService {
 			experimentModel.setStock(stockModelMap.get(String.valueOf(meansData.getEntryNo())));
 			final List<Phenotype> phenotypes = new ArrayList<>();
 			for (final Map.Entry<String, String> meansMapEntryValue : meansData.getValues().entrySet()) {
-				final Phenotype phenotype = new Phenotype();
-				phenotype.setExperiment(experimentModel);
-				phenotype.setValue(meansMapEntryValue.getValue());
-				phenotype.setObservableId(analaysisVariablesMap.get(meansMapEntryValue.getKey()).getCvTermId());
-				phenotypes.add(phenotype);
+				if (StringUtils.isNotEmpty(meansMapEntryValue.getValue())) {
+					final Phenotype phenotype = new Phenotype();
+					phenotype.setExperiment(experimentModel);
+					phenotype.setValue(meansMapEntryValue.getValue());
+					phenotype.setObservableId(analaysisVariablesMap.get(meansMapEntryValue.getKey()).getCvTermId());
+					phenotypes.add(phenotype);
+				}
 			}
 			experimentModel.setPhenotypes(phenotypes);
 			this.daoFactory.getExperimentDao().save(experimentModel);

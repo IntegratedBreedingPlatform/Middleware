@@ -1,4 +1,4 @@
-package org.generationcp.middleware.api.analysis;
+package org.generationcp.middleware.service.impl.analysis;
 
 import java.util.List;
 import java.util.Map;
