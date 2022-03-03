@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
+import org.generationcp.middleware.exceptions.InvalidBrapiDatatypeException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.hibernate.HibernateException;
@@ -34,6 +35,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -141,10 +143,14 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		this.appendAttributeValueSeachFilters(sql, attributeValueSearchRequestDto);
 
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql.toString());
-		this.addAttributeValueSearchParameters(sqlQuery, attributeValueSearchRequestDto);
-		sqlQuery.setParameter("programUUID", programUUID);
+		try {
+			this.addAttributeValueSearchParameters(sqlQuery, attributeValueSearchRequestDto);
+			sqlQuery.setParameter("programUUID", programUUID);
 
-		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+			return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+		} catch (final InvalidBrapiDatatypeException e) {
+			return 0;
+		}
 	}
 
 	public List<AttributeValueDto> getAttributeValueDtos(final AttributeValueSearchRequestDto attributeValueSearchRequestDto,
@@ -156,28 +162,32 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
 			sqlQuery.setMaxResults(pageable.getPageSize());
 		}
-		this.addAttributeValueSearchParameters(sqlQuery, attributeValueSearchRequestDto);
+		try {
+			this.addAttributeValueSearchParameters(sqlQuery, attributeValueSearchRequestDto);
 
-		sqlQuery.addScalar("aid", IntegerType.INSTANCE);
-		sqlQuery.addScalar("locationDbId", StringType.INSTANCE);
-		sqlQuery.addScalar("attributeDbId", StringType.INSTANCE);
-		sqlQuery.addScalar("attributeName", StringType.INSTANCE);
-		sqlQuery.addScalar("attributeValueDbId", StringType.INSTANCE);
-		sqlQuery.addScalar("determinedDate", DateType.INSTANCE);
-		sqlQuery.addScalar("germplasmDbId", StringType.INSTANCE);
-		sqlQuery.addScalar("germplasmName", StringType.INSTANCE);
-		sqlQuery.addScalar("value", StringType.INSTANCE);
-		sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(AttributeValueDto.class));
+			sqlQuery.addScalar("aid", IntegerType.INSTANCE);
+			sqlQuery.addScalar("locationDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("attributeDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("attributeName", StringType.INSTANCE);
+			sqlQuery.addScalar("attributeValueDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("determinedDate", DateType.INSTANCE);
+			sqlQuery.addScalar("germplasmDbId", StringType.INSTANCE);
+			sqlQuery.addScalar("germplasmName", StringType.INSTANCE);
+			sqlQuery.addScalar("value", StringType.INSTANCE);
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(AttributeValueDto.class));
 
-		final List<AttributeValueDto> results = sqlQuery.list();
+			final List<AttributeValueDto> results = sqlQuery.list();
 
-		if (results != null && !results.isEmpty()) {
-			results.stream().map(
-					attributeValue -> this.addAdditionalInfoToAttributeValue(attributeValue))
-				.collect(Collectors.toList());
+			if (results != null && !results.isEmpty()) {
+				results.stream().map(
+						attributeValue -> this.addAdditionalInfoToAttributeValue(attributeValue))
+					.collect(Collectors.toList());
+			}
+
+			return results;
+		} catch (final InvalidBrapiDatatypeException e) {
+			return Collections.EMPTY_LIST;
 		}
-
-		return results;
 	}
 
 	private AttributeValueDto addAdditionalInfoToAttributeValue(final AttributeValueDto attributeValue) {
@@ -489,7 +499,8 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		}
 	}
 
-	private void addAttributeValueSearchParameters(final SQLQuery sqlQuery, final AttributeValueSearchRequestDto requestDTO) {
+	private void addAttributeValueSearchParameters(final SQLQuery sqlQuery, final AttributeValueSearchRequestDto requestDTO) throws
+		InvalidBrapiDatatypeException {
 		if (!CollectionUtils.isEmpty(requestDTO.getAttributeDbIds())) {
 			sqlQuery.setParameterList("attributeDbIds", requestDTO.getAttributeDbIds());
 		}
