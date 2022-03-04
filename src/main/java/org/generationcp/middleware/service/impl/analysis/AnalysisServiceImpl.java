@@ -46,11 +46,11 @@ public class AnalysisServiceImpl implements AnalysisService {
 	}
 
 	@Override
-	public Integer createMeansDataset(final MeansImportRequest meansRequestDto) {
+	public Integer createMeansDataset(final MeansImportRequest meansImportRequest) {
 
-		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(meansRequestDto.getStudyId());
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(meansImportRequest.getStudyId());
 		final Set<String> analysisVariableNames =
-			meansRequestDto.getData().stream().map(o -> o.getValues().keySet()).flatMap(Set::stream).collect(Collectors.toSet());
+			meansImportRequest.getData().stream().map(o -> o.getValues().keySet()).flatMap(Set::stream).collect(Collectors.toSet());
 		final Map<String, CVTerm> analaysisVariablesMap =
 			this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisVariableNames, CvId.VARIABLES).stream().collect(Collectors.toMap(
 				CVTerm::getName, Function.identity()));
@@ -60,7 +60,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 		// Add necessary dataset project properties
 		this.addMeansDatasetProperties(meansDataset, analaysisVariablesMap);
 		// Save means experiment and means values
-		this.saveMeansExperimentAndValues(meansDataset, analaysisVariablesMap, meansRequestDto);
+		this.saveMeansExperimentAndValues(meansDataset, analaysisVariablesMap, meansImportRequest);
 
 		return meansDataset.getProjectId();
 	}
