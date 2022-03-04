@@ -80,12 +80,16 @@ public class AnalysisServiceImpl implements AnalysisService {
 
 	private void saveMeansExperimentAndValues(final DmsProject meansDataset, final Map<String, CVTerm> analaysisVariablesMap,
 		final MeansImportRequest meansImportRequest) {
+
+		final Set<String> entryNumbers =
+			meansImportRequest.getData().stream().map(m -> String.valueOf(m.getEntryNo())).collect(Collectors.toSet());
 		final Map<String, StockModel>
-			stockModelMap = this.daoFactory.getStockDao().getStocksForStudy(meansImportRequest.getStudyId()).stream()
-			.collect(Collectors.toMap(StockModel::getUniqueName, Function.identity()));
+			stockModelMap =
+			this.daoFactory.getStockDao().getStocksByStudyAndEntryNumbers(meansImportRequest.getStudyId(), entryNumbers).stream()
+				.collect(Collectors.toMap(StockModel::getUniqueName, Function.identity()));
 
 		// Save means experiment and means values
-		for (final MeansData meansData : meansImportRequest.getData()) {
+		for (final MeansImportRequest.MeansData meansData : meansImportRequest.getData()) {
 			final ExperimentModel experimentModel = new ExperimentModel();
 			experimentModel.setProject(meansDataset);
 			experimentModel.setGeoLocation(new Geolocation(meansData.getEnvironmentId()));

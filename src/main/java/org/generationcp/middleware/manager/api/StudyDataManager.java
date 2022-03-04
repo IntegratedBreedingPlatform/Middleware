@@ -35,6 +35,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
+import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
@@ -671,4 +672,5 @@ public interface StudyDataManager {
 
 	void deleteStudy(int studyId);
 
+	List<StockModel> getStocksByStudyAndEntryNumbers(int studyId, Set<String> entryNumbers);
 }

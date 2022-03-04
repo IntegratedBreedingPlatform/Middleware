@@ -12,8 +12,6 @@
 package org.generationcp.middleware.manager;
 
 import com.google.common.base.Function;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
@@ -1259,6 +1257,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			study.setDeleted(true);
 			this.daoFactory.getDmsProjectDAO().save(study);
 		}
+	}
+
+	@Override
+	public List<StockModel> getStocksByStudyAndEntryNumbers(final int studyId, final Set<String> entryNumbers) {
+		return this.daoFactory.getStockDao().getStocksByStudyAndEntryNumbers(studyId, entryNumbers);
 	}
 
 	private void renameStudyAndDatasets(final DmsProject study) {

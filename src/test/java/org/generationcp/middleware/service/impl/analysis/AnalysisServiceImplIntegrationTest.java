@@ -76,7 +76,7 @@ public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 		final MeansImportRequest meansImportRequest = new MeansImportRequest();
 		final List<Geolocation> environmentGeolocations =
 			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(study.getProjectId());
-		final List<MeansData> meansDataList =
+		final List<MeansImportRequest.MeansData> meansDataList =
 			environmentGeolocations.stream().map(o -> this.createMeansData(o.getLocationId(), 1, analysisVariablesMap))
 				.collect(Collectors.toList());
 		meansImportRequest.setStudyId(study.getProjectId());
@@ -109,10 +109,10 @@ public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 		});
 		// Verify experiment and phenotype values
 		assertEquals(meansImportRequest.getData().size(), experimentModels.size());
-		final Map<Integer, MeansData> meansDataByEnvironmentId =
-			meansImportRequest.getData().stream().collect(Collectors.toMap(MeansData::getEnvironmentId, Function.identity()));
+		final Map<Integer, MeansImportRequest.MeansData> meansDataByEnvironmentId =
+			meansImportRequest.getData().stream().collect(Collectors.toMap(MeansImportRequest.MeansData::getEnvironmentId, Function.identity()));
 		for (final ExperimentModel experimentModel : experimentModels) {
-			final MeansData meansData = meansDataByEnvironmentId.get(experimentModel.getGeoLocation().getLocationId());
+			final MeansImportRequest.MeansData meansData = meansDataByEnvironmentId.get(experimentModel.getGeoLocation().getLocationId());
 			experimentModel.getPhenotypes().forEach(p -> {
 				final Variable analysisVariable = analysisVariablesMap.get(p.getObservableId());
 				assertEquals(p.getValue(), meansData.getValues().get(analysisVariable.getName()));
@@ -235,8 +235,8 @@ public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 
 	}
 
-	private MeansData createMeansData(final int environmentId, final int entryNo, final Map<Integer, Variable> analysisVariablesMap) {
-		final MeansData meansData = new MeansData();
+	private MeansImportRequest.MeansData createMeansData(final int environmentId, final int entryNo, final Map<Integer, Variable> analysisVariablesMap) {
+		final MeansImportRequest.MeansData meansData = new MeansImportRequest.MeansData();
 		meansData.setEntryNo(entryNo);
 		meansData.setEnvironmentId(environmentId);
 		final Map<String, String> valuesMap = new HashMap<>();
