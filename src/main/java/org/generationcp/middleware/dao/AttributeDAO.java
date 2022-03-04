@@ -470,10 +470,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			sql.append(" AND cv.cvterm_id IN (  SELECT vrpr.subject_id ");
 			sql.append(
 				"						FROM cvterm_relationship vrpr INNER JOIN cvterm p ON p.cvterm_id = vrpr.object_id AND vrpr.type_id = ");
-			sql.append(TermRelationshipId.HAS_PROPERTY.getId() + " ");
-			sql.append(
-				" 						INNER JOIN cvterm_relationship trpr ON trpr.subject_id = vrpr.object_id AND trpr.type_id = ");
-			sql.append(TermRelationshipId.IS_A.getId() + " AND trpr.object_id IN (:traitDbIds) ) ");
+			sql.append(TermRelationshipId.HAS_PROPERTY.getId() + " AND p.cvterm_id IN (:traitDbIds) ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getTraitClasses())) {
