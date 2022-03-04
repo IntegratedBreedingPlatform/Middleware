@@ -12,6 +12,7 @@
 package org.generationcp.middleware.dao.oms;
 
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.VariableServiceBrapiImpl;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -1472,15 +1473,15 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	public long countObservationVariables(final VariableSearchRequestDTO requestDTO, final List<String> variableTypes) {
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createCountObservationVariablesQueryString(requestDTO));
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createCountObservationVariablesQueryString(requestDTO, variableTypes));
 		this.addObservationVariableSearchParameters(sqlQuery, requestDTO, variableTypes);
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
 
-	private String createCountObservationVariablesQueryString(final VariableSearchRequestDTO requestDTO) {
+	private String createCountObservationVariablesQueryString(final VariableSearchRequestDTO requestDTO, final List<String> variableTypes) {
 		final StringBuilder sql = new StringBuilder(" SELECT COUNT(1) FROM ( ");
 		sql.append("SELECT DISTINCT variable.cvterm_id ");
-		this.appendObservationVariablesFromQuery(sql);
+		this.appendObservationVariablesFromQuery(sql, variableTypes);
 		this.appendObservationVariableSeachFilters(sql, requestDTO);
 		sql.append(") as variableIds");
 		return sql.toString();
@@ -1488,7 +1489,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 	public List<VariableDTO> getObservationVariables(final VariableSearchRequestDTO requestDTO,	final Pageable pageable,
 		final List<String> variableTypes) {
-		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createObservationVariablesQuery(requestDTO));
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createObservationVariablesQuery(requestDTO, variableTypes));
 		if (pageable != null) {
 			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
 			sqlQuery.setMaxResults(pageable.getPageSize());
@@ -1555,7 +1556,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		}
 	}
 
-	public String createObservationVariablesQuery(final VariableSearchRequestDTO requestDTO) {
+	public String createObservationVariablesQuery(final VariableSearchRequestDTO requestDTO, final List<String> variableTypes) {
 		final StringBuilder stringBuilder = new StringBuilder(" SELECT DISTINCT ");
 		stringBuilder.append("   vo.alias AS " + VARIABLE_ALIAS + ", ");
 		stringBuilder.append("   variable.cvterm_id AS " + VARIABLE_ID + ", ");
@@ -1582,12 +1583,12 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			"   GROUP_CONCAT(DISTINCT CONCAT(category.name, ',', category.definition) SEPARATOR '|') AS " + VARIABLE_SCALE_CATEGORIES
 				+ ",");
 		stringBuilder.append("   GROUP_CONCAT(DISTINCT synonym.synonym SEPARATOR ',') AS " + VARIABLE_NAME_SYNONYMS);
-		this.appendObservationVariablesFromQuery(stringBuilder);
+		this.appendObservationVariablesFromQuery(stringBuilder, variableTypes);
 		this.appendObservationVariableSeachFilters(stringBuilder, requestDTO);
 		return stringBuilder.toString();
 	}
 
-	public void appendObservationVariablesFromQuery(final StringBuilder stringBuilder) {
+	public void appendObservationVariablesFromQuery(final StringBuilder stringBuilder, final List<String> variableTypes) {
 		stringBuilder.append("   FROM cvterm variable ");
 		// Scale
 		stringBuilder.append("   INNER JOIN cvterm_relationship cvtrscale ON variable.cvterm_id = cvtrscale.subject_id ");
@@ -1632,19 +1633,26 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		// Retrieve the variable synonyms
 		stringBuilder.append("	LEFT JOIN (SELECT syn.cvterm_id, syn.synonym as synonym FROM cvtermsynonym syn) ");
 		stringBuilder.append("		synonym on synonym.cvterm_id = variable.cvterm_id ");
-		// Left Join project and project prop to check if there are variables associated to a study
-		stringBuilder.append("	  LEFT JOIN projectprop pp ON pp.variable_id = variable.cvterm_id");
-		stringBuilder.append("	  LEFT JOIN project plotdataset ON plotdataset.project_id = pp.project_id AND plotdataset.dataset_type_id = "
-			+ DatasetTypeEnum.PLOT_DATA.getId());
-		stringBuilder.append(
-			"	  LEFT JOIN project envdataset ON envdataset.study_id = plotdataset.study_id AND envdataset.dataset_type_id = "
-				+ DatasetTypeEnum.SUMMARY_DATA.getId());
-		stringBuilder.append("	  LEFT JOIN nd_experiment nde ON nde.project_id = envdataset.project_id AND nde.type_id = "
-			+ ExperimentType.TRIAL_ENVIRONMENT.getTermId());
+
+		if(VariableServiceBrapiImpl.TRAIT_VARIABLE_TYPE.equals(variableTypes)) {
+			// Left Join project and project prop to check if there are trait variables associated to a study
+			stringBuilder.append("	  LEFT JOIN projectprop pp ON pp.variable_id = variable.cvterm_id");
+			stringBuilder.append("	  LEFT JOIN project plotdataset ON plotdataset.project_id = pp.project_id AND "
+				+ "plotdataset.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId());
+			stringBuilder.append("	  LEFT JOIN project envdataset ON envdataset.study_id = plotdataset.study_id AND "
+				+ "envdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId());
+			stringBuilder.append("	  LEFT JOIN nd_experiment nde ON nde.project_id = envdataset.project_id AND nde.type_id = "
+				+ ExperimentType.TRIAL_ENVIRONMENT.getTermId());
+		} else if(VariableServiceBrapiImpl.ATTRIBUTE_VARIABLE_TYPES.equals(variableTypes)) {
+			// Left Join atributs tp check if there are germplasm attribute variables associated to a study
+			stringBuilder.append("	LEFT JOIN atributs a ON a.atype = variable.cvterm_id ");
+			stringBuilder.append("	LEFT JOIN stock s on s.dbxref_id = a.gid ");
+			stringBuilder.append("	LEFT JOIN nd_experiment nde ON nde.stock_id = s.stock_id ");
+		}
 		// To get Min and Max override values per program
 		stringBuilder.append("	  LEFT JOIN variable_overrides vo ON vo.id = (SELECT MIN(vos.id) ");
 		stringBuilder.append("		FROM variable_overrides vos WHERE variable.cvterm_id = vos.cvterm_id) ");
-		stringBuilder.append(" WHERE variableType.value IN :variableTypes ");
+		stringBuilder.append(" WHERE variableType.value IN (:variableTypes) ");
 	}
 
 	public void appendObservationVariableSeachFilters(final StringBuilder stringBuilder, final VariableSearchRequestDTO requestDTO) {
@@ -1837,6 +1845,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		for (final String brapiDataTypeName : brapiDataTypeNames) {
 			final DataType dataType = DataType.getByBrapiName(brapiDataTypeName);
 			if (dataType != null) {
+				dataTypeIds.add(dataType.getId().toString());
+			} else {
 				dataTypeIds.add(dataType.getId().toString());
 			}
 		}

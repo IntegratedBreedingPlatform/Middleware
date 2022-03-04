@@ -37,6 +37,10 @@ import static java.util.stream.Collectors.groupingBy;
 @Transactional
 public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
+	public static final List<String> TRAIT_VARIABLE_TYPE = Collections.singletonList(VariableType.TRAIT.getName());
+	public static final List<String> ATTRIBUTE_VARIABLE_TYPES = Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE.getName(),
+		VariableType.GERMPLASM_PASSPORT.getName());
+
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
@@ -55,13 +59,13 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	@Override
 	public List<VariableDTO> getObservationVariables(final VariableSearchRequestDTO requestDTO,	final Pageable pageable) {
-		return getVariableDTOS(requestDTO, pageable, Collections.singletonList(VariableType.TRAIT.getName()));
+		return getVariableDTOS(requestDTO, pageable, TRAIT_VARIABLE_TYPE);
 	}
 
 	@Override
 	public List<AttributeDTO> getGermplasmAttributes(final AttributeSearchRequestDTO requestDTO,	final Pageable pageable) {
 		final List<VariableDTO> variableDTOS = getVariableDTOS(new VariableSearchRequestDTO(requestDTO), pageable,
-			Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE.getName(), VariableType.GERMPLASM_PASSPORT.getName()));
+			ATTRIBUTE_VARIABLE_TYPES);
 		final List<AttributeDTO> attributeDTOS = new ArrayList<>();
 		final AttributeMapper attributeMapper = new AttributeMapper();
 		attributeMapper.map(variableDTOS, attributeDTOS);
@@ -98,13 +102,13 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	@Override
 	public long countObservationVariables(final VariableSearchRequestDTO requestDTO) {
-		return this.daoFactory.getCvTermDao().countObservationVariables(requestDTO, Collections.singletonList(VariableType.TRAIT.getName()));
+		return this.daoFactory.getCvTermDao().countObservationVariables(requestDTO, TRAIT_VARIABLE_TYPE);
 	}
 
 	@Override
 	public long countGermplasmAttributes(final AttributeSearchRequestDTO requestDTO) {
 		return this.daoFactory.getCvTermDao().countObservationVariables(new VariableSearchRequestDTO(requestDTO),
-			Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE.getName(), VariableType.GERMPLASM_PASSPORT.getName()));
+			ATTRIBUTE_VARIABLE_TYPES);
 	}
 
 	@Override
