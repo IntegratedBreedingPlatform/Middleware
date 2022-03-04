@@ -1847,7 +1847,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			if (dataType != null) {
 				dataTypeIds.add(dataType.getId().toString());
 			} else {
-				dataTypeIds.add(dataType.getId().toString());
+				dataTypeIds.add(brapiDataTypeName);
 			}
 		}
 		return dataTypeIds;
