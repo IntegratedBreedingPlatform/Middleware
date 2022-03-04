@@ -402,9 +402,9 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 	private void appendAttributeValuesFromQuery(final StringBuilder sql) {
 		sql.append("FROM atributs a ");
 		sql.append(" INNER JOIN germplsm g ON g.gid = a.gid ");
-		sql.append(" INNER JOIN names ON names.gid = a.gid AND names.nstat = 1 ");
 		sql.append(" INNER JOIN cvterm cv ON a.atype = cv.cvterm_id ");
 		sql.append(" LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = cv.cvterm_id AND vpo.program_uuid = :programUUID  ");
+		sql.append(" LEFT JOIN names ON names.gid = a.gid AND names.nstat = 1 ");
 		sql.append(" WHERE 1=1 ");
 	}
 
@@ -506,6 +506,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
 			sqlQuery.setParameterList("germplasmDbIds", requestDTO.getGermplasmDbIds());
 		}
+
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
 			sqlQuery.setParameterList("referenceIDs", requestDTO.getExternalReferenceIDs());
 		}
