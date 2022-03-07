@@ -136,9 +136,9 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 	}
 
 	public long countAttributeValueDtos(final AttributeValueSearchRequestDto attributeValueSearchRequestDto, final String programUUID) {
-		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT cv.cvterm_id) ");
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT a.aid) ");
 		this.appendAttributeValuesFromQuery(sql);
-		this.appendAttributeValueSeachFilters(sql, attributeValueSearchRequestDto);
+		this.appendAttributeValueSearchFilters(sql, attributeValueSearchRequestDto);
 
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql.toString());
 		this.addAttributeValueSearchParameters(sqlQuery, attributeValueSearchRequestDto);
@@ -395,7 +395,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		final StringBuilder sql = new StringBuilder();
 		sql.append(ATTRIBUTE_VALUE_SELECT);
 		this.appendAttributeValuesFromQuery(sql);
-		this.appendAttributeValueSeachFilters(sql, attributeValueSearchRequestDto);
+		this.appendAttributeValueSearchFilters(sql, attributeValueSearchRequestDto);
 		return sql.toString();
 	}
 
@@ -408,7 +408,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		sql.append(" WHERE 1=1 ");
 	}
 
-	private void appendAttributeValueSeachFilters(final StringBuilder sql, final AttributeValueSearchRequestDto requestDTO) {
+	private void appendAttributeValueSearchFilters(final StringBuilder sql, final AttributeValueSearchRequestDto requestDTO) {
 		if (!CollectionUtils.isEmpty(requestDTO.getAttributeDbIds())) {
 			sql.append(" AND cv.cvterm_id IN (:attributeDbIds)");
 		}
@@ -444,8 +444,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
 		// Search preferred names
 		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmNames())) {
-			sql.append(" AND g.gid IN ( SELECT n.gid ");
-			sql.append(" FROM names n WHERE n.nstat = 1 AND n.nval in (:germplasmNames) ) ");
+			sql.append(" AND names.nval IN (:germplasmNames) ");
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getMethodDbIds())) {
