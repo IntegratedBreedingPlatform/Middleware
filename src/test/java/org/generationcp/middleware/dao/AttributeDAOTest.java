@@ -20,6 +20,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
@@ -61,9 +62,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 			this.setupTestData();
 		}
 
-		this.pageable = Mockito.mock(Pageable.class);
-		Mockito.when(this.pageable.getPageSize()).thenReturn(10);
-		Mockito.when(this.pageable.getPageNumber()).thenReturn(0);
+		this.pageable = new PageRequest(0,10);
 	}
 
 	private void setupTestData() {
