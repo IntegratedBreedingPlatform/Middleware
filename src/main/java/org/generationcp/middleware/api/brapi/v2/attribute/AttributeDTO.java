@@ -5,12 +5,15 @@ import org.generationcp.middleware.service.api.study.MethodDTO;
 import org.generationcp.middleware.service.api.study.OntologyReferenceDTO;
 import org.generationcp.middleware.service.api.study.ScaleDTO;
 import org.generationcp.middleware.service.api.study.TraitDTO;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@AutoProperty
 public class AttributeDTO {
 	private Map<String, String> additionalInfo = new HashMap<>();
 	private String attributeCategory;
@@ -202,5 +205,19 @@ public class AttributeDTO {
 		this.trait = trait;
 	}
 
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
+	}
 }
 

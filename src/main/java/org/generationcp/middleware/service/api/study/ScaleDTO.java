@@ -3,11 +3,15 @@ package org.generationcp.middleware.service.api.study;
 import com.fasterxml.jackson.annotation.JsonView;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.BrapiView;
+import org.pojomatic.Pojomatic;
+import org.pojomatic.annotations.AutoProperty;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
+@AutoProperty
 public class ScaleDTO {
 
 	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
@@ -112,5 +116,20 @@ public class ScaleDTO {
 
 	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
 		this.externalReferences = externalReferences;
+	}
+
+	@Override
+	public int hashCode() {
+		return Pojomatic.hashCode(this);
+	}
+
+	@Override
+	public String toString() {
+		return Pojomatic.toString(this);
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return Pojomatic.equals(this, o);
 	}
 }
