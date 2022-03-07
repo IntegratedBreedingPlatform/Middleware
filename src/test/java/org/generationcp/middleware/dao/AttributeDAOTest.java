@@ -31,7 +31,7 @@ import java.util.List;
 public class AttributeDAOTest extends IntegrationTestBase {
 
 	private List<Integer> gids;
-	private List<Germplasm> germplasms;
+	private List<Germplasm> germplasmList;
 	private List<CVTerm> testAttributeTypes;
 	private Attribute attribute1;
 	private Attribute attribute2;
@@ -67,7 +67,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	}
 
 	private void setupTestData() {
-		this.germplasms = new ArrayList<>();
+		this.germplasmList = new ArrayList<>();
 		final Germplasm germplasm1 =
 			GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		germplasm1.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
@@ -78,9 +78,9 @@ public class AttributeDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm3 =
 			GermplasmTestDataInitializer.createGermplasm(20180909, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		germplasm3.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
-		this.germplasms.add(this.daoFactory.getGermplasmDao().save(germplasm1));
-		this.germplasms.add(this.daoFactory.getGermplasmDao().save(germplasm2));
-		this.germplasms.add(this.daoFactory.getGermplasmDao().save(germplasm3));
+		this.germplasmList.add(this.daoFactory.getGermplasmDao().save(germplasm1));
+		this.germplasmList.add(this.daoFactory.getGermplasmDao().save(germplasm2));
+		this.germplasmList.add(this.daoFactory.getGermplasmDao().save(germplasm3));
 		this.gids = Arrays.asList(germplasm1.getGid(), germplasm2.getGid(), germplasm3.getGid());
 
 		final CVTerm attributeType1 =
@@ -150,7 +150,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	public void testGetAttributesByGUIDAndAttributeIds() {
 		final List<AttributeDTO> attributes = this.daoFactory.getAttributeDAO()
 			.getAttributesByGUIDAndAttributeIds(
-				String.valueOf(this.germplasms.get(0).getGermplasmUUID()), Lists.newArrayList(String.valueOf(this.attribute1.getTypeId())),
+				String.valueOf(this.germplasmList.get(0).getGermplasmUUID()), Lists.newArrayList(String.valueOf(this.attribute1.getTypeId())),
 				null);
 		Assert.assertNotNull(attributes);
 		Assert.assertEquals(1, attributes.size());
@@ -158,7 +158,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetAttributeValues() {
-		final Germplasm germplasm = this.germplasms.get(1);
+		final Germplasm germplasm = this.germplasmList.get(1);
 
 		final AttributeValueSearchRequestDto request = new AttributeValueSearchRequestDto();
 		request.setGermplasmDbIds(Collections.singletonList(germplasm.getGermplasmUUID()));
@@ -179,13 +179,13 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	public void testCountAttributeValues_FilterByGermplasmDbId() {
 		final AttributeValueSearchRequestDto request = new AttributeValueSearchRequestDto();
 
-		request.setGermplasmDbIds(Collections.singletonList(this.germplasms.get(0).getGermplasmUUID()));
+		request.setGermplasmDbIds(Collections.singletonList(this.germplasmList.get(0).getGermplasmUUID()));
 		Assert.assertEquals(2, this.daoFactory.getAttributeDAO().countAttributeValueDtos(request, "1"));
 
-		request.setGermplasmDbIds(Collections.singletonList(this.germplasms.get(1).getGermplasmUUID()));
+		request.setGermplasmDbIds(Collections.singletonList(this.germplasmList.get(1).getGermplasmUUID()));
 		Assert.assertEquals(1, this.daoFactory.getAttributeDAO().countAttributeValueDtos(request, "1"));
 
-		request.setGermplasmDbIds(Collections.singletonList(this.germplasms.get(2).getGermplasmUUID()));
+		request.setGermplasmDbIds(Collections.singletonList(this.germplasmList.get(2).getGermplasmUUID()));
 		Assert.assertEquals(0, this.daoFactory.getAttributeDAO().countAttributeValueDtos(request, "1"));
 	}
 
@@ -237,7 +237,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	@Test
 	public void testCountAttributeValues_FilterByGermplasmName() {
 		final AttributeValueSearchRequestDto request = new AttributeValueSearchRequestDto();
-		request.setGermplasmNames(Collections.singletonList(this.germplasms.get(1).getPreferredName().getNval()));
+		request.setGermplasmNames(Collections.singletonList(this.germplasmList.get(1).getPreferredName().getNval()));
 		Assert.assertEquals(1, this.daoFactory.getAttributeDAO().countAttributeValueDtos(request, "1"));
 	}
 
