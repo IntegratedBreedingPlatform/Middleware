@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface VariableServiceBrapi {
 
-    List<VariableDTO> getObservationVariables(VariableSearchRequestDTO requestDTO, Pageable pageable);
+    List<VariableDTO> getVariables(VariableSearchRequestDTO requestDTO, Pageable pageable, VariableTypeGroup variableTypeGroup);
 
-    long countObservationVariables(VariableSearchRequestDTO requestDTO);
+    long countVariables(VariableSearchRequestDTO requestDTO, VariableTypeGroup variableTypeGroup);
 
 	VariableDTO updateObservationVariable(VariableDTO variable);
 }
