@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -110,12 +111,13 @@ public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 		// Verify experiment and phenotype values
 		assertEquals(meansImportRequest.getData().size(), experimentModels.size());
 		final Map<Integer, MeansImportRequest.MeansData> meansDataByEnvironmentId =
-			meansImportRequest.getData().stream().collect(Collectors.toMap(MeansImportRequest.MeansData::getEnvironmentId, Function.identity()));
+			meansImportRequest.getData().stream()
+				.collect(Collectors.toMap(MeansImportRequest.MeansData::getEnvironmentId, Function.identity()));
 		for (final ExperimentModel experimentModel : experimentModels) {
 			final MeansImportRequest.MeansData meansData = meansDataByEnvironmentId.get(experimentModel.getGeoLocation().getLocationId());
 			experimentModel.getPhenotypes().forEach(p -> {
 				final Variable analysisVariable = analysisVariablesMap.get(p.getObservableId());
-				assertEquals(p.getValue(), meansData.getValues().get(analysisVariable.getName()));
+				assertEquals(p.getValue(), meansData.getValues().get(analysisVariable.getName()).toString());
 			});
 		}
 	}
@@ -235,13 +237,14 @@ public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 
 	}
 
-	private MeansImportRequest.MeansData createMeansData(final int environmentId, final int entryNo, final Map<Integer, Variable> analysisVariablesMap) {
+	private MeansImportRequest.MeansData createMeansData(final int environmentId, final int entryNo,
+		final Map<Integer, Variable> analysisVariablesMap) {
 		final MeansImportRequest.MeansData meansData = new MeansImportRequest.MeansData();
 		meansData.setEntryNo(entryNo);
 		meansData.setEnvironmentId(environmentId);
-		final Map<String, String> valuesMap = new HashMap<>();
+		final Map<String, Double> valuesMap = new HashMap<>();
 		for (final Variable variable : analysisVariablesMap.values()) {
-			valuesMap.put(variable.getName(), RandomStringUtils.randomNumeric(10));
+			valuesMap.put(variable.getName(), new Random().nextDouble());
 		}
 		meansData.setValues(valuesMap);
 		return meansData;

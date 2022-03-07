@@ -28,7 +28,7 @@ public class MeansImportRequest {
 
 		private Integer environmentId;
 		private Integer entryNo;
-		private Map<String, String> values;
+		private Map<String, Double> values;
 
 		public Integer getEnvironmentId() {
 			return this.environmentId;
@@ -46,11 +46,11 @@ public class MeansImportRequest {
 			this.entryNo = entryNo;
 		}
 
-		public Map<String, String> getValues() {
+		public Map<String, Double> getValues() {
 			return this.values;
 		}
 
-		public void setValues(final Map<String, String> values) {
+		public void setValues(final Map<String, Double> values) {
 			this.values = values;
 		}
 	}

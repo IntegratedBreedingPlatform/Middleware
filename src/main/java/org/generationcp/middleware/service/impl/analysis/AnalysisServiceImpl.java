@@ -1,7 +1,6 @@
 package org.generationcp.middleware.service.impl.analysis;
 
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -96,11 +95,11 @@ public class AnalysisServiceImpl implements AnalysisService {
 			experimentModel.setTypeId(ExperimentType.AVERAGE.getTermId());
 			experimentModel.setStock(stockModelMap.get(String.valueOf(meansData.getEntryNo())));
 			final List<Phenotype> phenotypes = new ArrayList<>();
-			for (final Map.Entry<String, String> meansMapEntryValue : meansData.getValues().entrySet()) {
-				if (StringUtils.isNotEmpty(meansMapEntryValue.getValue())) {
+			for (final Map.Entry<String, Double> meansMapEntryValue : meansData.getValues().entrySet()) {
+				if (meansMapEntryValue.getValue() != null) {
 					final Phenotype phenotype = new Phenotype();
 					phenotype.setExperiment(experimentModel);
-					phenotype.setValue(meansMapEntryValue.getValue());
+					phenotype.setValue(meansMapEntryValue.getValue().toString());
 					phenotype.setObservableId(analaysisVariablesMap.get(meansMapEntryValue.getKey()).getCvTermId());
 					phenotypes.add(phenotype);
 				}
