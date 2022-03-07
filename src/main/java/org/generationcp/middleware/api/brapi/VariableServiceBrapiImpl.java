@@ -59,12 +59,12 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	@Override
 	public List<VariableDTO> getObservationVariables(final VariableSearchRequestDTO requestDTO,	final Pageable pageable) {
-		return getVariableDTOS(requestDTO, pageable, TRAIT_VARIABLE_TYPE);
+		return this.getVariableDTOS(requestDTO, pageable, TRAIT_VARIABLE_TYPE);
 	}
 
 	@Override
 	public List<AttributeDTO> getGermplasmAttributes(final AttributeSearchRequestDTO requestDTO,	final Pageable pageable) {
-		final List<VariableDTO> variableDTOS = getVariableDTOS(new VariableSearchRequestDTO(requestDTO), pageable,
+		final List<VariableDTO> variableDTOS = this.getVariableDTOS(new VariableSearchRequestDTO(requestDTO), pageable,
 			ATTRIBUTE_VARIABLE_TYPES);
 		final List<AttributeDTO> attributeDTOS = new ArrayList<>();
 		final AttributeMapper attributeMapper = new AttributeMapper();

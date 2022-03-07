@@ -35,7 +35,7 @@ public class AttributeDTO {
 	private TraitDTO trait = new TraitDTO();
 
 	public Map<String, String> getAdditionalInfo() {
-		return additionalInfo;
+		return this.additionalInfo;
 	}
 
 	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
@@ -43,7 +43,7 @@ public class AttributeDTO {
 	}
 
 	public String getAttributeCategory() {
-		return attributeCategory;
+		return this.attributeCategory;
 	}
 
 	public void setAttributeCategory(final String attributeCategory) {
@@ -51,7 +51,7 @@ public class AttributeDTO {
 	}
 
 	public String getAttributeDbId() {
-		return attributeDbId;
+		return this.attributeDbId;
 	}
 
 	public void setAttributeDbId(final String attributeDbId) {
@@ -59,7 +59,7 @@ public class AttributeDTO {
 	}
 
 	public String getAttributeDescription() {
-		return attributeDescription;
+		return this.attributeDescription;
 	}
 
 	public void setAttributeDescription(final String attributeDescription) {
@@ -67,7 +67,7 @@ public class AttributeDTO {
 	}
 
 	public String getAttributeName() {
-		return attributeName;
+		return this.attributeName;
 	}
 
 	public void setAttributeName(final String attributeName) {
@@ -75,7 +75,7 @@ public class AttributeDTO {
 	}
 
 	public String getCommonCropName() {
-		return commonCropName;
+		return this.commonCropName;
 	}
 
 	public void setCommonCropName(final String commonCropName) {
@@ -83,7 +83,7 @@ public class AttributeDTO {
 	}
 
 	public List<String> getContextOfUse() {
-		return contextOfUse;
+		return this.contextOfUse;
 	}
 
 	public void setContextOfUse(final List<String> contextOfUse) {
@@ -91,7 +91,7 @@ public class AttributeDTO {
 	}
 
 	public String getDefaultValue() {
-		return defaultValue;
+		return this.defaultValue;
 	}
 
 	public void setDefaultValue(final String defaultValue) {
@@ -99,7 +99,7 @@ public class AttributeDTO {
 	}
 
 	public String getDocumentationURL() {
-		return documentationURL;
+		return this.documentationURL;
 	}
 
 	public void setDocumentationURL(final String documentationURL) {
@@ -107,7 +107,7 @@ public class AttributeDTO {
 	}
 
 	public List<ExternalReferenceDTO> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
 	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
@@ -115,7 +115,7 @@ public class AttributeDTO {
 	}
 
 	public String getGrowthStage() {
-		return growthStage;
+		return this.growthStage;
 	}
 
 	public void setGrowthStage(final String growthStage) {
@@ -123,7 +123,7 @@ public class AttributeDTO {
 	}
 
 	public String getInstitution() {
-		return institution;
+		return this.institution;
 	}
 
 	public void setInstitution(final String institution) {
@@ -131,7 +131,7 @@ public class AttributeDTO {
 	}
 
 	public String getLanguage() {
-		return language;
+		return this.language;
 	}
 
 	public void setLanguage(final String language) {
@@ -139,7 +139,7 @@ public class AttributeDTO {
 	}
 
 	public MethodDTO getMethod() {
-		return method;
+		return this.method;
 	}
 
 	public void setMethod(final MethodDTO method) {
@@ -147,7 +147,7 @@ public class AttributeDTO {
 	}
 
 	public OntologyReferenceDTO getOntologyReference() {
-		return ontologyReference;
+		return this.ontologyReference;
 	}
 
 	public void setOntologyReference(final OntologyReferenceDTO ontologyReference) {
@@ -155,7 +155,7 @@ public class AttributeDTO {
 	}
 
 	public ScaleDTO getScale() {
-		return scale;
+		return this.scale;
 	}
 
 	public void setScale(final ScaleDTO scale) {
@@ -163,7 +163,7 @@ public class AttributeDTO {
 	}
 
 	public String getScientist() {
-		return scientist;
+		return this.scientist;
 	}
 
 	public void setScientist(final String scientist) {
@@ -171,7 +171,7 @@ public class AttributeDTO {
 	}
 
 	public String getStatus() {
-		return status;
+		return this.status;
 	}
 
 	public void setStatus(final String status) {
@@ -179,7 +179,7 @@ public class AttributeDTO {
 	}
 
 	public String getSubmissionTimestamp() {
-		return submissionTimestamp;
+		return this.submissionTimestamp;
 	}
 
 	public void setSubmissionTimestamp(final String submissionTimestamp) {
@@ -187,7 +187,7 @@ public class AttributeDTO {
 	}
 
 	public List<String> getSynonyms() {
-		return synonyms;
+		return this.synonyms;
 	}
 
 	public void setSynonyms(final List<String> synonyms) {
@@ -195,7 +195,7 @@ public class AttributeDTO {
 	}
 
 	public TraitDTO getTrait() {
-		return trait;
+		return this.trait;
 	}
 
 	public void setTrait(final TraitDTO trait) {

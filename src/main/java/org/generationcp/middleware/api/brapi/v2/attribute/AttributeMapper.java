@@ -1,20 +1,12 @@
 package org.generationcp.middleware.api.brapi.v2.attribute;
 
-import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
-import org.generationcp.middleware.service.api.study.MethodDTO;
-import org.generationcp.middleware.service.api.study.OntologyReferenceDTO;
-import org.generationcp.middleware.service.api.study.ScaleDTO;
-import org.generationcp.middleware.service.api.study.TraitDTO;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AttributeMapper {
 
-	public void map(List<VariableDTO> from, List<AttributeDTO> to) {
+	public void map(final List<VariableDTO> from, final List<AttributeDTO> to) {
 		for(final VariableDTO variableDTO: from) {
 			final AttributeDTO attributeDTO = new AttributeDTO();
 			attributeDTO.setAdditionalInfo(variableDTO.getAdditionalInfo());
