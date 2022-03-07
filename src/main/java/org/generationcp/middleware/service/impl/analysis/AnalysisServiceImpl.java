@@ -50,16 +50,16 @@ public class AnalysisServiceImpl implements AnalysisService {
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(meansImportRequest.getStudyId());
 		final Set<String> analysisVariableNames =
 			meansImportRequest.getData().stream().map(o -> o.getValues().keySet()).flatMap(Set::stream).collect(Collectors.toSet());
-		final Map<String, CVTerm> analaysisVariablesMap =
+		final Map<String, CVTerm> analysisVariablesMap =
 			this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisVariableNames, CvId.VARIABLES).stream().collect(Collectors.toMap(
 				CVTerm::getName, Function.identity()));
 
 		// Create means dataset
 		final DmsProject meansDataset = this.createMeansDataset(study);
 		// Add necessary dataset project properties
-		this.addMeansDatasetProperties(meansDataset, analaysisVariablesMap);
+		this.addMeansDatasetProperties(meansDataset, analysisVariablesMap);
 		// Save means experiment and means values
-		this.saveMeansExperimentAndValues(meansDataset, analaysisVariablesMap, meansImportRequest);
+		this.saveMeansExperimentAndValues(meansDataset, analysisVariablesMap, meansImportRequest);
 
 		return meansDataset.getProjectId();
 	}
