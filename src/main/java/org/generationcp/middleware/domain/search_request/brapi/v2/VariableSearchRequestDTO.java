@@ -1,6 +1,5 @@
 package org.generationcp.middleware.domain.search_request.brapi.v2;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -23,6 +22,26 @@ public class VariableSearchRequestDTO extends SearchRequestDto {
     private List<String> studyDbId;
     private List<String> traitClasses;
     private List<String> traitDbIds;
+
+    public VariableSearchRequestDTO() {
+
+    }
+
+    public VariableSearchRequestDTO(final AttributeSearchRequestDTO attributeSearchRequestDTO) {
+        this.dataTypes = attributeSearchRequestDTO.getDataTypes();
+        this.externalReferenceIDs = attributeSearchRequestDTO.getExternalReferenceIDs();
+        this.externalReferenceSources = attributeSearchRequestDTO.getExternalReferenceSources();
+        this.methodDbIds = attributeSearchRequestDTO.getMethodDbIds();
+        this.observationVariableDbIds = attributeSearchRequestDTO.getAttributeDbIds();
+        this.observationVariableNames = attributeSearchRequestDTO.getAttributeNames();
+        this.ontologyDbIds = attributeSearchRequestDTO.getOntologyDbIds();
+        this.page = attributeSearchRequestDTO.getPage();
+        this.pageSize = attributeSearchRequestDTO.getPageSize();
+        this.scaleDbIds = attributeSearchRequestDTO.getScaleDbIds();
+        this.studyDbId = attributeSearchRequestDTO.getStudyDbId();
+        this.traitClasses = attributeSearchRequestDTO.getTraitClasses();
+        this.traitDbIds = attributeSearchRequestDTO.getTraitDbIds();
+    }
 
     public List<String> getDataTypes() {
         return this.dataTypes;
