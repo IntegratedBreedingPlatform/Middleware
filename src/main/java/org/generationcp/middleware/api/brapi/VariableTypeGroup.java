@@ -10,7 +10,7 @@ public enum VariableTypeGroup {
 	TRAIT(Collections.singletonList(VariableType.TRAIT.getName())),
 	GERMPLASM_ATTRIBUTES(Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE.getName(), VariableType.GERMPLASM_PASSPORT.getName()));
 
-	private List<String> variableTypeNames;
+	private final List<String> variableTypeNames;
 
 	VariableTypeGroup(final List<String> variableTypeNames) {
 		this.variableTypeNames = variableTypeNames;

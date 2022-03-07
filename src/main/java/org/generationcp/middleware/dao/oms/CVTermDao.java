@@ -12,7 +12,6 @@
 package org.generationcp.middleware.dao.oms;
 
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.api.brapi.VariableServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ExperimentType;
