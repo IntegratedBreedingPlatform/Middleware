@@ -1487,7 +1487,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		return sql.toString();
 	}
 
-	public List<VariableDTO> getVariableDTOS(final VariableSearchRequestDTO requestDTO,	final Pageable pageable,
+	public List<VariableDTO> getVariableDTOS(final VariableSearchRequestDTO requestDTO, final Pageable pageable,
 		final VariableTypeGroup variableTypeGroup) {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createVariablesQuery(requestDTO,
 			variableTypeGroup));
@@ -1632,7 +1632,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		stringBuilder.append("	LEFT JOIN (SELECT syn.cvterm_id, syn.synonym as synonym FROM cvtermsynonym syn) ");
 		stringBuilder.append("		synonym on synonym.cvterm_id = variable.cvterm_id ");
 
-		if(VariableTypeGroup.TRAIT.equals(variableTypeGroup)) {
+		if (VariableTypeGroup.TRAIT.equals(variableTypeGroup)) {
 			// Left Join project and project prop to check if there are trait variables associated to a study
 			stringBuilder.append("	  LEFT JOIN projectprop pp ON pp.variable_id = variable.cvterm_id");
 			stringBuilder.append("	  LEFT JOIN project plotdataset ON plotdataset.project_id = pp.project_id AND "
@@ -1641,8 +1641,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				+ "envdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId());
 			stringBuilder.append("	  LEFT JOIN nd_experiment nde ON nde.project_id = envdataset.project_id AND nde.type_id = "
 				+ ExperimentType.TRIAL_ENVIRONMENT.getTermId());
-		} else if(VariableTypeGroup.GERMPLASM_ATTRIBUTES.equals(variableTypeGroup)) {
-			// Left Join atributs tp check if there are germplasm attribute variables associated to a study
+		} else if (VariableTypeGroup.GERMPLASM_ATTRIBUTES.equals(variableTypeGroup)) {
+			// Left Join atributs to check if there are germplasm attribute variables associated to a study
 			stringBuilder.append("	LEFT JOIN atributs a ON a.atype = variable.cvterm_id ");
 			stringBuilder.append("	LEFT JOIN stock s on s.dbxref_id = a.gid ");
 			stringBuilder.append("	LEFT JOIN nd_experiment nde ON nde.stock_id = s.stock_id ");
@@ -1957,7 +1957,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		criteria.add(Restrictions.eq("cvId", cvId));
 		return criteria.list();
 	}
-
 
 	/***
 	 * Continues

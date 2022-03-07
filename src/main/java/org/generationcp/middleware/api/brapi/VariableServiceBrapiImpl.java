@@ -50,7 +50,7 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	}
 
 	@Override
-	public List<VariableDTO> getVariables(final VariableSearchRequestDTO requestDTO,	final Pageable pageable,
+	public List<VariableDTO> getVariables(final VariableSearchRequestDTO requestDTO, final Pageable pageable,
 		final VariableTypeGroup variableTypeGroup) {
 		final List<VariableDTO> variableDTOS = this.daoFactory.getCvTermDao().getVariableDTOS(requestDTO, pageable, variableTypeGroup);
 		if (!CollectionUtils.isEmpty(variableDTOS)) {
