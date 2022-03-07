@@ -1,12 +1,9 @@
 package org.generationcp.middleware.api.brapi;
 
-import org.generationcp.middleware.api.brapi.v2.attribute.AttributeDTO;
-import org.generationcp.middleware.api.brapi.v2.attribute.AttributeMapper;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeSearchRequestDTO;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -24,7 +21,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -36,10 +32,6 @@ import static java.util.stream.Collectors.groupingBy;
 @Service
 @Transactional
 public class VariableServiceBrapiImpl implements VariableServiceBrapi {
-
-	public static final List<String> TRAIT_VARIABLE_TYPE = Collections.singletonList(VariableType.TRAIT.getName());
-	public static final List<String> ATTRIBUTE_VARIABLE_TYPES = Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE.getName(),
-		VariableType.GERMPLASM_PASSPORT.getName());
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -58,23 +50,9 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	}
 
 	@Override
-	public List<VariableDTO> getObservationVariables(final VariableSearchRequestDTO requestDTO,	final Pageable pageable) {
-		return this.getVariableDTOS(requestDTO, pageable, TRAIT_VARIABLE_TYPE);
-	}
-
-	@Override
-	public List<AttributeDTO> getGermplasmAttributes(final AttributeSearchRequestDTO requestDTO,	final Pageable pageable) {
-		final List<VariableDTO> variableDTOS = this.getVariableDTOS(new VariableSearchRequestDTO(requestDTO), pageable,
-			ATTRIBUTE_VARIABLE_TYPES);
-		final List<AttributeDTO> attributeDTOS = new ArrayList<>();
-		final AttributeMapper attributeMapper = new AttributeMapper();
-		attributeMapper.map(variableDTOS, attributeDTOS);
-		return attributeDTOS;
-	}
-
-	private List<VariableDTO> getVariableDTOS(final VariableSearchRequestDTO requestDTO, final Pageable pageable,
-		final List<String> variableTypes) {
-		final List<VariableDTO> variableDTOS = this.daoFactory.getCvTermDao().getObservationVariables(requestDTO, pageable, variableTypes);
+	public List<VariableDTO> getVariables(final VariableSearchRequestDTO requestDTO,	final Pageable pageable,
+		final VariableTypeGroup variableTypeGroup) {
+		final List<VariableDTO> variableDTOS = this.daoFactory.getCvTermDao().getVariableDTOS(requestDTO, pageable, variableTypeGroup);
 		if (!CollectionUtils.isEmpty(variableDTOS)) {
 			final List<Integer> variableIds =
 				new ArrayList<>(variableDTOS.stream().map(v -> Integer.valueOf(v.getObservationVariableDbId()))
@@ -101,14 +79,8 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	}
 
 	@Override
-	public long countObservationVariables(final VariableSearchRequestDTO requestDTO) {
-		return this.daoFactory.getCvTermDao().countObservationVariables(requestDTO, TRAIT_VARIABLE_TYPE);
-	}
-
-	@Override
-	public long countGermplasmAttributes(final AttributeSearchRequestDTO requestDTO) {
-		return this.daoFactory.getCvTermDao().countObservationVariables(new VariableSearchRequestDTO(requestDTO),
-			ATTRIBUTE_VARIABLE_TYPES);
+	public long countVariables(final VariableSearchRequestDTO requestDTO, final VariableTypeGroup variableTypeGroup) {
+		return this.daoFactory.getCvTermDao().countVariables(requestDTO, variableTypeGroup);
 	}
 
 	@Override
