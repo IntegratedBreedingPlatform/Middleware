@@ -140,6 +140,57 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testGetGermplasmAttributes() {
+		final List<String> possibleValues = new ArrayList<>();
+		possibleValues.add(RandomStringUtils.randomAlphabetic(5));
+		possibleValues.add(RandomStringUtils.randomAlphabetic(5));
+		possibleValues.add(RandomStringUtils.randomAlphabetic(5));
+		final CVTerm categoricalVariable = this.testDataInitializer
+			.createCategoricalVariable(VariableType.GERMPLASM_ATTRIBUTE, possibleValues);
+		final VariableOverrides vo = new VariableOverrides();
+		vo.setAlias(RandomStringUtils.randomAlphabetic(10));
+		vo.setVariableId(categoricalVariable.getCvTermId());
+		this.daoFactory.getVariableProgramOverridesDao().save(vo);
+
+		final CvTermExternalReference varExRef = new CvTermExternalReference();
+		varExRef.setCvTerm(categoricalVariable);
+		varExRef.setSource(RandomStringUtils.randomAlphabetic(5));
+		varExRef.setReferenceId(RandomStringUtils.randomAlphabetic(5));
+		this.daoFactory.getCvTermExternalReferenceDAO().save(varExRef);
+
+		final CVTermSynonym synonym = new CVTermSynonym();
+		synonym.setSynonym(RandomStringUtils.randomAlphabetic(10));
+		synonym.setCvTermId(categoricalVariable.getCvTermId());
+		synonym.setTypeId(1230);
+		synonym.setCvTermSynonymId(categoricalVariable.getCvTermId());
+		this.daoFactory.getCvTermSynonymDao().save(synonym);
+
+		this.sessionProvder.getSession().flush();
+
+		final VariableSearchRequestDTO searchRequestDTO = new VariableSearchRequestDTO();
+		searchRequestDTO.setObservationVariableDbIds(Collections.singletonList(categoricalVariable.getCvTermId().toString()));
+		final String cropName = "MAIZE";
+		final List<VariableDTO> variableDTOS =
+			this.variableServiceBrapi.getVariables(searchRequestDTO, null, VariableTypeGroup.GERMPLASM_ATTRIBUTES);
+		Assert.assertEquals(1, variableDTOS.size());
+		final VariableDTO dto = variableDTOS.get(0);
+		Assert.assertEquals(categoricalVariable.getCvTermId().toString(), dto.getObservationVariableDbId());
+		Assert.assertEquals(categoricalVariable.getCvTermId().toString(), dto.getOntologyReference().getOntologyDbId());
+		Assert.assertEquals(vo.getAlias(), dto.getObservationVariableName());
+		Assert.assertEquals(categoricalVariable.getName(), dto.getOntologyReference().getOntologyName());
+		Assert.assertNotNull(dto.getMethod());
+		Assert.assertNotNull(dto.getTrait());
+		Assert.assertNotNull(dto.getScale());
+		Assert.assertEquals(3, dto.getScale().getValidValues().getCategories().size());
+		Assert.assertEquals(1, dto.getSynonyms().size());
+		Assert.assertEquals(synonym.getSynonym(), dto.getSynonyms().get(0));
+		Assert.assertEquals(vo.getAlias(), dto.getName());
+		Assert.assertEquals(1, dto.getExternalReferences().size());
+		Assert.assertEquals(varExRef.getSource(), dto.getExternalReferences().get(0).getReferenceSource());
+		Assert.assertEquals(varExRef.getReferenceId(), dto.getExternalReferences().get(0).getReferenceID());
+	}
+
+	@Test
 	public void testUpdateObservationVariable_AddVariableToStudy() {
 		final TrialImportRequestDTO trialImportRequestDTO = new TrialImportRequestDTO();
 		trialImportRequestDTO.setStartDate("2019-01-01");
