@@ -338,18 +338,8 @@ public class ExperimentBuilder extends Builder {
 		}
 		final String val = this.findStockValue(variableType.getId(), stockModel.getProperties());
 
-		if (standardVariable.getId() == TermId.ENTRY_TYPE.getId()) {
-			return new Variable(variableType, Strings.nullToEmpty(val));
-		}
-
 		if (standardVariable.isCategorical()) {
-			final Optional<StockProperty> stockProperty =
-				stockModel.getProperties().stream().filter(stproperty -> variableType.getId() == stproperty.getTypeId()).findFirst();
-			if (stockProperty.isPresent()) {
-				Variable variable = new Variable(variableType.getId(), variableType, stockProperty.get().getCategoricalValueId());
-				variable.setValue(stockProperty.get().getValue());
-				return variable;
-			}
+			return new Variable(variableType, Strings.nullToEmpty(val));
 		}
 
 		if (val != null) {
