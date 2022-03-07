@@ -5,7 +5,11 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import java.util.ArrayList;
 import java.util.List;
 
-public class VariableUtils {
+public class BrapiVariableUtils {
+
+	private BrapiVariableUtils() {
+		// utility class
+	}
 
 	public static List<String> convertBrapiDataTypeToDataTypeIds(final List<String> brapiDataTypeNames) {
 		final List<String> dataTypeIds = new ArrayList<>();

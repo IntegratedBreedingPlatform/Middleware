@@ -14,7 +14,7 @@ package org.generationcp.middleware.dao.oms;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.dao.util.VariableUtils;
+import org.generationcp.middleware.dao.util.BrapiVariableUtils;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -1512,7 +1512,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		sqlQuery.setParameterList("variableTypes", variableTypeGroup.getVariableTypeNames());
 
 		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
-			sqlQuery.setParameterList("dataTypeIds", VariableUtils.convertBrapiDataTypeToDataTypeIds(requestDTO.getDataTypes()));
+			sqlQuery.setParameterList("dataTypeIds", BrapiVariableUtils.convertBrapiDataTypeToDataTypeIds(requestDTO.getDataTypes()));
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {

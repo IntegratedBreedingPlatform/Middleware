@@ -14,7 +14,7 @@ package org.generationcp.middleware.dao;
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
-import org.generationcp.middleware.dao.util.VariableUtils;
+import org.generationcp.middleware.dao.util.BrapiVariableUtils;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
@@ -497,7 +497,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			sqlQuery.setParameterList("attributeValueDbIds", requestDTO.getAttributeValueDbIds());
 		}
 		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
-			sqlQuery.setParameterList("dataTypeIds", VariableUtils.convertBrapiDataTypeToDataTypeIds(requestDTO.getDataTypes()));
+			sqlQuery.setParameterList("dataTypeIds", BrapiVariableUtils.convertBrapiDataTypeToDataTypeIds(requestDTO.getDataTypes()));
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {

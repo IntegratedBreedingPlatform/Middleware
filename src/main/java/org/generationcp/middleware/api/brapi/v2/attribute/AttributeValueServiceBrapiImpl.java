@@ -20,7 +20,7 @@ import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @Transactional
-public class AttributeValueServiceImpl implements AttributeValueService {
+public class AttributeValueServiceBrapiImpl implements AttributeValueServiceBrapi {
 
 	private final HibernateSessionProvider sessionProvider;
 
@@ -29,7 +29,7 @@ public class AttributeValueServiceImpl implements AttributeValueService {
 
 	private final DaoFactory daoFactory;
 
-	public AttributeValueServiceImpl(final HibernateSessionProvider sessionProvider) {
+	public AttributeValueServiceBrapiImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 		this.daoFactory = new DaoFactory(this.sessionProvider);
 	}

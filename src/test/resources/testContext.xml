@@ -381,7 +381,7 @@
 		<constructor-arg name="sessionProvider" ref="workbenchSessionProvider"/>
 	</bean>
 
-	<bean id="attributeValueService" class="org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueServiceImpl">
+	<bean id="attributeValueService" class="org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueServiceBrapiImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
