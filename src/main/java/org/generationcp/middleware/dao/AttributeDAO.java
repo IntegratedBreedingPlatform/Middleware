@@ -21,13 +21,13 @@ import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
-import org.hibernate.type.DateType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.springframework.data.domain.Pageable;
@@ -54,7 +54,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		"SELECT a.aid, cv.cvterm_id AS attributeDbId, "
 			+ "IFNULL(vpo.alias, cv.name) AS attributeName, "
 			+ "a.aid AS attributeValueDbId, "
-			+ "a.adate AS determinedDate, "
+			+ "a.adate, "
 			+ "a.alocn AS locationDbId, "
 			+ "g.germplsm_uuid AS germplasmDbId, "
 			+ "names.nval AS germplasmName, "
@@ -163,7 +163,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		sqlQuery.addScalar("attributeDbId", StringType.INSTANCE);
 		sqlQuery.addScalar("attributeName", StringType.INSTANCE);
 		sqlQuery.addScalar("attributeValueDbId", StringType.INSTANCE);
-		sqlQuery.addScalar("determinedDate", DateType.INSTANCE);
+		sqlQuery.addScalar("adate", StringType.INSTANCE);
 		sqlQuery.addScalar("germplasmDbId", StringType.INSTANCE);
 		sqlQuery.addScalar("germplasmName", StringType.INSTANCE);
 		sqlQuery.addScalar("value", StringType.INSTANCE);
@@ -173,17 +173,21 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 
 		if (results != null && !results.isEmpty()) {
 			results.stream().map(
-					attributeValue -> this.addAdditionalInfoToAttributeValue(attributeValue))
+					attributeValue -> this.processAttributeValueData(attributeValue))
 				.collect(Collectors.toList());
 		}
 
 		return results;
 	}
 
-	private AttributeValueDto addAdditionalInfoToAttributeValue(final AttributeValueDto attributeValue) {
+	private AttributeValueDto processAttributeValueData(final AttributeValueDto attributeValue) {
+		// add additional info from retrieved location db id
 		final Map<String, String> additionalInfo = new HashMap<>();
 		additionalInfo.put(ADDTL_INFO_LOCATION, attributeValue.getLocationDbId());
 		attributeValue.setAdditionalInfo(additionalInfo);
+
+		// parse adate value
+		attributeValue.setDeterminedDate(Util.tryParseDate(attributeValue.getAdate()));
 		return attributeValue;
 	}
 

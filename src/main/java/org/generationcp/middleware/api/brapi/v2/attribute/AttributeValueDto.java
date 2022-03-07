@@ -1,9 +1,9 @@
 package org.generationcp.middleware.api.brapi.v2.attribute;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.util.serializer.DatePropertySerializer;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -18,6 +18,9 @@ public class AttributeValueDto {
 	private Integer aid;
 
 	@JsonIgnore
+	private String adate;
+
+	@JsonIgnore
 	private String locationDbId;
 
 	private Map<String, String> additionalInfo;
@@ -25,8 +28,7 @@ public class AttributeValueDto {
 	private String attributeDbId;
 	private String attributeName;
 
-	@JsonSerialize(as = Date.class)
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+	@JsonSerialize(using = DatePropertySerializer.class)
 	private Date determinedDate;
 
 	private List<ExternalReferenceDTO> externalReferences;
@@ -120,6 +122,14 @@ public class AttributeValueDto {
 
 	public void setLocationDbId(final String locationDbId) {
 		this.locationDbId = locationDbId;
+	}
+
+	public String getAdate() {
+		return this.adate;
+	}
+
+	public void setAdate(final String adate) {
+		this.adate = adate;
 	}
 
 	@Override
