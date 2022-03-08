@@ -7,7 +7,6 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
@@ -25,7 +24,6 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
@@ -78,12 +76,14 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private static final List<Integer> SUBOBS_COLUMNS_ALL_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.GERMPLASM_DESCRIPTOR.getId(),
+		VariableType.ENTRY_DETAIL.getId(),//
 		VariableType.TRAIT.getId(),
 		VariableType.SELECTION_METHOD.getId(),
 		VariableType.OBSERVATION_UNIT.getId());
 
 	private static final List<Integer> PLOT_COLUMNS_ALL_VARIABLE_TYPES = Lists.newArrayList( //
-		VariableType.GERMPLASM_DESCRIPTOR.getId(), //
+		VariableType.GERMPLASM_DESCRIPTOR.getId(),
+		VariableType.ENTRY_DETAIL.getId(),//
 		VariableType.EXPERIMENTAL_DESIGN.getId(), //
 		VariableType.TREATMENT_FACTOR.getId(), //
 		VariableType.OBSERVATION_UNIT.getId(), //
@@ -92,6 +92,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private static final List<Integer> PLOT_COLUMNS_FACTOR_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.GERMPLASM_DESCRIPTOR.getId(),
+		VariableType.ENTRY_DETAIL.getId(),//
 		VariableType.EXPERIMENTAL_DESIGN.getId(),
 		VariableType.TREATMENT_FACTOR.getId(),
 		VariableType.OBSERVATION_UNIT.getId());
@@ -104,7 +105,9 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.OBSERVATION_UNIT.getId(),
 		VariableType.TRAIT.getId(),
 		VariableType.SELECTION_METHOD.getId(),
-		VariableType.GERMPLASM_DESCRIPTOR.getId());
+		VariableType.GERMPLASM_DESCRIPTOR.getId(),
+		VariableType.ENTRY_DETAIL.getId())//
+	;
 
 	protected static final List<Integer> MEASUREMENT_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.TRAIT.getId(),
@@ -120,9 +123,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
-
-	@Autowired
-	private OntologyDataManager ontologyDataManager;
 
 	@Autowired
 	private StudyService studyService;
@@ -607,6 +607,11 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
 				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 		searchDTO.setSelectionMethodsAndTraits(selectionMethodsAndTraits);
+
+		final List<MeasurementVariableDto> entryDetails =
+			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
+				VariableType.ENTRY_DETAIL.getId());
+		searchDTO.setEntryDetails(entryDetails);
 	}
 
 	@Override

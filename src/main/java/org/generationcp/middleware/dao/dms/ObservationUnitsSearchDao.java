@@ -17,6 +17,7 @@ import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstanc
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
+import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -528,6 +529,25 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			}
 		}
 
+		final String entryDetailsClauseFormat = " MAX(IF(cvterm_entry_variable.name = '%s', sp.value, NULL)) AS '%s',"
+			+ " MAX(IF(cvterm_entry_variable.name = '%s', sp.stockprop_id, NULL)) AS '%s',"
+			+ " MAX(IF(cvterm_entry_variable.name = '%s', sp.cvalue_id, NULL)) AS '%s'";
+
+		//fixme temporary excluding entry_type to not break the query until we complete the implementation
+		for (final MeasurementVariableDto measurementVariable : searchDto.getEntryDetails()) {
+			if (measurementVariable.getId()!=8255) {
+				columns.add(String.format(
+					entryDetailsClauseFormat,
+					measurementVariable.getName(),
+					measurementVariable.getName(),
+					measurementVariable.getName(),
+					measurementVariable.getName() + "_StockPropId",
+					measurementVariable.getName(),
+					measurementVariable.getName() + "_CvalueId"
+				));
+			}
+		}
+
 		if (noFilterVariables) {
 			final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s',"
 				+ " MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s',"
@@ -654,6 +674,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
 			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id "
 			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id "
+			+ " LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id "
+			+ " LEFT JOIN cvterm cvterm_entry_variable ON (cvterm_entry_variable.cvterm_id = sp.type_id) "
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
 			+ "	LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = ph.observable_id "
 			+ " LEFT JOIN nd_experiment parent ON parent.nd_experiment_id = nde.parent_id "
@@ -1046,6 +1068,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final Map<String, Object> row, final Map<Integer, String> standardVariableNameMap) {
 		final Map<String, ObservationUnitData> environmentVariables = new HashMap<>();
 		final Map<String, ObservationUnitData> observationVariables = new HashMap<>();
+		final Map<String, StockPropertyData> entryDetailVariables = new HashMap<>();
 
 		for (final MeasurementVariableDto variable : searchDto.getSelectionMethodsAndTraits()) {
 			final String status = (String) row.get(variable.getName() + "_Status");
@@ -1060,6 +1083,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 			observationVariables.put(variable.getName(), observationUnitData);
 		}
+
+		for (final MeasurementVariableDto variable : searchDto.getEntryDetails()) {
+			final StockPropertyData stockPropertyData = new StockPropertyData((Integer) row.get(variable.getName() + "_StockPropId"), variable.getId(), (String) row.get(variable.getName()),
+				(Integer) row.get(variable.getName() + "_CvalueId"));
+			entryDetailVariables.put(variable.getName(), stockPropertyData);
+		}
+
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 
 		observationUnitRow.setObservationUnitId((Integer) row.get(OBSERVATION_UNIT_ID));
@@ -1134,6 +1164,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		observationUnitRow.setVariables(observationVariables);
 		observationUnitRow.setEnvironmentVariables(environmentVariables);
+		observationUnitRow.setEntryDetails(entryDetailVariables);
 		return observationUnitRow;
 	}
 

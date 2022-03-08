@@ -20,6 +20,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	private List<String> genericGermplasmDescriptors;
 	private List<String> additionalDesignFactors;
 	private List<MeasurementVariableDto> selectionMethodsAndTraits;
+	private List<MeasurementVariableDto> entryDetails;
 	private int datasetId;
 	private Integer instanceId;
 	private Integer environmentDatasetId;
@@ -188,6 +189,14 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 
 	public void setSelectionMethodsAndTraits(final List<MeasurementVariableDto> selectionMethodsAndTraits) {
 		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
+	}
+
+	public List<MeasurementVariableDto> getEntryDetails() {
+		return entryDetails;
+	}
+
+	public void setEntryDetails(final List<MeasurementVariableDto> entryDetails) {
+		this.entryDetails = entryDetails;
 	}
 
 	public int getDatasetId() {
