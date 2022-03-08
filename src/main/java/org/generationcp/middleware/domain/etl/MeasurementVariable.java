@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.domain.etl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -245,7 +246,7 @@ public class MeasurementVariable {
 		if (this.label == null) {
 			this.label = "";
 		}
-		if ("".equalsIgnoreCase(this.label) && this.role != null) {
+		if ("".equalsIgnoreCase(this.label) && this.role != null && CollectionUtils.isNotEmpty(this.role.getLabelList())) {
 			this.label = this.role.getLabelList().get(0);
 		}
 		return this.label;

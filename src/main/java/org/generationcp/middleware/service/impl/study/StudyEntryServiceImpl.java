@@ -2,11 +2,13 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.collect.Lists;
+import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
@@ -17,6 +19,8 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.DmsProject;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -36,6 +40,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -46,6 +51,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private OntologyDataManager ontologyDataManager;
+
+	@Resource
+	private GermplasmListService germplasmListService;
 
 	private final DaoFactory daoFactory;
 
@@ -118,16 +126,37 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public List<StudyEntryDto> saveStudyEntries(final Integer studyId, final List<StudyEntryDto> studyEntryDtoList) {
-		final List<Integer> entryIds = new ArrayList<>();
-		for (final StudyEntryDto studyEntryDto : studyEntryDtoList) {
-			final StockModel entry = new StockModel(studyId, studyEntryDto);
-			this.daoFactory.getStockDao().saveOrUpdate(entry);
-			entryIds.add(entry.getStockId());
-		}
-		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
-		filter.setEntryIds(entryIds);
-		return this.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE));
+	public void saveStudyEntries(final Integer studyId, final Integer listId) {
+		final DmsProject plotDataDataset =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+		// Filter all entry details project variable that the project currently has because entry details are going to be added later
+		final List<ProjectProperty> projectProperties = plotDataDataset.getProperties()
+			.stream()
+			.filter(projectProperty -> !VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()))
+			.collect(Collectors.toList());
+
+		// Add germplasm list entry details as project properties
+		final AtomicInteger projectPropertyInitialRank = new AtomicInteger(plotDataDataset.getNextPropertyRank());
+		final List<Variable> germplasmListVariables = this.germplasmListService.getGermplasmListVariables(null, listId, null);
+		final List<ProjectProperty> entryDetailsProjectProperties = germplasmListVariables.stream()
+			.map(variable -> new ProjectProperty(plotDataDataset, VariableType.ENTRY_DETAIL.getId(), null,
+				projectPropertyInitialRank.getAndIncrement(), variable.getId(), variable.getName()))
+			.collect(Collectors.toList());
+		projectProperties.addAll(entryDetailsProjectProperties);
+
+		plotDataDataset.setProperties(projectProperties);
+		this.daoFactory.getDmsProjectDAO().save(plotDataDataset);
+
+		final boolean listHasEntryType =
+			germplasmListVariables.stream().anyMatch(variable -> variable.getId() == TermId.ENTRY_TYPE.getId());
+		this.daoFactory.getStockDao().createStudyEntries(studyId, listId, !listHasEntryType);
+	}
+
+	@Override
+	public void saveStudyEntries(final Integer studyId, final List<Integer> gids, final Integer entryTypeId) {
+		final Term entryType = this.ontologyDataManager.getTermById(Integer.valueOf(entryTypeId));
+		final Integer nextEntryNumber = this.getNextEntryNumber(studyId);
+		this.daoFactory.getStockDao().createStudyEntries(studyId, nextEntryNumber, gids, entryType.getId(), entryType.getName());
 	}
 
 	@Override
@@ -198,23 +227,24 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final Optional<StockProperty> entryType =
 			stock.getProperties().stream().filter(prop -> variableId.equals(prop.getTypeId())).findFirst();
 		entryType.ifPresent(stockProperty -> {
-			// TODO: Fix value/categoricalValueId
-			final Integer categoricalValueId = null;
 				studyEntryDto.getProperties().put(variableId,
-					new StudyEntryPropertyData(null, stockProperty.getTypeId(), value.isPresent() ? value.get() : stockProperty.getValue(), categoricalValueId));
+					new StudyEntryPropertyData(null, stockProperty.getTypeId(), value.isPresent() ? value.get() : stockProperty.getValue(), stockProperty.getCategoricalValueId()));
 			}
 		);
 	}
 
 	@Override
 	public void updateStudyEntriesProperty(final StudyEntryPropertyBatchUpdateRequest studyEntryPropertyBatchUpdateRequest) {
+		final Term entryType = this.ontologyDataManager.getTermById(Integer.valueOf(studyEntryPropertyBatchUpdateRequest.getValue()));
+
 		this.daoFactory.getStockPropertyDao().updateByStockIdsAndTypeId(
 			new ArrayList<>(studyEntryPropertyBatchUpdateRequest.getSearchComposite().getItemIds()),
-			studyEntryPropertyBatchUpdateRequest.getVariableId(), studyEntryPropertyBatchUpdateRequest.getValue());
+			studyEntryPropertyBatchUpdateRequest.getVariableId(), studyEntryPropertyBatchUpdateRequest.getValue(), entryType.getName());
 	}
 
 	@Override
 	public Boolean hasUnassignedEntries(final int studyId) {
 		return this.daoFactory.getStockDao().hasUnassignedEntries(studyId);
 	}
+
 }

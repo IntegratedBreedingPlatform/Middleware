@@ -338,7 +338,7 @@ public class ExperimentBuilder extends Builder {
 		}
 		final String val = this.findStockValue(variableType.getId(), stockModel.getProperties());
 
-		if (standardVariable.getId() == TermId.ENTRY_TYPE.getId()) {
+		if (standardVariable.isCategorical()) {
 			return new Variable(variableType, Strings.nullToEmpty(val));
 		}
 

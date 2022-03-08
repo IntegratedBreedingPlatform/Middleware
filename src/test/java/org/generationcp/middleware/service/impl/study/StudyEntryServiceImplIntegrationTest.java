@@ -11,8 +11,9 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -32,11 +33,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+
+import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.hamcrest.core.Is.is;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 /**
  * The class <code>StudyGermplasmListServiceImplTest</code> contains tests for the class <code>{@link StudyEntryServiceImpl}</code>.
  */
-public class StudyEntryServiceImplTest extends IntegrationTestBase {
+public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private static final Integer NUMBER_OF_GERMPLASM = 5;
 
@@ -44,9 +51,6 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	private static final String ENTRYCODE = "ENTRYCODE-";
 	private static final String CROSS = "ABC/XYZ-";
 	private static final String SEEDSOURCE = "SEEDSOURCE-";
-
-	@Autowired
-	private GermplasmDataManager germplasmManager;
 
 	@Autowired
 	private StudyEntryService service;
@@ -69,7 +73,7 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	public void testCountStudyEntries() {
 		final DmsProject study = this.createStudy();
 		this.createTestGermplasm(study.getProjectId());
-		Assert.assertEquals(StudyEntryServiceImplTest.NUMBER_OF_GERMPLASM.intValue(), this.service.countStudyEntries(study.getProjectId()));
+		Assert.assertEquals(NUMBER_OF_GERMPLASM.intValue(), this.service.countStudyEntries(study.getProjectId()));
 	}
 
 	@Test
@@ -82,33 +86,58 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudyEntries() {
+	public void testSaveStudyEntries_shouldAddDefaultEntryType() {
 		final DmsProject study = this.createStudy();
-		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
+		final Germplasm germplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 
-		final Integer gid = gids.get(0);
-		final int index = StudyEntryServiceImplTest.NUMBER_OF_GERMPLASM + 1;
-		final StudyEntryDto studyEntryDto = this.createTestStudyEntry(index, gid);
-		final List<StudyEntryDto> addedStudyEntries =
-			this.service.saveStudyEntries(study.getProjectId(), Collections.singletonList(studyEntryDto));
-		Assert.assertEquals(1, addedStudyEntries.size());
-		final StudyEntryDto dto = addedStudyEntries.get(0);
-		this.verifyStudyEntryDetails(gid, index, dto);
-		Assert.assertEquals(index, this.service.countStudyEntries(study.getProjectId()));
+		final GermplasmList
+			germplasmList = new GermplasmList(null, RandomStringUtils.randomAlphabetic(10), 20222302L, GermplasmList.LIST_TYPE, this.findAdminUser(), "", null, GermplasmList.Status.LIST.getCode());
+
+		this.daoFactory.getGermplasmListDAO().save(germplasmList);
+
+		final String designation = RandomStringUtils.randomAlphabetic(10);
+		// TODO: create an entry details and add it to a germplasm view. Then assert that the entry details is a project property
+		final GermplasmListData
+			germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "1", "Unknown", designation, "LNAME", 0, null);
+		this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+
+		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+
+		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		assertThat(studyEntries, hasSize(1));
+
+		final StudyEntryDto studyEntryDto = studyEntries.get(0);
+		assertNotNull(studyEntryDto.getEntryId());
+		assertThat(studyEntryDto.getEntryNumber(), is(1));
+		assertThat(studyEntryDto.getGid(), is(germplasm.getGid()));
+		assertThat(studyEntryDto.getDesignation(), is(germplasm.getPreferredName().getNval()));
+
+		final Map<Integer, StudyEntryPropertyData> properties = studyEntryDto.getProperties();
+		// Despite germplasm list doesn't have ENTRY_TYPE as entry variable, it must be present in the study as a property because it's mandatory
+		this.assertStudyEntryProperty(properties.get(TermId.ENTRY_TYPE.getId()), TermId.ENTRY_TYPE,
+			SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue(), SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
 	}
 
 	@Test
 	public void testGetNextEntryNumber() {
 		final DmsProject study = this.createStudy();
-		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
+		final Germplasm germplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 
-		final Integer gid = gids.get(0);
-		final int index = StudyEntryServiceImplTest.NUMBER_OF_GERMPLASM + 1;
-		final StudyEntryDto studyEntryDto = this.createTestStudyEntry(index, gid);
-		final List<StudyEntryDto> addedStudyEntries =
-			this.service.saveStudyEntries(study.getProjectId(), Collections.singletonList(studyEntryDto));
+		final GermplasmList
+			germplasmList = new GermplasmList(null, RandomStringUtils.randomAlphabetic(10), 20222302L, GermplasmList.LIST_TYPE, this.findAdminUser(), "", null, GermplasmList.Status.LIST.getCode());
+		this.daoFactory.getGermplasmListDAO().save(germplasmList);
+
+		final String designation = RandomStringUtils.randomAlphabetic(10);
+		final GermplasmListData
+			germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "1", "Unknown", designation, "LNAME", 0, null);
+		this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+
+		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+
+		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+
 		final Integer nextEntryNumber = this.service.getNextEntryNumber(study.getProjectId());
-		final int expectedValue = addedStudyEntries.get(0).getEntryNumber() + 1;
+		final int expectedValue = studyEntries.get(0).getEntryNumber() + 1;
 		Assert.assertEquals(Integer.toString(expectedValue), nextEntryNumber.toString());
 	}
 
@@ -137,7 +166,7 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 		final StudyEntryDto newEntry = this.service.replaceStudyEntry(study.getProjectId(), oldEntry.getEntryId(), newGid, crossExpansion);
 
 		Assert.assertNotEquals(oldEntry.getEntryId(), newEntry.getEntryId());
-		Assert.assertEquals(StudyEntryServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + 1, newEntry.getDesignation());
+		Assert.assertEquals(GERMPLASM_PREFERRED_NAME_PREFIX + 1, newEntry.getDesignation());
 		Assert.assertEquals(crossExpansion, newEntry.getProperties().get(TermId.CROSS.getId()).getValue());
 		Assert.assertEquals(newGid, newEntry.getGid());
 		// Some fields should have been copied from old entry
@@ -225,9 +254,9 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 
 	private void verifyStudyEntryDetails(final Integer gid, final int index, final StudyEntryDto dto) {
 		Assert.assertEquals(index, dto.getEntryNumber().intValue());
-		Assert.assertEquals(StudyEntryServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + index, dto.getDesignation());
-		Assert.assertEquals(StudyEntryServiceImplTest.SEEDSOURCE + index, dto.getProperties().get(TermId.SEED_SOURCE.getId()).getValue());
-		Assert.assertEquals(StudyEntryServiceImplTest.CROSS + index, dto.getProperties().get(TermId.CROSS.getId()).getValue());
+		Assert.assertEquals(GERMPLASM_PREFERRED_NAME_PREFIX + index, dto.getDesignation());
+		Assert.assertEquals(SEEDSOURCE + index, dto.getProperties().get(TermId.SEED_SOURCE.getId()).getValue());
+		Assert.assertEquals(CROSS + index, dto.getProperties().get(TermId.CROSS.getId()).getValue());
 		Assert.assertEquals(gid, dto.getGid());
 		// TODO: assert entry code from properties
 //		Assert.assertEquals(StudyEntryServiceImplTest.ENTRYCODE + gid, dto.getEntryCode());
@@ -237,10 +266,10 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 	private List<Integer> createTestGermplasm(final int studyId) {
 		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 		final Integer[] gids = this.germplasmTestDataGenerator
-			.createChildrenGermplasm(StudyEntryServiceImplTest.NUMBER_OF_GERMPLASM,
-				StudyEntryServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX,
+			.createChildrenGermplasm(NUMBER_OF_GERMPLASM,
+				GERMPLASM_PREFERRED_NAME_PREFIX,
 				parentGermplasm);
-		for (int i = 1; i <= StudyEntryServiceImplTest.NUMBER_OF_GERMPLASM; i++) {
+		for (int i = 1; i <= NUMBER_OF_GERMPLASM; i++) {
 			final Integer gid = gids[i - 1];
 			this.daoFactory.getStockDao().save(new StockModel(studyId, this.createTestStudyEntry(i, gid)));
 		}
@@ -251,19 +280,19 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 		final StudyEntryDto studyEntryDto = new StudyEntryDto();
 		studyEntryDto.setGid(gid);
 		studyEntryDto.setEntryNumber(i);
-		studyEntryDto.setDesignation(StudyEntryServiceImplTest.GERMPLASM_PREFERRED_NAME_PREFIX + i);
+		studyEntryDto.setDesignation(GERMPLASM_PREFERRED_NAME_PREFIX + i);
 
 		studyEntryDto.getProperties()
-			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), StudyEntryServiceImplTest.CROSS + i, null));
+			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), CROSS + i, null));
 		studyEntryDto.getProperties()
 			.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(),
 				null, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()));
 		studyEntryDto.getProperties()
 			.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(),
-				StudyEntryServiceImplTest.SEEDSOURCE + i, null));
+				SEEDSOURCE + i, null));
 		studyEntryDto.getProperties()
 			.put(TermId.ENTRY_CODE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_CODE.getId(),
-				StudyEntryServiceImplTest.ENTRYCODE + gid, null));
+				ENTRYCODE + gid, null));
 
 
 		return studyEntryDto;
@@ -319,6 +348,14 @@ public class StudyEntryServiceImplTest extends IntegrationTestBase {
 			experimentModel.setStock(stock);
 			this.daoFactory.getExperimentDao().save(experimentModel);
 		}
+	}
+
+	private void assertStudyEntryProperty(final StudyEntryPropertyData entryPropertyData, final TermId termId, final String value, final Integer categoricalValueId) {
+		assertNotNull(entryPropertyData);
+		assertNotNull(entryPropertyData.getStudyEntryPropertyId());
+		assertThat(entryPropertyData.getVariableId(), is(termId.getId()));
+		assertThat(entryPropertyData.getValue(), is(value));
+		assertThat(entryPropertyData.getCategoricalValueId(), is(categoricalValueId));
 	}
 
 }
