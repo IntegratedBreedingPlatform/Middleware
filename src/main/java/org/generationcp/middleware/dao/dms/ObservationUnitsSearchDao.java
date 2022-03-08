@@ -17,7 +17,6 @@ import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstanc
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitRow;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO;
-import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -459,6 +458,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			this.addScalar(query, standardVariableNamesMap);
 
 			this.addScalarForTraits(searchDto.getSelectionMethodsAndTraits(), query, true);
+			this.addScalarForEntryDetails(searchDto.getEntryDetails(), query);
 
 			for (final String gpDescriptor : searchDto.getGenericGermplasmDescriptors()) {
 				query.addScalar(gpDescriptor, new StringType());
@@ -1049,6 +1049,14 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
+	private void addScalarForEntryDetails(final List<MeasurementVariableDto> entryDetails, final SQLQuery createSQLQuery) {
+		for (final MeasurementVariableDto measurementVariable : entryDetails) {
+			createSQLQuery.addScalar(measurementVariable.getName()); // Value
+			createSQLQuery.addScalar(measurementVariable.getName() + "_StockPropId", new IntegerType());
+			createSQLQuery.addScalar(measurementVariable.getName() + "_CvalueId", new IntegerType());
+		}
+	}
+
 	private List<ObservationUnitRow> convertToObservationUnitRows(final List<Map<String, Object>> results,
 		final ObservationUnitsSearchDTO searchDto,
 		final String observationVariableName, final Map<Integer, String> standardVariableNameMap) {
@@ -1068,7 +1076,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final Map<String, Object> row, final Map<Integer, String> standardVariableNameMap) {
 		final Map<String, ObservationUnitData> environmentVariables = new HashMap<>();
 		final Map<String, ObservationUnitData> observationVariables = new HashMap<>();
-		final Map<String, StockPropertyData> entryDetailVariables = new HashMap<>();
 
 		for (final MeasurementVariableDto variable : searchDto.getSelectionMethodsAndTraits()) {
 			final String status = (String) row.get(variable.getName() + "_Status");
@@ -1085,9 +1092,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		for (final MeasurementVariableDto variable : searchDto.getEntryDetails()) {
-			final StockPropertyData stockPropertyData = new StockPropertyData((Integer) row.get(variable.getName() + "_StockPropId"), variable.getId(), (String) row.get(variable.getName()),
-				(Integer) row.get(variable.getName() + "_CvalueId"));
-			entryDetailVariables.put(variable.getName(), stockPropertyData);
+			observationVariables.put(variable.getName(), new ObservationUnitData(
+				(Integer) row.get(variable.getName() + "_StockPropId"),
+				(Integer) row.get(variable.getName() + "_CvalueId"),
+				(String) row.get(variable.getName()),
+				null,
+				variable.getId()
+			));
 		}
 
 		final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
@@ -1164,7 +1175,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		observationUnitRow.setVariables(observationVariables);
 		observationUnitRow.setEnvironmentVariables(environmentVariables);
-		observationUnitRow.setEntryDetails(entryDetailVariables);
 		return observationUnitRow;
 	}
 

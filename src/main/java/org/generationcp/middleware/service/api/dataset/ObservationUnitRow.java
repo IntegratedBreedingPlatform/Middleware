@@ -22,8 +22,6 @@ public class ObservationUnitRow {
 
 	private Map<String, ObservationUnitData> variables;
 
-	private Map<String, StockPropertyData> entryDetails;
-
 	// Contains environment level variables (variables added in Environment Details and Environment Conditions)
 	private Map<String, ObservationUnitData> environmentVariables;
 
@@ -144,14 +142,6 @@ public class ObservationUnitRow {
 
 	public void setStockId(final String stockId) {
 		this.stockId = stockId;
-	}
-
-	public Map<String, StockPropertyData> getEntryDetails() {
-		return entryDetails;
-	}
-
-	public void setEntryDetails(final Map<String, StockPropertyData> entryDetails) {
-		this.entryDetails = entryDetails;
 	}
 
 	@Override
