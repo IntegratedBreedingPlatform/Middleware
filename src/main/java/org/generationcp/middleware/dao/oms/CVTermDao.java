@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.oms;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.dao.util.BrapiVariableUtils;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -170,7 +171,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 				final StringBuilder sqlString =
 					new StringBuilder().append(
-						"SELECT UPPER(cvt.name) AS name, cvt.cvterm_id AS termId, dataType.object_id As dataTypeId, hasScale.object_id as scaleId ")
+							"SELECT UPPER(cvt.name) AS name, cvt.cvterm_id AS termId, dataType.object_id As dataTypeId, hasScale.object_id as scaleId ")
 						.append(" FROM cvterm cvt ")
 						.append(" INNER JOIN cvterm_relationship hasScale ON hasScale.subject_id = cvt.cvterm_id AND hasScale.type_id = "
 							+ TermId.HAS_SCALE.getId() + " ")
@@ -1502,6 +1503,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			sqlQuery.setMaxResults(pageable.getPageSize());
 		}
 		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
 		return this.convertToVariableDTO(sqlQuery.list());
 	}
 
@@ -1510,7 +1512,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		sqlQuery.setParameterList("variableTypes", variableTypeGroup.getVariableTypeNames());
 
 		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
-			sqlQuery.setParameterList("dataTypeIds", this.convertBrapiDataTypeToDataTypeIds(requestDTO.getDataTypes()));
+			sqlQuery.setParameterList("dataTypeIds", BrapiVariableUtils.convertBrapiDataTypeToDataTypeIds(requestDTO.getDataTypes()));
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
@@ -1836,19 +1838,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		} else {
 			return StringUtils.EMPTY;
 		}
-	}
-
-	protected List<String> convertBrapiDataTypeToDataTypeIds(final List<String> brapiDataTypeNames) {
-		final List<String> dataTypeIds = new ArrayList<>();
-		for (final String brapiDataTypeName : brapiDataTypeNames) {
-			final DataType dataType = DataType.getByBrapiName(brapiDataTypeName);
-			if (dataType != null) {
-				dataTypeIds.add(dataType.getId().toString());
-			} else {
-				dataTypeIds.add(brapiDataTypeName);
-			}
-		}
-		return dataTypeIds;
 	}
 
 	/**
