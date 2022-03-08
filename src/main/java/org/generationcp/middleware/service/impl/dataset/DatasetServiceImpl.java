@@ -608,8 +608,12 @@ public class DatasetServiceImpl implements DatasetService {
 				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 		searchDTO.setSelectionMethodsAndTraits(selectionMethodsAndTraits);
 
+		final DmsProject project = this.daoFactory.getDmsProjectDAO().getById(datasetId);
+		final int plotDatasetId = DatasetTypeEnum.PLOT_DATA.getId() == project.getDatasetType().getDatasetTypeId() //
+			? datasetId //
+			: project.getParent().getProjectId();
 		final List<MeasurementVariableDto> entryDetails =
-			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
+			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(plotDatasetId,
 				VariableType.ENTRY_DETAIL.getId());
 		searchDTO.setEntryDetails(entryDetails);
 	}
