@@ -1,5 +1,10 @@
 package org.generationcp.middleware.pojos;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -86,5 +91,28 @@ public class CopMatrix implements Serializable {
 
 	public void setGermplasm2(final Germplasm germplasm2) {
 		this.germplasm2 = germplasm2;
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		if (this == o)
+			return true;
+
+		if (o == null || getClass() != o.getClass())
+			return false;
+
+		final CopMatrix copMatrix = (CopMatrix) o;
+
+		return new EqualsBuilder().append(gid1, copMatrix.gid1).append(gid2, copMatrix.gid2).isEquals();
+	}
+
+	@Override
+	public int hashCode() {
+		return new HashCodeBuilder(17, 37).append(gid1).append(gid2).toHashCode();
+	}
+
+	@Override
+	public String toString() {
+		return new ReflectionToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE).toString();
 	}
 }
