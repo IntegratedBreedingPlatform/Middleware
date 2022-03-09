@@ -78,7 +78,7 @@ public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 		final List<Geolocation> environmentGeolocations =
 			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(study.getProjectId());
 		final List<MeansImportRequest.MeansData> meansDataList =
-			environmentGeolocations.stream().map(o -> this.createMeansData(o.getLocationId(), 1, analysisVariablesMap))
+			environmentGeolocations.stream().map(o -> this.createMeansData(Integer.valueOf(o.getDescription()), 1, analysisVariablesMap))
 				.collect(Collectors.toList());
 		meansImportRequest.setStudyId(study.getProjectId());
 		meansImportRequest.setData(meansDataList);
@@ -122,11 +122,12 @@ public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 		assertEquals(VariableType.GERMPLASM_DESCRIPTOR.getId(), meansDatasetProjectProperties.get(TermId.CROSS.getId()).getTypeId());
 		// Verify experiment and phenotype values
 		assertEquals(meansImportRequest.getData().size(), experimentModels.size());
-		final Map<Integer, MeansImportRequest.MeansData> meansDataByEnvironmentId =
+		final Map<Integer, MeansImportRequest.MeansData> meansDataByEnvironmentNumber =
 			meansImportRequest.getData().stream()
-				.collect(Collectors.toMap(MeansImportRequest.MeansData::getEnvironmentId, Function.identity()));
+				.collect(Collectors.toMap(MeansImportRequest.MeansData::getEnvironmentNumber, Function.identity()));
 		for (final ExperimentModel experimentModel : experimentModels) {
-			final MeansImportRequest.MeansData meansData = meansDataByEnvironmentId.get(experimentModel.getGeoLocation().getLocationId());
+			final MeansImportRequest.MeansData meansData =
+				meansDataByEnvironmentNumber.get(Integer.valueOf(experimentModel.getGeoLocation().getDescription()));
 			experimentModel.getPhenotypes().forEach(p -> {
 				final Variable analysisVariable = analysisVariablesMap.get(p.getObservableId());
 				assertEquals(p.getValue(), meansData.getValues().get(analysisVariable.getName()).toString());
@@ -188,7 +189,7 @@ public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 		for (final int locationId : locationIds) {
 
 			final Geolocation geolocation = new Geolocation();
-			geolocation.setDescription("1");
+			geolocation.setDescription(String.valueOf(locationId));
 			this.daoFactory.getGeolocationDao().saveOrUpdate(geolocation);
 
 			final GeolocationProperty geolocationProperty = new GeolocationProperty();
@@ -268,11 +269,11 @@ public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 
 	}
 
-	private MeansImportRequest.MeansData createMeansData(final int environmentId, final int entryNo,
+	private MeansImportRequest.MeansData createMeansData(final int environmentNumber, final int entryNo,
 		final Map<Integer, Variable> analysisVariablesMap) {
 		final MeansImportRequest.MeansData meansData = new MeansImportRequest.MeansData();
 		meansData.setEntryNo(entryNo);
-		meansData.setEnvironmentId(environmentId);
+		meansData.setEnvironmentNumber(environmentNumber);
 		final Map<String, Double> valuesMap = new HashMap<>();
 		for (final Variable variable : analysisVariablesMap.values()) {
 			valuesMap.put(variable.getName(), new Random().nextDouble());

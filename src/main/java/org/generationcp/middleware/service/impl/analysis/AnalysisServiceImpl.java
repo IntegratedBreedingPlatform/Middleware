@@ -51,13 +51,16 @@ public class AnalysisServiceImpl implements AnalysisService {
 			new CaseInsensitiveMap(
 				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisVariableNames, CvId.VARIABLES).stream().collect(Collectors.toMap(
 					CVTerm::getName, Function.identity())));
+		final Map<String, Geolocation> environmentNumberGeolocationMap =
+			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(meansImportRequest.getStudyId()).stream()
+				.collect(Collectors.toMap(Geolocation::getDescription, Function.identity()));
 
 		// Create means dataset
 		final DmsProject meansDataset = this.createMeansDataset(study);
 		// Add necessary dataset project properties
 		this.addMeansDatasetVariables(meansDataset, analysisVariablesMap);
 		// Save means experiment and means values
-		this.saveMeansExperimentAndValues(meansDataset, analysisVariablesMap, meansImportRequest);
+		this.saveMeansExperimentAndValues(meansDataset, analysisVariablesMap, environmentNumberGeolocationMap, meansImportRequest);
 
 		return meansDataset.getProjectId();
 	}
@@ -76,7 +79,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 	}
 
 	private void saveMeansExperimentAndValues(final DmsProject meansDataset, final Map<String, CVTerm> analaysisVariablesMap,
-		final MeansImportRequest meansImportRequest) {
+		final Map<String, Geolocation> environmentNumberGeolocationMap, final MeansImportRequest meansImportRequest) {
 
 		final Set<String> entryNumbers =
 			meansImportRequest.getData().stream().map(m -> String.valueOf(m.getEntryNo())).collect(Collectors.toSet());
@@ -89,7 +92,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 		for (final MeansImportRequest.MeansData meansData : meansImportRequest.getData()) {
 			final ExperimentModel experimentModel = new ExperimentModel();
 			experimentModel.setProject(meansDataset);
-			experimentModel.setGeoLocation(new Geolocation(meansData.getEnvironmentId()));
+			experimentModel.setGeoLocation(environmentNumberGeolocationMap.get(String.valueOf(meansData.getEnvironmentNumber())));
 			experimentModel.setTypeId(ExperimentType.AVERAGE.getTermId());
 			experimentModel.setStock(stockModelMap.get(String.valueOf(meansData.getEntryNo())));
 			final List<Phenotype> phenotypes = new ArrayList<>();

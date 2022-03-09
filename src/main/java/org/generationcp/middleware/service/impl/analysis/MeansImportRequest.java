@@ -26,16 +26,16 @@ public class MeansImportRequest {
 
 	public static class MeansData {
 
-		private Integer environmentId;
+		private Integer environmentNumber;
 		private Integer entryNo;
 		private Map<String, Double> values;
 
-		public Integer getEnvironmentId() {
-			return this.environmentId;
+		public Integer getEnvironmentNumber() {
+			return this.environmentNumber;
 		}
 
-		public void setEnvironmentId(final Integer environmentId) {
-			this.environmentId = environmentId;
+		public void setEnvironmentNumber(final Integer environmentNumber) {
+			this.environmentNumber = environmentNumber;
 		}
 
 		public Integer getEntryNo() {
