@@ -42,9 +42,9 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 	}
 
 	@Override
-	public Integer createMeansDataset(final MeansImportRequest meansImportRequest) {
+	public Integer createMeansDataset(final Integer studyId, final MeansImportRequest meansImportRequest) {
 
-		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(meansImportRequest.getStudyId());
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 		final Set<String> analysisVariableNames =
 			meansImportRequest.getData().stream().map(o -> o.getValues().keySet()).flatMap(Set::stream).collect(Collectors.toSet());
 		final Map<String, CVTerm> analysisVariablesMap =
@@ -52,7 +52,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisVariableNames, CvId.VARIABLES).stream().collect(Collectors.toMap(
 					CVTerm::getName, Function.identity())));
 		final Map<String, Geolocation> environmentNumberGeolocationMap =
-			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(meansImportRequest.getStudyId()).stream()
+			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId).stream()
 				.collect(Collectors.toMap(Geolocation::getDescription, Function.identity()));
 
 		// Create means dataset
@@ -60,7 +60,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		// Add necessary dataset project properties
 		this.addMeansDatasetVariables(meansDataset, analysisVariablesMap);
 		// Save means experiment and means values
-		this.saveMeansExperimentAndValues(meansDataset, analysisVariablesMap, environmentNumberGeolocationMap, meansImportRequest);
+		this.saveMeansExperimentAndValues(studyId, meansDataset, analysisVariablesMap, environmentNumberGeolocationMap, meansImportRequest);
 
 		return meansDataset.getProjectId();
 	}
@@ -78,14 +78,15 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		return meansDataset;
 	}
 
-	private void saveMeansExperimentAndValues(final DmsProject meansDataset, final Map<String, CVTerm> analaysisVariablesMap,
+	private void saveMeansExperimentAndValues(final int studyId, final DmsProject meansDataset,
+		final Map<String, CVTerm> analaysisVariablesMap,
 		final Map<String, Geolocation> environmentNumberGeolocationMap, final MeansImportRequest meansImportRequest) {
 
 		final Set<String> entryNumbers =
 			meansImportRequest.getData().stream().map(m -> String.valueOf(m.getEntryNo())).collect(Collectors.toSet());
 		final Map<String, StockModel>
 			stockModelMap =
-			this.daoFactory.getStockDao().getStocksByStudyAndEntryNumbers(meansImportRequest.getStudyId(), entryNumbers).stream()
+			this.daoFactory.getStockDao().getStocksByStudyAndEntryNumbers(studyId, entryNumbers).stream()
 				.collect(Collectors.toMap(StockModel::getUniqueName, Function.identity()));
 
 		// Save means experiment and means values

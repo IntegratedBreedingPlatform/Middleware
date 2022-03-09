@@ -80,10 +80,9 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		final List<MeansImportRequest.MeansData> meansDataList =
 			environmentGeolocations.stream().map(o -> this.createMeansData(Integer.valueOf(o.getDescription()), 1, analysisVariablesMap))
 				.collect(Collectors.toList());
-		meansImportRequest.setStudyId(study.getProjectId());
 		meansImportRequest.setData(meansDataList);
 
-		final int meansDatasetId = this.analysisService.createMeansDataset(meansImportRequest);
+		final int meansDatasetId = this.analysisService.createMeansDataset(study.getProjectId(), meansImportRequest);
 
 		// Verify the means dataset is saved successfully
 		// including the project, projectprop, experiment, and phenotype records.

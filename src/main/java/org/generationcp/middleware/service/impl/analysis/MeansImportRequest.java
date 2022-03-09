@@ -5,16 +5,7 @@ import java.util.Map;
 
 public class MeansImportRequest {
 
-	private Integer studyId;
 	private List<MeansData> data;
-
-	public Integer getStudyId() {
-		return this.studyId;
-	}
-
-	public void setStudyId(final Integer studyId) {
-		this.studyId = studyId;
-	}
 
 	public List<MeansData> getData() {
 		return this.data;
