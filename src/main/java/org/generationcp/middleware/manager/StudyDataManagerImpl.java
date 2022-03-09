@@ -1259,11 +1259,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 	}
 
-	@Override
-	public List<StockModel> getStocksByStudyAndEntryNumbers(final int studyId, final Set<String> entryNumbers) {
-		return this.daoFactory.getStockDao().getStocksByStudyAndEntryNumbers(studyId, entryNumbers);
-	}
-
 	private void renameStudyAndDatasets(final DmsProject study) {
 		final String tstamp = Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS");
 		study.setName(study.getName() + "#" + tstamp);

@@ -672,5 +672,4 @@ public interface StudyDataManager {
 
 	void deleteStudy(int studyId);
 
-	List<StockModel> getStocksByStudyAndEntryNumbers(int studyId, Set<String> entryNumbers);
 }
