@@ -4,5 +4,5 @@ import org.generationcp.middleware.service.impl.analysis.MeansImportRequest;
 
 public interface SiteAnalysisService {
 
-	Integer createMeansDataset(final Integer studyId, MeansImportRequest meansRequestDto);
+	Integer createMeansDataset(Integer studyId, MeansImportRequest meansRequestDto);
 }
