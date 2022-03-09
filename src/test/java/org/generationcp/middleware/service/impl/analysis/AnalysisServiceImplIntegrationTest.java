@@ -108,6 +108,18 @@ public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 			assertEquals(VariableType.ANALYSIS.getId(),
 				meansDatasetProjectProperties.get(expectedVariablesInProjectProp.getKey()).getTypeId());
 		});
+		assertTrue(meansDatasetProjectProperties.containsKey(TermId.ENTRY_TYPE.getId()));
+		assertTrue(meansDatasetProjectProperties.containsKey(TermId.GID.getId()));
+		assertTrue(meansDatasetProjectProperties.containsKey(TermId.DESIG.getId()));
+		assertTrue(meansDatasetProjectProperties.containsKey(TermId.ENTRY_NO.getId()));
+		assertTrue(meansDatasetProjectProperties.containsKey(TermId.OBS_UNIT_ID.getId()));
+		assertTrue(meansDatasetProjectProperties.containsKey(TermId.CROSS.getId()));
+		assertEquals(VariableType.GERMPLASM_DESCRIPTOR.getId(), meansDatasetProjectProperties.get(TermId.ENTRY_TYPE.getId()).getTypeId());
+		assertEquals(VariableType.GERMPLASM_DESCRIPTOR.getId(), meansDatasetProjectProperties.get(TermId.GID.getId()).getTypeId());
+		assertEquals(VariableType.GERMPLASM_DESCRIPTOR.getId(), meansDatasetProjectProperties.get(TermId.DESIG.getId()).getTypeId());
+		assertEquals(VariableType.GERMPLASM_DESCRIPTOR.getId(), meansDatasetProjectProperties.get(TermId.ENTRY_NO.getId()).getTypeId());
+		assertEquals(VariableType.GERMPLASM_DESCRIPTOR.getId(), meansDatasetProjectProperties.get(TermId.OBS_UNIT_ID.getId()).getTypeId());
+		assertEquals(VariableType.GERMPLASM_DESCRIPTOR.getId(), meansDatasetProjectProperties.get(TermId.CROSS.getId()).getTypeId());
 		// Verify experiment and phenotype values
 		assertEquals(meansImportRequest.getData().size(), experimentModels.size());
 		final Map<Integer, MeansImportRequest.MeansData> meansDataByEnvironmentId =
@@ -149,6 +161,13 @@ public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 		plot.setStudy(study);
 		plot.setDatasetType(new DatasetType(DatasetTypeEnum.PLOT_DATA.getId()));
 		this.daoFactory.getDmsProjectDAO().save(plot);
+
+		this.addProjectProperty(plot, TermId.ENTRY_TYPE.getId(), VariableType.GERMPLASM_DESCRIPTOR, 1);
+		this.addProjectProperty(plot, TermId.GID.getId(), VariableType.GERMPLASM_DESCRIPTOR, 2);
+		this.addProjectProperty(plot, TermId.DESIG.getId(), VariableType.GERMPLASM_DESCRIPTOR, 3);
+		this.addProjectProperty(plot, TermId.ENTRY_NO.getId(), VariableType.GERMPLASM_DESCRIPTOR, 4);
+		this.addProjectProperty(plot, TermId.OBS_UNIT_ID.getId(), VariableType.GERMPLASM_DESCRIPTOR, 5);
+		this.addProjectProperty(plot, TermId.CROSS.getId(), VariableType.GERMPLASM_DESCRIPTOR, 6);
 
 		final Map<Integer, StockModel> stockModelMap = new HashMap<>();
 		for (int i = 1; i <= noOfEntries; i++) {
@@ -200,6 +219,18 @@ public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 
 		return study;
 
+	}
+
+	private void addProjectProperty(final DmsProject dataset, final Integer variableId,
+		final VariableType variableType, final Integer rank) {
+		final CVTerm variable = this.daoFactory.getCvTermDao().getById(variableId);
+		final ProjectProperty projectProperty = new ProjectProperty();
+		projectProperty.setProject(dataset);
+		projectProperty.setAlias(variable.getName());
+		projectProperty.setVariableId(variableId);
+		projectProperty.setRank(rank);
+		projectProperty.setTypeId(variableType.getId());
+		this.daoFactory.getProjectPropertyDAO().save(projectProperty);
 	}
 
 	private Variable createTestVariable(final String variableName) {

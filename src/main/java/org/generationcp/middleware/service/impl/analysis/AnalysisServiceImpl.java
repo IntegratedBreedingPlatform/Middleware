@@ -33,11 +33,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 		.put(TermId.DATASET_NAME.getId(), VariableType.STUDY_DETAIL)
 		.put(TermId.DATASET_TITLE.getId(), VariableType.STUDY_DETAIL)
 		.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), VariableType.ENVIRONMENT_DETAIL)
-		.put(TermId.ENTRY_TYPE.getId(), VariableType.GERMPLASM_DESCRIPTOR)
-		.put(TermId.GID.getId(), VariableType.GERMPLASM_DESCRIPTOR)
-		.put(TermId.DESIG.getId(), VariableType.GERMPLASM_DESCRIPTOR)
-		.put(TermId.ENTRY_NO.getId(), VariableType.GERMPLASM_DESCRIPTOR)
-		.put(TermId.OBS_UNIT_ID.getId(), VariableType.GERMPLASM_DESCRIPTOR).build();
+		.put(TermId.LOCATION_ID.getId(), VariableType.ENVIRONMENT_DETAIL).build();
 
 	private final DaoFactory daoFactory;
 
@@ -59,7 +55,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 		// Create means dataset
 		final DmsProject meansDataset = this.createMeansDataset(study);
 		// Add necessary dataset project properties
-		this.addMeansDatasetProperties(meansDataset, analysisVariablesMap);
+		this.addMeansDatasetVariables(meansDataset, analysisVariablesMap);
 		// Save means experiment and means values
 		this.saveMeansExperimentAndValues(meansDataset, analysisVariablesMap, meansImportRequest);
 
@@ -111,12 +107,20 @@ public class AnalysisServiceImpl implements AnalysisService {
 		}
 	}
 
-	private void addMeansDatasetProperties(final DmsProject meansDataset, final Map<String, CVTerm> analaysisVariablesMap) {
+	private void addMeansDatasetVariables(final DmsProject meansDataset, final Map<String, CVTerm> analaysisVariablesMap) {
 		final AtomicInteger rank = new AtomicInteger();
 
 		final List<CVTerm> cvTerms = this.daoFactory.getCvTermDao().getByIds(new ArrayList<>(MEANS_DATASET_DMSPROJECT_PROPERTIES.keySet()));
 		cvTerms.forEach(term -> this.addProjectProperty(meansDataset, term.getCvTermId(), term.getName(),
 			MEANS_DATASET_DMSPROJECT_PROPERTIES.get(term.getCvTermId()), rank.incrementAndGet()));
+
+		// Retrieve the germplasm descriptor variables from PLOT dataset and copy it to the means dataset
+		final Map<Integer, String> germplasmDescriptorsMap =
+			this.daoFactory.getProjectPropertyDAO().getGermplasmDescriptors(meansDataset.getStudy().getProjectId());
+		for (final Map.Entry<Integer, String> entry : germplasmDescriptorsMap.entrySet()) {
+			this.addProjectProperty(meansDataset, entry.getKey(), entry.getValue(), VariableType.GERMPLASM_DESCRIPTOR,
+				rank.incrementAndGet());
+		}
 
 		for (final Map.Entry<String, CVTerm> entry : analaysisVariablesMap.entrySet()) {
 			this.addProjectProperty(meansDataset, entry.getValue().getCvTermId(), entry.getValue().getName(), VariableType.ANALYSIS,
