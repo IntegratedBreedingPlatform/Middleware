@@ -17,7 +17,7 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.generationcp.middleware.service.api.analysis.AnalysisService;
+import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class AnalysisServiceImpl implements AnalysisService {
+public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 
 	public static final Map<Integer, VariableType> MEANS_DATASET_DMSPROJECT_PROPERTIES = ImmutableMap.<Integer, VariableType>builder()
 		.put(TermId.DATASET_NAME.getId(), VariableType.STUDY_DETAIL)
@@ -37,7 +37,7 @@ public class AnalysisServiceImpl implements AnalysisService {
 
 	private final DaoFactory daoFactory;
 
-	public AnalysisServiceImpl(final HibernateSessionProvider sessionProvider) {
+	public SiteAnalysisServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 

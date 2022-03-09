@@ -389,7 +389,7 @@
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
-	<bean id="analysisService" class="org.generationcp.middleware.service.impl.analysis.AnalysisServiceImpl">
+	<bean id="siteAnalysisService" class="org.generationcp.middleware.service.impl.analysis.SiteAnalysisServiceImpl">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 

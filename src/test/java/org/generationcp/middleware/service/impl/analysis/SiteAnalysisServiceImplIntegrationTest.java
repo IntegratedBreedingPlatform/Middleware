@@ -24,7 +24,7 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
-import org.generationcp.middleware.service.api.analysis.AnalysisService;
+import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,10 +41,10 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
+public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Autowired
-	private AnalysisService analysisService;
+	private SiteAnalysisService analysisService;
 
 	@Autowired
 	private OntologyVariableService ontologyVariableService;
@@ -98,7 +98,7 @@ public class AnalysisServiceImplIntegrationTest extends IntegrationTestBase {
 		assertEquals(meansDataset.getDatasetTypeId().intValue(), DatasetTypeEnum.MEANS_DATA.getId());
 		assertEquals("TestStudy-MEANS", meansDataset.getName());
 		// Verify ProjectProp
-		AnalysisServiceImpl.MEANS_DATASET_DMSPROJECT_PROPERTIES.entrySet().forEach(expectedProjectProperty -> {
+		SiteAnalysisServiceImpl.MEANS_DATASET_DMSPROJECT_PROPERTIES.entrySet().forEach(expectedProjectProperty -> {
 			assertTrue(meansDatasetProjectProperties.containsKey(expectedProjectProperty.getKey()));
 			assertEquals(expectedProjectProperty.getValue().getId(),
 				meansDatasetProjectProperties.get(expectedProjectProperty.getKey()).getTypeId());
