@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.analysis;
 
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -51,8 +52,9 @@ public class AnalysisServiceImpl implements AnalysisService {
 		final Set<String> analysisVariableNames =
 			meansImportRequest.getData().stream().map(o -> o.getValues().keySet()).flatMap(Set::stream).collect(Collectors.toSet());
 		final Map<String, CVTerm> analysisVariablesMap =
-			this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisVariableNames, CvId.VARIABLES).stream().collect(Collectors.toMap(
-				CVTerm::getName, Function.identity()));
+			new CaseInsensitiveMap(
+				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisVariableNames, CvId.VARIABLES).stream().collect(Collectors.toMap(
+					CVTerm::getName, Function.identity())));
 
 		// Create means dataset
 		final DmsProject meansDataset = this.createMeansDataset(study);
