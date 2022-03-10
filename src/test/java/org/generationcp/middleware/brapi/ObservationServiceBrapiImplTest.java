@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.brapi.ObservationServiceBrapi;
 import org.generationcp.middleware.api.brapi.StudyServiceBrapi;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
+import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
@@ -116,7 +117,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		GermplasmGuidGenerator.generateGermplasmGuids(this.crop, Collections.singletonList(this.germplasm));
 		this.daoFactory.getGermplasmDao().save(this.germplasm);
 
-		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid());
+		final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(this.germplasm.getGid());
 		germplasmName.setTypeId(2);
 		this.daoFactory.getNameDao().save(germplasmName);
 
@@ -159,7 +160,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		final VariableSearchRequestDTO variableSearchRequestDTO = new VariableSearchRequestDTO();
 		variableSearchRequestDTO.setObservationVariableDbIds(Collections.singletonList(numericVariable.getCvTermId().toString()));
 		this.variableDTO = this.variableServiceBrapi
-			.getObservationVariables(variableSearchRequestDTO, null).get(0);
+			.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT).get(0);
 		this.variableDTO.setStudyDbIds(Collections.singletonList(this.studyInstanceDto.getStudyDbId()));
 		this.variableServiceBrapi.updateObservationVariable(this.variableDTO);
 		this.sessionProvder.getSession().flush();
@@ -203,7 +204,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		final VariableSearchRequestDTO variableSearchRequestDTO = new VariableSearchRequestDTO();
 		variableSearchRequestDTO.setObservationVariableDbIds(Collections.singletonList(categoricalVariable.getCvTermId().toString()));
 		final VariableDTO categoricalVariableDto = this.variableServiceBrapi
-			.getObservationVariables(variableSearchRequestDTO, null).get(0);
+			.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT).get(0);
 		categoricalVariableDto.setStudyDbIds(Collections.singletonList(this.studyInstanceDto.getStudyDbId()));
 		this.variableServiceBrapi.updateObservationVariable(this.variableDTO);
 

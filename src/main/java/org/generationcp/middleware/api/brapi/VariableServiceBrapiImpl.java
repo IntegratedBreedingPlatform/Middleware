@@ -50,10 +50,9 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	}
 
 	@Override
-	public List<VariableDTO> getObservationVariables(
-		final VariableSearchRequestDTO requestDTO,
-		final Pageable pageable) {
-		final List<VariableDTO> variableDTOS = this.daoFactory.getCvTermDao().getObservationVariables(requestDTO, pageable);
+	public List<VariableDTO> getVariables(final VariableSearchRequestDTO requestDTO, final Pageable pageable,
+		final VariableTypeGroup variableTypeGroup) {
+		final List<VariableDTO> variableDTOS = this.daoFactory.getCvTermDao().getVariableDTOS(requestDTO, pageable, variableTypeGroup);
 		if (!CollectionUtils.isEmpty(variableDTOS)) {
 			final List<Integer> variableIds =
 				new ArrayList<>(variableDTOS.stream().map(v -> Integer.valueOf(v.getObservationVariableDbId()))
@@ -80,8 +79,8 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	}
 
 	@Override
-	public long countObservationVariables(final VariableSearchRequestDTO requestDTO) {
-		return this.daoFactory.getCvTermDao().countObservationVariables(requestDTO);
+	public long countVariables(final VariableSearchRequestDTO requestDTO, final VariableTypeGroup variableTypeGroup) {
+		return this.daoFactory.getCvTermDao().countVariables(requestDTO, variableTypeGroup);
 	}
 
 	@Override
