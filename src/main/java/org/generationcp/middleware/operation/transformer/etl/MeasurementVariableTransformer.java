@@ -132,7 +132,7 @@ public class MeasurementVariableTransformer extends Transformer {
 	}
 
 	private String getLabelBasedOnRole(final PhenotypicType role) {
-		// TODO: define if org.generationcp.middleware.domain.dms.PhenotypicType.labelList for EntryDetails should be a list with an empty string. If it's the case, then remove the CollectionUtils.isEmpty condition
+		// TODO: review PhenotypicType.UNASSIGNED empty labelList
 		if (role == null || CollectionUtils.isEmpty(role.getLabelList())) {
 			return "";
 		}

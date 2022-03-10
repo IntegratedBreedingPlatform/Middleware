@@ -129,7 +129,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public void saveStudyEntries(final Integer studyId, final Integer listId) {
 		final DmsProject plotDataDataset =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+
 		// Filter all entry details project variable that the project currently has because entry details are going to be added later
+		// FIXME keep existing entry details added manually?
 		final List<ProjectProperty> projectProperties = plotDataDataset.getProperties()
 			.stream()
 			.filter(projectProperty -> !VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()))

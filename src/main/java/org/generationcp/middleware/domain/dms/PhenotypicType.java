@@ -9,6 +9,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static java.util.Collections.singletonList;
+
 /**
  * The different phenotypic types used in standard variable. For factor type, these are used: STUDY, DATASET, TRIAL_ENVIRONMENT, GERMPLASM,
  * TRIAL_DESIGN For role type, these are used: TRIAL_ENVIRONMENT, GERMPLASM, TRIAL_DESIGN, VARIATE
@@ -30,6 +32,8 @@ public enum PhenotypicType {
 	GERMPLASM(Arrays.asList(TermId.GERMPLASM_ENTRY_STORAGE.getId(), TermId.ENTRY_NUMBER_STORAGE.getId(), TermId.ENTRY_GID_STORAGE.getId(),
 			TermId.ENTRY_DESIGNATION_STORAGE.getId(), TermId.ENTRY_CODE_STORAGE.getId()), Arrays.asList("ENTRY", "ENTRY_NO", "ENTRYNO"),
 			"GERMPLASM ENTRY"), //
+
+	ENTRY_DETAIL(new ArrayList<>(), singletonList(""), "ENTRY_DETAIL"),
 
 	TRIAL_DESIGN(Arrays.asList(TermId.TRIAL_DESIGN_INFO_STORAGE.getId()), Arrays.asList("PLOT", "PLOT_NO", "PLOTNO"), "TRIAL DESIGN"), //
 
