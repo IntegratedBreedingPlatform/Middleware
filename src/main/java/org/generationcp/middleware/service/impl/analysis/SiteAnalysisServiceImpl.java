@@ -32,8 +32,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 	public static final Map<Integer, VariableType> MEANS_DATASET_DMSPROJECT_PROPERTIES = ImmutableMap.<Integer, VariableType>builder()
 		.put(TermId.DATASET_NAME.getId(), VariableType.STUDY_DETAIL)
 		.put(TermId.DATASET_TITLE.getId(), VariableType.STUDY_DETAIL)
-		.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), VariableType.ENVIRONMENT_DETAIL)
-		.put(TermId.LOCATION_ID.getId(), VariableType.ENVIRONMENT_DETAIL).build();
+		.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), VariableType.ENVIRONMENT_DETAIL).build();
 
 	private final DaoFactory daoFactory;
 
