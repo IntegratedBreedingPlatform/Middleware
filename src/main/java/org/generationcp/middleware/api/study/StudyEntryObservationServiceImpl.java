@@ -3,7 +3,6 @@ package org.generationcp.middleware.api.study;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.dataset.StockPropertyData;
@@ -42,6 +41,12 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 		this.daoFactory.getStockPropertyDao().update(stockProperty);
 
 		return stockProperty.getStockPropId();
+	}
+
+	@Override
+	public void deleteObservation(final Integer stockPropertyId) {
+		final StockProperty stockProperty = this.daoFactory.getStockPropertyDao().getById(stockPropertyId);
+		this.daoFactory.getStockPropertyDao().makeTransient(stockProperty);
 	}
 
 }

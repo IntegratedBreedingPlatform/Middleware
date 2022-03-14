@@ -8,4 +8,6 @@ public interface StudyEntryObservationService {
 
 	Integer updateObservation(StockPropertyData stockPropertyData);
 
+	void deleteObservation(Integer stockPropertyId);
+
 }
