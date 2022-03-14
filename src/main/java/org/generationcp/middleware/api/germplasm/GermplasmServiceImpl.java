@@ -151,7 +151,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	public GermplasmServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
-		this.germplasmMethodValidator = new GermplasmMethodValidator();
+		this.germplasmMethodValidator = new GermplasmMethodValidator(sessionProvider);
 	}
 
 	@Override

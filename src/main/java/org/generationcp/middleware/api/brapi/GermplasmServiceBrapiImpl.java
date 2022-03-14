@@ -81,7 +81,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 	public GermplasmServiceBrapiImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 		this.daoFactory = new DaoFactory(sessionProvider);
-		this.germplasmMethodValidator = new GermplasmMethodValidator();
+		this.germplasmMethodValidator = new GermplasmMethodValidator(sessionProvider);
 	}
 
 	@Override
@@ -456,7 +456,8 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 
 		for (final Map.Entry<Integer, List<AttributeDTO>> gidAttributes : attributesByGidsMap.entrySet()) {
 			final Map<String, String> attributeCodeValueMap = new HashMap<>();
-			gidAttributes.getValue().stream().forEach(attributeDTO -> attributeCodeValueMap.put(attributeDTO.getAttributeCode(), attributeDTO.getValue()));
+			gidAttributes.getValue().stream()
+				.forEach(attributeDTO -> attributeCodeValueMap.put(attributeDTO.getAttributeCode(), attributeDTO.getValue()));
 			attributeMap.put(gidAttributes.getKey(), attributeCodeValueMap);
 		}
 
