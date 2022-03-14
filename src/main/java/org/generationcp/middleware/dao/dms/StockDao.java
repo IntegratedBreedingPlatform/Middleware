@@ -742,4 +742,12 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
+	public List<StockModel> getStocksByStudyAndEntryNumbers(final Integer studyId, final Set<String> entryNumbers) {
+		final Criteria criteria = this.getSession().createCriteria(StockModel.class);
+		criteria.createAlias("project", "project");
+		criteria.add(Restrictions.eq("project.projectId", studyId));
+		criteria.add(Restrictions.in("uniqueName", entryNumbers));
+		return criteria.list();
+	}
+
 }

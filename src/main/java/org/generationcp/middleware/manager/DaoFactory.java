@@ -1,6 +1,7 @@
 package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.dao.AttributeDAO;
+import org.generationcp.middleware.dao.AttributeExternalReferenceDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
 import org.generationcp.middleware.dao.CopMatrixDao;
@@ -90,6 +91,7 @@ import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.dao.oms.VariableOverridesDao;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.pojos.CopMatrix;
+import org.generationcp.middleware.pojos.AttributeExternalReference;
 
 public class DaoFactory {
 
@@ -579,6 +581,12 @@ public class DaoFactory {
 		final ExperimentExternalReferenceDao experimentExternalReferenceDao = new ExperimentExternalReferenceDao();
 		experimentExternalReferenceDao.setSession(this.sessionProvider.getSession());
 		return experimentExternalReferenceDao;
+	}
+
+	public AttributeExternalReferenceDAO getAttributeExternalReferenceDao() {
+		final AttributeExternalReferenceDAO attributeExternalReferenceDao = new AttributeExternalReferenceDAO();
+		attributeExternalReferenceDao.setSession(this.sessionProvider.getSession());
+		return attributeExternalReferenceDao;
 	}
 
 	public GermplasmAuditDAO getGermplasmAuditDAO() {

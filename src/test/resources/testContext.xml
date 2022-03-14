@@ -389,7 +389,15 @@
 		<constructor-arg name="sessionProvider" ref="workbenchSessionProvider"/>
 	</bean>
 
+	<bean id="attributeValueService" class="org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueServiceBrapiImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
 	<bean id="ontologyVariableService" class="org.generationcp.middleware.api.ontology.OntologyVariableServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
+	<bean id="siteAnalysisService" class="org.generationcp.middleware.service.impl.analysis.SiteAnalysisServiceImpl">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 

@@ -880,7 +880,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest4, new PageRequest(0, 50), PROGRAM_UUID),
 			hasSize(0));
 
-
 		final GermplasmList list2 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 1", TEST_LIST_DESCRIPTION,
 				20151103, TEST_GERMPLASM_LIST_TYPE_LST,
@@ -955,7 +954,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		return new PageRequest(0, 50, new Sort(new Sort.Order(direction, property)));
 	}
 
-	private Date convertLongToDate(long date) {
+	private Date convertLongToDate(final long date) {
 		return Date.valueOf(LocalDate.parse(String.valueOf(date), DATE_FORMATTER));
 	}
 
