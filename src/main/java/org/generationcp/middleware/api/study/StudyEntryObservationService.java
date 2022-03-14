@@ -4,6 +4,8 @@ import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 
 public interface StudyEntryObservationService {
 
-	Integer createObservation(Integer studyId, StockPropertyData stockPropertyData);
+	Integer createObservation(StockPropertyData stockPropertyData);
+
+	Integer updateObservation(StockPropertyData stockPropertyData);
 
 }
