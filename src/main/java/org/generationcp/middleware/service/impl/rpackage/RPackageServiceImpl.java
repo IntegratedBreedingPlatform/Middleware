@@ -47,8 +47,10 @@ public class RPackageServiceImpl implements RPackageService {
 
 	private RCallDTO mapToDTO(final RCall rCall) {
 		final RCallDTO rCallDTO = new RCallDTO();
+		rCallDTO.setrCallId(rCall.getId());
 		rCallDTO.setDescription(rCall.getDescription());
 		rCallDTO.setEndpoint(rCall.getrPackage().getEndpoint());
+		rCallDTO.setAggregate(rCall.isAggregate());
 		final Map<String, String> parameters = new HashMap<>();
 		for (final RCallParameter rCallParameter : rCall.getrCallParameters()) {
 			parameters.put(rCallParameter.getKey(), rCallParameter.getValue());

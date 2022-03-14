@@ -1,0 +1,55 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="aldrin" id="v20.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="r_call" columnName="is_aggregate"/>
+			</not>
+		</preConditions>
+		<comment>
+			Add is_aggregate column in r_call table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE r_call
+				ADD COLUMN `is_aggregate` TINYINT NULL DEFAULT 0 AFTER `package_id`;
+
+			UPDATE r_call
+			SET is_aggregate = 1
+			WHERE call_id IN (8, 9, 10);
+		</sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v20.3.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(*) FROM r_call WHERE description in ('Entries by STUDY and REP_NO','Entries by STUDY, REP_NO and BLOCK_NO');
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Add new R call transformation records for transposing raw data
+			- Entries by study and replicate
+			- Entries by study, replicate, and blockNumber
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO r_call (`description`, `package_id`)
+			VALUES ('Entries by STUDY and REP_NO', 1),
+				('Entries by STUDY, REP_NO and BLOCK_NO', 1);
+
+			SET
+			@call_id = (SELECT call_id FROM r_call where description = 'Entries by STUDY and REP_NO');
+
+			INSERT INTO r_call_parameter (`parameter_key`, `value`, `call_id`)
+			VALUES ('formula', 'germplasmDbId+germplasmName~studyName+variable+replicate', @call_id);
+
+			SET
+			@call_id = (SELECT call_id FROM r_call where description = 'Entries by STUDY, REP_NO and BLOCK_NO');
+			INSERT INTO r_call_parameter (`parameter_key`, `value`, `call_id`)
+			VALUES ('formula', 'germplasmDbId+germplasmName~studyName+variable+replicate+blockNumber', @call_id);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
