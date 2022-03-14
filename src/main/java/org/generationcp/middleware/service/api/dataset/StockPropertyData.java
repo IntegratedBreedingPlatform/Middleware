@@ -6,7 +6,7 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class StockPropertyData {
 
-	private Integer stockPropertyId;
+	private Integer stockId;
 	private Integer variableId;
 	private String value;
 	private Integer categoricalValueId;
@@ -14,9 +14,9 @@ public class StockPropertyData {
 	public StockPropertyData() {
 	}
 
-	public StockPropertyData(final Integer stockPropertyId, final Integer variableId, final String value,
+	public StockPropertyData(final Integer stockId, final Integer variableId, final String value,
 		final Integer categoricalValueId) {
-		this.stockPropertyId = stockPropertyId;
+		this.stockId = stockId;
 		this.variableId = variableId;
 		this.value = value;
 		this.categoricalValueId = categoricalValueId;
@@ -30,12 +30,12 @@ public class StockPropertyData {
 		this.variableId = variableId;
 	}
 
-	public Integer getStockPropertyId() {
-		return stockPropertyId;
+	public Integer getStockId() {
+		return stockId;
 	}
 
-	public void setStockPropertyId(final Integer stockPropertyId) {
-		this.stockPropertyId = stockPropertyId;
+	public void setStockId(final Integer stockId) {
+		this.stockId = stockId;
 	}
 
 	public Integer getCategoricalValueId() {
@@ -68,4 +68,9 @@ public class StockPropertyData {
 	public String toString() {
 		return Pojomatic.toString(this);
 	}
+
+	public boolean hasValue() {
+		return this.value != null || this.getCategoricalValueId() != null;
+	}
+
 }

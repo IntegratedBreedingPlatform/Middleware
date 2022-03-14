@@ -11,8 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.List;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.StockProperty;
@@ -22,6 +20,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * DAO class for {@link StockProperty}.
@@ -85,6 +86,13 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 			throw new MiddlewareQueryException("Error in updateByStockIdsAndTypeId(" + stockIds + ", " + typeId  + ", " + entryTypeId
 				+ ") in StockPropertyDao: "	+ e.getMessage(), e);
 		}
+	}
+
+	public Optional<StockProperty> getByStockIdAndTypeId(final Integer stockId, final Integer typeId) {
+		final Criteria criteria = this.getSession().createCriteria(StockProperty.class);
+		criteria.add(Restrictions.eq("stockModel.stockId", stockId));
+		criteria.add(Restrictions.eq("typeId", typeId));
+		return Optional.ofNullable((StockProperty) criteria.uniqueResult());
 	}
 
 }

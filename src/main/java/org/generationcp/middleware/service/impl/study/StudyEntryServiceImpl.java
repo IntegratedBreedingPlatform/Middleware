@@ -249,4 +249,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		return this.daoFactory.getStockDao().hasUnassignedEntries(studyId);
 	}
 
+	@Override
+	public Optional<StockProperty> getByStockIdAndTypeId(final Integer stockId, final Integer typeId) {
+		return this.daoFactory.getStockPropertyDao().getByStockIdAndTypeId(stockId, typeId);
+	}
+
 }
