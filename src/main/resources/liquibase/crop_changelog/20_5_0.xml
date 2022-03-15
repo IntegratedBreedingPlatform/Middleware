@@ -1,0 +1,51 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+  <changeSet author="cuenyad" id="v20.5.0-1">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8230 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+            </sqlCheck>
+        </preConditions>
+        <comment>Change 'ENTRY_NO' variable type to entry detail</comment>
+    <sql dbms="mysql" splitStatements="true">
+             UPDATE cvtermprop SET value = 'Entry Detail' WHERE cvterm_id = 8230 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+    </sql>
+  </changeSet>
+
+  <changeSet author="cuenyad" id="v20.5.0-2">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT count(1) > 0 FROM  list_data_details WHERE variable_id = 8230;
+            </sqlCheck>
+        </preConditions>
+        <comment>Migrate ENTRY_NO from listdata to list_data_details table as entry details variable</comment>
+        <sql dbms="mysql" splitStatements="true">
+			<!-- Insert ENTRY_NO variable to list_data_view -->
+			INSERT INTO list_data_view(listid,cvterm_id,type_id)
+			SELECT distinct(ld.listid), 8230, 1815 FROM listnms ld;
+
+             <!-- Remove ENTRY_NO as default view -->
+             DELETE FROM list_data_default_view WHERE name = 'ENTRY_NO';
+
+             <!-- Remove ENTRY_NO as static column -->
+			 DELETE FROM list_data_view WHERE static_id = 8230;
+        </sql>
+  </changeSet>
+
+  <changeSet author="cuenyad" id="v20.5.0-3">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="listdata"/>
+            <columnExists tableName="listdata" columnName="entrycd"/>
+        </preConditions>
+        <comment>Changset temporary until entrycd column will be removed</comment>
+        <sql dbms="mysql" splitStatements="true">
+        ALTER TABLE listdata
+            CHANGE COLUMN `entrycd` `entrycd` VARCHAR (47) NULL DEFAULT '-';
+        </sql>
+  </changeSet>
+
+</databaseChangeLog>
