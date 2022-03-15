@@ -254,4 +254,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		return this.daoFactory.getStockPropertyDao().getByStockIdAndTypeId(stockId, typeId);
 	}
 
+	@Override
+	public StockProperty getByStockPropertyId(final Integer stockPropertyId) {
+		return this.daoFactory.getStockPropertyDao().getById(stockPropertyId);
+	}
+
 }

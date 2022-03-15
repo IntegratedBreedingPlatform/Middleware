@@ -42,4 +42,7 @@ public interface StudyEntryService {
 	Boolean hasUnassignedEntries(int studyId);
 
 	Optional<StockProperty> getByStockIdAndTypeId(Integer stockId, Integer typeId);
+
+	StockProperty getByStockPropertyId(Integer stockPropertyId);
+
 }
