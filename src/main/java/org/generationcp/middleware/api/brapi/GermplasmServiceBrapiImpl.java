@@ -81,7 +81,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 	public GermplasmServiceBrapiImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 		this.daoFactory = new DaoFactory(sessionProvider);
-		this.germplasmMethodValidator = new GermplasmMethodValidator(sessionProvider);
+		this.germplasmMethodValidator = new GermplasmMethodValidator();
 	}
 
 	@Override
@@ -218,8 +218,9 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 						.collect(Collectors.toMap(Method::getMid, Function.identity()));
 				final Method newBreedingMethod = methodMap.get(newBreedingMethodId);
 				final Method oldBreedingMethod = methodMap.get(oldBreedingMethodId);
-				if (this.germplasmMethodValidator
-					.isNewBreedingMethodValid(oldBreedingMethod, newBreedingMethod, germplasmDbId, conflictErrors)) {
+				if (this.daoFactory.getGermplasmDao().getGermplasmDescendantByGID(germplasm.getGid(), 0, Integer.MAX_VALUE).isEmpty() ||
+					this.germplasmMethodValidator
+						.isNewBreedingMethodValid(oldBreedingMethod, newBreedingMethod, germplasmDbId, conflictErrors)) {
 					germplasm.setMethodId(newBreedingMethodId);
 				}
 			}
