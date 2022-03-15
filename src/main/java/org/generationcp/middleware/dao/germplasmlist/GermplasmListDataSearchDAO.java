@@ -7,6 +7,7 @@ import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataViewM
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListStaticColumns;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.dao.util.DAOQueryUtils;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -364,7 +365,11 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 				final String alias = this.formatVariableAlias(variableId);
 				final String paramenterName = String.format("%s_ENTRY_DETAILS_FILTER", alias);
 				queryParams.put(paramenterName, "%" + value + "%");
-				whereClause.add(String.format("%s.value LIKE :%s", alias, paramenterName));
+				if (TermId.ENTRY_NO.getId() != variableId) {
+					whereClause.add(String.format("%s.value LIKE :%s", alias, paramenterName));
+				} else {
+					whereClause.add(String.format("listData.entryid LIKE:%s", paramenterName));
+				}
 			});
 		}
 
@@ -378,7 +383,6 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 
 	private void addFixedScalars(final List<String> scalars, final List<String> selectClause) {
 		selectClause.add(this.addSelectExpression(scalars, "listData.lrecid", LIST_DATA_ID_ALIAS));
-		selectClause.add(this.addSelectExpression(scalars, "listData.entryid", GermplasmListStaticColumns.ENTRY_NO.name()));
 		selectClause.add(this.addSelectExpression(scalars, "listData.grpname", GermplasmListStaticColumns.CROSS.name()));
 		selectClause.add(this.addSelectExpression(scalars, "g.gid", GermplasmListStaticColumns.GID.name()));
 		selectClause.add(this.addSelectExpression(scalars, "g.mgid", GermplasmListStaticColumns.GROUP_ID.name()));
@@ -533,8 +537,11 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 
 		final String alias = this.formatVariableAlias(variableId);
 		selectClause.add(this.addSelectExpression(scalars, String.format("%s.id", alias), alias + "_DETAIL_ID"));
-		selectClause.add(this.addSelectExpression(scalars, String.format("%s.value", alias), alias));
-
+		if (TermId.ENTRY_NO.getId() != variableId) {
+			selectClause.add(this.addSelectExpression(scalars, String.format("%s.value", alias), alias));
+		} else {
+			selectClause.add(this.addSelectExpression(scalars, "listData.entryid", alias));
+		}
 		final String join = this.formatEntryDetailJoin(alias, variableId);
 		joins.add(join);
 	}
