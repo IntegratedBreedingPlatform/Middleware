@@ -20,9 +20,9 @@ import java.util.List;
 
 public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 
-	private final String LIST_NAME = RandomStringUtils.random(10);
-	private final String LIST_DESCRIPTION = RandomStringUtils.random(10);
-	private static final String PROGRAM_UUID = RandomStringUtils.random(10);
+	private final String LIST_NAME = RandomStringUtils.randomAlphanumeric(10);
+	private final String LIST_DESCRIPTION = RandomStringUtils.randomAlphanumeric(10);
+	private static final String PROGRAM_UUID = RandomStringUtils.randomAlphanumeric(10);
 	private Integer userId;
 	private Integer germplasmListId;
 
@@ -41,10 +41,10 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.userId = this.findAdminUser();
 		this.germplasmListTestDataInitializer = new GermplasmListTestDataInitializer();
-		final GermplasmList germplasmListParent = this.germplasmListTestDataInitializer
-			.createGermplasmList(LIST_NAME, userId, LIST_DESCRIPTION, null, 1,
+		final GermplasmList germplasmList = this.germplasmListTestDataInitializer
+			.createGermplasmList(LIST_NAME, this.userId, LIST_DESCRIPTION, null, 1,
 				PROGRAM_UUID);
-		this.germplasmListId = this.germplasmListManager.addGermplasmList(germplasmListParent);
+		this.germplasmListId = this.germplasmListManager.addGermplasmList(germplasmList);
 	}
 
 	@Test
@@ -58,8 +58,8 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 	public void testSearchGermplasmListDTOs() {
 		final GermplasmListExternalReference germplasmListExternalReference = new GermplasmListExternalReference();
 		germplasmListExternalReference.setList(new GermplasmList(this.germplasmListId));
-		germplasmListExternalReference.setReferenceId(RandomStringUtils.random(10));
-		germplasmListExternalReference.setSource(RandomStringUtils.random(10));
+		germplasmListExternalReference.setReferenceId(RandomStringUtils.randomAlphanumeric(10));
+		germplasmListExternalReference.setSource(RandomStringUtils.randomAlphanumeric(10));
 		this.daoFactory.getGermplasmListExternalReferenceDAO().save(germplasmListExternalReference);
 		this.sessionProvder.getSession().flush();
 
