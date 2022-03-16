@@ -56,19 +56,16 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
 
 		final List<GermplasmListDataUpdateViewDTO> newView = Arrays.asList(
-			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.ENTRY_NO.getTermId(), GermplasmListColumnCategory.STATIC),
 			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.GID.getTermId(), GermplasmListColumnCategory.STATIC));
 
 		this.germplasmListDataService.updateGermplasmListDataView(germplasmList.getId(), newView);
 
 		final List<GermplasmListDataView> currentNewView = this.daoFactory.getGermplasmListDataViewDAO().getByListId(germplasmList.getId());
-		assertThat(currentNewView, hasSize(2));
+		assertThat(currentNewView, hasSize(1));
 		assertThat(currentNewView, CoreMatchers.hasItems(
-			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.ENTRY_NO.getTermId())),
 			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.GID.getTermId()))));
 
 		final List<GermplasmListDataUpdateViewDTO> updatedView = Arrays.asList(
-			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.ENTRY_NO.getTermId(), GermplasmListColumnCategory.STATIC),
 			this.createGermplasmListDataUpdateViewDTO(
 				GermplasmListStaticColumns.DESIGNATION.getTermId(), GermplasmListColumnCategory.STATIC),
 			this.createGermplasmListDataUpdateViewDTO(
@@ -78,9 +75,8 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 
 		final List<GermplasmListDataView> currentUpdatedView =
 			this.daoFactory.getGermplasmListDataViewDAO().getByListId(germplasmList.getId());
-		assertThat(currentUpdatedView, hasSize(3));
+		assertThat(currentUpdatedView, hasSize(2));
 		assertThat(currentUpdatedView, CoreMatchers.hasItems(
-			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.ENTRY_NO.getTermId())),
 			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.DESIGNATION.getTermId())),
 			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.GERMPLASM_REFERENCE.getTermId()))));
 	}

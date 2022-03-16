@@ -16,6 +16,7 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -65,6 +66,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
+
+	private static final String SORT_BY_ENTRY_NO = "VARIABLE_" + TermId.ENTRY_NO.getId();
+
 	public static final String LIST_NOT_FOUND = "list.not.found";
 
 	private final DaoFactory daoFactory;
@@ -108,6 +112,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		// save variables
 		final Set<Integer> variableIds = request.getEntries().stream().flatMap(e -> e.getData().keySet().stream()).collect(toSet());
+
+		// Forcing add ENTRY_NO variable.
+		// It is particular case because is required after the migration of ENTRY_NO as a entry detail variable.
+		variableIds.add(TermId.ENTRY_NO.getId());
+
 		for (final Integer variableId : variableIds) {
 			final GermplasmListDataView germplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(
 				germplasmList,
@@ -344,7 +353,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		if (searchComposite.getSearchRequest() != null
 			&& !CollectionUtils.isEmpty(searchComposite.getSearchRequest().getEntryNumbers())) {
 			pageRequest = new PageRequest(0, searchComposite.getSearchRequest().getEntryNumbers().size(),
-				new Sort(Sort.Direction.ASC, GermplasmListStaticColumns.ENTRY_NO.name()));
+				new Sort(Sort.Direction.ASC, GermplasmListServiceImpl.SORT_BY_ENTRY_NO));
 		}
 
 		final List<GermplasmListDataSearchResponse> responseList =

@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class GermplasmListGeneratorDTO extends GermplasmListBasicInfoDTO{
+public class GermplasmListGeneratorDTO extends GermplasmListBasicInfoDTO {
 
 	public static class GermplasmEntryDTO {
 
@@ -86,6 +86,5 @@ public class GermplasmListGeneratorDTO extends GermplasmListBasicInfoDTO{
 		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite) {
 		this.searchComposite = searchComposite;
 	}
-
 
 }
