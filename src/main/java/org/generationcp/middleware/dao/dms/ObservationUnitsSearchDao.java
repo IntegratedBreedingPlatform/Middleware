@@ -93,8 +93,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			"    (SELECT loc.lname FROM nd_geolocationprop gprop INNER JOIN location loc on loc.locid = gprop.value WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = 8190) AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.EXPERIMENT_DESIGN_FACTOR.getId()),
 			"    (SELECT edesign.name FROM nd_geolocationprop gprop INNER JOIN cvterm edesign on edesign.cvterm_id = gprop.value WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = 8135) AS '%s'");
-		mainVariablesMap.put(String.valueOf(TermId.ENTRY_TYPE.getId()),
-			"    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND isp.type_id = 8255) AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.GID.getId()), "    s.dbxref_id AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.DESIG.getId()), "    s.name AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.ENTRY_NO.getId()), "    s.uniquename AS '%s'");
@@ -484,7 +482,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private void addScalar(final SQLQuery createSQLQuery, final Map<Integer, String> standardVariableNames) {
 		createSQLQuery.addScalar(ObservationUnitsSearchDao.OBSERVATION_UNIT_ID);
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.TRIAL_INSTANCE_FACTOR.getId()));
-		createSQLQuery.addScalar(standardVariableNames.get(TermId.ENTRY_TYPE.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.GID.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.DESIG.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.ENTRY_NO.getId()));
@@ -529,50 +526,19 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			}
 		}
 
-		final String entryDetailsClauseFormat = " MAX(IF(cvterm_entry_variable.name = '%s', sp.value, NULL)) AS '%s',"
-			+ " MAX(IF(cvterm_entry_variable.name = '%s', sp.stockprop_id, NULL)) AS '%s',"
-			+ " MAX(IF(cvterm_entry_variable.name = '%s', sp.cvalue_id, NULL)) AS '%s'";
-
-		//fixme temporary excluding entry_type to not break the query until we complete the implementation
-		for (final MeasurementVariableDto measurementVariable : searchDto.getEntryDetails()) {
-			if (measurementVariable.getId()!=8255) {
-				columns.add(String.format(
-					entryDetailsClauseFormat,
-					measurementVariable.getName(),
-					measurementVariable.getName(),
-					measurementVariable.getName(),
-					measurementVariable.getName() + "_StockPropId",
-					measurementVariable.getName(),
-					measurementVariable.getName() + "_CvalueId"
-				));
-			}
-		}
+		final String entryDetailsClauseFormat = " MAX(IF(cvterm_entry_variable.name = '%1$s', sp.value, NULL)) AS '%1$s',"
+			+ " MAX(IF(cvterm_entry_variable.name = '%1$s', sp.stockprop_id, NULL)) AS '%1$s_StockPropId',"
+			+ " MAX(IF(cvterm_entry_variable.name = '%1$s', sp.cvalue_id, NULL)) AS '%1$s_CvalueId'";
+		searchDto.getEntryDetails().forEach(measurementVariable -> columns.add(String.format(entryDetailsClauseFormat, measurementVariable.getName())));
 
 		if (noFilterVariables) {
-			final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s',"
-				+ " MAX(IF(cvterm_variable.name = '%s', ph.phenotype_id, NULL)) AS '%s',"
-				+ " MAX(IF(cvterm_variable.name = '%s', ph.status, NULL)) AS '%s',"
-				+ " MAX(IF(cvterm_variable.name = '%s', ph.cvalue_id, NULL)) AS '%s', "
-				+ " MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS '%s',"
-				+ " MAX(IF(cvterm_variable.name = '%s', ph.draft_cvalue_id, NULL)) AS '%s'";
-
-			for (final MeasurementVariableDto measurementVariable : searchDto.getSelectionMethodsAndTraits()) {
-				columns.add(String.format(
-					traitClauseFormat,
-					measurementVariable.getName(),
-					measurementVariable.getName(),
-					measurementVariable.getName(),
-					measurementVariable.getName() + "_PhenotypeId",
-					measurementVariable.getName(),
-					measurementVariable.getName() + "_Status",
-					measurementVariable.getName(),
-					measurementVariable.getName() + "_CvalueId",
-					measurementVariable.getName(),
-					measurementVariable.getName() + "_DraftValue",
-					measurementVariable.getName(),
-					measurementVariable.getName() + "_DraftCvalueId"
-				));
-			}
+			final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%1$s', ph.value, NULL)) AS '%1$s',"
+				+ " MAX(IF(cvterm_variable.name = '%1$s', ph.phenotype_id, NULL)) AS '%1$s_PhenotypeId',"
+				+ " MAX(IF(cvterm_variable.name = '%1$s', ph.status, NULL)) AS '%1$s_Status',"
+				+ " MAX(IF(cvterm_variable.name = '%1$s', ph.cvalue_id, NULL)) AS '%1$s_CvalueId', "
+				+ " MAX(IF(cvterm_variable.name = '%1$s', ph.draft_value, NULL)) AS '%1$s_DraftValue',"
+				+ " MAX(IF(cvterm_variable.name = '%1$s', ph.draft_cvalue_id, NULL)) AS '%1$s_DraftCvalueId'";
+			searchDto.getSelectionMethodsAndTraits().forEach(measurementVariable -> columns.add(String.format(traitClauseFormat, measurementVariable.getName())));
 		} else {
 
 			final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'";
