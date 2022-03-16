@@ -66,6 +66,9 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
+
+	private static final String SORT_BY_ENTRY_NO = "VARIABLE_" + TermId.ENTRY_NO.getId();
+
 	public static final String LIST_NOT_FOUND = "list.not.found";
 
 	private final DaoFactory daoFactory;
@@ -346,7 +349,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		if (searchComposite.getSearchRequest() != null
 			&& !CollectionUtils.isEmpty(searchComposite.getSearchRequest().getEntryNumbers())) {
 			pageRequest = new PageRequest(0, searchComposite.getSearchRequest().getEntryNumbers().size(),
-				new Sort(Sort.Direction.ASC, GermplasmListStaticColumns.ENTRY_NO.name()));
+				new Sort(Sort.Direction.ASC, GermplasmListServiceImpl.SORT_BY_ENTRY_NO));
 		}
 
 		final List<GermplasmListDataSearchResponse> responseList =
