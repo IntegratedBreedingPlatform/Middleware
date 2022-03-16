@@ -1,0 +1,26 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="darla" id="v20.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1)
+				FROM INFORMATION_SCHEMA.COLUMNS c
+				WHERE TABLE_NAME = 'atributs'
+				AND COLUMN_NAME = 'aval'
+				AND CHARACTER_MAXIMUM_LENGTH = 255
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+        </preConditions>
+		<comment>
+			Extend length of atributs value column
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE atributs MODIFY COLUMN aval varchar(5000) NOT NULL DEFAULT '-';
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
