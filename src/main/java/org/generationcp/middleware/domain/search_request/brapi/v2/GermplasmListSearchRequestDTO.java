@@ -23,6 +23,9 @@ public class GermplasmListSearchRequestDTO extends SearchRequestDto {
 		this.externalReferenceSource = externalReferenceSource;
 	}
 
+	public GermplasmListSearchRequestDTO() {
+	}
+
 	public String getListType() {
 		return this.listType;
 	}
