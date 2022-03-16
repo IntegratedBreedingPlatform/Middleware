@@ -35,7 +35,7 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 	}
 
 	@Override
-	public List<GermplasmListDTO> searchGermplasmListDTOs(GermplasmListSearchRequestDTO searchRequestDTO, Pageable pageable) {
+	public List<GermplasmListDTO> searchGermplasmListDTOs(final GermplasmListSearchRequestDTO searchRequestDTO, final Pageable pageable) {
 		final List<GermplasmListDTO> lists = this.daoFactory.getGermplasmListDAO().searchGermplasmListDTOs(searchRequestDTO, pageable);
 		if (!CollectionUtils.isEmpty(lists)) {
 			final List<Integer> userIds =
@@ -46,7 +46,7 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 			final Map<String, List<ExternalReferenceDTO>> externalReferencesMap =
 				this.daoFactory.getGermplasmListExternalReferenceDAO().getExternalReferences(listIds).stream()
 					.collect(groupingBy(ExternalReferenceDTO::getEntityId));
-			for (GermplasmListDTO listDTO : lists) {
+			for (final GermplasmListDTO listDTO : lists) {
 				listDTO.setListOwnerName(userIDFullNameMap.get(Integer.valueOf(listDTO.getListOwnerPersonDbId())));
 				listDTO.setExternalReferences(externalReferencesMap.get(listDTO.getListDbId()));
 			}
@@ -55,7 +55,7 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 	}
 
 	@Override
-	public long countGermplasmListDTOs(GermplasmListSearchRequestDTO searchRequestDTO) {
+	public long countGermplasmListDTOs(final GermplasmListSearchRequestDTO searchRequestDTO) {
 		return this.daoFactory.getGermplasmListDAO().countGermplasmListDTOs(searchRequestDTO);
 	}
 

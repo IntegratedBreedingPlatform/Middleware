@@ -41,7 +41,7 @@ public class GermplasmListDTO implements Serializable {
 	private String listType = "germplasm";
 
 	public Map<String, String> getAdditionalInfo() {
-		return additionalInfo;
+		return this.additionalInfo;
 	}
 
 	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
@@ -49,7 +49,7 @@ public class GermplasmListDTO implements Serializable {
 	}
 
 	public Date getDateCreated() {
-		return dateCreated;
+		return this.dateCreated;
 	}
 
 	public void setDateCreated(final Date dateCreated) {
@@ -57,7 +57,7 @@ public class GermplasmListDTO implements Serializable {
 	}
 
 	public String getDateModified() {
-		return dateModified;
+		return this.dateModified;
 	}
 
 	public void setDateModified(final String dateModified) {
@@ -65,7 +65,7 @@ public class GermplasmListDTO implements Serializable {
 	}
 
 	public List<ExternalReferenceDTO> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
 	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
@@ -73,7 +73,7 @@ public class GermplasmListDTO implements Serializable {
 	}
 
 	public String getListDbId() {
-		return listDbId;
+		return this.listDbId;
 	}
 
 	public void setListDbId(final String listDbId) {
@@ -81,7 +81,7 @@ public class GermplasmListDTO implements Serializable {
 	}
 
 	public String getListDescription() {
-		return listDescription;
+		return this.listDescription;
 	}
 
 	public void setListDescription(final String listDescription) {
@@ -89,7 +89,7 @@ public class GermplasmListDTO implements Serializable {
 	}
 
 	public String getListName() {
-		return listName;
+		return this.listName;
 	}
 
 	public void setListName(final String listName) {
@@ -97,7 +97,7 @@ public class GermplasmListDTO implements Serializable {
 	}
 
 	public String getListOwnerName() {
-		return listOwnerName;
+		return this.listOwnerName;
 	}
 
 	public void setListOwnerName(final String listOwnerName) {
@@ -105,7 +105,7 @@ public class GermplasmListDTO implements Serializable {
 	}
 
 	public String getListOwnerPersonDbId() {
-		return listOwnerPersonDbId;
+		return this.listOwnerPersonDbId;
 	}
 
 	public void setListOwnerPersonDbId(final String listOwnerPersonDbId) {
@@ -113,7 +113,7 @@ public class GermplasmListDTO implements Serializable {
 	}
 
 	public Integer getListSize() {
-		return listSize;
+		return this.listSize;
 	}
 
 	public void setListSize(final Integer listSize) {
@@ -121,7 +121,7 @@ public class GermplasmListDTO implements Serializable {
 	}
 
 	public String getListSource() {
-		return listSource;
+		return this.listSource;
 	}
 
 	public void setListSource(final String listSource) {
@@ -129,7 +129,7 @@ public class GermplasmListDTO implements Serializable {
 	}
 
 	public String getListType() {
-		return listType;
+		return this.listType;
 	}
 
 	public void setListType(final String listType) {

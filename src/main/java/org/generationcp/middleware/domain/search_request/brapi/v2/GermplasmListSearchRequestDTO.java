@@ -24,7 +24,7 @@ public class GermplasmListSearchRequestDTO extends SearchRequestDto {
 	}
 
 	public String getListType() {
-		return listType;
+		return this.listType;
 	}
 
 	public void setListType(final String listType) {
@@ -32,7 +32,7 @@ public class GermplasmListSearchRequestDTO extends SearchRequestDto {
 	}
 
 	public String getListName() {
-		return listName;
+		return this.listName;
 	}
 
 	public void setListName(final String listName) {
@@ -40,7 +40,7 @@ public class GermplasmListSearchRequestDTO extends SearchRequestDto {
 	}
 
 	public String getListDbId() {
-		return listDbId;
+		return this.listDbId;
 	}
 
 	public void setListDbId(final String listDbId) {
@@ -48,7 +48,7 @@ public class GermplasmListSearchRequestDTO extends SearchRequestDto {
 	}
 
 	public String getListSource() {
-		return listSource;
+		return this.listSource;
 	}
 
 	public void setListSource(final String listSource) {
@@ -56,7 +56,7 @@ public class GermplasmListSearchRequestDTO extends SearchRequestDto {
 	}
 
 	public String getExternalReferenceID() {
-		return externalReferenceID;
+		return this.externalReferenceID;
 	}
 
 	public void setExternalReferenceID(final String externalReferenceID) {
@@ -64,7 +64,7 @@ public class GermplasmListSearchRequestDTO extends SearchRequestDto {
 	}
 
 	public String getExternalReferenceSource() {
-		return externalReferenceSource;
+		return this.externalReferenceSource;
 	}
 
 	public void setExternalReferenceSource(final String externalReferenceSource) {
