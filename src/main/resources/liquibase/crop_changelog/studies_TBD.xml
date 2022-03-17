@@ -220,4 +220,16 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="cuenyad" id="studies-TBD-15">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8230 AND type_id = 1804;
+            </sqlCheck>
+        </preConditions>
+        <comment>Change 'ENTRY_NO' variable type to entry detail in 'projectprop' table</comment>
+        <sql dbms="mysql" splitStatements="true">
+                 UPDATE projectprop SET type_id = 1815 WHERE variable_id = 8230 AND type_id = 1804;
+        </sql>
+	</changeSet>
+
 </databaseChangeLog>
