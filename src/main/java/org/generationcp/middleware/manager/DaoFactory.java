@@ -12,6 +12,7 @@ import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.GermplasmExternalReferenceDAO;
+import org.generationcp.middleware.dao.GermplasmListExternalReferenceDAO;
 import org.generationcp.middleware.dao.GermplasmSearchDAO;
 import org.generationcp.middleware.dao.GermplasmStudySourceDAO;
 import org.generationcp.middleware.dao.KeySequenceRegisterDAO;
@@ -539,6 +540,12 @@ public class DaoFactory {
 		final GermplasmExternalReferenceDAO germplasmExternalReferenceDAO = new GermplasmExternalReferenceDAO();
 		germplasmExternalReferenceDAO.setSession(this.sessionProvider.getSession());
 		return germplasmExternalReferenceDAO;
+	}
+
+	public GermplasmListExternalReferenceDAO getGermplasmListExternalReferenceDAO() {
+		final GermplasmListExternalReferenceDAO germplasmListExternalReferenceDAO = new GermplasmListExternalReferenceDAO();
+		germplasmListExternalReferenceDAO.setSession(this.sessionProvider.getSession());
+		return germplasmListExternalReferenceDAO;
 	}
 
 	public StudyExternalReferenceDao getStudyExternalReferenceDAO() {
