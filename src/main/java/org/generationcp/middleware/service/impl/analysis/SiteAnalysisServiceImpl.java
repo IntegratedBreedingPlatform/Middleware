@@ -34,6 +34,12 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		.put(TermId.DATASET_TITLE.getId(), VariableType.STUDY_DETAIL)
 		.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), VariableType.ENVIRONMENT_DETAIL).build();
 
+	public static final Map<Integer, VariableType> SUMMARY_STATISTICS_DATASET_DMSPROJECT_PROPERTIES =
+		ImmutableMap.<Integer, VariableType>builder()
+			.put(TermId.DATASET_NAME.getId(), VariableType.STUDY_DETAIL)
+			.put(TermId.DATASET_TITLE.getId(), VariableType.STUDY_DETAIL)
+			.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), VariableType.ENVIRONMENT_DETAIL).build();
+
 	private final DaoFactory daoFactory;
 
 	public SiteAnalysisServiceImpl(final HibernateSessionProvider sessionProvider) {
@@ -50,25 +56,48 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 			new CaseInsensitiveMap(
 				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisVariableNames, CvId.VARIABLES).stream().collect(Collectors.toMap(
 					CVTerm::getName, Function.identity())));
-		final Map<String, Geolocation> environmentNumberGeolocationMap =
-			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId).stream()
-				.collect(Collectors.toMap(Geolocation::getDescription, Function.identity()));
 
 		// Create means dataset
-		final DmsProject meansDataset = this.createMeansDataset(study);
+		final DmsProject meansDataset = this.createDataset(study, DatasetTypeEnum.MEANS_DATA, "-MEANS");
 		// Add necessary dataset project properties
 		this.addMeansDatasetVariables(meansDataset, analysisVariablesMap);
 		// Save means experiment and means values
-		this.saveMeansExperimentAndValues(studyId, meansDataset, analysisVariablesMap, environmentNumberGeolocationMap, meansImportRequest);
+		this.saveMeansExperimentAndValues(studyId, meansDataset, analysisVariablesMap, meansImportRequest);
 
 		return meansDataset.getProjectId();
 	}
 
-	private DmsProject createMeansDataset(final DmsProject study) {
+	@Override
+	public Integer createSummaryStatisticsDataset(final Integer studyId,
+		final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
+
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
+		final Set<String> analysisSummaryVariableNames =
+			summaryStatisticsImportRequest.getData().stream().map(o -> o.getValues().keySet()).flatMap(Set::stream)
+				.collect(Collectors.toSet());
+		final Map<String, CVTerm> analysisSummaryVariablesMap =
+			new CaseInsensitiveMap(
+				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisSummaryVariableNames, CvId.VARIABLES).stream()
+					.collect(Collectors.toMap(
+						CVTerm::getName, Function.identity())));
+
+		// Create summary statistics dataset
+		final DmsProject summaryStatisticsDataset =
+			this.createDataset(study, DatasetTypeEnum.SUMMARY_STATISTICS_DATA, "-SUMMARY_STATISTICS");
+		// Add necessary dataset project properties
+		this.addSummaryStatisticsDatasetVariables(summaryStatisticsDataset, analysisSummaryVariablesMap);
+		// Save summary statistics experiment and values
+		this.saveSummaryStatisticsExperimentAndValues(studyId, summaryStatisticsDataset, analysisSummaryVariablesMap,
+			summaryStatisticsImportRequest);
+
+		return summaryStatisticsDataset.getProjectId();
+	}
+
+	private DmsProject createDataset(final DmsProject study, final DatasetTypeEnum datasetType, final String nameSuffix) {
 		final DmsProject meansDataset = new DmsProject();
-		meansDataset.setDatasetType(new DatasetType(DatasetTypeEnum.MEANS_DATA.getId()));
-		meansDataset.setName(study.getName() + "-MEANS");
-		meansDataset.setDescription(study.getName() + "-MEANS");
+		meansDataset.setDatasetType(new DatasetType(datasetType.getId()));
+		meansDataset.setName(study.getName() + nameSuffix);
+		meansDataset.setDescription(study.getName() + nameSuffix);
 		meansDataset.setParent(study);
 		meansDataset.setStudy(study);
 		meansDataset.setDeleted(false);
@@ -78,8 +107,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 	}
 
 	private void saveMeansExperimentAndValues(final int studyId, final DmsProject meansDataset,
-		final Map<String, CVTerm> analaysisVariablesMap,
-		final Map<String, Geolocation> environmentNumberGeolocationMap, final MeansImportRequest meansImportRequest) {
+		final Map<String, CVTerm> analaysisVariablesMap, final MeansImportRequest meansImportRequest) {
 
 		final Set<String> entryNumbers =
 			meansImportRequest.getData().stream().map(m -> String.valueOf(m.getEntryNo())).collect(Collectors.toSet());
@@ -87,6 +115,9 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 			stockModelMap =
 			this.daoFactory.getStockDao().getStocksByStudyAndEntryNumbers(studyId, entryNumbers).stream()
 				.collect(Collectors.toMap(StockModel::getUniqueName, Function.identity()));
+		final Map<String, Geolocation> environmentNumberGeolocationMap =
+			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId).stream()
+				.collect(Collectors.toMap(Geolocation::getDescription, Function.identity()));
 
 		// Save means experiment and means values
 		for (final MeansImportRequest.MeansData meansData : meansImportRequest.getData()) {
@@ -95,19 +126,42 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 			experimentModel.setGeoLocation(environmentNumberGeolocationMap.get(String.valueOf(meansData.getEnvironmentNumber())));
 			experimentModel.setTypeId(ExperimentType.AVERAGE.getTermId());
 			experimentModel.setStock(stockModelMap.get(String.valueOf(meansData.getEntryNo())));
-			final List<Phenotype> phenotypes = new ArrayList<>();
-			for (final Map.Entry<String, Double> meansMapEntryValue : meansData.getValues().entrySet()) {
-				if (meansMapEntryValue.getValue() != null) {
-					final Phenotype phenotype = new Phenotype();
-					phenotype.setExperiment(experimentModel);
-					phenotype.setValue(meansMapEntryValue.getValue().toString());
-					phenotype.setObservableId(analaysisVariablesMap.get(meansMapEntryValue.getKey()).getCvTermId());
-					phenotypes.add(phenotype);
-				}
-			}
-			experimentModel.setPhenotypes(phenotypes);
-			this.daoFactory.getExperimentDao().save(experimentModel);
+			this.saveExperimentModel(analaysisVariablesMap, experimentModel, meansData.getValues());
 		}
+	}
+
+	private void saveSummaryStatisticsExperimentAndValues(final int studyId, final DmsProject summaryStatisticsDataset,
+		final Map<String, CVTerm> analaysisVariablesMap,
+		final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
+
+		final Map<String, Geolocation> environmentNumberGeolocationMap =
+			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId).stream()
+				.collect(Collectors.toMap(Geolocation::getDescription, Function.identity()));
+
+		// Save summary statistics experiment and summary values
+		for (final SummaryStatisticsImportRequest.SummaryData meansData : summaryStatisticsImportRequest.getData()) {
+			final ExperimentModel experimentModel = new ExperimentModel();
+			experimentModel.setProject(summaryStatisticsDataset);
+			experimentModel.setGeoLocation(environmentNumberGeolocationMap.get(String.valueOf(meansData.getEnvironmentNumber())));
+			experimentModel.setTypeId(ExperimentType.SUMMARY_STATISTICS.getTermId());
+			this.saveExperimentModel(analaysisVariablesMap, experimentModel, meansData.getValues());
+		}
+	}
+
+	private void saveExperimentModel(final Map<String, CVTerm> analaysisVariablesMap, final ExperimentModel experimentModel,
+		final Map<String, Double> values) {
+		final List<Phenotype> phenotypes = new ArrayList<>();
+		for (final Map.Entry<String, Double> meansMapEntryValue : values.entrySet()) {
+			if (meansMapEntryValue.getValue() != null) {
+				final Phenotype phenotype = new Phenotype();
+				phenotype.setExperiment(experimentModel);
+				phenotype.setValue(meansMapEntryValue.getValue().toString());
+				phenotype.setObservableId(analaysisVariablesMap.get(meansMapEntryValue.getKey()).getCvTermId());
+				phenotypes.add(phenotype);
+			}
+		}
+		experimentModel.setPhenotypes(phenotypes);
+		this.daoFactory.getExperimentDao().save(experimentModel);
 	}
 
 	private void addMeansDatasetVariables(final DmsProject meansDataset, final Map<String, CVTerm> analaysisVariablesMap) {
@@ -127,6 +181,22 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 
 		for (final Map.Entry<String, CVTerm> entry : analaysisVariablesMap.entrySet()) {
 			this.addProjectProperty(meansDataset, entry.getValue().getCvTermId(), entry.getValue().getName(), VariableType.ANALYSIS,
+				rank.incrementAndGet());
+		}
+	}
+
+	private void addSummaryStatisticsDatasetVariables(final DmsProject summaryStatisticDataset,
+		final Map<String, CVTerm> analaysisSummaryVariablesMap) {
+		final AtomicInteger rank = new AtomicInteger();
+
+		final List<CVTerm> cvTerms =
+			this.daoFactory.getCvTermDao().getByIds(new ArrayList<>(SUMMARY_STATISTICS_DATASET_DMSPROJECT_PROPERTIES.keySet()));
+		cvTerms.forEach(term -> this.addProjectProperty(summaryStatisticDataset, term.getCvTermId(), term.getName(),
+			MEANS_DATASET_DMSPROJECT_PROPERTIES.get(term.getCvTermId()), rank.incrementAndGet()));
+
+		for (final Map.Entry<String, CVTerm> entry : analaysisSummaryVariablesMap.entrySet()) {
+			this.addProjectProperty(summaryStatisticDataset, entry.getValue().getCvTermId(), entry.getValue().getName(),
+				VariableType.ANALYSIS_SUMMARY,
 				rank.incrementAndGet());
 		}
 	}
