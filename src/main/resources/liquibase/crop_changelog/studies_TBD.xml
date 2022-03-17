@@ -194,7 +194,7 @@
 			SELECT count(1) > 0 FROM  list_data_details WHERE variable_id = 8230;
 		</sqlCheck>
 		</preConditions>
-		<comment>Migrate ENTRY_NO from listdata to list_data_details table as entry details variable</comment>
+		<comment>Migrate ENTRY_NO as an Entry Detail variable</comment>
 		<sql dbms="mysql" splitStatements="true">
 			<!-- Insert ENTRY_NO variable to list_data_view -->
 			INSERT INTO list_data_view(listid,cvterm_id,type_id)
