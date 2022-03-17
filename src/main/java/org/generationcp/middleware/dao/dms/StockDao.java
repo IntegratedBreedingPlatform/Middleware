@@ -716,7 +716,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		return criteria.list();
 	}
 
-	public void createStudyEntries(final Integer studyId, final Integer listId, final boolean addEntryTypeProperty) {
+	public void createStudyEntries(final Integer studyId, final Integer listId) {
 		final String insertStockQuery = "INSERT INTO stock(dbxref_id, name, uniquename, project_id) "
 			+ "SELECT ld.gid, (SELECT n.nval FROM names n WHERE nstat = 1 AND n.gid = ld.gid), entryid, " + studyId + " FROM listdata ld WHERE ld.listid = " + listId;
 		this.getSession().createSQLQuery(insertStockQuery).executeUpdate();
@@ -728,15 +728,19 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			+ " WHERE l.listid = "  + listId + " AND s.project_id = " + studyId;
 		this.getSession().createSQLQuery(insertStockPropertyQuery).executeUpdate();
 
-		// Add entry type with a default value
-		if (addEntryTypeProperty) {
-			final String insertEntryTypeProperty = "INSERT INTO stockprop(stock_id, type_id, value, cvalue_id) "
-				+ "SELECT stock_id, " + TermId.ENTRY_TYPE.getId() + ", '" + SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue() + "', "
-				+ SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() + "  "
-				+ "		FROM stock WHERE project_id = " + studyId;
-			this.getSession().createSQLQuery(insertEntryTypeProperty).executeUpdate();
-		}
-
+		// Add entry type with a default value for those entries which don't have a entry type set
+		final String insertEntryTypeProperty = "INSERT INTO stockprop(stock_id, type_id, value, cvalue_id) "
+			+ "SELECT stock_id, " + TermId.ENTRY_TYPE.getId() + ", '" + SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue() + "', "
+			+ SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId() + "  "
+			+ "		FROM listdata ld "
+			+ "		INNER JOIN stock s ON ld.entryid = s.uniquename "
+			+ "		LEFT JOIN list_data_details ldd ON ldd.lrecid = ld.lrecid "
+			+ " WHERE ld.listid = "  + listId + " AND s.project_id = " + studyId + " AND ld.entryid NOT IN "
+			+ "		(SELECT ld.entryid FROM listdata ld "
+			+ "				INNER JOIN list_data_details ldd ON ld.lrecid = ldd.lrecid "
+			+ "         WHERE ld.listid = " + listId + " and ldd.variable_id = " + TermId.ENTRY_TYPE.getId() + ") "
+			+ " GROUP BY ld.entryid";
+		this.getSession().createSQLQuery(insertEntryTypeProperty).executeUpdate();
 	}
 
 	public void createStudyEntries(final Integer studyId, final Integer startingEntryNumber, final List<Integer> gids,
