@@ -19,6 +19,7 @@ public class GermplasmListSearchRequestDTO extends SearchRequestDto {
 		this.listType = listType;
 		this.listName = listName;
 		this.listDbId = listDbId;
+		this.listSource = listSource;
 		this.externalReferenceID = externalReferenceID;
 		this.externalReferenceSource = externalReferenceSource;
 	}

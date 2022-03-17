@@ -27,10 +27,8 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 	private UserService userService;
 
 	private final DaoFactory daoFactory;
-	private final HibernateSessionProvider sessionProvider;
 
 	public GermplasmListServiceBrapiImpl(final HibernateSessionProvider sessionProvider) {
-		this.sessionProvider = sessionProvider;
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 

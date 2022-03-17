@@ -912,10 +912,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 
 	public List<GermplasmListDTO> searchGermplasmListDTOs(final GermplasmListSearchRequestDTO requestDTO, final Pageable pageable) {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createListsQuery(requestDTO));
-		if (pageable != null) {
-			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
-			sqlQuery.setMaxResults(pageable.getPageSize());
-		}
+		GenericDAO.addPaginationToSQLQuery(sqlQuery, pageable);
 		this.addListSearchParameters(sqlQuery, requestDTO);
 		this.appendVariablesScalar(sqlQuery);
 		if (pageable != null) {
