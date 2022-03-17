@@ -130,17 +130,19 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final DmsProject plotDataDataset =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
 
-		// Filter all entry details project variable that the project currently has because entry details are going to be added later
-		// FIXME keep existing entry details added manually?
+		// Filter entry details project variable except ENTRY_TYPE and ENTRY_NO because they are going to be added later
 		final List<ProjectProperty> projectProperties = plotDataDataset.getProperties()
 			.stream()
-			.filter(projectProperty -> !VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()))
+			.filter(projectProperty -> !projectProperty.getTypeId().equals(TermId.ENTRY_TYPE.getId()) ||
+				!projectProperty.getTypeId().equals(TermId.ENTRY_NO.getId()) ||
+				!VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()))
 			.collect(Collectors.toList());
 
 		// Add germplasm list entry details as project properties
 		final AtomicInteger projectPropertyInitialRank = new AtomicInteger(plotDataDataset.getNextPropertyRank());
 		final List<Variable> germplasmListVariables = this.germplasmListService.getGermplasmListVariables(null, listId, null);
 		final List<ProjectProperty> entryDetailsProjectProperties = germplasmListVariables.stream()
+			.filter(variable -> TermId.ENTRY_TYPE.getId() != variable.getId() && TermId.ENTRY_NO.getId() != variable.getId())
 			.map(variable -> new ProjectProperty(plotDataDataset, VariableType.ENTRY_DETAIL.getId(), null,
 				projectPropertyInitialRank.getAndIncrement(), variable.getId(), variable.getName()))
 			.collect(Collectors.toList());
@@ -149,9 +151,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		plotDataDataset.setProperties(projectProperties);
 		this.daoFactory.getDmsProjectDAO().save(plotDataDataset);
 
-		final boolean listHasEntryType =
-			germplasmListVariables.stream().anyMatch(variable -> variable.getId() == TermId.ENTRY_TYPE.getId());
-		this.daoFactory.getStockDao().createStudyEntries(studyId, listId, !listHasEntryType);
+		this.daoFactory.getStockDao().createStudyEntries(studyId, listId);
 	}
 
 	@Override
