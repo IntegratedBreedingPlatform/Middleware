@@ -314,6 +314,10 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
+	<bean id="germplasmListServiceBrapi" class="org.generationcp.middleware.api.brapi.GermplasmListServiceBrapiImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 	<bean id="observationServiceBrapi" class="org.generationcp.middleware.api.brapi.ObservationServiceBrapiImpl">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>

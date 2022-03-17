@@ -87,6 +87,7 @@
 	<include file="crop_changelog/19_5_1.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/20_1_0.xml" relativeToChangelogFile="true"/>
 	<include file="crop_changelog/20_2_0.xml" relativeToChangelogFile="true"/>
+	<include file="crop_changelog/20_3_0.xml" relativeToChangelogFile="true"/>
 	<!-- TODO: change file name. Pls, take in mind to also rename all changeset id's  -->
 	<include file="crop_changelog/studies_TBD.xml" relativeToChangelogFile="true"/>
 

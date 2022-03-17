@@ -388,12 +388,13 @@ public class GermplasmServiceImpl implements GermplasmService {
 				.getAttributeValuesGIDList(gids);
 		final Map<Integer, List<Attribute>> attributesMap =
 			attributes.stream().collect(groupingBy(Attribute::getGermplasmId, LinkedHashMap::new, Collectors.toList()));
+		final Set<Integer> gidsWithProgeny = this.daoFactory.getGermplasmDao().getGidsOfGermplasmWithDescendants(new HashSet<>(gids));
 
 		for (final Germplasm germplasm : germplasmList) {
 			this.saveGermplasmUpdateDTO(attributeVariablesNameMap, nameCodesFieldNoMap,
 				germplasmUpdateDTOMap,
 				locationAbbreviationIdMap, codeBreedingMethodDTOMap, namesMap, attributesMap, germplasm,
-				progenitorsMapByGid, existingGermplasmPUIs, conflictErrors);
+				progenitorsMapByGid, existingGermplasmPUIs, gidsWithProgeny, conflictErrors);
 		}
 
 		if (!conflictErrors.isEmpty()) {
@@ -447,13 +448,14 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, Method> codeBreedingMethodDTOMap, final Map<Integer, List<Name>> namesMap,
 		final Map<Integer, List<Attribute>> attributesMap, final Germplasm germplasm,
 		final Map<String, Germplasm> progenitorsMapByGid, final List<String> existingGermplasmPUIs,
+		final Set<Integer> gidsWithProgeny,
 		final Multimap<String, Object[]> conflictErrors) {
 		final Optional<GermplasmUpdateDTO> optionalGermplasmUpdateDTO =
 			this.getGermplasmUpdateDTOByGidOrUUID(germplasm, germplasmUpdateDTOMap);
 		if (optionalGermplasmUpdateDTO.isPresent()) {
 			final GermplasmUpdateDTO germplasmUpdateDTO = optionalGermplasmUpdateDTO.get();
 			this.updateGermplasm(germplasm, germplasmUpdateDTO, locationAbbreviationIdMap, codeBreedingMethodDTOMap, progenitorsMapByGid,
-				conflictErrors);
+				gidsWithProgeny, conflictErrors);
 			this.saveAttributesAndNames(attributeVariablesMap, nameCodes, namesMap, attributesMap, existingGermplasmPUIs, germplasm,
 				conflictErrors, germplasmUpdateDTO);
 			this.updatePreferredName(nameCodes, namesMap, germplasm, germplasmUpdateDTO, conflictErrors);
@@ -511,6 +513,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Map<String, Integer> locationAbbreviationIdMap,
 		final Map<String, Method> codeBreedingMethodDTOMap,
 		final Map<String, Germplasm> progenitorsMapByGid,
+		final Set<Integer> gidsWithProgeny,
 		final Multimap<String, Object[]> conflictErrors) {
 
 		final Optional<Method> breedingMethodOptional =
@@ -529,7 +532,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 		this.saveOrUpdateReference(germplasm, referenceOptional);
 		this.updateBreedingMethodAndProgenitors(germplasmUpdateDTO, germplasm, breedingMethodOptional, progenitorsMapByGid,
-			conflictErrors);
+			gidsWithProgeny, conflictErrors);
 
 		this.daoFactory.getGermplasmDao().update(germplasm);
 	}
@@ -537,6 +540,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private void updateBreedingMethodAndProgenitors(final GermplasmUpdateDTO germplasmUpdateDTO, final Germplasm germplasm,
 		final Optional<Method> breedingMethodOptional,
 		final Map<String, Germplasm> progenitorsMapByGid,
+		final Set<Integer> gidsWithProgeny,
 		final Multimap<String, Object[]> conflictErrors) {
 
 		final Integer femaleParentGid = germplasmUpdateDTO.getProgenitors().get(PROGENITOR_1);
@@ -552,7 +556,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 				maleParentGid,
 				germplasm.getMethod(), otherProgenitors);
 
-		} else if (this.germplasmMethodValidator
+		} else if (!gidsWithProgeny.contains(germplasmUpdateDTO.getGid()) || this.germplasmMethodValidator
 			.isNewBreedingMethodValid(germplasm.getMethod(), breedingMethodOptional.get(), String.valueOf(germplasm.getGid()),
 				conflictErrors)) {
 
