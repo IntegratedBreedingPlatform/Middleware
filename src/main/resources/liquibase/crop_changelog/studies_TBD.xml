@@ -4,7 +4,7 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-  <changeSet author="lkovacic" id="v20.4.0-1">
+  <changeSet author="lkovacic" id="studies-TBD-1">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8300 AND type_id = 1800 AND value = 'Germplasm Descriptor';
@@ -16,7 +16,7 @@
     </sql>
   </changeSet>
 
-  <changeSet author="lkovacic" id="v20.4.0-2">
+  <changeSet author="lkovacic" id="studies-TBD-2">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8300 AND type_id = 1804;
@@ -28,7 +28,7 @@
     </sql>
   </changeSet>
 
-  <changeSet author="cuenyad" id="v20.4.0-3">
+  <changeSet author="cuenyad" id="studies-TBD-3">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT count(1) > 0 FROM  list_data_details WHERE variable_id = 8300;
@@ -37,22 +37,22 @@
         <comment>Migrate ENTRY_CODE from listdata to list_data_details table as entry details variable</comment>
         <sql dbms="mysql" splitStatements="true">
              <!-- Migrate ENTRY_CODE from listdata to list_data_details -->
-            INSERT INTO list_data_details(variable_id, lrecid, value, created_by)
+			INSERT INTO list_data_details(variable_id, lrecid, value, created_by)
             SELECT 8300, r.lrecid, r.entrycd, ln.listuid FROM listdata r inner join listnms ln on ln.listid = r.listid;
 
 			<!-- Insert ENTRY_CODE variable to list_data_view -->
 			INSERT INTO list_data_view(listid,cvterm_id,type_id)
 			SELECT distinct(ld.listid), 8300, 1815 FROM listnms ld;
 
-             <!-- Remove ENTRY_CODE as default view -->
-             DELETE FROM list_data_default_view WHERE name = 'ENTRY_CODE';
+			<!-- Remove ENTRY_CODE as default view -->
+			DELETE FROM list_data_default_view WHERE name = 'ENTRY_CODE';
 
-             <!-- Remove ENTRY_CODE as static column -->
-			 DELETE FROM list_data_view WHERE static_id = 8300;
+			<!-- Remove ENTRY_CODE as static column -->
+			DELETE FROM list_data_view WHERE static_id = 8300;
         </sql>
   </changeSet>
 
-	<changeSet author="lkovacic" id="v20.4.0-4">
+	<changeSet author="lkovacic" id="studies-TBD-4">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
 				SELECT COUNT(1) > 0
@@ -74,9 +74,9 @@
 		</sql>
 	</changeSet>
 
-    <changeSet author="lkovacic" id="v20.4.0-5">
+    <changeSet author="lkovacic" id="studies-TBD-5">
         <preConditions onFail="MARK_RAN">
-			<columnExists tableName="stock" columnName="value" />
+			<columnExists tableName="stock" columnName="value"/>
 		</preConditions>
 		<comment>Rename column 'value' to 'value_bkp' in table 'stock'</comment>
 		<sql>
@@ -84,9 +84,9 @@
 		</sql>
 	</changeSet>
 
-    <changeSet author="lkovacic" id="v20.4.0-6">
+    <changeSet author="lkovacic" id="studies-TBD-6">
         <preConditions onFail="MARK_RAN">
-			<columnExists tableName="stock" columnName="type_id" />
+			<columnExists tableName="stock" columnName="type_id"/>
 		</preConditions>
 		<comment>Rename column 'type_id' to 'type_id_bkp' in table 'stock' and make it nullable</comment>
 		<sql>
@@ -94,7 +94,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v20.4.0-7">
+	<changeSet author="lkovacic" id="studies-TBD-7">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(*)
@@ -110,7 +110,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v20.4.0-8">
+	<changeSet author="lkovacic" id="studies-TBD-8">
 		<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8255 AND type_id = 1800 AND value = 'Germplasm Descriptor';
@@ -122,7 +122,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v20.4.0-9">
+	<changeSet author="lkovacic" id="studies-TBD-9">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8255 AND type_id = 1804;
@@ -134,7 +134,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v20.4.0-10">
+	<changeSet author="lkovacic" id="studies-TBD-10">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="stockprop" columnName="cvalue_id"/>
@@ -150,9 +150,14 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v20.4.0-11">
+	<changeSet author="lkovacic" id="studies-TBD-11">
 		<preConditions onFail="MARK_RAN">
-			<columnExists tableName="stockprop" columnName="cvalue_id"/>
+			<and>
+				<columnExists tableName="stockprop" columnName="cvalue_id"/>
+				<sqlCheck expectedResult="0">
+					SELECT count(1) FROM stockprop WHERE cvalue_id IS NOT NULL;
+				</sqlCheck>
+			</and>
 		</preConditions>
 		<comment>Migrate categorical variable values to 'cvalue_id' column</comment>
 		<sql dbms="mysql" splitStatements="true">
@@ -168,6 +173,50 @@
 												  INNER JOIN cvterm_relationship cr2
 														  ON cr.object_id = cr2.subject_id
 															 AND cr2.type_id = 1190) AS inn);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="studies-TBD-12">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8230 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+			</sqlCheck>
+		</preConditions>
+		<comment>Change 'ENTRY_NO' variable type to entry detail</comment>
+		<sql dbms="mysql" splitStatements="true">
+			 UPDATE cvtermprop SET value = 'Entry Detail' WHERE cvterm_id = 8230 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="studies-TBD-13">
+		<preConditions onFail="MARK_RAN">
+		<sqlCheck expectedResult="0">
+			SELECT count(1) > 0 FROM  list_data_details WHERE variable_id = 8230;
+		</sqlCheck>
+		</preConditions>
+		<comment>Migrate ENTRY_NO from listdata to list_data_details table as entry details variable</comment>
+		<sql dbms="mysql" splitStatements="true">
+			<!-- Insert ENTRY_NO variable to list_data_view -->
+			INSERT INTO list_data_view(listid,cvterm_id,type_id)
+			SELECT distinct(ld.listid), 8230, 1815 FROM listnms ld;
+
+			<!-- Remove ENTRY_NO as default view -->
+			DELETE FROM list_data_default_view WHERE name = 'ENTRY_NO';
+
+			<!-- Remove ENTRY_NO as static column -->
+			DELETE FROM list_data_view WHERE static_id = 8230;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="studies-TBD-14">
+		<preConditions onFail="MARK_RAN">
+			<tableExists tableName="listdata"/>
+			<columnExists tableName="listdata" columnName="entrycd"/>
+		</preConditions>
+		<comment>Changset temporary until entrycd column will be removed</comment>
+		<sql dbms="mysql" splitStatements="true">
+		ALTER TABLE listdata
+			CHANGE COLUMN `entrycd` `entrycd` VARCHAR (47) NULL DEFAULT '-';
 		</sql>
 	</changeSet>
 
