@@ -14,6 +14,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -86,35 +87,107 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testSaveStudyEntries_shouldAddDefaultEntryType() {
+	public void testSaveStudyEntries_shouldCopyEntryTypeValuesFromGermplasmListForAllEntries() {
 		final DmsProject study = this.createStudy();
-		final Germplasm germplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final Germplasm germplasm1 = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final Germplasm germplasm2 = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 
 		final GermplasmList
 			germplasmList = new GermplasmList(null, RandomStringUtils.randomAlphabetic(10), 20222302L, GermplasmList.LIST_TYPE, this.findAdminUser(), "", null, GermplasmList.Status.LIST.getCode());
-
 		this.daoFactory.getGermplasmListDAO().save(germplasmList);
 
-		final String designation = RandomStringUtils.randomAlphabetic(10);
-		// TODO: create an entry details and add it to a germplasm view. Then assert that the entry details is a project property
-		final GermplasmListData
-			germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "1", "Unknown", designation, "LNAME", 0, null);
-		this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+		// Add germplasm list entries
+		final GermplasmListData germplasmListData1 = this.addGermplasmListData(germplasmList, germplasm1.getGid(), 1);
+		this.addGermplasmListDataDetail(germplasmListData1, TermId.ENTRY_TYPE.getId(),
+			SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeValue(), SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId());
+		this.addGermplasmListDataDetail(germplasmListData1, TermId.ENTRY_CODE.getId(), "entryCodeValue", null);
+
+		final GermplasmListData germplasmListData2 = this.addGermplasmListData(germplasmList, germplasm2.getGid(), 2);
+		this.addGermplasmListDataDetail(germplasmListData2, TermId.ENTRY_TYPE.getId(),
+			SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeValue(), SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeCategoricalId());
 
 		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
 
 		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
-		assertThat(studyEntries, hasSize(1));
+		assertThat(studyEntries, hasSize(2));
 
-		final StudyEntryDto studyEntryDto = studyEntries.get(0);
-		assertNotNull(studyEntryDto.getEntryId());
-		assertThat(studyEntryDto.getEntryNumber(), is(1));
-		assertThat(studyEntryDto.getGid(), is(germplasm.getGid()));
-		assertThat(studyEntryDto.getDesignation(), is(germplasm.getPreferredName().getNval()));
+		// Assert entry 1
+		final StudyEntryDto studyEntryDto1 = studyEntries.get(0);
+		this.assertStudyEntryDto(studyEntryDto1, germplasm1, 1);
+		this.assertStudyEntryProperty(studyEntryDto1.getProperties().get(TermId.ENTRY_TYPE.getId()), TermId.ENTRY_TYPE,
+			SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeValue(), SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId());
 
-		final Map<Integer, StudyEntryPropertyData> properties = studyEntryDto.getProperties();
-		// Despite germplasm list doesn't have ENTRY_TYPE as entry variable, it must be present in the study as a property because it's mandatory
-		this.assertStudyEntryProperty(properties.get(TermId.ENTRY_TYPE.getId()), TermId.ENTRY_TYPE,
+		// Assert entry 2
+		final StudyEntryDto studyEntryDto2 = studyEntries.get(1);
+		this.assertStudyEntryDto(studyEntryDto2, germplasm2, 2);
+		this.assertStudyEntryProperty(studyEntryDto2.getProperties().get(TermId.ENTRY_TYPE.getId()), TermId.ENTRY_TYPE,
+			SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeValue(), SystemDefinedEntryType.DISEASE_CHECK.getEntryTypeCategoricalId());
+	}
+
+	@Test
+	public void testSaveStudyEntries_shouldAddDefaultEntryTypeToAllEntries() {
+		final DmsProject study = this.createStudy();
+		final Germplasm germplasm1 = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final Germplasm germplasm2 = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+
+		final GermplasmList
+			germplasmList = new GermplasmList(null, RandomStringUtils.randomAlphabetic(10), 20222302L, GermplasmList.LIST_TYPE, this.findAdminUser(), "", null, GermplasmList.Status.LIST.getCode());
+		this.daoFactory.getGermplasmListDAO().save(germplasmList);
+
+		// Add germplasm list entries
+		this.addGermplasmListData(germplasmList, germplasm1.getGid(), 1);
+		this.addGermplasmListData(germplasmList, germplasm2.getGid(), 2);
+
+		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+
+		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		assertThat(studyEntries, hasSize(2));
+
+		// Assert entry 1
+		final StudyEntryDto studyEntryDto1 = studyEntries.get(0);
+		this.assertStudyEntryDto(studyEntryDto1, germplasm1, 1);
+		this.assertStudyEntryProperty(studyEntryDto1.getProperties().get(TermId.ENTRY_TYPE.getId()), TermId.ENTRY_TYPE,
+			SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue(), SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
+
+		// Assert entry 2
+		final StudyEntryDto studyEntryDto2 = studyEntries.get(1);
+		this.assertStudyEntryDto(studyEntryDto2, germplasm2, 2);
+		this.assertStudyEntryProperty(studyEntryDto2.getProperties().get(TermId.ENTRY_TYPE.getId()), TermId.ENTRY_TYPE,
+			SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue(), SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
+	}
+
+	@Test
+	public void testSaveStudyEntries_shouldAddDefaultEntryTypeOnlyForEntriesWithoutEntryTypeValues() {
+		final DmsProject study = this.createStudy();
+		final Germplasm germplasm1 = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+		final Germplasm germplasm2 = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
+
+		final GermplasmList
+			germplasmList = new GermplasmList(null, RandomStringUtils.randomAlphabetic(10), 20222302L, GermplasmList.LIST_TYPE, this.findAdminUser(), "", null, GermplasmList.Status.LIST.getCode());
+		this.daoFactory.getGermplasmListDAO().save(germplasmList);
+
+		// Add germplasm list entries
+		final GermplasmListData germplasmListData1 = this.addGermplasmListData(germplasmList, germplasm1.getGid(), 1);
+		this.addGermplasmListDataDetail(germplasmListData1, TermId.ENTRY_TYPE.getId(),
+			SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeValue(), SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId());
+
+		this.addGermplasmListData(germplasmList, germplasm2.getGid(), 2);
+
+		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
+
+		final List<StudyEntryDto> studyEntries = this.service.getStudyEntries(study.getProjectId());
+		assertThat(studyEntries, hasSize(2));
+
+		// Assert entry 1
+		final StudyEntryDto studyEntryDto1 = studyEntries.get(0);
+		this.assertStudyEntryDto(studyEntryDto1, germplasm1, 1);
+		this.assertStudyEntryProperty(studyEntryDto1.getProperties().get(TermId.ENTRY_TYPE.getId()), TermId.ENTRY_TYPE,
+			SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeValue(), SystemDefinedEntryType.NON_REPLICATED_ENTRY.getEntryTypeCategoricalId());
+
+		// Assert entry 2
+		final StudyEntryDto studyEntryDto2 = studyEntries.get(1);
+		this.assertStudyEntryDto(studyEntryDto2, germplasm2, 2);
+		this.assertStudyEntryProperty(studyEntryDto2.getProperties().get(TermId.ENTRY_TYPE.getId()), TermId.ENTRY_TYPE,
 			SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue(), SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId());
 	}
 
@@ -348,6 +421,29 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 			experimentModel.setStock(stock);
 			this.daoFactory.getExperimentDao().save(experimentModel);
 		}
+	}
+
+	private GermplasmListData addGermplasmListData(final GermplasmList germplasmList, final Integer gid, final Integer entryId) {
+		final String designation = RandomStringUtils.randomAlphabetic(10);
+		final GermplasmListData
+			germplasmListData = new GermplasmListData(null, germplasmList, gid, entryId, String.valueOf(entryId), "Unknown", designation, "LNAME", 0, null);
+		return this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+	}
+
+	private GermplasmListDataDetail addGermplasmListDataDetail(final GermplasmListData germplasmListData, final Integer variableId,
+		final String value, final Integer categoricalValueId) {
+
+		final GermplasmListDataDetail germplasmListDataDetail =
+			new GermplasmListDataDetail(germplasmListData, variableId, value, categoricalValueId);
+		return this.daoFactory.getGermplasmListDataDetailDAO().save(germplasmListDataDetail);
+	}
+
+	private void assertStudyEntryDto(final StudyEntryDto studyEntryDto, final Germplasm germplasm, final Integer entryNumber) {
+		assertNotNull(studyEntryDto.getEntryId());
+		assertThat(studyEntryDto.getEntryNumber(), is(entryNumber));
+		assertThat(studyEntryDto.getGid(), is(germplasm.getGid()));
+		assertThat(studyEntryDto.getDesignation(), is(germplasm.getPreferredName().getNval()));
+		assertNotNull(studyEntryDto.getProperties());
 	}
 
 	private void assertStudyEntryProperty(final StudyEntryPropertyData entryPropertyData, final TermId termId, final String value, final Integer categoricalValueId) {
