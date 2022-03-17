@@ -11,6 +11,7 @@
         <mapping class="org.generationcp.middleware.pojos.Georef"/>
         <mapping class="org.generationcp.middleware.pojos.Germplasm"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmExternalReference"/>
+        <mapping class="org.generationcp.middleware.pojos.GermplasmListExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.StudyExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.InstanceExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.ExperimentExternalReference"/>

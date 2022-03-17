@@ -218,8 +218,9 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 						.collect(Collectors.toMap(Method::getMid, Function.identity()));
 				final Method newBreedingMethod = methodMap.get(newBreedingMethodId);
 				final Method oldBreedingMethod = methodMap.get(oldBreedingMethodId);
-				if (this.germplasmMethodValidator
-					.isNewBreedingMethodValid(oldBreedingMethod, newBreedingMethod, germplasmDbId, conflictErrors)) {
+				if (this.daoFactory.getGermplasmDao().getGermplasmDescendantByGID(germplasm.getGid(), 0, Integer.MAX_VALUE).isEmpty() ||
+					this.germplasmMethodValidator
+						.isNewBreedingMethodValid(oldBreedingMethod, newBreedingMethod, germplasmDbId, conflictErrors)) {
 					germplasm.setMethodId(newBreedingMethodId);
 				}
 			}
@@ -456,7 +457,8 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 
 		for (final Map.Entry<Integer, List<AttributeDTO>> gidAttributes : attributesByGidsMap.entrySet()) {
 			final Map<String, String> attributeCodeValueMap = new HashMap<>();
-			gidAttributes.getValue().stream().forEach(attributeDTO -> attributeCodeValueMap.put(attributeDTO.getAttributeCode(), attributeDTO.getValue()));
+			gidAttributes.getValue().stream()
+				.forEach(attributeDTO -> attributeCodeValueMap.put(attributeDTO.getAttributeCode(), attributeDTO.getValue()));
 			attributeMap.put(gidAttributes.getKey(), attributeCodeValueMap);
 		}
 

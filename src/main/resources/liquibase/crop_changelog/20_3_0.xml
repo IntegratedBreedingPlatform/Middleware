@@ -4,7 +4,44 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="darla" id="v20.3.0-1">
+	<changeSet author="mderamos" id="v20.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="external_reference_listnms"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create external_reference_listnms table
+		</comment>
+		<createTable tableName="external_reference_listnms">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="listId" type="int">
+				<constraints nullable="false" foreignKeyName="fk_external_reference_listnms" references="listnms(listId)"/>
+			</column>
+			<column name="reference_id" type="varchar(2000)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="reference_source" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_by" type="int" defaultValue="0">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_date" type="timestamp">
+				<constraints nullable="true"/>
+			</column>
+			<column name="modified_by" type="int">
+				<constraints nullable="true" />
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet author="darla" id="v20.3.0-2">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(1)
