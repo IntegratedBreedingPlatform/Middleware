@@ -1,6 +1,5 @@
 package org.generationcp.middleware.service.impl.rpackage;
 
-import com.google.common.base.Optional;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.rpackage.RCallDTO;
@@ -16,6 +15,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 public class RPackageServiceImplTest extends IntegrationTestBase {
 
@@ -40,6 +40,7 @@ public class RPackageServiceImplTest extends IntegrationTestBase {
 		final RCall rCall = new RCall();
 		rCall.setrPackage(rPackage);
 		rCall.setDescription(RandomStringUtils.randomAlphanumeric(BOUND));
+		rCall.setAggregate(true);
 		final RCallParameter rCallParameter = new RCallParameter();
 		rCallParameter.setKey(RandomStringUtils.randomAlphanumeric(BOUND));
 		rCallParameter.setValue(RandomStringUtils.randomAlphanumeric(BOUND));
@@ -50,8 +51,10 @@ public class RPackageServiceImplTest extends IntegrationTestBase {
 
 		Assert.assertEquals(1, rCalls.size());
 		final RCallDTO savedRCall = rCalls.get(0);
+		Assert.assertNotNull(savedRCall.getrCallId());
 		Assert.assertEquals(rCall.getrPackage().getEndpoint(), savedRCall.getEndpoint());
 		Assert.assertEquals(rCall.getDescription(), savedRCall.getDescription());
+		Assert.assertEquals(rCall.isAggregate(), savedRCall.isAggregate());
 		Assert.assertEquals(rCallParameter.getValue(), savedRCall.getParameters().get(rCallParameter.getKey()));
 
 	}
