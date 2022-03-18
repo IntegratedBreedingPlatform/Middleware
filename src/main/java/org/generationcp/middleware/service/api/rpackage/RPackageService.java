@@ -1,11 +1,10 @@
 package org.generationcp.middleware.service.api.rpackage;
 
-import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.rpackage.RCallDTO;
 import org.generationcp.middleware.domain.rpackage.RPackageDTO;
-import org.generationcp.middleware.pojos.workbench.RPackage;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface RPackageService {
 

@@ -4,9 +4,11 @@ import java.util.Map;
 
 public class RCallDTO {
 
+	private Integer rCallId;
 	private String description;
 	private String endpoint;
 	private Map<String, String> parameters;
+	private boolean isAggregate;
 
 	public String getDescription() {
 		return this.description;
@@ -32,4 +34,19 @@ public class RCallDTO {
 		this.parameters = parameters;
 	}
 
+	public boolean isAggregate() {
+		return this.isAggregate;
+	}
+
+	public void setAggregate(final boolean aggregate) {
+		this.isAggregate = aggregate;
+	}
+
+	public Integer getrCallId() {
+		return this.rCallId;
+	}
+
+	public void setrCallId(final Integer rCallId) {
+		this.rCallId = rCallId;
+	}
 }
