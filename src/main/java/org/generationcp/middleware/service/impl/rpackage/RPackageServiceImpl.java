@@ -1,6 +1,5 @@
 package org.generationcp.middleware.service.impl.rpackage;
 
-import com.google.common.base.Optional;
 import org.generationcp.middleware.domain.rpackage.RCallDTO;
 import org.generationcp.middleware.domain.rpackage.RPackageDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -14,6 +13,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class RPackageServiceImpl implements RPackageService {
 
@@ -34,7 +34,7 @@ public class RPackageServiceImpl implements RPackageService {
 		if (rPackage != null) {
 			return Optional.of(new RPackageDTO(rPackage.getEndpoint(), rPackage.getDescription()));
 		}
-		return Optional.absent();
+		return Optional.empty();
 	}
 
 	private List<RCallDTO> convert(final List<RCall> rCalls) {
@@ -47,8 +47,10 @@ public class RPackageServiceImpl implements RPackageService {
 
 	private RCallDTO mapToDTO(final RCall rCall) {
 		final RCallDTO rCallDTO = new RCallDTO();
+		rCallDTO.setrCallId(rCall.getId());
 		rCallDTO.setDescription(rCall.getDescription());
 		rCallDTO.setEndpoint(rCall.getrPackage().getEndpoint());
+		rCallDTO.setAggregate(rCall.isAggregate());
 		final Map<String, String> parameters = new HashMap<>();
 		for (final RCallParameter rCallParameter : rCall.getrCallParameters()) {
 			parameters.put(rCallParameter.getKey(), rCallParameter.getValue());
