@@ -15,7 +15,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE r_call
-				ADD COLUMN `is_aggregate` TINYINT NULL DEFAULT 0 AFTER `package_id`;
+				ADD COLUMN `is_aggregate` TINYINT NOT NULL DEFAULT 0 AFTER `package_id`;
 
 			UPDATE r_call
 			SET is_aggregate = 1
