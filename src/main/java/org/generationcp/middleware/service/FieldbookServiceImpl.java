@@ -27,6 +27,8 @@ import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -42,6 +44,7 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.GermplasmListDataView;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Locdes;
@@ -331,6 +334,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 				counter++;
 			}
+			// Adding ENTRY_NO as an Entry Detail variable to the List.
+			final GermplasmListDataView germplasmListDataView =
+				new GermplasmListDataView.GermplasmListDataVariableViewBuilder(germplasmList, TermId.ENTRY_NO.getId(),
+					VariableType.ENTRY_DETAIL.getId()).build();
+			this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
 
 		} catch (final Exception e) {
 
@@ -380,6 +388,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				germplasmListData.setList(germplasmList);
 				germplasmListDataDAO.save(germplasmListData);
 			}
+
+			// Adding ENTRY_NO as an Entry Detail variable to the List.
+			final GermplasmListDataView germplasmListDataView =
+				new GermplasmListDataView.GermplasmListDataVariableViewBuilder(germplasmList, TermId.ENTRY_NO.getId(),
+					VariableType.ENTRY_DETAIL.getId()).build();
+			this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
 
 			// For Management Group Settings Processing
 			this.germplasmGroupingService.processGroupInheritanceForCrosses(cropName, germplasmIdMethodIdMap, isApplyNewGroupToPreviousCrosses,
