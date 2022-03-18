@@ -94,16 +94,16 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 	}
 
 	private DmsProject createDataset(final DmsProject study, final DatasetTypeEnum datasetType, final String nameSuffix) {
-		final DmsProject meansDataset = new DmsProject();
-		meansDataset.setDatasetType(new DatasetType(datasetType.getId()));
-		meansDataset.setName(study.getName() + nameSuffix);
-		meansDataset.setDescription(study.getName() + nameSuffix);
-		meansDataset.setParent(study);
-		meansDataset.setStudy(study);
-		meansDataset.setDeleted(false);
-		meansDataset.setProgramUUID(study.getProgramUUID());
-		this.daoFactory.getDmsProjectDAO().save(meansDataset);
-		return meansDataset;
+		final DmsProject dmsProject = new DmsProject();
+		dmsProject.setDatasetType(new DatasetType(datasetType.getId()));
+		dmsProject.setName(study.getName() + nameSuffix);
+		dmsProject.setDescription(study.getDescription() + nameSuffix);
+		dmsProject.setParent(study);
+		dmsProject.setStudy(study);
+		dmsProject.setDeleted(false);
+		dmsProject.setProgramUUID(study.getProgramUUID());
+		this.daoFactory.getDmsProjectDAO().save(dmsProject);
+		return dmsProject;
 	}
 
 	private void saveMeansExperimentAndValues(final int studyId, final DmsProject meansDataset,
@@ -131,7 +131,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 	}
 
 	private void saveSummaryStatisticsExperimentAndValues(final int studyId, final DmsProject summaryStatisticsDataset,
-		final Map<String, CVTerm> analaysisVariablesMap,
+		final Map<String, CVTerm> analaysisSummaryVariablesMap,
 		final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
 
 		final Map<String, Geolocation> environmentNumberGeolocationMap =
@@ -144,7 +144,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 			experimentModel.setProject(summaryStatisticsDataset);
 			experimentModel.setGeoLocation(environmentNumberGeolocationMap.get(String.valueOf(meansData.getEnvironmentNumber())));
 			experimentModel.setTypeId(ExperimentType.SUMMARY_STATISTICS.getTermId());
-			this.saveExperimentModel(analaysisVariablesMap, experimentModel, meansData.getValues());
+			this.saveExperimentModel(analaysisSummaryVariablesMap, experimentModel, meansData.getValues());
 		}
 	}
 
@@ -192,7 +192,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		final List<CVTerm> cvTerms =
 			this.daoFactory.getCvTermDao().getByIds(new ArrayList<>(SUMMARY_STATISTICS_DATASET_DMSPROJECT_PROPERTIES.keySet()));
 		cvTerms.forEach(term -> this.addProjectProperty(summaryStatisticDataset, term.getCvTermId(), term.getName(),
-			MEANS_DATASET_DMSPROJECT_PROPERTIES.get(term.getCvTermId()), rank.incrementAndGet()));
+			SUMMARY_STATISTICS_DATASET_DMSPROJECT_PROPERTIES.get(term.getCvTermId()), rank.incrementAndGet()));
 
 		for (final Map.Entry<String, CVTerm> entry : analaysisSummaryVariablesMap.entrySet()) {
 			this.addProjectProperty(summaryStatisticDataset, entry.getValue().getCvTermId(), entry.getValue().getName(),
