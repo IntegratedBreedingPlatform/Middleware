@@ -42,16 +42,23 @@
 	</changeSet>
 	<changeSet author="aldrin" id="v20.3.0-2">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">select count(*) from dataset_type where dataset_type_id = 12;</sqlCheck>
+			<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 1181;</sqlCheck>
 		</preConditions>
-		<comment>Add cvterm and dataset_type records for Summary Statistics Dataset</comment>
+		<comment>Add cvterm record for Summary Statistics Dataset</comment>
         <sql>
 			INSERT INTO cvterm (`cvterm_id`, `cv_id`, `name`, `definition`, `dbxref_id`, `is_obsolete`, `is_relationshiptype`, `is_system`)
 			VALUES (1181, 1000, 'Summary Statistics', 'Summary Statistics type of experiment', NULL, 0, 0, 0);
-
+        </sql>
+    </changeSet>
+	<changeSet author="aldrin" id="v20.3.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from dataset_type where name = 'SUMMARY_STATISTICS';</sqlCheck>
+		</preConditions>
+		<comment>Add dataset_type record for Summary Statistics Dataset</comment>
+        <sql>
 			INSERT INTO dataset_type
 				(`dataset_type_id`, `name`, `description`, `cvterm_id`, `is_subobs_type`, `is_obs_type`)
-			VALUES (12, 'SUMMARY STATISTICS', 'Summary Statistics Dataset', NULL, 0, 0);
+			VALUES (12, 'SUMMARY_STATISTICS', 'Summary Statistics Dataset', NULL, 0, 0);
         </sql>
     </changeSet>
 </databaseChangeLog>
