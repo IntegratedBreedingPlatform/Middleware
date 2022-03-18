@@ -95,7 +95,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			"    (SELECT edesign.name FROM nd_geolocationprop gprop INNER JOIN cvterm edesign on edesign.cvterm_id = gprop.value WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = 8135) AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.GID.getId()), "    s.dbxref_id AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.DESIG.getId()), "    s.name AS '%s'");
-		mainVariablesMap.put(String.valueOf(TermId.ENTRY_NO.getId()), "    s.uniquename AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.REP_NO.getId()),
 			"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ndep.type_id = 8210) AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.PLOT_NO.getId()),
@@ -484,7 +483,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.TRIAL_INSTANCE_FACTOR.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.GID.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.DESIG.getId()));
-		createSQLQuery.addScalar(standardVariableNames.get(TermId.ENTRY_NO.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.REP_NO.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.PLOT_NO.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.BLOCK_NO.getId()));
@@ -526,10 +524,18 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			}
 		}
 
-		final String entryDetailsClauseFormat = " MAX(IF(cvterm_entry_variable.name = '%1$s', sp.value, NULL)) AS '%1$s',"
-			+ " MAX(IF(cvterm_entry_variable.name = '%1$s', sp.stockprop_id, NULL)) AS '%1$s_StockPropId',"
-			+ " MAX(IF(cvterm_entry_variable.name = '%1$s', sp.cvalue_id, NULL)) AS '%1$s_CvalueId'";
-		searchDto.getEntryDetails().forEach(measurementVariable -> columns.add(String.format(entryDetailsClauseFormat, measurementVariable.getName())));
+		searchDto.getEntryDetails().forEach(measurementVariable -> {
+			final StringBuilder entryDetailsClauseFormat = new StringBuilder();
+			if (TermId.ENTRY_NO.name().equals(measurementVariable.getName())) {
+				entryDetailsClauseFormat.append(" s.uniquename AS '%1$s',");
+			} else {
+				entryDetailsClauseFormat.append(" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.value, NULL)) AS '%1$s',");
+			}
+
+			entryDetailsClauseFormat.append(" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.stockprop_id, NULL)) AS '%1$s_StockPropId',");
+			entryDetailsClauseFormat.append(" MAX(IF(cvterm_entry_variable.name = '%1$s', sp.cvalue_id, NULL)) AS '%1$s_CvalueId'");
+			columns.add(String.format(entryDetailsClauseFormat.toString(), measurementVariable.getName()));
+		});
 
 		if (noFilterVariables) {
 			final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%1$s', ph.value, NULL)) AS '%1$s',"
@@ -872,7 +878,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ "WHERE xp.nd_experiment_id = plot.nd_experiment_id AND xp.type_id = :" + variableId
 				+ "_Id AND value ").append(matchClause).append(" )");
 
-		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
+		} else if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType) || VariableType.ENTRY_DETAIL.name().equals(variableType)) {
 			// IF searching by list of values, search for the values in:
 			// 1)cvterm.name (for categorical variables) or
 			// 2)perform IN operation on stockprop.value
