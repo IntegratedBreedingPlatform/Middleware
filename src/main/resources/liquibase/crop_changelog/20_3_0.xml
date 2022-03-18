@@ -40,4 +40,26 @@
 			</column>
 		</createTable>
 	</changeSet>
+
+	<changeSet author="darla" id="v20.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1) > 0
+				 FROM projectprop pp
+				 INNER JOIN project p ON p.project_id = pp.project_id
+				 INNER JOIN dataset_type d ON d.dataset_type_id = p.dataset_type_id
+				 WHERE d.name = 'MEANS' AND pp.type_id = 1808;
+			</sqlCheck>
+        </preConditions>
+		<comment>
+			Change variable type in projectprop of means variables in means dataset to Analysis (1811) from Trait (1808)
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE projectprop pp
+			 INNER JOIN project p ON p.project_id = pp.project_id
+			 INNER JOIN dataset_type d ON d.dataset_type_id = p.dataset_type_id
+			   SET pp.type_id = 1811
+			 WHERE d.name = 'MEANS' AND pp.type_id = 1808;
+		</sql>
+	</changeSet>
 </databaseChangeLog>
