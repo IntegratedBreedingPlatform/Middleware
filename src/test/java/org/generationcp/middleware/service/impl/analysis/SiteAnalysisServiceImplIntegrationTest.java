@@ -201,7 +201,7 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 				final Variable analysisVariable = analysisSummaryVariablesMap.get(p.getObservableId());
 				assertEquals(p.getValue(), summaryData.getValues().get(analysisVariable.getName()).toString());
 			});
-			assertEquals(experimentModel.getTypeId(), ExperimentType.SUMMARY_STATISTICS.getTermId());
+			assertEquals(experimentModel.getTypeId(), ExperimentType.SUMMARY.getTermId());
 		}
 	}
 

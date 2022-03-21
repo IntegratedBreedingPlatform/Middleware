@@ -143,8 +143,8 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 			final ExperimentModel experimentModel = new ExperimentModel();
 			experimentModel.setProject(summaryStatisticsDataset);
 			experimentModel.setGeoLocation(environmentNumberGeolocationMap.get(String.valueOf(meansData.getEnvironmentNumber())));
-			experimentModel.setTypeId(ExperimentType.SUMMARY_STATISTICS.getTermId());
-			this.saveExperimentModel(analaysisSummaryVariablesMap, experimentModel, meansData.getValues());
+			experimentModel.setTypeId(ExperimentType.SUMMARY.getTermId());
+			this.saveExperimentModel(analysisSummaryVariablesMap, experimentModel, meansData.getValues());
 		}
 	}
 
