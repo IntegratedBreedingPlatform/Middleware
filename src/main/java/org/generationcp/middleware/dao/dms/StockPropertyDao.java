@@ -95,4 +95,17 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 		return Optional.ofNullable((StockProperty) criteria.uniqueResult());
 	}
 
+	public long countObservationsByStudyIdAndVariableIds(final Integer studyId, final List<Integer> variableIds) {
+		if (variableIds.isEmpty()) {
+			return 0l;
+		}
+		final Criteria criteria = this.getSession().createCriteria(StockProperty.class);
+		criteria.createAlias("stockModel", "stockModel");
+		criteria.createAlias("stockModel.project", "study");
+		criteria.add(Restrictions.eq("study.projectId", studyId));
+		criteria.add(Restrictions.in("typeId", variableIds));
+		criteria.setProjection(Projections.rowCount());
+		return (Long) criteria.uniqueResult();
+	}
+
 }
