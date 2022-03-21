@@ -61,4 +61,15 @@
 			VALUES (12, 'SUMMARY_STATISTICS', 'Summary Statistics Dataset', NULL, 0, 0);
         </sql>
     </changeSet>
+	<changeSet author="aldrin" id="v20.3.0-4">
+		<preConditions onFail="MARK_RAN">
+				<columnExists tableName="dataset_type" columnName="cvterm_id"/>
+        </preConditions>
+		<comment>
+			Delete 'cvterm_id' column of 'dataset_type' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE dataset_type DROP COLUMN cvterm_id;
+		</sql>
+	</changeSet>
 </databaseChangeLog>

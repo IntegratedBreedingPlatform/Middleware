@@ -38,7 +38,6 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
 	DatasetTypeDTO convertToDatasetTypeDTO(final DatasetType datasetType) {
 		final DatasetTypeDTO datasetTypeDTO = new DatasetTypeDTO();
 		datasetTypeDTO.setDatasetTypeId(datasetType.getDatasetTypeId());
-		datasetTypeDTO.setCvTermId(datasetType.getCvTermId());
 		datasetTypeDTO.setDescription(datasetType.getDescription());
 		datasetTypeDTO.setName(datasetType.getName());
 		datasetTypeDTO.setSubObservationType(datasetType.isSubObservationType());
@@ -50,7 +49,6 @@ public class DatasetTypeServiceImpl implements DatasetTypeService {
 	public List<Integer> getObservationDatasetTypeIds() {
 		return this.daoFactory.getDatasetTypeDao().getObservationDatasetTypeIds();
 	}
-
 
 	@Override
 	public List<Integer> getSubObservationDatasetTypeIds() {
