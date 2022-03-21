@@ -40,6 +40,7 @@
 			</column>
 		</createTable>
 	</changeSet>
+
 	<changeSet author="aldrin" id="v20.3.0-2">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">select count(*) from dataset_type where name = 'SUMMARY_STATISTICS';</sqlCheck>
@@ -51,9 +52,10 @@
 			VALUES (12, 'SUMMARY_STATISTICS', 'Summary Statistics Dataset', NULL, 0, 0);
         </sql>
     </changeSet>
-	<changeSet author="aldrin" id="v20.3.0-4">
+
+	<changeSet author="aldrin" id="v20.3.0-3">
 		<preConditions onFail="MARK_RAN">
-				<columnExists tableName="dataset_type" columnName="cvterm_id"/>
+			<columnExists tableName="dataset_type" columnName="cvterm_id"/>
         </preConditions>
 		<comment>
 			Delete 'cvterm_id' column of 'dataset_type' table
