@@ -16,7 +16,7 @@ public enum DatasetTypeEnum {
 	SUB_SAMPLE_DATA(9, "SS"),
 	WEATHER_DATA(10, "WD"),
 	MEANS_OVER_TRIAL_INSTANCES(11, "OM"),
-	SUMMARY_STATISTICS(12, "SUMMARY_STATISTICS");
+	SUMMARY_STATISTICS_DATA(12, "SUMMARY_STATISTICS");
 
 	private static final Map<Integer, DatasetTypeEnum> lookup = new HashMap<>();
 	private static final Map<String, DatasetTypeEnum> lookupByName = new HashMap<>();
