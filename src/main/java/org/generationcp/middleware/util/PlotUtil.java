@@ -27,7 +27,6 @@ public class PlotUtil {
 		PlotUtil.plotTypes.add(TermId.SAMPLE_EXPERIMENT);
 		PlotUtil.plotTypes.add(TermId.AVERAGE_EXPERIMENT);
 		PlotUtil.plotTypes.add(TermId.SUMMARY_EXPERIMENT);
-		PlotUtil.plotTypes.add(TermId.SUMMARY_STATISTICS_EXPERIMENT);
 	}
 
 	public static List<TermId> getAllPlotTypes() {

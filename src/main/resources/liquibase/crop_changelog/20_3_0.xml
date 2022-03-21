@@ -153,7 +153,7 @@
 
 							-- Create experiment records for summary statistics dataset
 							INSERT INTO nd_experiment (`nd_geolocation_id`, `type_id`, `obs_unit_id`, `project_id`)
-							SELECT `nd_geolocation_id`, 1181 as `type_id`, CASE WHEN crop.use_uuid THEN UUID() ELSE SUBSTRING(CONCAT(crop.plot_code_prefix, 'P',MD5(RAND())) FROM 1 FOR 13) END, summaryStatsDatasetId
+							SELECT `nd_geolocation_id`, 1180 as `type_id`, CASE WHEN crop.use_uuid THEN UUID() ELSE SUBSTRING(CONCAT(crop.plot_code_prefix, 'P',MD5(RAND())) FROM 1 FOR 13) END, summaryStatsDatasetId
 							 FROM nd_experiment
 							 INNER JOIN workbench.workbench_crop crop ON crop.db_name = DATABASE()
 							 WHERE project_id = trialEnvironmentDatasetId;
@@ -167,7 +167,7 @@
 							-- Link the existing phenotype to the new Summary Statistic experiments
 							UPDATE phenotype ph
 							 INNER JOIN nd_experiment env_exp ON env_exp.nd_experiment_id = ph.nd_experiment_id AND env_exp.type_id = 1020
-							 INNER JOIN nd_experiment summary_exp ON summary_exp.nd_geolocation_id = env_exp.nd_geolocation_id AND summary_exp.type_id = 1181
+							 INNER JOIN nd_experiment summary_exp ON summary_exp.nd_geolocation_id = env_exp.nd_geolocation_id AND summary_exp.type_id = 1180
 							 INNER JOIN projectprop pp ON pp.project_id = summary_exp.project_id AND pp.type_id = 1811 AND pp.variable_id = ph.observable_id
 							   SET ph.nd_experiment_id = summary_exp.nd_experiment_id
 							 WHERE env_exp.project_id = trialEnvironmentDatasetId;
@@ -187,10 +187,6 @@
 				<!-- Check if dataset type for Summary Statitics data has been seeded previously -->
 				<sqlCheck expectedResult="1">
 					SELECT COUNT(1) FROM dataset_type WHERE name = 'SUMMARY_STATISTICS';
-				</sqlCheck>
-				<!-- Check if experiment type for Summary Statistics data has been seeded previously -->
-				<sqlCheck expectedResult="1">
-					SELECT COUNT(1) FROM cvterm WHERE cvterm_id = 1181;
 				</sqlCheck>
 				<sqlCheck expectedResult="1">
 					SELECT
