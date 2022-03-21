@@ -760,4 +760,12 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		this.getSession().createSQLQuery(insertEntryTypeProperty).executeUpdate();
 	}
 
+	public void deleteStocksForStudyAndVariable(final int studyId, final List<Integer> variableIds) {
+		final Query query = this.getSession().createSQLQuery("DELETE sp FROM stockprop sp INNER JOIN stock s ON sp.stock_id = s.stock_id "
+			+ " WHERE s.project_id = :studyId AND sp.type_id IN (:variableIds)");
+		query.setParameter("studyId", studyId);
+		query.setParameterList("variableIds", variableIds);
+		query.executeUpdate();
+	}
+
 }
