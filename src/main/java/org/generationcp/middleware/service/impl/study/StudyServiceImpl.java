@@ -139,7 +139,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public boolean studyHasGivenDatasetType(final Integer studyId, final Integer datasetTypeId) {
 		final List<DmsProject> datasets = this.daoFactory.getDmsProjectDAO()
-			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.MEANS_DATA.getId());
+			.getDatasetsByTypeForStudy(studyId, datasetTypeId);
 		return (!org.springframework.util.CollectionUtils.isEmpty(datasets));
 	}
 
