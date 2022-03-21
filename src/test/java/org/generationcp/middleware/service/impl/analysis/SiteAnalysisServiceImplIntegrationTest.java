@@ -142,7 +142,7 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		final DmsProject study = this.createTestStudyWithObservations("TestStudy", Arrays.asList(1, 2), 5);
 		final Variable testVariable = this.createTestVariable(RandomStringUtils.randomAlphabetic(10));
 
-		// Create Analysis Summary Variables to be used in creating means dataset
+		// Create Analysis Summary Variables to be used in creating summary statistics dataset
 		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
 		analysisVariablesImportRequest.setVariableIds(Arrays.asList(testVariable.getId()));
@@ -183,6 +183,10 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 			assertTrue(summaryStatisticsDatasetProjectProperties.containsKey(expectedProjectProperty.getKey()));
 			assertEquals(expectedProjectProperty.getValue().getId(),
 				summaryStatisticsDatasetProjectProperties.get(expectedProjectProperty.getKey()).getTypeId());
+			if (expectedProjectProperty.getKey().intValue() == TermId.LOCATION_ID.getId()) {
+				assertEquals(SiteAnalysisServiceImpl.LOCATION_NAME,
+					summaryStatisticsDatasetProjectProperties.get(expectedProjectProperty.getKey()).getAlias());
+			}
 		});
 		analysisSummaryVariablesMap.entrySet().forEach(expectedVariablesInProjectProp -> {
 			assertTrue(summaryStatisticsDatasetProjectProperties.containsKey(expectedVariablesInProjectProp.getKey()));

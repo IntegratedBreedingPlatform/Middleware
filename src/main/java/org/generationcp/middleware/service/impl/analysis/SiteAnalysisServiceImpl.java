@@ -38,7 +38,9 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		ImmutableMap.<Integer, VariableType>builder()
 			.put(TermId.DATASET_NAME.getId(), VariableType.STUDY_DETAIL)
 			.put(TermId.DATASET_TITLE.getId(), VariableType.STUDY_DETAIL)
-			.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), VariableType.ENVIRONMENT_DETAIL).build();
+			.put(TermId.TRIAL_INSTANCE_FACTOR.getId(), VariableType.ENVIRONMENT_DETAIL)
+			.put(TermId.LOCATION_ID.getId(), VariableType.ENVIRONMENT_DETAIL).build();
+	public static final String LOCATION_NAME = "LOCATION_NAME";
 
 	private final DaoFactory daoFactory;
 
@@ -107,7 +109,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 	}
 
 	private void saveMeansExperimentAndValues(final int studyId, final DmsProject meansDataset,
-		final Map<String, CVTerm> analaysisVariablesMap, final MeansImportRequest meansImportRequest) {
+		final Map<String, CVTerm> analysisVariablesMap, final MeansImportRequest meansImportRequest) {
 
 		final Set<String> entryNumbers =
 			meansImportRequest.getData().stream().map(m -> String.valueOf(m.getEntryNo())).collect(Collectors.toSet());
@@ -126,12 +128,12 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 			experimentModel.setGeoLocation(environmentNumberGeolocationMap.get(String.valueOf(meansData.getEnvironmentNumber())));
 			experimentModel.setTypeId(ExperimentType.AVERAGE.getTermId());
 			experimentModel.setStock(stockModelMap.get(String.valueOf(meansData.getEntryNo())));
-			this.saveExperimentModel(analaysisVariablesMap, experimentModel, meansData.getValues());
+			this.saveExperimentModel(analysisVariablesMap, experimentModel, meansData.getValues());
 		}
 	}
 
 	private void saveSummaryStatisticsExperimentAndValues(final int studyId, final DmsProject summaryStatisticsDataset,
-		final Map<String, CVTerm> analaysisSummaryVariablesMap,
+		final Map<String, CVTerm> analysisSummaryVariablesMap,
 		final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
 
 		final Map<String, Geolocation> environmentNumberGeolocationMap =
@@ -148,15 +150,15 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		}
 	}
 
-	private void saveExperimentModel(final Map<String, CVTerm> analaysisVariablesMap, final ExperimentModel experimentModel,
+	private void saveExperimentModel(final Map<String, CVTerm> variablesMap, final ExperimentModel experimentModel,
 		final Map<String, Double> values) {
 		final List<Phenotype> phenotypes = new ArrayList<>();
-		for (final Map.Entry<String, Double> meansMapEntryValue : values.entrySet()) {
-			if (meansMapEntryValue.getValue() != null) {
+		for (final Map.Entry<String, Double> mapEntry : values.entrySet()) {
+			if (mapEntry.getValue() != null) {
 				final Phenotype phenotype = new Phenotype();
 				phenotype.setExperiment(experimentModel);
-				phenotype.setValue(meansMapEntryValue.getValue().toString());
-				phenotype.setObservableId(analaysisVariablesMap.get(meansMapEntryValue.getKey()).getCvTermId());
+				phenotype.setValue(mapEntry.getValue().toString());
+				phenotype.setObservableId(variablesMap.get(mapEntry.getKey()).getCvTermId());
 				phenotypes.add(phenotype);
 			}
 		}
@@ -191,7 +193,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 
 		final List<CVTerm> cvTerms =
 			this.daoFactory.getCvTermDao().getByIds(new ArrayList<>(SUMMARY_STATISTICS_DATASET_DMSPROJECT_PROPERTIES.keySet()));
-		cvTerms.forEach(term -> this.addProjectProperty(summaryStatisticDataset, term.getCvTermId(), term.getName(),
+		cvTerms.forEach(term -> this.addProjectProperty(summaryStatisticDataset, term.getCvTermId(), this.resolveAlias(term),
 			SUMMARY_STATISTICS_DATASET_DMSPROJECT_PROPERTIES.get(term.getCvTermId()), rank.incrementAndGet()));
 
 		for (final Map.Entry<String, CVTerm> entry : analaysisSummaryVariablesMap.entrySet()) {
@@ -199,6 +201,13 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 				VariableType.ANALYSIS_SUMMARY,
 				rank.incrementAndGet());
 		}
+	}
+
+	private String resolveAlias(final CVTerm cvTerm) {
+		if (cvTerm.getCvTermId().intValue() == TermId.LOCATION_ID.getId()) {
+			return LOCATION_NAME;
+		}
+		return cvTerm.getName();
 	}
 
 	private void addProjectProperty(final DmsProject meansDataset, final Integer variableId, final String variableName,
