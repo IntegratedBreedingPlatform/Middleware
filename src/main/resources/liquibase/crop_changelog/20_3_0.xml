@@ -124,7 +124,8 @@
 							VALUES
 							(summaryStatsDatasetId, 1805, NULL, 1, 8150, 'DATASET_NAME'),
 							(summaryStatsDatasetId, 1805, NULL, 2, 8155, 'DATASET_TITLE'),
-							(summaryStatsDatasetId, 1806, NULL, 3, 8170, 'TRIAL_INSTANCE');
+							(summaryStatsDatasetId, 1806, NULL, 3, 8170, 'TRIAL_INSTANCE'),
+							(summaryStatsDatasetId, 1806, NULL, 4, 8190, 'LOCATION_NAME');
 
 							-- Create experiment records for summary statistics dataset
 							INSERT INTO nd_experiment (`nd_geolocation_id`, `type_id`, `obs_unit_id`, `project_id`)
