@@ -30,14 +30,38 @@
 				<constraints nullable="false"/>
 			</column>
 			<column name="created_by" type="int" defaultValue="0">
-				<constraints nullable="false" />
+				<constraints nullable="false"/>
 			</column>
 			<column name="modified_date" type="timestamp">
 				<constraints nullable="true"/>
 			</column>
 			<column name="modified_by" type="int">
-				<constraints nullable="true" />
+				<constraints nullable="true"/>
 			</column>
 		</createTable>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v20.3.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from dataset_type where name = 'SUMMARY_STATISTICS';</sqlCheck>
+		</preConditions>
+		<comment>Add dataset_type record for Summary Statistics Dataset</comment>
+        <sql>
+			INSERT INTO dataset_type
+				(`dataset_type_id`, `name`, `description`, `cvterm_id`, `is_subobs_type`, `is_obs_type`)
+			VALUES (12, 'SUMMARY_STATISTICS', 'Summary Statistics Dataset', NULL, 0, 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="aldrin" id="v20.3.0-3">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="dataset_type" columnName="cvterm_id"/>
+        </preConditions>
+		<comment>
+			Delete 'cvterm_id' column of 'dataset_type' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE dataset_type DROP COLUMN cvterm_id;
+		</sql>
 	</changeSet>
 </databaseChangeLog>
