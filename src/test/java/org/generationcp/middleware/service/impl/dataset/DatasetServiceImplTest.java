@@ -13,6 +13,7 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -143,6 +144,9 @@ public class DatasetServiceImplTest {
 	@Mock
 	private DerivedVariableService derivedVariableService;
 
+	@Mock
+	private StockDao stockDao;
+
 	@InjectMocks
 	private DatasetServiceImpl datasetService = new DatasetServiceImpl();
 
@@ -174,6 +178,7 @@ public class DatasetServiceImplTest {
 		when(this.daoFactory.getExperimentDao()).thenReturn(this.experimentDao);
 		when(this.daoFactory.getFormulaDAO()).thenReturn(this.formulaDao);
 		when(this.daoFactory.getObservationUnitsSearchDAO()).thenReturn(this.obsUnitsSearchDao);
+		when(this.daoFactory.getStockDao()).thenReturn(this.stockDao);
 	}
 
 	@Test
@@ -231,10 +236,12 @@ public class DatasetServiceImplTest {
 	public void testRemoveVariables() {
 		final Random ran = new Random();
 		final int datasetId = ran.nextInt();
+		final int studyId = ran.nextInt();
 		final List<Integer> variableIds = Arrays.asList(ran.nextInt(), ran.nextInt());
-		this.datasetService.removeDatasetVariables(datasetId, variableIds);
+		this.datasetService.removeDatasetVariables(studyId, datasetId, variableIds);
 		Mockito.verify(this.phenotypeDao).deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
 		Mockito.verify(this.projectPropertyDao).deleteProjectVariables(datasetId, variableIds);
+		Mockito.verify(this.stockDao).deleteStocksForStudyAndVariable(studyId, variableIds);
 	}
 
 	@Test

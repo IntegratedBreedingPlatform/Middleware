@@ -431,11 +431,9 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void removeDatasetVariables(final Integer datasetId, final List<Integer> variableIds) {
+	public void removeDatasetVariables(final Integer studyId, final Integer datasetId, final List<Integer> variableIds) {
 		this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(datasetId, variableIds);
 		this.daoFactory.getPhenotypeDAO().deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
-
-		final Integer studyId = this.daoFactory.getDmsProjectDAO().getById(datasetId).getStudy().getProjectId();
 		this.daoFactory.getStockDao().deleteStocksForStudyAndVariable(studyId, variableIds);
 	}
 

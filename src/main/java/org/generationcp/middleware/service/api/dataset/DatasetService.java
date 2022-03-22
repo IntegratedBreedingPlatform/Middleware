@@ -48,10 +48,11 @@ public interface DatasetService {
 	/**
 	 * Given a dataset and a list of variables, it will de-associated them from the dataset
 	 *
+	 * @param studyId
 	 * @param datasetId   Id of the dataset
 	 * @param variableIds List of variables
 	 */
-	void removeDatasetVariables(Integer datasetId, List<Integer> variableIds);
+	void removeDatasetVariables(Integer studyId, Integer datasetId, List<Integer> variableIds);
 
 	/**
 	 * Return if an observation is valid
