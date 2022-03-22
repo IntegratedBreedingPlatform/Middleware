@@ -133,8 +133,8 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		// Filter entry details project variable except ENTRY_TYPE and ENTRY_NO because they are going to be added later
 		final List<ProjectProperty> projectProperties = plotDataDataset.getProperties()
 			.stream()
-			.filter(projectProperty -> !projectProperty.getTypeId().equals(TermId.ENTRY_TYPE.getId()) ||
-				!projectProperty.getTypeId().equals(TermId.ENTRY_NO.getId()) ||
+			.filter(projectProperty -> projectProperty.getVariableId().equals(TermId.ENTRY_TYPE.getId()) ||
+				projectProperty.getVariableId().equals(TermId.ENTRY_NO.getId()) ||
 				!VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()))
 			.collect(Collectors.toList());
 
