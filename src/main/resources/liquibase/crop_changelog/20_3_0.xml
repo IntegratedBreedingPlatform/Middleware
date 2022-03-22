@@ -64,4 +64,42 @@
 			ALTER TABLE dataset_type DROP COLUMN cvterm_id;
 		</sql>
 	</changeSet>
+
+	<changeSet author="cheryleigh" id="v20.3.0-4">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="external_reference_atributs_aud"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create audit table 'external_reference_atributs_aud'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE external_reference_atributs_aud (
+				aud_id        	 int auto_increment primary key,
+				rev_type         tinyint       not null,
+				id               int           not null,
+				aid              int           not null,
+				reference_id     varchar(2000) not null,
+				reference_source varchar(255)  not null,
+				created_by       int default 0 not null,
+				modified_by      int           null,
+				created_date     timestamp     null,
+				modified_date    timestamp     null
+			);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v20.3.0-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(1) FROM audit_cfg where table_name = 'EXTERNAL_REFERENCE_ATRIBUTS';</sqlCheck>
+		</preConditions>
+		<comment>
+            Add data to 'audit_cfg' table
+        </comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO audit_cfg (table_name, is_audited)
+			VALUES ('EXTERNAL_REFERENCE_ATRIBUTS', 1);
+        </sql>
+	</changeSet>
 </databaseChangeLog>
