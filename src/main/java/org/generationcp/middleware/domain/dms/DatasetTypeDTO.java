@@ -21,8 +21,6 @@ public class DatasetTypeDTO {
 
 	private String description;
 
-	private Integer cvTermId;
-
 	private boolean isSubObservationType;
 
 	private boolean isObservationType;
@@ -49,14 +47,6 @@ public class DatasetTypeDTO {
 
 	public void setDescription(final String description) {
 		this.description = description;
-	}
-
-	public Integer getCvTermId() {
-		return this.cvTermId;
-	}
-
-	public void setCvTermId(final Integer cvTermId) {
-		this.cvTermId = cvTermId;
 	}
 
 	public boolean isSubObservationType() {

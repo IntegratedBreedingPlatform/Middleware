@@ -31,10 +31,6 @@ public class DatasetType {
 	@Column(name = "description")
 	private String description;
 
-	@Basic(optional = true)
-	@Column(name = "cvterm_id")
-	private Integer cvTermId;
-
 	@Type(type = "org.hibernate.type.NumericBooleanType")
 	@Basic(optional = false)
 	@Column(name = "is_subobs_type", columnDefinition = "TINYINT")
@@ -79,14 +75,6 @@ public class DatasetType {
 
 	public void setDescription(final String description) {
 		this.description = description;
-	}
-
-	public Integer getCvTermId() {
-		return this.cvTermId;
-	}
-
-	public void setCvTermId(final Integer cvTermId) {
-		this.cvTermId = cvTermId;
 	}
 
 	public boolean isSubObservationType() {
