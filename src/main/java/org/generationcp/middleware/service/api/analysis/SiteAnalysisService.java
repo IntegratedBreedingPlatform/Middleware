@@ -8,4 +8,7 @@ public interface SiteAnalysisService {
 	Integer createMeansDataset(Integer studyId, MeansImportRequest meansRequestDto);
 
 	Integer createSummaryStatisticsDataset(Integer studyId, SummaryStatisticsImportRequest summaryStatisticsImportRequest);
+
+	void updateSummaryStatisticsDataset(Integer summaryStatisticsDatasetId,
+		SummaryStatisticsImportRequest summaryStatisticsImportRequest);
 }
