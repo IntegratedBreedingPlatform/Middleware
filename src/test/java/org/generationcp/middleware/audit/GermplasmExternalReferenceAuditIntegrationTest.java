@@ -8,16 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.persistence.Table;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 public class GermplasmExternalReferenceAuditIntegrationTest extends GenericExternalReferenceAuditIntegrationTest {
 

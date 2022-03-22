@@ -10,16 +10,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import javax.persistence.Table;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
-
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 
 public class AttributeExternalReferenceAuditIntegrationTest extends GenericExternalReferenceAuditIntegrationTest {
 
@@ -39,9 +29,10 @@ public class AttributeExternalReferenceAuditIntegrationTest extends GenericExter
 			new CVTerm(null, CvId.VARIABLES.getId(), RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(10), null,
 				0, 0, false);
 		this.daoFactory.getCvTermDao().save(attributeType1);
-		final Attribute attribute = new Attribute(null, 1, attributeType1.getCvTermId(), RandomStringUtils.randomAlphabetic(100), null, null,
-			null,
-			null);
+		final Attribute attribute =
+			new Attribute(null, 1, attributeType1.getCvTermId(), RandomStringUtils.randomAlphabetic(100), null, null,
+				null,
+				null);
 		this.daoFactory.getAttributeDAO().save(attribute);
 
 		this.recordId = attribute.getAid();

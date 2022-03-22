@@ -1,10 +1,7 @@
 package org.generationcp.middleware.audit;
 
-import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.junit.Before;
-import org.junit.Test;
 
 import java.util.Date;
 import java.util.LinkedHashMap;
@@ -22,7 +19,7 @@ public abstract class GenericExternalReferenceAuditIntegrationTest extends Audit
 	private static final String PRIMARY_KEY_FIELD = "id";
 
 	private DaoFactory daoFactory;
-	private String foreignKeyField;
+	private final String foreignKeyField;
 
 	public GenericExternalReferenceAuditIntegrationTest(final String tableName, final String foreignKeyField) {
 		super(tableName, PRIMARY_KEY_FIELD);
@@ -35,16 +32,16 @@ public abstract class GenericExternalReferenceAuditIntegrationTest extends Audit
 	}
 
 	public void checkAllTriggers() {
-		this.checkTriggerExists("trigger_"+this.tableName+"_aud_insert", "INSERT");
-		this.checkTriggerExists("trigger_"+this.tableName+"_aud_update", "UPDATE");
-		this.checkTriggerExists("trigger_"+this.tableName+"_aud_delete", "DELETE");
+		this.checkTriggerExists("trigger_" + this.tableName + "_aud_insert", "INSERT");
+		this.checkTriggerExists("trigger_" + this.tableName + "_aud_update", "UPDATE");
+		this.checkTriggerExists("trigger_" + this.tableName + "_aud_delete", "DELETE");
 	}
 
-	public void checkAuditInsertAndUpdate(Integer testRecordId) {
+	public void checkAuditInsertAndUpdate(final Integer testRecordId) {
 		this.enableEntityAudit();
 
 		//Create a externalReference 1
-		Map<String, Object> insertExternalReference1QueryParams = this.createQueryParams(testRecordId, null, null);
+		final Map<String, Object> insertExternalReference1QueryParams = this.createQueryParams(testRecordId, null, null);
 		this.insertEntity(insertExternalReference1QueryParams);
 
 		final Integer externalReference1Id = this.getLastInsertIdFromEntity();
@@ -60,7 +57,7 @@ public abstract class GenericExternalReferenceAuditIntegrationTest extends Audit
 		this.disableEntityAudit();
 
 		//Insert another externalReference
-		Map<String, Object> insertExternalReference2QueryParams = this.createQueryParams(testRecordId, null, null);
+		final Map<String, Object> insertExternalReference2QueryParams = this.createQueryParams(testRecordId, null, null);
 		this.insertEntity(insertExternalReference2QueryParams);
 
 		//Because the audit was disabled, the externalReference shouldn't be audited
