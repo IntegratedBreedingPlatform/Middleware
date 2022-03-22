@@ -2,6 +2,7 @@
 package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -123,6 +124,16 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Override
 	public void deleteStudyEntries(final int studyId) {
 		this.daoFactory.getStockDao().deleteStocksForStudy(studyId);
+
+		final DmsProject plotDataDataset = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+		final List<Integer> variableIds = plotDataDataset.getProperties().stream()
+			.filter(projectProperty -> VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()) && (!projectProperty.getVariableId().equals(TermId.ENTRY_TYPE.getId()) &&
+				!projectProperty.getVariableId().equals(TermId.ENTRY_NO.getId())))
+			.map(ProjectProperty::getVariableId)
+			.collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(variableIds)) {
+			this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(plotDataDataset.getProjectId(), variableIds);
+		}
 	}
 
 	@Override
