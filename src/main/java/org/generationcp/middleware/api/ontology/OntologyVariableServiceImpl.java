@@ -5,7 +5,6 @@ import com.google.common.collect.Multimap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
-import org.apache.commons.collections.map.LinkedMap;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -47,7 +46,8 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 	}
 
 	@Override
-	public MultiKeyMap createAnalysisVariables(final AnalysisVariablesImportRequest analysisVariablesImportRequest) {
+	public MultiKeyMap createAnalysisVariables(final AnalysisVariablesImportRequest analysisVariablesImportRequest,
+		final Map<String, String> variableNameToAliasMap) {
 
 		final MultiKeyMap variableIdsByTraitAndMethodName = MultiKeyMap.decorate(new CaseInsensitiveMap());
 
@@ -70,13 +70,15 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 		for (final Map.Entry<Integer, Variable> variableEntry : variablesMap.entrySet()) {
 			for (final String analysisName : analysisMethodNames) {
 				final CVTerm method = methodsMap.get(analysisName);
+				final String variableNameOrAlias =
+					variableNameToAliasMap.getOrDefault(variableEntry.getValue().getName(), variableEntry.getValue().getName());
 				// If analysis variable already exists for specific trait, do not create new, just return the existing id of analysis variable
 				if (existingAnalysisMethodsOfTraitsMap.containsKey(variableEntry.getKey(), method.getCvTermId())) {
-					variableIdsByTraitAndMethodName.put(variableEntry.getValue().getName(), analysisName,
+					variableIdsByTraitAndMethodName.put(variableNameOrAlias, analysisName,
 						existingAnalysisMethodsOfTraitsMap.get(variableEntry.getKey(), method.getCvTermId()));
 				} else { // else, create new analysis variable
-					variableIdsByTraitAndMethodName.put(variableEntry.getValue().getName(), analysisName,
-						this.createAnalysisStandardVariable(variableEntry.getValue(), method, variableType));
+					variableIdsByTraitAndMethodName.put(variableNameOrAlias, analysisName,
+						this.createAnalysisStandardVariable(variableEntry.getValue(), variableNameOrAlias, method, variableType));
 				}
 			}
 		}
@@ -94,7 +96,8 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 		return variableTypesMultimap;
 	}
 
-	private Integer createAnalysisStandardVariable(final Variable traitVariable, final CVTerm method, final String variableType) {
+	private Integer createAnalysisStandardVariable(final Variable traitVariable, final String alias, final CVTerm method,
+		final String variableType) {
 
 		// Try to look for existing variable with same Property, Scale and Method.
 		// If it exists, reuse it. Only variable with Analysis or Analysis Summary variable type can be reused.
@@ -114,7 +117,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 						method.getName()));
 			}
 		} else {
-			String analysisVariableName = traitVariable.getName() + "_" + method.getName();
+			String analysisVariableName = alias + "_" + method.getName();
 
 			/** It's possible that the analysisVariableName to be saved is already used by other variables,
 			 * in that case append _1 to the name to make sure it's unique. This is the same logic found in

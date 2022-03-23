@@ -70,7 +70,7 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		analysisVariablesImportRequest.setVariableIds(Arrays.asList(testVariable.getId()));
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs", "BLUPs"));
 		final MultiKeyMap createdAnalysisVariablesMap =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 
 		final VariableFilter variableFilter = new VariableFilter();
 		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
@@ -150,7 +150,7 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		analysisVariablesImportRequest.setVariableIds(Arrays.asList(testVariable.getId()));
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("Heritability", "PValue", "CV"));
 		final MultiKeyMap createdAnalysisVariablesMap =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 
 		final VariableFilter variableFilter = new VariableFilter();
 		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
@@ -224,7 +224,7 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		analysisVariablesImportRequest.setVariableIds(Arrays.asList(testVariable.getId()));
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("Heritability", "PValue", "CV"));
 		final MultiKeyMap createdAnalysisVariablesMap =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 
 		final VariableFilter variableFilter = new VariableFilter();
 		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
@@ -248,7 +248,7 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		analysisVariablesImportRequestUpdated.setVariableIds(Arrays.asList(testVariable.getId()));
 		analysisVariablesImportRequestUpdated.setAnalysisMethodNames(Arrays.asList("Heritability", "PValue", "CV", "Means", "MeanSED"));
 		final MultiKeyMap createdAnalysisVariablesUpdated =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequestUpdated);
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequestUpdated, new HashMap<>());
 
 		final VariableFilter variableFilterUpdated = new VariableFilter();
 		createdAnalysisVariablesUpdated.values().forEach(i -> variableFilterUpdated.addVariableId((Integer) i));

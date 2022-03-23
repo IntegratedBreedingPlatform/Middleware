@@ -20,7 +20,9 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -56,7 +58,7 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList(BLUES, BLUPS));
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
 		final MultiKeyMap createdAnalysisVariablesMap =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 
 		assertEquals(2, createdAnalysisVariablesMap.size());
 
@@ -78,11 +80,11 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList(BLUES, BLUPS));
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
 
-		this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+		this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 
 		// Create analysis variables again
 		final MultiKeyMap createdAnalysisVariablesMap =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 
 		final VariableFilter variableFilter = new VariableFilter();
 		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
@@ -103,7 +105,7 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList(HERITABILITY, PVALUE, CV));
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
 		final MultiKeyMap createdAnalysisVariablesMap =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 
 		final VariableFilter variableFilter = new VariableFilter();
 		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
@@ -125,11 +127,11 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList(HERITABILITY, PVALUE, CV));
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
 
-		this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+		this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 
 		// Create analysis variables again
 		final MultiKeyMap createdAnalysisVariablesMap =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 
 		final VariableFilter variableFilter = new VariableFilter();
 		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
@@ -144,9 +146,9 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 
 	@Test
 	public void testCreateAnalysisVariables_MultipleVariables() {
-		final Variable traitVariable1 = this.createTestVariable("testVariable1");
-		final Variable traitVariable2 = this.createTestVariable("testVariable2");
-		final Variable traitVariable3 = this.createTestVariable("testVariable3");
+		final Variable traitVariable1 = this.createTestVariable(RandomStringUtils.randomAlphanumeric(10));
+		final Variable traitVariable2 = this.createTestVariable(RandomStringUtils.randomAlphanumeric(10));
+		final Variable traitVariable3 = this.createTestVariable(RandomStringUtils.randomAlphanumeric(10));
 
 		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
 		analysisVariablesImportRequest.setVariableIds(
@@ -155,7 +157,7 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
 
 		final MultiKeyMap createdAnalysisVariablesMap =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 
 		assertEquals(6, createdAnalysisVariablesMap.size());
 	}
@@ -172,7 +174,7 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
 
 		final MultiKeyMap createdAnalysisVariablesMap =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 
 		assertEquals(1, createdAnalysisVariablesMap.size());
 
@@ -188,9 +190,9 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 
 	@Test
 	public void testGetVariableTypesOfVariables() {
-		final Variable traitVariable1 = this.createTestVariable("testVariable1");
-		final Variable traitVariable2 = this.createTestVariable("testVariable2");
-		final Variable traitVariable3 = this.createTestVariable("testVariable3");
+		final Variable traitVariable1 = this.createTestVariable(RandomStringUtils.randomAlphanumeric(10));
+		final Variable traitVariable2 = this.createTestVariable(RandomStringUtils.randomAlphanumeric(10));
+		final Variable traitVariable3 = this.createTestVariable(RandomStringUtils.randomAlphanumeric(10));
 
 		final Multimap<Integer, VariableType> result = this.ontologyVariableService.getVariableTypesOfVariables(
 			Arrays.asList(traitVariable1.getId(), traitVariable2.getId(), traitVariable3.getId()));
@@ -220,7 +222,7 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
 
 		final MultiKeyMap createdAnalysisVariablesMap =
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 
 		final VariableFilter variableFilter = new VariableFilter();
 		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
@@ -250,13 +252,47 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 			analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList(BLUES));
 			analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
 
-			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 			fail("Should throw an exception");
 		} catch (final Exception e) {
 			assertEquals(String.format("Variable (%s) with same property (%s), scale (%s) and method (%s) already exists in the database.",
 				existingAnalysisVariable.getId(), traitVariable.getProperty().getName(), traitVariable.getScale().getName(),
 				bluesMethod.getName()), e.getMessage());
 		}
+	}
+
+	@Test
+	public void testCreateAnalysisVariables_AliasMapIsSpecified() {
+
+		final Variable traitVariable =
+			this.createTestVariable("testVariable");
+		final String trait_alias = "Trait_Alias";
+
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setVariableIds(Arrays.asList(traitVariable.getId()));
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList(BLUES, BLUPS));
+		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
+
+		final Map<String, String> variableNameToAliasMap = new HashMap<>();
+		variableNameToAliasMap.put(traitVariable.getName(), trait_alias);
+		final MultiKeyMap createdAnalysisVariablesMap =
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, variableNameToAliasMap);
+
+		assertEquals(2, createdAnalysisVariablesMap.size());
+		assertTrue(createdAnalysisVariablesMap.containsKey(trait_alias, BLUES));
+		assertTrue(createdAnalysisVariablesMap.containsKey(trait_alias, BLUPS));
+
+		final VariableFilter variableFilter = new VariableFilter();
+		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
+		final List<Variable> result = this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().stream().collect(
+			Collectors.toList());
+
+		final Optional<Variable> variable1 = result.stream().filter(v -> v.getMethod().getName().equalsIgnoreCase(BLUES)).findAny();
+		assertTrue(variable1.isPresent());
+		assertTrue(variable1.get().getName().equalsIgnoreCase(trait_alias + "_" + BLUES));
+		final Optional<Variable> variable2 = result.stream().filter(v -> v.getMethod().getName().equalsIgnoreCase(BLUPS)).findAny();
+		assertTrue(variable2.isPresent());
+		assertTrue(variable2.get().getName().equalsIgnoreCase(trait_alias + "_" + BLUPS));
 	}
 
 	private Variable createTestVariable(final String variableName) {
