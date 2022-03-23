@@ -55,13 +55,13 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		analysisVariablesImportRequest.setVariableIds(Arrays.asList(traitVariable.getId()));
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList(BLUES, BLUPS));
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
-		final List<Integer> createdAnalysisVariableIds =
+		final MultiKeyMap createdAnalysisVariablesMap =
 			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
 
-		assertEquals(2, createdAnalysisVariableIds.size());
+		assertEquals(2, createdAnalysisVariablesMap.size());
 
 		final VariableFilter variableFilter = new VariableFilter();
-		createdAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
+		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
 		final List<Variable> result = this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().stream().collect(
 			Collectors.toList());
 
@@ -81,11 +81,11 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
 
 		// Create analysis variables again
-		final List<Integer> createdAnalysisVariableIds =
+		final MultiKeyMap createdAnalysisVariablesMap =
 			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
 
 		final VariableFilter variableFilter = new VariableFilter();
-		createdAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
+		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
 		final List<Variable> result = this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().stream().collect(
 			Collectors.toList());
 
@@ -102,11 +102,11 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		analysisVariablesImportRequest.setVariableIds(Arrays.asList(traitVariable.getId()));
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList(HERITABILITY, PVALUE, CV));
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
-		final List<Integer> createdAnalysisVariableIds =
+		final MultiKeyMap createdAnalysisVariablesMap =
 			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
 
 		final VariableFilter variableFilter = new VariableFilter();
-		createdAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
+		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
 		final List<Variable> result = this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().stream().collect(
 			Collectors.toList());
 
@@ -128,11 +128,11 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
 
 		// Create analysis variables again
-		final List<Integer> createdAnalysisVariableIds =
+		final MultiKeyMap createdAnalysisVariablesMap =
 			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
 
 		final VariableFilter variableFilter = new VariableFilter();
-		createdAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
+		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
 		final List<Variable> result = this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().stream().collect(
 			Collectors.toList());
 
@@ -154,10 +154,10 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList(BLUES, BLUPS));
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
 
-		final List<Integer> createdAnalysisVariableIds =
+		final MultiKeyMap createdAnalysisVariablesMap =
 			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
 
-		assertEquals(6, createdAnalysisVariableIds.size());
+		assertEquals(6, createdAnalysisVariablesMap.size());
 	}
 
 	@Test
@@ -171,13 +171,13 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList(BLUES));
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
 
-		final List<Integer> createdAnalysisVariableIds =
+		final MultiKeyMap createdAnalysisVariablesMap =
 			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
 
-		assertEquals(1, createdAnalysisVariableIds.size());
+		assertEquals(1, createdAnalysisVariablesMap.size());
 
 		final VariableFilter variableFilter = new VariableFilter();
-		createdAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
+		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
 		final List<Variable> result = this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().stream().collect(
 			Collectors.toList());
 
@@ -219,11 +219,11 @@ public class OntologyVariableServiceImplIntegrationTest extends IntegrationTestB
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList(BLUES));
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
 
-		final List<Integer> createdAnalysisVariableIds =
+		final MultiKeyMap createdAnalysisVariablesMap =
 			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
 
 		final VariableFilter variableFilter = new VariableFilter();
-		createdAnalysisVariableIds.stream().forEach(variableFilter::addVariableId);
+		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
 		final List<Variable> result = this.ontologyVariableService.getVariablesWithFilterById(variableFilter).values().stream().collect(
 			Collectors.toList());
 		final MultiKeyMap existingAnalysisMethodsOfTraitsMap = this.daoFactory.getCvTermRelationshipDao()

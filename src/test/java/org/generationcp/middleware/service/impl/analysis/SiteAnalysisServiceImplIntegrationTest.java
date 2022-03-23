@@ -1,5 +1,6 @@
 package org.generationcp.middleware.service.impl.analysis;
 
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
@@ -68,10 +69,11 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
 		analysisVariablesImportRequest.setVariableIds(Arrays.asList(testVariable.getId()));
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs", "BLUPs"));
-		final List<Integer> analysisVariableIds = this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+		final MultiKeyMap createdAnalysisVariablesMap =
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
 
 		final VariableFilter variableFilter = new VariableFilter();
-		analysisVariableIds.forEach(variableFilter::addVariableId);
+		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
 		final Map<Integer, Variable> analysisVariablesMap = this.ontologyVariableService.getVariablesWithFilterById(variableFilter);
 
 		// Create means dataset
@@ -147,10 +149,11 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
 		analysisVariablesImportRequest.setVariableIds(Arrays.asList(testVariable.getId()));
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("Heritability", "PValue", "CV"));
-		final List<Integer> analysisVariableIds = this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+		final MultiKeyMap createdAnalysisVariablesMap =
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
 
 		final VariableFilter variableFilter = new VariableFilter();
-		analysisVariableIds.forEach(variableFilter::addVariableId);
+		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
 		final Map<Integer, Variable> analysisSummaryVariablesMap = this.ontologyVariableService.getVariablesWithFilterById(variableFilter);
 
 		// Create summary statistics dataset
@@ -220,10 +223,11 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
 		analysisVariablesImportRequest.setVariableIds(Arrays.asList(testVariable.getId()));
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("Heritability", "PValue", "CV"));
-		final List<Integer> analysisVariableIds = this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+		final MultiKeyMap createdAnalysisVariablesMap =
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
 
 		final VariableFilter variableFilter = new VariableFilter();
-		analysisVariableIds.forEach(variableFilter::addVariableId);
+		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
 		final Map<Integer, Variable> analysisSummaryVariablesMap = this.ontologyVariableService.getVariablesWithFilterById(variableFilter);
 
 		// Create summary statistics dataset for the first environment
@@ -243,11 +247,11 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		analysisVariablesImportRequestUpdated.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
 		analysisVariablesImportRequestUpdated.setVariableIds(Arrays.asList(testVariable.getId()));
 		analysisVariablesImportRequestUpdated.setAnalysisMethodNames(Arrays.asList("Heritability", "PValue", "CV", "Means", "MeanSED"));
-		final List<Integer> analysisVariableIdsUpdated =
+		final MultiKeyMap createdAnalysisVariablesUpdated =
 			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequestUpdated);
 
 		final VariableFilter variableFilterUpdated = new VariableFilter();
-		analysisVariableIdsUpdated.forEach(variableFilterUpdated::addVariableId);
+		createdAnalysisVariablesUpdated.values().forEach(i -> variableFilterUpdated.addVariableId((Integer) i));
 		final Map<Integer, Variable> analysisSummaryVariablesMapUpdated =
 			this.ontologyVariableService.getVariablesWithFilterById(variableFilterUpdated);
 

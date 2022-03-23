@@ -5,6 +5,7 @@ import com.google.common.collect.Multimap;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
+import org.apache.commons.collections.map.LinkedMap;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -20,7 +21,6 @@ import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -47,13 +47,14 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 	}
 
 	@Override
-	public List<Integer> createAnalysisVariables(final AnalysisVariablesImportRequest analysisVariablesImportRequest) {
+	public MultiKeyMap createAnalysisVariables(final AnalysisVariablesImportRequest analysisVariablesImportRequest) {
+
+		final MultiKeyMap variableIdsByTraitAndMethodName = MultiKeyMap.decorate(new CaseInsensitiveMap());
 
 		final List<Integer> variableIds = analysisVariablesImportRequest.getVariableIds();
 		final List<String> analysisMethodNames = analysisVariablesImportRequest.getAnalysisMethodNames();
 		final String variableType = analysisVariablesImportRequest.getVariableType();
 
-		final List<Integer> analysisVariableIds = new ArrayList<>();
 		final VariableFilter variableFilter = new VariableFilter();
 		variableIds.stream().forEach(variableFilter::addVariableId);
 		// Get the existing trait variables
@@ -71,15 +72,15 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 				final CVTerm method = methodsMap.get(analysisName);
 				// If analysis variable already exists for specific trait, do not create new, just return the existing id of analysis variable
 				if (existingAnalysisMethodsOfTraitsMap.containsKey(variableEntry.getKey(), method.getCvTermId())) {
-					analysisVariableIds.add(
-						(Integer) existingAnalysisMethodsOfTraitsMap.get(variableEntry.getKey(), method.getCvTermId()));
+					variableIdsByTraitAndMethodName.put(variableEntry.getValue().getName(), analysisName,
+						existingAnalysisMethodsOfTraitsMap.get(variableEntry.getKey(), method.getCvTermId()));
 				} else { // else, create new analysis variable
-					analysisVariableIds.add(
+					variableIdsByTraitAndMethodName.put(variableEntry.getValue().getName(), analysisName,
 						this.createAnalysisStandardVariable(variableEntry.getValue(), method, variableType));
 				}
 			}
 		}
-		return analysisVariableIds;
+		return variableIdsByTraitAndMethodName;
 	}
 
 	@Override
