@@ -123,6 +123,10 @@ public class GermplasmList implements Serializable {
 	@OneToMany(mappedBy = "list", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
 	private List<GermplasmListDataView> view = new ArrayList<>();
 
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinColumn(name = "listid")
+	private List<GermplasmListExternalReference> externalReferences = new ArrayList<>();
+
 	@Transient
 	private String tabLabel;
 
@@ -469,6 +473,14 @@ public class GermplasmList implements Serializable {
 
 	public void unlock() {
 		this.status = Status.LIST.getCode();
+	}
+
+	public List<GermplasmListExternalReference> getExternalReferences() {
+		return externalReferences;
+	}
+
+	public void setExternalReferences(final List<GermplasmListExternalReference> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 }

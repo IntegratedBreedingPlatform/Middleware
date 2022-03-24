@@ -16,6 +16,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.Collections;
 import java.util.List;
 
 public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
@@ -50,7 +51,7 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 	@Test
 	public void testCountGermplasmListDTOs() {
 		final GermplasmListSearchRequestDTO requestDTO = new GermplasmListSearchRequestDTO();
-		requestDTO.setListDbId(this.germplasmListId.toString());
+		requestDTO.setListDbIds(Collections.singletonList(this.germplasmListId.toString()));
 		Assert.assertEquals(1, (int) this.germplasmListServiceBrapi.countGermplasmListDTOs(requestDTO));
 	}
 
@@ -64,7 +65,7 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 
 		final GermplasmListSearchRequestDTO requestDTO = new GermplasmListSearchRequestDTO();
-		requestDTO.setListDbId(this.germplasmListId.toString());
+		requestDTO.setListDbIds(Collections.singletonList(this.germplasmListId.toString()));
 		requestDTO.setListName(LIST_NAME);
 		requestDTO.setExternalReferenceID(germplasmListExternalReference.getReferenceId());
 		requestDTO.setExternalReferenceSource(germplasmListExternalReference.getSource());

@@ -4,21 +4,23 @@ import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.List;
+
 @AutoProperty
 public class GermplasmListSearchRequestDTO extends SearchRequestDto {
 
 	private String listType;
 	private String listName;
-	private String listDbId;
+	private List<String> listDbIds;
 	private String listSource;
 	private String externalReferenceID;
 	private String externalReferenceSource;
 
-	public GermplasmListSearchRequestDTO(final String listType, final String listName, final String listDbId, final String listSource,
+	public GermplasmListSearchRequestDTO(final String listType, final String listName, final List<String> listDbId, final String listSource,
 		final String externalReferenceID, final String externalReferenceSource) {
 		this.listType = listType;
 		this.listName = listName;
-		this.listDbId = listDbId;
+		this.listDbIds = listDbId;
 		this.listSource = listSource;
 		this.externalReferenceID = externalReferenceID;
 		this.externalReferenceSource = externalReferenceSource;
@@ -43,12 +45,12 @@ public class GermplasmListSearchRequestDTO extends SearchRequestDto {
 		this.listName = listName;
 	}
 
-	public String getListDbId() {
-		return this.listDbId;
+	public List<String> getListDbIds() {
+		return this.listDbIds;
 	}
 
-	public void setListDbId(final String listDbId) {
-		this.listDbId = listDbId;
+	public void setListDbIds(final List<String> listDbIds) {
+		this.listDbIds = listDbIds;
 	}
 
 	public String getListSource() {
