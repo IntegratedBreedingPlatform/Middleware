@@ -203,4 +203,37 @@
 	</changeSet>
 
 
+	<changeSet author="cheryleigh" id="v20.3.0-trigger_external_reference_atributs_aud_insert" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_external_reference_atributs_aud_insert.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_external_reference_atributs_aud_insert' trigger</comment>
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v20.3.0-trigger_external_reference_atributs_aud_update" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_external_reference_atributs_aud_update.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_external_reference_atributs_aud_update' trigger</comment>
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v20.3.0-trigger_external_reference_atributs_aud_delete" runOnChange="true" runAlways="true">
+    	<sqlFile path="sql/trigger_external_reference_atributs_aud_delete.sql"
+				 dbms="mysql"
+				 encoding="UTF-8"
+				 relativeToChangelogFile="true"
+				 endDelimiter="GO"
+				 splitStatements="true"
+				 stripComments="false"/>
+		<comment>Add 'trigger_external_reference_atributs_aud_delete' trigger</comment>
+	</changeSet>
+
 </databaseChangeLog>
