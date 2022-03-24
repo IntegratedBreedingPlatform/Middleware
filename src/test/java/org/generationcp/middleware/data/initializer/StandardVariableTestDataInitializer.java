@@ -57,12 +57,13 @@ public class StandardVariableTestDataInitializer {
 		stdVariable.setDescription(name + " Description");
 		return stdVariable;
 	}
-	
+
 	public static StandardVariable createStandardVariable(final TermId termId) {
 		final StandardVariable standardVariable = new StandardVariable();
 		Term term = new Term();
 		term.setId(termId.getId());
 		standardVariable.setDataType(term);
+		standardVariable.setVariableTypes(new HashSet<>(Arrays.asList(VariableType.TRAIT)));
 		return standardVariable;
 	}
 
