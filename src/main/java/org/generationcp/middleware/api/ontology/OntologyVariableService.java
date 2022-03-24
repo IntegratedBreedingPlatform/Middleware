@@ -20,4 +20,6 @@ public interface OntologyVariableService {
 		Map<String, String> variableNameToAliasMap);
 
 	Multimap<Integer, VariableType> getVariableTypesOfVariables(List<Integer> variableIds);
+
+	MultiKeyMap getAnalysisMethodsOfTraits(List<Integer> variableIds, List<Integer> methodIds);
 }

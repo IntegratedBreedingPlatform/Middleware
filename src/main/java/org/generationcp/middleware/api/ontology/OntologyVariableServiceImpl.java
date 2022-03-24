@@ -96,6 +96,11 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 		return variableTypesMultimap;
 	}
 
+	@Override
+	public MultiKeyMap getAnalysisMethodsOfTraits(final List<Integer> variableIds, final List<Integer> methodIds) {
+		return this.daoFactory.getCvTermRelationshipDao().retrieveAnalysisMethodsOfTraits(variableIds, methodIds);
+	}
+
 	private Integer createAnalysisStandardVariable(final Variable traitVariable, final String alias, final CVTerm method,
 		final String variableType) {
 
