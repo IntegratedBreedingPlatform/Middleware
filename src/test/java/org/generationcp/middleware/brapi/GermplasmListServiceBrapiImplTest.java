@@ -133,7 +133,7 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 		final List<GermplasmListData> data = this.daoFactory.getGermplasmListDataDAO()
 			.getByListId(Integer.valueOf(germplasmListDTOList.get(0).getListDbId()));
 		Assert.assertEquals(1, data.size());
-		Assert.assertEquals(savedGermplasm.getGid(), data.get(0).getGermplasm().getGid());
+		Assert.assertEquals(savedGermplasm.getGid(), data.get(0).getGid());
 		Assert.assertEquals(1, data.get(0).getEntryId().intValue());
 		Assert.assertEquals("1", data.get(0).getEntryCode());
 		Assert.assertEquals(germplasm.getPreferredName().getNval(), data.get(0).getDesignation());
