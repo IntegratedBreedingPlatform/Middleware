@@ -1,13 +1,8 @@
 package org.generationcp.middleware.audit;
 
-import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.junit.Before;
-import org.junit.Test;
 
-import javax.persistence.Table;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -19,14 +14,16 @@ import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestBase {
+public abstract class GenericExternalReferenceAuditIntegrationTest extends AuditIntegrationTestBase {
 
 	private static final String PRIMARY_KEY_FIELD = "id";
 
 	private DaoFactory daoFactory;
+	private final String foreignKeyField;
 
-	public ExternalReferenceAuditIntegrationTest() {
-		super(GermplasmExternalReference.class.getAnnotation(Table.class).name(), PRIMARY_KEY_FIELD);
+	public GenericExternalReferenceAuditIntegrationTest(final String tableName, final String foreignKeyField) {
+		super(tableName, PRIMARY_KEY_FIELD);
+		this.foreignKeyField = foreignKeyField;
 	}
 
 	@Before
@@ -34,22 +31,17 @@ public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestB
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 	}
 
-	@Test
-	public void shouldTriggersExists() {
-		this.checkTriggerExists("trigger_external_reference_germplasm_aud_insert", "INSERT");
-		this.checkTriggerExists("trigger_external_reference_germplasm_aud_update", "UPDATE");
-		this.checkTriggerExists("trigger_external_reference_germplasm_aud_delete", "DELETE");
+	public void checkAllTriggers() {
+		this.checkTriggerExists("trigger_" + this.tableName + "_aud_insert", "INSERT");
+		this.checkTriggerExists("trigger_" + this.tableName + "_aud_update", "UPDATE");
+		this.checkTriggerExists("trigger_" + this.tableName + "_aud_delete", "DELETE");
 	}
 
-	@Test
-	public void shouldAuditInsertAndUpdate() {
-		final Germplasm germplasm = new GermplasmTestDataInitializer().createGermplasmWithPreferredName("LNAME");
-		this.daoFactory.getGermplasmDao().save(germplasm);
-
+	public void checkAuditInsertAndUpdate(final Integer testRecordId) {
 		this.enableEntityAudit();
 
 		//Create a externalReference 1
-		Map<String, Object> insertExternalReference1QueryParams = this.createQueryParams(germplasm.getGid(), null, null);
+		final Map<String, Object> insertExternalReference1QueryParams = this.createQueryParams(testRecordId, null, null);
 		this.insertEntity(insertExternalReference1QueryParams);
 
 		final Integer externalReference1Id = this.getLastInsertIdFromEntity();
@@ -65,7 +57,7 @@ public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestB
 		this.disableEntityAudit();
 
 		//Insert another externalReference
-		Map<String, Object> insertExternalReference2QueryParams = this.createQueryParams(germplasm.getGid(), null, null);
+		final Map<String, Object> insertExternalReference2QueryParams = this.createQueryParams(testRecordId, null, null);
 		this.insertEntity(insertExternalReference2QueryParams);
 
 		//Because the audit was disabled, the externalReference shouldn't be audited
@@ -77,7 +69,7 @@ public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestB
 
 		//Update the externalReference 1
 		final Map<String, Object> updateExternalReference1QueryParams1 =
-			this.createQueryParams(germplasm.getGid(), new Random().nextInt(), new Date());
+			this.createQueryParams(testRecordId, new Random().nextInt(), new Date());
 		this.updateEntity(updateExternalReference1QueryParams1, externalReference1Id);
 
 		assertThat(this.countEntityAudit(externalReference1Id), is(2));
@@ -91,7 +83,7 @@ public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestB
 
 		//Update again the entity, because the audit was disable shouldn't be audited
 		final Map<String, Object> updateExternalReference1QueryParams2 =
-			this.createQueryParams(germplasm.getGid(), new Random().nextInt(), new Date());
+			this.createQueryParams(testRecordId, new Random().nextInt(), new Date());
 		this.updateEntity(updateExternalReference1QueryParams2, externalReference1Id);
 
 		assertThat(this.countEntityAudit(externalReference1Id), is(2));
@@ -114,9 +106,10 @@ public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestB
 		assertThat(this.countEntityAudit(externalReference2Id), is(0));
 	}
 
-	protected Map<String, Object> createQueryParams(final Integer gid, final Integer modifiedBy, final Date modifiedDate) {
+	protected Map<String, Object> createQueryParams(final Integer idVal,
+		final Integer modifiedBy, final Date modifiedDate) {
 		final Map<String, Object> queryParams = new LinkedHashMap<>();
-		queryParams.put("gid", gid);
+		queryParams.put(this.foreignKeyField, idVal);
 		queryParams.put("reference_id", UUID.randomUUID().toString());
 		queryParams.put("reference_source", UUID.randomUUID().toString());
 		queryParams.put("created_date", new Date());
@@ -129,7 +122,7 @@ public class ExternalReferenceAuditIntegrationTest extends AuditIntegrationTestB
 	private void assertAudit(final Map<String, Object> audit, final Map<String, Object> entity, final int revType,
 		final int aid) {
 		assertThat(new Integer(audit.get("rev_type").toString()), is(revType));
-		assertThat(audit.get("gid"), is(entity.get("gid")));
+		assertThat(audit.get(this.foreignKeyField), is(entity.get(this.foreignKeyField)));
 		assertThat(audit.get("reference_id"), is(entity.get("reference_id")));
 		assertThat(audit.get("reference_source"), is(entity.get("reference_source")));
 		assertThat(DATE_FORMAT.format(audit.get("created_date")), is(DATE_FORMAT.format(entity.get(("created_date")))));
