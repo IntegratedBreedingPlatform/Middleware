@@ -6,7 +6,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.GermplasmListServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.list.GermplasmListImportRequestDTO;
-import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmListSearchRequestDTO;
@@ -18,6 +18,8 @@ import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListExternalReference;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.GermplasmListDTO;
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,7 +28,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 
@@ -41,6 +45,15 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private GermplasmListManager germplasmListManager;
+
+	@Autowired
+	private PedigreeService pedigreeService;
+
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
+
+	@Autowired
+	private GermplasmService germplasmService;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 	private DaoFactory daoFactory;
@@ -101,6 +114,8 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(Integer.MIN_VALUE);
 		this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
 		final Germplasm savedGermplasm = this.daoFactory.getGermplasmDao().getById(germplasm.getGid());
+		final List<Integer> gids = new ArrayList<>();
+		gids.add(savedGermplasm.getGid());
 
 		final List<GermplasmListImportRequestDTO> importRequestDTOS = new ArrayList<>();
 		final GermplasmListImportRequestDTO importRequestDTO = new GermplasmListImportRequestDTO();
@@ -129,6 +144,10 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 		final ExternalReferenceDTO savedExternalReferenceDTO = germplasmListDTOList.get(0).getExternalReferences().get(0);
 		Assert.assertEquals(externalReferenceDTO.getReferenceID(), savedExternalReferenceDTO.getReferenceID());
 		Assert.assertEquals(externalReferenceDTO.getReferenceSource(), savedExternalReferenceDTO.getReferenceSource());
+
+		final Map<Integer, String> crossExpansions =
+			this.pedigreeService.getCrossExpansionsBulk(new HashSet<>(gids), null, this.crossExpansionProperties);
+		final Map<Integer, String> plotCodeValuesByGIDs = this.germplasmService.getPlotCodeValues(new HashSet<>(gids));
 		
 		final List<GermplasmListData> data = this.daoFactory.getGermplasmListDataDAO()
 			.getByListId(Integer.valueOf(germplasmListDTOList.get(0).getListDbId()));
@@ -137,8 +156,8 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(1, data.get(0).getEntryId().intValue());
 		Assert.assertEquals("1", data.get(0).getEntryCode());
 		Assert.assertEquals(germplasm.getPreferredName().getNval(), data.get(0).getDesignation());
-		Assert.assertEquals(GermplasmListDataDAO.SOURCE_UNKNOWN, data.get(0).getGroupName());
-		Assert.assertEquals(GermplasmListDataDAO.SOURCE_UNKNOWN, data.get(0).getSeedSource());
+		Assert.assertEquals(crossExpansions.get(savedGermplasm.getGid()), data.get(0).getGroupName());
+		Assert.assertEquals(plotCodeValuesByGIDs.get(savedGermplasm.getGid()), data.get(0).getSeedSource());
 
 	}
 }
