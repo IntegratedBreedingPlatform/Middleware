@@ -921,7 +921,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		stringBuilder.append("   list.listuid AS " + LIST_OWNER_ID + ", ");
 		stringBuilder.append("   (Select count(*) FROM listdata data WHERE data.listid = list.listid) AS " + LIST_SIZE + " ");
 		this.appendListsFromQuery(stringBuilder);
-		this.appendListSeachFilters(stringBuilder, requestDTO);
+		this.appendListSearchFilters(stringBuilder, requestDTO);
 		return stringBuilder.toString();
 	}
 
@@ -929,7 +929,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		final StringBuilder sql = new StringBuilder(" SELECT COUNT(1) FROM ( ");
 		sql.append("SELECT DISTINCT list.listid ");
 		this.appendListsFromQuery(sql);
-		this.appendListSeachFilters(sql, requestDTO);
+		this.appendListSearchFilters(sql, requestDTO);
 		sql.append(") as listids");
 		return sql.toString();
 	}
@@ -939,7 +939,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		stringBuilder.append("	WHERE list.liststatus != " + GermplasmList.Status.DELETED.getCode() + " ");
 	}
 
-	public void appendListSeachFilters(final StringBuilder stringBuilder, final GermplasmListSearchRequestDTO requestDTO) {
+	public void appendListSearchFilters(final StringBuilder stringBuilder, final GermplasmListSearchRequestDTO requestDTO) {
 		if (!CollectionUtils.isEmpty(requestDTO.getListDbIds())) {
 			stringBuilder.append(" AND list.listid IN (:listDbId) ");
 		}
