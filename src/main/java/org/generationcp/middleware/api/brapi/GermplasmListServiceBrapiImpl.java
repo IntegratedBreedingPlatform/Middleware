@@ -1,11 +1,24 @@
 package org.generationcp.middleware.api.brapi;
 
+import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.api.brapi.v2.list.GermplasmListImportRequestDTO;
+import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmListSearchRequestDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.GermplasmListExternalReference;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.GermplasmListDTO;
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.user.UserService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -13,6 +26,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,6 +40,15 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private PedigreeService pedigreeService;
+
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
+
+	@Autowired
+	private GermplasmService germplasmService;
 
 	private final DaoFactory daoFactory;
 
@@ -57,4 +81,82 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 		return this.daoFactory.getGermplasmListDAO().countGermplasmListDTOs(searchRequestDTO);
 	}
 
+	@Override
+	public List<GermplasmListDTO> saveGermplasmListDTOs(final List<GermplasmListImportRequestDTO> importRequestDTOS) {
+		final List<String> savedListIds = new ArrayList<>();
+
+		final List<String> germplasmUUIDs = importRequestDTOS.stream()
+			.map(GermplasmListImportRequestDTO::getData).filter(data -> !CollectionUtils.isEmpty(data))
+			.flatMap(Collection::stream).collect(Collectors.toList());
+		final List<Germplasm> data = this.daoFactory.getGermplasmDao().getGermplasmByGUIDs(germplasmUUIDs);
+		final Map<String, Integer> guuidGidMap = data.stream()
+			.collect(Collectors.toMap(germplasm -> germplasm.getGermplasmUUID().toUpperCase(), Germplasm::getGid));
+
+		final List<Integer> gids = data.stream().map(Germplasm::getGid).collect(Collectors.toList());
+		final Map<Integer, String> crossExpansions =
+			this.pedigreeService.getCrossExpansionsBulk(new HashSet<>(gids), null, this.crossExpansionProperties);
+		final Map<Integer, String> plotCodeValuesByGIDs = this.germplasmService.getPlotCodeValues(new HashSet<>(gids));
+		final List<Name> germplasmNames = this.daoFactory.getNameDao().getNamesByGids(gids);
+		final Map<Integer, String> preferredNamesMap = germplasmNames.stream()
+			.filter(name -> name.getNstat().equals(Name.NSTAT_PREFERRED_NAME))
+			.collect(Collectors.toMap(name -> name.getGermplasm().getGid(), Name::getNval));
+		final Map<Integer, List<Name>> namesByGid = germplasmNames.stream().collect(groupingBy(n -> n.getGermplasm().getGid()));
+
+		for(final GermplasmListImportRequestDTO importRequestDTO: importRequestDTOS) {
+			final GermplasmList germplasmList = this.saveGermplasmList(importRequestDTO);
+			this.saveGermplasmListData(germplasmList, importRequestDTO.getData(), crossExpansions, plotCodeValuesByGIDs, guuidGidMap,
+				preferredNamesMap, namesByGid);
+			savedListIds.add(germplasmList.getId().toString());
+		}
+		final GermplasmListSearchRequestDTO germplasmListSearchRequestDTO = new GermplasmListSearchRequestDTO();
+		germplasmListSearchRequestDTO.setListDbIds(savedListIds);
+		return this.searchGermplasmListDTOs(germplasmListSearchRequestDTO, null);
+	}
+
+	private void saveGermplasmListData(final GermplasmList germplasmList, final List<String> guuids,
+		final Map<Integer, String> crossExpansions,	final Map<Integer, String> plotCodeValuesByGIDs,
+		final Map<String, Integer> guuidGidMap, final Map<Integer, String> preferredNamesMap,
+		final Map<Integer, List<Name>> namesByGid) {
+		if(!CollectionUtils.isEmpty(guuids)) {
+			int entryNo = 1;
+			for (final String guid : guuids) {
+				if (guuidGidMap.containsKey(guid.toUpperCase())) {
+					final Integer gid = guuidGidMap.get(guid.toUpperCase());
+					final String preferredName = preferredNamesMap.get(gid);
+					final List<Name> names = namesByGid.get(gid);
+					Preconditions.checkArgument(preferredName != null || names != null, "No name found for gid=" + gid);
+					final String designation = preferredName != null ? preferredName : names.get(0).getNval();
+					final Integer currentEntryNo = entryNo++;
+					final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, currentEntryNo,
+						String.valueOf(currentEntryNo), plotCodeValuesByGIDs.get(gid), designation, crossExpansions.get(gid),
+						GermplasmListDataDAO.STATUS_ACTIVE, null);
+					this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
+				}
+			}
+		}
+	}
+
+	private GermplasmList saveGermplasmList(final GermplasmListImportRequestDTO request) {
+		final String description = request.getListDescription() != null ? request.getListDescription() : StringUtils.EMPTY;
+		final Long date = Long.valueOf(Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT).format(Util.tryParseDate(request.getDateCreated(), Util.FRONTEND_DATE_FORMAT)));
+		GermplasmList germplasmList = new GermplasmList(null, request.getListName(), date,	GermplasmList.LIST_TYPE,
+			Integer.valueOf(request.getListOwnerPersonDbId()), description, null, GermplasmList.Status.LOCKED_LIST.getCode(),
+			null, null);
+		this.setGermplasmListExternalReferences(request, germplasmList);
+
+		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
+		return germplasmList;
+	}
+
+	private void setGermplasmListExternalReferences(final GermplasmListImportRequestDTO request, final GermplasmList germplasmList) {
+		if (request.getExternalReferences() != null) {
+			final List<GermplasmListExternalReference> references = new ArrayList<>();
+			request.getExternalReferences().forEach(reference -> {
+				final GermplasmListExternalReference externalReference =
+					new GermplasmListExternalReference(germplasmList, reference.getReferenceID(), reference.getReferenceSource());
+				references.add(externalReference);
+			});
+			germplasmList.setExternalReferences(references);
+		}
+	}
 }
