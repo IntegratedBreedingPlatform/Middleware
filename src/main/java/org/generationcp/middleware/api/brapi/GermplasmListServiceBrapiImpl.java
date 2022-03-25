@@ -91,12 +91,12 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 	}
 
 	@Override
-	public List<GermplasmListDTO> saveGermplasmListDTOs(List<GermplasmListImportRequestDTO> importRequestDTOS) {
+	public List<GermplasmListDTO> saveGermplasmListDTOs(final List<GermplasmListImportRequestDTO> importRequestDTOS) {
 		final List<String> savedListIds = new ArrayList<>();
 
 		final List<String> germplasmUUIDs = importRequestDTOS.stream()
-			.filter(importRequestDTO -> !CollectionUtils.isEmpty(importRequestDTO.getData()))
-			.map(importRequestDTO -> importRequestDTO.getData()).flatMap(Collection::stream).collect(Collectors.toList());
+			.map(GermplasmListImportRequestDTO::getData).filter(data -> !CollectionUtils.isEmpty(data))
+			.flatMap(Collection::stream).collect(Collectors.toList());
 
 		final GermplasmSearchRequest germplasmSearchRequest = new GermplasmSearchRequest();
 		germplasmSearchRequest.setGermplasmDbIds(germplasmUUIDs);
@@ -113,7 +113,7 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 		final Map<Integer, List<Name>> namesByGid = this.daoFactory.getNameDao().getNamesByGids(gids)
 			.stream().collect(groupingBy(n -> n.getGermplasm().getGid()));
 
-		for(GermplasmListImportRequestDTO importRequestDTO: importRequestDTOS) {
+		for(final GermplasmListImportRequestDTO importRequestDTO: importRequestDTOS) {
 			final GermplasmList germplasmList = this.saveGermplasmList(importRequestDTO);
 			this.saveGermplasmListData(germplasmList, importRequestDTO.getData(), crossExpansions, plotCodeValuesByGIDs, germplasmDTOMap,
 				preferredNamesMap, namesByGid);
@@ -138,7 +138,7 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 					Preconditions.checkArgument(preferredName != null || names != null, "No name found for gid=" + gid);
 					final String designation = preferredName != null ? preferredName : names.get(0).getNval();
 					final Integer currentEntryNo = entryNo++;
-					GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, currentEntryNo,
+					final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, currentEntryNo,
 						String.valueOf(currentEntryNo), plotCodeValuesByGIDs.get(gid), designation, crossExpansions.get(gid),
 						GermplasmListDataDAO.STATUS_ACTIVE, null);
 					this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
@@ -153,7 +153,7 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 		GermplasmList germplasmList = new GermplasmList(null, request.getListName(), date,	GermplasmList.LIST_TYPE,
 			Integer.valueOf(request.getListOwnerPersonDbId()), description, null, GermplasmList.Status.LOCKED_LIST.getCode(),
 			null, null);
-		setGermplasmListExternalReferences(request, germplasmList);
+		this.setGermplasmListExternalReferences(request, germplasmList);
 
 		germplasmList = this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
 		return germplasmList;

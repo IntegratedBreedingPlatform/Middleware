@@ -24,7 +24,7 @@ public class GermplasmListImportRequestDTO {
 	private String listType;
 
 	public Map<String, String> getAdditionalInfo() {
-		return additionalInfo;
+		return this.additionalInfo;
 	}
 
 	public void setAdditionalInfo(final Map<String, String> additionalInfo) {
@@ -32,7 +32,7 @@ public class GermplasmListImportRequestDTO {
 	}
 
 	public List<String> getData() {
-		return data;
+		return this.data;
 	}
 
 	public void setData(final List<String> data) {
@@ -40,7 +40,7 @@ public class GermplasmListImportRequestDTO {
 	}
 
 	public String getDateCreated() {
-		return dateCreated;
+		return this.dateCreated;
 	}
 
 	public void setDateCreated(final String dateCreated) {
@@ -48,7 +48,7 @@ public class GermplasmListImportRequestDTO {
 	}
 
 	public String getDateModified() {
-		return dateModified;
+		return this.dateModified;
 	}
 
 	public void setDateModified(final String dateModified) {
@@ -56,7 +56,7 @@ public class GermplasmListImportRequestDTO {
 	}
 
 	public List<ExternalReferenceDTO> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
 	public void setExternalReferences(final List<ExternalReferenceDTO> externalReferences) {
@@ -64,7 +64,7 @@ public class GermplasmListImportRequestDTO {
 	}
 
 	public String getListDescription() {
-		return listDescription;
+		return this.listDescription;
 	}
 
 	public void setListDescription(final String listDescription) {
@@ -72,7 +72,7 @@ public class GermplasmListImportRequestDTO {
 	}
 
 	public String getListName() {
-		return listName;
+		return this.listName;
 	}
 
 	public void setListName(final String listName) {
@@ -80,7 +80,7 @@ public class GermplasmListImportRequestDTO {
 	}
 
 	public String getListOwnerName() {
-		return listOwnerName;
+		return this.listOwnerName;
 	}
 
 	public void setListOwnerName(final String listOwnerName) {
@@ -88,7 +88,7 @@ public class GermplasmListImportRequestDTO {
 	}
 
 	public String getListOwnerPersonDbId() {
-		return listOwnerPersonDbId;
+		return this.listOwnerPersonDbId;
 	}
 
 	public void setListOwnerPersonDbId(final String listOwnerPersonDbId) {
@@ -96,7 +96,7 @@ public class GermplasmListImportRequestDTO {
 	}
 
 	public Integer getListSize() {
-		return listSize;
+		return this.listSize;
 	}
 
 	public void setListSize(final Integer listSize) {
@@ -104,7 +104,7 @@ public class GermplasmListImportRequestDTO {
 	}
 
 	public String getListSource() {
-		return listSource;
+		return this.listSource;
 	}
 
 	public void setListSource(final String listSource) {
@@ -112,7 +112,7 @@ public class GermplasmListImportRequestDTO {
 	}
 
 	public String getListType() {
-		return listType;
+		return this.listType;
 	}
 
 	public void setListType(final String listType) {

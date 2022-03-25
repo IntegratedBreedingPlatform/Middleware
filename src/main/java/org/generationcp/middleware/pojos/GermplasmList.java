@@ -349,7 +349,7 @@ public class GermplasmList implements Serializable {
 	}
 
 	public Integer getGenerationLevel() {
-		return generationLevel;
+		return this.generationLevel;
 	}
 
 	public void setGenerationLevel(final Integer generationLevel) {
@@ -456,7 +456,7 @@ public class GermplasmList implements Serializable {
 	}
 
 	public String getCreatedBy() {
-		return createdBy;
+		return this.createdBy;
 	}
 
 	public void setCreatedBy(final String createdBy) {
@@ -476,7 +476,7 @@ public class GermplasmList implements Serializable {
 	}
 
 	public List<GermplasmListExternalReference> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
 	public void setExternalReferences(final List<GermplasmListExternalReference> externalReferences) {

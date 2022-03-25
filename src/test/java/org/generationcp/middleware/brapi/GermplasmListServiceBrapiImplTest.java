@@ -47,11 +47,12 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 	@Before
 	public void setUp() {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 		this.userId = this.findAdminUser();
-		GermplasmListTestDataInitializer germplasmListTestDataInitializer = new GermplasmListTestDataInitializer();
+		final GermplasmListTestDataInitializer germplasmListTestDataInitializer = new GermplasmListTestDataInitializer();
 		final GermplasmList germplasmList = germplasmListTestDataInitializer
-			.createGermplasmList(LIST_NAME, this.userId, LIST_DESCRIPTION, null, 1,
+			.createGermplasmList(
+				this.LIST_NAME, this.userId, this.LIST_DESCRIPTION, null, 1,
 				PROGRAM_UUID);
 		this.germplasmListId = this.germplasmListManager.addGermplasmList(germplasmList);
 	}
@@ -74,16 +75,16 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 
 		final GermplasmListSearchRequestDTO requestDTO = new GermplasmListSearchRequestDTO();
 		requestDTO.setListDbIds(Collections.singletonList(this.germplasmListId.toString()));
-		requestDTO.setListName(LIST_NAME);
+		requestDTO.setListName(this.LIST_NAME);
 		requestDTO.setExternalReferenceID(germplasmListExternalReference.getReferenceId());
 		requestDTO.setExternalReferenceSource(germplasmListExternalReference.getSource());
 
 		final List<GermplasmListDTO> lists = this.germplasmListServiceBrapi.searchGermplasmListDTOs(requestDTO, null);
 		Assert.assertEquals(1, lists.size());
 		final GermplasmListDTO listDTO = lists.get(0);
-		Assert.assertEquals(LIST_NAME, listDTO.getListName());
-		Assert.assertEquals(LIST_DESCRIPTION, listDTO.getListDescription());
-		Assert.assertEquals(userId.toString(), listDTO.getListOwnerPersonDbId());
+		Assert.assertEquals(this.LIST_NAME, listDTO.getListName());
+		Assert.assertEquals(this.LIST_DESCRIPTION, listDTO.getListDescription());
+		Assert.assertEquals(this.userId.toString(), listDTO.getListOwnerPersonDbId());
 		Assert.assertEquals("0", listDTO.getListSize().toString());
 		Assert.assertEquals(1, listDTO.getExternalReferences().size());
 		final ExternalReferenceDTO externalReferenceDTO = listDTO.getExternalReferences().get(0);
@@ -103,7 +104,7 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 		final GermplasmListImportRequestDTO importRequestDTO = new GermplasmListImportRequestDTO();
 		importRequestDTO.setListName(RandomStringUtils.randomAlphanumeric(10));
 		importRequestDTO.setListDescription(RandomStringUtils.randomAlphanumeric(10));
-		importRequestDTO.setListOwnerPersonDbId(userId.toString());
+		importRequestDTO.setListOwnerPersonDbId(this.userId.toString());
 		importRequestDTO.setDateCreated("2022-03-03");
 		importRequestDTO.setData(new ArrayList<>());
 		importRequestDTO.getData().add(savedGermplasm.getGermplasmUUID());
