@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.impl.analysis;
 
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
@@ -85,7 +86,8 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 				.collect(Collectors.toList());
 		meansImportRequest.setData(meansDataList);
 
-		final int meansDatasetId = this.analysisService.createMeansDataset(study.getProjectId(), meansImportRequest);
+		final int meansDatasetId =
+			this.analysisService.createMeansDataset(ContextHolder.getCurrentCrop(), study.getProjectId(), meansImportRequest);
 
 		// Verify the means dataset is saved successfully
 		// including the project, projectprop, experiment, and phenotype records.
@@ -167,7 +169,8 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		summaryStatisticsImportRequest.setData(summaryDataList);
 
 		final int summaryStatisticsDatasetId =
-			this.analysisService.createSummaryStatisticsDataset(study.getProjectId(), summaryStatisticsImportRequest);
+			this.analysisService.createSummaryStatisticsDataset(ContextHolder.getCurrentCrop(), study.getProjectId(),
+				summaryStatisticsImportRequest);
 
 		// Verify the summary statistics dataset is saved successfully
 		// including the project, projectprop, experiment, and phenotype records.
@@ -240,7 +243,8 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		summaryStatisticsImportRequest.setData(summaryDataList);
 
 		final int summaryStatisticsDatasetId =
-			this.analysisService.createSummaryStatisticsDataset(study.getProjectId(), summaryStatisticsImportRequest);
+			this.analysisService.createSummaryStatisticsDataset(ContextHolder.getCurrentCrop(), study.getProjectId(),
+				summaryStatisticsImportRequest);
 
 		// Create Analysis Summary Variables to be used in updating summary statistics dataset
 		final AnalysisVariablesImportRequest analysisVariablesImportRequestUpdated = new AnalysisVariablesImportRequest();
@@ -263,7 +267,8 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 				.collect(Collectors.toList());
 		summaryStatisticsImportRequestUpdated.setData(summaryDataListUpdated);
 		// Update the existing summary statistics dataset
-		this.analysisService.updateSummaryStatisticsDataset(summaryStatisticsDatasetId, summaryStatisticsImportRequestUpdated);
+		this.analysisService.updateSummaryStatisticsDataset(ContextHolder.getCurrentCrop(), summaryStatisticsDatasetId,
+			summaryStatisticsImportRequestUpdated);
 
 		// Verify the updated experiment and phenotype values
 		final List<ExperimentModel> experimentModels = this.daoFactory.getExperimentDao()
