@@ -129,6 +129,14 @@
 											WHERE summary.study_id = study.project_id AND summary.dataset_type_id = ds.dataset_type_id);
 					DECLARE CONTINUE HANDLER FOR NOT FOUND SET done = TRUE;
 
+					DECLARE EXIT HANDLER FOR SQLEXCEPTION
+					BEGIN
+						ROLLBACK;
+						SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Error in migrating summary statistics data.';
+					END;
+
+					START TRANSACTION;
+
 					OPEN cur1;
 						project_loop: LOOP FETCH cur1 INTO  studyId, studyName, studyDescription, programUUID, trialEnvironmentDatasetId, summaryStatDatasetTypeId;
 							SET @NEW_ORDER = 0;
@@ -174,6 +182,8 @@
 
 						END LOOP project_loop;
 					CLOSE cur1;
+
+					COMMIT;
 
 				END;
 			]]>
