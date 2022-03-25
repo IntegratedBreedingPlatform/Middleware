@@ -16,11 +16,11 @@ public class GermplasmListSearchRequestDTO extends SearchRequestDto {
 	private String externalReferenceID;
 	private String externalReferenceSource;
 
-	public GermplasmListSearchRequestDTO(final String listType, final String listName, final List<String> listDbId, final String listSource,
+	public GermplasmListSearchRequestDTO(final String listType, final String listName, final List<String> listDbIds, final String listSource,
 		final String externalReferenceID, final String externalReferenceSource) {
 		this.listType = listType;
 		this.listName = listName;
-		this.listDbIds = listDbId;
+		this.listDbIds = listDbIds;
 		this.listSource = listSource;
 		this.externalReferenceID = externalReferenceID;
 		this.externalReferenceSource = externalReferenceSource;

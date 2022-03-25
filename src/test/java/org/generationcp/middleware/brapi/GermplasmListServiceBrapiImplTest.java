@@ -6,6 +6,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.GermplasmListServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.list.GermplasmListImportRequestDTO;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmListSearchRequestDTO;
@@ -13,6 +14,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListExternalReference;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.GermplasmListDTO;
@@ -127,5 +129,16 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 		final ExternalReferenceDTO savedExternalReferenceDTO = germplasmListDTOList.get(0).getExternalReferences().get(0);
 		Assert.assertEquals(externalReferenceDTO.getReferenceID(), savedExternalReferenceDTO.getReferenceID());
 		Assert.assertEquals(externalReferenceDTO.getReferenceSource(), savedExternalReferenceDTO.getReferenceSource());
+		
+		final List<GermplasmListData> data = this.daoFactory.getGermplasmListDataDAO()
+			.getByListId(Integer.valueOf(germplasmListDTOList.get(0).getListDbId()));
+		Assert.assertEquals(1, data.size());
+		Assert.assertEquals(savedGermplasm.getGid(), data.get(0).getGermplasm().getGid());
+		Assert.assertEquals(1, data.get(0).getEntryId().intValue());
+		Assert.assertEquals("1", data.get(0).getEntryCode());
+		Assert.assertEquals(germplasm.getPreferredName().getNval(), data.get(0).getDesignation());
+		Assert.assertEquals(GermplasmListDataDAO.SOURCE_UNKNOWN, data.get(0).getGroupName());
+		Assert.assertEquals(GermplasmListDataDAO.SOURCE_UNKNOWN, data.get(0).getSeedSource());
+
 	}
 }
