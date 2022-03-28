@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.impl.analysis;
 
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.CaseInsensitiveMap;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.CvId;
@@ -17,9 +18,14 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +55,7 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 	}
 
 	@Override
-	public Integer createMeansDataset(final Integer studyId, final MeansImportRequest meansImportRequest) {
+	public Integer createMeansDataset(final String crop, final Integer studyId, final MeansImportRequest meansImportRequest) {
 
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 		final Set<String> analysisVariableNames =
@@ -64,13 +70,13 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		// Add necessary dataset project properties
 		this.addMeansDatasetVariables(meansDataset, analysisVariablesMap);
 		// Save means experiment and means values
-		this.saveMeansExperimentAndValues(studyId, meansDataset, analysisVariablesMap, meansImportRequest);
+		this.saveMeansExperimentAndValues(crop, studyId, meansDataset, analysisVariablesMap, meansImportRequest);
 
 		return meansDataset.getProjectId();
 	}
 
 	@Override
-	public Integer createSummaryStatisticsDataset(final Integer studyId,
+	public Integer createSummaryStatisticsDataset(final String crop, final Integer studyId,
 		final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
 
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
@@ -87,12 +93,37 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		final DmsProject summaryStatisticsDataset =
 			this.createDataset(study, DatasetTypeEnum.SUMMARY_STATISTICS_DATA, "-SUMMARY_STATISTICS");
 		// Add necessary dataset project properties
+		this.addSummaryStatisticsFixedVariables(summaryStatisticsDataset);
 		this.addSummaryStatisticsDatasetVariables(summaryStatisticsDataset, analysisSummaryVariablesMap);
 		// Save summary statistics experiment and values
-		this.saveSummaryStatisticsExperimentAndValues(studyId, summaryStatisticsDataset, analysisSummaryVariablesMap,
+		this.saveOrUpdateSummaryStatisticsExperimentAndValues(crop, summaryStatisticsDataset, analysisSummaryVariablesMap,
 			summaryStatisticsImportRequest);
 
 		return summaryStatisticsDataset.getProjectId();
+	}
+
+	@Override
+	public void updateSummaryStatisticsDataset(final String crop, final Integer summaryStatisticsDatasetId,
+		final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
+
+		// Get the existing summary statistics dataset
+		final DmsProject summaryStatisticsDataset = this.daoFactory.getDmsProjectDAO().getById(summaryStatisticsDatasetId);
+
+		final Set<String> analysisSummaryVariableNames =
+			summaryStatisticsImportRequest.getData().stream().map(o -> o.getValues().keySet()).flatMap(Set::stream)
+				.collect(Collectors.toSet());
+		final Map<String, CVTerm> analysisSummaryVariablesMap =
+			new CaseInsensitiveMap(
+				this.daoFactory.getCvTermDao().getByNamesAndCvId(analysisSummaryVariableNames, CvId.VARIABLES).stream()
+					.collect(Collectors.toMap(
+						CVTerm::getName, Function.identity())));
+
+		// Add variables not yet present in the dataset if there's any.
+		this.addSummaryStatisticsDatasetVariables(summaryStatisticsDataset, analysisSummaryVariablesMap);
+		// Save summary statistics experiment and values
+		this.saveOrUpdateSummaryStatisticsExperimentAndValues(crop, summaryStatisticsDataset, analysisSummaryVariablesMap,
+			summaryStatisticsImportRequest);
+
 	}
 
 	private DmsProject createDataset(final DmsProject study, final DatasetTypeEnum datasetType, final String nameSuffix) {
@@ -108,9 +139,9 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		return dmsProject;
 	}
 
-	private void saveMeansExperimentAndValues(final int studyId, final DmsProject meansDataset,
+	private void saveMeansExperimentAndValues(final String crop, final int studyId, final DmsProject meansDataset,
 		final Map<String, CVTerm> analysisVariablesMap, final MeansImportRequest meansImportRequest) {
-
+		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(crop);
 		final Set<String> entryNumbers =
 			meansImportRequest.getData().stream().map(m -> String.valueOf(m.getEntryNo())).collect(Collectors.toSet());
 		final Map<String, StockModel>
@@ -128,42 +159,57 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 			experimentModel.setGeoLocation(environmentNumberGeolocationMap.get(String.valueOf(meansData.getEnvironmentNumber())));
 			experimentModel.setTypeId(ExperimentType.AVERAGE.getTermId());
 			experimentModel.setStock(stockModelMap.get(String.valueOf(meansData.getEntryNo())));
-			this.saveExperimentModel(analysisVariablesMap, experimentModel, meansData.getValues());
+			ObservationUnitIDGenerator.generateObservationUnitIds(cropType, Collections.singletonList(experimentModel));
+			this.saveOrUpdateExperimentModel(analysisVariablesMap, experimentModel, meansData.getValues());
 		}
 	}
 
-	private void saveSummaryStatisticsExperimentAndValues(final int studyId, final DmsProject summaryStatisticsDataset,
+	private void saveOrUpdateSummaryStatisticsExperimentAndValues(final String crop, final DmsProject summaryStatisticsDataset,
 		final Map<String, CVTerm> analysisSummaryVariablesMap,
 		final SummaryStatisticsImportRequest summaryStatisticsImportRequest) {
-
+		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(crop);
 		final Map<String, Geolocation> environmentNumberGeolocationMap =
-			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(studyId).stream()
+			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(summaryStatisticsDataset.getStudy().getProjectId()).stream()
 				.collect(Collectors.toMap(Geolocation::getDescription, Function.identity()));
 
-		// Save summary statistics experiment and summary values
-		for (final SummaryStatisticsImportRequest.SummaryData meansData : summaryStatisticsImportRequest.getData()) {
-			final ExperimentModel experimentModel = new ExperimentModel();
-			experimentModel.setProject(summaryStatisticsDataset);
-			experimentModel.setGeoLocation(environmentNumberGeolocationMap.get(String.valueOf(meansData.getEnvironmentNumber())));
-			experimentModel.setTypeId(ExperimentType.SUMMARY.getTermId());
-			this.saveExperimentModel(analysisSummaryVariablesMap, experimentModel, meansData.getValues());
+		final Map<String, ExperimentModel> experimentModelByTrialInstanceMap =
+			this.daoFactory.getExperimentDao().getExperimentsByProjectIds(Arrays.asList(summaryStatisticsDataset.getProjectId())).stream()
+				.collect(Collectors.toMap(e -> e.getGeoLocation().getDescription(), Function.identity()));
+
+		// Save or update summary statistics experiment and summary values
+		for (final SummaryStatisticsImportRequest.SummaryData summaryData : summaryStatisticsImportRequest.getData()) {
+			final ExperimentModel newExperimentModel = new ExperimentModel();
+			newExperimentModel.setProject(summaryStatisticsDataset);
+			newExperimentModel.setGeoLocation(environmentNumberGeolocationMap.get(String.valueOf(summaryData.getEnvironmentNumber())));
+			newExperimentModel.setTypeId(ExperimentType.SUMMARY.getTermId());
+			ObservationUnitIDGenerator.generateObservationUnitIds(cropType, Collections.singletonList(newExperimentModel));
+			final ExperimentModel experimentModel =
+				experimentModelByTrialInstanceMap.getOrDefault(String.valueOf(summaryData.getEnvironmentNumber()), newExperimentModel);
+			this.saveOrUpdateExperimentModel(analysisSummaryVariablesMap, experimentModel, summaryData.getValues());
 		}
 	}
 
-	private void saveExperimentModel(final Map<String, CVTerm> variablesMap, final ExperimentModel experimentModel,
+	private void saveOrUpdateExperimentModel(final Map<String, CVTerm> variablesMap, final ExperimentModel experimentModel,
 		final Map<String, Double> values) {
-		final List<Phenotype> phenotypes = new ArrayList<>();
+		final Map<Integer, Phenotype> phenotypesMap = CollectionUtils.isEmpty(experimentModel.getPhenotypes()) ? new HashMap<>() :
+			experimentModel.getPhenotypes().stream().collect(Collectors.toMap(Phenotype::getObservableId, Function.identity()));
 		for (final Map.Entry<String, Double> mapEntry : values.entrySet()) {
+			final int observableId = variablesMap.get(mapEntry.getKey()).getCvTermId();
 			if (mapEntry.getValue() != null) {
-				final Phenotype phenotype = new Phenotype();
-				phenotype.setExperiment(experimentModel);
-				phenotype.setValue(mapEntry.getValue().toString());
-				phenotype.setObservableId(variablesMap.get(mapEntry.getKey()).getCvTermId());
-				phenotypes.add(phenotype);
+				if (phenotypesMap.containsKey(observableId)) {
+					final Phenotype existingPhenotype = phenotypesMap.get(observableId);
+					existingPhenotype.setValue(mapEntry.getValue().toString());
+				} else {
+					final Phenotype phenotype = new Phenotype();
+					phenotype.setExperiment(experimentModel);
+					phenotype.setValue(mapEntry.getValue().toString());
+					phenotype.setObservableId(observableId);
+					phenotypesMap.put(observableId, phenotype);
+				}
 			}
 		}
-		experimentModel.setPhenotypes(phenotypes);
-		this.daoFactory.getExperimentDao().save(experimentModel);
+		experimentModel.setPhenotypes(new ArrayList<>(phenotypesMap.values()));
+		this.daoFactory.getExperimentDao().saveOrUpdate(experimentModel);
 	}
 
 	private void addMeansDatasetVariables(final DmsProject meansDataset, final Map<String, CVTerm> analaysisVariablesMap) {
@@ -187,19 +233,31 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 		}
 	}
 
-	private void addSummaryStatisticsDatasetVariables(final DmsProject summaryStatisticDataset,
-		final Map<String, CVTerm> analaysisSummaryVariablesMap) {
+	private void addSummaryStatisticsFixedVariables(final DmsProject summaryStatisticDataset) {
 		final AtomicInteger rank = new AtomicInteger();
-
 		final List<CVTerm> cvTerms =
 			this.daoFactory.getCvTermDao().getByIds(new ArrayList<>(SUMMARY_STATISTICS_DATASET_DMSPROJECT_PROPERTIES.keySet()));
 		cvTerms.forEach(term -> this.addProjectProperty(summaryStatisticDataset, term.getCvTermId(), this.resolveAlias(term),
 			SUMMARY_STATISTICS_DATASET_DMSPROJECT_PROPERTIES.get(term.getCvTermId()), rank.incrementAndGet()));
+	}
+
+	private void addSummaryStatisticsDatasetVariables(final DmsProject summaryStatisticDataset,
+		final Map<String, CVTerm> analaysisSummaryVariablesMap) {
+		final AtomicInteger rank =
+			new AtomicInteger(this.daoFactory.getProjectPropertyDAO().getNextRank(summaryStatisticDataset.getProjectId()));
+
+		final Set<Integer> existingVariablesInDataset =
+			this.daoFactory.getProjectPropertyDAO().getByProjectId(summaryStatisticDataset.getProjectId()).stream()
+				.map(ProjectProperty::getVariableId).collect(
+					Collectors.toSet());
 
 		for (final Map.Entry<String, CVTerm> entry : analaysisSummaryVariablesMap.entrySet()) {
-			this.addProjectProperty(summaryStatisticDataset, entry.getValue().getCvTermId(), entry.getValue().getName(),
-				VariableType.ANALYSIS_SUMMARY,
-				rank.incrementAndGet());
+			// Only add variables not yet exist in the dataset.
+			if (!existingVariablesInDataset.contains(entry.getValue().getCvTermId())) {
+				this.addProjectProperty(summaryStatisticDataset, entry.getValue().getCvTermId(), entry.getValue().getName(),
+					VariableType.ANALYSIS_SUMMARY,
+					rank.incrementAndGet());
+			}
 		}
 	}
 

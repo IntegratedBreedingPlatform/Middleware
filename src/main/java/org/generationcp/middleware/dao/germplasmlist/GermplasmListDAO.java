@@ -14,16 +14,13 @@ package org.generationcp.middleware.dao.germplasmlist;
 
 import com.google.common.base.Function;
 import com.google.common.collect.Maps;
-import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListDto;
 import org.generationcp.middleware.api.germplasmlist.MyListsDTO;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
-import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmListSearchRequestDTO;
-import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
@@ -31,10 +28,6 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.service.api.GermplasmListDTO;
-import org.generationcp.middleware.service.api.study.MethodDTO;
-import org.generationcp.middleware.service.api.study.OntologyReferenceDTO;
-import org.generationcp.middleware.service.api.study.ScaleDTO;
-import org.generationcp.middleware.service.api.study.TraitDTO;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
@@ -64,7 +57,6 @@ import org.springframework.util.StringUtils;
 import javax.annotation.Nullable;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -929,7 +921,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		stringBuilder.append("   list.listuid AS " + LIST_OWNER_ID + ", ");
 		stringBuilder.append("   (Select count(*) FROM listdata data WHERE data.listid = list.listid) AS " + LIST_SIZE + " ");
 		this.appendListsFromQuery(stringBuilder);
-		this.appendListSeachFilters(stringBuilder, requestDTO);
+		this.appendListSearchFilters(stringBuilder, requestDTO);
 		return stringBuilder.toString();
 	}
 
@@ -937,7 +929,7 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		final StringBuilder sql = new StringBuilder(" SELECT COUNT(1) FROM ( ");
 		sql.append("SELECT DISTINCT list.listid ");
 		this.appendListsFromQuery(sql);
-		this.appendListSeachFilters(sql, requestDTO);
+		this.appendListSearchFilters(sql, requestDTO);
 		sql.append(") as listids");
 		return sql.toString();
 	}
@@ -947,9 +939,9 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		stringBuilder.append("	WHERE list.liststatus != " + GermplasmList.Status.DELETED.getCode() + " ");
 	}
 
-	public void appendListSeachFilters(final StringBuilder stringBuilder, final GermplasmListSearchRequestDTO requestDTO) {
-		if (!StringUtils.isEmpty(requestDTO.getListDbId())) {
-			stringBuilder.append(" AND list.listid = :listDbId ");
+	public void appendListSearchFilters(final StringBuilder stringBuilder, final GermplasmListSearchRequestDTO requestDTO) {
+		if (!CollectionUtils.isEmpty(requestDTO.getListDbIds())) {
+			stringBuilder.append(" AND list.listid IN (:listDbId) ");
 		}
 
 		if (!StringUtils.isEmpty(requestDTO.getListName())) {
@@ -968,8 +960,8 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	}
 
 	public void addListSearchParameters(final SQLQuery sqlQuery, final GermplasmListSearchRequestDTO requestDTO) {
-		if (!StringUtils.isEmpty(requestDTO.getListDbId())) {
-			sqlQuery.setParameter("listDbId", requestDTO.getListDbId());
+		if (!CollectionUtils.isEmpty(requestDTO.getListDbIds())) {
+			sqlQuery.setParameterList("listDbId", requestDTO.getListDbIds());
 		}
 
 		if (!StringUtils.isEmpty(requestDTO.getListName())) {
