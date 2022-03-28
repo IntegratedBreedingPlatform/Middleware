@@ -20,7 +20,6 @@ import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -47,13 +46,15 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 	}
 
 	@Override
-	public List<Integer> createAnalysisVariables(final AnalysisVariablesImportRequest analysisVariablesImportRequest) {
+	public MultiKeyMap createAnalysisVariables(final AnalysisVariablesImportRequest analysisVariablesImportRequest,
+		final Map<String, String> variableNameToAliasMap) {
+
+		final MultiKeyMap variableIdsByTraitAndMethodName = MultiKeyMap.decorate(new CaseInsensitiveMap());
 
 		final List<Integer> variableIds = analysisVariablesImportRequest.getVariableIds();
 		final List<String> analysisMethodNames = analysisVariablesImportRequest.getAnalysisMethodNames();
 		final String variableType = analysisVariablesImportRequest.getVariableType();
 
-		final List<Integer> analysisVariableIds = new ArrayList<>();
 		final VariableFilter variableFilter = new VariableFilter();
 		variableIds.stream().forEach(variableFilter::addVariableId);
 		// Get the existing trait variables
@@ -69,17 +70,19 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 		for (final Map.Entry<Integer, Variable> variableEntry : variablesMap.entrySet()) {
 			for (final String analysisName : analysisMethodNames) {
 				final CVTerm method = methodsMap.get(analysisName);
+				final String variableNameOrAlias =
+					variableNameToAliasMap.getOrDefault(variableEntry.getValue().getName(), variableEntry.getValue().getName());
 				// If analysis variable already exists for specific trait, do not create new, just return the existing id of analysis variable
 				if (existingAnalysisMethodsOfTraitsMap.containsKey(variableEntry.getKey(), method.getCvTermId())) {
-					analysisVariableIds.add(
-						(Integer) existingAnalysisMethodsOfTraitsMap.get(variableEntry.getKey(), method.getCvTermId()));
+					variableIdsByTraitAndMethodName.put(variableNameOrAlias, analysisName,
+						existingAnalysisMethodsOfTraitsMap.get(variableEntry.getKey(), method.getCvTermId()));
 				} else { // else, create new analysis variable
-					analysisVariableIds.add(
-						this.createAnalysisStandardVariable(variableEntry.getValue(), method, variableType));
+					variableIdsByTraitAndMethodName.put(variableNameOrAlias, analysisName,
+						this.createAnalysisStandardVariable(variableEntry.getValue(), variableNameOrAlias, method, variableType));
 				}
 			}
 		}
-		return analysisVariableIds;
+		return variableIdsByTraitAndMethodName;
 	}
 
 	@Override
@@ -93,7 +96,13 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 		return variableTypesMultimap;
 	}
 
-	private Integer createAnalysisStandardVariable(final Variable traitVariable, final CVTerm method, final String variableType) {
+	@Override
+	public MultiKeyMap getAnalysisMethodsOfTraits(final List<Integer> variableIds, final List<Integer> methodIds) {
+		return this.daoFactory.getCvTermRelationshipDao().retrieveAnalysisMethodsOfTraits(variableIds, methodIds);
+	}
+
+	private Integer createAnalysisStandardVariable(final Variable traitVariable, final String alias, final CVTerm method,
+		final String variableType) {
 
 		// Try to look for existing variable with same Property, Scale and Method.
 		// If it exists, reuse it. Only variable with Analysis or Analysis Summary variable type can be reused.
@@ -113,7 +122,7 @@ public class OntologyVariableServiceImpl implements OntologyVariableService {
 						method.getName()));
 			}
 		} else {
-			String analysisVariableName = traitVariable.getName() + "_" + method.getName();
+			String analysisVariableName = alias + "_" + method.getName();
 
 			/** It's possible that the analysisVariableName to be saved is already used by other variables,
 			 * in that case append _1 to the name to make sure it's unique. This is the same logic found in
