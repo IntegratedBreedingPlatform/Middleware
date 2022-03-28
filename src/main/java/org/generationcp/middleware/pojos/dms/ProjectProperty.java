@@ -1,7 +1,10 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import java.io.Serializable;
+import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.annotations.Formula;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -14,31 +17,26 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
-
-import org.generationcp.middleware.pojos.oms.CVTerm;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Formula;
+import java.io.Serializable;
 
 /**
  * http://wiki.cimmyt.org/confluence/display/MBP/Business+Rules+for+Mapping+to+Chado
- *
+ * <p>
  * The project_properties table captures links to the ontology. Properties with the same rank represent a single compound property. The type
  * column distinguishes the components of the compound property. Note that these entries are just the names of the properties with their
  * ontology mappings. Values for properties are stored in the appropriate sub-module, usually in Experiment.
  *
  * @author tippsgo
- *
  */
 @Entity
 @Table(name = "projectprop", uniqueConstraints = {@UniqueConstraint(columnNames = {"project_id", "type_id", "rank"})})
-@Cache(usage=CacheConcurrencyStrategy.READ_WRITE, region="projectprop")
+@Cache(usage = CacheConcurrencyStrategy.READ_WRITE, region = "projectprop")
 public class ProjectProperty implements Serializable {
 
 	private static final long serialVersionUID = 7517773605676616639L;
 
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "projectprop_id")
 	private Integer projectPropertyId;
@@ -84,7 +82,8 @@ public class ProjectProperty implements Serializable {
 	public ProjectProperty() {
 	}
 
-	public ProjectProperty(final DmsProject project, final Integer typeId, final String value, final Integer rank, final Integer variableId, final String alias) {
+	public ProjectProperty(final DmsProject project, final Integer typeId, final String value, final Integer rank, final Integer variableId,
+		final String alias) {
 		this.project = project;
 		this.typeId = typeId;
 		this.value = value;
@@ -155,6 +154,14 @@ public class ProjectProperty implements Serializable {
 
 	public void setDescription(final String description) {
 		this.description = description;
+	}
+
+	public CVTerm getVariable() {
+		return this.variable;
+	}
+
+	public void setVariable(final CVTerm variable) {
+		this.variable = variable;
 	}
 
 	@Override

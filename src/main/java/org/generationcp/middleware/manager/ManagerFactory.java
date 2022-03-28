@@ -27,6 +27,8 @@ import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataServi
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataServiceImpl;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl;
+import org.generationcp.middleware.api.ontology.OntologyVariableService;
+import org.generationcp.middleware.api.ontology.OntologyVariableServiceImpl;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.api.program.ProgramFavoriteServiceImpl;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -71,6 +73,7 @@ import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
@@ -84,6 +87,7 @@ import org.generationcp.middleware.service.api.study.generation.ExperimentDesign
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
+import org.generationcp.middleware.service.impl.analysis.SiteAnalysisServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
@@ -396,6 +400,14 @@ public class ManagerFactory implements Serializable {
 
 	public FileMetadataService getFileMetadataService() {
 		return new FileMetadataServiceImpl(this.sessionProvider);
+	}
+
+	public SiteAnalysisService getSiteAnalysisService() {
+		return new SiteAnalysisServiceImpl(this.sessionProvider);
+	}
+
+	public OntologyVariableService getOntologyVariableService() {
+		return new OntologyVariableServiceImpl(this.sessionProvider);
 	}
 
 }

@@ -5,7 +5,10 @@ import org.generationcp.middleware.service.impl.analysis.SummaryStatisticsImport
 
 public interface SiteAnalysisService {
 
-	Integer createMeansDataset(Integer studyId, MeansImportRequest meansRequestDto);
+	Integer createMeansDataset(String crop, Integer studyId, MeansImportRequest meansRequestDto);
 
-	Integer createSummaryStatisticsDataset(Integer studyId, SummaryStatisticsImportRequest summaryStatisticsImportRequest);
+	Integer createSummaryStatisticsDataset(String crop, Integer studyId, SummaryStatisticsImportRequest summaryStatisticsImportRequest);
+
+	void updateSummaryStatisticsDataset(String crop, Integer summaryStatisticsDatasetId,
+		SummaryStatisticsImportRequest summaryStatisticsImportRequest);
 }
