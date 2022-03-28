@@ -190,9 +190,9 @@
 
 	<changeSet author="cuenyad" id="studies-TBD-13">
 		<preConditions onFail="MARK_RAN">
-		<sqlCheck expectedResult="0">
-			SELECT count(1) > 0 FROM  list_data_details WHERE variable_id = 8230;
-		</sqlCheck>
+			<sqlCheck expectedResult="0">
+				SELECT count(1) > 0 FROM list_data_view WHERE cvterm_id = 8230 and type_id = 1815;
+			</sqlCheck>
 		</preConditions>
 		<comment>Migrate ENTRY_NO as an Entry Detail variable</comment>
 		<sql dbms="mysql" splitStatements="true">
