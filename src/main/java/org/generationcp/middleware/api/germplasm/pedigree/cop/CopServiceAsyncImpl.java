@@ -168,9 +168,17 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 				// track progress
 				gidProcessingQueue.put(gid1, Boolean.TRUE);
 			}
-			info("cop: saving %s records", matrixNew.size());
+
+			final int recordCount;
 
 			if (listId == null) {
+				/*
+				 * Case 1: cop for some gids: store in db
+				 */
+
+				recordCount = matrixNew.size();
+				info("cop: saving %s records", recordCount);
+
 				final CopMatrixDao copMatrixDao = this.daoFactory.getCopMatrixDao();
 				for (final Map.Entry<Integer, Map<Integer, Double>> rowEntrySet : matrixNew.rowMap().entrySet()) {
 					for (final Integer column : rowEntrySet.getValue().keySet()) {
@@ -182,6 +190,11 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 			} else {
 
 				final TreeBasedTable<Integer, Integer, Double> matrixRequest = TreeBasedTable.create();
+
+				recordCount = matrixRequest.size();
+				info("cop: saving %s records", recordCount);
+
+				// csv storage saves all gids from request, not just the ones that are new
 				for (final Map.Entry<Integer, Map<Integer, Double>> rowEntrySet : matrix.rowMap().entrySet()) {
 					for (final Integer column : rowEntrySet.getValue().keySet()) {
 						if (gids.contains(column)) {
@@ -189,6 +202,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 						}
 					}
 				}
+
 				final String fileFullPath = CopUtils.getFileFullPath(listId);
 				try (final CSVWriter csvWriter = new CSVWriter(
 					new OutputStreamWriter(new FileOutputStream(fileFullPath), StandardCharsets.UTF_8), ',')
@@ -197,7 +211,8 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 					csvWriter.writeAll(new CopResponse(matrixRequest).getArray());
 				}
 			}
-			info("cop: finish saving %s records", matrixNew.size());
+
+			info("cop: finish saving %s records", recordCount);
 
 			return new AsyncResult<>(Boolean.TRUE);
 		} catch (final RuntimeException | IOException ex) {
