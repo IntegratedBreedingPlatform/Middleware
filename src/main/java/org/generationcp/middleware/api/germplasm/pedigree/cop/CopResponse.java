@@ -15,6 +15,7 @@ public class CopResponse {
 
 	private Table<Integer, Integer, Double> matrix;
 	private List<String[]> array;
+	private Boolean hasFile;
 
 	private double progress;
 
@@ -25,6 +26,10 @@ public class CopResponse {
 	public CopResponse(final Table<Integer, Integer, Double> matrix) {
 		this.matrix = matrix;
 		this.array = convertTableTo2DArray(matrix);
+	}
+
+	public CopResponse(final Boolean hasFile) {
+		this.hasFile = hasFile;
 	}
 
 	static List<String[]> convertTableTo2DArray(final Table<Integer, Integer, Double> table) {
@@ -92,5 +97,9 @@ public class CopResponse {
 
 	public void setArray(final List<String[]> array) {
 		this.array = array;
+	}
+
+	public Boolean getHasFile() {
+		return hasFile;
 	}
 }

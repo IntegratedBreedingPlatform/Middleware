@@ -10,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.File;
+import java.io.IOException;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Future;
 
@@ -52,9 +55,24 @@ public class CopServiceImpl implements CopService {
 	}
 
 	@Override
-	public CopResponse coefficientOfParentage(final Set<Integer> gids) {
+	public CopResponse coefficientOfParentage(Set<Integer> gids, final Integer listId,
+		final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+
+		if (listId != null) {
+			gids = new LinkedHashSet<>(this.daoFactory.getGermplasmListDataDAO().getGidsByListId(listId));
+		}
+
 		if (this.copServiceAsync.threadExists(gids)) {
 			return new CopResponse(this.copServiceAsync.getProgress(gids));
+		}
+
+		if (listId != null) {
+			final File csv = getCsv(listId);
+			if (csv.exists()) {
+				return new CopResponse(true);
+			} else {
+				throw new MiddlewareRequestException("", "cop.csv.not.exists");
+			}
 		}
 
 		final Table<Integer, Integer, Double> matrix = this.daoFactory.getCopMatrixDao().getByGids(gids);
@@ -77,7 +95,7 @@ public class CopServiceImpl implements CopService {
 	}
 
 	@Override
-	public CopResponse calculateCoefficientOfParentage(final Set<Integer> gids) {
+	public CopResponse calculateCoefficientOfParentage(final Set<Integer> gids, final Integer listId) {
 		final Table<Integer, Integer, Double> matrix = this.daoFactory.getCopMatrixDao().getByGids(gids);
 
 		// if all cop values are calculated, return them
@@ -96,7 +114,7 @@ public class CopServiceImpl implements CopService {
 			}
 
 			this.copServiceAsync.prepareExecution(gids);
-			final Future<Boolean> booleanFuture = this.copServiceAsync.calculateAsync(gids, matrix);
+			final Future<Boolean> booleanFuture = this.copServiceAsync.calculateAsync(gids, matrix, listId);
 			this.copServiceAsync.trackFutureTask(gids, booleanFuture);
 			return new CopResponse(this.copServiceAsync.getProgress(gids));
 		}
@@ -107,12 +125,26 @@ public class CopServiceImpl implements CopService {
 	@Override
 	public CopResponse calculateCoefficientOfParentage(final Integer listId) {
 		final Set<Integer> gids = new LinkedHashSet<>(this.daoFactory.getGermplasmListDataDAO().getGidsByListId(listId));
-		return this.calculateCoefficientOfParentage(gids);
+		return this.calculateCoefficientOfParentage(gids, listId);
 	}
 
 	@Override
-	public void cancelJobs(final Set<Integer> gids) {
+	public void cancelJobs(Set<Integer> gids, final Integer listId) {
+		if (listId != null) {
+			gids = new LinkedHashSet<>(this.daoFactory.getGermplasmListDataDAO().getGidsByListId(listId));
+		}
 		this.copServiceAsync.cancelJobs(gids);
+	}
+
+	@Override
+	public File downloadCoefficientOfParentage(final Integer listId) {
+		return getCsv(listId);
+	}
+
+	private static File getCsv(final Integer listId) {
+		final String fileFullPath = CopUtils.getFileFullPath(listId);
+		final File file = new File(fileFullPath);
+		return file;
 	}
 
 }

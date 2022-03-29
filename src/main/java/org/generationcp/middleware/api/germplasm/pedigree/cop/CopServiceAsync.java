@@ -9,8 +9,8 @@ public interface CopServiceAsync {
 
 	Future<Boolean> calculateAsync(
 		Set<Integer> gids,
-		Table<Integer, Integer, Double> matrix
-	);
+		Table<Integer, Integer, Double> matrix,
+		final Integer listId);
 
 	/**
 	 * Checks thread limit, put gids into queue

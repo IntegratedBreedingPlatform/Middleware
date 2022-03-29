@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasm.pedigree.cop;
 
+import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import com.google.common.collect.TreeBasedTable;
@@ -19,6 +20,10 @@ import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
@@ -94,8 +99,8 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 	@Async
 	public Future<Boolean> calculateAsync(
 		final Set<Integer> gids,
-		final Table<Integer, Integer, Double> matrix
-	) {
+		final Table<Integer, Integer, Double> matrix,
+		final Integer listId) {
 
 		try {
 			final TreeBasedTable<Integer, Integer, Double> matrixNew = TreeBasedTable.create();
@@ -165,18 +170,37 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 			}
 			info("cop: saving %s records", matrixNew.size());
 
-			final CopMatrixDao copMatrixDao = this.daoFactory.getCopMatrixDao();
-			for (final Map.Entry<Integer, Map<Integer, Double>> rowEntrySet : matrixNew.rowMap().entrySet()) {
-				for (final Integer column : rowEntrySet.getValue().keySet()) {
-					final Integer row = rowEntrySet.getKey();
-					final CopMatrix copMatrix = new CopMatrix(row, column, matrixNew.get(row, column));
-					copMatrixDao.save(copMatrix);
+			if (listId == null) {
+				final CopMatrixDao copMatrixDao = this.daoFactory.getCopMatrixDao();
+				for (final Map.Entry<Integer, Map<Integer, Double>> rowEntrySet : matrixNew.rowMap().entrySet()) {
+					for (final Integer column : rowEntrySet.getValue().keySet()) {
+						final Integer row = rowEntrySet.getKey();
+						final CopMatrix copMatrix = new CopMatrix(row, column, matrixNew.get(row, column));
+						copMatrixDao.save(copMatrix);
+					}
+				}
+			} else {
+
+				final TreeBasedTable<Integer, Integer, Double> matrixRequest = TreeBasedTable.create();
+				for (final Map.Entry<Integer, Map<Integer, Double>> rowEntrySet : matrix.rowMap().entrySet()) {
+					for (final Integer column : rowEntrySet.getValue().keySet()) {
+						if (gids.contains(column)) {
+							matrixRequest.put(rowEntrySet.getKey(), column, rowEntrySet.getValue().get(column));
+						}
+					}
+				}
+				final String fileFullPath = CopUtils.getFileFullPath(listId);
+				try (final CSVWriter csvWriter = new CSVWriter(
+					new OutputStreamWriter(new FileOutputStream(fileFullPath), StandardCharsets.UTF_8), ',')
+				) {
+					// TODO option to write as gid1,gid2,value (some spreadsheets has max column)
+					csvWriter.writeAll(new CopResponse(matrixRequest).getArray());
 				}
 			}
 			info("cop: finish saving %s records", matrixNew.size());
 
 			return new AsyncResult<>(Boolean.TRUE);
-		} catch (final RuntimeException ex) {
+		} catch (final RuntimeException | IOException ex) {
 			LOG.error("Error in CopServiceAsyncImpl.calculateAsync(), gids=" + gids + ", message: " + ex.getMessage(), ex);
 			return new AsyncResult<>(Boolean.FALSE);
 		} finally {
