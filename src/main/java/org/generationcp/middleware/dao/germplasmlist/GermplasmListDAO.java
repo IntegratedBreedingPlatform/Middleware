@@ -1,3 +1,4 @@
+
 /*******************************************************************************
  * Copyright (c) 2012, All Rights Reserved.
  *
@@ -19,12 +20,14 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmListSearchRequestDTO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.GermplasmDataManagerUtil;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListMetadata;
+import org.generationcp.middleware.service.api.GermplasmListDTO;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
@@ -41,6 +44,7 @@ import org.hibernate.criterion.Restrictions;
 import org.hibernate.criterion.Subqueries;
 import org.hibernate.sql.JoinType;
 import org.hibernate.transform.AliasToBeanResultTransformer;
+import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
 import org.hibernate.type.IntegerType;
@@ -48,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import javax.annotation.Nullable;
 import java.math.BigInteger;
@@ -67,6 +72,13 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 	private static final String NAME = "name";
 	private static final String PARENT = "parent";
 	private static final String TYPE = "type";
+
+	private static final String LIST_ID = "listId";
+	private static final String LIST_NAME = "listName";
+	private static final String CREATION_DATE = "createdDate";
+	private static final String LIST_DESCRIPTION = "description";
+	private static final String LIST_OWNER_ID = "listOwnerId";
+	private static final String LIST_SIZE = "listSize";
 
 	private static final String STATUS = "status";
 
@@ -882,5 +894,112 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		queryBuilder.addParamsToQuery(query);
 
 		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
+	public long countGermplasmListDTOs(final GermplasmListSearchRequestDTO requestDTO) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createCountListsQueryString(requestDTO));
+		this.addListSearchParameters(sqlQuery, requestDTO);
+		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+	}
+
+	public List<GermplasmListDTO> searchGermplasmListDTOs(final GermplasmListSearchRequestDTO requestDTO, final Pageable pageable) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createListsQuery(requestDTO));
+		GenericDAO.addPaginationToSQLQuery(sqlQuery, pageable);
+		this.addListSearchParameters(sqlQuery, requestDTO);
+		this.appendVariablesScalar(sqlQuery);
+		sqlQuery.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+		return this.convertToGermplasmListDTO(sqlQuery.list());
+	}
+
+	public String createListsQuery(final GermplasmListSearchRequestDTO requestDTO) {
+		final StringBuilder stringBuilder = new StringBuilder(" SELECT DISTINCT ");
+		stringBuilder.append("   list.listid AS " + LIST_ID + ", ");
+		stringBuilder.append("   list.listname AS " + LIST_NAME + ", ");
+		stringBuilder.append("   list.listdate AS " + CREATION_DATE + ", ");
+		stringBuilder.append("   list.listdesc AS " + LIST_DESCRIPTION + ", ");
+		stringBuilder.append("   list.listuid AS " + LIST_OWNER_ID + ", ");
+		stringBuilder.append("   (Select count(*) FROM listdata data WHERE data.listid = list.listid) AS " + LIST_SIZE + " ");
+		this.appendListsFromQuery(stringBuilder);
+		this.appendListSearchFilters(stringBuilder, requestDTO);
+		return stringBuilder.toString();
+	}
+
+	private String createCountListsQueryString(final GermplasmListSearchRequestDTO requestDTO) {
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(1) FROM ( ");
+		sql.append("SELECT DISTINCT list.listid ");
+		this.appendListsFromQuery(sql);
+		this.appendListSearchFilters(sql, requestDTO);
+		sql.append(") as listids");
+		return sql.toString();
+	}
+
+	public void appendListsFromQuery(final StringBuilder stringBuilder) {
+		stringBuilder.append("	FROM listnms list ");
+		stringBuilder.append("	WHERE list.liststatus != " + GermplasmList.Status.DELETED.getCode() + " ");
+	}
+
+	public void appendListSearchFilters(final StringBuilder stringBuilder, final GermplasmListSearchRequestDTO requestDTO) {
+		if (!CollectionUtils.isEmpty(requestDTO.getListDbIds())) {
+			stringBuilder.append(" AND list.listid IN (:listDbId) ");
+		}
+
+		if (!StringUtils.isEmpty(requestDTO.getListName())) {
+			stringBuilder.append(" AND list.listname = :listName ");
+		}
+
+		if (!StringUtils.isEmpty(requestDTO.getExternalReferenceID())) {
+			stringBuilder.append(" AND EXISTS (SELECT * FROM external_reference_listnms listref ");
+			stringBuilder.append(" WHERE list.listid = listref.listid AND listref.reference_id = :externalReferenceID) ");
+		}
+
+		if (!StringUtils.isEmpty(requestDTO.getExternalReferenceSource())) {
+			stringBuilder.append(" AND EXISTS (SELECT * FROM external_reference_listnms listref ");
+			stringBuilder.append(" WHERE list.listid = listref.listid AND listref.reference_source = :externalReferenceSource) ");
+		}
+	}
+
+	public void addListSearchParameters(final SQLQuery sqlQuery, final GermplasmListSearchRequestDTO requestDTO) {
+		if (!CollectionUtils.isEmpty(requestDTO.getListDbIds())) {
+			sqlQuery.setParameterList("listDbId", requestDTO.getListDbIds());
+		}
+
+		if (!StringUtils.isEmpty(requestDTO.getListName())) {
+			sqlQuery.setParameter("listName", requestDTO.getListName());
+		}
+
+		if (!StringUtils.isEmpty(requestDTO.getExternalReferenceID())) {
+			sqlQuery.setParameter("externalReferenceID", requestDTO.getExternalReferenceID());
+		}
+
+		if (!StringUtils.isEmpty(requestDTO.getExternalReferenceSource())) {
+			sqlQuery.setParameter("externalReferenceSource", requestDTO.getExternalReferenceSource());
+		}
+	}
+
+	private void appendVariablesScalar(final SQLQuery sqlQuery) {
+		sqlQuery.addScalar(LIST_ID)
+			.addScalar(LIST_NAME)
+			.addScalar(CREATION_DATE)
+			.addScalar(LIST_DESCRIPTION)
+			.addScalar(LIST_OWNER_ID)
+			.addScalar(LIST_SIZE, new IntegerType());
+	}
+
+	protected List<GermplasmListDTO> convertToGermplasmListDTO(final List<Map<String, Object>> results) {
+		final List<GermplasmListDTO> lists = new ArrayList<>();
+
+		for (final Map<String, Object> result : results) {
+			final GermplasmListDTO listDTO = new GermplasmListDTO();
+			listDTO.setListDbId(String.valueOf(result.get(LIST_ID)));
+			listDTO.setListName(String.valueOf(result.get(LIST_NAME)));
+			listDTO.setListDescription(String.valueOf(result.get(LIST_DESCRIPTION)));
+			listDTO.setListSize((Integer) result.get(LIST_SIZE));
+			listDTO.setListOwnerPersonDbId(String.valueOf(result.get(LIST_OWNER_ID)));
+			listDTO.setDateCreated(Util.tryParseDate(String.valueOf(result.get(CREATION_DATE))));
+			lists.add(listDTO);
+		}
+
+		return lists;
 	}
 }

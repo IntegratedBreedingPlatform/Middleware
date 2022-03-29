@@ -1,11 +1,14 @@
 package org.generationcp.middleware.service.impl.analysis;
 
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.ontology.AnalysisVariablesImportRequest;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -67,10 +70,11 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS.getName());
 		analysisVariablesImportRequest.setVariableIds(Arrays.asList(testVariable.getId()));
 		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("BLUEs", "BLUPs"));
-		final List<Integer> analysisVariableIds = this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest);
+		final MultiKeyMap createdAnalysisVariablesMap =
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
 
 		final VariableFilter variableFilter = new VariableFilter();
-		analysisVariableIds.forEach(variableFilter::addVariableId);
+		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
 		final Map<Integer, Variable> analysisVariablesMap = this.ontologyVariableService.getVariablesWithFilterById(variableFilter);
 
 		// Create means dataset
@@ -82,7 +86,8 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 				.collect(Collectors.toList());
 		meansImportRequest.setData(meansDataList);
 
-		final int meansDatasetId = this.analysisService.createMeansDataset(study.getProjectId(), meansImportRequest);
+		final int meansDatasetId =
+			this.analysisService.createMeansDataset(ContextHolder.getCurrentCrop(), study.getProjectId(), meansImportRequest);
 
 		// Verify the means dataset is saved successfully
 		// including the project, projectprop, experiment, and phenotype records.
@@ -131,7 +136,158 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 				final Variable analysisVariable = analysisVariablesMap.get(p.getObservableId());
 				assertEquals(p.getValue(), meansData.getValues().get(analysisVariable.getName()).toString());
 			});
+			assertEquals(experimentModel.getTypeId(), ExperimentType.AVERAGE.getTermId());
 		}
+	}
+
+	@Test
+	public void testCreateSummaryStatisticsDataset() {
+		// Create study with 2 instances and 5 entries per instance
+		final DmsProject study = this.createTestStudyWithObservations("TestStudy", Arrays.asList(1, 2), 5);
+		final Variable testVariable = this.createTestVariable(RandomStringUtils.randomAlphabetic(10));
+
+		// Create Analysis Summary Variables to be used in creating summary statistics dataset
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
+		analysisVariablesImportRequest.setVariableIds(Arrays.asList(testVariable.getId()));
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("Heritability", "PValue", "CV"));
+		final MultiKeyMap createdAnalysisVariablesMap =
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
+
+		final VariableFilter variableFilter = new VariableFilter();
+		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
+		final Map<Integer, Variable> analysisSummaryVariablesMap = this.ontologyVariableService.getVariablesWithFilterById(variableFilter);
+
+		// Create summary statistics dataset
+		final SummaryStatisticsImportRequest summaryStatisticsImportRequest = new SummaryStatisticsImportRequest();
+		final List<Geolocation> environmentGeolocations =
+			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(study.getProjectId());
+		final List<SummaryStatisticsImportRequest.SummaryData> summaryDataList =
+			environmentGeolocations.stream()
+				.map(o -> this.createSummaryData(Integer.valueOf(o.getDescription()), analysisSummaryVariablesMap))
+				.collect(Collectors.toList());
+		summaryStatisticsImportRequest.setData(summaryDataList);
+
+		final int summaryStatisticsDatasetId =
+			this.analysisService.createSummaryStatisticsDataset(ContextHolder.getCurrentCrop(), study.getProjectId(),
+				summaryStatisticsImportRequest);
+
+		// Verify the summary statistics dataset is saved successfully
+		// including the project, projectprop, experiment, and phenotype records.
+		final DatasetDTO summaryStatisticsDataset = this.daoFactory.getDmsProjectDAO().getDataset(summaryStatisticsDatasetId);
+		final Map<Integer, ProjectProperty> summaryStatisticsDatasetProjectProperties =
+			this.daoFactory.getProjectPropertyDAO().getByProjectId(summaryStatisticsDatasetId).stream().collect(
+				Collectors.toMap(ProjectProperty::getVariableId, Function.identity()));
+		final List<ExperimentModel> experimentModels = this.daoFactory.getExperimentDao()
+			.getObservationUnits(summaryStatisticsDatasetId, environmentGeolocations.stream().map(Geolocation::getLocationId).collect(
+				Collectors.toList()));
+		// Verify DmsProject
+		assertEquals(summaryStatisticsDataset.getDatasetTypeId().intValue(), DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId());
+		assertEquals("TestStudy-SUMMARY_STATISTICS", summaryStatisticsDataset.getName());
+		// Verify ProjectProp
+		SiteAnalysisServiceImpl.SUMMARY_STATISTICS_DATASET_DMSPROJECT_PROPERTIES.entrySet().forEach(expectedProjectProperty -> {
+			assertTrue(summaryStatisticsDatasetProjectProperties.containsKey(expectedProjectProperty.getKey()));
+			assertEquals(expectedProjectProperty.getValue().getId(),
+				summaryStatisticsDatasetProjectProperties.get(expectedProjectProperty.getKey()).getTypeId());
+			if (expectedProjectProperty.getKey().intValue() == TermId.LOCATION_ID.getId()) {
+				assertEquals(SiteAnalysisServiceImpl.LOCATION_NAME,
+					summaryStatisticsDatasetProjectProperties.get(expectedProjectProperty.getKey()).getAlias());
+			}
+		});
+		analysisSummaryVariablesMap.entrySet().forEach(expectedVariablesInProjectProp -> {
+			assertTrue(summaryStatisticsDatasetProjectProperties.containsKey(expectedVariablesInProjectProp.getKey()));
+			assertEquals(VariableType.ANALYSIS_SUMMARY.getId(),
+				summaryStatisticsDatasetProjectProperties.get(expectedVariablesInProjectProp.getKey()).getTypeId());
+		});
+		// Verify experiment and phenotype values
+		assertEquals(summaryStatisticsImportRequest.getData().size(), experimentModels.size());
+		final Map<Integer, SummaryStatisticsImportRequest.SummaryData> summaryDataByEnvironmentNumber =
+			summaryStatisticsImportRequest.getData().stream()
+				.collect(Collectors.toMap(SummaryStatisticsImportRequest.SummaryData::getEnvironmentNumber, Function.identity()));
+		for (final ExperimentModel experimentModel : experimentModels) {
+			final SummaryStatisticsImportRequest.SummaryData summaryData =
+				summaryDataByEnvironmentNumber.get(Integer.valueOf(experimentModel.getGeoLocation().getDescription()));
+			experimentModel.getPhenotypes().forEach(p -> {
+				final Variable analysisVariable = analysisSummaryVariablesMap.get(p.getObservableId());
+				assertEquals(p.getValue(), summaryData.getValues().get(analysisVariable.getName()).toString());
+			});
+			assertEquals(experimentModel.getTypeId(), ExperimentType.SUMMARY.getTermId());
+		}
+	}
+
+	@Test
+	public void testUpdateSummaryStatisticsDataset() {
+		// Create study with 2 instances and 5 entries per instance
+		final DmsProject study = this.createTestStudyWithObservations("TestStudy", Arrays.asList(1, 2), 5);
+		final Variable testVariable = this.createTestVariable(RandomStringUtils.randomAlphabetic(10));
+
+		// Create Analysis Summary Variables to be used in creating summary statistics dataset
+		final AnalysisVariablesImportRequest analysisVariablesImportRequest = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequest.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
+		analysisVariablesImportRequest.setVariableIds(Arrays.asList(testVariable.getId()));
+		analysisVariablesImportRequest.setAnalysisMethodNames(Arrays.asList("Heritability", "PValue", "CV"));
+		final MultiKeyMap createdAnalysisVariablesMap =
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequest, new HashMap<>());
+
+		final VariableFilter variableFilter = new VariableFilter();
+		createdAnalysisVariablesMap.values().stream().forEach(i -> variableFilter.addVariableId((Integer) i));
+		final Map<Integer, Variable> analysisSummaryVariablesMap = this.ontologyVariableService.getVariablesWithFilterById(variableFilter);
+
+		// Create summary statistics dataset for the first environment
+		final SummaryStatisticsImportRequest summaryStatisticsImportRequest = new SummaryStatisticsImportRequest();
+		final List<Geolocation> environmentGeolocations =
+			this.daoFactory.getGeolocationDao().getEnvironmentGeolocations(study.getProjectId());
+		final List<SummaryStatisticsImportRequest.SummaryData> summaryDataList =
+			Arrays.asList(
+				this.createSummaryData(Integer.valueOf(environmentGeolocations.get(0).getDescription()), analysisSummaryVariablesMap));
+		summaryStatisticsImportRequest.setData(summaryDataList);
+
+		final int summaryStatisticsDatasetId =
+			this.analysisService.createSummaryStatisticsDataset(ContextHolder.getCurrentCrop(), study.getProjectId(),
+				summaryStatisticsImportRequest);
+
+		// Create Analysis Summary Variables to be used in updating summary statistics dataset
+		final AnalysisVariablesImportRequest analysisVariablesImportRequestUpdated = new AnalysisVariablesImportRequest();
+		analysisVariablesImportRequestUpdated.setVariableType(VariableType.ANALYSIS_SUMMARY.getName());
+		analysisVariablesImportRequestUpdated.setVariableIds(Arrays.asList(testVariable.getId()));
+		analysisVariablesImportRequestUpdated.setAnalysisMethodNames(Arrays.asList("Heritability", "PValue", "CV", "Means", "MeanSED"));
+		final MultiKeyMap createdAnalysisVariablesUpdated =
+			this.ontologyVariableService.createAnalysisVariables(analysisVariablesImportRequestUpdated, new HashMap<>());
+
+		final VariableFilter variableFilterUpdated = new VariableFilter();
+		createdAnalysisVariablesUpdated.values().forEach(i -> variableFilterUpdated.addVariableId((Integer) i));
+		final Map<Integer, Variable> analysisSummaryVariablesMapUpdated =
+			this.ontologyVariableService.getVariablesWithFilterById(variableFilterUpdated);
+
+		// Update summary statistics dataset for the first environment and save the second environment
+		final SummaryStatisticsImportRequest summaryStatisticsImportRequestUpdated = new SummaryStatisticsImportRequest();
+		final List<SummaryStatisticsImportRequest.SummaryData> summaryDataListUpdated =
+			environmentGeolocations.stream()
+				.map(o -> this.createSummaryData(Integer.valueOf(o.getDescription()), analysisSummaryVariablesMapUpdated))
+				.collect(Collectors.toList());
+		summaryStatisticsImportRequestUpdated.setData(summaryDataListUpdated);
+		// Update the existing summary statistics dataset
+		this.analysisService.updateSummaryStatisticsDataset(ContextHolder.getCurrentCrop(), summaryStatisticsDatasetId,
+			summaryStatisticsImportRequestUpdated);
+
+		// Verify the updated experiment and phenotype values
+		final List<ExperimentModel> experimentModels = this.daoFactory.getExperimentDao()
+			.getObservationUnits(summaryStatisticsDatasetId, environmentGeolocations.stream().map(Geolocation::getLocationId).collect(
+				Collectors.toList()));
+		assertEquals(summaryStatisticsImportRequestUpdated.getData().size(), experimentModels.size());
+		final Map<Integer, SummaryStatisticsImportRequest.SummaryData> summaryDataByEnvironmentNumber =
+			summaryStatisticsImportRequestUpdated.getData().stream()
+				.collect(Collectors.toMap(SummaryStatisticsImportRequest.SummaryData::getEnvironmentNumber, Function.identity()));
+		for (final ExperimentModel experimentModel : experimentModels) {
+			final SummaryStatisticsImportRequest.SummaryData summaryData =
+				summaryDataByEnvironmentNumber.get(Integer.valueOf(experimentModel.getGeoLocation().getDescription()));
+			experimentModel.getPhenotypes().forEach(p -> {
+				final Variable analysisVariable = analysisSummaryVariablesMapUpdated.get(p.getObservableId());
+				assertEquals(p.getValue(), summaryData.getValues().get(analysisVariable.getName()).toString());
+			});
+			assertEquals(experimentModel.getTypeId(), ExperimentType.SUMMARY.getTermId());
+		}
+
 	}
 
 	DmsProject createTestStudyWithObservations(final String studyName, final List<Integer> locationIds, final int noOfEntries) {
@@ -279,6 +435,18 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 		}
 		meansData.setValues(valuesMap);
 		return meansData;
+	}
+
+	private SummaryStatisticsImportRequest.SummaryData createSummaryData(final int environmentNumber,
+		final Map<Integer, Variable> analysisSummaryVariablesMap) {
+		final SummaryStatisticsImportRequest.SummaryData summaryData = new SummaryStatisticsImportRequest.SummaryData();
+		summaryData.setEnvironmentNumber(environmentNumber);
+		final Map<String, Double> valuesMap = new HashMap<>();
+		for (final Variable variable : analysisSummaryVariablesMap.values()) {
+			valuesMap.put(variable.getName(), new Random().nextDouble());
+		}
+		summaryData.setValues(valuesMap);
+		return summaryData;
 	}
 
 }

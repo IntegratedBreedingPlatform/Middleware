@@ -7,7 +7,6 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
@@ -96,7 +95,7 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.TREATMENT_FACTOR.getId(),
 		VariableType.OBSERVATION_UNIT.getId());
 
-	private static final List<Integer> ENVIRONMENT_DATASET_VARIABLE_TYPES = Lists.newArrayList(
+	protected static final List<Integer> ENVIRONMENT_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.ENVIRONMENT_DETAIL.getId(),
 		VariableType.ENVIRONMENT_CONDITION.getId());
 
@@ -105,6 +104,15 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.TRAIT.getId(),
 		VariableType.SELECTION_METHOD.getId(),
 		VariableType.GERMPLASM_DESCRIPTOR.getId());
+
+	protected static final List<Integer> MEANS_DATASET_VARIABLE_TYPES = Lists.newArrayList(
+		VariableType.ENVIRONMENT_DETAIL.getId(),
+		VariableType.GERMPLASM_DESCRIPTOR.getId(),
+		VariableType.ANALYSIS_SUMMARY.getId());
+
+	protected static final List<Integer> SUMMARY_STATISTICS_DATASET_VARIABLE_TYPES = Lists.newArrayList(
+		VariableType.ENVIRONMENT_DETAIL.getId(),
+		VariableType.ANALYSIS_SUMMARY.getId());
 
 	protected static final List<Integer> MEASUREMENT_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.TRAIT.getId(),
@@ -219,7 +227,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final MeasurementVariable trialInstanceCol = new MeasurementVariable();
 		trialInstanceCol.setName(trialInstanceVariable.getName());
-		trialInstanceCol.setAlias(variableAlias.isPresent()? variableAlias.get().getAlias() : trialInstanceVariable.getName());
+		trialInstanceCol.setAlias(variableAlias.isPresent() ? variableAlias.get().getAlias() : trialInstanceVariable.getName());
 		trialInstanceCol.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		trialInstanceCol.setFactor(true);
 		factorColumns.add(0, trialInstanceCol);
@@ -558,8 +566,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final DatasetDTO datasetDTO = this.daoFactory.getDmsProjectDAO().getDataset(datasetId);
 		if (datasetDTO != null) {
 			datasetDTO.setInstances(this.daoFactory.getDmsProjectDAO().getDatasetInstances(datasetId));
-			final List<Integer> variableTypes = DatasetTypeEnum.SUMMARY_DATA.getId() == datasetDTO.getDatasetTypeId() ?
-				DatasetServiceImpl.ENVIRONMENT_DATASET_VARIABLE_TYPES : DatasetServiceImpl.OBSERVATION_DATASET_VARIABLE_TYPES;
+			final List<Integer> variableTypes = this.resolveVariableTypes(datasetDTO.getDatasetTypeId());
 			datasetDTO.setVariables(
 				this.daoFactory.getDmsProjectDAO().getObservationSetVariables(datasetId, variableTypes));
 			datasetDTO.setHasPendingData(this.daoFactory.getPhenotypeDAO().countPendingDataOfDataset(datasetId) > 0);
@@ -567,6 +574,17 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		return datasetDTO;
+	}
+
+	private List<Integer> resolveVariableTypes(final Integer datasetTypeId) {
+		if (DatasetTypeEnum.SUMMARY_DATA.getId() == datasetTypeId.intValue()) {
+			return DatasetServiceImpl.ENVIRONMENT_DATASET_VARIABLE_TYPES;
+		} else if (DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId() == datasetTypeId.intValue()) {
+			return DatasetServiceImpl.SUMMARY_STATISTICS_DATASET_VARIABLE_TYPES;
+		} else if (DatasetTypeEnum.MEANS_DATA.getId() == datasetTypeId.intValue()) {
+			return DatasetServiceImpl.MEANS_DATASET_VARIABLE_TYPES;
+		}
+		return DatasetServiceImpl.OBSERVATION_DATASET_VARIABLE_TYPES;
 	}
 
 	@Override
@@ -630,7 +648,6 @@ public class DatasetServiceImpl implements DatasetService {
 
 		return observationUnits;
 	}
-
 
 	List<MeasurementVariableDto> getEnvironmentConditionVariableNames(final Integer trialDatasetId) {
 		final List<MeasurementVariable> environmentConditions = this.daoFactory.getDmsProjectDAO()
@@ -1077,7 +1094,8 @@ public class DatasetServiceImpl implements DatasetService {
 					 *  Low priority as this flow is not reachable now from BMS
 					 *  Import goes to draft data always
 					 */
-					final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId.toString());
+					final Optional<ExperimentModel> experimentModelOptional =
+						this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitId.toString());
 
 					final ArrayList<Phenotype> datasetPhenotypes = new ArrayList<>(experimentModelOptional.get().getPhenotypes());
 					datasetPhenotypes.addAll(phenotypes);

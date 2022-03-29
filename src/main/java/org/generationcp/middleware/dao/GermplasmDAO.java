@@ -114,6 +114,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GermplasmDAO.class);
 
+	private static final String PUI_FROM_QUERY = " from names p INNER JOIN udflds u " //
+		+ " ON u.fldno = p.ntype AND u.ftable = 'NAMES' and u.ftype='NAME' and u.fcode = 'PUI' and p.nstat <> 9 ";
+
 	private static final String FIND_GERMPLASM_MATCHES_MAIN_QUERY = "select " //
 		+ "    g.gid as gid, " //
 		+ "    g.germplsm_uuid as germplasmUUID, " //
@@ -140,7 +143,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		+ "        left join " //
 		+ "    names n on n.gid = g.gid and n.nstat = 1 " //
 		+ " 		left join ("
-		+ " 	select p.gid, p.nval from names p INNER JOIN udflds u ON u.fldno = p.ntype AND u.ftable = 'NAMES' and u.ftype='NAME' and u.fcode = 'PUI' and p.nstat <> 9) pui on pui.gid = g.gid "
+		+ " 	select p.gid, p.nval " + PUI_FROM_QUERY + ") pui on pui.gid = g.gid "
 		+ "        left join " //
 		+ "    bibrefs r on g.gref = r.refid ";
 
@@ -1380,9 +1383,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final Set<Integer> matchedGids = new HashSet<>();
 		boolean preFiltered = false;
 		if (!CollectionUtils.isEmpty(germplasmMatchRequestDto.getGermplasmPUIs())) {
-			final List<Integer> gids = this.getSession().createSQLQuery("select p.gid from names p " //
-				+ "   INNER JOIN udflds u ON u.fldno = p.ntype AND u.ftable = 'NAMES' and u.ftype='NAME' and u.fcode = 'PUI' " //
-				+ " where p.nval IN (:puiList) and p.nstat <> 9 " ) //
+			final List<Integer> gids = this.getSession().createSQLQuery("select p.gid " + PUI_FROM_QUERY //
+				+ " where p.nval IN (:puiList) " ) //
 				.setParameterList("puiList", germplasmMatchRequestDto.getGermplasmPUIs()) //
 				.list();
 			matchedGids.addAll(gids);

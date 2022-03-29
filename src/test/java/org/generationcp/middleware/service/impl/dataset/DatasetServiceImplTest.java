@@ -28,7 +28,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
-import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -402,11 +401,42 @@ public class DatasetServiceImplTest {
 	public void testGetDataset() {
 		final List<DatasetDTO> datasetDTOList = this.setUpDatasets(null);
 		final DatasetDTO datasetDTO = datasetDTOList.get(4);
-		final DatasetType datasetType = new DatasetType();
-		datasetType.setDatasetTypeId(datasetDTO.getDatasetTypeId());
 		Mockito.when(this.datasetService.getDataset(datasetDTOList.get(4).getDatasetId())).thenReturn(datasetDTO);
 		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
 		assertThat(datasetDTOList.get(4), equalTo(result));
+		Mockito.verify(this.dmsProjectDao)
+			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetServiceImpl.OBSERVATION_DATASET_VARIABLE_TYPES);
+	}
+
+	@Test
+	public void testGetDataset_EnvironmentDataset() {
+		final DatasetDTO datasetDTO = createDataset(25020, 25019, "STUDY-ENVIRONMENT", DatasetTypeEnum.SUMMARY_DATA.getId());
+		Mockito.when(this.datasetService.getDataset(datasetDTO.getDatasetId())).thenReturn(datasetDTO);
+		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
+		assertThat(datasetDTO, equalTo(result));
+		Mockito.verify(this.dmsProjectDao)
+			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetServiceImpl.ENVIRONMENT_DATASET_VARIABLE_TYPES);
+	}
+
+	@Test
+	public void testGetDataset_MeansDataset() {
+		final DatasetDTO datasetDTO = createDataset(25020, 25019, "STUDY-MEANS", DatasetTypeEnum.MEANS_DATA.getId());
+		Mockito.when(this.datasetService.getDataset(datasetDTO.getDatasetId())).thenReturn(datasetDTO);
+		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
+		assertThat(datasetDTO, equalTo(result));
+		Mockito.verify(this.dmsProjectDao)
+			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetServiceImpl.MEANS_DATASET_VARIABLE_TYPES);
+	}
+
+	@Test
+	public void testGetDataset_SummaryStatisticsDataset() {
+		final DatasetDTO datasetDTO =
+			createDataset(25020, 25019, "STUDY-SUMMARY-STATISTICS", DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId());
+		Mockito.when(this.datasetService.getDataset(datasetDTO.getDatasetId())).thenReturn(datasetDTO);
+		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
+		assertThat(datasetDTO, equalTo(result));
+		Mockito.verify(this.dmsProjectDao)
+			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetServiceImpl.SUMMARY_STATISTICS_DATASET_VARIABLE_TYPES);
 	}
 
 	@Test
