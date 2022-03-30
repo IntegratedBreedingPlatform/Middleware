@@ -27,5 +27,7 @@ public interface GermplasmListDataService {
 
 	long countByListId(Integer listId);
 
+	List<Integer> getGidsByListId(Integer listId);
+
 	List<Integer> getListDataIdsByListId(Integer listId);
 }

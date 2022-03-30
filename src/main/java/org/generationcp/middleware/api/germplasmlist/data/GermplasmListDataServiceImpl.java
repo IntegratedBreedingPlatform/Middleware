@@ -260,6 +260,11 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	}
 
 	@Override
+	public List<Integer> getGidsByListId(final Integer listId) {
+		return this.daoFactory.getGermplasmListDataDAO().getGidsByListId(listId);
+	}
+
+	@Override
 	public List<Integer> getListDataIdsByListId(final Integer listId) {
 		return this.daoFactory.getGermplasmListDataDAO().getListDataIdsByListId(listId);
 	}
