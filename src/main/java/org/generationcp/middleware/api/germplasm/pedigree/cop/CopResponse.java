@@ -1,11 +1,13 @@
 package org.generationcp.middleware.api.germplasm.pedigree.cop;
 
+import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
@@ -14,7 +16,29 @@ import static org.apache.commons.lang3.StringUtils.EMPTY;
 public class CopResponse {
 
 	private Table<Integer, Integer, Double> matrix;
-	private List<String[]> array;
+
+	/**
+	 * <pre>
+	 *       1 2 3 4 5 6
+	 * gid 1 x x x x x x
+	 * gid 2   x x x x x
+	 * gid 3     x x x x
+	 * gid 4       x x x
+	 * gid 5         x x
+	 * gid 6           x
+	 * </pre>
+	 */
+	private List<String[]> upperTriangularMatrix;
+
+	/**
+	 * <pre>
+	 * gid1 gid2 cop
+	 * 1    2    0.5
+	 * 1    3    0.7
+	 * </pre>
+	 */
+	private List<String[]> array2d;
+
 	private Boolean hasFile;
 
 	private double progress;
@@ -25,14 +49,15 @@ public class CopResponse {
 
 	public CopResponse(final Table<Integer, Integer, Double> matrix) {
 		this.matrix = matrix;
-		this.array = convertTableTo2DArray(matrix);
+		this.upperTriangularMatrix = convertTableToUpperTriangularMatrix(matrix);
+		this.array2d = convertTableTo2dArray(matrix);
 	}
 
 	public CopResponse(final Boolean hasFile) {
 		this.hasFile = hasFile;
 	}
 
-	static List<String[]> convertTableTo2DArray(final Table<Integer, Integer, Double> table) {
+	static List<String[]> convertTableToUpperTriangularMatrix(final Table<Integer, Integer, Double> table) {
 		final List<Integer> gids = new ArrayList<>(table.columnKeySet());
 		final List<String[]> array = new ArrayList<>();
 
@@ -41,15 +66,6 @@ public class CopResponse {
 		header.addAll(gids.stream().map(Object::toString).collect(toList()));
 		array.add(header.toArray(new String[] {}));
 
-		/*
-		 * show only one half of symmetric matrix:
-		 * x x x x x x
-		 *   x x x x x
-		 *     x x x x
-		 *       x x x
-		 *         x x
-		 *           x
-		 */
 		final Set<Pair<Integer, Integer>> added = new HashSet<>();
 
 		for (final Integer gid1 : gids) {
@@ -75,31 +91,41 @@ public class CopResponse {
 		return array;
 	}
 
-	public Table<Integer, Integer, Double> getMatrix() {
-		return matrix;
+	private static List<String[]> convertTableTo2dArray(final Table<Integer, Integer, Double> matrix) {
+		final List<String[]> array = new ArrayList<>();
+
+		final List<String> header = new ArrayList<>(Lists.newArrayList("gid1", "gid2", "cop"));
+		array.add(header.toArray(new String[] {}));
+		for (Map.Entry<Integer, Map<Integer, Double>> rowMap : matrix.rowMap().entrySet()) {
+			for (Map.Entry<Integer, Double> colMap : rowMap.getValue().entrySet()) {
+				array.add(new String[]{
+					rowMap.getKey().toString(),
+					colMap.getKey().toString(),
+					colMap.getValue().toString()
+				});
+			}
+		}
+
+		return array;
 	}
 
-	public void setMatrix(final Table<Integer, Integer, Double> matrix) {
-		this.matrix = matrix;
+	public Table<Integer, Integer, Double> getMatrix() {
+		return matrix;
 	}
 
 	public double getProgress() {
 		return progress;
 	}
 
-	public void setProgress(final double progress) {
-		this.progress = progress;
-	}
-
-	public List<String[]> getArray() {
-		return array;
-	}
-
-	public void setArray(final List<String[]> array) {
-		this.array = array;
+	public List<String[]> getUpperTriangularMatrix() {
+		return upperTriangularMatrix;
 	}
 
 	public Boolean getHasFile() {
 		return hasFile;
+	}
+
+	public List<String[]> getArray2d() {
+		return array2d;
 	}
 }

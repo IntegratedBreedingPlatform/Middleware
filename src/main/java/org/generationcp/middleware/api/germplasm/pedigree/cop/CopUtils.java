@@ -22,7 +22,7 @@ public abstract class CopUtils {
 			new OutputStreamWriter(new FileOutputStream(fileNameFullPath), StandardCharsets.UTF_8), ',')
 		) {
 			final File newFile = new File(fileNameFullPath);
-			csvWriter.writeAll(results.getArray());
+			csvWriter.writeAll(results.getUpperTriangularMatrix());
 			return newFile;
 		}
 
