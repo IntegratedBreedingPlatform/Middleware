@@ -83,9 +83,9 @@ public class CopCalculation {
 		this.btype = btype;
 	}
 
-	public CopCalculation(final Table<Integer, Integer, Double> sparseMatrix, final int bType) {
+	public CopCalculation(final Table<Integer, Integer, Double> sparseMatrix, final BTypeEnum btype) {
 		this.sparseMatrix = sparseMatrix != null ? sparseMatrix : HashBasedTable.create();
-		this.btype = BTypeEnum.fromValue(bType);
+		this.btype = btype;
 	}
 
 	/*

@@ -1,6 +1,12 @@
 package org.generationcp.middleware.api.germplasm.pedigree.cop;
 
-enum BTypeEnum {
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+/**
+ * See https://cropforge.github.io/iciswiki/articles/t/d/m/TDM_COP2.htm BTYPE
+ */
+@JsonFormat(shape = JsonFormat.Shape.OBJECT)
+public enum BTypeEnum {
 	/**
 	 * homozygous, Fully inbreed, self pollinating
 	 * From fortran code: FOR SF CROPS ASSUMING F4 FOR LINES WITH UNKNOWN SOURCE BUT KNOWN PARENTS
