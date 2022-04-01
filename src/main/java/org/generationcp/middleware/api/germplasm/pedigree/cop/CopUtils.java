@@ -28,11 +28,6 @@ public abstract class CopUtils {
 
 	}
 
-	public static String getFileTempFullPath(final Integer listId) {
-		final String tmpdir = System.getProperty("java.io.tmpdir");
-		return tmpdir + File.separator + getFileName(listId);
-	}
-
 	public static String getStorageFilePath(final Integer listId) {
 		return FILE_STORAGE_PATH_ROOT + FILE_STORAGE_PATH_SLASH + getFileName(listId);
 	}
