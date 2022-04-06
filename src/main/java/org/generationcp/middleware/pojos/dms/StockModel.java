@@ -90,6 +90,9 @@ public class StockModel implements Serializable {
 	@JoinColumn(name = "project_id")
 	private DmsProject project;
 
+	@Column(name = "cross_value")
+	private String cross;
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "stockModel")
 	@BatchSize(size = 5000)
 	private Set<StockProperty> properties;
@@ -180,6 +183,14 @@ public class StockModel implements Serializable {
 
 	public void setIsObsolete(Boolean isObsolete) {
 		this.isObsolete = isObsolete;
+	}
+
+	public String getCross() {
+		return cross;
+	}
+
+	public void setCross(final String cross) {
+		this.cross = cross;
 	}
 
 	public Set<StockProperty> getProperties() {

@@ -489,7 +489,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				+ "  OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue()
 				+ " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) "
 				+ "  FROM ims_transaction imt INNER JOIN ims_lot lo ON lo.lotid = imt.lotid WHERE lo.eid = l.eid),0), 'Mixed') AS availableBalance, "
-				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, IFNULL(c.name,'-'), 'Mixed') AS unit ");
+				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, IFNULL(c.name,'-'), 'Mixed') AS unit, "
+				+ "  s.cross_value as crossValue ");
 
 			final String entryClause = ",MAX(IF(cvterm_variable.name = '%1$s', sp.value, NULL)) AS '%1$s',"
 				+ " MAX(IF(cvterm_variable.name = '%1$s', sp.stockprop_id, NULL)) AS '%1$s_PropertyId',"
@@ -524,6 +525,7 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			query.addScalar("lotCount", new IntegerType());
 			query.addScalar("availableBalance", new StringType());
 			query.addScalar("unit", new StringType());
+			query.addScalar("crossValue", new StringType());
 			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
 				final String entryName = entryDescriptor.getName();
 				query.addScalar(entryName, new StringType());
@@ -548,9 +550,10 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 				final Integer lotCount = (Integer) row.get("lotCount");
 				final String availableBalance = (String) row.get("availableBalance");
 				final String unit = (String) row.get("unit");
+				final String cross = (String) row.get("crossValue");
 
 				final StudyEntryDto studyEntryDto =
-					new StudyEntryDto(entryId, entryNumber, gid, designation, lotCount, availableBalance, unit);
+					new StudyEntryDto(entryId, entryNumber, gid, designation, lotCount, availableBalance, unit, cross);
 				final Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 				for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
 					final String value;
@@ -717,8 +720,9 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	public void createStudyEntries(final Integer studyId, final Integer listId) {
-		final String insertStockQuery = "INSERT INTO stock(dbxref_id, name, uniquename, project_id) "
-			+ "SELECT ld.gid, (SELECT n.nval FROM names n WHERE nstat = 1 AND n.gid = ld.gid), entryid, " + studyId + " FROM listdata ld WHERE ld.listid = " + listId;
+		final String insertStockQuery = "INSERT INTO stock(dbxref_id, name, uniquename, project_id, cross_value) "
+			+ "SELECT ld.gid, (SELECT n.nval FROM names n WHERE nstat = 1 AND n.gid = ld.gid), ld.entryid, " + studyId + ", ld.grpname "
+			+ " FROM listdata ld WHERE ld.listid = " + listId;
 		this.getSession().createSQLQuery(insertStockQuery).executeUpdate();
 
 		final String insertStockPropertyQuery = "INSERT INTO stockprop(stock_id, type_id, value, cvalue_id) "

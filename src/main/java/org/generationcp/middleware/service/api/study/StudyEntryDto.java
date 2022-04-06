@@ -27,6 +27,8 @@ public class StudyEntryDto implements Serializable {
 
 	private String unit;
 
+	private String cross;
+
 	private Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 
 	public StudyEntryDto(){
@@ -47,7 +49,7 @@ public class StudyEntryDto implements Serializable {
 	}
 
 	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final Integer gid,
-		final String designation, final Integer lotCount, final String availableBalance, final String unit){
+		final String designation, final Integer lotCount, final String availableBalance, final String unit, final String cross){
 		this.entryId = entryId;
 		this.entryNumber = entryNumber;
 		this.gid = gid;
@@ -55,6 +57,7 @@ public class StudyEntryDto implements Serializable {
 		this.lotCount = lotCount;
 		this.availableBalance = availableBalance;
 		this.unit = unit;
+		this.cross = cross;
 	}
 
 	public Integer getEntryId() {
@@ -111,6 +114,14 @@ public class StudyEntryDto implements Serializable {
 
 	public void setUnit(final String unit) {
 		this.unit = unit;
+	}
+
+	public String getCross() {
+		return cross;
+	}
+
+	public void setCross(final String cross) {
+		this.cross = cross;
 	}
 
 	public Map<Integer, StudyEntryPropertyData> getProperties() {

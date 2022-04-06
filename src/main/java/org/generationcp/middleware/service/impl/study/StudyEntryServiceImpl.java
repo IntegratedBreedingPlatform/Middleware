@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -58,11 +59,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	private final DaoFactory daoFactory;
 
+	// TODO: remove ENTRY_NO
 	private static final List<Integer> FIXED_GERMPLASM_DESCRIPTOR_IDS = Lists
 		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId());
 
 	private static final List<Integer> REMOVABLE_GERMPLASM_DESCRIPTOR_IDS = Lists
-		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.OBS_UNIT_ID.getId());
+		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId());
 
 	public StudyEntryServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -219,10 +221,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			studyEntryDto.setEntryNumber(Integer.valueOf(stockToReplace.getUniqueName()));
 			studyEntryDto.setGid(germplasm.getGid());
 			studyEntryDto.setDesignation(germplasm.getPreferredName());
+			if (!StringUtils.isEmpty(crossExpansion)) {
+				studyEntryDto.setCross(crossExpansion);
+			}
 
 			// If germplasm descriptors exist for previous entry, copy ENTRY_TYPE value and set cross expansion and MGID of new germplasm
 			this.addStudyEntryPropertyDataIfApplicable(stockToReplace, studyEntryDto, TermId.ENTRY_TYPE.getId(), Optional.empty());
-			this.addStudyEntryPropertyDataIfApplicable(stockToReplace, studyEntryDto, TermId.CROSS.getId(), Optional.of(crossExpansion));
 			this.addStudyEntryPropertyDataIfApplicable(stockToReplace, studyEntryDto, TermId.GROUPGID.getId(),
 				Optional.of(String.valueOf(germplasm.getGroupId())));
 
@@ -239,10 +243,8 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final Optional<String> value) {
 		final Optional<StockProperty> entryType =
 			stock.getProperties().stream().filter(prop -> variableId.equals(prop.getTypeId())).findFirst();
-		entryType.ifPresent(stockProperty -> {
-				studyEntryDto.getProperties().put(variableId,
-					new StudyEntryPropertyData(null, stockProperty.getTypeId(), value.isPresent() ? value.get() : stockProperty.getValue(), stockProperty.getCategoricalValueId()));
-			}
+		entryType.ifPresent(stockProperty -> studyEntryDto.getProperties().put(variableId,
+			new StudyEntryPropertyData(null, stockProperty.getTypeId(), value.isPresent() ? value.get() : stockProperty.getValue(), stockProperty.getCategoricalValueId()))
 		);
 	}
 
