@@ -232,4 +232,35 @@
         </sql>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="studies-TBD-16">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="stock" columnName="cross"/>
+			</not>
+		</preConditions>
+		<comment>Add 'cross' column to 'stock' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE STOCK ADD `cross` VARCHAR(255) DEFAULT '-' NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="studies-TBD-17">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="stock" columnName="cross"/>
+				<sqlCheck expectedResult="1">
+					SELECT count(1) > 0 FROM stockprop WHERE type_id = 8377;
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Migrate cross values from 'stockprop' table to 'cross' column in 'stock' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE stock s INNER JOIN stockprop sp ON s.stock_id = sp.stock_id
+			SET s.cross = sp.value
+			WHERE sp.type_id = 8377 AND sp.value IS NOT NULL AND sp.value != '-';
+
+			DELETE FROM stockprop WHERE type_id = 8377;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
