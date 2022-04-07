@@ -1,0 +1,35 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="mderamos" id="v20.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="file_metadata" columnName="nd_geolocation_id"/>
+			</not>
+		</preConditions>
+		<comment>link file_metadata to nd_geolocation</comment>
+		<addColumn tableName="file_metadata">
+			<column name="nd_geolocation_id" type="int">
+				<constraints nullable="true"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v20.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'file_metadata' AND CONSTRAINT_NAME='fk_file_metadata_nd_geolocation_id' and TABLE_SCHEMA = DATABASE();</sqlCheck>
+		</preConditions>
+		<comment>Add FK to file_metadata.nd_geolocation_id linking to nd_geolocation.nd_geolocation_id</comment>
+		<addForeignKeyConstraint
+			constraintName="fk_file_metadata_nd_geolocation_id"
+			baseTableName="file_metadata"
+			baseColumnNames="nd_geolocation_id"
+			referencedTableName="nd_geolocation"
+			referencedColumnNames="nd_geolocation_id"
+			onDelete="NO ACTION"
+			onUpdate="NO ACTION"/>
+	</changeSet>
+</databaseChangeLog>

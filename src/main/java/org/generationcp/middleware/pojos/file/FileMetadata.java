@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.generationcp.middleware.pojos.AbstractEntity;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 
 import javax.persistence.Basic;
@@ -74,6 +75,10 @@ public class FileMetadata extends AbstractEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "gid")
 	private Germplasm germplasm;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "nd_geolocation_id")
+	private Geolocation geolocation;
 
 	@OneToMany
 	@JoinTable(
@@ -192,6 +197,14 @@ public class FileMetadata extends AbstractEntity {
 
 	public void setGermplasm(final Germplasm germplasm) {
 		this.germplasm = germplasm;
+	}
+
+	public Geolocation getGeolocation() {
+		return geolocation;
+	}
+
+	public void setGeolocation(final Geolocation geolocation) {
+		this.geolocation = geolocation;
 	}
 
 	public List<CVTerm> getVariables() {

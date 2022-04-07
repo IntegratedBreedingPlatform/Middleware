@@ -109,7 +109,7 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 		));
 		assertThat(fileMetadata.getGermplasm().getGermplasmUUID(), is(this.germplasm1.getGermplasmUUID()));
 
-		this.fileMetadataDAO.detachFiles(singletonList(cvterm1.getCvTermId()), null, this.germplasm1.getGermplasmUUID());
+		this.fileMetadataDAO.detachFiles(singletonList(cvterm1.getCvTermId()), null, this.germplasm1.getGermplasmUUID(), null);
 		this.sessionProvder.getSession().refresh(this.fileMetadata1);
 
 		final FileMetadata fileMetadataWithoutVariables = this.fileMetadataDAO.getByFileUUID(this.fileMetadata1.getFileUUID());
@@ -133,7 +133,7 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 		));
 		assertThat(fileMetadata.getGermplasm().getGermplasmUUID(), is(this.germplasm1.getGermplasmUUID()));
 
-		this.fileMetadataDAO.removeFiles(singletonList(cvterm1.getCvTermId()), null, this.germplasm1.getGermplasmUUID());
+		this.fileMetadataDAO.removeFiles(singletonList(cvterm1.getCvTermId()), null, this.germplasm1.getGermplasmUUID(), null);
 
 		final FileMetadata fileMetadataWithoutVariables = this.fileMetadataDAO.getByFileUUID(this.fileMetadata1.getFileUUID());
 		assertThat(fileMetadataWithoutVariables, nullValue());

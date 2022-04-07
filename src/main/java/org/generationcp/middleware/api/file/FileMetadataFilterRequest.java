@@ -6,6 +6,7 @@ public class FileMetadataFilterRequest {
 	private String germplasmUUID;
 	private String variableName;
 	private String fileName;
+	private Integer instanceId;
 
 	public String getObservationUnitUUID() {
 		return this.observationUnitUUID;
@@ -37,5 +38,13 @@ public class FileMetadataFilterRequest {
 
 	public void setFileName(final String fileName) {
 		this.fileName = fileName;
+	}
+
+	public Integer getInstanceId() {
+		return instanceId;
+	}
+
+	public void setInstanceId(final Integer instanceId) {
+		this.instanceId = instanceId;
 	}
 }
