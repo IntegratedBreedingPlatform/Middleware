@@ -118,6 +118,7 @@ public class StockModel implements Serializable {
 		this.setGermplasm(new Germplasm(Integer.valueOf(studyEntryDto.getGid())));
 		this.setUniqueName(studyEntryDto.getEntryNumber().toString());
 		this.setIsObsolete(false);
+		this.setCross(studyEntryDto.getCross());
 
 		final Set<StockProperty> stockProperties = new HashSet<>();
 		final Iterator<Map.Entry<Integer, StudyEntryPropertyData>> iterator = studyEntryDto.getProperties().entrySet().iterator();

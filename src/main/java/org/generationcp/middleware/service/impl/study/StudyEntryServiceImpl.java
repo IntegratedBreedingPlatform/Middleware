@@ -232,7 +232,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			studyEntryDto.setGid(germplasm.getGid());
 			studyEntryDto.setDesignation(germplasm.getPreferredName());
 			if (!StringUtils.isEmpty(crossExpansion)) {
-				studyEntryDto.setCross(crossExpansion);
+				studyEntryDto.setCross(StringUtils.isEmpty(crossExpansion) ? "-" : crossExpansion);
 			}
 
 			// If germplasm descriptors exist for previous entry, copy ENTRY_TYPE value and set cross expansion and MGID of new germplasm
