@@ -45,4 +45,6 @@ public interface StudyEntryService {
 
 	StockProperty getByStockPropertyId(Integer stockPropertyId);
 
+	void fillWithCrossExpansion(Integer studyId, Integer level);
+
 }

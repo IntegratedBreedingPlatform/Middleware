@@ -25,10 +25,12 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -45,6 +47,8 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toSet;
+
 @Transactional
 public class StudyEntryServiceImpl implements StudyEntryService {
 
@@ -56,6 +60,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private GermplasmListService germplasmListService;
+
+	@Resource
+	private PedigreeService pedigreeService;
+
+	@Resource
+	private CrossExpansionProperties crossExpansionProperties;
 
 	private final DaoFactory daoFactory;
 
@@ -272,4 +282,33 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		return this.daoFactory.getStockPropertyDao().getById(stockPropertyId);
 	}
 
+	@Override
+	public void fillWithCrossExpansion(final Integer studyId, final Integer level) {
+		final DmsProject plotDataDataset =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+		final Optional<ProjectProperty> crossProperty =
+			plotDataDataset.getProperties().stream().filter(projectProperty -> TermId.CROSS.getId() == projectProperty.getVariableId())
+				.findFirst();
+		final ProjectProperty projectProperty;
+		if (crossProperty.isPresent()) {
+			projectProperty = crossProperty.get();
+			projectProperty.setValue(String.valueOf(level));
+			this.daoFactory.getProjectPropertyDAO().update(projectProperty);
+		} else {
+			projectProperty = new ProjectProperty(plotDataDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), String.valueOf(level),
+				plotDataDataset.getNextPropertyRank(), TermId.CROSS.getId(), TermId.CROSS.name());
+			this.daoFactory.getProjectPropertyDAO().save(projectProperty);
+		}
+
+		final List<StockModel> entries = this.daoFactory.getStockDao().getStocksForStudy(studyId);
+		final Set<Integer> gids = entries.stream().map(stockModel -> stockModel.getGermplasm().getGid()).collect(toSet());
+		final Map<Integer, String> pedigreeStringMap =
+			this.pedigreeService.getCrossExpansionsBulk(gids, level, this.crossExpansionProperties);
+
+		entries.forEach(entry -> {
+			entry.setCross(pedigreeStringMap.get(entry.getGermplasm().getGid()));
+			entry.truncateCrossValueIfNeeded();
+			this.daoFactory.getStockDao().save(entry);
+		});
+	}
 }

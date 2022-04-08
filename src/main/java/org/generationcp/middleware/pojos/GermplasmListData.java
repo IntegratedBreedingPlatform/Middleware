@@ -14,6 +14,7 @@ package org.generationcp.middleware.pojos;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.interfaces.GermplasmExportSource;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.generationcp.middleware.util.CrossExpansionUtil;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.NotFound;
@@ -51,9 +52,6 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	// string contants for name of queries
 	public static final String DELETE_BY_LIST_ID = "deleteGermplasmListDataByListId";
-
-	public static final int MAX_CROSS_NAME_SIZE = 240;
-	public static final String CROSS_NAME_TRUNCATED_SUFFIX = "(truncated)";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -249,12 +247,8 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	}
 
 	public void truncateGroupNameIfNeeded() {
-		String groupName = getGroupName();
-		if (groupName.length() > MAX_CROSS_NAME_SIZE) {
-			groupName = groupName.substring(0, MAX_CROSS_NAME_SIZE - 1);
-			groupName = groupName + CROSS_NAME_TRUNCATED_SUFFIX;
-			setGroupName(groupName);
-		}
+		String groupName = CrossExpansionUtil.truncateCrossValueIfNeeded(this.getGroupName());
+		this.setGroupName(groupName);
 	}
 
 	public Integer getStatus() {
