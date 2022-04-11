@@ -44,4 +44,34 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="cheryleigh" id="v20.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'listdata'
+					AND COLUMN_NAME = 'desig'
+					AND CHARACTER_MAXIMUM_LENGTH = 255
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.STATISTICS c
+					WHERE TABLE_NAME = 'listdata'
+					AND COLUMN_NAME = 'desig'
+					AND INDEX_NAME = 'index_desig'
+					AND INDEX_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Extend length of list data designation column
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DROP INDEX index_desig ON listdata;
+			ALTER TABLE listdata MODIFY COLUMN desig VARCHAR(5000) NOT NULL DEFAULT '-';
+			CREATE INDEX index_desig ON listdata(desig(255));
+		</sql>
+	</changeSet>
 </databaseChangeLog>
