@@ -21,6 +21,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -160,6 +161,18 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				projectProperty.getVariableId().equals(TermId.ENTRY_NO.getId()) ||
 				!VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()))
 			.collect(Collectors.toList());
+
+		// Copy cross generation level
+		projectProperties.stream()
+			.filter(projectProperty -> projectProperty.getTypeId().equals(VariableType.GERMPLASM_DESCRIPTOR.getId()) && projectProperty.getVariableId().equals(TermId.CROSS.getId()))
+			.findFirst()
+			.ifPresent(projectProperty -> {
+				final Optional<GermplasmList> germplasmList = this.germplasmListService.getGermplasmListById(listId);
+				final Integer generationLevel = germplasmList.get().getGenerationLevel();
+				if (generationLevel != null) {
+					projectProperty.setValue(String.valueOf(generationLevel));
+				}
+			});
 
 		// Add germplasm list entry details as project properties
 		final AtomicInteger projectPropertyInitialRank = new AtomicInteger(plotDataDataset.getNextPropertyRank());
