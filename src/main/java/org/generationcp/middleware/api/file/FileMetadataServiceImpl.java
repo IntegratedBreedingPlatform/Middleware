@@ -220,7 +220,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	private void validateEnvironment(final Geolocation environment, final Integer instanceId) {
-		if (environment != null) {
+		if (environment == null) {
 			throw new MiddlewareRequestException("", "filemetadata.geolocation.not.found", new String[] {instanceId.toString()});
 		}
 	}
