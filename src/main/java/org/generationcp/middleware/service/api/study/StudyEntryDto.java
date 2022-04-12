@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.api.study;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.lang3.StringUtils;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -121,7 +122,7 @@ public class StudyEntryDto implements Serializable {
 	}
 
 	public void setCross(final String cross) {
-		this.cross = cross;
+		this.cross = StringUtils.isEmpty(cross) ? "-" : cross;
 	}
 
 	public Map<Integer, StudyEntryPropertyData> getProperties() {

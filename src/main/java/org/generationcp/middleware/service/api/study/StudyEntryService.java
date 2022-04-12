@@ -33,7 +33,7 @@ public interface StudyEntryService {
 
 	long countStudyGermplasmByEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
 
-	StudyEntryDto replaceStudyEntry(int studyId, int entryId, int gid, String crossExpansion);
+	void replaceStudyEntry(int studyId, int entryId, int gid);
 
 	void replaceStudyEntries(List<Integer> gidsToReplace, Integer replaceWithGid, String crossExpansion);
 

@@ -21,6 +21,7 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
+import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
@@ -34,12 +35,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * The class <code>StudyGermplasmListServiceImplTest</code> contains tests for the class <code>{@link StudyEntryServiceImpl}</code>.
@@ -235,17 +237,22 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final StudyEntryDto oldEntry = this.service.getStudyEntries(study.getProjectId()).get(1);
 		Assert.assertNotNull(oldEntry);
 		final Integer newGid = gids.get(0);
-		final String crossExpansion = RandomStringUtils.randomAlphabetic(20);
-		final StudyEntryDto newEntry = this.service.replaceStudyEntry(study.getProjectId(), oldEntry.getEntryId(), newGid, crossExpansion);
+		this.service.replaceStudyEntry(study.getProjectId(), oldEntry.getEntryId(), newGid);
 
-		Assert.assertNotEquals(oldEntry.getEntryId(), newEntry.getEntryId());
-		Assert.assertEquals(GERMPLASM_PREFERRED_NAME_PREFIX + 1, newEntry.getDesignation());
-		Assert.assertEquals(crossExpansion, newEntry.getProperties().get(TermId.CROSS.getId()).getValue());
-		Assert.assertEquals(newGid, newEntry.getGid());
+		final StockModel newEntry = this.daoFactory.getStockDao().getStocksForStudy(study.getProjectId()).stream()
+			.filter(stockModel -> stockModel.getGermplasm().getGid().equals(newGid)).findFirst().get();
+
+		Assert.assertNotEquals(oldEntry.getEntryId(), newEntry.getUniqueName());
+		Assert.assertEquals(GERMPLASM_PREFERRED_NAME_PREFIX + 1, newEntry.getName());
+		Assert.assertEquals(newGid, newEntry.getGermplasm().getGid());
 		// Some fields should have been copied from old entry
+		final Optional<StockProperty> entryType =
+			newEntry.getProperties().stream().filter(stockProperty -> stockProperty.getTypeId().equals(TermId.ENTRY_TYPE.getId()))
+				.findFirst();
+		assertTrue(entryType.isPresent());
 		Assert.assertEquals(oldEntry.getProperties().get(TermId.ENTRY_TYPE.getId()).getValue(),
-			newEntry.getProperties().get(TermId.ENTRY_TYPE.getId()).getValue());
-		Assert.assertEquals(oldEntry.getEntryNumber(), newEntry.getEntryNumber());
+			entryType.get().getValue());
+		Assert.assertEquals(oldEntry.getEntryNumber(), newEntry.getUniqueName());
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
@@ -256,7 +263,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final StudyEntryDto dto = this.service.getStudyEntries(study.getProjectId()).get(1);
 		Assert.assertNotNull(dto);
 		final Integer newGid = gids.get(0);
-		this.service.replaceStudyEntry(study.getProjectId(), dto.getEntryId() + 10, newGid, RandomStringUtils.random(5));
+		this.service.replaceStudyEntry(study.getProjectId(), dto.getEntryId() + 10, newGid);
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
@@ -267,17 +274,17 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final StudyEntryDto dto = this.service.getStudyEntries(study.getProjectId()).get(1);
 		Assert.assertNotNull(dto);
 		final Integer newGid = gids.get(0);
-		this.service.replaceStudyEntry(study.getProjectId() + 1, dto.getEntryId(), newGid, RandomStringUtils.random(5));
+		this.service.replaceStudyEntry(study.getProjectId() + 1, dto.getEntryId(), newGid);
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
 	public void testReplaceStudyEntry_SameGidAsExistingEntry() {
 		final DmsProject study = this.createStudy();
-		final List<Integer> gids = this.createTestGermplasm(study.getProjectId());
+		this.createTestGermplasm(study.getProjectId());
 
 		final StudyEntryDto dto = this.service.getStudyEntries(study.getProjectId()).get(1);
 		Assert.assertNotNull(dto);
-		this.service.replaceStudyEntry(study.getProjectId() + 1, dto.getEntryId(), dto.getGid(), RandomStringUtils.random(5));
+		this.service.replaceStudyEntry(study.getProjectId() + 1, dto.getEntryId(), dto.getGid());
 	}
 
 	@Test
@@ -329,7 +336,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals(index, dto.getEntryNumber().intValue());
 		Assert.assertEquals(GERMPLASM_PREFERRED_NAME_PREFIX + index, dto.getDesignation());
 		Assert.assertEquals(SEEDSOURCE + index, dto.getProperties().get(TermId.SEED_SOURCE.getId()).getValue());
-		Assert.assertEquals(CROSS + index, dto.getProperties().get(TermId.CROSS.getId()).getValue());
+		Assert.assertEquals(CROSS + index, dto.getCross());
 		Assert.assertEquals(gid, dto.getGid());
 		// TODO: assert entry code from properties
 //		Assert.assertEquals(StudyEntryServiceImplTest.ENTRYCODE + gid, dto.getEntryCode());
@@ -354,6 +361,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		studyEntryDto.setGid(gid);
 		studyEntryDto.setEntryNumber(i);
 		studyEntryDto.setDesignation(GERMPLASM_PREFERRED_NAME_PREFIX + i);
+		studyEntryDto.setCross(CROSS + i);
 
 		studyEntryDto.getProperties()
 			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), CROSS + i, null));

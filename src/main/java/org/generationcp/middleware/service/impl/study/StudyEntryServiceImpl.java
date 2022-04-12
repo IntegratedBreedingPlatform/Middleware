@@ -3,7 +3,6 @@ package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -195,6 +194,10 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final Term entryType = this.ontologyDataManager.getTermById(Integer.valueOf(entryTypeId));
 		final Integer nextEntryNumber = this.getNextEntryNumber(studyId);
 		this.daoFactory.getStockDao().createStudyEntries(studyId, nextEntryNumber, gids, entryType.getId(), entryType.getName());
+
+		final Integer crossGenerationLevel = this.getCrossGenerationLevel(studyId);
+		final List<StockModel> entries = this.daoFactory.getStockDao().getStocksByStudyAndEntryNumbersGreaterThanEqual(studyId, nextEntryNumber);
+		this.setCrossValues(entries, new HashSet<>(gids), crossGenerationLevel);
 	}
 
 	@Override
@@ -203,7 +206,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public StudyEntryDto replaceStudyEntry(final int studyId, final int entryId, final int gid, final String crossExpansion) {
+	public void replaceStudyEntry(final int studyId, final int entryId, final int gid) {
 		// Check first that new GID is valid
 		final Germplasm newGermplasm = this.daoFactory.getGermplasmDao().getById(gid);
 		if (newGermplasm == null) {
@@ -219,11 +222,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			throw new MiddlewareRequestException("", "new.gid.matches.old.gid");
 		}
 
-		final List<StockModel> savedStockModels = this.replaceStocks(Lists.newArrayList(stock), gid, crossExpansion);
-
-		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
-		filter.setEntryIds(savedStockModels.stream().map(StockModel::getStockId).collect(Collectors.toList()));
-		return this.getStudyEntries(studyId, filter, new PageRequest(0, Integer.MAX_VALUE)).get(0);
+		final Integer crossGenerationLevel = this.getCrossGenerationLevel(studyId);
+		final String crossExpansion = this.pedigreeService.getCrossExpansion(gid, crossGenerationLevel, this.crossExpansionProperties);
+		this.replaceStocks(Lists.newArrayList(stock), gid, crossExpansion);
 	}
 
 	@Override
@@ -232,10 +233,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		this.replaceStocks(stocksToReplace, replaceWithGid, crossExpansion);
 	}
 
-	private List<StockModel> replaceStocks(final List<StockModel> stocksToReplace, final Integer replaceWithGid,
+	private void replaceStocks(final List<StockModel> stocksToReplace, final Integer replaceWithGid,
 		final String crossExpansion) {
 
-		final List<StockModel> savedStockModels = new ArrayList<>();
 		final GermplasmDto germplasm = this.daoFactory.getGermplasmDao().getGermplasmDtoByGid(replaceWithGid);
 		final StockDao stockDao = this.daoFactory.getStockDao();
 		for (final StockModel stockToReplace : stocksToReplace) {
@@ -244,9 +244,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			studyEntryDto.setEntryNumber(Integer.valueOf(stockToReplace.getUniqueName()));
 			studyEntryDto.setGid(germplasm.getGid());
 			studyEntryDto.setDesignation(germplasm.getPreferredName());
-			if (!StringUtils.isEmpty(crossExpansion)) {
-				studyEntryDto.setCross(StringUtils.isEmpty(crossExpansion) ? "-" : crossExpansion);
-			}
+			studyEntryDto.setCross(crossExpansion);
 
 			// If germplasm descriptors exist for previous entry, copy ENTRY_TYPE value and set cross expansion and MGID of new germplasm
 			this.addStudyEntryPropertyDataIfApplicable(stockToReplace, studyEntryDto, TermId.ENTRY_TYPE.getId(), Optional.empty());
@@ -255,11 +253,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 			final StockModel savedStock =
 				stockDao.save(new StockModel(stockToReplace.getProject().getProjectId(), studyEntryDto));
-			savedStockModels.add(savedStock);
 			stockDao.replaceExperimentStocks(stockToReplace.getStockId(), savedStock.getStockId());
 			stockDao.makeTransient(stockToReplace);
 		}
-		return savedStockModels;
 	}
 
 	private void addStudyEntryPropertyDataIfApplicable(final StockModel stock, final StudyEntryDto studyEntryDto, final Integer variableId,
@@ -315,13 +311,28 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		final List<StockModel> entries = this.daoFactory.getStockDao().getStocksForStudy(studyId);
 		final Set<Integer> gids = entries.stream().map(stockModel -> stockModel.getGermplasm().getGid()).collect(toSet());
+		this.setCrossValues(entries, gids, level);
+	}
+
+	private Integer getCrossGenerationLevel(final Integer studyId) {
+		final DmsProject plotDataDataset =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+		return plotDataDataset.getProperties()
+			.stream()
+			.filter(projectProperty -> TermId.CROSS.getId() == projectProperty.getVariableId())
+			.findFirst()
+			.map(projectProperty -> (projectProperty.getValue() != null) ? Integer.parseInt(projectProperty.getValue()) : null)
+			.orElse(null);
+	}
+
+	private void setCrossValues(final List<StockModel> entries, final Set<Integer> gids, final Integer level) {
 		final Map<Integer, String> pedigreeStringMap =
 			this.pedigreeService.getCrossExpansionsBulk(gids, level, this.crossExpansionProperties);
-
 		entries.forEach(entry -> {
 			entry.setCross(pedigreeStringMap.get(entry.getGermplasm().getGid()));
 			entry.truncateCrossValueIfNeeded();
 			this.daoFactory.getStockDao().save(entry);
 		});
 	}
+
 }
