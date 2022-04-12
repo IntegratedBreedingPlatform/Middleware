@@ -241,19 +241,27 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	) {
 
 		final FileMetadata fileMetadata = new FileMetadata();
-		Preconditions.checkArgument(isBlank(observationUnitUUID) != isBlank(germplasmUUID));
+		//Check if only one of the parameters has value
+		final boolean valid = ((isBlank(observationUnitUUID)? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1)) == 1;
+		Preconditions.checkArgument(valid);
 
 		if (!isBlank(observationUnitUUID)) {
 			final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitUUID);
 			this.validateObservationUnit(experimentModelOptional, observationUnitUUID);
 			fileMetadata.setExperimentModel(experimentModelOptional.get());
-		} else {
+		} else if (!isBlank(germplasmUUID)) {
 			final Optional<Germplasm> germplasmOptional = this.daoFactory.getGermplasmDao().getGermplasmByGUIDs(singletonList(germplasmUUID))
 				.stream().findFirst();
 			if (!germplasmOptional.isPresent()) {
 				throw new MiddlewareRequestException("", "filemetadata.germplasm.not.found", new String[] {germplasmUUID});
 			}
 			fileMetadata.setGermplasm(germplasmOptional.get());
+		} else if (instanceId != null) {
+			final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(instanceId);
+			if (geolocation == null) {
+				throw new MiddlewareRequestException("", "filemetadata.geolocation.not.found", new String[] {instanceId.toString()});
+			}
+			fileMetadata.setGeolocation(geolocation);
 		}
 
 		if (termId != null) {
@@ -262,14 +270,6 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 				throw new MiddlewareRequestException("", "error.record.not.found", new String[] {"cvterm=" + termId});
 			}
 			fileMetadata.getVariables().add(cvTerm);
-		}
-
-		if (instanceId != null) {
-			final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(instanceId);
-			if (geolocation == null) {
-				throw new MiddlewareRequestException("", "filemetadata.geolocation.not.found", new String[] {instanceId.toString()});
-			}
-			fileMetadata.setGeolocation(geolocation);
 		}
 
 		final CropType cropType = this.daoFactory.getCropTypeDAO().getByName(ContextHolder.getCurrentCrop());
