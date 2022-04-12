@@ -5,8 +5,10 @@ import com.google.common.collect.Table;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
+import org.generationcp.middleware.pojos.Methods;
 
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +68,10 @@ public class CopCalculation {
 	private static final double COP_DEFAULT = 0.0;
 	private static final int UNKNOWN_INBREEDING_GENERATIONS = 4;
 	private static final int UNKNOWN_GID = 0;
+
+	private static final double COPZ_CROSS_FERTILIZING_UNKNOWN_PARENTS = 1;
+	private static final double COPZ_UNKNOWN_DERIVATIVE = 1;
+	private static final double COPZ_CROSS_FERTILIZING_WIDE_VARIABILITY = -1;
 
 	/**
 	 * Named as in the paper just for consistency
@@ -200,28 +206,102 @@ public class CopCalculation {
 	public double coefficientOfInbreeding(final GermplasmTreeNode g) {
 		final GermplasmTreeNode g0 = this.getGroupSource(g);
 
-		if (this.isBTypeScenario(g, g0)) {
-		 	// FIXME BTYPE=2 produces COP > 1
-			return this.getBType(g);
-		}
+		/*
+		 * "BTYPE to implement some assumptions in the case of incomplete pedigree records.
+		 * The user should set BTYPE = 1 for self-pollinating species and 0 otherwise.
+		 * If the progenitors of a strain are unknown, then FZ is set to BTYPE.
+		 * This occurs most frequently when Z is derived from a landrace or traditional cultivar
+		 * and corresponds to an assumption of full inbreeding for self-pollinating crops and no inbreeding for others.
+		 * Similarly, if Z traces back to a single progenitor, such as a mutant strain, then FZ = BTYPE."
+		 */
 
 		/*
-		 * TODO implement COPZ
+		 * if only male parent (immediate source) is unknown => handle later by UNKNOWN_INBREEDING_GENERATIONS if btype=2.
 		 */
-		final double fg = !isUnknown(g0.getFemaleParentNode()) && !isUnknown(g0.getMaleParentNode())
-			? this.coefficientOfParentage(g0.getFemaleParentNode(), g0.getMaleParentNode())
-			: COP_DEFAULT;
+		if (isUnknown(g.getMaleParentNode()) && !BTypeEnum.SELF_FERTILIZING_F4.equals(this.btype)) {
+			return this.btype.getValue();
+		}
+
+		final double copz = getCopZ(g, g0);
 
 		/*
 		 * Equation 2
 		 *
 		 * If generative, then generations = 0
-		 * => F(g) = 1 - (1 - fg) / 2^0 = fg
+		 * => F(g) = 1 - (1 - copz) / 2^0 = copz = f(g)
 		 *
 		 * Unknown inbreeding generations:
-		 * 1 - (1 - 0) / 2^4 = 0.9375
+		 * 1 - (1 - 0) / 2^4 = 15/16 = 0.9375
 		 */
-		return 1 - ((1 - fg) / Math.pow(2.0, this.countInbreedingGenerations(g)));
+		return 1 - ((1 - copz) / Math.pow(2.0, this.countInbreedingGenerations(g)));
+	}
+
+	private double getCopZ(final GermplasmTreeNode g, final GermplasmTreeNode g0) {
+		/*
+		 * "if Z traces back to a single progenitor, such as a mutant strain"
+		 * According to Graham: "refers to gpid1 >0 gpid2 = 0 and gnpgs = 1. with method for mutation"
+		 */
+		if (g0.getNumberOfProgenitors() == 1
+			&& !isUnknown(g0.getFemaleParentNode()) && isUnknown(g0.getMaleParentNode())) {
+			return this.getCopZMutant(g);
+		}
+
+		/*
+		 * "If the progenitors of a strain are unknown"
+		 */
+		if (isUnknown(g0.getFemaleParentNode()) && isUnknown(g0.getMaleParentNode())) {
+			return this.getCopZUnknownParents(g);
+		}
+
+		/*
+		 * Unknown group
+		 */
+		if (isUnknown(g0.getFemaleParentNode())) {
+			return this.getCopZUnknownGroup(g);
+		}
+
+		return !isUnknown(g0.getFemaleParentNode()) && !isUnknown(g0.getMaleParentNode())
+			? this.coefficientOfParentage(g0.getFemaleParentNode(), g0.getMaleParentNode())
+			: COP_DEFAULT;
+	}
+
+	private double getCopZMutant(final GermplasmTreeNode g) {
+		if (this.isSelfFertilizing()) {
+			return this.btype.getValue();
+		} else {
+			return this.getCopZFromMethod(g);
+		}
+	}
+
+	private double getCopZUnknownParents(final GermplasmTreeNode g) {
+		if (this.isSelfFertilizing()) {
+			return this.btype.getValue();
+		} else {
+			return COPZ_CROSS_FERTILIZING_UNKNOWN_PARENTS;
+		}
+	}
+
+	private double getCopZUnknownGroup(final GermplasmTreeNode g) {
+		if (this.isSelfFertilizing()) {
+			return this.btype.getValue();
+		} else {
+			return this.getCopZFromMethod(g);
+		}
+	}
+
+	private double getCopZFromMethod(final GermplasmTreeNode g) {
+		if (Methods.UNKNOWN_DERIVATIVE_METHOD.getMethodCode().equals(g.getMethodCode())) {
+			return COPZ_UNKNOWN_DERIVATIVE;
+		}
+		if (Arrays.stream(Methods.COP_CROSS_FERTILIZING_WIDE_VARIABILITY).anyMatch(m -> m.getMethodCode().equals(g.getMethodCode()))) {
+			return COPZ_CROSS_FERTILIZING_WIDE_VARIABILITY;
+		}
+
+		return this.btype.getValue();
+	}
+
+	private boolean isSelfFertilizing() {
+		return BTypeEnum.SELF_FERTILIZING.equals(this.btype) || BTypeEnum.SELF_FERTILIZING_F4.equals(this.btype);
 	}
 
 	/**
@@ -254,48 +334,6 @@ public class CopCalculation {
 		node.setOrder(order);
 		groupSource.setOrder(order);
 		return order + 1;
-	}
-
-	private double getBType(final GermplasmTreeNode g) {
-		// TODO COPZ: get btype from method?
-		return this.btype.getValue();
-	}
-
-	/**
-	 * "BTYPE to implement some assumptions in the case of incomplete pedigree records.
-	 * The user should set BTYPE = 1 for self-pollinating species and 0 otherwise.
-	 * If the progenitors of a strain are unknown, then FZ is set to BTYPE.
-	 * This occurs most frequently when Z is derived from a landrace or traditional cultivar
-	 * and corresponds to an assumption of full inbreeding for self-pollinating crops and no inbreeding for others.
-	 * Similarly, if Z traces back to a single progenitor, such as a mutant strain, then FZ = BTYPE."
-	 *
-	 */
-	private boolean isBTypeScenario(final GermplasmTreeNode g, final GermplasmTreeNode groupSource) {
-		/*
-		 * TODO verify
-		 * "if Z traces back to a single progenitor, such as a mutant strain"
-		 * According to Graham: "refers to gpid1 >0 gpid2 = 0 and gnpgs = 1. with method for mutation"
-		 */
-		if (groupSource.getNumberOfProgenitors() == 1
-			&& !isUnknown(groupSource.getFemaleParentNode()) && isUnknown(groupSource.getMaleParentNode())) {
-			return true;
-		}
-
-		/*
-		 * "If the progenitors of a strain are unknown"
-		 */
-		if (isUnknown(groupSource.getFemaleParentNode()) && isUnknown(groupSource.getMaleParentNode())) {
-			return true;
-		}
-
-		/*
-		 * if only male parent (immediate source) is unknown => handle later by UNKNOWN_INBREEDING_GENERATIONS if btype=2.
-		 */
-		if (isUnknown(g.getMaleParentNode()) && !BTypeEnum.SELF_FERTILIZING_F4.equals(this.btype)) {
-			return true;
-		}
-
-		return false;
 	}
 
 	private int countInbreedingGenerations(final GermplasmTreeNode g) {
