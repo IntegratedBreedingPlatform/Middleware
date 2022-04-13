@@ -67,6 +67,8 @@ public class StudyDetails implements Serializable {
 	
 	private Boolean isLocked;
 
+	private Integer generationLevel;
+
 	public StudyDetails() {
 
 	}
@@ -92,7 +94,7 @@ public class StudyDetails implements Serializable {
 	// Used by getTrialObservationTable
 	public StudyDetails(final Integer id, final String studyName, final String description, final String objective, final String startDate,
 			final String endDate, final StudyTypeDto studyType, final String piName, final String siteName, final String piId,
-			final String siteId, final String studyUpdate, final String createdBy, final Boolean isLocked) {
+			final String siteId, final String studyUpdate, final String createdBy, final Boolean isLocked, final Integer generationLevel) {
 
 		this(studyName, description, objective, startDate, endDate, studyType, piName, siteName, studyUpdate, createdBy, isLocked);
 		this.id = id;
@@ -102,6 +104,7 @@ public class StudyDetails implements Serializable {
 		if (siteId != null && NumberUtils.isNumber(siteId)) {
 			this.siteId = Double.valueOf(siteId).intValue();
 		}
+		this.generationLevel = generationLevel;
 	}
 
 	public StudyDetails(final Integer id, final String studyName, final String description, final String objective, final String startDate,
@@ -284,6 +287,14 @@ public class StudyDetails implements Serializable {
 
 	public void setDescription(final String description) {
 		this.description = description;
+	}
+
+	public Integer getGenerationLevel() {
+		return generationLevel;
+	}
+
+	public void setGenerationLevel(final Integer generationLevel) {
+		this.generationLevel = generationLevel;
 	}
 
 	@Override

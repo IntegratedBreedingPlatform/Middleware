@@ -129,6 +129,9 @@ public class DmsProject implements Serializable {
 	@Column(name = "created_by")
 	private String createdBy;
 
+	@Column(name = "generation_level")
+	private Integer generationLevel;
+
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 	@JoinColumn(name = "study_id")
 	private List<StudyExternalReference> externalReferences = new ArrayList<>();
@@ -297,6 +300,14 @@ public class DmsProject implements Serializable {
 
 	public void setStudy(final DmsProject study) {
 		this.study = study;
+	}
+
+	public Integer getGenerationLevel() {
+		return generationLevel;
+	}
+
+	public void setGenerationLevel(final Integer generationLevel) {
+		this.generationLevel = generationLevel;
 	}
 
 	public List<StudyExternalReference> getExternalReferences() {

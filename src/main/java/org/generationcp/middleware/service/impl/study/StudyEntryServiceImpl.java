@@ -161,17 +161,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				!VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()))
 			.collect(Collectors.toList());
 
-		// Copy cross generation level
-		projectProperties.stream()
-			.filter(projectProperty -> projectProperty.getTypeId().equals(VariableType.GERMPLASM_DESCRIPTOR.getId()) && projectProperty.getVariableId().equals(TermId.CROSS.getId()))
-			.findFirst()
-			.ifPresent(projectProperty -> {
-				final Optional<GermplasmList> germplasmList = this.germplasmListService.getGermplasmListById(listId);
-				final Integer generationLevel = germplasmList.get().getGenerationLevel();
-				if (generationLevel != null) {
-					projectProperty.setValue(String.valueOf(generationLevel));
-				}
-			});
+		Optional.ofNullable(this.germplasmListService.getGermplasmListById(listId).get().getGenerationLevel())
+			.ifPresent(getCrossGenerationLevel -> {
+				final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
+				study.setGenerationLevel(getCrossGenerationLevel);
+				this.daoFactory.getDmsProjectDAO().save(study);
+		});
 
 		// Add germplasm list entry details as project properties
 		final AtomicInteger projectPropertyInitialRank = new AtomicInteger(plotDataDataset.getNextPropertyRank());
@@ -293,21 +288,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public void fillWithCrossExpansion(final Integer studyId, final Integer level) {
-		final DmsProject plotDataDataset =
-			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
-		final Optional<ProjectProperty> crossProperty =
-			plotDataDataset.getProperties().stream().filter(projectProperty -> TermId.CROSS.getId() == projectProperty.getVariableId())
-				.findFirst();
-		final ProjectProperty projectProperty;
-		if (crossProperty.isPresent()) {
-			projectProperty = crossProperty.get();
-			projectProperty.setValue(String.valueOf(level));
-			this.daoFactory.getProjectPropertyDAO().update(projectProperty);
-		} else {
-			projectProperty = new ProjectProperty(plotDataDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), String.valueOf(level),
-				plotDataDataset.getNextPropertyRank(), TermId.CROSS.getId(), TermId.CROSS.name());
-			this.daoFactory.getProjectPropertyDAO().save(projectProperty);
-		}
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
+		study.setGenerationLevel(level);
+		this.daoFactory.getDmsProjectDAO().save(study);
 
 		final List<StockModel> entries = this.daoFactory.getStockDao().getStocksForStudy(studyId);
 		final Set<Integer> gids = entries.stream().map(stockModel -> stockModel.getGermplasm().getGid()).collect(toSet());
@@ -315,14 +298,8 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	private Integer getCrossGenerationLevel(final Integer studyId) {
-		final DmsProject plotDataDataset =
-			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
-		return plotDataDataset.getProperties()
-			.stream()
-			.filter(projectProperty -> TermId.CROSS.getId() == projectProperty.getVariableId())
-			.findFirst()
-			.map(projectProperty -> (projectProperty.getValue() != null) ? Integer.parseInt(projectProperty.getValue()) : null)
-			.orElse(null);
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
+		return study.getGenerationLevel();
 	}
 
 	private void setCrossValues(final List<StockModel> entries, final Set<Integer> gids, final Integer level) {
