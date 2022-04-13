@@ -74,4 +74,23 @@
 			CREATE INDEX index_desig ON listdata(desig(255));
 		</sql>
 	</changeSet>
+
+	<changeSet author="cheryleigh" id="v20.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1)
+				FROM INFORMATION_SCHEMA.COLUMNS c
+				WHERE TABLE_NAME = 'stock'
+				AND COLUMN_NAME = 'name'
+				AND CHARACTER_MAXIMUM_LENGTH = 255
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Extend length of stock name column
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE stock MODIFY COLUMN name VARCHAR(5000);
+		</sql>
+	</changeSet>
 </databaseChangeLog>
