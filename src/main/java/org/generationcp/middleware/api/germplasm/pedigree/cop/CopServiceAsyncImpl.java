@@ -25,7 +25,7 @@ public class CopServiceAsyncImpl implements CopServiceAsync {
 	}
 
 	@Override
-	public void save(final CopMatrix copMatrix) {
-		this.daoFactory.getCopMatrixDao().save(copMatrix);
+	public void saveOrUpdate(final CopMatrix copMatrix) {
+		this.daoFactory.getCopMatrixDao().saveOrUpdate(copMatrix);
 	}
 }

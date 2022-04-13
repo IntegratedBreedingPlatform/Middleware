@@ -10,5 +10,5 @@ public interface CopServiceAsync {
 
 	GermplasmTreeNode getGermplasmPedigreeTree(Integer gid, Integer level, boolean includeDerivativeLines);
 
-	void save(CopMatrix copMatrix);
+	void saveOrUpdate(CopMatrix copMatrix);
 }

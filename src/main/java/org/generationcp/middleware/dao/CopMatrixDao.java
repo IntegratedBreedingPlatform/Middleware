@@ -37,7 +37,7 @@ public class CopMatrixDao {
 		return matrix;
 	}
 
-	public void save(final CopMatrix matrix) {
-		this.session.save(matrix);
+	public void saveOrUpdate(final CopMatrix matrix) {
+		this.session.saveOrUpdate(matrix);
 	}
 }
