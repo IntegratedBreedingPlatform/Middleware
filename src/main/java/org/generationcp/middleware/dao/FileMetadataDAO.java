@@ -138,7 +138,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			+ "         where fmc.cvterm_id in (:variableIds)"  //
 			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //
 			+ " 			  and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) "
-			+ " 			  and (:instanceId is null or env.nd_geolocation = :instanceId) " //
+			+ " 			  and (:instanceId is null or env.nd_geolocation_id = :instanceId) " //
 			+ " ) T on T.file_metadata_id = fmc.file_metadata_id and T.cvterm_id = fmc.cvterm_id ");
 
 		sqlQuery.setParameter("datasetId", datasetId);
@@ -168,7 +168,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			+ "         where fmc.cvterm_id in (:variableIds) " //
 			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //
 			+ " 			  and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) "
-			+ " 			  and (:instanceId is null or env.nd_geolocation = :instanceId) ")
+			+ " 			  and (:instanceId is null or env.nd_geolocation_id = :instanceId) ")
 			.setParameter("datasetId", datasetId)
 			.setParameter("germplasmUUID", germplasmUUID)
 			.setParameter("instanceId", instanceId)
