@@ -6,6 +6,7 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
@@ -261,6 +262,9 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 			if (geolocation == null) {
 				throw new MiddlewareRequestException("", "filemetadata.geolocation.not.found", new String[] {instanceId.toString()});
 			}
+			final ExperimentModel model = this.daoFactory.getExperimentDao()
+				.getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), instanceId);
+			fileMetadata.setExperimentModel(model);
 			fileMetadata.setGeolocation(geolocation);
 		}
 
