@@ -133,7 +133,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			+ "         from file_metadata fm " //
 			+ "                  left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
 			+ "                  left join germplsm g on fm.gid = g.gid " //
-			+ "					 left join nd_geolocation env on env.nd_geolocation_id = f.nd_geolocation_id " //
+			+ "					 left join nd_geolocation env on env.nd_geolocation_id = fm.nd_geolocation_id " //
 			+ "                  inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
 			+ "         where fmc.cvterm_id in (:variableIds)"  //
 			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //
@@ -163,7 +163,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			+ "         from file_metadata fm " //
 			+ "                  left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
 			+ "                  left join germplsm g on fm.gid = g.gid " //
-			+ "					 left join nd_geolocation env on env.nd_geolocation_id = f.nd_geolocation_id " //
+			+ "					 left join nd_geolocation env on env.nd_geolocation_id = fm.nd_geolocation_id " //
 			+ "                  inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
 			+ "         where fmc.cvterm_id in (:variableIds) " //
 			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //

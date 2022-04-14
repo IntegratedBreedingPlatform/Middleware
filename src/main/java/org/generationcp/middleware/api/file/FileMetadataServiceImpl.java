@@ -327,15 +327,15 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 	@Override
 	public void detachFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID, final Integer instanceId) {
-		Preconditions.checkArgument((datasetId == null) != isBlank(germplasmUUID));
-
+		final boolean valid = ((datasetId == null? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1)) == 1;
+		Preconditions.checkArgument(valid);
 		this.daoFactory.getFileMetadataDAO().detachFiles(variableIds, datasetId, germplasmUUID, instanceId);
 	}
 
 	@Override
 	public void removeFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID, final Integer instanceId) {
-		Preconditions.checkArgument((datasetId == null) != isBlank(germplasmUUID));
-
+		final boolean valid = ((datasetId == null? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1)) == 1;
+		Preconditions.checkArgument(valid);
 		this.daoFactory.getFileMetadataDAO().removeFiles(variableIds, datasetId, germplasmUUID, instanceId);
 	}
 
