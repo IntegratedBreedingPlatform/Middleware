@@ -1,12 +1,14 @@
 package org.generationcp.middleware.api.file;
 
+import java.util.List;
+
 public class FileMetadataFilterRequest {
 
 	private String observationUnitUUID;
 	private String germplasmUUID;
 	private String variableName;
 	private String fileName;
-	private Integer instanceId;
+	private List<Integer> instanceIds;
 
 	public String getObservationUnitUUID() {
 		return this.observationUnitUUID;
@@ -40,11 +42,11 @@ public class FileMetadataFilterRequest {
 		this.fileName = fileName;
 	}
 
-	public Integer getInstanceId() {
-		return instanceId;
+	public List<Integer> getInstanceIds() {
+		return instanceIds;
 	}
 
-	public void setInstanceId(final Integer instanceId) {
-		this.instanceId = instanceId;
+	public void setInstanceIds(final List<Integer> instanceIds) {
+		this.instanceIds = instanceIds;
 	}
 }

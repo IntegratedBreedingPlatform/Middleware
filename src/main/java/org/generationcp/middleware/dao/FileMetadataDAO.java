@@ -113,10 +113,9 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			paramBuilder.setParameter("germplasmUUID", germplasmUUID);
 		}
 
-		final Integer instanceId = filterRequest.getInstanceId();
-		if(instanceId != null) {
-			paramBuilder.append(" and env.nd_geolocation_id = :instanceId ");
-			paramBuilder.setParameter("instanceId", instanceId);
+		if(!CollectionUtils.isEmpty(filterRequest.getInstanceIds())) {
+			paramBuilder.append(" and env.nd_geolocation_id IN (:instanceIds) ");
+			paramBuilder.setParameterList("instanceIds", filterRequest.getInstanceIds());
 		}
 	}
 

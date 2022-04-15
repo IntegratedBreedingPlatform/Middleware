@@ -83,6 +83,9 @@ public class FileMetadataMapper {
 			to.setObservationUnitUUID(experimentModel.getObsUnitId());
 			to.setNdExperimentId(experimentModel.getNdExperimentId());
 		}
+		if(from.getGeolocation() != null) {
+			to.setInstanceId(from.getGeolocation().getLocationId());
+		}
 
 		final ObjectMapper objectMapper = new ObjectMapper();
 		try {
