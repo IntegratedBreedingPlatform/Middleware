@@ -4,11 +4,13 @@ import org.generationcp.middleware.api.file.FileMetadataFilterRequest;
 import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.springframework.data.domain.Pageable;
+import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -159,37 +161,44 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 	 */
 	public void removeFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID,
 		final Integer instanceId) {
-		final List<Integer> fileMetadataIds = this.getSession().createSQLQuery("select fm.file_id " //
-			+ "         from file_metadata fm " //
-			+ "                  left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
-			+ "                  left join germplsm g on fm.gid = g.gid " //
-			+ "					 left join nd_geolocation env on env.nd_geolocation_id = fm.nd_geolocation_id " //
-			+ "                  inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
-			+ "         where 1=1"
-			+ " 			  and (:variableIds is null or fmc.cvterm_id in (:variableIds)) " //
-			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //
-			+ " 			  and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) "
-			+ " 			  and (:instanceId is null or env.nd_geolocation_id = :instanceId) ")
+		final StringBuilder queryString = new StringBuilder();
+		queryString.append("select fm.file_id ");
+		queryString.append("     from file_metadata fm ");
+		queryString.append("          left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id ");
+		queryString.append("          left join germplsm g on fm.gid = g.gid ");
+		queryString.append("          left join nd_geolocation env on env.nd_geolocation_id = fm.nd_geolocation_id ");
+		queryString.append("          inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id ");
+		queryString.append("      where 1=1 ");
+		if(!CollectionUtils.isEmpty(variableIds)) {
+			queryString.append("      and fmc.cvterm_id in (:variableIds) ");
+		}
+		queryString.append("          and (:datasetId is null or ne.project_id = :datasetId) ");
+		queryString.append("          and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) ");
+		queryString.append("          and (:instanceId is null or env.nd_geolocation_id = :instanceId) ");
+		final Query query = this.getSession().createSQLQuery(queryString.toString())
 			.setParameter("datasetId", datasetId)
 			.setParameter("germplasmUUID", germplasmUUID)
-			.setParameter("instanceId", instanceId)
-			.setParameterList("variableIds", variableIds)
-			.list();
+			.setParameter("instanceId", instanceId);
+		if(!CollectionUtils.isEmpty(variableIds)) {
+			query.setParameterList("variableIds", variableIds);
+		}
+		final List<Integer> fileMetadataIds = query.list();
 
 		/*
 		 * We do multiple deletes instead of single delete join (delete fmc, fm from ...) because
 		 * "the MySQL optimizer might process tables in an order that differs from that of their parent/child relationship"
 		 */
+		if(!CollectionUtils.isEmpty(fileMetadataIds)) {
+			this.getSession().createSQLQuery("delete from file_metadata_cvterm "
+				+ " where file_metadata_id in (:fileMetadataIds)")
+				.setParameterList("fileMetadataIds", fileMetadataIds)
+				.executeUpdate();
 
-		this.getSession().createSQLQuery("delete from file_metadata_cvterm "
-			+ " where file_metadata_id in (:fileMetadataIds)")
-			.setParameterList("fileMetadataIds", fileMetadataIds)
-			.executeUpdate();
-
-		this.getSession().createSQLQuery("delete from file_metadata "
-			+ " where file_metadata.file_id in (:fileMetadataIds)")
-			.setParameterList("fileMetadataIds", fileMetadataIds)
-			.executeUpdate();
+			this.getSession().createSQLQuery("delete from file_metadata "
+				+ " where file_metadata.file_id in (:fileMetadataIds)")
+				.setParameterList("fileMetadataIds", fileMetadataIds)
+				.executeUpdate();
+		}
 	}
 
 	public void updateGid(final Integer newGid, final List<String> targetFileUUIDs) {
