@@ -165,7 +165,8 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			+ "                  left join germplsm g on fm.gid = g.gid " //
 			+ "					 left join nd_geolocation env on env.nd_geolocation_id = fm.nd_geolocation_id " //
 			+ "                  inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
-			+ "         where fmc.cvterm_id in (:variableIds) " //
+			+ "         where 1=1"
+			+ " 			  and (:variableIds is null or fmc.cvterm_id in (:variableIds)) " //
 			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //
 			+ " 			  and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) "
 			+ " 			  and (:instanceId is null or env.nd_geolocation_id = :instanceId) ")
