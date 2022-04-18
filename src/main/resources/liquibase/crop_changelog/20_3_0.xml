@@ -275,4 +275,35 @@
 		</sql>
 	</changeSet>
 
+
+	<changeSet author="darla" id="v20.3.0-10">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'atributs'
+					AND COLUMN_NAME = 'aval'
+					AND CHARACTER_MAXIMUM_LENGTH = 255
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'atributs_aud'
+					AND COLUMN_NAME = 'aval'
+					AND CHARACTER_MAXIMUM_LENGTH = 255
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Extend length of atributs value column (and counterpart audit table column)
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE atributs_aud MODIFY COLUMN aval VARCHAR(5000) NOT NULL DEFAULT '-';
+			ALTER TABLE atributs MODIFY COLUMN aval VARCHAR(5000) NOT NULL DEFAULT '-';
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
