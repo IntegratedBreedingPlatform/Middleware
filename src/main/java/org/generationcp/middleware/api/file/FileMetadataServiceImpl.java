@@ -337,7 +337,8 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	public void removeFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID, final Integer instanceId) {
 		final boolean valid = ((datasetId == null? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1)) == 1;
 		Preconditions.checkArgument(valid);
-		this.daoFactory.getFileMetadataDAO().removeFiles(variableIds, datasetId, germplasmUUID, Collections.singletonList(instanceId));
+		final List<Integer> instanceIds = instanceId == null? null : Collections.singletonList(instanceId);
+		this.daoFactory.getFileMetadataDAO().removeFiles(variableIds, datasetId, germplasmUUID, instanceIds);
 	}
 
 	@Override
