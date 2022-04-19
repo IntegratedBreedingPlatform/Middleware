@@ -165,7 +165,6 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 		queryString.append("     from file_metadata fm ");
 		queryString.append("          left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id ");
 		queryString.append("          left join germplsm g on fm.gid = g.gid ");
-		queryString.append("          left join nd_geolocation env on env.nd_geolocation_id = fm.nd_geolocation_id ");
 		queryString.append("          inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id ");
 		queryString.append("      where 1=1 ");
 		if(!CollectionUtils.isEmpty(variableIds)) {
@@ -174,7 +173,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 		queryString.append("          and (:datasetId is null or ne.project_id = :datasetId) ");
 		queryString.append("          and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) ");
 		if(!CollectionUtils.isEmpty(instanceIds)) {
-			queryString.append("      and env.nd_geolocation_id IN (:instanceIds) ");
+			queryString.append("      and fm.nd_geolocation_id IN (:instanceIds) ");
 		}
 		final Query query = this.getSession().createSQLQuery(queryString.toString())
 			.setParameter("datasetId", datasetId)
