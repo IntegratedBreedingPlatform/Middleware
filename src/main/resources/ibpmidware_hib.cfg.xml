@@ -130,6 +130,7 @@
         <mapping class="org.generationcp.middleware.pojos.derived_variables.Formula"/>
 
         <!-- Other -->
+        <mapping class="org.generationcp.middleware.pojos.CopMatrix"/>
         <mapping class="org.generationcp.middleware.pojos.search.SearchRequest"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmStudySource"/>
         <mapping class="org.generationcp.middleware.pojos.file.FileMetadata"/>

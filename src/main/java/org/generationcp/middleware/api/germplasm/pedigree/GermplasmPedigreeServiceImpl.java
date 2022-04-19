@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.germplasm.pedigree;
 
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -12,6 +13,10 @@ import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Note: see also {@link GermplasmPedigreeServiceAsyncImpl} (not a managed bean).
+ * When autowiring things here, make sure to add setters there
+ */
 public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 
 	private final DaoFactory daoFactory;
@@ -27,6 +32,10 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	@Override
 	public GermplasmTreeNode getGermplasmPedigreeTree(final Integer gid, final Integer level, final boolean includeDerivativeLines) {
 		final Germplasm root = this.daoFactory.getGermplasmDao().getById(gid);
+
+		if (root == null) {
+			throw new MiddlewareRequestException("", "error.record.not.found", "gid=" + gid);
+		}
 
 		final GermplasmTreeNode rootNode = new GermplasmTreeNode(root);
 		rootNode.setNumberOfGenerations(this.countGenerations(gid, includeDerivativeLines, level == null));
@@ -201,7 +210,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 						this.addNodeForKnownParents(node, level, germplasm.getFemaleParent(), true);
 					}
 				} else {
-					// Get and add the source germplasm, if it is unknown
+					// Get and add the source germplasm, if it is known
 					if (maleGid != 0) {
 						this.addMaleParentNode(node, level, germplasm.getMaleParent(), false);
 						// Use female parent to continue traversal if source is unknown
@@ -279,7 +288,15 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 			if (!includeDerivativeLine) {
 				maxPedigreeLevel = this.getMaxGenerationCountFromParent(germplasm.getFemaleParent(), false);
 			} else {
-				maxPedigreeLevel = this.getMaxGenerationCountFromParent(germplasm.getMaleParent(), true);
+				final Germplasm parent;
+				if (germplasm.getMaleParent() != null) {
+					parent = germplasm.getMaleParent();
+				} else {
+					// incomplete pedigree records, try to get pedigree level from group source
+					// TODO create test
+					parent = germplasm.getFemaleParent();
+				}
+				maxPedigreeLevel = this.getMaxGenerationCountFromParent(parent, true);
 			}
 		} else if (germplasm.getGnpgs() >= 2) {
 			maxPedigreeLevel = this.getMaxGenerationCountFromBothParents(germplasm, includeDerivativeLine);

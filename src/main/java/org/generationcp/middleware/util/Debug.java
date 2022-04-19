@@ -183,4 +183,14 @@ public class Debug {
 			LOG.debug(format(message, args));
 		}
 	}
+
+	/**
+	 * Set BMSAPI/src/main/resources/logback.xml root level="INFO"
+	 * TODO jvm -Dlogback.debug=true not working?
+	 */
+	public static void info(final String message, final Object... args) {
+		if (LOG.isInfoEnabled()) {
+			LOG.info(format(message, args));
+		}
+	}
 }
