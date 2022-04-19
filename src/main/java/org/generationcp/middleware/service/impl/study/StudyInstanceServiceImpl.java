@@ -165,6 +165,9 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final ExperimentDao experimentDao = this.daoFactory.getExperimentDao();
 		experimentDao.deleteExperimentsForDatasets(Arrays.asList(plotDatasetId, environmentDatasetId), instanceNumbersToDelete);
 
+		// Delete files associated to the instances
+		this.daoFactory.getFileMetadataDAO().removeFiles(null, null, null, instanceIds);
+
 		// Delete geolocation and its properties
 		this.daoFactory.getGeolocationDao().deleteGeolocations(instanceIds);
 

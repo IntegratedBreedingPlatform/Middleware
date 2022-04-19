@@ -159,7 +159,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 	 * prompting the user to execute a detach variables instead ({@link #detachFiles(List, Integer, String)})
 	 */
 	public void removeFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID,
-		final Integer instanceId) {
+		final List<Integer> instanceIds) {
 		final StringBuilder queryString = new StringBuilder();
 		queryString.append("select fm.file_id ");
 		queryString.append("     from file_metadata fm ");
@@ -173,11 +173,15 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 		}
 		queryString.append("          and (:datasetId is null or ne.project_id = :datasetId) ");
 		queryString.append("          and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) ");
-		queryString.append("          and (:instanceId is null or env.nd_geolocation_id = :instanceId) ");
+		if(!CollectionUtils.isEmpty(instanceIds)) {
+			queryString.append("      and env.nd_geolocation_id IN (:instanceIds) ");
+		}
 		final Query query = this.getSession().createSQLQuery(queryString.toString())
 			.setParameter("datasetId", datasetId)
-			.setParameter("germplasmUUID", germplasmUUID)
-			.setParameter("instanceId", instanceId);
+			.setParameter("germplasmUUID", germplasmUUID);
+		if(!CollectionUtils.isEmpty(instanceIds)) {
+			query.setParameterList("instanceIds", instanceIds);
+		}
 		if(!CollectionUtils.isEmpty(variableIds)) {
 			query.setParameterList("variableIds", variableIds);
 		}
