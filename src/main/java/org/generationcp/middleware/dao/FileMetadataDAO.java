@@ -9,8 +9,6 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
@@ -167,7 +165,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 		queryString.append("     from file_metadata fm ");
 		queryString.append("          left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id ");
 		queryString.append("          left join germplsm g on fm.gid = g.gid ");
-		queryString.append("          inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id ");
+		queryString.append("          left join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id ");
 		queryString.append("      where 1=1 ");
 		if(!CollectionUtils.isEmpty(variableIds)) {
 			queryString.append("      and fmc.cvterm_id in (:variableIds) ");
