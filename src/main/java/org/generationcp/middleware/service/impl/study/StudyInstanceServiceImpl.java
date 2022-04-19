@@ -158,7 +158,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				.collect(Collectors.toList());
 
 		// Delete files associated to the instances
-		this.daoFactory.getFileMetadataDAO().removeFiles(null, null, null, instanceIds);
+		this.daoFactory.getFileMetadataDAO().removeFiles(null, environmentDatasetId, null, instanceIds);
 
 		//Update StudyExperimentGeolocation
 		this.daoFactory.getExperimentDao().updateStudyExperimentGeolocationIfNecessary(studyId, instanceIds);
