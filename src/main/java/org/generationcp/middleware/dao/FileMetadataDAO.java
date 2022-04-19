@@ -1,6 +1,7 @@
 package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.api.file.FileMetadataFilterRequest;
+import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataViewDAO;
 import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.hibernate.Criteria;
@@ -9,6 +10,8 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
@@ -19,6 +22,7 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
+	private static final Logger LOG = LoggerFactory.getLogger(FileMetadataDAO.class);
 
 	private static final String SEARCH_BASE_QUERY = " select distinct f.* from file_metadata f " //
 		+ " left join nd_experiment nde on f.nd_experiment_id = nde.nd_experiment_id " //
@@ -160,6 +164,13 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 	 */
 	public void removeFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID,
 		final List<Integer> instanceIds) {
+		LOG.error("EMPTY: " + CollectionUtils.isEmpty(instanceIds));
+		if(!CollectionUtils.isEmpty(instanceIds)) {
+			LOG.error("size: " + instanceIds.size());
+			for(Integer id: instanceIds) {
+				LOG.error("id: " + id);
+			}
+		}
 		final StringBuilder queryString = new StringBuilder();
 		queryString.append("select fm.file_id ");
 		queryString.append("     from file_metadata fm ");
