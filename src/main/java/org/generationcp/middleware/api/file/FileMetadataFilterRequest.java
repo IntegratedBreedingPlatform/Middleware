@@ -19,7 +19,7 @@ public class FileMetadataFilterRequest {
 	}
 
 	public String getGermplasmUUID() {
-		return germplasmUUID;
+		return this.germplasmUUID;
 	}
 
 	public void setGermplasmUUID(final String germplasmUUID) {
@@ -43,7 +43,7 @@ public class FileMetadataFilterRequest {
 	}
 
 	public List<Integer> getInstanceIds() {
-		return instanceIds;
+		return this.instanceIds;
 	}
 
 	public void setInstanceIds(final List<Integer> instanceIds) {

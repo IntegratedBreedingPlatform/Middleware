@@ -21,8 +21,6 @@ import org.generationcp.middleware.pojos.file.FileMetadata;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.uid.FileUIDGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +33,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -45,8 +42,6 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Transactional
 @Service
 public class FileMetadataServiceImpl implements FileMetadataService {
-
-	private static final Logger LOG = LoggerFactory.getLogger(FileMetadataServiceImpl.class);
 
 	public static final String FILE_PATH_PREFIX_PROGRAMUUID = "programuuid-";
 	public static final String FILE_PATH_PREFIX_STUDYID = "studyid-";
@@ -97,8 +92,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 		this.daoFactory.getFileMetadataDAO().save(fileMetadata);
 
-		final Image response = fileMetadataMapper.map(fileMetadata);
-		return response;
+		return fileMetadataMapper.map(fileMetadata);
 	}
 
 	@Override
@@ -144,7 +138,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 			.getAll(variableIds, datasetId, germplasmUUID, instanceId);
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
 		final List<FileMetadataDTO> fileMetadataDTOList = new ArrayList<>();
-		for (FileMetadata fileMetadata : fileMetadataList) {
+		for (final FileMetadata fileMetadata : fileMetadataList) {
 			final FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
 			fileMetadataMapper.map(fileMetadata, fileMetadataDTO);
 			fileMetadataDTOList.add(fileMetadataDTO);
@@ -189,7 +183,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		final MessageDigest md5;
 		try {
 			md5 = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
+		} catch (final NoSuchAlgorithmException e) {
 			throw new IllegalStateException("No MD5 algorithm available!");
 		}
 		/*

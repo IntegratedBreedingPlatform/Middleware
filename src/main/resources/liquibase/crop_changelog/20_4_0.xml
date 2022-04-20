@@ -22,7 +22,7 @@
 			) comment 'coefficient of parentage matrix';
 		</sql>
 	</changeSet>
-	
+
 	<changeSet author="mderamos" id="v20.4.0-2">
 		<preConditions onFail="MARK_RAN">
 			<not>

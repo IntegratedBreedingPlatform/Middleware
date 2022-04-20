@@ -151,7 +151,7 @@ public class FileMetadataDTO {
 	}
 
 	public Integer getInstanceId() {
-		return instanceId;
+		return this.instanceId;
 	}
 
 	public void setInstanceId(final Integer instanceId) {

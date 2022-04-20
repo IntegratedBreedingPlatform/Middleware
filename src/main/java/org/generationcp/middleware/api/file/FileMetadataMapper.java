@@ -8,16 +8,12 @@ import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.file.FileMetadata;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class FileMetadataMapper {
-
-	private static final Logger LOG = LoggerFactory.getLogger(FileMetadataMapper.class);
 
 	public void map(final ImageNewRequest from, final FileMetadata to) {
 		to.setCopyright(from.getCopyright());
