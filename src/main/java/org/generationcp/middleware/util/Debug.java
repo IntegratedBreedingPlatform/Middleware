@@ -11,11 +11,11 @@
 
 package org.generationcp.middleware.util;
 
-import java.lang.reflect.Field;
-import java.util.List;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Field;
+import java.util.List;
 
 import static java.lang.String.format;
 
@@ -181,6 +181,16 @@ public class Debug {
 	public static void debug(final String message, final Object... args) {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug(format(message, args));
+		}
+	}
+
+	/**
+	 * Set BMSAPI/src/main/resources/logback.xml root level="INFO"
+	 * TODO jvm -Dlogback.debug=true not working?
+	 */
+	public static void info(final String message, final Object... args) {
+		if (LOG.isInfoEnabled()) {
+			LOG.info(format(message, args));
 		}
 	}
 }
