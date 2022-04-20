@@ -22,8 +22,147 @@
 			) comment 'coefficient of parentage matrix';
 		</sql>
 	</changeSet>
+	<changeSet author="cheryleigh" id="v20.4.0-2">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'names'
+					AND COLUMN_NAME = 'nval'
+					AND CHARACTER_MAXIMUM_LENGTH = 255
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'names_aud'
+					AND COLUMN_NAME = 'nval'
+					AND CHARACTER_MAXIMUM_LENGTH = 255
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.STATISTICS c
+					WHERE TABLE_NAME = 'names'
+					AND COLUMN_NAME = 'nval'
+					AND INDEX_NAME = 'names_idx06'
+					AND INDEX_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Extend length of names value column (and counterpart audit table column)
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE names_aud MODIFY COLUMN nval VARCHAR(5000) NOT NULL DEFAULT '-';
+			DROP INDEX names_idx06 ON names;
+			ALTER TABLE names MODIFY COLUMN nval VARCHAR(5000) NOT NULL DEFAULT '-';
+			CREATE INDEX names_idx06 ON names(nval(255));
+		</sql>
+	</changeSet>
 
-	<changeSet author="mderamos" id="v20.4.0-2">
+	<changeSet author="cheryleigh" id="v20.4.0-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'listdata'
+					AND COLUMN_NAME = 'desig'
+					AND CHARACTER_MAXIMUM_LENGTH = 255
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.STATISTICS c
+					WHERE TABLE_NAME = 'listdata'
+					AND COLUMN_NAME = 'desig'
+					AND INDEX_NAME = 'index_desig'
+					AND INDEX_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Extend length of list data designation column
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DROP INDEX index_desig ON listdata;
+			ALTER TABLE listdata MODIFY COLUMN desig VARCHAR(5000) NOT NULL DEFAULT '-';
+			CREATE INDEX index_desig ON listdata(desig(255));
+		</sql>
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v20.4.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1)
+				FROM INFORMATION_SCHEMA.COLUMNS c
+				WHERE TABLE_NAME = 'stock'
+				AND COLUMN_NAME = 'name'
+				AND CHARACTER_MAXIMUM_LENGTH = 255
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Extend length of stock name column
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE stock MODIFY COLUMN name VARCHAR(5000);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v20.4.0-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1)
+				FROM INFORMATION_SCHEMA.COLUMNS c
+				WHERE TABLE_NAME = 'listdata'
+				AND COLUMN_NAME = 'grpname'
+				AND CHARACTER_MAXIMUM_LENGTH = 255
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Extend length of listdata grpname column
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE listdata MODIFY COLUMN grpname VARCHAR(5000);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v20.4.0-6">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.COLUMNS c
+					WHERE TABLE_NAME = 'key_sequence_register'
+					AND COLUMN_NAME = 'key_prefix'
+					AND CHARACTER_MAXIMUM_LENGTH = 255
+					AND TABLE_SCHEMA = DATABASE();
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(1)
+					FROM INFORMATION_SCHEMA.STATISTICS c
+					WHERE TABLE_NAME = 'key_sequence_register'
+					AND COLUMN_NAME = 'key_prefix'
+					AND INDEX_NAME = 'key_prefix_unique'
+					AND INDEX_SCHEMA = DATABASE();
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Extend length of key_sequence_register key_prefix column
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DROP INDEX key_prefix_unique ON key_sequence_register;
+			ALTER TABLE key_sequence_register MODIFY COLUMN key_prefix VARCHAR(5000);
+			CREATE INDEX key_prefix_unique ON key_sequence_register(key_prefix(255));
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v20.4.0-7">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="file_metadata" columnName="nd_geolocation_id"/>
@@ -37,7 +176,7 @@
 		</addColumn>
 	</changeSet>
 
-	<changeSet author="mderamos" id="v20.4.0-3">
+	<changeSet author="mderamos" id="v20.4.0-8">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = 'file_metadata' AND CONSTRAINT_NAME='fk_file_metadata_nd_geolocation_id' and TABLE_SCHEMA = DATABASE();</sqlCheck>
 		</preConditions>
