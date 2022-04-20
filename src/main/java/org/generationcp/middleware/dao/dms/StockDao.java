@@ -772,4 +772,12 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		query.executeUpdate();
 	}
 
+	public List<StockModel> getStocksByStudyAndEntryNumbersGreaterThanEqual(final Integer studyId, final Integer entryNumber) {
+		return this.getSession()
+			.createQuery("SELECT entry FROM StockModel entry WHERE entry.project.projectId = :studyId AND entry.uniqueName >= :entryNumber")
+			.setParameter("studyId", studyId)
+			.setParameter("entryNumber", entryNumber, IntegerType.INSTANCE)
+			.list();
+	}
+
 }

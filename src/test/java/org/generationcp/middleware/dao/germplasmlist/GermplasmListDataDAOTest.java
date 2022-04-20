@@ -14,6 +14,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.germplasm.GermplasmParent;
+import org.generationcp.middleware.util.CrossExpansionUtil;
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -26,8 +27,6 @@ import java.util.List;
 import java.util.Map;
 
 import static org.apache.commons.lang3.RandomStringUtils.randomAlphanumeric;
-import static org.generationcp.middleware.pojos.GermplasmListData.CROSS_NAME_TRUNCATED_SUFFIX;
-import static org.generationcp.middleware.pojos.GermplasmListData.MAX_CROSS_NAME_SIZE;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
@@ -247,14 +246,14 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	@Test
 	public void testTruncateGroupName() {
 		final GermplasmListData listData = this.createTestListWithListData();
-		final String groupName = randomAlphanumeric(MAX_CROSS_NAME_SIZE + 1);
+		final String groupName = randomAlphanumeric(CrossExpansionUtil.MAX_CROSS_NAME_SIZE + 1);
 		listData.setGroupName(groupName);
 		listData.truncateGroupNameIfNeeded();
 
 		// should not thrown exception
 		this.germplasmListDataDAO.saveOrUpdate(listData);
 
-		Assert.assertThat(listData.getGroupName(), is(groupName.substring(0, MAX_CROSS_NAME_SIZE - 1) + CROSS_NAME_TRUNCATED_SUFFIX));
+		Assert.assertThat(listData.getGroupName(), is(groupName.substring(0, CrossExpansionUtil.MAX_CROSS_NAME_SIZE - 1) + CrossExpansionUtil.CROSS_NAME_TRUNCATED_SUFFIX));
 
 	}
 

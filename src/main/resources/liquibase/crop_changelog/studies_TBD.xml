@@ -263,4 +263,20 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="studies-TBD-18">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="project" columnName="generation_level" />
+			</not>
+		</preConditions>
+		<comment>
+			Add 'generation_level' column: indicates preferred cross expansion (pedigree) level for the entire study
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			# a property to complement (or potentially migrate) the stored pedigree in stock.cross_value
+			alter table project
+				add generation_level int null comment 'cross expansion (pedigree) level';
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

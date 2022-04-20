@@ -4,6 +4,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -156,7 +158,10 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		if (view.size() == entryDetailsColumnIds.size()) {
 			final List<GermplasmListMeasurementVariableDTO> defaultStaticColumns = this.transformDefaultStaticColumns();
 			final List<GermplasmListMeasurementVariableDTO> variableColumns = this.getVariableColumns(entryDetailsColumnIds, programUUID);
-			return Stream.concat(defaultStaticColumns.stream(), variableColumns.stream()).collect(toList());
+			final Map<Integer, GermplasmListMeasurementVariableDTO> columnsIndexedByTermId =
+				variableColumns.stream().collect(Collectors.toMap(GermplasmListMeasurementVariableDTO::getTermId, standardVariable -> standardVariable));
+			defaultStaticColumns.add(0, columnsIndexedByTermId.remove(TermId.ENTRY_NO.getId()));
+			return Stream.concat(defaultStaticColumns.stream(), columnsIndexedByTermId.values().stream()).collect(toList());
 		}
 
 		final List<GermplasmListMeasurementVariableDTO> header = new ArrayList<>();
@@ -201,7 +206,10 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			.collect(toList());
 		final List<GermplasmListMeasurementVariableDTO> variableColumns = this.getVariableColumns(variableIds, programUUID);
 		if (!CollectionUtils.isEmpty(variableColumns)) {
-			header.addAll(variableColumns);
+			final Map<Integer, GermplasmListMeasurementVariableDTO> columnsIndexedByTermId =
+				variableColumns.stream().collect(Collectors.toMap(GermplasmListMeasurementVariableDTO::getTermId, standardVariable -> standardVariable));
+			header.add(0, columnsIndexedByTermId.remove(TermId.ENTRY_NO.getId()));
+			header.addAll(columnsIndexedByTermId.values());
 		}
 		return header;
 	}

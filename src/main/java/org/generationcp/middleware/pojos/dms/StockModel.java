@@ -14,6 +14,7 @@ package org.generationcp.middleware.pojos.dms;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
+import org.generationcp.middleware.util.CrossExpansionUtil;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.Basic;
@@ -117,6 +118,7 @@ public class StockModel implements Serializable {
 		this.setGermplasm(new Germplasm(Integer.valueOf(studyEntryDto.getGid())));
 		this.setUniqueName(studyEntryDto.getEntryNumber().toString());
 		this.setIsObsolete(false);
+		this.setCross(studyEntryDto.getCross());
 
 		final Set<StockProperty> stockProperties = new HashSet<>();
 		final Iterator<Map.Entry<Integer, StudyEntryPropertyData>> iterator = studyEntryDto.getProperties().entrySet().iterator();
@@ -207,6 +209,11 @@ public class StockModel implements Serializable {
 
 	public void setProject(final DmsProject project) {
 		this.project = project;
+	}
+
+	public void truncateCrossValueIfNeeded() {
+		String cross = CrossExpansionUtil.truncateCrossValueIfNeeded(this.getCross());
+		this.setCross(cross);
 	}
 
 	@Override
