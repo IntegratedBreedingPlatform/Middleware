@@ -5,6 +5,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.generationcp.middleware.pojos.AbstractEntity;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 
 import javax.persistence.Basic;
@@ -16,7 +17,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
@@ -74,6 +74,10 @@ public class FileMetadata extends AbstractEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "gid")
 	private Germplasm germplasm;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "nd_geolocation_id")
+	private Geolocation geolocation;
 
 	@OneToMany
 	@JoinTable(
@@ -187,11 +191,19 @@ public class FileMetadata extends AbstractEntity {
 	}
 
 	public Germplasm getGermplasm() {
-		return germplasm;
+		return this.germplasm;
 	}
 
 	public void setGermplasm(final Germplasm germplasm) {
 		this.germplasm = germplasm;
+	}
+
+	public Geolocation getGeolocation() {
+		return this.geolocation;
+	}
+
+	public void setGeolocation(final Geolocation geolocation) {
+		this.geolocation = geolocation;
 	}
 
 	public List<CVTerm> getVariables() {
