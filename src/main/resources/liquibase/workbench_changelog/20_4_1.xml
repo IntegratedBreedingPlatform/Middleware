@@ -4,7 +4,7 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="aldrin" id="v20.4.0-1">
+	<changeSet author="aldrin" id="v20.4.1-1">
          <preConditions onFail="MARK_RAN">
  			<sqlCheck expectedResult="0">
                  SELECT count(*) FROM release_note where version = '21.0'
