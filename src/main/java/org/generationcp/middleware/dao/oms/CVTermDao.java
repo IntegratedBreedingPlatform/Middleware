@@ -1756,8 +1756,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			final VariableDTO variableDto = new VariableDTO();
 
-			variableDto.getContextOfUse().add("PLOT");
-
 			final String observationVariableName = result.get(VARIABLE_ALIAS) != null ? String.valueOf(result.get(VARIABLE_ALIAS)) :
 				String.valueOf(result.get(VARIABLE_NAME));
 

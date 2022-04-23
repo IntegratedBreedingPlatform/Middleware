@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 public enum VariableTypeGroup {
-	TRAIT(Collections.singletonList(VariableType.TRAIT.getName())),
+	TRAIT(Arrays.asList(VariableType.TRAIT.getName(), VariableType.ANALYSIS.getName())),
 	GERMPLASM_ATTRIBUTES(Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE.getName(), VariableType.GERMPLASM_PASSPORT.getName()));
 
 	private final List<String> variableTypeNames;

@@ -1,6 +1,8 @@
 package org.generationcp.middleware.api.brapi;
 
+import com.google.common.collect.Multimap;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -9,6 +11,7 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
@@ -35,6 +38,9 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
+
+	@Autowired
+	private OntologyVariableService ontologyVariableService;
 
 	@Autowired
 	private DatasetService datasetService;
@@ -74,6 +80,17 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 				dto.getMethod().setExternalReferences(externalReferencesMap.get(dto.getMethod().getMethodDbId()));
 				dto.getTrait().setExternalReferences(externalReferencesMap.get(dto.getTrait().getTraitDbId()));
 			}
+
+			final Multimap<Integer, VariableType> variableTypeMultimap =
+				this.ontologyVariableService.getVariableTypesOfVariables(variableIds);
+			for (final VariableDTO dto : variableDTOS) {
+				if (variableTypeMultimap.get(Integer.valueOf(dto.getObservationVariableDbId())).contains(VariableType.ANALYSIS)) {
+					dto.getContextOfUse().add("MEANS");
+				} else {
+					dto.getContextOfUse().add("PLOT");
+				}
+			}
+
 		}
 		return variableDTOS;
 	}
@@ -101,6 +118,37 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 			}
 		}
 		return variable;
+	}
+
+	@Override
+	public List<VariableDTO> createObservationVariables(final List<VariableDTO> variableDTOList) {
+		for (final VariableDTO variableDTO : variableDTOList) {
+			final OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+			variableInfo.setName(variableDTO.getObservationVariableName());
+			variableInfo.setMethodId(Integer.valueOf(variableDTO.getMethod().getMethodDbId()));
+			variableInfo.setPropertyId(Integer.valueOf(variableDTO.getTrait().getTraitDbId()));
+			variableInfo.setScaleId(Integer.valueOf(variableDTO.getScale().getScaleDbId()));
+
+			if (variableDTO.getScale().getValidValues() != null && variableDTO.getScale().getValidValues().getMin() != null) {
+				variableInfo.setExpectedMin(String.valueOf(variableDTO.getScale().getValidValues().getMin()));
+			}
+
+			if (variableDTO.getScale().getValidValues() != null && variableDTO.getScale().getValidValues().getMax() != null) {
+				variableInfo.setExpectedMax(String.valueOf(variableDTO.getScale().getValidValues().getMax()));
+			}
+
+			// If ContextOfUse is MEANS, it means the variable should have a varibleType = ANALYSIS
+			if (variableDTO.getContextOfUse() != null && variableDTO.getContextOfUse().contains("MEANS")) {
+				variableInfo.addVariableType(VariableType.ANALYSIS);
+			} else {
+				// Default variableType is TRAIT
+				variableInfo.addVariableType(VariableType.TRAIT);
+			}
+
+			this.ontologyVariableDataManager.addVariable(variableInfo);
+			variableDTO.setObservationVariableDbId(String.valueOf(variableInfo.getId()));
+		}
+		return variableDTOList;
 	}
 
 	private void updateVariable(final VariableDTO variable) {
