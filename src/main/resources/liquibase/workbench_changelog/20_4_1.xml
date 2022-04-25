@@ -1,0 +1,24 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="aldrin" id="v20.4.1-1">
+         <preConditions onFail="MARK_RAN">
+ 			<sqlCheck expectedResult="0">
+                 SELECT count(*) FROM release_note where version = '21.0'
+             </sqlCheck>
+ 		</preConditions>
+         <comment>Add release note for version 21.0</comment>
+ 		<sql dbms="mysql" splitStatements="true">
+ 			-- Disable release note for v20
+			UPDATE release_note SET enabled = 0 WHERE version = '20.0';
+			-- Add release note for version 21.0
+			INSERT INTO release_note (version, release_date, has_coming_soon, enabled, file_name) VALUES ('21.0', CURRENT_TIMESTAMP, 0, 1, '21.0');
+			-- Show again the release notes for all user
+			UPDATE release_note_user SET show_again = 1;
+ 		</sql>
+ 	</changeSet>
+
+</databaseChangeLog>
