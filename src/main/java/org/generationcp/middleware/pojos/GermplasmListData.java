@@ -52,7 +52,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	// string contants for name of queries
 	public static final String DELETE_BY_LIST_ID = "deleteGermplasmListDataByListId";
 
-	public static final int MAX_CROSS_NAME_SIZE = 240;
+	public static final int MAX_CROSS_NAME_SIZE = 4985;
 	public static final String CROSS_NAME_TRUNCATED_SUFFIX = "(truncated)";
 
 	@Id
