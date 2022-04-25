@@ -21,4 +21,21 @@
  		</sql>
  	</changeSet>
 
+	<changeSet author="cuenyad" id="v20.4.1-2">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="feedback"></tableExists>
+				<sqlCheck expectedResult="0">
+					SELECT count(*) FROM feedback WHERE feature = 'MANAGE_PROGRAM_SETTINGS'
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Add 'manage program settings' feature to 'feedback' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO feedback (feature, enabled) VALUES ('MANAGE_PROGRAM_SETTINGS', true);
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
