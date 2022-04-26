@@ -14,6 +14,7 @@ import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataMana
 import org.generationcp.middleware.manager.ontology.daoElements.OntologyVariableInfo;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
+import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,9 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	@Autowired
 	private DatasetService datasetService;
+
+	@Autowired
+	private SiteAnalysisService siteAnalysisService;
 
 	private DaoFactory daoFactory;
 
@@ -85,9 +89,9 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 				this.ontologyVariableService.getVariableTypesOfVariables(variableIds);
 			for (final VariableDTO dto : variableDTOS) {
 				if (variableTypeMultimap.get(Integer.valueOf(dto.getObservationVariableDbId())).contains(VariableType.ANALYSIS)) {
-					dto.getContextOfUse().add("MEANS");
+					dto.getContextOfUse().add(VariableDTO.ContextOfUseEnum.MEANS.toString());
 				} else {
-					dto.getContextOfUse().add("PLOT");
+					dto.getContextOfUse().add(VariableDTO.ContextOfUseEnum.PLOT.toString());
 				}
 			}
 
@@ -112,9 +116,11 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 		// Assign variable to studies
 		if (!CollectionUtils.isEmpty(variable.getStudyDbIds())) {
 			final List<Integer> plotDatasetIds = new ArrayList<>();
+			final List<Integer> meansDatasetIds = new ArrayList<>();
 			for (final String studyDbId : variable.getStudyDbIds()) {
 				this.addObservationVariableToStudy(Integer.valueOf(studyDbId),
-					Integer.valueOf(variable.getObservationVariableDbId()), variable.getObservationVariableName(), plotDatasetIds);
+					Integer.valueOf(variable.getObservationVariableDbId()), variable.getObservationVariableName(), plotDatasetIds,
+					meansDatasetIds, variable.getContextOfUse().get(0));
 			}
 		}
 		return variable;
@@ -138,7 +144,8 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 			}
 
 			// If ContextOfUse is MEANS, it means the variable should have a varibleType = ANALYSIS
-			if (variableDTO.getContextOfUse() != null && variableDTO.getContextOfUse().contains("MEANS")) {
+			if (variableDTO.getContextOfUse() != null && variableDTO.getContextOfUse()
+				.contains(VariableDTO.ContextOfUseEnum.MEANS.toString())) {
 				variableInfo.addVariableType(VariableType.ANALYSIS);
 			} else {
 				// Default variableType is TRAIT
@@ -191,18 +198,41 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 
 	private void addObservationVariableToStudy(
 		final Integer studyDbId, final Integer observationVariableDbId,
-		final String observationVariableName, final List<Integer> plotDatasetIds) {
-		final Integer plotDatasetId = this.daoFactory
-			.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
-		if (!plotDatasetIds.contains(plotDatasetId)) {
-			final List<MeasurementVariable> studyMeasurementVariables =
-				this.datasetService.getObservationSetVariables(plotDatasetId, Arrays.asList(VariableType.TRAIT.getId()));
-			// Check first if the variable already exists in study
-			if (studyMeasurementVariables.stream().noneMatch(o -> o.getTermId() == observationVariableDbId)) {
-				this.datasetService
-					.addDatasetVariable(plotDatasetId, observationVariableDbId, VariableType.TRAIT, observationVariableName);
+		final String observationVariableName, final List<Integer> plotDatasetIds, final List<Integer> meansDatasetIds,
+		final String contextOfUse) {
+		if (VariableDTO.ContextOfUseEnum.MEANS.toString().equalsIgnoreCase(contextOfUse)) {
+			Integer meansDatasetId = this.daoFactory
+				.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.MEANS_DATA);
+			// If means dataset is not yet existing create new.
+			if (meansDatasetId == null) {
+				final int studyId = this.daoFactory.getDmsProjectDAO().getProjectIdByStudyDbId(studyDbId);
+				meansDatasetId = this.siteAnalysisService.createMeansDataset(studyId);
 			}
-			plotDatasetIds.add(plotDatasetId);
+			if (!meansDatasetIds.contains(meansDatasetId)) {
+				final List<MeasurementVariable> studyMeasurementVariables =
+					this.datasetService.getObservationSetVariables(meansDatasetId, Arrays.asList(VariableType.ANALYSIS.getId()));
+				// Check first if the variable already exists in study
+				if (studyMeasurementVariables.stream().noneMatch(o -> o.getTermId() == observationVariableDbId)) {
+					this.datasetService
+						.addDatasetVariable(meansDatasetId, observationVariableDbId, VariableType.ANALYSIS, observationVariableName);
+				}
+				meansDatasetIds.add(meansDatasetId);
+			}
+		} else {
+			final Integer plotDatasetId = this.daoFactory
+				.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+			if (!plotDatasetIds.contains(plotDatasetId)) {
+				final List<MeasurementVariable> studyMeasurementVariables =
+					this.datasetService.getObservationSetVariables(plotDatasetId, Arrays.asList(VariableType.TRAIT.getId()));
+				// Check first if the variable already exists in study
+				if (studyMeasurementVariables.stream().noneMatch(o -> o.getTermId() == observationVariableDbId)) {
+					this.datasetService
+						.addDatasetVariable(plotDatasetId, observationVariableDbId, VariableType.TRAIT, observationVariableName);
+				}
+				plotDatasetIds.add(plotDatasetId);
+			}
 		}
+
 	}
+
 }

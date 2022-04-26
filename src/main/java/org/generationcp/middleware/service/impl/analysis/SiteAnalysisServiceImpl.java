@@ -126,6 +126,14 @@ public class SiteAnalysisServiceImpl implements SiteAnalysisService {
 
 	}
 
+	@Override
+	public Integer createMeansDataset(final Integer studyId) {
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
+		final DmsProject meansDataset = this.createDataset(study, DatasetTypeEnum.MEANS_DATA, "-MEANS");
+		this.addMeansDatasetVariables(meansDataset, new HashMap<>());
+		return meansDataset.getProjectId();
+	}
+
 	private DmsProject createDataset(final DmsProject study, final DatasetTypeEnum datasetType, final String nameSuffix) {
 		final DmsProject dmsProject = new DmsProject();
 		dmsProject.setDatasetType(new DatasetType(datasetType.getId()));
