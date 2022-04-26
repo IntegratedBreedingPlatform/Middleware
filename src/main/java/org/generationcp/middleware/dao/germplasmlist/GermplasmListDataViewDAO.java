@@ -38,6 +38,14 @@ public class GermplasmListDataViewDAO extends GenericDAO<GermplasmListDataView, 
 		return criteria.list();
 	}
 
+	public long countEntryDetailsNamesAndAttributesAdded(final Integer listId) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("list.id", listId));
+		criteria.add(Restrictions.isNull("staticId"));
+		criteria.setProjection(Projections.rowCount());
+		return (long) criteria.uniqueResult();
+	}
+
 	public long countListByVariableId(final Integer variableId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
