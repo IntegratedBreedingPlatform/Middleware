@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.impl.sampleList;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
@@ -10,6 +11,7 @@ import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.StudyDataManager;
@@ -44,7 +46,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import static org.mockito.Mockito.when;
 
@@ -249,7 +250,7 @@ public class SampleListServiceImplTest {
 
 		when(this.sampleListDao.getById(folderId)).thenReturn(folder);
 		when(this.sampleListDao.getSampleListByParentAndName(newFolderName, folder.getHierarchy().getId(), null))
-				.thenReturn(notUniqueFolder);
+			.thenReturn(notUniqueFolder);
 		this.sampleListService.updateSampleListFolderName(folderId, newFolderName);
 
 	}
@@ -517,7 +518,7 @@ public class SampleListServiceImplTest {
 		this.sampleListService.moveSampleList(sampleListId, folderId, true, PROGRAM_UUID);
 
 		Assert.assertNull("The programUUID should be null because the sample list was moved to the crop list",
-				sampleListToMove.getProgramUUID());
+			sampleListToMove.getProgramUUID());
 		Assert.assertEquals(folder, sampleListToMove.getHierarchy());
 	}
 
@@ -543,14 +544,29 @@ public class SampleListServiceImplTest {
 		this.sampleListService.moveSampleList(sampleListId, folderId, false, PROGRAM_UUID);
 
 		Assert.assertEquals("The sample list should inherit the programUUID of its parent folder.", PROGRAM_UUID,
-				sampleListToMove.getProgramUUID());
+			sampleListToMove.getProgramUUID());
 		Assert.assertEquals(folder, sampleListToMove.getHierarchy());
 	}
 
 	@Test
 	public void testCreateSampleList() {
+		final String variableValue = "10";
+		final String preferredNameGid = "GID1";
+
+		this.createSampleList(variableValue, preferredNameGid);
+
+		final ArgumentCaptor<SampleList> sampleListArgumentCaptor = ArgumentCaptor.forClass(SampleList.class);
+		Mockito.verify(this.sampleListDao).save(sampleListArgumentCaptor.capture());
+		Assert.assertEquals(SampleListType.SAMPLE_LIST, sampleListArgumentCaptor.getValue().getType());
+		Assert.assertEquals("desc", sampleListArgumentCaptor.getValue().getDescription());
+		Assert.assertEquals("notes", sampleListArgumentCaptor.getValue().getNotes());
+		Assert.assertEquals(Integer.valueOf(variableValue).longValue(), sampleListArgumentCaptor.getValue().getSamples().size());
+	}
+
+	private void createSampleList(final String variableValue, final String preferredNameGid) {
 		final int studyId = 1;
 		this.study.setId(studyId);
+
 		final CropType cropType = new CropType();
 		cropType.setCropName(SampleListServiceImplTest.MAIZE);
 		cropType.setPlotCodePrefix(SampleListServiceImplTest.PLOT_CODE_PREFIX);
@@ -565,11 +581,9 @@ public class SampleListServiceImplTest {
 
 		final List<MeasurementDto> measurementVariableResults = new ArrayList<>();
 
-		final String variableValue = "10";
 		final MeasurementDto measurementDto = new MeasurementDto(variableValue);
 		measurementVariableResults.add(measurementDto);
 
-		final String preferredNameGid = "GID1";
 		final Integer ndExperimentId = 1;
 		final Integer gid = 123;
 
@@ -592,21 +606,24 @@ public class SampleListServiceImplTest {
 		when(this.workbenchDataManager.getCropTypeByName("maize")).thenReturn(cropType);
 		when(this.sampleDao.getMaxSampleNumber(experimentIds)).thenReturn(mapSampleNumbers);
 		when(this.sampleService
-				.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX , 1, preferredNameGid,
-						Util.getCurrentDate(), ndExperimentId, sampleList, user.getUserid(), Util.getCurrentDate(), user.getUserid(), 6)).thenReturn(sample);
+			.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX, 1, preferredNameGid,
+				Util.getCurrentDate(), ndExperimentId, sampleList, user.getUserid(), Util.getCurrentDate(), user.getUserid(),
+				6)).thenReturn(sample);
 		when(this.sampleListDao.save(org.mockito.Matchers.any(SampleList.class))).thenReturn(sampleList);
 		final SampleList rootSampleList = new SampleList();
 		rootSampleList.setType(SampleListType.FOLDER);
 		when(this.sampleListDao.getRootSampleList()).thenReturn(rootSampleList);
 
 		this.createSampleListDTO(studyId, selectionVariableId, instanceIds);
+	}
 
-		final ArgumentCaptor<SampleList> sampleListArgumentCaptor = ArgumentCaptor.forClass(SampleList.class);
-		Mockito.verify(this.sampleListDao).save(sampleListArgumentCaptor.capture());
-		Assert.assertEquals(SampleListType.SAMPLE_LIST, sampleListArgumentCaptor.getValue().getType());
-		Assert.assertEquals("desc", sampleListArgumentCaptor.getValue().getDescription());
-		Assert.assertEquals("notes", sampleListArgumentCaptor.getValue().getNotes());
-		Assert.assertEquals(Integer.valueOf(variableValue).longValue(), sampleListArgumentCaptor.getValue().getSamples().size());
+	@Test(expected = MiddlewareRequestException.class)
+	public void testCreateSampleListLongNameException() throws Exception {
+
+		final String variableValue = "10";
+		final String preferredNameGid = RandomStringUtils.randomAlphanumeric(5001);
+
+		this.createSampleList(variableValue, preferredNameGid);
 	}
 
 	private SampleListDTO createSampleListDTO(final int datasetId, final Integer selectionVariableId, final List<Integer> instanceIds) {
@@ -716,10 +733,10 @@ public class SampleListServiceImplTest {
 	public void testCountSamplesByUIDs() {
 
 		final int sampleListId = 1;
-		when(sampleDao.countBySampleUIDs(Mockito.anySetOf(String.class), Mockito.eq(sampleListId))).thenReturn(1l);
+		when(this.sampleDao.countBySampleUIDs(Mockito.anySetOf(String.class), Mockito.eq(sampleListId))).thenReturn(1l);
 
 		final long count = this.sampleListService.countSamplesByUIDs(new HashSet<String>(), sampleListId);
-		Mockito.verify(sampleDao).countBySampleUIDs(Mockito.anySetOf(String.class), Mockito.eq(sampleListId));
+		Mockito.verify(this.sampleDao).countBySampleUIDs(Mockito.anySetOf(String.class), Mockito.eq(sampleListId));
 
 		Assert.assertEquals(1l, count);
 
@@ -732,12 +749,12 @@ public class SampleListServiceImplTest {
 		final Map<String, SamplePlateInfo> samplePlateInfoMap = this.createSamplePlateInfoMap();
 		final SampleList sampleList = this.createSampleList();
 
-		for(Sample sample: sampleList.getSamples()){
+		for (final Sample sample : sampleList.getSamples()) {
 			Assert.assertEquals(null, sample.getPlateId());
 			Assert.assertEquals(null, sample.getWell());
 		}
 
-		when(sampleListDao.getById(sampleListId)).thenReturn(sampleList);
+		when(this.sampleListDao.getById(sampleListId)).thenReturn(sampleList);
 
 		this.sampleListService.updateSamplePlateInfo(sampleListId, samplePlateInfoMap);
 
@@ -749,7 +766,7 @@ public class SampleListServiceImplTest {
 		Assert.assertEquals("PlateId2", sample2.getPlateId());
 		Assert.assertEquals("Well2", sample2.getWell());
 
-		Mockito.verify(sampleListDao).saveOrUpdate(sampleList);
+		Mockito.verify(this.sampleListDao).saveOrUpdate(sampleList);
 
 	}
 
@@ -767,12 +784,12 @@ public class SampleListServiceImplTest {
 
 		final SampleList sampleList = this.createSampleList();
 
-		for(Sample sample: sampleList.getSamples()){
+		for (final Sample sample : sampleList.getSamples()) {
 			Assert.assertEquals(null, sample.getPlateId());
 			Assert.assertEquals(null, sample.getWell());
 		}
 
-		when(sampleListDao.getById(sampleListId)).thenReturn(sampleList);
+		when(this.sampleListDao.getById(sampleListId)).thenReturn(sampleList);
 
 		this.sampleListService.updateSamplePlateInfo(sampleListId, samplePlateInfoMap);
 
@@ -781,17 +798,16 @@ public class SampleListServiceImplTest {
 		Assert.assertEquals("PlateId2", sample.getPlateId());
 		Assert.assertEquals("Well2", sample.getWell());
 
-		Mockito.verify(sampleListDao).saveOrUpdate(sampleList);
+		Mockito.verify(this.sampleListDao).saveOrUpdate(sampleList);
 
 	}
-
 
 	private SampleList createSampleList() {
 
 		final SampleList sampleList = new SampleList();
 		final List<Sample> samples = new ArrayList<>();
-		samples.add(createSample(sampleList, "BusinessKey1"));
-		samples.add(createSample(sampleList, "BusinessKey2"));
+		samples.add(this.createSample(sampleList, "BusinessKey1"));
+		samples.add(this.createSample(sampleList, "BusinessKey2"));
 		sampleList.setSamples(samples);
 		return sampleList;
 	}
@@ -803,8 +819,7 @@ public class SampleListServiceImplTest {
 		return sample;
 	}
 
-
-	private Map<String,SamplePlateInfo> createSamplePlateInfoMap() {
+	private Map<String, SamplePlateInfo> createSamplePlateInfoMap() {
 		final Map<String, SamplePlateInfo> samplePlateInfoMap = new HashMap<>();
 
 		final String plantBusinessKey1 = "BusinessKey1";

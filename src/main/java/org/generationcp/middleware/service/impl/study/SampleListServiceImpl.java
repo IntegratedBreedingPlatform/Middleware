@@ -10,6 +10,7 @@ import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -40,6 +41,8 @@ import java.util.Set;
 @Repository
 @Transactional(propagation = Propagation.REQUIRED)
 public class SampleListServiceImpl implements SampleListService {
+
+	public static final int MAX_SAMPLE_NAME_SIZE = 5000;
 
 	private StudyMeasurements studyMeasurements;
 
@@ -101,7 +104,7 @@ public class SampleListServiceImpl implements SampleListService {
 				 */
 				throw new NotImplementedException();
 			} else {
-				 samples = this.createSamplesFromStudy(sampleListDTO, sampleList, workbenchUser);
+				samples = this.createSamplesFromStudy(sampleListDTO, sampleList, workbenchUser);
 			}
 
 			sampleList.setSamples(samples);
@@ -161,6 +164,10 @@ public class SampleListServiceImpl implements SampleListService {
 				entryNumber++;
 
 				final String sampleName = observationDto.getDesignation() + ':' + maxSequence;
+
+				if (sampleName.length() > MAX_SAMPLE_NAME_SIZE) {
+					throw new MiddlewareRequestException("", "error.save.resulting.name.exceeds.limit");
+				}
 
 				final Sample sample = this.sampleService
 					.buildSample(sampleListDTO.getCropName(), cropPrefix, entryNumber, sampleName,
