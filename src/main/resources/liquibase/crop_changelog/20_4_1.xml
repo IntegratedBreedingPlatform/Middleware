@@ -1,0 +1,25 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="cheryleigh" id="v20.4.1-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(1)
+				FROM INFORMATION_SCHEMA.COLUMNS c
+				WHERE TABLE_NAME = 'sample'
+				AND COLUMN_NAME = 'sample_name'
+				AND CHARACTER_MAXIMUM_LENGTH = 100
+				AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Extend length of sample sample_name column
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE sample MODIFY COLUMN sample_name VARCHAR(5000);
+		</sql>
+	</changeSet>
+</databaseChangeLog>
