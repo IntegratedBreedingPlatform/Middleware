@@ -25,6 +25,50 @@
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<tableExists tableName="feedback"></tableExists>
+				<not>
+					<columnExists tableName="feedback" columnName="collector_id"/>
+				</not>
+				<not>
+					<columnExists tableName="feedback" columnName="attempts"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Add collector_id and attempts columns to 'feedback' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE feedback
+				ADD COLUMN collector_id VARCHAR(45) NOT NULL,
+				ADD COLUMN attempts INT(11) NOT NULL DEFAULT 1,
+				CHANGE COLUMN enabled enabled TINYINT(1) NOT NULL DEFAULT '1' AFTER attempts;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v20.4.1-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="feedback"></tableExists>
+				<columnExists tableName="feedback" columnName="collector_id"/>
+				<columnExists tableName="feedback" columnName="attempts"/>
+				<sqlCheck expectedResult="1">
+					SELECT count(*) FROM feedback WHERE feature = 'GERMPLASM_LIST'
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>
+			Update 'Germplasm List' feature
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE feedback SET collector_id = '7k444vha', attempts = '5' WHERE (feature = 'GERMPLASM_LIST');
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v20.4.1-4">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="feedback"></tableExists>
+				<columnExists tableName="feedback" columnName="collector_id"/>
+				<columnExists tableName="feedback" columnName="attempts"/>
 				<sqlCheck expectedResult="0">
 					SELECT count(*) FROM feedback WHERE feature = 'MANAGE_PROGRAM_SETTINGS'
 				</sqlCheck>
@@ -34,7 +78,7 @@
 			Add 'manage program settings' feature to 'feedback' table
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			INSERT INTO feedback (feature, enabled) VALUES ('MANAGE_PROGRAM_SETTINGS', true);
+			INSERT INTO feedback (feature, collector_id, attempts, enabled) VALUES ('MANAGE_PROGRAM_SETTINGS', 'cfvubhz4', 3, true);
 		</sql>
 	</changeSet>
 
