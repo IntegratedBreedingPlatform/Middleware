@@ -21,9 +21,6 @@ public class FeedbackServiceImpl implements FeedbackService {
 	@Value("#{new Boolean('${feedback.enabled}')}")
 	private boolean feedbackFeatureEnabled;
 
-	@Value("${feedback.show.after.feature.views}")
-	private int showFeedbackAfterFeatureViews;
-
 	private final WorkbenchDaoFactory workbenchDaoFactory;
 
 	public FeedbackServiceImpl(final HibernateSessionProvider sessionProvider) {
@@ -52,7 +49,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 			feedbackUser = this.createFeedback(feedback);
 			this.workbenchDaoFactory.getFeedbackUserDAO().save(feedbackUser);
 			// We check here if the feature should be shown just in case that the amount of feature views is set to 1
-			return this.checkFeedbackShouldBeShown(feedbackUser);
+			return this.checkFeedbackShouldBeShown(feedbackUser, feedback.getAttempts());
 		}
 
 		feedbackUser = optionalFeedbackUser.get();
@@ -63,7 +60,7 @@ public class FeedbackServiceImpl implements FeedbackService {
 		feedbackUser.hasSeen();
 		this.workbenchDaoFactory.getFeedbackUserDAO().save(feedbackUser);
 
-		return this.checkFeedbackShouldBeShown(feedbackUser);
+		return this.checkFeedbackShouldBeShown(feedbackUser, feedback.getAttempts());
 	}
 
 	@Override
@@ -92,8 +89,8 @@ public class FeedbackServiceImpl implements FeedbackService {
 			.getByFeedbackAndUserId(feedback, ContextHolder.getLoggedInUserId());
 	}
 
-	private boolean checkFeedbackShouldBeShown(final FeedbackUser feedbackUser) {
-		return (feedbackUser.getViews() >= this.showFeedbackAfterFeatureViews);
+	private boolean checkFeedbackShouldBeShown(final FeedbackUser feedbackUser, final Integer attempts) {
+		return (feedbackUser.getViews() >= attempts);
 	}
 
 }
