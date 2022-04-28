@@ -44,9 +44,11 @@ public class FeedbackServiceImplIntegrationTest extends IntegrationTestBase {
 	public void shouldShowFeedbackAndMarkItToNotShowAgain() {
 		assertFalse(this.feedbackService.shouldShowFeedback(FeedbackFeature.GERMPLASM_LIST));
 		assertFalse(this.feedbackService.shouldShowFeedback(FeedbackFeature.GERMPLASM_LIST));
+		assertFalse(this.feedbackService.shouldShowFeedback(FeedbackFeature.GERMPLASM_LIST));
+		assertFalse(this.feedbackService.shouldShowFeedback(FeedbackFeature.GERMPLASM_LIST));
 
-		// Take in mind that property 'feedback.show.after.feature.views' is set to 3 in 'test.properties'. So, that's why
-		// the feedback should be shown the third time this is method is called.
+		// Take in mind that attempts field in the feature table is set to 5. So, that's why
+		// the feedback should be shown the fifth time this is method is called.
 		assertTrue(this.feedbackService.shouldShowFeedback(FeedbackFeature.GERMPLASM_LIST));
 		assertTrue(this.feedbackService.shouldShowFeedback(FeedbackFeature.GERMPLASM_LIST));
 
