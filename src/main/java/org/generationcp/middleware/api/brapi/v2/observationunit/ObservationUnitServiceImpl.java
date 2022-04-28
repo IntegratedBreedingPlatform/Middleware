@@ -228,14 +228,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		for (final ObservationUnitImportRequestDto dto : requestDtos) {
 			final Integer trialDbId = Integer.valueOf(dto.getTrialDbId());
 			final Integer studyDbId = Integer.valueOf(dto.getStudyDbId());
-			final boolean isObservationUnitForMeans = this.isObservationUnitForMeans(dto);
+			final boolean isObservationUnitForMeansDataset = this.isObservationUnitForMeans(dto);
 
 			final Optional<String> entryNoOptional =
 				!MapUtils.isEmpty(dto.getAdditionalInfo()) ? Optional.ofNullable(dto.getAdditionalInfo().getOrDefault(ENTRY_NO, null)) :
 					Optional.empty();
 
-			this.addExperimentVariablesIfNecessary(dto, plotExperimentVariablesMap, trialIdPlotDatasetMap, variableNamesMap,
-				variableSynonymsMap);
 			// If combination of germplasmDbId and entryNumber (if specified) does not exist, create new stock
 			if (!stockMap.get(trialDbId)
 				.containsKey(dto.getGermplasmDbId(), entryNoOptional.orElse(StringUtils.EMPTY))) {
@@ -245,16 +243,23 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			}
 
 			final ExperimentModel experimentModel = new ExperimentModel();
-			experimentModel.setProject(
-				isObservationUnitForMeans ? trialIdMeansDatasetMap.get(trialDbId) : trialIdPlotDatasetMap.get(trialDbId));
+			if (isObservationUnitForMeansDataset) {
+				experimentModel.setProject(trialIdMeansDatasetMap.get(trialDbId));
+				experimentModel.setTypeId(TermId.AVERAGE_EXPERIMENT.getId());
+			} else {
+				experimentModel.setProject(trialIdPlotDatasetMap.get(trialDbId));
+				experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+				this.setJsonProps(experimentModel, dto);
+				this.addExperimentVariablesIfNecessary(dto, plotExperimentVariablesMap, trialIdPlotDatasetMap, variableNamesMap,
+					variableSynonymsMap);
+				this.addExperimentProperties(experimentModel, dto, variableNamesMap, variableSynonymsMap, categoricalVariablesMap);
+			}
 			experimentModel.setGeoLocation(new Geolocation(studyDbId));
-			experimentModel.setTypeId(isObservationUnitForMeans ? TermId.AVERAGE_EXPERIMENT.getId() : TermId.PLOT_EXPERIMENT.getId());
 			experimentModel.setStock(
 				(StockModel) stockMap.get(trialDbId).get(dto.getGermplasmDbId(), entryNoOptional.orElse(StringUtils.EMPTY)));
 
-			this.setJsonProps(experimentModel, dto);
 			ObservationUnitIDGenerator.generateObservationUnitIds(cropType, Collections.singletonList(experimentModel));
-			this.addExperimentProperties(experimentModel, dto, variableNamesMap, variableSynonymsMap, categoricalVariablesMap);
+
 			this.setExperimentExternalReferences(dto, experimentModel);
 			this.daoFactory.getExperimentDao().save(experimentModel);
 
