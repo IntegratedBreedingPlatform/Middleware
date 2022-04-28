@@ -8,4 +8,5 @@ public interface FeedbackService {
 
 	void dontShowAgain(FeedbackFeature feature);
 
+	String getCollectorId(FeedbackFeature feature);
 }

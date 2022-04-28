@@ -73,6 +73,15 @@ public class FeedbackServiceImpl implements FeedbackService {
 		});
 	}
 
+	@Override
+	public String getCollectorId(final FeedbackFeature feature) {
+		Optional<Feedback> feedback = this.getFeedback(feature);
+		if (feedback.isPresent()) {
+			return feedback.get().getCollectorId();
+		}
+		return null;
+	}
+
 	private FeedbackUser createFeedback(final Feedback feedback) {
 		final WorkbenchUser user =
 			this.workbenchDaoFactory.getWorkbenchUserDAO().getById(ContextHolder.getLoggedInUserId());
