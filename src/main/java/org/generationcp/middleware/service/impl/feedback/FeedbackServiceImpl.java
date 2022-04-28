@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.feedback;
 import java.util.Optional;
 
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.feedback.FeedbackDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -74,10 +75,11 @@ public class FeedbackServiceImpl implements FeedbackService {
 	}
 
 	@Override
-	public String getCollectorId(final FeedbackFeature feature) {
+	public FeedbackDto getFeedBack(final FeedbackFeature feature) {
 		Optional<Feedback> feedback = this.getFeedback(feature);
 		if (feedback.isPresent()) {
-			return feedback.get().getCollectorId();
+			return new FeedbackDto(feedback.get().getId(), feedback.get().getFeature(), feedback.get().getCollectorId(),
+				feedback.get().getAttempts(), feedback.get().isEnabled());
 		}
 		return null;
 	}
