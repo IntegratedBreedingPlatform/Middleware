@@ -39,21 +39,15 @@
 		<sql dbms="mysql" splitStatements="true">
 			ALTER TABLE feedback
 				ADD COLUMN collector_id VARCHAR(45) NOT NULL,
-				ADD COLUMN attempts INT(11) NOT NULL DEFAULT 1,
-				CHANGE COLUMN enabled enabled TINYINT(1) NOT NULL DEFAULT '1' AFTER attempts;
+				ADD COLUMN attempts INT(11) NOT NULL DEFAULT 1;
 		</sql>
 	</changeSet>
 
 	<changeSet author="cuenyad" id="v20.4.1-3">
 		<preConditions onFail="MARK_RAN">
-			<and>
-				<tableExists tableName="feedback"></tableExists>
-				<columnExists tableName="feedback" columnName="collector_id"/>
-				<columnExists tableName="feedback" columnName="attempts"/>
-				<sqlCheck expectedResult="1">
-					SELECT count(*) FROM feedback WHERE feature = 'GERMPLASM_LIST'
-				</sqlCheck>
-			</and>
+			<sqlCheck expectedResult="1">
+					SELECT count(*) FROM feedback WHERE feature = 'GERMPLASM_LIST';
+			</sqlCheck>
 		</preConditions>
 		<comment>
 			Update 'Germplasm List' feature
@@ -65,14 +59,9 @@
 
 	<changeSet author="cuenyad" id="v20.4.1-4">
 		<preConditions onFail="MARK_RAN">
-			<and>
-				<tableExists tableName="feedback"></tableExists>
-				<columnExists tableName="feedback" columnName="collector_id"/>
-				<columnExists tableName="feedback" columnName="attempts"/>
-				<sqlCheck expectedResult="0">
-					SELECT count(*) FROM feedback WHERE feature = 'MANAGE_PROGRAM_SETTINGS'
-				</sqlCheck>
-			</and>
+			<sqlCheck expectedResult="0">
+					SELECT count(*) FROM feedback WHERE feature = 'MANAGE_PROGRAM_SETTINGS';
+			</sqlCheck>
 		</preConditions>
 		<comment>
 			Add 'manage program settings' feature to 'feedback' table
