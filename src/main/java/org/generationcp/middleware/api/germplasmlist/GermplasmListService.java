@@ -92,4 +92,6 @@ public interface GermplasmListService {
 		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
 
 	void editListMetadata(GermplasmListDto germplasmListDto);
+
+	long countEntryDetailsNamesAndAttributesAdded(Integer listId);
 }
