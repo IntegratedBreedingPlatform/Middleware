@@ -680,6 +680,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public long countEntryDetailsNamesAndAttributesAdded(final Integer listId) {
+		return this.daoFactory.getGermplasmListDataViewDAO().countEntryDetailsNamesAndAttributesAdded(listId);
+	}
+
+	@Override
 	public void deleteGermplasmList(final Integer listId) {
 		final GermplasmList germplasmList = this.getGermplasmListById(listId)
 			.orElseThrow(() -> new MiddlewareRequestException("", LIST_NOT_FOUND));
