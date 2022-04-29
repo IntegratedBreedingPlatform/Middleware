@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.feedback;
 
+import org.generationcp.middleware.pojos.workbench.feedback.Feedback;
 import org.generationcp.middleware.pojos.workbench.feedback.FeedbackFeature;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -17,13 +18,16 @@ public class FeedbackDto {
 
 	private boolean enabled;
 
-	public FeedbackDto(final Integer id, final FeedbackFeature feature, final String collectorId, final Integer attempts,
-		final boolean enabled) {
-		this.id = id;
-		this.feature = feature;
-		this.collectorId = collectorId;
-		this.attempts = attempts;
-		this.enabled = enabled;
+	public FeedbackDto(){
+
+	}
+
+	public FeedbackDto(final Feedback feedback) {
+		this.id = feedback.getId();
+		this.feature = feedback.getFeature();
+		this.collectorId = feedback.getCollectorId();
+		this.attempts = feedback.getAttempts();
+		this.enabled = feedback.isEnabled();
 	}
 
 	public Integer getId() {
