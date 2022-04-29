@@ -15,7 +15,7 @@ public class FeedbackDto {
 
 	private Integer attempts;
 
-	private boolean enabled = true;
+	private boolean enabled;
 
 	public FeedbackDto(final Integer id, final FeedbackFeature feature, final String collectorId, final Integer attempts,
 		final boolean enabled) {
@@ -54,12 +54,8 @@ public class FeedbackDto {
 		return enabled;
 	}
 
-	public void enable() {
-		this.enabled = true;
-	}
-
-	public void disable() {
-		this.enabled = false;
+	public void setEnabled(final boolean enabled) {
+		this.enabled = enabled;
 	}
 
 	@Override

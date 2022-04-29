@@ -1,9 +1,6 @@
 package org.generationcp.middleware.service.impl.feedback;
 
-import java.util.Optional;
-
 import org.generationcp.middleware.ContextHolder;
-import org.generationcp.middleware.api.feedback.FeedbackDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -14,6 +11,8 @@ import org.generationcp.middleware.service.api.feedback.FeedbackService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -74,16 +73,6 @@ public class FeedbackServiceImpl implements FeedbackService {
 		});
 	}
 
-	@Override
-	public FeedbackDto getFeedBack(final FeedbackFeature feature) {
-		Optional<Feedback> feedback = this.getFeedback(feature);
-		if (feedback.isPresent()) {
-			return new FeedbackDto(feedback.get().getId(), feedback.get().getFeature(), feedback.get().getCollectorId(),
-				feedback.get().getAttempts(), feedback.get().isEnabled());
-		}
-		return null;
-	}
-
 	private FeedbackUser createFeedback(final Feedback feedback) {
 		final WorkbenchUser user =
 			this.workbenchDaoFactory.getWorkbenchUserDAO().getById(ContextHolder.getLoggedInUserId());
@@ -91,7 +80,8 @@ public class FeedbackServiceImpl implements FeedbackService {
 		return feedbackUser;
 	}
 
-	private Optional<Feedback> getFeedback(final FeedbackFeature feature) {
+	@Override
+	public Optional<Feedback> getFeedback(final FeedbackFeature feature) {
 		return this.workbenchDaoFactory.getFeedbackDAO().getByFeature(feature);
 	}
 
