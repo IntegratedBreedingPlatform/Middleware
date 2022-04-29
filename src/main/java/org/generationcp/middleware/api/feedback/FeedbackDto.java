@@ -18,10 +18,6 @@ public class FeedbackDto {
 
 	private boolean enabled;
 
-	public FeedbackDto(){
-
-	}
-
 	public FeedbackDto(final Feedback feedback) {
 		this.id = feedback.getId();
 		this.feature = feedback.getFeature();
