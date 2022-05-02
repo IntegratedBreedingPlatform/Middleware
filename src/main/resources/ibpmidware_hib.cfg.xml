@@ -134,6 +134,7 @@
         <mapping class="org.generationcp.middleware.pojos.search.SearchRequest"/>
         <mapping class="org.generationcp.middleware.pojos.GermplasmStudySource"/>
         <mapping class="org.generationcp.middleware.pojos.file.FileMetadata"/>
+        <mapping class="org.generationcp.middleware.pojos.Config"/>
 
     </session-factory>
 </hibernate-configuration>

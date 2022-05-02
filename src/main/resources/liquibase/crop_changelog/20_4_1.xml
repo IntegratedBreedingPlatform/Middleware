@@ -22,4 +22,40 @@
 			ALTER TABLE sample MODIFY COLUMN sample_name VARCHAR(5000);
 		</sql>
 	</changeSet>
+
+	<changeSet author="nahuel" id="v20.4.1-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="config"/>
+			</not>
+		</preConditions>
+		<comment>
+			config table: key/value store for crop settings
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table config (
+				`key`       varchar(255) null,
+				value       varchar(255) null,
+				description varchar(255) null
+			) comment 'key/value configuration for the crop';
+
+			create unique index uk_config_key on config(`key`);
+			alter table config add constraint pk_config_key primary key (`key`);
+		</sql>
+	</changeSet>
+
+	<changeSet author="nahuel" id="v20.4.1-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from config where `key` = 'btype'
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Create crop config btype, for coefficient of parentage
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO config (`key`, value, description)
+			VALUES ('btype', '0', 'Coefficient of parentage btype param (0=cross fertilizing, 1=self fertilizing, 2=self Fertilizing with unknown source but known parents)');
+		</sql>
+	</changeSet>
 </databaseChangeLog>
