@@ -1,17 +1,17 @@
-package org.generationcp.middleware.api.config;
+package org.generationcp.middleware.api.cropparameter;
 
-import org.generationcp.middleware.pojos.Config;
+import org.generationcp.middleware.pojos.CropParameter;
 
-public class ConfigDTO {
+public class CropParameterDTO {
 
 	private String key;
 	private String value;
 	private String description;
 
-	public ConfigDTO(final Config config) {
-		this.key = config.getKey();
-		this.value = config.getValue();
-		this.description = config.getDescription();
+	public CropParameterDTO(final CropParameter cropParameter) {
+		this.key = cropParameter.getKey();
+		this.value = cropParameter.getValue();
+		this.description = cropParameter.getDescription();
 	}
 
 	public String getKey() {

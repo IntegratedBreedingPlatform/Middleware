@@ -1,6 +1,6 @@
-package org.generationcp.middleware.api.config;
+package org.generationcp.middleware.api.cropparameter;
 
-public class ConfigPatchRequestDTO {
+public class CropParameterPatchRequestDTO {
 
 	private String value;
 

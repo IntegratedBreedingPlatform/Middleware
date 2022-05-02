@@ -10,8 +10,8 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "config")
-public class Config  {
+@Table(name = "crop_parameter")
+public class CropParameter {
 
 	@Id
 	@Basic(optional = false)
