@@ -55,7 +55,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO crop_parameter (`key`, value, description)
-			VALUES ('btype', '0', 'Coefficient of parentage btype param (0=cross fertilizing, 1=self fertilizing, 2=self Fertilizing with unknown source but known parents)');
+			VALUES ('btype', '0', 'Coefficient of parentage breeding type (BTYPE) param (0=cross fertilizing, 1=self fertilizing, 2=self Fertilizing with unknown source but known parents)');
 		</sql>
 	</changeSet>
 </databaseChangeLog>
