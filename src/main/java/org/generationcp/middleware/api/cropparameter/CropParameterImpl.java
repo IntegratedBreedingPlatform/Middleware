@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
+
+import static java.util.Optional.ofNullable;
 
 @Service
 @Transactional
@@ -33,5 +36,10 @@ public class CropParameterImpl implements CropParameterService {
 		}
 		cropParameter.setValue(request.getValue());
 		this.daoFactory.getCropParameterDAO().saveOrUpdate(cropParameter);
+	}
+
+	@Override
+	public Optional<CropParameter> getCropParameter(final CropParameterEnum cropParameterEnum) {
+		return ofNullable(this.daoFactory.getCropParameterDAO().getById(cropParameterEnum.getKey()));
 	}
 }
