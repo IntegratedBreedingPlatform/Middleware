@@ -21,7 +21,7 @@ public class CropParameterImpl implements CropParameterService {
 	}
 
 	@Override
-	public List<CropParameter> getCropParameter(final Pageable pageable) {
+	public List<CropParameter> getCropParameters(final Pageable pageable) {
 		return this.daoFactory.getCropParameterDAO().getAll(pageable.getPageNumber(), pageable.getPageSize());
 	}
 

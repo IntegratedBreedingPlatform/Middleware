@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface CropParameterService {
 
-	List<CropParameter> getCropParameter(Pageable pageable);
+	List<CropParameter> getCropParameters(Pageable pageable);
 
 	void modifyCropParameter(String key, CropParameterPatchRequestDTO request);
 }
