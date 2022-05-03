@@ -32,7 +32,7 @@ public class FeedbackServiceImplTest {
 
 	private static final FeedbackFeature FEEDBACK_FEATURE = FeedbackFeature.GERMPLASM_LIST;
 	private static final int USER_ID = new Random().nextInt();
-	private static final int SHOW_FEEDBACK_AFTER_VIEWS = 5;
+	private static final int ATTEMPTS = 5;
 
 	@InjectMocks
 	private FeedbackServiceImpl feedbackService;
@@ -63,23 +63,22 @@ public class FeedbackServiceImplTest {
 		Mockito.when(this.workbenchDaoFactory.getWorkbenchUserDAO()).thenReturn(this.workbenchUserDAO);
 
 		ReflectionTestUtils.setField(this.feedbackService, "workbenchDaoFactory", this.workbenchDaoFactory);
-		ReflectionTestUtils.setField(this.feedbackService, "showFeedbackAfterFeatureViews", SHOW_FEEDBACK_AFTER_VIEWS);
 		ReflectionTestUtils.setField(this.feedbackService, "feedbackFeatureEnabled", true);
 	}
 
 	@Test
 	public void testShouldShowFeedback_featureReachedAmountOfViews() {
-		this.assertFeatureReachedAmountOfViews(4, true);
+		this.assertFeatureReachedAmountOfViews(4, true, FeedbackServiceImplTest.ATTEMPTS);
 	}
 
 	@Test
 	public void testShouldShowFeedback_featureNotReachedAmountOfViews() {
-		this.assertFeatureReachedAmountOfViews(3, false);
+		this.assertFeatureReachedAmountOfViews(3, false, 6);
 	}
 
 	@Test
 	public void testShouldShowFeedback_feedbackMarkedAsDontShowAgain() {
-		final Feedback feedback = this.createMockFeedback(true);
+		final Feedback feedback = this.createMockFeedback(true, FeedbackServiceImplTest.ATTEMPTS);
 		Mockito.when(this.feedbackDAO.getByFeature(FEEDBACK_FEATURE)).thenReturn(Optional.of(feedback));
 
 		final FeedbackUser feedbackUser = this.createMockFeedbackUser(false, 1);
@@ -112,14 +111,12 @@ public class FeedbackServiceImplTest {
 
 	@Test
 	public void testShouldShowFeedback_feedbackUserNotPresentAndNotReachedAmountOfViews() {
-		this.assertFeedbackUserNotPresent(false);
+		this.assertFeedbackUserNotPresent(false, FeedbackServiceImplTest.ATTEMPTS);
 	}
 
 	@Test
 	public void testShouldShowFeedback_feedbackUserNotPresentShowFeedbackAfterTheFirstTimeViewed() {
-		ReflectionTestUtils.setField(this.feedbackService, "showFeedbackAfterFeatureViews", 1);
-
-		this.assertFeedbackUserNotPresent(true);
+		this.assertFeedbackUserNotPresent(true, 1);
 	}
 
 	@Test
@@ -132,7 +129,7 @@ public class FeedbackServiceImplTest {
 
 	@Test
 	public void testShouldShowFeedback_specificFeedbackNotEnabled() {
-		final Feedback feedback = this.createMockFeedback(false);
+		final Feedback feedback = this.createMockFeedback(false, FeedbackServiceImplTest.ATTEMPTS);
 		Mockito.when(this.feedbackDAO.getByFeature(FEEDBACK_FEATURE)).thenReturn(Optional.of(feedback));
 
 		final boolean shouldShowFeedback = this.feedbackService.shouldShowFeedback(FEEDBACK_FEATURE);
@@ -141,7 +138,7 @@ public class FeedbackServiceImplTest {
 
 	@Test
 	public void testDontShowAgain_OK() {
-		final Feedback feedback = this.createMockFeedback(true);
+		final Feedback feedback = this.createMockFeedback(true, FeedbackServiceImplTest.ATTEMPTS);
 		Mockito.when(this.feedbackDAO.getByFeature(FEEDBACK_FEATURE)).thenReturn(Optional.of(feedback));
 
 		final FeedbackUser feedbackUser = Mockito.mock(FeedbackUser.class, Mockito.CALLS_REAL_METHODS);
@@ -177,7 +174,7 @@ public class FeedbackServiceImplTest {
 
 	@Test
 	public void testDontShowAgain_feedbackUserNotPresent() {
-		final Feedback feedback = this.createMockFeedback(true);
+		final Feedback feedback = this.createMockFeedback(true, FeedbackServiceImplTest.ATTEMPTS);
 		Mockito.when(this.feedbackDAO.getByFeature(FEEDBACK_FEATURE)).thenReturn(Optional.of(feedback));
 
 		Mockito.when(this.feedbackUserDAO.getByFeedbackAndUserId(feedback, USER_ID)).thenReturn(Optional.empty());
@@ -191,13 +188,14 @@ public class FeedbackServiceImplTest {
 		Mockito.verifyNoMoreInteractions(this.feedbackUserDAO);
 	}
 
-	private Feedback createMockFeedback(boolean isEnabled) {
+	private Feedback createMockFeedback(final boolean isEnabled, final Integer attempts) {
 		final Feedback feedback = Mockito.mock(Feedback.class);
 		Mockito.when(feedback.isEnabled()).thenReturn(isEnabled);
+		Mockito.when(feedback.getAttempts()).thenReturn(attempts);
 		return feedback;
 	}
 
-	private FeedbackUser createMockFeedbackUser(boolean showAgain, int views) {
+	private FeedbackUser createMockFeedbackUser(final boolean showAgain, final int views) {
 		final FeedbackUser feedbackUser = Mockito.mock(FeedbackUser.class, Mockito.CALLS_REAL_METHODS);
 		Mockito.when(feedbackUser.getShowAgain()).thenReturn(showAgain);
 
@@ -206,8 +204,8 @@ public class FeedbackServiceImplTest {
 		return feedbackUser;
 	}
 
-	private void assertFeatureReachedAmountOfViews(int views, boolean shouldShow) {
-		final Feedback feedback = this.createMockFeedback(true);
+	private void assertFeatureReachedAmountOfViews(final int views, final boolean shouldShow, final Integer attempts) {
+		final Feedback feedback = this.createMockFeedback(true, attempts);
 		Mockito.when(this.feedbackDAO.getByFeature(FEEDBACK_FEATURE)).thenReturn(Optional.of(feedback));
 
 		final FeedbackUser feedbackUser = this.createMockFeedbackUser(true, views);
@@ -232,8 +230,8 @@ public class FeedbackServiceImplTest {
 		Mockito.verifyNoInteractions(this.workbenchUserDAO);
 	}
 
-	private void assertFeedbackUserNotPresent(boolean shouldShow) {
-		final Feedback feedback = this.createMockFeedback(true);
+	private void assertFeedbackUserNotPresent(final boolean shouldShow, final Integer attempts) {
+		final Feedback feedback = this.createMockFeedback(true, attempts);
 		Mockito.when(this.feedbackDAO.getByFeature(FEEDBACK_FEATURE)).thenReturn(Optional.of(feedback));
 
 		Mockito.when(this.feedbackUserDAO.getByFeedbackAndUserId(feedback, USER_ID)).thenReturn(Optional.empty());
