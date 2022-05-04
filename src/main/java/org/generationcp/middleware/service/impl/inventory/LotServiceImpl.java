@@ -160,7 +160,8 @@ public class LotServiceImpl implements LotService {
 		try {
 			final Map<String, Integer> locationsByLocationAbbrMap =
 				this.buildLocationsByLocationAbbrMap(lotMultiUpdateRequestDto.getLotList().stream()
-					.map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr)
+					.filter(lotUpdateDto -> StringUtils.isNotBlank(lotUpdateDto.getStorageLocationAbbr()))
+					.distinct().map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr)
 					.collect(Collectors.toList()));
 			final Map<String, Integer> unitMapByName = this.buildUnitsByNameMap();
 			final Map<String, LotMultiUpdateRequestDto.LotUpdateDto> lotUpdateMapByLotUID =
