@@ -158,11 +158,13 @@ public class LotServiceImpl implements LotService {
 
 	private void updateLots(final List<Lot> lots, final LotMultiUpdateRequestDto lotMultiUpdateRequestDto) {
 		try {
-			final Map<String, Integer> locationsByLocationAbbrMap =
-				this.buildLocationsByLocationAbbrMap(lotMultiUpdateRequestDto.getLotList().stream()
-					.filter(lotUpdateDto -> StringUtils.isNotBlank(lotUpdateDto.getStorageLocationAbbr()))
-					.distinct().map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr)
-					.collect(Collectors.toList()));
+			final List<String> locationAbbreviations = lotMultiUpdateRequestDto.getLotList().stream()
+				.filter(lotUpdateDto -> StringUtils.isNotBlank(lotUpdateDto.getStorageLocationAbbr())).distinct()
+				.map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr).collect(Collectors.toList());
+
+			final Map<String, Integer> locationsByLocationAbbrMap = CollectionUtils.isEmpty(locationAbbreviations) ? new HashMap<>() :
+				this.buildLocationsByLocationAbbrMap(locationAbbreviations);
+
 			final Map<String, Integer> unitMapByName = this.buildUnitsByNameMap();
 			final Map<String, LotMultiUpdateRequestDto.LotUpdateDto> lotUpdateMapByLotUID =
 				Maps.uniqueIndex(lotMultiUpdateRequestDto.getLotList(), LotMultiUpdateRequestDto.LotUpdateDto::getLotUID);
