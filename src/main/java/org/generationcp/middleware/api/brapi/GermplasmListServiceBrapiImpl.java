@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.brapi;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.list.GermplasmListImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
@@ -27,6 +28,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -138,9 +140,11 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 
 	private GermplasmList saveGermplasmList(final GermplasmListImportRequestDTO request) {
 		final String description = request.getListDescription() != null ? request.getListDescription() : StringUtils.EMPTY;
-		final Long date = Long.valueOf(Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT).format(Util.tryParseDate(request.getDateCreated(), Util.FRONTEND_DATE_FORMAT)));
+		final Date currentDate = request.getDateCreated() == null ? new Date() : Util.tryParseDate(request.getDateCreated(), Util.FRONTEND_DATE_FORMAT);
+		final Long date = Long.valueOf(Util.getSimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT).format(currentDate));
+		final Integer userId = request.getListOwnerPersonDbId() == null ? ContextHolder.getLoggedInUserId() : Integer.valueOf(request.getListOwnerPersonDbId());
 		GermplasmList germplasmList = new GermplasmList(null, request.getListName(), date,	GermplasmList.LIST_TYPE,
-			Integer.valueOf(request.getListOwnerPersonDbId()), description, null, GermplasmList.Status.LOCKED_LIST.getCode(),
+			userId, description, null, GermplasmList.Status.LOCKED_LIST.getCode(),
 			null, null);
 		this.setGermplasmListExternalReferences(request, germplasmList);
 
