@@ -39,6 +39,8 @@ public class CopResponse {
 	 */
 	private List<String[]> array2d;
 
+	private Map<String, Map<Integer, String>> germplasmCommonNamesMap;
+
 	private Boolean hasFile;
 
 	private double progress;
@@ -51,6 +53,11 @@ public class CopResponse {
 		this.matrix = matrix;
 		this.upperTriangularMatrix = convertTableToUpperTriangularMatrix(matrix);
 		this.array2d = convertTableTo2dArray(matrix);
+	}
+
+	public CopResponse(final Table<Integer, Integer, Double> matrix, Map<String, Map<Integer, String>> germplasmCommonNamesMap) {
+		this(matrix);
+		this.germplasmCommonNamesMap = germplasmCommonNamesMap;
 	}
 
 	public CopResponse(final Boolean hasFile) {
@@ -127,5 +134,9 @@ public class CopResponse {
 
 	public List<String[]> getArray2d() {
 		return array2d;
+	}
+
+	public Map<String, Map<Integer, String>> getGermplasmCommonNamesMap() {
+		return germplasmCommonNamesMap;
 	}
 }
