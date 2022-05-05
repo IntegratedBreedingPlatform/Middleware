@@ -281,7 +281,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	}
 
 	private boolean isObservationUnitForMeans(final ObservationUnitImportRequestDto observationUnitDto) {
-		return observationUnitDto.getObservationUnitPosition().getObservationLevel().getLevelName()
+		return observationUnitDto.getObservationUnitPosition() != null
+			&& observationUnitDto.getObservationUnitPosition().getObservationLevel() != null
+			&& observationUnitDto.getObservationUnitPosition().getObservationLevel().getLevelName()
 			.equalsIgnoreCase(DatasetTypeEnum.MEANS_DATA.getName());
 	}
 

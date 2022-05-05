@@ -18,9 +18,12 @@ import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.dms.DatasetType;
+import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -45,7 +48,7 @@ import java.util.Map;
 public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBase {
 
 	public static final String ENTRY_NO = "ENTRY_NO";
-	
+
 	@Resource
 	private TrialServiceBrapi trialServiceBrapi;
 
@@ -92,6 +95,10 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		this.studySummary = this.trialServiceBrapi
 			.saveStudies(this.crop.getCropName(), Collections.singletonList(importRequest1), this.testUser.getUserid()).get(0);
 
+		// Create means dataset
+		this.createDataset(this.daoFactory.getDmsProjectDAO().getById(this.studySummary.getTrialDbId()), DatasetTypeEnum.MEANS_DATA,
+			"-MEANS");
+
 		final StudyImportRequestDTO dto = new StudyImportRequestDTO();
 		dto.setTrialDbId(String.valueOf(this.studySummary.getTrialDbId()));
 		this.studyInstanceDto = this.studyServiceBrapi
@@ -126,6 +133,8 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		Assert.assertTrue(
 			dto.getObservationUnitPosition().getEntryType()
 				.equalsIgnoreCase(observationUnitDto.getObservationUnitPosition().getEntryType()));
+		Assert.assertEquals(dto.getObservationUnitPosition().getObservationLevel().getLevelName(),
+			observationUnitDto.getObservationUnitPosition().getObservationLevel().getLevelName());
 		Assert.assertEquals(dto.getObservationUnitPosition().getPositionCoordinateX(),
 			observationUnitDto.getObservationUnitPosition().getPositionCoordinateX());
 		Assert.assertEquals(dto.getObservationUnitPosition().getPositionCoordinateY(),
@@ -211,6 +220,9 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 
 		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
 		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
+		final ObservationLevelRelationship plotLevel = new ObservationLevelRelationship();
+		plotLevel.setLevelName(DatasetTypeEnum.PLOT_DATA.getName());
+		observationUnitPosition.setObservationLevel(plotLevel);
 
 		final CVTerm numericVariable =
 			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL);
@@ -252,6 +264,9 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 
 		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
 		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
+		final ObservationLevelRelationship plotLevel = new ObservationLevelRelationship();
+		plotLevel.setLevelName(DatasetTypeEnum.PLOT_DATA.getName());
+		observationUnitPosition.setObservationLevel(plotLevel);
 
 		final CVTerm numericVariable =
 			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.STUDY_DETAIL);
@@ -293,6 +308,9 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 
 		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
 		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
+		final ObservationLevelRelationship plotLevel = new ObservationLevelRelationship();
+		plotLevel.setLevelName(DatasetTypeEnum.PLOT_DATA.getName());
+		observationUnitPosition.setObservationLevel(plotLevel);
 
 		final ObservationLevelRelationship relationship = new ObservationLevelRelationship();
 		relationship.setLevelCode("NON NUMERIC VALUE");
@@ -322,6 +340,37 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		Assert.assertTrue(CollectionUtils.isEmpty(observationUnitDto.getObservationUnitPosition().getObservationLevelRelationships()));
 	}
 
+	@Test
+	public void testImportObservationUnits_MeansLevel() {
+		final ObservationUnitImportRequestDto dto = this.createObservationUnitImportRequestDtoForMeansLevel();
+
+		final List<String> observationDbIds =
+			this.observationUnitService.importObservationUnits(this.crop.getCropName(), Collections.singletonList(dto));
+
+		final ObservationUnitSearchRequestDTO searchRequestDTO = new ObservationUnitSearchRequestDTO();
+		searchRequestDTO.setObservationUnitDbIds(observationDbIds);
+		final List<ObservationUnitDto> observationUnitDtoList =
+			this.observationUnitService.searchObservationUnits(null, null, searchRequestDTO);
+
+		Assert.assertEquals(1, observationUnitDtoList.size());
+		final ObservationUnitDto observationUnitDto = observationUnitDtoList.get(0);
+		Assert.assertEquals(dto.getProgramDbId(), observationUnitDto.getProgramDbId());
+		Assert.assertEquals(dto.getTrialDbId(), observationUnitDto.getTrialDbId());
+		Assert.assertEquals(dto.getStudyDbId(), observationUnitDto.getStudyDbId());
+		Assert.assertEquals(dto.getGermplasmDbId(), observationUnitDto.getGermplasmDbId());
+		Assert.assertTrue(
+			dto.getObservationUnitPosition().getEntryType()
+				.equalsIgnoreCase(observationUnitDto.getObservationUnitPosition().getEntryType()));
+		Assert.assertEquals(dto.getObservationUnitPosition().getObservationLevel().getLevelName(),
+			observationUnitDto.getObservationUnitPosition().getObservationLevel().getLevelName());
+		Assert.assertEquals(1, observationUnitDto.getExternalReferences().size());
+		Assert.assertEquals(dto.getExternalReferences().get(0).getReferenceID(),
+			observationUnitDto.getExternalReferences().get(0).getReferenceID());
+		Assert.assertEquals(dto.getExternalReferences().get(0).getReferenceSource(),
+			observationUnitDto.getExternalReferences().get(0).getReferenceSource());
+		Assert.assertEquals("1", observationUnitDto.getAdditionalInfo().get(ENTRY_NO));
+	}
+
 	private ObservationUnitImportRequestDto createObservationUnitImportRequestDto() {
 		final ObservationUnitImportRequestDto dto = new ObservationUnitImportRequestDto();
 		dto.setTrialDbId(this.studySummary.getTrialDbId().toString());
@@ -337,6 +386,11 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
 		observationUnitPosition.setPositionCoordinateX("1");
 		observationUnitPosition.setPositionCoordinateY("2");
+		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
+		final ObservationLevelRelationship plotLevel = new ObservationLevelRelationship();
+		plotLevel.setLevelName(DatasetTypeEnum.PLOT_DATA.getName());
+		observationUnitPosition.setObservationLevel(plotLevel);
+
 		final ObservationLevelRelationship plotRelationship = new ObservationLevelRelationship();
 		plotRelationship.setLevelCode("1");
 		plotRelationship.setLevelName("PLOT");
@@ -359,6 +413,40 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		dto.setObservationUnitPosition(observationUnitPosition);
 
 		return dto;
+	}
+
+	private ObservationUnitImportRequestDto createObservationUnitImportRequestDtoForMeansLevel() {
+		final ObservationUnitImportRequestDto dto = new ObservationUnitImportRequestDto();
+		dto.setTrialDbId(this.studySummary.getTrialDbId().toString());
+		dto.setStudyDbId(this.studyInstanceDto.getStudyDbId());
+		dto.setProgramDbId(this.commonTestProject.getUniqueID());
+		dto.setGermplasmDbId(this.germplasm.getGermplasmUUID());
+		final ExternalReferenceDTO externalReference = new ExternalReferenceDTO();
+		externalReference.setReferenceID(RandomStringUtils.randomAlphabetic(20));
+		externalReference.setReferenceSource(RandomStringUtils.randomAlphabetic(20));
+		dto.setExternalReferences(Collections.singletonList(externalReference));
+
+		final ObservationUnitPosition observationUnitPosition = new ObservationUnitPosition();
+		observationUnitPosition.setEntryType(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeName());
+		final ObservationLevelRelationship meansLevel = new ObservationLevelRelationship();
+		meansLevel.setLevelName(DatasetTypeEnum.MEANS_DATA.getName());
+		observationUnitPosition.setObservationLevel(meansLevel);
+		dto.setObservationUnitPosition(observationUnitPosition);
+
+		return dto;
+	}
+
+	private DmsProject createDataset(final DmsProject study, final DatasetTypeEnum datasetType, final String nameSuffix) {
+		final DmsProject dmsProject = new DmsProject();
+		dmsProject.setDatasetType(new DatasetType(datasetType.getId()));
+		dmsProject.setName(study.getName() + nameSuffix);
+		dmsProject.setDescription(study.getDescription() + nameSuffix);
+		dmsProject.setParent(study);
+		dmsProject.setStudy(study);
+		dmsProject.setDeleted(false);
+		dmsProject.setProgramUUID(study.getProgramUUID());
+		this.daoFactory.getDmsProjectDAO().save(dmsProject);
+		return dmsProject;
 	}
 
 }
