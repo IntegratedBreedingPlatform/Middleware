@@ -50,7 +50,7 @@ public class LocationServiceImpl implements LocationService {
 
 	@Override
 	public List<LocationDTO> searchLocations(final LocationSearchRequest locationSearchRequest,
-			final Pageable pageable, final String programUUID) {
+		final Pageable pageable, final String programUUID) {
 		return this.daoFactory.getLocationDAO().searchLocations(locationSearchRequest, pageable, programUUID);
 	}
 
@@ -60,7 +60,8 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public List<org.generationcp.middleware.api.location.Location> getLocations(final LocationSearchRequest locationSearchRequest, final Pageable pageable) {
+	public List<org.generationcp.middleware.api.location.Location> getLocations(final LocationSearchRequest locationSearchRequest,
+		final Pageable pageable) {
 		return this.daoFactory.getLocationDAO().getLocations(locationSearchRequest, pageable);
 	}
 
@@ -92,7 +93,9 @@ public class LocationServiceImpl implements LocationService {
 			.stream().map(Locdes::getLocationId).collect(Collectors.toList());
 
 		// Delete Block Parents
-		this.daoFactory.getLocDesDao().deleteByLocationIds(blockParentIds);
+		if (!blockParentIds.isEmpty()) {
+			this.daoFactory.getLocDesDao().deleteByLocationIds(blockParentIds);
+		}
 	}
 
 	private void deleteFieldLocation(final List<Integer> locationIds) {
@@ -110,7 +113,10 @@ public class LocationServiceImpl implements LocationService {
 		// Delete Field Parents
 		final List<Integer> fieldParentIds = this.daoFactory.getLocDesDao().getLocdes(locationIds, null)
 			.stream().map(Locdes::getLocationId).collect(Collectors.toList());
-		this.daoFactory.getLocDesDao().deleteByLocationIds(fieldParentIds);
+
+		if (!fieldParentIds.isEmpty()) {
+			this.daoFactory.getLocDesDao().deleteByLocationIds(fieldParentIds);
+		}
 	}
 
 	@Override
@@ -119,7 +125,7 @@ public class LocationServiceImpl implements LocationService {
 		final Country country = (locationRequestDto.getCountryId() == null) ? null :
 			this.daoFactory.getCountryDao().getById(locationRequestDto.getCountryId());
 		final Location province = (locationRequestDto.getProvinceId() == null) ? null :
-				this.daoFactory.getLocationDAO().getById(locationRequestDto.getProvinceId());
+			this.daoFactory.getLocationDAO().getById(locationRequestDto.getProvinceId());
 
 		final Location newLocation = new Location(null, locationRequestDto.getType(),
 			0, locationRequestDto.getName(), locationRequestDto.getAbbreviation(),
@@ -146,20 +152,19 @@ public class LocationServiceImpl implements LocationService {
 	public void updateLocation(final Integer locationId, final LocationRequestDto locationRequestDto) {
 		final Location location = this.daoFactory.getLocationDAO().getById(locationId);
 
-			location.setLname(locationRequestDto.getName());
-			location.setLabbr(locationRequestDto.getAbbreviation());
-			location.setLtype(locationRequestDto.getType());
+		location.setLname(locationRequestDto.getName());
+		location.setLabbr(locationRequestDto.getAbbreviation());
+		location.setLtype(locationRequestDto.getType());
 
-			final Country country = this.daoFactory.getCountryDao().getById(locationRequestDto.getCountryId());
-			location.setCountry(country);
+		final Country country = this.daoFactory.getCountryDao().getById(locationRequestDto.getCountryId());
+		location.setCountry(country);
 
-			final Location province = this.daoFactory.getLocationDAO().getById(locationRequestDto.getProvinceId());
-			location.setProvince(province);
+		final Location province = this.daoFactory.getLocationDAO().getById(locationRequestDto.getProvinceId());
+		location.setProvince(province);
 
-			location.setLatitude(locationRequestDto.getLatitude());
-			location.setLongitude(locationRequestDto.getLongitude());
-			location.setAltitude(locationRequestDto.getAltitude());
-
+		location.setLatitude(locationRequestDto.getLatitude());
+		location.setLongitude(locationRequestDto.getLongitude());
+		location.setAltitude(locationRequestDto.getAltitude());
 
 		this.daoFactory.getLocationDAO().saveOrUpdate(location);
 	}
