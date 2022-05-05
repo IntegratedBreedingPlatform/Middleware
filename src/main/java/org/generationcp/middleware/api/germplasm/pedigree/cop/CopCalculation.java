@@ -69,7 +69,7 @@ public class CopCalculation {
 	private static final int UNKNOWN_INBREEDING_GENERATIONS = 4;
 	private static final int UNKNOWN_GID = 0;
 
-	private static final double COPZ_CROSS_FERTILIZING_UNKNOWN_PARENTS = 1;
+	private static final double COPZ_CROSS_FERTILIZING_UNKNOWN_PARENTS = 0;
 	private static final double COPZ_UNKNOWN_DERIVATIVE = 1;
 	private static final double COPZ_CROSS_FERTILIZING_WIDE_VARIABILITY = -1;
 
