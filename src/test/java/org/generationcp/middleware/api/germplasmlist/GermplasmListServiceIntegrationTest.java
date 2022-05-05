@@ -167,10 +167,9 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		assertThat(newGermplasmList2.getParentId(), is(this.parentFolderId));
 
 		//Move folder 1 to folder 2
-		final Integer movedListId =
-			this.germplasmListService.moveGermplasmListFolder(newFolderId1, newFolderId2, PROGRAM_UUID);
-		assertNotNull(movedListId);
-		assertThat(movedListId, is(newFolderId1));
+		final GermplasmList germplasmList = this.germplasmListService.moveGermplasmListFolder(newFolderId1, newFolderId2, PROGRAM_UUID);
+		assertNotNull(germplasmList.getId());
+		assertThat(germplasmList.getId(), is(newFolderId1));
 
 		//Get the moved folder
 		final Optional<GermplasmList> movedFolderById = this.germplasmListService.getGermplasmListById(newFolderId1);
