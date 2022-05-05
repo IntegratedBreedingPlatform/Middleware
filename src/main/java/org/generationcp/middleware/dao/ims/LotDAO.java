@@ -426,6 +426,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("status");
 			query.addScalar("locationId");
 			query.addScalar("locationName");
+			query.addScalar("locationAbbr");
 			query.addScalar("unitId");
 			query.addScalar("unitName");
 			query.addScalar("actualBalance");

@@ -43,6 +43,7 @@ final class SearchLotDaoQuery {
 		+ "  CASE WHEN lot.status = 0 then '" + LotStatus.ACTIVE.name()  +"' else '"+ LotStatus.CLOSED.name()+ "' end as status, " //
 		+ "  lot.locid as locationId, " //
 		+ "  l.lname as locationName, " //
+		+ "  l.labbr as locationAbbr, " //
 		+ "  lot.scaleid as unitId, " //
 		+ "  scale.name as unitName, " //
 		+ "  SUM(CASE WHEN transaction.trnstat = " + TransactionStatus.CONFIRMED.getIntValue() +" THEN transaction.trnqty ELSE 0 END) AS actualBalance, " //
