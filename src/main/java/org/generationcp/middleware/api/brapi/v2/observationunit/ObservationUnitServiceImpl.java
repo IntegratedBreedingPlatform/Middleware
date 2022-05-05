@@ -281,8 +281,8 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	}
 
 	private boolean isObservationUnitForMeans(final ObservationUnitImportRequestDto observationUnitDto) {
-		return observationUnitDto.getObservationUnitPosition().getObservationLevelRelationships().stream()
-			.anyMatch(d -> d.getLevelName().equalsIgnoreCase(DatasetTypeEnum.MEANS_DATA.getName()));
+		return observationUnitDto.getObservationUnitPosition().getObservationLevel().getLevelName()
+			.equalsIgnoreCase(DatasetTypeEnum.MEANS_DATA.getName());
 	}
 
 	private void setJsonProps(final ExperimentModel model, final ObservationUnitImportRequestDto dto) {
