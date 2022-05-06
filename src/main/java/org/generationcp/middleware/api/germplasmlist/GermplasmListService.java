@@ -36,7 +36,7 @@ public interface GermplasmListService {
 
 	Integer updateGermplasmListFolder(String folderName, Integer folderId);
 
-	Integer moveGermplasmListFolder(Integer germplasmListId, Integer newParentFolderId, String programUUID);
+	GermplasmList moveGermplasmListFolder(Integer germplasmListId, Integer newParentFolderId, String programUUID);
 
 	void deleteGermplasmListFolder(Integer folderId);
 
