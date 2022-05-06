@@ -1758,8 +1758,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			variableDto.getContextOfUse().add("PLOT");
 
-			final String observationVariableName = result.get(VARIABLE_ALIAS) != null ? String.valueOf(result.get(VARIABLE_ALIAS)) :
-				String.valueOf(result.get(VARIABLE_NAME));
+			final String observationVariableName =
+				result.get(VARIABLE_ALIAS) != null && StringUtils.isNotEmpty(String.valueOf(result.get(VARIABLE_ALIAS))) ?
+				String.valueOf(result.get(VARIABLE_ALIAS)) : String.valueOf(result.get(VARIABLE_NAME));
 
 			variableDto.setName(observationVariableName);
 			variableDto.setObservationVariableDbId(String.valueOf(result.get(VARIABLE_ID)));
