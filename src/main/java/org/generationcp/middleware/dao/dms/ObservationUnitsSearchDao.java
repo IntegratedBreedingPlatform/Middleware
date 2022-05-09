@@ -43,7 +43,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final List<Integer> STANDARD_DATASET_VARIABLE_IDS = Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId(), TermId.EXPERIMENT_DESIGN_FACTOR
 		.getId(), TermId.GID.getId(), TermId.DESIG.getId(), TermId.ENTRY_TYPE.getId(), TermId.ENTRY_NO.getId(), TermId.REP_NO
 		.getId(), TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId(), TermId.ROW.getId(), TermId.COL.getId(), TermId.FIELDMAP_RANGE.getId(), TermId.FIELDMAP_COLUMN
-		.getId(), TermId.OBS_UNIT_ID.getId());
+		.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId());
 	private static final String SUM_OF_SAMPLES_ID = "-2";
 	private static final String OBSERVATION_UNIT_ID = "observationUnitId";
 	static final String PARENT_OBS_UNIT_ID = "PARENT_OBS_UNIT_ID";
@@ -125,7 +125,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		mainVariablesMap.put(FILE_TERM_IDS, "(select group_concat(fcvt.cvterm_id separator ',') from file_metadata fm "
 			+ " inner join file_metadata_cvterm fcvt on fm.file_id = fcvt.file_metadata_id"
 			+ " where fm.nd_experiment_id = nde.nd_experiment_id) as '" + FILE_TERM_IDS + "'");
-
+		mainVariablesMap.put(String.valueOf(TermId.CROSS.getId()), "    s.cross_value AS '%s'");
 	}
 
 	public Integer countObservationUnitsForDataset(final Integer datasetId, final Integer instanceId, final Boolean draftMode,
@@ -498,6 +498,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.FIELDMAP_RANGE.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.LOCATION_ID.getId()));
 		createSQLQuery.addScalar(standardVariableNames.get(TermId.EXPERIMENT_DESIGN_FACTOR.getId()));
+		createSQLQuery.addScalar(standardVariableNames.get(TermId.CROSS.getId()));
 	}
 
 	private String getObservationUnitTableQuery(

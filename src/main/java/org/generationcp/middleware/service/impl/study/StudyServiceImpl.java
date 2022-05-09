@@ -75,8 +75,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		 */
 		final List<Integer> fixedGermplasmDescriptors =
 			Lists.newArrayList(TermId.GID.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.ENTRY_TYPE.getId(),
-				TermId.ENTRY_CODE.getId(), TermId.OBS_UNIT_ID
-					.getId());
+				TermId.ENTRY_CODE.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId());
 		final Map<Integer, String> genericGermplasmDescriptors = Maps.newHashMap();
 
 		for (final Map.Entry<Integer, String> gpDescriptor : allGermplasmDescriptors.entrySet()) {
