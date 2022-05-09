@@ -6,7 +6,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
-import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -15,7 +14,6 @@ import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
@@ -104,33 +102,6 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 		Assert.assertEquals(ListDataInventory.RESERVED, lotDetails.get(0).getWithdrawalStatus());
 		Assert.assertEquals(8234, lotDetails.get(0).getScaleId().intValue());
 		Assert.assertEquals(9007, lotDetails.get(0).getLocId().intValue());
-	}
-
-	@Test
-	public void testSetAvailableBalanceScaleForGermplasm() throws Exception {
-		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0 , 1 ,1 ,0, 1 ,1 , "MethodName",
-				"LocationName");
-		this.daoFactory.getGermplasmDao().save(germplasm);
-		this.daoFactory.getGermplasmDao().refresh(germplasm);
-		final Name name = germplasm.getPreferredName();
-		name.setGermplasm(germplasm);
-		this.daoFactory.getNameDao().save(name);
-		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
-		germplasm.setInventoryInfo(new GermplasmInventory(germplasmId));
-
-		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
-		this.daoFactory.getLotDao().save(lot);
-
-		final Transaction transaction = InventoryDetailsTestDataInitializer
-				.createTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST", TransactionType.DEPOSIT.getId());
-		this.daoFactory.getTransactionDAO().save(transaction);
-
-		final List<Germplasm> germplasmList = Lists.newArrayList(germplasm);
-		listInventoryBuilder.setAvailableBalanceScaleForGermplasm(germplasmList);
-
-		Assert.assertEquals(1, germplasmList.size());
-
-		Assert.assertEquals("g", germplasmList.get(0).getInventoryInfo().getScaleForGermplsm());
 	}
 
 	private void initializeGermplasms(final List<Integer> gids) {

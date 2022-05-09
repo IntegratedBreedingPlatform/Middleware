@@ -3,7 +3,6 @@ package org.generationcp.middleware.operation.builder;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import com.google.common.collect.Sets;
 import org.generationcp.middleware.domain.inventory.GermplasmInventory;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
 import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
@@ -20,17 +19,14 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermRelationship;
-import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ListInventoryBuilder extends Builder {
 
@@ -94,23 +90,6 @@ public class ListInventoryBuilder extends Builder {
 				listEntry.setGroupId(germplasmMap.get(gid).getMgid());
 			}
 		}
-	}
-
-	public List<GermplasmListData> retrieveLotCountsForListEntries(final List<Integer> entryIds)
-			throws MiddlewareQueryException {
-		List<GermplasmListData> listEntries = null;
-		listEntries = daoFactory.getGermplasmListDataDAO().getByIds(entryIds);
-		final List<Integer> gids = new ArrayList<Integer>();
-		final List<Integer> lrecIds = new ArrayList<Integer>();
-		for (final GermplasmListData entry : listEntries) {
-			gids.add(entry.getGid());
-			entry.setInventoryInfo(new ListDataInventory(entry.getId(), entry.getGid()));
-			lrecIds.add(entry.getId());
-		}
-		this.retrieveLotCounts(entryIds, listEntries, gids, lrecIds);
-		this.retrieveGroupId(listEntries, gids);
-		this.setAvailableBalanceScale(listEntries);
-		return listEntries;
 	}
 
 	private void retrieveLotCounts(final List<Integer> entryIds, final List<GermplasmListData> listEntries, final List<Integer> gids,
@@ -178,47 +157,6 @@ public class ListInventoryBuilder extends Builder {
 
 	}
 
-	public void setAvailableBalanceScaleForGermplasm(final List<Germplasm> germplasmList) {
-		if(!CollectionUtils.isEmpty(germplasmList)) {
-			List<Integer> gids = Lists.newArrayList();
-
-			for(Germplasm germplasm : germplasmList) {
-				gids.add(germplasm.getGid());
-			}
-
-			List<Object[]> lotScalesForGermplsms = daoFactory.getLotDao().retrieveLotScalesForGermplasms(gids);
-
-			if(!CollectionUtils.isEmpty(lotScalesForGermplsms)) {
-				Map<Integer, Set<String>> germplsmWiseScales = new HashMap<>();
-
-				for(Object[] entry : lotScalesForGermplsms) {
-					Integer germplasmId = (Integer) entry[0];
-					String scaleName = (String)entry[2];
-
-					if(germplsmWiseScales.containsKey(germplasmId)) {
-						germplsmWiseScales.get(germplasmId).add(scaleName);
-					} else {
-						germplsmWiseScales.put(germplasmId, Sets.newHashSet(scaleName));
-					}
-
-				}
-
-				for(Germplasm germplasm : germplasmList) {
-					if(germplsmWiseScales.containsKey(germplasm.getGid())) {
-						Set<String> scales = germplsmWiseScales.get(germplasm.getGid());
-						if(scales.size() > 1) {
-							germplasm.getInventoryInfo().setScaleForGermplsm(ListDataInventory.MIXED);
-						} else if(scales.size() == 1) {
-							germplasm.getInventoryInfo().setScaleForGermplsm(scales.iterator().next());
-						}
-					}
-				}
-			}
-
-		}
-
-	}
-
 	private void retrieveStockIds(final List<GermplasmListData> listEntries, final List<Integer> gIds) {
 		final Map<Integer, String> stockIDs = daoFactory.getTransactionDAO().retrieveStockIds(gIds);
 		for (final GermplasmListData entry : listEntries) {
@@ -229,16 +167,6 @@ public class ListInventoryBuilder extends Builder {
 				entry.setStockIDs(stockIdsForGid);
 			}
 		}
-	}
-
-	public Integer countLotsWithAvailableBalanceForGermplasm(final Integer gid) throws MiddlewareQueryException {
-		Integer lotCount = null;
-		final Map<Integer, BigInteger> lotCounts = daoFactory.getLotDao().countLotsWithAvailableBalance(Collections.singletonList(gid));
-		final BigInteger lotCountBigInt = lotCounts.get(gid);
-		if (lotCounts != null && lotCountBigInt != null) {
-			lotCount = lotCountBigInt.intValue();
-		}
-		return lotCount;
 	}
 
 	public List<LotDetails> retrieveInventoryLotsForGermplasm(final Integer gid) throws MiddlewareQueryException {

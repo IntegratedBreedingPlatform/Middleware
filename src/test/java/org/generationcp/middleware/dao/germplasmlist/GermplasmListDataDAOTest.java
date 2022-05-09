@@ -91,39 +91,6 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByIds() {
-		// insert new list data record from a newly-created list and germplasm
-		// records
-		final GermplasmListData testGermplasmListData1 = this.createTestListWithListData();
-		// create another list data
-		final GermplasmListData testGermplasmListData2 = this
-			.createTestListDataForList(testGermplasmListData1.getList().getId());
-
-		// get the 2 list data records from the database
-		final List<Integer> listDataIds = Arrays
-			.asList(new Integer[] {testGermplasmListData1.getId(), testGermplasmListData2.getId()});
-		final List<GermplasmListData> listDataRecords = this.germplasmListDataDAO.getByIds(listDataIds);
-		Assert.assertEquals("There should be 2 list data records returned", 2, listDataRecords.size());
-		for (final GermplasmListData germplasmListData : listDataRecords) {
-			Assert.assertTrue(
-				"The list data record id " + germplasmListData.getId() + " should be found in " + listDataIds,
-				listDataIds.contains(germplasmListData.getId()));
-			if (testGermplasmListData1.getId().equals(germplasmListData.getId())) {
-				Assert.assertEquals("The list id should be " + testGermplasmListData1.getList().getId(),
-					testGermplasmListData1.getList().getId(), germplasmListData.getList().getId());
-				Assert.assertEquals("The gid should be " + testGermplasmListData1.getGid(),
-					testGermplasmListData1.getGid(), germplasmListData.getGid());
-			} else if (testGermplasmListData2.getId().equals(germplasmListData.getId())) {
-				Assert.assertEquals("The list id should be " + testGermplasmListData2.getList().getId(),
-					testGermplasmListData2.getList().getId(), germplasmListData.getList().getId());
-				Assert.assertEquals("The gid id should be " + testGermplasmListData2.getGid(),
-					testGermplasmListData2.getGid(), germplasmListData.getGid());
-			}
-		}
-
-	}
-
-	@Test
 	public void testGetByListId() {
 		// insert a new list data record from a newly-created list and germplasm
 		// records
