@@ -32,6 +32,12 @@ public class Feedback implements Serializable {
 	@Column(name = "feature", updatable = false, nullable = false)
 	private FeedbackFeature feature;
 
+	@Column(name = "collector_id", nullable = false)
+	private String collectorId;
+
+	@Column(name = "attempts", nullable = false)
+	private Integer attempts;
+
 	@Column(name = "enabled", nullable = false)
 	private boolean enabled = true;
 
@@ -48,6 +54,22 @@ public class Feedback implements Serializable {
 
 	public FeedbackFeature getFeature() {
 		return feature;
+	}
+
+	public String getCollectorId() {
+		return this.collectorId;
+	}
+
+	public void setCollectorId(final String collectorId) {
+		this.collectorId = collectorId;
+	}
+
+	public Integer getAttempts() {
+		return this.attempts;
+	}
+
+	public void setAttempts(final Integer attempts) {
+		this.attempts = attempts;
 	}
 
 	public boolean isEnabled() {
@@ -91,6 +113,10 @@ public class Feedback implements Serializable {
 		builder.append(this.id);
 		builder.append(", feature=");
 		builder.append(this.feature.name());
+		builder.append(", collectorId=");
+		builder.append(this.getCollectorId());
+		builder.append(", attempts=");
+		builder.append(this.getAttempts());
 		builder.append(", enabled=");
 		builder.append(this.enabled);
 

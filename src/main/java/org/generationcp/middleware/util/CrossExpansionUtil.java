@@ -244,12 +244,13 @@ public class CrossExpansionUtil {
 		return pr;
 	}
 
-	public static String truncateCrossValueIfNeeded(final String crossValue) {
-		if (crossValue.length() > MAX_CROSS_NAME_SIZE) {
-			final StringBuilder truncatedValue = new StringBuilder(crossValue.substring(0, MAX_CROSS_NAME_SIZE - 1));
+	public static String truncateCrossValueIfNeeded(final String crossValue, final int maxLength) {
+		if (crossValue.length() > maxLength) {
+			final StringBuilder truncatedValue = new StringBuilder(crossValue.substring(0, maxLength - 1));
 			truncatedValue.append(CROSS_NAME_TRUNCATED_SUFFIX);
 			return truncatedValue.toString();
 		}
 		return crossValue;
 	}
+
 }

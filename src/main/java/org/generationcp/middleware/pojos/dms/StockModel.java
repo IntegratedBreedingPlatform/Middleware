@@ -212,7 +212,7 @@ public class StockModel implements Serializable {
 	}
 
 	public void truncateCrossValueIfNeeded() {
-		String cross = CrossExpansionUtil.truncateCrossValueIfNeeded(this.getCross());
+		String cross = CrossExpansionUtil.truncateCrossValueIfNeeded(this.getCross(), CrossExpansionUtil.MAX_CROSS_NAME_SIZE);
 		this.setCross(cross);
 	}
 

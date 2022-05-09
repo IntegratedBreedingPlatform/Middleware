@@ -459,7 +459,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public Integer moveGermplasmListFolder(final Integer germplasmListId, final Integer newParentFolderId,
+	public GermplasmList moveGermplasmListFolder(final Integer germplasmListId, final Integer newParentFolderId,
 		final String programUUID) {
 
 		final GermplasmList listToMove = this.getGermplasmListById(germplasmListId)
@@ -478,7 +478,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		listToMove.setParent(newParentFolder);
 
 		try {
-			return this.daoFactory.getGermplasmListDAO().saveOrUpdate(listToMove).getId();
+			return this.daoFactory.getGermplasmListDAO().saveOrUpdate(listToMove);
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in moveGermplasmList in GermplasmListServiceImpl: " + e.getMessage(), e);
 		}
@@ -679,6 +679,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		germplasmList.setDate(Long.valueOf(this.dateFormat.format(germplasmListDto.getCreationDate())));
 		germplasmList.setNotes(germplasmListDto.getNotes());
 		this.daoFactory.getGermplasmListDAO().update(germplasmList);
+	}
+
+	@Override
+	public long countEntryDetailsNamesAndAttributesAdded(final Integer listId) {
+		return this.daoFactory.getGermplasmListDataViewDAO().countEntryDetailsNamesAndAttributesAdded(listId);
 	}
 
 	@Override

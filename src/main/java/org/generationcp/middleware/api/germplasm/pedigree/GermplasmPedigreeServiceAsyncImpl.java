@@ -3,7 +3,7 @@ package org.generationcp.middleware.api.germplasm.pedigree;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 /**
- * Can be used outside a request. Instantiate with "new"
+ * Not a managed bean, can be used outside a request. Instantiate with "new"
  */
 public class GermplasmPedigreeServiceAsyncImpl extends GermplasmPedigreeServiceImpl {
 

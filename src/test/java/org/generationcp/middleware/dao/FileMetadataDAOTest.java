@@ -77,24 +77,24 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 		variables1.add(this.cvterm1);
 		this.fileMetadata1.setVariables(variables1);
 		this.fileMetadata1.setGermplasm(this.germplasm1);
-		FileUIDGenerator.generate(this.cropType, singletonList(fileMetadata1));
-		this.fileMetadataDAO.save(fileMetadata1);
+		FileUIDGenerator.generate(this.cropType, singletonList(this.fileMetadata1));
+		this.fileMetadataDAO.save(this.fileMetadata1);
 		
 		this.fileMetadata2 = new FileMetadata();
 		final List<CVTerm> variables2 = new ArrayList<>();
 		variables2.add(this.cvterm1);
 		this.fileMetadata2.setVariables(variables2);
 		this.fileMetadata2.setGermplasm(this.germplasm1);
-		FileUIDGenerator.generate(this.cropType, singletonList(fileMetadata2));
-		this.fileMetadataDAO.save(fileMetadata2);
+		FileUIDGenerator.generate(this.cropType, singletonList(this.fileMetadata2));
+		this.fileMetadataDAO.save(this.fileMetadata2);
 		
 		this.fileMetadata3 = new FileMetadata();
 		final List<CVTerm> variables3 = new ArrayList<>();
 		variables3.add(this.cvterm2);
 		this.fileMetadata3.setVariables(variables3);
 		this.fileMetadata3.setGermplasm(this.germplasm1);
-		FileUIDGenerator.generate(this.cropType, singletonList(fileMetadata3));
-		this.fileMetadataDAO.save(fileMetadata3);
+		FileUIDGenerator.generate(this.cropType, singletonList(this.fileMetadata3));
+		this.fileMetadataDAO.save(this.fileMetadata3);
 		
 		this.sessionProvder.getSession().flush();
 	}
@@ -105,11 +105,11 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 		final List<CVTerm> variables = fileMetadata.getVariables();
 		assertThat(variables, hasSize(1));
 		assertThat(variables, hasItems(
-			hasProperty("cvTermId", is(cvterm1.getCvTermId()))
+			hasProperty("cvTermId", is(this.cvterm1.getCvTermId()))
 		));
 		assertThat(fileMetadata.getGermplasm().getGermplasmUUID(), is(this.germplasm1.getGermplasmUUID()));
 
-		this.fileMetadataDAO.detachFiles(singletonList(cvterm1.getCvTermId()), null, this.germplasm1.getGermplasmUUID());
+		this.fileMetadataDAO.detachFiles(singletonList(this.cvterm1.getCvTermId()), null, this.germplasm1.getGermplasmUUID(), null);
 		this.sessionProvder.getSession().refresh(this.fileMetadata1);
 
 		final FileMetadata fileMetadataWithoutVariables = this.fileMetadataDAO.getByFileUUID(this.fileMetadata1.getFileUUID());
@@ -117,7 +117,7 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 
 		final FileMetadata fileUntouched = this.fileMetadataDAO.getByFileUUID(this.fileMetadata3.getFileUUID());
 		assertThat(fileUntouched.getVariables(), hasItems(
-			hasProperty("cvTermId", is(cvterm2.getCvTermId()))
+			hasProperty("cvTermId", is(this.cvterm2.getCvTermId()))
 		));
 		assertThat(fileUntouched.getGermplasm().getGermplasmUUID(), is(this.germplasm1.getGermplasmUUID()));
 	}
@@ -129,18 +129,18 @@ public class FileMetadataDAOTest extends IntegrationTestBase {
 		final List<CVTerm> variables = fileMetadata.getVariables();
 		assertThat(variables, hasSize(1));
 		assertThat(variables, hasItems(
-			hasProperty("cvTermId", is(cvterm1.getCvTermId()))
+			hasProperty("cvTermId", is(this.cvterm1.getCvTermId()))
 		));
 		assertThat(fileMetadata.getGermplasm().getGermplasmUUID(), is(this.germplasm1.getGermplasmUUID()));
 
-		this.fileMetadataDAO.removeFiles(singletonList(cvterm1.getCvTermId()), null, this.germplasm1.getGermplasmUUID());
+		this.fileMetadataDAO.removeFiles(singletonList(this.cvterm1.getCvTermId()), null, this.germplasm1.getGermplasmUUID(), null);
 
 		final FileMetadata fileMetadataWithoutVariables = this.fileMetadataDAO.getByFileUUID(this.fileMetadata1.getFileUUID());
 		assertThat(fileMetadataWithoutVariables, nullValue());
 
 		final FileMetadata fileUntouched = this.fileMetadataDAO.getByFileUUID(this.fileMetadata3.getFileUUID());
 		assertThat(fileUntouched.getVariables(), hasItems(
-			hasProperty("cvTermId", is(cvterm2.getCvTermId()))
+			hasProperty("cvTermId", is(this.cvterm2.getCvTermId()))
 		));
 		assertThat(fileUntouched.getGermplasm().getGermplasmUUID(), is(this.germplasm1.getGermplasmUUID()));
 	}

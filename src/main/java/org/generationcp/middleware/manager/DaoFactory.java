@@ -4,6 +4,7 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.AttributeExternalReferenceDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
+import org.generationcp.middleware.dao.CropParameterDAO;
 import org.generationcp.middleware.dao.CopMatrixDao;
 import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
@@ -102,6 +103,10 @@ public class DaoFactory {
 
 	public DaoFactory(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
+	}
+
+	public CropParameterDAO getCropParameterDAO() {
+		return new CropParameterDAO(this.sessionProvider.getSession());
 	}
 
 	public FormulaDAO getFormulaDAO() {

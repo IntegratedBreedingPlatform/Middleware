@@ -50,7 +50,7 @@ import java.util.concurrent.TimeUnit;
 @SuppressWarnings("unchecked")
 @Transactional
 public class GermplasmListManagerImpl extends DataManager implements GermplasmListManager {
-	private static final int MAX_CROSS_NAME_SIZE = 240;
+	private static final int MAX_CROSS_NAME_SIZE = 4985;
 	private static final String TRUNCATED = "(truncated)";
 
 	private DaoFactory daoFactory;
