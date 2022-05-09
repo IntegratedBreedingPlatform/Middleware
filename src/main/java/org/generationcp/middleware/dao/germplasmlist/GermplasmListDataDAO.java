@@ -154,25 +154,6 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		return map;
 	}
 
-	public GermplasmListData getByListIdAndEntryId(final Integer listId, final Integer entryId) {
-
-		// Make sure parameters are not null.
-		Preconditions.checkNotNull(listId, "List id passed in cannot be null.");
-		Preconditions.checkNotNull(entryId, "List entry id's passed in cannot be null.");
-
-		final Criteria criteria = this.getSession().createCriteria(GermplasmListData.class);
-		criteria.createAlias(GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE,
-			GermplasmListDataDAO.GERMPLASM_LIST_NAME_TABLE_ALIAS);
-		criteria.createAlias(GermplasmListDataDAO.GERMPLASM_TABLE, GermplasmListDataDAO.GERMPLASM_TABLE_ALIAS);
-		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_DELETED_COLUMN, Boolean.FALSE));
-		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_LIST_NAME_ID_COLUMN, listId));
-		criteria.add(Restrictions.eq(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN, entryId));
-		criteria.add(Restrictions.ne(GermplasmListDataDAO.GERMPLASM_LIST_DATA_TABLE_STATUS_COLUMN,
-			GermplasmListDataDAO.STATUS_DELETED));
-		criteria.addOrder(Order.asc(GermplasmListDataDAO.GERMPLASM_LIST_DATA_ENTRY_ID_COLUMN));
-		return (GermplasmListData) criteria.uniqueResult();
-	}
-
 	public GermplasmListData getByListIdAndLrecId(final Integer listId, final Integer lrecId) {
 
 		// Make sure parameters are not null.

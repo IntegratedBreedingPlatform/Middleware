@@ -132,27 +132,6 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetByListIdAndEntryId() {
-		// insert a new list data record from a newly-created list and germplasm
-		// records
-		final GermplasmListData testGermplasmListData = this.createTestListWithListData();
-
-		// get the list data record from the database
-		final GermplasmListData germplasmListData = this.germplasmListDataDAO
-			.getByListIdAndEntryId(testGermplasmListData.getList().getId(), GermplasmListDataDAOTest.TEST_ENTRY_ID);
-
-		Assert.assertNotNull("The germplasm list data should not be null", germplasmListData);
-		Assert.assertEquals("The id should be " + testGermplasmListData.getId(), testGermplasmListData.getId(),
-			germplasmListData.getId());
-		Assert.assertEquals("The list id should be " + testGermplasmListData.getList().getId(),
-			testGermplasmListData.getList().getId(), germplasmListData.getList().getId());
-		Assert.assertEquals("The entry id should be " + testGermplasmListData.getEntryId(),
-			testGermplasmListData.getEntryId(), germplasmListData.getEntryId());
-		Assert.assertEquals("The gid should be " + testGermplasmListData.getGid(), testGermplasmListData.getGid(),
-			germplasmListData.getGid());
-	}
-
-	@Test
 	public void testGetByListIdAndLrecId() {
 		// insert new list data record from a newly-created list and germplasm
 		// records
