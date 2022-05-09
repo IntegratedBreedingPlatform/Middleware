@@ -240,7 +240,7 @@
 		</preConditions>
 		<comment>Add 'cross_value' column to 'stock' table</comment>
 		<sql dbms="mysql" splitStatements="true">
-			ALTER TABLE STOCK ADD `cross_value` VARCHAR(255) DEFAULT '-' NOT NULL;
+			ALTER TABLE STOCK ADD `cross_value` VARCHAR(5000) DEFAULT '-' NOT NULL;
 		</sql>
 	</changeSet>
 
