@@ -120,7 +120,7 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 			for (final String studyDbId : variable.getStudyDbIds()) {
 				this.addObservationVariableToStudy(Integer.valueOf(studyDbId),
 					Integer.valueOf(variable.getObservationVariableDbId()), variable.getObservationVariableName(), plotDatasetIds,
-					meansDatasetIds, variable.getContextOfUse().get(0));
+					meansDatasetIds, variable.getContextOfUse());
 			}
 		}
 		return variable;
@@ -199,8 +199,9 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 	private void addObservationVariableToStudy(
 		final Integer studyDbId, final Integer observationVariableDbId,
 		final String observationVariableName, final List<Integer> plotDatasetIds, final List<Integer> meansDatasetIds,
-		final String contextOfUse) {
-		if (VariableDTO.ContextOfUseEnum.MEANS.toString().equalsIgnoreCase(contextOfUse)) {
+		final List<String> contextOfUse) {
+		if (!CollectionUtils.isEmpty(contextOfUse) && contextOfUse.stream()
+			.anyMatch(o -> VariableDTO.ContextOfUseEnum.MEANS.toString().equalsIgnoreCase(o))) {
 			Integer meansDatasetId = this.daoFactory
 				.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.MEANS_DATA);
 			// If means dataset is not yet existing create new.
