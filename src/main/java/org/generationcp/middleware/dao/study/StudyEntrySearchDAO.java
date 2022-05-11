@@ -22,7 +22,6 @@ import org.hibernate.Session;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
-import org.hibernate.type.Type;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
