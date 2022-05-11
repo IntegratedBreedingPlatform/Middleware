@@ -97,8 +97,10 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		this.addGroupGidScalar(scalars, selects, joins, studyEntrySearchDto.getVariableEntryDescriptors());
 
 		if (!CollectionUtils.isEmpty(studyEntrySearchDto.getVariableEntryDescriptors())) {
-			studyEntrySearchDto.getVariableEntryDescriptors().stream().forEach(measurementVariable -> this
-				.addEntryDetailsScalars(scalars, selects, measurementVariable.getName(), measurementVariable.getDataType()));
+			studyEntrySearchDto.getVariableEntryDescriptors().stream()
+				.filter(measurementVariable -> measurementVariable.getTermId() != TermId.GROUPGID.getId())
+				.forEach(measurementVariable -> this
+				.addVariableEntryDescriptorsScalars(scalars, selects, measurementVariable.getName(), measurementVariable.getDataType()));
 		}
 
 		final String whereClause = this.addFilters(studyEntrySearchDto.getFilter(), queryParams);
@@ -156,7 +158,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		selectClause.add(this.addSelectExpression(scalars, "s.cross_value", CROSS_ALIAS, StringType.INSTANCE));
 	}
 
-	private void addEntryDetailsScalars(final List<Scalar> scalars, final List<String> selectClause, final String entryName,
+	private void addVariableEntryDescriptorsScalars(final List<Scalar> scalars, final List<String> selectClause, final String entryName,
 		final String dataType) {
 		selectClause.add(
 			this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.value, NULL))", entryName), entryName, StringType.INSTANCE));
@@ -340,6 +342,10 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 				new StudyEntryDto(entryId, entryNumber, gid, designation, lotCount, availableBalance, unit, cross, groupGid);
 			final Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
+				if (entryDescriptor.getTermId() == TermId.GROUPGID.getId()) {
+					continue;
+				}
+
 				final String value;
 				final Integer categoricalValueId;
 				if (entryDescriptor.getDataType().equals(DataType.CATEGORICAL_VARIABLE.getName())) {
