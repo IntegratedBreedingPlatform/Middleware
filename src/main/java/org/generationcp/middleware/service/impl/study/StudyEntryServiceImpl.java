@@ -90,7 +90,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public long countFilteredStudyEntries(int studyId, StudyEntrySearchDto.Filter filter) {
-		return this.daoFactory.getStockDao().countFilteredStudyEntries(studyId, filter);
+		return this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(studyId, filter);
 	}
 
 	@Override
@@ -114,7 +114,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				Collectors.toList());
 
 		return
-			this.daoFactory.getStockDao()
+			this.daoFactory.getStudyEntrySearchDAO()
 				.getStudyEntries(new StudyEntrySearchDto(studyId, fixedEntryVariables, variableEntryDescriptors, filter), pageable);
 	}
 

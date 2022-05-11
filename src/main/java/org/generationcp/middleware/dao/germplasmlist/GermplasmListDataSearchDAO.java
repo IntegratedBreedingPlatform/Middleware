@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+//TODO: extends from AbstractGenericSearchDAO
 public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, Integer> {
 
 	// TODO: move to utils
@@ -546,6 +547,7 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 		joins.add(join);
 	}
 
+	// TODO: move to AbstractGenericSearchDAO
 	private String addSelectExpression(final List<String> scalars, final String expression, final String columnAlias) {
 		scalars.add(columnAlias);
 		return String.format("%s AS `%s`", expression, columnAlias);
@@ -582,12 +584,14 @@ public class GermplasmListDataSearchDAO extends GenericDAO<GermplasmListData, In
 			.format("LEFT JOIN list_data_details %1$s ON listData.lrecid = %1$s.lrecid AND %1$s.variable_id = %2$s", alias, variableId);
 	}
 
+	// TODO: move to AbstractGenericSearchDAO
 	private String getWhereClause(final List<String> whereClause) {
 		return whereClause
 			.stream()
 			.collect(Collectors.joining(" AND "));
 	}
 
+	// TODO: move to AbstractGenericSearchDAO
 	private String getJoinClause(final Set<String> joins) {
 		return joins
 			.stream()

@@ -30,6 +30,8 @@ public class StudyEntryDto implements Serializable {
 
 	private String cross;
 
+	private Integer groupGid;
+
 	private Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 
 	public StudyEntryDto(){
@@ -50,7 +52,8 @@ public class StudyEntryDto implements Serializable {
 	}
 
 	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final Integer gid,
-		final String designation, final Integer lotCount, final String availableBalance, final String unit, final String cross){
+		final String designation, final Integer lotCount, final String availableBalance, final String unit, final String cross,
+		final Integer groupGid){
 		this.entryId = entryId;
 		this.entryNumber = entryNumber;
 		this.gid = gid;
@@ -59,6 +62,7 @@ public class StudyEntryDto implements Serializable {
 		this.availableBalance = availableBalance;
 		this.unit = unit;
 		this.cross = cross;
+		this.groupGid = groupGid;
 	}
 
 	public Integer getEntryId() {
@@ -123,6 +127,14 @@ public class StudyEntryDto implements Serializable {
 
 	public void setCross(final String cross) {
 		this.cross = StringUtils.isEmpty(cross) ? "-" : cross;
+	}
+
+	public Integer getGroupGid() {
+		return groupGid;
+	}
+
+	public void setGroupGid(final Integer groupGid) {
+		this.groupGid = groupGid;
 	}
 
 	public Map<Integer, StudyEntryPropertyData> getProperties() {

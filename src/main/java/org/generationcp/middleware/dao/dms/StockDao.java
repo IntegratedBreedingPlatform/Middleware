@@ -11,26 +11,16 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmStudyDto;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.StockModel;
-import org.generationcp.middleware.pojos.ims.LotStatus;
-import org.generationcp.middleware.pojos.ims.TransactionStatus;
-import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
-import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -39,12 +29,10 @@ import org.hibernate.criterion.CriteriaQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanResultTransformer;
-import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
@@ -53,8 +41,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -63,25 +49,8 @@ import java.util.stream.Collectors;
  */
 public class StockDao extends GenericDAO<StockModel, Integer> {
 
-	private static final String LOTS_COUNT = "lotCount";
-	private static final String UNIT = "unit";
-
 	private static final Logger LOG = LoggerFactory.getLogger(StockDao.class);
 	private static final String IN_STOCK_DAO = " in StockDao: ";
-	private static final Map<String, String> factorsFilterMap = new HashMap() {{
-		this.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
-		this.put(String.valueOf(TermId.DESIG.getId()), "s.name");
-		this.put(String.valueOf(TermId.ENTRY_NO.getId()), "uniquename");
-		this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()),
-			"EXISTS (SELECT 1 FROM ims_lot l1 WHERE l1.eid = s.dbxref_id and l1.status = " +
-				LotStatus.ACTIVE.getIntValue() + " HAVING COUNT(l1.lotid)");
-		this.put(String.valueOf(TermId.GID_UNIT.getId()), "EXISTS("
-			+ "select l1.eid, IF(COUNT(DISTINCT IFNULL(l1.scaleid, 'null')) = 1, IFNULL(c1.name, '-'), 'Mixed') as unit1 "
-			+ "             from  stock s1"
-			+ "                       left join ims_lot l1 on s1.dbxref_id = l1.eid and l1.status = " + LotStatus.ACTIVE.getIntValue()
-			+ "                       left join cvterm c1 ON c1.cvterm_id = l1.scaleid where s1.dbxref_id = s.dbxref_id group by l1.eid"
-			+ "             having unit1");
-	}};
 
 	public long countStudiesByGids(final List<Integer> gids) {
 
@@ -207,91 +176,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			final String errorMessage = "Error in deleteStocksForStudy=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
-		}
-	}
-
-	public long countFilteredStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter) {
-		try {
-			final StringBuilder sqlQuery = new StringBuilder("select COUNT(DISTINCT S.stock_id) as totalStudyEntries ");
-			sqlQuery.append(" FROM stock s "
-				+ "       LEFT JOIN ims_lot l ON l.eid = s.dbxref_id and l.status = " + LotStatus.ACTIVE.getIntValue()
-				+ "       LEFT JOIN cvterm c ON c.cvterm_id = l.scaleid "
-				+ "       LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id "
-				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id "
-				+ "WHERE s.project_id = :studyId ");
-
-			this.addFiltersToStudyEntries(sqlQuery, filter);
-			final SQLQuery query = this.getSession().createSQLQuery(sqlQuery.toString());
-			query.addScalar("totalStudyEntries", new IntegerType());
-			query.setParameter("studyId", studyId);
-
-			this.addQueryParamsToStudyEntries(query, filter);
-
-			return (Integer) query.uniqueResult();
-		} catch (final HibernateException e) {
-			final String errorMessage =
-				"Unexpected error in executing totalStudyEntries(studyId = %s)" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
-			LOG.error(errorMessage, e);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-	}
-
-	private void addQueryParamsToStudyEntries(final SQLQuery query, final StudyEntrySearchDto.Filter filter) {
-		if (filter != null) {
-			if (!CollectionUtils.isEmpty(filter.getEntryNumbers())) {
-				query.setParameterList("entryNumbers", filter.getEntryNumbers());
-			}
-			if (!CollectionUtils.isEmpty(filter.getEntryIds())) {
-				query.setParameterList("entryIds", filter.getEntryIds());
-			}
-
-			if (!CollectionUtils.isEmpty(filter.getFilteredValues())) {
-				final Map<String, List<String>> filteredValues = filter.getFilteredValues();
-				for (final Map.Entry<String, List<String>> entry : filteredValues.entrySet()) {
-					final String variableId = entry.getKey();
-					if (factorsFilterMap.get(variableId) == null) {
-						query.setParameter(variableId + "_Id", variableId);
-					}
-					final String finalId = variableId.replace("-", "");
-					query.setParameterList(finalId + "_values", filteredValues.get(variableId));
-				}
-			}
-
-			if (!CollectionUtils.isEmpty(filter.getFilteredTextValues())) {
-				final Map<String, String> filteredTextValues = filter.getFilteredTextValues();
-				for (final Map.Entry<String, String> entry : filteredTextValues.entrySet()) {
-					final String variableId = entry.getKey();
-					if (factorsFilterMap.get(variableId) == null) {
-						query.setParameter(variableId + "_Id", variableId);
-					}
-					final String finalId = variableId.replace("-", "");
-					query.setParameter(finalId + "_text", "%" + filteredTextValues.get(variableId) + "%");
-				}
-			}
-		}
-	}
-
-	private void addFiltersToStudyEntries(final StringBuilder sqlQuery, final StudyEntrySearchDto.Filter filter) {
-		if (filter != null) {
-			if (!CollectionUtils.isEmpty(filter.getEntryNumbers())) {
-				sqlQuery.append(" AND s.uniquename in (:entryNumbers)");
-			}
-			if (!CollectionUtils.isEmpty(filter.getEntryIds())) {
-				sqlQuery.append(" AND s.stock_id in (:entryIds)");
-			}
-
-			if (!CollectionUtils.isEmpty(filter.getFilteredValues())) {
-				// Perform IN operation on variable values
-				this.appendVariableIdAndOperationToFilterQuery(sqlQuery, filter,
-					filter.getFilteredValues().keySet(), false);
-			}
-
-			if (!CollectionUtils.isEmpty(filter.getFilteredTextValues())) {
-				// Perform LIKE operation on variable value
-				this.appendVariableIdAndOperationToFilterQuery(sqlQuery, filter,
-					filter.getFilteredTextValues().keySet(), true);
-			}
-
 		}
 	}
 
@@ -474,199 +358,6 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 			final String errorMessage = "Error in getNextEntryNumber for studyId=" + studyId + StockDao.IN_STOCK_DAO + e.getMessage();
 			LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
-		}
-	}
-
-	public List<StudyEntryDto> getStudyEntries(final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
-		try {
-			final StringBuilder sqlQuery = new StringBuilder("SELECT s.stock_id AS entryId, "
-				+ "  CONVERT(S.uniquename, UNSIGNED INT) AS entry_no, "
-				+ "  s.dbxref_id AS gid, "
-				+ "  s.name AS designation, "
-				+ "  COUNT(DISTINCT (l.lotid)) AS lotCount, "
-				+ "  IF(COUNT(DISTINCT IFNULL(l.scaleid, 'null')) = 1, IFNULL((SELECT SUM(CASE WHEN imt.trnstat = "
-				+ TransactionStatus.CONFIRMED.getIntValue()
-				+ "  OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue()
-				+ " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) "
-				+ "  FROM ims_transaction imt INNER JOIN ims_lot lo ON lo.lotid = imt.lotid WHERE lo.eid = l.eid),0), 'Mixed') AS availableBalance, "
-				+ "  IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, IFNULL(c.name,'-'), 'Mixed') AS unit, "
-				+ "  s.cross_value as crossValue ");
-
-			final String entryClause = ",MAX(IF(cvterm_variable.name = '%1$s', sp.value, NULL)) AS '%1$s',"
-				+ " MAX(IF(cvterm_variable.name = '%1$s', sp.stockprop_id, NULL)) AS '%1$s_PropertyId',"
-				+ " MAX(IF(cvterm_variable.name = '%1$s', sp.type_id, NULL)) AS '%1$s_variableId' ,"
-				+ " MAX(IF(cvterm_variable.name = '%1$s', sp.%2$s, NULL)) AS '%1$s_value' ";
-
-			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
-				final String entryName = entryDescriptor.getName();
-				final String valueColumnReference =
-					(entryDescriptor.getDataType().equals(DataType.CATEGORICAL_VARIABLE.getName())) ? "cvalue_id" : "value";
-				sqlQuery.append(String.format(entryClause, entryName, valueColumnReference));
-			}
-
-			sqlQuery.append(" FROM stock s "
-				+ "       LEFT JOIN ims_lot l ON l.eid = s.dbxref_id and l.status = " + LotStatus.ACTIVE.getIntValue()
-				+ "       LEFT JOIN cvterm c ON c.cvterm_id = l.scaleid "
-				+ "       LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id "
-				+ "       LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id "
-				+ "WHERE s.project_id = :studyId ");
-
-			this.addFiltersToStudyEntries(sqlQuery, studyEntrySearchDto.getFilter());
-
-			sqlQuery.append(" GROUP BY s.stock_id ");
-
-			this.addOrder(sqlQuery, pageable);
-
-			final SQLQuery query = this.getSession().createSQLQuery(sqlQuery.toString());
-			query.addScalar("entryId", new IntegerType());
-			query.addScalar("entry_no", new IntegerType());
-			query.addScalar("gid", new IntegerType());
-			query.addScalar("designation", new StringType());
-			query.addScalar("lotCount", new IntegerType());
-			query.addScalar("availableBalance", new StringType());
-			query.addScalar("unit", new StringType());
-			query.addScalar("crossValue", new StringType());
-			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
-				final String entryName = entryDescriptor.getName();
-				query.addScalar(entryName, new StringType());
-				query.addScalar(entryName + "_propertyId", new IntegerType());
-				query.addScalar(entryName + "_variableId", new IntegerType());
-				query.addScalar(entryName + "_value", new StringType());
-			}
-
-			query.setParameter("studyId", studyEntrySearchDto.getStudyId());
-			this.addQueryParamsToStudyEntries(query, studyEntrySearchDto.getFilter());
-
-			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
-			GenericDAO.addPaginationToSQLQuery(query, pageable);
-
-			final List<Map<String, Object>> results = query.list();
-			final List<StudyEntryDto> studyEntryDtos = new ArrayList<>();
-			for (final Map<String, Object> row : results) {
-				final Integer entryId = (Integer) row.get("entryId");
-				final Integer entryNumber = (Integer) row.get("entry_no");
-				final Integer gid = (Integer) row.get("gid");
-				final String designation = (String) row.get("designation");
-				final Integer lotCount = (Integer) row.get("lotCount");
-				final String availableBalance = (String) row.get("availableBalance");
-				final String unit = (String) row.get("unit");
-				final String cross = (String) row.get("crossValue");
-
-				final StudyEntryDto studyEntryDto =
-					new StudyEntryDto(entryId, entryNumber, gid, designation, lotCount, availableBalance, unit, cross);
-				final Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
-				for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
-					final String value;
-					final Integer categoricalValueId;
-					if (entryDescriptor.getDataType().equals(DataType.CATEGORICAL_VARIABLE.getName())) {
-						value = (String) row.get(entryDescriptor.getName());
-						categoricalValueId = row.get(entryDescriptor.getName() + "_value") != null ?
-							Integer.valueOf((String) row.get(entryDescriptor.getName() + "_value")) : null;
-					} else {
-						value = (String) row.get(entryDescriptor.getName() + "_value");
-						categoricalValueId = null;
-					}
-
-					final StudyEntryPropertyData studyEntryPropertyData =
-						new StudyEntryPropertyData((Integer) row.get(entryDescriptor.getName() + "_propertyId"),
-							(Integer) row.get(entryDescriptor.getName() + "_variableId"),
-							value,
-							categoricalValueId);
-					properties.put(entryDescriptor.getTermId(), studyEntryPropertyData);
-				}
-				//These elements should not be listed as germplasm descriptors, this is a way to match values between column
-				//and table cells. In the near future this block should be removed
-				this.addFixedVariableIfPresent(TermId.GID, String.valueOf(studyEntryDto.getGid()), studyEntrySearchDto, properties);
-				this.addFixedVariableIfPresent(TermId.DESIG, studyEntryDto.getDesignation(), studyEntrySearchDto, properties);
-				this.addFixedVariableIfPresent(TermId.ENTRY_NO, String.valueOf(studyEntryDto.getEntryNumber()), studyEntrySearchDto,
-					properties);
-
-				studyEntryDto.setProperties(properties);
-				studyEntryDtos.add(studyEntryDto);
-			}
-			return studyEntryDtos;
-
-		} catch (final HibernateException e) {
-			final String errorMessage =
-				"Error at getStudyEntries=" + studyEntrySearchDto.getStudyId() + StockDao.IN_STOCK_DAO + e.getMessage();
-			LOG.error(errorMessage, e);
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-	}
-
-	private void addFixedVariableIfPresent(final TermId termId, final String value, final StudyEntrySearchDto studyEntrySearchDto,
-		final Map<Integer, StudyEntryPropertyData> variables) {
-		final Optional<MeasurementVariable>
-			measurementVariable =
-			studyEntrySearchDto.getFixedEntryDescriptors().stream().filter(v -> v.getTermId() == termId.getId())
-				.findFirst();
-		if (measurementVariable.isPresent()) {
-			variables.put(
-				measurementVariable.get().getTermId(), new StudyEntryPropertyData(value));
-		}
-	}
-
-	private void appendVariableIdAndOperationToFilterQuery(final StringBuilder sql,
-		final StudyEntrySearchDto.Filter filter,
-		final Set<String> variableIds, final boolean performLikeOperation) {
-		for (final String variableId : variableIds) {
-			final String variableTypeString = filter.getVariableTypeMap().get(variableId);
-			this.applyFactorsFilter(sql, variableId, variableTypeString, performLikeOperation);
-		}
-	}
-
-	private void applyFactorsFilter(final StringBuilder sql, final String variableId, final String variableType,
-		final boolean performLikeOperation) {
-		final String filterClause = factorsFilterMap.get(variableId);
-		if (filterClause != null) {
-			final String finalId = variableId.replace("-", "");
-			final String matchClause = performLikeOperation ? " LIKE :" + finalId + "_text " : " IN (:" + finalId + "_values) ";
-			sql.append(" AND ").append(filterClause).append(matchClause);
-			if (variableId.equalsIgnoreCase(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId())) ||
-				variableId.equalsIgnoreCase(String.valueOf(TermId.GID_UNIT.getId())))
-				sql.append(") ");
-			return;
-		}
-
-		// Otherwise, look in "props" tables
-		// If doing text searching, perform LIKE operation. Otherwise perform value "IN" operation
-		if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
-			// IF searching by list of values, search for the values in:
-			// 1)cvterm.name (for categorical variables) or
-			// 2)perform IN operation on stockprop.value
-			// Otherwise, search the value like a text by LIKE operation
-			final String stockMatchClause = performLikeOperation ? "sp.value LIKE :" + variableId + "_text " :
-				" (cvt.name IN (:" + variableId + "_values) OR sp.value IN (:" + variableId + "_values ))";
-			sql.append(" AND EXISTS ( SELECT 1 FROM stockprop sp "
-				+ "LEFT JOIN cvterm cvt ON cvt.cvterm_id = sp.value "
-				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId
-				+ "_Id AND ").append(stockMatchClause).append(" )");
-		}
-	}
-
-	private void addOrder(final StringBuilder sql, final Pageable pageable) {
-
-		if (Objects.isNull(pageable) || Objects.isNull(pageable.getSort()) || Objects.isNull(sql)) {
-			return;
-		}
-
-		final String sortBy = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getProperty() : "";
-		final String sortOrder = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getDirection().name() : "";
-		final String direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
-
-		Optional<String> orderColumn = Optional.empty();
-		if (NumberUtils.isNumber(sortBy)) {
-			if (String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()).equalsIgnoreCase(sortBy)) {
-				orderColumn = Optional.of(LOTS_COUNT);
-			} else if (String.valueOf(TermId.GID_UNIT.getId()).equalsIgnoreCase(sortBy)) {
-				orderColumn = Optional.of(UNIT);
-			}
-		} else if (StringUtils.isNotBlank(sortBy)) {
-			orderColumn = Optional.of(sortBy);
-		}
-
-		if (orderColumn.isPresent()) {
-			sql.append(" ORDER BY `" + orderColumn.get() + "` " + direction);
 		}
 	}
 

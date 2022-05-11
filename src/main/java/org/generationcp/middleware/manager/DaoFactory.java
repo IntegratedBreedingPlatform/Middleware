@@ -91,6 +91,7 @@ import org.generationcp.middleware.dao.oms.CvTermPropertyDao;
 import org.generationcp.middleware.dao.oms.CvTermSynonymDao;
 import org.generationcp.middleware.dao.oms.StandardVariableDao;
 import org.generationcp.middleware.dao.oms.VariableOverridesDao;
+import org.generationcp.middleware.dao.study.StudyEntrySearchDAO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 
 public class DaoFactory {
@@ -621,6 +622,10 @@ public class DaoFactory {
 
 	public GermplasmListDataDefaultViewDAO getGermplasmListDataDefaultViewDAO() {
 		return new GermplasmListDataDefaultViewDAO(this.sessionProvider.getSession());
+	}
+
+	public StudyEntrySearchDAO getStudyEntrySearchDAO() {
+		return new StudyEntrySearchDAO(this.sessionProvider.getSession());
 	}
 
 }
