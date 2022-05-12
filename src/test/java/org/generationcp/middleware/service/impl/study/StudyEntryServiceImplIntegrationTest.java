@@ -335,7 +335,6 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 	private void verifyStudyEntryDetails(final Integer gid, final int index, final StudyEntryDto dto) {
 		Assert.assertEquals(index, dto.getEntryNumber().intValue());
 		Assert.assertEquals(GERMPLASM_PREFERRED_NAME_PREFIX + index, dto.getDesignation());
-		Assert.assertEquals(SEEDSOURCE + index, dto.getProperties().get(TermId.SEED_SOURCE.getId()).getValue());
 		Assert.assertEquals(CROSS + index, dto.getCross());
 		Assert.assertEquals(gid, dto.getGid());
 		// TODO: assert entry code from properties
@@ -369,9 +368,6 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 			.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(),
 				null, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()));
 		studyEntryDto.getProperties()
-			.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(),
-				SEEDSOURCE + i, null));
-		studyEntryDto.getProperties()
 			.put(TermId.ENTRY_CODE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_CODE.getId(),
 				ENTRYCODE + gid, null));
 
@@ -401,9 +397,6 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 			new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), "", 2, TermId.DESIG.getId(), "DESIG");
 		final ProjectProperty entryNoProp =
 			new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), "", 3, TermId.ENTRY_NO.getId(), "ENTRY_NO");
-		final ProjectProperty seedSourceProp =
-			new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), "", 4, TermId.SEED_SOURCE.getId(),
-				"SEED_SOURCE");
 		final ProjectProperty crossProp =
 			new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), "", 5, TermId.CROSS.getId(), "CROSS");
 		final ProjectProperty entryTypeProp =
@@ -412,7 +405,6 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getProjectPropertyDAO().save(gidProp);
 		this.daoFactory.getProjectPropertyDAO().save(desigProp);
 		this.daoFactory.getProjectPropertyDAO().save(entryNoProp);
-		this.daoFactory.getProjectPropertyDAO().save(seedSourceProp);
 		this.daoFactory.getProjectPropertyDAO().save(crossProp);
 		this.daoFactory.getProjectPropertyDAO().save(entryTypeProp);
 

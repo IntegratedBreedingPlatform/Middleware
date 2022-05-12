@@ -39,9 +39,6 @@ public enum NonEditableFactors {
 	/** The plot no. */
 	PLOT_NO(TermId.PLOT_NO.getId()),
 
-	/** The seed source. */
-	SEED_SOURCE(TermId.SEED_SOURCE.getId()),
-
 	/** The column no. */
 	COLUMN_NO(TermId.COLUMN_NO.getId()),
 

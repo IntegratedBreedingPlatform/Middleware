@@ -376,12 +376,6 @@ public class WorkbookTestDataInitializer {
 				WorkbookTestDataInitializer.CROSS_HISTORY, WorkbookTestDataInitializer.CHAR, WorkbookTestDataInitializer.STUDY,
 				WorkbookTestDataInitializer.ENTRY, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.GERMPLASM, false));
 
-		factors.add(
-				WorkbookTestDataInitializer.createMeasurementVariable(TermId.SEED_SOURCE.getId(), WorkbookTestDataInitializer.SEED_SOURCE,
-						"The seed source of the germplasm", WorkbookTestDataInitializer.TEXT, WorkbookTestDataInitializer.SELECTED,
-						WorkbookTestDataInitializer.SEED_SOURCE, WorkbookTestDataInitializer.CHAR, WorkbookTestDataInitializer.STUDY,
-						WorkbookTestDataInitializer.ENTRY, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.GERMPLASM, false));
-
 		factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.PLOT_NO.getId(), WorkbookTestDataInitializer.PLOT,
 				"Plot number ", WorkbookTestDataInitializer.NESTED_NUMBER, WorkbookTestDataInitializer.ENUMERATED,
 				WorkbookTestDataInitializer.FIELD_PLOT, WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.NUMERIC_VALUE,
@@ -480,8 +474,6 @@ public class WorkbookTestDataInitializer {
 					WorkbookTestDataInitializer.G_NAMES[i], TermId.DESIG.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.CROSS, "-", TermId.CROSS.getId(),
 					workbook.getFactors()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.SOURCE, "-",
-					TermId.SEED_SOURCE.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.PLOT, String.valueOf(i),
 					TermId.PLOT_NO.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.OBS_UNIT_ID, "PLOT010203P"+ i,
