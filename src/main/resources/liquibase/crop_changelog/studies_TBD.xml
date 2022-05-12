@@ -279,4 +279,36 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="cuenyad" id="studies-TBD-19">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8360
+            </sqlCheck>
+        </preConditions>
+        <comment>Replace the SEED_SOURCE variable by ENTRY_SOURCE IN projectprop AND stockprop</comment>
+        <sql dbms="mysql" splitStatements="true">
+			# Replace SEED_SOURCE variable by ENTRY_SOURCE
+			UPDATE projectprop SET variable_id = ( SELECT cvterm_id FROM CVTERM WHERE NAME ='ENTRY_SOURCE' ), ALIAS = 'ENTRY_SOURCE', TYPE_ID = 1815 WHERE variable_id = 8360;
+			# Update cvterm_id 8360 from (SEED_SOURCE) to ENTRY_SOURCE cvterm_id
+			UPDATE stockprop SET TYPE_ID = ( SELECT cvterm_id FROM CVTERM WHERE NAME ='ENTRY_SOURCE' )
+			                 WHERE TYPE_ID = 8360;
+        </sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="studies-TBD-20">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) from cvterm where cvterm_id = 8360 and cv_id = 1040;
+				</sqlCheck>
+		</preConditions>
+		<comment>
+			Remove SEED_SOURCE variable from cvterm table and from cvterm_relationship table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM cvterm where cvterm_id = 8360;
+			DELETE FROM cvterm_relationship where subject_id = 8360;
+			DELETE FROM cvtermprop where cvterm_id = 8360;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
