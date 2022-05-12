@@ -57,6 +57,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final String ENVIRONMENT_COLUMN_NAME_SUFFIX = "_ENVIRONMENT";
 	private static final List<String> EXP_PROPS_VAR_TYPES =
 		Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.name(), VariableType.TREATMENT_FACTOR.name());
+	private static final String GERMPLASM_JOIN = " INNER JOIN germplsm g on g.gid = s.dbxref_id ";
 
 	static {
 		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
@@ -72,6 +73,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "   inner join ims_lot lot on lot.lotid = tr.lotid \n"
 			+ "    WHERE ndt.nd_experiment_id = nde.nd_experiment_id \n"
 			+ "     and lot.stock_id");
+		factorsFilterMap.put(String.valueOf(TermId.GROUPGID.getId()), "g.mgid");
 	}
 
 	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
@@ -138,10 +140,14 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id "
 				+ "    inner join stock s ON s.stock_id = nde.stock_id "
 				// FIXME won't work for sub-sub-obs
-				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) "
-				//
-				+ " where "
-				+ "	p.project_id = :datasetId ");
+				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
+
+			if (filter != null && !CollectionUtils.isEmpty(filter.getFilteredValues())
+				&& filter.getFilteredValues().keySet().contains(String.valueOf(TermId.GROUPGID.getId()))) {
+				sql.append(GERMPLASM_JOIN);
+			}
+
+			sql.append(" where p.project_id = :datasetId ");
 
 			if (instanceId != null) {
 				sql.append(" and gl.nd_geolocation_id = :instanceId ");
@@ -565,7 +571,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			final String germplasmDescriptorClauseFormat =
 				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND %s) AS '%s'";
 			for (final String gpFactor : searchDto.getGenericGermplasmDescriptors()) {
-				if (noFilterVariables || filterColumns.contains(gpFactor)) {
+				if ((noFilterVariables || filterColumns.contains(gpFactor)) && !gpFactor.equals(TermId.GROUPGID.name())) {
 					final String cvtermQuery = String.format(germplasmDescriptorClauseFormat, "spropcvt.name = '"+gpFactor+"'", gpFactor);
 					columns.add(cvtermQuery);
 				}
@@ -621,6 +627,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ " )) AS " + (noFilterVariables ? OBSERVATION_UNIT_NO : observationUnitNoName));
 		}
 
+		if (this.hasGroupGidDescriptor(searchDto.getGenericGermplasmDescriptors())) {
+			columns.add(" g.mgid AS " + TermId.GROUPGID.name());
+		}
+
 		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT  ");
 
 		sql.append(Joiner.on(", ").join(columns));
@@ -661,9 +671,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "            INNER JOIN nd_experiment parent ON child.parent_id = parent.nd_experiment_id "
 			+ "     GROUP BY parent.nd_experiment_id) child_sample_count ON child_sample_count.nd_experiment_id = nde.nd_experiment_id "
 			// FIXME won't work for sub-sub-obs
-			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) "
-			//
-			+ " WHERE p.project_id = :datasetId ");
+			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
+
+		if (this.hasGroupGidDescriptor(searchDto.getGenericGermplasmDescriptors())) {
+			sql.append(GERMPLASM_JOIN);
+		}
+
+		sql.append(" WHERE p.project_id = :datasetId ");
 
 		if (searchDto.getInstanceId() != null) {
 			sql.append(" AND gl.nd_geolocation_id = :instanceId");
@@ -1197,5 +1211,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		return result;
 	}
 
+
+	private boolean hasGroupGidDescriptor(final List<String> genericGermplasmDescriptors) {
+		return !CollectionUtils.isEmpty(genericGermplasmDescriptors) && genericGermplasmDescriptors.contains(TermId.GROUPGID.name());
+	}
 
 }
