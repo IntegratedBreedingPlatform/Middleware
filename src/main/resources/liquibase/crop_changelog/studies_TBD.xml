@@ -323,4 +323,16 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="cuenyad" id="studies-TBD-21">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(1) > 0 FROM stockprop WHERE type_id = 8378;
+            </sqlCheck>
+        </preConditions>
+        <comment>Delete values of 'SOURCE' variable from stockprop table</comment>
+        <sql dbms="mysql" splitStatements="true">
+             DELETE FROM stockprop where type_id = 8378;
+        </sql>
+	</changeSet>
+
 </databaseChangeLog>
