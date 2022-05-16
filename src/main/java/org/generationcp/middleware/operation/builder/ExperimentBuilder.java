@@ -322,6 +322,15 @@ public class ExperimentBuilder extends Builder {
 				}
 			}
 		}
+
+		final DMSVariableType groupGidVariableType = variableTypes.findByLocalName(TermId.GROUPGID.name());
+		final DMSVariableType crossVariableType = variableTypes.findByLocalName(TermId.CROSS.name());
+		if (groupGidVariableType != null) {
+			factors.add(new Variable(groupGidVariableType, experimentModel.getStock().getGermplasm().getMgid()));
+		}
+		if (crossVariableType != null) {
+			factors.add(new Variable(crossVariableType, experimentModel.getStock().getCross()));
+		}
 	}
 
 	protected Variable createGermplasmFactor(final StockModel stockModel, final DMSVariableType variableType) {
