@@ -58,6 +58,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final List<String> EXP_PROPS_VAR_TYPES =
 		Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.name(), VariableType.TREATMENT_FACTOR.name());
 	private static final String GERMPLASM_JOIN = " INNER JOIN germplsm g on g.gid = s.dbxref_id ";
+	private static final String IMMEDIATE_SOURCE_NAME_JOIN = " LEFT JOIN names immediateSource  ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
 
 	static {
 		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
@@ -573,13 +574,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			for (final String gpFactor : searchDto.getGenericGermplasmDescriptors()) {
 				if ((noFilterVariables || filterColumns.contains(gpFactor)) && !gpFactor.equals(TermId.GROUPGID.name())) {
 					String cvtermQuery = null;
-					if (TermId.SOURCE.name().equals(gpFactor)) {
+					if (TermId.IMMEDIATE_SOURCE_NAME.name().equals(gpFactor)) {
 						cvtermQuery = " CASE \n"
 							+ "                WHEN g.gnpgs = -1 \n"
 							+ "                AND g.gpid2 IS NOT NULL  \n"
 							+ "                AND g.gpid2 <> 0 THEN immediateSource.nval \n"
 							+ "                ELSE '-' \n"
-							+ "            END AS 'SOURCE' ";
+							+ "            END AS " + TermId.IMMEDIATE_SOURCE_NAME.name() + " ";
 					} else {
 						cvtermQuery = String.format(germplasmDescriptorClauseFormat, "spropcvt.name = '" + gpFactor + "'", gpFactor);
 					}
@@ -687,11 +688,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			sql.append(GERMPLASM_JOIN);
 		}
 
-		if (searchDto.getGenericGermplasmDescriptors().contains(TermId.SOURCE.name())) {
+		if (this.hasDescriptor(searchDto.getGenericGermplasmDescriptors(), TermId.IMMEDIATE_SOURCE_NAME)) {
 			if (!this.hasGroupGidDescriptor(searchDto.getGenericGermplasmDescriptors())) {
-				sql.append(" INNER JOIN germplsm g  ON g.gid = s.dbxref_id\n");
+				sql.append(GERMPLASM_JOIN);
 			}
-			sql.append(" LEFT JOIN names immediateSource  ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ");
+			sql.append(IMMEDIATE_SOURCE_NAME_JOIN);
 		}
 
 		sql.append(" WHERE p.project_id = :datasetId ");
@@ -1233,4 +1234,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		return !CollectionUtils.isEmpty(genericGermplasmDescriptors) && genericGermplasmDescriptors.contains(TermId.GROUPGID.name());
 	}
 
+	private boolean hasDescriptor(final List<String> genericGermplasmDescriptors, TermId termId) {
+		return !CollectionUtils.isEmpty(genericGermplasmDescriptors) && genericGermplasmDescriptors.contains(termId.name());
+	}
 }

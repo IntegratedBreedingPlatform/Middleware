@@ -79,7 +79,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	private static final String STOCK_PROP_JOIN = "LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id";
 	private static final String CVTERM_VARIABLE_JOIN = "LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id";
 	private static final String GERMPLASM_JOIN = "INNER JOIN germplsm g ON g.gid = s.dbxref_id";
-	private static final String SOURCE_JOIN = " LEFT JOIN names immediateSource ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
+	private static final String IMMEDIATE_SOURCE_NAME_JOIN = " LEFT JOIN names immediateSource ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
 
 	public StudyEntrySearchDAO(final Session session) {
 		super(session);
@@ -191,7 +191,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	private void addSourceScalar(final List<Scalar> scalars, final List<String> selectClause, final Set<String> joins, final List<MeasurementVariable> entryDescriptors) {
 		if (!CollectionUtils.isEmpty(entryDescriptors)) {
 			entryDescriptors.stream()
-				.filter(measurementVariable -> measurementVariable.getTermId() == TermId.SOURCE.getId())
+				.filter(measurementVariable -> measurementVariable.getTermId() == TermId.IMMEDIATE_SOURCE_NAME.getId())
 				.findFirst()
 				.ifPresent(measurementVariable -> {
 					selectClause.add(this.addSelectExpression(scalars,
@@ -200,12 +200,12 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 						+ "		    AND g.gpid2 IS NOT NULL\n"
 						+ "			AND g.gpid2 <> 0 THEN immediateSource.nval\n"
 						+ "	ELSE '-' END ) "
-						+ "", TermId.SOURCE.name(), StringType.INSTANCE));
+						+ "", TermId.IMMEDIATE_SOURCE_NAME.name(), StringType.INSTANCE));
 
 					if (!joins.contains(GERMPLASM_JOIN)) {
 						joins.add(GERMPLASM_JOIN);
 					}
-					joins.add(SOURCE_JOIN);
+					joins.add(IMMEDIATE_SOURCE_NAME_JOIN);
 				});
 		}
 	}
@@ -392,7 +392,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			this.addFixedVariableIfPresent(TermId.GID, String.valueOf(studyEntryDto.getGid()), studyEntrySearchDto, properties);
 			this.addFixedVariableIfPresent(TermId.DESIG, studyEntryDto.getDesignation(), studyEntrySearchDto, properties);
 			this.addFixedVariableIfPresent(TermId.ENTRY_NO, String.valueOf(studyEntryDto.getEntryNumber()), studyEntrySearchDto, properties);
-			this.addFixedVariableIfPresent(TermId.SOURCE, String.valueOf(row.get(TermId.SOURCE.name())), studyEntrySearchDto, properties);
+			this.addFixedVariableIfPresent(TermId.IMMEDIATE_SOURCE_NAME, String.valueOf(row.get(TermId.IMMEDIATE_SOURCE_NAME.name())), studyEntrySearchDto, properties);
 			studyEntryDto.setProperties(properties);
 			return studyEntryDto;
 		}).collect(Collectors.toList());
