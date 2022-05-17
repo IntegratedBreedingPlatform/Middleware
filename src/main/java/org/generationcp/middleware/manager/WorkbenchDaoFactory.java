@@ -1,5 +1,6 @@
 package org.generationcp.middleware.manager;
 
+import org.generationcp.middleware.dao.CropGenotypingParameterDAO;
 import org.generationcp.middleware.dao.CropPersonDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.PermissionDAO;
@@ -77,6 +78,12 @@ public class WorkbenchDaoFactory {
 		final CropTypeDAO cropTypeDAO = new CropTypeDAO();
 		cropTypeDAO.setSession(this.sessionProvider.getSession());
 		return cropTypeDAO;
+	}
+
+	public CropGenotypingParameterDAO getCropGenotyingParameterDAO(final String secretPassphrase) {
+		final CropGenotypingParameterDAO cropGenotypingParameterDAO = new CropGenotypingParameterDAO(secretPassphrase);
+		cropGenotypingParameterDAO.setSession(this.sessionProvider.getSession());
+		return cropGenotypingParameterDAO;
 	}
 
 	public ProjectActivityDAO getProjectActivityDAO() {

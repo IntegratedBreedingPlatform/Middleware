@@ -1,0 +1,33 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="aldrin" id="v21.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="crop_genotyping_parameter"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create table 'crop_genotyping_parameter'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `crop_genotyping_parameter` (
+			  `crop_name` VARCHAR(32) NOT NULL,
+			  `endpoint` VARCHAR(500) NULL,
+			  `token_endpoint` VARCHAR(500) NULL,
+			  `username` VARCHAR(45) NULL,
+			  `password` BLOB NULL,
+			  `program_id` VARCHAR(45) NULL,
+			  PRIMARY KEY (`crop_name`),
+			  CONSTRAINT `crop_genotyping_parameter_workbench_crop_fk`
+				FOREIGN KEY (`crop_name`)
+				REFERENCES `workbench`.`workbench_crop` (`crop_name`)
+				ON DELETE NO ACTION
+				ON UPDATE NO ACTION);
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
