@@ -169,7 +169,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		// Add germplasm list entry details as project properties
 		final AtomicInteger projectPropertyInitialRank = new AtomicInteger(plotDataDataset.getNextPropertyRank());
-		final List<Variable> germplasmListVariables = this.germplasmListService.getGermplasmListVariables(null, listId, null);
+		final List<Variable> germplasmListVariables = this.germplasmListService.getGermplasmListVariables(null, listId, VariableType.ENTRY_DETAIL.getId());
 		final List<ProjectProperty> entryDetailsProjectProperties = germplasmListVariables.stream()
 			.filter(variable -> TermId.ENTRY_TYPE.getId() != variable.getId() && TermId.ENTRY_NO.getId() != variable.getId())
 			.map(variable -> new ProjectProperty(plotDataDataset, VariableType.ENTRY_DETAIL.getId(), null,
