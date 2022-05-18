@@ -1,0 +1,25 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="aldrin" id="v21.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1) FROM methods WHERE mtype = 'GEN' AND (prefix IS NULL OR TRIM(prefix) = '');
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set the default prefix value ('IB') of GENERATIVE breeding methods with empty prefix
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE methods
+			SET prefix = 'IB'
+			WHERE mtype = 'GEN' AND (prefix IS NULL OR TRIM(prefix) = '');
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>

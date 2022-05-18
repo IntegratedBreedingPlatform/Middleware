@@ -18,7 +18,6 @@ import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -93,11 +92,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ " FROM ims_lot i LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9"
 		+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND act.trnqty < 0 AND i.eid IN (:gids)" + "GROUP BY i.lotid ORDER BY lotid";
 
-	private static final String GET_LOT_SCALE_FOR_GERMPLSMS = "select  lot.eid, lot.scaleid, cv.name from ims_lot lot "
-		+ " LEFT JOIN cvterm_relationship cvr ON cvr.subject_id = lot.scaleid AND cvr.type_id =" + TermId.HAS_SCALE.getId()
-		+ " LEFT JOIN cvterm cv ON cv.cvterm_id = cvr.object_id "
-		+ " where lot.eid in (:gids) AND lot.etype = 'GERMPLSM' AND lot.status <> 9 ORDER BY lot.eid";
-
 	@SuppressWarnings("unchecked")
 	public List<Lot> getByEntityType(final String type, final int start, final int numOfRows) throws MiddlewareQueryException {
 		try {
@@ -123,33 +117,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 		}
 		return new ArrayList<>();
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<Integer, BigInteger> countLotsWithAvailableBalance(final List<Integer> gids) throws MiddlewareQueryException {
-		final Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
-
-		try {
-			final String sql = "SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED) FROM ( "
-				+ "SELECT i.lotid, i.eid AS entity_id, " + "   SUM(trnqty) AS avail_bal " + "  FROM ims_lot i "
-				+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-				+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
-				+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
-
-			final Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
-			final List<Object[]> result = query.list();
-			for (final Object[] row : result) {
-				final Integer gid = (Integer) row[0];
-				final BigInteger count = (BigInteger) row[1];
-
-				lotCounts.put(gid, count);
-			}
-
-		} catch (final Exception e) {
-			this.logAndThrowException("Error at countLotsWithAvailableBalance=" + gids + AT_LOT_DAO + e.getMessage(), e);
-		}
-
-		return lotCounts;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -257,28 +224,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 
 		return lotStatusCounts;
-	}
-
-	public List<Object[]> retrieveLotScalesForGermplasms(final List<Integer> gids) throws MiddlewareQueryException {
-		final List<Object[]> lotScalesForGermplasm = new ArrayList<>();
-
-		try {
-			final String sql = LotDAO.GET_LOT_SCALE_FOR_GERMPLSMS;
-
-			final Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
-			final List<Object[]> result = query.list();
-			for (final Object[] row : result) {
-				final Integer gid = (Integer) row[0];
-				final Integer scaleId = (Integer) row[1];
-				final String scaleName = (String) row[2];
-				lotScalesForGermplasm.add(new Object[] {gid, scaleId, scaleName});
-			}
-
-		} catch (final Exception e) {
-			this.logAndThrowException("Error at retrieveLotScalesForGermplasms for GIDss = " + gids + AT_LOT_DAO + e.getMessage(), e);
-		}
-
-		return lotScalesForGermplasm;
 	}
 
 	public Set<Integer> getGermplasmsWithOpenLots(final List<Integer> gids) {
