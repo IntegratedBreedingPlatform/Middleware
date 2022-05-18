@@ -293,8 +293,6 @@ public interface UserService {
 
 	List<WorkbenchUser> getUsersWithRole(int id);
 
-	List<Integer> getActiveUserIDsWithAccessToTheProgram(Long projectId);
-
 	List<ProgramMemberDto> getProgramMembers(String programUUID, ProgramMembersSearchRequest userSearchRequest, Pageable pageable);
 
 	long countAllProgramMembers(String programUUID, ProgramMembersSearchRequest userSearchRequest);

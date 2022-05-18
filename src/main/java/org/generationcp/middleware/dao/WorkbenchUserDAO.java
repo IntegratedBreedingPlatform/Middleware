@@ -337,22 +337,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
 	}
 
-	public List<Integer> getActiveUserIDsWithAccessToTheProject(final Long projectId) {
-		final List<Integer> userIDs = new ArrayList<>();
-		try {
-			if (projectId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_ACTIVE_USER_IDS_WITH_ACCESS_TO_A_PROGRAM);
-				query.setParameter("projectId", projectId);
-				return query.list();
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error in getActiveUserIDsWithAccessToTheProject(projectId=" + projectId + ") query from WorkbenchUserDAO: "
-					+ e.getMessage(), e);
-		}
-		return userIDs;
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
 		final List<WorkbenchUser> users = new ArrayList<>();
