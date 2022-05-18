@@ -589,4 +589,5 @@ public interface FieldbookService {
 	 */
 	void saveWorkbookVariablesAndObservations(final Workbook workbook);
 
+	void deleteAllFieldMapsByTrialInstanceIds(List<Integer> geolocationId);
 }

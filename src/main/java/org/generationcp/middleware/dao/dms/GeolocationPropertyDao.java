@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link GeolocationProperty}.
@@ -76,6 +77,41 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
 				"Error at getValueOfTrialInstance=" + datasetId + " query on GeolocationPropertyDao: " + e.getMessage(), e);
+		}
+	}
+
+	public List<Integer> deleteBlockPropertiesByGeolocationId(final List<Integer> geolocationIds) {
+		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+
+			final String condition = "FROM nd_geolocationprop ngp "
+				+ "WHERE ngp.nd_geolocation_id IN (:geolocationIds) AND ngp.type_id = (:variableIds) ";
+			final StringBuilder selectSql = new StringBuilder().append("SELECT ngp.value "
+				+ condition);
+			final StringBuilder deleteSql = new StringBuilder().append("Delete ngp.* "
+				+ condition);
+
+			SQLQuery sqlQuery1 = this.getSession().createSQLQuery(selectSql.toString());
+			sqlQuery1.setParameterList("geolocationIds", geolocationIds);
+			sqlQuery1.setParameter("variableIds", TermId.BLOCK_ID.getId());
+
+			final List<Integer> blockIds = sqlQuery1.list();
+
+			sqlQuery1 = this.getSession().createSQLQuery(deleteSql.toString());
+			sqlQuery1.setParameterList("geolocationIds", geolocationIds);
+			sqlQuery1.setParameter("variableIds", TermId.BLOCK_ID.getId());
+			sqlQuery1.executeUpdate();
+
+			return blockIds;
+		} catch (final HibernateException e) {
+			final String message = "Error in deletePropertiesByGeolocationId("
+				+ geolocationIds.stream().map(id -> id.toString()).collect(Collectors.joining(","))
+				+ ") in GeolocationPropertyDao: " + e.getMessage();
+			GeolocationPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 

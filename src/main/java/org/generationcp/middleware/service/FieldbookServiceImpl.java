@@ -27,6 +27,7 @@ import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -67,6 +68,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -108,6 +110,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	private DaoFactory daoFactory;
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
+	private static final List<Integer> FIELDMAP_TERM_IDS =
+		Arrays.asList(TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId());
 
 	public FieldbookServiceImpl() {
 		super();
@@ -735,5 +739,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	void setWorkbookSaver(final WorkbookSaver workbookSaver) {
 		this.workbookSaver = workbookSaver;
+	}
+
+	@Override
+	public void deleteAllFieldMapsByTrialInstanceIds(final List<Integer> geolocationId) {
+		this.daoFactory.getExperimentPropertyDao().deleteExperimentPropByLocationIds(geolocationId, FIELDMAP_TERM_IDS);
+		final List<Integer> blockIdsToDelete = this.daoFactory.getGeolocationPropertyDao().deleteBlockPropertiesByGeolocationId(geolocationId);
+		this.daoFactory.getLocDesDao().deleteByLocationIds(blockIdsToDelete);
 	}
 }
