@@ -361,4 +361,29 @@
         </sql>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="studies-TBD-24">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) from cvterm where cvterm_id = 8340 and cv_id = 1040;
+            </sqlCheck>
+        </preConditions>
+        <comment>Rename 'GROUP' to 'GROUP_SOURCE_NAME' in cvterm and projectprop tables</comment>
+        <sql dbms="mysql" splitStatements="true">
+             UPDATE cvterm SET name = 'GROUP_SOURCE_NAME' WHERE cvterm_id = 8340;
+			 UPDATE projectprop SET ALIAS = 'GROUP_SOURCE_NAME' WHERE variable_id = 8340;
+        </sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="studies-TBD-25">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) > 0 from list_data_view where static_id = -9;
+            </sqlCheck>
+        </preConditions>
+        <comment>Replace GROUP_SOURCE_NAME value in 'list_data_view' table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			 UPDATE list_data_view SET static_id = 8340 where static_id = -9;
+        </sql>
+	</changeSet>
+
 </databaseChangeLog>

@@ -59,6 +59,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.name(), VariableType.TREATMENT_FACTOR.name());
 	private static final String GERMPLASM_JOIN = " INNER JOIN germplsm g on g.gid = s.dbxref_id ";
 	private static final String IMMEDIATE_SOURCE_NAME_JOIN = " LEFT JOIN names immediateSource  ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
+	private static final String GROUP_SOURCE_NAME_JOIN =
+		"LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0";
 
 	static {
 		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
@@ -75,6 +77,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "    WHERE ndt.nd_experiment_id = nde.nd_experiment_id \n"
 			+ "     and lot.stock_id");
 		factorsFilterMap.put(String.valueOf(TermId.GROUPGID.getId()), "g.mgid");
+		factorsFilterMap.put(String.valueOf(TermId.GROUP_SOURCE_NAME.getId()), "groupSourceName.nval");
+		factorsFilterMap.put(String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()), "immediateSource.nval");
 	}
 
 	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
@@ -143,9 +147,26 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				// FIXME won't work for sub-sub-obs
 				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
 
+			boolean germplasmJoinAdded = false;
 			if (filter != null && !CollectionUtils.isEmpty(filter.getFilteredValues())
 				&& filter.getFilteredValues().keySet().contains(String.valueOf(TermId.GROUPGID.getId()))) {
 				sql.append(GERMPLASM_JOIN);
+				germplasmJoinAdded = true;
+			}
+
+			if (this.checkFilterContainsFactor(filter, TermId.IMMEDIATE_SOURCE_NAME.getId())) {
+				if (!germplasmJoinAdded) {
+					sql.append(GERMPLASM_JOIN);
+				}
+				sql.append(IMMEDIATE_SOURCE_NAME_JOIN);
+				germplasmJoinAdded = true;
+			}
+
+			if (this.checkFilterContainsFactor(filter, TermId.GROUP_SOURCE_NAME.getId())) {
+				if (!germplasmJoinAdded) {
+					sql.append(GERMPLASM_JOIN);
+				}
+				sql.append(GROUP_SOURCE_NAME_JOIN);
 			}
 
 			sql.append(" where p.project_id = :datasetId ");
@@ -573,7 +594,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND %s) AS '%s'";
 			for (final String gpFactor : searchDto.getGenericGermplasmDescriptors()) {
 				if ((noFilterVariables || filterColumns.contains(gpFactor)) && !gpFactor.equals(TermId.GROUPGID.name())) {
-					String cvtermQuery = null;
+					final String cvtermQuery;
 					if (TermId.IMMEDIATE_SOURCE_NAME.name().equals(gpFactor)) {
 						cvtermQuery = " CASE \n"
 							+ "                WHEN g.gnpgs = -1 \n"
@@ -581,6 +602,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 							+ "                AND g.gpid2 <> 0 THEN immediateSource.nval \n"
 							+ "                ELSE '-' \n"
 							+ "            END AS " + TermId.IMMEDIATE_SOURCE_NAME.name() + " ";
+					} else if (TermId.GROUP_SOURCE_NAME.name().equals(gpFactor)) {
+							cvtermQuery = " CASE \n"
+								+ " 			WHEN g.gnpgs = -1 \n"
+								+ "				AND g.gpid1 IS NOT NULL \n"
+								+ " 			AND g.gpid1 <> 0 THEN groupSourceName.nval \n"
+								+ "				ELSE '-' "
+								+ "			END AS " + TermId.GROUP_SOURCE_NAME.name() + " ";
 					} else {
 						cvtermQuery = String.format(germplasmDescriptorClauseFormat, "spropcvt.name = '" + gpFactor + "'", gpFactor);
 					}
@@ -684,15 +712,25 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			// FIXME won't work for sub-sub-obs
 			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
 
+		boolean germplasmJoinAdded = false;
 		if (this.hasGroupGidDescriptor(searchDto.getGenericGermplasmDescriptors())) {
 			sql.append(GERMPLASM_JOIN);
+			germplasmJoinAdded = true;
 		}
 
 		if (this.hasDescriptor(searchDto.getGenericGermplasmDescriptors(), TermId.IMMEDIATE_SOURCE_NAME)) {
-			if (!this.hasGroupGidDescriptor(searchDto.getGenericGermplasmDescriptors())) {
+			if (!germplasmJoinAdded) {
 				sql.append(GERMPLASM_JOIN);
+				germplasmJoinAdded = true;
 			}
 			sql.append(IMMEDIATE_SOURCE_NAME_JOIN);
+		}
+
+		if (this.hasDescriptor(searchDto.getGenericGermplasmDescriptors(), TermId.GROUP_SOURCE_NAME)) {
+			if (!germplasmJoinAdded) {
+				sql.append(GERMPLASM_JOIN);
+			}
+			sql.append(GROUP_SOURCE_NAME_JOIN);
 		}
 
 		sql.append(" WHERE p.project_id = :datasetId ");
@@ -895,10 +933,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (filterClause != null || observationUnitClause != null) {
 			sql.append(" AND ").append(observationUnitClause != null ? observationUnitClause : filterClause).append(matchClause);
 			// If Sum of Samples, append extra closing parenthesis for the EXISTS clause it uses
-			if (SUM_OF_SAMPLES_ID.equals(variableId)) {
-				sql.append(") ");
-			}
-			if (String.valueOf(TermId.STOCK_ID.getId()).equals(variableId)) {
+			if (SUM_OF_SAMPLES_ID.equals(variableId) || String.valueOf(TermId.STOCK_ID.getId()).equals(variableId)) {
 				sql.append(") ");
 			}
 			return;
@@ -1234,7 +1269,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		return !CollectionUtils.isEmpty(genericGermplasmDescriptors) && genericGermplasmDescriptors.contains(TermId.GROUPGID.name());
 	}
 
-	private boolean hasDescriptor(final List<String> genericGermplasmDescriptors, TermId termId) {
+	private boolean hasDescriptor(final List<String> genericGermplasmDescriptors, final TermId termId) {
 		return !CollectionUtils.isEmpty(genericGermplasmDescriptors) && genericGermplasmDescriptors.contains(termId.name());
 	}
+
+	private boolean checkFilterContainsFactor(final ObservationUnitsSearchDTO.Filter filter, final int variableId) {
+		return filter != null && !CollectionUtils.isEmpty(filter.getFilteredTextValues()) && filter.getFilteredTextValues().keySet().contains(String.valueOf(variableId));
+	}
+
 }

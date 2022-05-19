@@ -80,6 +80,8 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	private static final String CVTERM_VARIABLE_JOIN = "LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id";
 	private static final String GERMPLASM_JOIN = "INNER JOIN germplsm g ON g.gid = s.dbxref_id";
 	private static final String IMMEDIATE_SOURCE_NAME_JOIN = " LEFT JOIN names immediateSource ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
+	private static final String GROUP_SOURCE_NAME_JOIN =
+		"LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0";
 
 	public StudyEntrySearchDAO(final Session session) {
 		super(session);
@@ -97,6 +99,8 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		this.addFixedScalars(scalars, selects);
 		this.addGroupGidScalar(scalars, selects, joins, studyEntrySearchDto.getVariableEntryDescriptors());
 		this.addSourceScalar(scalars, selects, joins, studyEntrySearchDto.getFixedEntryDescriptors());
+		this.addGroupSourceNameScalar(scalars, selects, joins, studyEntrySearchDto.getVariableEntryDescriptors());
+
 		if (!CollectionUtils.isEmpty(studyEntrySearchDto.getVariableEntryDescriptors())) {
 			studyEntrySearchDto.getVariableEntryDescriptors().stream()
 				.filter(measurementVariable -> measurementVariable.getTermId() != TermId.GROUPGID.getId())
@@ -202,10 +206,28 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 						+ "	ELSE '-' END ) "
 						+ "", TermId.IMMEDIATE_SOURCE_NAME.name(), StringType.INSTANCE));
 
-					if (!joins.contains(GERMPLASM_JOIN)) {
-						joins.add(GERMPLASM_JOIN);
-					}
+					joins.add(GERMPLASM_JOIN);
 					joins.add(IMMEDIATE_SOURCE_NAME_JOIN);
+				});
+		}
+	}
+
+	private void addGroupSourceNameScalar(final List<Scalar> scalars, final List<String> selectClause, final Set<String> joins, final List<MeasurementVariable> entryDescriptors) {
+		if (!CollectionUtils.isEmpty(entryDescriptors)) {
+			entryDescriptors.stream()
+				.filter(measurementVariable -> measurementVariable.getTermId() == TermId.GROUP_SOURCE_NAME.getId())
+				.findFirst()
+				.ifPresent(measurementVariable -> {
+					selectClause.add(this.addSelectExpression(scalars,
+						"	( CASE \n"
+							+ "		WHEN g.gnpgs = -1 \n"
+							+ "		    AND g.gpid1 IS NOT NULL \n"
+							+ "			AND g.gpid1 <> 0 THEN groupSourceName.nval \n"
+							+ "	ELSE '-' END ) "
+							+ "", TermId.GROUP_SOURCE_NAME.name(), StringType.INSTANCE));
+
+					joins.add(GERMPLASM_JOIN);
+					joins.add(GROUP_SOURCE_NAME_JOIN);
 				});
 		}
 	}
@@ -268,11 +290,11 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		return whereClause.toString();
 	}
 
-	private void addFixedVariableIfPresent(final TermId termId, final String value, final StudyEntrySearchDto studyEntrySearchDto,
+	private void addFixedVariableIfPresent(final TermId termId, final String value, final List<MeasurementVariable> entryDescriptors,
 		final Map<Integer, StudyEntryPropertyData> variables) {
 		final Optional<MeasurementVariable>
 			measurementVariable =
-			studyEntrySearchDto.getFixedEntryDescriptors().stream().filter(v -> v.getTermId() == termId.getId())
+			entryDescriptors.stream().filter(v -> v.getTermId() == termId.getId())
 				.findFirst();
 		if (measurementVariable.isPresent()) {
 			variables.put(
@@ -389,10 +411,12 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			}
 			//These elements should not be listed as germplasm descriptors, this is a way to match values between column
 			//and table cells. In the near future this block should be removed
-			this.addFixedVariableIfPresent(TermId.GID, String.valueOf(studyEntryDto.getGid()), studyEntrySearchDto, properties);
-			this.addFixedVariableIfPresent(TermId.DESIG, studyEntryDto.getDesignation(), studyEntrySearchDto, properties);
-			this.addFixedVariableIfPresent(TermId.ENTRY_NO, String.valueOf(studyEntryDto.getEntryNumber()), studyEntrySearchDto, properties);
-			this.addFixedVariableIfPresent(TermId.IMMEDIATE_SOURCE_NAME, String.valueOf(row.get(TermId.IMMEDIATE_SOURCE_NAME.name())), studyEntrySearchDto, properties);
+			this.addFixedVariableIfPresent(TermId.GID, String.valueOf(studyEntryDto.getGid()), studyEntrySearchDto.getFixedEntryDescriptors(), properties);
+			this.addFixedVariableIfPresent(TermId.DESIG, studyEntryDto.getDesignation(), studyEntrySearchDto.getFixedEntryDescriptors(), properties);
+			this.addFixedVariableIfPresent(TermId.ENTRY_NO, String.valueOf(studyEntryDto.getEntryNumber()), studyEntrySearchDto.getFixedEntryDescriptors(), properties);
+			this.addFixedVariableIfPresent(TermId.IMMEDIATE_SOURCE_NAME, String.valueOf(row.get(TermId.IMMEDIATE_SOURCE_NAME.name())), studyEntrySearchDto.getFixedEntryDescriptors(), properties);
+			this.addFixedVariableIfPresent(TermId.GROUP_SOURCE_NAME, String.valueOf(row.get(TermId.GROUP_SOURCE_NAME.name())), studyEntrySearchDto.getVariableEntryDescriptors(), properties);
+
 			studyEntryDto.setProperties(properties);
 			return studyEntryDto;
 		}).collect(Collectors.toList());
