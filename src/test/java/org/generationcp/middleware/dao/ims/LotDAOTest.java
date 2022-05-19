@@ -77,29 +77,6 @@ public class LotDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testRetrieveLotScalesForGermplasms() {
-		final Germplasm germplasm =
-				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
-
-		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
-		this.lotDAO.save(lot);
-
-		final Transaction transaction = InventoryDetailsTestDataInitializer
-			.createTransaction(
-				2.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST", TransactionType.DEPOSIT.getId());
-		this.transactionDAO.save(transaction);
-
-		final List<Object[]> scalesForGermplsms = this.lotDAO.retrieveLotScalesForGermplasms(Lists.newArrayList(germplasmId));
-
-		Assert.assertEquals(1, scalesForGermplsms.size());
-		Assert.assertEquals(germplasmId, scalesForGermplsms.get(0)[0]);
-		Assert.assertEquals(8264, ((Integer) scalesForGermplsms.get(0)[1]).intValue());
-		Assert.assertEquals("g", scalesForGermplsms.get(0)[2]);
-
-	}
-
-	@Test
 	public void testGetAvailableBalanceCountAndTotalLotsCount() {
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
