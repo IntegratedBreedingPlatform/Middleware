@@ -76,6 +76,9 @@ public class VariableTypeList implements Serializable {
 	}
 
 	public DMSVariableType findByLocalName(String localName) {
+		if (localName == null) {
+			return null;
+		}
 
 		// added for optimization
 		if (this.nameVarTypeMap != null && this.nameVarTypeMap.get(localName) != null) {
@@ -84,7 +87,7 @@ public class VariableTypeList implements Serializable {
 
 		if (this.variableTypes != null) {
 			for (DMSVariableType variableType : this.variableTypes) {
-				if (variableType.getLocalName().equals(localName)) {
+				if (localName.equals(variableType.getLocalName())) {
 					return variableType;
 				}
 			}

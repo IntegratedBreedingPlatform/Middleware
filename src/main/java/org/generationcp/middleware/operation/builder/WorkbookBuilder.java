@@ -319,8 +319,6 @@ public class WorkbookBuilder extends Builder {
 		VariableTypeList variables = null;
 		if (dataSetId != null) {
 			variables = this.dataSetBuilder.getVariableTypes(dataSetId);
-			// variable type roles are being set inside getexperiment
-			this.studyDataManager.getExperiments(dataSetId, 0, Integer.MAX_VALUE, variables);
 		}
 
 		final List<MeasurementVariable> factors = this.buildFactors(variables);
