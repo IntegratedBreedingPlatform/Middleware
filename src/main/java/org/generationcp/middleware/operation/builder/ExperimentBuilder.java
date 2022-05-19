@@ -147,7 +147,7 @@ public class ExperimentBuilder extends Builder {
 
 			final Map<Integer, Pair<String, String>> derivativeParents =
 				this.getGermplasmService().getDerivativeParentsMapByGids(gids);
-			derivativeParents.putAll(derivativeParents);
+			derivativeParentsMapByGids.putAll(derivativeParents);
 		}
 		return derivativeParentsMapByGids;
 	}
