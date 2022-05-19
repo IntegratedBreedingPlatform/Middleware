@@ -47,7 +47,7 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 			criteria.add(Restrictions.eq("entityId", entityId));
 
 			final List<ProgramFavorite> result = criteria.list();
-			return result.isEmpty() ? Optional.of(result.get(0)) : Optional.empty();
+			return CollectionUtils.isNotEmpty(result) ? Optional.of(result.get(0)) : Optional.empty();
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in getProgramFavorites(" + type.name() + ") in ProgramFavoriteDao: "
