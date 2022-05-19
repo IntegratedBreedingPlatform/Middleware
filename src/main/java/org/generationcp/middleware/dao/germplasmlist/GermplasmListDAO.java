@@ -576,14 +576,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		return queryString;
 	}
 
-	// returns all the list of the program regardless of the type and status
-	@SuppressWarnings("unchecked")
-	public List<GermplasmList> getListsByProgram(final String programUUID) {
-		final Criteria criteria = this.getSession().createCriteria(GermplasmList.class);
-		criteria.add(Restrictions.eq(GermplasmListDAO.PROGRAM_UUID, programUUID));
-		return criteria.list();
-	}
-
 	// returns all the list of the program except the deleted ones and snapshot
 	// list
 	@SuppressWarnings("unchecked")

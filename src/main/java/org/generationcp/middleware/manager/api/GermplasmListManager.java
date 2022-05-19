@@ -173,14 +173,6 @@ public interface GermplasmListManager {
 	List<Integer> updateGermplasmList(List<GermplasmList> germplasmLists);
 
 	/**
-	 * Service to delete all lists that belong to a program
-	 *
-	 * @param programUUID : string - the unique program key that denotes a program
-	 * @return int : returns number of rows deleted from the DB
-	 */
-	int deleteGermplasmListsByProgram(String programUUID);
-
-	/**
 	 * Removes the specified {@code GermplasmList} object from the database.
 	 *
 	 * @param germplasmList - The {@code GermplasmList} object to be removed from the database. Must be a valid {@code GermplasmList}
@@ -230,30 +222,12 @@ public interface GermplasmListManager {
 	List<Integer> addGermplasmListData(List<GermplasmListData> germplasmListDatas);
 
 	/**
-	 * Updates the database with the {@code GermplasmListData} objects specified.
-	 *
-	 * @param germplasmListDatas - A list of {@code GermplasmListData} objects to be updated in the database. Must be valid
-	 *                           {@code GermplasmListData} objects.
-	 * @return Returns the ids of the updated {@code GermplasmListData} records
-	 */
-	List<Integer> updateGermplasmListData(List<GermplasmListData> germplasmListDatas);
-
-	/**
 	 * Removes the corresponding {@code GermplasmListData} records from the database given their List ID.
 	 *
 	 * @param listId - {@code GermplasmList} ID of the Germplasm List Data records to be deleted.
 	 * @return Returns the number of {@code GermplasmListData} records deleted from the database.
 	 */
 	int deleteGermplasmListDataByListId(Integer listId);
-
-	/**
-	 * Removes the specified {@code GermplasmListData} objects from the database.
-	 *
-	 * @param germplasmListDatas - A list of {@code GermplasmListData} objects to be removed from the database. {@code GermplasmListData}
-	 *                           objects must be valid.
-	 * @return Returns the number of {@code GermplasmListData} records deleted from the database.
-	 */
-	int deleteGermplasmListData(List<GermplasmListData> germplasmListDatas);
 
 	/**
 	 * Returns a list of {@code GermplasmList} child records given a parent id.

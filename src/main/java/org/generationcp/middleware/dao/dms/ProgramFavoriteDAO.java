@@ -36,24 +36,6 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ProgramFavoriteDAO.class);
 
-	public List<ProgramFavorite> getProgramFavorites(final ProgramFavorite.FavoriteType type, final String programUUID)
-		throws MiddlewareQueryException {
-
-		try {
-
-			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("entityType", type));
-			criteria.add(Restrictions.eq("uniqueID", programUUID));
-
-			return criteria.list();
-
-		} catch (final HibernateException e) {
-			final String message = "Error in getProgramFavorites(" + type.name() + ") in ProgramFavoriteDao: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	public Optional<ProgramFavorite> getProgramFavorite(final String programUUID, final ProgramFavorite.FavoriteType type, final Integer entityId)
 			throws MiddlewareQueryException {
 

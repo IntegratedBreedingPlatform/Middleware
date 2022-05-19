@@ -60,37 +60,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<WorkbenchUser> getAllActiveUsersSorted() {
-		try {
-			final Query query = this.getSession().getNamedQuery(WorkbenchUser.GET_ALL_ACTIVE_USERS_SORTED);
-			return query.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllUsersSorted query from User: " + e.getMessage();
-			WorkbenchUserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<WorkbenchUser> getUsersByCrop(final String cropName) {
-		try {
-			final Query query = this.getSession().createQuery("SELECT u FROM WorkbenchUser u "
-				+ " INNER JOIN FETCH u.person p "
-				+ " INNER JOIN FETCH p.crops c "
-				+ " WHERE u.status = 0 "
-				+ " AND EXISTS(FROM WorkbenchUser wu INNER JOIN wu.person.crops ct WHERE ct.cropName = :cropName AND wu.userid = u.userid)"
-				+ " ORDER BY p.firstName, p.lastName");
-			query.setParameter("cropName", cropName);
-			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-			return query.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getUsersByCrop query from User: " + e.getMessage();
-			WorkbenchUserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<WorkbenchUser> getByNameUsingEqual(final String name, final int start, final int numOfRows) {
 		try {
 			if (name != null) {
@@ -212,27 +181,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			WorkbenchUserDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public boolean isSuperAdminUser(final Integer userId) {
-		try {
-			if (userId != null) {
-				final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
-				criteria.createAlias("roles", "roles");
-				criteria.createAlias("roles.role", "role");
-				criteria.add(Restrictions.eq("role.name", Role.SUPERADMIN));
-				criteria.add(Restrictions.eq("userid", userId));
-
-				final List<WorkbenchUser> users = criteria.list();
-				return !users.isEmpty();
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with isSuperAdminUser(userid=" + userId + ") query from User: " + e.getMessage();
-			WorkbenchUserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return false;
 	}
 
 	public List<WorkbenchUser> getUsers(final List<Integer> userIds) {

@@ -128,21 +128,6 @@ public class UserRoleDao extends GenericDAO<UserRole, Long> {
 		}
 	}
 
-	public Set<CropType> getCropsWithAddProgramPermissionForCropRoles(final int userId) {
-		final Set<CropType> cropTypes = new HashSet<>();
-		try {
-			final SQLQuery query = this.getSession().createSQLQuery(GET_CROPS_WITH_ADD_PROGRAM_PERMISSION_FOR_A_CROP_ROLE_SQL);
-			query.setParameter("userId", userId);
-			final List<String> results = query.list();
-			for (final String s : results) {
-				cropTypes.add(new CropType(s));
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getCropsWithAddProgramPermissionForCropRoles(userId=" + userId + ")", e);
-		}
-		return cropTypes;
-	}
-
 	public void deleteProgramRolesAssociations(final String programUUID) {
 		try {
 			final String sql = "DELETE ur FROM users_roles ur INNER JOIN workbench_project p ON p.project_id = ur.workbench_project_id "

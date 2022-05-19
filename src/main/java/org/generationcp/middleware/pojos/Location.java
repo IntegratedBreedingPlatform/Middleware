@@ -58,11 +58,6 @@ public class Location implements Serializable, Comparable<Location> {
 		"select l.* from location l, udflds u where l.ltype = u.fldno and u.ftable='LOCATION' and u.fcode='COUNTRY' "
 			+ "and exists (select 1 from cntry c where c.cntryid =l.cntryid) order by l.lname";
 
-	public static final String GET_PROVINCE_BY_COUNTRY =
-			"select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV'  and l.cntryid = (:countryId) order by l.lname";
-	public static final String GET_ALL_PROVINCES =
-			"select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV' order by l.lname";
-
 	public static final String UNSPECIFIED_LOCATION = "Unspecified Location";
 	
 	public static final Integer[] BREEDING_LOCATION_TYPE_IDS = {410, 411, 412};

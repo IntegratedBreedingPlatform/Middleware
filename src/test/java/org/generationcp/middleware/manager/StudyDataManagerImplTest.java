@@ -340,49 +340,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllFolders() {
-		final int originalSize = this.manager.getAllFolders().size();
-		final String uniqueID = this.commonTestProject.getUniqueID();
-		final DmsProject folder1 = this.studyTDI.createFolderTestData(uniqueID);
-		final DmsProject folder2 = this.studyTDI.createFolderTestData(null);
-		final DmsProject folder3 = this.studyTDI.createFolderTestData(uniqueID, folder1.getProjectId());
-		this.sessionProvder.getSession().flush();
-
-		final List<FolderReference> allFolders = this.manager.getAllFolders();
-		final int newSize = allFolders.size();
-		final List<Integer> idList = Lists.transform(allFolders, new Function<FolderReference, Integer>() {
-
-			@Override
-			public Integer apply(final FolderReference dataset) {
-				return dataset.getId();
-			}
-		});
-		Assert.assertEquals("The new size should be equal to the original size + 3", originalSize + 3, newSize);
-		Assert.assertTrue(idList.contains(folder1.getProjectId()));
-		Assert.assertTrue(idList.contains(folder2.getProjectId()));
-		Assert.assertTrue(idList.contains(folder3.getProjectId()));
-		for (final FolderReference folder : allFolders) {
-			final Integer id = folder.getId();
-			if (id.equals(folder1.getProjectId())) {
-				Assert.assertEquals(folder1.getProjectId(), id);
-				Assert.assertEquals(folder1.getName(), folder.getName());
-				Assert.assertEquals(folder1.getDescription(), folder.getDescription());
-				Assert.assertEquals(DmsProject.SYSTEM_FOLDER_ID, folder.getParentFolderId());
-			} else if (id.equals(folder2.getProjectId())) {
-				Assert.assertEquals(folder2.getProjectId(), id);
-				Assert.assertEquals(folder2.getName(), folder.getName());
-				Assert.assertEquals(folder2.getDescription(), folder.getDescription());
-				Assert.assertEquals(DmsProject.SYSTEM_FOLDER_ID, folder.getParentFolderId());
-			} else if (id.equals(folder3.getProjectId())) {
-				Assert.assertEquals(folder3.getProjectId(), id);
-				Assert.assertEquals(folder3.getName(), folder.getName());
-				Assert.assertEquals(folder3.getDescription(), folder.getDescription());
-				Assert.assertEquals(folder1.getProjectId(), folder.getParentFolderId());
-			}
-		}
-	}
-
-	@Test
 	public void testGetDatasetNodesByStudyId() throws Exception {
 		this.studyTDI.addTestDataset(this.studyReference.getId());
 		final List<DatasetReference> datasetReferences = this.manager.getDatasetReferences(this.studyReference.getId());
@@ -556,43 +513,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyType() {
-		try {
-			Assert.assertEquals("Study type returned did not match.", StudyTypeDto.getTrialDto(),
-				this.manager.getStudyType(this.studyReference.getStudyType().getId()));
-		} catch (final MiddlewareQueryException e) {
-			Assert.fail("Unexpected exception: " + e.getMessage());
-		}
-	}
-
-	@Test
-	public void testGetStudyTypeNullEdgeCase() {
-		try {
-			Assert.assertNull(
-				"Expected null return value but was non null.",
-				this.manager.getStudyType(PRESUMABLY_NON_EXISTENT_STUDY_TYPE_ID));
-		} catch (final MiddlewareQueryException e) {
-			Assert.fail("Unexpected exception: " + e.getMessage());
-		}
-	}
-
-	@Test
-	public void testDeleteProgramStudies() throws Exception {
-		final String uniqueId = "100001001001";
-		this.studyTDI.createFolderTestData(uniqueId);
-		this.studyTDI.addTestStudy(uniqueId);
-
-		List<? extends Reference> programStudiesAndFolders = this.manager.getRootFolders(uniqueId);
-		final int sizeBeforeDelete = programStudiesAndFolders.size();
-		this.manager.deleteProgramStudies(uniqueId);
-		programStudiesAndFolders = this.manager.getRootFolders(uniqueId);
-		final int sizeAfterDelete = programStudiesAndFolders.size();
-
-		Assert.assertTrue("The size after the delete should be less than the size before.", sizeAfterDelete < sizeBeforeDelete);
-
-	}
-
-	@Test
 	public void testGetStudyDetailsByStudyType() throws Exception {
 		final List<StudyDetails> trialStudyDetails =
 			this.manager.getStudyDetails(StudyTypeDto.getTrialDto(), this.commonTestProject.getUniqueID(), 0, 50);
@@ -664,26 +584,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.studyReference.getName(), studyDetails.getStudyName());
 		Assert.assertEquals(this.studyReference.getStudyType(), studyDetails.getStudyType());
 		this.verifyCommonStudyDetails(studyDetails);
-	}
-
-	@Test
-	public void testGetTrialInstanceNumberByGeolocationId() throws Exception {
-		final Integer studyId = this.studyReference.getId();
-		final Integer dataSetId = this.studyTDI.createEnvironmentDataset(this.crop, studyId, "1", "1");
-		final TrialEnvironments trialEnvironments = this.manager.getTrialEnvironmentsInDataset(dataSetId);
-		Assert.assertNotNull(trialEnvironments.getTrialEnvironments());
-		Assert.assertFalse(trialEnvironments.getTrialEnvironments().isEmpty());
-
-		final String trialInstanceNumberActual =
-			this.manager.getTrialInstanceNumberByGeolocationId(trialEnvironments.getTrialEnvironments().iterator().next().getId());
-		Assert.assertEquals("1", trialInstanceNumberActual);
-
-	}
-
-	@Test
-	public void testGetAllSharedProjectNames() {
-		final List<String> sharedProjectNames = this.manager.getAllSharedProjectNames();
-		Assert.assertNotNull("The shared project names should not be null", sharedProjectNames);
 	}
 
 	@Test

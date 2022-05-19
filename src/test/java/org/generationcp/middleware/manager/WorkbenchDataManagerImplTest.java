@@ -80,22 +80,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testProjectActivity() {
-		final ProjectActivity projectActivity =
-			this.workbenchTestDataUtil.createTestProjectActivityData(this.commonTestProject, this.testUser1);
-		final Integer result = this.workbenchDataManager.addProjectActivity(projectActivity);
-		Assert.assertNotNull("Expected id of a newly saved record in workbench_project_activity", result);
-
-		final List<ProjectActivity> results =
-			this.workbenchDataManager.getProjectActivitiesByProjectId(this.commonTestProject.getProjectId(), 0, 10);
-		Assert.assertNotNull(results);
-		Assert.assertEquals(3, results.size());
-
-		final long count = this.workbenchDataManager.countProjectActivitiesByProjectId(this.commonTestProject.getProjectId());
-		Assert.assertEquals(3, count);
-	}
-
-	@Test
 	public void testGetProjects() {
 		final List<Project> projects = this.workbenchDataManager.getProjects();
 		Assert.assertNotNull(projects);
@@ -107,13 +91,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final String toolName = "fieldbook_web";
 		final Tool tool = this.workbenchDataManager.getToolWithName(toolName);
 		Assert.assertNotNull(tool);
-	}
-
-	@Test
-	public void testGetProjectByName() {
-		final Project project = this.workbenchDataManager.getProjectByNameAndCrop(this.commonTestProject.getProjectName(),
-			this.commonTestProject.getCropType());
-		Assert.assertEquals(this.commonTestProject.getProjectName(), project.getProjectName());
 	}
 
 	@Test
@@ -153,31 +130,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final List<Tool> results = this.workbenchDataManager.getAllTools();
 		Assert.assertNotNull(results);
 		Assert.assertFalse(results.isEmpty());
-	}
-
-	@Test
-	public void testGetLastOpenedProject() {
-		final Project results = this.workbenchDataManager.getLastOpenedProject(this.testUser1.getUserid());
-		Assert.assertNotNull(results);
-	}
-
-	@Test
-	public void testGetToolsWithType() {
-		final List<Tool> results = this.workbenchDataManager.getToolsWithType(ToolType.NATIVE);
-		Assert.assertNotNull(results);
-		Assert.assertFalse(results.isEmpty());
-		Debug.printObjects(IntegrationTestBase.INDENT, results);
-	}
-
-	@Test
-	public void testCountProjectsByFilter() {
-		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
-		final Project project = this.commonTestProject;
-		programSearchRequest.setProgramName(project.getProjectName());
-		programSearchRequest.setCommonCropName(project.getCropType().getCropName());
-		programSearchRequest.setLoggedInUserId(this.testUser1.getUserid());
-		final long count = this.workbenchDataManager.countProjectsByFilter(programSearchRequest);
-		assertThat(new Long(1), is(equalTo(count)));
 	}
 
 	@Test

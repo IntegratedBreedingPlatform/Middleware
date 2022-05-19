@@ -60,9 +60,6 @@ import java.util.List;
 			+ "(CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
 
 })
-@NamedNativeQueries({
-	@NamedNativeQuery(name = "getAllActiveUsersSorted", query = "SELECT u.* FROM users u, persons p "
-		+ "WHERE u.personid = p.personid AND  u.ustatus = 0 ORDER BY fname, lname", resultClass = WorkbenchUser.class)})
 @Entity
 @Table(name = "users")
 public class WorkbenchUser implements Serializable, BeanFormState {
@@ -127,7 +124,6 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 
 	public static final String GET_BY_NAME_USING_EQUAL = "getUserByNameUsingEqual";
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
-	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 	public static final String GET_BY_FULLNAME = "getByFullName";
 	public static final String COUNT_BY_FULLNAME = "countByFullName";
 

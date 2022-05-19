@@ -823,17 +823,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		return null;
 	}
 
-	public List<String> getAllSharedProjectNames() {
-		try {
-			final String sql = "SELECT name FROM project WHERE program_uuid is null";
-			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			return query.list();
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error with getAllSharedProjectNames()" + e.getMessage(), e);
-		}
-	}
-
 	public StudyMetadata getStudyMetadataForInstanceId(final Integer instanceId) {
 		Preconditions.checkNotNull(instanceId);
 		try {

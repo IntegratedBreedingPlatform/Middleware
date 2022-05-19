@@ -72,22 +72,6 @@ public interface LocationDataManager {
 	List<Location> getLocationsByName(String name, int start, int numOfRows, Operation op);
 
 	/**
-	 * Returns all country records.
-	 *
-	 * @return List of Location POJOs
-	 * @ the middleware query exception
-	 */
-	List<Country> getAllCountry();
-
-	/**
-	 * Returns the udfld record identified by the given id.
-	 *
-	 * @param id - the id of the udfld record
-	 * @return the Udflds POJO representing the record
-	 */
-	UserDefinedField getUserDefinedFieldByID(Integer id);
-
-	/**
 	 * Returns the Map representation of <Code, UserDefinedField> of the given
 	 * tableType (ftable and ftype from the udflds table).
 	 *
@@ -200,39 +184,9 @@ public interface LocationDataManager {
 	 */
 	List<Location> getAllFields();
 
-	List<Location> getAllProvincesByCountry(Integer countryId);
-
-	List<Location> getAllProvinces();
-
-	/**
-	 * Retrieves all locdes entries from both central and local by location id
-	 *
-	 * @return all locdes entries by location id
-	 */
-	List<Locdes> getLocdesByLocId(Integer locationId);
-
-	/**
-	 * Save or update the list of locdes object
-	 *
-	 * @param locationId id
-	 * @param locdesList
-	 */
-	void saveOrUpdateLocdesList(Integer locationId, List<Locdes> locdesList);
-
 	List<Location> getAllBreedingLocations(List<Integer> locationIds);
 
 	List<Location> getAllSeedingLocations(List<Integer> locationIds);
-
-	List<LocationDetails> getFilteredLocationsDetails(Integer countryId, Integer locationType, String locationName);
-
-	/**
-	 * Gets the user defined field id of name.
-	 *
-	 * @param tableType the table type
-	 * @param name      the name
-	 * @return the user defined field id of code
-	 */
-	Integer getUserDefinedFieldIdOfName(UDTableType tableType, String name);
 
 	/**
 	 * Returns location ID of unspecified location
@@ -240,16 +194,6 @@ public interface LocationDataManager {
 	 * @return the location ID of unspecified lication
 	 */
 	String retrieveLocIdOfUnspecifiedLocation();
-
-	/**
-	 * Returns the number of locations where the location abbreviation value equals to the locationAbbreviation parameter
-	 *
-	 * @param locationAbbreviation
-	 * @return
-	 */
-	long countByLocationAbbreviation(String locationAbbreviation);
-
-	Location getDefaultLocationByType(LocationType locationType);
 
 	List<Locdes> getLocdes(List<Integer> locIds, List<String> dvals);
 }

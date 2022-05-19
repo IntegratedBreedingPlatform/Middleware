@@ -37,15 +37,6 @@ public interface WorkbenchDataManager {
 	List<Project> getProjects();
 
 	/**
-	 * Gets count projects.
-	 *
-	 * @param filters - the number of rows to retrieve
-	 * @return the number of all the projects
-	 */
-	//FIXME Remove this method, move tests. It is now in ProgramService
-	long countProjectsByFilter(final ProgramSearchRequest programSearchRequest);
-
-	/**
 	 * Gets the projects.
 	 *
 	 * @param pageable     - the starting record and number of page
@@ -71,28 +62,6 @@ public interface WorkbenchDataManager {
 	List<Project> getProjectsByCropName(final String cropName);
 
 	/**
-	 * Save or update project.
-	 *
-	 * @param project - the project to save
-	 * @return the project saved
-	 */
-	Project saveOrUpdateProject(Project project);
-
-	/**
-	 * Delete project.
-	 *
-	 * @param project - the project to delete
-	 */
-	void deleteProject(Project project);
-
-	/**
-	 * Delete project dependencies.
-	 *
-	 * @param project - the project to delete dependencies
-	 */
-	void deleteProjectDependencies(Project project);
-
-	/**
 	 * Get all tools.
 	 *
 	 * @return The list of all tools.
@@ -108,29 +77,12 @@ public interface WorkbenchDataManager {
 	Tool getToolWithName(String toolName);
 
 	/**
-	 * Get the list of tools with the specified type.
-	 *
-	 * @param toolType the tool type
-	 * @return the list of matching tools
-	 */
-	List<Tool> getToolsWithType(ToolType toolType);
-
-	/**
 	 * Gets a project by id.
 	 *
 	 * @param projectId - the project id to match
 	 * @return the project matching the given id
 	 */
 	Project getProjectById(Long projectId);
-
-	/**
-	 * Gets a project by name. Should return only one value.
-	 *
-	 * @param projectName - the project name to match
-	 * @param cropType    - the crop type to search for a name (name is unique per crop type)
-	 * @return the project matching the given name
-	 */
-	Project getProjectByNameAndCrop(String projectName, CropType cropType);
 
 	/**
 	 * Gets a project by Uuid and CropType. Should return only one value.
@@ -140,14 +92,6 @@ public interface WorkbenchDataManager {
 	 * @return the project matching the given Uuid and crop type
 	 */
 	Project getProjectByUuidAndCrop(String projectUuid, String cropType);
-
-	/**
-	 * Returns the project last accessed by the user.
-	 *
-	 * @param userId - the user id to match
-	 * @return the last Project opened by the given user
-	 */
-	Project getLastOpenedProject(Integer userId);
 
 	/**
 	 * Adds a project activity.
@@ -189,31 +133,6 @@ public interface WorkbenchDataManager {
 	 * @return Returns the id of the {@code CropType} record added
 	 */
 	String addCropType(CropType cropType);
-
-	/**
-	 * Return a List of {@link ProjectActivity} records associated with a {@link Project}.
-	 *
-	 * @param projectId - the project id
-	 * @param start     - the starting record
-	 * @param numOfRows - the number of rows to retrieve
-	 * @return the List of {@link ProjectActivity} records
-	 */
-	List<ProjectActivity> getProjectActivitiesByProjectId(Long projectId, int start, int numOfRows);
-
-	/**
-	 * Delete a project activity.
-	 *
-	 * @param projectActivity - the project activity to delete
-	 */
-	void deleteProjectActivity(ProjectActivity projectActivity);
-
-	/**
-	 * Returns the number of {@link ProjectActivity} records associated with a {@link Project}.
-	 *
-	 * @param projectId - the project id to match
-	 * @return the number of {@link ProjectActivity} records associated to the given project
-	 */
-	long countProjectActivitiesByProjectId(Long projectId);
 
 	/**
 	 * Returns the project last accessed regardless of user.
@@ -283,11 +202,5 @@ public interface WorkbenchDataManager {
 	 * @return Role
 	 */
 	Role getRoleById(Integer id);
-
-	/**
-	 * @param workbenchUserId
-	 * @return Crops for which user has permissions to add a program
-	 */
-	List<CropType> getCropsWithAddProgramPermission(int workbenchUserId);
 
 }

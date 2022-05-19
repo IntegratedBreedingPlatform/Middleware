@@ -317,27 +317,4 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 			GermplasmListManagerImplTest.GERMPLASM_LIST_DESC, germplasmList.getDescription());
 	}
 
-	@Test
-	public void getCodeFixedStatusByGidList() {
-		final GermplasmListManagerImpl germplasmListManager = Mockito.spy(GermplasmListManagerImpl.class);
-		final GermplasmDAO germplasmDAO = Mockito.mock(GermplasmDAO.class);
-		final DaoFactory daoFactory = Mockito.mock(DaoFactory.class);
-		germplasmListManager.setDaoFactory(daoFactory);
-
-		final List<Integer> gids = Arrays.asList(1, 2);
-		final Germplasm gid1 = new Germplasm();
-		gid1.setGid(1);
-		gid1.setMgid(1);
-		final Germplasm gid2 = new Germplasm();
-		gid2.setGid(2);
-		gid2.setMgid(0);
-		final List<Germplasm> germplasms = Arrays.asList(gid1, gid2);
-		Mockito.when(daoFactory.getGermplasmDao()).thenReturn(germplasmDAO);
-		Mockito.when(germplasmDAO.getByGIDList(gids)).thenReturn(germplasms);
-		Mockito.doCallRealMethod().when(germplasmListManager).getCodeFixedGidsByGidList(gids);
-		final Set<Integer> result = germplasmListManager.getCodeFixedGidsByGidList(gids);
-		Assert.assertEquals(1, result.size());
-		Assert.assertTrue(result.contains(gid1.getGid()));
-	}
-
 }

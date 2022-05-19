@@ -47,15 +47,6 @@ public interface UserService {
 
 	Map<Integer, String> getAllUserIDFullNameMap();
 
-	List<WorkbenchUser> getUsersByCrop(String cropName);
-
-	/**
-	 * Returns all the Workbench users.
-	 *
-	 * @return A {@code List} of all the {@code WorkbenchUser}s in the Workbench database.
-	 */
-	List<WorkbenchUser> getAllUsers();
-
 	/**
 	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
 	 *
@@ -72,26 +63,12 @@ public interface UserService {
 	List<UserDto> getAllUsersSortedByLastName();
 
 	/**
-	 * Returns all the Workbench users ordered by First Name then Last Name.
-	 *
-	 * @return A {@code List} of all the {@code WorkbenchUser}s in the Workbench database.
-	 */
-	List<WorkbenchUser> getAllActiveUsersSorted();
-
-	/**
 	 * Adds a user.
 	 *
 	 * @param user - the user to add
 	 * @return Returns the the {@code WorkbenchUser} record added
 	 */
 	WorkbenchUser addUser(WorkbenchUser user);
-
-	/**
-	 * Returns number of all Users.
-	 *
-	 * @return the number of all Users
-	 */
-	long countAllUsers();
 
 	/**
 	 * create the user.
@@ -110,28 +87,12 @@ public interface UserService {
 	Integer updateUser(UserDto userDto);
 
 	/**
-	 * Updates the user.
-	 *
-	 * @param user the user to update
-	 * @return Returns the id of the {@code User} record updated
-	 */
-	void updateUser(WorkbenchUser user);
-
-	/**
 	 * Checks if a username exists.
 	 *
 	 * @param userName - the user name to check
 	 * @return true, if is username exists
 	 */
 	boolean isUsernameExists(String userName);
-
-	/**
-	 * Returns true if user has SUPERADMIN role assigned
-	 *
-	 * @param userId
-	 * @return
-	 */
-	boolean isSuperAdminUser(Integer userId);
 
 	List<UserDto> getUsersByPersonIds(List<Integer> personIds);
 
@@ -160,33 +121,12 @@ public interface UserService {
 	List<Person> getPersonsByCrop(CropType cropType);
 
 	/**
-	 * Returns all Persons.
-	 *
-	 * @return all Persons
-	 */
-	List<Person> getAllPersons();
-
-	/**
-	 * Returns number of all Persons.
-	 *
-	 * @return the number of all Persons
-	 */
-	long countAllPersons();
-
-	/**
 	 * Adds the person.
 	 *
 	 * @param person - the Person to add
 	 * @return Returns the {@code Person} record added
 	 */
 	Person addPerson(Person person);
-
-	/**
-	 * Deletes a person.
-	 *
-	 * @param person - the Person to delete
-	 */
-	void deletePerson(Person person);
 
 	/**
 	 * Changes the password of the user.
@@ -196,15 +136,6 @@ public interface UserService {
 	 * @return true, if is user login is completed
 	 */
 	boolean changeUserPassword(String username, String password);
-
-	/**
-	 * Checks if is person exists.
-	 *
-	 * @param firstName - the first name
-	 * @param lastName  - the last name
-	 * @return true, if is person exists
-	 */
-	boolean isPersonExists(String firstName, String lastName);
 
 	/**
 	 * Checks if person with specified email exists.
@@ -267,15 +198,6 @@ public interface UserService {
 	List<WorkbenchUser> getSuperAdminUsers();
 
 	/**
-	 * Returns ProjectUserInfo with the given project id and user id
-	 *
-	 * @param projectId
-	 * @param userId
-	 * @return
-	 */
-	ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(Long projectId, Integer userId);
-
-	/**
 	 * Saves or updates the ProjectUserInfo.
 	 *
 	 * @param projectUserInfo the project user info
@@ -284,8 +206,6 @@ public interface UserService {
 	void saveOrUpdateProjectUserInfo(ProjectUserInfo projectUserInfo);
 
 	void saveCropPerson(CropPerson cropPerson);
-
-	void removeCropPerson(CropPerson cropPerson);
 
 	Map<Integer, String> getPersonNamesByPersonIds(List<Integer> personIds);
 
