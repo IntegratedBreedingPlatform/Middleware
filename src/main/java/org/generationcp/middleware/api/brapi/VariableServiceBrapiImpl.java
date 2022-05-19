@@ -143,7 +143,7 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 				variableInfo.setExpectedMax(String.valueOf(variableDTO.getScale().getValidValues().getMax()));
 			}
 
-			// If ContextOfUse is MEANS, it means the variable should have a varibleType = ANALYSIS
+			// If ContextOfUse is MEANS, it means the variable should have a variableType = ANALYSIS
 			if (variableDTO.getContextOfUse() != null && variableDTO.getContextOfUse()
 				.contains(VariableDTO.ContextOfUseEnum.MEANS.toString())) {
 				variableInfo.addVariableType(VariableType.ANALYSIS);
@@ -155,7 +155,12 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 			this.ontologyVariableDataManager.addVariable(variableInfo);
 			variableDTO.setObservationVariableDbId(String.valueOf(variableInfo.getId()));
 		}
-		return variableDTOList;
+
+		final VariableSearchRequestDTO variableSearchRequestDTO = new VariableSearchRequestDTO();
+		// Fetch the saved observation variables from the database to populate the fields.
+		variableSearchRequestDTO.setObservationVariableDbIds(variableDTOList.stream().map(VariableDTO::getObservationVariableDbId).collect(
+			Collectors.toList()));
+		return this.getVariables(variableSearchRequestDTO, null, VariableTypeGroup.TRAIT);
 	}
 
 	private void updateVariable(final VariableDTO variable) {
