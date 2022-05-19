@@ -12,7 +12,6 @@
 package org.generationcp.middleware.manager.api;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.Operation;
@@ -252,7 +251,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Gets the method by code.
 	 *
-	 * @param code        the code
+	 * @param code the code
 	 * @return the method by code
 	 */
 	Method getMethodByCode(String code);

@@ -106,6 +106,7 @@ public interface UserService {
 
 	/**
 	 * Returns the user's person name given the user id
+	 *
 	 * @param userId
 	 * @return
 	 */
@@ -113,6 +114,7 @@ public interface UserService {
 
 	/**
 	 * Returns the person name given the person id
+	 *
 	 * @param personId
 	 * @return
 	 */

@@ -191,7 +191,7 @@ public class UserServiceImpl implements UserService {
 				for (final UserRoleDto userRoleDto : userDto.getUserRoles()) {
 					boolean found = false;
 					for (final UserRole userRole : user.getRoles()) {
-						if (userRoleEqualsToUserRoleDto(userRole, userRoleDto)) {
+						if (this.userRoleEqualsToUserRoleDto(userRole, userRoleDto)) {
 							userRoles.add(userRole);
 							found = true;
 							break;
@@ -222,7 +222,6 @@ public class UserServiceImpl implements UserService {
 
 		return idUserSaved;
 	}
-
 
 	@Override
 	public boolean isUsernameExists(final String userName) {
@@ -261,7 +260,7 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public String getPersonNameForPersonId(final int personId) {
-		final Person person= this.workbenchDaoFactory.getPersonDAO().getById(personId);
+		final Person person = this.workbenchDaoFactory.getPersonDAO().getById(personId);
 		if (person != null) {
 			return person.getDisplayName();
 		}
@@ -401,7 +400,8 @@ public class UserServiceImpl implements UserService {
 		final WorkbenchUser user = this.workbenchDaoFactory.getWorkbenchUserDAO().getUserByUserName(userName);
 		final Project project = this.workbenchDaoFactory.getProjectDAO().getByUuid(programUuid);
 		final Integer programId = project != null ? project.getProjectId().intValue() : null;
-		final List<PermissionDto> permissions = this.workbenchDaoFactory.getPermissionDAO().getPermissions(user.getUserid(), cropName, programId);
+		final List<PermissionDto> permissions =
+			this.workbenchDaoFactory.getPermissionDAO().getPermissions(user.getUserid(), cropName, programId);
 		user.setPermissions(permissions);
 		return user;
 	}
@@ -412,7 +412,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final ProgramMembersSearchRequest searchRequest,
+	public List<ProgramMemberDto> getProgramMembers(
+		final String programUUID, final ProgramMembersSearchRequest searchRequest,
 		final Pageable pageable) {
 		return this.workbenchDaoFactory.getWorkbenchUserDAO().getProgramMembers(programUUID, searchRequest, pageable);
 	}
@@ -423,7 +424,8 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public List<UserDto> getProgramMembersEligibleUsers(final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest,
+	public List<UserDto> getProgramMembersEligibleUsers(
+		final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest,
 		final Pageable pageable) {
 		return this.workbenchDaoFactory.getWorkbenchUserDAO().getAllProgramEligibleUsers(programUUID, searchRequest, pageable);
 	}

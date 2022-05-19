@@ -17,13 +17,10 @@ import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Tool;
-import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
-import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +28,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -95,7 +91,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetProjectByUUID() {
-		final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(this.commonTestProject.getUniqueID(),
+		final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(
+			this.commonTestProject.getUniqueID(),
 			this.commonTestProject.getCropType().getCropName());
 
 		Assert.assertEquals(this.commonTestProject.getUniqueID(), project.getUniqueID());
@@ -104,7 +101,8 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetProjectByUUIDProjectDoesNotExistInTheSpecifiedCrop() {
-		final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(this.commonTestProject.getUniqueID(),
+		final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(
+			this.commonTestProject.getUniqueID(),
 			"wheat");
 		Assert.assertNull("Expecting a null project because the project's unique id is associated to maize crop.", project);
 	}

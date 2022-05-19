@@ -29,15 +29,15 @@ import java.util.Set;
 
 /**
  * DAO class for {@link ProgramFavoriteDAO}.
- *
  */
 @SuppressWarnings("unchecked")
 public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ProgramFavoriteDAO.class);
 
-	public Optional<ProgramFavorite> getProgramFavorite(final String programUUID, final ProgramFavorite.FavoriteType type, final Integer entityId)
-			throws MiddlewareQueryException {
+	public Optional<ProgramFavorite> getProgramFavorite(
+		final String programUUID, final ProgramFavorite.FavoriteType type, final Integer entityId)
+		throws MiddlewareQueryException {
 
 		try {
 
@@ -47,11 +47,11 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 			criteria.add(Restrictions.eq("entityId", entityId));
 
 			final List<ProgramFavorite> result = criteria.list();
-			return result.size() > 0 ? Optional.of(result.get(0)) : Optional.empty();
+			return result.isEmpty() ? Optional.of(result.get(0)) : Optional.empty();
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in getProgramFavorites(" + type.name() + ") in ProgramFavoriteDao: "
-					+ e.getMessage(), e);
+				+ e.getMessage(), e);
 		}
 	}
 
@@ -68,11 +68,12 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in getProgramFavorites(" + type.name() + "," + max + ") in ProgramFavoriteDao: "
-					+ e.getMessage(), e);
+				+ e.getMessage(), e);
 		}
 	}
 
-	public List<ProgramFavorite> getProgramFavorites(final String programUUID, final ProgramFavorite.FavoriteType favoriteType, final Set<Integer> entityIds)
+	public List<ProgramFavorite> getProgramFavorites(
+		final String programUUID, final ProgramFavorite.FavoriteType favoriteType, final Set<Integer> entityIds)
 		throws MiddlewareQueryException {
 		try {
 
@@ -80,15 +81,16 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 			criteria.add(Restrictions.eq("entityType", favoriteType));
 			criteria.add(Restrictions.eq("uniqueID", programUUID));
 
-			if(CollectionUtils.isNotEmpty(entityIds)){
+			if (CollectionUtils.isNotEmpty(entityIds)) {
 				criteria.add(Restrictions.in("entityId", entityIds));
 			}
 
 			return criteria.list();
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getProgramFavorites(" + favoriteType.name() + "," + entityIds.toArray() + ") in ProgramFavoriteDao: "
-				+ e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				"Error in getProgramFavorites(" + favoriteType.name() + "," + entityIds.toArray() + ") in ProgramFavoriteDao: "
+					+ e.getMessage(), e);
 		}
 	}
 
@@ -107,7 +109,8 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 
 	public void deleteProgramFavorites(final String programUUID, final Set<Integer> programFavoriteIds) {
 		try {
-			final StringBuilder stringBuilder = new StringBuilder("DELETE pf FROM program_favorites pf WHERE pf.program_uuid = :programUUID");
+			final StringBuilder stringBuilder =
+				new StringBuilder("DELETE pf FROM program_favorites pf WHERE pf.program_uuid = :programUUID");
 			stringBuilder.append(" and pf.id in (:programFavoriteIds)");
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(stringBuilder.toString());
@@ -126,7 +129,8 @@ public class ProgramFavoriteDAO extends GenericDAO<ProgramFavorite, Integer> {
 
 	public void deleteProgramFavorites(final ProgramFavorite.FavoriteType favoriteType, final Set<Integer> entityIds) {
 		try {
-			final StringBuilder stringBuilder = new StringBuilder("DELETE pf FROM program_favorites pf WHERE pf.entity_Type = :favoriteType");
+			final StringBuilder stringBuilder =
+				new StringBuilder("DELETE pf FROM program_favorites pf WHERE pf.entity_Type = :favoriteType");
 			stringBuilder.append(" and pf.entity_id in (:entityIds)");
 
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(stringBuilder.toString());

@@ -24,28 +24,29 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * DAO class for {@link Tool}.
- *
  */
 @Transactional
 public class ToolDAO extends GenericDAO<Tool, Long> {
 
-	public Tool getByToolName(String toolName) throws MiddlewareQueryException {
+	public Tool getByToolName(final String toolName) throws MiddlewareQueryException {
 		try {
-			Criteria criteria = this.getSession().createCriteria(Tool.class).add(Restrictions.eq("toolName", toolName)).setMaxResults(1);
+			final Criteria criteria =
+				this.getSession().createCriteria(Tool.class).add(Restrictions.eq("toolName", toolName)).setMaxResults(1);
 			return (Tool) criteria.uniqueResult();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getByToolName(toolName=" + toolName + ") query from Tool: " + e.getMessage(), e);
 		}
 		return null;
 	}
 
-	public Tool getByToolId(Long toolId) throws MiddlewareQueryException {
+	public Tool getByToolId(final Long toolId) throws MiddlewareQueryException {
 		try {
 			if (toolId != null) {
-				Criteria criteria = this.getSession().createCriteria(Tool.class).add(Restrictions.eq("toolId", toolId)).setMaxResults(1);
+				final Criteria criteria =
+					this.getSession().createCriteria(Tool.class).add(Restrictions.eq("toolId", toolId)).setMaxResults(1);
 				return (Tool) criteria.uniqueResult();
 			}
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error withgetByToolId(toolId=" + toolId + ") query from Tool: " + e.getMessage(), e);
 		}
 		return null;
@@ -54,40 +55,36 @@ public class ToolDAO extends GenericDAO<Tool, Long> {
 	@SuppressWarnings("unchecked")
 	public List<Tool> getUserTools() throws MiddlewareQueryException {
 		try {
-			Criteria criteria = this.getSession().createCriteria(Tool.class).add(Restrictions.eq("userTool", true));
+			final Criteria criteria = this.getSession().createCriteria(Tool.class).add(Restrictions.eq("userTool", true));
 
 			return criteria.list();
-		} catch (HibernateException e) {
+		} catch (final HibernateException e) {
 			this.logAndThrowException("Error with getUserTools() query from Tool: " + e.getMessage(), e);
 		}
-		return new ArrayList<Tool>();
+		return new ArrayList<>();
 	}
 
 	@Override
-	public Tool save(Tool entity) throws MiddlewareQueryException {
-
-
+	public Tool save(final Tool entity) throws MiddlewareQueryException {
 
 		try {
-			Tool out = super.save(entity);
+			final Tool out = super.save(entity);
 
 			return out;
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}
 	}
 
 	@Override
-	public Tool update(Tool entity) throws MiddlewareQueryException {
-
-
+	public Tool update(final Tool entity) throws MiddlewareQueryException {
 
 		try {
-			Tool out = super.update(entity);
+			final Tool out = super.update(entity);
 
 			return out;
-		} catch (MiddlewareQueryException e) {
+		} catch (final MiddlewareQueryException e) {
 
 			throw new MiddlewareQueryException(e.getMessage(), e);
 		}

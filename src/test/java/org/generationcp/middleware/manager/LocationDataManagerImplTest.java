@@ -19,7 +19,6 @@ import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationDetails;
-import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
@@ -30,9 +29,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class LocationDataManagerImplTest extends IntegrationTestBase {
 
@@ -94,11 +91,13 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	public void testHandlingOfNullOrEmptyLocationIdsInGetLocationsByIDs() {
 
 		final List<Location> locationsByIdEmptyTest = this.manager.getLocationsByIDs(Collections.emptyList());
-		Assert.assertTrue("Returned result must not be null and must be an empty list",
+		Assert.assertTrue(
+			"Returned result must not be null and must be an empty list",
 			locationsByIdEmptyTest != null && locationsByIdEmptyTest.isEmpty());
 
 		final List<Location> locationsByIdNullTest = this.manager.getLocationsByIDs(null);
-		Assert.assertTrue("Returned result must not be null and must be an empty list",
+		Assert.assertTrue(
+			"Returned result must not be null and must be an empty list",
 			locationsByIdNullTest != null && locationsByIdNullTest.isEmpty());
 
 	}
@@ -122,7 +121,8 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		Debug.printObjects(IntegrationTestBase.INDENT, locationList);
 
 		final List<Location> locationList2 = this.manager.getLocationsByName(name, start, numOfRows, Operation.EQUAL);
-		Debug.println(IntegrationTestBase.INDENT,
+		Debug.println(
+			IntegrationTestBase.INDENT,
 			"testGetLocationsByName(" + name + ", start=" + start + ", numOfRows=" + numOfRows + "): ");
 		Debug.printObjects(IntegrationTestBase.INDENT, locationList2);
 	}
@@ -167,7 +167,8 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		final String tableName = "LOCATION";
 		final String fieldType = "LTYPE";
 		final List<UserDefinedField> userDefinedField = this.manager.getUserDefinedFieldByFieldTableNameAndType(tableName, fieldType);
-		Debug.println(IntegrationTestBase.INDENT,
+		Debug.println(
+			IntegrationTestBase.INDENT,
 			"testGetUserDefineFieldByTableNameAndType(type=" + tableName + "): " + userDefinedField.size());
 		Debug.printObjects(IntegrationTestBase.INDENT, userDefinedField);
 	}

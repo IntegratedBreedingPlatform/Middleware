@@ -29,7 +29,7 @@ public interface GermplasmListManager {
 
 	/**
 	 * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasmlist.GermplasmListService#getGermplasmListById(Integer)}
-	 *
+	 * <p>
 	 * Returns the GermplasmList identified by the given id.
 	 *
 	 * @param id - the listid of the GermplasmList
@@ -211,7 +211,7 @@ public interface GermplasmListManager {
 
 	/**
 	 * This method is deprecated. Please, use {@link org.generationcp.middleware.api.germplasmlist.GermplasmListService#addGermplasmListData(List)}
-	 *
+	 * <p>
 	 * Inserts a list of multiple {@code GermplasmListData} objects into the database.
 	 *
 	 * @param germplasmListDatas - A list of {@code GermplasmListData} objects to be persisted to the database. {@code GermplasmListData}
@@ -241,7 +241,7 @@ public interface GermplasmListManager {
 	/**
 	 * Returns a list of {@code GermplasmList} child records given a parent id.
 	 *
-	 * @param parentId    - the ID of the parent to retrieve the child lists
+	 * @param parentId - the ID of the parent to retrieve the child lists
 	 * @return Returns a List of GermplasmList POJOs for the child lists
 	 */
 	List<GermplasmList> getGermplasmListByParentFolderId(Integer parentId);

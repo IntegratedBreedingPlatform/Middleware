@@ -17,13 +17,10 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
-import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListMetadata;
@@ -38,10 +35,8 @@ import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,9 +52,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Resource
 	private UserService userService;
-
-	@Resource
-	private GermplasmListService germplasmListService;
 
 	/**
 	 * Caches the udflds table. udflds should be small so this cache should be fine in terms of size. The string is the database url. So the

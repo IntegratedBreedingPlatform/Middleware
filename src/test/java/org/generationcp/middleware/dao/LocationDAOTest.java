@@ -38,7 +38,8 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void testGetLocations() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("Country");
-		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		final List<org.generationcp.middleware.api.location.Location> locationList =
+			this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected list of country location size > zero", locationList != null && locationList.size() > 0);
 	}
 
@@ -48,7 +49,8 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationAbbreviations(Collections.singletonList(location.getLabbr()));
-		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		final List<org.generationcp.middleware.api.location.Location> locationList =
+			this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected to return filtered list by abbreviation", locationList != null && locationList.size() > 0);
 	}
 
@@ -56,7 +58,8 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void testGetLocationsWithWrongLocType() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
-		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		final List<org.generationcp.middleware.api.location.Location> locationList =
+			this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected list of location size equals to zero", locationList != null && locationList.size() == 0);
 
 	}

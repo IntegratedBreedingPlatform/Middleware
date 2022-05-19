@@ -331,7 +331,8 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
-	public List<UserDto> getAllProgramEligibleUsers(final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest,
+	public List<UserDto> getAllProgramEligibleUsers(
+		final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest,
 		final Pageable pageable) {
 		try {
 			final SQLQueryBuilder queryBuilder = ProgramEligibleUsersQuery.getSelectQuery(pageable, searchRequest);
@@ -365,7 +366,8 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 	}
 
-	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final ProgramMembersSearchRequest searchRequest,
+	public List<ProgramMemberDto> getProgramMembers(
+		final String programUUID, final ProgramMembersSearchRequest searchRequest,
 		final Pageable pageable) {
 		try {
 			final SQLQueryBuilder queryBuilder = ProgramMembersQuery.getSelectQuery(pageable, searchRequest);

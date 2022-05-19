@@ -16,7 +16,6 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
-import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
@@ -39,8 +38,8 @@ public interface WorkbenchDataManager {
 	/**
 	 * Gets the projects.
 	 *
-	 * @param pageable     - the starting record and number of page
-	 * @param programSearchRequest   - the filters that to be included in the query
+	 * @param pageable             - the starting record and number of page
+	 * @param programSearchRequest - the filters that to be included in the query
 	 * @return All projects based on the given start, numOfRows and filters Map
 	 */
 	List<Project> getProjects(final Pageable pageable, final ProgramSearchRequest programSearchRequest);
@@ -160,7 +159,6 @@ public interface WorkbenchDataManager {
 	 * @return
 	 */
 	List<RoleType> getRoleTypes();
-
 
 	// TODO Move role methods to RoleServiceImp
 

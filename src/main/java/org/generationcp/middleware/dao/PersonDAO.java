@@ -100,7 +100,8 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		} catch (final HibernateException e) {
 			final String message = "Error with getPersonsByCrop(cropType=" + cropType + "";
 			LOG.error(message, e);
-			throw new MiddlewareQueryException(message,
+			throw new MiddlewareQueryException(
+				message,
 				e);
 		}
 	}

@@ -16,11 +16,7 @@ import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -28,7 +24,6 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
-import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -263,7 +258,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(final List<String> germplasmNames,
+	public List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(
+		final List<String> germplasmNames,
 		final GetGermplasmByNameModes mode) {
 		final List<String> namesToUse = GermplasmDataManagerUtil.getNamesToUseByMode(germplasmNames, mode);
 		return this.daoFactory.getNameDao().getGermplasmNameDetailsByNames(namesToUse, mode);
@@ -441,13 +437,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
+	public List<Germplasm> getExistingCrosses(
+		final Integer femaleParent, final List<Integer> maleParentIds,
 		final Optional<Integer> gid) {
 		return this.daoFactory.getGermplasmDao().getExistingCrosses(femaleParent, maleParentIds, gid);
 	}
 
 	@Override
-	public boolean hasExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
+	public boolean hasExistingCrosses(
+		final Integer femaleParent, final List<Integer> maleParentIds,
 		final Optional<Integer> gid) {
 		return this.daoFactory.getGermplasmDao().hasExistingCrosses(femaleParent, maleParentIds, gid);
 	}

@@ -3,10 +3,8 @@ package org.generationcp.middleware.service.impl.user;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.program.ProgramService;
-import org.generationcp.middleware.data.initializer.UserDtoTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserRoleDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
-import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -14,7 +12,6 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropPerson;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
@@ -30,16 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class UserServiceImplTest extends IntegrationTestBase {
@@ -246,7 +240,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		user.setStatus(1);
 		this.userService.addUser(user);
 		final Long newCount = this.userService.countUsersByFullname(user.getPerson().getDisplayName());
-		Assert.assertEquals(count.toString(), String.valueOf(newCount+1));
+		Assert.assertEquals(count.toString(), String.valueOf(newCount + 1));
 	}
 
 	@Test
@@ -374,7 +368,8 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	public void testGetUserIDFullNameMap() {
 		final WorkbenchUser workbenchUser = this.integrationTestDataInitializer.createUserForTesting();
 		final Map<Integer, String> result = this.userService.getUserIDFullNameMap(Arrays.asList(workbenchUser.getUserid()));
-		assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
+		assertEquals(
+			workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
 			result.get(workbenchUser.getUserid()));
 	}
 

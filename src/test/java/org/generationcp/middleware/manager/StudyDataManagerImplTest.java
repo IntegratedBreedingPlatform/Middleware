@@ -11,9 +11,7 @@
 
 package org.generationcp.middleware.manager;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
@@ -36,7 +34,6 @@ import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -142,6 +139,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private CropType crop;
 
 	private StandardVariableSaver standardVariableSaver;
+
 	@Before
 	public void setUp() throws Exception {
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
@@ -171,7 +169,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 		}
 		final Properties mockProperties = Mockito.mock(Properties.class);
 		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
@@ -265,7 +263,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testSearchStudiesByGid() throws Exception {
 		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 		final Integer[] gids = this.germplasmTestDataGenerator
-				.createChildrenGermplasm(1, "PREF-ABC", parentGermplasm);
+			.createChildrenGermplasm(1, "PREF-ABC", parentGermplasm);
 		this.studyTDI.addStudyGermplasm(this.studyReference.getId(), 1, Arrays.asList(gids));
 
 		// Flushing to force Hibernate to synchronize with the underlying database before the search
@@ -279,7 +277,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		for (final StudyReference study : studyReferences) {
 			Assert.assertNotNull(study.getOwnerId());
 			final WorkbenchUser workbenchUser = this.userService.getUserById(study.getOwnerId());
-			Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
+			Assert.assertEquals(
+				workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
+				study.getOwnerName());
 
 		}
 	}
@@ -334,7 +334,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 				Assert.assertFalse(study.getIsLocked());
 				Assert.assertEquals(this.studyReference.getOwnerId(), study.getOwnerId());
 				final WorkbenchUser workbenchUser = this.userService.getUserById(this.studyReference.getOwnerId());
-				Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
+				Assert.assertEquals(
+					workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
+					study.getOwnerName());
 			}
 		}
 	}
@@ -501,8 +503,12 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
 			this.manager.updateFieldMapWithBlockInformation(infos, false);
 
-			Assert.assertNotNull("Expected maximum number of rows " + trialInstance.getRowsInBlock() + " instead.", trialInstance.getRowsInBlock());
-			Assert.assertNotNull("Expected maximum number of range " + trialInstance.getRangesInBlock() + " instead.", trialInstance.getRangesInBlock());
+			Assert.assertNotNull(
+				"Expected maximum number of rows " + trialInstance.getRowsInBlock() + " instead.",
+				trialInstance.getRowsInBlock());
+			Assert.assertNotNull(
+				"Expected maximum number of range " + trialInstance.getRangesInBlock() + " instead.",
+				trialInstance.getRangesInBlock());
 			Assert.assertEquals("Expected with default value of 1 ", 1, (int) trialInstance.getRowsPerPlot());
 			Assert.assertEquals("Expected with default value of 1", 1, (int) trialInstance.getPlantingOrder());
 			Assert.assertEquals("Expected with default value of 1", 1, (int) trialInstance.getMachineRowCapacity());
@@ -684,7 +690,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse(studyFromDB.getIsLocked());
 		Assert.assertEquals(this.studyReference.getOwnerId(), studyFromDB.getOwnerId());
 		final WorkbenchUser workbenchUser = this.userService.getUserById(this.studyReference.getOwnerId());
-		Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), studyFromDB.getOwnerName());
+		Assert.assertEquals(
+			workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
+			studyFromDB.getOwnerName());
 	}
 
 	@Test
@@ -756,7 +764,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		values.setVariableList(factors);
 		values.setLocationId(this.manager.getExperimentModelSaver().createNewGeoLocation().getLocationId());
 		//Save the experiment
-		experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		this.experimentModelSaver.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 
 		final ExperimentModel experiment =
 			this.daoFactory.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
@@ -845,7 +853,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(newStudyName, project.getName());
 
 	}
-
 
 	@Test
 	public void testIsStudy() {
