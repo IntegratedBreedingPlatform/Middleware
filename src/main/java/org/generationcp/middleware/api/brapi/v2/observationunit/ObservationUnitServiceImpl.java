@@ -139,7 +139,8 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 				ObservationLevelRelationship::getExperimentId));
 
 			final ObservationSearchRequestDto observationSearchRequest = new ObservationSearchRequestDto();
-			observationSearchRequest.setObservationUnitDbIds(dtos.stream().map(ObservationUnitDto::getObservationUnitDbId).collect(Collectors.toList()));
+			observationSearchRequest.setObservationUnitDbIds(
+				dtos.stream().map(ObservationUnitDto::getObservationUnitDbId).collect(Collectors.toList()));
 			final List<ObservationDto> observationDtos = this.observationService.searchObservations(observationSearchRequest, null);
 			final Map<String, List<PhenotypeSearchObservationDTO>> phenotypeObservationsMap = observationDtos.stream()
 				.map(observation -> new PhenotypeSearchObservationDTO(observation))
@@ -196,6 +197,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final Map<Integer, DmsProject> trialIdPlotDatasetMap =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.PLOT_DATA.getId()).stream()
 				.collect(Collectors.toMap(plotDataset -> plotDataset.getStudy().getProjectId(), Function.identity()));
+		final Map<Integer, DmsProject> trialIdMeansDatasetMap =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.MEANS_DATA.getId()).stream()
+				.collect(Collectors.toMap(plotDataset -> plotDataset.getStudy().getProjectId(), Function.identity()));
 		final Map<Integer, List<Integer>> plotExperimentVariablesMap = this.populatePlotExperimentVariablesMap(trialIdPlotDatasetMap);
 
 		final Map<String, MeasurementVariable> variableNamesMap =
@@ -224,12 +228,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		for (final ObservationUnitImportRequestDto dto : requestDtos) {
 			final Integer trialDbId = Integer.valueOf(dto.getTrialDbId());
 			final Integer studyDbId = Integer.valueOf(dto.getStudyDbId());
+			final boolean isObservationUnitForMeansDataset = this.isObservationUnitForMeans(dto);
+
 			final Optional<String> entryNoOptional =
 				!MapUtils.isEmpty(dto.getAdditionalInfo()) ? Optional.ofNullable(dto.getAdditionalInfo().getOrDefault(ENTRY_NO, null)) :
 					Optional.empty();
 
-			this.addExperimentVariablesIfNecessary(dto, plotExperimentVariablesMap, trialIdPlotDatasetMap, variableNamesMap,
-				variableSynonymsMap);
 			// If combination of germplasmDbId and entryNumber (if specified) does not exist, create new stock
 			if (!stockMap.get(trialDbId)
 				.containsKey(dto.getGermplasmDbId(), entryNoOptional.orElse(StringUtils.EMPTY))) {
@@ -239,15 +243,23 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			}
 
 			final ExperimentModel experimentModel = new ExperimentModel();
-			experimentModel.setProject(trialIdPlotDatasetMap.get(trialDbId));
+			if (isObservationUnitForMeansDataset) {
+				experimentModel.setProject(trialIdMeansDatasetMap.get(trialDbId));
+				experimentModel.setTypeId(TermId.AVERAGE_EXPERIMENT.getId());
+			} else {
+				experimentModel.setProject(trialIdPlotDatasetMap.get(trialDbId));
+				experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+				this.setJsonProps(experimentModel, dto);
+				this.addExperimentVariablesIfNecessary(dto, plotExperimentVariablesMap, trialIdPlotDatasetMap, variableNamesMap,
+					variableSynonymsMap);
+				this.addExperimentProperties(experimentModel, dto, variableNamesMap, variableSynonymsMap, categoricalVariablesMap);
+			}
 			experimentModel.setGeoLocation(new Geolocation(studyDbId));
-			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 			experimentModel.setStock(
 				(StockModel) stockMap.get(trialDbId).get(dto.getGermplasmDbId(), entryNoOptional.orElse(StringUtils.EMPTY)));
 
-			this.setJsonProps(experimentModel, dto);
 			ObservationUnitIDGenerator.generateObservationUnitIds(cropType, Collections.singletonList(experimentModel));
-			this.addExperimentProperties(experimentModel, dto, variableNamesMap, variableSynonymsMap, categoricalVariablesMap);
+
 			this.setExperimentExternalReferences(dto, experimentModel);
 			this.daoFactory.getExperimentDao().save(experimentModel);
 
@@ -266,6 +278,13 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	public Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocations(
 		final Set<String> geolocationIds) {
 		return this.daoFactory.getExperimentPropertyDao().getPlotObservationLevelRelationshipsByGeolocations(geolocationIds);
+	}
+
+	private boolean isObservationUnitForMeans(final ObservationUnitImportRequestDto observationUnitDto) {
+		return observationUnitDto.getObservationUnitPosition() != null
+			&& observationUnitDto.getObservationUnitPosition().getObservationLevel() != null
+			&& observationUnitDto.getObservationUnitPosition().getObservationLevel().getLevelName()
+			.equalsIgnoreCase(DatasetTypeEnum.MEANS_DATA.getName());
 	}
 
 	private void setJsonProps(final ExperimentModel model, final ObservationUnitImportRequestDto dto) {

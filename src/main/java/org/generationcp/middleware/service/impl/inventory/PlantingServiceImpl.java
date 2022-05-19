@@ -25,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -204,17 +206,18 @@ public class PlantingServiceImpl implements PlantingService {
 				plantingRequestDto.getWithdrawalsPerUnit().get(lot.getUnitName());
 			final Double amount = (withdrawalInstruction.isWithdrawAllAvailableBalance()) ? lot.getAvailableBalance() :
 				withdrawalInstruction.getWithdrawalAmount();
-			final Double totalToWithdraw =
-				(withdrawalInstruction.isWithdrawAllAvailableBalance()) ? amount : (amount * ndExperimentIds.size());
+			final BigDecimal totalToWithdraw =
+				(withdrawalInstruction.isWithdrawAllAvailableBalance()) ? new BigDecimal(amount) :
+					(new BigDecimal(amount).multiply(new BigDecimal(ndExperimentIds.size())).setScale(3, RoundingMode.HALF_DOWN).stripTrailingZeros());
 
-			if (totalToWithdraw > lot.getAvailableBalance()) {
+			if (totalToWithdraw.doubleValue() > lot.getAvailableBalance()) {
 				throw new MiddlewareRequestException("", "planting.not.enough.inventory", lot.getStockId());
 			}
 
 			if (withdrawalInstruction.isGroupTransactions()) {
 				final Transaction transaction =
 					new Transaction(TransactionType.WITHDRAWAL, transactionStatus, userId, plantingRequestDto.getNotes(), lot.getLotId(),
-						-1 * totalToWithdraw);
+						-1 * totalToWithdraw.doubleValue());
 				this.daoFactory.getTransactionDAO().save(transaction);
 				for (final Integer ndExperimentId : ndExperimentIds) {
 					final ExperimentModel experimentModel = new ExperimentModel(ndExperimentId);
