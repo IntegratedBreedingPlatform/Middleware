@@ -22,4 +22,52 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="mderamos" id="v21.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="program_location_default"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create program_location_default table
+		</comment>
+		<createTable tableName="program_location_default">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="program_uuid" type="varchar(255)">
+				<constraints nullable="false" unique="true"/>
+			</column>
+			<column name="location_id" type="INT(11)">
+				<constraints nullable="false" foreignKeyName="fk_program_location_default" references="location(locid)"/>
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v21.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="program_location_default"/>
+				<not>
+					<sqlCheck expectedResult="0">
+						SELECT COUNT(1) FROM workbench.workbench_project project
+						INNER JOIN workbench.workbench_crop crop
+						WHERE crop.crop_name = project.crop_type
+						AND crop.db_name = DATABASE()
+					</sqlCheck>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Populate program_location_default for existing programs, set 0 as default
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO program_location_default(program_uuid, location_id)
+			SELECT project.project_uuid, 0 FROM workbench.workbench_project project
+			INNER JOIN workbench.workbench_crop crop
+			WHERE crop.crop_name = project.crop_type
+			AND crop.db_name = DATABASE()
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
