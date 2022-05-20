@@ -374,15 +374,72 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="studies-TBD-25">
+	<changeSet author="lkovacic" id="studies-TBD-25">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 from list_data_view where static_id = -9;
             </sqlCheck>
         </preConditions>
-        <comment>Replace GROUP_SOURCE_NAME value in 'list_data_view' table</comment>
+        <comment>Replace GROUP_SOURCE_NAME 'static_id' value in 'list_data_view' table</comment>
         <sql dbms="mysql" splitStatements="true">
 			 UPDATE list_data_view SET static_id = 8340 where static_id = -9;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="studies-TBD-26">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm where name = 'Universally Unique ID' and cv_id = 1030 and is_obsolete = 0;
+			</sqlCheck>
+        </preConditions>
+        <comment>Add new scale 'Universally Unique ID'</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+							VALUES (1030, 'Universally Unique ID', 'Universally Unique ID', NULL, 0, 0, 0);
+
+			SET @cvterm_id  = (SELECT LAST_INSERT_ID());
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			  	VALUES (1105, @cvterm_id, 1120);
+
+			INSERT INTO cvtermprop (cvterm_id, type_id, value, `rank`)
+				VALUES (@cvterm_id, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="studies-TBD-27">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">select count(*) from cvterm where name = 'Universally Unique ID' and cv_id = 1030 and is_obsolete = 0;</sqlCheck>
+				<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'GUID' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
+			</and>
+		</preConditions>
+        <comment>Add 'GUID' as germplasm descriptor</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+				VALUES (8235, 1040, 'GUID', 'Germplasm unique identifier', NULL, 0, 0, 0);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			  	VALUES
+			(1200, 8235, 2205),
+			(1210, 8235, 4030),
+			(1220, 8235, (select cvterm_id from cvterm where name = 'Universally Unique ID' and cv_id = 1030 and is_obsolete = 0));
+
+			INSERT INTO cvtermprop (cvterm_id, type_id, value, `rank`) VALUES
+			(8235, 1800, 'Germplasm Descriptor', 0),
+			(8235, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="studies-TBD-28">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) > 0 from list_data_view where static_id = -10;
+            </sqlCheck>
+        </preConditions>
+        <comment>Replace GUID 'static_id' value in 'list_data_view' table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			 UPDATE list_data_view SET static_id = 8235 where static_id = -10;
         </sql>
 	</changeSet>
 
