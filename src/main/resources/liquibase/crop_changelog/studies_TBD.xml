@@ -30,12 +30,12 @@
   <changeSet author="lkovacic" id="studies-TBD-bckp-2">
         <preConditions onFail="MARK_RAN">
       <not>
-        <tableExists tableName="project_prop_bkp" />
+        <tableExists tableName="projectprop_bkp" />
       </not>
         </preConditions>
         <comment>Create backup for 'projectprop' table</comment>
     <sql dbms="mysql" splitStatements="true">
-		create table project_prop_bkp (
+		create table projectprop_bkp (
 			projectprop_id int auto_increment
 				primary key,
 			project_id     int           not null,
@@ -46,7 +46,7 @@
 			alias          varchar(255)  null
 		);
 
-		INSERT INTO project_prop_bkp
+		INSERT INTO projectprop_bkp
 		SELECT * FROM projectprop;
     </sql>
   </changeSet>
