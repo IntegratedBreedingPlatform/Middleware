@@ -11,6 +11,7 @@
 package org.generationcp.middleware.service;
 
 import com.google.common.base.Optional;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.AttributeDAO;
@@ -742,9 +743,19 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void deleteAllFieldMapsByTrialInstanceIds(final List<Integer> geolocationId) {
+	public void deleteAllFieldMapsByTrialInstanceIds(final List<Integer> geolocationId, final Integer projectId,
+		final boolean deleteProjectProp) {
 		this.daoFactory.getExperimentPropertyDao().deleteExperimentPropByLocationIds(geolocationId, FIELDMAP_TERM_IDS);
-		final List<Integer> blockIdsToDelete = this.daoFactory.getGeolocationPropertyDao().deleteBlockPropertiesByGeolocationId(geolocationId);
-		this.daoFactory.getLocDesDao().deleteByLocationIds(blockIdsToDelete);
+		final List<Integer> blockIdsToDelete =
+			this.daoFactory.getGeolocationPropertyDao().deleteBlockPropertiesByGeolocationId(geolocationId);
+
+		if (CollectionUtils.isNotEmpty(blockIdsToDelete)) {
+			this.daoFactory.getLocDesDao().deleteByLocationIds(blockIdsToDelete);
+		}
+
+		if (deleteProjectProp) {
+			this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(
+				projectId, Arrays.asList(TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId()));
+		}
 	}
 }
