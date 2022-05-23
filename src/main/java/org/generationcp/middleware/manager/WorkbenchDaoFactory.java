@@ -16,7 +16,6 @@ import org.generationcp.middleware.dao.RoleTypePermissionDAO;
 import org.generationcp.middleware.dao.ToolDAO;
 import org.generationcp.middleware.dao.UserInfoDAO;
 import org.generationcp.middleware.dao.UserRoleDao;
-import org.generationcp.middleware.dao.WorkbenchSidebarCategoryDAO;
 import org.generationcp.middleware.dao.WorkbenchSidebarCategoryLinkDAO;
 import org.generationcp.middleware.dao.WorkbenchUserDAO;
 import org.generationcp.middleware.dao.feedback.FeedbackDAO;
