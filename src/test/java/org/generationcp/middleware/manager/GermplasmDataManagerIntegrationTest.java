@@ -121,7 +121,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 		}
 
 		if (this.commonTestProject == null) {
@@ -282,42 +282,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddMethod() throws MiddlewareQueryException {
-		Method method = new Method();
-		method.setMname("yesno");
-		method.setGeneq(0);
-		method.setLmid(2);
-		method.setMattr(0);
-		method.setMcode("UGM");
-		method.setMdate(19980610);
-		method.setMdesc("yay");
-		method.setMfprg(0);
-		method.setMgrp("S");
-		method.setMprgn(0);
-		method.setReference(0);
-		method.setUser(0);
-
-		method.setMtype("GEN");
-
-		this.germplasmDataManager.addMethod(method);
-
-		method = this.germplasmDataManager.getMethodByID(method.getMid());
-		Debug.println(IntegrationTestBase.INDENT, "testAddMethod(" + method + "): " + method);
-	}
-
-	@Test
-	public void testGetMethodsByGroupAndTypeAndName() throws MiddlewareQueryException {
-		final String group = "O"; // Tested with rice and cowpea
-		final String type = "GEN"; // Tested with rice and cowpea
-		final String name = "ALLO-POLYPLOID CF"; // Tested with rice and cowpea
-
-		final List<Method> methods = this.germplasmDataManager.getMethodsByGroupAndTypeAndName(group, type, name);
-		Debug.println(IntegrationTestBase.INDENT,
-			"testGetMethodsByGroupAndTypeAndName(group=" + group + " and type=" + type + " and name=" + name + "): " + methods.size());
-		Debug.printObjects(IntegrationTestBase.INDENT, methods);
-	}
-
-	@Test
 	public void testGetGermplasmDetailsByGermplasmNames() {
 		final List<String> germplasmNames =
 			Arrays.asList("C 65 CU   79", "C 65 CU 80", "C 65 CU 81", "Kevin 64", "Kevin 65", " BASMATI   370");
@@ -448,12 +412,6 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 		for (final Integer gid : results.keySet()) {
 			Debug.println(IntegrationTestBase.INDENT, gid + " : " + results.get(gid));
 		}
-	}
-
-	@Test
-	public void getMethodClasses() throws MiddlewareQueryException {
-		final List<Term> terms = this.germplasmDataManager.getMethodClasses();
-		System.out.println(terms);
 	}
 
 	@Test

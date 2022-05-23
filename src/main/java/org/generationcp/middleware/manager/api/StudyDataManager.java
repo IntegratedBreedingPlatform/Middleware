@@ -19,7 +19,6 @@ import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
@@ -310,18 +309,6 @@ public interface StudyDataManager {
 	void saveOrUpdateFieldmapProperties(List<FieldMapInfo> info, int userId, boolean isNew);
 
 	/**
-	 * Save Project Properties of the Project.
-	 *
-	 * @param project          the project
-	 * @param variableTypeList the variable type list
-	 * @param experimentValues the experiment values
-	 * @param locationIds      the location ids
-	 */
-	void saveTrialDatasetSummary(
-		DmsProject project, VariableTypeList variableTypeList, List<ExperimentValues> experimentValues,
-		List<Integer> locationIds);
-
-	/**
 	 * Retrieve all field map labels in the block of the specified trial instance id.
 	 *
 	 * @param datasetId     the dataset id
@@ -459,11 +446,6 @@ public interface StudyDataManager {
 	long countAllNurseryAndTrialStudyDetails(String programUUID);
 
 	/**
-	 * Retrieves a flat list (no tree structuring) of all folders.
-	 */
-	List<FolderReference> getAllFolders();
-
-	/**
 	 * Count plots with plants selected of dataset.
 	 *
 	 * @param dataSetId  the data set id
@@ -545,21 +527,6 @@ public interface StudyDataManager {
 	 */
 	Boolean containsAtLeast2CommonEntriesWithValues(int projectId, int locationId, int germplasmTermId);
 
-	/**
-	 * Determines the {@link StudyType} for study identified by the provided studyId.
-	 *
-	 * @param studyId Identifier of the study to determine study type for.
-	 * @return {@link StudyType} of the study. Returns {@code null} if study type can not be determined for the given study.
-	 */
-	StudyTypeDto getStudyType(int studyId);
-
-	/**
-	 * Soft-delete all program studies
-	 *
-	 * @param programUUID Program UUID of the studies to be deleted
-	 */
-	void deleteProgramStudies(String programUUID);
-
 	List<Experiment> getExperimentsWithTrialEnvironment(int trialDataSetId, int dataSetId, int start, int numRows);
 
 	/**
@@ -569,22 +536,6 @@ public interface StudyDataManager {
 	 * @param variableIds - list of variable IDs in the order that they will be saved
 	 */
 	void updateVariableOrdering(int datasetId, List<Integer> variableIds);
-
-	/**
-	 * Retrieves the trial instance number by geolocation id
-	 *
-	 * @param geolocationId
-	 * @return trial instance number
-	 */
-	String getTrialInstanceNumberByGeolocationId(int geolocationId);
-
-	/**
-	 * Retrieves all DMS project names with no program uuid.
-	 *
-	 * @return list of DMS project names with no programUUID
-	 * @
-	 */
-	List<String> getAllSharedProjectNames();
 
 	/**
 	 * Checks whether the specified locationIds exist in a given dataset
@@ -668,7 +619,4 @@ public interface StudyDataManager {
 	Map<Integer, String> getPhenotypeByVariableId(Integer datasetId, Integer instanceDbId);
 
 	boolean renameStudy(String newStudyName, int studyId, String programUUID);
-
-	void deleteStudy(int studyId);
-
 }
