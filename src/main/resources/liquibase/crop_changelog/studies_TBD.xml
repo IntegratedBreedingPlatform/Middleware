@@ -449,7 +449,7 @@
 				SELECT COUNT(*) from cvterm where cvterm_id = 8320 and cv_id = 1040;
 				</sqlCheck>
 		</preConditions>
-		<comment>Remove 'SEED_SOURCE' variable from cvterm</comment>
+		<comment>Remove 'GERM_SOURCE' variable from cvterm</comment>
 		<sql dbms="mysql" splitStatements="true">
 			DELETE FROM stockprop WHERE type_id = 8320;
 			DELETE FROM projectprop WHERE variable_id = 8320;
