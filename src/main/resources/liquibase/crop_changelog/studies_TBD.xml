@@ -443,4 +443,21 @@
         </sql>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="studies-TBD-29">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) from cvterm where cvterm_id = 8320 and cv_id = 1040;
+				</sqlCheck>
+		</preConditions>
+		<comment>Remove 'SEED_SOURCE' variable from cvterm</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM stockprop WHERE type_id = 8320;
+			DELETE FROM projectprop WHERE variable_id = 8320;
+
+			DELETE FROM cvterm where cvterm_id = 8320;
+			DELETE FROM cvterm_relationship where subject_id = 8320;
+			DELETE FROM cvtermprop where cvterm_id = 8320;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
