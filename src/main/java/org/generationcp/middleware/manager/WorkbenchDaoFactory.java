@@ -97,18 +97,6 @@ public class WorkbenchDaoFactory {
 		return toolDAO;
 	}
 
-	public WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDAO() {
-		final WorkbenchSidebarCategoryDAO workbenchSidebarCategoryDAO = new WorkbenchSidebarCategoryDAO();
-		workbenchSidebarCategoryDAO.setSession(this.sessionProvider.getSession());
-		return workbenchSidebarCategoryDAO;
-	}
-
-	public WorkbenchSidebarCategoryLinkDAO getWorkbenchSidebarCategoryLinkDAO() {
-		final WorkbenchSidebarCategoryLinkDAO workbenchSidebarCategoryLinkDAO = new WorkbenchSidebarCategoryLinkDAO();
-		workbenchSidebarCategoryLinkDAO.setSession(this.sessionProvider.getSession());
-		return workbenchSidebarCategoryLinkDAO;
-	}
-
 	public RoleTypeDAO getRoleTypeDAO() {
 		final RoleTypeDAO roleTypeDAO = new RoleTypeDAO();
 		roleTypeDAO.setSession(this.sessionProvider.getSession());
@@ -125,13 +113,6 @@ public class WorkbenchDaoFactory {
 		final RoleTypePermissionDAO roleTypePermissionDAO = new RoleTypePermissionDAO();
 		roleTypePermissionDAO.setSession(this.sessionProvider.getSession());
 		return roleTypePermissionDAO;
-	}
-
-	public WorkbenchSidebarCategoryDAO getWorkbenchSidebarCategoryDao() {
-
-		final WorkbenchSidebarCategoryDAO workbenchSidebarCategoryDAO = new WorkbenchSidebarCategoryDAO();
-		workbenchSidebarCategoryDAO.setSession(this.sessionProvider.getSession());
-		return workbenchSidebarCategoryDAO;
 	}
 
 	public WorkbenchSidebarCategoryLinkDAO getWorkbenchSidebarCategoryLinkDao() {
