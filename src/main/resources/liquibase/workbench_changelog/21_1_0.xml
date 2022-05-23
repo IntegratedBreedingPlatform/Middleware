@@ -24,7 +24,7 @@
 			  PRIMARY KEY (`crop_name`),
 			  CONSTRAINT `crop_genotyping_parameter_workbench_crop_fk`
 				FOREIGN KEY (`crop_name`)
-				REFERENCES `workbench`.`workbench_crop` (`crop_name`)
+				REFERENCES `workbench_crop` (`crop_name`)
 				ON DELETE NO ACTION
 				ON UPDATE NO ACTION);
 		</sql>
