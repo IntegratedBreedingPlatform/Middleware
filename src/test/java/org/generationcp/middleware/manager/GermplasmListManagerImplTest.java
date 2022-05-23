@@ -13,7 +13,6 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
@@ -29,12 +28,9 @@ import org.generationcp.middleware.utils.test.Debug;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 
 public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
@@ -77,7 +73,7 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 		}
 
 		final GermplasmListTestDataInitializer germplasmListTDI = new GermplasmListTestDataInitializer();
@@ -90,7 +86,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		final CropType cropType = new CropType();
 		cropType.setUseUUID(false);
 		this.germplasmTestDataGenerator.addGermplasm(this.testGermplasm, this.testGermplasm.getPreferredName(), cropType);
-
 
 		final GermplasmList germplasmListOther = germplasmListTDI
 			.createGermplasmList(GermplasmListManagerImplTest.OTHER_PROGRAM_LIST_NAME, GermplasmListManagerImplTest.OWNER_ID,
@@ -149,7 +144,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 		final GermplasmListData listData =
 			GermplasmListDataTestDataInitializer.createGermplasmListData(testGermplasmList, this.testGermplasm.getGid(), 2);
 		this.manager.addGermplasmListData(listData);
-
 
 	}
 
@@ -214,7 +208,9 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 	@Test
 	public void testAddGermplasmList() {
 		final GermplasmList germplasmList =
-			new GermplasmList(null, TEST_LIST_1, Long.valueOf(20120305), "LST", GermplasmListManagerImplTest.OWNER_ID, "Test List #1 for GCP-92", null, 1);
+			new GermplasmList(
+				null, TEST_LIST_1, Long.valueOf(20120305), "LST", GermplasmListManagerImplTest.OWNER_ID, "Test List #1 for GCP-92", null,
+				1);
 		germplasmList.setProgramUUID(GermplasmListManagerImplTest.PROGRAM_UUID);
 
 		final Integer id = this.manager.addGermplasmList(germplasmList);
@@ -244,8 +240,9 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 
 		this.manager.deleteGermplasmListByListIdPhysically(germplasmListId);
 
-		Assert.assertEquals(0,
-				this.manager.getGermplasmListByName(TEST_LIST_1, GermplasmListManagerImplTest.PROGRAM_UUID, 0, 1, Operation.EQUAL).size());
+		Assert.assertEquals(
+			0,
+			this.manager.getGermplasmListByName(TEST_LIST_1, GermplasmListManagerImplTest.PROGRAM_UUID, 0, 1, Operation.EQUAL).size());
 	}
 
 	@Test
@@ -315,29 +312,6 @@ public class GermplasmListManagerImplTest extends IntegrationTestBase {
 			GermplasmListManagerImplTest.GERMPLASM_LIST_NAME, germplasmList.getName());
 		Assert.assertEquals("The list description should be " + GermplasmListManagerImplTest.GERMPLASM_LIST_DESC,
 			GermplasmListManagerImplTest.GERMPLASM_LIST_DESC, germplasmList.getDescription());
-	}
-
-	@Test
-	public void getCodeFixedStatusByGidList() {
-		final GermplasmListManagerImpl germplasmListManager = Mockito.spy(GermplasmListManagerImpl.class);
-		final GermplasmDAO germplasmDAO = Mockito.mock(GermplasmDAO.class);
-		final DaoFactory daoFactory = Mockito.mock(DaoFactory.class);
-		germplasmListManager.setDaoFactory(daoFactory);
-
-		final List<Integer> gids = Arrays.asList(1, 2);
-		final Germplasm gid1 = new Germplasm();
-		gid1.setGid(1);
-		gid1.setMgid(1);
-		final Germplasm gid2 = new Germplasm();
-		gid2.setGid(2);
-		gid2.setMgid(0);
-		final List<Germplasm> germplasms = Arrays.asList(gid1, gid2);
-		Mockito.when(daoFactory.getGermplasmDao()).thenReturn(germplasmDAO);
-		Mockito.when(germplasmDAO.getByGIDList(gids)).thenReturn(germplasms);
-		Mockito.doCallRealMethod().when(germplasmListManager).getCodeFixedGidsByGidList(gids);
-		final Set<Integer> result = germplasmListManager.getCodeFixedGidsByGidList(gids);
-		Assert.assertEquals(1, result.size());
-		Assert.assertTrue(result.contains(gid1.getGid()));
 	}
 
 }

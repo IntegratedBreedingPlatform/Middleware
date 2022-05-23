@@ -31,8 +31,6 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
-import javax.persistence.NamedNativeQueries;
-import javax.persistence.NamedNativeQuery;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -60,9 +58,6 @@ import java.util.List;
 			+ "(CONCAT(p.firstName, ' ', p.middleName, ' ', p.lastName) = :fullname OR CONCAT(p.firstName, ' ', p.lastName) = :fullname)")
 
 })
-@NamedNativeQueries({
-	@NamedNativeQuery(name = "getAllActiveUsersSorted", query = "SELECT u.* FROM users u, persons p "
-		+ "WHERE u.personid = p.personid AND  u.ustatus = 0 ORDER BY fname, lname", resultClass = WorkbenchUser.class)})
 @Entity
 @Table(name = "users")
 public class WorkbenchUser implements Serializable, BeanFormState {
@@ -127,7 +122,6 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 
 	public static final String GET_BY_NAME_USING_EQUAL = "getUserByNameUsingEqual";
 	public static final String GET_BY_NAME_USING_LIKE = "getUserByNameUsingLike";
-	public static final String GET_ALL_ACTIVE_USERS_SORTED = "getAllActiveUsersSorted";
 	public static final String GET_BY_FULLNAME = "getByFullName";
 	public static final String COUNT_BY_FULLNAME = "countByFullName";
 
@@ -191,7 +185,8 @@ public class WorkbenchUser implements Serializable, BeanFormState {
 		this.userid = userid;
 	}
 
-	public WorkbenchUser(final Integer userid, final Integer instalid, final Integer status, final Integer access, final Integer type,
+	public WorkbenchUser(
+		final Integer userid, final Integer instalid, final Integer status, final Integer access, final Integer type,
 		final String name, final String password,
 		final Person person, final Integer adate, final Integer cdate) {
 		super();

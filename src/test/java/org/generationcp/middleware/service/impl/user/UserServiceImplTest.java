@@ -3,10 +3,8 @@ package org.generationcp.middleware.service.impl.user;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.program.ProgramService;
-import org.generationcp.middleware.data.initializer.UserDtoTestDataInitializer;
 import org.generationcp.middleware.data.initializer.UserRoleDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
-import org.generationcp.middleware.domain.workbench.CropDto;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
@@ -14,7 +12,6 @@ import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropPerson;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
@@ -30,16 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class UserServiceImplTest extends IntegrationTestBase {
@@ -246,46 +240,13 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		user.setStatus(1);
 		this.userService.addUser(user);
 		final Long newCount = this.userService.countUsersByFullname(user.getPerson().getDisplayName());
-		Assert.assertEquals(count.toString(), String.valueOf(newCount+1));
-	}
-
-	@Test
-	public void testCountAllPersons() {
-		final long count = this.userService.countAllPersons();
-		assertTrue(count > 0);
-	}
-
-	@Test
-	public void testCountAllUsers() {
-		final long count = this.userService.countAllUsers();
-		assertTrue(count > 0);
-	}
-
-	@Test
-	public void testGetAllPersons() {
-		final List<Person> results = this.userService.getAllPersons();
-		assertNotNull(results);
-		assertTrue(!results.isEmpty());
-	}
-
-	@Test
-	public void testGetAllUsers() {
-		final List<WorkbenchUser> results = this.userService.getAllUsers();
-		assertNotNull(results);
-		assertTrue(!results.isEmpty());
+		Assert.assertEquals(count.toString(), String.valueOf(newCount + 1));
 	}
 
 	@Test
 	public void testGetUserById() {
 		final WorkbenchUser user = this.userService.getUserById(this.testUser1.getUserid());
 		assertNotNull(user);
-	}
-
-	@Test
-	public void testDeletePerson() {
-		final Person person = this.workbenchTestDataUtil.createTestPersonData();
-		this.userService.addPerson(person);
-		this.userService.deletePerson(person);
 	}
 
 	@Test
@@ -306,77 +267,6 @@ public class UserServiceImplTest extends IntegrationTestBase {
 
 		assertThat("Expected id of userDto saved record in workbench_user.", result != null);
 		assertThat("Expected the same id of userDto saved record ", result.equals(userId));
-	}
-
-	@Test
-	public void testGetAllActiveUsers() {
-		final List<WorkbenchUser> prevListOfActiveUsers = this.userService.getAllActiveUsersSorted();
-		final UserDto userDto =
-			UserDtoTestDataInitializer.createUserDto("FirstName", "LastName", "email@leafnode.io", "password", null, "username");
-		final int id = this.userService.createUser(userDto);
-		userDto.setUserId(id);
-		List<WorkbenchUser> listOfActiveUsers = this.userService.getAllActiveUsersSorted();
-		assertEquals("The newly added user should be added in the retrieved list.",
-			prevListOfActiveUsers.size() + 1, listOfActiveUsers.size());
-
-		//Deactivate the user to check if it's not retrieved
-		userDto.setStatus(1);
-		this.userService.updateUser(userDto);
-		listOfActiveUsers = this.userService.getAllActiveUsersSorted();
-		assertEquals("The newly added user should be added in the retrieved list.",
-			prevListOfActiveUsers.size(), listOfActiveUsers.size());
-
-	}
-
-	@Test
-	public void testGetUsersByCrop() {
-		final String cropName = CropType.CropEnum.MAIZE.toString();
-		final List<WorkbenchUser> prevListOfActiveUsers = this.userService.getUsersByCrop(cropName);
-		final UserDto userDto =
-			UserDtoTestDataInitializer.createUserDto("FirstName", "LastName", "email@leafnode.io", "password", null, "username");
-		final Set<CropDto> crops = new HashSet<>();
-		final CropDto cropDto = new CropDto();
-		cropDto.setCropName(cropName);
-		crops.add(cropDto);
-		userDto.setCrops(crops);
-		final int id = this.userService.createUser(userDto);
-		userDto.setUserId(id);
-		List<WorkbenchUser> users = this.userService.getUsersByCrop(cropName);
-		assertEquals("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size() + 1, users.size());
-
-		//Deactivate the user to check if it's not retrieved
-		userDto.setStatus(1);
-		this.userService.updateUser(userDto);
-		users = this.userService.getUsersByCrop(cropName);
-		assertEquals("The newly added user should be added in the retrieved list.", prevListOfActiveUsers.size(), users.size());
-
-	}
-
-	@Test
-	public void testUpdateUserWithPerson() {
-
-		final UserDto userDto = this.workbenchTestDataUtil.createTestUserDTO(0);
-
-		final WorkbenchUser userToBeUpdated = this.userService.getUserById(this.userService.createUser(userDto));
-
-		final String password = "password1111";
-		final String firstName = "John";
-		final String lastName = "Doe";
-		final String email = "John.Doe@email.com";
-
-		userToBeUpdated.setPassword(password);
-		userToBeUpdated.getPerson().setFirstName(firstName);
-		userToBeUpdated.getPerson().setLastName(lastName);
-		userToBeUpdated.getPerson().setEmail(email);
-
-		this.userService.updateUser(userToBeUpdated);
-
-		final WorkbenchUser updatedUser = this.userService.getUserById(userToBeUpdated.getUserid());
-
-		assertEquals(password, updatedUser.getPassword());
-		assertEquals(firstName, updatedUser.getPerson().getFirstName());
-		assertEquals(lastName, updatedUser.getPerson().getLastName());
-		assertEquals(email, updatedUser.getPerson().getEmail());
 	}
 
 	@Test
@@ -432,19 +322,6 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testIsSuperAdminUser() {
-		final WorkbenchUser savedUser1 = this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
-		final WorkbenchUser user2 = this.workbenchTestDataUtil.createTestUserData();
-		final Role role = new Role();
-		role.setId(5);
-		user2.setRoles(Arrays.asList(new UserRole(user2, role)));
-		final WorkbenchUser savedUser2 = this.userService.addUser(user2);
-
-		Assert.assertFalse(this.userService.isSuperAdminUser(savedUser1.getUserid()));
-		assertTrue(this.userService.isSuperAdminUser(savedUser2.getUserid()));
-	}
-
-	@Test
 	public void testWorkbenchUserHasOnlyProgramRoles() {
 		final String cropName = "maize";
 		final WorkbenchUser user = UserTestDataInitializer.createWorkbenchUser();
@@ -462,19 +339,6 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		user.setRoles(roles);
 		Assert.assertThat(user.hasOnlyProgramRoles(cropName), is(false));
 
-	}
-
-	@Test
-	public void testGetProjectUserInfoByProjectIdAndUserId() {
-		final Project project = this.workbenchTestDataUtil.createTestProjectData();
-		this.programService.addProgram(project);
-		final WorkbenchUser user1 = this.userService.addUser(this.workbenchTestDataUtil.createTestUserData());
-
-		final ProjectUserInfo pUserInfo = new ProjectUserInfo(project, user1);
-		this.userService.saveOrUpdateProjectUserInfo(pUserInfo);
-		final ProjectUserInfo result = this.userService.getProjectUserInfoByProjectIdAndUserId(project.getProjectId(), user1.getUserid());
-		assertEquals(user1.getUserid(), result.getUser().getUserid());
-		assertEquals(project.getProjectId(), result.getProject().getProjectId());
 	}
 
 	@Test
@@ -504,7 +368,8 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	public void testGetUserIDFullNameMap() {
 		final WorkbenchUser workbenchUser = this.integrationTestDataInitializer.createUserForTesting();
 		final Map<Integer, String> result = this.userService.getUserIDFullNameMap(Arrays.asList(workbenchUser.getUserid()));
-		assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
+		assertEquals(
+			workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
 			result.get(workbenchUser.getUserid()));
 	}
 
@@ -514,19 +379,9 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		final CropPerson cropPerson = new CropPerson(this.commonTestProject.getCropType(), workbenchUser.getPerson());
 		this.userService.saveCropPerson(cropPerson);
 
-		final CropPerson savedCropPerson = this.workbenchDaoFactory.getCropPersonDAO().getByCropNameAndPersonId(this.commonTestProject.getCropType().getCropName(), cropPerson.getPerson().getId());
+		final CropPerson savedCropPerson = this.workbenchDaoFactory.getCropPersonDAO()
+			.getByCropNameAndPersonId(this.commonTestProject.getCropType().getCropName(), cropPerson.getPerson().getId());
 		assertNotNull(savedCropPerson);
-	}
-
-	@Test
-	public void testRemoveCropPerson() {
-		final WorkbenchUser workbenchUser = this.integrationTestDataInitializer.createUserForTesting();
-		final CropPerson cropPerson = new CropPerson(this.commonTestProject.getCropType(), workbenchUser.getPerson());
-		this.userService.saveCropPerson(cropPerson);
-		this.userService.removeCropPerson(cropPerson);
-
-		final CropPerson savedCropPerson = this.workbenchDaoFactory.getCropPersonDAO().getByCropNameAndPersonId(this.commonTestProject.getCropType().getCropName(), cropPerson.getPerson().getId());
-		assertNull(savedCropPerson);
 	}
 
 }

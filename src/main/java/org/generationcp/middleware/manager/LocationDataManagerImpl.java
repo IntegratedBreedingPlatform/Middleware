@@ -76,11 +76,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public UserDefinedField getUserDefinedFieldByID(final Integer id) {
-		return this.daoFactory.getUserDefinedFieldDAO().getById(id, false);
-	}
-
-	@Override
 	public Map<String, UserDefinedField> getUserDefinedFieldMapOfCodeByUDTableType(final UDTableType type) {
 		final Map<String, UserDefinedField> types = new HashMap<>();
 
@@ -164,11 +159,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 					+ e.getMessage(), e);
 		}
 		return idLocationSaved;
-	}
-
-	@Override
-	public List<Country> getAllCountry() {
-		return this.daoFactory.getCountryDao().getAllCountry();
 	}
 
 	@Override
@@ -267,16 +257,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return locations;
 	}
 
-	@Override
-	public List<Location> getAllProvincesByCountry(final Integer countryId) {
-		return this.daoFactory.getLocationDAO().getAllProvincesByCountry(countryId);
-	}
-
-	@Override
-	public List<Location> getAllProvinces() {
-		return this.daoFactory.getLocationDAO().getAllProvinces();
-	}
-
 	private int getNumericValue(final String strValue) {
 		int value = 0;
 		try {
@@ -285,29 +265,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			value = 0; // if it's nut a number, set to 0
 		}
 		return value;
-	}
-
-	@Override
-	public List<Locdes> getLocdesByLocId(final Integer locationId) {
-		return this.daoFactory.getLocationDAO().getLocdesByLocId(locationId);
-	}
-
-	@Override
-	public void saveOrUpdateLocdesList(final Integer locId, final List<Locdes> locdesList) {
-
-		if (locdesList != null && !locdesList.isEmpty()) {
-			try {
-				final List<Locdes> existingLocdesList = this.daoFactory.getLocDesDao().getByLocation(locId);
-				for (final Locdes locdes : locdesList) {
-					this.getLocdesSaver()
-						.saveOrUpdateLocdes(locdes.getLocationId(), existingLocdesList, locdes.getTypeId(), locdes.getDval(),
-							locdes.getUserId());
-				}
-			} catch (final Exception e) {
-				this.logAndThrowException("Error encountered with saveOrUpdateLocdesList(): " + e.getMessage(), e);
-			}
-		}
-
 	}
 
 	@Override
@@ -321,29 +278,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 		return this.daoFactory.getLocationDAO().getSeedingLocations(locationIds, seedLType);
 	}
 
-	@Override
-	public List<LocationDetails> getFilteredLocationsDetails(final Integer countryId, final Integer locationType, final String locationName) {
-		return this.daoFactory.getLocationDAO().getFilteredLocations(countryId, locationType, locationName);
-	}
-
-	@Override
-	public Integer getUserDefinedFieldIdOfName(final UDTableType tableType, final String name) {
-		final Map<String, UserDefinedField> types = new HashMap<>();
-
-		final List<UserDefinedField> dTypeFields =
-			this.getUserDefinedFieldByFieldTableNameAndType(tableType.getTable(), tableType.getType());
-		for (final UserDefinedField dTypeField : dTypeFields) {
-			types.put(dTypeField.getFname().toUpperCase(), dTypeField);
-		}
-
-		return types.get(name.toUpperCase()) != null ? types.get(name.toUpperCase()).getFldno() : null;
-	}
-
-	@Override
-	public long countByLocationAbbreviation(final String locationAbbreviation) {
-		return this.daoFactory.getLocationDAO().countByLocationAbbreviation(locationAbbreviation);
-	}
-
 	public String retrieveLocIdOfUnspecifiedLocation() {
 		String unspecifiedLocationId = "";
 		final List<Location> locations = this.getLocationsByName(Location.UNSPECIFIED_LOCATION, Operation.EQUAL);
@@ -351,12 +285,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 			unspecifiedLocationId = String.valueOf(locations.get(0).getLocid());
 		}
 		return unspecifiedLocationId;
-	}
-
-	@Override
-	public Location getDefaultLocationByType(final LocationType locationType) {
-		final Integer id = this.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locationType.getCode());
-		return this.daoFactory.getLocationDAO().getDefaultLocationByType(id);
 	}
 
 	@Override

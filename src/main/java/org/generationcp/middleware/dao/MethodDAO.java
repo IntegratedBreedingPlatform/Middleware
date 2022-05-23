@@ -104,36 +104,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<Method> getByGroupAndTypeAndName(final String group, final String type, final String name) {
-		try {
-
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-
-			if (type != null && !type.isEmpty()) {
-				criteria.add(Restrictions.eq("mtype", type));
-			}
-
-			if (name != null && !name.isEmpty()) {
-				criteria.add(Restrictions.like(METHOD_NAME, "%" + name.trim() + "%"));
-			}
-
-			if (group != null && !group.isEmpty()) {
-				final Criterion group1 = Restrictions.eq("mgrp", group);
-				final Criterion group2 = Restrictions.eq("mgrp", "G");
-				final LogicalExpression orExp = Restrictions.or(group1, group2);
-
-				criteria.add(orExp);
-			}
-
-			criteria.addOrder(Order.asc(METHOD_NAME));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getMethodsByGroupAndType", "group|type", group + "|" + type, e.getMessage(), "Method"), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<Method> getAllMethodsNotGenerative() {
 		try {
 			final List<Integer> validMethodClasses = new ArrayList<Integer>();
