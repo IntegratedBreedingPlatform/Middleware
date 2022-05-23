@@ -89,8 +89,15 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 
 			final String condition = "FROM nd_geolocationprop ngp "
 				+ "WHERE ngp.nd_geolocation_id IN (:geolocationIds) AND ngp.type_id = (:variableIds) ";
+
+			// block IDs to return to be used for locdes deletion
+			// only return if no other geolocation uses the block
 			final StringBuilder selectSql = new StringBuilder().append("SELECT ngp.value "
-				+ condition);
+				+ condition
+				+ "and not exists ( select 1 from nd_geolocationprop others "
+				+ "					where others.value = ngp.value "
+				+ "					and others.nd_geolocation_id not in (:geolocationIds))");
+
 			final StringBuilder deleteSql = new StringBuilder().append("Delete ngp.* "
 				+ condition);
 
