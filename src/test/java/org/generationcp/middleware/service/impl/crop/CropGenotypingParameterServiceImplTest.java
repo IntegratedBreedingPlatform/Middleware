@@ -27,8 +27,7 @@ public class CropGenotypingParameterServiceImplTest extends IntegrationTestBase 
 	}
 
 	@Test
-	public void testCreateCropGenotypingParameter() {
-
+	public void testGetCropGenotypingParameter() {
 		final CropGenotypingParameterDTO cropGenotypingParameterDTO = this.createCropGenotypingParameterDTO();
 
 		final CropType cropType = new CropType();
@@ -37,11 +36,33 @@ public class CropGenotypingParameterServiceImplTest extends IntegrationTestBase 
 
 		this.cropGenotypingParameterService.createCropGenotypingParameter(cropGenotypingParameterDTO);
 
-		final Optional<CropGenotypingParameterDTO> cropGenotypingParameterDTOOptional =
+		final Optional<CropGenotypingParameterDTO> resultOptional =
 			this.cropGenotypingParameterService.getCropGenotypingParameter(cropGenotypingParameterDTO.getCropName());
 
-		Assert.assertTrue(cropGenotypingParameterDTOOptional.isPresent());
-		final CropGenotypingParameterDTO created = cropGenotypingParameterDTOOptional.get();
+		Assert.assertTrue(resultOptional.isPresent());
+		final CropGenotypingParameterDTO result = resultOptional.get();
+		Assert.assertNotEquals(0, result.getGenotypingParameterId());
+		Assert.assertThat(result.getCropName(), is(cropGenotypingParameterDTO.getCropName()));
+		Assert.assertThat(result.getEndpoint(), is(cropGenotypingParameterDTO.getEndpoint()));
+		Assert.assertThat(result.getTokenEndpoint(), is(cropGenotypingParameterDTO.getTokenEndpoint()));
+		Assert.assertThat(result.getUserName(), is(cropGenotypingParameterDTO.getUserName()));
+		Assert.assertThat(result.getPassword(), is(cropGenotypingParameterDTO.getPassword()));
+		Assert.assertThat(result.getProgramId(), is(cropGenotypingParameterDTO.getProgramId()));
+	}
+
+	@Test
+	public void testCreateCropGenotypingParameter() {
+
+		final CropGenotypingParameterDTO cropGenotypingParameterDTO = this.createCropGenotypingParameterDTO();
+
+		final CropType cropType = new CropType();
+		cropType.setCropName(cropGenotypingParameterDTO.getCropName());
+		this.workbenchDaoFactory.getCropTypeDAO().save(cropType);
+
+		final CropGenotypingParameterDTO created =
+			this.cropGenotypingParameterService.createCropGenotypingParameter(cropGenotypingParameterDTO);
+
+		Assert.assertNotEquals(0, created.getGenotypingParameterId());
 		Assert.assertThat(created.getCropName(), is(cropGenotypingParameterDTO.getCropName()));
 		Assert.assertThat(created.getEndpoint(), is(cropGenotypingParameterDTO.getEndpoint()));
 		Assert.assertThat(created.getTokenEndpoint(), is(cropGenotypingParameterDTO.getTokenEndpoint()));
@@ -60,28 +81,30 @@ public class CropGenotypingParameterServiceImplTest extends IntegrationTestBase 
 		cropType.setCropName(cropGenotypingParameterDTO.getCropName());
 		this.workbenchDaoFactory.getCropTypeDAO().save(cropType);
 
-		this.cropGenotypingParameterService.createCropGenotypingParameter(cropGenotypingParameterDTO);
+		final CropGenotypingParameterDTO created =
+			this.cropGenotypingParameterService.createCropGenotypingParameter(cropGenotypingParameterDTO);
 
-		cropGenotypingParameterDTO.setCropName(cropGenotypingParameterDTO.getCropName());
-		cropGenotypingParameterDTO.setEndpoint("updated endpoint");
-		cropGenotypingParameterDTO.setTokenEndpoint("updated token endpoint");
-		cropGenotypingParameterDTO.setUserName("updated username");
-		cropGenotypingParameterDTO.setPassword("updated password");
-		cropGenotypingParameterDTO.setProgramId("updated program id");
+		created.setCropName(cropGenotypingParameterDTO.getCropName());
+		created.setEndpoint("updated endpoint");
+		created.setTokenEndpoint("updated token endpoint");
+		created.setUserName("updated username");
+		created.setPassword("updated password");
+		created.setProgramId("updated program id");
 
-		this.cropGenotypingParameterService.updateCropGenotypingParameter(cropGenotypingParameterDTO);
+		this.cropGenotypingParameterService.updateCropGenotypingParameter(created);
 
 		final Optional<CropGenotypingParameterDTO> cropGenotypingParameterDTOOptional =
 			this.cropGenotypingParameterService.getCropGenotypingParameter(cropGenotypingParameterDTO.getCropName());
 
 		Assert.assertTrue(cropGenotypingParameterDTOOptional.isPresent());
 		final CropGenotypingParameterDTO updated = cropGenotypingParameterDTOOptional.get();
-		Assert.assertThat(updated.getCropName(), is(cropGenotypingParameterDTO.getCropName()));
-		Assert.assertThat(updated.getEndpoint(), is(cropGenotypingParameterDTO.getEndpoint()));
-		Assert.assertThat(updated.getTokenEndpoint(), is(cropGenotypingParameterDTO.getTokenEndpoint()));
-		Assert.assertThat(updated.getUserName(), is(cropGenotypingParameterDTO.getUserName()));
-		Assert.assertThat(updated.getPassword(), is(cropGenotypingParameterDTO.getPassword()));
-		Assert.assertThat(updated.getProgramId(), is(cropGenotypingParameterDTO.getProgramId()));
+		Assert.assertThat(updated.getGenotypingParameterId(), is(created.getGenotypingParameterId()));
+		Assert.assertThat(updated.getCropName(), is(created.getCropName()));
+		Assert.assertThat(updated.getEndpoint(), is(created.getEndpoint()));
+		Assert.assertThat(updated.getTokenEndpoint(), is(created.getTokenEndpoint()));
+		Assert.assertThat(updated.getUserName(), is(created.getUserName()));
+		Assert.assertThat(updated.getPassword(), is(created.getPassword()));
+		Assert.assertThat(updated.getProgramId(), is(created.getProgramId()));
 
 	}
 

@@ -15,18 +15,20 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `crop_genotyping_parameter` (
-			  `crop_name` VARCHAR(32) NOT NULL,
-			  `endpoint` VARCHAR(500) NULL,
-			  `token_endpoint` VARCHAR(500) NULL,
-			  `username` VARCHAR(45) NULL,
-			  `password` BLOB NULL,
-			  `program_id` VARCHAR(45) NULL,
-			  PRIMARY KEY (`crop_name`),
-			  CONSTRAINT `crop_genotyping_parameter_workbench_crop_fk`
-				FOREIGN KEY (`crop_name`)
-				REFERENCES `workbench_crop` (`crop_name`)
-				ON DELETE NO ACTION
-				ON UPDATE NO ACTION);
+				`crop_genotyping_parameter_id` INT NOT NULL AUTO_INCREMENT,
+				`crop_name` VARCHAR(32) NULL,
+				`endpoint` VARCHAR(500) NULL,
+				`token_endpoint` VARCHAR(500) NULL,
+				`username` VARCHAR(45) NULL,
+				`password` BLOB NULL,
+				`program_id` VARCHAR(45) NULL,
+				PRIMARY KEY (`crop_genotyping_parameter_id`),
+				UNIQUE INDEX `crop_name_UNIQUE` (`crop_name` ASC),
+				CONSTRAINT `crop_genotyping_parameter_workbench_crop_fk`
+					FOREIGN KEY (`crop_name`)
+						REFERENCES `workbench_crop` (`crop_name`)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION);
 		</sql>
 	</changeSet>
 

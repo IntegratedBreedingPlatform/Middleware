@@ -6,9 +6,11 @@ import java.util.Optional;
 
 public interface CropGenotypingParameterService {
 
+	Optional<CropGenotypingParameterDTO> getCropGenotypingParameterById(int cropGenotypingParameterId);
+
 	Optional<CropGenotypingParameterDTO> getCropGenotypingParameter(String cropName);
 
 	void updateCropGenotypingParameter(CropGenotypingParameterDTO cropGenotypingParameterDTO);
 
-	void createCropGenotypingParameter(CropGenotypingParameterDTO cropGenotypingParameterDTO);
+	CropGenotypingParameterDTO createCropGenotypingParameter(CropGenotypingParameterDTO cropGenotypingParameterDTO);
 }

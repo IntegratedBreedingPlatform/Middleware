@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.pojos.workbench.CropGenotypingParameter;
 import org.hibernate.SQLQuery;
 
-public class CropGenotypingParameterDAO extends GenericDAO<CropGenotypingParameter, String> {
+public class CropGenotypingParameterDAO extends GenericDAO<CropGenotypingParameter, Integer> {
 
 	private String secretPassphrase;
 

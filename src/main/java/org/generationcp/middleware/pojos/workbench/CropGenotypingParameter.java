@@ -4,8 +4,11 @@ import org.generationcp.middleware.pojos.AbstractEntity;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import javax.persistence.Basic;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -17,6 +20,11 @@ import java.io.Serializable;
 public class CropGenotypingParameter implements Serializable {
 
 	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Basic(optional = false)
+	@Column(name = "crop_genotyping_parameter_id")
+	private int cropGenotypingParameterId;
+
 	@Column(name = "crop_name")
 	private String cropName;
 
@@ -34,6 +42,14 @@ public class CropGenotypingParameter implements Serializable {
 
 	@Transient
 	private String password;
+
+	public int getCropGenotypingParameterId() {
+		return this.cropGenotypingParameterId;
+	}
+
+	public void setCropGenotypingParameterId(final int cropGenotypingParameterId) {
+		this.cropGenotypingParameterId = cropGenotypingParameterId;
+	}
 
 	public String getCropName() {
 		return this.cropName;

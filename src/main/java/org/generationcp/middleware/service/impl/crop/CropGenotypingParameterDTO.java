@@ -6,6 +6,7 @@ import org.pojomatic.annotations.AutoProperty;
 @AutoProperty
 public class CropGenotypingParameterDTO {
 
+	private int genotypingParameterId;
 	private String cropName;
 	private String endpoint;
 	private String tokenEndpoint;
@@ -59,6 +60,14 @@ public class CropGenotypingParameterDTO {
 
 	public void setProgramId(final String programId) {
 		this.programId = programId;
+	}
+
+	public int getGenotypingParameterId() {
+		return this.genotypingParameterId;
+	}
+
+	public void setGenotypingParameterId(final int genotypingParameterId) {
+		this.genotypingParameterId = genotypingParameterId;
 	}
 
 	@Override

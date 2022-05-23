@@ -25,6 +25,18 @@ public class CropGenotypingParameterServiceImpl implements CropGenotypingParamet
 	}
 
 	@Override
+	public Optional<CropGenotypingParameterDTO> getCropGenotypingParameterById(final int cropGenotypingParameterId) {
+		final CropGenotypingParameter cropGenotypingParameter =
+			this.workbenchDaoFactory.getCropGenotyingParameterDAO(this.secretPassphrase).getById(cropGenotypingParameterId);
+		if (cropGenotypingParameter != null) {
+			return Optional.of(new CropGenotypingParameterMapper().map(cropGenotypingParameter));
+		} else {
+			// Return an empty object
+			return Optional.empty();
+		}
+	}
+
+	@Override
 	public Optional<CropGenotypingParameterDTO> getCropGenotypingParameter(final String cropName) {
 		final CropGenotypingParameter cropGenotypingParameter =
 			this.workbenchDaoFactory.getCropGenotyingParameterDAO(this.secretPassphrase).getByCropName(cropName);
@@ -46,8 +58,9 @@ public class CropGenotypingParameterServiceImpl implements CropGenotypingParamet
 	}
 
 	@Override
-	public void createCropGenotypingParameter(final CropGenotypingParameterDTO cropGenotypingParameterDTO) {
-		final CropGenotypingParameter cropGenotypingParameter = new CropGenotypingParameterMapper().map(cropGenotypingParameterDTO);
-		this.workbenchDaoFactory.getCropGenotyingParameterDAO(this.secretPassphrase).save(cropGenotypingParameter);
+	public CropGenotypingParameterDTO createCropGenotypingParameter(final CropGenotypingParameterDTO cropGenotypingParameterDTO) {
+		final CropGenotypingParameter created = this.workbenchDaoFactory.getCropGenotyingParameterDAO(this.secretPassphrase)
+			.save(new CropGenotypingParameterMapper().map(cropGenotypingParameterDTO));
+		return new CropGenotypingParameterMapper().map(created);
 	}
 }

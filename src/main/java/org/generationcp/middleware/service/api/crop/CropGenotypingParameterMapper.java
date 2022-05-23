@@ -7,6 +7,7 @@ public class CropGenotypingParameterMapper {
 
 	public CropGenotypingParameterDTO map(final CropGenotypingParameter cropGenotypingParameter) {
 		final CropGenotypingParameterDTO cropGenotypingParameterDTO = new CropGenotypingParameterDTO();
+		cropGenotypingParameterDTO.setGenotypingParameterId(cropGenotypingParameter.getCropGenotypingParameterId());
 		cropGenotypingParameterDTO.setCropName(cropGenotypingParameter.getCropName());
 		cropGenotypingParameterDTO.setEndpoint(cropGenotypingParameter.getEndpoint());
 		cropGenotypingParameterDTO.setTokenEndpoint(cropGenotypingParameter.getTokenEndpoint());
@@ -18,6 +19,7 @@ public class CropGenotypingParameterMapper {
 
 	public CropGenotypingParameter map(final CropGenotypingParameterDTO cropGenotypingParameterDTO) {
 		final CropGenotypingParameter cropGenotypingParameter = new CropGenotypingParameter();
+		cropGenotypingParameter.setCropGenotypingParameterId(cropGenotypingParameterDTO.getGenotypingParameterId());
 		cropGenotypingParameter.setCropName(cropGenotypingParameterDTO.getCropName());
 		cropGenotypingParameter.setEndpoint(cropGenotypingParameterDTO.getEndpoint());
 		cropGenotypingParameter.setTokenEndpoint(cropGenotypingParameterDTO.getTokenEndpoint());
@@ -29,6 +31,7 @@ public class CropGenotypingParameterMapper {
 
 	public CropGenotypingParameterDTO map(final CropGenotypingParameterDTO from, final CropGenotypingParameter to) {
 		final CropGenotypingParameterDTO cropGenotypingParameterDTO = new CropGenotypingParameterDTO();
+		to.setCropGenotypingParameterId(from.getGenotypingParameterId());
 		to.setEndpoint(from.getEndpoint());
 		to.setTokenEndpoint(from.getTokenEndpoint());
 		to.setUserName(from.getUserName());
