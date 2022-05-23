@@ -47,4 +47,8 @@ public interface LocationService {
 	List<LocationDTO> getCountries();
 
 	ProgramLocationDefault saveProgramLocationDefault(String programUUID, Integer locationId);
+
+	void updateProgramLocationDefault(String programUUID, Integer locationId);
+
+	ProgramLocationDefault getProgramLocationDefault(String programUUID);
 }

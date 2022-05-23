@@ -41,6 +41,18 @@
 			<column name="location_id" type="INT(11)">
 				<constraints nullable="false" foreignKeyName="fk_program_location_default" references="location(locid)"/>
 			</column>
+			<column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_by" type="int" defaultValue="0">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_date" type="timestamp">
+				<constraints nullable="true"/>
+			</column>
+			<column name="modified_by" type="int">
+				<constraints nullable="true" />
+			</column>
 		</createTable>
 	</changeSet>
 
