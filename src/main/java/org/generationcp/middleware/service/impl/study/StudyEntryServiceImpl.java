@@ -26,6 +26,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
@@ -136,7 +137,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public void deleteStudyEntries(final int studyId) {
 		this.daoFactory.getStockDao().deleteStocksForStudy(studyId);
 
-		final DmsProject plotDataDataset = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+		final DmsProject plotDataDataset = this.getPlotDataset(studyId);
 		final List<Integer> variableIds = plotDataDataset.getProperties().stream()
 			.filter(projectProperty -> VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()) && (!projectProperty.getVariableId().equals(TermId.ENTRY_TYPE.getId()) &&
 				!projectProperty.getVariableId().equals(TermId.ENTRY_NO.getId())))
@@ -149,8 +150,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public void saveStudyEntries(final Integer studyId, final Integer listId) {
-		final DmsProject plotDataDataset =
-			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+		final DmsProject plotDataDataset = this.getPlotDataset(studyId);
 
 		// Filter entry details project variable except ENTRY_TYPE and ENTRY_NO because they are going to be added later
 		final List<ProjectProperty> projectProperties = plotDataDataset.getProperties()
@@ -296,6 +296,20 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		this.setCrossValues(entries, gids, level);
 	}
 
+	@Override
+	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId) {
+		final DmsProject study = this.getPlotDataset(studyId);
+		final List<StudyEntryColumnDTO> columns = new ArrayList<>();
+		columns.add(this.buildStudyEntryColumnDTO(TermId.GID, study.getProperties()));
+		columns.add(this.buildStudyEntryColumnDTO(TermId.GUID, study.getProperties()));
+		columns.add(this.buildStudyEntryColumnDTO(TermId.DESIG, study.getProperties()));
+		columns.add(this.buildStudyEntryColumnDTO(TermId.CROSS, study.getProperties()));
+		columns.add(this.buildStudyEntryColumnDTO(TermId.GROUPGID, study.getProperties()));
+		columns.add(this.buildStudyEntryColumnDTO(TermId.IMMEDIATE_SOURCE_NAME, study.getProperties()));
+		columns.add(this.buildStudyEntryColumnDTO(TermId.GROUP_SOURCE_NAME, study.getProperties()));
+		return columns;
+	}
+
 	private Integer getCrossGenerationLevel(final Integer studyId) {
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 		return study.getGenerationLevel();
@@ -309,6 +323,15 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			entry.truncateCrossValueIfNeeded();
 			this.daoFactory.getStockDao().save(entry);
 		});
+	}
+
+	private DmsProject getPlotDataset(final Integer studyId) {
+		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+	}
+
+	private StudyEntryColumnDTO buildStudyEntryColumnDTO(final TermId termId, final List<ProjectProperty> projectProperties) {
+		return new StudyEntryColumnDTO(termId.getId(), termId.name(),
+			projectProperties.stream().anyMatch(projectProperty -> projectProperty.getVariableId().equals(termId.getId())));
 	}
 
 }

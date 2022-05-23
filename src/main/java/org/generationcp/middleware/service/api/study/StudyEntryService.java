@@ -47,4 +47,6 @@ public interface StudyEntryService {
 
 	void fillWithCrossExpansion(Integer studyId, Integer level);
 
+	List<StudyEntryColumnDTO> getStudyEntryColumns(Integer studyId);
+
 }
