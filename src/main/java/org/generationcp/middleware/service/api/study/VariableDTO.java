@@ -15,6 +15,11 @@ import java.util.Map;
 @AutoProperty
 public class VariableDTO {
 
+	public enum ContextOfUseEnum {
+		PLOT,
+		MEANS
+	}
+
 	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})
 	private Map<String, String> additionalInfo = new HashMap<>();
 
