@@ -9,6 +9,7 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
+import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -183,5 +184,10 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public List<LocationDTO> getCountries() {
 		return this.daoFactory.getLocationDAO().getAllCountries();
+	}
+
+	@Override
+	public ProgramLocationDefault saveProgramLocationDefault(final String programUUID, final Integer locationId) {
+		return this.daoFactory.getProgramLocationDefaultDAO().save(new ProgramLocationDefault(programUUID, locationId));
 	}
 }

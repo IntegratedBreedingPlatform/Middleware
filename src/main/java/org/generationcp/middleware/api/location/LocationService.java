@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.location;
 
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
+import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -44,4 +45,6 @@ public interface LocationService {
 	boolean blockIdIsUsedInFieldMap(List<Integer> blockIds);
 
 	List<LocationDTO> getCountries();
+
+	ProgramLocationDefault saveProgramLocationDefault(String programUUID, Integer locationId);
 }

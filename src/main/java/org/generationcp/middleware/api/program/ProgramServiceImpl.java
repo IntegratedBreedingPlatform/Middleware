@@ -93,6 +93,7 @@ public class ProgramServiceImpl implements ProgramService {
 			userRole.setCreatedBy(loggedInUser);
 			this.daoFactory.getUserRoleDao().save(userRole);
 		});
+
 	}
 
 	@Override
