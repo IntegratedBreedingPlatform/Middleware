@@ -40,6 +40,7 @@ public class CropGenotypingParameterDAO extends GenericDAO<CropGenotypingParamet
 	public CropGenotypingParameter save(final CropGenotypingParameter cropGenotypingParameter) {
 		final CropGenotypingParameter savedCropGenotypingParameter = super.save(cropGenotypingParameter);
 		// Manually update the password column with encrypted data
+		this.getSession().flush(); // To ensure the record is already saved in the database before updating the password.
 		this.updateEncryptedPassword(savedCropGenotypingParameter);
 		return savedCropGenotypingParameter;
 	}

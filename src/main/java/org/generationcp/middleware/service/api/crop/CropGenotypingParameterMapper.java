@@ -33,7 +33,7 @@ public class CropGenotypingParameterMapper {
 		to.setTokenEndpoint(from.getTokenEndpoint());
 		to.setUserName(from.getUserName());
 		to.setPassword(from.getPassword());
-		to.setProgramId(from.getUserName());
+		to.setProgramId(from.getProgramId());
 		return cropGenotypingParameterDTO;
 	}
 

@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 public class CropGenotypingParameterServiceImpl implements CropGenotypingParameterService {
@@ -23,10 +25,15 @@ public class CropGenotypingParameterServiceImpl implements CropGenotypingParamet
 	}
 
 	@Override
-	public CropGenotypingParameterDTO getCropGenotypingParameter(final String cropName) {
+	public Optional<CropGenotypingParameterDTO> getCropGenotypingParameter(final String cropName) {
 		final CropGenotypingParameter cropGenotypingParameter =
 			this.workbenchDaoFactory.getCropGenotyingParameterDAO(this.secretPassphrase).getByCropName(cropName);
-		return new CropGenotypingParameterMapper().map(cropGenotypingParameter);
+		if (cropGenotypingParameter != null) {
+			return Optional.of(new CropGenotypingParameterMapper().map(cropGenotypingParameter));
+		} else {
+			// Return an empty object
+			return Optional.empty();
+		}
 	}
 
 	@Override
@@ -43,5 +50,4 @@ public class CropGenotypingParameterServiceImpl implements CropGenotypingParamet
 		final CropGenotypingParameter cropGenotypingParameter = new CropGenotypingParameterMapper().map(cropGenotypingParameterDTO);
 		this.workbenchDaoFactory.getCropGenotyingParameterDAO(this.secretPassphrase).save(cropGenotypingParameter);
 	}
-
 }
