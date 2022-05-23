@@ -16,11 +16,7 @@ import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.tuple.Triple;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.AttributeDAO;
-import org.generationcp.middleware.dao.MethodDAO;
 import org.generationcp.middleware.dao.NameDAO;
-import org.generationcp.middleware.dao.dms.ProgramFavoriteDAO;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
@@ -28,7 +24,6 @@ import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmNameDetails;
-import org.generationcp.middleware.pojos.GermplasmPedigreeTreeNode;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
@@ -187,54 +182,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return this.daoFactory.getMethodDAO().getByType(type);
 	}
 
-	@Override
-	public List<Method> getMethodsByGroupAndTypeAndName(final String group, final String type, final String name) {
-		return this.daoFactory.getMethodDAO().getByGroupAndTypeAndName(group, type, name);
-	}
-
-	@Override
-	public Integer addMethod(final Method method) {
-
-		final Integer methodId;
-		try {
-
-			final MethodDAO dao = this.daoFactory.getMethodDAO();
-
-			final Method recordSaved = dao.saveOrUpdate(method);
-			methodId = recordSaved.getMid();
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e);
-		}
-		return methodId;
-	}
-
-	@Override
-	public Method editMethod(final Method method) {
-
-		final Method recordSaved;
-
-		try {
-
-			if (method.getMid() == null) {
-				throw new MiddlewareQueryException("method has no Id or is not a local method");
-			}
-
-			final MethodDAO dao = this.daoFactory.getMethodDAO();
-
-			recordSaved = dao.merge(method);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while saving Method: GermplasmDataManager.addMethod(method=" + method + "): " + e.getMessage(), e);
-		}
-
-		return recordSaved;
-	}
-
 	/**
 	 * @deprecated
 	 */
@@ -311,7 +258,8 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(final List<String> germplasmNames,
+	public List<GermplasmNameDetails> getGermplasmNameDetailsByGermplasmNames(
+		final List<String> germplasmNames,
 		final GetGermplasmByNameModes mode) {
 		final List<String> namesToUse = GermplasmDataManagerUtil.getNamesToUseByMode(germplasmNames, mode);
 		return this.daoFactory.getNameDao().getGermplasmNameDetailsByNames(namesToUse, mode);
@@ -360,27 +308,6 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 		return toreturn;
 	}
 
-	/**
-	 * See {@link org.generationcp.middleware.pojos.MethodClass}
-	 */
-	@Deprecated
-	@Override
-	public List<Term> getMethodClasses() {
-		final List<Integer> ids = new ArrayList<>();
-		ids.add(TermId.BULKING_BREEDING_METHOD_CLASS.getId());
-		ids.add(TermId.NON_BULKING_BREEDING_METHOD_CLASS.getId());
-		ids.add(TermId.SEED_INCREASE_METHOD_CLASS.getId());
-		ids.add(TermId.SEED_ACQUISITION_METHOD_CLASS.getId());
-		ids.add(TermId.CULTIVAR_FORMATION_METHOD_CLASS.getId());
-		ids.add(TermId.CROSSING_METHODS_CLASS.getId());
-		ids.add(TermId.MUTATION_METHODS_CLASS.getId());
-		ids.add(TermId.GENETIC_MODIFICATION_CLASS.getId());
-		ids.add(TermId.CYTOGENETIC_MANIPULATION.getId());
-
-		return this.getTermBuilder().getTermsByIds(ids);
-
-	}
-
 	@Override
 	public Method getMethodByCode(final String code) {
 		return this.daoFactory.getMethodDAO().getByCode(code);
@@ -403,98 +330,13 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<ProgramFavorite> getProgramFavorites(final FavoriteType type, final String programUUID) {
-		return this.daoFactory.getProgramFavoriteDao().getProgramFavorites(type, programUUID);
-	}
-
-	@Override
 	public List<ProgramFavorite> getProgramFavorites(final FavoriteType type, final int max, final String programUUID) {
 		return this.daoFactory.getProgramFavoriteDao().getProgramFavorites(type, max, programUUID);
 	}
 
 	@Override
-	public void saveProgramFavorites(final List<ProgramFavorite> list) {
-
-		try {
-			final ProgramFavoriteDAO dao = this.daoFactory.getProgramFavoriteDao();
-
-			for (final ProgramFavorite favorite : list) {
-				dao.save(favorite);
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while saving ProgramFavorite: GermplasmDataManager.saveProgramFavorites(list=" + list + "): "
-					+ e.getMessage(),
-				e);
-		}
-	}
-
-
-	@Override
-	public void deleteProgramFavorites(final List<ProgramFavorite> list) {
-		try {
-			final ProgramFavoriteDAO dao = this.daoFactory.getProgramFavoriteDao();
-			for (final ProgramFavorite favorite : list) {
-				dao.makeTransient(favorite);
-			}
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Error encountered while saving ProgramFavorite: GermplasmDataManager.deleteProgramFavorites(list=" + list + "): "
-					+ e.getMessage(),
-				e);
-		}
-
-	}
-
-	@Override
 	public boolean checkIfMatches(final String name) {
 		return this.daoFactory.getNameDao().checkIfMatches(name);
-	}
-
-	protected GermplasmPedigreeTreeNode createGermplasmPedigreeTreeNode(final Integer gid, final Map<GermplasmNameType, Name> names) {
-		// this is encountered in cases where parental information is not available (gpid1 or gpid2 does not point to an actual germplasm)
-		if (gid == null || gid == 0) {
-			return null;
-		}
-
-		final GermplasmPedigreeTreeNode treeNode = new GermplasmPedigreeTreeNode();
-		final Germplasm female = new Germplasm(gid);
-		female.setPreferredName(this.getPreferredName(names));
-		female.setPreferredAbbreviation(this.getNameByType(names, GermplasmNameType.LINE_NAME).getNval());
-		female.setSelectionHistory(this.getNameByType(names, GermplasmNameType.OLD_MUTANT_NAME_1).getNval());
-		female.setCrossName(this.getNameByType(names, GermplasmNameType.CROSS_NAME).getNval());
-		female.setAccessionName(this.getNameByType(names, GermplasmNameType.GERMPLASM_BANK_ACCESSION_NUMBER).getNval());
-		treeNode.setGermplasm(female);
-
-		return treeNode;
-	}
-
-	/**
-	 * Local method for getting a particular germplasm's Name.
-	 *
-	 * @param names The Map containing Names for a germplasm. This is usually provided by getGermplasmParentNamesForStudy() in GermplasmDAO.
-	 * @param ntype the name type, i.e. Pedigree, Selection History, Cross Name,etc.
-	 * @return an instance of Name representing the searched name, or an empty Name instance if it doesn't exist
-	 */
-	private Name getNameByType(final Map<GermplasmNameType, Name> names, final GermplasmNameType ntype) {
-		Name n = null;
-		if (null != names) {
-			n = names.get(ntype);
-		}
-
-		return null == n ? new Name() : n;
-	}
-
-	private Name getPreferredName(final Map<GermplasmNameType, Name> names) {
-		for (final Name n : names.values()) {
-			if (1 == n.getNstat()) {
-				return n;
-			}
-		}
-
-		return new Name();
 	}
 
 	/**
@@ -595,13 +437,15 @@ public class GermplasmDataManagerImpl extends DataManager implements GermplasmDa
 	}
 
 	@Override
-	public List<Germplasm> getExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
+	public List<Germplasm> getExistingCrosses(
+		final Integer femaleParent, final List<Integer> maleParentIds,
 		final Optional<Integer> gid) {
 		return this.daoFactory.getGermplasmDao().getExistingCrosses(femaleParent, maleParentIds, gid);
 	}
 
 	@Override
-	public boolean hasExistingCrosses(final Integer femaleParent, final List<Integer> maleParentIds,
+	public boolean hasExistingCrosses(
+		final Integer femaleParent, final List<Integer> maleParentIds,
 		final Optional<Integer> gid) {
 		return this.daoFactory.getGermplasmDao().hasExistingCrosses(femaleParent, maleParentIds, gid);
 	}

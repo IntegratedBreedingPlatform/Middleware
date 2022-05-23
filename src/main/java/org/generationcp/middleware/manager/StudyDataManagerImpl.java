@@ -24,7 +24,6 @@ import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
@@ -467,26 +466,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	}
 
-	@Override
-	public void saveTrialDatasetSummary(
-		final DmsProject project, final VariableTypeList variableTypeList,
-		final List<ExperimentValues> experimentValues, final List<Integer> locationIds) {
-
-		try {
-
-			if (variableTypeList != null && variableTypeList.getVariableTypes() != null && !variableTypeList.getVariableTypes().isEmpty()) {
-				this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, null);
-			}
-			if (experimentValues != null && !experimentValues.isEmpty()) {
-				this.updateExperimentValues(experimentValues, project.getProjectId());
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in saveTrialDatasetSummary " + e.getMessage(), e);
-		}
-	}
-
 	void updateExperimentValues(final List<ExperimentValues> experimentValues, final Integer projectId) {
 		for (final ExperimentValues exp : experimentValues) {
 			if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
@@ -742,11 +721,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<FolderReference> getAllFolders() {
-		return this.daoFactory.getDmsProjectDAO().getAllFolders();
-	}
-
-	@Override
 	public int countPlotsWithRecordedVariatesInDataset(final int dataSetId, final List<Integer> variateIds) {
 		return this.daoFactory.getPhenotypeDAO().countRecordedVariatesOfStudy(dataSetId, variateIds);
 	}
@@ -964,24 +938,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public StudyTypeDto getStudyType(final int studyTypeId) {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.daoFactory.getStudyTypeDao().getById(studyTypeId));
-	}
-
-	@Override
-	public void deleteProgramStudies(final String programUUID) {
-		final List<Integer> projectIds = this.daoFactory.getDmsProjectDAO().getAllProgramStudiesAndFolders(programUUID);
-
-		try {
-			for (final Integer projectId : projectIds) {
-				this.deleteStudy(projectId);
-			}
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
 	public void updateVariableOrdering(final int datasetId, final List<Integer> variableIds) {
 
 		try {
@@ -990,20 +946,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error in updateVariableOrdering " + e.getMessage(), e);
 		}
-	}
-
-	@Override
-	public String getTrialInstanceNumberByGeolocationId(final int geolocationId) {
-		final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(geolocationId);
-		if (geolocation != null) {
-			return geolocation.getDescription();
-		}
-		return null;
-	}
-
-	@Override
-	public List<String> getAllSharedProjectNames() {
-		return this.daoFactory.getDmsProjectDAO().getAllSharedProjectNames();
 	}
 
 	@Override
@@ -1243,34 +1185,5 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			}
 		}
 		return false;
-	}
-
-	@Override
-	public void deleteStudy(final int studyId) {
-		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
-		this.renameStudyAndDatasets(study);
-		this.updateStudyStatusToDeleted(study);
-	}
-
-	private void updateStudyStatusToDeleted(final DmsProject study) {
-		if (null != study) {
-			study.setDeleted(true);
-			this.daoFactory.getDmsProjectDAO().save(study);
-		}
-	}
-
-	private void renameStudyAndDatasets(final DmsProject study) {
-		final String tstamp = Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS");
-		study.setName(study.getName() + "#" + tstamp);
-		this.daoFactory.getDmsProjectDAO().save(study);
-
-		final List<DmsProject> datasets = this.daoFactory.getDmsProjectDAO().getDatasetsByParent(study.getProjectId());
-		if (datasets != null) {
-			for (final DmsProject dataset : datasets) {
-				dataset.setName(dataset.getName() + "#" + tstamp);
-				dataset.setDeleted(true);
-				this.daoFactory.getDmsProjectDAO().save(dataset);
-			}
-		}
 	}
 }

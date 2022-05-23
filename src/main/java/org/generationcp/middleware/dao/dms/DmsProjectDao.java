@@ -168,7 +168,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String GET_STUDY_METADATA_BY_GEOLOCATION_ID = " SELECT  "
 		+ "     geoloc.nd_geolocation_id AS studyDbId, "
 		+ "     pmain.project_id AS trialOrNurseryId, "
-		+ "     "+ STUDY_NAME_BRAPI + " AS studyName, "
+		+ "     " + STUDY_NAME_BRAPI + " AS studyName, "
 		+ "     study_type.study_type_id AS studyType, "
 		+ "     study_type.label AS studyTypeName, "
 		+ "     MAX(IF(geoprop.type_id = " + TermId.SEASON_VAR.getId() + ", "
@@ -826,17 +826,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			throw new MiddlewareQueryException("Error with getDistinctProjectDescription() query from Project " + e.getMessage(), e);
 		}
 		return null;
-	}
-
-	public List<String> getAllSharedProjectNames() {
-		try {
-			final String sql = "SELECT name FROM project WHERE program_uuid is null";
-			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			return query.list();
-		} catch (final HibernateException e) {
-			LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException("Error with getAllSharedProjectNames()" + e.getMessage(), e);
-		}
 	}
 
 	public StudyMetadata getStudyMetadataForInstanceId(final Integer instanceId) {
@@ -1747,11 +1736,13 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 		// Search Date Range
 		if (studySearchFilter.getSearchDateRangeStart() != null) {
-			sqlQuery.setParameter("searchTrialDateStart",
+			sqlQuery.setParameter(
+				"searchTrialDateStart",
 				Util.formatDateAsStringValue(studySearchFilter.getSearchDateRangeStart(), Util.DATE_AS_NUMBER_FORMAT));
 
 		} else if (studySearchFilter.getSearchDateRangeEnd() != null) {
-			sqlQuery.setParameter("searchTrialDateEnd",
+			sqlQuery.setParameter(
+				"searchTrialDateEnd",
 				Util.formatDateAsStringValue(studySearchFilter.getSearchDateRangeEnd(), Util.DATE_AS_NUMBER_FORMAT));
 		}
 
@@ -2044,7 +2035,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 
 	private void addStudySearchFilters(final Criteria criteria, final StudySearchRequest request) {
 		if (!StringUtils.isEmpty(request.getStudyName())) {
-			criteria.add(Restrictions.like("name", "%" +request.getStudyName() + "%"));
+			criteria.add(Restrictions.like("name", "%" + request.getStudyName() + "%"));
 		}
 	}
 

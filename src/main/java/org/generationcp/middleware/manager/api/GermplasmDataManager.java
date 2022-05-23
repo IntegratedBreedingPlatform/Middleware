@@ -12,7 +12,6 @@
 package org.generationcp.middleware.manager.api;
 
 import org.apache.commons.lang3.tuple.Triple;
-import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.manager.GetGermplasmByNameModes;
 import org.generationcp.middleware.manager.Operation;
@@ -176,23 +175,6 @@ public interface GermplasmDataManager {
 	List<Method> getMethodsByType(String type);
 
 	/**
-	 * Returns all the method and type records matching the given group, type and name. Retrieves from both local and central databases.
-	 *
-	 * @param group the group of the method
-	 * @param type  the type of the method
-	 * @param name  the name of the method
-	 * @return List of Method POJOs
-	 */
-	List<Method> getMethodsByGroupAndTypeAndName(String group, String type, String name);
-
-	/**
-	 * Gets list of cvterm records which are possible values of method classes.
-	 *
-	 * @return the method classes
-	 */
-	List<Term> getMethodClasses();
-
-	/**
 	 * Returns the udfld records identified by the given tablename and field type.
 	 *
 	 * @param tableName - the value of the ftable record
@@ -212,22 +194,6 @@ public interface GermplasmDataManager {
 	 */
 	@Deprecated
 	Location getLocationByID(Integer id);
-
-	/**
-	 * Updates the {@code Method} object into the database.
-	 *
-	 * @param method - The {@code Method} object to be persisted to the database. Must be a valid {@code Method} object.
-	 * @return Returns the updated {@code Method} record
-	 */
-	Method editMethod(Method method);
-
-	/**
-	 * Inserts a single {@code Method} object into the database.
-	 *
-	 * @param method - The {@code Method} object to be persisted to the database. Must be a valid {@code Method} object.
-	 * @return Returns the id of the {@code Method} record inserted in the database.
-	 */
-	Integer addMethod(Method method);
 
 	/**
 	 * Given a map of valid Germplasm and Name objects, add new records for the given parameters.
@@ -285,7 +251,7 @@ public interface GermplasmDataManager {
 	/**
 	 * Gets the method by code.
 	 *
-	 * @param code        the code
+	 * @param code the code
 	 * @return the method by code
 	 */
 	Method getMethodByCode(String code);
@@ -304,36 +270,11 @@ public interface GermplasmDataManager {
 	 * Gets the list of favorite methods/locations
 	 *
 	 * @param type        - can be FavoriteType.METHOD or FavoriteType.LOCATION
-	 * @param programUUID - unique id of the program where the favorites location/method were created
-	 * @return list of ProgramFavorite
-	 */
-	List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, String programUUID);
-
-	/**
-	 * Gets the list of favorite methods/locations
-	 *
-	 * @param type        - can be FavoriteType.METHOD or FavoriteType.LOCATION
 	 * @param max         - maximum number of records to return
 	 * @param programUUID - unique id of the program where the favorites location/method were created
 	 * @return list of ProgramFavorite
 	 */
 	List<ProgramFavorite> getProgramFavorites(ProgramFavorite.FavoriteType type, int max, String programUUID);
-
-	/**
-	 * Saves the list of favorite methods/locations
-	 *
-	 * @param list of ProgramFavorite
-	 * @return none
-	 */
-	void saveProgramFavorites(List<ProgramFavorite> list);
-
-	/**
-	 * Deletes a list of favorite methods/locations
-	 *
-	 * @param list of ProgramFavorite
-	 * @return none
-	 */
-	void deleteProgramFavorites(List<ProgramFavorite> list);
 
 	/**
 	 * check if name and standardized version of it already exists.
