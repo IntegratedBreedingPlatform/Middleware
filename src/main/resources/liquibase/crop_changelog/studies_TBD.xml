@@ -460,4 +460,28 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="studies-TBD-30">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1) > 0 FROM stockprop sp INNER JOIN cvtermprop c ON sp.type_id = c.cvterm_id AND c.value = 'Germplasm Descriptor';
+			</sqlCheck>
+		</preConditions>
+		<comment>Remove crop specific and created by user germplasm descriptors from 'stockprop' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE sp FROM stockprop sp INNER JOIN cvtermprop c ON sp.type_id = c.cvterm_id AND c.value = 'Germplasm Descriptor';
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="studies-TBD-31">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1) > 0 FROM projectprop WHERE type_id = 1804 AND variable_id NOT IN (8377, 8250, 8240, 8340, 8330, 8201, 8378, 8235);
+			</sqlCheck>
+		</preConditions>
+		<comment>Remove crop specific and created by user germplasm descriptors from 'projectprop' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM projectprop WHERE type_id = 1804 AND variable_id NOT IN (8377, 8250, 8240, 8340, 8330, 8201, 8378, 8235);
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
