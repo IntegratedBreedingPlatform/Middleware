@@ -1652,8 +1652,11 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 			stringBuilder.append("	  LEFT JOIN projectprop pp ON pp.variable_id = variable.cvterm_id");
 			stringBuilder.append("	  LEFT JOIN project plotdataset ON plotdataset.project_id = pp.project_id AND "
 				+ "plotdataset.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId());
-			stringBuilder.append("	  LEFT JOIN project envdataset ON envdataset.study_id = plotdataset.study_id AND "
-				+ "envdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId());
+			stringBuilder.append("	  LEFT JOIN project meansdataset ON meansdataset.project_id = pp.project_id AND "
+				+ "meansdataset.dataset_type_id = " + DatasetTypeEnum.MEANS_DATA.getId());
+			stringBuilder.append(
+				"	  LEFT JOIN project envdataset ON (envdataset.study_id = plotdataset.study_id || envdataset.study_id = meansdataset.study_id) AND "
+					+ "envdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId());
 			stringBuilder.append("	  LEFT JOIN nd_experiment nde ON nde.project_id = envdataset.project_id AND nde.type_id = "
 				+ ExperimentType.TRIAL_ENVIRONMENT.getTermId());
 		} else if (VariableTypeGroup.GERMPLASM_ATTRIBUTES.equals(variableTypeGroup)) {
@@ -1755,8 +1758,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 		for (final Map<String, Object> result : results) {
 
 			final VariableDTO variableDto = new VariableDTO();
-
-			variableDto.getContextOfUse().add("PLOT");
 
 			final String observationVariableName =
 				result.get(VARIABLE_ALIAS) != null && StringUtils.isNotEmpty(String.valueOf(result.get(VARIABLE_ALIAS))) ?

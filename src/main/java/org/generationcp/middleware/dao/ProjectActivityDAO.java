@@ -80,27 +80,4 @@ public class ProjectActivityDAO extends GenericDAO<ProjectActivity, Integer> {
 			throw new MiddlewareQueryException(message);
 		}
 	}
-
-	/**
-	 * Returns the number of {@link ProjectActivity} records by project id.
-	 *
-	 * @param projectId the project id
-	 * @return the number of {@link ProjectActivity} records
-	 * @throws MiddlewareQueryException the MiddlewareQueryException
-	 */
-	public long countByProjectId(final Long projectId) throws MiddlewareQueryException {
-		try {
-			if (projectId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(ProjectActivity.COUNT_ACTIVITIES_BY_PROJECT_ID);
-				query.setParameter("projectId", projectId.intValue());
-				final BigInteger result = (BigInteger) query.uniqueResult();
-				return result.longValue();
-			}
-			return 0;
-		} catch (final HibernateException e) {
-			final String message = "Error with countByProjectId(projectId=" + projectId + ") query from ProjectActivity " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message);
-		}
-	}
 }
