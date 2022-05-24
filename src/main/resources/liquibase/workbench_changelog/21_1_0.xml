@@ -25,10 +25,9 @@
 				PRIMARY KEY (`crop_genotyping_parameter_id`),
 				UNIQUE INDEX `crop_name_UNIQUE` (`crop_name` ASC),
 				CONSTRAINT `crop_genotyping_parameter_workbench_crop_fk`
-					FOREIGN KEY (`crop_name`)
-						REFERENCES `workbench_crop` (`crop_name`)
-						ON DELETE NO ACTION
-						ON UPDATE NO ACTION);
+				FOREIGN KEY (`crop_name`) REFERENCES `workbench_crop` (`crop_name`)
+				ON DELETE NO ACTION
+				ON UPDATE NO ACTION) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 		</sql>
 	</changeSet>
 
