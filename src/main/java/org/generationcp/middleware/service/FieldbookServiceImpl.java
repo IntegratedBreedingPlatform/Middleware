@@ -14,6 +14,7 @@ import com.google.common.base.Optional;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
@@ -107,6 +108,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Resource
 	private LocationDataManager locationDataManager;
+
+	@Resource
+	private LocationService locationService;
 
 	private DaoFactory daoFactory;
 
@@ -750,7 +754,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			this.daoFactory.getGeolocationPropertyDao().deleteBlockPropertiesByGeolocationId(geolocationId);
 
 		if (CollectionUtils.isNotEmpty(blockIdsToDelete)) {
-			this.daoFactory.getLocDesDao().deleteByLocationIds(blockIdsToDelete);
+			this.locationService.deleteBlockFieldLocationByBlockId(blockIdsToDelete);
 		}
 
 		if (deleteProjectProp) {

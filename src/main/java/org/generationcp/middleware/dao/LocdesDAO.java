@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.LocdesType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -133,6 +134,32 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 			final String message = "Error with deleteByLocationIds(locids=" + locids + ") in LocdesDAO: " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	/**
+	 * @param blockIdsToDelete
+	 * @return block parent IDs that is not used as block parent after specified blocks deletion
+	 */
+	public List<Integer> getBlockParentsToDelete(final List<Integer> blockIdsToDelete) {
+		try {
+			final StringBuilder queryString = new StringBuilder().append("SELECT parent.locid");
+			queryString.append(" FROM locdes parent");
+			queryString.append(" WHERE parent.locid in (select block.dval from locdes block");
+			queryString.append("                        where block.locid in (:blockIds) and block.dtype = "
+				+ LocdesType.BLOCK_PARENT.getId() + ")");
+			queryString.append("   AND parent.locid not in (select oth_block.dval from locdes oth_block");
+			queryString.append("                            where oth_block.locid not in (:blockIds) and oth_block.dtype = "
+				+ LocdesType.BLOCK_PARENT.getId() + ")");
+
+			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			query.setParameterList("blockIds", blockIdsToDelete);
+			return query.list();
+		} catch (final HibernateException e) {
+			LocdesDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("getBlockParentsToDelete", "blockIdsToDelete",
+					String.valueOf(blockIdsToDelete), e.getMessage(), "LocDes"), e);
 		}
 	}
 }

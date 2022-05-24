@@ -120,6 +120,22 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
+	public void deleteBlockFieldLocationByBlockId(final List<Integer> blockLocIds) {
+		final List<Integer> blockParentIds = this.daoFactory.getLocDesDao()
+			.getBlockParentsToDelete(blockLocIds);
+
+		// Delete Block Records
+		this.daoFactory.getLocDesDao().deleteByLocationIds(blockLocIds);
+		//this.daoFactory.getLocationDAO().deleteByLocationIds(blockLocIds);
+
+		// Delete Field/Block Parent Records
+		if (!blockParentIds.isEmpty()) {
+			this.daoFactory.getLocDesDao().deleteByLocationIds(blockParentIds);
+			//this.daoFactory.getLocationDAO().deleteByLocationIds(blockParentIds);
+		}
+	}
+
+	@Override
 	public LocationDTO createLocation(final LocationRequestDto locationRequestDto) {
 
 		final Country country = (locationRequestDto.getCountryId() == null) ? null :
