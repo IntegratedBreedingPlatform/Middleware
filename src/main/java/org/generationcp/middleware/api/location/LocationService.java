@@ -51,4 +51,6 @@ public interface LocationService {
 	void updateProgramLocationDefault(String programUUID, Integer locationId);
 
 	ProgramLocationDefault getProgramLocationDefault(String programUUID);
+
+	LocationDTO getDefaultLocation(String programUUID);
 }

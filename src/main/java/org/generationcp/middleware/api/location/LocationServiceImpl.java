@@ -202,4 +202,10 @@ public class LocationServiceImpl implements LocationService {
 	public ProgramLocationDefault getProgramLocationDefault(final String programUUID) {
 		return this.daoFactory.getProgramLocationDefaultDAO().getByprogramUUID(programUUID);
 	}
+
+	@Override
+	public LocationDTO getDefaultLocation(final String programUUID) {
+		final ProgramLocationDefault programLocationDefault = this.daoFactory.getProgramLocationDefaultDAO().getByprogramUUID(programUUID);
+		return this.getLocation(programLocationDefault.getLocationId());
+	}
 }
