@@ -29,6 +29,7 @@ import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.VariableDTO;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,8 +37,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 
 public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 
@@ -137,6 +144,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(1, dto.getExternalReferences().size());
 		Assert.assertEquals(varExRef.getSource(), dto.getExternalReferences().get(0).getReferenceSource());
 		Assert.assertEquals(varExRef.getReferenceId(), dto.getExternalReferences().get(0).getReferenceID());
+		Assert.assertThat(dto.getContextOfUse(), contains(VariableDTO.ContextOfUseEnum.PLOT.toString()));
 	}
 
 	@Test
@@ -191,7 +199,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testUpdateObservationVariable_AddVariableToStudy() {
+	public void testUpdateObservationVariable_AddVariableToPlotDataset() {
 		final TrialImportRequestDTO trialImportRequestDTO = new TrialImportRequestDTO();
 		trialImportRequestDTO.setStartDate("2019-01-01");
 		trialImportRequestDTO.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
@@ -221,6 +229,41 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 			this.variableServiceBrapi.getVariables(searchRequestDTO, null, VariableTypeGroup.TRAIT);
 		Assert.assertEquals(1, retrievedVariableByStudyId.size());
 		Assert.assertEquals(variableDTO.getObservationVariableDbId(), retrievedVariableByStudyId.get(0).getObservationVariableDbId());
+		Assert.assertThat(variableDTO.getContextOfUse(), contains(VariableDTO.ContextOfUseEnum.PLOT.toString()));
+	}
+
+	@Test
+	public void testUpdateObservationVariable_AddVariableToMeansDataset() {
+		final TrialImportRequestDTO trialImportRequestDTO = new TrialImportRequestDTO();
+		trialImportRequestDTO.setStartDate("2019-01-01");
+		trialImportRequestDTO.setTrialDescription(RandomStringUtils.randomAlphabetic(20));
+		trialImportRequestDTO.setTrialName(RandomStringUtils.randomAlphabetic(20));
+		trialImportRequestDTO.setProgramDbId(this.commonTestProject.getUniqueID());
+		final StudySummary studySummary = this.trialServiceBrapi
+			.saveStudies(this.cropType.getCropName(), Collections.singletonList(trialImportRequestDTO), this.testUser.getUserid()).get(0);
+		final StudyImportRequestDTO instance = new StudyImportRequestDTO();
+		instance.setTrialDbId(studySummary.getTrialDbId().toString());
+		instance.setLocationDbId("0");
+		final StudyInstanceDto savedInstance = this.studyServiceBrapi
+			.saveStudyInstances(this.cropType.getCropName(), Collections.singletonList(instance), this.testUser.getUserid()).get(0);
+
+		final CVTerm variable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ANALYSIS);
+		final VariableSearchRequestDTO searchRequestDTO = new VariableSearchRequestDTO();
+		searchRequestDTO.setObservationVariableDbIds(Collections.singletonList(variable.getCvTermId().toString()));
+		final List<VariableDTO> variableDTOS =
+			this.variableServiceBrapi.getVariables(searchRequestDTO, null, VariableTypeGroup.TRAIT);
+		final VariableDTO variableDTO = variableDTOS.get(0);
+		variableDTO.setStudyDbIds(Collections.singletonList(savedInstance.getStudyDbId()));
+
+		this.variableServiceBrapi.updateObservationVariable(variableDTO);
+		this.sessionProvder.getSession().flush();
+
+		searchRequestDTO.setStudyDbId(Collections.singletonList(savedInstance.getStudyDbId()));
+		final List<VariableDTO> retrievedVariableByStudyId =
+			this.variableServiceBrapi.getVariables(searchRequestDTO, null, VariableTypeGroup.TRAIT);
+		Assert.assertEquals(1, retrievedVariableByStudyId.size());
+		Assert.assertEquals(variableDTO.getObservationVariableDbId(), retrievedVariableByStudyId.get(0).getObservationVariableDbId());
+		Assert.assertThat(variableDTO.getContextOfUse(), contains(VariableDTO.ContextOfUseEnum.MEANS.toString()));
 	}
 
 	@Test
@@ -310,8 +353,8 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		final CVTerm variable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.TRAIT);
 		final CVTerm newScale = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
 		this.daoFactory.getCvTermRelationshipDao()
-				.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), newScale.getCvTermId(), DataType.NUMERIC_VARIABLE
-						.getId()));
+			.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), newScale.getCvTermId(), DataType.NUMERIC_VARIABLE
+				.getId()));
 		final CVTerm newProperty = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.PROPERTIES.getId());
 		final CVTerm newMethod = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.METHODS.getId());
 
@@ -340,6 +383,72 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(newMethod.getDefinition(), retrievedVariable.getMethod().getDescription());
 		Assert.assertEquals(newScale.getName(), retrievedVariable.getScale().getScaleName());
 
+	}
+
+	@Test
+	public void testCreateObservationVariables_CreateVariableForMeansDataset() {
+		final CVTerm newScale = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), newScale.getCvTermId(), DataType.NUMERIC_VARIABLE
+				.getId()));
+		final CVTerm newProperty = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.PROPERTIES.getId());
+		final CVTerm newMethod = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.METHODS.getId());
+
+		final VariableDTO variable = new VariableDTO();
+		variable.getContextOfUse().add(VariableDTO.ContextOfUseEnum.MEANS.toString());
+		variable.setObservationVariableName(RandomStringUtils.randomAlphabetic(20));
+		variable.getTrait().setTraitDbId(String.valueOf(newProperty.getCvTermId()));
+		variable.getScale().setScaleDbId(String.valueOf(newScale.getCvTermId()));
+		variable.getMethod().setMethodDbId(String.valueOf(newMethod.getCvTermId()));
+
+		this.variableServiceBrapi.createObservationVariables(Arrays.asList(variable));
+
+		final VariableSearchRequestDTO searchRequestDTO = new VariableSearchRequestDTO();
+		searchRequestDTO.setObservationVariableNames(Collections.singletonList(variable.getObservationVariableName()));
+		final List<VariableDTO> retrievedVariables =
+			this.variableServiceBrapi.getVariables(searchRequestDTO, null, VariableTypeGroup.TRAIT);
+
+		Assert.assertThat(retrievedVariables, is(not(Matchers.empty())));
+		final VariableDTO savedVariable = retrievedVariables.get(0);
+		Assert.assertThat(savedVariable.getObservationVariableDbId(), is(equalTo(variable.getObservationVariableDbId())));
+		Assert.assertThat(savedVariable.getObservationVariableName(), is(equalTo(variable.getObservationVariableName())));
+		Assert.assertThat(savedVariable.getTrait().getTraitDbId(), is(equalTo(variable.getTrait().getTraitDbId())));
+		Assert.assertThat(savedVariable.getScale().getScaleDbId(), is(equalTo(variable.getScale().getScaleDbId())));
+		Assert.assertThat(savedVariable.getMethod().getMethodDbId(), is(equalTo(variable.getMethod().getMethodDbId())));
+		Assert.assertThat(savedVariable.getContextOfUse(), contains(VariableDTO.ContextOfUseEnum.MEANS.toString()));
+	}
+
+	@Test
+	public void testCreateObservationVariables_CreateVariableForPlotDataset() {
+		final CVTerm newScale = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.SCALES.getId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(new CVTermRelationship(TermId.HAS_TYPE.getId(), newScale.getCvTermId(), DataType.NUMERIC_VARIABLE
+				.getId()));
+		final CVTerm newProperty = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.PROPERTIES.getId());
+		final CVTerm newMethod = this.testDataInitializer.createCVTerm(RandomStringUtils.randomAlphabetic(20), CvId.METHODS.getId());
+
+		final VariableDTO variable = new VariableDTO();
+		variable.getContextOfUse().add(VariableDTO.ContextOfUseEnum.PLOT.toString());
+		variable.setObservationVariableName(RandomStringUtils.randomAlphabetic(20));
+		variable.getTrait().setTraitDbId(String.valueOf(newProperty.getCvTermId()));
+		variable.getScale().setScaleDbId(String.valueOf(newScale.getCvTermId()));
+		variable.getMethod().setMethodDbId(String.valueOf(newMethod.getCvTermId()));
+
+		this.variableServiceBrapi.createObservationVariables(Arrays.asList(variable));
+
+		final VariableSearchRequestDTO searchRequestDTO = new VariableSearchRequestDTO();
+		searchRequestDTO.setObservationVariableNames(Collections.singletonList(variable.getObservationVariableName()));
+		final List<VariableDTO> retrievedVariables =
+			this.variableServiceBrapi.getVariables(searchRequestDTO, null, VariableTypeGroup.TRAIT);
+
+		Assert.assertThat(retrievedVariables, is(not(Matchers.empty())));
+		final VariableDTO savedVariable = retrievedVariables.get(0);
+		Assert.assertThat(savedVariable.getObservationVariableDbId(), is(equalTo(variable.getObservationVariableDbId())));
+		Assert.assertThat(savedVariable.getObservationVariableName(), is(equalTo(variable.getObservationVariableName())));
+		Assert.assertThat(savedVariable.getTrait().getTraitDbId(), is(equalTo(variable.getTrait().getTraitDbId())));
+		Assert.assertThat(savedVariable.getScale().getScaleDbId(), is(equalTo(variable.getScale().getScaleDbId())));
+		Assert.assertThat(savedVariable.getMethod().getMethodDbId(), is(equalTo(variable.getMethod().getMethodDbId())));
+		Assert.assertThat(savedVariable.getContextOfUse(), contains(VariableDTO.ContextOfUseEnum.PLOT.toString()));
 	}
 
 }

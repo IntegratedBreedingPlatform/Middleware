@@ -60,37 +60,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 	}
 
 	@SuppressWarnings("unchecked")
-	public List<WorkbenchUser> getAllActiveUsersSorted() {
-		try {
-			final Query query = this.getSession().getNamedQuery(WorkbenchUser.GET_ALL_ACTIVE_USERS_SORTED);
-			return query.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllUsersSorted query from User: " + e.getMessage();
-			WorkbenchUserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<WorkbenchUser> getUsersByCrop(final String cropName) {
-		try {
-			final Query query = this.getSession().createQuery("SELECT u FROM WorkbenchUser u "
-				+ " INNER JOIN FETCH u.person p "
-				+ " INNER JOIN FETCH p.crops c "
-				+ " WHERE u.status = 0 "
-				+ " AND EXISTS(FROM WorkbenchUser wu INNER JOIN wu.person.crops ct WHERE ct.cropName = :cropName AND wu.userid = u.userid)"
-				+ " ORDER BY p.firstName, p.lastName");
-			query.setParameter("cropName", cropName);
-			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-			return query.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getUsersByCrop query from User: " + e.getMessage();
-			WorkbenchUserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
 	public List<WorkbenchUser> getByNameUsingEqual(final String name, final int start, final int numOfRows) {
 		try {
 			if (name != null) {
@@ -214,27 +183,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public boolean isSuperAdminUser(final Integer userId) {
-		try {
-			if (userId != null) {
-				final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
-				criteria.createAlias("roles", "roles");
-				criteria.createAlias("roles.role", "role");
-				criteria.add(Restrictions.eq("role.name", Role.SUPERADMIN));
-				criteria.add(Restrictions.eq("userid", userId));
-
-				final List<WorkbenchUser> users = criteria.list();
-				return !users.isEmpty();
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with isSuperAdminUser(userid=" + userId + ") query from User: " + e.getMessage();
-			WorkbenchUserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return false;
-	}
-
 	public List<WorkbenchUser> getUsers(final List<Integer> userIds) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
@@ -337,22 +285,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
 	}
 
-	public List<Integer> getActiveUserIDsWithAccessToTheProject(final Long projectId) {
-		final List<Integer> userIDs = new ArrayList<>();
-		try {
-			if (projectId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_ACTIVE_USER_IDS_WITH_ACCESS_TO_A_PROGRAM);
-				query.setParameter("projectId", projectId);
-				return query.list();
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error in getActiveUserIDsWithAccessToTheProject(projectId=" + projectId + ") query from WorkbenchUserDAO: "
-					+ e.getMessage(), e);
-		}
-		return userIDs;
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
 		final List<WorkbenchUser> users = new ArrayList<>();
@@ -399,7 +331,8 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
-	public List<UserDto> getAllProgramEligibleUsers(final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest,
+	public List<UserDto> getAllProgramEligibleUsers(
+		final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest,
 		final Pageable pageable) {
 		try {
 			final SQLQueryBuilder queryBuilder = ProgramEligibleUsersQuery.getSelectQuery(pageable, searchRequest);
@@ -433,7 +366,8 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 	}
 
-	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final ProgramMembersSearchRequest searchRequest,
+	public List<ProgramMemberDto> getProgramMembers(
+		final String programUUID, final ProgramMembersSearchRequest searchRequest,
 		final Pageable pageable) {
 		try {
 			final SQLQueryBuilder queryBuilder = ProgramMembersQuery.getSelectQuery(pageable, searchRequest);

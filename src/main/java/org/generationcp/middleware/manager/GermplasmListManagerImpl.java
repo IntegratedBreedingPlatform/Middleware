@@ -17,13 +17,10 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
-import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
-import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.ListMetadata;
@@ -38,10 +35,8 @@ import javax.annotation.Nullable;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -57,9 +52,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 
 	@Resource
 	private UserService userService;
-
-	@Resource
-	private GermplasmListService germplasmListService;
 
 	/**
 	 * Caches the udflds table. udflds should be small so this cache should be fine in terms of size. The string is the database url. So the
@@ -227,12 +219,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	}
 
 	@Override
-	public int deleteGermplasmListsByProgram(final String programUUID) {
-		final List<GermplasmList> lists = this.daoFactory.getGermplasmListDAO().getListsByProgram(programUUID);
-		return this.deleteGermplasmList(lists);
-	}
-
-	@Override
 	public int deleteGermplasmList(final List<GermplasmList> germplasmLists) {
 		int germplasmListsDeleted = 0;
 		try {
@@ -264,11 +250,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public List<Integer> addGermplasmListData(final List<GermplasmListData> germplasmListDatas) {
 		return this.addOrUpdateGermplasmListData(germplasmListDatas, Operation.ADD);
-	}
-
-	@Override
-	public List<Integer> updateGermplasmListData(final List<GermplasmListData> germplasmListDatas) {
-		return this.addOrUpdateGermplasmListData(germplasmListDatas, Operation.UPDATE);
 	}
 
 	private List<Integer> addOrUpdateGermplasmListData(final List<GermplasmListData> germplasmListDatas, final Operation operation) {
@@ -321,28 +302,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 					+ listId + "): " + e.getMessage(),
 				e);
 		}
-	}
-
-	@Override
-	public int deleteGermplasmListData(final List<GermplasmListData> germplasmListDatas) {
-
-		int germplasmListDataDeleted = 0;
-		try {
-
-			for (final GermplasmListData germplasmListData : germplasmListDatas) {
-				this.daoFactory.getGermplasmListDataDAO().makeTransient(germplasmListData);
-				germplasmListDataDeleted++;
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while deleting Germplasm List Data: GermplasmListManager.deleteGermplasmListData(germplasmListDatas="
-					+ germplasmListDatas + "): " + e.getMessage(),
-				e);
-		}
-
-		return germplasmListDataDeleted;
 	}
 
 	@Override
@@ -486,67 +445,6 @@ public class GermplasmListManagerImpl extends DataManager implements GermplasmLi
 	@Override
 	public List<GermplasmList> getAllGermplasmListsByIds(final List<Integer> listIds) {
 		return this.daoFactory.getGermplasmListDAO().getAllGermplasmListsById(listIds);
-	}
-
-	private List<Integer> validateGermplasmForDeletion(final List<Integer> germplasm) {
-
-		final Set<Integer> codeFixedGermplasms = this.getCodeFixedGidsByGidList(germplasm);
-		final Set<Integer> germplasmOffspringByGIDs = this.getGermplasmOffspringByGIDs(germplasm);
-		final Set<Integer> germplasmUsedInStudies = new HashSet<>(this.daoFactory.getStockDao().getGermplasmUsedInStudies(germplasm, false));
-		final Set<Integer> germplasmWithOpenLots = this.getGidsWithOpenLots(germplasm);
-		final Set<Integer> germplasmInLockedLists = new HashSet<>(this.daoFactory.getGermplasmListDAO()
-			.getGermplasmUsedInLockedList(germplasm));
-
-		final Set<Integer> all = new HashSet<>();
-
-		all.addAll(codeFixedGermplasms);
-		all.addAll(germplasmOffspringByGIDs);
-		all.addAll(germplasmUsedInStudies);
-		all.addAll(germplasmWithOpenLots);
-		all.addAll(germplasmInLockedLists);
-
-		return Lists.newArrayList(all);
-	}
-
-	protected Set<Integer> getCodeFixedGidsByGidList(final List<Integer> gids) {
-		try {
-			final Set<Integer> set = new HashSet<>();
-			final List<Germplasm> germplasms = this.daoFactory.getGermplasmDao().getByGIDList(gids);
-			for (final Germplasm germplasm : germplasms) {
-				if (germplasm.getMgid() > 0) {
-					set.add(germplasm.getGid());
-				}
-			}
-			return set;
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Error encountered while getting code fixed status: GermplasmDataManager.getCodeFixedStatusByGidList(gids=" + gids
-					+ "): " + e.getMessage(),
-				e);
-		}
-	}
-
-	private Set<Integer> getGidsWithOpenLots(final List<Integer> gids) {
-		try {
-			final LotDAO dao = this.daoFactory.getLotDao();
-			return dao.getGermplasmsWithOpenLots(gids);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Error encountered while getting gids with open lots: GermplasmDataManager.getGidsWithOpenLots(gids=" + gids + "): "
-					+ e.getMessage(),
-				e);
-		}
-	}
-
-	private Set<Integer> getGermplasmOffspringByGIDs(final List<Integer> gids) {
-		try {
-			return this.daoFactory.getGermplasmDao().getGermplasmOffspringByGIDs(gids).keySet();
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Error encountered while getting gids thart belongs to more than one list: GermplasmDataManager.getGermplasmUsedInMoreThanOneList(gids="
-					+ gids + "): " + e.getMessage(),
-				e);
-		}
 	}
 
 	@Override

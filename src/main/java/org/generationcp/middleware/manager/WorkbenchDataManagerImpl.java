@@ -18,17 +18,13 @@ import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectActivity;
-import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
-import org.generationcp.middleware.pojos.workbench.ToolType;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Session;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,8 +36,6 @@ import java.util.List;
  */
 @Transactional
 public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
-
-	private static final Logger LOG = LoggerFactory.getLogger(WorkbenchDataManagerImpl.class);
 
 	private HibernateSessionProvider sessionProvider;
 
@@ -71,83 +65,8 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public long countProjectsByFilter(final ProgramSearchRequest programSearchRequest) {
-		return this.workbenchDaoFactory.getProjectDAO().countProjectsByFilter(programSearchRequest);
-	}
-
-	@Override
 	public List<Project> getProjectsByCropName(final String cropName) {
 		return this.workbenchDaoFactory.getProjectDAO().getProjectsByCropName(cropName);
-	}
-
-	@Override
-	public Project saveOrUpdateProject(final Project project) {
-
-		try {
-			this.workbenchDaoFactory.getProjectDAO().merge(project);
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Cannot save Project: WorkbenchDataManager.saveOrUpdateProject(project=" + project + "): " + e.getMessage(), e);
-		}
-
-		return project;
-	}
-
-	@Override
-	public void deleteProjectDependencies(final Project project) {
-
-		try {
-			final Long projectId = project.getProjectId();
-			final List<ProjectActivity> projectActivities =
-				this.getProjectActivitiesByProjectId(projectId, 0, (int) this.countProjectActivitiesByProjectId(projectId));
-			for (final ProjectActivity projectActivity : projectActivities) {
-				this.deleteProjectActivity(projectActivity);
-			}
-
-			final List<ProjectUserInfo> projectUserInfos = this.getByProjectId(projectId);
-			for (final ProjectUserInfo projectUserInfo : projectUserInfos) {
-				this.deleteProjectUserInfo(projectUserInfo);
-			}
-
-			final List<UserRole> userRolesPerProgram = this.workbenchDaoFactory.getUserRoleDao().getByProgramId(projectId);
-			for (final UserRole userRole : userRolesPerProgram) {
-				userRole.getUser().getRoles().remove(userRole);
-				this.workbenchDaoFactory.getUserRoleDao().delete(userRole);
-			}
-
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException(
-				"Cannot delete Project Dependencies: WorkbenchDataManager.deleteProjectDependencies(project=" + project + "): " + e
-					.getMessage(), e);
-		}
-	}
-
-	public void deleteProjectUserInfo(final ProjectUserInfo projectUserInfo) {
-
-		try {
-
-			this.workbenchDaoFactory.getProjectUserInfoDAO().makeTransient(projectUserInfo);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Cannot delete ProjectUserInfo: WorkbenchDataManager.deleteProjectUserInfoDao(projectUserInfo=" + projectUserInfo
-					+ "): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public void deleteProject(final Project project) {
-
-		try {
-
-			this.workbenchDaoFactory.getProjectDAO().deleteProject(project.getProjectName());
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Cannot delete Project: WorkbenchDataManager.deleteProject(project=" + project + "): " + e.getMessage(), e);
-		}
 	}
 
 	@Override
@@ -161,28 +80,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Tool> getToolsWithType(final ToolType toolType) {
-		return this.workbenchDaoFactory.getToolDAO().getToolsByToolType(toolType);
-	}
-
-	@Override
 	public Project getProjectById(final Long projectId) {
 		return this.workbenchDaoFactory.getProjectDAO().getById(projectId);
 	}
 
 	@Override
-	public Project getProjectByNameAndCrop(final String projectName, final CropType cropType) {
-		return this.workbenchDaoFactory.getProjectDAO().getProjectByNameAndCrop(projectName, cropType);
-	}
-
-	@Override
 	public Project getProjectByUuidAndCrop(final String projectUuid, final String cropType) {
 		return this.workbenchDaoFactory.getProjectDAO().getByUuid(projectUuid, cropType);
-	}
-
-	@Override
-	public Project getLastOpenedProject(final Integer userId) {
-		return this.workbenchDaoFactory.getProjectDAO().getLastOpenedProject(userId);
 	}
 
 	@Override
@@ -224,11 +128,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return idSaved;
 	}
 
-	public List<ProjectUserInfo> getByProjectId(final Long projectId) {
-		return this.workbenchDaoFactory.getProjectUserInfoDAO().getByProjectId(projectId);
-
-	}
-
 	@Override
 	public Integer addProjectActivity(final ProjectActivity projectActivity) {
 		final List<ProjectActivity> list = new ArrayList<>();
@@ -265,31 +164,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		}
 
 		return idsSaved;
-	}
-
-	@Override
-	public List<ProjectActivity> getProjectActivitiesByProjectId(final Long projectId, final int start, final int numOfRows) {
-		return this.workbenchDaoFactory.getProjectActivityDAO().getByProjectId(projectId, start, numOfRows);
-	}
-
-	@Override
-	public void deleteProjectActivity(final ProjectActivity projectActivity) {
-
-		try {
-
-			this.workbenchDaoFactory.getProjectActivityDAO().makeTransient(projectActivity);
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while deleting ProjectActivity: WorkbenchDataManager.deleteProjectActivity(projectActivity="
-					+ projectActivity + "): " + e.getMessage(), e);
-		}
-	}
-
-	@Override
-	public long countProjectActivitiesByProjectId(final Long projectId) {
-		return this.workbenchDaoFactory.getProjectActivityDAO().countByProjectId(projectId);
 	}
 
 	@Override
@@ -353,16 +227,5 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public Role getRoleById(final Integer id) {
 		return this.workbenchDaoFactory.getRoleDao().getRoleById(id);
-	}
-
-	@Override
-	public List<CropType> getCropsWithAddProgramPermission(final int workbenchUserId) {
-
-		final boolean hasInstanceRoleWithAddProgramPermission = this.workbenchDaoFactory.getUserRoleDao().hasInstanceRoleWithAddProgramPermission(workbenchUserId);
-		if (hasInstanceRoleWithAddProgramPermission) {
-			return this.getAvailableCropsForUser(workbenchUserId);
-		} else {
-			return new ArrayList<>(this.workbenchDaoFactory.getUserRoleDao().getCropsWithAddProgramPermissionForCropRoles(workbenchUserId));
-		}
 	}
 }
