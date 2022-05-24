@@ -11,4 +11,6 @@ public interface SiteAnalysisService {
 
 	void updateSummaryStatisticsDataset(String crop, Integer summaryStatisticsDatasetId,
 		SummaryStatisticsImportRequest summaryStatisticsImportRequest);
+
+	Integer createMeansDataset(Integer studyId);
 }
