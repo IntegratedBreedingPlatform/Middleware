@@ -56,6 +56,13 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 	private static final List<Integer> OBSERVATION_LEVEL_RELATIONSHIP_IDS =
 		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId());
 
+	private static final String DELETE_EXPERIMENT_PROP_BY_LOCID_AND_TYPE =
+		"DELETE FROM nd_experimentprop "
+			+ "WHERE nd_experiment_id IN ( "
+			+ " 	SELECT e.nd_experiment_id FROM nd_experiment e "
+			+ " 	WHERE e.nd_geolocation_id IN (:locationIds) )"
+			+ " AND type_id IN (:termIds)";
+
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByPropertyTypeAndValue(final Integer typeId, final String value) {
 		try {
@@ -624,16 +631,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			// statement
 			this.getSession().flush();
 
-			final StringBuilder sql1 = new StringBuilder().append("DELETE FROM nd_experimentprop "
-				+ "WHERE nd_experiment_id IN (:locationIds) AND ngp.type_id IN (:variableIds) ");
-			final StringBuilder sql =
-				new StringBuilder().append("DELETE FROM nd_experimentprop ")
-					.append(" WHERE nd_experiment_id IN ( ")
-					.append(" 	SELECT e.nd_experiment_id FROM nd_experiment e ")
-					.append(" 	WHERE e.nd_geolocation_id IN (:locationIds) )")
-					.append(" AND type_id IN (:termIds)");
-
-			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+			final SQLQuery query = this.getSession().createSQLQuery(DELETE_EXPERIMENT_PROP_BY_LOCID_AND_TYPE);
 			query.setParameterList("locationIds", locationIds);
 			query.setParameterList("termIds", termIds);
 			query.executeUpdate();

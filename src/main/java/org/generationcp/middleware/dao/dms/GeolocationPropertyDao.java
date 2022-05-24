@@ -45,6 +45,19 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 
 	private static final Logger LOG = LoggerFactory.getLogger(GeolocationPropertyDao.class);
 
+
+	private static final String GEOLOCATIONPROP_ID_TYPE_CONDITION = "FROM nd_geolocationprop ngp "
+		+ "WHERE ngp.nd_geolocation_id IN (:geolocationIds) AND ngp.type_id = (:variableIds) ";
+
+	private static final String GET_BLOCK_IDS_TO_DELETE = "SELECT ngp.value "
+		+ GEOLOCATIONPROP_ID_TYPE_CONDITION
+		+ "and not exists ( select 1 from nd_geolocationprop others "
+		+ "					where others.value = ngp.value "
+		+ "					and others.nd_geolocation_id not in (:geolocationIds))";
+
+	private static final String DELETE_GEOLOCATIONPROP_BY_ID_TYPE = "Delete ngp.* "
+		+ GEOLOCATIONPROP_ID_TYPE_CONDITION;
+
 	@SuppressWarnings("unchecked")
 	public List<Integer> getGeolocationIdsByPropertyTypeAndValue(final Integer typeId, final String value) {
 		try {
@@ -87,27 +100,15 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			// statement
 			this.getSession().flush();
 
-			final String condition = "FROM nd_geolocationprop ngp "
-				+ "WHERE ngp.nd_geolocation_id IN (:geolocationIds) AND ngp.type_id = (:variableIds) ";
-
 			// block IDs to return to be used for locdes deletion
 			// only return if no other geolocation uses the block
-			final StringBuilder selectSql = new StringBuilder().append("SELECT ngp.value "
-				+ condition
-				+ "and not exists ( select 1 from nd_geolocationprop others "
-				+ "					where others.value = ngp.value "
-				+ "					and others.nd_geolocation_id not in (:geolocationIds))");
-
-			final StringBuilder deleteSql = new StringBuilder().append("Delete ngp.* "
-				+ condition);
-
-			SQLQuery sqlQuery1 = this.getSession().createSQLQuery(selectSql.toString());
+			SQLQuery sqlQuery1 = this.getSession().createSQLQuery(GET_BLOCK_IDS_TO_DELETE);
 			sqlQuery1.setParameterList("geolocationIds", geolocationIds);
 			sqlQuery1.setParameter("variableIds", TermId.BLOCK_ID.getId());
 
 			final List<Integer> blockIds = sqlQuery1.list();
 
-			sqlQuery1 = this.getSession().createSQLQuery(deleteSql.toString());
+			sqlQuery1 = this.getSession().createSQLQuery(DELETE_GEOLOCATIONPROP_BY_ID_TYPE);
 			sqlQuery1.setParameterList("geolocationIds", geolocationIds);
 			sqlQuery1.setParameter("variableIds", TermId.BLOCK_ID.getId());
 			sqlQuery1.executeUpdate();
