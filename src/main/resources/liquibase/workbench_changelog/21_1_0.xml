@@ -16,7 +16,7 @@
 		<sql dbms="mysql" splitStatements="true">
 			CREATE TABLE `crop_genotyping_parameter` (
 				`crop_genotyping_parameter_id` INT NOT NULL AUTO_INCREMENT,
-				`crop_name` VARCHAR(32) NULL,
+				`crop_name` VARCHAR(32) NOT NULL,
 				`endpoint` VARCHAR(500) NULL,
 				`token_endpoint` VARCHAR(500) NULL,
 				`username` VARCHAR(45) NULL,
