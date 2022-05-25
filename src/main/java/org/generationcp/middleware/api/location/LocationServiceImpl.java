@@ -125,13 +125,13 @@ public class LocationServiceImpl implements LocationService {
 			.getBlockParentsToDelete(blockLocIds);
 
 		// Delete Block Records
+		this.daoFactory.getLocationDAO().deleteByLocationIds(blockLocIds);
 		this.daoFactory.getLocDesDao().deleteByLocationIds(blockLocIds);
-		//this.daoFactory.getLocationDAO().deleteByLocationIds(blockLocIds);
 
 		// Delete Field/Block Parent Records
 		if (!blockParentIds.isEmpty()) {
+			this.daoFactory.getLocationDAO().deleteByLocationIds(blockParentIds);
 			this.daoFactory.getLocDesDao().deleteByLocationIds(blockParentIds);
-			//this.daoFactory.getLocationDAO().deleteByLocationIds(blockParentIds);
 		}
 	}
 
