@@ -14,8 +14,10 @@
 			Remove old 'Manage Program Settings' link
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			DELETE FROM workbench_sidebar_category_link
-			WHERE tool_name = 'manage_program';
+			set @new_manage_program_sidebar_link_id = (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link WHERE tool_name = 'program_settings_manager');
+			update permission set workbench_sidebar_category_link_id = @new_manage_program_sidebar_link_id where name = 'MANAGE_PROGRAM_SETTINGS';
+
+			DELETE FROM workbench_sidebar_category_link WHERE tool_name = 'manage_program';
 		</sql>
 	</changeSet>
 
