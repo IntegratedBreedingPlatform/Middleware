@@ -25,6 +25,8 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListServiceImpl;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataServiceImpl;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.LocationServiceImpl;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl;
 import org.generationcp.middleware.api.ontology.OntologyVariableService;
@@ -238,6 +240,10 @@ public class ManagerFactory implements Serializable {
 
 	public PedigreeService getPedigreeService() {
 		return PedigreeFactory.getPedigreeService(this.sessionProvider, this.pedigreeProfile, this.cropName);
+	}
+
+	public LocationService getLocationService() {
+		return new LocationServiceImpl(this.sessionProvider);
 	}
 
 	/**

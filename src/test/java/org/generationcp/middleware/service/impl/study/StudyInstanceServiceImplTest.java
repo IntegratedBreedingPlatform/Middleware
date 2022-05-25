@@ -3,10 +3,6 @@ package org.generationcp.middleware.service.impl.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
-import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
-import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
-import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -15,13 +11,8 @@ import org.generationcp.middleware.domain.dms.ExperimentDesignType;
 import org.generationcp.middleware.domain.dms.InstanceDescriptorData;
 import org.generationcp.middleware.domain.dms.InstanceObservationData;
 import org.generationcp.middleware.domain.dms.StudyReference;
-import org.generationcp.middleware.domain.dms.StudySummary;
-import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
-import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.DataType;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -36,11 +27,7 @@ import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.EnvironmentParameter;
-import org.generationcp.middleware.service.api.study.StudyDetailsDto;
-import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
-import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.api.study.generation.ExperimentDesignService;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
@@ -57,13 +44,10 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.UUID;
 
-import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class StudyInstanceServiceImplTest extends IntegrationTestBase {
@@ -94,8 +78,6 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 	@Resource
 	private ExperimentDesignService experimentDesignService;
-
-
 
 	private DaoFactory daoFactory;
 	private StudyDataManagerImpl studyDataManager;
@@ -172,7 +154,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		// Create instance 1
 		final Integer studyId = this.studyReference.getId();
 		final List<StudyInstance> studyInstances =
-			this.studyInstanceService.createStudyInstances(this.cropType, studyId, this.environmentDataset.getId(), 2);
+			this.studyInstanceService.createStudyInstances(this.cropType, studyId, this.environmentDataset.getId(), 0, 2);
 		final StudyInstance studyInstance1 = studyInstances.get(0);
 
 		// Need to flush session to sync with underlying database before querying
@@ -181,8 +163,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertNotNull(studyInstance1.getInstanceId());
 		assertNotNull(studyInstance1.getLocationId());
 		assertFalse(studyInstance1.isHasFieldmap());
-		assertEquals("Unspecified Location", studyInstance1.getLocationName());
-		assertEquals("NOLOC", studyInstance1.getLocationAbbreviation());
+		assertEquals("Unknown", studyInstance1.getLocationName());
+		assertEquals("UKN", studyInstance1.getLocationAbbreviation());
 		assertNull(studyInstance1.getCustomLocationAbbreviation());
 		assertTrue(studyInstance1.getCanBeDeleted());
 		assertFalse(studyInstance1.isHasMeasurements());
@@ -196,8 +178,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertNotNull(studyInstance2.getInstanceId());
 		assertNotNull(studyInstance2.getLocationId());
 		assertFalse(studyInstance2.isHasFieldmap());
-		assertEquals("Unspecified Location", studyInstance2.getLocationName());
-		assertEquals("NOLOC", studyInstance2.getLocationAbbreviation());
+		assertEquals("Unknown", studyInstance2.getLocationName());
+		assertEquals("UKN", studyInstance2.getLocationAbbreviation());
 		assertNull(studyInstance2.getCustomLocationAbbreviation());
 		assertTrue(studyInstance2.getCanBeDeleted());
 		assertFalse(studyInstance2.isHasMeasurements());
@@ -531,7 +513,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		// Create an instance
 		final Integer studyId = this.studyReference.getId();
 		final List<StudyInstance> studyInstances =
-			this.studyInstanceService.createStudyInstances(this.cropType, studyId, this.environmentDataset.getId(), 1);
+			this.studyInstanceService.createStudyInstances(this.cropType, studyId, this.environmentDataset.getId(), 0, 1);
 		return studyInstances.get(0);
 	}
 
