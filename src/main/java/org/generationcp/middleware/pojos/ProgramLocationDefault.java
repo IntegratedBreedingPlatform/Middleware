@@ -40,7 +40,6 @@ public class ProgramLocationDefault extends AbstractEntity implements Serializab
 		this.locationId = locationId;
 	}
 
-
 	public Integer getId() {
 		return this.id;
 	}

@@ -69,7 +69,8 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 	}
 
 	@Override
-	public List<StudyInstance> createStudyInstances(final CropType crop, final int studyId, final int datasetId, final int locationId,
+	public List<StudyInstance> createStudyInstances(
+		final CropType crop, final int studyId, final int datasetId, final int locationId,
 		final Integer numberOfInstancesToGenerate) {
 		Preconditions.checkArgument(numberOfInstancesToGenerate > 0);
 
@@ -181,7 +182,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				allEnvironments.stream()
 					.filter(instance -> !instanceNumbersToDelete.contains(Integer.valueOf(instance.getDescription()))
 						&& Integer.valueOf(instance.getDescription()) > startingInstanceNumber).collect(
-						Collectors.toList());
+					Collectors.toList());
 			// Unfortunately, not possible in MySQL 5 to do batch update as row_number function is only available in MySQL 8
 			// Also tried using MySQL variable assignment like @instance_number:=@instance_number + 1 but it causes Hibernate error
 			// as it's being treated as named parameter. Hopefully can be optimized when we upgrade Hibernate and/or MySQL version
@@ -248,14 +249,16 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 		// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 		this.datasetService
-			.updateDependentPhenotypesStatusByGeolocation(instanceObservationData.getInstanceId(),
+			.updateDependentPhenotypesStatusByGeolocation(
+				instanceObservationData.getInstanceId(),
 				Arrays.asList(instanceObservationData.getVariableId()));
 
 		return instanceObservationData;
 	}
 
 	@Override
-	public Optional<InstanceObservationData> getInstanceObservation(final Integer instanceId, final Integer observationDataId,
+	public Optional<InstanceObservationData> getInstanceObservation(
+		final Integer instanceId, final Integer observationDataId,
 		final Integer variableId) {
 
 		final ExperimentModel experimentModel =
@@ -289,7 +292,8 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 			geolocationDao.save(geolocation);
 			// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 			this.datasetService
-				.updateDependentPhenotypesStatusByGeolocation(instanceDescriptorData.getInstanceId(),
+				.updateDependentPhenotypesStatusByGeolocation(
+					instanceDescriptorData.getInstanceId(),
 					Arrays.asList(instanceDescriptorData.getVariableId()));
 		} else {
 			final GeolocationProperty property = new GeolocationProperty(geolocation, value, 1, instanceDescriptorData.getVariableId());
@@ -316,14 +320,16 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 		// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 		this.datasetService
-			.updateDependentPhenotypesStatusByGeolocation(instanceDescriptorData.getInstanceId(),
+			.updateDependentPhenotypesStatusByGeolocation(
+				instanceDescriptorData.getInstanceId(),
 				Arrays.asList(instanceDescriptorData.getVariableId()));
 
 		return instanceDescriptorData;
 	}
 
 	@Override
-	public Optional<InstanceDescriptorData> getInstanceDescriptorData(final Integer instanceId, final Integer descriptorDataId,
+	public Optional<InstanceDescriptorData> getInstanceDescriptorData(
+		final Integer instanceId, final Integer descriptorDataId,
 		final Integer variableId) {
 
 		final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(instanceId);

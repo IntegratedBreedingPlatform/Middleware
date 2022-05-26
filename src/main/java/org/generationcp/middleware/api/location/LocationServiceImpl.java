@@ -50,7 +50,8 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public List<LocationDTO> searchLocations(final LocationSearchRequest locationSearchRequest,
+	public List<LocationDTO> searchLocations(
+		final LocationSearchRequest locationSearchRequest,
 		final Pageable pageable, final String programUUID) {
 		return this.daoFactory.getLocationDAO().searchLocations(locationSearchRequest, pageable, programUUID);
 	}
@@ -61,7 +62,8 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public List<org.generationcp.middleware.api.location.Location> getLocations(final LocationSearchRequest locationSearchRequest,
+	public List<org.generationcp.middleware.api.location.Location> getLocations(
+		final LocationSearchRequest locationSearchRequest,
 		final Pageable pageable) {
 		return this.daoFactory.getLocationDAO().getLocations(locationSearchRequest, pageable);
 	}
@@ -102,7 +104,7 @@ public class LocationServiceImpl implements LocationService {
 	private void deleteFieldLocation(final List<Integer> locationIds) {
 		// Get the Block Parents
 		final List<Integer> blockParentIds = this.daoFactory.getLocDesDao().getLocdes(null, locationIds.stream()
-				.map(Object::toString).collect(Collectors.toList()))
+			.map(Object::toString).collect(Collectors.toList()))
 			.stream().map(Locdes::getLocationId).collect(Collectors.toList());
 
 		// Delete Blocks & Block Parents

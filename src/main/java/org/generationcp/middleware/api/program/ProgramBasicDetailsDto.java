@@ -20,7 +20,7 @@ public class ProgramBasicDetailsDto {
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
@@ -28,7 +28,7 @@ public class ProgramBasicDetailsDto {
 	}
 
 	public String getStartDate() {
-		return startDate;
+		return this.startDate;
 	}
 
 	public void setStartDate(final String startDate) {

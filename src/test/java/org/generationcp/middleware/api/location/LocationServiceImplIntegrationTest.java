@@ -54,7 +54,8 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testGetLocationsByFilter() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("COUNTRY");
-		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		final List<org.generationcp.middleware.api.location.Location> locationList =
+			this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		assertThat("Expected list of location size > zero", !locationList.isEmpty());
 	}
 
@@ -62,7 +63,8 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testGetLocationsByFilterNotRecoveredLocation() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
-		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		final List<org.generationcp.middleware.api.location.Location> locationList =
+			this.locationService.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		assertThat("Expected list of location size equals to zero", locationList.isEmpty());
 	}
 
@@ -154,7 +156,8 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertNotNull(locationDTO);
 		Assert.assertThat("Expected same Location id", newLocationDTO.getId(), equalTo(locationDTO.getId()));
 		Assert.assertThat("Expected diferent Location name", locationRequestDto.getName(), not(equalTo(locationDTO.getName())));
-		Assert.assertThat("Expected diferent Location abbr", locationRequestDto.getAbbreviation(), not(equalTo(locationDTO.getAbbreviation())));
+		Assert.assertThat("Expected diferent Location abbr", locationRequestDto.getAbbreviation(),
+			not(equalTo(locationDTO.getAbbreviation())));
 		Assert.assertThat("Expected diferent Location type", locationRequestDto.getType(), not(equalTo(locationDTO.getType())));
 
 		Assert.assertThat("Expected diferent altitude", locationRequestDto.getAltitude(), not(equalTo(locationDTO.getAltitude())));

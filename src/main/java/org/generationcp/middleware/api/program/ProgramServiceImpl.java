@@ -79,7 +79,8 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
-	public void addProgramMembers(final String programUUID,
+	public void addProgramMembers(
+		final String programUUID,
 		final AddProgramMemberRequestDto addProgramMemberRequestDto) {
 		final Project project = this.daoFactory.getProjectDAO().getByUuid(programUUID);
 		final Map<Integer, WorkbenchUser> userMap =

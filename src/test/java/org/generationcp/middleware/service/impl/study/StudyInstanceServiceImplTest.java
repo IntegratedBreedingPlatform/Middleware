@@ -319,7 +319,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		Assert.assertTrue(studyInstances.get(0).isHasExperimentalDesign());
 		Assert.assertEquals(2, studyInstances.size());
 		final Integer instance1LocationId = instance1.getLocationId();
-		Assert.assertEquals(instance1LocationId,
+		Assert.assertEquals(
+			instance1LocationId,
 			this.daoFactory.getExperimentDao().getById(studyExperimentId).getGeoLocation().getLocationId());
 
 		// Confirm geolocation and its properties have been deleted
@@ -566,7 +567,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		return study;
 	}
 
-	private Integer createTestExperiments(final DmsProject study, final DmsProject environmentDataset, final DmsProject plotDataset,
+	private Integer createTestExperiments(
+		final DmsProject study, final DmsProject environmentDataset, final DmsProject plotDataset,
 		final Geolocation instance1, final Geolocation instance2, final Geolocation instance3) {
 		// Study experiment
 		final ExperimentModel studyExperiment =

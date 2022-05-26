@@ -11,7 +11,8 @@ import java.util.Optional;
 
 public interface StudyInstanceService {
 
-	List<StudyInstance> createStudyInstances(CropType crop, int studyId, int datasetId, int locationId,
+	List<StudyInstance> createStudyInstances(
+		CropType crop, int studyId, int datasetId, int locationId,
 		Integer numberOfInstancesToGenerate);
 
 	List<StudyInstance> getStudyInstances(int studyId);
@@ -30,7 +31,8 @@ public interface StudyInstanceService {
 
 	InstanceDescriptorData updateInstanceDescriptorData(InstanceDescriptorData instanceDescriptorData);
 
-	Optional<InstanceDescriptorData> getInstanceDescriptorData(Integer instanceId, final Integer descriptorDataId,
+	Optional<InstanceDescriptorData> getInstanceDescriptorData(
+		Integer instanceId, final Integer descriptorDataId,
 		final Integer variableId);
 
 	/**
