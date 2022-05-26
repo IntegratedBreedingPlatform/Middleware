@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Locdes;
+import org.generationcp.middleware.pojos.LocdesType;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
@@ -31,7 +32,13 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(LocdesDAO.class);
 
-	
+	private static final String GET_BLOCK_PARENTS_QUERY =
+		"SELECT parent.locid FROM locdes parent"
+			+ " WHERE parent.locid in (select block.dval from locdes block"
+			+ " 	where block.locid in (:blockIds) and block.dtype = " + LocdesType.BLOCK_PARENT.getId() + ")"
+			+ " AND parent.locid not in (select oth_block.dval from locdes oth_block"
+			+ " 	where oth_block.locid not in (:blockIds) and oth_block.dtype = " + LocdesType.BLOCK_PARENT.getId() + ")";
+
 	@SuppressWarnings("unchecked")
 	public List<Locdes> getByLocation(final Integer locId) throws MiddlewareQueryException {
 		try {
@@ -133,6 +140,23 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 			final String message = "Error with deleteByLocationIds(locids=" + locids + ") in LocdesDAO: " + e.getMessage();
 			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	/**
+	 * @param blockIdsToDelete
+	 * @return block parent IDs that is not used as block parent after specified blocks deletion
+	 */
+	public List<Integer> getBlockParentsToDelete(final List<Integer> blockIdsToDelete) {
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(GET_BLOCK_PARENTS_QUERY);
+			query.setParameterList("blockIds", blockIdsToDelete);
+			return query.list();
+		} catch (final HibernateException e) {
+			LocdesDAO.LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(
+				this.getLogExceptionMessage("getBlockParentsToDelete", "blockIdsToDelete",
+					String.valueOf(blockIdsToDelete), e.getMessage(), "LocDes"), e);
 		}
 	}
 }

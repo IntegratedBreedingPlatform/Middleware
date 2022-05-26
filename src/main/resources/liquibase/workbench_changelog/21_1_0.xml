@@ -4,7 +4,39 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="aldrin" id="v21.1.0-1">
+	<changeSet author="mderamos" id="v21.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(*) FROM workbench_sidebar_category_link WHERE tool_name = 'manage_program';
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Remove old 'Manage Program Settings' link
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @new_manage_program_sidebar_link_id = (SELECT sidebar_category_link_id FROM workbench_sidebar_category_link WHERE tool_name = 'program_settings_manager');
+			update permission set workbench_sidebar_category_link_id = @new_manage_program_sidebar_link_id where name = 'MANAGE_PROGRAM_SETTINGS';
+
+			DELETE FROM workbench_sidebar_category_link WHERE tool_name = 'manage_program';
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v21.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(*) FROM workbench_tool WHERE name = 'manage_program';
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Remove old 'Manage Program Settings' tool
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM workbench_tool
+			WHERE name = 'manage_program';
+		</sql>
+	</changeSet>
+
+	<changeSet author="aldrin" id="v21.1.0-3">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<tableExists tableName="crop_genotyping_parameter"></tableExists>
@@ -25,9 +57,9 @@
 				PRIMARY KEY (`crop_genotyping_parameter_id`),
 				UNIQUE INDEX `crop_name_UNIQUE` (`crop_name` ASC),
 				CONSTRAINT `crop_genotyping_parameter_workbench_crop_fk`
-				FOREIGN KEY (`crop_name`) REFERENCES `workbench_crop` (`crop_name`)
-				ON DELETE NO ACTION
-				ON UPDATE NO ACTION) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+					FOREIGN KEY (`crop_name`) REFERENCES `workbench_crop` (`crop_name`)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 		</sql>
 	</changeSet>
 

@@ -18,12 +18,14 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +46,9 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 
 	private DmsProject study;
 	private DmsProject plot;
+
+	private static final List<Integer> FIELDMAP_TERM_IDS =
+		Arrays.asList(TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId());
 
 	@Before
 	public void setUp() {
@@ -116,13 +121,12 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 		assertEquals("General", fieldMapLabel.getSeason().getLabel());
 		assertEquals("Study1", fieldMapLabel.getStudyName());
 		assertEquals(1, fieldMapLabel.getPlotNo().intValue());
-		assertEquals("Range " + fieldMapLabel.getRange() + " Col " + fieldMapLabel.getColumn() , fieldMapLabel.getPlotCoordinate()) ;
+		assertEquals("Range " + fieldMapLabel.getRange() + " Col " + fieldMapLabel.getColumn(), fieldMapLabel.getPlotCoordinate());
 
 	}
 
 	@Test
 	public void testGetAllFieldMapsInBlockByTrialInstanceId() {
-
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
 		this.testDataInitializer.addGeolocationProp(geolocation, TermId.SEASON_VAR.getId(), "10101", 1);
 		this.testDataInitializer.addGeolocationProp(geolocation, TermId.TRIAL_LOCATION.getId(), "India", 2);
@@ -145,6 +149,33 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 			.getAllFieldMapsInBlockByTrialInstanceId(this.study.getProjectId(), geolocation.getLocationId(), 9999);
 		assertEquals(0, fieldMapInfos2.size());
 
+	}
+
+	@Test
+	public void testDeleteExperimentPropByLocationIds() {
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+		this.testDataInitializer.addGeolocationProp(geolocation, TermId.SEASON_VAR.getId(), "10101", 1);
+		this.testDataInitializer.addGeolocationProp(geolocation, TermId.TRIAL_LOCATION.getId(), "India", 2);
+		this.testDataInitializer.addGeolocationProp(geolocation, TermId.BLOCK_ID.getId(), "1234", 3);
+
+		final ExperimentModel experimentModel =
+			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), "1",
+				null, true);
+		this.testDataInitializer.createTestStock(this.study, experimentModel);
+
+		// Need to flush session to sync with underlying database before querying
+		this.sessionProvder.getSession().flush();
+
+		final Integer experimentId = experimentModel.getNdExperimentId();
+		final Integer locationId = geolocation.getLocationId();
+
+		List<ExperimentProperty> expPropList = this.experimentPropertyDao.getExperimentPropertiesByType(experimentId, FIELDMAP_TERM_IDS);
+		assertEquals(2, expPropList.size());
+
+		this.experimentPropertyDao.deleteExperimentPropByLocationIds(Arrays.asList(locationId), FIELDMAP_TERM_IDS);
+
+		expPropList = this.experimentPropertyDao.getExperimentPropertiesByType(experimentId, FIELDMAP_TERM_IDS);
+		assertTrue(expPropList.isEmpty());
 	}
 
 	@Test
@@ -175,7 +206,6 @@ public class ExperimentPropertyDaoIntegrationTest extends IntegrationTestBase {
 		final List<String> instance1PlotLevelCodes = plotObservationLevelRelationships.get(instance1.getLocationId().toString());
 		assertThat(instance1PlotLevelCodes, hasSize(1));
 		assertThat(instance1PlotLevelCodes.get(0), is(plotCode1));
-
 
 		assertTrue(plotObservationLevelRelationships.containsKey(instance2.getLocationId().toString()));
 		final List<String> instance2PlotLevelCodes = plotObservationLevelRelationships.get(instance2.getLocationId().toString());

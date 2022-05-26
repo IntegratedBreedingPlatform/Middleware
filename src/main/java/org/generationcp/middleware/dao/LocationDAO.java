@@ -38,6 +38,7 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -552,9 +553,9 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 
 	public void deleteByLocationIds(final List<Integer> locids) {
 		try {
-			final Query query = this.getSession().createQuery("delete from Location where locid in (:locids) ");
-			query.setParameterList("locids", locids);
-			query.executeUpdate();
+			this.getSession().createSQLQuery("delete from Location where locid in (:locids) ")
+				.setParameterList("locids", locids)
+				.executeUpdate();
 		} catch (final HibernateException e) {
 			final String message = "Error with deleteByLocationIds(locids=" + locids + ") in LocationDAO: " + e.getMessage();
 			LOG.error(message, e);
