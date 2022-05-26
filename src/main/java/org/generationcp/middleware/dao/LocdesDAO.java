@@ -32,7 +32,13 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 	
 	private static final Logger LOG = LoggerFactory.getLogger(LocdesDAO.class);
 
-	
+	private static final String GET_BLOCK_PARENTS_QUERY =
+		"SELECT parent.locid FROM locdes parent"
+			+ " WHERE parent.locid in (select block.dval from locdes block"
+			+ " 	where block.locid in (:blockIds) and block.dtype = " + LocdesType.BLOCK_PARENT.getId() + ")"
+			+ " AND parent.locid not in (select oth_block.dval from locdes oth_block"
+			+ " 	where oth_block.locid not in (:blockIds) and oth_block.dtype = " + LocdesType.BLOCK_PARENT.getId() + ")";
+
 	@SuppressWarnings("unchecked")
 	public List<Locdes> getByLocation(final Integer locId) throws MiddlewareQueryException {
 		try {
@@ -143,16 +149,7 @@ public class LocdesDAO extends GenericDAO<Locdes, Integer> {
 	 */
 	public List<Integer> getBlockParentsToDelete(final List<Integer> blockIdsToDelete) {
 		try {
-			final StringBuilder queryString = new StringBuilder().append("SELECT parent.locid");
-			queryString.append(" FROM locdes parent");
-			queryString.append(" WHERE parent.locid in (select block.dval from locdes block");
-			queryString.append("                        where block.locid in (:blockIds) and block.dtype = "
-				+ LocdesType.BLOCK_PARENT.getId() + ")");
-			queryString.append("   AND parent.locid not in (select oth_block.dval from locdes oth_block");
-			queryString.append("                            where oth_block.locid not in (:blockIds) and oth_block.dtype = "
-				+ LocdesType.BLOCK_PARENT.getId() + ")");
-
-			final SQLQuery query = this.getSession().createSQLQuery(queryString.toString());
+			final SQLQuery query = this.getSession().createSQLQuery(GET_BLOCK_PARENTS_QUERY);
 			query.setParameterList("blockIds", blockIdsToDelete);
 			return query.list();
 		} catch (final HibernateException e) {

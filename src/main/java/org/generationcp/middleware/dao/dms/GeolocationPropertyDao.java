@@ -51,9 +51,9 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 
 	private static final String GET_BLOCK_IDS_TO_DELETE = "SELECT ngp.value "
 		+ GEOLOCATIONPROP_ID_TYPE_CONDITION
-		+ "and not exists ( select 1 from nd_geolocationprop others "
-		+ "					where others.value = ngp.value "
-		+ "					and others.nd_geolocation_id not in (:geolocationIds))";
+		+ " AND not exists ( select 1 from nd_geolocationprop others "
+		+ " 	where others.value = ngp.value "
+		+ " 	and others.nd_geolocation_id not in (:geolocationIds))";
 
 	private static final String DELETE_GEOLOCATIONPROP_BY_ID_TYPE = "Delete ngp.* "
 		+ GEOLOCATIONPROP_ID_TYPE_CONDITION;
