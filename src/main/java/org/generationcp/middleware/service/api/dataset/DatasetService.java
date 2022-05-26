@@ -419,4 +419,7 @@ public interface DatasetService {
 	long countByVariableIdAndValue(final Integer variableId, final String value);
 
 	long countObservationsByVariableIdAndValue(final Integer variableId, final String value);
+
+	void updateDatasetProperties(Integer studyId, List<Integer> variableIds);
+
 }

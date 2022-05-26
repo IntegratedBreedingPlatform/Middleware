@@ -26,6 +26,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -65,6 +66,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * Created by clarysabel on 10/22/18.
@@ -1182,6 +1185,45 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public long countObservationsByVariableIdAndValue(final Integer variableId, final String value) {
 		return this.daoFactory.getPhenotypeDAO().countByVariableIdAndValue(variableId, value);
+	}
+
+	@Override
+	public void updateDatasetProperties(final Integer studyId, final List<Integer> variableIds) {
+		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
+		final List<Integer> germplasmDescriptorPropertyIds = plotDataset.getProperties()
+			.stream()
+			.filter(projectProperty ->
+				projectProperty.getTypeId().equals(VariableType.GERMPLASM_DESCRIPTOR.getId()) && !projectProperty.getVariableId()
+					.equals(TermId.OBS_UNIT_ID.getId()))
+			.map(ProjectProperty::getVariableId)
+			.collect(Collectors.toList());
+
+		final List<Integer> newPropertyVariableIds = variableIds.stream()
+				.filter(variableId -> !germplasmDescriptorPropertyIds.contains(variableId)).collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(newPropertyVariableIds)) {
+			final AtomicInteger nextRank =
+				new AtomicInteger(this.daoFactory.getProjectPropertyDAO().getNextRank(plotDataset.getProjectId()));
+
+			final VariableFilter variableFilter = new VariableFilter();
+			newPropertyVariableIds.forEach(variableFilter::addVariableId);
+			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+			final Map<Integer, String> variableAliasByIds = variables.stream()
+				.collect(Collectors.toMap(Variable::getId,
+					variable -> StringUtils.isEmpty(variable.getAlias()) ? variable.getName() : variable.getAlias()));
+
+			newPropertyVariableIds.forEach(variableId -> {
+				final ProjectProperty projectProperty =
+					new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, nextRank.getAndIncrement(),
+						variableId, variableAliasByIds.get(variableId));
+				this.daoFactory.getProjectPropertyDAO().save(projectProperty);
+			});
+		}
+
+		final List<Integer> removeVariableIds = germplasmDescriptorPropertyIds.stream()
+			.filter(variableId -> !variableIds.contains(variableId)).collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(removeVariableIds)) {
+			this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(plotDataset.getProjectId(), removeVariableIds);
+		}
 	}
 
 	void addStudyVariablesToUnitRows(final List<ObservationUnitRow> observationUnits, final List<MeasurementVariable> studyVariables) {

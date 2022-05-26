@@ -298,15 +298,15 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Override
 	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId) {
-		final DmsProject study = this.getPlotDataset(studyId);
+		final DmsProject plotDataset = this.getPlotDataset(studyId);
 		final List<StudyEntryColumnDTO> columns = new ArrayList<>();
-		columns.add(this.buildStudyEntryColumnDTO(TermId.GID, study.getProperties()));
-		columns.add(this.buildStudyEntryColumnDTO(TermId.GUID, study.getProperties()));
-		columns.add(this.buildStudyEntryColumnDTO(TermId.DESIG, study.getProperties()));
-		columns.add(this.buildStudyEntryColumnDTO(TermId.CROSS, study.getProperties()));
-		columns.add(this.buildStudyEntryColumnDTO(TermId.GROUPGID, study.getProperties()));
-		columns.add(this.buildStudyEntryColumnDTO(TermId.IMMEDIATE_SOURCE_NAME, study.getProperties()));
-		columns.add(this.buildStudyEntryColumnDTO(TermId.GROUP_SOURCE_NAME, study.getProperties()));
+		columns.add(this.buildStudyEntryColumnDTO(TermId.GID, plotDataset.getProperties()));
+		columns.add(this.buildStudyEntryColumnDTO(TermId.GUID, plotDataset.getProperties()));
+		columns.add(this.buildStudyEntryColumnDTO(TermId.DESIG.getId(), "DESIGNATION", plotDataset.getProperties()));
+		columns.add(this.buildStudyEntryColumnDTO(TermId.CROSS, plotDataset.getProperties()));
+		columns.add(this.buildStudyEntryColumnDTO(TermId.GROUPGID, plotDataset.getProperties()));
+		columns.add(this.buildStudyEntryColumnDTO(TermId.IMMEDIATE_SOURCE_NAME, plotDataset.getProperties()));
+		columns.add(this.buildStudyEntryColumnDTO(TermId.GROUP_SOURCE_NAME, plotDataset.getProperties()));
 		return columns;
 	}
 
@@ -330,8 +330,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	private StudyEntryColumnDTO buildStudyEntryColumnDTO(final TermId termId, final List<ProjectProperty> projectProperties) {
-		return new StudyEntryColumnDTO(termId.getId(), termId.name(),
-			projectProperties.stream().anyMatch(projectProperty -> projectProperty.getVariableId().equals(termId.getId())));
+		return this.buildStudyEntryColumnDTO(termId.getId(), termId.name(), projectProperties);
+	}
+
+	private StudyEntryColumnDTO buildStudyEntryColumnDTO(final Integer termId, final String name, final List<ProjectProperty> projectProperties) {
+		return new StudyEntryColumnDTO(termId, name,
+			projectProperties.stream().anyMatch(projectProperty -> projectProperty.getVariableId().equals(termId)));
 	}
 
 }
