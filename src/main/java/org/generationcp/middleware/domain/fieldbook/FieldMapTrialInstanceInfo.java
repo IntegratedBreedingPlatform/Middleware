@@ -684,6 +684,15 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 		}
 	}
 
+	public void clearColumnRangeIfExists() {
+		if (this.getFieldMapLabels() != null) {
+			for (final FieldMapLabel label : this.getFieldMapLabels()) {
+				label.setColumn(null);
+				label.setRange(null);
+			}
+		}
+	}
+
 	public Map<Integer, String> getLabelHeaders() {
 		return this.labelHeaders;
 	}
