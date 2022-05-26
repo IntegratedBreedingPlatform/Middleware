@@ -7,6 +7,7 @@ import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.junit.Assert;
 import org.junit.Before;
@@ -162,6 +163,56 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		Assert.assertThat("Expected diferent country id", locationRequestDto.getCountryId(), not(equalTo(locationDTO.getCountryId())));
 		Assert.assertThat("Expected diferent province id", locationRequestDto.getProvinceId(), not(equalTo(locationDTO.getProvinceId())));
 
+	}
+
+	@Test
+	public void testSaveProgramLocationDefault() {
+		final LocationDTO newLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final ProgramLocationDefault programLocationDefault =
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), newLocationDTO.getId());
+		final ProgramLocationDefault savedProgramLocationDefault = this.daoFactory.getProgramLocationDefaultDAO()
+			.getById(programLocationDefault.getId());
+		Assert.assertEquals(savedProgramLocationDefault, programLocationDefault);
+	}
+
+	@Test
+	public void testUpdateProgramLocationDefault() {
+		final LocationDTO locationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final ProgramLocationDefault programLocationDefault =
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), locationDTO.getId());
+		final ProgramLocationDefault savedProgramLocationDefault = this.daoFactory.getProgramLocationDefaultDAO()
+			.getById(programLocationDefault.getId());
+		final LocationDTO newLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		this.locationService.updateProgramLocationDefault(savedProgramLocationDefault.getProgramUUID(), newLocationDTO.getId());
+		final ProgramLocationDefault updatedProgramLocationDefault =
+			this.locationService.getProgramLocationDefault(savedProgramLocationDefault.getProgramUUID());
+		Assert.assertEquals(newLocationDTO.getId(), updatedProgramLocationDefault.getLocationId());
+	}
+
+	@Test
+	public void testGetProgramLocationDefault() {
+		final LocationDTO locationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final ProgramLocationDefault programLocationDefault =
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), locationDTO.getId());
+		final ProgramLocationDefault savedProgramLocationDefault =
+			this.locationService.getProgramLocationDefault(programLocationDefault.getProgramUUID());
+		Assert.assertEquals(programLocationDefault, savedProgramLocationDefault);
+	}
+
+	@Test
+	public void testGetDefaultLocation() {
+		final LocationDTO locationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final ProgramLocationDefault programLocationDefault =
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), locationDTO.getId());
+		final LocationDTO defaultLocation = this.locationService.getDefaultLocation(programLocationDefault.getProgramUUID());
+		Assert.assertEquals(locationDTO, defaultLocation);
+	}
+
+	@Test
+	public void testIsProgramLocationDefault() {
+		final LocationDTO locationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), locationDTO.getId());
+		Assert.assertTrue(this.locationService.isProgramLocationDefault(locationDTO.getId()));
 	}
 
 	private LocationRequestDto buildLocationRequestDto() {
