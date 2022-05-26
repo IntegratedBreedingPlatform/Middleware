@@ -53,4 +53,6 @@ public interface LocationService {
 	ProgramLocationDefault getProgramLocationDefault(String programUUID);
 
 	LocationDTO getDefaultLocation(String programUUID);
+
+	boolean isProgramLocationDefault(Integer locationId);
 }
