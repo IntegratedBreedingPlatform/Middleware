@@ -11,8 +11,10 @@
 package org.generationcp.middleware.service;
 
 import com.google.common.base.Optional;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
@@ -70,6 +72,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -108,9 +111,14 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	@Resource
 	private LocationDataManager locationDataManager;
 
+	@Resource
+	private LocationService locationService;
+
 	private DaoFactory daoFactory;
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
+	private static final List<Integer> FIELDMAP_TERM_IDS =
+		Arrays.asList(TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId());
 
 	public FieldbookServiceImpl() {
 		super();
@@ -749,5 +757,22 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	void setWorkbookSaver(final WorkbookSaver workbookSaver) {
 		this.workbookSaver = workbookSaver;
+	}
+
+	@Override
+	public void deleteAllFieldMapsByTrialInstanceIds(final List<Integer> geolocationId, final Integer projectId,
+		final boolean deleteProjectProp) {
+		this.daoFactory.getExperimentPropertyDao().deleteExperimentPropByLocationIds(geolocationId, FIELDMAP_TERM_IDS);
+		final List<Integer> blockIdsToDelete =
+			this.daoFactory.getGeolocationPropertyDao().deleteBlockPropertiesByGeolocationId(geolocationId);
+
+		if (CollectionUtils.isNotEmpty(blockIdsToDelete)) {
+			this.locationService.deleteBlockFieldLocationByBlockId(blockIdsToDelete);
+		}
+
+		if (deleteProjectProp) {
+			this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(
+				projectId, Arrays.asList(TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId()));
+		}
 	}
 }

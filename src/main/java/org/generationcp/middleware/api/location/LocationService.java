@@ -44,4 +44,12 @@ public interface LocationService {
 	boolean blockIdIsUsedInFieldMap(List<Integer> blockIds);
 
 	List<LocationDTO> getCountries();
+
+	/**
+	 * Delete given block locations. Also delete field location (block parent)
+	 * if no other blocks uses particular field as parent.
+	 *
+	 * @param blockLocIds
+	 */
+	void deleteBlockFieldLocationByBlockId (List<Integer> blockLocIds);
 }
