@@ -51,5 +51,5 @@ public interface LocationService {
 	 *
 	 * @param blockLocIds
 	 */
-	void deleteBlockFieldLocationByBlockId (final List<Integer> blockLocIds);
+	void deleteBlockFieldLocationByBlockId (List<Integer> blockLocIds);
 }
