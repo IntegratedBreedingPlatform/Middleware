@@ -211,6 +211,11 @@ public class IntegrationTestDataInitializer {
 
 	public ExperimentModel createTestExperiment(final DmsProject project, final Geolocation geolocation, final int experimentType,
 		final String value, final ExperimentModel parent) {
+		return this.createTestExperiment(project, geolocation, experimentType, value, parent, false);
+	}
+
+	public ExperimentModel createTestExperiment(final DmsProject project, final Geolocation geolocation, final int experimentType,
+		final String value, final ExperimentModel parent, final boolean addFieldmapProps) {
 
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setGeoLocation(geolocation);
@@ -221,16 +226,24 @@ public class IntegrationTestDataInitializer {
 		this.experimentDao.saveOrUpdate(experimentModel);
 
 		if (!StringUtils.isEmpty(value)) {
-			final ExperimentProperty experimentProperty = new ExperimentProperty();
-			experimentModel.setProperties(new ArrayList<>(Collections.singleton(experimentProperty)));
-			experimentProperty.setExperiment(experimentModel);
-			experimentProperty.setTypeId(TermId.PLOT_NO.getId());
-			experimentProperty.setValue(value);
-			experimentProperty.setRank(1);
-			this.experimentPropertyDao.saveOrUpdate(experimentProperty);
+			this.saveExperimentProperty(experimentModel, TermId.PLOT_NO.getId(), value);
+			if (addFieldmapProps) {
+				this.saveExperimentProperty(experimentModel, TermId.FIELDMAP_COLUMN.getId(), "1");
+				this.saveExperimentProperty(experimentModel, TermId.FIELDMAP_RANGE.getId(), "1");
+			}
 		}
 
 		return experimentModel;
+	}
+
+	private void saveExperimentProperty(final ExperimentModel experimentModel, final Integer typeId, final String value) {
+		final ExperimentProperty experimentProperty = new ExperimentProperty();
+		experimentModel.setProperties(new ArrayList<>(Collections.singleton(experimentProperty)));
+		experimentProperty.setExperiment(experimentModel);
+		experimentProperty.setTypeId(typeId);
+		experimentProperty.setValue(value);
+		experimentProperty.setRank(1);
+		this.experimentPropertyDao.saveOrUpdate(experimentProperty);
 	}
 
 	public CVTerm createTrait(final String name) {
@@ -348,7 +361,8 @@ public class IntegrationTestDataInitializer {
 
 	}
 
-	public void addInstanceExternalReferenceSource(final Geolocation geolocation, final String externalReferenceId, final String externalReferenceSource) {
+	public void addInstanceExternalReferenceSource(final Geolocation geolocation, final String externalReferenceId,
+		final String externalReferenceSource) {
 		final InstanceExternalReference instanceExternalReference = new InstanceExternalReference();
 		instanceExternalReference.setInstance(geolocation);
 		instanceExternalReference.setReferenceId(externalReferenceId);
