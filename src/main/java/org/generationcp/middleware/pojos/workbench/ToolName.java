@@ -11,10 +11,6 @@
 
 package org.generationcp.middleware.pojos.workbench;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /**
  * The name of tools (e.g. germplasm_browser, study_browser) as stored in workbench_tool table in Workbench Database
  *
@@ -41,7 +37,6 @@ public enum ToolName {
 	TRAIT_DONOR_QUERY("trait_donor_query"),
 	TRIAL_MANAGER_FIELDBOOK_WEB("trial_manager_fieldbook_web"),
 	STUDY_MANAGER_FIELDBOOK_WEB("study_manager_fieldbook_web"),
-	MANAGE_PROGRAMS("manage_program"),
 	CREATE_PROGRAMS("create_program"),
 	GERMPLASM_LISTS("germplasm_lists"),
 	INVENTORY_MANAGEMENT("inventory_manager"),
@@ -58,27 +53,5 @@ public enum ToolName {
 
 	public String getName() {
 		return this.name;
-	}
-
-	public static boolean isURLAccessibleTool(final String name) {
-		final List<ToolName> workbenchTools = Arrays.asList(BV_SSA, BV_META_ANALYSIS, BV_GXE, MANAGE_PROGRAMS);
-		final List<ToolName> toolsWithURL = new ArrayList<>(Arrays.asList(ToolName.values()));
-		toolsWithURL.removeAll(workbenchTools);
-		for (final ToolName tool : toolsWithURL) {
-			if (tool.getName().equals(name)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public static ToolName equivalentToolEnum(final String name) {
-		for (final ToolName tool : ToolName.values()) {
-			if (tool.getName().equals(name)) {
-				return tool;
-			}
-		}
-
-		return null;
 	}
 }
