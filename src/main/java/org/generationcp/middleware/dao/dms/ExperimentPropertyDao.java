@@ -593,6 +593,13 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		return (ExperimentProperty) criteria.uniqueResult();
 	}
 
+	public List<ExperimentProperty> getExperimentPropertiesByType(final Integer experimentId, final List<Integer> typeIds) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("experiment.ndExperimentId", experimentId));
+		criteria.add(Restrictions.in("typeId", typeIds));
+		return (List<ExperimentProperty>) criteria.list();
+	}
+
 	public Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocations(final Set<String> geolocationIds) {
 		if (isEmpty(geolocationIds)) {
 			return emptyMap();
