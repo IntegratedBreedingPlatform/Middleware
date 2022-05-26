@@ -205,7 +205,17 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final ProgramLocationDefault programLocationDefault =
 			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), locationDTO.getId());
 		final LocationDTO defaultLocation = this.locationService.getDefaultLocation(programLocationDefault.getProgramUUID());
-		Assert.assertEquals(locationDTO, defaultLocation);
+		Assert.assertNotNull(locationDTO);
+		Assert.assertThat("Expected same Location id", locationDTO.getId(), equalTo(defaultLocation.getId()));
+		Assert.assertThat("Expected same Location name", locationDTO.getName(), equalTo(defaultLocation.getName()));
+		Assert.assertThat("Expected same Location Abbr", locationDTO.getAbbreviation(), equalTo(defaultLocation.getAbbreviation()));
+		Assert.assertThat("Expected same Location type", locationDTO.getType(), equalTo(defaultLocation.getType()));
+
+		Assert.assertThat("Expected same altitude", locationDTO.getAltitude(), equalTo(defaultLocation.getAltitude()));
+		Assert.assertThat("Expected same latitude", locationDTO.getLatitude(), equalTo(defaultLocation.getLatitude()));
+		Assert.assertThat("Expected same longitude", locationDTO.getLongitude(), equalTo(defaultLocation.getLongitude()));
+		Assert.assertThat("Expected same country id", locationDTO.getCountryId(), equalTo(defaultLocation.getCountryId()));
+		Assert.assertThat("Expected same province id", locationDTO.getProvinceId(), equalTo(defaultLocation.getProvinceId()));
 	}
 
 	@Test
