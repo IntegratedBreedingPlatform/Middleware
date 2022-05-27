@@ -58,6 +58,21 @@
 
 	<changeSet author="mderamos" id="v21.1.0-3">
 		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(1) FROM location where labbr = 'UKN';
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Reinsert Unknown location if it was deleted.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO location(ltype, lname, labbr)
+			VALUES (405, 'Unknown', 'UKN')
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v21.1.0-4">
+		<preConditions onFail="MARK_RAN">
 			<and>
 				<tableExists tableName="program_location_default"/>
 				<not>
@@ -74,12 +89,13 @@
 			Populate program_location_default for existing programs, set 0 as default
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
+			set @unknown_location_id = (select locid from location where labbr = 'UKN');
+
 			INSERT INTO program_location_default(program_uuid, location_id)
-			SELECT project.project_uuid, 0 FROM workbench.workbench_project project
+			SELECT project.project_uuid, @unknown_location_id FROM workbench.workbench_project project
 			INNER JOIN workbench.workbench_crop crop
 			WHERE crop.crop_name = project.crop_type
 			AND crop.db_name = DATABASE()
 		</sql>
 	</changeSet>
-
 </databaseChangeLog>

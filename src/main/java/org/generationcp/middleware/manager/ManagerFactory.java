@@ -246,10 +246,6 @@ public class ManagerFactory implements Serializable {
 		return PedigreeFactory.getPedigreeService(this.sessionProvider, this.pedigreeProfile, this.cropName);
 	}
 
-	public LocationService getLocationService() {
-		return new LocationServiceImpl(this.sessionProvider);
-	}
-
 	/**
 	 * Closes the db connection by shutting down the HibernateUtil object
 	 */
