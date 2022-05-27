@@ -30,10 +30,9 @@ public enum PhenotypicType {
 			"SITENO"), "TRIAL ENVIRONMENT"), //
 
 	GERMPLASM(Arrays.asList(TermId.GERMPLASM_ENTRY_STORAGE.getId(), TermId.ENTRY_NUMBER_STORAGE.getId(), TermId.ENTRY_GID_STORAGE.getId(),
-			TermId.ENTRY_DESIGNATION_STORAGE.getId(), TermId.ENTRY_CODE_STORAGE.getId()), Arrays.asList("ENTRY", "ENTRY_NO", "ENTRYNO"),
-			"GERMPLASM ENTRY"), //
+			TermId.ENTRY_DESIGNATION_STORAGE.getId(), TermId.ENTRY_CODE_STORAGE.getId()), singletonList(""), "GERMPLASM ENTRY"), //
 
-	ENTRY_DETAIL(new ArrayList<>(), singletonList(""), "ENTRY_DETAIL"),
+	ENTRY_DETAIL(new ArrayList<>(), Arrays.asList("ENTRY", "ENTRY_NO", "ENTRYNO"), "ENTRY_DETAIL"),
 
 	TRIAL_DESIGN(Arrays.asList(TermId.TRIAL_DESIGN_INFO_STORAGE.getId()), Arrays.asList("PLOT", "PLOT_NO", "PLOTNO"), "TRIAL DESIGN"), //
 
