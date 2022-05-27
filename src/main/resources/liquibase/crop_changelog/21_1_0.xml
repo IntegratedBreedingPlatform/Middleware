@@ -59,15 +59,15 @@
 	<changeSet author="mderamos" id="v21.1.0-3">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
-				SELECT COUNT(1) FROM location where labbr = 'UKN';
+				SELECT COUNT(1) FROM location where labbr = 'NOLOC';
 			</sqlCheck>
 		</preConditions>
 		<comment>
-			Reinsert Unknown location if it was deleted.
+			Reinsert Unspecified location if it was deleted.
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			INSERT INTO location(ltype, lname, labbr)
-			VALUES (405, 'Unknown', 'UKN')
+			INSERT INTO `location` (`ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`)
+			VALUES('405', '1', 'Unspecified Location', 'NOLOC', '0', '0', '0', '0', '0', '0');
 		</sql>
 	</changeSet>
 
@@ -86,13 +86,13 @@
 			</and>
 		</preConditions>
 		<comment>
-			Populate program_location_default for existing programs, set 0 as default
+			Populate program_location_default for existing programs, set unspecified location as default
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			set @unknown_location_id = (select locid from location where labbr = 'UKN');
+			set @unspecified_location_id = (select locid from location where labbr = 'NOLOC');
 
 			INSERT INTO program_location_default(program_uuid, location_id)
-			SELECT project.project_uuid, @unknown_location_id FROM workbench.workbench_project project
+			SELECT project.project_uuid, @unspecified_location_id FROM workbench.workbench_project project
 			INNER JOIN workbench.workbench_crop crop
 			WHERE crop.crop_name = project.crop_type
 			AND crop.db_name = DATABASE()
