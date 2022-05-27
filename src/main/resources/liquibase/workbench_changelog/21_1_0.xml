@@ -36,4 +36,31 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="aldrin" id="v21.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="crop_genotyping_parameter"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create table 'crop_genotyping_parameter'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE `crop_genotyping_parameter` (
+				`crop_genotyping_parameter_id` INT NOT NULL AUTO_INCREMENT,
+				`crop_name` VARCHAR(32) NOT NULL,
+				`endpoint` VARCHAR(500) NULL,
+				`token_endpoint` VARCHAR(500) NULL,
+				`username` VARCHAR(45) NULL,
+				`password` BLOB NULL,
+				`program_id` VARCHAR(45) NULL,
+				PRIMARY KEY (`crop_genotyping_parameter_id`),
+				UNIQUE INDEX `crop_name_UNIQUE` (`crop_name` ASC),
+				CONSTRAINT `crop_genotyping_parameter_workbench_crop_fk`
+					FOREIGN KEY (`crop_name`) REFERENCES `workbench_crop` (`crop_name`)
+						ON DELETE NO ACTION
+						ON UPDATE NO ACTION) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>
