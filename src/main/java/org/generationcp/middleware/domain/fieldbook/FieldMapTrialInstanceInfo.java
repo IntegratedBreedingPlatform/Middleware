@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.domain.fieldbook;
 
+import org.generationcp.middleware.util.Debug;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -18,8 +20,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import org.generationcp.middleware.util.Debug;
 
 /**
  * The Class FieldMapTrialInstanceInfo.
@@ -81,6 +81,12 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 
 	/** The has field map. */
 	private boolean hasFieldMap;
+
+	/** The has geo json. */
+	private boolean hasGeoJSON;
+
+	/** The has means data. */
+	private boolean hasMeansData;
 
 	/** The rows per plot. */
 	private Integer rowsPerPlot;
@@ -464,6 +470,42 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 	}
 
 	/**
+	 * Gets the checks for geo json.
+	 *
+	 * @return the hasGeoJSON
+	 */
+	public boolean getHasGeoJSON() {
+		return this.hasGeoJSON;
+	}
+
+	/**
+	 * Sets the checks for geo json.
+	 *
+	 * @param hasGeoJSON the hasGeoJSON to set
+	 */
+	public void setHasGeoJSON(final boolean hasGeoJSON) {
+		this.hasGeoJSON = hasGeoJSON;
+	}
+
+	/**
+	 * Gets the checks for means data.
+	 *
+	 * @return the hasMeansData
+	 */
+	public boolean getHasMeansData() {
+		return this.hasMeansData;
+	}
+
+	/**
+	 * Sets the checks for means data.
+	 *
+	 * @param hasMeansData the hasMeansData to set
+	 */
+	public void setHasMeansData(final boolean hasMeansData) {
+		this.hasMeansData = hasMeansData;
+	}
+
+	/**
 	 * Gets the rows per plot.
 	 *
 	 * @return the rowsPerPlot
@@ -639,6 +681,15 @@ public class FieldMapTrialInstanceInfo implements Serializable {
 			this.machineRowCapacity = blockInfo.getMachineRowCapacity();
 			this.deletedPlots = blockInfo.getDeletedPlots();
 			this.fieldId = blockInfo.getFieldId();
+		}
+	}
+
+	public void clearColumnRangeIfExists() {
+		if (this.getFieldMapLabels() != null) {
+			for (final FieldMapLabel label : this.getFieldMapLabels()) {
+				label.setColumn(null);
+				label.setRange(null);
+			}
 		}
 	}
 

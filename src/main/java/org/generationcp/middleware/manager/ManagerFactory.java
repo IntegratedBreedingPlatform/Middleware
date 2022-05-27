@@ -165,6 +165,10 @@ public class ManagerFactory implements Serializable {
 		return new LocationDataManagerImpl(this.sessionProvider);
 	}
 
+	public LocationService getLocationService() {
+		return new LocationServiceImpl(this.sessionProvider);
+	}
+
 	public OntologyDataManager getOntologyDataManager() {
 		return new OntologyDataManagerImpl(this.sessionProvider);
 	}

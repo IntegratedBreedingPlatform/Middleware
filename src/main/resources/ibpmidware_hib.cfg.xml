@@ -90,6 +90,7 @@
         <mapping class="org.generationcp.middleware.pojos.workbench.releasenote.ReleaseNoteUser"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.feedback.Feedback"/>
         <mapping class="org.generationcp.middleware.pojos.workbench.feedback.FeedbackUser"/>
+        <mapping class="org.generationcp.middleware.pojos.workbench.CropGenotypingParameter"/>
 
         <!-- Mapping classes for new OMS schema -->
         <mapping class="org.generationcp.middleware.pojos.oms.CV"/>
