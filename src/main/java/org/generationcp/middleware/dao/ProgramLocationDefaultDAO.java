@@ -14,7 +14,7 @@ public class ProgramLocationDefaultDAO extends GenericDAO<ProgramLocationDefault
 		super(session);
 	}
 
-	public ProgramLocationDefault getByprogramUUID(final String programUUID) throws MiddlewareQueryException {
+	public ProgramLocationDefault getByProgramUUID(final String programUUID) throws MiddlewareQueryException {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(ProgramLocationDefault.class);
 			criteria.add(Restrictions.eq("programUUID", programUUID));
@@ -22,7 +22,7 @@ public class ProgramLocationDefaultDAO extends GenericDAO<ProgramLocationDefault
 			return (ProgramLocationDefault) criteria.uniqueResult();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"error in: ProgramLocationDefaultDao.getByprogramUUID(programUUID=" + programUUID + "): " + e.getMessage(), e);
+				"error in: ProgramLocationDefaultDao.getByProgramUUID(programUUID=" + programUUID + "): " + e.getMessage(), e);
 		}
 	}
 
