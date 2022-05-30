@@ -101,11 +101,18 @@ public class WorkbookBuilder extends Builder {
 		final Integer dataSetId = workbook.getMeasurementDatesetId();
 		final VariableTypeList variables = this.dataSetBuilder.getVariableTypes(dataSetId);
 		final List<Experiment> experiments =
-			this.studyDataManager.getExperiments(dataSetId, instanceNumbers, repNumbers);
+			this.studyDataManager.getExperimentsWithGid(dataSetId, instanceNumbers, repNumbers);
 		final Map<Integer, String> samples = this.getExperimentSampleMap(workbook.getStudyDetails().getId());
 		// Do not rely on workbook variates, instead query the latest record from DB
 		final List<MeasurementVariable> selectionsAndTraits = this.daoFactory.getDmsProjectDAO()
 			.getObservationSetVariables(dataSetId, Arrays.asList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
+
+		final boolean gidFactorPresent =
+			workbook.getFactors().stream().anyMatch(measurementVariable -> measurementVariable.getTermId() == TermId.GID.getId());
+		if (!gidFactorPresent) {
+			workbook.getFactors().add(new MeasurementVariable(TermId.GID.getId()));
+		}
+
 		workbook.setObservations(this.buildObservations(experiments, variables.getVariates(), workbook.getFactors(), selectionsAndTraits,
 			workbook.getConditions(), samples));
 	}

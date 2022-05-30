@@ -619,4 +619,16 @@ public interface StudyDataManager {
 	Map<Integer, String> getPhenotypeByVariableId(Integer datasetId, Integer instanceDbId);
 
 	boolean renameStudy(String newStudyName, int studyId, String programUUID);
+
+	/**
+	 * Please, DO NOT USE this method! This method it's being used as a workaround to fix an issue advancing a study.
+	 *
+	 * @param dataSetId
+	 * @param instanceNumbers
+	 * @param repNumbers
+	 * @return
+	 */
+	@Deprecated
+	List<Experiment> getExperimentsWithGid(int dataSetId, List<Integer> instanceNumbers, List<Integer> repNumbers);
+
 }

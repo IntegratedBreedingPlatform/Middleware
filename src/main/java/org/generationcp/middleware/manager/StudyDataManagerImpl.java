@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
@@ -50,6 +51,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.Location;
@@ -92,6 +94,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
 	private DaoFactory daoFactory;
+	private StandardVariableBuilder standardVariableBuilder;
 
 	@Resource
 	private UserService userService;
@@ -112,6 +115,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
 		this.daoFactory = new DaoFactory(sessionProvider);
+		this.standardVariableBuilder = new StandardVariableBuilder(sessionProvider);
 	}
 
 	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider) {
@@ -569,6 +573,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException(
 				"Error encountered with renameStudy(studyId=" + studyId + ", label=" + newStudyName + ": " + e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public List<Experiment> getExperimentsWithGid(final int dataSetId, final List<Integer> instanceNumbers,
+		final List<Integer> repNumbers) {
+		final VariableTypeList variableTypes = this.dataSetBuilder.getVariableTypes(dataSetId);
+		if (variableTypes.findById(TermId.GID) == null) {
+			final StandardVariable gidVariable = this.standardVariableBuilder.getByName(TermId.GID.name(), null);
+			variableTypes.add(new DMSVariableType(TermId.GID.name(), null, gidVariable, 0));
+		}
+		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), variableTypes, instanceNumbers, repNumbers);
 	}
 
 	@Override

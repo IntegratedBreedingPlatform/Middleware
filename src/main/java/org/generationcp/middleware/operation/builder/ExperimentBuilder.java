@@ -325,24 +325,24 @@ public class ExperimentBuilder extends Builder {
 				}
 			}
 
-			final DMSVariableType groupGidVariableType = variableTypes.findByLocalName(TermId.GROUPGID.name());
+			final DMSVariableType groupGidVariableType = variableTypes.findById(TermId.GROUPGID);
 			if (groupGidVariableType != null) {
 				factors.add(new Variable(groupGidVariableType, stockModel.getGermplasm().getMgid()));
 			}
 
-			final DMSVariableType crossVariableType = variableTypes.findByLocalName(TermId.CROSS.name());
+			final DMSVariableType crossVariableType = variableTypes.findById(TermId.CROSS);
 			if (crossVariableType != null) {
 				factors.add(new Variable(crossVariableType, stockModel.getCross()));
 			}
 
-			final DMSVariableType immediateSourceNameVariableType = variableTypes.findByLocalName(TermId.IMMEDIATE_SOURCE_NAME.name());
+			final DMSVariableType immediateSourceNameVariableType = variableTypes.findById(TermId.IMMEDIATE_SOURCE_NAME);
 			if (immediateSourceNameVariableType != null) {
 				final String immediateSourceName =
 					derivativeParentsMapByGids.get(stockModel.getGermplasm().getGid()).getRight();
 				factors.add(new Variable(immediateSourceNameVariableType, immediateSourceName));
 			}
 
-			final DMSVariableType groupSourceNameVariableType = variableTypes.findByLocalName(TermId.GROUP_SOURCE_NAME.name());
+			final DMSVariableType groupSourceNameVariableType = variableTypes.findById(TermId.GROUP_SOURCE_NAME);
 			if (groupSourceNameVariableType != null) {
 				final String groupSourceName =
 					derivativeParentsMapByGids.get(stockModel.getGermplasm().getGid()).getLeft();
