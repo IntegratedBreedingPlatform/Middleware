@@ -8,7 +8,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -260,48 +259,6 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 			testGermplasmListData.getEntryId(), germplasmListData.getEntryId());
 		Assert.assertEquals("The gid should be " + testGermplasmListData.getGid(), testGermplasmListData.getGid(),
 			germplasmListData.getGid());
-	}
-
-	@Test
-	public void testSearchForGermplasmListsWhereOperationIsEqual() {
-		final GermplasmList testList = this.createTestList();
-		final List<GermplasmList> resultLists = this.germplasmListDAO.searchForGermplasmLists(testList.getName(),
-			testList.getProgramUUID(), Operation.EQUAL);
-
-		Assert.assertEquals("The results array should contain 1 germplasm list.", 1, resultLists.size());
-		Assert.assertEquals("The germplasm lists should have the same name.", testList.getName(),
-			resultLists.get(0).getName());
-		Assert.assertEquals("The germplasm lists should have the same type.", testList.getType(),
-			resultLists.get(0).getType());
-		Assert.assertEquals("The germplasm lists should have the same id.", testList.getId(),
-			resultLists.get(0).getId());
-	}
-
-	@Test
-	public void testSearchForGermplasmListsWhereOperationIsLike() {
-		final GermplasmList testList = this.createTestList();
-		List<GermplasmList> resultLists = this.germplasmListDAO.searchForGermplasmLists(testList.getName(),
-			testList.getProgramUUID(), Operation.LIKE);
-
-		Assert.assertEquals("The results array should contain 1 germplasm list.", 1, resultLists.size());
-		Assert.assertEquals("The germplasm lists should have the same name.", testList.getName(),
-			resultLists.get(0).getName());
-		Assert.assertEquals("The germplasm lists should have the same type.", testList.getType(),
-			resultLists.get(0).getType());
-		Assert.assertEquals("The germplasm lists should have the same id.", testList.getId(),
-			resultLists.get(0).getId());
-
-		// With percent sign
-		resultLists = this.germplasmListDAO.searchForGermplasmLists(testList.getName() + "%", testList.getProgramUUID(),
-			Operation.LIKE);
-
-		Assert.assertEquals("The results array should contain 1 germplasm list.", 1, resultLists.size());
-		Assert.assertEquals("The germplasm lists should have the same name.", testList.getName(),
-			resultLists.get(0).getName());
-		Assert.assertEquals("The germplasm lists should have the same type.", testList.getType(),
-			resultLists.get(0).getType());
-		Assert.assertEquals("The germplasm lists should have the same id.", testList.getId(),
-			resultLists.get(0).getId());
 	}
 
 	@Test
