@@ -19,7 +19,6 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -41,7 +40,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -219,19 +217,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllListMetadata() {
-		final List<GermplasmList> germplasmLists = this.germplasmListDAO.getListsByProgramUUID(PROGRAM_UUID);
-
-		final List<Integer> germplasmListIds = new ArrayList<>();
-		for (final GermplasmList germplasmList : germplasmLists) {
-			germplasmListIds.add(germplasmList.getId());
-		}
-
-		final List<Object[]> listMetadata = this.germplasmListDAO.getAllListMetadata(germplasmListIds);
-		Assert.assertEquals("Meta data size must be the same as the list size", listMetadata.size(), germplasmLists.size());
-	}
-
-	@Test
 	public void testGetListsByProgramUUID() {
 		final List<GermplasmList> germplasmLists = this.germplasmListDAO.getListsByProgramUUID(PROGRAM_UUID);
 		final GermplasmList resultList = germplasmLists.get(0);
@@ -257,22 +242,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final int result =
 			(int) this.germplasmListDAO.countByGIDandProgramUUID(this.germplasm.getGid(), PROGRAM_UUID);
 		Assert.assertEquals("The count should be 1", 1, result);
-	}
-
-	@Test
-	public void testGetGermplasmFolderMetadata() {
-		// Create germplasm test folder
-		final GermplasmList testFolder =
-			GermplasmListTestDataInitializer.createGermplasmListTestData("TestFolder", "Test Folder Description",
-				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_FOLDER,
-				this.findAdminUser(), GermplasmList.Status.FOLDER.getCode(), PROGRAM_UUID, null);
-		this.saveGermplasmList(testFolder);
-		final Map<Integer, ListMetadata> result =
-			this.germplasmListDAO.getGermplasmFolderMetadata(Collections.singletonList(testFolder.getId()));
-		final ListMetadata germplasmFolderMetadata = result.get(testFolder.getId());
-		Assert.assertNotNull("Newly created folder should not be null", germplasmFolderMetadata);
-		Assert.assertEquals("Newly created folder should have zero children",
-			new Integer(0), germplasmFolderMetadata.getNumberOfChildren());
 	}
 
 	@Test
