@@ -15,9 +15,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.Germplasm;
-
 /**
  * Utility methods for the GermplasmDataManager class
  *
@@ -25,25 +22,6 @@ import org.generationcp.middleware.pojos.Germplasm;
  *
  */
 public class GermplasmDataManagerUtil {
-
-	/**
-	 * Transforms the germplasm name to compare into: (1) its standardized form and (2) its form without spaces to check if it is equal to
-	 * the value stored in the database.
-	 * 
-	 * @param nameToCompare - germplasm name to test against the name in the database.
-	 * @param nameInDb - germplasm name as retrieved in the database.
-	 * @return Returns true if the name to compare is essentially equal to the name in the database. Returns false otherwise.
-	 */
-	public static boolean compareGermplasmNames(String nameToCompare, String nameInDb) {
-		String standardizedNameToCompare = GermplasmDataManagerUtil.standardizeName(nameToCompare).toLowerCase();
-		String nameToCompareWithSpacesRemoved = GermplasmDataManagerUtil.removeSpaces(nameToCompare).toLowerCase();
-
-		nameInDb = nameInDb.toLowerCase();
-		if (nameInDb.equals(nameToCompare) || nameInDb.equals(standardizedNameToCompare) || nameInDb.equals(nameToCompareWithSpacesRemoved)) {
-			return true;
-		}
-		return false;
-	}
 
 	/**
 	 * 
@@ -398,12 +376,6 @@ public class GermplasmDataManagerUtil {
 		names.add(GermplasmDataManagerUtil.standardizeName(name));
 		names.add(GermplasmDataManagerUtil.removeSpaces(name));
 		return names;
-	}
-
-	public static void checkIfGermplasmIsNull(Germplasm germplasm, Integer gid) throws MiddlewareQueryException {
-		if (germplasm == null) {
-			throw new MiddlewareQueryException("There is no germplasm with id: " + gid);
-		}
 	}
 
 }
