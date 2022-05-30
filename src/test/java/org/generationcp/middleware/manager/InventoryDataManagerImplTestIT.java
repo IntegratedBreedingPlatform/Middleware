@@ -15,8 +15,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
-import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
-import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -93,23 +91,6 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 			if (inventory != null) {
 				System.out.println(inventory);
 			}
-		}
-	}
-
-	@Test
-	public void testGetLotsForGermplasmListEntry() throws MiddlewareQueryException {
-		final List<ListEntryLotDetails> lots = this.manager.getLotDetailsForListEntry(-543041, -507029, -88175);
-		for (final ListEntryLotDetails lot : lots) {
-			Debug.print(lot);
-		}
-	}
-
-	@Test
-	public void testGetLotsForGermplasm() throws MiddlewareQueryException {
-		final int gid = 89;
-		final List<LotDetails> lots = this.manager.getLotDetailsForGermplasm(gid);
-		for (final LotDetails lot : lots) {
-			System.out.println(lot);
 		}
 	}
 
