@@ -67,7 +67,7 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			INSERT INTO `location` (`ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`)
-			VALUES('405', '1', 'Unspecified Location', 'NOLOC', '0', '0', '0', '0', '0', '0');
+			VALUES('410', '1', 'Unspecified Location', 'NOLOC', '0', '0', '0', '0', '0', '0');
 		</sql>
 	</changeSet>
 
