@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.location;
 
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
+import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -52,4 +53,14 @@ public interface LocationService {
 	 * @param blockLocIds
 	 */
 	void deleteBlockFieldLocationByBlockId (List<Integer> blockLocIds);
+
+	ProgramLocationDefault saveProgramLocationDefault(String programUUID, Integer locationId);
+
+	void updateProgramLocationDefault(String programUUID, Integer locationId);
+
+	ProgramLocationDefault getProgramLocationDefault(String programUUID);
+
+	LocationDTO getDefaultLocation(String programUUID);
+
+	boolean isProgramLocationDefault(Integer locationId);
 }
