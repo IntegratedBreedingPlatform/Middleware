@@ -10,11 +10,9 @@
 
 package org.generationcp.middleware.dao.ims;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
@@ -41,9 +39,7 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -73,24 +69,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		+ "  SUM(CASE WHEN trnstat = 0 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS reserved_amt, "
 		+ "  SUM(CASE WHEN trnstat = 1 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS committed_amt, ";
 
-	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS =
-		LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS + "  GROUP_CONCAT(DISTINCT stock_id SEPARATOR ', ') AS stockids, created_date ";
-
-	private static final String GET_LOTS_FOR_GERMPLASM_CONDITION =
-		"FROM ims_lot i " + "LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-			+ "WHERE (i.status = 0 OR :includeCloseLots) AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) " + "GROUP BY i.lotid ";
-
-	private static final String GET_LOTS_FOR_GERMPLASM =
-		LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS + LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
-
-	private static final String GET_LOTS_FOR_LIST_ENTRIES =
-		"SELECT lot.*, recordid, trnqty * -1, trnstat, trnid " + "FROM " + "   (" + LotDAO.GET_LOTS_FOR_GERMPLASM + "   ) lot "
-			+ " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid " + "  AND trnstat in (:statusList) AND trnqty < 0 "
-			+ "  AND sourceid = :listId AND sourcetype = 'LIST' ";
-
-	private static final String GET_LOTS_STATUS_FOR_GERMPLASM = "SELECT i.lotid, COUNT(DISTINCT (act.trnstat)), act.trnstat"
-		+ " FROM ims_lot i LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9"
-		+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND act.trnqty < 0 AND i.eid IN (:gids)" + "GROUP BY i.lotid ORDER BY lotid";
 
 	@SuppressWarnings("unchecked")
 	public List<Lot> getByEntityType(final String type, final int start, final int numOfRows) throws MiddlewareQueryException {
@@ -158,74 +136,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		return lotCounts;
 	}
 
-	public List<Lot> getLotAggregateDataForListEntry(final Integer listId, final Integer gid) throws MiddlewareQueryException {
-		final List<Lot> lots = new ArrayList<Lot>();
-
-		try {
-			final String sql = LotDAO.GET_LOTS_FOR_LIST_ENTRIES + " ORDER by lot.lotid ";
-
-			final Query query = this.getSession().createSQLQuery(sql);
-			query.setParameterList("gids", Collections.singletonList(gid));
-			query.setParameter("listId", listId);
-			query.setParameter("includeCloseLots", 1);
-
-			final List<Integer> statusList = Lists.newArrayList();
-			statusList.add(0);
-			statusList.add(1);
-			query.setParameterList("statusList", statusList);
-
-			this.createLotRows(lots, query, true);
-
-		} catch (final Exception e) {
-			this.logAndThrowException(
-				"Error at getLotAggregateDataForListEntry for list ID = " + listId + " and GID = " + gid + AT_LOT_DAO + e.getMessage(),
-				e);
-		}
-		return lots;
-	}
-
-	public List<Lot> getLotAggregateDataForGermplasm(final Integer gid) throws MiddlewareQueryException {
-		final List<Lot> lots = new ArrayList<Lot>();
-
-		try {
-			final String sql = LotDAO.GET_LOTS_FOR_GERMPLASM + "ORDER by lotid ";
-
-			final Query query = this.getSession().createSQLQuery(sql);
-			query.setParameterList("gids", Collections.singleton(gid));
-			query.setParameter("includeCloseLots", 1);
-
-			this.createLotRows(lots, query, false);
-
-		} catch (final Exception e) {
-			this.logAndThrowException("Error at getLotAggregateDataForGermplasm for GID = " + gid + AT_LOT_DAO + e.getMessage(), e);
-		}
-
-		return lots;
-	}
-
-	public Map<Integer, Object[]> getLotStatusDataForGermplasm(final Integer gid) throws MiddlewareQueryException {
-		final Map<Integer, Object[]> lotStatusCounts = new HashMap<Integer, Object[]>();
-
-		try {
-			final String sql = LotDAO.GET_LOTS_STATUS_FOR_GERMPLASM;
-
-			final Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", Collections.singletonList(gid));
-			final List<Object[]> result = query.list();
-			for (final Object[] row : result) {
-				final Integer lotId = (Integer) row[0];
-				final BigInteger lotDistinctStatusCount = (BigInteger) row[1];
-				final Integer distinctStatus = (Integer) row[2];
-
-				lotStatusCounts.put(lotId, new Object[] {lotDistinctStatusCount, distinctStatus});
-			}
-
-		} catch (final Exception e) {
-			this.logAndThrowException("Error at getLotStatusDataForGermplasm for GID = " + gid + AT_LOT_DAO + e.getMessage(), e);
-		}
-
-		return lotStatusCounts;
-	}
-
 	public Set<Integer> getGermplasmsWithOpenLots(final List<Integer> gids) {
 		if (CollectionUtils.isEmpty(gids)) {
 			return Collections.emptySet();
@@ -238,116 +148,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		} catch (final Exception e) {
 			LotDAO.LOG.error("Error at checkGermplasmsWithOpenLots for GIDs = " + gids + AT_LOT_DAO + e.getMessage(), e);
 			throw new MiddlewareQueryException("Error at checkGermplasmsWithOpenLots for GIDss = " + gids + AT_LOT_DAO + e.getMessage(), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	private void createLotRows(final List<Lot> lots, final Query query, final boolean withReservationMap) {
-		final List<Object[]> result = query.list();
-
-		Map<Integer, Double> reservationMap = null;
-		Map<Integer, Double> committedMap = null;
-		Map<Integer, Set<String>> reservationStatusMap = null;
-		Lot lot = null;
-
-		for (final Object[] row : result) {
-			final Integer lotId = (Integer) row[0];
-			if (lot == null || !lot.getId().equals(lotId)) {
-				if (lot != null && reservationMap != null && committedMap != null) {
-					lot.getAggregateData().setReservationMap(reservationMap);
-					lot.getAggregateData().setReservationStatusMap(reservationStatusMap);
-					lot.getAggregateData().setCommittedMap(committedMap);
-				}
-				final Integer entityId = (Integer) row[1];
-				final Integer locationId = (Integer) row[2];
-				final Integer scaleId = (Integer) row[3];
-				final String comments = (String) row[4];
-				final Integer lotStatus = (Integer) row[5];
-				final Double actualBalance = (Double) row[6];
-				final Double availableBalance = (Double) row[7];
-				final Double reservedTotal = (Double) row[8];
-				final Double committedTotal = (Double) row[9];
-				final String stockIds = (String) row[10];
-				final Date createdDate = (Date) row[11];
-
-				lot = new Lot(lotId);
-				lot.setEntityId(entityId);
-				lot.setLocationId(locationId);
-				lot.setScaleId(scaleId);
-				lot.setComments(comments);
-				lot.setStatus(lotStatus);
-				lot.setCreatedDate(createdDate);
-
-				final LotAggregateData aggregateData = new LotAggregateData(lotId);
-				aggregateData.setActualBalance(actualBalance);
-				aggregateData.setAvailableBalance(availableBalance);
-				aggregateData.setReservedTotal(reservedTotal);
-				aggregateData.setCommittedTotal(committedTotal);
-				aggregateData.setStockIds(stockIds);
-
-				reservationMap = new HashMap<Integer, Double>();
-				aggregateData.setReservationMap(reservationMap);
-
-				committedMap = new HashMap<>();
-				aggregateData.setCommittedMap(committedMap);
-
-				reservationStatusMap = new HashMap<>();
-				aggregateData.setReservationStatusMap(reservationStatusMap);
-
-				lot.setAggregateData(aggregateData);
-
-				lots.add(lot);
-			}
-
-			if (withReservationMap) {
-				final Integer recordId = (Integer) row[12];
-				final Double qty = (Double) row[13];
-				final Integer transactionState = (Integer) row[14];
-
-				// compute total reserved and committed for entry
-				if (recordId != null && qty != null && transactionState != null) {
-					Double prevValue = null;
-					Double prevTotal = null;
-					if (TransactionStatus.PENDING.getIntValue() == transactionState && (qty * -1) < 0.0) {
-						prevValue = reservationMap.get(recordId);
-						prevTotal = prevValue == null ? 0d : prevValue;
-
-						reservationMap.put(recordId, prevTotal + qty);
-					}
-
-					if (TransactionStatus.CONFIRMED.getIntValue() == transactionState) {
-						prevValue = committedMap.get(recordId);
-						prevTotal = prevValue == null ? 0d : prevValue;
-
-						committedMap.put(recordId, prevTotal + qty);
-					}
-
-				}
-
-				if (transactionState != null) {
-					if (!reservationStatusMap.containsKey(recordId)) {
-						reservationStatusMap.put(recordId, new HashSet<String>());
-					}
-					reservationStatusMap.get(recordId).add(String.valueOf(transactionState));
-				}
-
-				if (row[15] != null) {
-					final Integer transactionId = (Integer) row[15];
-					lot.getAggregateData().setTransactionId(transactionId);
-				}
-
-			}
-
-		}
-
-		// set last lot's reservation map
-		if (lot != null && reservationMap != null) {
-			lot.getAggregateData().setReservationMap(reservationMap);
-		}
-
-		// set last lot's comiitted map
-		if (lot != null && committedMap != null) {
-			lot.getAggregateData().setCommittedMap(committedMap);
 		}
 	}
 

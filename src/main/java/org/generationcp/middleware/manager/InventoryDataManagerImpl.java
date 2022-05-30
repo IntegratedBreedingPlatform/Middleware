@@ -14,10 +14,8 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.service.api.user.UserService;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.Resource;
 import java.util.List;
 
 /**
@@ -29,9 +27,6 @@ import java.util.List;
  */
 @Transactional
 public class InventoryDataManagerImpl extends DataManager implements InventoryDataManager {
-
-	@Resource
-	private UserService userService;
 
 	private DaoFactory daoFactory;
 
