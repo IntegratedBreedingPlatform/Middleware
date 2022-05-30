@@ -53,19 +53,6 @@ public class InventoryServiceImpl implements InventoryService {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
-	@Override
-	public boolean hasInventoryDetails(final Integer studyId) {
-		return this.daoFactory.getTransactionDAO().hasInventoryDetails(studyId);
-	}
-
-	@Override
-	public List<InventoryDetails> getInventoryDetails(final Integer studyId) {
-		final List<InventoryDetails> inventoryDetails = this.daoFactory.getTransactionDAO().getInventoryDetails(studyId);
-		this.fillLocationDetails(inventoryDetails);
-		this.fillScaleDetails(inventoryDetails);
-		return inventoryDetails;
-	}
-
 	private void fillScaleDetails(final List<InventoryDetails> inventoryDetails) {
 		// collect all used scales
 		final Set<Integer> scaleIds = new HashSet<Integer>();
