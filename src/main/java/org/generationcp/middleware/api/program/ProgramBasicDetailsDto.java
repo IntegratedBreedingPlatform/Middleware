@@ -8,17 +8,19 @@ public class ProgramBasicDetailsDto {
 
 	private String name;
 	private String startDate;
+	private Integer defaultLocationId;
 
 	public ProgramBasicDetailsDto() {
 	}
 
-	public ProgramBasicDetailsDto(final String name, final String startDate) {
+	public ProgramBasicDetailsDto(final String name, final String startDate, final Integer defaultLocationId) {
 		this.name = name;
 		this.startDate = startDate;
+		this.defaultLocationId = defaultLocationId;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
@@ -26,15 +28,23 @@ public class ProgramBasicDetailsDto {
 	}
 
 	public String getStartDate() {
-		return startDate;
+		return this.startDate;
 	}
 
 	public void setStartDate(final String startDate) {
 		this.startDate = startDate;
 	}
 
+	public Integer getDefaultLocationId() {
+		return this.defaultLocationId;
+	}
+
+	public void setDefaultLocationId(final Integer defaultLocationId) {
+		this.defaultLocationId = defaultLocationId;
+	}
+
 	public boolean allAttributesNull() {
-		return this.getName() == null && this.getStartDate() == null;
+		return this.getName() == null && this.getStartDate() == null && this.getDefaultLocationId() == null;
 	}
 
 	@Override

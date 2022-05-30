@@ -9,6 +9,7 @@ import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
+import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
@@ -49,7 +50,8 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public List<LocationDTO> searchLocations(final LocationSearchRequest locationSearchRequest,
+	public List<LocationDTO> searchLocations(
+		final LocationSearchRequest locationSearchRequest,
 		final Pageable pageable, final String programUUID) {
 		return this.daoFactory.getLocationDAO().searchLocations(locationSearchRequest, pageable, programUUID);
 	}
@@ -60,7 +62,8 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public List<org.generationcp.middleware.api.location.Location> getLocations(final LocationSearchRequest locationSearchRequest,
+	public List<org.generationcp.middleware.api.location.Location> getLocations(
+		final LocationSearchRequest locationSearchRequest,
 		final Pageable pageable) {
 		return this.daoFactory.getLocationDAO().getLocations(locationSearchRequest, pageable);
 	}
@@ -101,7 +104,7 @@ public class LocationServiceImpl implements LocationService {
 	private void deleteFieldLocation(final List<Integer> locationIds) {
 		// Get the Block Parents
 		final List<Integer> blockParentIds = this.daoFactory.getLocDesDao().getLocdes(null, locationIds.stream()
-				.map(Object::toString).collect(Collectors.toList()))
+			.map(Object::toString).collect(Collectors.toList()))
 			.stream().map(Locdes::getLocationId).collect(Collectors.toList());
 
 		// Delete Blocks & Block Parents
@@ -199,5 +202,33 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public List<LocationDTO> getCountries() {
 		return this.daoFactory.getLocationDAO().getAllCountries();
+	}
+
+	@Override
+	public ProgramLocationDefault saveProgramLocationDefault(final String programUUID, final Integer locationId) {
+		return this.daoFactory.getProgramLocationDefaultDAO().save(new ProgramLocationDefault(programUUID, locationId));
+	}
+
+	@Override
+	public void updateProgramLocationDefault(final String programUUID, final Integer locationId) {
+		final ProgramLocationDefault programLocationDefault = this.daoFactory.getProgramLocationDefaultDAO().getByProgramUUID(programUUID);
+		programLocationDefault.setLocationId(locationId);
+		this.daoFactory.getProgramLocationDefaultDAO().update(programLocationDefault);
+	}
+
+	@Override
+	public ProgramLocationDefault getProgramLocationDefault(final String programUUID) {
+		return this.daoFactory.getProgramLocationDefaultDAO().getByProgramUUID(programUUID);
+	}
+
+	@Override
+	public LocationDTO getDefaultLocation(final String programUUID) {
+		final ProgramLocationDefault programLocationDefault = this.daoFactory.getProgramLocationDefaultDAO().getByProgramUUID(programUUID);
+		return this.getLocation(programLocationDefault.getLocationId());
+	}
+
+	@Override
+	public boolean isProgramLocationDefault(final Integer locationId) {
+		return this.daoFactory.getProgramLocationDefaultDAO().isProgramLocationDefault(locationId);
 	}
 }

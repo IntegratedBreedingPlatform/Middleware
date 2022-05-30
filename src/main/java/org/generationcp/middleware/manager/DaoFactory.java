@@ -25,6 +25,7 @@ import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.NamingConfigurationDAO;
 import org.generationcp.middleware.dao.PhenotypeExternalReferenceDAO;
 import org.generationcp.middleware.dao.ProgenitorDAO;
+import org.generationcp.middleware.dao.ProgramLocationDefaultDAO;
 import org.generationcp.middleware.dao.ProgramPresetDAO;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleExternalReferenceDAO;
@@ -201,7 +202,7 @@ public class DaoFactory {
 	}
 
 	public LocationDAO getLocationDAO() {
-		return  new LocationDAO(this.sessionProvider.getSession());
+		return new LocationDAO(this.sessionProvider.getSession());
 	}
 
 	public MethodDAO getMethodDAO() {
@@ -622,6 +623,10 @@ public class DaoFactory {
 
 	public GermplasmListDataDefaultViewDAO getGermplasmListDataDefaultViewDAO() {
 		return new GermplasmListDataDefaultViewDAO(this.sessionProvider.getSession());
+	}
+
+	public ProgramLocationDefaultDAO getProgramLocationDefaultDAO() {
+		return new ProgramLocationDefaultDAO(this.sessionProvider.getSession());
 	}
 
 	public StudyEntrySearchDAO getStudyEntrySearchDAO() {
