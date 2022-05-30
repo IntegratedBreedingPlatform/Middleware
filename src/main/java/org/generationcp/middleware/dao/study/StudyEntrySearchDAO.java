@@ -169,7 +169,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.value, NULL))", entryName), entryName, StringType.INSTANCE));
 		selectClause.add(
 			this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.stockprop_id, NULL))", entryName),
-				entryName + "_PropertyId", IntegerType.INSTANCE));
+				entryName + "_propertyId", IntegerType.INSTANCE));
 		selectClause.add(
 			this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.type_id, NULL))", entryName),
 				entryName + "_variableId", IntegerType.INSTANCE));
