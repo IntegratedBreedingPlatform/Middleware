@@ -51,26 +51,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LotDAO.class);
 
-	private static final String QUERY_FROM_LOT = ") query from Lot: ";
-
 	private static final String AT_LOT_DAO = " at LotDAO: ";
-
-	private static final String ENTITY_TYPE = "entityType";
-
-
-	@SuppressWarnings("unchecked")
-	public List<Lot> getByEntityType(final String type, final int start, final int numOfRows) throws MiddlewareQueryException {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Lot.class);
-			criteria.add(Restrictions.eq(ENTITY_TYPE, type));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByEntityType(type=" + type + QUERY_FROM_LOT + e.getMessage(), e);
-		}
-		return new ArrayList<Lot>();
-	}
 
 	public List<Lot> getByGids(final List<Integer> gids) {
 		if (CollectionUtils.isNotEmpty(gids)) {

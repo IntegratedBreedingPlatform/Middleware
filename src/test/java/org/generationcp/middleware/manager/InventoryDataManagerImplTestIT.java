@@ -56,13 +56,13 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		this.daoFactory.getLotDao().save(lot);
 		this.daoFactory.getLotDao().save(new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9002, 1539, 0, 0, "sample added lot 2", RandomStringUtils.randomAlphabetic(35)));
 
-		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, this.daoFactory.getLotDao().getByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140413)), 1, -1d, "sample added transaction 1", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
-		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, this.daoFactory.getLotDao().getByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 1, -2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
-		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, this.daoFactory.getLotDao().getByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 0, -2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
-		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, this.daoFactory.getLotDao().getByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 0, 2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
+		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, lot, new Date((20140413)), 1, -1d, "sample added transaction 1", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
+		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, lot, new Date((20140518)), 1, -2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
+		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, lot, new Date((20140518)), 0, -2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
+		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, lot, new Date((20140518)), 0, 2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
 		final Transaction t4 = new Transaction(null, 1, this.lot, new Date((20140413)), 1, -1d, "sample added transaction 1", 0, null, null, null, 1, TransactionType.DEPOSIT.getId());
 		this.daoFactory.getTransactionDAO().save(t4);
-		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, this.daoFactory.getLotDao().getByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20120518)), 1, 2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
+		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, lot, new Date((20120518)), 1, 2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
 		final Set<Transaction> transactionSet = new HashSet<>();
 		transactionSet.add(t4);
 		this.lot.setTransactions(transactionSet);

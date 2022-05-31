@@ -15,8 +15,6 @@ package org.generationcp.middleware.service;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.service.api.InventoryService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -32,8 +30,6 @@ import java.util.regex.Pattern;
 public class InventoryServiceImpl implements InventoryService {
 
 	private DaoFactory daoFactory;
-
-	private static final Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
 
 	public InventoryServiceImpl() {
 
