@@ -30,7 +30,6 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
-import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -201,62 +200,6 @@ public class TransactionDAOTest extends IntegrationTestBase {
 			this.transactionDAO.save(t);
 			this.listDataIdTransactionMap.put(t.getSourceRecordId(), t);
 		});
-
-	}
-
-	@Test
-	public void testGetTransactionDetailsForLot() throws ParseException {
-		final CropType cropType = new CropType();
-		cropType.setUseUUID(false);
-		final Germplasm germplasm =
-			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), cropType);
-
-		final WorkbenchUser user = this.getUserService().getUserById(1);
-
-		final Lot lot = InventoryDetailsTestDataInitializer.createLot(user.getUserid(), "GERMPLSM", germplasmId, 1, 8264, 0, 1, "Comments",
-			"InventoryId");
-		this.lotDAO.save(lot);
-
-		final String sDate1 = "01/01/2015";
-		final Date date1 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate1);
-		final Transaction depositTransaction =
-			InventoryDetailsTestDataInitializer
-				.createTransaction(5.0, 0, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, "LIST",
-					TransactionType.DEPOSIT.getId());
-		depositTransaction.setTransactionDate(date1);
-		depositTransaction.setUserId(user.getUserid());
-
-		final String sDate2 = "10/10/2015";
-		final Date date2 = new SimpleDateFormat("dd/MM/yyyy").parse(sDate2);
-		final Transaction closedTransaction =
-			InventoryDetailsTestDataInitializer
-				.createTransaction(-5.0, 1, "Discard", lot, 1, 1, 1, "LIST", TransactionType.DISCARD.getId());
-		closedTransaction.setTransactionDate(date2);
-		closedTransaction.setUserId(user.getUserid());
-
-		this.transactionDAO.save(depositTransaction);
-		this.transactionDAO.save(closedTransaction);
-
-		final List<TransactionReportRow> transactionReportRows = this.transactionDAO.getTransactionDetailsForLot(lot.getId());
-
-		for (final TransactionReportRow reportRow : transactionReportRows) {
-			if (LOT_DEPOSIT.equals(reportRow.getLotStatus())) {
-
-				Assert.assertEquals(depositTransaction.getQuantity(), reportRow.getQuantity());
-				Assert.assertEquals(LOT_DEPOSIT, reportRow.getLotStatus());
-				Assert.assertEquals(depositTransaction.getTransactionDate(), reportRow.getDate());
-				Assert.assertEquals(depositTransaction.getComments(), reportRow.getCommentOfLot());
-
-			}
-			if (LOT_DISCARD.equals(reportRow.getLotStatus())) {
-				Assert.assertEquals(closedTransaction.getTransactionDate(), reportRow.getDate());
-				Assert.assertEquals(closedTransaction.getComments(), reportRow.getCommentOfLot());
-				Assert.assertEquals(closedTransaction.getQuantity(), reportRow.getQuantity());
-				Assert.assertEquals(LOT_DISCARD, reportRow.getLotStatus());
-			}
-			Assert.assertEquals(user.getUserid(), reportRow.getUserId());
-		}
 
 	}
 

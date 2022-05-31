@@ -11,34 +11,11 @@
 
 package org.generationcp.middleware.service.api;
 
-import org.generationcp.middleware.domain.inventory.InventoryDetails;
-import org.generationcp.middleware.pojos.ims.Lot;
-
-import java.util.List;
-
 /**
  * This is the API for inventory management system.
  *
  */
 public interface InventoryService {
-
-
-	/**
-	 * Checks if the study has inventory.
-	 *
-	 * @param studyId the study id
-	 * @return boolean
-	 */
-	boolean hasInventoryDetails(Integer studyId);
-
-	/**
-	 * Gets the inventory details by studyId.
-	 *
-	 * @param studyId the study id
-	 * @return the inventory details by study id
-	 */
-	List<InventoryDetails> getInventoryDetails(Integer studyId);
-
 
 	/**
 	 * This method gets the maximum notation number of the existing stock IDs. For example, if there are existing stock IDs: SID1-1, SID1-2,
