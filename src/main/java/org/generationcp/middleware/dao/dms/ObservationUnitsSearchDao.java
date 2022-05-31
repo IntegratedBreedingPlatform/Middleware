@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -77,6 +78,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "    WHERE ndt.nd_experiment_id = nde.nd_experiment_id \n"
 			+ "     and lot.stock_id");
 		factorsFilterMap.put(String.valueOf(TermId.GROUPGID.getId()), "g.mgid");
+		factorsFilterMap.put(String.valueOf(TermId.GUID.getId()), "g.germplsm_uuid");
 		factorsFilterMap.put(String.valueOf(TermId.GROUP_SOURCE_NAME.getId()), "groupSourceName.nval");
 		factorsFilterMap.put(String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()), "immediateSource.nval");
 	}
@@ -147,27 +149,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				// FIXME won't work for sub-sub-obs
 				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
 
-			boolean germplasmJoinAdded = false;
-			if (filter != null && !CollectionUtils.isEmpty(filter.getFilteredValues())
-				&& filter.getFilteredValues().keySet().contains(String.valueOf(TermId.GROUPGID.getId()))) {
-				sql.append(GERMPLASM_JOIN);
-				germplasmJoinAdded = true;
-			}
-
-			if (this.checkFilterContainsFactor(filter, TermId.IMMEDIATE_SOURCE_NAME.getId())) {
-				if (!germplasmJoinAdded) {
-					sql.append(GERMPLASM_JOIN);
-				}
-				sql.append(IMMEDIATE_SOURCE_NAME_JOIN);
-				germplasmJoinAdded = true;
-			}
-
-			if (this.checkFilterContainsFactor(filter, TermId.GROUP_SOURCE_NAME.getId())) {
-				if (!germplasmJoinAdded) {
-					sql.append(GERMPLASM_JOIN);
-				}
-				sql.append(GROUP_SOURCE_NAME_JOIN);
-			}
+			this.addCountQueryJoins(sql, filter);
 
 			sql.append(" where p.project_id = :datasetId ");
 
@@ -296,6 +278,31 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			ObservationUnitsSearchDao.LOG.error(error);
 			throw new MiddlewareException(error, e);
 		}
+	}
+
+	private void addCountQueryJoins(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter) {
+		if (filter == null) {
+			return;
+		}
+
+		final Set<String> joins = new LinkedHashSet<>();
+
+		if ((!CollectionUtils.isEmpty(filter.getFilteredValues()) && filter.getFilteredValues().keySet().contains(String.valueOf(TermId.GROUPGID.getId()))) ||
+				this.checkFilterContainsFactor(filter, TermId.GUID.getId())) {
+			joins.add(GERMPLASM_JOIN);
+		}
+
+		if (this.checkFilterContainsFactor(filter, TermId.IMMEDIATE_SOURCE_NAME.getId())) {
+			joins.add(GERMPLASM_JOIN);
+			joins.add(IMMEDIATE_SOURCE_NAME_JOIN);
+		}
+
+		if (this.checkFilterContainsFactor(filter, TermId.GROUP_SOURCE_NAME.getId())) {
+			joins.add(GERMPLASM_JOIN);
+			joins.add(GROUP_SOURCE_NAME_JOIN);
+		}
+
+		joins.forEach(sql::append);
 	}
 
 	private String getObservationUnitsByVariableQuery(final ObservationUnitsSearchDTO searchDto) {
@@ -593,7 +600,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			final String germplasmDescriptorClauseFormat =
 				"    (SELECT sprop.value FROM stockprop sprop INNER JOIN cvterm spropcvt ON spropcvt.cvterm_id = sprop.type_id WHERE sprop.stock_id = s.stock_id AND %s) AS '%s'";
 			for (final String gpFactor : searchDto.getGenericGermplasmDescriptors()) {
-				if ((noFilterVariables || filterColumns.contains(gpFactor)) && !gpFactor.equals(TermId.GROUPGID.name())) {
+				if ((noFilterVariables || filterColumns.contains(gpFactor)) && !gpFactor.equals(TermId.GROUPGID.name()) &&
+					!gpFactor.equals(TermId.GUID.name())) {
 					final String cvtermQuery;
 					if (TermId.IMMEDIATE_SOURCE_NAME.name().equals(gpFactor)) {
 						cvtermQuery = " CASE \n"
@@ -666,8 +674,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ " )) AS " + (noFilterVariables ? OBSERVATION_UNIT_NO : observationUnitNoName));
 		}
 
-		if (this.hasGroupGidDescriptor(searchDto.getGenericGermplasmDescriptors())) {
+		if (this.hasDescriptor(searchDto.getGenericGermplasmDescriptors(), TermId.GROUPGID)) {
 			columns.add(" g.mgid AS " + TermId.GROUPGID.name());
+		}
+
+		if (this.hasDescriptor(searchDto.getGenericGermplasmDescriptors(), TermId.GUID)) {
+			columns.add(" g.germplsm_uuid AS " + TermId.GUID.name());
 		}
 
 		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT  ");
@@ -712,26 +724,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			// FIXME won't work for sub-sub-obs
 			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
 
-		boolean germplasmJoinAdded = false;
-		if (this.hasGroupGidDescriptor(searchDto.getGenericGermplasmDescriptors())) {
-			sql.append(GERMPLASM_JOIN);
-			germplasmJoinAdded = true;
-		}
-
-		if (this.hasDescriptor(searchDto.getGenericGermplasmDescriptors(), TermId.IMMEDIATE_SOURCE_NAME)) {
-			if (!germplasmJoinAdded) {
-				sql.append(GERMPLASM_JOIN);
-				germplasmJoinAdded = true;
-			}
-			sql.append(IMMEDIATE_SOURCE_NAME_JOIN);
-		}
-
-		if (this.hasDescriptor(searchDto.getGenericGermplasmDescriptors(), TermId.GROUP_SOURCE_NAME)) {
-			if (!germplasmJoinAdded) {
-				sql.append(GERMPLASM_JOIN);
-			}
-			sql.append(GROUP_SOURCE_NAME_JOIN);
-		}
+		this.addSelectQueryJoins(sql, searchDto.getGenericGermplasmDescriptors());
 
 		sql.append(" WHERE p.project_id = :datasetId ");
 
@@ -742,6 +735,27 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
 			sql.append(" AND (ph.draft_value is not null or ph.draft_cvalue_id is not null) ");
 		}
+	}
+
+	private void addSelectQueryJoins(final StringBuilder sql, final List<String> genericGermplasmDescriptors) {
+		final Set<String> joins = new LinkedHashSet<>();
+
+		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUPGID) ||
+			this.hasDescriptor(genericGermplasmDescriptors, TermId.GUID)) {
+			sql.append(GERMPLASM_JOIN);
+		}
+
+		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.IMMEDIATE_SOURCE_NAME)) {
+			sql.append(GERMPLASM_JOIN);
+			sql.append(IMMEDIATE_SOURCE_NAME_JOIN);
+		}
+
+		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUP_SOURCE_NAME)) {
+			sql.append(GERMPLASM_JOIN);
+			sql.append(GROUP_SOURCE_NAME_JOIN);
+		}
+
+		joins.forEach(sql::append);
 	}
 
 	private void addFilters(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter, final Boolean draftMode) {
@@ -1264,17 +1278,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		return result;
 	}
 
-
-	private boolean hasGroupGidDescriptor(final List<String> genericGermplasmDescriptors) {
-		return !CollectionUtils.isEmpty(genericGermplasmDescriptors) && genericGermplasmDescriptors.contains(TermId.GROUPGID.name());
-	}
-
 	private boolean hasDescriptor(final List<String> genericGermplasmDescriptors, final TermId termId) {
 		return !CollectionUtils.isEmpty(genericGermplasmDescriptors) && genericGermplasmDescriptors.contains(termId.name());
 	}
 
 	private boolean checkFilterContainsFactor(final ObservationUnitsSearchDTO.Filter filter, final int variableId) {
-		return filter != null && !CollectionUtils.isEmpty(filter.getFilteredTextValues()) && filter.getFilteredTextValues().keySet().contains(String.valueOf(variableId));
+		return !CollectionUtils.isEmpty(filter.getFilteredTextValues()) && filter.getFilteredTextValues().keySet().contains(String.valueOf(variableId));
 	}
 
 }

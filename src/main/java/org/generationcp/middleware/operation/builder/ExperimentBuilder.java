@@ -330,6 +330,11 @@ public class ExperimentBuilder extends Builder {
 				factors.add(new Variable(groupGidVariableType, stockModel.getGermplasm().getMgid()));
 			}
 
+			final DMSVariableType guidVariableType = variableTypes.findById(TermId.GUID);
+			if (guidVariableType != null) {
+				factors.add(new Variable(guidVariableType, stockModel.getGermplasm().getGermplasmUUID()));
+			}
+
 			final DMSVariableType crossVariableType = variableTypes.findById(TermId.CROSS);
 			if (crossVariableType != null) {
 				factors.add(new Variable(crossVariableType, stockModel.getCross()));

@@ -72,6 +72,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	private static final String LOT_UNIT_ALIAS = "unit";
 	private static final String CROSS_ALIAS = "crossValue";
 	private static final String GROUP_GID_ALIAS = "groupGID";
+	private static final String GUID_ALIAS = "guid";
 
 	// Joins
 	private static final String LOT_JOIN = "LEFT JOIN ims_lot l ON l.eid = s.dbxref_id and l.status = " + LotStatus.ACTIVE.getIntValue();
@@ -98,6 +99,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 
 		this.addFixedScalars(scalars, selects);
 		this.addGroupGidScalar(scalars, selects, joins, studyEntrySearchDto.getVariableEntryDescriptors());
+		this.addGuidScalar(scalars, selects, joins, studyEntrySearchDto.getVariableEntryDescriptors());
 		this.addSourceScalar(scalars, selects, joins, studyEntrySearchDto.getFixedEntryDescriptors());
 		this.addGroupSourceNameScalar(scalars, selects, joins, studyEntrySearchDto.getVariableEntryDescriptors());
 
@@ -187,6 +189,18 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 				.findFirst()
 				.ifPresent(measurementVariable -> {
 					selectClause.add(this.addSelectExpression(scalars, "g.mgid", GROUP_GID_ALIAS, IntegerType.INSTANCE));
+					joins.add(GERMPLASM_JOIN);
+				});
+		}
+	}
+
+	private void addGuidScalar(final List<Scalar> scalars, final List<String> selectClause, final Set<String> joins, final List<MeasurementVariable> entryDescriptors) {
+		if (!CollectionUtils.isEmpty(entryDescriptors)) {
+			entryDescriptors.stream()
+				.filter(measurementVariable -> measurementVariable.getTermId() == TermId.GUID.getId())
+				.findFirst()
+				.ifPresent(measurementVariable -> {
+					selectClause.add(this.addSelectExpression(scalars, "g.germplsm_uuid", GUID_ALIAS, StringType.INSTANCE));
 					joins.add(GERMPLASM_JOIN);
 				});
 		}
@@ -382,12 +396,13 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			final String unit = (String) row.get(LOT_UNIT_ALIAS);
 			final String cross = (String) row.get(CROSS_ALIAS);
 			final Integer groupGid = (Integer) row.get(GROUP_GID_ALIAS);
+			final String guid = (String) row.get(GUID_ALIAS);
 
 			final StudyEntryDto studyEntryDto =
-				new StudyEntryDto(entryId, entryNumber, gid, designation, lotCount, availableBalance, unit, cross, groupGid);
+				new StudyEntryDto(entryId, entryNumber, gid, designation, lotCount, availableBalance, unit, cross, groupGid, guid);
 			final Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
-				if (entryDescriptor.getTermId() == TermId.GROUPGID.getId()) {
+				if (entryDescriptor.getTermId() == TermId.GROUPGID.getId() || entryDescriptor.getTermId() == TermId.GUID.getId()) {
 					continue;
 				}
 
