@@ -243,7 +243,6 @@ public class LotDAOTest extends IntegrationTestBase {
 
 		final Location province = this.locationDAO.getById(1001);
 		this.location.setProvince(province);
-		this.location.setLdefault(Boolean.FALSE);
 
 		this.locationDAO.saveOrUpdate(this.location);
 

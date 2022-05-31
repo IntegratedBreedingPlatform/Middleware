@@ -356,8 +356,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void resolveStorageLocation() {
-		final Integer id = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.name());
-		this.storageLocationId = this.daoFactory.getLocationDAO().getDefaultLocationByType(id).getLocid();
+		this.storageLocationId = 6000;
 	}
 
 	private void assertTransaction(final Transaction actualTransaction, final TransactionType type, final TransactionStatus status,

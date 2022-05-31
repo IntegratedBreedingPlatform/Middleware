@@ -54,7 +54,6 @@ public class LocationSearchDAOQuery {
   public static final String COUNTRY_NAME_ALIAS = "countryName";
   public static final String COUNTRY_CODE_ALIAS = "countryCode";
   public static final String PROVINCE_NAME_ALIAS = "provinceName";
-  public static final String LOCATION_DEFAULT_ALIAS = "locationDefault";
   public static final String FAVORITE_PROGRAM_UUID_ALIAS = "favoriteProgramUUID";
   public static final String FAVORITE_PROGRAM_ID_ALIAS = "favoriteProgramId";
 
@@ -74,8 +73,7 @@ public class LocationSearchDAOQuery {
       + " l.snl1id AS " + PROVINCE_ID_ALIAS + ", "
       + " c.isoabbr AS " + COUNTRY_NAME_ALIAS + ", "
       + " c.isothree AS " + COUNTRY_CODE_ALIAS + ", "
-      + " province.lname AS " + PROVINCE_NAME_ALIAS + ", "
-      + " l.ldefault AS " + LOCATION_DEFAULT_ALIAS;
+      + " province.lname AS " + PROVINCE_NAME_ALIAS;
 
   private final static String GEOREF_JOIN_QUERY = " LEFT JOIN georef g on l.locid = g.locid ";
   private final static String COUNTRY_JOIN_QUERY = " LEFT JOIN cntry c on l.cntryid = c.cntryid ";
@@ -127,7 +125,6 @@ public class LocationSearchDAOQuery {
     sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(COUNTRY_NAME_ALIAS));
     sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(COUNTRY_CODE_ALIAS));
     sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(PROVINCE_NAME_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(LOCATION_DEFAULT_ALIAS, BooleanType.INSTANCE));
     if (!StringUtils.isEmpty(programUUID)) {
       sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(FAVORITE_PROGRAM_UUID_ALIAS));
       sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(FAVORITE_PROGRAM_ID_ALIAS));

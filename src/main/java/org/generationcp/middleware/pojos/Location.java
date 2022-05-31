@@ -109,10 +109,6 @@ public class Location implements Serializable, Comparable<Location> {
 	@Column(name = "lrplce")
 	private Integer lrplce;
 
-	@Type(type = "org.hibernate.type.NumericBooleanType")
-	@Column(name = "ldefault", columnDefinition = "TINYINT")
-	private Boolean ldefault;
-
 	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
 	@JoinColumn(name = "locid")
 	private Georef georef;
@@ -325,14 +321,6 @@ public class Location implements Serializable, Comparable<Location> {
 		this.parentLocationAbbr = parentLocationAbbr;
 	}
 
-	public Boolean getLdefault() {
-		return this.ldefault;
-	}
-
-	public void setLdefault(final Boolean ldefault) {
-		this.ldefault = ldefault;
-	}
-
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
@@ -378,8 +366,6 @@ public class Location implements Serializable, Comparable<Location> {
 		builder.append(this.georef != null ? this.georef.getAlt() : null);
 		builder.append(", parentLocationName=");
 		builder.append(this.parentLocationName);
-		builder.append(", ldefault=");
-		builder.append(this.ldefault);
 		builder.append("]");
 		return builder.toString();
 	}

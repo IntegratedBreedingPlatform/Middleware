@@ -18,7 +18,6 @@ public class LocationDTO extends LocationRequestDto {
 	private String countryName;
 	private String countryCode;
 	private String provinceName;
-	private boolean defaultLocation;
 
 	private List<ProgramFavoriteDTO> programFavorites;
 
@@ -34,7 +33,6 @@ public class LocationDTO extends LocationRequestDto {
 		this.setAltitude(location.getAltitude());
 		this.setLatitude(location.getLatitude());
 		this.setLongitude(location.getLongitude());
-		this.setDefaultLocation(location.getLdefault());
 
 		final Country country = location.getCountry();
 		if (country != null) {
@@ -96,14 +94,6 @@ public class LocationDTO extends LocationRequestDto {
 
 	public void setProgramFavorites(final List<ProgramFavoriteDTO> programFavorites) {
 		this.programFavorites = programFavorites;
-	}
-
-	public boolean isDefaultLocation() {
-		return defaultLocation;
-	}
-
-	public void setDefaultLocation(final boolean defaultLocation) {
-		this.defaultLocation = defaultLocation;
 	}
 
 	@Override

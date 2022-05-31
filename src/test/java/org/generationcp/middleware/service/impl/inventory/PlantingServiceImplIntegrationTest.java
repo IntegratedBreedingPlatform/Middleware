@@ -335,8 +335,7 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void resolveStorageLocation() {
-		final Integer id = locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.name());
-		storageLocationId = this.daoFactory.getLocationDAO().getDefaultLocationByType(id).getLocid();
+		storageLocationId = 6000;
 	}
 
 	private Lot createLot(final Integer gid) {

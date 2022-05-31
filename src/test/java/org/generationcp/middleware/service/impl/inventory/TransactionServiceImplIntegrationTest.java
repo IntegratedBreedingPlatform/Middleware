@@ -307,8 +307,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void resolveStorageLocation() {
-		final Integer id = locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.name());
-		storageLocationId = this.daoFactory.getLocationDAO().getDefaultLocationByType(id).getLocid();
+		storageLocationId = 6000;
 	}
 
 	private void assertTransaction(final Transaction actualTransaction, final TransactionType type, final TransactionStatus status,

@@ -149,7 +149,6 @@ public class LocationServiceImpl implements LocationService {
 		final Location newLocation = new Location(null, locationRequestDto.getType(),
 			0, locationRequestDto.getName(), locationRequestDto.getAbbreviation(),
 			0, 0, province, country, 0);
-		newLocation.setLdefault(false);
 
 		if (locationRequestDto.getLatitude() != null) {
 			newLocation.setLatitude(locationRequestDto.getLatitude());

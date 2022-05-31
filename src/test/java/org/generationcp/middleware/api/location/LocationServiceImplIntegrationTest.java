@@ -76,7 +76,6 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final Location location = LocationTestDataInitializer
 			.createLocation(null, RandomStringUtils.randomAlphabetic(10), 405, RandomStringUtils.randomAlphabetic(3));
 		location.setCountry(country);
-		location.setLdefault(Boolean.FALSE);
 
 		this.daoFactory.getLocationDAO().saveOrUpdate(location);
 

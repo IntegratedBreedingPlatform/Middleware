@@ -337,7 +337,6 @@ public class StudyTestDataInitializer {
 		location.setProvince(province);
 		location.setSnl2id(1);
 		location.setSnl3id(1);
-		location.setLdefault(Boolean.FALSE);
 
 		// add the location
 		return this.locationDataManager.addLocation(location);

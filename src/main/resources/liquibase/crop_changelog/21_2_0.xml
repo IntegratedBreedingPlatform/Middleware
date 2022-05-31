@@ -67,4 +67,14 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="mderamos" id="v22.1.0-5">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="location" columnName="ldefault"/>
+		</preConditions>
+		<comment>
+			Drop ldefault column from location table
+		</comment>
+		<dropColumn tableName="location" columnName="ldefault"></dropColumn>
+	</changeSet>
+
 </databaseChangeLog>
