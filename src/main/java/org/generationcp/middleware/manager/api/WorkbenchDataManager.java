@@ -30,13 +30,6 @@ public interface WorkbenchDataManager {
 	/**
 	 * Gets the projects.
 	 *
-	 * @return the projects
-	 */
-	List<Project> getProjects();
-
-	/**
-	 * Gets the projects.
-	 *
 	 * @param pageable             - the starting record and number of page
 	 * @param programSearchRequest - the filters that to be included in the query
 	 * @return All projects based on the given start, numOfRows and filters Map

@@ -54,11 +54,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Project> getProjects() {
-		return this.workbenchDaoFactory.getProjectDAO().getAll();
-	}
-
-	@Override
 	public List<Project> getProjects(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
 		return this.workbenchDaoFactory.getProjectDAO().getProjectsByFilter(pageable, programSearchRequest);
 	}

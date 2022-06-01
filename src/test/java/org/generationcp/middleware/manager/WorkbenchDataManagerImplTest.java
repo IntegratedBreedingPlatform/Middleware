@@ -77,7 +77,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetProjects() {
-		final List<Project> projects = this.workbenchDataManager.getProjects();
+		final List<Project> projects = this.workbenchDaoFactory.getProjectDAO().getAll();
 		Assert.assertNotNull(projects);
 		Assert.assertFalse(projects.isEmpty());
 	}
