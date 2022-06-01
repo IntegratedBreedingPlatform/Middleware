@@ -124,13 +124,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllTools() {
-		final List<Tool> results = this.workbenchDataManager.getAllTools();
-		Assert.assertNotNull(results);
-		Assert.assertFalse(results.isEmpty());
-	}
-
-	@Test
 	public void testGetProjectsByFilters() {
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		final Project project = this.commonTestProject;

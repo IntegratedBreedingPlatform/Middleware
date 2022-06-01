@@ -34,13 +34,6 @@ public interface WorkbenchDataManager {
 	Project getProjectByUuid(String projectUuid);
 
 	/**
-	 * Get all tools.
-	 *
-	 * @return The list of all tools.
-	 */
-	List<Tool> getAllTools();
-
-	/**
 	 * Gets the tool with the given name.
 	 *
 	 * @param toolName - the tool name to match
