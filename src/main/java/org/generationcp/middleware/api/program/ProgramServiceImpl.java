@@ -186,4 +186,8 @@ public class ProgramServiceImpl implements ProgramService {
 		return this.daoFactory.getProjectDAO().getById(projectId);
 	}
 
+	@Override
+	public List<Project> getProjects(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
+		return this.daoFactory.getProjectDAO().getProjectsByFilter(pageable, programSearchRequest);
+	}
 }

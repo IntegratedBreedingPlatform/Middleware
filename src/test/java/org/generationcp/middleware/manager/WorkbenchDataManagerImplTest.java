@@ -142,7 +142,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		programSearchRequest.setLoggedInUserId(project.getUserId());
 
 		final Pageable pageable = new PageRequest(0, 100);
-		final List<Project> projects = this.workbenchDataManager.getProjects(pageable, programSearchRequest);
+		final List<Project> projects = this.workbenchDaoFactory.getProjectDAO().getProjectsByFilter(pageable, programSearchRequest);
 
 		assertThat(project.getProjectId(), is(equalTo(projects.get(0).getProjectId())));
 		assertThat(project.getCropType().getCropName(), is(equalTo(projects.get(0).getCropType().getCropName())));

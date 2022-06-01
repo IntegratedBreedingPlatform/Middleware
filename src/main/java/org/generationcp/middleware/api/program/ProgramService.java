@@ -50,4 +50,13 @@ public interface ProgramService {
 	 */
 	Project getProjectById(Long projectId);
 
+	/**
+	 * Gets the projects.
+	 *
+	 * @param pageable             - the starting record and number of page
+	 * @param programSearchRequest - the filters that to be included in the query
+	 * @return All projects based on the given start, numOfRows and filters Map
+	 */
+	List<Project> getProjects(final Pageable pageable, final ProgramSearchRequest programSearchRequest);
+
 }

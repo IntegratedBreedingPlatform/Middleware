@@ -16,9 +16,7 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
-import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -26,15 +24,6 @@ import java.util.List;
  * This is the API used by the Workbench to retrieve Workbench project information.
  */
 public interface WorkbenchDataManager {
-
-	/**
-	 * Gets the projects.
-	 *
-	 * @param pageable             - the starting record and number of page
-	 * @param programSearchRequest - the filters that to be included in the query
-	 * @return All projects based on the given start, numOfRows and filters Map
-	 */
-	List<Project> getProjects(final Pageable pageable, final ProgramSearchRequest programSearchRequest);
 
 	/**
 	 * Gets a project by Uuid. Should return only one value.

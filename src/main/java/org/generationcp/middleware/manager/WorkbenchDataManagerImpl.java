@@ -21,10 +21,8 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
-import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Session;
-import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
@@ -51,11 +49,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 
 	public Session getCurrentSession() {
 		return this.sessionProvider.getSession();
-	}
-
-	@Override
-	public List<Project> getProjects(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
-		return this.workbenchDaoFactory.getProjectDAO().getProjectsByFilter(pageable, programSearchRequest);
 	}
 
 	@Override
