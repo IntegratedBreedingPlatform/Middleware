@@ -67,14 +67,6 @@ public interface WorkbenchDataManager {
 	Integer addProjectActivity(ProjectActivity projectActivity);
 
 	/**
-	 * Adds project activities.
-	 *
-	 * @param projectActivityList - the project activity list
-	 * @return Returns the ids of the {@code ProjectActivity} records added
-	 */
-	List<Integer> addProjectActivity(List<ProjectActivity> projectActivityList);
-
-	/**
 	 * Get the list of all installed central crop databases.
 	 *
 	 * @return the installed central crops
@@ -90,14 +82,6 @@ public interface WorkbenchDataManager {
 	 * @return the CropType retrieved
 	 */
 	CropType getCropTypeByName(String cropName);
-
-	/**
-	 * Add a crop type to the database.
-	 *
-	 * @param cropType - the crop type to add
-	 * @return Returns the id of the {@code CropType} record added
-	 */
-	String addCropType(CropType cropType);
 
 	/**
 	 * Returns the project last accessed regardless of user.

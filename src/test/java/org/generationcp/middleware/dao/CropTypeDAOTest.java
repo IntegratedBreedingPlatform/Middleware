@@ -103,7 +103,7 @@ public class CropTypeDAOTest extends IntegrationTestBase {
 	CropType createCropType(final String cropName) {
 		final CropType cropType = new CropType();
 		cropType.setCropName(cropName);
-		this.workbenchDataManager.addCropType(cropType);
+		this.cropTypeDAO.saveOrUpdate(cropType);
 		return cropType;
 	}
 

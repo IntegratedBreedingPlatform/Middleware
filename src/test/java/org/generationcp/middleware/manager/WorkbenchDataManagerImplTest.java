@@ -111,8 +111,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	public void testCropType() {
 		final String cropName = "Coconut";
 		final CropType cropType = new CropType(cropName);
-		final String added = this.workbenchDataManager.addCropType(cropType);
-		Assert.assertNotNull(added);
+		this.workbenchDaoFactory.getCropTypeDAO().saveOrUpdate(cropType);
 
 		final List<CropType> cropTypes = this.workbenchDataManager.getInstalledCropDatabses();
 		Assert.assertNotNull(cropTypes);

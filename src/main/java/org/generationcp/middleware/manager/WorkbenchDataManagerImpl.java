@@ -10,7 +10,6 @@
 
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -52,11 +51,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<Tool> getAllTools() {
-		return this.workbenchDaoFactory.getToolDAO().getAll();
-	}
-
-	@Override
 	public Tool getToolWithName(final String toolId) {
 		return this.workbenchDaoFactory.getToolDAO().getByToolName(toolId);
 	}
@@ -87,30 +81,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public String addCropType(final CropType cropType) {
-
-		final CropTypeDAO dao = this.workbenchDaoFactory.getCropTypeDAO();
-		if (this.workbenchDaoFactory.getCropTypeDAO().getByName(cropType.getCropName()) != null) {
-			throw new MiddlewareQueryException("Crop type already exists.");
-		}
-
-		final String idSaved;
-		try {
-
-			final CropType recordSaved = dao.saveOrUpdate(cropType);
-			idSaved = recordSaved.getCropName();
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while adding crop type: WorkbenchDataManager.addCropType(cropType=" + cropType + "): " + e
-					.getMessage(), e);
-		}
-
-		return idSaved;
-	}
-
-	@Override
 	public Integer addProjectActivity(final ProjectActivity projectActivity) {
 		final List<ProjectActivity> list = new ArrayList<>();
 		list.add(projectActivity);
@@ -120,8 +90,7 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 		return !ids.isEmpty() ? ids.get(0) : null;
 	}
 
-	@Override
-	public List<Integer> addProjectActivity(final List<ProjectActivity> projectActivityList) {
+	private List<Integer> addProjectActivity(final List<ProjectActivity> projectActivityList) {
 
 		return this.addOrUpdateProjectActivityData(projectActivityList, Operation.ADD);
 	}
