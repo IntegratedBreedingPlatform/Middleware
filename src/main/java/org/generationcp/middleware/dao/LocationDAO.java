@@ -190,7 +190,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				+ "  g.lon as longitude," //
 				+ "  g.alt as altitude," //
 				+ "  l.cntryid as countryId," //
-				+ "  l.snl1id as provinceId, " //
+				+ "  l.snl1id as provinceId " //
 				+ " from location l" //
 				+ "  left join georef g on l.locid = g.locid" //
 				+ " where l.locid = :locationId");

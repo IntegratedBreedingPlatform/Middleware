@@ -54,7 +54,7 @@ public interface LocationService {
 	 */
 	void deleteBlockFieldLocationByBlockId (List<Integer> blockLocIds);
 
-	ProgramLocationDefault saveProgramLocationDefault(String programUUID, Integer locationId);
+	ProgramLocationDefault saveProgramLocationDefault(String programUUID, Integer breedingLocationId, Integer storageLocationId);
 
 	void updateProgramLocationDefault(String programUUID, Integer locationId);
 
