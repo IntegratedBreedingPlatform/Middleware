@@ -56,11 +56,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Project getProjectById(final Long projectId) {
-		return this.workbenchDaoFactory.getProjectDAO().getById(projectId);
-	}
-
-	@Override
 	public Project getProjectByUuidAndCrop(final String projectUuid, final String cropType) {
 		return this.workbenchDaoFactory.getProjectDAO().getByUuid(projectUuid, cropType);
 	}

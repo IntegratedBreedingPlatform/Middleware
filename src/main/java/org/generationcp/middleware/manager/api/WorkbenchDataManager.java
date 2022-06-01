@@ -34,14 +34,6 @@ public interface WorkbenchDataManager {
 	Tool getToolWithName(String toolName);
 
 	/**
-	 * Gets a project by id.
-	 *
-	 * @param projectId - the project id to match
-	 * @return the project matching the given id
-	 */
-	Project getProjectById(Long projectId);
-
-	/**
 	 * Gets a project by Uuid and CropType. Should return only one value.
 	 *
 	 * @param projectUuid - the project Uuid to match (uuid is unique per crop type)
