@@ -59,4 +59,12 @@ public interface ProgramService {
 	 */
 	List<Project> getProjects(final Pageable pageable, final ProgramSearchRequest programSearchRequest);
 
+	/**
+	 * Gets the list of Projects that the specified User is associated with.
+	 *
+	 * @param cropName - the Crop Name associated with the projects to be retrieved
+	 * @return the projects which the specified user is involved
+	 */
+	List<Project> getProjectsByCropName(final String cropName);
+
 }

@@ -190,4 +190,10 @@ public class ProgramServiceImpl implements ProgramService {
 	public List<Project> getProjects(final Pageable pageable, final ProgramSearchRequest programSearchRequest) {
 		return this.daoFactory.getProjectDAO().getProjectsByFilter(pageable, programSearchRequest);
 	}
+
+	@Override
+	public List<Project> getProjectsByCropName(final String cropName) {
+		return this.daoFactory.getProjectDAO().getProjectsByCropName(cropName);
+	}
+
 }
