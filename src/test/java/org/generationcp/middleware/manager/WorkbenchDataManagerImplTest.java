@@ -71,7 +71,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		this.programService.addProgram(project);
 		Assert.assertNotNull("Expected id of a newly saved record in workbench_project.", project.getProjectId());
 
-		final Project readProject = this.workbenchDataManager.getProjectById(project.getProjectId());
+		final Project readProject = this.workbenchDaoFactory.getProjectDAO().getById(project.getProjectId());
 		Assert.assertEquals(project, readProject);
 	}
 
