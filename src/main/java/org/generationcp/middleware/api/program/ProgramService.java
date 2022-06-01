@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.program;
 
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -74,5 +75,23 @@ public interface ProgramService {
 	 * @return the projects which the specified user is involved
 	 */
 	List<Project> getProjectsByCropName(final String cropName);
+
+	/**
+	 * Gets a project by Uuid and CropType. Should return only one value.
+	 *
+	 * @param projectUuid - the project Uuid to match (uuid is unique per crop type)
+	 * @param cropType    - the crop type to match
+	 * @return the project matching the given Uuid and crop type
+	 */
+	Project getProjectByUuidAndCrop(String projectUuid, String cropType);
+
+	/**
+	 * Adds a project activity.
+	 *
+	 * @param projectActivity - the project activity
+	 * @return Returns the id of the {@code ProjectActivity} record added
+	 */
+	Integer addProjectActivity(ProjectActivity projectActivity);
+
 
 }

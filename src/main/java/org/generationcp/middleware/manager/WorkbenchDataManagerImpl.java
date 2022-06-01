@@ -10,13 +10,10 @@
 
 package org.generationcp.middleware.manager;
 
-import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -24,7 +21,6 @@ import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -56,11 +52,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Project getProjectByUuidAndCrop(final String projectUuid, final String cropType) {
-		return this.workbenchDaoFactory.getProjectDAO().getByUuid(projectUuid, cropType);
-	}
-
-	@Override
 	public List<CropType> getInstalledCropDatabses() {
 		return this.workbenchDaoFactory.getCropTypeDAO().getAll();
 	}
@@ -73,48 +64,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public CropType getCropTypeByName(final String cropName) {
 		return this.workbenchDaoFactory.getCropTypeDAO().getByName(cropName);
-	}
-
-	@Override
-	public Integer addProjectActivity(final ProjectActivity projectActivity) {
-		final List<ProjectActivity> list = new ArrayList<>();
-		list.add(projectActivity);
-
-		final List<Integer> ids = this.addProjectActivity(list);
-
-		return !ids.isEmpty() ? ids.get(0) : null;
-	}
-
-	private List<Integer> addProjectActivity(final List<ProjectActivity> projectActivityList) {
-
-		return this.addOrUpdateProjectActivityData(projectActivityList, Operation.ADD);
-	}
-
-	private List<Integer> addOrUpdateProjectActivityData(final List<ProjectActivity> projectActivityList, final Operation operation) {
-
-		final List<Integer> idsSaved = new ArrayList<>();
-		try {
-
-			final ProjectActivityDAO dao = this.workbenchDaoFactory.getProjectActivityDAO();
-
-			for (final ProjectActivity projectActivityListData : projectActivityList) {
-				final ProjectActivity recordSaved = dao.save(projectActivityListData);
-				idsSaved.add(recordSaved.getProjectActivityId());
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while adding addProjectActivity: WorkbenchDataManager.addOrUpdateProjectActivityData(projectActivityList="
-					+ projectActivityList + ", operation=" + operation + "): " + e.getMessage(), e);
-		}
-
-		return idsSaved;
-	}
-
-	@Override
-	public Project getLastOpenedProjectAnyUser() {
-		return this.workbenchDaoFactory.getProjectDAO().getLastOpenedProjectAnyUser();
 	}
 
 	@Override

@@ -1,11 +1,15 @@
 package org.generationcp.middleware.api.program;
 
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.dao.ProjectActivityDAO;
 import org.generationcp.middleware.domain.workbench.AddProgramMemberRequestDto;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
+import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.UserRole;
@@ -200,5 +204,47 @@ public class ProgramServiceImpl implements ProgramService {
 	public List<Project> getProjectsByCropName(final String cropName) {
 		return this.daoFactory.getProjectDAO().getProjectsByCropName(cropName);
 	}
+
+	@Override
+	public Project getProjectByUuidAndCrop(final String projectUuid, final String cropType) {
+		return this.daoFactory.getProjectDAO().getByUuid(projectUuid, cropType);
+	}
+
+	@Override
+	public Integer addProjectActivity(final ProjectActivity projectActivity) {
+		final List<ProjectActivity> list = new ArrayList<>();
+		list.add(projectActivity);
+
+		final List<Integer> ids = this.addProjectActivity(list);
+
+		return !ids.isEmpty() ? ids.get(0) : null;
+	}
+
+	private List<Integer> addProjectActivity(final List<ProjectActivity> projectActivityList) {
+		return this.addOrUpdateProjectActivityData(projectActivityList, Operation.ADD);
+	}
+
+	private List<Integer> addOrUpdateProjectActivityData(final List<ProjectActivity> projectActivityList, final Operation operation) {
+
+		final List<Integer> idsSaved = new ArrayList<>();
+		try {
+
+			final ProjectActivityDAO dao = this.daoFactory.getProjectActivityDAO();
+
+			for (final ProjectActivity projectActivityListData : projectActivityList) {
+				final ProjectActivity recordSaved = dao.save(projectActivityListData);
+				idsSaved.add(recordSaved.getProjectActivityId());
+			}
+
+		} catch (final Exception e) {
+
+			throw new MiddlewareQueryException(
+				"Error encountered while adding addProjectActivity: WorkbenchDataManager.addOrUpdateProjectActivityData(projectActivityList="
+					+ projectActivityList + ", operation=" + operation + "): " + e.getMessage(), e);
+		}
+
+		return idsSaved;
+	}
+
 
 }

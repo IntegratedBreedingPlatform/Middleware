@@ -11,8 +11,6 @@
 package org.generationcp.middleware.manager.api;
 
 import org.generationcp.middleware.pojos.workbench.CropType;
-import org.generationcp.middleware.pojos.workbench.Project;
-import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
@@ -34,23 +32,6 @@ public interface WorkbenchDataManager {
 	Tool getToolWithName(String toolName);
 
 	/**
-	 * Gets a project by Uuid and CropType. Should return only one value.
-	 *
-	 * @param projectUuid - the project Uuid to match (uuid is unique per crop type)
-	 * @param cropType    - the crop type to match
-	 * @return the project matching the given Uuid and crop type
-	 */
-	Project getProjectByUuidAndCrop(String projectUuid, String cropType);
-
-	/**
-	 * Adds a project activity.
-	 *
-	 * @param projectActivity - the project activity
-	 * @return Returns the id of the {@code ProjectActivity} record added
-	 */
-	Integer addProjectActivity(ProjectActivity projectActivity);
-
-	/**
 	 * Get the list of all installed central crop databases.
 	 *
 	 * @return the installed central crops
@@ -66,14 +47,6 @@ public interface WorkbenchDataManager {
 	 * @return the CropType retrieved
 	 */
 	CropType getCropTypeByName(String cropName);
-
-	/**
-	 * Returns the project last accessed regardless of user.
-	 *
-	 * @return the last Project opened by the given user
-	 */
-
-	Project getLastOpenedProjectAnyUser();
 
 	/**
 	 * Close the sessionProvider

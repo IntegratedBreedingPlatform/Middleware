@@ -90,24 +90,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetProjectByUUID() {
-		final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(
-			this.commonTestProject.getUniqueID(),
-			this.commonTestProject.getCropType().getCropName());
-
-		Assert.assertEquals(this.commonTestProject.getUniqueID(), project.getUniqueID());
-		Assert.assertEquals(this.commonTestProject.getCropType(), project.getCropType());
-	}
-
-	@Test
-	public void testGetProjectByUUIDProjectDoesNotExistInTheSpecifiedCrop() {
-		final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(
-			this.commonTestProject.getUniqueID(),
-			"wheat");
-		Assert.assertNull("Expecting a null project because the project's unique id is associated to maize crop.", project);
-	}
-
-	@Test
 	public void testCropType() {
 		final String cropName = "Coconut";
 		final CropType cropType = new CropType(cropName);
