@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.location;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
+import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Country;
@@ -185,7 +186,9 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final ProgramLocationDefault savedProgramLocationDefault = this.daoFactory.getProgramLocationDefaultDAO()
 			.getById(programLocationDefault.getId());
 		final LocationDTO newLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
-		this.locationService.updateProgramLocationDefault(savedProgramLocationDefault.getProgramUUID(), newLocationDTO.getId());
+		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
+		programBasicDetailsDto.setBreedingLocationDefaultId(newLocationDTO.getId());
+		this.locationService.updateProgramLocationDefault(savedProgramLocationDefault.getProgramUUID(), programBasicDetailsDto);
 		final ProgramLocationDefault updatedProgramLocationDefault =
 			this.locationService.getProgramLocationDefault(savedProgramLocationDefault.getProgramUUID());
 		Assert.assertEquals(newLocationDTO.getId(), updatedProgramLocationDefault.getBreedingLocationId());

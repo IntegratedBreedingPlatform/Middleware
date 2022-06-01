@@ -1,6 +1,7 @@
 package org.generationcp.middleware.api.location;
 
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
+import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.springframework.data.domain.Pageable;
 
@@ -56,11 +57,13 @@ public interface LocationService {
 
 	ProgramLocationDefault saveProgramLocationDefault(String programUUID, Integer breedingLocationId, Integer storageLocationId);
 
-	void updateProgramLocationDefault(String programUUID, Integer locationId);
+	void updateProgramLocationDefault(String programUUID, ProgramBasicDetailsDto programBasicDetailsDto);
 
 	ProgramLocationDefault getProgramLocationDefault(String programUUID);
 
 	LocationDTO getBreedingLocationDefault(String programUUID);
+
+	LocationDTO getStorageLocationDefault(String programUUID);
 
 	boolean isProgramBreedingLocationDefault(Integer locationId);
 

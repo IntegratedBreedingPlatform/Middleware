@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.location;
 import com.google.common.collect.ImmutableSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
+import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Country;
@@ -211,9 +212,14 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public void updateProgramLocationDefault(final String programUUID, final Integer locationId) {
+	public void updateProgramLocationDefault(final String programUUID, final ProgramBasicDetailsDto programBasicDetailsDto) {
 		final ProgramLocationDefault programLocationDefault = this.daoFactory.getProgramLocationDefaultDAO().getByProgramUUID(programUUID);
-		programLocationDefault.setBreedingLocationId(locationId);
+		if(programBasicDetailsDto.getBreedingLocationDefaultId() != null) {
+			programLocationDefault.setBreedingLocationId(programBasicDetailsDto.getBreedingLocationDefaultId());
+		}
+		if(programBasicDetailsDto.getStorageLocationDefaultId() != null) {
+			programLocationDefault.setStorageLocationId(programBasicDetailsDto.getStorageLocationDefaultId());
+		}
 		this.daoFactory.getProgramLocationDefaultDAO().update(programLocationDefault);
 	}
 
@@ -226,6 +232,12 @@ public class LocationServiceImpl implements LocationService {
 	public LocationDTO getBreedingLocationDefault(final String programUUID) {
 		final ProgramLocationDefault programLocationDefault = this.daoFactory.getProgramLocationDefaultDAO().getByProgramUUID(programUUID);
 		return this.getLocation(programLocationDefault.getBreedingLocationId());
+	}
+
+	@Override
+	public LocationDTO getStorageLocationDefault(final String programUUID) {
+		final ProgramLocationDefault programLocationDefault = this.daoFactory.getProgramLocationDefaultDAO().getByProgramUUID(programUUID);
+		return this.getLocation(programLocationDefault.getStorageLocationId());
 	}
 
 	@Override
