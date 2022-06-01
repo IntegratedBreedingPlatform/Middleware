@@ -130,11 +130,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Project getProjectByUuid(final String projectUuid) {
-		return this.workbenchDaoFactory.getProjectDAO().getByUuid(projectUuid);
-	}
-
-	@Override
 	public List<Role> getRoles(final RoleSearchDto roleSearchDto) {
 		return this.workbenchDaoFactory.getRoleDao().getRoles(roleSearchDto);
 	}

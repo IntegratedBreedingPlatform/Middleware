@@ -177,6 +177,11 @@ public class ProgramServiceImpl implements ProgramService {
 	}
 
 	@Override
+	public Project getProjectByUuid(final String projectUuid) {
+		return this.daoFactory.getProjectDAO().getByUuid(projectUuid);
+	}
+
+	@Override
 	public Project getLastOpenedProjectAnyUser() {
 		return this.daoFactory.getProjectDAO().getLastOpenedProjectAnyUser();
 	}

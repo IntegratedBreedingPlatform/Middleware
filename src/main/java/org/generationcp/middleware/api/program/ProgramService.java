@@ -35,6 +35,14 @@ public interface ProgramService {
 	void editProgram(String programUUID, ProgramBasicDetailsDto programBasicDetailsDto);
 
 	/**
+	 * Gets a project by Uuid. Should return only one value.
+	 *
+	 * @param projectUuid - the project Uuid to match
+	 * @return the project matching the given Uuid
+	 */
+	Project getProjectByUuid(String projectUuid);
+
+	/**
 	 * Returns the project last accessed regardless of user.
 	 *
 	 * @return the last Project opened by the given user
