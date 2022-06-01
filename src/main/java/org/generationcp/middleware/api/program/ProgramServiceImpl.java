@@ -175,4 +175,15 @@ public class ProgramServiceImpl implements ProgramService {
 		}
 		this.daoFactory.getProjectDAO().update(project);
 	}
+
+	@Override
+	public Project getLastOpenedProjectAnyUser() {
+		return this.daoFactory.getProjectDAO().getLastOpenedProjectAnyUser();
+	}
+
+	@Override
+	public Project getProjectById(final Long projectId) {
+		return this.daoFactory.getProjectDAO().getById(projectId);
+	}
+
 }

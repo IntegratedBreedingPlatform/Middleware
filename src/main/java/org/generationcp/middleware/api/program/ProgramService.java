@@ -33,4 +33,21 @@ public interface ProgramService {
 	void deleteProgramAndDependencies(String programUUID);
 
 	void editProgram(String programUUID, ProgramBasicDetailsDto programBasicDetailsDto);
+
+	/**
+	 * Returns the project last accessed regardless of user.
+	 *
+	 * @return the last Project opened by the given user
+	 */
+
+	Project getLastOpenedProjectAnyUser();
+
+	/**
+	 * Gets a project by id.
+	 *
+	 * @param projectId - the project id to match
+	 * @return the project matching the given id
+	 */
+	Project getProjectById(Long projectId);
+
 }

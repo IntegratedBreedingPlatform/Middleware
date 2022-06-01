@@ -16,7 +16,6 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
-import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.springframework.data.domain.Pageable;
@@ -169,13 +168,6 @@ public interface WorkbenchDataManager {
 	 * @return ROle Type
 	 */
 	RoleType getRoleType(Integer id);
-
-	/**
-	 * Save or update role
-	 *
-	 * @param userRole
-	 */
-	void saveOrUpdateUserRole(UserRole userRole);
 
 	/**
 	 * Save role

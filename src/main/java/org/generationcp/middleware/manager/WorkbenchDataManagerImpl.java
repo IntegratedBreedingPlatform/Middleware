@@ -21,7 +21,6 @@ import org.generationcp.middleware.pojos.workbench.ProjectActivity;
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.RoleType;
 import org.generationcp.middleware.pojos.workbench.Tool;
-import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Session;
@@ -196,11 +195,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public RoleType getRoleType(final Integer id) {
 		return this.workbenchDaoFactory.getRoleTypeDAO().getById(id);
-	}
-
-	@Override
-	public void saveOrUpdateUserRole(final UserRole userRole) {
-		this.workbenchDaoFactory.getUserRoleDao().saveOrUpdate(userRole);
 	}
 
 	@Override
