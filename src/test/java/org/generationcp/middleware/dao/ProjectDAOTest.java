@@ -62,6 +62,21 @@ public class ProjectDAOTest extends IntegrationTestBase {
 
 		this.workbenchTestDataUtil.setUpWorkbench();
 
+		if (this.roleTypeDAO == null) {
+			this.roleTypeDAO = new RoleTypeDAO();
+			this.roleTypeDAO.setSession(this.workbenchSessionProvider.getSession());
+		}
+
+		if (this.userRoleDao == null) {
+			this.userRoleDao = new UserRoleDao();
+			this.userRoleDao.setSession(this.workbenchSessionProvider.getSession());
+		}
+
+		if (this.roleDAO == null) {
+			this.roleDAO = new RoleDAO();
+			this.roleDAO.setSession(this.workbenchSessionProvider.getSession());
+		}
+
 		final RoleType programAdminRoleType =
 			roleTypeDAO.getById(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.getId());
 		this.programAdminRole = new Role();
@@ -89,21 +104,6 @@ public class ProjectDAOTest extends IntegrationTestBase {
 		if (this.workbenchProjectDao == null) {
 			this.workbenchProjectDao = new ProjectDAO();
 			this.workbenchProjectDao.setSession(this.workbenchSessionProvider.getSession());
-		}
-
-		if (this.roleTypeDAO == null) {
-			this.roleTypeDAO = new RoleTypeDAO();
-			this.roleTypeDAO.setSession(this.workbenchSessionProvider.getSession());
-		}
-
-		if (this.userRoleDao == null) {
-			this.userRoleDao = new UserRoleDao();
-			this.userRoleDao.setSession(this.workbenchSessionProvider.getSession());
-		}
-
-		if (this.roleDAO == null) {
-			this.roleDAO = new RoleDAO();
-			this.roleDAO.setSession(this.workbenchSessionProvider.getSession());
 		}
 
 		if (this.cropType == null) {
