@@ -188,7 +188,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		this.locationService.updateProgramLocationDefault(savedProgramLocationDefault.getProgramUUID(), newLocationDTO.getId());
 		final ProgramLocationDefault updatedProgramLocationDefault =
 			this.locationService.getProgramLocationDefault(savedProgramLocationDefault.getProgramUUID());
-		Assert.assertEquals(newLocationDTO.getId(), updatedProgramLocationDefault.getLocationId());
+		Assert.assertEquals(newLocationDTO.getId(), updatedProgramLocationDefault.getBreedingLocationId());
 	}
 
 	@Test
@@ -206,7 +206,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final LocationDTO locationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
 			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), locationDTO.getId());
-		final LocationDTO defaultLocation = this.locationService.getDefaultLocation(programLocationDefault.getProgramUUID());
+		final LocationDTO defaultLocation = this.locationService.getBreedingLocationDefault(programLocationDefault.getProgramUUID());
 		Assert.assertNotNull(locationDTO);
 		Assert.assertThat("Expected same Location id", locationDTO.getId(), equalTo(defaultLocation.getId()));
 		Assert.assertThat("Expected same Location name", locationDTO.getName(), equalTo(defaultLocation.getName()));
@@ -224,7 +224,7 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testIsProgramLocationDefault() {
 		final LocationDTO locationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), locationDTO.getId());
-		Assert.assertTrue(this.locationService.isProgramLocationDefault(locationDTO.getId()));
+		Assert.assertTrue(this.locationService.isProgramBreedingLocationDefault(locationDTO.getId()));
 	}
 
 	private LocationRequestDto buildLocationRequestDto() {

@@ -60,7 +60,9 @@ public interface LocationService {
 
 	ProgramLocationDefault getProgramLocationDefault(String programUUID);
 
-	LocationDTO getDefaultLocation(String programUUID);
+	LocationDTO getBreedingLocationDefault(String programUUID);
 
-	boolean isProgramLocationDefault(Integer locationId);
+	boolean isProgramBreedingLocationDefault(Integer locationId);
+
+	boolean isProgramStorageLocationDefault(Integer locationId);
 }

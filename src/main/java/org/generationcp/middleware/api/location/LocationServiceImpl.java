@@ -205,13 +205,13 @@ public class LocationServiceImpl implements LocationService {
 
 	@Override
 	public ProgramLocationDefault saveProgramLocationDefault(final String programUUID, final Integer locationId) {
-		return this.daoFactory.getProgramLocationDefaultDAO().save(new ProgramLocationDefault(programUUID, locationId));
+		return this.daoFactory.getProgramLocationDefaultDAO().save(new ProgramLocationDefault(programUUID, locationId, 6000));
 	}
 
 	@Override
 	public void updateProgramLocationDefault(final String programUUID, final Integer locationId) {
 		final ProgramLocationDefault programLocationDefault = this.daoFactory.getProgramLocationDefaultDAO().getByProgramUUID(programUUID);
-		programLocationDefault.setLocationId(locationId);
+		programLocationDefault.setBreedingLocationId(locationId);
 		this.daoFactory.getProgramLocationDefaultDAO().update(programLocationDefault);
 	}
 
@@ -221,13 +221,18 @@ public class LocationServiceImpl implements LocationService {
 	}
 
 	@Override
-	public LocationDTO getDefaultLocation(final String programUUID) {
+	public LocationDTO getBreedingLocationDefault(final String programUUID) {
 		final ProgramLocationDefault programLocationDefault = this.daoFactory.getProgramLocationDefaultDAO().getByProgramUUID(programUUID);
-		return this.getLocation(programLocationDefault.getLocationId());
+		return this.getLocation(programLocationDefault.getBreedingLocationId());
 	}
 
 	@Override
-	public boolean isProgramLocationDefault(final Integer locationId) {
-		return this.daoFactory.getProgramLocationDefaultDAO().isProgramLocationDefault(locationId);
+	public boolean isProgramBreedingLocationDefault(final Integer locationId) {
+		return this.daoFactory.getProgramLocationDefaultDAO().isProgramBreedingLocationDefault(locationId);
+	}
+
+	@Override
+	public boolean isProgramStorageLocationDefault(final Integer locationId) {
+		return this.daoFactory.getProgramLocationDefaultDAO().isProgramStorageLocationDefault(locationId);
 	}
 }
