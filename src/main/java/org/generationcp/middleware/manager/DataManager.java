@@ -38,8 +38,6 @@ import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.operation.saver.ProjectPropertySaver;
 import org.generationcp.middleware.operation.saver.ProjectSaver;
 import org.generationcp.middleware.operation.saver.StandardVariableSaver;
-import org.generationcp.middleware.operation.saver.StockSaver;
-import org.generationcp.middleware.operation.saver.StudySaver;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -233,10 +231,6 @@ public abstract class DataManager {
 		return new NameSynonymBuilder(this.sessionProvider);
 	}
 
-	protected final StudySaver getStudySaver() {
-		return new StudySaver(this.sessionProvider);
-	}
-
 	protected final DatasetProjectSaver getDatasetProjectSaver() {
 		return new DatasetProjectSaver(this.sessionProvider);
 	}
@@ -259,10 +253,6 @@ public abstract class DataManager {
 
 	protected final ProjectPropertySaver getProjectPropertySaver() {
 		return new ProjectPropertySaver(this.sessionProvider);
-	}
-
-	protected final StockSaver getStockSaver() {
-		return new StockSaver(this.sessionProvider);
 	}
 
 	protected final StandardVariableSaver getStandardVariableSaver() {

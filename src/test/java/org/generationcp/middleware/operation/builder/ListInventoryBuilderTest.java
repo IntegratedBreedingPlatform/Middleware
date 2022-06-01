@@ -7,16 +7,12 @@ import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitial
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
-import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.GermplasmListManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ims.Lot;
-import org.generationcp.middleware.pojos.ims.Transaction;
-import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.junit.Assert;
 import org.junit.Before;
@@ -70,38 +66,6 @@ public class ListInventoryBuilderTest extends IntegrationTestBase {
 			Assert.assertTrue("Expecting each list entry should have group id set to " + GROUP_ID + "but didn't.",
 					listEntry.getGroupId().equals(GROUP_ID));
 		}
-	}
-
-	@Test
-	public void testRetrieveInventoryLotsForGermplasm() {
-		final List<GermplasmListData> listEntries = this.germplasmList.getListData();
-
-		final List<Integer> listGid = this.retrieveGidFromListEntries(listEntries);
-
-		final List<Lot> lots = this.inventoryDetailsTestDataInitializer.createLots(listGid, this.germplasmList.getId(), 8234, 9007);
-
-		lots.forEach(l -> this.daoFactory.getLotDao().save(l));
-
-		final Transaction initialTransaction = this.inventoryDetailsTestDataInitializer
-			.createTransaction(5.0, 1, "Initial inventory", lots.get(0), 1, this.germplasmList.getId(),
-				listEntries.get(0).getId(), "LIST", TransactionType.DEPOSIT.getId());
-
-		final Transaction reservationTransaction = this.inventoryDetailsTestDataInitializer
-			.createTransaction(-2.0, 0, "2 reserved", lots.get(0), 1, this.germplasmList.getId(), listEntries.get(0).getId(),
-				"LIST", TransactionType.WITHDRAWAL.getId());
-
-		this.daoFactory.getTransactionDAO().save(initialTransaction);
-		this.daoFactory.getTransactionDAO().save(reservationTransaction);
-		final List<LotDetails> lotDetails = listInventoryBuilder.retrieveInventoryLotsForGermplasm(listGid.get(0));
-
-		Assert.assertEquals(1, lotDetails.size());
-		Assert.assertEquals("5.0", lotDetails.get(0).getActualLotBalance().toString());
-		Assert.assertEquals("3.0", lotDetails.get(0).getAvailableLotBalance().toString());
-		Assert.assertEquals("2.0", lotDetails.get(0).getReservedTotal().toString());
-		Assert.assertEquals("2.0", lotDetails.get(0).getWithdrawalBalance().toString());
-		Assert.assertEquals(ListDataInventory.RESERVED, lotDetails.get(0).getWithdrawalStatus());
-		Assert.assertEquals(8234, lotDetails.get(0).getScaleId().intValue());
-		Assert.assertEquals(9007, lotDetails.get(0).getLocId().intValue());
 	}
 
 	private void initializeGermplasms(final List<Integer> gids) {

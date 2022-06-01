@@ -15,8 +15,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.ListDataInventory;
-import org.generationcp.middleware.domain.inventory.ListEntryLotDetails;
-import org.generationcp.middleware.domain.inventory.LotDetails;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.pojos.GermplasmListData;
@@ -58,13 +56,13 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 		this.daoFactory.getLotDao().save(lot);
 		this.daoFactory.getLotDao().save(new Lot(null, 1, EntityType.GERMPLSM.name(), 50533, 9002, 1539, 0, 0, "sample added lot 2", RandomStringUtils.randomAlphabetic(35)));
 
-		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, this.daoFactory.getLotDao().getByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140413)), 1, -1d, "sample added transaction 1", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
-		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, this.daoFactory.getLotDao().getByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 1, -2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
-		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, this.daoFactory.getLotDao().getByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 0, -2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
-		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, this.daoFactory.getLotDao().getByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20140518)), 0, 2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
+		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, lot, new Date((20140413)), 1, -1d, "sample added transaction 1", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
+		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, lot, new Date((20140518)), 1, -2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
+		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, lot, new Date((20140518)), 0, -2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
+		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, lot, new Date((20140518)), 0, 2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
 		final Transaction t4 = new Transaction(null, 1, this.lot, new Date((20140413)), 1, -1d, "sample added transaction 1", 0, null, null, null, 1, TransactionType.DEPOSIT.getId());
 		this.daoFactory.getTransactionDAO().save(t4);
-		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, this.daoFactory.getLotDao().getByEntityType(EntityType.GERMPLSM.name(), 0, 1).get(0), new Date((20120518)), 1, 2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
+		this.daoFactory.getTransactionDAO().save(new Transaction(null, 1, lot, new Date((20120518)), 1, 2d, "sample added transaction 2", 0, null, null, null, 1, TransactionType.DEPOSIT.getId()));
 		final Set<Transaction> transactionSet = new HashSet<>();
 		transactionSet.add(t4);
 		this.lot.setTransactions(transactionSet);
@@ -93,23 +91,6 @@ public class InventoryDataManagerImplTestIT extends IntegrationTestBase {
 			if (inventory != null) {
 				System.out.println(inventory);
 			}
-		}
-	}
-
-	@Test
-	public void testGetLotsForGermplasmListEntry() throws MiddlewareQueryException {
-		final List<ListEntryLotDetails> lots = this.manager.getLotDetailsForListEntry(-543041, -507029, -88175);
-		for (final ListEntryLotDetails lot : lots) {
-			Debug.print(lot);
-		}
-	}
-
-	@Test
-	public void testGetLotsForGermplasm() throws MiddlewareQueryException {
-		final int gid = 89;
-		final List<LotDetails> lots = this.manager.getLotDetailsForGermplasm(gid);
-		for (final LotDetails lot : lots) {
-			System.out.println(lot);
 		}
 	}
 

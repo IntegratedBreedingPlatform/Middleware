@@ -104,43 +104,6 @@ public class LotDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetLotAggregateDataForGermplasm() {
-
-		final Germplasm germplasm =
-				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
-
-		final Lot lot = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
-		this.lotDAO.save(lot);
-
-		Transaction transaction =
-				InventoryDetailsTestDataInitializer.createTransaction(5.0, 1, TransactionType.DEPOSIT.getValue(), lot, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
-		transaction.setType(TransactionType.DEPOSIT.getId());
-		this.transactionDAO.save(transaction);
-
-		final List<Lot> lotAggregateDataForGermplasm = this.lotDAO.getLotAggregateDataForGermplasm(germplasmId);
-
-		Assert.assertEquals(1, lotAggregateDataForGermplasm.size());
-
-		final Lot returnedLot = lotAggregateDataForGermplasm.get(0);
-
-		Assert.assertEquals(lot.getId(), returnedLot.getId());
-		Assert.assertEquals(lot.getEntityId(), returnedLot.getEntityId());
-		Assert.assertEquals(lot.getLocationId(), returnedLot.getLocationId());
-		Assert.assertEquals(lot.getComments(), returnedLot.getComments());
-		Assert.assertEquals(lot.getStatus(), returnedLot.getStatus());
-		Assert.assertEquals("5.0", returnedLot.getAggregateData().getActualBalance().toString());
-		Assert.assertEquals("5.0", returnedLot.getAggregateData().getAvailableBalance().toString());
-		Assert.assertEquals("0.0", returnedLot.getAggregateData().getReservedTotal().toString());
-		Assert.assertEquals("0.0", returnedLot.getAggregateData().getCommittedTotal().toString());
-		Assert.assertEquals("InventoryId", returnedLot.getAggregateData().getStockIds());
-
-		Assert.assertEquals(0, returnedLot.getAggregateData().getReservationMap().size());
-		Assert.assertEquals(0, returnedLot.getAggregateData().getCommittedMap().size());
-
-	}
-
-	@Test
 	public void testGetGermplasmsWithOpenLots() {
 		final Germplasm germplasm =
 				GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");

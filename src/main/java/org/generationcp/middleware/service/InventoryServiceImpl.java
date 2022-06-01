@@ -12,22 +12,12 @@
 
 package org.generationcp.middleware.service;
 
-import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.InventoryService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -41,85 +31,14 @@ public class InventoryServiceImpl implements InventoryService {
 
 	private DaoFactory daoFactory;
 
-	private static final Logger LOG = LoggerFactory.getLogger(InventoryServiceImpl.class);
-
 	public InventoryServiceImpl() {
 
 	}
-
 
 	public InventoryServiceImpl(final HibernateSessionProvider sessionProvider) {
 
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
-
-	@Override
-	public boolean hasInventoryDetails(final Integer studyId) {
-		return this.daoFactory.getTransactionDAO().hasInventoryDetails(studyId);
-	}
-
-	@Override
-	public List<InventoryDetails> getInventoryDetails(final Integer studyId) {
-		final List<InventoryDetails> inventoryDetails = this.daoFactory.getTransactionDAO().getInventoryDetails(studyId);
-		this.fillLocationDetails(inventoryDetails);
-		this.fillScaleDetails(inventoryDetails);
-		return inventoryDetails;
-	}
-
-	private void fillScaleDetails(final List<InventoryDetails> inventoryDetails) {
-		// collect all used scales
-		final Set<Integer> scaleIds = new HashSet<Integer>();
-		for (final InventoryDetails detail : inventoryDetails) {
-			final Integer scaleId = detail.getScaleId();
-			if (scaleId != null) {
-				scaleIds.add(scaleId);
-			}
-		}
-		// get the scale details from database
-		final Map<Integer, CVTerm> scalesMap = new HashMap<>();
-		if (!scaleIds.isEmpty()) {
-			final List<CVTerm> cvtermList = this.daoFactory.getCvTermDao().getByIds(new ArrayList<>(scaleIds));
-			for (final CVTerm cvTerm : cvtermList) {
-				scalesMap.put(cvTerm.getCvTermId(), cvTerm);
-			}
-		}
-		// set scale details of the inventory
-		for (final InventoryDetails detail : inventoryDetails) {
-			if (detail.getScaleId() != null && scalesMap.containsKey(detail.getScaleId())) {
-				final CVTerm cvTerm = scalesMap.get(detail.getScaleId());
-				detail.setScaleName(cvTerm.getName());
-			}
-		}
-	}
-
-	private void fillLocationDetails(final List<InventoryDetails> inventoryDetails) {
-		// collect all used locations
-		final Set<Integer> locationIds = new HashSet<Integer>();
-		for (final InventoryDetails detail : inventoryDetails) {
-			final Integer locationId = detail.getLocationId();
-			if (locationId != null) {
-				locationIds.add(locationId);
-			}
-		}
-		// get the location details from database
-		final Map<Integer, Location> locationsMap = new HashMap<>();
-		if (!locationIds.isEmpty()) {
-			final List<Location> locations = this.daoFactory.getLocationDAO().getByIds(new ArrayList<>(locationIds));
-			for (final Location location : locations) {
-				locationsMap.put(location.getLocid(), location);
-			}
-		}
-		// set location details of the inventory
-		for (final InventoryDetails detail : inventoryDetails) {
-			if (detail.getLocationId() != null && locationsMap.containsKey(detail.getLocationId())) {
-				final Location location = locationsMap.get(detail.getLocationId());
-				detail.setLocationName(location.getLname());
-				detail.setLocationAbbr(location.getLabbr());
-			}
-		}
-	}
-
-
 
 	/**
 	 * This method gets the maximum notation number of the existing stock IDs. For example, if there are existing stock IDs: SID1-1, SID1-2,
