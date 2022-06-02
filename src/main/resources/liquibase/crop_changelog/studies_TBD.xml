@@ -285,7 +285,7 @@
 		<comment>Changset temporary until entrycd column will be removed</comment>
 		<sql dbms="mysql" splitStatements="true">
 		ALTER TABLE listdata
-			CHANGE COLUMN `entrycd` `entrycd` VARCHAR (47) NULL DEFAULT '-';
+			CHANGE COLUMN entrycd entrycd_bkp VARCHAR (47) NULL DEFAULT '-';
 		</sql>
 	</changeSet>
 
