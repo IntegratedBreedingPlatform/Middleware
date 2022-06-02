@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.user;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.program.ProgramService;
+import org.generationcp.middleware.dao.UserRoleDao;
 import org.generationcp.middleware.data.initializer.UserRoleDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.manager.Operation;
@@ -55,6 +56,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 	private Project commonTestProject;
 	private WorkbenchUser testUser1;
 	private WorkbenchDaoFactory workbenchDaoFactory;
+	private UserRoleDao userRoleDao;
 
 	@Before
 	public void beforeTest() {
@@ -70,6 +72,12 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		}
 
 		this.workbenchDaoFactory = new WorkbenchDaoFactory(this.workbenchSessionProvider);
+
+		if (this.userRoleDao == null) {
+			this.userRoleDao = new UserRoleDao();
+			this.userRoleDao.setSession(this.workbenchSessionProvider.getSession());
+		}
+
 		this.integrationTestDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 	}
 
@@ -288,7 +296,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		roleType.setId(1);
 		role.setRoleType(roleType);
 		userRole.setRole(role);
-		this.workbenchDataManager.saveOrUpdateUserRole(userRole);
+		userRoleDao.saveOrUpdate(userRole);
 
 		this.sessionProvder.getSession().flush();
 
