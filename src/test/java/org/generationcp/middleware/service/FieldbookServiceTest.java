@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -44,6 +45,9 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 	private UserService userService;
 
 	@Autowired
+	private ProgramService programService;
+
+	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	@Autowired
@@ -74,7 +78,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
-			this.crop = this.workbenchDataManager.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
+			this.crop = this.programService.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
 		}
 
 		this.germplasmListDAO = new GermplasmListDAO();

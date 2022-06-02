@@ -117,7 +117,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 			cropType = new CropType("maize");
 			cropType.setDbName("ibdbv2_maize_merged");
 			cropType.setVersion("4.0.0");
-			this.workbenchDataManager.addCropType(cropType);
+			this.daoFactory.getCropTypeDAO().saveOrUpdate(cropType);
 		}
 
 		final Project program = new Project();

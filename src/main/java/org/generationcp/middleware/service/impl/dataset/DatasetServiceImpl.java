@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
@@ -24,7 +25,6 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
@@ -130,7 +130,7 @@ public class DatasetServiceImpl implements DatasetService {
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Autowired
-	private OntologyDataManager ontologyDataManager;
+	private ProgramService programService;
 
 	@Autowired
 	private StudyService studyService;
@@ -329,7 +329,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<ExperimentModel> plotObservationUnits =
 			this.daoFactory.getExperimentDao().getObservationUnits(plotDataset.getProjectId(), instanceIds);
 		final DmsProject dmsProject = this.daoFactory.getDmsProjectDAO().getById(studyId);
-		final CropType crop = this.workbenchDataManager.getProjectByUuid(dmsProject.getProgramUUID()).getCropType();
+		final CropType crop = this.programService.getProjectByUuid(dmsProject.getProgramUUID()).getCropType();
 		for (final ExperimentModel plotObservationUnit : plotObservationUnits) {
 			for (int i = 1; i <= numberOfSubObservationUnits; i++) {
 				final ExperimentModel experimentModel = new ExperimentModel(plotObservationUnit.getGeoLocation(),
