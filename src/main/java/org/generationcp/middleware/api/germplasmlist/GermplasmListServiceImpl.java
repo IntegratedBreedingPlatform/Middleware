@@ -134,8 +134,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 			Preconditions.checkArgument(preferredName != null || names != null, "No name found for gid=" + gid);
 			final String designation = preferredName != null ? preferredName : names.get(0).getNval();
 			GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, entry.getEntryNo(),
-				null, entry.getSeedSource(), designation, entry.getGroupName(),
-				GermplasmListDataDAO.STATUS_ACTIVE, null);
+				entry.getSeedSource(), designation, entry.getGroupName(), GermplasmListDataDAO.STATUS_ACTIVE, null);
 			germplasmListData = this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 
 			// save entry details
@@ -328,7 +327,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				germplasmList,
 				model.getGid(),
 				entryNo,
-				String.valueOf(entryNo),
 				plotCodeValuesIndexedByGids.get(model.getGid()),
 				model.getPreferredName(),
 				crossExpansionsBulk.get(model.getGid()),

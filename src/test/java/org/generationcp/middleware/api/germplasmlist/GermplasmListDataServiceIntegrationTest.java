@@ -98,8 +98,8 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 		final Name name = new Name(null, savedGermplasm, 1, 1, "Name", 0, 0, 0);
 		this.daoFactory.getNameDao().save(name);
 
-		final GermplasmListData data = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "EntryCode 1",
-			DataSetupTest.GERMPLSM_PREFIX + 1 + " Source", DataSetupTest.GERMPLSM_PREFIX + 1,
+		final GermplasmListData data = new GermplasmListData(null, germplasmList, germplasm.getGid(),
+			1, DataSetupTest.GERMPLSM_PREFIX + 1 + " Source", DataSetupTest.GERMPLSM_PREFIX + 1,
 			DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0);
 		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(data);
 

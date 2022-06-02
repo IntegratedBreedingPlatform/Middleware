@@ -906,8 +906,8 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	}
 
 	private GermplasmListData createGermplasmListData(final GermplasmList germplasmList, final Germplasm germplasm) {
-		final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "EntryCode",
-			"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
+		final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(),
+			1, "SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
 		this.manager.addGermplasmListData(germplasmListData);
 		return germplasmListData;
 	}

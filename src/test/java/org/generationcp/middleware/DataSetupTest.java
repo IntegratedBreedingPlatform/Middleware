@@ -212,7 +212,7 @@ public class DataSetupTest extends IntegrationTestBase {
         // Germplasm list data
         final List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
         for (int i = 0; i < DataSetupTest.NUMBER_OF_GERMPLASM; i++) {
-            germplasmListData.add(new GermplasmListData(null, germplasmList, gids[i], i, "EntryCode" + i,
+            germplasmListData.add(new GermplasmListData(null, germplasmList, gids[i], i,
                     DataSetupTest.GERMPLSM_PREFIX + i + " Source", DataSetupTest.GERMPLSM_PREFIX + i,
                     DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));
         }

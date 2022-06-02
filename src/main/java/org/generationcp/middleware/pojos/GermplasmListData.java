@@ -72,10 +72,6 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	@Column(name = "entryid")
 	private Integer entryId;
 
-	@Basic(optional = false)
-	@Column(name = "entrycd")
-	private String entryCode;
-
 	@Column(name = "source")
 	private String seedSource;
 
@@ -146,14 +142,13 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		this.id = id;
 	}
 
-	public GermplasmListData(final Integer id, final GermplasmList list, final Integer gid, final Integer entryId, final String entryCode,
+	public GermplasmListData(final Integer id, final GermplasmList list, final Integer gid, final Integer entryId,
 			final String seedSource, final String designation, final String groupName, final Integer status, final Integer localRecordId) {
 		super();
 		this.id = id;
 		this.list = list;
 		this.gid = gid;
 		this.entryId = entryId;
-		this.entryCode = entryCode;
 		this.seedSource = seedSource;
 		this.designation = designation;
 		this.groupName = groupName;
@@ -161,18 +156,18 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		this.localRecordId = localRecordId;
 	}
 
-	public GermplasmListData(final Integer id, final GermplasmList list, final Integer gid, final Integer entryId, final String entryCode,
+	public GermplasmListData(final Integer id, final GermplasmList list, final Integer gid, final Integer entryId,
 		final String seedSource, final String designation, final String groupName, final Integer status, final Integer localRecordId,
 		final Integer groupId) {
-		this(id, list, gid, entryId, entryCode, seedSource, designation, groupName, status, localRecordId);
+		this(id, list, gid, entryId, seedSource, designation, groupName, status, localRecordId);
 		this.groupId = groupId;
 	}
 
 
-	public GermplasmListData(final Integer id, final GermplasmList list, final Integer gid, final Integer entryId, final String entryCode,
+	public GermplasmListData(final Integer id, final GermplasmList list, final Integer gid, final Integer entryId,
 			final String seedSource, final String designation, final String groupName, final Integer status, final Integer localRecordId,
 			final String notes, final Integer crossingDate) {
-		this(id, list, gid, entryId, entryCode, seedSource, designation, groupName, status, localRecordId);
+		this(id, list, gid, entryId, seedSource, designation, groupName, status, localRecordId);
 		this.notes = notes;
 		this.crossingDate = crossingDate;
 	}
@@ -208,15 +203,6 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 
 	public void setEntryId(final Integer entryId) {
 		this.entryId = entryId;
-	}
-
-	@Override
-	public String getEntryCode() {
-		return this.entryCode;
-	}
-
-	public void setEntryCode(final String entryCode) {
-		this.entryCode = entryCode;
 	}
 
 	@Override
@@ -332,8 +318,6 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		builder.append(this.gid);
 		builder.append(", entryId=");
 		builder.append(this.entryId);
-		builder.append(", entryCode=");
-		builder.append(this.entryCode);
 		builder.append(", seedSource=");
 		builder.append(this.seedSource);
 		builder.append(", designation=");
