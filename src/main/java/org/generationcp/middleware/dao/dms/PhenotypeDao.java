@@ -140,6 +140,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			+ " WHERE p.study_id = :studyId AND p.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId() + " \n"
 			+ " AND cvterm_variable.cvterm_id IN (:cvtermIds) AND ph.value IS NOT NULL\n" + " GROUP BY  cvterm_variable.name";
 	public static final String ENTRY_NO = "ENTRY_NO";
+	public static final String DATASET_ID = "datasetId";
 
 	public List<NumericTraitInfo> getNumericTraitInfoList(final List<Integer> environmentIds, final List<Integer> numericVariableIds) {
 		final List<NumericTraitInfo> numericTraitInfoList = new ArrayList<>();
@@ -947,7 +948,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.addScalar("blockNumber", new StringType()).addScalar("replicate", new StringType()).addScalar("COL").addScalar("ROW")
 			.addScalar("studyLocationDbId", new StringType()).addScalar("studyLocation", new StringType()).addScalar("entryType")
 			.addScalar("entryNumber", new StringType()).addScalar("programDbId", new StringType()).addScalar("trialDbId", new StringType())
-			.addScalar("trialDbName", new StringType()).addScalar("jsonProps");
+			.addScalar("trialDbName", new StringType()).addScalar("jsonProps").addScalar("datasetDbId", new StringType());
 
 		// TODO get map with AliasToEntityMapResultTransformer.INSTANCE
 		final List<Object[]> results = sqlQuery.list();
@@ -996,6 +997,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 				final Map<String, String> additionalInfo = new HashMap<>();
 				additionalInfo.put(ENTRY_NO, (String) row[21]);
+				additionalInfo.put(DATASET_ID, (String) row[26]);
 				observationUnit.setAdditionalInfo(additionalInfo);
 				observationUnit.setLocationDbId(observationUnit.getStudyLocationDbId());
 				observationUnit.setLocationName(observationUnit.getStudyLocation());
