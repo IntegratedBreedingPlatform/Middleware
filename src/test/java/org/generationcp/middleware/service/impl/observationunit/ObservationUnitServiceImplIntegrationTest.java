@@ -13,6 +13,7 @@ import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationUnitS
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
@@ -20,7 +21,6 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -59,7 +59,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 	private ObservationUnitService observationUnitService;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private ProgramService programService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -80,7 +80,7 @@ public class ObservationUnitServiceImplIntegrationTest extends IntegrationTestBa
 		this.workbenchTestDataUtil.setUpWorkbench();
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
-			this.crop = this.workbenchDataManager.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
+			this.crop = this.programService.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
 		}
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.testUser = this.testDataInitializer.createUserForTesting();

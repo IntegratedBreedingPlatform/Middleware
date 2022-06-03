@@ -148,10 +148,10 @@ public class WorkbenchTestDataUtil {
 		this.programService.addProgram(this.commonTestProject);
 
 		this.testProjectActivity1 = this.createTestProjectActivityData(this.commonTestProject, this.testUser1);
-		this.workbenchDataManager.addProjectActivity(this.testProjectActivity1);
+		this.programService.addProjectActivity(this.testProjectActivity1);
 
 		this.testProjectActivity2 = this.createTestProjectActivityData(this.commonTestProject, this.testUser2);
-		this.workbenchDataManager.addProjectActivity(this.testProjectActivity2);
+		this.programService.addProjectActivity(this.testProjectActivity2);
 
 		final UserInfo userInfo = new UserInfo();
 		//TODO check if this is needed since we are hardcoding to user id 3

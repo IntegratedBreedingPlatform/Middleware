@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
@@ -142,6 +143,9 @@ public class DatasetServiceImplTest {
 
 	@Mock
 	private DerivedVariableService derivedVariableService;
+
+	@Mock
+	private ProgramService programService;
 
 	@InjectMocks
 	private DatasetServiceImpl datasetService = new DatasetServiceImpl();
@@ -1030,7 +1034,7 @@ public class DatasetServiceImplTest {
 		crop.setUseUUID(false);
 		final Project project = new Project();
 		project.setCropType(crop);
-		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(DatasetServiceImplTest.PROGRAM_UUID);
+		Mockito.doReturn(project).when(this.programService).getProjectByUuid(DatasetServiceImplTest.PROGRAM_UUID);
 
 		final int plotCount = 3;
 		final List<ExperimentModel> plotExperiments = this.getPlotExperiments(plotCount);

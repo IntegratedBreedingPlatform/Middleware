@@ -71,13 +71,13 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		this.programService.addProgram(project);
 		Assert.assertNotNull("Expected id of a newly saved record in workbench_project.", project.getProjectId());
 
-		final Project readProject = this.workbenchDataManager.getProjectById(project.getProjectId());
+		final Project readProject = this.workbenchDaoFactory.getProjectDAO().getById(project.getProjectId());
 		Assert.assertEquals(project, readProject);
 	}
 
 	@Test
 	public void testGetProjects() {
-		final List<Project> projects = this.workbenchDataManager.getProjects();
+		final List<Project> projects = this.workbenchDaoFactory.getProjectDAO().getAll();
 		Assert.assertNotNull(projects);
 		Assert.assertFalse(projects.isEmpty());
 	}
@@ -90,29 +90,10 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetProjectByUUID() {
-		final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(
-			this.commonTestProject.getUniqueID(),
-			this.commonTestProject.getCropType().getCropName());
-
-		Assert.assertEquals(this.commonTestProject.getUniqueID(), project.getUniqueID());
-		Assert.assertEquals(this.commonTestProject.getCropType(), project.getCropType());
-	}
-
-	@Test
-	public void testGetProjectByUUIDProjectDoesNotExistInTheSpecifiedCrop() {
-		final Project project = this.workbenchDataManager.getProjectByUuidAndCrop(
-			this.commonTestProject.getUniqueID(),
-			"wheat");
-		Assert.assertNull("Expecting a null project because the project's unique id is associated to maize crop.", project);
-	}
-
-	@Test
 	public void testCropType() {
 		final String cropName = "Coconut";
 		final CropType cropType = new CropType(cropName);
-		final String added = this.workbenchDataManager.addCropType(cropType);
-		Assert.assertNotNull(added);
+		this.workbenchDaoFactory.getCropTypeDAO().saveOrUpdate(cropType);
 
 		final List<CropType> cropTypes = this.workbenchDataManager.getInstalledCropDatabses();
 		Assert.assertNotNull(cropTypes);
@@ -121,13 +102,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final CropType cropTypeRead = this.workbenchDataManager.getCropTypeByName(cropName);
 		Assert.assertNotNull(cropTypeRead);
 		Assert.assertEquals(cropType, cropTypeRead);
-	}
-
-	@Test
-	public void testGetAllTools() {
-		final List<Tool> results = this.workbenchDataManager.getAllTools();
-		Assert.assertNotNull(results);
-		Assert.assertFalse(results.isEmpty());
 	}
 
 	@Test
@@ -142,7 +116,7 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		programSearchRequest.setLoggedInUserId(project.getUserId());
 
 		final Pageable pageable = new PageRequest(0, 100);
-		final List<Project> projects = this.workbenchDataManager.getProjects(pageable, programSearchRequest);
+		final List<Project> projects = this.workbenchDaoFactory.getProjectDAO().getProjectsByFilter(pageable, programSearchRequest);
 
 		assertThat(project.getProjectId(), is(equalTo(projects.get(0).getProjectId())));
 		assertThat(project.getCropType().getCropName(), is(equalTo(projects.get(0).getCropType().getCropName())));
