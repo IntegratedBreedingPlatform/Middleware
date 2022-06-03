@@ -1039,12 +1039,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		final Set<Integer> factorsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getFactors());
 		final Set<Integer> trialVariablesTermIds = this.getTermIdsOfMeasurementVariables(workbook.getTrialVariables());
+		final Set<Integer> entryDetailsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getEntryDetails());
 
 		// DMV : TODO change implem so that backend is agnostic to UI when
 		// determining messages
-		if (!factorsTermIds.contains(TermId.ENTRY_NO.getId())) {
+		if (!entryDetailsTermIds.contains(TermId.ENTRY_NO.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_ENTRY);
-			errors.get(Constants.MISSING_ENTRY).add(new Message("error.entry.doesnt.exist.wizard"));
+			errors.get(Constants.MISSING_ENTRY).add(new Message("error.entryno.doesnt.exist.wizard"));
 		}
 
 		if (!factorsTermIds.contains(TermId.GID.getId())) {
