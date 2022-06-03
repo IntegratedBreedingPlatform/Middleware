@@ -1,17 +1,7 @@
-/*******************************************************************************
- * Copyright (c) 2012, All Rights Reserved.
- *
- * Generation Challenge Programme (GCP)
- *
- *
- * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
- * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
- *******************************************************************************/
-
 package org.generationcp.middleware.pojos.ims;
 
 import org.generationcp.middleware.pojos.AbstractEntity;
+import org.generationcp.middleware.pojos.GenericAttribute;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -19,8 +9,6 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import java.io.Serializable;
 
@@ -29,16 +17,11 @@ import java.io.Serializable;
  *
  * @author cverano
  */
-@NamedQueries({
-	@NamedQuery(name = "getAttributesByLotID",
-		query = "FROM ims_lot_attribute a WHERE a.lotId = :lotId ")})
 @Entity
 @Table(name = "ims_lot_attribute")
-public class LotAttribute extends AbstractEntity implements Serializable {
+public class LotAttribute extends AbstractEntity implements GenericAttribute, Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	public static final String GET_BY_LOTID = "getAttributesByLotID";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -80,7 +63,8 @@ public class LotAttribute extends AbstractEntity implements Serializable {
 		this.aid = aid;
 	}
 
-	public LotAttribute(final Integer aid, final Integer lotId, final Integer typeId, final String aval, final Integer cValueId, final Integer locationId,
+	public LotAttribute(final Integer aid, final Integer lotId, final Integer typeId, final String aval, final Integer cValueId,
+		final Integer locationId,
 		final Integer referenceId, final Integer adate) {
 		this.aid = aid;
 		this.lotId = lotId;

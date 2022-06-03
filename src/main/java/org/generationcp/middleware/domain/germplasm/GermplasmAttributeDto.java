@@ -5,7 +5,7 @@ import org.pojomatic.annotations.AutoProperty;
 
 
 @AutoProperty
-public class GermplasmAttributeDto extends GermplasmAttributeRequestDto {
+public class GermplasmAttributeDto extends AttributeRequestDto {
 
 	private Integer id;
 

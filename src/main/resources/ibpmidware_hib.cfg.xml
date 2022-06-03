@@ -35,6 +35,7 @@
         <mapping class="org.generationcp.middleware.pojos.ProgramLocationDefault"/>
 
         <mapping class="org.generationcp.middleware.pojos.ims.Lot"/>
+        <mapping class="org.generationcp.middleware.pojos.ims.LotAttribute"/>
         <mapping class="org.generationcp.middleware.pojos.ims.Transaction"/>
         <mapping class="org.generationcp.middleware.pojos.ims.ExperimentTransaction"/>
 

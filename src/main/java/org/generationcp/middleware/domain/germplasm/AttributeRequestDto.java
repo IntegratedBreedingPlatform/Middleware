@@ -4,7 +4,7 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 @AutoProperty
-public class GermplasmAttributeRequestDto {
+public class AttributeRequestDto {
 
 	private Integer variableId;
 
@@ -14,11 +14,11 @@ public class GermplasmAttributeRequestDto {
 
 	private Integer locationId;
 
-	public GermplasmAttributeRequestDto() {
+	public AttributeRequestDto() {
 
 	}
 
-	public GermplasmAttributeRequestDto(final Integer variableId, final String value, final String date,
+	public AttributeRequestDto(final Integer variableId, final String value, final String date,
 		final Integer locationId) {
 		this.variableId = variableId;
 		this.value = value;

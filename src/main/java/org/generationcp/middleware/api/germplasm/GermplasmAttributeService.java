@@ -2,7 +2,7 @@ package org.generationcp.middleware.api.germplasm;
 
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
+import org.generationcp.middleware.domain.germplasm.AttributeRequestDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.springframework.data.domain.Pageable;
 
@@ -13,9 +13,9 @@ public interface GermplasmAttributeService {
 
 	List<GermplasmAttributeDto> getGermplasmAttributeDtos(Integer gid, Integer variableTypeId, String programUUID);
 
-	Integer createGermplasmAttribute(Integer gid, GermplasmAttributeRequestDto dto);
+	Integer createGermplasmAttribute(Integer gid, AttributeRequestDto dto);
 
-	void updateGermplasmAttribute(Integer attributeId, GermplasmAttributeRequestDto dto);
+	void updateGermplasmAttribute(Integer attributeId, AttributeRequestDto dto);
 
 	void deleteGermplasmAttribute(Integer attributeId);
 

@@ -21,6 +21,8 @@ import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.pojos.GenericAttribute;
+import org.generationcp.middleware.pojos.ims.LotAttribute;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -42,7 +44,7 @@ import java.util.stream.Collectors;
 /**
  * DAO class for {@link Attribute}.
  */
-public class AttributeDAO extends GenericDAO<Attribute, Integer> {
+public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 
 	private static final String COUNT_ATTRIBUTE_WITH_VARIABLES =
 		"SELECT COUNT(A.ATYPE) FROM ATRIBUTS A INNER JOIN GERMPLSM G ON G.GID = A.GID AND G.DELETED = 0 AND g.grplce = 0 WHERE A.ATYPE IN (:variableIds)";
@@ -539,5 +541,12 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		if (!CollectionUtils.isEmpty(requestDTO.getTraitClasses())) {
 			sqlQuery.setParameterList("traitClasses", requestDTO.getTraitClasses());
 		}
+	}
+
+	@Override
+	protected Attribute getNewAttributeInstance(Integer id) {
+		Attribute newAttribute = new Attribute();
+		newAttribute.setGermplasmId(id);
+		return newAttribute;
 	}
 }
