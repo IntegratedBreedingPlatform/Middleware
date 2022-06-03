@@ -57,7 +57,7 @@ public class LocationDTO extends LocationRequestDto {
 	}
 
 	public String getLocationTypeName() {
-		return locationTypeName;
+		return this.locationTypeName;
 	}
 
 	public void setLocationTypeName(final String locationTypeName) {
@@ -65,7 +65,7 @@ public class LocationDTO extends LocationRequestDto {
 	}
 
 	public String getCountryName() {
-		return countryName;
+		return this.countryName;
 	}
 
 	public void setCountryName(final String countryName) {
@@ -73,7 +73,7 @@ public class LocationDTO extends LocationRequestDto {
 	}
 
 	public String getCountryCode() {
-		return countryCode;
+		return this.countryCode;
 	}
 
 	public void setCountryCode(final String countryCode) {
@@ -81,7 +81,7 @@ public class LocationDTO extends LocationRequestDto {
 	}
 
 	public String getProvinceName() {
-		return provinceName;
+		return this.provinceName;
 	}
 
 	public void setProvinceName(final String provinceName) {
@@ -89,7 +89,7 @@ public class LocationDTO extends LocationRequestDto {
 	}
 
 	public List<ProgramFavoriteDTO> getProgramFavorites() {
-		return programFavorites;
+		return this.programFavorites;
 	}
 
 	public void setProgramFavorites(final List<ProgramFavoriteDTO> programFavorites) {

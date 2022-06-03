@@ -13,7 +13,6 @@ package org.generationcp.middleware.pojos;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.Basic;
 import javax.persistence.CascadeType;

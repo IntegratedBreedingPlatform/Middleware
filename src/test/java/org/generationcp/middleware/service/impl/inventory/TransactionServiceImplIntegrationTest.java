@@ -14,10 +14,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
-import org.generationcp.middleware.pojos.LocationType;
-import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.ims.EntityType;
@@ -33,7 +30,6 @@ import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -46,6 +42,7 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 
 public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
+	private static final Integer DEFAULT_SEED_STORE_ID = 6000;
 
 	private TransactionServiceImpl transactionService;
 
@@ -59,12 +56,8 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private String unitName;
 
-	private Integer storageLocationId;
 
 	public static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
-
-	@Autowired
-	private LocationDataManager locationDataManager;
 
 	@Before
 	public void setUp() {
@@ -73,8 +66,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		this.transactionService.setLotService(this.lotService);
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.createGermplasmStudySource();
-		userId = findAdminUser();
-		this.resolveStorageLocation();
+		this.userId = this.findAdminUser();
 		this.createLot();
 		this.createTransactions();
 		this.resolveUnitName();
@@ -83,40 +75,40 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test(expected = MiddlewareRequestException.class)
 	public void testUpdatePendingTransactions_WithdrawalInvalidAvailableBalance() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
-			new TransactionUpdateRequestDto(pendingWithdrawalId, null, 30D, null);
+			new TransactionUpdateRequestDto(this.pendingWithdrawalId, null, 30D, null);
 		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
 	public void testUpdatePendingTransactions_DepositInvalidAvailableBalance() {
-		final TransactionUpdateRequestDto transactionUpdateRequestDto = new TransactionUpdateRequestDto(pendingDepositId, null, 2D, null);
+		final TransactionUpdateRequestDto transactionUpdateRequestDto = new TransactionUpdateRequestDto(this.pendingDepositId, null, 2D, null);
 		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
 	public void testUpdatePendingTransactions_WithdrawalInvalidAmount() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
-			new TransactionUpdateRequestDto(pendingWithdrawalId, 22D, null, null);
+			new TransactionUpdateRequestDto(this.pendingWithdrawalId, 22D, null, null);
 		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
 	}
 
 	@Test
 	public void testUpdatePendingTransactions_WithdrawalNewAmount_Ok() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
-			new TransactionUpdateRequestDto(pendingWithdrawalId, 20D, null, null);
+			new TransactionUpdateRequestDto(this.pendingWithdrawalId, 20D, null, null);
 		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
-		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingWithdrawalId);
+		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(this.pendingWithdrawalId);
 		Assert.assertTrue(transaction.getQuantity().equals(-20D));
 	}
 
 	@Test
 	public void testUpdatePendingTransactions_WithdrawalNewBalance_Ok() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
-			new TransactionUpdateRequestDto(pendingWithdrawalId, null, 0D, null);
+			new TransactionUpdateRequestDto(this.pendingWithdrawalId, null, 0D, null);
 		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
-		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingWithdrawalId);
+		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(this.pendingWithdrawalId);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+		lotsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
 		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, null).get(0);
 		Assert.assertTrue(transaction.getQuantity().equals(-20D));
 		Assert.assertTrue(lotDto.getAvailableBalance().equals(0D));
@@ -125,11 +117,11 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testUpdatePendingTransactions_DepositNewBalance_Ok() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
-			new TransactionUpdateRequestDto(pendingDepositId, null, 20D, null);
+			new TransactionUpdateRequestDto(this.pendingDepositId, null, 20D, null);
 		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
-		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingDepositId);
+		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(this.pendingDepositId);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+		lotsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
 		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, null).get(0);
 		Assert.assertTrue(transaction.getQuantity().equals(2D));
 		Assert.assertTrue(lotDto.getAvailableBalance().equals(18D));
@@ -138,11 +130,11 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testUpdatePendingTransactions_DepositNewAmount_Ok() {
 		final TransactionUpdateRequestDto transactionUpdateRequestDto =
-			new TransactionUpdateRequestDto(pendingDepositId, 5D, null, null);
+			new TransactionUpdateRequestDto(this.pendingDepositId, 5D, null, null);
 		this.transactionService.updatePendingTransactions(Collections.singletonList(transactionUpdateRequestDto));
-		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(pendingDepositId);
+		final Transaction transaction = this.daoFactory.getTransactionDAO().getById(this.pendingDepositId);
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+		lotsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
 		final ExtendedLotDto lotDto = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, null).get(0);
 		Assert.assertTrue(transaction.getQuantity().equals(5D));
 		Assert.assertTrue(lotDto.getAvailableBalance().equals(18D));
@@ -152,11 +144,11 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testDepositLots_Ok() {
 		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
 		final Map<String, Double> instructions = new HashMap<>();
-		instructions.put(unitName, 20D);
+		instructions.put(this.unitName, 20D);
 		lotDepositRequestDto.setDepositsPerUnit(instructions);
 
-		final List<Integer> lotIds = Collections.singletonList(lot.getId());
-		this.transactionService.depositLots(userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED, null, null);
+		final List<Integer> lotIds = Collections.singletonList(this.lot.getId());
+		this.transactionService.depositLots(this.userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED, null, null);
 
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(lotIds);
@@ -170,7 +162,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testDepositLots_WithSourceStudy_Ok() {
 		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
 		final Map<String, Double> instructions = new HashMap<>();
-		instructions.put(unitName, 20D);
+		instructions.put(this.unitName, 20D);
 		lotDepositRequestDto.setDepositsPerUnit(instructions);
 		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
 		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY_SOURCE);
@@ -178,8 +170,8 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<SearchOriginCompositeDto, Integer>();
 		searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
 		lotDepositRequestDto.setSearchComposite(searchCompositeDto);
-		final List<Integer> lotIds = Collections.singletonList(lot.getId());
-		this.transactionService.depositLots(userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED, null, null);
+		final List<Integer> lotIds = Collections.singletonList(this.lot.getId());
+		this.transactionService.depositLots(this.userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED, null, null);
 
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(lotIds);
@@ -197,7 +189,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	public void testDepositLots_With_study_source_as_search_origin_Ok() {
 		final LotDepositRequestDto lotDepositRequestDto = new LotDepositRequestDto();
 		final Map<String, Double> instructions = new HashMap<>();
-		instructions.put(unitName, 20D);
+		instructions.put(this.unitName, 20D);
 		lotDepositRequestDto.setDepositsPerUnit(instructions);
 		final SearchOriginCompositeDto searchOriginCompositeDto = new SearchOriginCompositeDto();
 		searchOriginCompositeDto.setSearchOrigin(SearchOriginCompositeDto.SearchOrigin.MANAGE_STUDY_SOURCE);
@@ -205,9 +197,10 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 		final SearchCompositeDto searchCompositeDto = new SearchCompositeDto<SearchOriginCompositeDto, Integer>();
 		searchCompositeDto.setSearchRequest(searchOriginCompositeDto);
 		lotDepositRequestDto.setSearchComposite(searchCompositeDto);
-		final List<Integer> lotIds = Collections.singletonList(lot.getId());
-		this.transactionService.depositLots(userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED,
-			TransactionSourceType.SPLIT_LOT, lot.getId());
+		final List<Integer> lotIds = Collections.singletonList(this.lot.getId());
+		this.transactionService.depositLots(
+			this.userId, new HashSet<>(lotIds), lotDepositRequestDto, TransactionStatus.CONFIRMED,
+			TransactionSourceType.SPLIT_LOT, this.lot.getId());
 
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(lotIds);
@@ -226,14 +219,14 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test(expected = MiddlewareRequestException.class)
 	public void testSaveAdjustmentTransactions_InvalidNewBalance() {
-		this.transactionService.saveAdjustmentTransactions(userId, Collections.singleton(lot.getId()), 1D, "");
+		this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singleton(this.lot.getId()), 1D, "");
 	}
 
 	@Test
 	public void testSaveAdjustmentTransactions_OK() {
-		this.transactionService.saveAdjustmentTransactions(userId, Collections.singleton(lot.getId()), 3D, "");
+		this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singleton(this.lot.getId()), 3D, "");
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+		lotsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
 		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
 		Assert.assertTrue(extendedLotDto.getActualBalance().equals(3D));
@@ -241,14 +234,14 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testSaveAdjustmentTransactions_NoTransactionSaved() {
-		this.transactionService.saveAdjustmentTransactions(userId, Collections.singleton(lot.getId()), 20D, "");
+		this.transactionService.saveAdjustmentTransactions(this.userId, Collections.singleton(this.lot.getId()), 20D, "");
 
 		final TransactionsSearchDto transactionsSearchDto = new TransactionsSearchDto();
-		transactionsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+		transactionsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
 		final List<TransactionDto> transactionDtos = this.transactionService.searchTransactions(transactionsSearchDto, null);
 
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Collections.singletonList(lot.getId()));
+		lotsSearchDto.setLotIds(Collections.singletonList(this.lot.getId()));
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(lotsSearchDto, null);
 		final ExtendedLotDto extendedLotDto = extendedLotDtos.get(0);
 		Assert.assertTrue(extendedLotDto.getActualBalance().equals(20D));
@@ -257,24 +250,24 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void createLot() {
-		lot = new Lot(null, userId, EntityType.GERMPLSM.name(), gid, storageLocationId, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
+		this.lot = new Lot(null, this.userId, EntityType.GERMPLSM.name(), this.gid, DEFAULT_SEED_STORE_ID, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
 			"Lot", RandomStringUtils.randomAlphabetic(35));
-		this.daoFactory.getLotDao().save(lot);
+		this.daoFactory.getLotDao().save(this.lot);
 	}
 
 	private void createTransactions() {
 
 		final Transaction confirmedDeposit =
-			new Transaction(null, userId, lot, Util.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
-				20D, "Transaction 1", Util.getCurrentDateAsIntegerValue(), null, null, null, userId, TransactionType.DEPOSIT.getId());
+			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.CONFIRMED.getIntValue(),
+				20D, "Transaction 1", Util.getCurrentDateAsIntegerValue(), null, null, null, this.userId, TransactionType.DEPOSIT.getId());
 
 		final Transaction pendingDeposit =
-			new Transaction(null, userId, lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
-				20D, "Transaction 2", 0, null, null, null, userId, TransactionType.DEPOSIT.getId());
+			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
+				20D, "Transaction 2", 0, null, null, null, this.userId, TransactionType.DEPOSIT.getId());
 
 		final Transaction pendingWithdrawal =
-			new Transaction(null, userId, lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
-				-2D, "Transaction 3", 0, null, null, null, userId, TransactionType.WITHDRAWAL.getId());
+			new Transaction(null, this.userId, this.lot, Util.getCurrentDate(), TransactionStatus.PENDING.getIntValue(),
+				-2D, "Transaction 3", 0, null, null, null, this.userId, TransactionType.WITHDRAWAL.getId());
 
 		this.daoFactory.getTransactionDAO().save(confirmedDeposit);
 		this.daoFactory.getTransactionDAO().save(pendingDeposit);
@@ -303,11 +296,7 @@ public class TransactionServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void resolveUnitName() {
-		unitName = this.daoFactory.getCvTermDao().getById(UNIT_ID).getName();
-	}
-
-	private void resolveStorageLocation() {
-		storageLocationId = 6000;
+		this.unitName = this.daoFactory.getCvTermDao().getById(UNIT_ID).getName();
 	}
 
 	private void assertTransaction(final Transaction actualTransaction, final TransactionType type, final TransactionStatus status,

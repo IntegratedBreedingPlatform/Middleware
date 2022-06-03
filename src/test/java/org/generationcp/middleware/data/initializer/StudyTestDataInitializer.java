@@ -217,7 +217,7 @@ public class StudyTestDataInitializer {
 	}
 
 	public DmsProject createFolderTestData(final String uniqueId) {
-		return createFolderTestData(uniqueId, null);
+		return this.createFolderTestData(uniqueId, null);
 	}
 
 	public DmsProject createFolderTestData(final String uniqueId, final Integer parentId) {
@@ -302,12 +302,12 @@ public class StudyTestDataInitializer {
 
 		this.geolocationId = geolocation.getLocationId();
 		final ExperimentValues experimentValue = new ExperimentValues();
-		experimentValue.setLocationId(geolocationId);
+		experimentValue.setLocationId(this.geolocationId);
 
 		final ExperimentModelSaver experimentModelSaver = new ExperimentModelSaver(this.sessionProvider);
 		experimentModelSaver.addExperiment(crop, datasetId, ExperimentType.TRIAL_ENVIRONMENT, experimentValue);
 
-		return geolocationId;
+		return this.geolocationId;
 	}
 
 	private DMSVariableType createVariableType(final int termId, final String name, final String description, final int rank)

@@ -7,7 +7,6 @@ import org.generationcp.middleware.dao.util.DAOQueryUtils;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.util.SQLQueryBuilder;
-import org.hibernate.type.BooleanType;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
@@ -28,7 +27,7 @@ public class LocationSearchDAOQuery {
     TYPE(LOCATION_TYPE_NAME_ALIAS),
     FAVORITE_PROGRAM_UUID(FAVORITE_PROGRAM_UUID_ALIAS);
 
-    private String value;
+    private final String value;
 
     SortColumn(final String value) {
       this.value = value;
@@ -171,7 +170,7 @@ public class LocationSearchDAOQuery {
     return joinBuilder.toString();
   }
 
-  private static String getProgramFavoriteJoinQuery(String programUUID) {
+  private static String getProgramFavoriteJoinQuery(final String programUUID) {
     return String.format(PROGRAM_FAVORITE_JOIN_QUERY, programUUID);
   }
 
