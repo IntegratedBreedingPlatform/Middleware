@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableSet;
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
+import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Country;
@@ -14,12 +15,14 @@ import org.generationcp.middleware.pojos.ProgramLocationDefault;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -27,6 +30,9 @@ import java.util.stream.Collectors;
 @Transactional
 @Service
 public class LocationServiceImpl implements LocationService {
+
+	@Autowired
+	private ProgramFavoriteService programFavoriteService;
 
 	private final DaoFactory daoFactory;
 
@@ -207,6 +213,10 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public ProgramLocationDefault saveProgramLocationDefault(final String programUUID, final Integer breedingLocationId,
 		final Integer storageLocationId) {
+		//Save location defaults as program favorites
+		final Set<Integer> favoriteLocations = new HashSet<>(Arrays.asList(breedingLocationId, storageLocationId));
+		this.programFavoriteService.addProgramFavorites(programUUID, ProgramFavorite.FavoriteType.LOCATION, favoriteLocations);
+
 		return this.daoFactory.getProgramLocationDefaultDAO()
 			.save(new ProgramLocationDefault(programUUID, breedingLocationId, storageLocationId));
 	}
@@ -214,12 +224,29 @@ public class LocationServiceImpl implements LocationService {
 	@Override
 	public void updateProgramLocationDefault(final String programUUID, final ProgramBasicDetailsDto programBasicDetailsDto) {
 		final ProgramLocationDefault programLocationDefault = this.daoFactory.getProgramLocationDefaultDAO().getByProgramUUID(programUUID);
+		final Set<Integer> defaultLocations = new HashSet<>();
 		if(programBasicDetailsDto.getBreedingLocationDefaultId() != null) {
+			defaultLocations.add(programBasicDetailsDto.getBreedingLocationDefaultId());
 			programLocationDefault.setBreedingLocationId(programBasicDetailsDto.getBreedingLocationDefaultId());
 		}
 		if(programBasicDetailsDto.getStorageLocationDefaultId() != null) {
+			defaultLocations.add(programBasicDetailsDto.getStorageLocationDefaultId());
 			programLocationDefault.setStorageLocationId(programBasicDetailsDto.getStorageLocationDefaultId());
 		}
+		final List<ProgramFavorite> programFavorites =
+			this.programFavoriteService.getProgramFavorites(programUUID, ProgramFavorite.FavoriteType.LOCATION, defaultLocations);
+		final List<Integer> programFavoriteLocationIds = programFavorites.stream().map(ProgramFavorite::getEntityId).collect(Collectors.toList());
+
+		final Set<Integer> favoriteLocations = new HashSet<>();
+		for(final Integer defaultLocation: defaultLocations) {
+			// Check if the location to be set as default is not yet a program favorite
+			if(!programFavoriteLocationIds.contains(defaultLocation)) {
+				favoriteLocations.add(defaultLocation);
+			}
+		}
+
+		//Save location defaults as program favorites
+		this.programFavoriteService.addProgramFavorites(programUUID, ProgramFavorite.FavoriteType.LOCATION, favoriteLocations);
 		this.daoFactory.getProgramLocationDefaultDAO().update(programLocationDefault);
 	}
 
