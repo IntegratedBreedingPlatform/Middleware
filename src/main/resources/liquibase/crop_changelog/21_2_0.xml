@@ -34,13 +34,13 @@
 	<changeSet author="mderamos" id="v22.1.0-3">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
-				SELECT COUNT(*) FROM location WHERE locid = 6000 AND ltype = 1500;
+				SELECT COUNT(*) FROM location WHERE labbr = 'DSS';
 			</sqlCheck>
 		</preConditions>
-		<comment>ADD location ID 6000 AND SET AS DEFAULT storage location</comment>
+		<comment>ADD Default Seed Store location </comment>
 		<sql dbms="mysql">
-			INSERT INTO location (`locid`, `ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`, `program_uuid`) VALUES
-			(6000,1500,0,'Default Seed Store','DSS',0,0,0,0,0,0,NULL);
+			INSERT INTO location (`ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`) VALUES
+			(1500,0,'Default Seed Store','DSS',0,0,0,0,0,0);
 		</sql>
 	</changeSet>
 
@@ -62,8 +62,10 @@
 			Populate program_location_default.storage_location_id for existing programs, set DSS(id=6000) as default
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
+			set @dss_location_id = (select locid from location where labbr = 'DSS');
+
 			UPDATE program_location_default
-			set storage_location_id = 6000;
+			set storage_location_id = @dss_location_id;
 		</sql>
 	</changeSet>
 
