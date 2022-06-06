@@ -55,6 +55,10 @@ public class ProgramFavorite {
 		return this.programFavoriteId;
 	}
 
+	public void setProgramFavoriteId(final Integer programFavoriteId) {
+		this.programFavoriteId = programFavoriteId;
+	}
+
 	public FavoriteType getEntityType() {
 		return this.entityType;
 	}
