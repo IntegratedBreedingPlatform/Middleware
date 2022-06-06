@@ -211,12 +211,12 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetBreedingLocationDefault() {
+	public void testGetDefaultBreedingLocation() {
 		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
 			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
-		final LocationDTO defaultBreedingLocation = this.locationService.getBreedingLocationDefault(programLocationDefault.getProgramUUID());
+		final LocationDTO defaultBreedingLocation = this.locationService.getDefaultBreedingLocation(programLocationDefault.getProgramUUID());
 		Assert.assertNotNull(defaultBreedingLocation);
 		Assert.assertThat("Expected same Location id", breedingLocationDTO.getId(), equalTo(defaultBreedingLocation.getId()));
 		Assert.assertThat("Expected same Location name", breedingLocationDTO.getName(), equalTo(defaultBreedingLocation.getName()));
@@ -231,12 +231,12 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStorageLocationDefault() {
+	public void testGetDefaultStorageLocation() {
 		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
 			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
-		final LocationDTO defaultStorageLocation = this.locationService.getStorageLocationDefault(programLocationDefault.getProgramUUID());
+		final LocationDTO defaultStorageLocation = this.locationService.getDefaultStorageLocation(programLocationDefault.getProgramUUID());
 		Assert.assertNotNull(defaultStorageLocation);
 		Assert.assertThat("Expected same Location id", storageLocationDTO.getId(), equalTo(defaultStorageLocation.getId()));
 		Assert.assertThat("Expected same Location name", storageLocationDTO.getName(), equalTo(defaultStorageLocation.getName()));
