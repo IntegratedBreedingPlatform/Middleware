@@ -26,6 +26,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 
 import java.util.HashSet;
+import java.util.Map;
 
 public class StockSaver extends Saver {
 
@@ -36,9 +37,13 @@ public class StockSaver extends Saver {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
-	public Integer saveStock(final int studyId, final VariableList variableList) {
+	public Integer saveStock(final int studyId, final VariableList variableList, final Map<Integer, String> preferredNamesByGIDs,
+		final Map<Integer, String> pedigreeByGids) {
 		final StockModel stockModel = this.createStock(variableList, null);
 		if (stockModel != null) {
+			final Integer gid = stockModel.getGermplasm().getGid();
+			stockModel.setName(preferredNamesByGIDs.get(gid));
+			stockModel.setCross(pedigreeByGids.get(gid));
 			stockModel.setProject(new DmsProject(studyId));
 			this.daoFactory.getStockDao().save(stockModel);
 			return stockModel.getStockId();
@@ -76,10 +81,6 @@ public class StockSaver extends Saver {
 						}
 					}
 					stockModel.setGermplasm(new Germplasm(dbxref));
-
-				} else if (TermId.DESIG.getId() == variableId) {
-					stockModel = this.getStockObject(stockModel);
-					stockModel.setName(value);
 
 				} else if (TermId.ENTRY_CODE.getId() == variableId) {
 					stockModel = this.getStockObject(stockModel);

@@ -36,7 +36,9 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 
 /*
@@ -354,12 +356,20 @@ public class StudyTestDataInitializer {
 			stockModel.setGermplasm(new Germplasm(gid));
 			stockModel.setProject(new DmsProject(studyId));
 
+			final String designation = StudyTestDataInitializer.GERMPLASM_PREFIX + gid;
 			final VariableList variableList =
-				this.createGermplasm(String.valueOf(entryNumber), gid.toString(), StudyTestDataInitializer.GERMPLASM_PREFIX + gid,
+				this.createGermplasm(String.valueOf(entryNumber), gid.toString(), designation,
 					RandomStringUtils.randomAlphanumeric(5), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
 					RandomStringUtils.randomAlphanumeric(5));
+
+			final Map<Integer, String> preferredNamesByGIDs = new HashMap<>();
+			preferredNamesByGIDs.put(gid, designation);
+
+			final Map<Integer, String> pedigreeByGids = new HashMap<>();
+			pedigreeByGids.put(gid, designation);
+
 			final StockSaver stockSaver = new StockSaver(this.sessionProvider);
-			final int entryId = stockSaver.saveStock(studyId, variableList);
+			final int entryId = stockSaver.saveStock(studyId, variableList, preferredNamesByGIDs, pedigreeByGids);
 			entryIds.add(entryId);
 			entryNumber++;
 		}

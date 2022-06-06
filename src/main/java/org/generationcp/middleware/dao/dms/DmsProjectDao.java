@@ -376,7 +376,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			"SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
 			.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
 			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, p.created_by as createdBy, p.locked as isLocked, ")
-			.append("p.generation_level as generationLevel")
+			.append("p.generation_level as generationLevel ")
 			.append("FROM project p ")
 			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 			.append("                   AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")

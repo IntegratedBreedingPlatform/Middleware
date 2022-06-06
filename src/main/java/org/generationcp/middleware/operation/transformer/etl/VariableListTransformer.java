@@ -53,8 +53,8 @@ public class VariableListTransformer extends Transformer {
 		return variableList;
 	}
 
-	public VariableList transformStockOptimize(final List<Integer> variableIndexesList, final MeasurementRow mRow,
-			final VariableTypeList variableTypeList, final List<String> trialHeaders) throws MiddlewareQueryException {
+	public VariableList transformStockOptimize(final MeasurementRow mRow,
+		final VariableTypeList variableTypeList, final List<String> trialHeaders) throws MiddlewareQueryException {
 		final VariableList variableList = new VariableList();
 
 		if (mRow == null) {
