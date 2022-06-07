@@ -21,15 +21,12 @@ import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.GenericAttribute;
-import org.generationcp.middleware.pojos.ims.LotAttribute;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
-import org.hibernate.type.BooleanType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.springframework.data.domain.Pageable;
@@ -220,21 +217,13 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 				queryString.append("AND cp.value = (select name from cvterm where cvterm_id = :variableTypeId) ");
 			}
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
-			sqlQuery.addScalar("id");
-			sqlQuery.addScalar("variableId");
-			sqlQuery.addScalar("value");
-			sqlQuery.addScalar("variableName");
-			sqlQuery.addScalar("variableTypeName");
-			sqlQuery.addScalar("variableDescription");
-			sqlQuery.addScalar("date");
-			sqlQuery.addScalar("locationId");
-			sqlQuery.addScalar("locationName");
-			sqlQuery.addScalar("hasFiles", new BooleanType());
+			this.addQueryScalars(sqlQuery);
 			sqlQuery.setParameter("gid", gid);
 			if (variableTypeId != null) {
 				sqlQuery.setParameter("variableTypeId", variableTypeId);
 			}
 
+			sqlQuery.setParameter("programUUID", programUUID);
 			sqlQuery.setParameter("programUUID", programUUID);
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmAttributeDto.class));
 			return sqlQuery.list();
@@ -544,8 +533,8 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 	}
 
 	@Override
-	protected Attribute getNewAttributeInstance(Integer id) {
-		Attribute newAttribute = new Attribute();
+	protected Attribute getNewAttributeInstance(final Integer id) {
+		final Attribute newAttribute = new Attribute();
 		newAttribute.setGermplasmId(id);
 		return newAttribute;
 	}
