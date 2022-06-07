@@ -82,20 +82,18 @@ public class StockSaver extends Saver {
 					}
 					stockModel.setGermplasm(new Germplasm(dbxref));
 
-				} else if (TermId.ENTRY_CODE.getId() == variableId) {
-					stockModel = this.getStockObject(stockModel);
-					// TODO: add entry_code as property
-//					stockModel.setValue(value);
-
 				} else if (TermId.OBS_UNIT_ID.getId() == variableId) {
 					continue;
 
-				} else if (PhenotypicType.GERMPLASM == role) {
+				} else if (TermId.ENTRY_TYPE.getId() == variableId) {
 					stockModel = this.getStockObject(stockModel);
 					final StockProperty stockProperty = this.getStockProperty(stockModel, variable);
 					if (stockProperty == null && variable.getValue() != null && !variable.getValue().isEmpty()) {
 						this.addProperty(stockModel, this.createProperty(variable));
 					}
+				} else if (PhenotypicType.ENTRY_DETAIL == role) {
+					continue;
+
 				} else {
 					throw new MiddlewareQueryException("Non-Stock Variable was used in calling create stock: "
 							+ variable.getVariableType().getId());
@@ -110,7 +108,17 @@ public class StockSaver extends Saver {
 		if (stockModel != null && stockModel.getProperties() != null && !stockModel.getProperties().isEmpty()) {
 			for (final StockProperty property : stockModel.getProperties()) {
 				if (property.getTypeId().equals(Integer.valueOf(variable.getVariableType().getId()))) {
-					property.setValue(variable.getValue());
+					final String value;
+					final Integer categoricalValueId;
+					if (variable.getVariableType().getStandardVariable().getDataType().getName().equals(DataType.CATEGORICAL_VARIABLE.getName())) {
+						value = variable.getActualValue();
+						categoricalValueId = Integer.valueOf(variable.getValue());
+					} else {
+						value = variable.getValue();
+						categoricalValueId = null;
+					}
+					property.setValue(value);
+					property.setCategoricalValueId(categoricalValueId);
 					return property;
 				}
 			}
@@ -122,8 +130,6 @@ public class StockSaver extends Saver {
 		if (stockModel == null) {
 			stockModel = new StockModel();
 			stockModel.setIsObsolete(false);
-			// TODO: should set entry code as property?
-//			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		}
 		return stockModel;
 	}
@@ -140,7 +146,7 @@ public class StockSaver extends Saver {
 		final String value;
 		final Integer categoricalValueId;
 		if (variable.getVariableType().getStandardVariable().getDataType().getName().equals(DataType.CATEGORICAL_VARIABLE.getName())) {
-			value = null;
+			value = variable.getActualValue();
 			categoricalValueId = Integer.valueOf(variable.getValue());
 		} else {
 			value = variable.getValue();

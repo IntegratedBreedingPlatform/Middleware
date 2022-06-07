@@ -154,6 +154,8 @@ public class WorkbookSaver extends Saver {
 			this.getVariableTypeListTransformer().transform(workbook.getNonTrialFactors(), programUUID);
 		effectVariables
 			.addAll(this.getVariableTypeListTransformer().transform(workbook.getVariates(), effectVariables.size() + 1, programUUID));
+		effectVariables
+			.addAll(this.getVariableTypeListTransformer().transform(workbook.getEntryDetails(), effectVariables.size() + 1, programUUID));
 
 		// -- headers
 		headerMap.put(WorkbookSaver.TRIALHEADERS, trialHeaders);
@@ -287,6 +289,7 @@ public class WorkbookSaver extends Saver {
 			workbook.setFactors(null);
 			workbook.setStudyDetails(null);
 			workbook.setVariates(null);
+			workbook.setEntryDetails(null);
 		} else {
 			workbook.getStudyDetails().setId(studyId);
 			workbook.setTrialDatasetId(environmentDatasetId);

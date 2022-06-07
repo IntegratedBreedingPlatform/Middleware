@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.domain.etl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -112,7 +113,6 @@ public class Workbook {
 		this.studyConstants = null;
 		this.trialConditions = null;
 		this.trialConstants = null;
-		this.entryDetails = null;
 		this.treatmentFactors = null;
 		this.hasExistingDataOverwrite = false;
 		this.hasOutOfBoundsData = false;
@@ -178,6 +178,10 @@ public class Workbook {
 			this.measurementDatasetVariables.addAll(this.getNonTrialFactors());
 			if (this.variates != null && !this.variates.isEmpty()) {
 				this.measurementDatasetVariables.addAll(this.variates);
+			}
+
+			if (!CollectionUtils.isEmpty(this.entryDetails)) {
+				this.measurementDatasetVariables.addAll(this.entryDetails);
 			}
 		}
 		this.measurementDatasetVariables = this.arrangeMeasurementVariables(this.measurementDatasetVariables);
@@ -462,7 +466,9 @@ public class Workbook {
 		if (this.variates != null) {
 			variableList.addAll(this.variates);
 		}
-
+		if (this.entryDetails != null) {
+			variableList.addAll(this.entryDetails);
+		}
 		return variableList;
 	}
 
