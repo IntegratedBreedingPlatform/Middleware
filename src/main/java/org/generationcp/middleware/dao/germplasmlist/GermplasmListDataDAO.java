@@ -298,10 +298,8 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		try {
 			final Query query =
 				this.getSession().createQuery(
-					"UPDATE GermplasmListData listData SET listData.gid = :replaceWithGid, listData.designation = :designation, listData.groupName = :groupName WHERE listData.gid in (:gidsToReplace)");
+					"UPDATE GermplasmListData listData SET listData.gid = :replaceWithGid, listData.groupName = :groupName WHERE listData.gid in (:gidsToReplace)");
 			query.setParameter("replaceWithGid", germplasm.getGid());
-			query.setParameter("designation",
-				germplasm.getPreferredName() != null ? germplasm.getPreferredName().getNval() : StringUtils.EMPTY);
 			query.setParameter("groupName", crossExpansion);
 			query.setParameterList("gidsToReplace", gidsToReplace);
 			query.executeUpdate();
