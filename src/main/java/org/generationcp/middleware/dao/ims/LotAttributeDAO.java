@@ -20,7 +20,7 @@ public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 	private static final String GET_LOT_ATTRIBUTES = "Select a.aid AS id, "
 		+ "cv.cvterm_id as variableId, "
 		+ "a.aval AS value, "
-		+ "cv.name AS variableName, "
+		+ "IFNULL(vpo.alias, cv.name) AS variableName, "
 		+ "cp.value AS variableTypeName, "
 		+ "cv.definition AS variableDescription, "
 		+ "CAST(a.adate AS CHAR(255)) AS date, "
@@ -31,14 +31,15 @@ public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 		+ "INNER JOIN cvterm cv ON a.atype = cv.cvterm_id "
 		+ "INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id "
 		+ "LEFT JOIN location l on a.alocn = l.locid "
-		//+ "LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = cv.cvterm_id AND vpo.program_uuid = :programUUID "
+		+ "LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = cv.cvterm_id AND vpo.program_uuid = :programUUID "
 		+ "WHERE a.lotId = :lotId ";
 
-	public List<GermplasmAttributeDto> getLotAttributeDtos(final Integer lotId) {
+	public List<GermplasmAttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
 		try {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(GET_LOT_ATTRIBUTES);
 			this.addQueryScalars(sqlQuery);
 			sqlQuery.setParameter("lotId", lotId);
+			sqlQuery.setParameter("programUUID", programUUID);
 
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmAttributeDto.class));
 			return sqlQuery.list();

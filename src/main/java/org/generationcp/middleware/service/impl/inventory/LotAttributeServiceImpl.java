@@ -25,8 +25,8 @@ public class LotAttributeServiceImpl implements LotAttributeService {
 	}
 
 	@Override
-	public List<GermplasmAttributeDto> getLotAttributeDtos(final Integer lotId) {
-		return this.daoFactory.getLotAttributeDAO().getLotAttributeDtos(lotId);
+	public List<GermplasmAttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
+		return this.daoFactory.getLotAttributeDAO().getLotAttributeDtos(lotId, programUUID);
 	}
 
 	@Override

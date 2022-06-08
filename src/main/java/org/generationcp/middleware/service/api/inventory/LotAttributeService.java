@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface LotAttributeService {
 
-	List<GermplasmAttributeDto> getLotAttributeDtos(Integer lotId);
+	List<GermplasmAttributeDto> getLotAttributeDtos(Integer lotId, String programUUID);
 
 	Integer createLotAttribute(Integer gid, AttributeRequestDto dto);
 
