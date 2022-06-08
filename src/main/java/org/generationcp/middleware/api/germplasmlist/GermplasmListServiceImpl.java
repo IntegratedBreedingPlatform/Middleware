@@ -99,7 +99,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final List<Integer> gids = request.getEntries()
 			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
-		final Map<Integer, String> preferredNamesMap = this.germplasmDataManager.getPreferredNamesByGids(gids);
 		final Map<Integer, List<Name>> namesByGid = this.daoFactory.getNameDao().getNamesByGids(gids)
 			.stream().collect(groupingBy(n -> n.getGermplasm().getGid()));
 
@@ -120,12 +119,9 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		// save germplasm list data
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			final Integer gid = entry.getGid();
-			final String preferredName = preferredNamesMap.get(gid);
 			final List<Name> names = namesByGid.get(gid);
-			Preconditions.checkArgument(preferredName != null || names != null, "No name found for gid=" + gid);
-			final String designation = preferredName != null ? preferredName : names.get(0).getNval();
 			GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, entry.getEntryNo(),
-				entry.getEntryCode(), entry.getSeedSource(), designation, entry.getGroupName(),
+				entry.getEntryCode(), entry.getSeedSource(), entry.getGroupName(),
 				GermplasmListDataDAO.STATUS_ACTIVE, null);
 			germplasmListData = this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 
@@ -328,7 +324,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				entryNo,
 				String.valueOf(entryNo),
 				plotCodeValuesIndexedByGids.get(model.getGid()),
-				model.getPreferredName(),
 				crossExpansionsBulk.get(model.getGid()),
 				0,
 				0,
