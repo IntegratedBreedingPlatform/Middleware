@@ -382,7 +382,7 @@ public class ManagerFactory implements Serializable {
 		return new GermplasmNameTypeServiceImpl(this.sessionProvider);
 	}
 
-	public GermplasmNameService germplasmNameService() {
+	public GermplasmNameService getGermplasmNameService() {
 		return new GermplasmNameServiceImpl(this.sessionProvider);
 	}
 
