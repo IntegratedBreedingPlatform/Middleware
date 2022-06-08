@@ -55,7 +55,7 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 	}
 
 	@Test
@@ -220,7 +220,7 @@ public class GermplasmListDataDAOTest extends IntegrationTestBase {
 	}
 
 	private GermplasmListData createTestListDataForList(final Germplasm listDataGermplasm,
-		final GermplasmList listDataGermplasmList, int entryNumber) {
+		final GermplasmList listDataGermplasmList, final int entryNumber) {
 		final GermplasmListData listData = GermplasmListDataTestDataInitializer.createGermplasmListData(
 			listDataGermplasmList, listDataGermplasm.getGid(), entryNumber);
 		listData.setFemaleParent(new GermplasmParent(listDataGermplasm.getGpid1(), "", ""));

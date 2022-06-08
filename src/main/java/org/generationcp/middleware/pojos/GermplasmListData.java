@@ -120,7 +120,7 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	 * The other male parents come from progntrs table.
 	 */
 	@Transient
-	private List<GermplasmParent> maleParents = new ArrayList<>();
+	private final List<GermplasmParent> maleParents = new ArrayList<>();
 
 	/**
 	 * The Group ID of the germplasm. It is mapped to germplsm.mgid column in the database.
@@ -235,11 +235,11 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	}
 
 	public void truncateGroupNameIfNeeded() {
-		String groupName = getGroupName();
+		String groupName = this.getGroupName();
 		if (groupName.length() > MAX_CROSS_NAME_SIZE) {
 			groupName = groupName.substring(0, MAX_CROSS_NAME_SIZE - 1);
 			groupName = groupName + CROSS_NAME_TRUNCATED_SUFFIX;
-			setGroupName(groupName);
+			this.setGroupName(groupName);
 		}
 	}
 
@@ -286,18 +286,18 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 	}
 
 	public String getNotes() {
-		return notes;
+		return this.notes;
 	}
 
-	public void setNotes(String notes) {
+	public void setNotes(final String notes) {
 		this.notes = notes;
 	}
 
 	public Integer getCrossingDate() {
-		return crossingDate;
+		return this.crossingDate;
 	}
 
-	public void setCrossingDate(Integer crossingDate) {
+	public void setCrossingDate(final Integer crossingDate) {
 		this.crossingDate = crossingDate;
 	}
 
@@ -468,14 +468,14 @@ public class GermplasmListData implements Serializable, GermplasmExportSource {
 		this.groupId = groupId;
 	}
 	public String getBreedingMethodName() {
-		return breedingMethodName;
+		return this.breedingMethodName;
 	}
 
-	public void setBreedingMethodName(String breedingMethodName) {
+	public void setBreedingMethodName(final String breedingMethodName) {
 		this.breedingMethodName = breedingMethodName;
 	}
 
-	public void setStockIDs(String stockIDs) {
+	public void setStockIDs(final String stockIDs) {
 		this.stockIDs = stockIDs;
 	}
 
