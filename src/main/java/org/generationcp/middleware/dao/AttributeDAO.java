@@ -224,7 +224,6 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 			}
 
 			sqlQuery.setParameter("programUUID", programUUID);
-			sqlQuery.setParameter("programUUID", programUUID);
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmAttributeDto.class));
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
