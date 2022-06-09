@@ -1,6 +1,5 @@
 package org.generationcp.middleware.api.germplasmlist;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
@@ -24,14 +23,12 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.Util;
@@ -57,9 +54,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Transactional
 @Service
@@ -72,9 +67,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	public static final String LIST_NOT_FOUND = "list.not.found";
 
 	private final DaoFactory daoFactory;
-
-	@Autowired
-	private GermplasmDataManager germplasmDataManager;
 
 	@Autowired
 	private GermplasmSearchService germplasmSearchService;
@@ -103,9 +95,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		final List<Integer> gids = request.getEntries()
 			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
-		final Map<Integer, String> preferredNamesMap = this.germplasmDataManager.getPreferredNamesByGids(gids);
-		final Map<Integer, List<Name>> namesByGid = this.daoFactory.getNameDao().getNamesByGids(gids)
-			.stream().collect(groupingBy(n -> n.getGermplasm().getGid()));
 
 		// save list
 		final GermplasmList germplasmList = this.createGermplasmList(request, loggedInUserId);
@@ -129,12 +118,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		// save germplasm list data
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			final Integer gid = entry.getGid();
-			final String preferredName = preferredNamesMap.get(gid);
-			final List<Name> names = namesByGid.get(gid);
-			Preconditions.checkArgument(preferredName != null || names != null, "No name found for gid=" + gid);
-			final String designation = preferredName != null ? preferredName : names.get(0).getNval();
 			GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, entry.getEntryNo(),
-				entry.getSeedSource(), designation, entry.getGroupName(), GermplasmListDataDAO.STATUS_ACTIVE, null);
+				entry.getSeedSource(), entry.getGroupName(), GermplasmListDataDAO.STATUS_ACTIVE, null);
 			germplasmListData = this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 
 			// save entry details
@@ -328,7 +313,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				model.getGid(),
 				entryNo,
 				plotCodeValuesIndexedByGids.get(model.getGid()),
-				model.getPreferredName(),
 				crossExpansionsBulk.get(model.getGid()),
 				0,
 				0,

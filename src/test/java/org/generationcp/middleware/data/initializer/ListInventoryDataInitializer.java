@@ -33,7 +33,6 @@ public class ListInventoryDataInitializer {
 
 		listData.setId(id);
 		listData.setEntryId(id);
-		listData.setDesignation("Germplasm" + id);
 		listData.setGid(id);
 		listData.setInventoryInfo(createInventoryInfo(id));
 		listData.setStatus(0);
