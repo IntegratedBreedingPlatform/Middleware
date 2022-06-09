@@ -31,7 +31,7 @@ public interface StudyEntryService {
 
 	void saveStudyEntries(Integer studyId, List<Integer> gids, final Integer entryTypeId);
 
-	long countStudyGermplasmByEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
+	long countStudyGermplasmByEntryTypeIds(int studyId, List<Integer> systemDefinedEntryTypeIds);
 
 	void replaceStudyEntry(int studyId, int entryId, int gid);
 
