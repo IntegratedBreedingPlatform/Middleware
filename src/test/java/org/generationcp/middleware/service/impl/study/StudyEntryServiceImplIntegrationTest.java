@@ -202,9 +202,8 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 			germplasmList = new GermplasmList(null, RandomStringUtils.randomAlphabetic(10), 20222302L, GermplasmList.LIST_TYPE, this.findAdminUser(), "", null, GermplasmList.Status.LIST.getCode());
 		this.daoFactory.getGermplasmListDAO().save(germplasmList);
 
-		final String designation = RandomStringUtils.randomAlphabetic(10);
 		final GermplasmListData
-			germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "Unknown", designation, "LNAME", 0, null);
+			germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "Unknown", "LNAME", 0, null);
 		this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 
 		this.service.saveStudyEntries(study.getProjectId(), germplasmList.getId());
@@ -426,7 +425,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 	private GermplasmListData addGermplasmListData(final GermplasmList germplasmList, final Integer gid, final Integer entryId) {
 		final String designation = RandomStringUtils.randomAlphabetic(10);
 		final GermplasmListData
-			germplasmListData = new GermplasmListData(null, germplasmList, gid, entryId, "Unknown", designation, "LNAME", 0, null);
+			germplasmListData = new GermplasmListData(null, germplasmList, gid, entryId, "Unknown", "LNAME", 0, null);
 		return this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 	}
 
