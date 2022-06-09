@@ -153,7 +153,6 @@ public class GermplasmListTestDataInitializer {
 		final GermplasmListData listEntry = new GermplasmListData();
 		listEntry.setId(setDefaultId ? listDataId : null);
 		listEntry.setList(germplasmList);
-		listEntry.setDesignation("Designation " + listDataId);
 		listEntry.setEntryCode("EntryCode " + listDataId);
 		listEntry.setEntryId(listDataId);
 		listEntry.setGroupName("GroupName " + listDataId);

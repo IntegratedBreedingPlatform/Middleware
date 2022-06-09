@@ -13,7 +13,6 @@ package org.generationcp.middleware.dao.germplasmlist;
 
 import com.google.common.base.Preconditions;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -72,8 +71,8 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	public static final Integer STATUS_ACTIVE = 0;
 	public static final String SOURCE_UNKNOWN = "Unknown";
 
-	private static final String COPY_LISTDATA_TO_NEW_LIST = "INSERT INTO listdata (listid, gid, entryid, entrycd, source, desig, grpname, lrstatus, llrecid) "
-		+ "      SELECT :destListid, gid, entryid, entrycd, source, desig, grpname, lrstatus, llrecid "
+	private static final String COPY_LISTDATA_TO_NEW_LIST = "INSERT INTO listdata (listid, gid, entryid, entrycd, source, grpname, lrstatus, llrecid) "
+		+ "      SELECT :destListid, gid, entryid, entrycd, source, grpname, lrstatus, llrecid "
 		+ "      FROM listdata "
 		+ "      WHERE listid = :srcListid ";
 
@@ -201,7 +200,7 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 		try {
 
-			final String queryStr = "select  lp.lrecid as lrecid,  lp.entryid as entryid,  lp.desig as desig,  lp.grpname as grpname, "
+			final String queryStr = "select  lp.lrecid as lrecid,  lp.entryid as entryid, lp.grpname as grpname, "
 				+ " if(g.gpid1 = 0, '" + Name.UNKNOWN + "', femaleParentName.nval) as fnval,  g.gpid1 as fpgid,  if(g.gpid2 = 0, '"
 				+ Name.UNKNOWN + "', maleParentName.nval) as mnval,  g.gpid2 as mpgid,  "
 				+ " g.gid as gid,  lp.source as source,  m.mname as mname, "
@@ -220,7 +219,6 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 
 			query.addScalar("lrecid");
 			query.addScalar("entryid");
-			query.addScalar("desig");
 			query.addScalar("grpname");
 			query.addScalar("fnval");
 			query.addScalar("fpgid");
@@ -249,22 +247,20 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		for (final Object[] row : result) {
 			final Integer id = (Integer) row[0];
 			final Integer entryId = (Integer) row[1];
-			final String designation = (String) row[2];
-			final String femaleParent = (String) row[4];
-			final Integer fgid = (Integer) row[5];
-			final String maleParent = (String) row[6];
-			final Integer mgid = (Integer) row[7];
-			final Integer gid = (Integer) row[8];
-			final String seedSource = (String) row[9];
-			final String methodName = (String) row[10];
-			final String malePedigree = (String) row[11];
-			final String femalePedigree = (String) row[12];
+			final String femaleParent = (String) row[3];
+			final Integer fgid = (Integer) row[4];
+			final String maleParent = (String) row[5];
+			final Integer mgid = (Integer) row[6];
+			final Integer gid = (Integer) row[7];
+			final String seedSource = (String) row[8];
+			final String methodName = (String) row[9];
+			final String malePedigree = (String) row[10];
+			final String femalePedigree = (String) row[11];
 
 			final GermplasmListData data = new GermplasmListData();
 			data.setId(id);
 			data.setEntryId(entryId);
 			data.setGid(gid);
-			data.setDesignation(designation);
 			data.setFemaleParent(new GermplasmParent(fgid, femaleParent, femalePedigree));
 			data.setSeedSource(seedSource);
 			data.setBreedingMethodName(methodName);
@@ -301,10 +297,8 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 		try {
 			final Query query =
 				this.getSession().createQuery(
-					"UPDATE GermplasmListData listData SET listData.gid = :replaceWithGid, listData.designation = :designation, listData.groupName = :groupName WHERE listData.gid in (:gidsToReplace)");
+					"UPDATE GermplasmListData listData SET listData.gid = :replaceWithGid, listData.groupName = :groupName WHERE listData.gid in (:gidsToReplace)");
 			query.setParameter("replaceWithGid", germplasm.getGid());
-			query.setParameter("designation",
-				germplasm.getPreferredName() != null ? germplasm.getPreferredName().getNval() : StringUtils.EMPTY);
 			query.setParameter("groupName", crossExpansion);
 			query.setParameterList("gidsToReplace", gidsToReplace);
 			query.executeUpdate();

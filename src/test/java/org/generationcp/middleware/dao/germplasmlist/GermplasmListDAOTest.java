@@ -103,7 +103,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		this.germplasmListDAO = new GermplasmListDAO();
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 
 		this.germplasmListDataDAO = new GermplasmListDataDAO();
 		this.germplasmListDataDAO.setSession(this.sessionProvder.getSession());
@@ -907,7 +907,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	private GermplasmListData createGermplasmListData(final GermplasmList germplasmList, final Germplasm germplasm) {
 		final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "EntryCode",
-			"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
+			"SeedSource", "GroupName", 0, 99995);
 		this.manager.addGermplasmListData(germplasmListData);
 		return germplasmListData;
 	}
