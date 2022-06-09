@@ -192,13 +192,13 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 		}
 	}
 
-	public long countStocksByStudyAndEntryTypeIds(final int studyId, final List<String> systemDefinedEntryTypeIds) {
+	public long countStocksByStudyAndEntryTypeIds(final int studyId, final List<Integer> systemDefinedEntryTypeIds) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(StockModel.class);
 			criteria.createAlias("properties", "properties");
 			criteria.add(Restrictions.eq("project.projectId", studyId));
 			criteria.add(Restrictions.and(Restrictions.eq("properties.typeId", TermId.ENTRY_TYPE.getId()),
-				Restrictions.in("properties.value", systemDefinedEntryTypeIds)));
+				Restrictions.in("properties.categoricalValueId", systemDefinedEntryTypeIds)));
 			criteria.setProjection(Projections.rowCount());
 			return ((Long) criteria.uniqueResult()).longValue();
 

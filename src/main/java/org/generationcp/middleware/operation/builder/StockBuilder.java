@@ -62,6 +62,7 @@ public class StockBuilder extends Builder {
 		VariableTypeList stockVariableTypes = new VariableTypeList();
 		stockVariableTypes.addAll(study.getVariableTypesByPhenotypicType(PhenotypicType.GERMPLASM));
 		stockVariableTypes.addAll(dataSet.getFactorsByPhenotypicType(PhenotypicType.GERMPLASM));
+		stockVariableTypes.addAll(dataSet.getFactorsByPhenotypicType(PhenotypicType.ENTRY_DETAIL));
 		return stockVariableTypes;
 	}
 

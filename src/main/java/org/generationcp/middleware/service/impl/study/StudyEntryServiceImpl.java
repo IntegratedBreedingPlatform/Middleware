@@ -190,7 +190,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public long countStudyGermplasmByEntryTypeIds(final int studyId, final List<String> systemDefinedEntryTypeIds) {
+	public long countStudyGermplasmByEntryTypeIds(final int studyId, final List<Integer> systemDefinedEntryTypeIds) {
 		return this.daoFactory.getStockDao().countStocksByStudyAndEntryTypeIds(studyId, systemDefinedEntryTypeIds);
 	}
 

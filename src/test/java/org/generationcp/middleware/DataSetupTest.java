@@ -119,14 +119,14 @@ public class DataSetupTest extends IntegrationTestBase {
     public void setUp() {
         if (this.germplasmTestDataGenerator == null) {
             this.daoFactory = new DaoFactory(this.sessionProvder);
-            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
         }
     }
 
     @Test
     public void setUpBasicTestData() {
         final String programUUID = this.createWorkbenchProgram();
-        this.createNursery(programUUID, cropPrefix);
+        this.createNursery(programUUID, this.cropPrefix);
     }
 
     private String createWorkbenchProgram() {
@@ -213,8 +213,8 @@ public class DataSetupTest extends IntegrationTestBase {
         final List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
         for (int i = 0; i < DataSetupTest.NUMBER_OF_GERMPLASM; i++) {
             germplasmListData.add(new GermplasmListData(null, germplasmList, gids[i], i,
-                    DataSetupTest.GERMPLSM_PREFIX + i + " Source", DataSetupTest.GERMPLSM_PREFIX + i,
-                    DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));
+                    DataSetupTest.GERMPLSM_PREFIX + i + " Source",
+                DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));
         }
         this.germplasmListManager.addGermplasmListData(germplasmListData);
 
