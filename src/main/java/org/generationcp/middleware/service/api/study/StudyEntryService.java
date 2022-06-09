@@ -29,7 +29,7 @@ public interface StudyEntryService {
 
 	void saveStudyEntries(Integer studyId, Integer listId);
 
-	void saveStudyEntries(Integer studyId, List<Integer> gids, final Integer entryTypeId);
+	void saveStudyEntries(Integer studyId, List<Integer> gids, Integer entryTypeId);
 
 	long countStudyGermplasmByEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
 
@@ -46,6 +46,8 @@ public interface StudyEntryService {
 	StockProperty getByStockPropertyId(Integer stockPropertyId);
 
 	void fillWithCrossExpansion(Integer studyId, Integer level);
+
+	Integer getCrossGenerationLevel(Integer studyId);
 
 	List<StudyEntryColumnDTO> getStudyEntryColumns(Integer studyId);
 

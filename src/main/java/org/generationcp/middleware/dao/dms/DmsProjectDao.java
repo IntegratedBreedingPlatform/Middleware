@@ -236,8 +236,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		+ "   p.program_uuid             AS programUUID, \n"
 		+ "	  p.study_update 			 AS studyUpdate, \n"
 		+ "	  p.created_by               AS createdBy, \n"
-		+ "   p.locked                   AS isLocked, \n"
-		+ "   p.generation_level         AS generationLevel "
+		+ "   p.locked                   AS isLocked "
 		+ " FROM \n"
 		+ "   project p \n"
 		+ "   INNER JOIN study_type stype on stype.study_type_id = p.study_type_id"
@@ -375,8 +374,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		final StringBuilder sqlString = new StringBuilder().append(
 			"SELECT DISTINCT p.name AS name, p.description AS title, p.objective AS objective, p.start_date AS startDate, ")
 			.append("p.end_date AS endDate, ppPI.value AS piName, gpSiteName.value AS siteName, p.project_id AS id ")
-			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, p.created_by as createdBy, p.locked as isLocked, ")
-			.append("p.generation_level as generationLevel ")
+			.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, p.created_by as createdBy, p.locked as isLocked ")
 			.append("FROM project p ")
 			.append("   LEFT JOIN projectprop ppPI ON p.project_id = ppPI.project_id ")
 			.append("                   AND ppPI.variable_id =  ").append(TermId.PI_NAME.getId()).append(" ")
@@ -401,7 +399,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Query query =
 				this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
 					.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
-					.addScalar("piId").addScalar("siteId").addScalar("createdBy").addScalar("isLocked").addScalar("generationLevel")
+					.addScalar("piId").addScalar("siteId").addScalar("createdBy").addScalar("isLocked")
 					.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 			list = query.list();
 		} catch (final HibernateException e) {
@@ -425,11 +423,10 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final String siteId = (String) row[9];
 			final String createdBy = (String) row[10];
 			final Boolean isLocked = (Boolean) row[11];
-			final Integer generationLevel = (Integer) row[12];
 
 			final StudyDetails study =
 				new StudyDetails(id, name, title, objective, startDate, endDate, studyType, piName, siteName, piId, siteId, Util
-					.getCurrentDateAsStringValue(), createdBy, isLocked, generationLevel);
+					.getCurrentDateAsStringValue(), createdBy, isLocked);
 			studyDetails.add(study);
 		}
 		return studyDetails;
@@ -444,7 +441,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					.addScalar("startDate").addScalar("endDate").addScalar("studyTypeId").addScalar("studyTypeLabel").addScalar(
 					"studyTypeName").addScalar("piName").addScalar("siteName").addScalar("id").addScalar("piId").addScalar("siteId")
 					.addScalar("folderId").addScalar("programUUID").addScalar("studyUpdate")
-					.addScalar("createdBy").addScalar("isLocked").addScalar("generationLevel");
+					.addScalar("createdBy").addScalar("isLocked");
 
 			query.setParameter("studyId", studyId);
 
@@ -470,13 +467,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final String studyUpdate = (String) row[15];
 					final String createdBy = (String) row[16];
 					final Boolean isLocked = (Boolean) row[17];
-					final Integer generationLevel = (Integer) row[18];
 
 					final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, studyTypeLabel, studyTypeName);
 
 					studyDetails =
 						new StudyDetails(id, name, title, objective, startDate, endDate, studyTypeDto, piName, siteName, piId, siteId,
-							studyUpdate, createdBy, isLocked, generationLevel);
+							studyUpdate, createdBy, isLocked);
 					studyDetails.setParentFolderId(folderId.longValue());
 					studyDetails.setProgramUUID(programUUID);
 				}
@@ -529,7 +525,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					+ ".study_type_id AS "
 					+ "studyType , st.label as label, st.name as studyTypeName, st.visible as visible, st.cvterm_id as cvtermId ")
 				.append(", ppPIid.value AS piId, gpSiteId.value AS siteId, p.created_by as createdBy, p.locked as isLocked ")
-				.append(", p.generation_level as generationLevel ")
 				.append("FROM project p ")
 				.append(" LEFT JOIN projectprop  ppPI ON p.project_id = ppPI.project_id ").append(" AND ppPI.variable_id =  ")
 				.append(TermId.PI_NAME.getId()).append(" ")
@@ -555,7 +550,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
 					.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
 					.addScalar("studyType").addScalar("label").addScalar("studyTypeName").addScalar("visible").addScalar("cvTermId")
-					.addScalar("piId").addScalar("siteId").addScalar("createdBy").addScalar("isLocked").addScalar("generationLevel")
+					.addScalar("piId").addScalar("siteId").addScalar("createdBy").addScalar("isLocked")
 					.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 
 			final List<Object[]> list = query.list();
@@ -579,12 +574,11 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					final String siteId = (String) row[14];
 					final String createdBy = (String) row[15];
 					final Boolean isLocked = (Boolean) row[16];
-					final Integer generationLevel = (Integer) row[17];
 
 					final StudyTypeDto studyTypeDto = new StudyTypeDto(studyTypeId, label, studyTypeName, cvTermId, visible);
 					studyDetails.add(
 						new StudyDetails(id, name, title, objective, startDate, endDate, studyTypeDto, piName, siteName, piId, siteId,
-							Util.getCurrentDateAsStringValue(), createdBy, isLocked, generationLevel));
+							Util.getCurrentDateAsStringValue(), createdBy, isLocked));
 				}
 			}
 

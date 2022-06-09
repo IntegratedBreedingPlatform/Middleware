@@ -160,12 +160,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				!VariableType.ENTRY_DETAIL.getId().equals(projectProperty.getTypeId()))
 			.collect(Collectors.toList());
 
-		Optional.ofNullable(this.germplasmListService.getGermplasmListById(listId).get().getGenerationLevel())
-			.ifPresent(getCrossGenerationLevel -> {
-				final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
-				study.setGenerationLevel(getCrossGenerationLevel);
-				this.daoFactory.getDmsProjectDAO().save(study);
-		});
+		this.setStudyGenerationLevel(listId, studyId);
 
 		// Add germplasm list entry details as project properties
 		final AtomicInteger projectPropertyInitialRank = new AtomicInteger(plotDataDataset.getNextPropertyRank());
@@ -297,6 +292,12 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
+	public Integer getCrossGenerationLevel(final Integer studyId) {
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
+		return study.getGenerationLevel();
+	}
+
+	@Override
 	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId) {
 		final DmsProject plotDataset = this.getPlotDataset(studyId);
 		final List<StudyEntryColumnDTO> columns = new ArrayList<>();
@@ -308,11 +309,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		columns.add(this.buildStudyEntryColumnDTO(TermId.IMMEDIATE_SOURCE_NAME, plotDataset.getProperties()));
 		columns.add(this.buildStudyEntryColumnDTO(TermId.GROUP_SOURCE_NAME, plotDataset.getProperties()));
 		return columns;
-	}
-
-	private Integer getCrossGenerationLevel(final Integer studyId) {
-		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
-		return study.getGenerationLevel();
 	}
 
 	private void setCrossValues(final List<StockModel> entries, final Set<Integer> gids, final Integer level) {
@@ -336,6 +332,13 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	private StudyEntryColumnDTO buildStudyEntryColumnDTO(final Integer termId, final String name, final List<ProjectProperty> projectProperties) {
 		return new StudyEntryColumnDTO(termId, name,
 			projectProperties.stream().anyMatch(projectProperty -> projectProperty.getVariableId().equals(termId)));
+	}
+
+	private void setStudyGenerationLevel(final Integer listId, final Integer studyId) {
+		final Integer generationLevel = this.germplasmListService.getGermplasmListById(listId).get().getGenerationLevel();
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
+		study.setGenerationLevel(generationLevel);
+		this.daoFactory.getDmsProjectDAO().save(study);
 	}
 
 }
