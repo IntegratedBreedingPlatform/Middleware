@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.brapi;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeSearchRequest;
@@ -31,7 +32,9 @@ import java.util.stream.Collectors;
 @Transactional
 public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 
+	public static final int UNKNOWN = 0;
 	private final DaoFactory daoFactory;
+
 
 	public PedigreeServiceBrapiImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -43,7 +46,7 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 	}
 
 	@Override
-	public List<PedigreeNodeDTO> updatePedigreeNodes(final Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap) {
+	public List<PedigreeNodeDTO> updatePedigreeNodes(final Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap, final Multimap<String, Object[]> conflictErrors) {
 
 		final GermplasmDAO germplasmDAO = this.daoFactory.getGermplasmDao();
 
@@ -68,18 +71,19 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 		germplasmForUpdate.stream().forEach(germplasm -> {
 
 			if (pedigreeNodeDTOMap.containsKey(germplasm.getGermplasmUUID())) {
-
-				final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 				final PedigreeNodeDTO pedigreeNodeDTO = pedigreeNodeDTOMap.get(germplasm.getGermplasmUUID());
 				final Integer femaleParentGid = this.resolveFemaleGid(pedigreeNodeDTO, germplasmProgenitorsMapByUUIDs);
 				final Integer maleParentGid = this.resolveMaleGid(pedigreeNodeDTO, germplasmProgenitorsMapByUUIDs);
 				final List<Integer> otherParentGids = this.resolveOtherParentGids(pedigreeNodeDTO, germplasmProgenitorsMapByUUIDs);
 
-				PedigreeUtil.assignProgenitors(germplasm, germplasmProgenitorsMapByGIDs, conflictErrors, femaleParentGid,
+				final Multimap<String, Object[]> conflictErrorsPerGermplasm = ArrayListMultimap.create();
+				PedigreeUtil.assignProgenitors(germplasm, germplasmProgenitorsMapByGIDs, conflictErrorsPerGermplasm, femaleParentGid,
 					maleParentGid, germplasm.getMethod(), otherParentGids);
 
-				if (conflictErrors.isEmpty()) {
+				if (conflictErrorsPerGermplasm.isEmpty()) {
 					germplasmDAO.update(germplasm);
+				} else {
+					conflictErrors.putAll(conflictErrorsPerGermplasm);
 				}
 			}
 		});
@@ -94,10 +98,10 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 				pedigreeNodeReferenceDTO -> pedigreeNodeReferenceDTO.getParentType() == ParentType.FEMALE
 					|| pedigreeNodeReferenceDTO.getParentType() == ParentType.POPULATION)
 			.findAny();
-		if (femalePedigreeNodeReference.isPresent()) {
+		if (femalePedigreeNodeReference.isPresent() && StringUtils.isNotEmpty(femalePedigreeNodeReference.get().getGermplasmDbId())) {
 			return germplasmProgenitorsMapByUUIDs.get(femalePedigreeNodeReference.get().getGermplasmDbId()).getGid();
 		}
-		return null;
+		return UNKNOWN;
 	}
 
 	private Integer resolveMaleGid(final PedigreeNodeDTO pedigreeNodeDTO, final Map<String, Germplasm> germplasmProgenitorsMapByUUIDs) {
@@ -105,10 +109,10 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 				pedigreeNodeReferenceDTO -> pedigreeNodeReferenceDTO.getParentType() == ParentType.MALE
 					|| pedigreeNodeReferenceDTO.getParentType() == ParentType.SELF)
 			.findFirst();
-		if (malePedigreeNodeReference.isPresent()) {
+		if (malePedigreeNodeReference.isPresent() && StringUtils.isNotEmpty(malePedigreeNodeReference.get().getGermplasmDbId())) {
 			return germplasmProgenitorsMapByUUIDs.get(malePedigreeNodeReference.get().getGermplasmDbId()).getGid();
 		}
-		return null;
+		return UNKNOWN;
 	}
 
 	private List<Integer> resolveOtherParentGids(final PedigreeNodeDTO pedigreeNodeDTO,

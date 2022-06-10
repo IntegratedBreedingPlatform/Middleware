@@ -534,35 +534,22 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 	public List<PedigreeNodeDTO> searchPedigreeNodes(final PedigreeNodeSearchRequest pedigreeNodeSearchRequest, final Pageable pageable) {
 		final List<PedigreeNodeDTO> pedigreeNodeDTOList = new ArrayList<>();
 		final String query = "SELECT "
-			+ "   g.germplsm_uuid as germplasmDbId,"
+			+ "   {g.*},"
 			+ "   (select n.nval from names n where n.gid = g.gid AND n.nstat = 1) as defaultDisplayName,"
-			+ "   m.mid as breedingMethodDbId,"
-			+ "   m.mname as breedingMethodName,"
 			+ "   year(str_to_date(g.gdate, '%Y%m%d')) as crossingYear,"
-			+ "   femaleParent.germplsm_uuid as parent1DbId,"
 			+ "   femaleParentName.nval as parent1Name,"
-			// If germplasmDbId is a cross (gnpgs > 0), the parents' type should be FEMALE and MALE
-			// If germplasmDbId is advanced (gnpgs < 0), the parents' type should be POPULATION and SELF
-			+ "   CASE WHEN femaleParent.germplsm_uuid is not null AND g.gnpgs > 0 THEN '" + ParentType.FEMALE.name() + "' "
-			+ "	  WHEN femaleParent.germplsm_uuid is not null AND g.gnpgs < 0 THEN '" + ParentType.POPULATION.name()
-			+ "' ELSE NULL END as parent1Type,"
-			+ "   maleParent.germplsm_uuid as parent2DbId,"
-			+ "   maleParentName.nval as parent2Name,"
-			+ "   CASE WHEN maleParent.germplsm_uuid is not null AND g.gnpgs > 0 THEN '" + ParentType.MALE.name() + "' "
-			+ "	  WHEN maleParent.germplsm_uuid is not null AND g.gnpgs < 0  THEN '" + ParentType.SELF.name()
-			+ "' ELSE NULL END as parent2Type"
-			+ " FROM germplsm g"
-			+ "   LEFT JOIN methods m ON m.mid = g.methn"
-			+ "   LEFT JOIN germplsm femaleParent ON g.gpid1 = femaleParent.gid"
-			+ "   LEFT JOIN names femaleParentName ON femaleParent.gid = femaleParentName.gid AND femaleParentName.nstat = 1"
-			+ "   LEFT JOIN germplsm maleParent ON g.gpid2 = maleParent.gid"
-			+ "   LEFT JOIN names maleParentName ON maleParent.gid = maleParentName.gid AND maleParentName.nstat = 1"
+			+ "   maleParentName.nval as parent2Name"
+			+ "   FROM germplsm g"
+			+ "   LEFT JOIN names femaleParentName ON g.gpid1 = femaleParentName.gid AND femaleParentName.nstat = 1"
+			+ "   LEFT JOIN names maleParentName ON g.gpid2 = maleParentName.gid AND maleParentName.nstat = 1"
 			+ " WHERE g.germplsm_uuid IN (:germplasmDbIds) AND g.deleted = 0 AND g.grplce = 0";
 
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(query);
-		sqlQuery.addScalar("germplasmDbId").addScalar("defaultDisplayName").addScalar("breedingMethodDbId").addScalar("breedingMethodName")
-			.addScalar("crossingYear", new IntegerType()).addScalar("parent1DbId").addScalar("parent1Name").addScalar("parent1Type")
-			.addScalar("parent2DbId").addScalar("parent2Name").addScalar("parent2Type");
+		sqlQuery.addEntity("g", Germplasm.class);
+		sqlQuery.addScalar("defaultDisplayName");
+		sqlQuery.addScalar("crossingYear", new IntegerType());
+		sqlQuery.addScalar("parent1Name");
+		sqlQuery.addScalar("parent2Name");
 
 		// TODO: This is an initial implementation of search pedigree nodes. Only support filtering by germplasmDbIds for now.
 		sqlQuery.setParameterList("germplasmDbIds", pedigreeNodeSearchRequest.getGermplasmDbIds());
@@ -570,35 +557,57 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final List<Object[]> results = sqlQuery.list();
 
 		for (final Object[] row : results) {
+
+			final Germplasm germplasm = (Germplasm) row[0];
+			final String defaultDisplayName = (String) row[1];
+			final Integer crossingYear = (Integer) row[2];
+			final String parent1Name = (String) row[3];
+			final String parent2Name = (String) row[4];
+
 			final PedigreeNodeDTO pedigreeNodeDTO = new PedigreeNodeDTO();
-			pedigreeNodeDTO.setGermplasmDbId((String) row[0]);
-			pedigreeNodeDTO.setDefaultDisplayName((String) row[1]);
-			pedigreeNodeDTO.setBreedingMethodDbId(String.valueOf(row[2]));
-			pedigreeNodeDTO.setBreedingMethodName((String) row[3]);
-			pedigreeNodeDTO.setCrossingYear((Integer) row[4]);
-
-			final List<PedigreeNodeReferenceDTO> parents = new ArrayList<>();
-
-			final PedigreeNodeReferenceDTO parent1 = new PedigreeNodeReferenceDTO();
-			parent1.setGermplasmDbId((String) row[5]);
-			parent1.setGermplasmName((String) row[6]);
-			parent1.setParentType(row[7] != null ? ParentType.valueOf((String) row[7]) : null);
-			parents.add(parent1);
-
-			final PedigreeNodeReferenceDTO parent2 = new PedigreeNodeReferenceDTO();
-			parent2.setGermplasmDbId((String) row[8]);
-			parent2.setGermplasmName((String) row[9]);
-			parent2.setParentType(row[10] != null ? ParentType.valueOf((String) row[10]): null);
-			parents.add(parent2);
-
-			// TODO: Get the Other Progenitors if there's any.
-
-			pedigreeNodeDTO.setParents(parents);
+			pedigreeNodeDTO.setGermplasmDbId(germplasm.getGermplasmUUID());
+			pedigreeNodeDTO.setDefaultDisplayName(defaultDisplayName);
+			pedigreeNodeDTO.setBreedingMethodDbId(String.valueOf(germplasm.getMethod().getMid()));
+			pedigreeNodeDTO.setBreedingMethodName(germplasm.getMethod().getMname());
+			pedigreeNodeDTO.setCrossingYear(crossingYear);
+			pedigreeNodeDTO.setParents(this.createParents(germplasm, parent1Name, parent2Name));
 			pedigreeNodeDTOList.add(pedigreeNodeDTO);
 
 		}
 
 		return pedigreeNodeDTOList;
+	}
+
+	private List<PedigreeNodeReferenceDTO> createParents(final Germplasm germplasm, final String parent1Name,
+		final String parent2Name) {
+		final List<PedigreeNodeReferenceDTO> parents = new ArrayList<>();
+
+		final PedigreeNodeReferenceDTO femalParentReference = new PedigreeNodeReferenceDTO();
+		femalParentReference.setGermplasmDbId(germplasm.getFemaleParent() != null ? germplasm.getFemaleParent().getGermplasmUUID() : null);
+		femalParentReference.setGermplasmName(parent1Name);
+		if (germplasm.getGnpgs() > 0) {
+			femalParentReference.setParentType(ParentType.FEMALE);
+		} else {
+			femalParentReference.setParentType(ParentType.POPULATION);
+		}
+		parents.add(femalParentReference);
+
+		final PedigreeNodeReferenceDTO maleParentReference = new PedigreeNodeReferenceDTO();
+		maleParentReference.setGermplasmDbId(germplasm.getMaleParent() != null ? germplasm.getMaleParent().getGermplasmUUID() : null);
+		maleParentReference.setGermplasmName(parent2Name);
+		if (germplasm.getGnpgs() > 0) {
+			maleParentReference.setParentType(ParentType.MALE);
+		} else {
+			maleParentReference.setParentType(ParentType.SELF);
+		}
+		parents.add(maleParentReference);
+
+		for (final Progenitor progenitor : germplasm.getOtherProgenitors()) {
+			if (progenitor.getProgenitorGermplasm() != null) {
+				parents.add(new PedigreeNodeReferenceDTO(progenitor.getProgenitorGermplasm().getGermplasmUUID(), "", ParentType.MALE));
+			}
+		}
+		return parents;
 	}
 
 	public PedigreeDTO getPedigree(final Integer gid, final String notation, final Boolean includeSiblings) {
