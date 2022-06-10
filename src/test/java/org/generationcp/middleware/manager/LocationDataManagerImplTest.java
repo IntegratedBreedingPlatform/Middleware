@@ -154,7 +154,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		location.setProvince(province);
 		location.setSnl2id(1);
 		location.setSnl3id(1);
-		location.setLdefault(Boolean.FALSE);
 
 		// add the location
 		final Integer id = this.manager.addLocation(location);
