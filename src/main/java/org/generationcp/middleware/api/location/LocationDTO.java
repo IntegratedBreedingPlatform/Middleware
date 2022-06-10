@@ -18,7 +18,6 @@ public class LocationDTO extends LocationRequestDto {
 	private String countryName;
 	private String countryCode;
 	private String provinceName;
-	private boolean defaultLocation;
 
 	private List<ProgramFavoriteDTO> programFavorites;
 
@@ -34,7 +33,6 @@ public class LocationDTO extends LocationRequestDto {
 		this.setAltitude(location.getAltitude());
 		this.setLatitude(location.getLatitude());
 		this.setLongitude(location.getLongitude());
-		this.setDefaultLocation(location.getLdefault());
 
 		final Country country = location.getCountry();
 		if (country != null) {
@@ -59,7 +57,7 @@ public class LocationDTO extends LocationRequestDto {
 	}
 
 	public String getLocationTypeName() {
-		return locationTypeName;
+		return this.locationTypeName;
 	}
 
 	public void setLocationTypeName(final String locationTypeName) {
@@ -67,7 +65,7 @@ public class LocationDTO extends LocationRequestDto {
 	}
 
 	public String getCountryName() {
-		return countryName;
+		return this.countryName;
 	}
 
 	public void setCountryName(final String countryName) {
@@ -75,7 +73,7 @@ public class LocationDTO extends LocationRequestDto {
 	}
 
 	public String getCountryCode() {
-		return countryCode;
+		return this.countryCode;
 	}
 
 	public void setCountryCode(final String countryCode) {
@@ -83,7 +81,7 @@ public class LocationDTO extends LocationRequestDto {
 	}
 
 	public String getProvinceName() {
-		return provinceName;
+		return this.provinceName;
 	}
 
 	public void setProvinceName(final String provinceName) {
@@ -91,19 +89,11 @@ public class LocationDTO extends LocationRequestDto {
 	}
 
 	public List<ProgramFavoriteDTO> getProgramFavorites() {
-		return programFavorites;
+		return this.programFavorites;
 	}
 
 	public void setProgramFavorites(final List<ProgramFavoriteDTO> programFavorites) {
 		this.programFavorites = programFavorites;
-	}
-
-	public boolean isDefaultLocation() {
-		return defaultLocation;
-	}
-
-	public void setDefaultLocation(final boolean defaultLocation) {
-		this.defaultLocation = defaultLocation;
 	}
 
 	@Override

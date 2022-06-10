@@ -15,11 +15,8 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.LocationType;
-import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotStatus;
@@ -52,6 +49,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 public class LotServiceImplIntegrationTest extends IntegrationTestBase {
+	private static final Integer DEFAULT_SEED_STORE_ID = 6000;
 
 	private TransactionServiceImpl transactionService;
 
@@ -65,8 +63,6 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private CropType crop;
 
-	private Integer storageLocationId;
-
 	private static final int GROUP_ID = 0;
 
 	private static final int UNIT_ID = TermId.SEED_AMOUNT_G.getId();
@@ -74,9 +70,6 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	private static final String UUID_REGEX = "[0-9a-f]{8}-[0-9a-f]{4}-[4][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}";
 	private static final int CROP_PREFIX_LENGTH = 10;
 	private static final String SUFFIX_REGEX = "[a-zA-Z0-9]{" + LotServiceImpl.SUFFIX_LENGTH + "}";
-
-	@Autowired
-	private LocationDataManager locationDataManager;
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -94,10 +87,9 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.lotService.setTransactionService(this.transactionService);
 		this.lotService.setOntologyVariableDataManager(this.ontologyVariableDataManager);
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 		this.createGermplasm();
 		this.userId = this.findAdminUser();
-		this.resolveStorageLocation();
 		this.createLot();
 		this.createTransactions();
 	}
@@ -334,7 +326,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private void createLot() {
-		this.lot = new Lot(null, this.userId, EntityType.GERMPLSM.name(), this.gid, this.storageLocationId, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
+		this.lot = new Lot(null, this.userId, EntityType.GERMPLSM.name(), this.gid, DEFAULT_SEED_STORE_ID, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
 			"Lot", RandomStringUtils.randomAlphabetic(35));
 		this.lot.setLotUuId(RandomStringUtils.randomAlphabetic(35));
 		this.daoFactory.getLotDao().save(this.lot);
@@ -353,11 +345,6 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getTransactionDAO().save(confirmedDeposit);
 		this.daoFactory.getTransactionDAO().save(pendingDeposit);
 
-	}
-
-	private void resolveStorageLocation() {
-		final Integer id = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.name());
-		this.storageLocationId = this.daoFactory.getLocationDAO().getDefaultLocationByType(id).getLocid();
 	}
 
 	private void assertTransaction(final Transaction actualTransaction, final TransactionType type, final TransactionStatus status,

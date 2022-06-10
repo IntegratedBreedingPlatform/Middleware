@@ -48,9 +48,9 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	public static final Comparator<LocationDetails> LocationNameComparator = new Comparator<LocationDetails>() {
 
 		@Override
-		public int compare(LocationDetails location1, LocationDetails location2) {
-			String locationName1 = location1.getLocationName().toUpperCase();
-			String locationName2 = location2.getLocationName().toUpperCase();
+		public int compare(final LocationDetails location1, final LocationDetails location2) {
+			final String locationName1 = location1.getLocationName().toUpperCase();
+			final String locationName2 = location2.getLocationName().toUpperCase();
 
 			// ascending order
 			return locationName1.compareTo(locationName2);
@@ -115,19 +115,16 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	@Column(name = "province_id")
 	private Integer provinceId;
 
-	@Basic(optional = false)
-	@Column(name = "ldefault")
-	private Boolean lDefault;
-
 	public LocationDetails() {
 	}
 
-	public LocationDetails(Integer locid) {
+	public LocationDetails(final Integer locid) {
 		this.locid = locid;
 	}
 
-	public LocationDetails(Integer locid, String locationName, String countryFullName, String locationAbbreviation, String locationType,
-			String locationDescription) {
+	public LocationDetails(
+		final Integer locid, final String locationName, final String countryFullName, final String locationAbbreviation, final String locationType,
+			final String locationDescription) {
 		super();
 		this.locid = locid;
 		this.locationName = locationName;
@@ -147,7 +144,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return this.locid;
 	}
 
-	public void setLocid(Integer locid) {
+	public void setLocid(final Integer locid) {
 		this.locid = locid;
 	}
 
@@ -155,7 +152,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return this.locationName;
 	}
 
-	public void setLocationName(String locationName) {
+	public void setLocationName(final String locationName) {
 		this.locationName = locationName;
 	}
 
@@ -163,7 +160,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return this.countryFullName;
 	}
 
-	public void setCountryFullName(String countryFullName) {
+	public void setCountryFullName(final String countryFullName) {
 		this.countryFullName = countryFullName;
 	}
 
@@ -171,7 +168,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return this.locationAbbreviation;
 	}
 
-	public void setLocationAbbreviation(String locationAbbreviation) {
+	public void setLocationAbbreviation(final String locationAbbreviation) {
 		this.locationAbbreviation = locationAbbreviation;
 	}
 
@@ -179,7 +176,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return this.locationType;
 	}
 
-	public void setLocationType(String locationType) {
+	public void setLocationType(final String locationType) {
 		this.locationType = locationType;
 	}
 
@@ -187,7 +184,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return this.locationDescription;
 	}
 
-	public void setLocationDescription(String locationDescription) {
+	public void setLocationDescription(final String locationDescription) {
 		this.locationDescription = locationDescription;
 	}
 
@@ -195,7 +192,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return this.latitude;
 	}
 
-	public void setLatitude(Double latitude) {
+	public void setLatitude(final Double latitude) {
 		this.latitude = latitude;
 	}
 
@@ -203,7 +200,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return this.longitude;
 	}
 
-	public void setLongitude(Double longitude) {
+	public void setLongitude(final Double longitude) {
 		this.longitude = longitude;
 	}
 
@@ -211,18 +208,18 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 		return this.altitude;
 	}
 
-	public void setAltitude(Double altitude) {
+	public void setAltitude(final Double altitude) {
 		this.altitude = altitude;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
 
 		if (obj instanceof LocationDetails) {
-			LocationDetails param = (LocationDetails) obj;
+			final LocationDetails param = (LocationDetails) obj;
 			if (this.getLocid().equals(param.getLocid())) {
 				return true;
 			}
@@ -233,7 +230,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Location [locid=");
 		builder.append(this.locid);
 		builder.append(", location_description=");
@@ -256,8 +253,8 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	}
 
 	@Override
-	public int compareTo(LocationDetails compareLocation) {
-		String compareName = compareLocation.getLocationName();
+	public int compareTo(final LocationDetails compareLocation) {
+		final String compareName = compareLocation.getLocationName();
 
 		// ascending order
 		return this.locationName.compareTo(compareName);
@@ -280,7 +277,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	}
 
 	public String getProvinceName() {
-		return provinceName;
+		return this.provinceName;
 	}
 
 	public void setProvinceName(final String provinceName) {
@@ -288,7 +285,7 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	}
 
 	public String getCountryName() {
-		return countryName;
+		return this.countryName;
 	}
 
 	public void setCountryName(final String countryName) {
@@ -296,19 +293,11 @@ public class LocationDetails implements Serializable, Comparable<LocationDetails
 	}
 
 	public Integer getProvinceId() {
-		return provinceId;
+		return this.provinceId;
 	}
 
 	public void setProvinceId(final Integer provinceId) {
 		this.provinceId = provinceId;
-	}
-
-	public Boolean getlDefault() {
-		return lDefault;
-	}
-
-	public void setlDefault(final Boolean lDefault) {
-		this.lDefault = lDefault;
 	}
 
 }

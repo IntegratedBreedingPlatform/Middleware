@@ -3,11 +3,87 @@
 				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
 	<changeSet author="mderamos" id="v21.2.0-1">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="listdata" columnName="desig"></columnExists>
 		</preConditions>
 		<comment>Remove desig column from listdata table</comment>
 		<dropColumn tableName="listdata" columnName="desig"></dropColumn>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v21.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="program_location_default" columnName="location_id"/>
+		</preConditions>
+		<comment>
+			Rename location_id column name to breeding_location_id
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE program_location_default
+			CHANGE COLUMN location_id breeding_location_id INT(11);
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v21.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="program_location_default" columnName="storage_location_id" />
+			</not>
+		</preConditions>
+		<comment>Add storage_location_id column in program_location_default table</comment>
+		<addColumn tableName="program_location_default">
+			<column name="storage_location_id" type="INT(11)" afterColumn="breeding_location_id">
+				<constraints nullable="false" foreignKeyName="fk_program_storage_location_default" references="location(locid)"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v22.1.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM location WHERE labbr = 'DSS';
+			</sqlCheck>
+		</preConditions>
+		<comment>ADD Default Seed Store location </comment>
+		<sql dbms="mysql">
+			INSERT INTO location (`ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`) VALUES
+			(1500,0,'Default Seed Store','DSS',0,0,0,0,0,0);
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v22.1.0-5">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="program_location_default"/>
+				<not>
+					<sqlCheck expectedResult="0">
+						SELECT COUNT(1) FROM workbench.workbench_project project
+						INNER JOIN workbench.workbench_crop crop
+						WHERE crop.crop_name = project.crop_type
+						AND crop.db_name = DATABASE()
+					</sqlCheck>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Populate program_location_default.storage_location_id for existing programs, set DSS(id=6000) as default
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @dss_location_id = (select locid from location where labbr = 'DSS');
+
+			UPDATE program_location_default
+			set storage_location_id = @dss_location_id;
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v22.1.0-6">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="location" columnName="ldefault"/>
+		</preConditions>
+		<comment>
+			Drop ldefault column from location table
+		</comment>
+		<dropColumn tableName="location" columnName="ldefault"></dropColumn>
 	</changeSet>
 </databaseChangeLog>
