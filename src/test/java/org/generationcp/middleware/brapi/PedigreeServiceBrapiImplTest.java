@@ -84,9 +84,9 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final PedigreeNodeReferenceDTO maleReference = updatedPedigreeNodeDTO.getParents().get(1);
 
 		assertEquals(germplasmFemale.getGermplasmUUID(), femaleReference.getGermplasmDbId());
-		assertEquals(ParentType.FEMALE, femaleReference.getParentType());
+		assertEquals(ParentType.FEMALE.name(), femaleReference.getParentType());
 		assertEquals(germplasmMale.getGermplasmUUID(), maleReference.getGermplasmDbId());
-		assertEquals(ParentType.MALE, maleReference.getParentType());
+		assertEquals(ParentType.MALE.name(), maleReference.getParentType());
 		assertEquals(2, germplasm.getGnpgs().intValue());
 
 	}
@@ -126,11 +126,11 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final PedigreeNodeReferenceDTO otherParentReference = updatedPedigreeNodeDTO.getParents().get(2);
 
 		assertEquals(germplasmFemale.getGermplasmUUID(), femaleReference.getGermplasmDbId());
-		assertEquals(ParentType.FEMALE, femaleReference.getParentType());
+		assertEquals(ParentType.FEMALE.name(), femaleReference.getParentType());
 		assertEquals(germplasmMale.getGermplasmUUID(), maleReference.getGermplasmDbId());
-		assertEquals(ParentType.MALE, maleReference.getParentType());
+		assertEquals(ParentType.MALE.name(), maleReference.getParentType());
 		assertEquals(germplasmOtherParent.getGermplasmUUID(), otherParentReference.getGermplasmDbId());
-		assertEquals(ParentType.MALE, maleReference.getParentType());
+		assertEquals(ParentType.MALE.name(), maleReference.getParentType());
 		assertEquals(3, germplasm.getGnpgs().intValue());
 
 	}
@@ -185,9 +185,9 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final PedigreeNodeReferenceDTO maleReference = updatedPedigreeNodeDTO.getParents().get(1);
 
 		assertNull(femaleReference.getGermplasmDbId());
-		assertEquals(ParentType.FEMALE, femaleReference.getParentType());
+		assertEquals(ParentType.FEMALE.name(), femaleReference.getParentType());
 		assertEquals(germplasmMale.getGermplasmUUID(), maleReference.getGermplasmDbId());
-		assertEquals(ParentType.MALE, maleReference.getParentType());
+		assertEquals(ParentType.MALE.name(), maleReference.getParentType());
 		assertEquals(2, germplasm.getGnpgs().intValue());
 
 	}
@@ -223,9 +223,9 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final PedigreeNodeReferenceDTO maleReference = updatedPedigreeNodeDTO.getParents().get(1);
 
 		assertEquals(germplasmFemale.getGermplasmUUID(), femaleReference.getGermplasmDbId());
-		assertEquals(ParentType.FEMALE, femaleReference.getParentType());
+		assertEquals(ParentType.FEMALE.name(), femaleReference.getParentType());
 		assertNull(maleReference.getGermplasmDbId());
-		assertEquals(ParentType.MALE, maleReference.getParentType());
+		assertEquals(ParentType.MALE.name(), maleReference.getParentType());
 		assertEquals(2, germplasm.getGnpgs().intValue());
 
 	}
@@ -259,9 +259,9 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final PedigreeNodeReferenceDTO immediateSourceReference = updatedPedigreeNodeDTO.getParents().get(1);
 
 		assertNull(groupSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.POPULATION, groupSourceReference.getParentType());
+		assertEquals(ParentType.POPULATION.name(), groupSourceReference.getParentType());
 		assertNull(immediateSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.SELF, immediateSourceReference.getParentType());
+		assertEquals(ParentType.SELF.name(), immediateSourceReference.getParentType());
 		assertEquals(0, germplasm.getGnpgs().intValue());
 
 	}
@@ -336,9 +336,9 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final PedigreeNodeReferenceDTO immediateSourceReference = updatedPedigreeNodeDTO.getParents().get(1);
 
 		assertEquals(germplasmWithDescendants.getGermplasmUUID(), groupSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.POPULATION, groupSourceReference.getParentType());
+		assertEquals(ParentType.POPULATION.name(), groupSourceReference.getParentType());
 		assertEquals(germplasmDescendant2.getGermplasmUUID(), immediateSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.SELF, immediateSourceReference.getParentType());
+		assertEquals(ParentType.SELF.name(), immediateSourceReference.getParentType());
 		assertEquals(-1, germplasm.getGnpgs().intValue());
 
 	}
@@ -374,9 +374,9 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final PedigreeNodeReferenceDTO immediateSourceReference = updatedPedigreeNodeDTO.getParents().get(1);
 
 		assertEquals(germplasmGroupSource.getGermplasmUUID(), groupSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.POPULATION, groupSourceReference.getParentType());
+		assertEquals(ParentType.POPULATION.name(), groupSourceReference.getParentType());
 		assertNull(immediateSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.SELF, immediateSourceReference.getParentType());
+		assertEquals(ParentType.SELF.name(), immediateSourceReference.getParentType());
 		assertEquals(-1, germplasm.getGnpgs().intValue());
 
 	}
@@ -418,9 +418,9 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final PedigreeNodeReferenceDTO immediateSourceReference = updatedPedigreeNodeDTO.getParents().get(1);
 
 		assertEquals(germplasmWithDescendants.getGermplasmUUID(), groupSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.POPULATION, groupSourceReference.getParentType());
+		assertEquals(ParentType.POPULATION.name(), groupSourceReference.getParentType());
 		assertEquals(germplasmWithDescendants.getGermplasmUUID(), immediateSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.SELF, immediateSourceReference.getParentType());
+		assertEquals(ParentType.SELF.name(), immediateSourceReference.getParentType());
 		assertEquals(-1, germplasm.getGnpgs().intValue());
 
 	}
@@ -459,9 +459,9 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final PedigreeNodeReferenceDTO immediateSourceReference = updatedPedigreeNodeDTO.getParents().get(1);
 
 		assertEquals(germplasmParent.getGermplasmUUID(), groupSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.POPULATION, groupSourceReference.getParentType());
+		assertEquals(ParentType.POPULATION.name(), groupSourceReference.getParentType());
 		assertEquals(germplasmParent.getGermplasmUUID(), immediateSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.SELF, immediateSourceReference.getParentType());
+		assertEquals(ParentType.SELF.name(), immediateSourceReference.getParentType());
 		assertEquals(-1, germplasm.getGnpgs().intValue());
 
 	}
@@ -499,9 +499,9 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final PedigreeNodeReferenceDTO immediateSourceReference = updatedPedigreeNodeDTO.getParents().get(1);
 
 		assertEquals(germplasmParent.getGermplasmUUID(), groupSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.POPULATION, groupSourceReference.getParentType());
+		assertEquals(ParentType.POPULATION.name(), groupSourceReference.getParentType());
 		assertEquals(germplasmParent.getGermplasmUUID(), immediateSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.SELF, immediateSourceReference.getParentType());
+		assertEquals(ParentType.SELF.name(), immediateSourceReference.getParentType());
 		assertEquals(-1, germplasm.getGnpgs().intValue());
 
 	}
@@ -538,9 +538,9 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final PedigreeNodeReferenceDTO immediateSourceReference = updatedPedigreeNodeDTO.getParents().get(1);
 
 		assertEquals(parentGermplasm.getGermplasmUUID(), groupSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.POPULATION, groupSourceReference.getParentType());
+		assertEquals(ParentType.POPULATION.name(), groupSourceReference.getParentType());
 		assertEquals(parentGermplasm.getGermplasmUUID(), immediateSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.SELF, immediateSourceReference.getParentType());
+		assertEquals(ParentType.SELF.name(), immediateSourceReference.getParentType());
 		assertEquals(-1, germplasm.getGnpgs().intValue());
 	}
 
@@ -577,9 +577,9 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final PedigreeNodeReferenceDTO immediateSourceReference = updatedPedigreeNodeDTO.getParents().get(1);
 
 		assertEquals(parentGermplasm.getGermplasmUUID(), groupSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.POPULATION, groupSourceReference.getParentType());
+		assertEquals(ParentType.POPULATION.name(), groupSourceReference.getParentType());
 		assertEquals(parentGermplasm.getGermplasmUUID(), immediateSourceReference.getGermplasmDbId());
-		assertEquals(ParentType.SELF, immediateSourceReference.getParentType());
+		assertEquals(ParentType.SELF.name(), immediateSourceReference.getParentType());
 		assertEquals(-1, germplasm.getGnpgs().intValue());
 
 	}
@@ -640,10 +640,10 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		pedigreeNodeDTO.setGermplasmDbId(germplasmDbId);
 
 		final List<PedigreeNodeReferenceDTO> parents = new ArrayList<>();
-		parents.add(new PedigreeNodeReferenceDTO(parent1GermplasmDbId, "", ParentType.FEMALE));
-		parents.add(new PedigreeNodeReferenceDTO(parent2GermplasmDbId, "", ParentType.MALE));
+		parents.add(new PedigreeNodeReferenceDTO(parent1GermplasmDbId, "", ParentType.FEMALE.name()));
+		parents.add(new PedigreeNodeReferenceDTO(parent2GermplasmDbId, "", ParentType.MALE.name()));
 		for (final String otherParentGermplasmDbId : otherParentGermplasmDbIds) {
-			parents.add(new PedigreeNodeReferenceDTO(otherParentGermplasmDbId, "", ParentType.MALE));
+			parents.add(new PedigreeNodeReferenceDTO(otherParentGermplasmDbId, "", ParentType.MALE.name()));
 		}
 		pedigreeNodeDTO.setParents(parents);
 		return pedigreeNodeDTO;
@@ -655,8 +655,8 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		pedigreeNodeDTO.setGermplasmDbId(germplasmDbId);
 
 		final List<PedigreeNodeReferenceDTO> parents = new ArrayList<>();
-		parents.add(new PedigreeNodeReferenceDTO(parent1GermplasmDbId, "", ParentType.POPULATION));
-		parents.add(new PedigreeNodeReferenceDTO(parent2GermplasmDbId, "", ParentType.SELF));
+		parents.add(new PedigreeNodeReferenceDTO(parent1GermplasmDbId, "", ParentType.POPULATION.name()));
+		parents.add(new PedigreeNodeReferenceDTO(parent2GermplasmDbId, "", ParentType.SELF.name()));
 		pedigreeNodeDTO.setParents(parents);
 		return pedigreeNodeDTO;
 	}

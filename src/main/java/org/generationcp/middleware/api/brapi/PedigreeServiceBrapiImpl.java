@@ -35,7 +35,6 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 	public static final int UNKNOWN = 0;
 	private final DaoFactory daoFactory;
 
-
 	public PedigreeServiceBrapiImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
@@ -46,7 +45,8 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 	}
 
 	@Override
-	public List<PedigreeNodeDTO> updatePedigreeNodes(final Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap, final Multimap<String, Object[]> conflictErrors) {
+	public List<PedigreeNodeDTO> updatePedigreeNodes(final Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap,
+		final Multimap<String, Object[]> conflictErrors) {
 
 		final GermplasmDAO germplasmDAO = this.daoFactory.getGermplasmDao();
 
@@ -95,8 +95,8 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 
 	private Integer resolveFemaleGid(final PedigreeNodeDTO pedigreeNodeDTO, final Map<String, Germplasm> germplasmProgenitorsMapByUUIDs) {
 		final Optional<PedigreeNodeReferenceDTO> femalePedigreeNodeReference = pedigreeNodeDTO.getParents().stream().filter(
-				pedigreeNodeReferenceDTO -> pedigreeNodeReferenceDTO.getParentType() == ParentType.FEMALE
-					|| pedigreeNodeReferenceDTO.getParentType() == ParentType.POPULATION)
+				pedigreeNodeReferenceDTO -> ParentType.FEMALE.name().equals(pedigreeNodeReferenceDTO.getParentType())
+					|| ParentType.POPULATION.name().equals(pedigreeNodeReferenceDTO.getParentType()))
 			.findAny();
 		if (femalePedigreeNodeReference.isPresent() && StringUtils.isNotEmpty(femalePedigreeNodeReference.get().getGermplasmDbId())) {
 			return germplasmProgenitorsMapByUUIDs.get(femalePedigreeNodeReference.get().getGermplasmDbId()).getGid();
@@ -106,8 +106,8 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 
 	private Integer resolveMaleGid(final PedigreeNodeDTO pedigreeNodeDTO, final Map<String, Germplasm> germplasmProgenitorsMapByUUIDs) {
 		final Optional<PedigreeNodeReferenceDTO> malePedigreeNodeReference = pedigreeNodeDTO.getParents().stream().filter(
-				pedigreeNodeReferenceDTO -> pedigreeNodeReferenceDTO.getParentType() == ParentType.MALE
-					|| pedigreeNodeReferenceDTO.getParentType() == ParentType.SELF)
+				pedigreeNodeReferenceDTO -> ParentType.MALE.name().equals(pedigreeNodeReferenceDTO.getParentType())
+					|| ParentType.SELF.name().equals(pedigreeNodeReferenceDTO.getParentType()))
 			.findFirst();
 		if (malePedigreeNodeReference.isPresent() && StringUtils.isNotEmpty(malePedigreeNodeReference.get().getGermplasmDbId())) {
 			return germplasmProgenitorsMapByUUIDs.get(malePedigreeNodeReference.get().getGermplasmDbId()).getGid();
@@ -118,7 +118,7 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 	private List<Integer> resolveOtherParentGids(final PedigreeNodeDTO pedigreeNodeDTO,
 		final Map<String, Germplasm> germplasmProgenitorsMapByUUIDs) {
 		final List<PedigreeNodeReferenceDTO> otherParentPedigreeNodeReferences = pedigreeNodeDTO.getParents().stream().filter(
-			pedigreeNodeReferenceDTO -> pedigreeNodeReferenceDTO.getParentType() == ParentType.MALE).collect(
+			pedigreeNodeReferenceDTO -> ParentType.MALE.name().equals(pedigreeNodeReferenceDTO.getParentType())).collect(
 			Collectors.toList());
 		if (!CollectionUtils.isEmpty(otherParentPedigreeNodeReferences)) {
 			final List<Integer> otherParentGids = new ArrayList<>();

@@ -9,13 +9,13 @@ public class PedigreeNodeReferenceDTO {
 
 	private String germplasmDbId;
 	private String germplasmName;
-	private ParentType parentType;
+	private String parentType;
 
 	public PedigreeNodeReferenceDTO() {
 
 	}
 
-	public PedigreeNodeReferenceDTO(final String germplasmDbId, final String germplasmName, final ParentType parentType) {
+	public PedigreeNodeReferenceDTO(final String germplasmDbId, final String germplasmName, final String parentType) {
 		this.germplasmDbId = germplasmDbId;
 		this.germplasmName = germplasmName;
 		this.parentType = parentType;
@@ -37,11 +37,11 @@ public class PedigreeNodeReferenceDTO {
 		this.germplasmName = germplasmName;
 	}
 
-	public ParentType getParentType() {
+	public String getParentType() {
 		return this.parentType;
 	}
 
-	public void setParentType(final ParentType parentType) {
+	public void setParentType(final String parentType) {
 		this.parentType = parentType;
 	}
 

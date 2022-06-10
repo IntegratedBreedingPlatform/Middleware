@@ -586,9 +586,9 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		femalParentReference.setGermplasmDbId(germplasm.getFemaleParent() != null ? germplasm.getFemaleParent().getGermplasmUUID() : null);
 		femalParentReference.setGermplasmName(parent1Name);
 		if (germplasm.getGnpgs() > 0) {
-			femalParentReference.setParentType(ParentType.FEMALE);
+			femalParentReference.setParentType(ParentType.FEMALE.name());
 		} else {
-			femalParentReference.setParentType(ParentType.POPULATION);
+			femalParentReference.setParentType(ParentType.POPULATION.name());
 		}
 		parents.add(femalParentReference);
 
@@ -596,15 +596,15 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		maleParentReference.setGermplasmDbId(germplasm.getMaleParent() != null ? germplasm.getMaleParent().getGermplasmUUID() : null);
 		maleParentReference.setGermplasmName(parent2Name);
 		if (germplasm.getGnpgs() > 0) {
-			maleParentReference.setParentType(ParentType.MALE);
+			maleParentReference.setParentType(ParentType.MALE.name());
 		} else {
-			maleParentReference.setParentType(ParentType.SELF);
+			maleParentReference.setParentType(ParentType.SELF.name());
 		}
 		parents.add(maleParentReference);
 
 		for (final Progenitor progenitor : germplasm.getOtherProgenitors()) {
 			if (progenitor.getProgenitorGermplasm() != null) {
-				parents.add(new PedigreeNodeReferenceDTO(progenitor.getProgenitorGermplasm().getGermplasmUUID(), "", ParentType.MALE));
+				parents.add(new PedigreeNodeReferenceDTO(progenitor.getProgenitorGermplasm().getGermplasmUUID(), "", ParentType.MALE.name()));
 			}
 		}
 		return parents;
