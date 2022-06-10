@@ -143,7 +143,6 @@ public class FieldbookServiceImplTest {
 		final Locdes locdes = locdesCaptor.getValue();
 		Assert.assertEquals("1001", location.getLtype().toString());
 		Assert.assertEquals("LOCNAME", location.getLname());
-		Assert.assertFalse(location.getLdefault());
 		Assert.assertNull(location.getLabbr());
 		Assert.assertEquals("1002", locdes.getTypeId().toString());
 		Assert.assertEquals("101", locdes.getUserId().toString());

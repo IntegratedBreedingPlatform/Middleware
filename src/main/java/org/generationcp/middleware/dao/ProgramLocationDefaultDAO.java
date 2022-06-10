@@ -26,15 +26,27 @@ public class ProgramLocationDefaultDAO extends GenericDAO<ProgramLocationDefault
 		}
 	}
 
-	public boolean isProgramLocationDefault(final Integer locationId) throws MiddlewareQueryException {
+	public boolean isProgramBreedingLocationDefault(final Integer locationId) throws MiddlewareQueryException {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(ProgramLocationDefault.class);
-			criteria.add(Restrictions.eq("locationId", locationId));
+			criteria.add(Restrictions.eq("breedingLocationId", locationId));
 
 			return CollectionUtils.isNotEmpty(criteria.list());
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
-				"error in: ProgramLocationDefaultDao.isProgramLocationDefault(locationId=" + locationId + "): " + e.getMessage(), e);
+				"error in: ProgramLocationDefaultDao.isProgramBreedingLocationDefault(locationId=" + locationId + "): " + e.getMessage(), e);
+		}
+	}
+
+	public boolean isProgramStorageLocationDefault(final Integer locationId) throws MiddlewareQueryException {
+		try {
+			final Criteria criteria = this.getSession().createCriteria(ProgramLocationDefault.class);
+			criteria.add(Restrictions.eq("storageLocationId", locationId));
+
+			return CollectionUtils.isNotEmpty(criteria.list());
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException(
+				"error in: ProgramLocationDefaultDao.isProgramStorageLocationDefault(locationId=" + locationId + "): " + e.getMessage(), e);
 		}
 	}
 }

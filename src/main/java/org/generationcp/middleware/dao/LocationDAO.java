@@ -28,7 +28,6 @@ import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.DetachedCriteria;
@@ -38,7 +37,6 @@ import org.hibernate.criterion.Property;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
-import org.hibernate.type.IntegerType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
@@ -153,7 +151,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			locationDTO.setCountryCode((String) row.get(LocationSearchDAOQuery.COUNTRY_CODE_ALIAS));
 			locationDTO.setProvinceId((Integer) row.get(LocationSearchDAOQuery.PROVINCE_ID_ALIAS));
 			locationDTO.setProvinceName((String) row.get(LocationSearchDAOQuery.PROVINCE_NAME_ALIAS));
-			locationDTO.setDefaultLocation((Boolean) row.get(LocationSearchDAOQuery.LOCATION_DEFAULT_ALIAS));
 
 			final Integer programFavoriteId = (Integer) row.get(LocationSearchDAOQuery.FAVORITE_PROGRAM_ID_ALIAS);
 			if (programFavoriteId != null) {
@@ -191,8 +188,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				+ "  g.lon as longitude," //
 				+ "  g.alt as altitude," //
 				+ "  l.cntryid as countryId," //
-				+ "  l.snl1id as provinceId, " //
-				+ "  l.ldefault as defaultLocation " //
+				+ "  l.snl1id as provinceId " //
 				+ " from location l" //
 				+ "  left join georef g on l.locid = g.locid" //
 				+ " where l.locid = :locationId");
@@ -200,7 +196,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(query.toString());
 			sqlQuery.setParameter("locationId", locationId);
 			sqlQuery.addScalar("id").addScalar("name").addScalar("type").addScalar("abbreviation").addScalar("latitude")
-				.addScalar("longitude").addScalar("altitude").addScalar("countryId").addScalar("provinceId").addScalar("defaultLocation");
+				.addScalar("longitude").addScalar("altitude").addScalar("countryId").addScalar("provinceId");
 			sqlQuery.setResultTransformer(Transformers.aliasToBean(LocationDTO.class));
 
 			return (LocationDTO) sqlQuery.uniqueResult();
@@ -216,7 +212,7 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 				.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
 				.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
 				.append(" ud.fname as location_type,").append(" ud.fdesc as location_description,")
-				.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id, l.ldefault")
+				.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id")
 				.append(" from location l")
 				.append(" left join georef g on l.locid = g.locid")
 				.append(" left join cntry c on l.cntryid = c.cntryid")
@@ -496,21 +492,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 			locations.add(location);
 		}
 		return locations;
-	}
-
-	public Location getDefaultLocationByType(final Integer type) {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Location.class);
-			criteria.add(Restrictions.eq("ltype", type));
-			criteria.add(Restrictions.eq("ldefault", Boolean.TRUE));
-
-			return (Location) criteria.uniqueResult();
-		} catch (final HibernateException e) {
-			LocationDAO.LOG.error(e.getMessage(), e);
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getDefaultLocationByType", "type", String.valueOf(type), e.getMessage(), "Location"),
-				e);
-		}
 	}
 
 	public Optional<Location> getUnspecifiedLocation() {
