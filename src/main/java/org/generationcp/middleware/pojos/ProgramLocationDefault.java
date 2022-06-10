@@ -29,15 +29,20 @@ public class ProgramLocationDefault extends AbstractEntity implements Serializab
 	private String programUUID;
 
 	@Basic(optional = false)
-	@Column(name = "location_id")
-	private Integer locationId;
+	@Column(name = "breeding_location_id")
+	private Integer breedingLocationId;
+
+	@Basic(optional = false)
+	@Column(name = "storage_location_id")
+	private Integer storageLocationId;
 
 	public ProgramLocationDefault() {
 	}
 
-	public ProgramLocationDefault(final String programUUID, final Integer locationId) {
+	public ProgramLocationDefault(final String programUUID, final Integer locationId, final Integer storageLocationId) {
 		this.programUUID = programUUID;
-		this.locationId = locationId;
+		this.breedingLocationId = locationId;
+		this.storageLocationId = storageLocationId;
 	}
 
 	public Integer getId() {
@@ -56,12 +61,20 @@ public class ProgramLocationDefault extends AbstractEntity implements Serializab
 		this.programUUID = programUUID;
 	}
 
-	public Integer getLocationId() {
-		return this.locationId;
+	public Integer getBreedingLocationId() {
+		return this.breedingLocationId;
 	}
 
-	public void setLocationId(final Integer locationId) {
-		this.locationId = locationId;
+	public void setBreedingLocationId(final Integer locationId) {
+		this.breedingLocationId = locationId;
+	}
+
+	public Integer getStorageLocationId() {
+		return this.storageLocationId;
+	}
+
+	public void setStorageLocationId(final Integer storageLocationId) {
+		this.storageLocationId = storageLocationId;
 	}
 
 	@Override

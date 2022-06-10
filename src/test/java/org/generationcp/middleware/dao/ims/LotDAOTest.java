@@ -68,7 +68,7 @@ public class LotDAOTest extends IntegrationTestBase {
 		this.germplasmListDAO = this.daoFactory.getGermplasmListDAO();
 		this.countryDAO = this.daoFactory.getCountryDao();
 		this.transactionDAO = this.daoFactory.getTransactionDAO();
-		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 
 		this.cropType = new CropType();
 		this.cropType.setUseUUID(false);
@@ -206,7 +206,6 @@ public class LotDAOTest extends IntegrationTestBase {
 
 		final Location province = this.locationDAO.getById(1001);
 		this.location.setProvince(province);
-		this.location.setLdefault(Boolean.FALSE);
 
 		this.locationDAO.saveOrUpdate(this.location);
 
@@ -227,22 +226,22 @@ public class LotDAOTest extends IntegrationTestBase {
 
 		this.lot3 = InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId2, 1, 8267, 0, 1, "Comments", RandomStringUtils.randomAlphabetic(35));
 
-		transaction1 = InventoryDetailsTestDataInitializer
-			.createTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot1, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
+		this.transaction1 = InventoryDetailsTestDataInitializer
+			.createTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), this.lot1, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
 
-		transaction2 = InventoryDetailsTestDataInitializer
-			.createTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot2, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
+		this.transaction2 = InventoryDetailsTestDataInitializer
+			.createTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), this.lot2, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
 
-		transaction3 = InventoryDetailsTestDataInitializer
-			.createTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), lot3, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
+		this.transaction3 = InventoryDetailsTestDataInitializer
+			.createTransaction(2.0, 0, TransactionType.DEPOSIT.getValue(), this.lot3, 1, 1, 1, LIST, TransactionType.DEPOSIT.getId());
 
-		this.lotDAO.save(lot1);
-		this.lotDAO.save(lot2);
-		this.lotDAO.save(lot3);
+		this.lotDAO.save(this.lot1);
+		this.lotDAO.save(this.lot2);
+		this.lotDAO.save(this.lot3);
 
-		this.transactionDAO.save(transaction1);
-		this.transactionDAO.save(transaction2);
-		this.transactionDAO.save(transaction3);
+		this.transactionDAO.save(this.transaction1);
+		this.transactionDAO.save(this.transaction2);
+		this.transactionDAO.save(this.transaction3);
 
 		this.germplasmList = this.germplasmListDAO.save(GermplasmListTestDataInitializer
 				.createGermplasmListTestData(RandomStringUtils.randomAlphabetic(6), RandomStringUtils.randomAlphabetic(6), 20141103, LST, 9999, 0,
@@ -250,7 +249,7 @@ public class LotDAOTest extends IntegrationTestBase {
 
 		final GermplasmListData listData1 =
 				new GermplasmListData(null, this.germplasmList, this.germplasm1.getGid(), 1, RandomStringUtils.randomAlphabetic(6), RandomStringUtils.randomAlphabetic(6),
-						RandomStringUtils.randomAlphabetic(6), RandomStringUtils.randomAlphabetic(6), 0, 99995);
+						RandomStringUtils.randomAlphabetic(6), 0, 99995);
 
 		this.manager.addGermplasmListData(listData1);
 

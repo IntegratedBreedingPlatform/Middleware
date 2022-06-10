@@ -741,8 +741,8 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 
 	private GermplasmListData createGermplasmListData(final GermplasmList germplasmList, final int gid, final int entryNo) {
 		return new GermplasmListData(null, germplasmList, gid, entryNo, "EntryCode" + entryNo,
-			DataSetupTest.GERMPLSM_PREFIX + entryNo + " Source", DataSetupTest.GERMPLSM_PREFIX + entryNo,
-			DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0);
+			DataSetupTest.GERMPLSM_PREFIX + entryNo + " Source", DataSetupTest.GERMPLSM_PREFIX + "Group A",
+			0, 0);
 	}
 
 	private void assertGermplasmList(final GermplasmList germplasmList, final Integer id, final String name) {

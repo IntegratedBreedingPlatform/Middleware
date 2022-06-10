@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.location;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
+import org.generationcp.middleware.api.program.ProgramBasicDetailsDto;
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Country;
@@ -76,7 +77,6 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 		final Location location = LocationTestDataInitializer
 			.createLocation(null, RandomStringUtils.randomAlphabetic(10), 405, RandomStringUtils.randomAlphabetic(3));
 		location.setCountry(country);
-		location.setLdefault(Boolean.FALSE);
 
 		this.daoFactory.getLocationDAO().saveOrUpdate(location);
 
@@ -170,9 +170,10 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testSaveProgramLocationDefault() {
-		final LocationDTO newLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
-			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), newLocationDTO.getId());
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
 		final ProgramLocationDefault savedProgramLocationDefault = this.daoFactory.getProgramLocationDefaultDAO()
 			.getById(programLocationDefault.getId());
 		Assert.assertEquals(savedProgramLocationDefault, programLocationDefault);
@@ -180,52 +181,91 @@ public class LocationServiceImplIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testUpdateProgramLocationDefault() {
-		final LocationDTO locationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
-			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), locationDTO.getId());
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
 		final ProgramLocationDefault savedProgramLocationDefault = this.daoFactory.getProgramLocationDefaultDAO()
 			.getById(programLocationDefault.getId());
-		final LocationDTO newLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
-		this.locationService.updateProgramLocationDefault(savedProgramLocationDefault.getProgramUUID(), newLocationDTO.getId());
+		final LocationDTO newBreedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final LocationDTO newStorageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final ProgramBasicDetailsDto programBasicDetailsDto = new ProgramBasicDetailsDto();
+		programBasicDetailsDto.setBreedingLocationDefaultId(newBreedingLocationDTO.getId());
+		programBasicDetailsDto.setStorageLocationDefaultId(newStorageLocationDTO.getId());
+		this.locationService.updateProgramLocationDefault(savedProgramLocationDefault.getProgramUUID(), programBasicDetailsDto);
 		final ProgramLocationDefault updatedProgramLocationDefault =
 			this.locationService.getProgramLocationDefault(savedProgramLocationDefault.getProgramUUID());
-		Assert.assertEquals(newLocationDTO.getId(), updatedProgramLocationDefault.getLocationId());
+		Assert.assertEquals(newBreedingLocationDTO.getId(), updatedProgramLocationDefault.getBreedingLocationId());
+		Assert.assertEquals(newStorageLocationDTO.getId(), updatedProgramLocationDefault.getStorageLocationId());
 	}
 
 	@Test
 	public void testGetProgramLocationDefault() {
-		final LocationDTO locationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
-			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), locationDTO.getId());
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
 		final ProgramLocationDefault savedProgramLocationDefault =
 			this.locationService.getProgramLocationDefault(programLocationDefault.getProgramUUID());
 		Assert.assertEquals(programLocationDefault, savedProgramLocationDefault);
 	}
 
 	@Test
-	public void testGetDefaultLocation() {
-		final LocationDTO locationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+	public void testGetDefaultBreedingLocation() {
+		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
 		final ProgramLocationDefault programLocationDefault =
-			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), locationDTO.getId());
-		final LocationDTO defaultLocation = this.locationService.getDefaultLocation(programLocationDefault.getProgramUUID());
-		Assert.assertNotNull(locationDTO);
-		Assert.assertThat("Expected same Location id", locationDTO.getId(), equalTo(defaultLocation.getId()));
-		Assert.assertThat("Expected same Location name", locationDTO.getName(), equalTo(defaultLocation.getName()));
-		Assert.assertThat("Expected same Location Abbr", locationDTO.getAbbreviation(), equalTo(defaultLocation.getAbbreviation()));
-		Assert.assertThat("Expected same Location type", locationDTO.getType(), equalTo(defaultLocation.getType()));
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
+		final LocationDTO defaultBreedingLocation = this.locationService.getDefaultBreedingLocation(programLocationDefault.getProgramUUID());
+		Assert.assertNotNull(defaultBreedingLocation);
+		Assert.assertThat("Expected same Location id", breedingLocationDTO.getId(), equalTo(defaultBreedingLocation.getId()));
+		Assert.assertThat("Expected same Location name", breedingLocationDTO.getName(), equalTo(defaultBreedingLocation.getName()));
+		Assert.assertThat("Expected same Location Abbr", breedingLocationDTO.getAbbreviation(), equalTo(defaultBreedingLocation.getAbbreviation()));
+		Assert.assertThat("Expected same Location type", breedingLocationDTO.getType(), equalTo(defaultBreedingLocation.getType()));
 
-		Assert.assertThat("Expected same altitude", locationDTO.getAltitude(), equalTo(defaultLocation.getAltitude()));
-		Assert.assertThat("Expected same latitude", locationDTO.getLatitude(), equalTo(defaultLocation.getLatitude()));
-		Assert.assertThat("Expected same longitude", locationDTO.getLongitude(), equalTo(defaultLocation.getLongitude()));
-		Assert.assertThat("Expected same country id", locationDTO.getCountryId(), equalTo(defaultLocation.getCountryId()));
-		Assert.assertThat("Expected same province id", locationDTO.getProvinceId(), equalTo(defaultLocation.getProvinceId()));
+		Assert.assertThat("Expected same altitude", breedingLocationDTO.getAltitude(), equalTo(defaultBreedingLocation.getAltitude()));
+		Assert.assertThat("Expected same latitude", breedingLocationDTO.getLatitude(), equalTo(defaultBreedingLocation.getLatitude()));
+		Assert.assertThat("Expected same longitude", breedingLocationDTO.getLongitude(), equalTo(defaultBreedingLocation.getLongitude()));
+		Assert.assertThat("Expected same country id", breedingLocationDTO.getCountryId(), equalTo(defaultBreedingLocation.getCountryId()));
+		Assert.assertThat("Expected same province id", breedingLocationDTO.getProvinceId(), equalTo(defaultBreedingLocation.getProvinceId()));
 	}
 
 	@Test
-	public void testIsProgramLocationDefault() {
-		final LocationDTO locationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
-		this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), locationDTO.getId());
-		Assert.assertTrue(this.locationService.isProgramLocationDefault(locationDTO.getId()));
+	public void testGetDefaultStorageLocation() {
+		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final ProgramLocationDefault programLocationDefault =
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
+		final LocationDTO defaultStorageLocation = this.locationService.getDefaultStorageLocation(programLocationDefault.getProgramUUID());
+		Assert.assertNotNull(defaultStorageLocation);
+		Assert.assertThat("Expected same Location id", storageLocationDTO.getId(), equalTo(defaultStorageLocation.getId()));
+		Assert.assertThat("Expected same Location name", storageLocationDTO.getName(), equalTo(defaultStorageLocation.getName()));
+		Assert.assertThat("Expected same Location Abbr", storageLocationDTO.getAbbreviation(), equalTo(defaultStorageLocation.getAbbreviation()));
+		Assert.assertThat("Expected same Location type", storageLocationDTO.getType(), equalTo(defaultStorageLocation.getType()));
+
+		Assert.assertThat("Expected same altitude", storageLocationDTO.getAltitude(), equalTo(defaultStorageLocation.getAltitude()));
+		Assert.assertThat("Expected same latitude", storageLocationDTO.getLatitude(), equalTo(defaultStorageLocation.getLatitude()));
+		Assert.assertThat("Expected same longitude", storageLocationDTO.getLongitude(), equalTo(defaultStorageLocation.getLongitude()));
+		Assert.assertThat("Expected same country id", storageLocationDTO.getCountryId(), equalTo(defaultStorageLocation.getCountryId()));
+		Assert.assertThat("Expected same province id", storageLocationDTO.getProvinceId(), equalTo(defaultStorageLocation.getProvinceId()));
+	}
+
+	@Test
+	public void testIsProgramBreedingLocationDefault() {
+		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final ProgramLocationDefault programLocationDefault =
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
+		Assert.assertTrue(this.locationService.isProgramBreedingLocationDefault(breedingLocationDTO.getId()));
+	}
+
+	@Test
+	public void testIsProgramStorageLocationDefault() {
+		final LocationDTO breedingLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final LocationDTO storageLocationDTO = this.locationService.createLocation(this.buildLocationRequestDto());
+		final ProgramLocationDefault programLocationDefault =
+			this.locationService.saveProgramLocationDefault(RandomStringUtils.randomAlphabetic(10), breedingLocationDTO.getId(), storageLocationDTO.getId());
+		Assert.assertTrue(this.locationService.isProgramStorageLocationDefault(storageLocationDTO.getId()));
 	}
 
 	private LocationRequestDto buildLocationRequestDto() {

@@ -68,7 +68,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 			this.daoFactory = new DaoFactory(this.sessionProvder);
 		}
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 		}
 	}
 
@@ -163,8 +163,8 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 			for (int entryNumber = 1; entryNumber <= numberOfEntries; entryNumber++) {
 				final int randomGidIndex = new Random().nextInt(gids.length);
 				germplasmListData.add(new GermplasmListData(null, germplasmList, gids[randomGidIndex], entryNumber, "EntryCode"
-						+ entryNumber, PerfDataSetupTest.GERMPLSM_PREFIX + entryNumber + " Source", PerfDataSetupTest.GERMPLSM_PREFIX
-						+ entryNumber, PerfDataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));
+						+ entryNumber, PerfDataSetupTest.GERMPLSM_PREFIX + entryNumber + " Source",
+					PerfDataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));
 			}
 			this.germplasmListManager.addGermplasmListData(germplasmListData);
 			
