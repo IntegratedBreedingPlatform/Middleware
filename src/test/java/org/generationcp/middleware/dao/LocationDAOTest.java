@@ -97,7 +97,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final int provinceId = 1001;
 		final Location province = this.locationDAO.getById(provinceId);
 		location.setProvince(province);
-		location.setLdefault(Boolean.FALSE);
 
 		this.locationDAO.saveOrUpdate(location);
 
@@ -132,7 +131,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		final Location province = this.locationDAO.getById(1001);
 		location.setProvince(province);
-		location.setLdefault(Boolean.FALSE);
 
 		this.locationDAO.saveOrUpdate(location);
 
@@ -240,7 +238,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final Country country = this.countryDAO.getById(1);
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, 0, labbr);
 		location.setCountry(country);
-		location.setLdefault(Boolean.FALSE);
 		this.locationDAO.saveOrUpdate(location);
 
 		return location;

@@ -44,7 +44,6 @@ public class LocationTestDataInitializer {
 		location.setSnl3id(0);
 		location.setCountry(null);
 		location.setLrplce(0);
-		location.setLdefault(Boolean.FALSE);
 
 		return location;
 	}

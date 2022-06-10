@@ -2643,7 +2643,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			1, RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(8),
 			1, 1, province,
 			country, 1);
-		location.setLdefault(false);
 		this.daoFactory.getLocationDAO().saveOrUpdate(location);
 		this.sessionProvder.getSession().flush();
 		this.daoFactory.getLocationDAO().refresh(location);
@@ -2729,9 +2728,8 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 	private Lot addLot(final int gid) {
 		final Integer id = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.name());
-		final Integer storageLocationId = this.daoFactory.getLocationDAO().getDefaultLocationByType(id).getLocid();
 		final Lot lot =
-			new Lot(null, this.userId, EntityType.GERMPLSM.name(), gid, storageLocationId, TermId.SEED_AMOUNT_G.getId(),
+			new Lot(null, this.userId, EntityType.GERMPLSM.name(), gid, 6000, TermId.SEED_AMOUNT_G.getId(),
 				LotStatus.ACTIVE.getIntValue(), 0,
 				"Lot", RandomStringUtils.randomAlphabetic(35));
 		lot.setLotUuId(RandomStringUtils.randomAlphabetic(35));
