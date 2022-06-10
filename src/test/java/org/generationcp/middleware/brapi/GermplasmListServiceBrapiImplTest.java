@@ -155,7 +155,6 @@ public class GermplasmListServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(savedGermplasm.getGid(), data.get(0).getGid());
 		Assert.assertEquals(1, data.get(0).getEntryId().intValue());
 		Assert.assertEquals("1", data.get(0).getEntryCode());
-		Assert.assertEquals(germplasm.getPreferredName().getNval(), data.get(0).getDesignation());
 		Assert.assertEquals(crossExpansions.get(savedGermplasm.getGid()), data.get(0).getGroupName());
 		Assert.assertEquals(plotCodeValuesByGIDs.get(savedGermplasm.getGid()), data.get(0).getSeedSource());
 

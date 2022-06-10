@@ -39,11 +39,6 @@ public interface GermplasmExportSource {
 	String getSeedSource();
 
 	/**
-	 * @return the designation
-	 */
-	String getDesignation();
-
-	/**
 	 * @return the groupName
 	 */
 	String getGroupName();

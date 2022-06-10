@@ -249,7 +249,7 @@ public class LotDAOTest extends IntegrationTestBase {
 
 		final GermplasmListData listData1 =
 				new GermplasmListData(null, this.germplasmList, this.germplasm1.getGid(), 1, RandomStringUtils.randomAlphabetic(6), RandomStringUtils.randomAlphabetic(6),
-						RandomStringUtils.randomAlphabetic(6), RandomStringUtils.randomAlphabetic(6), 0, 99995);
+						RandomStringUtils.randomAlphabetic(6), 0, 99995);
 
 		this.manager.addGermplasmListData(listData1);
 

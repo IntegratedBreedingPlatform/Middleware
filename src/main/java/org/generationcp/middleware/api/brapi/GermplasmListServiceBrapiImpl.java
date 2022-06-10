@@ -1,6 +1,5 @@
 package org.generationcp.middleware.api.brapi;
 
-import com.google.common.base.Preconditions;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
@@ -14,7 +13,6 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListExternalReference;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.GermplasmListDTO;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.user.UserService;
@@ -98,16 +96,10 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 		final Map<Integer, String> crossExpansions =
 			this.pedigreeService.getCrossExpansionsBulk(new HashSet<>(gids), null, this.crossExpansionProperties);
 		final Map<Integer, String> plotCodeValuesByGIDs = this.germplasmService.getPlotCodeValues(new HashSet<>(gids));
-		final List<Name> germplasmNames = this.daoFactory.getNameDao().getNamesByGids(gids);
-		final Map<Integer, String> preferredNamesMap = germplasmNames.stream()
-			.filter(name -> name.getNstat().equals(Name.NSTAT_PREFERRED_NAME))
-			.collect(Collectors.toMap(name -> name.getGermplasm().getGid(), Name::getNval));
-		final Map<Integer, List<Name>> namesByGid = germplasmNames.stream().collect(groupingBy(n -> n.getGermplasm().getGid()));
 
 		for(final GermplasmListImportRequestDTO importRequestDTO: importRequestDTOS) {
 			final GermplasmList germplasmList = this.saveGermplasmList(importRequestDTO);
-			this.saveGermplasmListData(germplasmList, importRequestDTO.getData(), crossExpansions, plotCodeValuesByGIDs, guuidGidMap,
-				preferredNamesMap, namesByGid);
+			this.saveGermplasmListData(germplasmList, importRequestDTO.getData(), crossExpansions, plotCodeValuesByGIDs, guuidGidMap);
 			savedListIds.add(germplasmList.getId().toString());
 		}
 		final GermplasmListSearchRequestDTO germplasmListSearchRequestDTO = new GermplasmListSearchRequestDTO();
@@ -117,20 +109,15 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 
 	private void saveGermplasmListData(final GermplasmList germplasmList, final List<String> guuids,
 		final Map<Integer, String> crossExpansions,	final Map<Integer, String> plotCodeValuesByGIDs,
-		final Map<String, Integer> guuidGidMap, final Map<Integer, String> preferredNamesMap,
-		final Map<Integer, List<Name>> namesByGid) {
+		final Map<String, Integer> guuidGidMap) {
 		if(!CollectionUtils.isEmpty(guuids)) {
 			int entryNo = 1;
 			for (final String guid : guuids) {
 				if (guuidGidMap.containsKey(guid.toUpperCase())) {
 					final Integer gid = guuidGidMap.get(guid.toUpperCase());
-					final String preferredName = preferredNamesMap.get(gid);
-					final List<Name> names = namesByGid.get(gid);
-					Preconditions.checkArgument(preferredName != null || names != null, "No name found for gid=" + gid);
-					final String designation = preferredName != null ? preferredName : names.get(0).getNval();
 					final Integer currentEntryNo = entryNo++;
 					final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, currentEntryNo,
-						String.valueOf(currentEntryNo), plotCodeValuesByGIDs.get(gid), designation, crossExpansions.get(gid),
+						String.valueOf(currentEntryNo), plotCodeValuesByGIDs.get(gid), crossExpansions.get(gid),
 						GermplasmListDataDAO.STATUS_ACTIVE, null);
 					this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 				}

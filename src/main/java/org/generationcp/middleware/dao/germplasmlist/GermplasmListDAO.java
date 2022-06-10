@@ -99,26 +99,6 @@ public class GermplasmListDAO extends GenericDAO<GermplasmList, Integer> {
 		"SELECT fldno, ftable, ftype, fcode, fname, ffmt, fdesc, lfldno, fuid, fdate, scaleid "
 			+ "FROM udflds " + "WHERE ftable = 'NAMES' AND ftype = 'NAME'";
 
-	private static final String SEARCH_FOR_GERMPLASM_LIST = "SELECT DISTINCT listnms.* " + "FROM listnms "
-		+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-		+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) "
-		+ "WHERE liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
-		+ "      OR desig LIKE :q OR listname LIKE :q " + "      OR desig LIKE :qNoSpaces "
-		+ "      OR desig LIKE :qStandardized " + ")";
-
-	private static final String SEARCH_FOR_GERMPLASM_LIST_GID_LIKE = "SELECT DISTINCT listnms.* " + "FROM listnms "
-		+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-		+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) "
-		+ "WHERE liststatus!=9 AND (listdata.gid LIKE :gid OR desig LIKE :q OR listname LIKE :q"
-		+ "      OR desig LIKE :qNoSpaces " + "      OR desig LIKE :qStandardized " + ")";
-
-	private static final String SEARCH_FOR_GERMPLASM_LIST_EQUAL = "SELECT DISTINCT listnms.* " + "FROM listnms "
-		+ "      LEFT JOIN listdata ON (listdata.listid=listnms.listid AND lrstatus!=9) "
-		+ "      LEFT JOIN germplsm ON (listdata.gid=germplsm.gid AND germplsm.deleted = 0) "
-		+ "WHERE liststatus!=9 AND ((listdata.gid=:gid AND 0!=:gid AND length(listdata.gid)=:gidLength) "
-		+ "      OR desig = :q OR listname = :q " + "      OR desig = :qNoSpaces "
-		+ "      OR desig = :qStandardized " + ")";
-
 	private static final String FILTER_BY_PROGRAM_UUID = " AND (program_uuid = :programUUID OR program_uuid IS NULL)";
 
 	@SuppressWarnings("unchecked")

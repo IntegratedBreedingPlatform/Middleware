@@ -17,6 +17,8 @@ import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.file.FileMetadataServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeServiceImpl;
+import org.generationcp.middleware.api.germplasm.GermplasmNameService;
+import org.generationcp.middleware.api.germplasm.GermplasmNameServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
@@ -378,6 +380,10 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmNameTypeService getGermplasmNameTypeService() {
 		return new GermplasmNameTypeServiceImpl(this.sessionProvider);
+	}
+
+	public GermplasmNameService getGermplasmNameService() {
+		return new GermplasmNameServiceImpl(this.sessionProvider);
 	}
 
 	public GermplasmAttributeService getGermplasmAttributeService() {

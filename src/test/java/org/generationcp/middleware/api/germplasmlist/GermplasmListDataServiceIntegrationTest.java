@@ -103,8 +103,7 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 		this.daoFactory.getNameDao().save(name);
 
 		final GermplasmListData data = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "EntryCode 1",
-			DataSetupTest.GERMPLSM_PREFIX + 1 + " Source", DataSetupTest.GERMPLSM_PREFIX + 1,
-			DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0);
+			DataSetupTest.GERMPLSM_PREFIX + 1 + " Source", DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0);
 		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(data);
 
 		final CVTerm variable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ENTRY_DETAIL);
