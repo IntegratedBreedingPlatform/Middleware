@@ -70,7 +70,7 @@ class ObservationQuery {
 			+ " 	INNER JOIN " //
 			+ "      cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id " //
 			+ " 	INNER JOIN " //
-			+ "      cvterm iispcvt ON iispcvt.cvterm_id = isp.value " //
+			+ "      cvterm iispcvt ON iispcvt.cvterm_id = isp.cvalue_id " //
 			+ " 	WHERE " //
 			+ "      isp.stock_id = s.stock_id " //
 			+ "      AND ispcvt.name = 'ENTRY_TYPE') AS ENTRY_TYPE, " //
@@ -218,7 +218,7 @@ class ObservationQuery {
 			.append("    nde.nd_experiment_id, ")
 			.append("    gl.description AS TRIAL_INSTANCE, ")
 			.append(
-				"    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,  ")
+				"    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.cvalue_id WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE,  ")
 			.append("    s.dbxref_id AS GID, ")
 			.append("    s.name DESIGNATION, ")
 			.append("    s.uniquename ENTRY_NO, ")

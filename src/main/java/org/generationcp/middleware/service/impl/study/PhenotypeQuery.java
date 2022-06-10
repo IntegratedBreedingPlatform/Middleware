@@ -31,7 +31,7 @@ public class PhenotypeQuery {
 		//
 		+ "  l.locid AS studyLocationDbId, " //
 		+ "  l.lname AS studyLocation, " //
-		+ "  (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') AS entryType, "
+		+ "  (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.cvalue_id WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') AS entryType, "
 		//
 		+ "  s.uniquename AS entryNumber,"
 		+ "  dataset.program_uuid as programDbId,"
