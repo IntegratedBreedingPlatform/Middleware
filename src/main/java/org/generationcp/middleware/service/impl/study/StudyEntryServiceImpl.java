@@ -300,15 +300,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Override
 	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId) {
 		final DmsProject plotDataset = this.getPlotDataset(studyId);
-		final List<StudyEntryColumnDTO> columns = new ArrayList<>();
-		columns.add(this.buildStudyEntryColumnDTO(TermId.GID, plotDataset.getProperties()));
-		columns.add(this.buildStudyEntryColumnDTO(TermId.GUID, plotDataset.getProperties()));
-		columns.add(this.buildStudyEntryColumnDTO(TermId.DESIG.getId(), "DESIGNATION", plotDataset.getProperties()));
-		columns.add(this.buildStudyEntryColumnDTO(TermId.CROSS, plotDataset.getProperties()));
-		columns.add(this.buildStudyEntryColumnDTO(TermId.GROUPGID, plotDataset.getProperties()));
-		columns.add(this.buildStudyEntryColumnDTO(TermId.IMMEDIATE_SOURCE_NAME, plotDataset.getProperties()));
-		columns.add(this.buildStudyEntryColumnDTO(TermId.GROUP_SOURCE_NAME, plotDataset.getProperties()));
-		return columns;
+		return StudyEntryDescriptorColumns.getColumnsSortedByRank()
+			.map(column -> this.buildStudyEntryColumnDTO(column, plotDataset.getProperties()))
+			.collect(Collectors.toList());
 	}
 
 	private void setCrossValues(final List<StockModel> entries, final Set<Integer> gids, final Integer level) {
@@ -325,13 +319,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
 	}
 
-	private StudyEntryColumnDTO buildStudyEntryColumnDTO(final TermId termId, final List<ProjectProperty> projectProperties) {
-		return this.buildStudyEntryColumnDTO(termId.getId(), termId.name(), projectProperties);
-	}
-
-	private StudyEntryColumnDTO buildStudyEntryColumnDTO(final Integer termId, final String name, final List<ProjectProperty> projectProperties) {
-		return new StudyEntryColumnDTO(termId, name,
-			projectProperties.stream().anyMatch(projectProperty -> projectProperty.getVariableId().equals(termId)));
+	private StudyEntryColumnDTO buildStudyEntryColumnDTO(final StudyEntryDescriptorColumns column, final List<ProjectProperty> projectProperties) {
+		return new StudyEntryColumnDTO(column.getId(), column.getName(),
+			projectProperties.stream().anyMatch(projectProperty -> projectProperty.getVariableId().equals(column.getId())));
 	}
 
 	private void setStudyGenerationLevel(final Integer listId, final Integer studyId) {
