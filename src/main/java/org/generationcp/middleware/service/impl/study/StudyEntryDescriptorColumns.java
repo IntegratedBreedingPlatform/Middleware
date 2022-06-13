@@ -38,16 +38,21 @@ public enum StudyEntryDescriptorColumns {
 		return rank;
 	}
 
-	public static StudyEntryDescriptorColumns getByTermId(final int termId) {
-		return Arrays.stream(StudyEntryDescriptorColumns.values())
-			.filter(c -> c.getId() == termId)
-			.findFirst()
-			.orElse(null);
+	public static int getRankByTermId(final int termId) {
+		final StudyEntryDescriptorColumns column = StudyEntryDescriptorColumns.getByTermId(termId);
+		return column == null ? Integer.MAX_VALUE : column.getRank();
 	}
 
 	public static Stream<StudyEntryDescriptorColumns> getColumnsSortedByRank() {
 		return Arrays.stream(StudyEntryDescriptorColumns.values())
 			.sorted(Comparator.comparingInt(StudyEntryDescriptorColumns::getRank));
+	}
+
+	private static StudyEntryDescriptorColumns getByTermId(final int termId) {
+		return Arrays.stream(StudyEntryDescriptorColumns.values())
+			.filter(c -> c.getId() == termId)
+			.findFirst()
+			.orElse(null);
 	}
 
 }
