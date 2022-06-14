@@ -20,6 +20,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +49,7 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 	public List<PedigreeNodeDTO> updatePedigreeNodes(final Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap,
 		final Multimap<String, Object[]> conflictErrors) {
 
+		final Set<String> updatedGermplasmDbIds = new HashSet<>();
 		final GermplasmDAO germplasmDAO = this.daoFactory.getGermplasmDao();
 
 		final List<Germplasm> germplasmForUpdate =
@@ -82,6 +84,7 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 
 				if (conflictErrorsPerGermplasm.isEmpty()) {
 					germplasmDAO.update(germplasm);
+					updatedGermplasmDbIds.add(germplasm.getGermplasmUUID());
 				} else {
 					conflictErrors.putAll(conflictErrorsPerGermplasm);
 				}
@@ -89,7 +92,7 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 		});
 
 		final PedigreeNodeSearchRequest pedigreeNodeSearchRequest = new PedigreeNodeSearchRequest();
-		pedigreeNodeSearchRequest.setGermplasmDbIds(new ArrayList<>(pedigreeNodeDTOMap.keySet()));
+		pedigreeNodeSearchRequest.setGermplasmDbIds(new ArrayList<>(updatedGermplasmDbIds));
 		return this.searchPedigreeNodes(pedigreeNodeSearchRequest, null);
 	}
 
