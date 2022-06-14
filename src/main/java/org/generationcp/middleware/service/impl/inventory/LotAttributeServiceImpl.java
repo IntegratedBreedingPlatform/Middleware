@@ -1,7 +1,7 @@
 package org.generationcp.middleware.service.impl.inventory;
 
-import org.generationcp.middleware.domain.germplasm.AttributeRequestDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
+import org.generationcp.middleware.domain.shared.RecordAttributeDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -25,7 +25,7 @@ public class LotAttributeServiceImpl implements LotAttributeService {
 	}
 
 	@Override
-	public List<GermplasmAttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
+	public List<RecordAttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
 		return this.daoFactory.getLotAttributeDAO().getLotAttributeDtos(lotId, programUUID);
 	}
 

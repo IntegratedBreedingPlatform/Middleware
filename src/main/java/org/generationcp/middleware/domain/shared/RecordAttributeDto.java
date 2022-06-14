@@ -1,11 +1,12 @@
-package org.generationcp.middleware.domain.germplasm;
+package org.generationcp.middleware.domain.shared;
 
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 
 @AutoProperty
-public class GermplasmAttributeDto extends AttributeRequestDto {
+public class RecordAttributeDto extends AttributeRequestDto {
 
 	private Integer id;
 
@@ -19,7 +20,7 @@ public class GermplasmAttributeDto extends AttributeRequestDto {
 
 	private Boolean hasFiles;
 
-	public GermplasmAttributeDto() {
+	public RecordAttributeDto() {
 	}
 
 	public Integer getId() {

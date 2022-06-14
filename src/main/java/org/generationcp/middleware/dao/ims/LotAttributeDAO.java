@@ -1,7 +1,7 @@
 package org.generationcp.middleware.dao.ims;
 
 import org.generationcp.middleware.dao.GenericAttributeDAO;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
+import org.generationcp.middleware.domain.shared.RecordAttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -34,14 +34,14 @@ public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 		+ "LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = cv.cvterm_id AND vpo.program_uuid = :programUUID "
 		+ "WHERE a.lotId = :lotId ";
 
-	public List<GermplasmAttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
+	public List<RecordAttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
 		try {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(GET_LOT_ATTRIBUTES);
 			this.addQueryScalars(sqlQuery);
 			sqlQuery.setParameter("lotId", lotId);
 			sqlQuery.setParameter("programUUID", programUUID);
 
-			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmAttributeDto.class));
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(RecordAttributeDto.class));
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(

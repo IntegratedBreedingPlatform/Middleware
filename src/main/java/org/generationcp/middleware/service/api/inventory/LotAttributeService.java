@@ -1,13 +1,13 @@
 package org.generationcp.middleware.service.api.inventory;
 
-import org.generationcp.middleware.domain.germplasm.AttributeRequestDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
+import org.generationcp.middleware.domain.shared.RecordAttributeDto;
 
 import java.util.List;
 
 public interface LotAttributeService {
 
-	List<GermplasmAttributeDto> getLotAttributeDtos(Integer lotId, String programUUID);
+	List<RecordAttributeDto> getLotAttributeDtos(Integer lotId, String programUUID);
 
 	Integer createLotAttribute(Integer gid, AttributeRequestDto dto);
 

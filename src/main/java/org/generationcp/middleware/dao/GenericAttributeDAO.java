@@ -10,7 +10,7 @@
 
 package org.generationcp.middleware.dao;
 
-import org.generationcp.middleware.domain.germplasm.AttributeRequestDto;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.pojos.GenericAttribute;
 import org.generationcp.middleware.util.VariableValueUtil;
