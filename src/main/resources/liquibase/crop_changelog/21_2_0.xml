@@ -109,21 +109,43 @@
 		<comment>
 			Create table 'ims_lot_attribute'
 		</comment>
-		<sql dbms="mysql" splitStatements="true">
-			CREATE TABLE ims_lot_attribute (
-				aid              int auto_increment primary key,
-				lotid            int default 0 not null,
-				atype            int           not null,
-				aval             varchar(5000) default '-' not null,
-				cval_id          int           null,
-				alocn            int default 0 null,
-				aref             int default 0 null,
-				adate            int default 0 null,
-				created_by       int default 0 not null,
-				modified_by      int           null,
-				created_date     timestamp default CURRENT_TIMESTAMP not null,
-				modified_date    timestamp     null
-			);
-		</sql>
+		<createTable tableName="ims_lot_attribute">
+			<column name="aid" type="int" autoIncrement="true">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="lotid" type="int" defaultValue="0">
+				<constraints nullable="false" foreignKeyName="fk_ims_lot_attribute_lotid" references="ims_lot(lotid)"/>
+			</column>
+			<column name="atype" type="int">
+				<constraints nullable="false" foreignKeyName="fk_ims_lot_attribute_atype" references="cvterm(cvterm_id)"/>
+			</column>
+			<column name="aval" type="varchar(5000)" defaultValue="-">
+				<constraints nullable="false"/>
+			</column>
+			<column name="cval_id" type="int">
+				<constraints nullable="true" foreignKeyName="fk_ims_lot_attribute_cval_id" referencedTableName="cvterm" referencedColumnNames="cvterm_id"/>
+			</column>
+			<column name="alocn" type="int" defaultValue="0">>
+				<constraints nullable="true" foreignKeyName="fk_ims_lot_attribute_alocn" references="location(locid)"/>
+			</column>
+			<column name="aref" type="int" defaultValue="0">>
+				<constraints nullable="true" />
+			</column>
+			<column name="adate" type="int" defaultValue="0">>
+				<constraints nullable="true" />
+			</column>
+			<column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_by" type="int" defaultValue="0">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_date" type="timestamp">
+				<constraints nullable="true"/>
+			</column>
+			<column name="modified_by" type="int">
+				<constraints nullable="true" />
+			</column>
+		</createTable>
 	</changeSet>
 </databaseChangeLog>
