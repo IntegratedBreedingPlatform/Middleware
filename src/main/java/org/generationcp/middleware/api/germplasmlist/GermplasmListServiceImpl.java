@@ -93,14 +93,20 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request, final Integer loggedInUserId) {
 
-		final List<Integer> gids = request.getEntries()
-			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
-
 		// save list
 		final GermplasmList germplasmList = this.createGermplasmList(request, loggedInUserId);
 
 		// save variables
 		final Set<Integer> variableIds = request.getEntries().stream().flatMap(e -> e.getData().keySet().stream()).collect(toSet());
+
+		// Add default columns
+		this.germplasmListDataService.getDefaultColumns()
+			.stream()
+			.forEach(column -> {
+				final GermplasmListDataView view =
+					new GermplasmListDataView.GermplasmListDataStaticViewBuilder(germplasmList, column.getTermId()).build();
+				this.daoFactory.getGermplasmListDataViewDAO().save(view);
+			});
 
 		// Forcing add ENTRY_NO variable.
 		// It is particular case because is required after the migration of ENTRY_NO as a entry detail variable.

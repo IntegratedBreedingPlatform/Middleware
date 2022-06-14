@@ -553,4 +553,60 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="lkovacic" id="studies-TBD-32">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT Count(*) > 0
+				FROM (SELECT listid,
+						  Count(static_id) AS staticColumns,
+						  Count(name_fldno) AS nameColumns,
+						  (SELECT Count(*)
+						   FROM list_data_view
+						   WHERE listid = ldv.listid AND type_id = 1815) AS entryDetailsColumns,
+						  (SELECT Count(*)
+						   FROM list_data_view
+						   WHERE listid = ldv.listid AND type_id IN (1813, 1814)) AS descriptorsColumns
+					  FROM list_data_view ldv
+					  GROUP BY listid) countQuery
+				WHERE countQuery.staticcolumns = 0 AND countQuery.namecolumns = 0;
+			</sqlCheck>
+		</preConditions>
+		<comment>Add default static columns to germplasm lists</comment>
+		<sql dbms="mysql" splitStatements="true">
+			# Create list_data_default_view_temporary Table
+			CREATE TEMPORARY TABLE list_data_default_view_temporary (
+				static_column_term_id int not null
+			);
+
+			INSERT INTO list_data_default_view_temporary (static_column_term_id)
+			VALUES (8240),
+				(8250),
+				(-3),
+				(-4),
+				(-5);
+
+			INSERT INTO list_data_view (listid, static_id)
+			SELECT countQuery.listid, tempListdataDefaultView.static_column_term_id
+			FROM (SELECT listid,
+					  Count(static_id) AS staticColumns,
+					  Count(name_fldno) AS nameColumns,
+					  (SELECT Count(*)
+					   FROM list_data_view
+					   WHERE listid = ldv.listid AND type_id = 1815) AS entryDetailsColumns,
+					  (SELECT Count(*)
+					   FROM list_data_view
+					   WHERE listid = ldv.listid AND type_id IN (1813, 1814)) AS descriptorsColumns
+				  FROM list_data_view ldv
+				  GROUP BY listid) countQuery,
+				(SELECT static_column_term_id
+				 FROM list_data_default_view_temporary) tempListdataDefaultView
+			WHERE countQuery.staticcolumns = 0 AND countQuery.namecolumns = 0
+			ORDER BY countQuery.listid;
+
+			#Delete list_data_default_view_temporary Table
+			DROP TABLE list_data_default_view_temporary;
+
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

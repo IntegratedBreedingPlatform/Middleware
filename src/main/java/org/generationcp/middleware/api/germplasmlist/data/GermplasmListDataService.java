@@ -30,4 +30,7 @@ public interface GermplasmListDataService {
 	List<Integer> getGidsByListId(Integer listId);
 
 	List<Integer> getListDataIdsByListId(Integer listId);
+
+	List<GermplasmListStaticColumns> getDefaultColumns();
+
 }
