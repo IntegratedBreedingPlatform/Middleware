@@ -100,7 +100,7 @@ public class ObservationQueryTest {
 		return "SELECT \n"
 			+ "    nde.nd_experiment_id,\n"
 			+ "    gl.description AS TRIAL_INSTANCE,\n"
-			+ "    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n"
+			+ "    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.cvalue_id WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n"
 			+ "    s.dbxref_id AS GID,\n"
 			+ "    s.name DESIGNATION,\n"
 			+ "    s.uniquename ENTRY_NO,\n"
@@ -140,7 +140,7 @@ public class ObservationQueryTest {
 	private String expectedQueryForSingleMeasurement() {
 
 		return "SELECT \n" + "    nde.nd_experiment_id,\n" + "    gl.description AS TRIAL_INSTANCE,\n"
-			+ "    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n"
+			+ "    (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.cvalue_id WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') ENTRY_TYPE, \n"
 			+ "    s.dbxref_id AS GID,\n"
 			+ "    s.name DESIGNATION,\n"
 			+ "    s.uniquename ENTRY_NO,\n"
@@ -186,7 +186,7 @@ public class ObservationQueryTest {
 
 	private String getRowColumnQuery() {
 		return
-			" SELECT    nde.nd_experiment_id,    gl.description AS TRIAL_INSTANCE,    proj.name AS PROJECT_NAME,    gl.nd_geolocation_id,    (SELECT iispcvt.definition  FROM       stockprop isp  INNER JOIN       cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id  INNER JOIN       cvterm iispcvt ON iispcvt.cvterm_id = isp.value  WHERE       isp.stock_id = s.stock_id       AND ispcvt.name = 'ENTRY_TYPE') AS ENTRY_TYPE,    g.germplsm_uuid AS GERMPLSM_UUID,    "
+			" SELECT    nde.nd_experiment_id,    gl.description AS TRIAL_INSTANCE,    proj.name AS PROJECT_NAME,    gl.nd_geolocation_id,    (SELECT iispcvt.definition  FROM       stockprop isp  INNER JOIN       cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id  INNER JOIN       cvterm iispcvt ON iispcvt.cvterm_id = isp.cvalue_id  WHERE       isp.stock_id = s.stock_id       AND ispcvt.name = 'ENTRY_TYPE') AS ENTRY_TYPE,    g.germplsm_uuid AS GERMPLSM_UUID,    "
 				+ "s.name AS DESIGNATION,    "
 				+ "s.uniquename AS ENTRY_NO,    "
 				+ "s.value AS ENTRY_CODE,    "
