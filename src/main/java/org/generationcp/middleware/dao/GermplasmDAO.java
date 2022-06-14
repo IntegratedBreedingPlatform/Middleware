@@ -533,6 +533,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	public List<PedigreeNodeDTO> searchPedigreeNodes(final PedigreeNodeSearchRequest pedigreeNodeSearchRequest, final Pageable pageable) {
 		final List<PedigreeNodeDTO> pedigreeNodeDTOList = new ArrayList<>();
+
+		if (CollectionUtils.isEmpty(pedigreeNodeSearchRequest.getGermplasmDbIds())) {
+			return pedigreeNodeDTOList;
+		}
+
 		final String query = "SELECT "
 			+ "   {g.*},"
 			+ "   (select n.nval from names n where n.gid = g.gid AND n.nstat = 1) as defaultDisplayName,"
@@ -604,7 +609,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 		for (final Progenitor progenitor : germplasm.getOtherProgenitors()) {
 			if (progenitor.getProgenitorGermplasm() != null) {
-				parents.add(new PedigreeNodeReferenceDTO(progenitor.getProgenitorGermplasm().getGermplasmUUID(), "", ParentType.MALE.name()));
+				parents.add(
+					new PedigreeNodeReferenceDTO(progenitor.getProgenitorGermplasm().getGermplasmUUID(), "", ParentType.MALE.name()));
 			}
 		}
 		return parents;
