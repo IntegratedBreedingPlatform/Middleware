@@ -675,6 +675,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
+	public Map<Integer, Map<Integer, String>> getObservationValuesByListAndVariableIds(final Integer listId, final Set<Integer> variableIds) {
+		return this.daoFactory.getGermplasmListDataDetailDAO().getObservationValuesByListAndVariableIds(listId, variableIds);
+	}
+
+	@Override
 	public void deleteGermplasmList(final Integer listId) {
 		final GermplasmList germplasmList = this.getGermplasmListById(listId)
 			.orElseThrow(() -> new MiddlewareRequestException("", LIST_NOT_FOUND));
