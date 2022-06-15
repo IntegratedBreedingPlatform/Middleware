@@ -537,4 +537,9 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 		newAttribute.setGermplasmId(id);
 		return newAttribute;
 	}
+
+	@Override
+	protected String getCountAttributeWithVariablesQuery() {
+		return COUNT_ATTRIBUTE_WITH_VARIABLES;
+	}
 }

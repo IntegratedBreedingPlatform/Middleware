@@ -17,6 +17,9 @@ import java.util.List;
  */
 public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 
+	private static final String COUNT_ATTRIBUTE_WITH_VARIABLES =
+		"SELECT COUNT(A.ATYPE) FROM IMS_LOT_ATTRIBUTE A INNER JOIN IMS_LOT L ON L.LOTID = A.LOTID WHERE A.ATYPE IN (:variableIds)";
+
 	private static final String GET_LOT_ATTRIBUTES = "Select a.aid AS id, "
 		+ "cv.cvterm_id as variableId, "
 		+ "a.aval AS value, "
@@ -54,5 +57,10 @@ public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 		final LotAttribute newAttribute = new LotAttribute();
 		newAttribute.setLotId(id);
 		return newAttribute;
+	}
+
+	@Override
+	protected String getCountAttributeWithVariablesQuery() {
+		return COUNT_ATTRIBUTE_WITH_VARIABLES;
 	}
 }

@@ -12,10 +12,15 @@ package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.GenericAttribute;
 import org.generationcp.middleware.util.VariableValueUtil;
+import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.type.BooleanType;
+
+import java.math.BigInteger;
+import java.util.List;
 
 public abstract class GenericAttributeDAO<T extends GenericAttribute> extends GenericDAO<T, Integer> {
 
@@ -57,5 +62,21 @@ public abstract class GenericAttributeDAO<T extends GenericAttribute> extends Ge
 		sqlQuery.addScalar("hasFiles", new BooleanType());
 	}
 
+	public long countByVariables(final List<Integer> variablesIds) {
+		try {
+			final SQLQuery query =
+				this.getSession().createSQLQuery(this.getCountAttributeWithVariablesQuery());
+			query.setParameterList("variableIds", variablesIds);
+
+			return ((BigInteger) query.uniqueResult()).longValue();
+
+		} catch (final HibernateException e) {
+			final String errorMessage = "Error at countByVariables=" + variablesIds + " in GenericAttributeDAO: " + e.getMessage();
+			throw new MiddlewareQueryException(errorMessage, e);
+		}
+	}
+
 	protected abstract T getNewAttributeInstance(Integer Id);
+
+	protected abstract String getCountAttributeWithVariablesQuery();
 }

@@ -1013,7 +1013,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	@Override
 	public boolean areVariablesUsedInAttributes(final List<Integer> variablesIds) {
-		return this.daoFactory.getAttributeDAO().countByVariables(variablesIds) > 0;
+		return this.daoFactory.getAttributeDAO().countByVariables(variablesIds) > 0
+			|| this.daoFactory.getLotAttributeDAO().countByVariables(variablesIds) > 0;
 	}
 
 	@Override
