@@ -13,6 +13,6 @@ public interface PedigreeServiceBrapi {
 
 	List<PedigreeNodeDTO> searchPedigreeNodes(PedigreeNodeSearchRequest pedigreeNodeSearchRequest, Pageable pageable);
 
-	List<PedigreeNodeDTO> updatePedigreeNodes(Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap, Multimap<String, Object[]> conflictErrors);
+	Set<String> updatePedigreeNodes(Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap, Multimap<String, Object[]> conflictErrors);
 
 }

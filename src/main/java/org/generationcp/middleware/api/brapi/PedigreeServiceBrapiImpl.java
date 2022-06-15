@@ -46,7 +46,7 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 	}
 
 	@Override
-	public List<PedigreeNodeDTO> updatePedigreeNodes(final Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap,
+	public Set<String> updatePedigreeNodes(final Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap,
 		final Multimap<String, Object[]> conflictErrors) {
 
 		final Set<String> updatedGermplasmDbIds = new HashSet<>();
@@ -91,9 +91,7 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 			}
 		});
 
-		final PedigreeNodeSearchRequest pedigreeNodeSearchRequest = new PedigreeNodeSearchRequest();
-		pedigreeNodeSearchRequest.setGermplasmDbIds(new ArrayList<>(updatedGermplasmDbIds));
-		return this.searchPedigreeNodes(pedigreeNodeSearchRequest, null);
+		return updatedGermplasmDbIds;
 	}
 
 	private Integer resolveFemaleGid(final PedigreeNodeDTO pedigreeNodeDTO, final Map<String, Germplasm> germplasmProgenitorsMapByUUIDs) {

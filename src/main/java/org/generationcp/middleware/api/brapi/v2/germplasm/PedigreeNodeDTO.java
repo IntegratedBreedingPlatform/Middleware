@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.brapi.v2.germplasm;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -7,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 @AutoProperty
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class PedigreeNodeDTO {
 
 	private Map<String, String> additionalInfo;
