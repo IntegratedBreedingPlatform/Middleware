@@ -425,6 +425,18 @@ public class Workbook {
 		return list;
 	}
 
+	private List<MeasurementVariable> getEntryDetailVariables(final List<MeasurementVariable> variables) {
+		final List<MeasurementVariable> list = new ArrayList<>();
+		if (variables != null && !variables.isEmpty()) {
+			for (final MeasurementVariable variable : variables) {
+				if (PhenotypicType.ENTRY_DETAIL.getLabelList().contains(variable.getLabel().toUpperCase())) {
+					list.add(variable);
+				}
+			}
+		}
+		return list;
+	}
+
 	private List<MeasurementVariable> getTrialVariables(final List<MeasurementVariable> variables) {
 		final List<MeasurementVariable> list = new ArrayList<>();
 		if (variables != null && !variables.isEmpty()) {
@@ -1055,7 +1067,10 @@ public class Workbook {
 	}
 
 	public List<MeasurementVariable> getEntryDetails() {
-		return entryDetails;
+		if (this.entryDetails == null) {
+			this.entryDetails = this.getEntryDetailVariables(this.factors);
+		}
+		return this.entryDetails;
 	}
 
 	public void setEntryDetails(final List<MeasurementVariable> entryDetails) {
