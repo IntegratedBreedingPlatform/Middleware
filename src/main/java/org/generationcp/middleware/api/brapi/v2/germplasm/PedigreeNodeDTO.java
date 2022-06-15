@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.brapi.v2.germplasm;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
@@ -26,6 +27,9 @@ public class PedigreeNodeDTO {
 	private List<PedigreeNodeReferenceDTO> parents;
 	private List<PedigreeNodeReferenceDTO> progeny;
 	private List<PedigreeNodeReferenceDTO> siblings;
+
+	@JsonIgnore
+	private Integer gid;
 
 	public Map<String, String> getAdditionalInfo() {
 		return this.additionalInfo;
@@ -145,6 +149,14 @@ public class PedigreeNodeDTO {
 
 	public void setSiblings(final List<PedigreeNodeReferenceDTO> siblings) {
 		this.siblings = siblings;
+	}
+
+	public Integer getGid() {
+		return this.gid;
+	}
+
+	public void setGid(final Integer gid) {
+		this.gid = gid;
 	}
 
 	@Override

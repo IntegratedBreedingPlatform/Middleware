@@ -570,6 +570,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			final String parent2Name = (String) row[4];
 
 			final PedigreeNodeDTO pedigreeNodeDTO = new PedigreeNodeDTO();
+			pedigreeNodeDTO.setGid(germplasm.getGid());
 			pedigreeNodeDTO.setGermplasmDbId(germplasm.getGermplasmUUID());
 			pedigreeNodeDTO.setDefaultDisplayName(defaultDisplayName);
 			pedigreeNodeDTO.setBreedingMethodDbId(String.valueOf(germplasm.getMethod().getMid()));

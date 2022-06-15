@@ -11,7 +11,10 @@ import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.PedigreeUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,13 +39,28 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 	public static final int UNKNOWN = 0;
 	private final DaoFactory daoFactory;
 
+	@Autowired
+	private PedigreeService pedigreeService;
+
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
+
 	public PedigreeServiceBrapiImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
 	public List<PedigreeNodeDTO> searchPedigreeNodes(final PedigreeNodeSearchRequest pedigreeNodeSearchRequest, final Pageable pageable) {
-		return this.daoFactory.getGermplasmDao().searchPedigreeNodes(pedigreeNodeSearchRequest, pageable);
+		final List<PedigreeNodeDTO> result = this.daoFactory.getGermplasmDao().searchPedigreeNodes(pedigreeNodeSearchRequest, pageable);
+		final Map<Integer, String> pedigreeStringMap =
+			this.pedigreeService.getCrossExpansions(result.stream().map(PedigreeNodeDTO::getGid).collect(Collectors.toSet()), null,
+				this.crossExpansionProperties);
+		for (final PedigreeNodeDTO pedigreeNodeDTO : result) {
+			if (pedigreeStringMap.containsKey(pedigreeNodeDTO.getGid())) {
+				pedigreeNodeDTO.setPedigreeString(pedigreeStringMap.get(pedigreeNodeDTO.getGid()));
+			}
+		}
+		return result;
 	}
 
 	@Override
