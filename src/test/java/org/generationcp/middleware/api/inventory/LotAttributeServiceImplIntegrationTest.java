@@ -1,22 +1,28 @@
-package org.generationcp.middleware.api.germplasm;
+package org.generationcp.middleware.api.inventory;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.domain.shared.RecordAttributeDto;
-import org.generationcp.middleware.domain.shared.AttributeRequestDto;
+import org.generationcp.middleware.dao.ims.LotDAO;
+import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
+import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInitializer;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.shared.AttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
-import org.generationcp.middleware.pojos.Attribute;
-import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.Method;
-import org.generationcp.middleware.pojos.MethodType;
+import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.LotAttribute;
+import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
+import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.inventory.LotAttributeService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -26,24 +32,25 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.core.Is.is;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+public class LotAttributeServiceImplIntegrationTest extends IntegrationTestBase {
 
-public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTestBase {
-
-	private static final String NOTE_ATTRIBUTE = "NOTE_AA_text";
+	private static final String TEST_ATTRIBUTE = "TEST_ATTRIBUTE";
 	private static final String ATTRIBUTE_VALUE = RandomStringUtils.randomAlphanumeric(5);
 	private static final Integer LOCATION_ID = 1;
 	private static final String ATTRIBUTE_DATE = "20210316";
 	private Integer userId, attributeId;
 	private String creationDate;
+	private CropType cropType;
+	private Lot lot;
 
 	private DaoFactory daoFactory;
+	private LotDAO lotDAO;
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
+
+	private static final String GERMPLASM = "GERMPLSM";
 
 	@Autowired
-	private GermplasmAttributeService germplasmAttributeService;
+	private LotAttributeService lotAttributeService;
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -53,35 +60,46 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.userId = this.findAdminUser();
 		this.creationDate = "20201212";
-		this.attributeId = this.daoFactory.getCvTermDao().getByNameAndCvId(NOTE_ATTRIBUTE, CvId.VARIABLES.getId()).getCvTermId();
+
+		this.lotDAO = this.daoFactory.getLotDao();
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
+
+		this.cropType = new CropType();
+		this.cropType.setUseUUID(false);
+
+		final Germplasm germplasm =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		final Integer germplasmId = this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+
+		this.lot =
+			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, germplasmId, 1, 8264, 0, 1, "Comments", "InventoryId");
+		this.lotDAO.save(this.lot);
+
+		this.attributeId = this.createTestVariable().getId();
 	}
 
 	@Test
-	public void testCreateGermplasmAttribute() {
-		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
-		final Integer createAttributeId = this.createAttribute(germplasm.getGid());
-		final Attribute attribute = this.daoFactory.getAttributeDAO().getById(createAttributeId);
+	public void testCreateLotAttribute() {
+		final Integer createAttributeId = this.createAttribute(this.lot.getId(), TEST_ATTRIBUTE);
+		final LotAttribute attribute = this.daoFactory.getLotAttributeDAO().getById(createAttributeId);
 		Assert.assertEquals(createAttributeId, attribute.getAid());
-		Assert.assertEquals(germplasm.getGid(), attribute.getGermplasmId());
+		Assert.assertEquals(this.lot.getId(), attribute.getLotId());
 		Assert.assertEquals(ATTRIBUTE_VALUE, attribute.getAval());
 		Assert.assertEquals(LOCATION_ID, attribute.getLocationId());
 	}
 
 	@Test
 	public void testUpdateGermplasmAttribute() {
-		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
-		final Integer createAttributeId = this.createAttribute(germplasm.getGid());
-		Attribute attribute = this.daoFactory.getAttributeDAO().getById(createAttributeId);
-		Assert.assertEquals(germplasm.getGid(), attribute.getGermplasmId());
+		final Integer createAttributeId = this.createAttribute(this.lot.getId(), TEST_ATTRIBUTE);
+		LotAttribute attribute = this.daoFactory.getLotAttributeDAO().getById(createAttributeId);
+		Assert.assertEquals(this.lot.getId(), attribute.getLotId());
 		Assert.assertEquals(ATTRIBUTE_VALUE, attribute.getAval());
 		Assert.assertEquals(LOCATION_ID, attribute.getLocationId());
 		final AttributeRequestDto dto = new AttributeRequestDto(attribute.getTypeId(), "new value", "20210317", 1);
-		this.germplasmAttributeService.updateGermplasmAttribute(createAttributeId, dto);
+		this.lotAttributeService.updateLotAttribute(createAttributeId, dto);
 
-		attribute = this.daoFactory.getAttributeDAO().getById(createAttributeId);
-		Assert.assertEquals(germplasm.getGid(), attribute.getGermplasmId());
+		attribute = this.daoFactory.getLotAttributeDAO().getById(createAttributeId);
+		Assert.assertEquals(this.lot.getId(), attribute.getLotId());
 		Assert.assertEquals(dto.getValue(), attribute.getAval());
 		Assert.assertEquals(dto.getLocationId(), attribute.getLocationId());
 		Assert.assertEquals("20210317", attribute.getAdate().toString());
@@ -89,76 +107,62 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 
 	@Test
 	public void testDeleteGermplasmAttribute() {
-		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
-		final Integer createAttributeId = this.createAttribute(germplasm.getGid());
-		this.germplasmAttributeService.deleteGermplasmAttribute(createAttributeId);
-		final Attribute attribute = this.daoFactory.getAttributeDAO().getById(createAttributeId);
+		final Integer createAttributeId = this.createAttribute(this.lot.getId(), TEST_ATTRIBUTE);
+		this.lotAttributeService.deleteLotAttribute(createAttributeId);
+		final LotAttribute attribute = this.daoFactory.getLotAttributeDAO().getById(createAttributeId);
 		Assert.assertNull(attribute);
 	}
 
 	@Test
 	public void testGetGermplasmAttributeDtos() {
-		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
-		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
-		final Integer createdAttributeId = this.createAttribute(germplasm.getGid());
-		final List<RecordAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(
-			germplasm.getGid(), VariableType.GERMPLASM_ATTRIBUTE.getId(), null);
-		final List<RecordAttributeDto> filteredDtos = germplasmAttributeDtos.stream().filter(dto -> dto.getId().equals(createdAttributeId))
+		final Integer createdAttributeId = this.createAttribute(this.lot.getId(), TEST_ATTRIBUTE);
+		final List<AttributeDto> lotAttributeDtos = this.lotAttributeService.getLotAttributeDtos(
+			this.lot.getId(), null);
+		final List<AttributeDto> filteredDtos = lotAttributeDtos.stream().filter(dto -> dto.getId().equals(createdAttributeId))
 			.collect(Collectors.toList());
 		Assert.assertFalse(CollectionUtils.isEmpty(filteredDtos));
-		final RecordAttributeDto germplasmAttributeDto = filteredDtos.get(0);
+		final AttributeDto germplasmAttributeDto = filteredDtos.get(0);
 		Assert.assertEquals(createdAttributeId, germplasmAttributeDto.getId());
 		Assert.assertEquals(ATTRIBUTE_VALUE, germplasmAttributeDto.getValue());
-		Assert.assertEquals(NOTE_ATTRIBUTE, germplasmAttributeDto.getVariableName());
+		Assert.assertEquals(TEST_ATTRIBUTE, germplasmAttributeDto.getVariableName());
 		Assert.assertEquals(ATTRIBUTE_DATE, germplasmAttributeDto.getDate());
 		Assert.assertEquals(LOCATION_ID, germplasmAttributeDto.getLocationId());
 	}
 
-	private Integer createAttribute(final Integer germplasmId) {
+	private Integer createAttribute(final Integer lotId, final String variableName) {
 		final VariableFilter variableFilter = new VariableFilter();
-		variableFilter.addName(NOTE_ATTRIBUTE);
-		variableFilter.addVariableType(VariableType.GERMPLASM_ATTRIBUTE);
+		variableFilter.addVariableType(VariableType.INVENTORY_ATTRIBUTE);
+		variableFilter.addName(variableName);
 		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 		final AttributeRequestDto dto = new AttributeRequestDto(variables.get(0).getId(), ATTRIBUTE_VALUE,
 			ATTRIBUTE_DATE, LOCATION_ID);
-		return this.germplasmAttributeService.createGermplasmAttribute(germplasmId, dto);
+		return this.lotAttributeService.createLotAttribute(lotId, dto);
 	}
 
-	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
-		final Integer gpid1, final Integer gpid2) {
-		return this.createGermplasm(method, germplasmUUID, location, gnpgs, gpid1, gpid2, null);
+	private Variable createTestVariable() {
+		// Create traitVariable
+		final CVTerm cvTermVariable = this.daoFactory.getCvTermDao()
+			.save(TEST_ATTRIBUTE, RandomStringUtils.randomAlphanumeric(10), CvId.VARIABLES);
+		final CVTerm property = this.daoFactory.getCvTermDao().save(RandomStringUtils.randomAlphanumeric(10), "", CvId.PROPERTIES);
+		final CVTerm scale = this.daoFactory.getCvTermDao().save(RandomStringUtils.randomAlphanumeric(10), "", CvId.SCALES);
+		this.daoFactory.getCvTermRelationshipDao().save(scale.getCvTermId(), TermId.HAS_TYPE.getId(), DataType.NUMERIC_VARIABLE.getId());
+		final CVTerm method = this.daoFactory.getCvTermDao().save(RandomStringUtils.randomAlphanumeric(10), "", CvId.METHODS);
+		final CVTerm numericDataType = this.daoFactory.getCvTermDao().getById(DataType.NUMERIC_VARIABLE.getId());
+
+		// Assign Property, Scale, Method
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(cvTermVariable.getCvTermId(), TermId.HAS_PROPERTY.getId(), property.getCvTermId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(cvTermVariable.getCvTermId(), TermId.HAS_SCALE.getId(), scale.getCvTermId());
+		this.daoFactory.getCvTermRelationshipDao().save(cvTermVariable.getCvTermId(), TermId.HAS_METHOD.getId(), method.getCvTermId());
+
+		this.daoFactory.getCvTermPropertyDao()
+			.save(new CVTermProperty(null, cvTermVariable.getCvTermId(), TermId.VARIABLE_TYPE.getId(),
+				VariableType.INVENTORY_ATTRIBUTE.getName(), 0));
+
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addVariableId(cvTermVariable.getCvTermId());
+		return this.daoFactory.getCvTermDao().getVariablesWithFilterById(variableFilter).values().stream().findFirst().get();
+
 	}
-
-	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
-		final Integer gpid1, final Integer gpid2, final Bibref reference) {
-		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2,
-			0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
-			0, 0, null, null, method);
-		if (StringUtils.isNotEmpty(germplasmUUID)) {
-			germplasm.setGermplasmUUID(germplasmUUID);
-		}
-		germplasm.setBibref(reference);
-		this.daoFactory.getGermplasmDao().save(germplasm);
-		this.sessionProvder.getSession().flush();
-
-		assertThat(germplasm.getCreatedBy(), is(this.userId));
-		assertNotNull(germplasm.getCreatedBy());
-		assertNull(germplasm.getModifiedBy());
-		assertNull(germplasm.getModifiedDate());
-
-		return germplasm;
-	}
-
-	private Method createBreedingMethod(final String breedingMethodType, final int numberOfProgenitors) {
-		final Method method =
-			new Method(null, breedingMethodType, "G", RandomStringUtils.randomAlphanumeric(4).toUpperCase(),
-				RandomStringUtils.randomAlphanumeric(10),
-				RandomStringUtils.randomAlphanumeric(10), 0, numberOfProgenitors, 1, 0, 1490, 1, 0, 19980708);
-		this.daoFactory.getMethodDAO().save(method);
-		this.sessionProvder.getSession().flush();
-		this.daoFactory.getMethodDAO().refresh(method);
-		return method;
-	}
-
 }
