@@ -266,16 +266,21 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	}
 
 	@Override
-	public List<GermplasmListStaticColumns> getDefaultColumns() {
-		if (this.defaultColumns == null) {
-			this.defaultColumns = this.daoFactory.getGermplasmListDataDefaultViewDAO()
-				.getAll()
-				.stream()
-				.map(GermplasmListDataDefaultView::getName)
-				.sorted(Comparator.comparingInt(GermplasmListStaticColumns::getRank))
-				.collect(toList());
-		}
-		return this.defaultColumns;
+	public void saveDefaultView(final GermplasmList list) {
+		// Forcing add ENTRY_NO variable.
+		// It is particular case because is required after the migration of ENTRY_NO as a entry detail variable.
+		final GermplasmListDataView germplasmListDataView =
+			new GermplasmListDataView.GermplasmListDataVariableViewBuilder(list, TermId.ENTRY_NO.getId(),
+				VariableType.ENTRY_DETAIL.getId()).build();
+		this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
+
+		this.getDefaultViewColumns()
+			.stream()
+			.forEach(column -> {
+				final GermplasmListDataView view =
+					new GermplasmListDataView.GermplasmListDataStaticViewBuilder(list, column.getTermId()).build();
+				this.daoFactory.getGermplasmListDataViewDAO().save(view);
+			});
 	}
 
 	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<GermplasmListDataSearchResponse> response) {
@@ -341,7 +346,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	}
 
 	private List<GermplasmListDataViewModel> transformDefaultView() {
-		return this.getDefaultColumns()
+		return this.getDefaultViewColumns()
 			.stream()
 			.map(column -> GermplasmListDataViewModel.buildStaticGermplasmListDataViewModel(column.getTermId()))
 			.collect(toList());
@@ -358,14 +363,26 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	}
 
 	private List<Integer> getDefaultColumnIds() {
-		return this.getDefaultColumns()
+		return this.getDefaultViewColumns()
 			.stream()
 			.map(GermplasmListStaticColumns::getTermId)
 			.collect(toList());
 	}
 
+	private List<GermplasmListStaticColumns> getDefaultViewColumns() {
+		if (this.defaultColumns == null) {
+			this.defaultColumns = this.daoFactory.getGermplasmListDataDefaultViewDAO()
+				.getAll()
+				.stream()
+				.map(GermplasmListDataDefaultView::getName)
+				.sorted(Comparator.comparingInt(GermplasmListStaticColumns::getRank))
+				.collect(toList());
+		}
+		return this.defaultColumns;
+	}
+
 	private List<GermplasmListMeasurementVariableDTO> transformDefaultStaticColumns() {
-		return this.getDefaultColumns()
+		return this.getDefaultViewColumns()
 			.stream()
 			.map(column -> new GermplasmListMeasurementVariableDTO(column.getTermId(), column.getName(), column.name(),
 				GermplasmListColumnCategory.STATIC))

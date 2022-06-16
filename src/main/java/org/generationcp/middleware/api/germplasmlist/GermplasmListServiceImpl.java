@@ -100,17 +100,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		final Set<Integer> variableIds = request.getEntries().stream().flatMap(e -> e.getData().keySet().stream()).collect(toSet());
 
 		// Add default columns
-		this.germplasmListDataService.getDefaultColumns()
-			.stream()
-			.forEach(column -> {
-				final GermplasmListDataView view =
-					new GermplasmListDataView.GermplasmListDataStaticViewBuilder(germplasmList, column.getTermId()).build();
-				this.daoFactory.getGermplasmListDataViewDAO().save(view);
-			});
-
-		// Forcing add ENTRY_NO variable.
-		// It is particular case because is required after the migration of ENTRY_NO as a entry detail variable.
-		variableIds.add(TermId.ENTRY_NO.getId());
+		this.germplasmListDataService.saveDefaultView(germplasmList);
 
 		for (final Integer variableId : variableIds) {
 			final GermplasmListDataView germplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(

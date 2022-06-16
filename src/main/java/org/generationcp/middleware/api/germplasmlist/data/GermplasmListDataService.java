@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.germplasmlist.data;
 
 import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.springframework.data.domain.Pageable;
 
@@ -31,6 +32,6 @@ public interface GermplasmListDataService {
 
 	List<Integer> getListDataIdsByListId(Integer listId);
 
-	List<GermplasmListStaticColumns> getDefaultColumns();
+	void saveDefaultView(final GermplasmList list);
 
 }
