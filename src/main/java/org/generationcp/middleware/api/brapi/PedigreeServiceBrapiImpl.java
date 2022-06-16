@@ -104,6 +104,8 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 					germplasmDAO.update(germplasm);
 					updatedGermplasmDbIds.add(germplasm.getGermplasmUUID());
 				} else {
+					// Detach the germplasm from session so that any changes to it will not be automatically persisted by the transaction.
+					germplasmDAO.evict(germplasm);
 					conflictErrors.putAll(conflictErrorsPerGermplasm);
 				}
 			}
