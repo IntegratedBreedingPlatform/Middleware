@@ -576,13 +576,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<Experiment> getExperimentsWithGid(final int dataSetId, final List<Integer> instanceNumbers,
+	public List<Experiment> getExperimentsWithGidAndCross(final int dataSetId, final List<Integer> instanceNumbers,
 		final List<Integer> repNumbers) {
 		final VariableTypeList variableTypes = this.dataSetBuilder.getVariableTypes(dataSetId);
-		if (variableTypes.findById(TermId.GID) == null) {
-			final StandardVariable gidVariable = this.standardVariableBuilder.getByName(TermId.GID.name(), null);
-			variableTypes.add(new DMSVariableType(TermId.GID.name(), null, gidVariable, 0));
-		}
+		this.addVariableIfNotPresent(variableTypes, TermId.GID);
+		// Forcing to add CROSS variable because we need cross values to show them in Advance Study > REVIEW ADVANCED LINES
+		this.addVariableIfNotPresent(variableTypes, TermId.CROSS);
+
 		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), variableTypes, instanceNumbers, repNumbers);
 	}
 
@@ -1201,4 +1201,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		return false;
 	}
+
+	private void addVariableIfNotPresent(final VariableTypeList variableTypes, final TermId termId) {
+		if (variableTypes.findById(termId) == null) {
+			final StandardVariable variable = this.standardVariableBuilder.getByName(termId.name(), null);
+			variableTypes.add(new DMSVariableType(termId.name(), null, variable, 0));
+		}
+	}
+
 }

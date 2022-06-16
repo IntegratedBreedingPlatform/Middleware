@@ -629,6 +629,6 @@ public interface StudyDataManager {
 	 * @return
 	 */
 	@Deprecated
-	List<Experiment> getExperimentsWithGid(int dataSetId, List<Integer> instanceNumbers, List<Integer> repNumbers);
+	List<Experiment> getExperimentsWithGidAndCross(int dataSetId, List<Integer> instanceNumbers, List<Integer> repNumbers);
 
 }
