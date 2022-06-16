@@ -15,7 +15,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
 import org.generationcp.middleware.dao.util.BrapiVariableUtils;
-import org.generationcp.middleware.domain.shared.RecordAttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
@@ -190,7 +190,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 		return attributeValue;
 	}
 
-	public List<RecordAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId,
+	public List<AttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId,
 		final String programUUID) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
@@ -224,7 +224,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 			}
 
 			sqlQuery.setParameter("programUUID", programUUID);
-			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(RecordAttributeDto.class));
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(AttributeDto.class));
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(

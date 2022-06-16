@@ -3,7 +3,7 @@ package org.generationcp.middleware.api.germplasm;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.domain.shared.AttributeDto;
+import org.generationcp.middleware.domain.shared.RecordAttributeDto;
 import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Variable;
@@ -102,12 +102,12 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 		final Integer createdAttributeId = this.createAttribute(germplasm.getGid());
-		final List<AttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(
+		final List<RecordAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(
 			germplasm.getGid(), VariableType.GERMPLASM_ATTRIBUTE.getId(), null);
-		final List<AttributeDto> filteredDtos = germplasmAttributeDtos.stream().filter(dto -> dto.getId().equals(createdAttributeId))
+		final List<RecordAttributeDto> filteredDtos = germplasmAttributeDtos.stream().filter(dto -> dto.getId().equals(createdAttributeId))
 			.collect(Collectors.toList());
 		Assert.assertFalse(CollectionUtils.isEmpty(filteredDtos));
-		final AttributeDto germplasmAttributeDto = filteredDtos.get(0);
+		final RecordAttributeDto germplasmAttributeDto = filteredDtos.get(0);
 		Assert.assertEquals(createdAttributeId, germplasmAttributeDto.getId());
 		Assert.assertEquals(ATTRIBUTE_VALUE, germplasmAttributeDto.getValue());
 		Assert.assertEquals(NOTE_ATTRIBUTE, germplasmAttributeDto.getVariableName());

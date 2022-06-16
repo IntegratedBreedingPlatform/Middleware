@@ -6,7 +6,7 @@ import org.pojomatic.annotations.AutoProperty;
 
 
 @AutoProperty
-public class RecordAttributeDto extends AttributeRequestDto {
+public class AttributeDto extends AttributeRequestDto {
 
 	private Integer id;
 
@@ -20,7 +20,7 @@ public class RecordAttributeDto extends AttributeRequestDto {
 
 	private Boolean hasFiles;
 
-	public RecordAttributeDto() {
+	public AttributeDto() {
 	}
 
 	public Integer getId() {

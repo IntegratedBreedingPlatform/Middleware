@@ -1,7 +1,8 @@
 package org.generationcp.middleware.dao.ims;
 
 import org.generationcp.middleware.dao.GenericAttributeDAO;
-import org.generationcp.middleware.domain.shared.RecordAttributeDto;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -33,18 +34,19 @@ public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 		+ "FROM ims_lot_attribute a "
 		+ "INNER JOIN cvterm cv ON a.atype = cv.cvterm_id "
 		+ "INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId() + " and cv.cvterm_id = cp.cvterm_id "
+		+ "		AND cp.value = '" + VariableType.INVENTORY_ATTRIBUTE.getName() + "' "
 		+ "LEFT JOIN location l on a.alocn = l.locid "
 		+ "LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = cv.cvterm_id AND vpo.program_uuid = :programUUID "
 		+ "WHERE a.lotId = :lotId ";
 
-	public List<RecordAttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
+	public List<AttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
 		try {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(GET_LOT_ATTRIBUTES);
 			this.addQueryScalars(sqlQuery);
 			sqlQuery.setParameter("lotId", lotId);
 			sqlQuery.setParameter("programUUID", programUUID);
 
-			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(RecordAttributeDto.class));
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(AttributeDto.class));
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
