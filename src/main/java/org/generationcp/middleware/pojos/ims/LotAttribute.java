@@ -1,15 +1,7 @@
-/*******************************************************************************
- * Copyright (c) 2012, All Rights Reserved.
- *
- * Generation Challenge Programme (GCP)
- *
- *
- * This software is licensed for use under the terms of the GNU General Public License (http://bit.ly/8Ztv8M) and the provisions of Part F
- * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
- *
- *******************************************************************************/
+package org.generationcp.middleware.pojos.ims;
 
-package org.generationcp.middleware.pojos;
+import org.generationcp.middleware.pojos.AbstractEntity;
+import org.generationcp.middleware.pojos.GenericAttribute;
 
 import javax.persistence.Basic;
 import javax.persistence.Column;
@@ -17,36 +9,29 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.NamedQueries;
-import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import java.io.Serializable;
-
 
 /**
  * POJO for atributs table.
  *
- * @author klmanansala
+ * @author cverano
  */
-@NamedQueries({@NamedQuery(name = "getAttributesByGID",
-	query = "FROM Attribute a WHERE a.germplasmId = :gid ")})
 @Entity
-@Table(name = "atributs")
-public class Attribute extends AbstractEntity implements GenericAttribute, Serializable {
+@Table(name = "ims_lot_attribute")
+public class LotAttribute extends AbstractEntity implements GenericAttribute, Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String GET_BY_GID = "getAttributesByGID";
-
 	@Id
-	@GeneratedValue(strategy= GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Basic(optional = false)
 	@Column(name = "aid")
 	private Integer aid;
 
 	@Basic(optional = false)
-	@Column(name = "gid")
-	private Integer germplasmId;
+	@Column(name = "lotid")
+	private Integer lotId;
 
 	@Basic(optional = false)
 	@Column(name = "atype")
@@ -71,17 +56,18 @@ public class Attribute extends AbstractEntity implements GenericAttribute, Seria
 	/**
 	 * Don't use it. This constructor is required by hibernate.
 	 */
-	public Attribute() {
+	public LotAttribute() {
 	}
 
-	public Attribute(Integer aid) {
+	public LotAttribute(final Integer aid) {
 		this.aid = aid;
 	}
 
-	public Attribute(Integer aid, Integer germplasmId, Integer typeId, String aval, Integer cValueId, Integer locationId,
-		Integer referenceId, Integer adate) {
+	public LotAttribute(final Integer aid, final Integer lotId, final Integer typeId, final String aval, final Integer cValueId,
+		final Integer locationId,
+		final Integer referenceId, final Integer adate) {
 		this.aid = aid;
-		this.germplasmId = germplasmId;
+		this.lotId = lotId;
 		this.typeId = typeId;
 		this.aval = aval;
 		this.cValueId = cValueId;
@@ -94,23 +80,23 @@ public class Attribute extends AbstractEntity implements GenericAttribute, Seria
 		return this.aid;
 	}
 
-	public void setAid(Integer aid) {
+	public void setAid(final Integer aid) {
 		this.aid = aid;
 	}
 
-	public Integer getGermplasmId() {
-		return this.germplasmId;
+	public Integer getLotId() {
+		return this.lotId;
 	}
 
-	public void setGermplasmId(Integer germplasmId) {
-		this.germplasmId = germplasmId;
+	public void setLotId(final Integer lotId) {
+		this.lotId = lotId;
 	}
 
 	public Integer getTypeId() {
 		return this.typeId;
 	}
 
-	public void setTypeId(Integer typeId) {
+	public void setTypeId(final Integer typeId) {
 		this.typeId = typeId;
 	}
 
@@ -118,7 +104,7 @@ public class Attribute extends AbstractEntity implements GenericAttribute, Seria
 		return this.locationId;
 	}
 
-	public void setLocationId(Integer locationId) {
+	public void setLocationId(final Integer locationId) {
 		this.locationId = locationId;
 	}
 
@@ -126,7 +112,7 @@ public class Attribute extends AbstractEntity implements GenericAttribute, Seria
 		return this.referenceId;
 	}
 
-	public void setReferenceId(Integer referenceId) {
+	public void setReferenceId(final Integer referenceId) {
 		this.referenceId = referenceId;
 	}
 
@@ -134,7 +120,7 @@ public class Attribute extends AbstractEntity implements GenericAttribute, Seria
 		return this.aval;
 	}
 
-	public void setAval(String aval) {
+	public void setAval(final String aval) {
 		this.aval = aval;
 	}
 
@@ -142,12 +128,12 @@ public class Attribute extends AbstractEntity implements GenericAttribute, Seria
 		return this.adate;
 	}
 
-	public void setAdate(Integer adate) {
+	public void setAdate(final Integer adate) {
 		this.adate = adate;
 	}
 
 	public Integer getcValueId() {
-		return cValueId;
+		return this.cValueId;
 	}
 
 	public void setcValueId(final Integer cValueId) {
@@ -156,11 +142,11 @@ public class Attribute extends AbstractEntity implements GenericAttribute, Seria
 
 	@Override
 	public String toString() {
-		StringBuilder builder = new StringBuilder();
+		final StringBuilder builder = new StringBuilder();
 		builder.append("Attribute [aid=");
 		builder.append(this.aid);
-		builder.append(", germplasmId=");
-		builder.append(this.germplasmId);
+		builder.append(", lotId=");
+		builder.append(this.lotId);
 		builder.append(", typeId=");
 		builder.append(this.typeId);
 		builder.append(", createdBy=");
@@ -180,13 +166,13 @@ public class Attribute extends AbstractEntity implements GenericAttribute, Seria
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
 
-		if (obj instanceof Attribute) {
-			Attribute param = (Attribute) obj;
+		if (obj instanceof LotAttribute) {
+			final LotAttribute param = (LotAttribute) obj;
 			if (this.getAid().equals(param.getAid())) {
 				return true;
 			}
