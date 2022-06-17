@@ -15,7 +15,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
 import org.generationcp.middleware.dao.util.BrapiVariableUtils;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
@@ -27,7 +27,6 @@ import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
-import org.hibernate.type.BooleanType;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.StringType;
 import org.springframework.data.domain.Pageable;
@@ -42,7 +41,7 @@ import java.util.stream.Collectors;
 /**
  * DAO class for {@link Attribute}.
  */
-public class AttributeDAO extends GenericDAO<Attribute, Integer> {
+public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 
 	private static final String COUNT_ATTRIBUTE_WITH_VARIABLES =
 		"SELECT COUNT(A.ATYPE) FROM ATRIBUTS A INNER JOIN GERMPLSM G ON G.GID = A.GID AND G.DELETED = 0 AND g.grplce = 0 WHERE A.ATYPE IN (:variableIds)";
@@ -191,7 +190,7 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return attributeValue;
 	}
 
-	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId,
+	public List<AttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId,
 		final String programUUID) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
@@ -218,23 +217,14 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 				queryString.append("AND cp.value = (select name from cvterm where cvterm_id = :variableTypeId) ");
 			}
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
-			sqlQuery.addScalar("id");
-			sqlQuery.addScalar("variableId");
-			sqlQuery.addScalar("value");
-			sqlQuery.addScalar("variableName");
-			sqlQuery.addScalar("variableTypeName");
-			sqlQuery.addScalar("variableDescription");
-			sqlQuery.addScalar("date");
-			sqlQuery.addScalar("locationId");
-			sqlQuery.addScalar("locationName");
-			sqlQuery.addScalar("hasFiles", new BooleanType());
+			this.addQueryScalars(sqlQuery);
 			sqlQuery.setParameter("gid", gid);
 			if (variableTypeId != null) {
 				sqlQuery.setParameter("variableTypeId", variableTypeId);
 			}
 
 			sqlQuery.setParameter("programUUID", programUUID);
-			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmAttributeDto.class));
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(AttributeDto.class));
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
@@ -539,5 +529,17 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		if (!CollectionUtils.isEmpty(requestDTO.getTraitClasses())) {
 			sqlQuery.setParameterList("traitClasses", requestDTO.getTraitClasses());
 		}
+	}
+
+	@Override
+	protected Attribute getNewAttributeInstance(final Integer id) {
+		final Attribute newAttribute = new Attribute();
+		newAttribute.setGermplasmId(id);
+		return newAttribute;
+	}
+
+	@Override
+	protected String getCountAttributeWithVariablesQuery() {
+		return COUNT_ATTRIBUTE_WITH_VARIABLES;
 	}
 }
