@@ -3,8 +3,8 @@ package org.generationcp.middleware.api.germplasm;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeRequestDto;
+import org.generationcp.middleware.domain.shared.AttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -77,7 +77,7 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 		Assert.assertEquals(germplasm.getGid(), attribute.getGermplasmId());
 		Assert.assertEquals(ATTRIBUTE_VALUE, attribute.getAval());
 		Assert.assertEquals(LOCATION_ID, attribute.getLocationId());
-		final GermplasmAttributeRequestDto dto = new GermplasmAttributeRequestDto(attribute.getTypeId(), "new value", "20210317", 1);
+		final AttributeRequestDto dto = new AttributeRequestDto(attribute.getTypeId(), "new value", "20210317", 1);
 		this.germplasmAttributeService.updateGermplasmAttribute(createAttributeId, dto);
 
 		attribute = this.daoFactory.getAttributeDAO().getById(createAttributeId);
@@ -102,12 +102,12 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 		final Germplasm germplasm = this.createGermplasm(method, null, null, 0, 0, 0);
 		final Integer createdAttributeId = this.createAttribute(germplasm.getGid());
-		final List<GermplasmAttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(
+		final List<AttributeDto> germplasmAttributeDtos = this.germplasmAttributeService.getGermplasmAttributeDtos(
 			germplasm.getGid(), VariableType.GERMPLASM_ATTRIBUTE.getId(), null);
-		final List<GermplasmAttributeDto> filteredDtos = germplasmAttributeDtos.stream().filter(dto -> dto.getId().equals(createdAttributeId))
+		final List<AttributeDto> filteredDtos = germplasmAttributeDtos.stream().filter(dto -> dto.getId().equals(createdAttributeId))
 			.collect(Collectors.toList());
 		Assert.assertFalse(CollectionUtils.isEmpty(filteredDtos));
-		final GermplasmAttributeDto germplasmAttributeDto = filteredDtos.get(0);
+		final AttributeDto germplasmAttributeDto = filteredDtos.get(0);
 		Assert.assertEquals(createdAttributeId, germplasmAttributeDto.getId());
 		Assert.assertEquals(ATTRIBUTE_VALUE, germplasmAttributeDto.getValue());
 		Assert.assertEquals(NOTE_ATTRIBUTE, germplasmAttributeDto.getVariableName());
@@ -120,7 +120,7 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 		variableFilter.addName(NOTE_ATTRIBUTE);
 		variableFilter.addVariableType(VariableType.GERMPLASM_ATTRIBUTE);
 		final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
-		final GermplasmAttributeRequestDto dto = new GermplasmAttributeRequestDto(variables.get(0).getId(), ATTRIBUTE_VALUE,
+		final AttributeRequestDto dto = new AttributeRequestDto(variables.get(0).getId(), ATTRIBUTE_VALUE,
 			ATTRIBUTE_DATE, LOCATION_ID);
 		return this.germplasmAttributeService.createGermplasmAttribute(germplasmId, dto);
 	}

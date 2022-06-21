@@ -373,6 +373,10 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="lotAttributeService" class="org.generationcp.middleware.service.impl.inventory.LotAttributeServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
 	<bean id="copService" class="org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceImpl">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>

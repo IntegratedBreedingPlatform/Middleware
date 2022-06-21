@@ -4,9 +4,9 @@ import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.AttributeExternalReferenceDAO;
 import org.generationcp.middleware.dao.BibrefDAO;
 import org.generationcp.middleware.dao.BreedersQueryDao;
-import org.generationcp.middleware.dao.CropParameterDAO;
 import org.generationcp.middleware.dao.CopMatrixDao;
 import org.generationcp.middleware.dao.CountryDAO;
+import org.generationcp.middleware.dao.CropParameterDAO;
 import org.generationcp.middleware.dao.CropTypeDAO;
 import org.generationcp.middleware.dao.CvTermExternalReferenceDAO;
 import org.generationcp.middleware.dao.ExperimentExternalReferenceDao;
@@ -83,6 +83,7 @@ import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDetailDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataSearchDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataViewDAO;
 import org.generationcp.middleware.dao.ims.ExperimentTransactionDAO;
+import org.generationcp.middleware.dao.ims.LotAttributeDAO;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.dao.oms.CVDao;
@@ -197,6 +198,12 @@ public class DaoFactory {
 
 	public AttributeDAO getAttributeDAO() {
 		final AttributeDAO attributeDAO = new AttributeDAO();
+		attributeDAO.setSession(this.sessionProvider.getSession());
+		return attributeDAO;
+	}
+
+	public LotAttributeDAO getLotAttributeDAO() {
+		final LotAttributeDAO attributeDAO = new LotAttributeDAO();
 		attributeDAO.setSession(this.sessionProvider.getSession());
 		return attributeDAO;
 	}

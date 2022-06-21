@@ -36,7 +36,8 @@ public class PhenotypeQuery {
 		+ "  s.uniquename AS entryNumber,"
 		+ "  dataset.program_uuid as programDbId,"
 		+ "  p.project_id as trialDbId, " //
-		+ "  p.name as trialDbName "
+		+ "  p.name as trialDbName, "//
+		+ "  dataset.project_id as datasetDbId "
 		+ " FROM " //
 		+ "  project dataset " //
 		+ "  INNER JOIN nd_experiment nde ON nde.project_id = dataset.project_id " //
