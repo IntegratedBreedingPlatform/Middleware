@@ -733,7 +733,7 @@ public class WorkbookBuilder extends Builder {
 		if (variables != null) {
 			return variables.getVariableTypes().stream()
 				.filter(variableType -> variableType.getVariableType() == VariableType.ENTRY_DETAIL)
-				.map(variableType -> this.getMeasurementVariableTransformer().transform(variableType, false, false))
+				.map(variableType -> this.getMeasurementVariableTransformer().transform(variableType, true, false))
 				.collect(Collectors.toList());
 		}
 		return new ArrayList<>();
