@@ -28,7 +28,6 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
-import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.Util;
@@ -54,7 +53,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toSet;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -359,7 +357,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.addGermplasmEntriesModelsToList(destinationGermplasmList, addGermplasmEntriesModels);
 	}
 
-	private AddGermplasmEntryModel constructGermplasmEntryModel(final Map<Integer, GermplasmSearchResponse> germplasmResponseMap, final Integer gid) {
+	private AddGermplasmEntryModel constructGermplasmEntryModel(final Map<Integer, GermplasmSearchResponse> germplasmResponseMap,
+		final Integer gid) {
 		return new AddGermplasmEntryModel(
 			gid, germplasmResponseMap.get(gid).getGermplasmPreferredName(), germplasmResponseMap.get(gid).getGroupId());
 	}
@@ -707,8 +706,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private void deleteGermplasmListData(final List<GermplasmListData> germplasmListData) {
 		try {
-			for (final GermplasmListData data : germplasmListData) {
-				this.daoFactory.getGermplasmListDataDAO().makeTransient(data);
+			if (!CollectionUtils.isEmpty(germplasmListData)) {
+				// Delete first the listDataDetail associated to the listData
+				this.daoFactory.getGermplasmListDataDetailDAO()
+					.deleteByListDataIds(germplasmListData.stream().map(GermplasmListData::getListDataId).collect(
+						Collectors.toSet()));
+				// Then delete the listData
+				for (final GermplasmListData data : germplasmListData) {
+					this.daoFactory.getGermplasmListDataDAO().makeTransient(data);
+				}
 			}
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
