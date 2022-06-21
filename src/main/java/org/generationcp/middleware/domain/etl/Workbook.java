@@ -1067,9 +1067,6 @@ public class Workbook {
 	}
 
 	public List<MeasurementVariable> getEntryDetails() {
-		if (this.entryDetails == null) {
-			this.entryDetails = this.getEntryDetailVariables(this.factors);
-		}
 		return this.entryDetails;
 	}
 
