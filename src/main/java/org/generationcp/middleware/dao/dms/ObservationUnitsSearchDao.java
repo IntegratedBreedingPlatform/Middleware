@@ -288,17 +288,17 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final Set<String> joins = new LinkedHashSet<>();
 
 		if ((!CollectionUtils.isEmpty(filter.getFilteredValues()) && filter.getFilteredValues().keySet().contains(String.valueOf(TermId.GROUPGID.getId()))) ||
-				this.checkFilterContainsFactor(filter, TermId.GUID.getId())) {
+				this.checkFilterContainsFactor(filter, TermId.GUID.getId()) ||
+				this.checkFilterContainsFactor(filter, TermId.IMMEDIATE_SOURCE_NAME.getId()) ||
+				this.checkFilterContainsFactor(filter, TermId.GROUP_SOURCE_NAME.getId())) {
 			joins.add(GERMPLASM_JOIN);
 		}
 
 		if (this.checkFilterContainsFactor(filter, TermId.IMMEDIATE_SOURCE_NAME.getId())) {
-			joins.add(GERMPLASM_JOIN);
 			joins.add(IMMEDIATE_SOURCE_NAME_JOIN);
 		}
 
 		if (this.checkFilterContainsFactor(filter, TermId.GROUP_SOURCE_NAME.getId())) {
-			joins.add(GERMPLASM_JOIN);
 			joins.add(GROUP_SOURCE_NAME_JOIN);
 		}
 
@@ -741,17 +741,17 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final Set<String> joins = new LinkedHashSet<>();
 
 		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUPGID) ||
-			this.hasDescriptor(genericGermplasmDescriptors, TermId.GUID)) {
+			this.hasDescriptor(genericGermplasmDescriptors, TermId.GUID) ||
+			this.hasDescriptor(genericGermplasmDescriptors, TermId.IMMEDIATE_SOURCE_NAME) ||
+			this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUP_SOURCE_NAME)) {
 			sql.append(GERMPLASM_JOIN);
 		}
 
 		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.IMMEDIATE_SOURCE_NAME)) {
-			sql.append(GERMPLASM_JOIN);
 			sql.append(IMMEDIATE_SOURCE_NAME_JOIN);
 		}
 
 		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUP_SOURCE_NAME)) {
-			sql.append(GERMPLASM_JOIN);
 			sql.append(GROUP_SOURCE_NAME_JOIN);
 		}
 
