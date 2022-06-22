@@ -413,6 +413,10 @@
 		<constructor-arg name="workbenchSessionProvider" ref="workbenchSessionProvider"/>
 	</bean>
 
+	<bean id="pedigreeServiceBrapi" class="org.generationcp.middleware.api.brapi.PedigreeServiceBrapiImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 	<bean id="studyEntryObservationService" class="org.generationcp.middleware.api.study.StudyEntryObservationServiceImpl">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>

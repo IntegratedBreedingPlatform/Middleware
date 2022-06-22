@@ -352,7 +352,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		this.addGermplasmEntriesModelsToList(destinationGermplasmList, addGermplasmEntriesModels);
 	}
 
-	private AddGermplasmEntryModel constructGermplasmEntryModel(final Map<Integer, GermplasmSearchResponse> germplasmResponseMap, final Integer gid) {
+	private AddGermplasmEntryModel constructGermplasmEntryModel(final Map<Integer, GermplasmSearchResponse> germplasmResponseMap,
+		final Integer gid) {
 		return new AddGermplasmEntryModel(
 			gid, germplasmResponseMap.get(gid).getGermplasmPreferredName(), germplasmResponseMap.get(gid).getGroupId());
 	}
@@ -705,8 +706,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private void deleteGermplasmListData(final List<GermplasmListData> germplasmListData) {
 		try {
-			for (final GermplasmListData data : germplasmListData) {
-				this.daoFactory.getGermplasmListDataDAO().makeTransient(data);
+			if (!CollectionUtils.isEmpty(germplasmListData)) {
+				// Delete first the listDataDetail associated to the listData
+				this.daoFactory.getGermplasmListDataDetailDAO()
+					.deleteByListDataIds(germplasmListData.stream().map(GermplasmListData::getListDataId).collect(
+						Collectors.toSet()));
+				// Then delete the listData
+				for (final GermplasmListData data : germplasmListData) {
+					this.daoFactory.getGermplasmListDataDAO().makeTransient(data);
+				}
 			}
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
