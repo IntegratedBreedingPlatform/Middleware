@@ -4,5 +4,14 @@ public enum ParentType {
 	MALE,
 	FEMALE,
 	SELF,
-	POPULATION
+	POPULATION;
+
+	public static ParentType fromString(final String text) {
+		for (final ParentType parentType : ParentType.values()) {
+			if (parentType.name().equals(text)) {
+				return parentType;
+			}
+		}
+		return null;
+	}
 }
