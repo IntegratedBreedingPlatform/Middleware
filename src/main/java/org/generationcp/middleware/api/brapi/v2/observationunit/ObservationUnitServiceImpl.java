@@ -37,11 +37,13 @@ import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.OntologyService;
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,6 +89,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	@Resource
 	private ObservationServiceBrapi observationService;
+
+	@Resource
+	private PedigreeService pedigreeService;
+
+	@Resource
+	private CrossExpansionProperties crossExpansionProperties;
 
 	private final HibernateSessionProvider sessionProvider;
 	private final DaoFactory daoFactory;
@@ -194,6 +202,9 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			);
 		}
 
+		final Map<Integer, Integer> generationLevelByTrialIds = this.daoFactory.getDmsProjectDAO().getByIds(trialIds)
+			.stream()
+			.collect(Collectors.toMap(DmsProject::getProjectId, trial -> trial.getGenerationLevel() == null ? 1 : trial.getGenerationLevel()));
 		final Map<Integer, DmsProject> trialIdPlotDatasetMap =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.PLOT_DATA.getId()).stream()
 				.collect(Collectors.toMap(plotDataset -> plotDataset.getStudy().getProjectId(), Function.identity()));
@@ -237,8 +248,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			// If combination of germplasmDbId and entryNumber (if specified) does not exist, create new stock
 			if (!stockMap.get(trialDbId)
 				.containsKey(dto.getGermplasmDbId(), entryNoOptional.orElse(StringUtils.EMPTY))) {
+				final GermplasmDTO germplasmDTO = germplasmDTOMap.get(dto.getGermplasmDbId());
+				final Integer generationLevel = generationLevelByTrialIds.get(trialDbId);
+				final String crossExpansion = this.pedigreeService
+					.getCrossExpansion(Integer.valueOf(germplasmDTO.getGid()), generationLevel, this.crossExpansionProperties);
 				final StockModel stockModel =
-					this.createStockModel(germplasmDTOMap.get(dto.getGermplasmDbId()), stockMap, dto, trialDbId, entryTypes, entryTypesMap);
+					this.createStockModel(germplasmDTO, stockMap, dto, trialDbId, entryTypes, entryTypesMap, crossExpansion);
 				stockMap.get(trialDbId).put(dto.getGermplasmDbId(), entryNoOptional.orElse(StringUtils.EMPTY), stockModel);
 			}
 
@@ -406,8 +421,10 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	private StockModel createStockModel(final GermplasmDTO germplasmDTO, final Map<Integer, MultiKeyMap> stockMap,
 		final ObservationUnitImportRequestDto dto, final Integer trialDbId, final Map<String, Integer> entryTypes,
-		final Map<String, Map<String, Integer>> entryTypesMap) {
+		final Map<String, Map<String, Integer>> entryTypesMap, final String cross) {
+
 		final StockModel stockModel = new StockModel();
+		stockModel.setCross(cross);
 
 		final Optional<String> entryNoOptional =
 			!MapUtils.isEmpty(dto.getAdditionalInfo()) ? Optional.ofNullable(dto.getAdditionalInfo().getOrDefault(ENTRY_NO, null)) :

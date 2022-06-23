@@ -77,7 +77,9 @@ class ObservationQuery {
 			+ "   g.germplsm_uuid AS GERMPLSM_UUID, " //
 			+ "   s.name AS DESIGNATION, " //
 			+ "   s.uniquename AS ENTRY_NO, " //
-			+ "   s.value AS ENTRY_CODE, " //
+			+ "   (SELECT isp.value FROM stockprop isp "
+			+ "              INNER JOIN cvterm ispcvt1 ON ispcvt1.cvterm_id = isp.type_id "
+			+ "     WHERE isp.stock_id = s.stock_id AND ispcvt1.name = 'ENTRY_CODE' ) AS ENTRY_CODE, " //
 			+ "   (SELECT isp.value " //
 			+ " 	FROM " //
 			+ "      stockprop isp " //
