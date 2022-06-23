@@ -613,17 +613,13 @@
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 FROM CVTERM WHERE IS_SYSTEM = 1
-					AND NAME IN ('CROSS','DESIGNATION','GID',
-								 'GROUP_SOURCE_NAME','GROUPGID','OBS_UNIT_ID',
-								 'IMMEDIATE_SOURCE_NAME','GUID');
+					AND CVTERM_ID IN (8377, 8250, 8240, 8330, 8340, 8235, 8378, 8201);
             </sqlCheck>
         </preConditions>
         <comment>Mark Germplasm Descriptors as system variables</comment>
         <sql dbms="mysql" splitStatements="true">
 			 UPDATE CVTERM SET IS_SYSTEM = 1
-			 WHERE NAME IN ('CROSS','DESIGNATION','GID',
-							'GROUP_SOURCE_NAME','GROUPGID','OBS_UNIT_ID',
-							'IMMEDIATE_SOURCE_NAME','GUID');
+			 WHERE CVTERM_ID IN (8377, 8250, 8240, 8330, 8340, 8235, 8378, 8201);
         </sql>
 	</changeSet>
 
