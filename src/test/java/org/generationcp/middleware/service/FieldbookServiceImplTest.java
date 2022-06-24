@@ -13,6 +13,7 @@ package org.generationcp.middleware.service;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.etl.Workbook;
@@ -46,6 +47,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import javax.annotation.Resource;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -71,6 +73,9 @@ public class FieldbookServiceImplTest {
 	GermplasmListManager germplasmListManager;
 
 	@Mock
+	private GermplasmListDataService germplasmListDataService;
+
+	@Mock
 	private CrossExpansionProperties crossExpansionProperties;
 
 	@Mock
@@ -94,6 +99,7 @@ public class FieldbookServiceImplTest {
 		this.fieldbookServiceImpl.setGermplasmGroupingService(this.germplasmGroupingService);
 		this.fieldbookServiceImpl.setLocationDataManager(this.locationDataManager);
 		this.fieldbookServiceImpl.setGermplasmListManager(this.germplasmListManager);
+		this.fieldbookServiceImpl.setGermplasmListDataService(this.germplasmListDataService);
 		this.fieldbookServiceImpl.setWorkbookSaver(this.workbookSaver);
 		Mockito.doReturn(this.session).when(this.sessionProvider).getSession();
 		Mockito.doReturn(this.query).when(this.session).createSQLQuery(ArgumentMatchers.anyString());

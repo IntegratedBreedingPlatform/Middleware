@@ -752,6 +752,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		this.workbookSaver = workbookSaver;
 	}
 
+	public void setGermplasmListDataService(final GermplasmListDataService germplasmListDataService) {
+		this.germplasmListDataService = germplasmListDataService;
+	}
+
 	@Override
 	public void deleteAllFieldMapsByTrialInstanceIds(final List<Integer> geolocationId, final Integer projectId,
 		final boolean deleteProjectProp) {
