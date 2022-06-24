@@ -25,7 +25,7 @@ public class StockSaverTest {
 
 	private enum StockVariable {
 
-		ENTRY_NO(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.toString(), PhenotypicType.GERMPLASM, "1"),
+		ENTRY_NO(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.toString(), PhenotypicType.ENTRY_DETAIL, "1"),
 		GID(TermId.GID.getId(), TermId.GID.toString(), PhenotypicType.GERMPLASM, "4"),
 		DESIG(TermId.DESIG.getId(), TermId.DESIG.toString(), PhenotypicType.GERMPLASM,"SDFTY"),
 		GERMPLASM_1(1, "GERMPLASM_1", PhenotypicType.GERMPLASM, "3"),
@@ -91,7 +91,7 @@ public class StockSaverTest {
 
 	private VariableList createVariableList() {
 		VariableList variableList = new VariableList();
-		for (int i = 0; i < 6; i++) {
+		for (int i = 0; i < StockVariable.values().length; i++) {
 			StockVariable variable = StockVariable.values()[i];
 			int standardVariableId = variable.getId();
 			String name = variable.getName();
