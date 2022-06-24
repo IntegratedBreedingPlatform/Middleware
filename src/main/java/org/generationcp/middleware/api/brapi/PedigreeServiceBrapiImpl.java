@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.brapi;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeSearchRequest;
@@ -27,10 +28,13 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @Transactional
@@ -50,14 +54,33 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 	}
 
 	@Override
+	public long countPedigreeNodes(final PedigreeNodeSearchRequest pedigreeNodeSearchRequest) {
+		return this.daoFactory.getGermplasmDao().countPedigreeNodes(pedigreeNodeSearchRequest);
+	}
+
+	@Override
 	public List<PedigreeNodeDTO> searchPedigreeNodes(final PedigreeNodeSearchRequest pedigreeNodeSearchRequest, final Pageable pageable) {
 		final List<PedigreeNodeDTO> result = this.daoFactory.getGermplasmDao().searchPedigreeNodes(pedigreeNodeSearchRequest, pageable);
-		final Map<Integer, String> pedigreeStringMap =
-			this.pedigreeService.getCrossExpansions(result.stream().map(PedigreeNodeDTO::getGid).collect(Collectors.toSet()), null,
-				this.crossExpansionProperties);
-		for (final PedigreeNodeDTO pedigreeNodeDTO : result) {
-			if (pedigreeStringMap.containsKey(pedigreeNodeDTO.getGid())) {
-				pedigreeNodeDTO.setPedigreeString(pedigreeStringMap.get(pedigreeNodeDTO.getGid()));
+
+		// Extract the gids of the germplasm and its parents
+		final List<Integer> gids = result.stream().map(PedigreeNodeDTO::getGid).filter(Objects::nonNull).collect(Collectors.toList());
+		gids.addAll(result.stream().filter(p -> !CollectionUtils.isEmpty(p.getParents())).flatMap(p -> p.getParents().stream())
+			.map(PedigreeNodeReferenceDTO::getGid).filter(Objects::nonNull)
+			.collect(Collectors.toList()));
+
+		if (!CollectionUtils.isEmpty(result)) {
+			// Populate the preferred name, external references and pedigree string
+			final Map<Integer, String> preferredNamesMap = this.daoFactory.getNameDao().getPreferredNamesByGIDs(gids);
+			final Map<Integer, String> pedigreeStringMap =
+				this.pedigreeService.getCrossExpansions(new HashSet<>(gids), null, this.crossExpansionProperties);
+			final Map<String, List<ExternalReferenceDTO>> referencesByGidMap =
+				this.daoFactory.getGermplasmExternalReferenceDAO().getExternalReferences(gids).stream()
+					.collect(groupingBy(ExternalReferenceDTO::getEntityId));
+			for (final PedigreeNodeDTO pedigreeNodeDTO : result) {
+				pedigreeNodeDTO.setPedigreeString(pedigreeStringMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				pedigreeNodeDTO.setDefaultDisplayName(preferredNamesMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				pedigreeNodeDTO.setExternalReferences(
+					referencesByGidMap.getOrDefault(String.valueOf(pedigreeNodeDTO.getGid()), new ArrayList<>()));
 			}
 		}
 		return result;

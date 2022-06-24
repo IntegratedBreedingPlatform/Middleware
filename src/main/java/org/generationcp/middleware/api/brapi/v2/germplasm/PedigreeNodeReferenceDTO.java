@@ -1,6 +1,6 @@
 package org.generationcp.middleware.api.brapi.v2.germplasm;
 
-import org.generationcp.middleware.domain.germplasm.ParentType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -10,6 +10,9 @@ public class PedigreeNodeReferenceDTO {
 	private String germplasmDbId;
 	private String germplasmName;
 	private String parentType;
+
+	@JsonIgnore
+	private Integer gid;
 
 	public PedigreeNodeReferenceDTO() {
 
@@ -43,6 +46,14 @@ public class PedigreeNodeReferenceDTO {
 
 	public void setParentType(final String parentType) {
 		this.parentType = parentType;
+	}
+
+	public Integer getGid() {
+		return gid;
+	}
+
+	public void setGid(Integer gid) {
+		this.gid = gid;
 	}
 
 	@Override
