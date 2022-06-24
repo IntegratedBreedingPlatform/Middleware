@@ -191,6 +191,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final StockModel stock = new StockModel();
 		stock.setGermplasm(germplasm);
 		stock.setUniqueName("1");
+		stock.setCross("-");
 		stock.setIsObsolete(false);
 		stock.setProject(new DmsProject(TEST_PROJECT_ID));
 		this.daoFactory.getStockDao().save(stock);
@@ -715,6 +716,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		stockModel.setName("Germplasm 1");
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
+		stockModel.setCross("-");
 		stockModel.setProject(study);
 		this.daoFactory.getStockDao().saveOrUpdate(stockModel);
 		experimentModel.setStock(stockModel);

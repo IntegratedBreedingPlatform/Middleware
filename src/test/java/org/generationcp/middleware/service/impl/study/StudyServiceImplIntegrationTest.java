@@ -117,7 +117,9 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getGermplasmDao().save(germplasm);
 
 		stockModel.setGermplasm(germplasm);
+		stockModel.setCross("-");
 		stockModel.setProject(newStudy);
+
 		this.daoFactory.getStockDao().saveOrUpdate(stockModel);
 		this.sessionProvder.getSession().flush();
 

@@ -27,7 +27,7 @@ public class StockSaverTest {
 
 		ENTRY_NO(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.toString(), PhenotypicType.ENTRY_DETAIL, "1"),
 		GID(TermId.GID.getId(), TermId.GID.toString(), PhenotypicType.GERMPLASM, "4"),
-		DESIG(TermId.DESIG.getId(), TermId.DESIG.toString(), PhenotypicType.GERMPLASM,"SDFTY"),
+		//DESIG(TermId.DESIG.getId(), TermId.DESIG.toString(), PhenotypicType.GERMPLASM,"SDFTY"),
 		GERMPLASM_1(1, "GERMPLASM_1", PhenotypicType.GERMPLASM, "3"),
 		GERMPLASM_2(2, "GERMPLASM_2", PhenotypicType.GERMPLASM, "4");
 
@@ -72,7 +72,7 @@ public class StockSaverTest {
 		assertNotNull(this.stockModel);
 		assertEquals(StockVariable.ENTRY_NO.getValue(), this.stockModel.getUniqueName());
 		assertEquals(StockVariable.GID.getValue(), this.stockModel.getGermplasm().getGid().toString());
-		assertEquals(StockVariable.DESIG.getValue(), this.stockModel.getName());
+		//assertEquals(StockVariable.DESIG.getValue(), this.stockModel.getName());
 		assertNotNull(this.stockModel.getProperties());
 		assertEquals(2, this.stockModel.getProperties().size());
 		for (StockProperty property : this.stockModel.getProperties()) {
