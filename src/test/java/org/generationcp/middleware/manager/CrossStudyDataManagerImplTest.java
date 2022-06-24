@@ -292,6 +292,7 @@ public class CrossStudyDataManagerImplTest extends IntegrationTestBase {
 		stockModel.setUniqueName("1");
 		stockModel.setGermplasm(germplasm);
 		stockModel.setProject(study);
+		stockModel.setCross("-");
 		this.stockDao.saveOrUpdate(stockModel);
 
 		final ExperimentModel experimentModel = new ExperimentModel();
