@@ -423,6 +423,7 @@ public class SampleDaoTest extends IntegrationTestBase {
 			stockModel.setIsObsolete(false);
 			stockModel.setUniqueName(String.valueOf(i));
 			stockModel.setGermplasm(germplasm);
+			stockModel.setCross("-");
 			stockModel.setProject(study);
 			this.stockDao.saveOrUpdate(stockModel);
 

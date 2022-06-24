@@ -537,6 +537,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			stockModel.setIsObsolete(false);
 			stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(10));
 			stockModel.setGermplasm(germplasm);
+			stockModel.setCross("-");
 			stockModel.setProject(this.study);
 			this.stockDao.saveOrUpdate(stockModel);
 

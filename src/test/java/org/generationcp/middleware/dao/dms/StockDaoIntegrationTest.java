@@ -229,6 +229,7 @@ public class StockDaoIntegrationTest extends IntegrationTestBase {
 		stockModel.setName(RandomStringUtils.randomAlphanumeric(10));
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
+		stockModel.setCross("-");
 		stockModel.setProject(study);
 		stockModel.setCross(RandomStringUtils.randomAlphanumeric(10));
 		this.stockDao.saveOrUpdate(stockModel);
