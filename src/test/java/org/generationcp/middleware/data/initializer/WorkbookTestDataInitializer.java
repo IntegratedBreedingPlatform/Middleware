@@ -210,6 +210,7 @@ public class WorkbookTestDataInitializer {
 			WorkbookTestDataInitializer.LOCATION_ID_1));
 		WorkbookTestDataInitializer.createFactors(workbook, true, hasMultipleLocations, studyNo);
 		WorkbookTestDataInitializer.createConstants(workbook);
+		WorkbookTestDataInitializer.createEntryDetails(workbook);
 		WorkbookTestDataInitializer.createVariates(workbook, isForMeansDataset);
 		WorkbookTestDataInitializer.createObservations(workbook, noOfObservations, hasMultipleLocations, studyNo, isForMeansDataset);
 		WorkbookTestDataInitializer.createEntryDetails(workbook);
@@ -374,9 +375,15 @@ public class WorkbookTestDataInitializer {
 		// Entry Factors
 		if (withEntry) {
 			factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), WorkbookTestDataInitializer.ENTRY,
-					"The germplasm entry number", WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
-					WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.STUDY,
-					WorkbookTestDataInitializer.ENTRY, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.ENTRY_DETAIL, false));
+				"The germplasm entry number", WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
+				WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.STUDY,
+				WorkbookTestDataInitializer.ENTRY, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.ENTRY_DETAIL, false));
+
+			factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), WorkbookTestDataInitializer.ENTRY_TYPE,
+				"The germplasm entry type", WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
+				WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.CATEGORICA, WorkbookTestDataInitializer.STUDY,
+				WorkbookTestDataInitializer.ENTRY_TYPE, TermId.CATEGORICAL_VARIATE.getId(), PhenotypicType.ENTRY_DETAIL, false));
+
 		}
 
 		factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.GID.getId(), WorkbookTestDataInitializer.GID,
