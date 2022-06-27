@@ -239,9 +239,10 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		this.service.replaceStudyEntry(study.getProjectId(), oldEntry.getEntryId(), newGid);
 
 		final StockModel newEntry = this.daoFactory.getStockDao().getStocksForStudy(study.getProjectId()).stream()
-			.filter(stockModel -> stockModel.getGermplasm().getGid().equals(newGid)).findFirst().get();
+			.filter(stockModel -> stockModel.getGermplasm().getGid().equals(newGid) &&
+				Integer.valueOf(stockModel.getUniqueName()).equals(oldEntry.getEntryNumber())).findFirst().get();
 
-		Assert.assertNotEquals(oldEntry.getEntryId(), newEntry.getUniqueName());
+		Assert.assertNotEquals(oldEntry.getEntryId(), newEntry.getStockId());
 		Assert.assertEquals(GERMPLASM_PREFERRED_NAME_PREFIX + 1, newEntry.getName());
 		Assert.assertEquals(newGid, newEntry.getGermplasm().getGid());
 		// Some fields should have been copied from old entry
@@ -251,7 +252,7 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		assertTrue(entryType.isPresent());
 		Assert.assertEquals(oldEntry.getProperties().get(TermId.ENTRY_TYPE.getId()).getValue(),
 			entryType.get().getValue());
-		Assert.assertEquals(oldEntry.getEntryNumber(), newEntry.getUniqueName());
+		Assert.assertEquals(oldEntry.getEntryNumber(), Integer.valueOf(newEntry.getUniqueName()));
 	}
 
 	@Test(expected = MiddlewareRequestException.class)
@@ -395,11 +396,11 @@ public class StudyEntryServiceImplIntegrationTest extends IntegrationTestBase {
 		final ProjectProperty desigProp =
 			new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), "", 2, TermId.DESIG.getId(), "DESIG");
 		final ProjectProperty entryNoProp =
-			new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), "", 3, TermId.ENTRY_NO.getId(), "ENTRY_NO");
+			new ProjectProperty(plotDataset, VariableType.ENTRY_DETAIL.getId(), "", 3, TermId.ENTRY_NO.getId(), "ENTRY_NO");
 		final ProjectProperty crossProp =
 			new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), "", 5, TermId.CROSS.getId(), "CROSS");
 		final ProjectProperty entryTypeProp =
-			new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), "", 6, TermId.ENTRY_TYPE.getId(),
+			new ProjectProperty(plotDataset, VariableType.ENTRY_DETAIL.getId(), "", 6, TermId.ENTRY_TYPE.getId(),
 				"ENTRY_TYPE");
 		this.daoFactory.getProjectPropertyDAO().save(gidProp);
 		this.daoFactory.getProjectPropertyDAO().save(desigProp);
