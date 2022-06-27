@@ -277,10 +277,20 @@ public class DataSetupTest extends IntegrationTestBase {
 
         // Factors
         final List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
-        final MeasurementVariable entryFactor = this.createMeasurementVariable(TermId.ENTRY_NO.getId(), "ENTRY_NO",
+        final MeasurementVariable entryNumberFactor = this.createMeasurementVariable(TermId.ENTRY_NO.getId(), "ENTRY_NO",
                 "Germplasm entry - enumerated (number)", "Germplasm entry", DataSetupTest.ENUMERATED,
-                DataSetupTest.NUMBER, DataSetupTest.NUMERIC, null, DataSetupTest.ENTRY, PhenotypicType.GERMPLASM, true);
-        factors.add(entryFactor);
+                DataSetupTest.NUMBER, DataSetupTest.NUMERIC, null, DataSetupTest.ENTRY, PhenotypicType.ENTRY_DETAIL, true);
+        factors.add(entryNumberFactor);
+
+        final MeasurementVariable entryTypeFactor = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), "ENTRY_TYPE",
+            "Entry type (test/check)- assigned (type)", "Entry type", DataSetupTest.ENUMERATED,
+            DataSetupTest.CHAR, "C", null, DataSetupTest.ENTRY, PhenotypicType.ENTRY_DETAIL, true);
+        factors.add(entryTypeFactor);
+
+        final MeasurementVariable entryCodeFactor = this.createMeasurementVariable(TermId.ENTRY_CODE.getId(), "ENTRY_CODE",
+            "Germplasm ID - Assigned (Code)", "Germplasm entry", DataSetupTest.ENUMERATED,
+            DataSetupTest.CHAR, "C", null, DataSetupTest.ENTRY, PhenotypicType.ENTRY_DETAIL, true);
+        factors.add(entryCodeFactor);
 
         final MeasurementVariable designationFactor = this.createMeasurementVariable(TermId.DESIG.getId(),
                 "DESIGNATION", "Germplasm designation - assigned (DBCV)", "Germplasm Designation",
@@ -330,8 +340,8 @@ public class DataSetupTest extends IntegrationTestBase {
             for (int i = 0; i < DataSetupTest.NUMBER_OF_GERMPLASM; i++) {
                 row = new MeasurementRow();
                 dataList = new ArrayList<>();
-                final MeasurementData entryData = new MeasurementData(entryFactor.getLabel(), String.valueOf(i));
-                entryData.setMeasurementVariable(entryFactor);
+                final MeasurementData entryData = new MeasurementData(entryNumberFactor.getLabel(), String.valueOf(i));
+                entryData.setMeasurementVariable(entryNumberFactor);
                 dataList.add(entryData);
 
                 final MeasurementData designationData = new MeasurementData(designationFactor.getLabel(),
@@ -358,6 +368,14 @@ public class DataSetupTest extends IntegrationTestBase {
 
                 final MeasurementData variateData = new MeasurementData(variate.getLabel(),
                     String.valueOf(new Random().nextInt(100)));
+                variateData.setMeasurementVariable(variate);
+                dataList.add(variateData);
+
+                final MeasurementData entryTypeData = new MeasurementData(entryTypeFactor.getLabel(),"T");
+                variateData.setMeasurementVariable(variate);
+                dataList.add(variateData);
+
+                final MeasurementData entryCodeData = new MeasurementData(entryCodeFactor.getLabel(),String.valueOf(i));
                 variateData.setMeasurementVariable(variate);
                 dataList.add(variateData);
 

@@ -30,6 +30,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
+import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -148,6 +149,8 @@ public class DatasetServiceImplTest {
 	@Mock
 	private ProgramService programService;
 
+	@Mock
+	private StockDao stockDao;
 	@InjectMocks
 	private DatasetServiceImpl datasetService = new DatasetServiceImpl();
 
@@ -179,6 +182,7 @@ public class DatasetServiceImplTest {
 		when(this.daoFactory.getExperimentDao()).thenReturn(this.experimentDao);
 		when(this.daoFactory.getFormulaDAO()).thenReturn(this.formulaDao);
 		when(this.daoFactory.getObservationUnitsSearchDAO()).thenReturn(this.obsUnitsSearchDao);
+		when(daoFactory.getStockDao()).thenReturn(this.stockDao);
 	}
 
 	@Test
@@ -649,13 +653,17 @@ public class DatasetServiceImplTest {
 		final int datasetId = random.nextInt();
 		final int studyId = random.nextInt();
 		final DmsProject dmsProject = new DmsProject();
+		final DatasetType datasetSymmaryData = new DatasetType();
+		datasetSymmaryData.setDatasetTypeId(DatasetTypeEnum.SUMMARY_DATA.getId());
 		dmsProject.setProjectId(datasetId);
-
+		dmsProject.setDatasetType(datasetSymmaryData);
+		dmsProject.setParent(new DmsProject());
+		dmsProject.getParent().setProjectId(random.nextInt());
 		Mockito.doReturn(Maps.newHashMap()).when(this.studyService).getGenericGermplasmDescriptors(studyId);
 		Mockito.doReturn(Maps.newHashMap()).when(this.studyService).getAdditionalDesignFactors(studyId);
 		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao)
 			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
-
+		Mockito.doReturn(dmsProject).when(this.dmsProjectDao).getById(datasetId);
 		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
 		Mockito.verify(this.dmsProjectDao).getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
