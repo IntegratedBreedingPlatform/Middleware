@@ -231,11 +231,11 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 		final List<String> observationUnitDbIds = new ArrayList<>();
 
-		final Map<String, Integer> entryTypes =
+		final Map<String, Enumeration> entryTypes =
 			this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), null).getEnumerations()
-				.stream().collect(Collectors.toMap(enumeration -> enumeration.getDescription().toUpperCase(), Enumeration::getId));
+				.stream().collect(Collectors.toMap(enumeration -> enumeration.getDescription().toUpperCase(), enumeration -> enumeration));
 
-		final Map<String, Map<String, Integer>> entryTypesMap = new HashMap<>();
+		final Map<String, Map<String, Enumeration>> entryTypesMap = new HashMap<>();
 		for (final ObservationUnitImportRequestDto dto : requestDtos) {
 			final Integer trialDbId = Integer.valueOf(dto.getTrialDbId());
 			final Integer studyDbId = Integer.valueOf(dto.getStudyDbId());
@@ -420,8 +420,8 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	}
 
 	private StockModel createStockModel(final GermplasmDTO germplasmDTO, final Map<Integer, MultiKeyMap> stockMap,
-		final ObservationUnitImportRequestDto dto, final Integer trialDbId, final Map<String, Integer> entryTypes,
-		final Map<String, Map<String, Integer>> entryTypesMap, final String cross) {
+		final ObservationUnitImportRequestDto dto, final Integer trialDbId, final Map<String, Enumeration> entryTypes,
+		final Map<String, Map<String, Enumeration>> entryTypesMap, final String cross) {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setCross(cross);
@@ -447,17 +447,17 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		germplasm.setGermplasmUUID(germplasmDTO.getGermplasmDbId());
 		stockModel.setGermplasm(germplasm);
 
-		Integer entryType = entryTypes.get(dto.getObservationUnitPosition().getEntryType().toUpperCase());
+		Enumeration entryType = entryTypes.get(dto.getObservationUnitPosition().getEntryType().toUpperCase());
 		if (entryType == null) {
 			if (!entryTypesMap.containsKey(dto.getProgramDbId())) {
 				entryTypesMap.put(dto.getProgramDbId(),
 					this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), dto.getProgramDbId()).getEnumerations()
-						.stream().collect(Collectors.toMap(enumeration -> enumeration.getDescription().toUpperCase(), Enumeration::getId)));
+						.stream().collect(Collectors.toMap(enumeration -> enumeration.getDescription().toUpperCase(), enumeration -> enumeration)));
 			}
 			entryType = entryTypesMap.get(dto.getProgramDbId()).get(dto.getObservationUnitPosition().getEntryType().toUpperCase());
 		}
 
-		final StockProperty stockProperty = new StockProperty(stockModel, TermId.ENTRY_TYPE.getId(), null, entryType);
+		final StockProperty stockProperty = new StockProperty(stockModel, TermId.ENTRY_TYPE.getId(), entryType.getName(), entryType.getId());
 		final Set<StockProperty> properties = new HashSet<>();
 		properties.add(stockProperty);
 		stockModel.setProperties(properties);
