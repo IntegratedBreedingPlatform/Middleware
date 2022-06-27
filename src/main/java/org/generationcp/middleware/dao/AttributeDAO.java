@@ -15,10 +15,12 @@ import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
 import org.generationcp.middleware.dao.util.BrapiVariableUtils;
-import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
+import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.util.Util;
@@ -33,6 +35,7 @@ import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -531,6 +534,19 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 		}
 	}
 
+	/**
+	 * Given a list of Germplasms return the Variables related with type GERMPLASM_PASSPORT, GERMPLASM_ATTRIBUTE.
+	 * The programUUID is used to return the expected range and alias of the program if it exists.
+	 *
+	 * @param List        of gids
+	 * @param programUUID program's unique id
+	 * @return List of Variable or empty list if none found
+	 */
+	public List<Variable> getGermplasmAttributeVariables(final List<Integer> gids, final String programUUID) {
+		return this.getAttributeVariables(gids, programUUID,
+			Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId()));
+	}
+
 	@Override
 	protected Attribute getNewAttributeInstance(final Integer id) {
 		final Attribute newAttribute = new Attribute();
@@ -541,5 +557,15 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 	@Override
 	protected String getCountAttributeWithVariablesQuery() {
 		return COUNT_ATTRIBUTE_WITH_VARIABLES;
+	}
+
+	@Override
+	protected String getAttributeTable() {
+		return "atributs";
+	}
+
+	@Override
+	protected String getForeignKeyToMainRecord() {
+		return "gid";
 	}
 }
