@@ -4,10 +4,14 @@ import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Progenitor;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 public class PedigreeNodeMapper {
+
+	private static DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMdd");
 
 	public static PedigreeNodeDTO map(final Germplasm germplasm, final boolean isIncludeParents) {
 		final PedigreeNodeDTO pedigreeNodeDTO = new PedigreeNodeDTO();
@@ -15,6 +19,8 @@ public class PedigreeNodeMapper {
 		pedigreeNodeDTO.setGermplasmDbId(germplasm.getGermplasmUUID());
 		pedigreeNodeDTO.setBreedingMethodDbId(String.valueOf(germplasm.getMethod().getMid()));
 		pedigreeNodeDTO.setBreedingMethodName(germplasm.getMethod().getMname());
+		pedigreeNodeDTO.setCrossingYear(LocalDate.parse(String.valueOf(germplasm.getGdate()), dateTimeFormatter).getYear());
+
 		if (isIncludeParents) {
 			pedigreeNodeDTO.setParents(createParents(germplasm));
 		}

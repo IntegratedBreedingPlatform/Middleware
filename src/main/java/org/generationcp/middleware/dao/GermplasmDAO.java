@@ -1131,6 +1131,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getExternalReferenceIDs())) {
 			paramBuilder.setParameterList("referenceIds", germplasmSearchRequest.getExternalReferenceIDs());
 		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getTrialDbIds())) {
+			paramBuilder.setParameterList("trialDbIds", germplasmSearchRequest.getTrialDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getTrialNames())) {
+			paramBuilder.setParameterList("trialNames", germplasmSearchRequest.getTrialNames());
+		}
 	}
 
 	// These are appended to the MAIN where clause because they are filters on (or EXISTS clause related to) the main germplasm object
@@ -1228,6 +1236,23 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				" INNER JOIN cvterm c on a.atype = c.cvterm_id AND c.name = '" + GermplasmImportRequest.SPECIES_ATTR + "' and c.cv_id = "
 					+ CvId.VARIABLES.getId());
 			paramBuilder.append(" WHERE a.aval IN (:germplasmSpecies)  ) ");
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getTrialDbIds())) {
+			paramBuilder.append(" AND g.gid IN ( "
+				+ "  SELECT s.dbxref_id from stock s "
+				+ "   INNER JOIN nd_experiment e ON e.stock_id = s.stock_id "
+				+ "   INNER JOIN project p ON e.project_id = p.project_id "
+				+ "   WHERE p.study_id in (:trialDbIds)) ");
+		}
+
+		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getTrialNames())) {
+			paramBuilder.append(" AND g.gid IN ( "
+				+ "  SELECT s.dbxref_id from stock s "
+				+ "   INNER JOIN nd_experiment e ON e.stock_id = s.stock_id "
+				+ "   INNER JOIN project p ON e.project_id = p.project_id "
+				+ "   INNER JOIN project study ON p.study_id = study.project_id "
+				+ "   WHERE study.name in (:trialNames)) ");
 		}
 
 	}

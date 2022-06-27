@@ -12,6 +12,7 @@ import org.generationcp.middleware.domain.germplasm.ParentType;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.GermplasmExternalReference;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
@@ -55,6 +56,38 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 	public void setUp() {
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.userId = this.findAdminUser();
+	}
+
+	@Test
+	public void testSearchPedigreeNodes() {
+		final Method derMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Method crossMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
+		final Germplasm germplasm_C = this.createGermplasm("C", derMethod, null, -1, 0, 0);
+		final Germplasm germplasm_B = this.createGermplasm("B", derMethod, null, -1, 0, 0);
+		final Germplasm germplasm_A = this.createGermplasm("A", crossMethod, null, 0, germplasm_B.getGid(), germplasm_C.getGid());
+		final GermplasmExternalReference externalReference = this.createGermplasmExternalReference(germplasm_A);
+
+		final PedigreeNodeSearchRequest pedigreeNodeSearchRequest = new PedigreeNodeSearchRequest();
+		// Include full pedigree tree
+		pedigreeNodeSearchRequest.setIncludeFullTree(false);
+		pedigreeNodeSearchRequest.setIncludeParents(true);
+		pedigreeNodeSearchRequest.setGermplasmDbIds(Arrays.asList(germplasm_A.getGermplasmUUID()));
+		final List<PedigreeNodeDTO> result = this.pedigreeServiceBrapi.searchPedigreeNodes(pedigreeNodeSearchRequest, null);
+		Assert.assertEquals(1, result.size());
+
+		final PedigreeNodeDTO pedigreeNodeDTO = result.get(0);
+		Assert.assertEquals(germplasm_A.getGermplasmUUID(), pedigreeNodeDTO.getGermplasmDbId());
+		Assert.assertEquals("A", pedigreeNodeDTO.getGermplasmName());
+		Assert.assertEquals("A", pedigreeNodeDTO.getDefaultDisplayName());
+		Assert.assertNotNull(pedigreeNodeDTO.getGermplasmPUI());
+		Assert.assertEquals(String.valueOf(crossMethod.getMid()), pedigreeNodeDTO.getBreedingMethodDbId());
+		Assert.assertEquals(crossMethod.getMname(), pedigreeNodeDTO.getBreedingMethodName());
+		Assert.assertEquals("A", pedigreeNodeDTO.getPedigreeString());
+		Assert.assertEquals(2020, pedigreeNodeDTO.getCrossingYear().intValue());
+		Assert.assertFalse(pedigreeNodeDTO.getParents().isEmpty());
+		Assert.assertEquals(externalReference.getReferenceId(), pedigreeNodeDTO.getExternalReferences().get(0).getReferenceID());
+		Assert.assertEquals(externalReference.getSource(), pedigreeNodeDTO.getExternalReferences().get(0).getReferenceSource());
+
 	}
 
 	@Test
@@ -758,6 +791,8 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final Integer gpid1, final Integer gpid2) {
 		final Germplasm germplasm = this.createGermplasm(method, location, gnpgs, gpid1, gpid2, null);
 		this.addName(germplasm, 1, preferredName, 0, Util.getCurrentDateAsIntegerValue(), 1);
+		this.addName(germplasm, 40, RandomStringUtils.randomAlphabetic(10), 0, Util.getCurrentDateAsIntegerValue(), 0);
+		this.sessionProvder.getSession().refresh(germplasm);
 		return germplasm;
 	}
 
@@ -848,6 +883,17 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		this.daoFactory.getProgenitorDao().save(progenitor);
 		this.sessionProvder.getSession().flush();
 		this.sessionProvder.getSession().refresh(progenitor);
+	}
+
+	private GermplasmExternalReference createGermplasmExternalReference(final Germplasm germplasm) {
+		final GermplasmExternalReference germplasmExternalReference = new GermplasmExternalReference();
+		germplasmExternalReference.setGermplasm(germplasm);
+		germplasmExternalReference.setSource(RandomStringUtils.randomAlphabetic(200));
+		germplasmExternalReference.setReferenceId(RandomStringUtils.randomAlphabetic(500));
+		this.daoFactory.getGermplasmExternalReferenceDAO().save(germplasmExternalReference);
+		this.sessionProvder.getSession().flush();
+		this.sessionProvder.getSession().refresh(germplasmExternalReference);
+		return germplasmExternalReference;
 	}
 
 }

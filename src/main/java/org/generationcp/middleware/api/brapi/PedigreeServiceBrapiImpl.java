@@ -69,8 +69,9 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 			.collect(Collectors.toList()));
 
 		if (!CollectionUtils.isEmpty(result)) {
-			// Populate the preferred name, external references and pedigree string
+			// Populate the preferred name, PUIs, external references and pedigree string
 			final Map<Integer, String> preferredNamesMap = this.daoFactory.getNameDao().getPreferredNamesByGIDs(gids);
+			final Map<Integer, String> germplasmPUIsMap = this.daoFactory.getNameDao().getPUIsByGIDs(gids);
 			final Map<Integer, String> pedigreeStringMap =
 				this.pedigreeService.getCrossExpansions(new HashSet<>(gids), null, this.crossExpansionProperties);
 			final Map<String, List<ExternalReferenceDTO>> referencesByGidMap =
@@ -79,6 +80,8 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 			for (final PedigreeNodeDTO pedigreeNodeDTO : result) {
 				pedigreeNodeDTO.setPedigreeString(pedigreeStringMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
 				pedigreeNodeDTO.setDefaultDisplayName(preferredNamesMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				pedigreeNodeDTO.setGermplasmName(preferredNamesMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				pedigreeNodeDTO.setGermplasmPUI(germplasmPUIsMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
 				pedigreeNodeDTO.setExternalReferences(
 					referencesByGidMap.getOrDefault(String.valueOf(pedigreeNodeDTO.getGid()), new ArrayList<>()));
 			}
