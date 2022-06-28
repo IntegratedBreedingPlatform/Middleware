@@ -279,6 +279,22 @@
 
 	<changeSet author="cuenyad" id="studies-TBD-14">
 		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*)
+				FROM INFORMATION_SCHEMA.STATISTICS
+				WHERE TABLE_SCHEMA = DATABASE()
+					AND TABLE_NAME = 'listdata'
+					AND INDEX_NAME = 'listdata_idx02';
+			</sqlCheck>
+		</preConditions>
+		<comment>Drop the listdata_idx02 unique index</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE listdata DROP INDEX listdata_idx02;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="studies-TBD-15">
+		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="listdata" columnName="entrycd"/>
 		</preConditions>
 		<comment>Rename column 'entrycd' to 'entrycd_bkp' in table listdata and make it nullable.</comment>
@@ -288,7 +304,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="studies-TBD-15">
+	<changeSet author="cuenyad" id="studies-TBD-16">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8230 AND type_id = 1804;
@@ -300,7 +316,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="studies-TBD-16">
+	<changeSet author="lkovacic" id="studies-TBD-17">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="stock" columnName="cross_value"/>
@@ -312,7 +328,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="studies-TBD-17">
+	<changeSet author="lkovacic" id="studies-TBD-18">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<columnExists tableName="stock" columnName="cross_value"/>
@@ -331,7 +347,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="studies-TBD-18">
+	<changeSet author="lkovacic" id="studies-TBD-19">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="project" columnName="generation_level" />
@@ -347,7 +363,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="studies-TBD-19">
+	<changeSet author="cuenyad" id="studies-TBD-20">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8360
@@ -363,7 +379,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="studies-TBD-20">
+	<changeSet author="cuenyad" id="studies-TBD-21">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(*) from cvterm where cvterm_id = 8360 and cv_id = 1040;
@@ -379,7 +395,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="studies-TBD-21">
+	<changeSet author="lkovacic" id="studies-TBD-22">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT count(1) > 0 FROM stockprop WHERE type_id = 8330;
@@ -391,7 +407,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="studies-TBD-21">
+	<changeSet author="cuenyad" id="studies-TBD-23">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(1) > 0 FROM stockprop WHERE type_id = 8378;
@@ -403,7 +419,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="studies-TBD-22">
+	<changeSet author="cuenyad" id="studies-TBD-24">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) from cvterm where cvterm_id = 8378 and cv_id = 1040;
@@ -417,7 +433,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="studies-TBD-23">
+	<changeSet author="cuenyad" id="studies-TBD-25">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 from list_data_view where static_id = -7;
@@ -429,7 +445,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="studies-TBD-24">
+	<changeSet author="lkovacic" id="studies-TBD-26">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) from cvterm where cvterm_id = 8340 and cv_id = 1040;
@@ -442,7 +458,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="studies-TBD-25">
+	<changeSet author="lkovacic" id="studies-TBD-27">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 from list_data_view where static_id = -9;
@@ -454,7 +470,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="studies-TBD-26">
+	<changeSet author="lkovacic" id="studies-TBD-28">
         <preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(*) from cvterm where name = 'Universally Unique ID' and cv_id = 1030 and is_obsolete = 0;
@@ -475,7 +491,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="studies-TBD-27">
+	<changeSet author="lkovacic" id="studies-TBD-29">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="1">select count(*) from cvterm where name = 'Universally Unique ID' and cv_id = 1030 and is_obsolete = 0;</sqlCheck>
@@ -499,7 +515,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="studies-TBD-28">
+	<changeSet author="lkovacic" id="studies-TBD-30">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 from list_data_view where static_id = -10;
@@ -511,7 +527,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="studies-TBD-29">
+	<changeSet author="lkovacic" id="studies-TBD-31">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(*) from cvterm where cvterm_id = 8320 and cv_id = 1040;
@@ -528,7 +544,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="studies-TBD-30">
+	<changeSet author="lkovacic" id="studies-TBD-32">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT count(1) > 0 FROM stockprop sp INNER JOIN cvtermprop c ON sp.type_id = c.cvterm_id AND c.value = 'Germplasm Descriptor';
@@ -540,7 +556,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="studies-TBD-31">
+	<changeSet author="lkovacic" id="studies-TBD-33">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT count(1) > 0 FROM projectprop WHERE type_id = 1804 AND variable_id NOT IN (8377, 8250, 8240, 8340, 8330, 8201, 8378, 8235);
@@ -552,7 +568,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="studies-TBD-32">
+	<changeSet author="lkovacic" id="studies-TBD-34">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT Count(*) > 0
@@ -608,7 +624,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="studies-TBD-33">
+	<changeSet author="cuenyad" id="studies-TBD-35">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 FROM CVTERM WHERE IS_SYSTEM = 1
