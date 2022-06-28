@@ -372,10 +372,11 @@
         <comment>Replace the SEED_SOURCE variable by ENTRY_SOURCE IN projectprop AND stockprop</comment>
         <sql dbms="mysql" splitStatements="true">
 			# Replace SEED_SOURCE variable by ENTRY_SOURCE
-			UPDATE projectprop SET variable_id = ( SELECT cvterm_id FROM CVTERM WHERE NAME ='ENTRY_SOURCE' ), ALIAS = 'ENTRY_SOURCE', TYPE_ID = 1815 WHERE variable_id = 8360;
+			UPDATE projectprop SET variable_id = ( SELECT cvterm_id FROM CVTERM WHERE NAME ='ENTRY_SOURCE' ), ALIAS = 'ENTRY_SOURCE', TYPE_ID = 1815
+				WHERE variable_id = 8360 AND cv_id=1040 AND is_obsolete = 0;
 			# Update cvterm_id 8360 from (SEED_SOURCE) to ENTRY_SOURCE cvterm_id
 			UPDATE stockprop SET TYPE_ID = ( SELECT cvterm_id FROM CVTERM WHERE NAME ='ENTRY_SOURCE' )
-			                 WHERE TYPE_ID = 8360;
+				WHERE TYPE_ID = 8360;
         </sql>
 	</changeSet>
 
