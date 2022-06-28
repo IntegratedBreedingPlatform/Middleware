@@ -265,7 +265,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 			allCategories.addAll(this.getScaleCategoriesUsedAsTrialDesignFactors(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedAsEnvironmentFactors(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedInAttributes(scaleId));
-			allCategories.addAll(this.getScaleCategoriesUsedInListEntryDetails(scaleId));
+			allCategories.addAll(this.getScaleCategoriesUsedAsEntryDetails(scaleId));
 			return allCategories;
 		} catch (final HibernateException e) {
 			final String message = "Error in getCategoriesInUse in CVTermRelationshipDao: "
@@ -293,18 +293,24 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		return query.list();
 	}
 
-	public List<String> getScaleCategoriesUsedInListEntryDetails(final int scaleId) {
+	public List<String> getScaleCategoriesUsedAsEntryDetails(final int scaleId) {
 		final SQLQuery query = this.getSession().createSQLQuery(
-			"SELECT DISTINCT v.name category "
+			"SELECT DISTINCT v.name as category "
 				+ " FROM cvterm_relationship scale_values "
-				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id and scale_values.subject_id = :scaleId and scale_values.type_id = "
+				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id AND scale_values.subject_id = :scaleId AND scale_values.type_id = "
 				+ TermId.HAS_VALUE.getId()
-				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE
+				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id AND var.type_id = " + TermId.HAS_SCALE
 				.getId()
 				+ " WHERE EXISTS ( "
 				+ "     SELECT 1    	 "
 				+ "     FROM list_data_details a "
-				+ "     WHERE a.cvalue_id = v.cvterm_id and a.variable_id = var.subject_id ) ");
+				+ "     WHERE a.cvalue_id = v.cvterm_id AND a.variable_id = var.subject_id ) "
+				+ "OR EXISTS ("
+				+ "     SELECT 1    	 "
+				+ "        FROM stockprop stp "
+				+ "           INNER JOIN stock st ON st.stock_id = stp.stock_id "
+				+ "           INNER JOIN project pr ON pr.project_id = st.project_id AND pr.deleted = 0 "
+				+ "        WHERE stp.type_id = var.subject_id AND stp.cvalue_id = v.cvterm_id )");
 		query.setParameter("scaleId", scaleId);
 		query.addScalar("category", CVTermRelationshipDao.STRING);
 		return query.list();
@@ -322,7 +328,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 				+ "     FROM phenotype p "
 				+ "     INNER JOIN nd_experiment ep on ep.nd_experiment_id = p.nd_experiment_id "
 				+ "     INNER JOIN project pr ON pr.project_id = ep.project_id and pr.deleted = 0 "
-				+ "     WHERE cvalue_id = v.cvterm_id)"
+				+ "     WHERE p.cvalue_id = v.cvterm_id)"
 				+ "");
 		query.setParameter("scaleId", scaleId);
 		query.addScalar("category", CVTermRelationshipDao.STRING);
@@ -362,7 +368,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 				+ "      FROM stockprop sp "
 				+ "      INNER JOIN nd_experiment ep on ep.stock_id = sp.stock_id "
 				+ "      INNER JOIN project pr ON pr.project_id =ep.project_id and pr.deleted = 0 "
-				+ "      WHERE sp.type_id = var.subject_id and sp.value = categ.cvterm_id)");
+				+ "      WHERE sp.type_id = var.subject_id and sp.cvalue_id = categ.cvterm_id)");
 		query.setParameter("scaleId", scaleId);
 		query.addScalar("category", CVTermRelationshipDao.STRING);
 		return query.list();
