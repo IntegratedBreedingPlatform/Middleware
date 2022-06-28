@@ -423,7 +423,7 @@
 	<changeSet author="cuenyad" id="studies-TBD-24">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
-                SELECT COUNT(*) from cvterm where cvterm_id = 8378 and cv_id = 1040;
+                SELECT COUNT(*) from cvterm where cvterm_id = 8378;
             </sqlCheck>
         </preConditions>
         <comment>Rename 'SOURCE' as 'IMMEDIATE_SOURCE_NAME' in cvterm and projectprop tables</comment>
