@@ -1880,6 +1880,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 				false);
 		stockModel.setGermplasm(germplasm);
 		stockModel.setProject(dmsProject);
+		stockModel.setCross("-");
 		this.daoFactory.getStockDao().save(stockModel);
 
 		final Set<Integer> gids =
@@ -2760,7 +2761,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		studyEntryDto.setGid(gid);
 		studyEntryDto.setEntryNumber(i);
 		studyEntryDto.setDesignation("DESIGNATION" + i);
-
+		studyEntryDto.setCross("-");
 		studyEntryDto.getProperties()
 			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), "CROSS" + i, null));
 		studyEntryDto.getProperties()

@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -371,13 +372,14 @@ public class DataSetupTest extends IntegrationTestBase {
                 variateData.setMeasurementVariable(variate);
                 dataList.add(variateData);
 
-                final MeasurementData entryTypeData = new MeasurementData(entryTypeFactor.getLabel(),"T");
-                variateData.setMeasurementVariable(variate);
-                dataList.add(variateData);
+                final MeasurementData entryTypeData = new MeasurementData(entryTypeFactor.getLabel(),SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue());
+                entryTypeData.setMeasurementVariable(entryTypeFactor);
+                entryTypeData.setcValueId(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()));
+                dataList.add(entryTypeData);
 
                 final MeasurementData entryCodeData = new MeasurementData(entryCodeFactor.getLabel(),String.valueOf(i));
-                variateData.setMeasurementVariable(variate);
-                dataList.add(variateData);
+                entryCodeData.setMeasurementVariable(entryCodeFactor);
+                dataList.add(entryCodeData);
 
                 row.setDataList(dataList);
                 observations.add(row);
