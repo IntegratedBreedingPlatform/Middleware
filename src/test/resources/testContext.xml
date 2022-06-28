@@ -123,10 +123,6 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
-    <bean id="inventoryService" class="org.generationcp.middleware.service.InventoryServiceImpl">
-        <constructor-arg ref="cropSessionProvider"/>
-    </bean>
-
 	<bean id="programFavoriteService" class="org.generationcp.middleware.api.program.ProgramFavoriteServiceImpl">
         <constructor-arg ref="cropSessionProvider"/>
     </bean>

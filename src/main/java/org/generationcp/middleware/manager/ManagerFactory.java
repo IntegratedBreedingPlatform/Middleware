@@ -66,12 +66,10 @@ import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
-import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
-import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
@@ -82,6 +80,7 @@ import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.gdms.DatasetService;
+import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactoryImpl;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
@@ -96,6 +95,7 @@ import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.service.impl.gdms.DatasetServiceImpl;
+import org.generationcp.middleware.service.impl.inventory.LotServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyEntryServiceImpl;
@@ -232,10 +232,6 @@ public class ManagerFactory implements Serializable {
 		return new FieldbookServiceImpl(this.sessionProvider);
 	}
 
-	public InventoryService getInventoryMiddlewareService() {
-		return new InventoryServiceImpl(this.sessionProvider);
-	}
-
 	public DataImportService getDataImportService() {
 		return new DataImportServiceImpl(this.sessionProvider);
 	}
@@ -354,10 +350,6 @@ public class ManagerFactory implements Serializable {
 		return new GermplasmStudySourceServiceImpl(this.sessionProvider);
 	}
 
-	public InventoryService getInventoryService() {
-		return new InventoryServiceImpl(this.sessionProvider);
-	}
-
 	public SearchRequestService getSearchRequestService() {
 		return new SearchRequestServiceImpl(this.sessionProvider);
 	}
@@ -420,6 +412,10 @@ public class ManagerFactory implements Serializable {
 
 	public OntologyVariableService getOntologyVariableService() {
 		return new OntologyVariableServiceImpl(this.sessionProvider);
+	}
+
+	public LotService getLotService() {
+		return new LotServiceImpl(this.sessionProvider);
 	}
 
 }
