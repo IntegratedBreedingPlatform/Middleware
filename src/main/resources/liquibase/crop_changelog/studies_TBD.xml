@@ -279,7 +279,6 @@
 
 	<changeSet author="cuenyad" id="studies-TBD-14">
 		<preConditions onFail="MARK_RAN">
-			<tableExists tableName="listdata"/>
 			<columnExists tableName="listdata" columnName="entrycd"/>
 		</preConditions>
 		<comment>Changset temporary until entrycd column will be removed</comment>
