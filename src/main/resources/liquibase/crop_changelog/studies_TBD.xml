@@ -281,7 +281,7 @@
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="listdata" columnName="entrycd"/>
 		</preConditions>
-		<comment>Changset temporary until entrycd column will be removed</comment>
+		<comment>Rename column 'entrycd' to 'entrycd_bkp' in table listdata and make it nullable.</comment>
 		<sql dbms="mysql" splitStatements="true">
 		ALTER TABLE listdata
 			CHANGE COLUMN entrycd entrycd_bkp VARCHAR (47) NULL DEFAULT '-';
