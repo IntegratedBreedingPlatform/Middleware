@@ -5,6 +5,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
@@ -55,7 +56,7 @@ public class SampleListServiceImpl implements SampleListService {
 	private UserService userService;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	public SampleListServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
@@ -128,7 +129,7 @@ public class SampleListServiceImpl implements SampleListService {
 			takenBy = this.userService.getUserByUsername(sampleListDTO.getTakenBy()).getUserid();
 		}
 
-		final String cropPrefix = this.workbenchDataManager.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
+		final String cropPrefix = this.cropService.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
 		final Collection<Integer> gids = this.getGids(observationDtos);
 		final Collection<Integer> experimentIds = this.getExperimentIds(observationDtos);
 		final Map<Integer, Integer> maxSampleNumbers = this.getMaxSampleNumber(experimentIds);
@@ -504,8 +505,8 @@ public class SampleListServiceImpl implements SampleListService {
 		this.studyMeasurements = studyMeasurements;
 	}
 
-	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
+	public void setCropService(final CropService cropService) {
+		this.cropService = cropService;
 	}
 
 	public void setSampleService(final SampleService sampleService) {

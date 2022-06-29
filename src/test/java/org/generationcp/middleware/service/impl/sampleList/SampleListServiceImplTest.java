@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.sampleList;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.dao.SampleDao;
 import org.generationcp.middleware.dao.SampleListDao;
 import org.generationcp.middleware.data.initializer.SampleTestDataInitializer;
@@ -74,7 +75,7 @@ public class SampleListServiceImplTest {
 	private StudyMeasurements studyMeasurements;
 
 	@Mock
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	@Mock
 	private Study study;
@@ -92,7 +93,7 @@ public class SampleListServiceImplTest {
 		MockitoAnnotations.initMocks(this);
 		this.sampleListService = new SampleListServiceImpl(this.session);
 		this.sampleListService.setStudyMeasurements(this.studyMeasurements);
-		this.sampleListService.setWorkbenchDataManager(this.workbenchDataManager);
+		this.sampleListService.setCropService(this.cropService);
 		this.sampleListService.setSampleService(this.sampleService);
 		this.sampleListService.setUserService(this.userService);
 
@@ -603,7 +604,7 @@ public class SampleListServiceImplTest {
 		when(this.studyService.getStudy(studyId)).thenReturn(this.study);
 		when(this.studyMeasurements.getSampleObservations(studyId, instanceIds, selectionVariableId)).thenReturn(observationDtos);
 		when(this.study.getName()).thenReturn("Maizing_Study");
-		when(this.workbenchDataManager.getCropTypeByName("maize")).thenReturn(cropType);
+		when(this.cropService.getCropTypeByName("maize")).thenReturn(cropType);
 		when(this.sampleDao.getMaxSampleNumber(experimentIds)).thenReturn(mapSampleNumbers);
 		when(this.sampleService
 			.buildSample(SampleListServiceImplTest.MAIZE, SampleListServiceImplTest.PLOT_CODE_PREFIX, 1, preferredNameGid,

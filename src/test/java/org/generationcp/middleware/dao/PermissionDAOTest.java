@@ -3,9 +3,9 @@ package org.generationcp.middleware.dao;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertThat;
 public class PermissionDAOTest extends IntegrationTestBase {
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -127,7 +127,7 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		}
 
 		if (this.cropType == null) {
-			this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.name());
+			this.cropType = this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.name());
 		}
 
 		if (this.project1 == null) {
