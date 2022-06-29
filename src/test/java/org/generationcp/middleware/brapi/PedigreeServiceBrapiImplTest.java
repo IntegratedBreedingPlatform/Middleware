@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -87,6 +88,74 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertFalse(pedigreeNodeDTO.getParents().isEmpty());
 		Assert.assertEquals(externalReference.getReferenceId(), pedigreeNodeDTO.getExternalReferences().get(0).getReferenceID());
 		Assert.assertEquals(externalReference.getSource(), pedigreeNodeDTO.getExternalReferences().get(0).getReferenceSource());
+
+	}
+
+	@Test
+	public void testSearchPedigreeNodes_IncludeSiblings() {
+		final Method derMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Method crossMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
+		final Germplasm germplasm_C = this.createGermplasm("C", derMethod, null, -1, 0, 0);
+		final Germplasm germplasm_B = this.createGermplasm("B", derMethod, null, -1, 0, 0);
+		final Germplasm germplasm_A = this.createGermplasm("A", crossMethod, null, 2, germplasm_B.getGid(), germplasm_C.getGid());
+
+		final Germplasm advance1 = this.createGermplasm("advance1", derMethod, null, -1, germplasm_A.getGid(), germplasm_A.getGid());
+		final Germplasm advance2 = this.createGermplasm("advance2", derMethod, null, -1, germplasm_A.getGid(), germplasm_A.getGid());
+
+		this.sessionProvder.getSession().flush();
+
+		final PedigreeNodeSearchRequest pedigreeNodeSearchRequest = new PedigreeNodeSearchRequest();
+		// Include siblings
+		pedigreeNodeSearchRequest.setIncludeSiblings(true);
+		pedigreeNodeSearchRequest.setGermplasmDbIds(Arrays.asList(advance1.getGermplasmUUID()));
+		final List<PedigreeNodeDTO> result = this.pedigreeServiceBrapi.searchPedigreeNodes(pedigreeNodeSearchRequest, null);
+		Assert.assertEquals(1, result.size());
+		Assert.assertThat(result.get(0).getSiblings(), hasSize(1));
+		Assert.assertThat(result.get(0).getSiblings().get(0).getGermplasmDbId(), is(advance2.getGermplasmUUID()));
+
+		pedigreeNodeSearchRequest.setGermplasmDbIds(Arrays.asList(advance2.getGermplasmUUID()));
+		final List<PedigreeNodeDTO> result2 = this.pedigreeServiceBrapi.searchPedigreeNodes(pedigreeNodeSearchRequest, null);
+		Assert.assertEquals(1, result2.size());
+		Assert.assertThat(result2.get(0).getSiblings(), hasSize(1));
+		Assert.assertThat(result2.get(0).getSiblings().get(0).getGermplasmDbId(), is(advance1.getGermplasmUUID()));
+
+	}
+
+	@Test
+	public void testSearchPedigreeNodes_IncludeProgeny() {
+		final Method derMethod = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
+		final Method crossMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
+		final Germplasm germplasm_C = this.createGermplasm("C", derMethod, null, -1, 0, 0);
+		final Germplasm germplasm_B = this.createGermplasm("B", derMethod, null, -1, 0, 0);
+		final Germplasm germplasm_A = this.createGermplasm("A", crossMethod, null, 2, germplasm_B.getGid(), germplasm_C.getGid());
+
+		final Germplasm advance1 = this.createGermplasm("advance1", derMethod, null, -1, germplasm_A.getGid(), germplasm_A.getGid());
+
+		this.sessionProvder.getSession().flush();
+
+		final PedigreeNodeSearchRequest pedigreeNodeSearchRequest = new PedigreeNodeSearchRequest();
+		// Include progeny
+		pedigreeNodeSearchRequest.setIncludeProgeny(true);
+		pedigreeNodeSearchRequest.setGermplasmDbIds(Arrays.asList(germplasm_B.getGermplasmUUID()));
+		final List<PedigreeNodeDTO> result = this.pedigreeServiceBrapi.searchPedigreeNodes(pedigreeNodeSearchRequest, null);
+		Assert.assertEquals(1, result.size());
+		Assert.assertThat(result.get(0).getProgeny(), hasSize(1));
+		Assert.assertThat(result.get(0).getProgeny().get(0).getParentType(), is(ParentType.FEMALE.name()));
+		Assert.assertThat(result.get(0).getProgeny().get(0).getGermplasmName(), is("A"));
+
+		pedigreeNodeSearchRequest.setGermplasmDbIds(Arrays.asList(germplasm_C.getGermplasmUUID()));
+		final List<PedigreeNodeDTO> result2 = this.pedigreeServiceBrapi.searchPedigreeNodes(pedigreeNodeSearchRequest, null);
+		Assert.assertEquals(1, result2.size());
+		Assert.assertThat(result2.get(0).getProgeny(), hasSize(1));
+		Assert.assertThat(result2.get(0).getProgeny().get(0).getParentType(), is(ParentType.MALE.name()));
+		Assert.assertThat(result2.get(0).getProgeny().get(0).getGermplasmName(), is("A"));
+
+		pedigreeNodeSearchRequest.setGermplasmDbIds(Arrays.asList(germplasm_A.getGermplasmUUID()));
+		final List<PedigreeNodeDTO> result3 = this.pedigreeServiceBrapi.searchPedigreeNodes(pedigreeNodeSearchRequest, null);
+		Assert.assertEquals(1, result3.size());
+		Assert.assertThat(result3.get(0).getProgeny(), hasSize(1));
+		Assert.assertThat(result3.get(0).getProgeny().get(0).getParentType(), is(ParentType.SELF.name()));
+		Assert.assertThat(result3.get(0).getProgeny().get(0).getGermplasmName(), is("advance1"));
 
 	}
 

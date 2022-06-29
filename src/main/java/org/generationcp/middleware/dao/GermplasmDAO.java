@@ -20,6 +20,7 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeMapper;
+import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeSearchRequest;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
@@ -577,6 +578,81 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			}
 		}
 		return new ArrayList<>(pedigreeNodesToReturn);
+	}
+
+	public Map<Integer, List<PedigreeNodeReferenceDTO>> getProgenyByGids(final List<Integer> gids) {
+
+		final Map<Integer, List<PedigreeNodeReferenceDTO>> progenyMapByGids = new HashMap<>();
+
+		if (CollectionUtils.isEmpty(gids))
+			return progenyMapByGids;
+
+		final StringBuilder query = new StringBuilder().append("SELECT")
+			.append("   parent.gid as parentGid, ")
+			.append("   progeny.germplsm_uuid as germplasmDbId,")
+			.append("   name.nval as germplasmName,")
+			.append("   CASE")
+			.append("   WHEN progeny.gnpgs = -1")
+			.append("     THEN '" + ParentType.SELF.name() + "'")
+			.append("   WHEN progeny.gnpgs >= 2")
+			.append("     THEN")
+			.append("       CASE")
+			.append("         WHEN progeny.gpid1 = progeny.gpid2")
+			.append("           THEN '" + ParentType.SELF.name() + "'")
+			.append("         WHEN progeny.gpid1 = parent.gid")
+			.append("           THEN '" + ParentType.FEMALE.name() + "'")
+			.append("         ELSE '" + ParentType.MALE.name() + "'")
+			.append("       END")
+			.append("   ELSE ''")
+			.append("   END as parentType")
+			.append(" FROM germplsm parent")
+			.append("   LEFT JOIN germplsm progeny ON (progeny.gnpgs = -1 AND progeny.gpid2 = parent.gid)")
+			.append("   OR (progeny.gnpgs >= 2 AND (progeny.gpid1 = parent.gid OR progeny.gpid2 = parent.gid))")
+			.append("   LEFT JOIN names name ON progeny.gid = name.gid AND name.nstat = 1")
+			.append(" WHERE parent.gid in (:gids)")
+			.append("       AND parent.deleted = 0 AND parent.grplce = 0")
+			.append("       AND progeny.deleted = 0 AND progeny.grplce = 0");
+
+		return this.convertPedigreeNodeListToMap(gids, query);
+
+	}
+
+	public Map<Integer, List<PedigreeNodeReferenceDTO>> getSiblingsByGids(final List<Integer> gids) {
+
+		final Map<Integer, List<PedigreeNodeReferenceDTO>> siblingsMapByGids = new HashMap<>();
+
+		if (CollectionUtils.isEmpty(gids))
+			return siblingsMapByGids;
+
+		final StringBuilder siblingsQuery = new StringBuilder().append("SELECT")
+			.append("   g.gid as parentGid, ")
+			.append("   sibling.germplsm_uuid AS germplasmDbId, ")
+			.append("   n.nval AS germplasmName, ")
+			.append("   '' AS parentType")
+			.append("	FROM germplsm g ")
+			.append("   INNER JOIN germplsm sibling ON sibling.gpid1 = g.gpid1")
+			.append("                                  AND sibling.gnpgs = -1")
+			.append("                                  AND g.gpid1 != 0")
+			.append("                                  AND sibling.gid != g.gid")
+			.append("   LEFT JOIN names n ON sibling.gid = n.gid AND n.nstat = 1")
+			.append(" WHERE g.gid in (:gids)");
+
+		return this.convertPedigreeNodeListToMap(gids, siblingsQuery);
+
+	}
+
+	private Map<Integer, List<PedigreeNodeReferenceDTO>> convertPedigreeNodeListToMap(final List<Integer> gids, final StringBuilder query) {
+		final List<Object[]> rows = this.getSession().createSQLQuery(query.toString())
+			.addScalar("parentGid").addScalar("germplasmDbId").addScalar("germplasmName").addScalar("parentType")
+			.setParameterList("gids", gids)
+			.list();
+
+		return rows.stream().
+			collect(Collectors.groupingBy(row -> (Integer) row[0],
+				Collectors.mapping(row -> new PedigreeNodeReferenceDTO((String) row[1], (String) row[2], (String) row[3]),
+					Collectors.toList())
+			));
+
 	}
 
 	private void extractParentsGids(final Set<Integer> germplasmGids, final Germplasm germplasm) {

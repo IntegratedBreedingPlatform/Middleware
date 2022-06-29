@@ -24,6 +24,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -69,7 +70,14 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 			.collect(Collectors.toList()));
 
 		if (!CollectionUtils.isEmpty(result)) {
-			// Populate the preferred name, PUIs, external references and pedigree string
+
+			final Map<Integer, List<PedigreeNodeReferenceDTO>> progenyMapByGids =
+				pedigreeNodeSearchRequest.isIncludeProgeny() ? this.daoFactory.getGermplasmDao().getProgenyByGids(gids) : new HashMap<>();
+			final Map<Integer, List<PedigreeNodeReferenceDTO>> siblingsMapByGids =
+				pedigreeNodeSearchRequest.isIncludeSiblings() ? this.daoFactory.getGermplasmDao().getSiblingsByGids(gids) : new HashMap<>();
+
+			// Populate the preferred name, PUIs, external references, pedigree string
+			// progeny (optional) and siblings (optional)
 			final Map<Integer, String> preferredNamesMap = this.daoFactory.getNameDao().getPreferredNamesByGIDs(gids);
 			final Map<Integer, String> germplasmPUIsMap = this.daoFactory.getNameDao().getPUIsByGIDs(gids);
 			final Map<Integer, String> pedigreeStringMap =
@@ -84,6 +92,8 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 				pedigreeNodeDTO.setGermplasmPUI(germplasmPUIsMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
 				pedigreeNodeDTO.setExternalReferences(
 					referencesByGidMap.getOrDefault(String.valueOf(pedigreeNodeDTO.getGid()), new ArrayList<>()));
+				pedigreeNodeDTO.setProgeny(progenyMapByGids.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				pedigreeNodeDTO.setSiblings(siblingsMapByGids.getOrDefault(pedigreeNodeDTO.getGid(), null));
 			}
 		}
 		return result;
