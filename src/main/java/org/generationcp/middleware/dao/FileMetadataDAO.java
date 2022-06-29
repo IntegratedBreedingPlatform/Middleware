@@ -62,7 +62,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			criteria.add(Restrictions.eq("geolocation.locationId", instanceId));
 		}
 		if (lotId != null) {
-			criteria.add(Restrictions.eq("lot.lotid", lotId));
+			criteria.add(Restrictions.eq("lot.id", lotId));
 		}
 		return criteria.list();
 
