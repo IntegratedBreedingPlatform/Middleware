@@ -24,6 +24,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 		+ " left join nd_experiment nde on f.nd_experiment_id = nde.nd_experiment_id " //
 		+ " left join germplsm g on f.gid = g.gid " //
 		+ " left join nd_geolocation env on env.nd_geolocation_id = f.nd_geolocation_id " //
+		+ " left join ims_lot lot on lot.lotid = f.lotid " //
 		+ " left join file_metadata_cvterm fmc on f.file_id = fmc.file_metadata_id " //
 		+ "    left join cvterm variable on fmc.cvterm_id = variable.cvterm_id " //
 		+ "    left join variable_overrides vo on vo.cvterm_id = variable.cvterm_id " //
@@ -41,12 +42,13 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 	}
 
 	public List<FileMetadata> getAll(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID,
-		final Integer instanceId) {
+		final Integer instanceId, final Integer lotId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass())
 			.createAlias("variables", "variables", JoinType.LEFT_OUTER_JOIN)
 			.createAlias("germplasm", "germplasm", JoinType.LEFT_OUTER_JOIN)
 			.createAlias("experimentModel", "experimentModel", JoinType.LEFT_OUTER_JOIN)
-			.createAlias("geolocation", "geolocation", JoinType.LEFT_OUTER_JOIN);
+			.createAlias("geolocation", "geolocation", JoinType.LEFT_OUTER_JOIN)
+			.createAlias("lot", "lot", JoinType.LEFT_OUTER_JOIN);
 		if (!isEmpty(variableIds)) {
 			criteria.add(Restrictions.in("variables.cvTermId", variableIds));
 		}
@@ -56,9 +58,11 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 		if (!isBlank(germplasmUUID)) {
 			criteria.add(Restrictions.eq("germplasm.germplasmUUID", germplasmUUID));
 		}
-
 		if (instanceId != null) {
 			criteria.add(Restrictions.eq("geolocation.locationId", instanceId));
+		}
+		if (lotId != null) {
+			criteria.add(Restrictions.eq("lot.lotid", lotId));
 		}
 		return criteria.list();
 
@@ -113,6 +117,11 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			paramBuilder.setParameter("germplasmUUID", germplasmUUID);
 		}
 
+		if(filterRequest.getLotId() != null) {
+			paramBuilder.append(" and lot.lotid = :lotId ");
+			paramBuilder.setParameter("lotId", filterRequest.getLotId());
+		}
+
 		if(!CollectionUtils.isEmpty(filterRequest.getInstanceIds())) {
 			paramBuilder.append(" and env.nd_geolocation_id IN (:instanceIds) ");
 			paramBuilder.setParameterList("instanceIds", filterRequest.getInstanceIds());
@@ -126,7 +135,7 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 	}
 
 	public void detachFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID,
-		final Integer instanceId) {
+		final Integer instanceId, final Integer lotId) {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery("delete fmc " //
 			+ " from file_metadata_cvterm fmc " //
 			+ " inner join ( " //
@@ -134,17 +143,20 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 			+ "         from file_metadata fm " //
 			+ "                  left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id " //
 			+ "                  left join germplsm g on fm.gid = g.gid " //
+			+ "                  left join ims_lot lot on fm.lotid = lot.lotid " //
 			+ "					 left join nd_geolocation env on env.nd_geolocation_id = fm.nd_geolocation_id " //
 			+ "                  inner join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id " //
 			+ "         where fmc.cvterm_id in (:variableIds)"  //
 			+ " 			  and (:datasetId is null or ne.project_id = :datasetId) " //
 			+ " 			  and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) "
 			+ " 			  and (:instanceId is null or env.nd_geolocation_id = :instanceId) " //
+			+ " 			  and (:lotId is null or lot.lotid = :lotId) " //
 			+ " ) T on T.file_metadata_id = fmc.file_metadata_id and T.cvterm_id = fmc.cvterm_id ");
 
 		sqlQuery.setParameter("datasetId", datasetId);
 		sqlQuery.setParameter("germplasmUUID", germplasmUUID);
 		sqlQuery.setParameter("instanceId", instanceId);
+		sqlQuery.setParameter("lotId", lotId);
 		sqlQuery.setParameterList("variableIds", variableIds);
 		sqlQuery.executeUpdate();
 	}
@@ -159,12 +171,13 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 	 * prompting the user to execute a detach variables instead ({@link #detachFiles(List, Integer, String)})
 	 */
 	public void removeFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID,
-		final List<Integer> instanceIds) {
+		final List<Integer> instanceIds, final Integer lotId) {
 		final StringBuilder queryString = new StringBuilder();
 		queryString.append("select fm.file_id ");
 		queryString.append("     from file_metadata fm ");
 		queryString.append("          left join nd_experiment ne on fm.nd_experiment_id = ne.nd_experiment_id ");
 		queryString.append("          left join germplsm g on fm.gid = g.gid ");
+		queryString.append("          left join ims_lot lot on fm.gid = lot.lotid ");
 		queryString.append("          left join file_metadata_cvterm fmc on fm.file_id = fmc.file_metadata_id ");
 		queryString.append("      where 1=1 ");
 		if(!CollectionUtils.isEmpty(variableIds)) {
@@ -172,11 +185,13 @@ public class FileMetadataDAO extends GenericDAO<FileMetadata, Integer> {
 		}
 		queryString.append("          and (:datasetId is null or ne.project_id = :datasetId) ");
 		queryString.append("          and (:germplasmUUID is null or g.germplsm_uuid = :germplasmUUID) ");
+		queryString.append("          and (:lotId is null or lot.lotid = :lotId) ");
 		if(!CollectionUtils.isEmpty(instanceIds)) {
 			queryString.append("      and fm.nd_geolocation_id IN (:instanceIds) ");
 		}
 		final Query query = this.getSession().createSQLQuery(queryString.toString())
 			.setParameter("datasetId", datasetId)
+			.setParameter("lotId", lotId)
 			.setParameter("germplasmUUID", germplasmUUID);
 		if(!CollectionUtils.isEmpty(instanceIds)) {
 			query.setParameterList("instanceIds", instanceIds);

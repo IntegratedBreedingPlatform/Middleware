@@ -8,6 +8,7 @@ public class FileMetadataFilterRequest {
 	private String germplasmUUID;
 	private String variableName;
 	private String fileName;
+	private Integer lotId;
 	private List<Integer> instanceIds;
 
 	public String getObservationUnitUUID() {
@@ -42,6 +43,14 @@ public class FileMetadataFilterRequest {
 		this.fileName = fileName;
 	}
 
+	public Integer getLotId() {
+		return lotId;
+	}
+
+	public void setLotId(final Integer lotId) {
+		this.lotId = lotId;
+	}
+
 	public List<Integer> getInstanceIds() {
 		return this.instanceIds;
 	}
@@ -49,4 +58,5 @@ public class FileMetadataFilterRequest {
 	public void setInstanceIds(final List<Integer> instanceIds) {
 		this.instanceIds = instanceIds;
 	}
+
 }
