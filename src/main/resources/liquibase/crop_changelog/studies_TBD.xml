@@ -553,10 +553,11 @@
 			DELETE FROM stockprop WHERE type_id = 8320;
 			DELETE FROM projectprop WHERE variable_id = 8320;
 
-			DELETE FROM cvterm WHERE cvterm_id = 8320;
 			DELETE FROM cvterm_relationship WHERE subject_id = 8320;
 			DELETE FROM cvtermprop WHERE cvterm_id = 8320;
 			DELETE FROM cvtermsynonym WHERE cvterm_id = 8320;
+			DELETE FROM variable_overrides WHERE cvterm_id = 8320;
+			DELETE FROM cvterm WHERE cvterm_id = 8320;
 		</sql>
 	</changeSet>
 
