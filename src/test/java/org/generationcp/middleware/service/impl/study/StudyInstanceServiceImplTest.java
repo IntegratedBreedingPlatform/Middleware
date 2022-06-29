@@ -164,7 +164,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertNotNull(studyInstance1.getLocationId());
 		assertFalse(studyInstance1.isHasFieldmap());
 		assertEquals("Unknown", studyInstance1.getLocationName());
-		assertEquals("UKN", studyInstance1.getLocationAbbreviation());
+		assertEquals("L0", studyInstance1.getLocationAbbreviation());
 		assertNull(studyInstance1.getCustomLocationAbbreviation());
 		assertTrue(studyInstance1.getCanBeDeleted());
 		assertFalse(studyInstance1.isHasMeasurements());
@@ -179,7 +179,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertNotNull(studyInstance2.getLocationId());
 		assertFalse(studyInstance2.isHasFieldmap());
 		assertEquals("Unknown", studyInstance2.getLocationName());
-		assertEquals("UKN", studyInstance2.getLocationAbbreviation());
+		assertEquals("L0", studyInstance2.getLocationAbbreviation());
 		assertNull(studyInstance2.getCustomLocationAbbreviation());
 		assertTrue(studyInstance2.getCanBeDeleted());
 		assertFalse(studyInstance2.isHasMeasurements());
