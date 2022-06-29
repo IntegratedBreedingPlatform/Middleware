@@ -385,28 +385,32 @@
         </preConditions>
         <comment>Replace the SEED_SOURCE variable by ENTRY_SOURCE IN projectprop AND stockprop</comment>
         <sql dbms="mysql" splitStatements="true">
+			set @ENTRY_SOURCE_ID = (select cvterm_id from cvterm where name ='ENTRY_SOURCE' and cv_id = 1040 and is_obsolete = 0);
+
 			# Replace SEED_SOURCE variable by ENTRY_SOURCE
-			UPDATE projectprop SET variable_id = ( SELECT cvterm_id FROM CVTERM WHERE NAME ='ENTRY_SOURCE' ), ALIAS = 'ENTRY_SOURCE', TYPE_ID = 1815
-				WHERE variable_id = 8360 AND cv_id=1040 AND is_obsolete = 0;
+			update projectprop set variable_id = @ENTRY_SOURCE_ID , alias = 'ENTRY_SOURCE', type_id = 1815
+			where variable_id = 8360 and cv_id = 1040 and is_obsolete = 0;
+
 			# Update cvterm_id 8360 from (SEED_SOURCE) to ENTRY_SOURCE cvterm_id
-			UPDATE stockprop SET TYPE_ID = ( SELECT cvterm_id FROM CVTERM WHERE NAME ='ENTRY_SOURCE' )
-				WHERE TYPE_ID = 8360;
+			update stockprop set type_id = @ENTRY_SOURCE_ID where type_id = 8360;
         </sql>
 	</changeSet>
 
 	<changeSet author="cuenyad" id="studies-TBD-21">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
-				SELECT COUNT(*) from cvterm where cvterm_id = 8360 and cv_id = 1040;
+				select COUNT(*) from cvterm where cvterm_id = 8360;
 				</sqlCheck>
 		</preConditions>
 		<comment>
 			Remove SEED_SOURCE variable from cvterm table and from cvterm_relationship table
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
-			DELETE FROM cvterm where cvterm_id = 8360;
-			DELETE FROM cvterm_relationship where subject_id = 8360;
-			DELETE FROM cvtermprop where cvterm_id = 8360;
+			delete from cvterm where cvterm_id = 8360;
+			delete from cvterm_relationship where subject_id = 8360;
+			delete from cvtermprop where cvterm_id = 8360;
+			delete from variable_overrides where cvterm_id = 8360;
+			delete from cvtermsynonym where cvterm_id = 8360;
 		</sql>
 	</changeSet>
 
@@ -437,14 +441,14 @@
 	<changeSet author="cuenyad" id="studies-TBD-24">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
-                SELECT COUNT(*) from cvterm where cvterm_id = 8378;
+                select COUNT(*) from cvterm where cvterm_id = 8378;
             </sqlCheck>
         </preConditions>
         <comment>Rename 'SOURCE' as 'IMMEDIATE_SOURCE_NAME' in cvterm and projectprop tables</comment>
         <sql dbms="mysql" splitStatements="true">
-             UPDATE cvterm SET name = 'IMMEDIATE_SOURCE_NAME' WHERE cvterm_id = 8378;
-			 UPDATE projectprop SET ALIAS = 'IMMEDIATE_SOURCE_NAME' WHERE variable_id = 8378;
-
+             update cvterm set name = 'IMMEDIATE_SOURCE_NAME' where cvterm_id = 8378;
+             update projectprop set alias = 'IMMEDIATE_SOURCE_NAME' where alias = 'SOURCE' and  variable_id = 8378;
+             update variable_overrides set alias = null where cvterm_id = 8378;
         </sql>
 	</changeSet>
 
@@ -463,13 +467,14 @@
 	<changeSet author="lkovacic" id="studies-TBD-26">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
-                SELECT COUNT(*) from cvterm where cvterm_id = 8340;
+                select COUNT(*) from cvterm where cvterm_id = 8340;
             </sqlCheck>
         </preConditions>
         <comment>Rename 'GROUP' to 'GROUP_SOURCE_NAME' in cvterm and projectprop tables</comment>
         <sql dbms="mysql" splitStatements="true">
-             UPDATE cvterm SET name = 'GROUP_SOURCE_NAME' WHERE cvterm_id = 8340;
-			 UPDATE projectprop SET ALIAS = 'GROUP_SOURCE_NAME' WHERE variable_id = 8340;
+             update cvterm set name = 'GROUP_SOURCE_NAME' where cvterm_id = 8340;
+			 update projectprop set alias = 'GROUP_SOURCE_NAME' where variable_id = 8340;
+			 update variable_overrides set alias = null where cvterm_id = 8340;
         </sql>
 	</changeSet>
 
