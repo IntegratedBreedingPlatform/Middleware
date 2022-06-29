@@ -1,9 +1,9 @@
 package org.generationcp.middleware.dao.ims;
 
 import org.generationcp.middleware.dao.GenericAttributeDAO;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.shared.AttributeDto;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotAttribute;
@@ -11,6 +11,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,6 +55,23 @@ public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 		}
 	}
 
+	public List<LotAttribute> getLotAttributeValuesIdList(final List<Integer> lotIdList) {
+		List<LotAttribute> attributes = new ArrayList<>();
+		if (lotIdList != null && !lotIdList.isEmpty()) {
+			try {
+				final String sql = "SELECT {a.*}" + " FROM ims_lot_attribute a" + " WHERE a.lotId in (:lotIdList)";
+				final SQLQuery query = this.getSession().createSQLQuery(sql);
+				query.addEntity("a", LotAttribute.class);
+				query.setParameterList("lotIdList", lotIdList);
+				attributes = query.list();
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException(
+					"Error with getLotAttributeValuesIdList(lotIdList=" + lotIdList + "): " + e.getMessage(), e);
+			}
+		}
+		return attributes;
+	}
+	
 	@Override
 	protected LotAttribute getNewAttributeInstance(final Integer id) {
 		final LotAttribute newAttribute = new LotAttribute();

@@ -3,8 +3,10 @@ package org.generationcp.middleware.domain.inventory.manager;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 @AutoProperty
 public class LotMultiUpdateRequestDto {
@@ -21,6 +23,8 @@ public class LotMultiUpdateRequestDto {
 		private String notes;
 
 		private String newLotUID;
+
+		private Map<String, String> attributes = new HashMap<>();
 
 		public LotUpdateDto(){
 
@@ -64,6 +68,14 @@ public class LotMultiUpdateRequestDto {
 
 		public void setNewLotUID(final String newLotUID) {
 			this.newLotUID = newLotUID;
+		}
+
+		public Map<String, String> getAttributes() {
+			return this.attributes;
+		}
+
+		public void setAttributes(final Map<String, String> attributes) {
+			this.attributes = attributes;
 		}
 
 		@Override
