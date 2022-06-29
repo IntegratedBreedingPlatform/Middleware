@@ -261,11 +261,11 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 			final Set<String> allCategories = new HashSet<>();
 			allCategories.addAll(this.getScaleCategoriesUsedInObservations(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedAsConditions(scaleId));
-			allCategories.addAll(this.getScaleCategoriesUsedAsGermplasmDescriptors(scaleId));
+			allCategories.addAll(this.getScaleCategoriesUsedInStudyEntries(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedAsTrialDesignFactors(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedAsEnvironmentFactors(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedInAttributes(scaleId));
-			allCategories.addAll(this.getScaleCategoriesUsedAsEntryDetails(scaleId));
+			allCategories.addAll(this.getScaleCategoriesUsedInListEntries(scaleId));
 			return allCategories;
 		} catch (final HibernateException e) {
 			final String message = "Error in getCategoriesInUse in CVTermRelationshipDao: "
@@ -293,7 +293,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		return query.list();
 	}
 
-	public List<String> getScaleCategoriesUsedAsEntryDetails(final int scaleId) {
+	public List<String> getScaleCategoriesUsedInListEntries(final int scaleId) {
 		final SQLQuery query = this.getSession().createSQLQuery(
 			"SELECT DISTINCT v.name as category "
 				+ " FROM cvterm_relationship scale_values "
@@ -304,13 +304,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 				+ " WHERE EXISTS ( "
 				+ "     SELECT 1    	 "
 				+ "     FROM list_data_details a "
-				+ "     WHERE a.cvalue_id = v.cvterm_id AND a.variable_id = var.subject_id ) "
-				+ "OR EXISTS ("
-				+ "     SELECT 1    	 "
-				+ "        FROM stockprop stp "
-				+ "           INNER JOIN stock st ON st.stock_id = stp.stock_id "
-				+ "           INNER JOIN project pr ON pr.project_id = st.project_id AND pr.deleted = 0 "
-				+ "        WHERE stp.type_id = var.subject_id AND stp.cvalue_id = v.cvterm_id )");
+				+ "     WHERE a.cvalue_id = v.cvterm_id AND a.variable_id = var.subject_id ) ");
 		query.setParameter("scaleId", scaleId);
 		query.addScalar("category", CVTermRelationshipDao.STRING);
 		return query.list();
@@ -355,7 +349,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 	}
 
 	@SuppressWarnings("unchecked")
-	protected List<String> getScaleCategoriesUsedAsGermplasmDescriptors(final int scaleId) {
+	protected List<String> getScaleCategoriesUsedInStudyEntries(final int scaleId) {
 		final SQLQuery query = this.getSession().createSQLQuery(
 			"SELECT categ.name category "
 				+ " FROM cvterm_relationship scale_values "
@@ -366,8 +360,8 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 				+ " AND EXISTS ( "
 				+ "      SELECT 1 "
 				+ "      FROM stockprop sp "
-				+ "      INNER JOIN nd_experiment ep on ep.stock_id = sp.stock_id "
-				+ "      INNER JOIN project pr ON pr.project_id =ep.project_id and pr.deleted = 0 "
+				+ "      INNER JOIN stock st ON st.stock_id = sp.stock_id "
+				+ "      INNER JOIN project pr ON pr.project_id = st.project_id AND pr.deleted = 0 "
 				+ "      WHERE sp.type_id = var.subject_id and sp.cvalue_id = categ.cvterm_id)");
 		query.setParameter("scaleId", scaleId);
 		query.addScalar("category", CVTermRelationshipDao.STRING);
