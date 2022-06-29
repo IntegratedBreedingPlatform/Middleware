@@ -5,12 +5,12 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
   <changeSet author="lkovacic" id="studies-TBD-bckp-1">
-        <preConditions onFail="MARK_RAN">
+	<preConditions onFail="MARK_RAN">
       <not>
-        <tableExists tableName="stockprop_bkp" />
+        <tableExists tableName="list_data_view_bkp" />
       </not>
-        </preConditions>
-        <comment>Create backup for 'list_data_view' </comment>
+	</preConditions>
+	<comment>Create backup for 'list_data_view' </comment>
     <sql dbms="mysql" splitStatements="true">
 		CREATE TABLE list_data_view_bkp (
 			id         int auto_increment
@@ -28,12 +28,12 @@
   </changeSet>
 
   <changeSet author="lkovacic" id="studies-TBD-bckp-2">
-        <preConditions onFail="MARK_RAN">
+	<preConditions onFail="MARK_RAN">
       <not>
         <tableExists tableName="projectprop_bkp" />
       </not>
-        </preConditions>
-        <comment>Create backup for 'projectprop' table</comment>
+	</preConditions>
+	<comment>Create backup for 'projectprop' table</comment>
     <sql dbms="mysql" splitStatements="true">
 		create table projectprop_bkp (
 			projectprop_id int auto_increment
@@ -52,12 +52,12 @@
   </changeSet>
 
   <changeSet author="lkovacic" id="studies-TBD-bckp-3">
-        <preConditions onFail="MARK_RAN">
+	<preConditions onFail="MARK_RAN">
       <not>
         <tableExists tableName="stockprop_bkp" />
       </not>
-        </preConditions>
-        <comment>Create backup for 'stockprop' table</comment>
+	</preConditions>
+	<comment>Create backup for 'stockprop' table</comment>
     <sql dbms="mysql" splitStatements="true">
 		create table stockprop_bkp (
 			stockprop_id int auto_increment
@@ -71,7 +71,6 @@
 		SELECT * FROM stockprop;
     </sql>
   </changeSet>
-
 
   <changeSet author="lkovacic" id="studies-TBD-1">
         <preConditions onFail="MARK_RAN">
@@ -139,7 +138,7 @@
 				SELECT stock_id, 8300, s.value FROM project p
 						 INNER JOIN projectprop pp ON p.project_id = pp.project_id AND p.dataset_type_id = 4
 						 INNER JOIN stock s ON p.parent_project_id = s.project_id
-				WHERE pp.variable_id = 8300;
+				WHERE pp.variable_id = 8300 AND s.value IS NOT NULL AND s.value != '';
 		</sql>
 	</changeSet>
 
@@ -153,17 +152,7 @@
 		</sql>
 	</changeSet>
 
-    <changeSet author="lkovacic" id="studies-TBD-6">
-        <preConditions onFail="MARK_RAN">
-			<columnExists tableName="stock" columnName="type_id"/>
-		</preConditions>
-		<comment>Rename column 'type_id' to 'type_id_bkp' in table 'stock' and make it nullable</comment>
-		<sql>
-			ALTER TABLE stock CHANGE type_id type_id_bkp int null;
-		</sql>
-	</changeSet>
-
-	<changeSet author="lkovacic" id="studies-TBD-7">
+	<changeSet author="lkovacic" id="studies-TBD-6">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(*)
@@ -176,6 +165,32 @@
 		<comment>Drop unique index 'stock_idx1' in 'stock' table</comment>
 		<sql>
 			DROP INDEX stock_idx1 ON stock;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="studies-TBD-6-bis">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*)
+				FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS
+				WHERE TABLE_NAME = 'stock'
+				  AND CONSTRAINT_NAME = 'stock_idx5'
+				  AND TABLE_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<comment>Drop unique index 'stock_idx5' in 'stock' table</comment>
+		<sql>
+			DROP INDEX stock_idx5 ON stock;
+		</sql>
+	</changeSet>
+
+    <changeSet author="lkovacic" id="studies-TBD-7">
+        <preConditions onFail="MARK_RAN">
+			<columnExists tableName="stock" columnName="type_id"/>
+		</preConditions>
+		<comment>Rename column 'type_id' to 'type_id_bkp' in table 'stock' and make it nullable</comment>
+		<sql>
+			ALTER TABLE stock CHANGE type_id type_id_bkp int null;
 		</sql>
 	</changeSet>
 
@@ -230,7 +245,6 @@
 		</preConditions>
 		<comment>Migrate categorical variable values to 'cvalue_id' column</comment>
 		<sql dbms="mysql" splitStatements="true">
-			<!-- TODO: review this query -->
 			UPDATE stockprop
 				SET cvalue_id = value, value = (SELECT name FROM cvterm WHERE cvterm_id = cvalue_id)
 				WHERE type_id IN (SELECT inn.typeid
@@ -449,7 +463,7 @@
 	<changeSet author="lkovacic" id="studies-TBD-26">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
-                SELECT COUNT(*) from cvterm where cvterm_id = 8340 and cv_id = 1040;
+                SELECT COUNT(*) from cvterm where cvterm_id = 8340;
             </sqlCheck>
         </preConditions>
         <comment>Rename 'GROUP' to 'GROUP_SOURCE_NAME' in cvterm and projectprop tables</comment>
@@ -531,17 +545,18 @@
 	<changeSet author="lkovacic" id="studies-TBD-31">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
-				SELECT COUNT(*) from cvterm where cvterm_id = 8320 and cv_id = 1040;
-				</sqlCheck>
+				SELECT COUNT(*) from cvterm where cvterm_id = 8320;
+			</sqlCheck>
 		</preConditions>
 		<comment>Remove 'GERM_SOURCE' variable from cvterm</comment>
 		<sql dbms="mysql" splitStatements="true">
 			DELETE FROM stockprop WHERE type_id = 8320;
 			DELETE FROM projectprop WHERE variable_id = 8320;
 
-			DELETE FROM cvterm where cvterm_id = 8320;
-			DELETE FROM cvterm_relationship where subject_id = 8320;
-			DELETE FROM cvtermprop where cvterm_id = 8320;
+			DELETE FROM cvterm WHERE cvterm_id = 8320;
+			DELETE FROM cvterm_relationship WHERE subject_id = 8320;
+			DELETE FROM cvtermprop WHERE cvterm_id = 8320;
+			DELETE FROM cvtermsynonym WHERE cvterm_id = 8320;
 		</sql>
 	</changeSet>
 
@@ -575,16 +590,10 @@
 				SELECT Count(*) > 0
 				FROM (SELECT listid,
 						  Count(static_id) AS staticColumns,
-						  Count(name_fldno) AS nameColumns,
-						  (SELECT Count(*)
-						   FROM list_data_view
-						   WHERE listid = ldv.listid AND type_id = 1815) AS entryDetailsColumns,
-						  (SELECT Count(*)
-						   FROM list_data_view
-						   WHERE listid = ldv.listid AND type_id IN (1813, 1814)) AS descriptorsColumns
+						  Count(name_fldno) AS nameColumns
 					  FROM list_data_view ldv
 					  GROUP BY listid) countQuery
-				WHERE countQuery.staticcolumns = 0 AND countQuery.namecolumns = 0;
+				WHERE countQuery.staticColumns = 0 AND countQuery.nameColumns = 0;
 			</sqlCheck>
 		</preConditions>
 		<comment>Add default static columns to germplasm lists</comment>
@@ -605,18 +614,12 @@
 			SELECT countQuery.listid, tempListdataDefaultView.static_column_term_id
 			FROM (SELECT listid,
 					  Count(static_id) AS staticColumns,
-					  Count(name_fldno) AS nameColumns,
-					  (SELECT Count(*)
-					   FROM list_data_view
-					   WHERE listid = ldv.listid AND type_id = 1815) AS entryDetailsColumns,
-					  (SELECT Count(*)
-					   FROM list_data_view
-					   WHERE listid = ldv.listid AND type_id IN (1813, 1814)) AS descriptorsColumns
+					  Count(name_fldno) AS nameColumns
 				  FROM list_data_view ldv
 				  GROUP BY listid) countQuery,
 				(SELECT static_column_term_id
 				 FROM list_data_default_view_temporary) tempListdataDefaultView
-			WHERE countQuery.staticcolumns = 0 AND countQuery.namecolumns = 0
+			WHERE countQuery.staticColumns = 0 AND countQuery.nameColumns = 0
 			ORDER BY countQuery.listid;
 
 			#Delete list_data_default_view_temporary Table
