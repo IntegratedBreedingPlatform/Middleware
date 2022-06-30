@@ -8,6 +8,7 @@ import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -16,7 +17,6 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -60,7 +60,7 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	private DaoFactory daoFactory;
 	private IntegrationTestDataInitializer testDataInitializer;
@@ -79,7 +79,7 @@ public class StudyServiceBrapiImplTest extends IntegrationTestBase {
 		}
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
-		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.name());
+		this.cropType = this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.name());
 		this.testUser = this.testDataInitializer.createUserForTesting();
 		this.study = this.testDataInitializer
 			.createStudy("Study1", "Study-Description", 6, this.commonTestProject.getUniqueID(), this.testUser.getUserid().toString(),

@@ -2,13 +2,13 @@ package org.generationcp.middleware.service.impl.user;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.dao.UserRoleDao;
 import org.generationcp.middleware.data.initializer.UserRoleDataInitializer;
 import org.generationcp.middleware.data.initializer.UserTestDataInitializer;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropPerson;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -40,13 +40,10 @@ import static org.junit.Assert.assertTrue;
 public class UserServiceImplTest extends IntegrationTestBase {
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	@Autowired
 	private UserService userService;
-
-	@Autowired
-	private ProgramService programService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -287,7 +284,7 @@ public class UserServiceImplTest extends IntegrationTestBase {
 		final UserRole userRole = new UserRole();
 		userRole.setCreatedBy(this.testUser1);
 		userRole.setWorkbenchProject(this.commonTestProject);
-		userRole.setCropType(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
+		userRole.setCropType(this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
 		userRole.setUser(user);
 		userRole.setCreatedDate(new Date());
 		final Role role = new Role();

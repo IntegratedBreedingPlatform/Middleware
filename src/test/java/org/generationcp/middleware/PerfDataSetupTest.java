@@ -1,14 +1,13 @@
 
 package org.generationcp.middleware;
 
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Person;
@@ -37,16 +36,13 @@ import java.util.Random;
 public class PerfDataSetupTest extends IntegrationTestBase {
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	@Autowired
 	private UserService userService;
 
 	@Autowired
 	private ProgramService programService;
-
-	@Autowired
-	private GermplasmDataManager germplasmManager;
 
 	@Autowired
 	private GermplasmListManager germplasmListManager;
@@ -112,7 +108,7 @@ public class PerfDataSetupTest extends IntegrationTestBase {
 
 		this.userService.addUser(workbenchUser);
 
-		CropType cropType = this.workbenchDataManager.getCropTypeByName("maize");
+		CropType cropType = this.cropService.getCropTypeByName("maize");
 		if (cropType == null) {
 			cropType = new CropType("maize");
 			cropType.setDbName("ibdbv2_maize_merged");

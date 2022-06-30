@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.brapi.VariableServiceBrapi;
 import org.generationcp.middleware.api.brapi.VariableTypeGroup;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -16,7 +17,6 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.CvTermExternalReference;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.oms.CVTermProperty;
@@ -55,7 +55,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	@Resource
 	private TrialServiceBrapi trialServiceBrapi;
@@ -78,7 +78,7 @@ public class VariableServiceBrapiImplTest extends IntegrationTestBase {
 		}
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
 		this.testUser = this.testDataInitializer.createUserForTesting();
-		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.name());
+		this.cropType = this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.name());
 	}
 
 	@Test
