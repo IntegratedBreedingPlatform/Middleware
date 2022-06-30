@@ -70,6 +70,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -150,6 +151,45 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		+ " 	select p.gid, p.nval " + PUI_FROM_QUERY + ") pui on pui.gid = g.gid "
 		+ "        left join " //
 		+ "    bibrefs r on g.gref = r.refid ";
+
+	private static final String FIND_PROGENY_QUERY = "SELECT"
+		+ "   g.gid as parentGid, "
+		+ "   progeny.germplsm_uuid as germplasmDbId,"
+		+ "   name.nval as defaultDisplayName,"
+		+ "   CASE"
+		+ "   WHEN progeny.gnpgs = -1"
+		+ "     THEN '" + ParentType.SELF.name() + "'"
+		+ "   WHEN progeny.gnpgs >= 2"
+		+ "     THEN"
+		+ "       CASE"
+		+ "         WHEN progeny.gpid1 = progeny.gpid2"
+		+ "           THEN '" + ParentType.SELF.name() + "'"
+		+ "         WHEN progeny.gpid1 = g.gid"
+		+ "           THEN '" + ParentType.FEMALE.name() + "'"
+		+ "         ELSE '" + ParentType.MALE.name() + "'"
+		+ "       END"
+		+ "   ELSE ''"
+		+ "   END as parentType"
+		+ " FROM germplsm g"
+		+ "   LEFT JOIN germplsm progeny ON (progeny.gnpgs = -1 AND progeny.gpid2 = g.gid)"
+		+ "   OR (progeny.gnpgs >= 2 AND (progeny.gpid1 = g.gid OR progeny.gpid2 = g.gid))"
+		+ "   LEFT JOIN names name ON progeny.gid = name.gid AND name.nstat = 1"
+		+ " WHERE g.deleted = 0 AND g.grplce = 0"
+		+ "       AND progeny.deleted = 0 AND progeny.grplce = 0"
+		+ "		  AND g.gid in (:gids)";
+
+	private static final String FIND_SIBLINGS_QUERY = "SELECT"
+		+ "   g.gid as parentGid, "
+		+ "   sibling.germplsm_uuid AS germplasmDbId, "
+		+ "   n.nval AS defaultDisplayName, "
+		+ "   '' AS parentType"
+		+ "	FROM germplsm g "
+		+ "   INNER JOIN germplsm sibling ON sibling.gpid1 = g.gpid1"
+		+ "                                  AND sibling.gnpgs = -1"
+		+ "                                  AND g.gpid1 != 0"
+		+ "                                  AND sibling.gid != g.gid"
+		+ "   LEFT JOIN names n ON sibling.gid = n.gid AND n.nstat = 1"
+		+ "	WHERE g.gid in (:gids)";
 
 	public GermplasmDAO(final Session session) {
 		super(session);
@@ -556,7 +596,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		// and query them by batch.
 		for (int level = 1; level <= maxDepth; level++) {
 
-			// Exit loop if there's no more parents to fetch
 			if (!CollectionUtils.isEmpty(germplasmIds)) {
 				final Query pedigreeQuery = this.getSession().createQuery("SELECT DISTINCT g FROM Germplasm g "
 					+ "LEFT JOIN FETCH g.femaleParent "
@@ -572,7 +611,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 					pedigreeNodesToReturn.add(PedigreeNodeMapper.map(germplasm, pedigreeNodeSearchRequest.isIncludeParents()));
 				});
 
-				// If includeParents is true, also return the parents, grandparents, ... (stop at the specified depth level)
+				// If includeParents is true, we should return the parents, grandparents, etc ... (stop at the specified depth level)
 				if (!pedigreeNodeSearchRequest.isIncludeFullTree() || pedigreeNodeSearchRequest.getPedigreeDepth() <= 1)
 					break;
 			}
@@ -587,32 +626,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (CollectionUtils.isEmpty(gids))
 			return progenyMapByGids;
 
-		final StringBuilder query = new StringBuilder().append("SELECT")
-			.append("   parent.gid as parentGid, ")
-			.append("   progeny.germplsm_uuid as germplasmDbId,")
-			.append("   name.nval as germplasmName,")
-			.append("   CASE")
-			.append("   WHEN progeny.gnpgs = -1")
-			.append("     THEN '" + ParentType.SELF.name() + "'")
-			.append("   WHEN progeny.gnpgs >= 2")
-			.append("     THEN")
-			.append("       CASE")
-			.append("         WHEN progeny.gpid1 = progeny.gpid2")
-			.append("           THEN '" + ParentType.SELF.name() + "'")
-			.append("         WHEN progeny.gpid1 = parent.gid")
-			.append("           THEN '" + ParentType.FEMALE.name() + "'")
-			.append("         ELSE '" + ParentType.MALE.name() + "'")
-			.append("       END")
-			.append("   ELSE ''")
-			.append("   END as parentType")
-			.append(" FROM germplsm parent")
-			.append("   LEFT JOIN germplsm progeny ON (progeny.gnpgs = -1 AND progeny.gpid2 = parent.gid)")
-			.append("   OR (progeny.gnpgs >= 2 AND (progeny.gpid1 = parent.gid OR progeny.gpid2 = parent.gid))")
-			.append("   LEFT JOIN names name ON progeny.gid = name.gid AND name.nstat = 1")
-			.append(" WHERE parent.gid in (:gids)")
-			.append("       AND parent.deleted = 0 AND parent.grplce = 0")
-			.append("       AND progeny.deleted = 0 AND progeny.grplce = 0");
-
+		final StringBuilder query = new StringBuilder(FIND_PROGENY_QUERY);
 		return this.convertPedigreeNodeListToMap(gids, query);
 
 	}
@@ -624,18 +638,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (CollectionUtils.isEmpty(gids))
 			return siblingsMapByGids;
 
-		final StringBuilder siblingsQuery = new StringBuilder().append("SELECT")
-			.append("   g.gid as parentGid, ")
-			.append("   sibling.germplsm_uuid AS germplasmDbId, ")
-			.append("   n.nval AS germplasmName, ")
-			.append("   '' AS parentType")
-			.append("	FROM germplsm g ")
-			.append("   INNER JOIN germplsm sibling ON sibling.gpid1 = g.gpid1")
-			.append("                                  AND sibling.gnpgs = -1")
-			.append("                                  AND g.gpid1 != 0")
-			.append("                                  AND sibling.gid != g.gid")
-			.append("   LEFT JOIN names n ON sibling.gid = n.gid AND n.nstat = 1")
-			.append(" WHERE g.gid in (:gids)");
+		final StringBuilder siblingsQuery = new StringBuilder().append(FIND_SIBLINGS_QUERY);
 
 		return this.convertPedigreeNodeListToMap(gids, siblingsQuery);
 
@@ -643,7 +646,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	private Map<Integer, List<PedigreeNodeReferenceDTO>> convertPedigreeNodeListToMap(final List<Integer> gids, final StringBuilder query) {
 		final List<Object[]> rows = this.getSession().createSQLQuery(query.toString())
-			.addScalar("parentGid").addScalar("germplasmDbId").addScalar("germplasmName").addScalar("parentType")
+			.addScalar("parentGid").addScalar("germplasmDbId").addScalar("defaultDisplayName").addScalar("parentType")
 			.setParameterList("gids", gids)
 			.list();
 
@@ -728,20 +731,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				return pedigreeDTO;
 			}
 
-			final String siblingsQuery = "SELECT" //
-				+ "   sibling.germplsm_uuid AS germplasmDbId," //
-				+ "   n.nval AS defaultDisplayName" //
-				+ " FROM germplsm g" //
-				+ "   INNER JOIN germplsm sibling ON sibling.gpid1 = g.gpid1"//
-				+ "                                  AND sibling.gnpgs = -1"//
-				+ "                                  AND g.gpid1 != 0"//
-				+ "                                  AND sibling.gid != g.gid"//
-				+ "   LEFT JOIN names n ON sibling.gid = n.gid AND n.nstat = 1" //
-				+ " WHERE g.gid = :gid";
+			final StringBuilder siblingsQuery = new StringBuilder(FIND_SIBLINGS_QUERY);
 
-			final List<PedigreeDTO.Sibling> siblings = this.getSession().createSQLQuery(siblingsQuery) //
+			final List<PedigreeDTO.Sibling> siblings = this.getSession().createSQLQuery(siblingsQuery.toString()) //
 				.addScalar("germplasmDbId").addScalar("defaultDisplayName")
-				.setParameter("gid", gid)
+				.setParameterList("gids", Arrays.asList(gid))
 				.setResultTransformer(Transformers.aliasToBean(PedigreeDTO.Sibling.class)) //
 				.list();
 
@@ -761,35 +755,11 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 				return null;
 			}
 
-			final String query = "SELECT" //
-				+ "   progeny.germplsm_uuid as germplasmDbId," //
-				+ "   name.nval as defaultDisplayName," //
-				+ "   CASE" //
-				+ "   WHEN progeny.gnpgs = -1" //
-				+ "     THEN '" + ParentType.SELF.name() + "'" //
-				+ "   WHEN progeny.gnpgs >= 2" //
-				+ "     THEN" //
-				+ "       CASE" //
-				+ "         WHEN progeny.gpid1 = progeny.gpid2" //
-				+ "           THEN '" + ParentType.SELF.name() + "'" //
-				+ "         WHEN progeny.gpid1 = parent.gid" //
-				+ "           THEN '" + ParentType.FEMALE.name() + "'" //
-				+ "         ELSE '" + ParentType.MALE.name() + "'" //
-				+ "       END" //
-				+ "   ELSE ''" //
-				+ "   END as parentType" //
-				+ " FROM germplsm parent" //
-				+ "   LEFT JOIN germplsm progeny ON (progeny.gnpgs = -1 AND progeny.gpid2 = parent.gid)" //
-				+ "                                 OR (progeny.gnpgs >= 2 AND (progeny.gpid1 = parent.gid OR progeny.gpid2 = parent.gid))"
-				//
-				+ "   LEFT JOIN names name ON progeny.gid = name.gid AND name.nstat = 1" //
-				+ " WHERE parent.gid = :gid" //
-				+ "       AND parent.deleted = 0 AND parent.grplce = 0" //
-				+ "       AND progeny.deleted = 0 AND progeny.grplce = 0";
+			final StringBuilder query = new StringBuilder(FIND_PROGENY_QUERY);
 
-			final List<ProgenyDTO.Progeny> progeny = this.getSession().createSQLQuery(query) //
+			final List<ProgenyDTO.Progeny> progeny = this.getSession().createSQLQuery(query.toString()) //
 				.addScalar("germplasmDbId").addScalar("defaultDisplayName").addScalar("parentType")
-				.setParameter("gid", germplasmDbId) //
+				.setParameterList("gids", Arrays.asList(germplasmDbId)) //
 				.setResultTransformer(Transformers.aliasToBean(ProgenyDTO.Progeny.class)) //
 				.list();
 
