@@ -1317,18 +1317,14 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getTrialDbIds())) {
 			paramBuilder.append(" AND g.gid IN ( "
 				+ "  SELECT s.dbxref_id from stock s "
-				+ "   INNER JOIN nd_experiment e ON e.stock_id = s.stock_id "
-				+ "   INNER JOIN project p ON e.project_id = p.project_id "
-				+ "   WHERE p.study_id in (:trialDbIds)) ");
+				+ "  WHERE s.project_id in (:trialDbIds)) ");
 		}
 
 		if (!CollectionUtils.isEmpty(germplasmSearchRequest.getTrialNames())) {
 			paramBuilder.append(" AND g.gid IN ( "
 				+ "  SELECT s.dbxref_id from stock s "
-				+ "   INNER JOIN nd_experiment e ON e.stock_id = s.stock_id "
-				+ "   INNER JOIN project p ON e.project_id = p.project_id "
-				+ "   INNER JOIN project study ON p.study_id = study.project_id "
-				+ "   WHERE study.name in (:trialNames)) ");
+				+ "  INNER JOIN project p ON p.project_id = s.project_id "
+				+ "  WHERE p.name in (:trialNames)) ");
 		}
 
 	}
