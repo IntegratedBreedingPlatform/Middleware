@@ -70,8 +70,8 @@ public class VariableListTransformer extends Transformer {
 			if (nonTrialMDSize == variableTypeSize) {
 				for (final DMSVariableType variableType : variableTypeList.getVariableTypes()) {
 					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM ||
-						variableType.getId() == TermId.ENTRY_NO.getId() ||
-						variableType.getId() == TermId.ENTRY_TYPE.getId()) {
+						variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.ENTRY_DETAIL
+					) {
 						String value = null;
 						for (final MeasurementData data : nonTrialMD) {
 							if (data.getMeasurementVariable().getTermId() == variableType.getStandardVariable()
