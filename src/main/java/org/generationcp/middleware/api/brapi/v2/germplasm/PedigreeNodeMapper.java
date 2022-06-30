@@ -6,6 +6,7 @@ import org.generationcp.middleware.pojos.Progenitor;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +20,12 @@ public class PedigreeNodeMapper {
 		pedigreeNodeDTO.setGermplasmDbId(germplasm.getGermplasmUUID());
 		pedigreeNodeDTO.setBreedingMethodDbId(String.valueOf(germplasm.getMethod().getMid()));
 		pedigreeNodeDTO.setBreedingMethodName(germplasm.getMethod().getMname());
-		pedigreeNodeDTO.setCrossingYear(LocalDate.parse(String.valueOf(germplasm.getGdate()), dateTimeFormatter).getYear());
+
+		try {
+			pedigreeNodeDTO.setCrossingYear(LocalDate.parse(String.valueOf(germplasm.getGdate()), dateTimeFormatter).getYear());
+		} catch (final DateTimeParseException e) {
+			// do nothing if gdate cannot be parsed
+		}
 
 		if (isIncludeParents) {
 			pedigreeNodeDTO.setParents(createParents(germplasm));
