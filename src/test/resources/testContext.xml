@@ -413,4 +413,8 @@
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
+	<bean id="cropService" class="org.generationcp.middleware.api.crop.CropServiceImpl">
+		<constructor-arg ref="workbenchSessionProvider" />
+	</bean>
+
 </beans>
