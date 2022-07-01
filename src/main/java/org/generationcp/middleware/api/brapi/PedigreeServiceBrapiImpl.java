@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.brapi;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeDTO;
@@ -63,14 +64,17 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 	public List<PedigreeNodeDTO> searchPedigreeNodes(final PedigreeNodeSearchRequest pedigreeNodeSearchRequest, final Pageable pageable) {
 		final List<PedigreeNodeDTO> result = this.daoFactory.getGermplasmDao().searchPedigreeNodes(pedigreeNodeSearchRequest, pageable);
 
-		// Extract the gids of the germplasm and its parents
+		// Extract the gids of the germplasm
 		final List<Integer> gids = result.stream().map(PedigreeNodeDTO::getGid).filter(Objects::nonNull).collect(Collectors.toList());
-		gids.addAll(result.stream().filter(p -> !CollectionUtils.isEmpty(p.getParents())).flatMap(p -> p.getParents().stream())
-			.map(PedigreeNodeReferenceDTO::getGid).filter(Objects::nonNull)
-			.collect(Collectors.toList()));
+		// Extract the gids of the germplasm's parents
+		final List<Integer> gidsOfParents =
+			result.stream().filter(p -> !CollectionUtils.isEmpty(p.getParents())).flatMap(p -> p.getParents().stream())
+				.map(PedigreeNodeReferenceDTO::getGid).filter(Objects::nonNull)
+				.collect(Collectors.toList());
 
 		if (!CollectionUtils.isEmpty(result)) {
 
+			// Retrieve the progeny and siblings if explicitly specified
 			final Map<Integer, List<PedigreeNodeReferenceDTO>> progenyMapByGids =
 				pedigreeNodeSearchRequest.isIncludeProgeny() ? this.daoFactory.getGermplasmDao().getProgenyByGids(gids) : new HashMap<>();
 			final Map<Integer, List<PedigreeNodeReferenceDTO>> siblingsMapByGids =
@@ -78,7 +82,8 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 
 			// Populate the preferred name, PUIs, external references, pedigree string
 			// progeny (optional) and siblings (optional)
-			final Map<Integer, String> preferredNamesMap = this.daoFactory.getNameDao().getPreferredNamesByGIDs(gids);
+			final Map<Integer, String> preferredNamesMap =
+				this.daoFactory.getNameDao().getPreferredNamesByGIDs(ListUtils.union(gids, gidsOfParents));
 			final Map<Integer, String> germplasmPUIsMap = this.daoFactory.getNameDao().getPUIsByGIDs(gids);
 			final Map<Integer, String> pedigreeStringMap =
 				this.pedigreeService.getCrossExpansions(new HashSet<>(gids), null, this.crossExpansionProperties);
@@ -94,6 +99,9 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 					referencesByGidMap.getOrDefault(String.valueOf(pedigreeNodeDTO.getGid()), new ArrayList<>()));
 				pedigreeNodeDTO.setProgeny(progenyMapByGids.getOrDefault(pedigreeNodeDTO.getGid(), null));
 				pedigreeNodeDTO.setSiblings(siblingsMapByGids.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				if (!CollectionUtils.isEmpty(pedigreeNodeDTO.getParents())) {
+					pedigreeNodeDTO.getParents().forEach(p -> p.setGermplasmName(preferredNamesMap.getOrDefault(p.getGid(), null)));
+				}
 			}
 		}
 		return result;

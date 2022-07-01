@@ -65,7 +65,7 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final Method crossMethod = this.createBreedingMethod(MethodType.GENERATIVE.getCode(), 2);
 		final Germplasm germplasm_C = this.createGermplasm("C", derMethod, null, -1, 0, 0);
 		final Germplasm germplasm_B = this.createGermplasm("B", derMethod, null, -1, 0, 0);
-		final Germplasm germplasm_A = this.createGermplasm("A", crossMethod, null, 0, germplasm_B.getGid(), germplasm_C.getGid());
+		final Germplasm germplasm_A = this.createGermplasm("A", crossMethod, null, 2, germplasm_B.getGid(), germplasm_C.getGid());
 		final GermplasmExternalReference externalReference = this.createGermplasmExternalReference(germplasm_A);
 
 		final PedigreeNodeSearchRequest pedigreeNodeSearchRequest = new PedigreeNodeSearchRequest();
@@ -86,6 +86,12 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals("A", pedigreeNodeDTO.getPedigreeString());
 		Assert.assertEquals(2020, pedigreeNodeDTO.getCrossingYear().intValue());
 		Assert.assertFalse(pedigreeNodeDTO.getParents().isEmpty());
+		Assert.assertEquals("B", pedigreeNodeDTO.getParents().get(0).getGermplasmName());
+		Assert.assertEquals(germplasm_B.getGermplasmUUID(), pedigreeNodeDTO.getParents().get(0).getGermplasmDbId());
+		Assert.assertEquals(ParentType.FEMALE.name(), pedigreeNodeDTO.getParents().get(0).getParentType());
+		Assert.assertEquals("C", pedigreeNodeDTO.getParents().get(1).getGermplasmName());
+		Assert.assertEquals(germplasm_C.getGermplasmUUID(), pedigreeNodeDTO.getParents().get(1).getGermplasmDbId());
+		Assert.assertEquals(ParentType.MALE.name(), pedigreeNodeDTO.getParents().get(1).getParentType());
 		Assert.assertEquals(externalReference.getReferenceId(), pedigreeNodeDTO.getExternalReferences().get(0).getReferenceID());
 		Assert.assertEquals(externalReference.getSource(), pedigreeNodeDTO.getExternalReferences().get(0).getReferenceSource());
 

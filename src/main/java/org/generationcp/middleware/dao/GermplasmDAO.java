@@ -152,31 +152,64 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		+ "        left join " //
 		+ "    bibrefs r on g.gref = r.refid ";
 
-	private static final String FIND_PROGENY_QUERY = "SELECT"
-		+ "   g.gid as parentGid, "
-		+ "   progeny.germplsm_uuid as germplasmDbId,"
-		+ "   name.nval as defaultDisplayName,"
-		+ "   CASE"
-		+ "   WHEN progeny.gnpgs = -1"
-		+ "     THEN '" + ParentType.SELF.name() + "'"
-		+ "   WHEN progeny.gnpgs >= 2"
-		+ "     THEN"
+	private static final String FIND_PROGENY_QUERY = "SELECT g.gid                 AS parentGid,"
+		+ "       progeny.germplsm_uuid AS germplasmDbId,"
+		+ "       name.nval             AS defaultDisplayName,"
+		+ "       '" + ParentType.SELF.name() + "' AS parentType, "
+		+ "       g.created_date        AS createdDate "
+		+ "FROM   germplsm g"
+		+ "       LEFT JOIN germplsm progeny"
+		+ "              ON progeny.gnpgs = -1"
+		+ "                   AND progeny.gpid2 = g.gid"
+		+ "       LEFT JOIN names name"
+		+ "              ON progeny.gid = name.gid"
+		+ "                 AND name.nstat = 1 "
+		+ "WHERE  g.deleted = 0"
+		+ "       AND g.grplce = 0"
+		+ "       AND progeny.deleted = 0"
+		+ "       AND progeny.grplce = 0"
+		+ "       AND g.gid IN ( :gids ) "
+		+ "UNION "
+		+ "SELECT g.gid                 AS parentGid,"
+		+ "       progeny.germplsm_uuid AS germplasmDbId,"
+		+ "       name.nval             AS defaultDisplayName,"
 		+ "       CASE"
-		+ "         WHEN progeny.gpid1 = progeny.gpid2"
-		+ "           THEN '" + ParentType.SELF.name() + "'"
-		+ "         WHEN progeny.gpid1 = g.gid"
-		+ "           THEN '" + ParentType.FEMALE.name() + "'"
-		+ "         ELSE '" + ParentType.MALE.name() + "'"
-		+ "       END"
-		+ "   ELSE ''"
-		+ "   END as parentType"
-		+ " FROM germplsm g"
-		+ "   LEFT JOIN germplsm progeny ON (progeny.gnpgs = -1 AND progeny.gpid2 = g.gid)"
-		+ "   OR (progeny.gnpgs >= 2 AND (progeny.gpid1 = g.gid OR progeny.gpid2 = g.gid))"
-		+ "   LEFT JOIN names name ON progeny.gid = name.gid AND name.nstat = 1"
-		+ " WHERE g.deleted = 0 AND g.grplce = 0"
-		+ "       AND progeny.deleted = 0 AND progeny.grplce = 0"
-		+ "		  AND g.gid in (:gids)";
+		+ "             WHEN progeny.gpid1 = progeny.gpid2 THEN '" + ParentType.SELF.name() + "'"
+		+ "             WHEN progeny.gpid1 = g.gid THEN '" + ParentType.FEMALE.name() + "'"
+		+ "       END 					AS parentType, "
+		+ "       g.created_date        AS createdDate "
+		+ "FROM   germplsm g"
+		+ "       LEFT JOIN germplsm progeny"
+		+ "                  ON progeny.gnpgs >= 2 AND progeny.gpid1 = g.gid"
+		+ "       LEFT JOIN names name"
+		+ "              ON progeny.gid = name.gid"
+		+ "                 AND name.nstat = 1 "
+		+ "WHERE  g.deleted = 0"
+		+ "       AND g.grplce = 0"
+		+ "       AND progeny.deleted = 0"
+		+ "       AND progeny.grplce = 0"
+		+ "       AND g.gid IN ( :gids ) "
+		+ "UNION "
+		+ "SELECT g.gid                 AS parentGid,"
+		+ "       progeny.germplsm_uuid AS germplasmDbId,"
+		+ "       name.nval             AS defaultDisplayName,"
+		+ "       CASE"
+		+ "             WHEN progeny.gpid1 = progeny.gpid2 THEN '" + ParentType.SELF.name() + "'"
+		+ "             WHEN progeny.gpid2 = g.gid THEN '" + ParentType.MALE.name() + "'"
+		+ "       END                   AS parentType, "
+		+ "       g.created_date        AS createdDate "
+		+ "FROM   germplsm g"
+		+ "       LEFT JOIN germplsm progeny"
+		+ "              ON progeny.gnpgs >= 2 AND progeny.gpid2 = g.gid"
+		+ "       LEFT JOIN names name"
+		+ "              ON progeny.gid = name.gid"
+		+ "                 AND name.nstat = 1 "
+		+ "WHERE  g.deleted = 0"
+		+ "       AND g.grplce = 0"
+		+ "       AND progeny.deleted = 0"
+		+ "       AND progeny.grplce = 0"
+		+ "       AND g.gid IN ( :gids ) "
+		+ " ORDER BY createdDate ASC";
 
 	private static final String FIND_SIBLINGS_QUERY = "SELECT"
 		+ "   g.gid as parentGid, "
@@ -586,32 +619,38 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final SQLQuery filterQuery = this.getSession().createSQLQuery(this.buildFilterGermplasmQuery(germplasmSearchRequest));
 		this.addGermplasmSearchParameters(new SqlQueryParamBuilder(filterQuery), germplasmSearchRequest);
 		addPaginationToSQLQuery(filterQuery, pageable);
-		final Set<Integer> germplasmIds = new HashSet<>(filterQuery.list());
 
 		// Use Set to make sure there will be no duplicates
 		final Set<PedigreeNodeDTO> pedigreeNodesToReturn = new HashSet<>();
 		final int maxDepth = pedigreeNodeSearchRequest.getPedigreeDepth() <= 0 ? 1 : pedigreeNodeSearchRequest.getPedigreeDepth();
 
-		// Traverse through pedigree tree by level. This will extract the parents for each level
-		// and query them by batch.
-		for (int level = 1; level <= maxDepth; level++) {
+		/**
+		 * Traverse through pedigree tree. If includeIncludeFullTree is true, we should also return the pedigree
+		 * to the result (parents, grandparents, etc ...) and traverse until it reaches the specified pedigree depth.
+		 **/
 
-			if (!CollectionUtils.isEmpty(germplasmIds)) {
+		// List of gids that are already retrieved from the database.
+		// This is to track which parent is already loaded from the database.
+		final Set<Integer> gidsOfGermplasmAlreadyRetrieved = new HashSet<>(filterQuery.list());
+		// Temporarily store the gids of the parents extracted from the germplasm. This will reset for each level.
+		final Set<Integer> parentsGids = new HashSet<>(gidsOfGermplasmAlreadyRetrieved);
+		for (int level = 1; level <= maxDepth; level++) {
+			if (!CollectionUtils.isEmpty(parentsGids)) {
 				final Query pedigreeQuery = this.getSession().createQuery("SELECT DISTINCT g FROM Germplasm g "
 					+ "LEFT JOIN FETCH g.femaleParent "
 					+ "LEFT JOIN FETCH g.maleParent "
 					+ "LEFT JOIN FETCH g.otherProgenitors "
 					+ "WHERE g.gid IN (:gids) AND g.deleted = 0 AND g.grplce = 0 ");
-				pedigreeQuery.setParameterList("gids", germplasmIds);
+				pedigreeQuery.setParameterList("gids", parentsGids);
 				final List<Germplasm> pedigreeGermplasmList = pedigreeQuery.list();
-				germplasmIds.clear();
+				parentsGids.clear();
 				pedigreeGermplasmList.stream().forEach(germplasm -> {
-					// Extract the parents of the germplasm at the current level
-					this.extractParentsGids(germplasmIds, germplasm);
+					// Extract the parents of the germplasm at the current level.
+					// If the parent is already retrieved from the database, it will be ignored and won't be added to the
+					// parentsGids.
+					this.extractParentsGids(parentsGids, gidsOfGermplasmAlreadyRetrieved, germplasm);
 					pedigreeNodesToReturn.add(PedigreeNodeMapper.map(germplasm, pedigreeNodeSearchRequest.isIncludeParents()));
 				});
-
-				// If includeParents is true, we should return the parents, grandparents, etc ... (stop at the specified depth level)
 				if (!pedigreeNodeSearchRequest.isIncludeFullTree() || pedigreeNodeSearchRequest.getPedigreeDepth() <= 1)
 					break;
 			}
@@ -658,15 +697,17 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 
 	}
 
-	private void extractParentsGids(final Set<Integer> germplasmGids, final Germplasm germplasm) {
-		if (germplasm.getGpid1() != null) {
+	private void extractParentsGids(final Set<Integer> germplasmGids, final Set<Integer> gidsOfGermplasmAlreadyFetched,
+		final Germplasm germplasm) {
+		if (germplasm.getGpid1() != null && !gidsOfGermplasmAlreadyFetched.contains(germplasm.getGpid1())) {
 			germplasmGids.add(germplasm.getGpid1());
 		}
-		if (germplasm.getGpid2() != null) {
+		if (germplasm.getGpid2() != null && !gidsOfGermplasmAlreadyFetched.contains(germplasm.getGpid2())) {
 			germplasmGids.add(germplasm.getGpid2());
 		}
 		for (final Progenitor progenitor : germplasm.getOtherProgenitors()) {
-			if (progenitor.getProgenitorGermplasm() != null) {
+			if (progenitor.getProgenitorGermplasm() != null && !gidsOfGermplasmAlreadyFetched.contains(
+				progenitor.getProgenitorGermplasm().getGid())) {
 				germplasmGids.add(progenitor.getProgenitorGermplasm().getGid());
 			}
 		}
