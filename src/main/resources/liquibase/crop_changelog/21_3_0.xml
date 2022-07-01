@@ -16,25 +16,4 @@
 			</column>
 		</addColumn>
 	</changeSet>
-
-	<changeSet author="nahuel" id="v21.3.0-2">
-		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="0">
-				SELECT count(*) FROM permission where name = 'MI_MANAGE_FILES'
-			</sqlCheck>
-		</preConditions>
-		<comment>Add Manage Inventory "Manage files" permission</comment>
-		<sql dbms="mysql" splitStatements="true">
-			set @update_lots_id = (select permission_id from permission where name = 'UPDATE_LOTS');
-
-			insert into permission(name, description, parent_id, workbench_sidebar_category_link_id)
-			values ('MI_MANAGE_FILES', 'Manage Files', @update_lots_id, null);
-
-			SET @mi_manage_files_id = (SELECT permission_id FROM permission where name = 'MI_MANAGE_FILES');
-
-			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('1', @mi_manage_files_id, '1');
-			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('2', @mi_manage_files_id, '1');
-			INSERT INTO role_type_permission (role_type_id, permission_id, selectable) VALUES ('3', @mi_manage_files_id, '1');
-		</sql>
-	</changeSet>
 </databaseChangeLog>
