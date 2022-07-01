@@ -32,23 +32,6 @@ public interface WorkbenchDataManager {
 	Tool getToolWithName(String toolName);
 
 	/**
-	 * Get the list of all installed central crop databases.
-	 *
-	 * @return the installed central crops
-	 */
-	List<CropType> getInstalledCropDatabses();
-
-	List<CropType> getAvailableCropsForUser(int workbenchUserId);
-
-	/**
-	 * Get the crop type corresponding to the given name.
-	 *
-	 * @param cropName - the crop name to match
-	 * @return the CropType retrieved
-	 */
-	CropType getCropTypeByName(String cropName);
-
-	/**
 	 * Close the sessionProvider
 	 */
 	void close();

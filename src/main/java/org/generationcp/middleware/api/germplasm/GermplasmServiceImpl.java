@@ -6,6 +6,7 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.crop.CropService;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
@@ -37,7 +38,6 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Attribute;
@@ -116,9 +116,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	private final DaoFactory daoFactory;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-
-	@Autowired
 	private GermplasmListService germplasmListService;
 
 	@Autowired
@@ -129,9 +126,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private UserService userService;
-
-	@Autowired
-	private GermplasmAttributeService germplasmAttributeService;
 
 	@Autowired
 	private GermplasmNameTypeService germplasmNameTypeService;
@@ -147,6 +141,9 @@ public class GermplasmServiceImpl implements GermplasmService {
 
 	@Autowired
 	private CrossExpansionProperties crossExpansionProperties;
+
+	@Autowired
+	private CropService cropService;
 
 	private final GermplasmMethodValidator germplasmMethodValidator;
 
@@ -203,7 +200,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		});
 		final Map<String, Variable> attributesMapByName = this.getAttributesMap(programUUID, attributesKeys);
 		final Map<String, Integer> nameTypesMapByName = this.getNameTypesMapByName(germplasmDtoList);
-		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropName);
+		final CropType cropType = this.cropService.getCropTypeByName(cropName);
 
 		final Map<String, Germplasm> progenitorsMap = this.loadProgenitors(germplasmImportRequestDto);
 		final List<GermplasmDto> germplasmMatches = this.loadGermplasmMatches(germplasmImportRequestDto, germplasmPUIs);
@@ -1214,8 +1211,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 		return Optional.empty();
 	}
 
-	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
+	public void setCropService(final CropService cropService) {
+		this.cropService = cropService;
 	}
 
 	public void setOntologyDataManager(final OntologyDataManager ontologyDataManager) {
@@ -1225,10 +1222,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 	public void setOntologyVariableDataManager(
 		final OntologyVariableDataManager ontologyVariableDataManager) {
 		this.ontologyVariableDataManager = ontologyVariableDataManager;
-	}
-
-	public void setGermplasmAttributeService(final GermplasmAttributeService germplasmAttributeService) {
-		this.germplasmAttributeService = germplasmAttributeService;
 	}
 
 	public void setGermplasmNameTypeService(final GermplasmNameTypeService germplasmNameTypeService) {

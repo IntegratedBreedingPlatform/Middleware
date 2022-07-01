@@ -2,8 +2,8 @@
 package org.generationcp.middleware;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.program.ProgramService;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -30,7 +30,7 @@ import java.util.Set;
 public class WorkbenchTestDataUtil {
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	@Autowired
 	private UserService userService;
@@ -125,7 +125,7 @@ public class WorkbenchTestDataUtil {
 
 	public void setUpWorkbench() {
 		this.commonTestProject = this.createTestProjectData();
-		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
+		this.cropType = this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
 		this.commonTestProject.setCropType(this.cropType);
 		final Set<CropType> crops = new HashSet<>();
 		crops.add(this.cropType);

@@ -90,21 +90,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCropType() {
-		final String cropName = "Coconut";
-		final CropType cropType = new CropType(cropName);
-		this.workbenchDaoFactory.getCropTypeDAO().saveOrUpdate(cropType);
-
-		final List<CropType> cropTypes = this.workbenchDataManager.getInstalledCropDatabses();
-		Assert.assertNotNull(cropTypes);
-		Assert.assertTrue(cropTypes.size() >= 1);
-
-		final CropType cropTypeRead = this.workbenchDataManager.getCropTypeByName(cropName);
-		Assert.assertNotNull(cropTypeRead);
-		Assert.assertEquals(cropType, cropTypeRead);
-	}
-
-	@Test
 	public void testGetProjectsByFilters() {
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		final Project project = this.commonTestProject;

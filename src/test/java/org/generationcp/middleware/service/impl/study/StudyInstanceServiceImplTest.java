@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.study;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -19,7 +20,6 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -65,7 +65,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 	private LocationDataManager locationManager;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	@Autowired
 	private OntologyDataManager ontologyDataManager;
@@ -109,7 +109,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 			new StudyTestDataInitializer(this.studyDataManager, this.ontologyManager, this.commonTestProject,
 				this.locationManager, this.sessionProvder);
 
-		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.name());
+		this.cropType = this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.name());
 
 		this.studyReference = this.studyTestDataInitializer.addTestStudy();
 
