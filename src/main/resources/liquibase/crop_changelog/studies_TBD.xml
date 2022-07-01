@@ -389,7 +389,7 @@
 
 			# Replace SEED_SOURCE variable by ENTRY_SOURCE
 			update projectprop set variable_id = @ENTRY_SOURCE_ID , alias = 'ENTRY_SOURCE', type_id = 1815
-			where variable_id = 8360 and cv_id = 1040 and is_obsolete = 0;
+			where variable_id = 8360;
 
 			# Update cvterm_id 8360 from (SEED_SOURCE) to ENTRY_SOURCE cvterm_id
 			update stockprop set type_id = @ENTRY_SOURCE_ID where type_id = 8360;
