@@ -689,7 +689,7 @@
 	<!-- End of GUID related changesets -->
 
 	<!-- list_data_view related changesets -->
-	<changeSet author="cuenyad" id="v21.3.0-38">
+	<changeSet author="cuenyad" id="v21.3.0-39">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 from list_data_view where static_id = -7;
@@ -701,7 +701,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-39">
+	<changeSet author="lkovacic" id="v21.3.0-40">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 from list_data_view where static_id = -9;
@@ -713,7 +713,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-40">
+	<changeSet author="lkovacic" id="v21.3.0-41">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 from list_data_view where static_id = -10;
@@ -725,7 +725,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-41">
+	<changeSet author="lkovacic" id="v21.3.0-42">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT Count(*) > 0
