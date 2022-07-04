@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.hibernate.annotations.common.reflection.ReflectionUtil;
@@ -24,6 +25,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
@@ -82,12 +84,15 @@ public class StudyEntryServiceImplTest {
 			this.createMockVariable(germplasmListEntryDetailVariableId1),
 			this.createMockVariable(germplasmListEntryDetailVariableId2)
 		);
-		Mockito.when(this.germplasmListService.getGermplasmListVariables(null, LIST_ID, null)).thenReturn(germplasmListVariables);
+		Mockito.when(this.germplasmListService.getGermplasmListVariables(null, LIST_ID, VariableType.ENTRY_DETAIL.getId())).thenReturn(germplasmListVariables);
+		Optional<GermplasmList> germplasmList = Optional.of(new GermplasmList());
+		Mockito.when(this.germplasmListService.getGermplasmListById(LIST_ID)).thenReturn(germplasmList);
 
+		Mockito.when(this.daoFactory.getDmsProjectDAO().getById(STUDY_ID)).thenReturn( new DmsProject());
 		this.studyEntryService.saveStudyEntries(STUDY_ID, LIST_ID);
 
 		final ArgumentCaptor<DmsProject> dmsProjectArgumentCaptor = ArgumentCaptor.forClass(DmsProject.class);
-		Mockito.verify(this.dmsProjectDao).save(dmsProjectArgumentCaptor.capture());
+		Mockito.verify(this.dmsProjectDao,Mockito.times(2)).save(dmsProjectArgumentCaptor.capture());
 
 		final DmsProject actualPlotDataSet = dmsProjectArgumentCaptor.getValue();
 		assertNotNull(actualPlotDataSet);
