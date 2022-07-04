@@ -204,16 +204,14 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 		final VariableTypeList constantsVariableTypeList = this.createVariableTypeList(workbook.getTrialConstants(), 1);
 		Mockito.doReturn(constantsVariableTypeList).when(transformer)
-				.transform(workbook.getTrialConstants(), workbook.getTrialConditions().size() + workbook.getTrialFactors().size() + 1,
-						programUUID);
-
-		final VariableTypeList entryDetailsVariableTypeList = this.createVariableTypeList(workbook.getEntryDetails(), 1);
-		Mockito.doReturn(entryDetailsVariableTypeList).when(transformer)
-			.transform(workbook.getEntryDetails(), programUUID);
+			.transform(workbook.getTrialConstants(), workbook.getTrialConditions().size() + workbook.getTrialFactors().size() + 1, programUUID);
 
 		final VariableTypeList variatesVariableTypeList = this.createVariableTypeList(workbook.getVariates(), 1);
 		Mockito.doReturn(variatesVariableTypeList).when(transformer)
-				.transform(workbook.getVariates(), workbook.getNonTrialFactors().size() + 1, programUUID);
+			.transform(workbook.getVariates(), workbook.getNonTrialFactors().size() + 1, programUUID);
+
+		final VariableTypeList entryDetailsVariableTypeList = this.createVariableTypeList(workbook.getEntryDetails(), 1);
+		Mockito.doReturn(entryDetailsVariableTypeList).when(transformer).transform(workbook.getEntryDetails(), workbook.getNonTrialFactors().size() + workbook.getVariates().size() + 1, programUUID);
 
 		Mockito.doReturn(transformer).when(workbookSaver).getVariableTypeListTransformer();
 
