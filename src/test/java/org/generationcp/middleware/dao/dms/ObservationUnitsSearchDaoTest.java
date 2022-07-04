@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -143,6 +144,10 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		observationUnitsSearchDTO.setEnvironmentDetails(Collections.singletonList(environmentDetailDto));
 		observationUnitsSearchDTO.setEnvironmentConditions(Collections.singletonList(environmentConditionDto));
 		observationUnitsSearchDTO.setFilter(observationUnitsSearchDTO.new Filter());
+		observationUnitsSearchDTO.setEntryDetails(Arrays.asList(
+			new MeasurementVariableDto(TermId.ENTRY_NO.getId(),"ENTRY_NO"), //
+			new MeasurementVariableDto(TermId.ENTRY_TYPE.getId(),"ENTRY_TYPE"), //
+			new MeasurementVariableDto(TermId.ENTRY_CODE.getId(),"ENTRY_CODE")));
 
 		// Need to flush session to sync with underlying database before querying
 		this.sessionProvder.getSession().flush();
