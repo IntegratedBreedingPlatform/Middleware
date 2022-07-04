@@ -143,7 +143,7 @@
                 select COUNT(*) from cvterm where cvterm_id = 8378;
             </sqlCheck>
         </preConditions>
-        <comment>Rename 'SOURCE' as 'IMMEDIATE_SOURCE_NAME' in cvterm and projectprop tables</comment>
+        <comment>Rename 'SOURCE' as 'IMMEDIATE_SOURCE_NAME'</comment>
         <sql dbms="mysql" splitStatements="true">
              update cvterm set name = 'IMMEDIATE_SOURCE_NAME' where cvterm_id = 8378;
              update projectprop set alias = 'IMMEDIATE_SOURCE_NAME' where variable_id = 8378 and (alias = 'SOURCE' || type_id = 1804);
@@ -157,7 +157,7 @@
                 select COUNT(*) from cvterm where cvterm_id = 8340;
             </sqlCheck>
         </preConditions>
-        <comment>Rename 'GROUP' to 'GROUP_SOURCE_NAME' in cvterm and projectprop tables</comment>
+        <comment>Rename 'GROUP' to 'GROUP_SOURCE_NAME'</comment>
         <sql dbms="mysql" splitStatements="true">
              update cvterm set name = 'GROUP_SOURCE_NAME' where cvterm_id = 8340;
 			 update projectprop set alias = 'GROUP_SOURCE_NAME' where variable_id = 8340 and (alias = 'GROUP' || type_id = 1804);
@@ -192,7 +192,7 @@
 		<sql dbms="mysql" splitStatements="true">
 			UPDATE stock s INNER JOIN stockprop sp ON s.stock_id = sp.stock_id
 			SET s.cross_value = sp.value
-			WHERE sp.type_id = 8377 AND sp.value IS NOT NULL AND sp.value != '-';
+			WHERE sp.type_id = 8377 AND sp.value IS NOT NULL AND sp.value NOT IN ('', '-') ;
 
 			DELETE FROM stockprop WHERE type_id = 8377;
 		</sql>
@@ -268,20 +268,28 @@
                 SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8360
             </sqlCheck>
         </preConditions>
-        <comment>Replace the SEED_SOURCE variable by ENTRY_SOURCE IN projectprop AND stockprop</comment>
+        <comment>Replace the SEED_SOURCE variable by ENTRY_SOURCE IN projectprop</comment>
         <sql dbms="mysql" splitStatements="true">
-			set @ENTRY_SOURCE_ID = (select cvterm_id from cvterm where name ='ENTRY_SOURCE' and cv_id = 1040 and is_obsolete = 0);
-
 			# Replace SEED_SOURCE variable by ENTRY_SOURCE
-			update projectprop set variable_id = @ENTRY_SOURCE_ID , alias = 'ENTRY_SOURCE', type_id = 1815
+			update projectprop set variable_id = (select cvterm_id from cvterm where name ='ENTRY_SOURCE' and cv_id = 1040 and is_obsolete = 0), alias = 'ENTRY_SOURCE', type_id = 1815
 			where variable_id = 8360 and (alias = 'ENTRY_SOURCE' || type_id = 1804);
-
-			# Update cvterm_id 8360 from (SEED_SOURCE) to ENTRY_SOURCE cvterm_id
-			update stockprop set type_id = @ENTRY_SOURCE_ID where type_id = 8360;
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-17">
+	<changeSet author="cuenyad" id="v21.3.0-17">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(1) > 0 FROM stockprop WHERE variable_id = 8360
+            </sqlCheck>
+        </preConditions>
+        <comment>Replace the SEED_SOURCE variable by ENTRY_SOURCE IN stockprop</comment>
+        <sql dbms="mysql" splitStatements="true">
+			# Update cvterm_id 8360 from (SEED_SOURCE) to ENTRY_SOURCE cvterm_id
+			update stockprop set type_id = (select cvterm_id from cvterm where name ='ENTRY_SOURCE' and cv_id = 1040 and is_obsolete = 0) where type_id = 8360;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-18">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8360 AND type_id = 1800 AND value = 'Germplasm Descriptor';
@@ -295,7 +303,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v21.3.0-18">
+	<changeSet author="cuenyad" id="v21.3.0-19">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8360 AND type_id = 1800;
@@ -315,7 +323,7 @@
 	<!-- End of SEED_SOURCE related changesets-->
 
 	<!-- ENTRY_TYPE related changesets-->
-	<changeSet author="lkovacic" id="v21.3.0-19">
+	<changeSet author="lkovacic" id="v21.3.0-20">
 		<preConditions onFail="MARK_RAN">
 				<sqlCheck expectedResult="1">
 					SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8255 AND type_id = 1800 AND value = 'Germplasm Descriptor';
@@ -327,7 +335,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-20">
+	<changeSet author="lkovacic" id="v21.3.0-21">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8255 AND type_id = 1804;
@@ -339,7 +347,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-21">
+	<changeSet author="lkovacic" id="v21.3.0-22">
 		<preConditions onFail="MARK_RAN">
 			<not>
 				<columnExists tableName="stockprop" columnName="cvalue_id"/>
@@ -351,7 +359,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-22">
+	<changeSet author="lkovacic" id="v21.3.0-23">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<columnExists tableName="stockprop" columnName="cvalue_id"/>
@@ -392,7 +400,7 @@
 	</changeSet>
 	<!-- End of ENTRY_TYPE related changesets -->
 
-	<changeSet author="lkovacic" id="v21.3.0-23">
+	<changeSet author="lkovacic" id="v21.3.0-24">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT COUNT(*) > 0
@@ -410,7 +418,8 @@
 
 			UPDATE projectprop
 			SET type_id = 1815
-			WHERE variable_id IN (SELECT DISTINCT sp.type_id
+			WHERE type_id = 1804 AND
+				variable_id IN (SELECT DISTINCT sp.type_id
 								 FROM stockprop sp
 										  INNER JOIN cvtermprop cp
 								 ON cp.cvterm_id = sp.type_id
@@ -420,7 +429,7 @@
 	</changeSet>
 
 	<!-- Identify unknown categorical values changesets -->
-	<changeSet author="lkovacic" id="v21.3.0-24">
+	<changeSet author="lkovacic" id="v21.3.0-25">
 		<preConditions onFail="MARK_RAN">
 		  <not>
 			<tableExists tableName="stockprop_wrong_categorical_value"/>
@@ -429,8 +438,7 @@
 		<comment>Create backup for 'stockprop_wrong_categorical_value' table</comment>
 		<sql dbms="mysql" splitStatements="true">
 			create table stockprop_wrong_categorical_value (
-				stockprop_id int auto_increment
-					primary key,
+				stockprop_id int primary key,
 				stock_id     int          not null,
 				type_id      int          not null,
 				value        varchar(255) null,
@@ -447,16 +455,13 @@
                                                                 ON cr.object_id = cr2.subject_id
                                                                     AND cr2.type_id = 1190);
 
-			DELETE sp
-			FROM stockprop sp
-				 INNER JOIN cvterm_relationship cr ON sp.type_id = cr.subject_id AND cr.type_id = 1220
-				 INNER JOIN cvterm_relationship cr2 ON cr.object_id = cr2.subject_id AND cr2.type_id = 1190
-			WHERE cvalue_id IS NULL;
+			DELETE sp FROM stockprop sp
+				INNER JOIN stockprop_wrong_categorical_value cwcv ON cwcv.stockprop_id = sp.stockprop_id;
 		</sql>
 	</changeSet>
 	<!-- End of identify unknown categorical values changesets -->
 
-	<changeSet author="lkovacic" id="v21.3.0-25">
+	<changeSet author="lkovacic" id="v21.3.0-26">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT COUNT(1)
@@ -476,7 +481,7 @@
 	</changeSet>
 
 	<!-- ENTRY_CODE related changesets -->
-	<changeSet author="lkovacic" id="v21.3.0-26">
+	<changeSet author="lkovacic" id="v21.3.0-27">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8300 AND type_id = 1800 AND value = 'Germplasm Descriptor';
@@ -488,7 +493,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-27">
+	<changeSet author="lkovacic" id="v21.3.0-28">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8300 AND type_id = 1804;
@@ -500,7 +505,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v21.3.0-28">
+	<changeSet author="cuenyad" id="v21.3.0-29">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT count(1) > 0 FROM  list_data_details WHERE variable_id = 8300;
@@ -524,7 +529,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-29">
+	<changeSet author="lkovacic" id="v21.3.0-30">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
 				SELECT COUNT(1) > 0
@@ -546,7 +551,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-30">
+	<changeSet author="lkovacic" id="v21.3.0-31">
         <preConditions onFail="MARK_RAN">
 			<columnExists tableName="stock" columnName="value"/>
 		</preConditions>
@@ -556,7 +561,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-31">
+	<changeSet author="lkovacic" id="v21.3.0-32">
         <preConditions onFail="MARK_RAN">
 			<columnExists tableName="stock" columnName="type_id"/>
 		</preConditions>
@@ -566,7 +571,7 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v21.3.0-32">
+	<changeSet author="cuenyad" id="v21.3.0-33">
 		<preConditions onFail="MARK_RAN">
 			<columnExists tableName="listdata" columnName="entrycd"/>
 		</preConditions>
@@ -578,7 +583,7 @@
 	</changeSet>
 	<!-- End of ENTRY_CODE related changesets -->
 
-	<changeSet author="cuenyad" id="v21.3.0-33">
+	<changeSet author="cuenyad" id="v21.3.0-34">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 FROM CVTERM WHERE IS_SYSTEM = 1
@@ -592,7 +597,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-34">
+	<changeSet author="lkovacic" id="v21.3.0-35">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT count(1) > 0 FROM projectprop WHERE type_id = 1804 AND variable_id NOT IN (8377, 8250, 8240, 8340, 8330, 8201, 8378, 8235);
@@ -605,7 +610,7 @@
 	</changeSet>
 
 	<!-- GERM_SOURCE related changesets -->
-	<changeSet author="lkovacic" id="v21.3.0-35">
+	<changeSet author="lkovacic" id="v21.3.0-36">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8320 AND type_id = 1800 AND value = 'Germplasm Descriptor';
@@ -616,13 +621,10 @@
 		</comment>
 		<sql dbms="mysql" splitStatements="true">
 			DELETE FROM cvtermprop WHERE cvterm_id = 8320 AND type_id = 1800 AND value = 'Germplasm Descriptor';
-
-			DELETE FROM stockprop WHERE type_id = 8320;
-			DELETE FROM projectprop WHERE variable_id = 8320 AND type_id = 1804;
 		</sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-36">
+	<changeSet author="lkovacic" id="v21.3.0-37">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8320 AND type_id = 1800;
@@ -642,7 +644,7 @@
 	<!-- End of GERM_SOURCE related changesets -->
 
 	<!-- GUID related changesets -->
-	<changeSet author="lkovacic" id="v21.3.0-37">
+	<changeSet author="lkovacic" id="v21.3.0-38">
         <preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(*) from cvterm where name = 'Universally Unique ID' and cv_id = 1030 and is_obsolete = 0;
@@ -663,7 +665,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-38">
+	<changeSet author="lkovacic" id="v21.3.0-39">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="1">select count(*) from cvterm where name = 'Universally Unique ID' and cv_id = 1030 and is_obsolete = 0;</sqlCheck>
@@ -689,7 +691,7 @@
 	<!-- End of GUID related changesets -->
 
 	<!-- list_data_view related changesets -->
-	<changeSet author="cuenyad" id="v21.3.0-39">
+	<changeSet author="cuenyad" id="v21.3.0-40">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 from list_data_view where static_id = -7;
@@ -701,7 +703,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-40">
+	<changeSet author="lkovacic" id="v21.3.0-41">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 from list_data_view where static_id = -9;
@@ -713,7 +715,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-41">
+	<changeSet author="lkovacic" id="v21.3.0-42">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="1">
                 SELECT COUNT(*) > 0 from list_data_view where static_id = -10;
@@ -725,7 +727,7 @@
         </sql>
 	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-42">
+	<changeSet author="lkovacic" id="v21.3.0-43">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="1">
 				SELECT Count(*) > 0
