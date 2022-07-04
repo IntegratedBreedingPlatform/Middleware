@@ -385,7 +385,7 @@ public class ExperimentBuilder extends Builder {
 		if (properties != null) {
 			for (final StockProperty property : properties) {
 				if (stdVariableId == property.getTypeId()) {
-					return property.getPropertyValue();
+					return property.getVariableValue();
 				}
 			}
 		}

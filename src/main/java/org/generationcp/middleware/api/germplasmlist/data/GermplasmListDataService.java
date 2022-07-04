@@ -32,6 +32,6 @@ public interface GermplasmListDataService {
 
 	List<Integer> getListDataIdsByListId(Integer listId);
 
-	void saveDefaultView(final GermplasmList list);
+	void saveDefaultView(GermplasmList list);
 
 }

@@ -114,8 +114,7 @@ public class StockProperty implements Serializable {
 		this.categoricalValueId = categoricalValueId;
 	}
 
-	// TODO: review property name
-	public String getPropertyValue() {
+	public String getVariableValue() {
 		if (this.categoricalValueId != null) {
 			return String.valueOf(this.categoricalValueId);
 		}

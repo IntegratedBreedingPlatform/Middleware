@@ -12,6 +12,6 @@ public interface StudyEntryObservationService {
 
 	void deleteObservation(Integer stockPropertyId);
 
-	long countObservationsByStudyAndVariables(final Integer studyId, final List<Integer> variableIds);
+	long countObservationsByStudyAndVariables(Integer studyId, List<Integer> variableIds);
 
 }
