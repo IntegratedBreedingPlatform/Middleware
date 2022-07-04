@@ -213,7 +213,6 @@ public class WorkbookTestDataInitializer {
 		WorkbookTestDataInitializer.createEntryDetails(workbook);
 		WorkbookTestDataInitializer.createVariates(workbook, isForMeansDataset);
 		WorkbookTestDataInitializer.createObservations(workbook, noOfObservations, hasMultipleLocations, studyNo, isForMeansDataset);
-		WorkbookTestDataInitializer.createEntryDetails(workbook);
 		return workbook;
 	}
 
