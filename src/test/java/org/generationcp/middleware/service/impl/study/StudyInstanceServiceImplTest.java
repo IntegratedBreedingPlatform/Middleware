@@ -154,7 +154,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		// Create instance 1
 		final Integer studyId = this.studyReference.getId();
 		final List<StudyInstance> studyInstances =
-			this.studyInstanceService.createStudyInstances(this.cropType, studyId, this.environmentDataset.getId(), 0, 2);
+			this.studyInstanceService.createStudyInstances(this.cropType, studyId, this.environmentDataset.getId(), 9, 2);
 		final StudyInstance studyInstance1 = studyInstances.get(0);
 
 		// Need to flush session to sync with underlying database before querying
@@ -163,8 +163,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertNotNull(studyInstance1.getInstanceId());
 		assertNotNull(studyInstance1.getLocationId());
 		assertFalse(studyInstance1.isHasFieldmap());
-		assertEquals("Unknown", studyInstance1.getLocationName());
-		assertEquals("L0", studyInstance1.getLocationAbbreviation());
+		assertEquals("Argentina", studyInstance1.getLocationName());
+		assertEquals("ARG", studyInstance1.getLocationAbbreviation());
 		assertNull(studyInstance1.getCustomLocationAbbreviation());
 		assertTrue(studyInstance1.getCanBeDeleted());
 		assertFalse(studyInstance1.isHasMeasurements());
@@ -178,8 +178,8 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 		assertNotNull(studyInstance2.getInstanceId());
 		assertNotNull(studyInstance2.getLocationId());
 		assertFalse(studyInstance2.isHasFieldmap());
-		assertEquals("Unknown", studyInstance2.getLocationName());
-		assertEquals("L0", studyInstance2.getLocationAbbreviation());
+		assertEquals("Argentina", studyInstance2.getLocationName());
+		assertEquals("ARG", studyInstance2.getLocationAbbreviation());
 		assertNull(studyInstance2.getCustomLocationAbbreviation());
 		assertTrue(studyInstance2.getCanBeDeleted());
 		assertFalse(studyInstance2.isHasMeasurements());
