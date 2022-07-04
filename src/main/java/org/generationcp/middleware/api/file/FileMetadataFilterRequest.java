@@ -44,7 +44,7 @@ public class FileMetadataFilterRequest {
 	}
 
 	public Integer getLotId() {
-		return lotId;
+		return this.lotId;
 	}
 
 	public void setLotId(final Integer lotId) {

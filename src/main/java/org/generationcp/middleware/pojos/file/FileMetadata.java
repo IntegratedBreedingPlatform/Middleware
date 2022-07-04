@@ -212,7 +212,7 @@ public class FileMetadata extends AbstractEntity {
 	}
 
 	public Lot getLot() {
-		return lot;
+		return this.lot;
 	}
 
 	public void setLot(final Lot lot) {

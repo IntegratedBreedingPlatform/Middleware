@@ -212,7 +212,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public String getFilePathForLot(Integer lotId, String fileName) {
+	public String getFilePathForLot(final Integer lotId, final String fileName) {
 		final Lot lot = this.daoFactory.getLotDao().getById(lotId);
 		this.validateLot(lot, lotId);
 		final MessageDigest md5;
