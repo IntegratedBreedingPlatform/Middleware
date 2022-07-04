@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeReferenceDTO;
@@ -80,8 +81,9 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 			final Map<Integer, List<PedigreeNodeReferenceDTO>> siblingsMapByGids =
 				pedigreeNodeSearchRequest.isIncludeSiblings() ? this.daoFactory.getGermplasmDao().getSiblingsByGids(gids) : new HashMap<>();
 
-			// Populate the preferred name, PUIs, external references, pedigree string
-			// progeny (optional) and siblings (optional)
+			/** Populate the preferred names, PUIs, external references, pedigree string, additionalInfo (attributes),
+			 * progeny (optional) and siblings (optional)
+			 **/
 			final Map<Integer, String> preferredNamesMap =
 				this.daoFactory.getNameDao().getPreferredNamesByGIDs(ListUtils.union(gids, gidsOfParents));
 			final Map<Integer, String> germplasmPUIsMap = this.daoFactory.getNameDao().getPUIsByGIDs(gids);
@@ -90,6 +92,12 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 			final Map<String, List<ExternalReferenceDTO>> referencesByGidMap =
 				this.daoFactory.getGermplasmExternalReferenceDAO().getExternalReferences(gids).stream()
 					.collect(groupingBy(ExternalReferenceDTO::getEntityId));
+			final Map<Integer, Map<String, String>> attributesByGidsMap =
+				this.daoFactory.getAttributeDAO().getAttributesByGidsMap(gids).entrySet().stream().collect(Collectors.toMap(
+					Map.Entry::getKey,
+					e -> e.getValue().stream()
+						.collect(Collectors.toMap(AttributeDTO::getAttributeCode, AttributeDTO::getValue, (a1, a2) -> a1))));
+
 			for (final PedigreeNodeDTO pedigreeNodeDTO : result) {
 				pedigreeNodeDTO.setPedigreeString(pedigreeStringMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
 				pedigreeNodeDTO.setDefaultDisplayName(preferredNamesMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
@@ -99,6 +107,7 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 					referencesByGidMap.getOrDefault(String.valueOf(pedigreeNodeDTO.getGid()), new ArrayList<>()));
 				pedigreeNodeDTO.setProgeny(progenyMapByGids.getOrDefault(pedigreeNodeDTO.getGid(), null));
 				pedigreeNodeDTO.setSiblings(siblingsMapByGids.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				pedigreeNodeDTO.setAdditionalInfo(attributesByGidsMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
 				if (!CollectionUtils.isEmpty(pedigreeNodeDTO.getParents())) {
 					pedigreeNodeDTO.getParents().forEach(p -> p.setGermplasmName(preferredNamesMap.getOrDefault(p.getGid(), null)));
 				}

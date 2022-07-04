@@ -9,7 +9,9 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeSearchRequest;
 import org.generationcp.middleware.domain.germplasm.ParentType;
+import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmExternalReference;
@@ -18,6 +20,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodType;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Progenitor;
+import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.util.Util;
 import org.junit.Assert;
 import org.junit.Before;
@@ -67,6 +70,8 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		final Germplasm germplasm_B = this.createGermplasm("B", derMethod, null, -1, 0, 0);
 		final Germplasm germplasm_A = this.createGermplasm("A", crossMethod, null, 2, germplasm_B.getGid(), germplasm_C.getGid());
 		final GermplasmExternalReference externalReference = this.createGermplasmExternalReference(germplasm_A);
+		final Attribute attribute1 = this.addAttribute(germplasm_A, "Attribute1", RandomStringUtils.randomAlphabetic(10));
+		final Attribute attribute2 = this.addAttribute(germplasm_A, "Attribute2", RandomStringUtils.randomAlphabetic(10));
 
 		final PedigreeNodeSearchRequest pedigreeNodeSearchRequest = new PedigreeNodeSearchRequest();
 		// Include full pedigree tree
@@ -94,6 +99,9 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(ParentType.MALE.name(), pedigreeNodeDTO.getParents().get(1).getParentType());
 		Assert.assertEquals(externalReference.getReferenceId(), pedigreeNodeDTO.getExternalReferences().get(0).getReferenceID());
 		Assert.assertEquals(externalReference.getSource(), pedigreeNodeDTO.getExternalReferences().get(0).getReferenceSource());
+		Assert.assertFalse(pedigreeNodeDTO.getAdditionalInfo().isEmpty());
+		Assert.assertEquals(attribute1.getAval(), pedigreeNodeDTO.getAdditionalInfo().get("Attribute1"));
+		Assert.assertEquals(attribute2.getAval(), pedigreeNodeDTO.getAdditionalInfo().get("Attribute2"));
 
 	}
 
@@ -969,6 +977,20 @@ public class PedigreeServiceBrapiImplTest extends IntegrationTestBase {
 		this.sessionProvder.getSession().flush();
 		this.sessionProvder.getSession().refresh(germplasmExternalReference);
 		return germplasmExternalReference;
+	}
+
+	private Attribute addAttribute(final Germplasm germplasm, final String attributeType, final String attributeValue) {
+		final CVTerm cvTerm = new CVTerm(null, CvId.VARIABLES.getId(), attributeType, attributeType, null, 0, 0, false);
+		this.daoFactory.getCvTermDao().save(cvTerm);
+
+		final Attribute attribute = new Attribute();
+		attribute.setGermplasmId(germplasm.getGid());
+		attribute.setTypeId(cvTerm.getCvTermId());
+		attribute.setAval(attributeValue);
+		attribute.setAdate(germplasm.getGdate());
+
+		this.daoFactory.getAttributeDAO().saveOrUpdate(attribute);
+		return attribute;
 	}
 
 }
