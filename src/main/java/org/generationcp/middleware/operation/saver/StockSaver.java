@@ -82,7 +82,7 @@ public class StockSaver extends Saver {
 					}
 					stockModel.setGermplasm(new Germplasm(dbxref));
 
-				} else if (TermId.ENTRY_TYPE.getId() == variableId || PhenotypicType.ENTRY_DETAIL == role) {
+				} else if (PhenotypicType.ENTRY_DETAIL == role) {
 					stockModel = this.getStockObject(stockModel);
 					final StockProperty stockProperty = this.getStockProperty(stockModel, variable);
 					if (stockProperty == null && variable.getValue() != null && !variable.getValue().isEmpty()) {
