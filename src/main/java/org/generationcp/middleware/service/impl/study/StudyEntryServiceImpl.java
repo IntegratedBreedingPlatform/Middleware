@@ -69,7 +69,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	private final DaoFactory daoFactory;
 
-	// TODO: remove ENTRY_NO
+	// TODO: remove ENTRY_NO. Please, check this ticket https://ibplatform.atlassian.net/browse/IBP-5793 for a cleanup.
 	private static final List<Integer> FIXED_GERMPLASM_DESCRIPTOR_IDS = Lists
 		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.IMMEDIATE_SOURCE_NAME.getId());
 
