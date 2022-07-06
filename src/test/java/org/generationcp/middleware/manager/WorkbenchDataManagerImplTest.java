@@ -14,11 +14,8 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.program.ProgramService;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.ProjectUserInfo;
-import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.program.ProgramSearchRequest;
 import org.junit.Assert;
@@ -35,9 +32,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
 public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -80,13 +74,6 @@ public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
 		final List<Project> projects = this.workbenchDaoFactory.getProjectDAO().getAll();
 		Assert.assertNotNull(projects);
 		Assert.assertFalse(projects.isEmpty());
-	}
-
-	@Test
-	public void testGetToolWithName() {
-		final String toolName = "fieldbook_web";
-		final Tool tool = this.workbenchDataManager.getToolWithName(toolName);
-		Assert.assertNotNull(tool);
 	}
 
 	@Test
