@@ -417,4 +417,8 @@
 		<constructor-arg ref="workbenchSessionProvider" />
 	</bean>
 
+	<bean id="toolService" class="org.generationcp.middleware.api.tool.ToolServiceImpl">
+		<constructor-arg ref="workbenchSessionProvider" />
+	</bean>
+
 </beans>
