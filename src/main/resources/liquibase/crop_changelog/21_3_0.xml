@@ -379,7 +379,7 @@
 					SELECT count(1) FROM stockprop WHERE cvalue_id IS NOT NULL;
 				</sqlCheck>
 				<sqlCheck expectedResult="1">
-					SELECT COUNT(DISTINCT( sp.type_id ))
+					SELECT COUNT(DISTINCT( sp.type_id )) > 0
 						  FROM stockprop sp
 								   INNER JOIN cvterm_relationship cr ON sp.type_id = cr.subject_id AND cr.type_id = 1220
 								   INNER JOIN cvterm_relationship cr2 ON cr.object_id = cr2.subject_id AND cr2.type_id = 1190;
