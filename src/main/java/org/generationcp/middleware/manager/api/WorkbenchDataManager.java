@@ -24,14 +24,6 @@ import java.util.List;
 public interface WorkbenchDataManager {
 
 	/**
-	 * Gets the tool with the given name.
-	 *
-	 * @param toolName - the tool name to match
-	 * @return the tool with the given name
-	 */
-	Tool getToolWithName(String toolName);
-
-	/**
 	 * Close the sessionProvider
 	 */
 	void close();

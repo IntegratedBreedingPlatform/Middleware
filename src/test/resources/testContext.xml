@@ -417,6 +417,10 @@
 		<constructor-arg ref="workbenchSessionProvider" />
 	</bean>
 
+	<bean id="toolService" class="org.generationcp.middleware.api.tool.ToolServiceImpl">
+		<constructor-arg ref="workbenchSessionProvider" />
+	</bean>
+
 	<bean id="studyEntryObservationService" class="org.generationcp.middleware.api.study.StudyEntryObservationServiceImpl">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
