@@ -697,7 +697,7 @@
         <comment>Add 'GUID' as germplasm descriptor</comment>
         <sql dbms="mysql" splitStatements="true">
 			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
-				VALUES (8235, 1040, 'GUID', 'Germplasm unique identifier', NULL, 0, 0, 0);
+				VALUES (8235, 1040, 'GUID', 'Germplasm unique identifier', NULL, 0, 0, 1);
 
 			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
 			  	VALUES
