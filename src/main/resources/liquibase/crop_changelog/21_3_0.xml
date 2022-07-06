@@ -379,15 +379,10 @@
 					SELECT count(1) FROM stockprop WHERE cvalue_id IS NOT NULL;
 				</sqlCheck>
 				<sqlCheck expectedResult="1">
-					SELECT count(*) > 0
-					FROM (SELECT DISTINCT( sp.type_id ) AS typeId
+					SELECT COUNT(DISTINCT( sp.type_id ))
 						  FROM stockprop sp
-								   INNER JOIN cvterm_relationship cr
-						  ON sp.type_id = cr.subject_id
-							  AND cr.type_id = 1220
-								   INNER JOIN cvterm_relationship cr2
-						  ON cr.object_id = cr2.subject_id
-							  AND cr2.type_id = 1190) AS inn;
+								   INNER JOIN cvterm_relationship cr ON sp.type_id = cr.subject_id AND cr.type_id = 1220
+								   INNER JOIN cvterm_relationship cr2 ON cr.object_id = cr2.subject_id AND cr2.type_id = 1190;
 				</sqlCheck>
 			</and>
 		</preConditions>
@@ -431,11 +426,6 @@
 									 AND cp.type_id = 1800
 								 WHERE cp.value = 'Germplasm Descriptor';
 
-			UPDATE cvtermprop cp
-				INNER JOIN stockprop sp ON sp.type_id = cp.cvterm_id AND cp.type_id = 1800
-			SET cp.value = 'Entry Detail'
-			WHERE cp.value = 'Germplasm Descriptor';
-
 			UPDATE projectprop
 			SET type_id = 1815
 			WHERE type_id = 1804 AND
@@ -445,6 +435,11 @@
 								 ON cp.cvterm_id = sp.type_id
 									 AND cp.type_id = 1800
 								 WHERE cp.value = 'Germplasm Descriptor');
+
+			UPDATE cvtermprop cp
+				INNER JOIN stockprop sp ON sp.type_id = cp.cvterm_id AND cp.type_id = 1800
+			SET cp.value = 'Entry Detail'
+			WHERE cp.value = 'Germplasm Descriptor';
 		</sql>
 	</changeSet>
 
@@ -559,7 +554,7 @@
 						 INNER JOIN projectprop pp ON p.project_id = pp.project_id AND p.dataset_type_id = 4
 						 INNER JOIN stock s ON p.parent_project_id = s.project_id
 						 INNER JOIN stockprop sp ON s.stock_id = sp.stock_id
-				WHERE pp.variable_id = 8300 AND sp.type_id = 8300;
+				WHERE pp.variable_id = 8300 AND sp.type_id = 8300 AND pp.type_id = 1815;
             </sqlCheck>
 		</preConditions>
 		<comment>ENTRY_CODE migration as stock property</comment>
@@ -569,7 +564,7 @@
 				SELECT stock_id, 8300, s.value FROM project p
 						 INNER JOIN projectprop pp ON p.project_id = pp.project_id AND p.dataset_type_id = 4
 						 INNER JOIN stock s ON p.parent_project_id = s.project_id
-				WHERE pp.variable_id = 8300 AND s.value IS NOT NULL AND s.value != '';
+				WHERE pp.variable_id = 8300 AND s.value IS NOT NULL AND s.value != '' AND pp.type_id = 1815;
 		</sql>
 	</changeSet>
 
