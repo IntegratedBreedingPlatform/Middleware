@@ -730,6 +730,7 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		germplasmSearchRequest.setProgramNames(pedigreeNodeSearchRequest.getProgramNames());
 		germplasmSearchRequest.setTrialDbIds(pedigreeNodeSearchRequest.getTrialDbIds());
 		germplasmSearchRequest.setTrialNames(pedigreeNodeSearchRequest.getTrialNames());
+		germplasmSearchRequest.setStudyDbIds(pedigreeNodeSearchRequest.getStudyDbIds());
 		return germplasmSearchRequest;
 	}
 
