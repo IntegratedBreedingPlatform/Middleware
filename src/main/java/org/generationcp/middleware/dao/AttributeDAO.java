@@ -63,6 +63,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 			+ "a.aval AS value ";
 
 	public static final String ADDTL_INFO_LOCATION = "locationDbId";
+	public static final String PROGRAM_UUID = "programUUID";
 
 	@SuppressWarnings("unchecked")
 	public List<Attribute> getByGID(final Integer gid) {
@@ -144,7 +145,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql.toString());
 		this.addAttributeValueSearchParameters(sqlQuery, attributeValueSearchRequestDto);
-		sqlQuery.setParameter("programUUID", programUUID);
+		sqlQuery.setParameter(PROGRAM_UUID, programUUID);
 
 		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
 	}
@@ -153,7 +154,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 		final Pageable pageable,
 		final String programUUID) {
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createAttributeValuesQueryString(attributeValueSearchRequestDto));
-		sqlQuery.setParameter("programUUID", programUUID);
+		sqlQuery.setParameter(PROGRAM_UUID, programUUID);
 		if (pageable != null) {
 			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
 			sqlQuery.setMaxResults(pageable.getPageSize());
@@ -161,7 +162,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 		this.addAttributeValueSearchParameters(sqlQuery, attributeValueSearchRequestDto);
 
 		sqlQuery.addScalar("aid", IntegerType.INSTANCE);
-		sqlQuery.addScalar("locationDbId", StringType.INSTANCE);
+		sqlQuery.addScalar(ADDTL_INFO_LOCATION, StringType.INSTANCE);
 		sqlQuery.addScalar("attributeDbId", StringType.INSTANCE);
 		sqlQuery.addScalar("attributeName", StringType.INSTANCE);
 		sqlQuery.addScalar("attributeValueDbId", StringType.INSTANCE);
@@ -174,8 +175,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 		final List<AttributeValueDto> results = sqlQuery.list();
 
 		if (results != null && !results.isEmpty()) {
-			results.stream().map(
-					attributeValue -> this.processAttributeValueData(attributeValue))
+			results.stream().map(this::processAttributeValueData)
 				.collect(Collectors.toList());
 		}
 
@@ -226,7 +226,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 				sqlQuery.setParameter("variableTypeId", variableTypeId);
 			}
 
-			sqlQuery.setParameter("programUUID", programUUID);
+			sqlQuery.setParameter(PROGRAM_UUID, programUUID);
 			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(AttributeDto.class));
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
@@ -290,10 +290,8 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 			+ "    a.aval AS value "
 			+ " FROM"
 			+ "    atributs a"
-			+ "        INNER JOIN"
-			+ "    cvterm u ON a.atype = u.cvterm_id "
-			+ "        INNER JOIN"
-			+ "    germplsm g ON a.gid = g.gid "
+			+ "        INNER JOIN  cvterm u ON a.atype = u.cvterm_id "
+			+ "        INNER JOIN germplsm g ON a.gid = g.gid "
 			+ " WHERE"
 			+ "    g.germplsm_uuid = :germplasmUUID ";
 
@@ -345,20 +343,6 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 			throw new MiddlewareQueryException("Error with getAttributesByGidsMap(gids=" + gids + "): " + e.getMessage(), e);
 		}
 		return attributesMap;
-	}
-
-	public long countByVariables(final List<Integer> variablesIds) {
-		try {
-			final SQLQuery query =
-				this.getSession().createSQLQuery(COUNT_ATTRIBUTE_WITH_VARIABLES);
-			query.setParameterList("variableIds", variablesIds);
-
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (final HibernateException e) {
-			final String errorMessage = "Error at countByVariables=" + variablesIds + " in AttributeDAO: " + e.getMessage();
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
 	}
 
 	public long countByVariablesUsedInHistoricalGermplasm(final Integer variablesId) {
@@ -419,10 +403,10 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
 			sql.append(" AND cv.cvterm_id IN (  SELECT vrsr.subject_id ");
 			sql.append(
-				"						FROM cvterm_relationship vrsr INNER JOIN cvterm s ON s.cvterm_id = vrsr.object_id AND vrsr.type_id = ");
+				"FROM cvterm_relationship vrsr INNER JOIN cvterm s ON s.cvterm_id = vrsr.object_id AND vrsr.type_id = ");
 			sql.append(TermRelationshipId.HAS_SCALE.getId() + " ");
 			sql.append(
-				" 						INNER JOIN cvterm_relationship drsr ON drsr.subject_id = vrsr.object_id AND drsr.type_id = ");
+				"INNER JOIN cvterm_relationship drsr ON drsr.subject_id = vrsr.object_id AND drsr.type_id = ");
 			sql.append(TermRelationshipId.HAS_TYPE.getId() + " AND drsr.object_id IN (:dataTypeIds) ) ");
 		}
 
@@ -447,7 +431,7 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 		if (!CollectionUtils.isEmpty(requestDTO.getMethodDbIds())) {
 			sql.append(" AND cv.cvterm_id IN (  SELECT mr.subject_id ");
 			sql.append(
-				"						FROM cvterm_relationship mr INNER JOIN cvterm m ON m.cvterm_id = mr.object_id AND mr.type_id = ");
+				"FROM cvterm_relationship mr INNER JOIN cvterm m ON m.cvterm_id = mr.object_id AND mr.type_id = ");
 			sql.append(TermRelationshipId.HAS_METHOD.getId() + " AND m.cvterm_id IN (:methodDbIds) ) ");
 		}
 
@@ -458,27 +442,27 @@ public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 		if (!CollectionUtils.isEmpty(requestDTO.getScaleDbIds())) {
 			sql.append(" AND cv.cvterm_id IN (  SELECT sr.subject_id ");
 			sql.append(
-				"						FROM cvterm_relationship sr INNER JOIN cvterm s ON s.cvterm_id = sr.object_id AND sr.type_id = ");
+				"FROM cvterm_relationship sr INNER JOIN cvterm s ON s.cvterm_id = sr.object_id AND sr.type_id = ");
 			sql.append(TermRelationshipId.HAS_SCALE.getId() + " AND s.cvterm_id IN (:scaleDbIds) ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getTraitDbIds())) {
 			sql.append(" AND cv.cvterm_id IN (  SELECT vrpr.subject_id ");
 			sql.append(
-				"						FROM cvterm_relationship vrpr INNER JOIN cvterm p ON p.cvterm_id = vrpr.object_id AND vrpr.type_id = ");
+				"FROM cvterm_relationship vrpr INNER JOIN cvterm p ON p.cvterm_id = vrpr.object_id AND vrpr.type_id = ");
 			sql.append(TermRelationshipId.HAS_PROPERTY.getId() + " AND p.cvterm_id IN (:traitDbIds) ) ");
 		}
 
 		if (!CollectionUtils.isEmpty(requestDTO.getTraitClasses())) {
 			sql.append(" AND cv.cvterm_id IN (  SELECT vrpr2.subject_id ");
 			sql.append(
-				"						FROM cvterm_relationship vrpr2 INNER JOIN cvterm p2 ON p2.cvterm_id = vrpr2.object_id AND vrpr2.type_id = ");
+				"FROM cvterm_relationship vrpr2 INNER JOIN cvterm p2 ON p2.cvterm_id = vrpr2.object_id AND vrpr2.type_id = ");
 			sql.append(TermRelationshipId.HAS_PROPERTY.getId() + " ");
 			sql.append(
-				" 						INNER JOIN cvterm_relationship trpr2 ON trpr2.subject_id = vrpr2.object_id AND trpr2.type_id = ");
+				"INNER JOIN cvterm_relationship trpr2 ON trpr2.subject_id = vrpr2.object_id AND trpr2.type_id = ");
 			sql.append(TermRelationshipId.IS_A.getId() + " ");
 			sql.append(
-				"						INNER JOIN cvterm trait ON trait.cvterm_id = trpr2.object_id AND trait.name IN (:traitClasses) )");
+				"INNER JOIN cvterm trait ON trait.cvterm_id = trpr2.object_id AND trait.name IN (:traitClasses) )");
 		}
 	}
 

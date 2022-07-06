@@ -26,8 +26,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.BooleanType;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -35,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class GenericAttributeDAO<T extends GenericAttribute> extends GenericDAO<T, Integer> {
-
-	private static final Logger LOG = LoggerFactory.getLogger(GenericAttributeDAO.class);
 
 	private static final String VARIABLE_ID = "vid";
 	private static final String VARIABLE_NAME = "vn";
@@ -93,7 +89,7 @@ public abstract class GenericAttributeDAO<T extends GenericAttribute> extends Ge
 	private static final String GET_ATTRIBUTE_VARIABLES_GROUP_BY = " group by v.cvterm_id";
 
 	public Integer createAttribute(final Integer mainRecordId, final AttributeRequestDto dto, final Variable variable) {
-		final GenericAttribute newAttribute = (GenericAttribute) this.getNewAttributeInstance(mainRecordId);
+		final GenericAttribute newAttribute = this.getNewAttributeInstance(mainRecordId);
 		newAttribute.setTypeId(dto.getVariableId());
 		newAttribute.setAval(dto.getValue());
 		newAttribute.setLocationId(dto.getLocationId());
@@ -184,7 +180,7 @@ public abstract class GenericAttributeDAO<T extends GenericAttribute> extends Ge
 			sqlQuery.setParameterList(RECORD_IDS, recordIds);
 			sqlQuery.setParameterList(VARIABLE_TYPE_IDS, variableTypeIds);
 
-			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) sqlQuery.list();
+			final List<Map<String, Object>> queryResults = sqlQuery.list();
 			final List<Variable> variables = new ArrayList<>();
 			for (final Map<String, Object> item : queryResults) {
 				final Variable variable =
@@ -214,12 +210,11 @@ public abstract class GenericAttributeDAO<T extends GenericAttribute> extends Ge
 		} catch (final HibernateException e) {
 			final String message =
 				"Error with getAttributeVariables(record IDs=" + recordIds + ") : " + e.getMessage();
-			LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
 	}
 
-	protected abstract T getNewAttributeInstance(Integer Id);
+	protected abstract T getNewAttributeInstance(Integer id);
 
 	protected abstract String getCountAttributeWithVariablesQuery();
 
