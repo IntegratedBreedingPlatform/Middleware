@@ -379,7 +379,7 @@ final class SearchLotDaoQuery {
 	}
 
 	private static String formatDescriptorJoin(final String alias, final Integer variableId) {
-		return String.format("LEFT JOIN ims_lot_attribute %1$s ON lot.lotid = %1$s.lotid AND %1$s.atype = %2$s", alias, variableId);
+		return String.format(" LEFT JOIN ims_lot_attribute %1$s ON lot.lotid = %1$s.lotid AND %1$s.atype = %2$s", alias, variableId);
 	}
 
 }
