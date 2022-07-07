@@ -15,6 +15,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.MapUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotAttributeColumnDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -29,6 +30,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.DateType;
 import org.hibernate.type.IntegerType;
@@ -259,6 +261,22 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 
 			return attributeMapByGid;
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getGermplasmAttributeValues() in LotDAO: " + e.getMessage(), e);
+		}
+	}
+
+	public List<LotAttributeColumnDto> getLotAttributeColumnDtos(final String programUUID) {
+		try {
+			final String sql = "SELECT DISTINCT (a.atype) AS id, c.name AS name, vpo.alias AS alias"
+				+ "	FROM ims_lot_attribute a "
+				+ "	INNER JOIN ims_lot lots ON lots.lotid = a.lotid "
+				+ " INNER JOIN cvterm c ON c.cvterm_id = a.atype "
+				+ "	LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = c.cvterm_id AND vpo.program_uuid = :programUUID ";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("programUUID", programUUID);
+			query.setResultTransformer(new AliasToBeanResultTransformer(LotAttributeColumnDto.class));
+			return  query.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error at getGermplasmAttributeValues() in LotDAO: " + e.getMessage(), e);
 		}
