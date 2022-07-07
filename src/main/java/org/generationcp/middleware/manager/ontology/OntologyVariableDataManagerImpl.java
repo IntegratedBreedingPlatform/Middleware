@@ -1062,8 +1062,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public List<Variable> searchAttributeVariables(final String query, final String programUUID) {
-		return this.daoFactory.getCvTermDao().searchAttributeVariables(query, programUUID);
+	public List<Variable> searchAttributeVariables(final String query, final List<Integer> variableTypeIds, final String programUUID) {
+		return this.daoFactory.getCvTermDao().searchAttributeVariables(query, variableTypeIds, programUUID);
 	}
 
 	/***

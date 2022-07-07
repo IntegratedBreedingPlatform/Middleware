@@ -1856,14 +1856,15 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	/**
-	 * Return a list of variables with type GERMPLASM_PASSPORT, GERMPLASM_ATTRIBUTE that match definition, name or alias.
+	 * Return a list of variables that match definition, name or alias.
 	 * The programUUID is used to return the expected range and alias of the program if it exists.
 	 *
 	 * @param query       used like condition to match definition, name or alias.
+	 * @param variableTypeIds variable type filter
 	 * @param programUUID program's unique id
 	 * @return List of Variable or empty list if none found
 	 */
-	public List<Variable> searchAttributeVariables(final String query, final String programUUID) {
+	public List<Variable> searchAttributeVariables(final String query, final List<Integer> variableTypeIds, final String programUUID) {
 		if (isBlank(query)) {
 			return Collections.EMPTY_LIST;
 		}
@@ -1886,9 +1887,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				+ " vpo.expected_max AS " + CVTermDao.VARIABLE_EXPECTED_MAX
 				+ " FROM cvterm v INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
 				+ " and v.cvterm_id = cp.cvterm_id " //
-				+ " INNER JOIN cvterm varType on varType.name = cp.value AND varType.cvterm_id in (" //
-				+ VariableType.GERMPLASM_PASSPORT.getId() + "," //
-				+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ") " //
+				+ " INNER JOIN cvterm varType on varType.name = cp.value AND varType.cvterm_id in (:variableTypeIds) " //
 				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
 				+ " left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
 				+ " left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
@@ -1900,6 +1899,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			sqlQuery.setParameter(CVTermDao.PROGRAMUUID, programUUID);
 			sqlQuery.setParameter(CVTermDao.QUERY_PARAMETER, '%' + query + '%');
+			sqlQuery.setParameterList("variableTypeIds", variableTypeIds);
 
 			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 			sqlQuery.addScalar(CVTermDao.VARIABLE_ID);
