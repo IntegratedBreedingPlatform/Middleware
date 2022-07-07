@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.api.inventory;
 
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotAttributeColumnDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
@@ -43,5 +44,7 @@ public interface LotService {
 	boolean isLocationUsedInLot(Integer locationId);
 
 	Integer getCurrentNotationNumberForBreederIdentifier(String breederIdentifier);
+
+	List<LotAttributeColumnDto> getLotAttributeColumnDtos(String programUUID);
 
 }

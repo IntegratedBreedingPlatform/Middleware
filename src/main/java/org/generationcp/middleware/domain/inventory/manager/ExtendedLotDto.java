@@ -7,6 +7,7 @@ import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Date;
+import java.util.Map;
 
 @AutoProperty
 public class ExtendedLotDto extends LotDto {
@@ -55,6 +56,9 @@ public class ExtendedLotDto extends LotDto {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMdd")
 	@JsonView({InventoryView.LotView.class})
 	private Date lastWithdrawalDate;
+
+	@JsonView({InventoryView.LotView.class})
+	private Map<Integer, Object> attributeTypesValueMap;
 
 	@JsonIgnore
 	private String germplasmUUID;
@@ -193,6 +197,14 @@ public class ExtendedLotDto extends LotDto {
 
 	public void setGermplasmUUID(final String germplasmUUID) {
 		this.germplasmUUID = germplasmUUID;
+	}
+
+	public Map<Integer, Object> getAttributeTypesValueMap() {
+		return attributeTypesValueMap;
+	}
+
+	public void setAttributeTypesValueMap(final Map<Integer, Object> attributeTypesValueMap) {
+		this.attributeTypesValueMap = attributeTypesValueMap;
 	}
 
 	@Override
