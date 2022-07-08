@@ -75,7 +75,7 @@ final class SearchLotDaoQuery {
 			for (final Integer attributeVariableId : attributeFilters.keySet()) {
 				final String alias = formatDynamicAttributeAlias(attributeVariableId);
 				selectExpression += String.format(", %s.aval AS %s", alias, alias);
-				baseQuery += formatDescriptorJoin(alias, attributeVariableId);
+				baseQuery += formatLotAttributeJoin(alias, attributeVariableId);
 			}
 		}
 		String selectBaseQuery = String.format(baseQuery, selectExpression);
@@ -91,7 +91,7 @@ final class SearchLotDaoQuery {
 			final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributeFilters();
 			for (final Integer attributeVariableId : attributeFilters.keySet()) {
 				final String alias = formatDynamicAttributeAlias(attributeVariableId);
-				baseQuery += formatDescriptorJoin(alias, attributeVariableId);
+				baseQuery += formatLotAttributeJoin(alias, attributeVariableId);
 			}
 		}
 		baseQuery += DELETED_CONDITION;
@@ -361,12 +361,21 @@ final class SearchLotDaoQuery {
 			if (pageable.getSort() != null) {
 				final List<String> sorts = new ArrayList<>();
 				for (final Sort.Order order : pageable.getSort()) {
-					sorts.add(order.getProperty() + " " + order.getDirection().toString());
+					final String orderProperty = getOrderProperty(order.getProperty());
+					sorts.add(orderProperty + " " + order.getDirection().toString());
 				}
 				if (!sorts.isEmpty()) {
 					query.append(" ORDER BY ").append(Joiner.on(",").join(sorts));
 				}
 			}
+		}
+	}
+
+	private static String getOrderProperty(final String orderProperty) {
+		if (org.apache.commons.lang3.StringUtils.isNumeric(orderProperty)) {
+			return formatDynamicAttributeAlias(Integer.parseInt(orderProperty));
+		} else {
+			return orderProperty;
 		}
 	}
 
@@ -378,7 +387,7 @@ final class SearchLotDaoQuery {
 		return String.format("%s_%s", ATTRIBUTE, variableId);
 	}
 
-	private static String formatDescriptorJoin(final String alias, final Integer variableId) {
+	private static String formatLotAttributeJoin(final String alias, final Integer variableId) {
 		return String.format(" LEFT JOIN ims_lot_attribute %1$s ON lot.lotid = %1$s.lotid AND %1$s.atype = %2$s", alias, variableId);
 	}
 
