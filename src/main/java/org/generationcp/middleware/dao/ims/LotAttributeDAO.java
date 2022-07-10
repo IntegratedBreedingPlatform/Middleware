@@ -1,9 +1,11 @@
 package org.generationcp.middleware.dao.ims;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.dao.GenericAttributeDAO;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.shared.AttributeDto;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.LotAttribute;
@@ -11,7 +13,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * DAO class for {@link Lot Attribute}.
@@ -39,6 +44,19 @@ public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 		+ "LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = cv.cvterm_id AND vpo.program_uuid = :programUUID "
 		+ "WHERE a.lotId = :lotId ";
 
+	final String GET_LOT_ATTRIBUTE_KEYVALUE_BY_LOTID = "SELECT "
+		+ "    u.cvterm_id AS attributeDbId,"
+		+ "    a.aval AS value, "
+		+ "    a.lotId AS lotId "
+		+ " FROM"
+		+ "    ims_lot_attribute a"
+		+ "        INNER JOIN"
+		+ "    cvterm u ON a.atype = u.cvterm_id "
+		+ "        INNER JOIN"
+		+ "    ims_lot lot ON a.lotId = lot.lotId "
+		+ " WHERE"
+		+ "    lot.lotId IN (:lotIds) ";
+
 	public List<AttributeDto> getLotAttributeDtos(final Integer lotId, final String programUUID) {
 		try {
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(GET_LOT_ATTRIBUTES);
@@ -54,6 +72,45 @@ public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 		}
 	}
 
+	/**
+	 * Given a list of Lots return the Variables related with type INVENTORY_ATTRIBUTE.
+	 * The programUUID is used to return the expected range and alias of the program if it exists.
+	 *
+	 * @param List        of lotIds
+	 * @param programUUID program's unique id
+	 * @return List of Variable or empty list if none found
+	 */
+	public List<Variable> getLotAttributeVariables(final List<Integer> lotIds, final String programUUID) {
+		return this.getAttributeVariables(lotIds, programUUID,
+			Arrays.asList(VariableType.INVENTORY_ATTRIBUTE.getId()));
+	}
+
+	public Map<Integer, Map<Integer, String>> getAttributesByLotIdsMap(
+		final List<Integer> lotIds) {
+
+		final Map<Integer, Map<Integer, String>> attributesMap = new HashMap<>();
+
+		if (CollectionUtils.isEmpty(lotIds)) {
+			return attributesMap;
+		}
+
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(this.GET_LOT_ATTRIBUTE_KEYVALUE_BY_LOTID);
+			query.setParameterList("lotIds", lotIds);
+
+			final List<Object[]> rows = query.list();
+			for (final Object[] row : rows) {
+				final Integer lotId = (Integer) row[2];
+				attributesMap.putIfAbsent(lotId, new HashMap<>());
+				attributesMap.get(lotId).put((Integer) row[0], (String) row[1]);
+			}
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with getLotAttributeVariables(lotIds=" + lotIds + "): " + e.getMessage(), e);
+		}
+		return attributesMap;
+	}
+
 	@Override
 	protected LotAttribute getNewAttributeInstance(final Integer id) {
 		final LotAttribute newAttribute = new LotAttribute();
@@ -64,5 +121,15 @@ public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 	@Override
 	protected String getCountAttributeWithVariablesQuery() {
 		return COUNT_ATTRIBUTE_WITH_VARIABLES;
+	}
+
+	@Override
+	protected String getAttributeTable() {
+		return "ims_lot_attribute";
+	}
+
+	@Override
+	protected String getForeignKeyToMainRecord() {
+		return "lotId";
 	}
 }

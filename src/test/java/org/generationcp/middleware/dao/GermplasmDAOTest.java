@@ -26,7 +26,6 @@ import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
@@ -76,7 +75,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
-import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -1774,29 +1772,4 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		this.germplasmTestDataGenerator.addGermplasm(mgMember, mgMember.getPreferredName(), this.cropType);
 	}
 
-	@Test
-	public void testGetGermplasmAttributeVariables() {
-		final Germplasm germplasm =
-			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
-		this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
-
-		final Map<String, String> fields = new HashMap<>();
-		// atributs
-		fields.put("NOTE_AA_text", "");
-		for (final Map.Entry<String, String> attributEntry : fields.entrySet()) {
-			final Attribute attribute = this.saveAttribute(germplasm, attributEntry.getKey());
-		}
-
-		final GermplasmSearchRequest request = new GermplasmSearchRequest();
-		request.setGermplasmDbIds(Lists.newArrayList(germplasm.getGermplasmUUID()));
-		final List<GermplasmDTO> result = this.daoFactory.getGermplasmDao().getGermplasmDTOList(request, null);
-
-		final Set<String> gids = result.stream().map(GermplasmDTO::getGid).collect(Collectors.toSet());
-		final List<Integer> gidsList = gids.stream().map(s -> Integer.valueOf(s)).collect(Collectors.toList());
-		final List<Variable> variables = this.daoFactory.getGermplasmDao().getGermplasmAttributeVariables(gidsList, null);
-		Assert.assertEquals(1, variables.size());
-		Assert.assertTrue(variables.stream().allMatch(cVTerm -> cVTerm.getName().equalsIgnoreCase(NOTE_ATTRIBUTE.toUpperCase())));
-		Assert.assertEquals(NOTE_ATTRIBUTE, variables.get(0).getName());
-		Assert.assertEquals("NOTES", variables.get(0).getDefinition());
-	}
 }
