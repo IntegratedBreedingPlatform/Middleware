@@ -927,7 +927,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		stock.setUniqueName("1");
 		stock.setIsObsolete(false);
 		stock.setProject(study);
-		stock.setTypeId(TermId.ENTRY_CODE.getId());
 		this.daoFactory.getStockDao().save(stock);
 
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();
@@ -952,7 +951,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		stock.setUniqueName("1");
 		stock.setIsObsolete(false);
 		stock.setProject(study);
-		stock.setTypeId(TermId.ENTRY_CODE.getId());
 		this.daoFactory.getStockDao().save(stock);
 
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();
