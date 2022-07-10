@@ -11,6 +11,8 @@ import java.util.Set;
 
 public interface PedigreeServiceBrapi {
 
+	long countPedigreeNodes(PedigreeNodeSearchRequest pedigreeNodeSearchRequest);
+
 	List<PedigreeNodeDTO> searchPedigreeNodes(PedigreeNodeSearchRequest pedigreeNodeSearchRequest, Pageable pageable);
 
 	Set<String> updatePedigreeNodes(Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap, Multimap<String, Object[]> conflictErrors);
