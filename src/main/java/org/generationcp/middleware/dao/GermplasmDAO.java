@@ -28,14 +28,6 @@ import org.generationcp.middleware.domain.germplasm.PedigreeDTO;
 import org.generationcp.middleware.domain.germplasm.ProgenyDTO;
 import org.generationcp.middleware.domain.germplasm.importation.GermplasmMatchRequestDto;
 import org.generationcp.middleware.domain.oms.CvId;
-import org.generationcp.middleware.domain.oms.Term;
-import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.domain.ontology.Method;
-import org.generationcp.middleware.domain.ontology.Property;
-import org.generationcp.middleware.domain.ontology.Scale;
-import org.generationcp.middleware.domain.ontology.TermRelationshipId;
-import org.generationcp.middleware.domain.ontology.Variable;
-import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -1851,103 +1843,6 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			GermplasmDAO.LOG.debug("updateGroupSource has modified the group source for " + updatedRows + " germplasm");
 		} catch (final HibernateException e) {
 			final String message = "Error with updateGroupSource" + e.getMessage();
-			GermplasmDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	/**
-	 * Given a list of Germplasms return the Variables related with type GERMPLASM_PASSPORT, GERMPLASM_ATTRIBUTE.
-	 * The programUUID is used to return the expected range and alias of the program if it exists.
-	 *
-	 * @param List        of gids
-	 * @param programUUID program's unique id
-	 * @return List of Variable or empty list if none found
-	 */
-	public List<Variable> getGermplasmAttributeVariables(final List<Integer> gids, final String programUUID) {
-		try {
-			final SQLQuery sqlQuery = this.getSession().createSQLQuery("select "
-				+ " v.cvterm_id AS " + GermplasmDAO.VARIABLE_ID + ", "  //
-				+ " v.name AS " + GermplasmDAO.VARIABLE_NAME + ", "  //
-				+ " v.definition AS " + GermplasmDAO.VARIABLE_DEFINITION + ", "  //
-				+ " vmr.mid AS " + GermplasmDAO.METHOD_ID + ", "  //
-				+ " vmr.mn AS " + GermplasmDAO.METHOD_NAME + ", "  //
-				+ " vmr.md AS " + GermplasmDAO.METHOD_DEFINITION + ", "  //
-				+ " vpr.pid AS " + GermplasmDAO.PROPERTY_ID + ", "  //
-				+ " vpr.pn AS " + GermplasmDAO.PROPERTY_NAME + ", "  //
-				+ " vpr.pd AS " + GermplasmDAO.PROPERTY_DEFINITION + ", "  //
-				+ " vsr.sid AS " + GermplasmDAO.SCALE_ID + ", "  //
-				+ " vsr.sn AS " + GermplasmDAO.SCALE_NAME + ", "  //
-				+ " vsr.sd AS " + GermplasmDAO.SCALE_DEFINITION + ", "  //
-				+ " vpo.alias  AS " + GermplasmDAO.VARIABLE_ALIAS + ", "  //
-				+ " vpo.expected_min AS " + GermplasmDAO.VARIABLE_EXPECTED_MIN + ", "  //
-				+ " vpo.expected_max AS " + GermplasmDAO.VARIABLE_EXPECTED_MAX
-				+ " FROM cvterm v INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
-				+ " and v.cvterm_id = cp.cvterm_id " //
-				+ " INNER JOIN cvterm varType on varType.name = cp.value AND varType.cvterm_id in (" //
-				+ VariableType.GERMPLASM_PASSPORT.getId() + "," //
-				+ VariableType.GERMPLASM_ATTRIBUTE.getId() + ") " //
-				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = "
-				+ TermRelationshipId.HAS_METHOD.getId() + ") vmr on vmr.vid = v.cvterm_id "
-				+ " left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = "
-				+ TermRelationshipId.HAS_PROPERTY.getId() + ") vpr on vpr.vid = v.cvterm_id "
-				+ " left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = "
-				+ TermRelationshipId.HAS_SCALE.getId() + ") vsr on vsr.vid = v.cvterm_id "
-				+ " left join variable_overrides vpo ON vpo.cvterm_id = v.cvterm_id AND vpo.program_uuid = :" + GermplasmDAO.PROGRAM_UUID //
-				+ " inner join atributs a  on a.atype = v.cvterm_id " //
-				+ " WHERE "
-				+ " a.gid in (:" + GermplasmDAO.GIDS + ")" //
-				+ " group by v.cvterm_id");
-
-			sqlQuery.setParameter(GermplasmDAO.PROGRAM_UUID, programUUID);
-			sqlQuery.setParameterList(GermplasmDAO.GIDS, gids);
-			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
-			sqlQuery.addScalar(GermplasmDAO.VARIABLE_ID);
-			sqlQuery.addScalar(GermplasmDAO.VARIABLE_NAME);
-			sqlQuery.addScalar(GermplasmDAO.VARIABLE_DEFINITION);
-			sqlQuery.addScalar(GermplasmDAO.METHOD_ID);
-			sqlQuery.addScalar(GermplasmDAO.METHOD_NAME);
-			sqlQuery.addScalar(GermplasmDAO.METHOD_DEFINITION);
-			sqlQuery.addScalar(GermplasmDAO.PROPERTY_ID);
-			sqlQuery.addScalar(GermplasmDAO.PROPERTY_NAME);
-			sqlQuery.addScalar(GermplasmDAO.PROPERTY_DEFINITION);
-			sqlQuery.addScalar(GermplasmDAO.SCALE_ID);
-			sqlQuery.addScalar(GermplasmDAO.SCALE_NAME);
-			sqlQuery.addScalar(GermplasmDAO.SCALE_DEFINITION);
-			sqlQuery.addScalar(GermplasmDAO.VARIABLE_ALIAS);
-			sqlQuery.addScalar(GermplasmDAO.VARIABLE_EXPECTED_MIN);
-			sqlQuery.addScalar(GermplasmDAO.VARIABLE_EXPECTED_MAX);
-
-			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) sqlQuery.list();
-			final List<Variable> variables = new ArrayList<>();
-			for (final Map<String, Object> item : queryResults) {
-				final Variable variable =
-					new Variable(new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.VARIABLE_ID)),
-						(String) item.get(GermplasmDAO.VARIABLE_NAME), (String) item.get(GermplasmDAO.VARIABLE_DEFINITION)));
-				variable.setMethod(new Method(
-					new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.METHOD_ID)), (String) item.get(GermplasmDAO.METHOD_NAME),
-						(String) item.get(GermplasmDAO.METHOD_DEFINITION))));
-				variable.setProperty(new Property(new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.PROPERTY_ID)),
-					(String) item.get(GermplasmDAO.PROPERTY_NAME), (String) item.get(GermplasmDAO.PROPERTY_DEFINITION))));
-				variable.setScale(new Scale(
-					new Term(Util.typeSafeObjectToInteger(item.get(GermplasmDAO.SCALE_ID)), (String) item.get(GermplasmDAO.SCALE_NAME),
-						(String) item.get(GermplasmDAO.SCALE_DEFINITION))));
-
-				// Alias, Expected Min Value, Expected Max Value
-				final String pAlias = (String) item.get(GermplasmDAO.VARIABLE_ALIAS);
-				final String pExpMin = (String) item.get(GermplasmDAO.VARIABLE_EXPECTED_MIN);
-				final String pExpMax = (String) item.get(GermplasmDAO.VARIABLE_EXPECTED_MAX);
-
-				variable.setAlias(pAlias);
-				variable.setMinValue(pExpMin);
-				variable.setMaxValue(pExpMax);
-
-				variables.add(variable);
-			}
-			return variables;
-		} catch (final HibernateException e) {
-			final String message =
-				"Error with getGermplasmAttributeVariables(gids=" + gids + ") : " + e.getMessage();
 			GermplasmDAO.LOG.error(message, e);
 			throw new MiddlewareQueryException(message, e);
 		}
