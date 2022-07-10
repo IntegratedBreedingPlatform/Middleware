@@ -1,7 +1,6 @@
 package org.generationcp.middleware.domain.search_request.brapi.v2;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +18,14 @@ public class GermplasmSearchRequest extends SearchRequestDto {
 
 	@JsonIgnore
 	private String preferredName;
+	@JsonIgnore
+	private List<String> trialDbIds;
+	@JsonIgnore
+	private List<String> trialNames;
+	@JsonIgnore
+	private List<String> programDbIds;
+	@JsonIgnore
+	private List<String> programNames;
 
 	private List<String> commonCropNames;
 	private List<String> germplasmDbIds;
@@ -198,6 +205,38 @@ public class GermplasmSearchRequest extends SearchRequestDto {
 		this.collections = collections;
 	}
 
+	public List<String> getTrialDbIds() {
+		return this.trialDbIds;
+	}
+
+	public void setTrialDbIds(final List<String> trialDbIds) {
+		this.trialDbIds = trialDbIds;
+	}
+
+	public List<String> getTrialNames() {
+		return this.trialNames;
+	}
+
+	public void setTrialNames(final List<String> trialNames) {
+		this.trialNames = trialNames;
+	}
+
+	public List<String> getProgramDbIds() {
+		return this.programDbIds;
+	}
+
+	public void setProgramDbIds(final List<String> programDbIds) {
+		this.programDbIds = programDbIds;
+	}
+
+	public List<String> getProgramNames() {
+		return this.programNames;
+	}
+
+	public void setProgramNames(final List<String> programNames) {
+		this.programNames = programNames;
+	}
+
 	@Override
 	public int hashCode() {
 		return Pojomatic.hashCode(this);
@@ -229,6 +268,10 @@ public class GermplasmSearchRequest extends SearchRequestDto {
 			CollectionUtils.isEmpty(this.parentDbIds) &&
 			CollectionUtils.isEmpty(this.progenyDbIds) &&
 			CollectionUtils.isEmpty(this.species) &&
-			CollectionUtils.isEmpty(this.synonyms);
+			CollectionUtils.isEmpty(this.synonyms) &&
+			CollectionUtils.isEmpty(this.programDbIds) &&
+			CollectionUtils.isEmpty(this.programNames) &&
+			CollectionUtils.isEmpty(this.trialDbIds) &&
+			CollectionUtils.isEmpty(this.trialNames);
 	}
 }

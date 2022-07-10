@@ -171,7 +171,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm maintenanceChildrenGermplsm = GermplasmTestDataInitializer
 			.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, maintenanceMethods.get(0).getMid(), 0, 1, 1,
 				"MethodName", "LocationName");
-		this.germplasmTestDataGenerator.addGermplasm(maintenanceChildrenGermplsm, maintenanceChildrenGermplsm.getPreferredName(), this.cropType);
+		this.germplasmTestDataGenerator.addGermplasm(maintenanceChildrenGermplsm, maintenanceChildrenGermplsm.getPreferredName(),
+			this.cropType);
 
 		final List<Germplasm> results = this.daoFactory.getGermplasmDao().getDescendants(parentGermplsm.getGid(), 'M');
 		Assert.assertNotNull(results);
@@ -220,7 +221,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm maintenanceChildrenGermplsm = GermplasmTestDataInitializer
 			.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, GermplasmDAOTest.UNKNOWN_GENERATIVE_METHOD_ID, 0, 1, 1,
 				"MethodName", "LocationName");
-		this.germplasmTestDataGenerator.addGermplasm(maintenanceChildrenGermplsm, maintenanceChildrenGermplsm.getPreferredName(), this.cropType);
+		this.germplasmTestDataGenerator.addGermplasm(maintenanceChildrenGermplsm, maintenanceChildrenGermplsm.getPreferredName(),
+			this.cropType);
 
 		final List<Germplasm> children = this.daoFactory.getGermplasmDao().getAllChildren(parentGermplsm.getGid());
 		Assert.assertNotNull("getAllChildren() should never return null.", children);
@@ -472,9 +474,12 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 				"LocationName");
 		this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
 
-		Assert.assertTrue(this.daoFactory.getGermplasmDao().getGermplasmOffspringByGIDs(Collections.singletonList(mParent.getGid())).size() > 0);
-		Assert.assertTrue(this.daoFactory.getGermplasmDao().getGermplasmOffspringByGIDs(Collections.singletonList(fParent.getGid())).size() > 0);
-		Assert.assertFalse(this.daoFactory.getGermplasmDao().getGermplasmOffspringByGIDs(Collections.singletonList(germplasm.getGid())).size() > 0);
+		Assert.assertTrue(
+			this.daoFactory.getGermplasmDao().getGermplasmOffspringByGIDs(Collections.singletonList(mParent.getGid())).size() > 0);
+		Assert.assertTrue(
+			this.daoFactory.getGermplasmDao().getGermplasmOffspringByGIDs(Collections.singletonList(fParent.getGid())).size() > 0);
+		Assert.assertFalse(
+			this.daoFactory.getGermplasmDao().getGermplasmOffspringByGIDs(Collections.singletonList(germplasm.getGid())).size() > 0);
 	}
 
 	@Test
@@ -904,6 +909,56 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		request.setExternalReferenceSources(Lists.newArrayList(germplasmExternalReference.getSource()));
 		final Long count = this.daoFactory.getGermplasmDao().countGermplasmDTOs(request);
 		Assert.assertThat(count.intValue(), is(1));
+	}
+
+	@Test
+	public void testCountGermplasmDTOs_FilterByTrialDbId() {
+		final Germplasm germplasm =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+
+		final DmsProject study = new DmsProject(TEST_PROJECT_ID);
+		study.setName(RandomStringUtils.randomAlphabetic(10));
+		study.setDescription(RandomStringUtils.randomAlphabetic(10));
+		this.daoFactory.getDmsProjectDAO().save(study);
+
+		final StockModel stock = new StockModel();
+		stock.setGermplasm(germplasm);
+		stock.setUniqueName("1");
+		stock.setIsObsolete(false);
+		stock.setProject(study);
+		stock.setTypeId(TermId.ENTRY_CODE.getId());
+		this.daoFactory.getStockDao().save(stock);
+
+		final GermplasmSearchRequest request = new GermplasmSearchRequest();
+		request.setTrialDbIds(Arrays.asList(String.valueOf(study.getProjectId())));
+		final long count = this.daoFactory.getGermplasmDao().countGermplasmDTOs(request);
+		Assert.assertThat(count, is(1L));
+	}
+
+	@Test
+	public void testCountGermplasmDTOs_FilterByTrialNames() {
+		final Germplasm germplasm =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmTestDataGenerator.addGermplasm(germplasm, germplasm.getPreferredName(), this.cropType);
+
+		final DmsProject study = new DmsProject(TEST_PROJECT_ID);
+		study.setName(RandomStringUtils.randomAlphabetic(10));
+		study.setDescription(RandomStringUtils.randomAlphabetic(10));
+		this.daoFactory.getDmsProjectDAO().save(study);
+
+		final StockModel stock = new StockModel();
+		stock.setGermplasm(germplasm);
+		stock.setUniqueName("1");
+		stock.setIsObsolete(false);
+		stock.setProject(study);
+		stock.setTypeId(TermId.ENTRY_CODE.getId());
+		this.daoFactory.getStockDao().save(stock);
+
+		final GermplasmSearchRequest request = new GermplasmSearchRequest();
+		request.setTrialNames(Arrays.asList(String.valueOf(study.getName())));
+		final long count = this.daoFactory.getGermplasmDao().countGermplasmDTOs(request);
+		Assert.assertThat(count, is(1L));
 	}
 
 	@Test
@@ -1541,7 +1596,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final List<GermplasmDto> germplasmMatches = this.daoFactory.getGermplasmDao().findGermplasmMatches(germplasmMatchRequestDto, null);
 		Assert.assertEquals(3, germplasmMatches.size());
-		Assert.assertTrue(germplasmMatches.stream().map(GermplasmDto::getGermplasmPUI).collect(Collectors.toList()).containsAll(germplasmPUIs));
+		Assert.assertTrue(
+			germplasmMatches.stream().map(GermplasmDto::getGermplasmPUI).collect(Collectors.toList()).containsAll(germplasmPUIs));
 	}
 
 	@Test
@@ -1579,7 +1635,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final List<GermplasmDto> germplasmMatches = this.daoFactory.getGermplasmDao().findGermplasmMatches(germplasmMatchRequestDto, null);
 		Assert.assertEquals(3, germplasmMatches.size());
-		Assert.assertTrue(germplasmMatches.stream().map(GermplasmDto::getGermplasmPUI).collect(Collectors.toList()).containsAll(germplasmPUIs));
+		Assert.assertTrue(
+			germplasmMatches.stream().map(GermplasmDto::getGermplasmPUI).collect(Collectors.toList()).containsAll(germplasmPUIs));
 	}
 
 	@Test
@@ -1638,7 +1695,8 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final List<GermplasmDto> germplasmMatches = this.daoFactory.getGermplasmDao().findGermplasmMatches(germplasmMatchRequestDto, null);
 		Assert.assertEquals(3, germplasmMatches.size());
-		Assert.assertTrue(germplasmMatches.stream().map(GermplasmDto::getGermplasmUUID).collect(Collectors.toList()).containsAll(germplasmUUIDs));
+		Assert.assertTrue(
+			germplasmMatches.stream().map(GermplasmDto::getGermplasmUUID).collect(Collectors.toList()).containsAll(germplasmUUIDs));
 	}
 
 	@Test
@@ -1759,7 +1817,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final Germplasm fParent =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmTestDataGenerator.addGermplasm(fParent, fParent.getPreferredName(), this.cropType);
-
 
 		final Germplasm mParent =
 			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 2, 2, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
