@@ -88,7 +88,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	private static final String DUMMY_STOCK_ID = "USER-1-1";
 	private static final Integer TEST_PROJECT_ID = 1;
-	private static final String NOTE_ATTRIBUTE = "NOTE_AA_text";
 
 	private static final Integer GROUP_ID = 10;
 
@@ -925,6 +924,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final StockModel stock = new StockModel();
 		stock.setGermplasm(germplasm);
 		stock.setUniqueName("1");
+		stock.setCross("-");
 		stock.setIsObsolete(false);
 		stock.setProject(study);
 		this.daoFactory.getStockDao().save(stock);
@@ -949,6 +949,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final StockModel stock = new StockModel();
 		stock.setGermplasm(germplasm);
 		stock.setUniqueName("1");
+		stock.setCross("-");
 		stock.setIsObsolete(false);
 		stock.setProject(study);
 		this.daoFactory.getStockDao().save(stock);
