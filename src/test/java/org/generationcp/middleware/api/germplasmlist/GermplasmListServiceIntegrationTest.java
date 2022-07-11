@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.gms.GermplasmListType;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.oms.Term;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -495,6 +496,14 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final Germplasm germplasm1 = this.createGermplasm(singleCrossMethod);
 		final Germplasm germplasm2 = this.createGermplasm(singleCrossMethod);
 
+		// Add ENTRY_NO Entry Detail Variable.
+		final GermplasmListDataView sourceGermplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(
+			sourceGermplasmList,
+			TermId.ENTRY_NO.getId(),
+			VariableType.ENTRY_DETAIL.getId()
+		).build();
+		this.daoFactory.getGermplasmListDataViewDAO().save(sourceGermplasmListDataView);
+
 		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(this.createGermplasmListData(sourceGermplasmList, germplasm1.getGid(), 1));
 		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(this.createGermplasmListData(sourceGermplasmList, germplasm2.getGid(), 2));
 
@@ -516,11 +525,20 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 		final GermplasmList germplasmList = new GermplasmList(null, "Test Germplasm List " + new Random().nextInt(100),
 			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
 		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
-
 		// Source Germplasm list
 		final GermplasmList sourceGermplasmList = new GermplasmList(null, "Test Germplasm List " + new Random().nextInt(100),
 			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
 		this.daoFactory.getGermplasmListDAO().saveOrUpdate(sourceGermplasmList);
+
+		// Add ENTRY_NO Entry Detail Variable.
+		final GermplasmListDataView sourceGermplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(
+			sourceGermplasmList,
+			TermId.ENTRY_NO.getId(),
+			VariableType.ENTRY_DETAIL.getId()
+		).build();
+
+		this.daoFactory.getGermplasmListDataViewDAO().save(sourceGermplasmListDataView);
+
 		final Method singleCrossMethod = this.daoFactory.getMethodDAO().getByCode(SINGLE_CROSS_METHOD);
 		final Germplasm germplasm1 = this.createGermplasm(singleCrossMethod);
 		final Germplasm germplasm2 = this.createGermplasm(singleCrossMethod);
@@ -663,8 +681,8 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 			this.germplasmListDataService.getGermplasmListDataDetailList(germplasmList.getId());
 		Assert.assertEquals(2, germplasmListDataResponseList.size());
 		Assert.assertEquals(2, germplasmListDataDetailList.size());
-		Assert.assertEquals(1, germplasmListDataResponseList.get(0).getData().get(GermplasmListStaticColumns.ENTRY_NO.getName()));
-		Assert.assertEquals(2, germplasmListDataResponseList.get(1).getData().get(GermplasmListStaticColumns.ENTRY_NO.getName()));
+		Assert.assertEquals(1, germplasmListDataResponseList.get(0).getData().get(TermId.ENTRY_NO.name()));
+		Assert.assertEquals(2, germplasmListDataResponseList.get(1).getData().get(TermId.ENTRY_NO.name()));
 
 		// Remove by searchComposite.searchRequest.entryNumbers
 		final SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite2 = new SearchCompositeDto<>();
@@ -680,7 +698,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 
 		Assert.assertEquals(1, germplasmListDataResponseList2.size());
 		Assert.assertEquals(1, germplasmListDataDetailList2.size());
-		Assert.assertEquals(1, germplasmListDataResponseList2.get(0).getData().get(GermplasmListStaticColumns.ENTRY_NO.getName()));
+		Assert.assertEquals(1, germplasmListDataResponseList2.get(0).getData().get(TermId.ENTRY_NO.name()));
 
 	}
 
@@ -787,7 +805,7 @@ public class GermplasmListServiceIntegrationTest extends IntegrationTestBase {
 	}
 
 	private GermplasmListData createGermplasmListData(final GermplasmList germplasmList, final int gid, final int entryNo) {
-		return new GermplasmListData(null, germplasmList, gid, entryNo, "EntryCode" + entryNo,
+		return new GermplasmListData(null, germplasmList, gid, entryNo,
 			DataSetupTest.GERMPLSM_PREFIX + entryNo + " Source", DataSetupTest.GERMPLSM_PREFIX + "Group A",
 			0, 0);
 	}

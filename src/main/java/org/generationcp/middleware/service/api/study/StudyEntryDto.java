@@ -1,6 +1,7 @@
 package org.generationcp.middleware.service.api.study;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import org.apache.commons.lang3.StringUtils;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
@@ -17,8 +18,6 @@ public class StudyEntryDto implements Serializable {
 
 	private Integer entryNumber;
 
-	private String entryCode;
-
 	private Integer gid;
 
 	private String designation;
@@ -28,6 +27,12 @@ public class StudyEntryDto implements Serializable {
 	private String availableBalance;
 
 	private String unit;
+
+	private String cross;
+
+	private Integer groupGid;
+
+	private String guid;
 
 	private Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 
@@ -41,23 +46,26 @@ public class StudyEntryDto implements Serializable {
 		this.designation = designation;
 	}
 
-	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final String entryCode, final Integer gid, final String designation) {
+	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final Integer gid, final String designation) {
 		this.entryId = entryId;
 		this.entryNumber = entryNumber;
-		this.entryCode = entryCode;
 		this.gid = gid;
 		this.designation = designation;
 	}
 
-	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final String entryCode, final Integer gid, final String designation, final Integer lotCount, final String availableBalance, final String unit){
+	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final Integer gid,
+		final String designation, final Integer lotCount, final String availableBalance, final String unit, final String cross,
+		final Integer groupGid, final String guid){
 		this.entryId = entryId;
 		this.entryNumber = entryNumber;
-		this.entryCode = entryCode;
 		this.gid = gid;
 		this.designation = designation;
 		this.lotCount = lotCount;
 		this.availableBalance = availableBalance;
 		this.unit = unit;
+		this.cross = cross;
+		this.groupGid = groupGid;
+		this.guid = guid;
 	}
 
 	public Integer getEntryId() {
@@ -92,14 +100,6 @@ public class StudyEntryDto implements Serializable {
 		this.entryNumber = entryNumber;
 	}
 
-	public String getEntryCode() {
-		return this.entryCode;
-	}
-
-	public void setEntryCode(final String entryCode) {
-		this.entryCode = entryCode;
-	}
-
 	public Integer getLotCount() {
 		return this.lotCount;
 	}
@@ -122,6 +122,30 @@ public class StudyEntryDto implements Serializable {
 
 	public void setUnit(final String unit) {
 		this.unit = unit;
+	}
+
+	public String getCross() {
+		return cross;
+	}
+
+	public void setCross(final String cross) {
+		this.cross = StringUtils.isEmpty(cross) ? "-" : cross;
+	}
+
+	public Integer getGroupGid() {
+		return groupGid;
+	}
+
+	public void setGroupGid(final Integer groupGid) {
+		this.groupGid = groupGid;
+	}
+
+	public String getGuid() {
+		return guid;
+	}
+
+	public void setGuid(final String guid) {
+		this.guid = guid;
 	}
 
 	public Map<Integer, StudyEntryPropertyData> getProperties() {
@@ -150,8 +174,8 @@ public class StudyEntryDto implements Serializable {
 
 	public Optional<String> getStudyEntryPropertyValue(final Integer variableId) {
 		if (this.properties.containsKey(variableId) && this.properties.get(variableId) != null
-			&& this.properties.get(variableId).getValue() != null) {
-			return Optional.of(this.properties.get(variableId).getValue());
+			&& this.properties.get(variableId).getVariableValue() != null) {
+			return Optional.of(this.properties.get(variableId).getVariableValue());
 		}
 		return Optional.empty();
 	}

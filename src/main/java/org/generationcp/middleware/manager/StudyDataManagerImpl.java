@@ -25,6 +25,7 @@ import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
 import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
@@ -50,6 +51,7 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.Location;
@@ -92,6 +94,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	private PedigreeService pedigreeService;
 	private LocationDataManager locationDataManager;
 	private DaoFactory daoFactory;
+	private StandardVariableBuilder standardVariableBuilder;
 
 	@Resource
 	private UserService userService;
@@ -112,6 +115,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
 		this.daoFactory = new DaoFactory(sessionProvider);
+		this.standardVariableBuilder = new StandardVariableBuilder(sessionProvider);
 	}
 
 	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider) {
@@ -569,6 +573,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException(
 				"Error encountered with renameStudy(studyId=" + studyId + ", label=" + newStudyName + ": " + e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public List<Experiment> getExperimentsWithGidAndCross(final int dataSetId, final List<Integer> instanceNumbers,
+		final List<Integer> repNumbers) {
+		final VariableTypeList variableTypes = this.dataSetBuilder.getVariableTypes(dataSetId);
+		this.addVariableIfNotPresent(variableTypes, TermId.GID);
+		// Forcing to add CROSS variable because we need cross values to show them in Advance Study > REVIEW ADVANCED LINES
+		this.addVariableIfNotPresent(variableTypes, TermId.CROSS);
+
+		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), variableTypes, instanceNumbers, repNumbers);
 	}
 
 	@Override
@@ -1186,4 +1201,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		}
 		return false;
 	}
+
+	private void addVariableIfNotPresent(final VariableTypeList variableTypes, final TermId termId) {
+		if (variableTypes.findById(termId) == null) {
+			final StandardVariable variable = this.standardVariableBuilder.getByName(termId.name(), null);
+			variableTypes.add(new DMSVariableType(termId.name(), null, variable, 0));
+		}
+	}
+
 }

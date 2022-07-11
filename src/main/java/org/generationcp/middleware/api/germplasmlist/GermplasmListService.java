@@ -10,6 +10,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -94,4 +95,7 @@ public interface GermplasmListService {
 	void editListMetadata(GermplasmListDto germplasmListDto);
 
 	long countEntryDetailsNamesAndAttributesAdded(Integer listId);
+
+	Map<Integer, Map<Integer, String>> getObservationValuesByListAndVariableIds(Integer listId, Set<Integer> variableIds);
+
 }

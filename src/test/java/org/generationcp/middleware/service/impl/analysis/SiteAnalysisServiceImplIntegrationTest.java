@@ -333,10 +333,9 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 			final StockModel stockModel = new StockModel();
 			stockModel.setName(germplasm.getGermplasmPreferredName());
 			stockModel.setIsObsolete(false);
-			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 			stockModel.setUniqueName(String.valueOf(i));
 			stockModel.setGermplasm(germplasm);
-			stockModel.setValue(String.valueOf(i));
+			stockModel.setCross("-");
 			stockModel.setProject(study);
 			this.daoFactory.getStockDao().saveOrUpdate(stockModel);
 		}

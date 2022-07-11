@@ -11,9 +11,6 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.StockProperty;
@@ -23,6 +20,9 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+
+import java.util.List;
+import java.util.Optional;
 
 /**
  * DAO class for {@link StockProperty}.
@@ -69,21 +69,43 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 		}
 	}
 
-	public boolean updateByStockIdsAndTypeId(final List<Integer> stockIds, final Integer typeId, final String value) {
+	public boolean updateByStockIdsAndTypeId(final List<Integer> stockIds, final Integer typeId, final String entryTypeId,
+		final String value) {
 		try {
 			this.getSession().flush();
 
-			final String queryString = "UPDATE stockprop SET value = :value WHERE type_id = :typeId AND stock_id IN (:stockIds)";
+			final String queryString = "UPDATE stockprop SET value = :value, cvalue_id = :entryTypeId WHERE type_id = :typeId AND stock_id IN (:stockIds)";
 			final SQLQuery query = this.getSession().createSQLQuery(queryString);
 			query.setParameter("value", value);
+			query.setParameter("entryTypeId", entryTypeId);
 			query.setParameter("typeId", typeId);
 			query.setParameterList("stockIds", stockIds);
 			return query.executeUpdate() > 0;
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in updateByStockIdsAndTypeId(" + stockIds + ", " + typeId  + ", " + value
+			throw new MiddlewareQueryException("Error in updateByStockIdsAndTypeId(" + stockIds + ", " + typeId  + ", " + entryTypeId
 				+ ") in StockPropertyDao: "	+ e.getMessage(), e);
 		}
+	}
+
+	public Optional<StockProperty> getByStockIdAndTypeId(final Integer stockId, final Integer typeId) {
+		final Criteria criteria = this.getSession().createCriteria(StockProperty.class);
+		criteria.add(Restrictions.eq("stockModel.stockId", stockId));
+		criteria.add(Restrictions.eq("typeId", typeId));
+		return Optional.ofNullable((StockProperty) criteria.uniqueResult());
+	}
+
+	public long countObservationsByStudyIdAndVariableIds(final Integer studyId, final List<Integer> variableIds) {
+		if (variableIds.isEmpty()) {
+			return 0l;
+		}
+		final Criteria criteria = this.getSession().createCriteria(StockProperty.class);
+		criteria.createAlias("stockModel", "stockModel");
+		criteria.createAlias("stockModel.project", "study");
+		criteria.add(Restrictions.eq("study.projectId", studyId));
+		criteria.add(Restrictions.in("typeId", variableIds));
+		criteria.setProjection(Projections.rowCount());
+		return (Long) criteria.uniqueResult();
 	}
 
 }

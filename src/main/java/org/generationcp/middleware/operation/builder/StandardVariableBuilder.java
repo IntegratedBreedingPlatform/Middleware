@@ -51,6 +51,7 @@ import java.util.Set;
 
 public class StandardVariableBuilder extends Builder {
 
+	private static final List<Integer> GERMPLASM_DESCRIPTOR_VARIABLE_IDS_ALLOWED = Arrays.asList(8377, 8250, 8240, 8330, 8340, 8235, 8378, 8201);
 	private static final String DATA_TYPE_NUMERIC = "N";
 	private static final String DATA_TYPE_CHARACTER = "C";
 	private static final String LOCATION_NAME = "LOCATION_NAME";
@@ -352,7 +353,7 @@ public class StandardVariableBuilder extends Builder {
 		this.removeHeaderNamesWithMatch(headerNamesTrimmed, standardVariableIdsWithTypeInProjects);
 
 		// Step 3: Search variables that match the standard variable's NAME (Ontology Level)
-		standardVariableIdsWithTypeInProjects.putAll(this.getStandardVariableIdsWithTypeForTerms(headerNamesTrimmed));
+		this.getStandardVariableIdsWithTypeForTerms(headerNamesTrimmed, standardVariableIdsWithTypeInProjects);
 
 		// Exclude header items with result from step 3
 		this.removeHeaderNamesWithMatch(headerNamesTrimmed, standardVariableIdsWithTypeInProjects);
@@ -427,11 +428,18 @@ public class StandardVariableBuilder extends Builder {
 		return new HashMap<>();
 	}
 
-	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsWithTypeForTerms(final List<String> termNames) {
+	public void getStandardVariableIdsWithTypeForTerms(final List<String> termNames, Map<String, Map<Integer, VariableType>> standardVariableIdsWithTypeInProjects) {
+		Map<String, Map<Integer, VariableType>> variables = new HashMap<>();
 		if (!termNames.isEmpty()) {
-			return daoFactory.getCvTermDao().getTermIdsWithTypeByNameOrSynonyms(termNames, CvId.VARIABLES.getId());
+			variables = daoFactory.getCvTermDao().getTermIdsWithTypeByNameOrSynonyms(termNames, CvId.VARIABLES.getId());
 		}
-		return new HashMap<>();
+
+		for (Map.Entry<String, Map<Integer, VariableType>> entry : variables.entrySet()) {
+			if (entry.getValue().values().contains(VariableType.GERMPLASM_DESCRIPTOR) && !StandardVariableBuilder.GERMPLASM_DESCRIPTOR_VARIABLE_IDS_ALLOWED.contains(entry.getValue().keySet())) {
+				continue;
+			}
+			standardVariableIdsWithTypeInProjects.put(entry.getKey(), entry.getValue());
+		}
 	}
 
 	public Map<String, Map<Integer, VariableType>> getStandardVariableIdsForTraits(final List<String> traitNames) {

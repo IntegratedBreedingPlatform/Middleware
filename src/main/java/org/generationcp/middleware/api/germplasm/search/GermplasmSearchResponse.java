@@ -34,7 +34,7 @@ public class GermplasmSearchResponse {
 	private String groupSourceGID;
 	private String groupSourcePreferredName;
 	private String immediateSourceGID;
-	private String immediateSourcePreferredName;
+	private String immediateSourceName;
 
 	// Pedigree-related fields
 
@@ -197,12 +197,12 @@ public class GermplasmSearchResponse {
 		this.immediateSourceGID = immediateSourceGID;
 	}
 
-	public String getImmediateSourcePreferredName() {
-		return this.immediateSourcePreferredName;
+	public String getImmediateSourceName() {
+		return this.immediateSourceName;
 	}
 
-	public void setImmediateSourcePreferredName(final String immediateSourcePreferredName) {
-		this.immediateSourcePreferredName = immediateSourcePreferredName;
+	public void setImmediateSourceName(final String immediateSourceName) {
+		this.immediateSourceName = immediateSourceName;
 	}
 
 	public String getFemaleParentGID() {
