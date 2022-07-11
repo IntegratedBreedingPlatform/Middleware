@@ -70,8 +70,8 @@ final class SearchLotDaoQuery {
 	public static String getSelectBaseQuery(final LotsSearchDto lotsSearchDto) {
 		String selectExpression = SELECT_EXPRESION;
 		String baseQuery = BASE_QUERY;
-		if (!CollectionUtils.isEmpty(lotsSearchDto.getAttributeFilters())) {
-			final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributeFilters();
+		if (!CollectionUtils.isEmpty(lotsSearchDto.getAttributes())) {
+			final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributes();
 			for (final Integer attributeVariableId : attributeFilters.keySet()) {
 				final String alias = formatDynamicAttributeAlias(attributeVariableId);
 				selectExpression += String.format(", %s.aval AS %s", alias, alias);
@@ -87,8 +87,8 @@ final class SearchLotDaoQuery {
 
 	public static String getCountBaseQuery(final LotsSearchDto lotsSearchDto) {
 		String baseQuery = BASE_QUERY;
-		if (!CollectionUtils.isEmpty(lotsSearchDto.getAttributeFilters())) {
-			final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributeFilters();
+		if (!CollectionUtils.isEmpty(lotsSearchDto.getAttributes())) {
+			final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributes();
 			for (final Integer attributeVariableId : attributeFilters.keySet()) {
 				final String alias = formatDynamicAttributeAlias(attributeVariableId);
 				baseQuery += formatLotAttributeJoin(alias, attributeVariableId);
@@ -199,8 +199,8 @@ final class SearchLotDaoQuery {
 				paramBuilder.setParameterList("germplasmGuids", lotsSearchDto.getGermplasmUUIDs());
 			}
 
-			if (!CollectionUtils.isEmpty(lotsSearchDto.getAttributeFilters())) {
-				final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributeFilters();
+			if (!CollectionUtils.isEmpty(lotsSearchDto.getAttributes())) {
+				final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributes();
 				attributeFilters.forEach((variableId, value) -> {
 					if (value != null || !StringUtils.isEmpty((String) value)) {
 						final String alias = formatDynamicAttributeAlias(variableId);
