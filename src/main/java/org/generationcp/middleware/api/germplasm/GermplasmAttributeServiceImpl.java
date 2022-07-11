@@ -62,7 +62,7 @@ public class GermplasmAttributeServiceImpl implements GermplasmAttributeService 
 
 	@Override
 	public List<Variable> getGermplasmAttributeVariables(final List<Integer> gids, final String programUUID) {
-		return this.daoFactory.getGermplasmDao().getGermplasmAttributeVariables(gids, programUUID);
+		return this.daoFactory.getAttributeDAO().getGermplasmAttributeVariables(gids, programUUID);
 	}
 
 	@Override

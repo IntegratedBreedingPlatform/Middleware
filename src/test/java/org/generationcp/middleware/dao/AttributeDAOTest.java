@@ -5,10 +5,13 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
+import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearchRequest;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.AttributeExternalReference;
@@ -19,7 +22,6 @@ import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
@@ -28,6 +30,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AttributeDAOTest extends IntegrationTestBase {
 
@@ -62,7 +66,7 @@ public class AttributeDAOTest extends IntegrationTestBase {
 			this.setupTestData();
 		}
 
-		this.pageable = new PageRequest(0,10);
+		this.pageable = new PageRequest(0, 10);
 	}
 
 	private void setupTestData() {
@@ -149,7 +153,8 @@ public class AttributeDAOTest extends IntegrationTestBase {
 	public void testGetAttributesByGUIDAndAttributeIds() {
 		final List<AttributeDTO> attributes = this.daoFactory.getAttributeDAO()
 			.getAttributesByGUIDAndAttributeIds(
-				String.valueOf(this.germplasmList.get(0).getGermplasmUUID()), Lists.newArrayList(String.valueOf(this.attribute1.getTypeId())),
+				String.valueOf(this.germplasmList.get(0).getGermplasmUUID()),
+				Lists.newArrayList(String.valueOf(this.attribute1.getTypeId())),
 				null);
 		Assert.assertNotNull(attributes);
 		Assert.assertEquals(1, attributes.size());
@@ -275,6 +280,24 @@ public class AttributeDAOTest extends IntegrationTestBase {
 
 		this.daoFactory.getAttributeDAO().saveOrUpdate(attribute);
 		return attribute;
+	}
+
+	@Test
+	public void testGetGermplasmAttributeVariables() {
+		final Germplasm germplasm = this.germplasmList.get(0);
+		this.saveAttribute(germplasm, NOTE_ATTRIBUTE, RandomStringUtils.randomAlphabetic(100));
+
+		final GermplasmSearchRequest request = new GermplasmSearchRequest();
+		request.setGermplasmDbIds(Lists.newArrayList(germplasm.getGermplasmUUID()));
+		final List<GermplasmDTO> result = this.daoFactory.getGermplasmDao().getGermplasmDTOList(request, null);
+
+		final Set<String> gids = result.stream().map(GermplasmDTO::getGid).collect(Collectors.toSet());
+		final List<Integer> gidsList = gids.stream().map(s -> Integer.valueOf(s)).collect(Collectors.toList());
+		final List<Variable> variables = this.daoFactory.getAttributeDAO().getGermplasmAttributeVariables(gidsList, null);
+		Assert.assertEquals(1, variables.size());
+		Assert.assertTrue(variables.stream().allMatch(cVTerm -> cVTerm.getName().equalsIgnoreCase(NOTE_ATTRIBUTE.toUpperCase())));
+		Assert.assertEquals(NOTE_ATTRIBUTE, variables.get(0).getName());
+		Assert.assertEquals("NOTES", variables.get(0).getDefinition());
 	}
 
 }

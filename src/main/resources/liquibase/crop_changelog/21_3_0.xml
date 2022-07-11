@@ -3,8 +3,21 @@
 				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	<changeSet author="mderamos" id="v21.3.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="file_metadata" columnName="lotid"/>
+			</not>
+		</preConditions>
+		<comment>link file_metadata to ims_lot</comment>
+		<addColumn tableName="file_metadata">
+			<column name="lotid" type="int">
+				<constraints nullable="true" foreignKeyName="fk_file_metadata_lotid" references="ims_lot(lotid)"/>
+			</column>
+		</addColumn>
+	</changeSet>
 
-	<changeSet author="lkovacic" id="v21.3.0-1">
+	<changeSet author="lkovacic" id="v21.3.0-2">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(1) from crop_parameter where `key` = 'default-brapi-sync-source'
