@@ -115,7 +115,7 @@ public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 		return attributesMap;
 	}
 
-	public List<LotAttribute> getLotAttributeValuesIdList(final List<Integer> lotIdList) {
+	public List<LotAttribute> getLotAttributeByIds(final List<Integer> lotIdList) {
 		List<LotAttribute> attributes = new ArrayList<>();
 		if (lotIdList != null && !lotIdList.isEmpty()) {
 			try {

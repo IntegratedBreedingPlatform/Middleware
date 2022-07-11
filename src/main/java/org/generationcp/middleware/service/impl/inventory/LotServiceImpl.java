@@ -187,7 +187,7 @@ public class LotServiceImpl implements LotService {
 			});
 
 			final List<LotAttribute> attributes =
-				this.daoFactory.getLotAttributeDAO().getLotAttributeValuesIdList(
+				this.daoFactory.getLotAttributeDAO().getLotAttributeByIds(
 					lots.stream().map(a -> a.getId()).collect(Collectors.toList()));
 			final Map<String, Variable> attributeVariablesNameMap = this.getAttributesMap(programUUID, attributeKeys);
 			final Map<Integer, List<LotAttribute>> attributesMap =
