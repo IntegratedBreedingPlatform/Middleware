@@ -163,7 +163,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		searchDto.setLotIds(Collections.singletonList(this.lot.getId()));
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 
-		this.lotService.updateLots(extendedLotDtos, lotUpdateRequestDto);
+		this.lotService.updateLots(extendedLotDtos, lotUpdateRequestDto, "");
 		assertThat(this.lot.getComments(), hasToString("Test1"));
 	}
 
@@ -182,7 +182,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		searchDto.setLotIds(Collections.singletonList(this.lot.getId()));
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 
-		this.lotService.updateLots(extendedLotDtos, lotUpdateRequestDto);
+		this.lotService.updateLots(extendedLotDtos, lotUpdateRequestDto, "");
 		assertThat(this.lot.getComments(), hasToString("Test2"));
 		assertThat(this.lot.getScaleId(), equalTo(8267));
 	}
@@ -211,7 +211,7 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final List<ExtendedLotDto> extendedLotDtos = this.lotService.searchLots(searchDto, null);
 
-		this.lotService.updateLots(extendedLotDtos, lotUpdateRequestDto);
+		this.lotService.updateLots(extendedLotDtos, lotUpdateRequestDto, "");
 		assertThat(this.lot.getComments(), hasToString("Test3"));
 		assertThat(this.lot.getScaleId(), equalTo(8267));
 		assertThat(this.lot.getLotUuId(), equalTo(newLotUID));
