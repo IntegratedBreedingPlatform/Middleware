@@ -24,31 +24,6 @@ import java.util.List;
 public interface WorkbenchDataManager {
 
 	/**
-	 * Gets the tool with the given name.
-	 *
-	 * @param toolName - the tool name to match
-	 * @return the tool with the given name
-	 */
-	Tool getToolWithName(String toolName);
-
-	/**
-	 * Get the list of all installed central crop databases.
-	 *
-	 * @return the installed central crops
-	 */
-	List<CropType> getInstalledCropDatabses();
-
-	List<CropType> getAvailableCropsForUser(int workbenchUserId);
-
-	/**
-	 * Get the crop type corresponding to the given name.
-	 *
-	 * @param cropName - the crop name to match
-	 * @return the CropType retrieved
-	 */
-	CropType getCropTypeByName(String cropName);
-
-	/**
 	 * Close the sessionProvider
 	 */
 	void close();

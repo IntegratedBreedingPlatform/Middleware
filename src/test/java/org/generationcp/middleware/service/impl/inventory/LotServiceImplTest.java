@@ -1,5 +1,4 @@
-
-package org.generationcp.middleware.service;
+package org.generationcp.middleware.service.impl.inventory;
 
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -7,19 +6,19 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.MockitoAnnotations;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.when;
+public class LotServiceImplTest {
 
-@RunWith(MockitoJUnitRunner.class)
-public class InventoryServiceImplTest {
+	@InjectMocks
+	private LotServiceImpl lotService;
 
 	@Mock
 	private DaoFactory daoFactory;
@@ -27,12 +26,13 @@ public class InventoryServiceImplTest {
 	@Mock
 	private LotDAO lotDAO;
 
-	@InjectMocks
-	private final InventoryServiceImpl inventoryServiceImpl = new InventoryServiceImpl();
-
 	@Before
 	public void setup() {
-	 	when(this.daoFactory.getLotDao()).thenReturn(this.lotDAO);
+		MockitoAnnotations.openMocks(this);
+
+		Mockito.when(this.daoFactory.getLotDao()).thenReturn(this.lotDAO);
+
+		ReflectionTestUtils.setField(this.lotService, "daoFactory", this.daoFactory);
 	}
 
 	@Test
@@ -40,7 +40,7 @@ public class InventoryServiceImplTest {
 		final String breederIdentifier = "TR";
 
 		Mockito.doReturn(null).when(this.lotDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
-		final Integer currentNotificationNumber = this.inventoryServiceImpl.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
+		final Integer currentNotificationNumber = this.lotService.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
 		Assert.assertEquals(0, currentNotificationNumber.intValue());
 	}
 
@@ -48,7 +48,7 @@ public class InventoryServiceImplTest {
 	public void testGetCurrentNotificationNumber_EmptyInventoryIds() throws MiddlewareException {
 		final String breederIdentifier = "TR";
 		Mockito.doReturn(new ArrayList<String>()).when(this.lotDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
-		final Integer currentNotificationNumber = this.inventoryServiceImpl.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
+		final Integer currentNotificationNumber = this.lotService.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
 		Assert.assertEquals(0, currentNotificationNumber.intValue());
 	}
 
@@ -64,7 +64,7 @@ public class InventoryServiceImplTest {
 
 		final String breederIdentifier = "PRE";
 		Mockito.doReturn(inventoryIDs).when(this.lotDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
-		final Integer currentNotationNumber = this.inventoryServiceImpl.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
+		final Integer currentNotationNumber = this.lotService.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
 		Assert.assertEquals(35, currentNotationNumber.intValue());
 
 	}
@@ -81,7 +81,7 @@ public class InventoryServiceImplTest {
 
 		final String breederIdentifier = "PRE";
 		Mockito.doReturn(inventoryIDs).when(this.lotDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
-		final Integer currentNotationNumber = this.inventoryServiceImpl.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
+		final Integer currentNotationNumber = this.lotService.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
 		Assert.assertEquals(36, currentNotationNumber.intValue());
 
 	}
@@ -93,11 +93,10 @@ public class InventoryServiceImplTest {
 
 		final String breederIdentifier = "PRE";
 		Mockito.doReturn(inventoryIDs).when(this.lotDAO).getInventoryIDsWithBreederIdentifier(breederIdentifier);
-		final Integer currentNotationNumber = this.inventoryServiceImpl.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
+		final Integer currentNotationNumber = this.lotService.getCurrentNotationNumberForBreederIdentifier(breederIdentifier);
 		Assert.assertEquals("0 must be returned because PRE is not found in DUMMY1-1", 0, currentNotationNumber.intValue());
 
 	}
-
 
 
 }

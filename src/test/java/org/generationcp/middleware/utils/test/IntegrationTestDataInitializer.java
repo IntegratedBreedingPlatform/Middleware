@@ -2,6 +2,8 @@ package org.generationcp.middleware.utils.test;
 
 import liquibase.util.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.crop.CropService;
+import org.generationcp.middleware.api.crop.CropServiceImpl;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.SampleDao;
@@ -29,8 +31,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
-import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.pojos.GermplasmStudySourceType;
@@ -91,7 +91,7 @@ public class IntegrationTestDataInitializer {
 	private final WorkbenchDaoFactory workbenchDaoFactory;
 	private final DaoFactory daoFactory;
 	private final UserService userService;
-	private final WorkbenchDataManager workbenchDataManager;
+	private final CropService cropService;
 
 	public IntegrationTestDataInitializer(final HibernateSessionProvider hibernateSessionProvider,
 		final HibernateSessionProvider workbenchSessionProvider) {
@@ -110,7 +110,7 @@ public class IntegrationTestDataInitializer {
 		this.sampleDao = this.daoFactory.getSampleDao();
 		this.sampleListDao = this.daoFactory.getSampleListDao();
 		this.projectPropertyDao = this.daoFactory.getProjectPropertyDAO();
-		this.workbenchDataManager = new WorkbenchDataManagerImpl(workbenchSessionProvider);
+		this.cropService = new CropServiceImpl(workbenchSessionProvider);
 		this.userService = new UserServiceImpl(workbenchSessionProvider);
 		this.studyTypeDAO = new StudyTypeDAO();
 		this.studyTypeDAO.setSession(hibernateSessionProvider.getSession());
@@ -412,7 +412,7 @@ public class IntegrationTestDataInitializer {
 		project.setUserId(1);
 		project.setProjectName("Test Project " + programUUID);
 		project.setStartDate(new Date(System.currentTimeMillis()));
-		project.setCropType(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
+		project.setCropType(this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
 		project.setLastOpenDate(new Date(System.currentTimeMillis()));
 		project.setUniqueID(programUUID);
 
@@ -460,7 +460,7 @@ public class IntegrationTestDataInitializer {
 		workbenchUser.setCloseDate(20150101);
 		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, role)));
 		final List<CropType> crops = new ArrayList<>();
-		crops.add(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
+		crops.add(this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
 		this.userService.addUser(workbenchUser);
 
 		return workbenchUser;

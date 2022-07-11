@@ -29,6 +29,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -89,7 +90,7 @@ public class LotAttributeServiceImplIntegrationTest extends IntegrationTestBase 
 	}
 
 	@Test
-	public void testUpdateGermplasmAttribute() {
+	public void testUpdateLotAttribute() {
 		final Integer createAttributeId = this.createAttribute(this.lot.getId(), TEST_ATTRIBUTE);
 		LotAttribute attribute = this.daoFactory.getLotAttributeDAO().getById(createAttributeId);
 		Assert.assertEquals(this.lot.getId(), attribute.getLotId());
@@ -106,7 +107,7 @@ public class LotAttributeServiceImplIntegrationTest extends IntegrationTestBase 
 	}
 
 	@Test
-	public void testDeleteGermplasmAttribute() {
+	public void testDeleteLotAttribute() {
 		final Integer createAttributeId = this.createAttribute(this.lot.getId(), TEST_ATTRIBUTE);
 		this.lotAttributeService.deleteLotAttribute(createAttributeId);
 		final LotAttribute attribute = this.daoFactory.getLotAttributeDAO().getById(createAttributeId);
@@ -114,7 +115,7 @@ public class LotAttributeServiceImplIntegrationTest extends IntegrationTestBase 
 	}
 
 	@Test
-	public void testGetGermplasmAttributeDtos() {
+	public void testGetLotAttributeDtos() {
 		final Integer createdAttributeId = this.createAttribute(this.lot.getId(), TEST_ATTRIBUTE);
 		final List<AttributeDto> lotAttributeDtos = this.lotAttributeService.getLotAttributeDtos(
 			this.lot.getId(), null);
@@ -127,6 +128,20 @@ public class LotAttributeServiceImplIntegrationTest extends IntegrationTestBase 
 		Assert.assertEquals(TEST_ATTRIBUTE, germplasmAttributeDto.getVariableName());
 		Assert.assertEquals(ATTRIBUTE_DATE, germplasmAttributeDto.getDate());
 		Assert.assertEquals(LOCATION_ID, germplasmAttributeDto.getLocationId());
+	}
+
+	@Test
+	public void testGetLotAttributeVariables() {
+		final Integer createAttributeId = this.createAttribute(this.lot.getId(), TEST_ATTRIBUTE);
+		final LotAttribute attribute = this.daoFactory.getLotAttributeDAO().getById(createAttributeId);
+
+		final List<Variable> variables =
+			this.lotAttributeService.getLotAttributeVariables(Arrays.asList(this.lot.getId()), RandomStringUtils.randomAlphanumeric(10));
+
+		Assert.assertEquals(1, variables.size());
+		Assert.assertTrue(variables.stream().allMatch(cVTerm -> cVTerm.getName().equalsIgnoreCase(TEST_ATTRIBUTE.toUpperCase())));
+		Assert.assertEquals(TEST_ATTRIBUTE, variables.get(0).getName());
+		Assert.assertEquals(TEST_ATTRIBUTE, variables.get(0).getDefinition());
 	}
 
 	private Integer createAttribute(final Integer lotId, final String variableName) {
@@ -142,7 +157,7 @@ public class LotAttributeServiceImplIntegrationTest extends IntegrationTestBase 
 	private Variable createTestVariable() {
 		// Create traitVariable
 		final CVTerm cvTermVariable = this.daoFactory.getCvTermDao()
-			.save(TEST_ATTRIBUTE, RandomStringUtils.randomAlphanumeric(10), CvId.VARIABLES);
+			.save(TEST_ATTRIBUTE, TEST_ATTRIBUTE, CvId.VARIABLES);
 		final CVTerm property = this.daoFactory.getCvTermDao().save(RandomStringUtils.randomAlphanumeric(10), "", CvId.PROPERTIES);
 		final CVTerm scale = this.daoFactory.getCvTermDao().save(RandomStringUtils.randomAlphanumeric(10), "", CvId.SCALES);
 		this.daoFactory.getCvTermRelationshipDao().save(scale.getCvTermId(), TermId.HAS_TYPE.getId(), DataType.NUMERIC_VARIABLE.getId());

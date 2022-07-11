@@ -25,6 +25,7 @@ public class VariableFilter {
 	private final List<String> names = new ArrayList<>();
 	private final List<Integer> datasetIds = new ArrayList<>();
 	private final List<String> germplasmUUIDs = new ArrayList<>();
+	private final List<Integer> lotIds = new ArrayList<>();
 
 	public String getProgramUuid() {
 		return this.programUuid;
@@ -136,6 +137,14 @@ public class VariableFilter {
 
 	public void addGermplasmUUID(final String germplasmUUIDs) {
 		this.germplasmUUIDs.add(germplasmUUIDs);
+	}
+
+	public List<Integer> getLotIds() {
+		return this.lotIds;
+	}
+
+	public void addLotId(final Integer lotId) {
+		this.lotIds.add(lotId);
 	}
 
 	@Override

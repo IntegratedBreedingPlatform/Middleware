@@ -47,26 +47,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Tool getToolWithName(final String toolId) {
-		return this.workbenchDaoFactory.getToolDAO().getByToolName(toolId);
-	}
-
-	@Override
-	public List<CropType> getInstalledCropDatabses() {
-		return this.workbenchDaoFactory.getCropTypeDAO().getAll();
-	}
-
-	@Override
-	public List<CropType> getAvailableCropsForUser(final int workbenchUserId) {
-		return this.workbenchDaoFactory.getCropTypeDAO().getAvailableCropsForUser(workbenchUserId);
-	}
-
-	@Override
-	public CropType getCropTypeByName(final String cropName) {
-		return this.workbenchDaoFactory.getCropTypeDAO().getByName(cropName);
-	}
-
-	@Override
 	public void close() {
 		if (this.sessionProvider != null) {
 			this.sessionProvider.close();

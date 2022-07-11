@@ -4,8 +4,8 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.program.ProgramService;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -30,7 +30,7 @@ import java.util.Set;
 public class ProjectDAOTest extends IntegrationTestBase {
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -107,7 +107,7 @@ public class ProjectDAOTest extends IntegrationTestBase {
 		}
 
 		if (this.cropType == null) {
-			this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.name());
+			this.cropType = this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.name());
 		}
 
 		if (this.project1 == null) {

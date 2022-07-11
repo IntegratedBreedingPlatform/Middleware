@@ -1,9 +1,11 @@
 package org.generationcp.middleware.service.api.inventory;
 
-import org.generationcp.middleware.domain.shared.AttributeRequestDto;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.shared.AttributeDto;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 
 import java.util.List;
+import java.util.Map;
 
 public interface LotAttributeService {
 
@@ -15,4 +17,7 @@ public interface LotAttributeService {
 
 	void deleteLotAttribute(Integer attributeId);
 
+	List<Variable> getLotAttributeVariables(List<Integer> lotIds, String programUUID);
+
+	Map<Integer, Map<Integer, String>> getAttributesByLotIdsMap(List<Integer> lotIds);
 }

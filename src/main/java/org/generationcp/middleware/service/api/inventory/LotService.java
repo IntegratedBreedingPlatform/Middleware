@@ -42,4 +42,6 @@ public interface LotService {
 
 	boolean isLocationUsedInLot(Integer locationId);
 
+	Integer getCurrentNotationNumberForBreederIdentifier(String breederIdentifier);
+
 }

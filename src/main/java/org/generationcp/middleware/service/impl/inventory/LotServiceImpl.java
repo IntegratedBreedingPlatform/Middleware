@@ -58,6 +58,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
@@ -457,6 +459,35 @@ public class LotServiceImpl implements LotService {
 					entry.setLotUuId(uid);
 				}
 			});
+	}
+
+	@Override
+	public Integer getCurrentNotationNumberForBreederIdentifier(final String breederIdentifier) {
+		final List<String> inventoryIDs = this.daoFactory.getLotDao().getInventoryIDsWithBreederIdentifier(breederIdentifier);
+
+		if (CollectionUtils.isEmpty(inventoryIDs)) {
+			return 0;
+		}
+
+		final String expression = "(?i)"+ breederIdentifier + "([0-9]+)";
+		final Pattern pattern = Pattern.compile(expression);
+
+		return this.findCurrentMaxNotationNumberInInventoryIDs(inventoryIDs, pattern);
+	}
+
+	private Integer findCurrentMaxNotationNumberInInventoryIDs(final List<String> inventoryIDs, final Pattern pattern) {
+		Integer currentMax = 0;
+
+		for (final String inventoryID : inventoryIDs) {
+			final Matcher matcher = pattern.matcher(inventoryID);
+			if (matcher.find()) {
+				// Matcher.group(1) is needed because group(0) includes the identifier in the match
+				// Matcher.group(1) only captures the value inside the parenthesis
+				currentMax = Math.max(currentMax, Integer.valueOf(matcher.group(1)));
+			}
+		}
+
+		return currentMax;
 	}
 
 	public void setTransactionService(final TransactionService transactionService) {
