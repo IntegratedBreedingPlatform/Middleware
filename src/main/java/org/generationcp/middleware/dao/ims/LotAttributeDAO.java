@@ -13,6 +13,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -74,6 +75,7 @@ public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 		}
 	}
 
+
 	/**
 	 * Given a list of Lots return the Variables related with type INVENTORY_ATTRIBUTE.
 	 * The programUUID is used to return the expected range and alias of the program if it exists.
@@ -111,6 +113,23 @@ public class LotAttributeDAO extends GenericAttributeDAO<LotAttribute> {
 			throw new MiddlewareQueryException("Error with getLotAttributeVariables(lotIds=" + lotIds + "): " + e.getMessage(), e);
 		}
 		return attributesMap;
+	}
+
+	public List<LotAttribute> getLotAttributeByIds(final List<Integer> lotIdList) {
+		List<LotAttribute> attributes = new ArrayList<>();
+		if (lotIdList != null && !lotIdList.isEmpty()) {
+			try {
+				final String sql = "SELECT {a.*}" + " FROM ims_lot_attribute a" + " WHERE a.lotId in (:lotIdList)";
+				final SQLQuery query = this.getSession().createSQLQuery(sql);
+				query.addEntity("a", LotAttribute.class);
+				query.setParameterList("lotIdList", lotIdList);
+				attributes = query.list();
+			} catch (final HibernateException e) {
+				throw new MiddlewareQueryException(
+					"Error with getLotAttributeValuesIdList(lotIdList=" + lotIdList + "): " + e.getMessage(), e);
+			}
+		}
+		return attributes;
 	}
 
 	@Override
