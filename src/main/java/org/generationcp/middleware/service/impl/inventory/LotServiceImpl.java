@@ -235,24 +235,26 @@ public class LotServiceImpl implements LotService {
 		if (attributeVariables.containsKey(variableNameOrAlias) && StringUtils.isNotEmpty(value)) {
 			final Variable variable = attributeVariables.get(variableNameOrAlias);
 			final List<LotAttribute> lotAttributes = attributesMap.getOrDefault(lot.getId(), new ArrayList<>());
-			final List<LotAttribute> attributesByType =
+			final List<LotAttribute> existingLotAttributesForVariable =
 				lotAttributes.stream().filter(n -> n.getTypeId().equals(variable.getId())).collect(Collectors.toList());
 
 			// Check if there are multiple attributes with same type
-			if (attributesByType.size() > 1) {
-				conflictErrors.put("germplasm.update.duplicate.attributes", new String[] {
+			if (existingLotAttributesForVariable.size() > 1) {
+				conflictErrors.put("lot.update.duplicate.attributes", new String[] {
 					variableNameOrAlias, String.valueOf(lot.getId())});
 			} else {
 				final boolean isValidValue = VariableValueUtil.isValidAttributeValue(variable, value);
 				if (isValidValue) {
 					final Integer cValueId = VariableValueUtil.resolveCategoricalValueId(variable, value);
-					if (attributesByType.size() == 1) {
-						final LotAttribute attribute = attributesByType.get(0);
+					if (existingLotAttributesForVariable.size() == 1) {
+						// if an attribute already exists for the variable, update the details from data input
+						final LotAttribute attribute = existingLotAttributesForVariable.get(0);
 						attribute.setLocationId(lot.getLocationId());
 						attribute.setAval(value);
 						attribute.setcValueId(cValueId);
 						this.daoFactory.getLotAttributeDAO().update(attribute);
 					} else {
+						// create new attribute for the variable and data input
 						final LotAttribute attribute =
 							new LotAttribute(null, lot.getId(), variable.getId(), value, cValueId,
 								lot.getLocationId(),
