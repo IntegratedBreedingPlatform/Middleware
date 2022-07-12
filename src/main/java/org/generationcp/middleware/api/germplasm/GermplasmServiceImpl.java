@@ -7,6 +7,7 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.crop.CropService;
+import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -1046,6 +1047,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public boolean isLocationUsedInGermplasm(final Integer locationId) {
 		return this.daoFactory.getGermplasmDao().isLocationUsedInGermplasm(locationId);
+	}
+
+	@Override
+	public Map<Integer, Pair<String, String>> getDerivativeParentsMapByGids(final Set<Integer> gids) {
+		return this.daoFactory.getGermplasmDao().getDerivativeParentsMapByGids(gids);
 	}
 
 	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Germplasm targetGermplasm) {

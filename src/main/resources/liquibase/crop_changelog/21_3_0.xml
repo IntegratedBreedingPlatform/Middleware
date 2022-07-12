@@ -3,6 +3,7 @@
 				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
 	<changeSet author="mderamos" id="v21.3.0-1">
 		<preConditions onFail="MARK_RAN">
 			<not>
@@ -17,7 +18,822 @@
 		</addColumn>
 	</changeSet>
 
+	<!-- Backup changesets -->
 	<changeSet author="lkovacic" id="v21.3.0-2">
+		<preConditions onFail="MARK_RAN">
+		  <not>
+			<tableExists tableName="list_data_view_bkp"/>
+		  </not>
+		</preConditions>
+		<comment>Create backup for 'list_data_view'</comment>
+		<sql dbms="mysql" splitStatements="true">
+			CREATE TABLE list_data_view_bkp (
+				id         int auto_increment
+					primary key,
+				listid     int not null,
+				static_id  int null,
+				name_fldno int null,
+				cvterm_id  int null,
+				type_id    int null
+			);
+
+			INSERT INTO list_data_view_bkp
+			SELECT * FROM list_data_view;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-3">
+		<preConditions onFail="MARK_RAN">
+		  <not>
+			<tableExists tableName="projectprop_bkp"/>
+		  </not>
+		</preConditions>
+		<comment>Create backup for 'projectprop' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table projectprop_bkp (
+				projectprop_id int auto_increment
+					primary key,
+				project_id     int           not null,
+				type_id        int           not null,
+				value          varchar(255)  null,
+				`rank`         int default 0 not null,
+				variable_id    int           not null,
+				alias          varchar(255)  null
+			);
+
+			INSERT INTO projectprop_bkp
+			SELECT * FROM projectprop;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-4">
+		<preConditions onFail="MARK_RAN">
+		  <not>
+			<tableExists tableName="stockprop_bkp"/>
+		  </not>
+		</preConditions>
+		<comment>Create backup for 'stockprop' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table stockprop_bkp (
+				stockprop_id int auto_increment
+					primary key,
+				stock_id     int          not null,
+				type_id      int          not null,
+				value        varchar(255) null
+			);
+
+			INSERT INTO stockprop_bkp
+			SELECT * FROM stockprop;
+		</sql>
+	</changeSet>
+	<!-- End of backup changesets -->
+
+	<changeSet author="lkovacic" id="v21.3.0-5">
+		<preConditions onFail="MARK_RAN">
+		  <not>
+			<tableExists tableName="entry_detail_migration_output"/>
+		  </not>
+		</preConditions>
+		<comment>Create 'entry_detail_migration_output' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table entry_detail_migration_output	(
+				cvterm_id int not null,
+				variable_type_count int null
+			);
+		</sql>
+	</changeSet>
+
+	<!-- Drop indexes changesets -->
+	<changeSet author="lkovacic" id="v21.3.0-6">
+		<preConditions onFail="MARK_RAN">
+			<indexExists tableName="stock" indexName="stock_idx1"/>
+		</preConditions>
+		<comment>Drop unique index 'stock_idx1' in 'stock' table</comment>
+		<dropIndex tableName="stock" indexName="stock_idx1"/>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v21.3.0-7">
+		<preConditions onFail="MARK_RAN">
+			<foreignKeyConstraintExists foreignKeyName="stock_fk3"></foreignKeyConstraintExists>
+		</preConditions>
+		<comment>Drop stock_fk3 on stock table. column in FK will be bckp and removed</comment>
+		<dropForeignKeyConstraint baseTableName="stock"
+								  constraintName="stock_fk3"></dropForeignKeyConstraint>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-8">
+		<preConditions onFail="MARK_RAN">
+			<indexExists tableName="stock" indexName="stock_idx5"/>
+		</preConditions>
+		<comment>Drop unique index 'stock_idx5' in 'stock' table</comment>
+		<dropIndex tableName="stock" indexName="stock_idx5"/>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.3.0-9">
+		<preConditions onFail="MARK_RAN">
+			<indexExists tableName="listdata" indexName="listdata_idx02"/>
+		</preConditions>
+		<comment>Drop the listdata_idx02 unique index</comment>
+		<dropIndex tableName="listdata" indexName="listdata_idx02"/>
+	</changeSet>
+	<!-- End of drop indexes changesets -->
+
+	<!-- Delete stockprop data changesets -->
+	<changeSet author="lkovacic" id="v21.3.0-10">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1) > 0 FROM stockprop WHERE type_id IN (8330, 8378, 8340);
+			</sqlCheck>
+		</preConditions>
+		<comment>Delete GROUPGID, SOURCE, GROUP values in 'stockprop' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+ 			DELETE FROM stockprop WHERE type_id IN (8330, 8378, 8340);
+		</sql>
+	</changeSet>
+
+	<changeSet author="clarysabel" id="v21.3.0-11">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1) > 0
+				FROM  	 stockprop sp
+							 INNER JOIN stock s ON s.stock_id = sp.stock_id
+							 INNER JOIN project p ON p.parent_project_id = s.project_id AND p.dataset_type_id = 4
+							 LEFT JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = 1804 AND sp.type_id = pp.variable_id
+				WHERE pp.projectprop_id IS NULL
+			</sqlCheck>
+		</preConditions>
+		<comment>Delete rows in stockprop for data with no corresponding variable in projectprop</comment>
+		<sql dbms="mysql" splitStatements="true">
+ 			DELETE
+			FROM stockprop
+			WHERE stock_id IN (
+				SELECT inn.stock_id FROM (
+					SELECT sp.stock_id
+					FROM stockprop sp
+							 INNER JOIN stock s ON s.stock_id = sp.stock_id
+							 INNER JOIN project p on p.parent_project_id = s.project_id AND p.dataset_type_id = 4
+							 LEFT JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = 1804 and sp.type_id = pp.variable_id
+					WHERE pp.projectprop_id is null) AS inn)
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.3.0-12">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                select COUNT(*) from cvterm where cvterm_id = 8378;
+            </sqlCheck>
+        </preConditions>
+        <comment>Rename 'SOURCE' as 'IMMEDIATE_SOURCE_NAME'</comment>
+        <sql dbms="mysql" splitStatements="true">
+             update cvterm set name = 'IMMEDIATE_SOURCE_NAME' where cvterm_id = 8378;
+             update projectprop set alias = 'IMMEDIATE_SOURCE_NAME' where variable_id = 8378 and (alias = 'SOURCE' || type_id = 1804);
+             update variable_overrides set alias = null where cvterm_id = 8378;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-13">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                select COUNT(*) from cvterm where cvterm_id = 8340;
+            </sqlCheck>
+        </preConditions>
+        <comment>Rename 'GROUP' to 'GROUP_SOURCE_NAME'</comment>
+        <sql dbms="mysql" splitStatements="true">
+             update cvterm set name = 'GROUP_SOURCE_NAME' where cvterm_id = 8340;
+			 update projectprop set alias = 'GROUP_SOURCE_NAME' where variable_id = 8340 and (alias = 'GROUP' || type_id = 1804);
+			 update variable_overrides set alias = null where cvterm_id = 8340;
+        </sql>
+	</changeSet>
+	<!-- End of delete stockprop data -->
+
+	<!-- CROSS related changesets -->
+	<changeSet author="lkovacic" id="v21.3.0-14">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="stock" columnName="cross_value"/>
+			</not>
+		</preConditions>
+		<comment>Add 'cross_value' column to 'stock' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE STOCK ADD `cross_value` VARCHAR(5000) DEFAULT '-' NOT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-15">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="stock" columnName="cross_value"/>
+				<sqlCheck expectedResult="1">
+					SELECT count(1) > 0 FROM stockprop WHERE type_id = 8377;
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Migrate cross values from 'stockprop' table to 'cross_value' column in 'stock' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE stock s INNER JOIN stockprop sp ON s.stock_id = sp.stock_id
+			SET s.cross_value = sp.value
+			WHERE sp.type_id = 8377 AND sp.value IS NOT NULL AND sp.value NOT IN ('', '-') ;
+
+			DELETE FROM stockprop WHERE type_id = 8377;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-16">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="project" columnName="generation_level"/>
+			</not>
+		</preConditions>
+		<comment>
+			Add 'generation_level' column: indicates preferred cross expansion (pedigree) level for the entire study
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			# a property to complement (or potentially migrate) the stored pedigree in stock.cross_value
+			alter table project
+				add generation_level int null comment 'cross expansion (pedigree) level';
+		</sql>
+	</changeSet>
+	<!-- End of CROSS related changesets -->
+
+	<!-- ENTRY_NO related changesets -->
+	<changeSet author="cuenyad" id="v21.3.0-17">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8230 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+			</sqlCheck>
+		</preConditions>
+		<comment>Change 'ENTRY_NO' variable type to entry detail</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE cvtermprop SET value = 'Entry Detail' WHERE cvterm_id = 8230 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+
+			INSERT INTO entry_detail_migration_output (cvterm_id) VALUES (8230);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.3.0-18">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(1) > 0 FROM list_data_view WHERE cvterm_id = 8230 and type_id = 1815;
+			</sqlCheck>
+		</preConditions>
+		<comment>Migrate ENTRY_NO as an Entry Detail variable</comment>
+		<sql dbms="mysql" splitStatements="true">
+			<!-- Remove ENTRY_NO as default view -->
+			DELETE FROM list_data_default_view WHERE name = 'ENTRY_NO';
+
+			<!-- Remove ENTRY_NO as static column -->
+			DELETE FROM list_data_view WHERE static_id = 8230;
+
+			<!-- Insert ENTRY_NO variable to list_data_view -->
+			INSERT INTO list_data_view(listid,cvterm_id,type_id)
+			SELECT distinct(ld.listid), 8230, 1815 FROM listnms ld;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.3.0-19">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8230 AND type_id = 1804;
+            </sqlCheck>
+        </preConditions>
+        <comment>Change 'ENTRY_NO' variable type to entry detail in 'projectprop' table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			UPDATE projectprop SET type_id = 1815 WHERE variable_id = 8230 AND type_id = 1804;
+        </sql>
+	</changeSet>
+	<!-- End of ENTRY_NO related changesets-->
+
+	<!-- SEED_SOURCE related changesets-->
+	<changeSet author="cuenyad" id="v21.3.0-20">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8360
+            </sqlCheck>
+        </preConditions>
+        <comment>Replace the SEED_SOURCE variable by ENTRY_SOURCE IN projectprop AND stockprop</comment>
+        <sql dbms="mysql" splitStatements="true">
+			set @ENTRY_SOURCE_ID = (select cvterm_id from cvterm where name ='ENTRY_SOURCE' and cv_id = 1040 and is_obsolete = 0);
+
+			# Replace SEED_SOURCE variable by ENTRY_SOURCE
+			update projectprop set variable_id = @ENTRY_SOURCE_ID , alias = 'ENTRY_SOURCE', type_id = 1815
+			where variable_id = 8360 and type_id = 1804;
+			update projectprop set alias = 'ENTRY_SOURCE' where alias = 'SOURCE' and variable_id = 8360;
+
+			# Update cvterm_id 8360 from (SEED_SOURCE) to ENTRY_SOURCE cvterm_id
+			update stockprop set type_id = @ENTRY_SOURCE_ID where type_id = 8360;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-21">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8360 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Remove 'Germplasm Descriptor' type to SEED_SOURCE
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM cvtermprop WHERE cvterm_id = 8360 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.3.0-22">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8360 AND type_id = 1800;
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Remove SEED_SOURCE variable from cvterm table and from cvterm_relationship table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			delete from cvterm_relationship where subject_id = 8360;
+			delete from cvtermprop where cvterm_id = 8360;
+			delete from variable_overrides where cvterm_id = 8360;
+			delete from cvtermsynonym where cvterm_id = 8360;
+			delete from cvterm where cvterm_id = 8360;
+		</sql>
+	</changeSet>
+	<!-- End of SEED_SOURCE related changesets-->
+
+	<!-- ENTRY_TYPE related changesets-->
+	<changeSet author="lkovacic" id="v21.3.0-23">
+		<preConditions onFail="MARK_RAN">
+				<sqlCheck expectedResult="1">
+					SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8255 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+				</sqlCheck>
+		</preConditions>
+		<comment>Change 'ENTRY_TYPE' variable type to entry detail</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE cvtermprop SET value = 'Entry Detail' WHERE cvterm_id = 8255 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+
+			INSERT INTO entry_detail_migration_output (cvterm_id) VALUES (8255);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-24">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8255 AND type_id = 1804;
+			</sqlCheck>
+		</preConditions>
+		<comment>Change 'ENTRY_TYPE' variable type to entry detail in 'projectprop' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE projectprop SET type_id = 1815 WHERE variable_id = 8255 AND type_id = 1804;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-25">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="stockprop" columnName="cvalue_id"/>
+			</not>
+		</preConditions>
+		<comment>Add column 'cvalue_id' to 'stockprop' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE stockprop ADD cvalue_id INT NULL;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-26">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<columnExists tableName="stockprop" columnName="cvalue_id"/>
+				<sqlCheck expectedResult="0">
+					SELECT count(1) FROM stockprop WHERE cvalue_id IS NOT NULL;
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT COUNT(DISTINCT( sp.type_id )) > 0
+						  FROM stockprop sp
+								   INNER JOIN cvterm_relationship cr ON sp.type_id = cr.subject_id AND cr.type_id = 1220
+								   INNER JOIN cvterm_relationship cr2 ON cr.object_id = cr2.subject_id AND cr2.type_id = 1190;
+				</sqlCheck>
+			</and>
+		</preConditions>
+		<comment>Migrate categorical variable values to 'cvalue_id' column</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE stockprop sp
+			SET cvalue_id = value,
+				value     = (SELECT name
+							 FROM cvterm
+							 WHERE cvterm_id = cvalue_id)
+			WHERE value IN (SELECT cvterm_id
+							FROM cvterm_relationship cr
+									 INNER JOIN cvterm_relationship cr2 ON cr2.subject_id = cr.object_id AND cr2.type_id = 1190
+									 INNER JOIN cvterm c ON c.cvterm_id = cr2.object_id
+							WHERE cr.subject_id = sp.type_id AND cr.type_id = 1220) AND
+					type_id IN (SELECT inn.typeid
+								FROM (SELECT DISTINCT(sp.type_id) AS typeId
+									  FROM stockprop sp
+											   INNER JOIN cvterm_relationship cr ON sp.type_id = cr.subject_id AND cr.type_id = 1220
+											   INNER JOIN cvterm_relationship cr2 ON cr.object_id = cr2.subject_id AND cr2.type_id = 1190) AS inn);
+		</sql>
+	</changeSet>
+	<!-- End of ENTRY_TYPE related changesets -->
+
+	<changeSet author="lkovacic" id="v21.3.0-27">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT COUNT(*) > 0
+				FROM stockprop sp
+					 INNER JOIN cvtermprop cp ON cp.cvterm_id = sp.type_id AND cp.type_id = 1800
+				WHERE cp.value = 'Germplasm Descriptor';
+			</sqlCheck>
+		</preConditions>
+		<comment>Migrate remaining germplasm descriptors to entry details in ontology and 'projectprop' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO entry_detail_migration_output (cvterm_id)
+			SELECT DISTINCT sp.type_id
+								 FROM stockprop sp
+										  INNER JOIN cvtermprop cp
+								 ON cp.cvterm_id = sp.type_id
+									 AND cp.type_id = 1800
+								 WHERE cp.value = 'Germplasm Descriptor';
+
+			UPDATE projectprop
+			SET type_id = 1815
+			WHERE type_id = 1804 AND
+				variable_id IN (SELECT DISTINCT sp.type_id
+								 FROM stockprop sp
+										  INNER JOIN cvtermprop cp
+								 ON cp.cvterm_id = sp.type_id
+									 AND cp.type_id = 1800
+								 WHERE cp.value = 'Germplasm Descriptor');
+
+			UPDATE cvtermprop cp
+				INNER JOIN stockprop sp ON sp.type_id = cp.cvterm_id AND cp.type_id = 1800
+			SET cp.value = 'Entry Detail'
+			WHERE cp.value = 'Germplasm Descriptor';
+		</sql>
+	</changeSet>
+
+	<!-- Identify unknown categorical values changesets -->
+	<changeSet author="lkovacic" id="v21.3.0-28">
+		<preConditions onFail="MARK_RAN">
+		  <not>
+			<tableExists tableName="stockprop_wrong_categorical_value"/>
+		  </not>
+		</preConditions>
+		<comment>Create backup for 'stockprop_wrong_categorical_value' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			create table stockprop_wrong_categorical_value (
+				stockprop_id int primary key,
+				stock_id     int          not null,
+				type_id      int          not null,
+				value        varchar(255) null,
+				cvalue_id    int          null
+			);
+
+			INSERT INTO stockprop_wrong_categorical_value
+			SELECT * FROM stockprop WHERE cvalue_id IS NULL AND type_id IN (SELECT DISTINCT( sp.type_id ) AS typeId
+                                                                FROM stockprop sp
+                                                                         INNER JOIN cvterm_relationship cr
+                                                                ON sp.type_id = cr.subject_id
+                                                                    AND cr.type_id = 1220
+                                                                         INNER JOIN cvterm_relationship cr2
+                                                                ON cr.object_id = cr2.subject_id
+                                                                    AND cr2.type_id = 1190);
+
+			DELETE sp FROM stockprop sp
+				INNER JOIN stockprop_wrong_categorical_value cwcv ON cwcv.stockprop_id = sp.stockprop_id;
+		</sql>
+	</changeSet>
+	<!-- End of identify unknown categorical values changesets -->
+
+	<changeSet author="lkovacic" id="v21.3.0-29">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(1)
+				FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS
+				WHERE TABLE_NAME = 'stockprop'
+				  AND REFERENCED_TABLE_NAME = 'cvterm'
+				  AND CONSTRAINT_NAME = 'stockprop_cvterm_cvterm_id_fk'
+				  AND CONSTRAINT_SCHEMA = DATABASE();
+			</sqlCheck>
+		</preConditions>
+		<comment>Add foreign key 'stockprop_cvterm_cvterm_id_fk' to 'stockprop.cvalue_id'</comment>
+		<sql>
+			ALTER TABLE stockprop
+					ADD CONSTRAINT stockprop_cvterm_cvterm_id_fk FOREIGN KEY (cvalue_id)
+					REFERENCES cvterm (cvterm_id);
+		</sql>
+	</changeSet>
+
+	<!-- ENTRY_CODE related changesets -->
+	<changeSet author="lkovacic" id="v21.3.0-30">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8300 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+			</sqlCheck>
+		</preConditions>
+		<comment>Change 'ENTRY_CODE' variable type to entry detail</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE cvtermprop SET value = 'Entry Detail' WHERE cvterm_id = 8300 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+
+			INSERT INTO entry_detail_migration_output (cvterm_id) VALUES (8300);
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-31">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1) > 0 FROM projectprop WHERE variable_id = 8300 AND type_id = 1804;
+			</sqlCheck>
+		</preConditions>
+		<comment>Change 'ENTRY_CODE' variable type to entry detail in 'projectprop' table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE projectprop SET type_id = 1815 WHERE variable_id = 8300 AND type_id = 1804;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.3.0-32">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(1) > 0 FROM  list_data_details WHERE variable_id = 8300;
+			</sqlCheck>
+		</preConditions>
+		<comment>Migrate ENTRY_CODE from listdata to list_data_details table as entry details variable</comment>
+		<sql dbms="mysql" splitStatements="true">
+			<!-- Remove ENTRY_CODE as default view -->
+			DELETE FROM list_data_default_view WHERE name = 'ENTRY_CODE';
+
+			<!-- Remove ENTRY_CODE as static column -->
+			DELETE FROM list_data_view WHERE static_id = 8300;
+
+			<!-- Migrate ENTRY_CODE from listdata to list_data_details -->
+			INSERT INTO list_data_details(variable_id, lrecid, value, created_by)
+			SELECT 8300, r.lrecid, r.entrycd, ln.listuid FROM listdata r inner join listnms ln on ln.listid = r.listid;
+
+			<!-- Insert ENTRY_CODE variable to list_data_view -->
+			INSERT INTO list_data_view(listid,cvterm_id,type_id)
+			SELECT distinct(ld.listid), 8300, 1815 FROM listnms ld;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-33">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+				SELECT COUNT(1) > 0
+				FROM project p
+						 INNER JOIN projectprop pp ON p.project_id = pp.project_id AND p.dataset_type_id = 4
+						 INNER JOIN stock s ON p.parent_project_id = s.project_id
+						 INNER JOIN stockprop sp ON s.stock_id = sp.stock_id
+				WHERE pp.variable_id = 8300 AND sp.type_id = 8300 AND pp.type_id = 1815;
+            </sqlCheck>
+		</preConditions>
+		<comment>ENTRY_CODE migration as stock property</comment>
+		<sql>
+			<!-- Only migrate the ENTRY_CODE that the user added in the study -->
+			INSERT INTO stockprop(stock_id, type_id, value)
+				SELECT stock_id, 8300, s.value FROM project p
+						 INNER JOIN projectprop pp ON p.project_id = pp.project_id AND p.dataset_type_id = 4
+						 INNER JOIN stock s ON p.parent_project_id = s.project_id
+				WHERE pp.variable_id = 8300 AND s.value IS NOT NULL AND s.value != '' AND pp.type_id = 1815;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-34">
+        <preConditions onFail="MARK_RAN">
+			<columnExists tableName="stock" columnName="value"/>
+		</preConditions>
+		<comment>Rename column 'value' to 'value_bkp' in table 'stock'</comment>
+		<sql>
+			ALTER TABLE stock CHANGE value value_bkp varchar(255) null;
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-35">
+        <preConditions onFail="MARK_RAN">
+			<columnExists tableName="stock" columnName="type_id"/>
+		</preConditions>
+		<comment>Rename column 'type_id' to 'type_id_bkp' in table 'stock' and make it nullable</comment>
+		<sql>
+			ALTER TABLE stock CHANGE type_id type_id_bkp int null;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.3.0-36">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="listdata" columnName="entrycd"/>
+		</preConditions>
+		<comment>Rename column 'entrycd' to 'entrycd_bkp' in table listdata and make it nullable.</comment>
+		<sql dbms="mysql" splitStatements="true">
+		ALTER TABLE listdata
+			CHANGE COLUMN entrycd entrycd_bkp VARCHAR (47) NULL DEFAULT '-';
+		</sql>
+	</changeSet>
+	<!-- End of ENTRY_CODE related changesets -->
+
+	<changeSet author="cuenyad" id="v21.3.0-37">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) > 0 FROM CVTERM WHERE IS_SYSTEM = 0
+					AND CVTERM_ID IN (8377, 8250, 8240, 8330, 8340, 8378, 8201);
+            </sqlCheck>
+        </preConditions>
+        <comment>Mark Germplasm Descriptors as system variables</comment>
+        <sql dbms="mysql" splitStatements="true">
+			 UPDATE CVTERM SET IS_SYSTEM = 1
+			 WHERE CVTERM_ID IN (8377, 8250, 8240, 8330, 8340, 8378, 8201);
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-38">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1) > 0 FROM projectprop WHERE type_id = 1804 AND variable_id NOT IN (8377, 8250, 8240, 8340, 8330, 8201, 8378);
+			</sqlCheck>
+		</preConditions>
+		<comment>Remove crop specific and created by user germplasm descriptors from 'projectprop' table that had no data in stockprop</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM projectprop WHERE type_id = 1804 AND variable_id NOT IN (8377, 8250, 8240, 8340, 8330, 8201, 8378);
+		</sql>
+	</changeSet>
+
+	<!-- GERM_SOURCE related changesets -->
+	<changeSet author="lkovacic" id="v21.3.0-39">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8320 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Remove 'Germplasm Descriptor' type to GERM_SOURCE
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM cvtermprop WHERE cvterm_id = 8320 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+		</sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-40">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8320 AND type_id = 1800;
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Remove GERM_SOURCE variable from cvterm table and from cvterm_relationship table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			DELETE FROM cvterm_relationship WHERE subject_id = 8320;
+			DELETE FROM cvtermprop WHERE cvterm_id = 8320;
+			DELETE FROM variable_overrides WHERE cvterm_id = 8320;
+			DELETE FROM cvtermsynonym WHERE cvterm_id = 8320;
+			DELETE FROM cvterm WHERE cvterm_id = 8320;
+		</sql>
+	</changeSet>
+	<!-- End of GERM_SOURCE related changesets -->
+
+	<!-- GUID related changesets -->
+	<changeSet author="lkovacic" id="v21.3.0-41">
+        <preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm where name = 'Universally Unique ID' and cv_id = 1030 and is_obsolete = 0;
+			</sqlCheck>
+        </preConditions>
+        <comment>Add new scale 'Universally Unique ID'</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+							VALUES (1030, 'Universally Unique ID', 'Universally Unique ID', NULL, 0, 0, 0);
+
+			SET @cvterm_id  = (SELECT LAST_INSERT_ID());
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			  	VALUES (1105, @cvterm_id, 1120);
+
+			INSERT INTO cvtermprop (cvterm_id, type_id, value, `rank`)
+				VALUES (@cvterm_id, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-42">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="1">select count(*) from cvterm where name = 'Universally Unique ID' and cv_id = 1030 and is_obsolete = 0;</sqlCheck>
+				<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'GUID' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
+				<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8235;</sqlCheck>
+			</and>
+		</preConditions>
+        <comment>Add 'GUID' as germplasm descriptor</comment>
+        <sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+				VALUES (8235, 1040, 'GUID', 'Germplasm unique identifier', NULL, 0, 0, 1);
+
+			INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+			  	VALUES
+			(1200, 8235, 2205),
+			(1210, 8235, 4030),
+			(1220, 8235, (select cvterm_id from cvterm where name = 'Universally Unique ID' and cv_id = 1030 and is_obsolete = 0));
+
+			INSERT INTO cvtermprop (cvterm_id, type_id, value, `rank`) VALUES
+			(8235, 1800, 'Germplasm Descriptor', 0),
+			(8235, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+	</changeSet>
+	<!-- End of GUID related changesets -->
+
+	<!-- list_data_view related changesets -->
+	<changeSet author="cuenyad" id="v21.3.0-43">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) > 0 from list_data_view where static_id = -7;
+            </sqlCheck>
+        </preConditions>
+        <comment>Replace the static_id -7 to 8378 of IMMEDIATE_SOURCE_NAME from list_data_view table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			 UPDATE list_data_view SET static_id = 8378 where static_id = -7;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-44">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) > 0 from list_data_view where static_id = -9;
+            </sqlCheck>
+        </preConditions>
+        <comment>Replace GROUP_SOURCE_NAME 'static_id' value in 'list_data_view' table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			 UPDATE list_data_view SET static_id = 8340 where static_id = -9;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-45">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) > 0 from list_data_view where static_id = -10;
+            </sqlCheck>
+        </preConditions>
+        <comment>Replace GUID 'static_id' value in 'list_data_view' table</comment>
+        <sql dbms="mysql" splitStatements="true">
+			 UPDATE list_data_view SET static_id = 8235 where static_id = -10;
+        </sql>
+	</changeSet>
+
+	<changeSet author="lkovacic" id="v21.3.0-46">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+				SELECT Count(*) > 0
+				FROM (SELECT listid,
+						  Count(static_id) AS staticColumns,
+						  Count(name_fldno) AS nameColumns
+					  FROM list_data_view ldv
+					  GROUP BY listid) countQuery
+				WHERE countQuery.staticColumns = 0 AND countQuery.nameColumns = 0;
+			</sqlCheck>
+		</preConditions>
+		<comment>Add default static columns to germplasm lists</comment>
+		<sql dbms="mysql" splitStatements="true">
+			# Create list_data_default_view_temporary Table
+			CREATE TEMPORARY TABLE list_data_default_view_temporary (
+				static_column_term_id int not null
+			);
+
+			INSERT INTO list_data_default_view_temporary (static_column_term_id)
+			VALUES (8240),
+				(8250),
+				(-3),
+				(-4),
+				(-5);
+
+			INSERT INTO list_data_view (listid, static_id)
+			SELECT countQuery.listid, tempListdataDefaultView.static_column_term_id
+			FROM (SELECT listid,
+					  Count(static_id) AS staticColumns,
+					  Count(name_fldno) AS nameColumns
+				  FROM list_data_view ldv
+				  GROUP BY listid) countQuery,
+				(SELECT static_column_term_id
+				 FROM list_data_default_view_temporary) tempListdataDefaultView
+			WHERE countQuery.staticColumns = 0 AND countQuery.nameColumns = 0
+			ORDER BY countQuery.listid;
+
+			#Delete list_data_default_view_temporary Table
+			DROP TABLE list_data_default_view_temporary;
+
+		</sql>
+	</changeSet>
+	<!-- End of list_data_view related changesets -->
+
+	<changeSet author="lkovacic" id="v21.3.0-47">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="1">
+                SELECT COUNT(*) > 0 from entry_detail_migration_output where variable_type_count is null;
+            </sqlCheck>
+        </preConditions>
+        <comment>Update 'entry_detail_migration_output.variable_type_count' values</comment>
+        <sql dbms="mysql" splitStatements="true">
+				UPDATE entry_detail_migration_output edmo
+				SET variable_type_count = (SELECT Count(1)
+											  FROM   cvtermprop
+											  WHERE  cvterm_id = edmo.cvterm_id
+													 AND type_id = 1800
+											  GROUP  BY cvterm_id);
+        </sql>
+	</changeSet>
+
+
+	<changeSet author="lkovacic" id="v21.3.0-48">
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">
 				select count(1) from crop_parameter where `key` = 'default-brapi-sync-source'

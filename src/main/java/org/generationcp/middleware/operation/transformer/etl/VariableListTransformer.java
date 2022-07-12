@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 
 import java.util.ArrayList;
@@ -53,8 +54,8 @@ public class VariableListTransformer extends Transformer {
 		return variableList;
 	}
 
-	public VariableList transformStockOptimize(final List<Integer> variableIndexesList, final MeasurementRow mRow,
-			final VariableTypeList variableTypeList, final List<String> trialHeaders) throws MiddlewareQueryException {
+	public VariableList transformStockOptimize(final MeasurementRow mRow,
+		final VariableTypeList variableTypeList, final List<String> trialHeaders) throws MiddlewareQueryException {
 		final VariableList variableList = new VariableList();
 
 		if (mRow == null) {
@@ -68,7 +69,9 @@ public class VariableListTransformer extends Transformer {
 			final int variableTypeSize = variableTypeList.getVariableTypes().size();
 			if (nonTrialMDSize == variableTypeSize) {
 				for (final DMSVariableType variableType : variableTypeList.getVariableTypes()) {
-					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM) {
+					if (variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.GERMPLASM ||
+						variableType.getStandardVariable().getPhenotypicType() == PhenotypicType.ENTRY_DETAIL
+					) {
 						String value = null;
 						for (final MeasurementData data : nonTrialMD) {
 							if (data.getMeasurementVariable().getTermId() == variableType.getStandardVariable()

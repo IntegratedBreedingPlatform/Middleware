@@ -9,6 +9,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
+import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -25,21 +26,34 @@ public class StockSaverTest {
 
 	private enum StockVariable {
 
-		ENTRY_NO(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.toString(), PhenotypicType.GERMPLASM, "1"), GID(TermId.GID.getId(), TermId.GID
-				.toString(), PhenotypicType.GERMPLASM, "4"), DESIG(TermId.DESIG.getId(), TermId.DESIG.toString(), PhenotypicType.GERMPLASM,
-				"SDFTY"), ENTRY_CODE(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.toString(), PhenotypicType.GERMPLASM, "CODE1"), GERMPLASM_1(
-				1, "GERMPLASM_1", PhenotypicType.GERMPLASM, "3"), GERMPLASM_2(2, "GERMPLASM_2", PhenotypicType.GERMPLASM, "4");
+		ENTRY_NO(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.toString(), PhenotypicType.ENTRY_DETAIL, "1",
+			new Term(TermId.NUMERIC_VARIABLE.getId(), "Numerical variable", "")),
+
+		ENTRY_TYPE(TermId.ENTRY_TYPE.getId(), TermId.ENTRY_TYPE.toString(), PhenotypicType.ENTRY_DETAIL, "10170",
+			new Term(TermId.CATEGORICAL_VARIABLE.getId(), "Categorical variable", "")),
+
+		ENTRY_CODE(TermId.ENTRY_CODE.getId(), TermId.ENTRY_CODE.toString(), PhenotypicType.ENTRY_DETAIL, "ASD",
+			new Term(TermId.CHARACTER_VARIABLE.getId(), "Character variable", "")),
+		GID(TermId.GID.getId(), TermId.GID.toString(), PhenotypicType.GERMPLASM, "4",
+			new Term(TermId.NUMERIC_VARIABLE.getId(), "Numerical variable", "")),
+		GERMPLASM_1(1, "GERMPLASM_1", PhenotypicType.GERMPLASM, "3",
+			new Term(TermId.NUMERIC_VARIABLE.getId(), "Numerical variable", "")),
+		GERMPLASM_2(2, "GERMPLASM_2", PhenotypicType.GERMPLASM, "4",
+			new Term(TermId.NUMERIC_VARIABLE.getId(), "Numerical variable", ""));
 
 		private int id;
 		private String name;
 		private PhenotypicType role;
 		private String value;
 
-		StockVariable(int id, String name, PhenotypicType role, String value) {
+		private Term dataType;
+
+		StockVariable(int id, String name, PhenotypicType role, String value, Term dataType) {
 			this.id = id;
 			this.name = name;
 			this.role = role;
 			this.value = value;
+			this.dataType = dataType;
 		}
 
 		public int getId() {
@@ -57,6 +71,10 @@ public class StockSaverTest {
 		public String getValue() {
 			return this.value;
 		}
+
+		public Term getDataType() {
+			return this.dataType;
+		}
 	}
 
 	@Before
@@ -71,18 +89,16 @@ public class StockSaverTest {
 		assertNotNull(this.stockModel);
 		assertEquals(StockVariable.ENTRY_NO.getValue(), this.stockModel.getUniqueName());
 		assertEquals(StockVariable.GID.getValue(), this.stockModel.getGermplasm().getGid().toString());
-		assertEquals(StockVariable.DESIG.getValue(), this.stockModel.getName().toString());
-		assertEquals(StockVariable.ENTRY_CODE.getValue(), this.stockModel.getValue());
 		assertNotNull(this.stockModel.getProperties());
 		assertEquals(2, this.stockModel.getProperties().size());
 		for (StockProperty property : this.stockModel.getProperties()) {
 			StockVariable stockVariable = null;
 			switch (property.getTypeId()) {
-				case 1:
-					stockVariable = StockVariable.GERMPLASM_1;
+				case 8255:
+					stockVariable = StockVariable.ENTRY_TYPE;
 					break;
-				case 2:
-					stockVariable = StockVariable.GERMPLASM_2;
+				case 8300:
+					stockVariable = StockVariable.ENTRY_CODE;
 					break;
 			}
 			assertEquals(stockVariable.getValue(), property.getValue());
@@ -91,21 +107,24 @@ public class StockSaverTest {
 
 	private VariableList createVariableList() {
 		VariableList variableList = new VariableList();
-		for (int i = 0; i < 6; i++) {
-			StockVariable variable = StockVariable.values()[i];
-			int standardVariableId = variable.getId();
-			String name = variable.getName();
-			String description = variable.getName() + "_DESC";
-			String value = variable.getValue();
-			PhenotypicType role = variable.getRole();
-			variableList.add(this.createVariable(standardVariableId, name, description, value, i + 1, role));
+		for (int i = 0; i < StockVariable.values().length; i++) {
+			StockVariable stVariable = StockVariable.values()[i];
+			int standardVariableId = stVariable.getId();
+			String name = stVariable.getName();
+			String description = stVariable.getName() + "_DESC";
+			String value = stVariable.getValue();
+			PhenotypicType role = stVariable.getRole();
+
+			Variable variable = this.createVariable(standardVariableId, name, description, value, i + 1, role, stVariable.getDataType());
+			variableList.add(variable);
 		}
 		return variableList;
 	}
 
-	private Variable createVariable(int standardVariableId, String name, String description, String value, int rank, PhenotypicType role) {
+	private Variable createVariable(int standardVariableId, String name, String description, String value, int rank, PhenotypicType role, Term dataType) {
 		Variable variable = new Variable();
 		variable.setVariableType(this.createVariableType(standardVariableId, name, description, rank, role));
+		variable.getVariableType().getStandardVariable().setDataType(dataType);
 		variable.setValue(value);
 		return variable;
 	}

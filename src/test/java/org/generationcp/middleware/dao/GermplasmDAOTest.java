@@ -88,7 +88,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 	private static final String DUMMY_STOCK_ID = "USER-1-1";
 	private static final Integer TEST_PROJECT_ID = 1;
-	private static final String NOTE_ATTRIBUTE = "NOTE_AA_text";
 
 	private static final Integer GROUP_ID = 10;
 
@@ -190,9 +189,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final StockModel stock = new StockModel();
 		stock.setGermplasm(germplasm);
 		stock.setUniqueName("1");
+		stock.setCross("-");
 		stock.setIsObsolete(false);
 		stock.setProject(new DmsProject(TEST_PROJECT_ID));
-		stock.setTypeId(TermId.ENTRY_CODE.getId());
 		this.daoFactory.getStockDao().save(stock);
 
 		final List<Germplasm> germplasmEntries =
@@ -716,10 +715,10 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
-		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		stockModel.setName("Germplasm 1");
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
+		stockModel.setCross("-");
 		stockModel.setProject(study);
 		this.daoFactory.getStockDao().saveOrUpdate(stockModel);
 		experimentModel.setStock(stockModel);
@@ -925,9 +924,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final StockModel stock = new StockModel();
 		stock.setGermplasm(germplasm);
 		stock.setUniqueName("1");
+		stock.setCross("-");
 		stock.setIsObsolete(false);
 		stock.setProject(study);
-		stock.setTypeId(TermId.ENTRY_CODE.getId());
 		this.daoFactory.getStockDao().save(stock);
 
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();
@@ -950,9 +949,9 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		final StockModel stock = new StockModel();
 		stock.setGermplasm(germplasm);
 		stock.setUniqueName("1");
+		stock.setCross("-");
 		stock.setIsObsolete(false);
 		stock.setProject(study);
-		stock.setTypeId(TermId.ENTRY_CODE.getId());
 		this.daoFactory.getStockDao().save(stock);
 
 		final GermplasmSearchRequest request = new GermplasmSearchRequest();

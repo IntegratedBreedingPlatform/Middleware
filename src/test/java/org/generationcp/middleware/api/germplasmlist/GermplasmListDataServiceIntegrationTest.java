@@ -56,19 +56,16 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
 
 		final List<GermplasmListDataUpdateViewDTO> newView = Arrays.asList(
-			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.ENTRY_NO.getTermId(), GermplasmListColumnCategory.STATIC),
 			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.GID.getTermId(), GermplasmListColumnCategory.STATIC));
 
 		this.germplasmListDataService.updateGermplasmListDataView(germplasmList.getId(), newView);
 
 		final List<GermplasmListDataView> currentNewView = this.daoFactory.getGermplasmListDataViewDAO().getByListId(germplasmList.getId());
-		assertThat(currentNewView, hasSize(2));
+		assertThat(currentNewView, hasSize(1));
 		assertThat(currentNewView, CoreMatchers.hasItems(
-			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.ENTRY_NO.getTermId())),
 			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.GID.getTermId()))));
 
 		final List<GermplasmListDataUpdateViewDTO> updatedView = Arrays.asList(
-			this.createGermplasmListDataUpdateViewDTO(GermplasmListStaticColumns.ENTRY_NO.getTermId(), GermplasmListColumnCategory.STATIC),
 			this.createGermplasmListDataUpdateViewDTO(
 				GermplasmListStaticColumns.DESIGNATION.getTermId(), GermplasmListColumnCategory.STATIC),
 			this.createGermplasmListDataUpdateViewDTO(
@@ -78,9 +75,8 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 
 		final List<GermplasmListDataView> currentUpdatedView =
 			this.daoFactory.getGermplasmListDataViewDAO().getByListId(germplasmList.getId());
-		assertThat(currentUpdatedView, hasSize(3));
+		assertThat(currentUpdatedView, hasSize(2));
 		assertThat(currentUpdatedView, CoreMatchers.hasItems(
-			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.ENTRY_NO.getTermId())),
 			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.DESIGNATION.getTermId())),
 			Matchers.hasProperty("staticId", Matchers.is(GermplasmListStaticColumns.GERMPLASM_REFERENCE.getTermId()))));
 	}
@@ -102,8 +98,8 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 		final Name name = new Name(null, savedGermplasm, 1, 1, "Name", 0, 0, 0);
 		this.daoFactory.getNameDao().save(name);
 
-		final GermplasmListData data = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "EntryCode 1",
-			DataSetupTest.GERMPLSM_PREFIX + 1 + " Source", DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0);
+		final GermplasmListData data = new GermplasmListData(null, germplasmList, germplasm.getGid(),
+			1, DataSetupTest.GERMPLSM_PREFIX + 1 + " Source", DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0);
 		this.daoFactory.getGermplasmListDataDAO().saveOrUpdate(data);
 
 		final CVTerm variable = this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ENTRY_DETAIL);
