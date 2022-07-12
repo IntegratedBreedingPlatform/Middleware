@@ -157,7 +157,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("lastDepositDate", DateType.INSTANCE);
 			query.addScalar("lastWithdrawalDate", DateType.INSTANCE);
 			query.addScalar("germplasmUUID");
-			if(!MapUtils.isEmpty(lotsSearchDto.getAttributes())) {
+			if(lotsSearchDto != null && !MapUtils.isEmpty(lotsSearchDto.getAttributes())) {
 				final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributes();
 				for (final Integer attributeVariableId : attributeFilters.keySet()) {
 					query.addScalar(SearchLotDaoQuery.formatDynamicAttributeAlias(attributeVariableId));
@@ -200,7 +200,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				lotDto.setLastWithdrawalDate((Date) result[23]);
 				lotDto.setGermplasmUUID((String) result[24]);
 
-				if(!MapUtils.isEmpty(lotsSearchDto.getAttributes())) {
+				if(lotsSearchDto != null && !MapUtils.isEmpty(lotsSearchDto.getAttributes())) {
 					final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributes();
 					lotDto.setAttributeTypesValueMap(new HashMap<>());
 					int i = 25;

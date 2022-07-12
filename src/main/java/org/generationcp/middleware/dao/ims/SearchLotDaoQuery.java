@@ -70,7 +70,7 @@ final class SearchLotDaoQuery {
 	public static String getSelectBaseQuery(final LotsSearchDto lotsSearchDto) {
 		String selectExpression = SELECT_EXPRESION;
 		String baseQuery = BASE_QUERY;
-		if (!CollectionUtils.isEmpty(lotsSearchDto.getAttributes())) {
+		if (lotsSearchDto != null && !CollectionUtils.isEmpty(lotsSearchDto.getAttributes())) {
 			final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributes();
 			for (final Integer attributeVariableId : attributeFilters.keySet()) {
 				final String alias = formatDynamicAttributeAlias(attributeVariableId);
