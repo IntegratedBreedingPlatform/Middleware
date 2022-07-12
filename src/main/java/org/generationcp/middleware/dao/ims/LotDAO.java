@@ -203,7 +203,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 				if(!MapUtils.isEmpty(lotsSearchDto.getAttributeFilters())) {
 					final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributeFilters();
 					lotDto.setAttributeTypesValueMap(new HashMap<>());
-					int i = 25;
+					int i = result.length - attributeFilters.size();
 					for (final Integer attributeVariableId : attributeFilters.keySet()) {
 						lotDto.getAttributeTypesValueMap().put(attributeVariableId, result[i++]);
 					}
