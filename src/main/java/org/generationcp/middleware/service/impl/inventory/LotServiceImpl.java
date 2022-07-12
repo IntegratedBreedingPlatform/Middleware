@@ -8,6 +8,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotAttributeColumnDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
@@ -475,6 +476,11 @@ public class LotServiceImpl implements LotService {
 		final Pattern pattern = Pattern.compile(expression);
 
 		return this.findCurrentMaxNotationNumberInInventoryIDs(inventoryIDs, pattern);
+	}
+
+	@Override
+	public List<LotAttributeColumnDto> getLotAttributeColumnDtos(final String programUUID) {
+		return this.daoFactory.getLotDao().getLotAttributeColumnDtos(programUUID);
 	}
 
 	private Integer findCurrentMaxNotationNumberInInventoryIDs(final List<String> inventoryIDs, final Pattern pattern) {

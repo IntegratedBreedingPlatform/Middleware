@@ -12,8 +12,10 @@ package org.generationcp.middleware.dao.ims;
 
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotAttributeColumnDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -28,6 +30,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.DateType;
 import org.hibernate.type.IntegerType;
@@ -39,6 +42,7 @@ import org.springframework.data.domain.Pageable;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -122,10 +126,9 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable, final Integer maxTotalResults) {
 		try {
-			final StringBuilder searchLotQuerySql = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
+			final StringBuilder searchLotQuerySql = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery(lotsSearchDto));
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(searchLotQuerySql), lotsSearchDto);
 			SearchLotDaoQuery.addSortToSearchLotsQuery(searchLotQuerySql, pageable);
-
 			final SQLQuery query = this.getSession().createSQLQuery(searchLotQuerySql.toString());
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), lotsSearchDto);
 
@@ -154,16 +157,60 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("lastDepositDate", DateType.INSTANCE);
 			query.addScalar("lastWithdrawalDate", DateType.INSTANCE);
 			query.addScalar("germplasmUUID");
-
-			query.setResultTransformer(Transformers.aliasToBean(ExtendedLotDto.class));
-
+			if(!MapUtils.isEmpty(lotsSearchDto.getAttributeFilters())) {
+				final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributeFilters();
+				for (final Integer attributeVariableId : attributeFilters.keySet()) {
+					query.addScalar(SearchLotDaoQuery.formatDynamicAttributeAlias(attributeVariableId));
+				}
+			}
 			if (maxTotalResults != null) {
 				query.setMaxResults(maxTotalResults);
 			}
 
 			GenericDAO.addPaginationToSQLQuery(query, pageable);
 
-			final List<ExtendedLotDto> extendedLotDtos = query.list();
+			final List<ExtendedLotDto> extendedLotDtos = new ArrayList<>();
+
+			final List<Object[]> results = query.list();
+			for (final Object[] result: results) {
+				final ExtendedLotDto lotDto = new ExtendedLotDto();
+				lotDto.setLotId((Integer) result[0]);
+				lotDto.setLotUUID((String) result[1]);
+				lotDto.setStockId((String) result[2]);
+				lotDto.setGid((Integer) result[3]);
+				lotDto.setMgid((Integer) result[4]);
+				lotDto.setGermplasmMethodName((String) result[5]);
+				lotDto.setGermplasmLocation((String) result[6]);
+				lotDto.setDesignation((String) result[7]);
+				lotDto.setStatus((String) result[8]);
+				lotDto.setLocationId((Integer) result[9]);
+				lotDto.setLocationName((String) result[10]);
+				lotDto.setLocationAbbr((String) result[11]);
+				lotDto.setUnitId((Integer) result[12]);
+				lotDto.setUnitName((String) result[13]);
+				lotDto.setActualBalance((Double) result[14]);
+				lotDto.setAvailableBalance((Double) result[15]);
+				lotDto.setReservedTotal((Double) result[16]);
+				lotDto.setWithdrawalTotal((Double) result[17]);
+				lotDto.setPendingDepositsTotal((Double) result[18]);
+				lotDto.setNotes((String) result[19]);
+				lotDto.setCreatedByUsername((String) result[20]);
+				lotDto.setCreatedDate((Date) result[21]);
+				lotDto.setLastDepositDate((Date) result[22]);
+				lotDto.setLastWithdrawalDate((Date) result[23]);
+				lotDto.setGermplasmUUID((String) result[24]);
+
+				if(!MapUtils.isEmpty(lotsSearchDto.getAttributeFilters())) {
+					final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributeFilters();
+					lotDto.setAttributeTypesValueMap(new HashMap<>());
+					int i = result.length - attributeFilters.size();
+					for (final Integer attributeVariableId : attributeFilters.keySet()) {
+						lotDto.getAttributeTypesValueMap().put(attributeVariableId, result[i++]);
+					}
+				}
+
+				extendedLotDtos.add(lotDto);
+			}
 
 			return extendedLotDtos;
 		} catch (final HibernateException e) {
@@ -174,7 +221,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
 		try {
-			final StringBuilder filteredLotsQuery = new StringBuilder(SearchLotDaoQuery.getCountBaseQuery());
+			final StringBuilder filteredLotsQuery = new StringBuilder(SearchLotDaoQuery.getCountBaseQuery(lotsSearchDto));
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filteredLotsQuery), lotsSearchDto);
 			SearchLotDaoQuery.addLimit(filteredLotsQuery);
 			final String countLotsQuery = "Select count(1) from (" + filteredLotsQuery + ") as filteredLots";
@@ -189,7 +236,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(final LotsSearchDto searchDto) {
 		try {
-			final StringBuilder lotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
+			final StringBuilder lotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery(searchDto));
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
 
 			final String sql = "select distinct {a.*} from atributs a inner join (" + lotsQuery + ") lots on lots.gid = a.gid";
@@ -219,11 +266,27 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 	}
 
+	public List<LotAttributeColumnDto> getLotAttributeColumnDtos(final String programUUID) {
+		try {
+			final String sql = "SELECT DISTINCT (a.atype) AS id, c.name AS name, vpo.alias AS alias"
+				+ "	FROM ims_lot_attribute a "
+				+ "	INNER JOIN ims_lot lots ON lots.lotid = a.lotid "
+				+ " INNER JOIN cvterm c ON c.cvterm_id = a.atype "
+				+ "	LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = c.cvterm_id AND vpo.program_uuid = :programUUID ";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("programUUID", programUUID);
+			query.setResultTransformer(new AliasToBeanResultTransformer(LotAttributeColumnDto.class));
+			return  query.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getGermplasmAttributeValues() in LotDAO: " + e.getMessage(), e);
+		}
+	}
+
 	public Map<String, BigInteger> getLotsCountPerScaleName(final LotsSearchDto lotsSearchDto) {
 		try {
 			final Map<String, BigInteger> lotsCountPerScaleName = new HashMap<>();
 
-			final StringBuilder filterLotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
+			final StringBuilder filterLotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery(lotsSearchDto));
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filterLotsQuery), lotsSearchDto);
 
 			final String countQuery = "SELECT scale.name, count(*) from ("  //

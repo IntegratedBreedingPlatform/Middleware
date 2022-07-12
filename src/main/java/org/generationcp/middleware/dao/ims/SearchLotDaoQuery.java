@@ -10,15 +10,18 @@ import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 final class SearchLotDaoQuery {
 
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
+	private static final String ATTRIBUTE = "Attribute";
 
 	private static final String BASE_QUERY = "SELECT %s "
 		+ "FROM ims_lot lot " //
@@ -29,8 +32,8 @@ final class SearchLotDaoQuery {
 		+ "       LEFT JOIN location l on l.locid = lot.locid " //
 		+ "       LEFT JOIN location gloc on gloc.locid = g.glocn " //
 		+ "       LEFT join cvterm scale on scale.cvterm_id = lot.scaleid " //
-		+ "       INNER JOIN workbench.users users on users.userid = lot.userid " //
-		+ "WHERE g.deleted=0 "; //
+		+ "       INNER JOIN workbench.users users on users.userid = lot.userid "; //
+	private static final String DELETED_CONDITION = " WHERE g.deleted=0 ";
 
 	private static final String SELECT_EXPRESION = " lot.lotid as lotId, " //
 		+ "  lot.lot_uuid AS lotUUID, " //
@@ -64,12 +67,33 @@ final class SearchLotDaoQuery {
 
 	private static final String LIMIT_CLAUSE = " LIMIT 5000 ";
 
-	public static String getSelectBaseQuery() {
-		return String.format(BASE_QUERY, SELECT_EXPRESION);
+	public static String getSelectBaseQuery(final LotsSearchDto lotsSearchDto) {
+		String selectExpression = SELECT_EXPRESION;
+		String baseQuery = BASE_QUERY;
+		if (!CollectionUtils.isEmpty(lotsSearchDto.getAttributeFilters())) {
+			final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributeFilters();
+			for (final Integer attributeVariableId : attributeFilters.keySet()) {
+				final String alias = formatDynamicAttributeAlias(attributeVariableId);
+				selectExpression += String.format(", %s.aval AS %s", alias, alias);
+				baseQuery += formatLotAttributeJoin(alias, attributeVariableId);
+			}
+		}
+
+		return String.format(baseQuery, selectExpression).concat(DELETED_CONDITION);
 	}
 
-	public static String getCountBaseQuery() {
-		return String.format(BASE_QUERY, " count(1) ");
+
+
+	public static String getCountBaseQuery(final LotsSearchDto lotsSearchDto) {
+		String baseQuery = BASE_QUERY;
+		if (!CollectionUtils.isEmpty(lotsSearchDto.getAttributeFilters())) {
+			final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributeFilters();
+			for (final Integer attributeVariableId : attributeFilters.keySet()) {
+				final String alias = formatDynamicAttributeAlias(attributeVariableId);
+				baseQuery += formatLotAttributeJoin(alias, attributeVariableId);
+			}
+		}
+		return String.format(baseQuery.concat(DELETED_CONDITION), " count(1) ");
 	}
 
 	public static void addSearchLotsQueryFiltersAndGroupBy(
@@ -171,6 +195,19 @@ final class SearchLotDaoQuery {
 			if (!CollectionUtils.isEmpty(lotsSearchDto.getGermplasmUUIDs())) {
 				paramBuilder.append(" and g.germplsm_uuid IN (:germplasmGuids)");
 				paramBuilder.setParameterList("germplasmGuids", lotsSearchDto.getGermplasmUUIDs());
+			}
+
+			if (!CollectionUtils.isEmpty(lotsSearchDto.getAttributeFilters())) {
+				final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributeFilters();
+				attributeFilters.forEach((variableId, value) -> {
+					if (value != null || !StringUtils.isEmpty((String) value)) {
+						final String alias = formatDynamicAttributeAlias(variableId);
+						final String parameterName = String.format("%s_ATTRIBUTE_FILTER", alias);
+						paramBuilder.append(String.format(" and %s.aval LIKE :%s", alias, parameterName));
+						paramBuilder.setParameter(parameterName, "%" + value + "%");
+					}
+
+				});
 			}
 		}
 		paramBuilder.append(" GROUP BY lot.lotid ");
@@ -322,7 +359,8 @@ final class SearchLotDaoQuery {
 			if (pageable.getSort() != null) {
 				final List<String> sorts = new ArrayList<>();
 				for (final Sort.Order order : pageable.getSort()) {
-					sorts.add(order.getProperty() + " " + order.getDirection().toString());
+					final String orderProperty = getOrderProperty(order.getProperty());
+					sorts.add(orderProperty + " " + order.getDirection().toString());
 				}
 				if (!sorts.isEmpty()) {
 					query.append(" ORDER BY ").append(Joiner.on(",").join(sorts));
@@ -331,8 +369,24 @@ final class SearchLotDaoQuery {
 		}
 	}
 
+	private static String getOrderProperty(final String orderProperty) {
+		if (org.apache.commons.lang3.StringUtils.isNumeric(orderProperty)) {
+			return formatDynamicAttributeAlias(Integer.parseInt(orderProperty));
+		} else {
+			return orderProperty;
+		}
+	}
+
 	public static void addLimit(final StringBuilder query) {
 		query.append(LIMIT_CLAUSE);
+	}
+
+	public static String formatDynamicAttributeAlias(final Integer variableId) {
+		return String.format("%s_%s", ATTRIBUTE, variableId);
+	}
+
+	private static String formatLotAttributeJoin(final String alias, final Integer variableId) {
+		return String.format(" LEFT JOIN ims_lot_attribute %1$s ON lot.lotid = %1$s.lotid AND %1$s.atype = %2$s", alias, variableId);
 	}
 
 }
