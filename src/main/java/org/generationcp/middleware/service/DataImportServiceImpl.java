@@ -769,6 +769,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		this.addErrorForDuplicates(errors, stdVarMap);
 		stdVarMap = this.checkForDuplicates(workbook.getVariateVariables());
 		this.addErrorForDuplicates(errors, stdVarMap);
+		stdVarMap = this.checkForDuplicates(workbook.getEntryDetails());
+		this.addErrorForDuplicates(errors, stdVarMap);
 	}
 
 	private Map<String, List<MeasurementVariable>> checkForDuplicates(
