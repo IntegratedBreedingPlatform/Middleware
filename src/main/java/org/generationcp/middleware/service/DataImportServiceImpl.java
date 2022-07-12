@@ -436,12 +436,12 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public void addEntryTypeVariableIfNotExists(final Workbook workbook,
 		final String programUUID) {
 
-		final Optional<MeasurementVariable> entryTypeFactor = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getFactors());
+		final Optional<MeasurementVariable> entryTypeFactor = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getEntryDetails());
 		final Optional<List<MeasurementRow>> rowsWithoutTermId = this.findMeasurementRowWithoutTermId(TermId.ENTRY_TYPE.getId(), workbook.getObservations());
 
 		// ENTRY_TYPE Not existing in Factors and in Observation
 		if (!entryTypeFactor.isPresent() && rowsWithoutTermId.isPresent()) {
-			final MeasurementVariable entryType = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.GERMPLASM, programUUID);
+			final MeasurementVariable entryType = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.ENTRY_DETAIL, programUUID);
 			workbook.getFactors().add(entryType);
 			final MeasurementData data = new MeasurementData(entryType.getLabel(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false, entryType.getDataType(), entryType);
 			workbook.getObservations().forEach(row->row.getDataList().add(data));
@@ -1039,12 +1039,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		final Set<Integer> factorsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getFactors());
 		final Set<Integer> trialVariablesTermIds = this.getTermIdsOfMeasurementVariables(workbook.getTrialVariables());
+		final Set<Integer> entryDetailsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getEntryDetails());
 
 		// DMV : TODO change implem so that backend is agnostic to UI when
 		// determining messages
-		if (!factorsTermIds.contains(TermId.ENTRY_NO.getId())) {
+		if (!entryDetailsTermIds.contains(TermId.ENTRY_NO.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_ENTRY);
-			errors.get(Constants.MISSING_ENTRY).add(new Message("error.entry.doesnt.exist.wizard"));
+			errors.get(Constants.MISSING_ENTRY).add(new Message("error.entryno.doesnt.exist.wizard"));
 		}
 
 		if (!factorsTermIds.contains(TermId.GID.getId())) {

@@ -22,7 +22,6 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
-import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.Term;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
@@ -205,12 +204,14 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 
 		final VariableTypeList constantsVariableTypeList = this.createVariableTypeList(workbook.getTrialConstants(), 1);
 		Mockito.doReturn(constantsVariableTypeList).when(transformer)
-				.transform(workbook.getTrialConstants(), workbook.getTrialConditions().size() + workbook.getTrialFactors().size() + 1,
-						programUUID);
+			.transform(workbook.getTrialConstants(), workbook.getTrialConditions().size() + workbook.getTrialFactors().size() + 1, programUUID);
 
 		final VariableTypeList variatesVariableTypeList = this.createVariableTypeList(workbook.getVariates(), 1);
 		Mockito.doReturn(variatesVariableTypeList).when(transformer)
-				.transform(workbook.getVariates(), workbook.getNonTrialFactors().size() + 1, programUUID);
+			.transform(workbook.getVariates(), workbook.getNonTrialFactors().size() + 1, programUUID);
+
+		final VariableTypeList entryDetailsVariableTypeList = this.createVariableTypeList(workbook.getEntryDetails(), 1);
+		Mockito.doReturn(entryDetailsVariableTypeList).when(transformer).transform(workbook.getEntryDetails(), workbook.getNonTrialFactors().size() + workbook.getVariates().size() + 1, programUUID);
 
 		Mockito.doReturn(transformer).when(workbookSaver).getVariableTypeListTransformer();
 
@@ -383,8 +384,8 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		workbook.getStudyDetails().setId(1);
 
 		final Random random = new Random();
-		final StockModel stock = new StockModel(random.nextInt(), random.nextInt(), RandomStringUtils.randomAlphabetic(10), "1", RandomStringUtils.randomAlphabetic(10),
-				RandomStringUtils.randomAlphabetic(10), SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId(), false);
+		final StockModel stock = new StockModel(random.nextInt(), random.nextInt(), RandomStringUtils.randomAlphabetic(10), "1",
+			RandomStringUtils.randomAlphabetic(10), false);
 		workbook.setObservations(MeasurementRowTestDataInitializer.
 			createMeasurementRowList(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), "1",
 				MeasurementVariableTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), "1")));

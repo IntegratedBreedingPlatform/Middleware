@@ -2,7 +2,10 @@ package org.generationcp.middleware.api.brapi;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.apache.commons.collections.ListUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
+import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.PedigreeNodeSearchRequest;
@@ -23,14 +26,18 @@ import org.springframework.util.CollectionUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @Transactional
@@ -50,14 +57,60 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 	}
 
 	@Override
+	public long countPedigreeNodes(final PedigreeNodeSearchRequest pedigreeNodeSearchRequest) {
+		return this.daoFactory.getGermplasmDao().countPedigreeNodes(pedigreeNodeSearchRequest);
+	}
+
+	@Override
 	public List<PedigreeNodeDTO> searchPedigreeNodes(final PedigreeNodeSearchRequest pedigreeNodeSearchRequest, final Pageable pageable) {
 		final List<PedigreeNodeDTO> result = this.daoFactory.getGermplasmDao().searchPedigreeNodes(pedigreeNodeSearchRequest, pageable);
-		final Map<Integer, String> pedigreeStringMap =
-			this.pedigreeService.getCrossExpansions(result.stream().map(PedigreeNodeDTO::getGid).collect(Collectors.toSet()), null,
-				this.crossExpansionProperties);
-		for (final PedigreeNodeDTO pedigreeNodeDTO : result) {
-			if (pedigreeStringMap.containsKey(pedigreeNodeDTO.getGid())) {
-				pedigreeNodeDTO.setPedigreeString(pedigreeStringMap.get(pedigreeNodeDTO.getGid()));
+
+		// Extract the gids of the germplasm
+		final List<Integer> gids = result.stream().map(PedigreeNodeDTO::getGid).filter(Objects::nonNull).collect(Collectors.toList());
+		// Extract the gids of the germplasm's parents
+		final List<Integer> gidsOfParents =
+			result.stream().filter(p -> !CollectionUtils.isEmpty(p.getParents())).flatMap(p -> p.getParents().stream())
+				.map(PedigreeNodeReferenceDTO::getGid).filter(Objects::nonNull)
+				.collect(Collectors.toList());
+
+		if (!CollectionUtils.isEmpty(result)) {
+
+			// Retrieve the progeny and siblings if explicitly specified
+			final Map<Integer, List<PedigreeNodeReferenceDTO>> progenyMapByGids =
+				pedigreeNodeSearchRequest.isIncludeProgeny() ? this.daoFactory.getGermplasmDao().getProgenyByGids(gids) : new HashMap<>();
+			final Map<Integer, List<PedigreeNodeReferenceDTO>> siblingsMapByGids =
+				pedigreeNodeSearchRequest.isIncludeSiblings() ? this.daoFactory.getGermplasmDao().getSiblingsByGids(gids) : new HashMap<>();
+
+			/** Populate the preferred names, PUIs, external references, pedigree string, additionalInfo (attributes),
+			 * progeny (optional) and siblings (optional)
+			 **/
+			final Map<Integer, String> preferredNamesMap =
+				this.daoFactory.getNameDao().getPreferredNamesByGIDs(ListUtils.union(gids, gidsOfParents));
+			final Map<Integer, String> germplasmPUIsMap = this.daoFactory.getNameDao().getPUIsByGIDs(gids);
+			final Map<Integer, String> pedigreeStringMap =
+				this.pedigreeService.getCrossExpansions(new HashSet<>(gids), null, this.crossExpansionProperties);
+			final Map<String, List<ExternalReferenceDTO>> referencesByGidMap =
+				this.daoFactory.getGermplasmExternalReferenceDAO().getExternalReferences(gids).stream()
+					.collect(groupingBy(ExternalReferenceDTO::getEntityId));
+			final Map<Integer, Map<String, String>> attributesByGidsMap =
+				this.daoFactory.getAttributeDAO().getAttributesByGidsMap(gids).entrySet().stream().collect(Collectors.toMap(
+					Map.Entry::getKey,
+					e -> e.getValue().stream()
+						.collect(Collectors.toMap(AttributeDTO::getAttributeCode, AttributeDTO::getValue, (a1, a2) -> a1))));
+
+			for (final PedigreeNodeDTO pedigreeNodeDTO : result) {
+				pedigreeNodeDTO.setPedigreeString(pedigreeStringMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				pedigreeNodeDTO.setDefaultDisplayName(preferredNamesMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				pedigreeNodeDTO.setGermplasmName(preferredNamesMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				pedigreeNodeDTO.setGermplasmPUI(germplasmPUIsMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				pedigreeNodeDTO.setExternalReferences(
+					referencesByGidMap.getOrDefault(String.valueOf(pedigreeNodeDTO.getGid()), new ArrayList<>()));
+				pedigreeNodeDTO.setProgeny(progenyMapByGids.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				pedigreeNodeDTO.setSiblings(siblingsMapByGids.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				pedigreeNodeDTO.setAdditionalInfo(attributesByGidsMap.getOrDefault(pedigreeNodeDTO.getGid(), null));
+				if (!CollectionUtils.isEmpty(pedigreeNodeDTO.getParents())) {
+					pedigreeNodeDTO.getParents().forEach(p -> p.setGermplasmName(preferredNamesMap.getOrDefault(p.getGid(), null)));
+				}
 			}
 		}
 		return result;

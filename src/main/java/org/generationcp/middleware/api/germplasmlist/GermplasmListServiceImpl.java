@@ -15,6 +15,7 @@ import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchR
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -54,13 +55,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
-import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Transactional
 @Service
 public class GermplasmListServiceImpl implements GermplasmListService {
 
 	private final SimpleDateFormat dateFormat = new SimpleDateFormat(Util.DATE_AS_NUMBER_FORMAT);
+
+	private static final String SORT_BY_ENTRY_NO = "VARIABLE_" + TermId.ENTRY_NO.getId();
+
 	public static final String LIST_NOT_FOUND = "list.not.found";
 
 	private final DaoFactory daoFactory;
@@ -90,14 +93,15 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public GermplasmListGeneratorDTO create(final GermplasmListGeneratorDTO request, final Integer loggedInUserId) {
 
-		final List<Integer> gids = request.getEntries()
-			.stream().map(GermplasmListGeneratorDTO.GermplasmEntryDTO::getGid).collect(Collectors.toList());
-
 		// save list
 		final GermplasmList germplasmList = this.createGermplasmList(request, loggedInUserId);
 
 		// save variables
 		final Set<Integer> variableIds = request.getEntries().stream().flatMap(e -> e.getData().keySet().stream()).collect(toSet());
+
+		// Add default columns
+		this.germplasmListDataService.saveDefaultView(germplasmList);
+
 		for (final Integer variableId : variableIds) {
 			final GermplasmListDataView germplasmListDataView = new GermplasmListDataView.GermplasmListDataVariableViewBuilder(
 				germplasmList,
@@ -111,8 +115,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			final Integer gid = entry.getGid();
 			GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, entry.getEntryNo(),
-				entry.getEntryCode(), entry.getSeedSource(), entry.getGroupName(),
-				GermplasmListDataDAO.STATUS_ACTIVE, null);
+				entry.getSeedSource(), entry.getGroupName(), GermplasmListDataDAO.STATUS_ACTIVE, null);
 			germplasmListData = this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 
 			// save entry details
@@ -182,13 +185,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 
 		for (final GermplasmListGeneratorDTO.GermplasmEntryDTO entry : request.getEntries()) {
 			final GermplasmListData germplasmListData = germplasmListDataByEntryId.get(entry.getEntryNo());
-
-			// Temporary workaround to allow users to edit ENTRY_CODE
-			final String entryCode = entry.getEntryCode();
-			if (!isBlank(entryCode)) {
-				germplasmListData.setEntryCode(entryCode);
-				this.daoFactory.getGermplasmListDataDAO().update(germplasmListData);
-			}
 
 			for (final Map.Entry<Integer, GermplasmListObservationDto> entryDetailSet : entry.getData().entrySet()) {
 				final GermplasmListObservationDto entryDetail = entryDetailSet.getValue();
@@ -312,7 +308,6 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				germplasmList,
 				model.getGid(),
 				entryNo,
-				String.valueOf(entryNo),
 				plotCodeValuesIndexedByGids.get(model.getGid()),
 				crossExpansionsBulk.get(model.getGid()),
 				0,
@@ -336,7 +331,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 		if (searchComposite.getSearchRequest() != null
 			&& !CollectionUtils.isEmpty(searchComposite.getSearchRequest().getEntryNumbers())) {
 			pageRequest = new PageRequest(0, searchComposite.getSearchRequest().getEntryNumbers().size(),
-				new Sort(Sort.Direction.ASC, GermplasmListStaticColumns.ENTRY_NO.name()));
+				new Sort(Sort.Direction.ASC, GermplasmListServiceImpl.SORT_BY_ENTRY_NO));
 		}
 
 		final List<GermplasmListDataSearchResponse> responseList =
@@ -668,6 +663,11 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	@Override
 	public long countEntryDetailsNamesAndAttributesAdded(final Integer listId) {
 		return this.daoFactory.getGermplasmListDataViewDAO().countEntryDetailsNamesAndAttributesAdded(listId);
+	}
+
+	@Override
+	public Map<Integer, Map<Integer, String>> getObservationValuesByListAndVariableIds(final Integer listId, final Set<Integer> variableIds) {
+		return this.daoFactory.getGermplasmListDataDetailDAO().getObservationValuesByListAndVariableIds(listId, variableIds);
 	}
 
 	@Override

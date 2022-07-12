@@ -7,13 +7,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
-public class GermplasmListGeneratorDTO extends GermplasmListBasicInfoDTO{
+public class GermplasmListGeneratorDTO extends GermplasmListBasicInfoDTO {
 
 	public static class GermplasmEntryDTO {
 
 		private Integer entryNo;
 		private Integer gid;
-		private String entryCode;
 		private String seedSource;
 		private String groupName;
 
@@ -36,14 +35,6 @@ public class GermplasmListGeneratorDTO extends GermplasmListBasicInfoDTO{
 
 		public void setGid(final Integer gid) {
 			this.gid = gid;
-		}
-
-		public String getEntryCode() {
-			return this.entryCode;
-		}
-
-		public void setEntryCode(final String entryCode) {
-			this.entryCode = entryCode;
 		}
 
 		public String getSeedSource() {
@@ -95,6 +86,5 @@ public class GermplasmListGeneratorDTO extends GermplasmListBasicInfoDTO{
 		final SearchCompositeDto<GermplasmSearchRequest, Integer> searchComposite) {
 		this.searchComposite = searchComposite;
 	}
-
 
 }

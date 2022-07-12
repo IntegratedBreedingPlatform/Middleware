@@ -14,6 +14,7 @@ import com.google.common.base.Optional;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -111,6 +112,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Resource
 	private LocationService locationService;
+
+	@Resource
+	private GermplasmListDataService germplasmListDataService;
 
 	private DaoFactory daoFactory;
 
@@ -341,6 +345,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				counter++;
 			}
 
+			// Add default columns
+			this.germplasmListDataService.saveDefaultView(germplasmList);
+
 		} catch (final Exception e) {
 
 			this.logAndThrowException(
@@ -390,6 +397,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				germplasmListDataDAO.save(germplasmListData);
 			}
 
+			this.germplasmListDataService.saveDefaultView(germplasmList);
+
 			// For Management Group Settings Processing
 			this.germplasmGroupingService.processGroupInheritanceForCrosses(cropName, germplasmIdMethodIdMap, isApplyNewGroupToPreviousCrosses,
 					this.crossExpansionProperties.getHybridBreedingMethods());
@@ -427,7 +436,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public int countPlotsWithRecordedVariatesInDataset(final int datasetId, final List<Integer> variateIds) {
-
 		return this.studyDataManager.countPlotsWithRecordedVariatesInDataset(datasetId, variateIds);
 	}
 
@@ -744,6 +752,10 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		this.workbookSaver = workbookSaver;
 	}
 
+	public void setGermplasmListDataService(final GermplasmListDataService germplasmListDataService) {
+		this.germplasmListDataService = germplasmListDataService;
+	}
+
 	@Override
 	public void deleteAllFieldMapsByTrialInstanceIds(final List<Integer> geolocationId, final Integer projectId,
 		final boolean deleteProjectProp) {
@@ -760,4 +772,5 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				projectId, Arrays.asList(TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId()));
 		}
 	}
+
 }

@@ -280,10 +280,10 @@ public class IntegrationTestDataInitializer {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
-		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		stockModel.setName("Germplasm " + RandomStringUtils.randomAlphanumeric(5));
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
+		stockModel.setCross("-");
 		stockModel.setProject(study);
 
 		this.stockDao.saveOrUpdate(stockModel);

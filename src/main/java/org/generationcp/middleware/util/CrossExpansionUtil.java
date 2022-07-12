@@ -5,6 +5,9 @@ import org.apache.commons.lang.math.NumberUtils;
 
 public class CrossExpansionUtil {
 
+	public static final int MAX_CROSS_NAME_SIZE = 4985;
+	public static final String CROSS_NAME_TRUNCATED_SUFFIX = "(truncated)";
+
 	public static String getNewDelimiter(String xPed) {
 		String getNewDelimiter = "";
 		int x = 0;
@@ -240,4 +243,14 @@ public class CrossExpansionUtil {
 		}
 		return pr;
 	}
+
+	public static String truncateCrossValueIfNeeded(final String crossValue) {
+		if (crossValue.length() > MAX_CROSS_NAME_SIZE) {
+			final StringBuilder truncatedValue = new StringBuilder(crossValue.substring(0, MAX_CROSS_NAME_SIZE - 1));
+			truncatedValue.append(CROSS_NAME_TRUNCATED_SUFFIX);
+			return truncatedValue.toString();
+		}
+		return crossValue;
+	}
+
 }

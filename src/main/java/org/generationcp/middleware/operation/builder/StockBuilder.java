@@ -62,6 +62,7 @@ public class StockBuilder extends Builder {
 		VariableTypeList stockVariableTypes = new VariableTypeList();
 		stockVariableTypes.addAll(study.getVariableTypesByPhenotypicType(PhenotypicType.GERMPLASM));
 		stockVariableTypes.addAll(dataSet.getFactorsByPhenotypicType(PhenotypicType.GERMPLASM));
+		stockVariableTypes.addAll(dataSet.getFactorsByPhenotypicType(PhenotypicType.ENTRY_DETAIL));
 		return stockVariableTypes;
 	}
 
@@ -79,7 +80,7 @@ public class StockBuilder extends Builder {
 	}
 
 	String getValue(StockModel stockModel, DMSVariableType variableType) {
-		String value = null;
+		final String value;
 		int id = variableType.getStandardVariable().getId();
 		if (id == TermId.ENTRY_NO.getId()) {
 			value = stockModel.getUniqueName();
@@ -87,8 +88,6 @@ public class StockBuilder extends Builder {
 			value = stockModel.getGermplasm() == null ? null : Integer.toString(stockModel.getGermplasm().getGid());
 		} else if (id == TermId.DESIG.getId()) {
 			value = stockModel.getName();
-		} else if (id == TermId.ENTRY_CODE.getId()) {
-			value = stockModel.getValue();
 		} else {
 			value = this.getPropertyValue(variableType.getId(), stockModel.getProperties());
 		}

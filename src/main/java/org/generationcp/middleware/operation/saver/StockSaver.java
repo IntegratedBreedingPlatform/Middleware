@@ -16,6 +16,7 @@ import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -25,6 +26,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 
 import java.util.HashSet;
+import java.util.Map;
 
 public class StockSaver extends Saver {
 
@@ -35,9 +37,13 @@ public class StockSaver extends Saver {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
-	public Integer saveStock(final int studyId, final VariableList variableList) {
+	public Integer saveStock(final int studyId, final VariableList variableList, final Map<Integer, String> preferredNamesByGIDs,
+		final Map<Integer, String> pedigreeByGids) {
 		final StockModel stockModel = this.createStock(variableList, null);
 		if (stockModel != null) {
+			final Integer gid = stockModel.getGermplasm().getGid();
+			stockModel.setName(preferredNamesByGIDs.get(gid));
+			stockModel.setCross(pedigreeByGids.get(gid));
 			stockModel.setProject(new DmsProject(studyId));
 			this.daoFactory.getStockDao().save(stockModel);
 			return stockModel.getStockId();
@@ -76,23 +82,15 @@ public class StockSaver extends Saver {
 					}
 					stockModel.setGermplasm(new Germplasm(dbxref));
 
-				} else if (TermId.DESIG.getId() == variableId) {
-					stockModel = this.getStockObject(stockModel);
-					stockModel.setName(value);
-
-				} else if (TermId.ENTRY_CODE.getId() == variableId) {
-					stockModel = this.getStockObject(stockModel);
-					stockModel.setValue(value);
-
-				} else if (TermId.OBS_UNIT_ID.getId() == variableId) {
-					continue;
-
-				} else if (PhenotypicType.GERMPLASM == role) {
+				} else if (TermId.ENTRY_TYPE.getId() == variableId || PhenotypicType.ENTRY_DETAIL == role) {
 					stockModel = this.getStockObject(stockModel);
 					final StockProperty stockProperty = this.getStockProperty(stockModel, variable);
 					if (stockProperty == null && variable.getValue() != null && !variable.getValue().isEmpty()) {
 						this.addProperty(stockModel, this.createProperty(variable));
 					}
+				} else if (PhenotypicType.GERMPLASM == role) {
+					continue;
+
 				} else {
 					throw new MiddlewareQueryException("Non-Stock Variable was used in calling create stock: "
 							+ variable.getVariableType().getId());
@@ -107,7 +105,17 @@ public class StockSaver extends Saver {
 		if (stockModel != null && stockModel.getProperties() != null && !stockModel.getProperties().isEmpty()) {
 			for (final StockProperty property : stockModel.getProperties()) {
 				if (property.getTypeId().equals(Integer.valueOf(variable.getVariableType().getId()))) {
-					property.setValue(variable.getValue());
+					final String value;
+					final Integer categoricalValueId;
+					if (variable.getVariableType().getStandardVariable().getDataType().getName().equals(DataType.CATEGORICAL_VARIABLE.getName())) {
+						value = variable.getActualValue();
+						categoricalValueId = Integer.valueOf(variable.getValue());
+					} else {
+						value = variable.getValue();
+						categoricalValueId = null;
+					}
+					property.setValue(value);
+					property.setCategoricalValueId(categoricalValueId);
 					return property;
 				}
 			}
@@ -119,24 +127,28 @@ public class StockSaver extends Saver {
 		if (stockModel == null) {
 			stockModel = new StockModel();
 			stockModel.setIsObsolete(false);
-			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		}
 		return stockModel;
 	}
 
 	private void addProperty(final StockModel stockModel, final StockProperty property) {
 		if (stockModel.getProperties() == null) {
-			stockModel.setProperties(new HashSet<StockProperty>());
+			stockModel.setProperties(new HashSet<>());
 		}
 		property.setStock(stockModel);
 		stockModel.getProperties().add(property);
 	}
 
 	private StockProperty createProperty(final Variable variable) {
-		final StockProperty property = new StockProperty();
-		property.setTypeId(variable.getVariableType().getId());
-		property.setValue(variable.getValue());
-
-		return property;
+		final String value;
+		final Integer categoricalValueId;
+		if (variable.getVariableType().getStandardVariable().getDataType().getName().equals(DataType.CATEGORICAL_VARIABLE.getName())) {
+			value = variable.getActualValue();
+			categoricalValueId = Integer.valueOf(variable.getValue());
+		} else {
+			value = variable.getValue();
+			categoricalValueId = null;
+		}
+		return new StockProperty(null, variable.getVariableType().getId(), value, categoricalValueId);
 	}
 }

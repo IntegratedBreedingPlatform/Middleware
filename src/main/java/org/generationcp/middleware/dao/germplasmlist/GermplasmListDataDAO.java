@@ -71,8 +71,8 @@ public class GermplasmListDataDAO extends GenericDAO<GermplasmListData, Integer>
 	public static final Integer STATUS_ACTIVE = 0;
 	public static final String SOURCE_UNKNOWN = "Unknown";
 
-	private static final String COPY_LISTDATA_TO_NEW_LIST = "INSERT INTO listdata (listid, gid, entryid, entrycd, source, grpname, lrstatus, llrecid) "
-		+ "      SELECT :destListid, gid, entryid, entrycd, source, grpname, lrstatus, llrecid "
+	private static final String COPY_LISTDATA_TO_NEW_LIST = "INSERT INTO listdata (listid, gid, entryid, source, grpname, lrstatus, llrecid) "
+		+ "      SELECT :destListid, gid, entryid, source, grpname, lrstatus, llrecid "
 		+ "      FROM listdata "
 		+ "      WHERE listid = :srcListid ";
 

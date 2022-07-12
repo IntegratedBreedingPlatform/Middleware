@@ -399,9 +399,8 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			final Query query =
 				this.getSession().createSQLQuery(sqlString.toString()).addScalar("name").addScalar("title").addScalar("objective")
 					.addScalar("startDate").addScalar("endDate").addScalar("piName").addScalar("siteName").addScalar("id")
-					.addScalar("piId").addScalar("siteId").addScalar("createdBy").addScalar("isLocked").setParameter(
-					DmsProjectDao.PROGRAM_UUID,
-					programUUID);
+					.addScalar("piId").addScalar("siteId").addScalar("createdBy").addScalar("isLocked")
+					.setParameter(DmsProjectDao.PROGRAM_UUID, programUUID);
 			list = query.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in getAllStudyDetails() query in DmsProjectDao: " + e.getMessage(), e);

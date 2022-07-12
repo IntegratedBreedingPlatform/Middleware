@@ -1876,10 +1876,11 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final StockModel stockModel =
 			new StockModel(null, null, RandomStringUtils.randomAlphabetic(5), RandomStringUtils.randomAlphabetic(5),
-				RandomStringUtils.randomAlphabetic(5), RandomStringUtils.randomAlphabetic(5),
-				SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId(), false);
+				RandomStringUtils.randomAlphabetic(5),
+				false);
 		stockModel.setGermplasm(germplasm);
 		stockModel.setProject(dmsProject);
+		stockModel.setCross("-");
 		this.daoFactory.getStockDao().save(stockModel);
 
 		final Set<Integer> gids =
@@ -2760,16 +2761,14 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		studyEntryDto.setGid(gid);
 		studyEntryDto.setEntryNumber(i);
 		studyEntryDto.setDesignation("DESIGNATION" + i);
-		studyEntryDto.setEntryCode("ENTRY_CODE" + gid);
-
+		studyEntryDto.setCross("-");
 		studyEntryDto.getProperties()
-			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), "CROSS" + i));
+			.put(TermId.CROSS.getId(), new StudyEntryPropertyData(null, TermId.CROSS.getId(), "CROSS" + i, null));
 		studyEntryDto.getProperties()
 			.put(TermId.ENTRY_TYPE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_TYPE.getId(),
-				String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId())));
+				null, SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()));
 		studyEntryDto.getProperties()
-			.put(TermId.SEED_SOURCE.getId(), new StudyEntryPropertyData(null, TermId.SEED_SOURCE.getId(),
-				"SEED_SOURCE" + i));
+			.put(TermId.ENTRY_CODE.getId(), new StudyEntryPropertyData(null, TermId.ENTRY_CODE.getId(), "ENTRY_CODE" + gid, null));
 
 		return studyEntryDto;
 	}
@@ -2796,9 +2795,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 			new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), "", 2, TermId.DESIG.getId(), "DESIG");
 		final ProjectProperty entryNoProp =
 			new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), "", 3, TermId.ENTRY_NO.getId(), "ENTRY_NO");
-		final ProjectProperty seedSourceProp =
-			new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), "", 4, TermId.SEED_SOURCE.getId(),
-				"SEED_SOURCE");
 		final ProjectProperty crossProp =
 			new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), "", 5, TermId.CROSS.getId(), "CROSS");
 		final ProjectProperty entryTypeProp =
@@ -2807,7 +2803,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 		this.daoFactory.getProjectPropertyDAO().save(gidProp);
 		this.daoFactory.getProjectPropertyDAO().save(desigProp);
 		this.daoFactory.getProjectPropertyDAO().save(entryNoProp);
-		this.daoFactory.getProjectPropertyDAO().save(seedSourceProp);
 		this.daoFactory.getProjectPropertyDAO().save(crossProp);
 		this.daoFactory.getProjectPropertyDAO().save(entryTypeProp);
 

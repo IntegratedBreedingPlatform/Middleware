@@ -47,11 +47,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public Tool getToolWithName(final String toolId) {
-		return this.workbenchDaoFactory.getToolDAO().getByToolName(toolId);
-	}
-
-	@Override
 	public void close() {
 		if (this.sessionProvider != null) {
 			this.sessionProvider.close();

@@ -1,8 +1,10 @@
 package org.generationcp.middleware.api.brapi.v2.germplasm;
 
+import org.generationcp.middleware.domain.search_request.SearchRequestDto;
+
 import java.util.List;
 
-public class PedigreeNodeSearchRequest {
+public class PedigreeNodeSearchRequest extends SearchRequestDto {
 
 	private List<String> accessionNumbers;
 	private List<String> binomialNames;
@@ -161,7 +163,7 @@ public class PedigreeNodeSearchRequest {
 		this.instituteCodes = instituteCodes;
 	}
 
-	public int getPage() {
+	public Integer getPage() {
 		return this.page;
 	}
 
@@ -169,7 +171,7 @@ public class PedigreeNodeSearchRequest {
 		this.page = page;
 	}
 
-	public int getPageSize() {
+	public Integer getPageSize() {
 		return this.pageSize;
 	}
 
