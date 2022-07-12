@@ -117,8 +117,7 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 					final Integer gid = guuidGidMap.get(guid.toUpperCase());
 					final Integer currentEntryNo = entryNo++;
 					final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, gid, currentEntryNo,
-						String.valueOf(currentEntryNo), plotCodeValuesByGIDs.get(gid), crossExpansions.get(gid),
-						GermplasmListDataDAO.STATUS_ACTIVE, null);
+						plotCodeValuesByGIDs.get(gid), crossExpansions.get(gid), GermplasmListDataDAO.STATUS_ACTIVE, null);
 					this.daoFactory.getGermplasmListDataDAO().save(germplasmListData);
 				}
 			}

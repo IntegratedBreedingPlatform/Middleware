@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.operation.builder;
 
+import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.InventoryDataManagerImpl;
@@ -134,6 +136,10 @@ public abstract class Builder {
 
 	protected final InventoryDataManager getInventoryDataManager() {
 		return new InventoryDataManagerImpl(this.sessionProvider);
+	}
+
+	protected final GermplasmService getGermplasmService() {
+		return new GermplasmServiceImpl(this.sessionProvider);
 	}
 
 	public HibernateSessionProvider getSessionProvider() {

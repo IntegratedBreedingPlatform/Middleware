@@ -231,22 +231,22 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	}
 	
 	@Test
-	public void testGetScaleCategoriesUsedAsGermplasmDescriptor() {
+	public void testGetScaleCategoriesUsedInStudyEntries() {
 		this.createGermplasmDescriptor();
 		this.sessionProvder.getSession().flush();
 		final List<String> usedCategories =
-			this.cvtermRelationshipDao.getScaleCategoriesUsedAsGermplasmDescriptors(this.scale.getCvTermId());
+			this.cvtermRelationshipDao.getScaleCategoriesUsedInStudyEntries(this.scale.getCvTermId());
 		assertEquals(1, usedCategories.size());
 		assertEquals(this.categories.get(3).getName(), usedCategories.get(0));
 	}
 	
 	@Test
-	public void testGetScaleCategoriesUsedAsGermplasmDescriptorWithStudyDeleted() {
+	public void testGetScaleCategoriesUsedInStudyEntriesWithStudyDeleted() {
 		this.markTestStudyAsDeleted();
 		this.createGermplasmDescriptor();
 		// For some reason, need to flush to be able to get the latest state of test study as deleted
 		this.sessionProvder.getSession().flush();
-		final List<String> usedCategories = this.cvtermRelationshipDao.getScaleCategoriesUsedAsGermplasmDescriptors(this.scale.getCvTermId());
+		final List<String> usedCategories = this.cvtermRelationshipDao.getScaleCategoriesUsedInStudyEntries(this.scale.getCvTermId());
 		assertEquals(0, usedCategories.size());
 	}
 	
@@ -323,17 +323,8 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 	}
 	
 	private void createGermplasmDescriptor() {
-		final ExperimentModel experiment = new ExperimentModel();
-		experiment.setGeoLocation(getGeolocation());
-		experiment.setTypeId(TermId.PLOT_EXPERIMENT.getId());
-		experiment.setProject(this.study);
-		experiment.setStock(getStock());
-		this.experimentDao.save(experiment);
-		
-		final StockProperty prop = new StockProperty();
-		prop.setStock(getStock());
-		prop.setTypeId(this.variable.getCvTermId());
-		prop.setValue(String.valueOf(this.categories.get(3).getCvTermId()));
+		StockModel  stock = getStock();
+		final StockProperty prop = new StockProperty(stock, this.variable.getCvTermId(), null, this.categories.get(3).getCvTermId());
 		this.stockPropDao.save(prop);
 
 	}
@@ -375,9 +366,9 @@ public class CVTermRelationshipDaoTest extends IntegrationTestBase {
 			this.stock = new StockModel();
 			this.stock.setName("Germplasm ");
 			this.stock.setIsObsolete(false);
-			this.stock.setTypeId(TermId.ENTRY_CODE.getId());
 			this.stock.setUniqueName("1");
 			this.stock.setGermplasm(getGermplasm());
+			this.stock.setCross("-");
 			this.stock.setProject(this.study);
 			this.stockDao.save(this.stock);
 		}

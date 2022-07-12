@@ -27,6 +27,8 @@ public class OntologyDataHelper {
 			variableType = VariableType.ENVIRONMENT_DETAIL;
 		} else if (PhenotypicType.GERMPLASM == phenotypicType) {
 			variableType = VariableType.GERMPLASM_DESCRIPTOR;
+		} else if (PhenotypicType.ENTRY_DETAIL == phenotypicType) {
+			variableType = VariableType.ENTRY_DETAIL;
 		} else if (PhenotypicType.TRIAL_DESIGN == phenotypicType) {
 			variableType = VariableType.EXPERIMENTAL_DESIGN;
 		} else if (PhenotypicType.VARIATE == phenotypicType) {

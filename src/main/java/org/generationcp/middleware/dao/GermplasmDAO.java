@@ -15,6 +15,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
@@ -1981,6 +1983,35 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 			GermplasmDAO.LOG.error(message);
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	/**
+	 * Returns the group and immediate source name for a given germplasms
+	 *
+	 * @param gids
+	 * @return a {@link Map} of {@link Pair} where the left value corresponds to the group source name and the right value to the immediate source name
+	 */
+	public Map<Integer, Pair<String, String>> getDerivativeParentsMapByGids(final Set<Integer> gids) {
+		final SQLQuery query = this.getSession().createSQLQuery("SELECT "
+			+ " g.gid as gid, "
+			+ " CASE WHEN g.gnpgs = -1 AND g.gpid1 IS NOT NULL AND g.gpid1 <> 0 THEN groupSource.nval ELSE '-' END AS groupSourceName, "
+			+ " CASE WHEN g.gnpgs = -1 AND g.gpid2 IS NOT NULL AND g.gpid2 <> 0 THEN immediateSource.nval ELSE '-' END AS immediateSourceName "
+			+ " 	FROM germplsm g "
+			+ " 		LEFT JOIN names groupSource ON g.gpid1 = groupSource.gid AND groupSource.nstat = 1 "
+			+ " 		LEFT JOIN names immediateSource ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 "
+			+ " WHERE g.gid IN (:" + GermplasmDAO.GIDS + ")");
+		query.addScalar("gid");
+		query.addScalar("groupSourceName");
+		query.addScalar("immediateSourceName");
+		query.setParameterList(GermplasmDAO.GIDS, gids);
+		query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+
+		final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) query.list();
+		final Map<Integer, Pair<String, String>> results = new HashMap<>();
+		queryResults.forEach(row -> {
+			results.put((Integer) row.get("gid"), new ImmutablePair<>((String) row.get("groupSourceName"), (String) row.get("immediateSourceName")));
+		});
+		return results;
 	}
 
 }

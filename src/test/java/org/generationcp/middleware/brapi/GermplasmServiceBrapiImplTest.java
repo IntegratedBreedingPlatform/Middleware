@@ -86,7 +86,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 	public void test_createGermplasm_Ok() {
 		final String creationDate = "2020-10-24";
 		final GermplasmImportRequest request = new GermplasmImportRequest(RandomStringUtils.randomAlphabetic(20), creationDate,
-			this.derivativeMethod.getMid().toString(), RandomStringUtils.randomAlphabetic(20), "UKN",
+			this.derivativeMethod.getMid().toString(), RandomStringUtils.randomAlphabetic(20), GermplasmServiceBrapiImplTest.NOLOC,
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20),
@@ -111,7 +111,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 		assertThat(germplasmDTO.getGid(), notNullValue());
 		final Integer gid = Integer.parseInt(germplasmDTO.getGid());
 		assertThat(germplasmDTO.getBreedingMethodDbId(), equalTo(this.derivativeMethod.getMid().toString()));
-		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo("UKN"));
+		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo(GermplasmServiceBrapiImplTest.NOLOC));
 		assertThat(germplasmDTO.getAcquisitionDate(), equalTo(Util.tryParseDate(creationDate, Util.FRONTEND_DATE_FORMAT)));
 		assertThat(germplasmDTO.getGermplasmDbId(), notNullValue());
 		assertThat(germplasmDTO.getEntryNumber(), nullValue());
@@ -140,7 +140,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 	public void test_createGermplasm_SetPUISynonym_Ok() {
 		final String creationDate = "2020-10-24";
 		final GermplasmImportRequest request = new GermplasmImportRequest(RandomStringUtils.randomAlphabetic(20), creationDate,
-			this.derivativeMethod.getMid().toString(), RandomStringUtils.randomAlphabetic(20), "UKN",
+			this.derivativeMethod.getMid().toString(), RandomStringUtils.randomAlphabetic(20), GermplasmServiceBrapiImplTest.NOLOC,
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20),
@@ -165,7 +165,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 		assertThat(germplasmDTO.getGid(), notNullValue());
 		final Integer gid = Integer.parseInt(germplasmDTO.getGid());
 		assertThat(germplasmDTO.getBreedingMethodDbId(), equalTo(this.derivativeMethod.getMid().toString()));
-		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo("UKN"));
+		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo(GermplasmServiceBrapiImplTest.NOLOC));
 		assertThat(germplasmDTO.getAcquisitionDate(), equalTo(Util.tryParseDate(creationDate, Util.FRONTEND_DATE_FORMAT)));
 		assertThat(germplasmDTO.getGermplasmDbId(), notNullValue());
 		assertThat(germplasmDTO.getEntryNumber(), nullValue());
@@ -286,7 +286,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 
 		final String creationDate = "2020-10-24";
 		final GermplasmImportRequest request = new GermplasmImportRequest(RandomStringUtils.randomAlphabetic(20), creationDate,
-			this.derivativeMethod.getMid().toString(), RandomStringUtils.randomAlphabetic(20), "UKN",
+			this.derivativeMethod.getMid().toString(), RandomStringUtils.randomAlphabetic(20), GermplasmServiceBrapiImplTest.NOLOC,
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20),
@@ -310,9 +310,8 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 
 		final String newCreationDate = "2020-10-24";
 		final Method methodNew = this.createBreedingMethod("GEN", 2);
-		final String location = "ARG";
 		final GermplasmUpdateRequest request = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), newCreationDate,
-			methodNew.getMid().toString(), RandomStringUtils.randomAlphabetic(20), location,
+			methodNew.getMid().toString(), RandomStringUtils.randomAlphabetic(20), GermplasmServiceBrapiImplTest.NOLOC,
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20),
@@ -329,7 +328,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 		assertThat(germplasmDTO.getGid(), equalTo(gid.toString()));
 		assertThat(germplasmDTO.getGermplasmDbId(), equalTo(germplasm.getGermplasmUUID()));
 		assertThat(germplasmDTO.getBreedingMethodDbId(), equalTo(methodNew.getMid().toString()));
-		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo(location));
+		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo(GermplasmServiceBrapiImplTest.NOLOC));
 		assertThat(germplasmDTO.getAcquisitionDate(), equalTo(Util.tryParseDate(newCreationDate, Util.FRONTEND_DATE_FORMAT)));
 		assertThat(germplasmDTO.getEntryNumber(), nullValue());
 		assertThat(germplasmDTO.getDefaultDisplayName(), equalTo(request.getDefaultDisplayName()));
@@ -355,9 +354,8 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 
 		final String newCreationDate = "2020-10-24";
 		final Method methodNew = this.createBreedingMethod("GEN", 2);
-		final String location = "ARG";
 		final GermplasmUpdateRequest request = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), newCreationDate,
-			methodNew.getMid().toString(), RandomStringUtils.randomAlphabetic(20), location,
+			methodNew.getMid().toString(), RandomStringUtils.randomAlphabetic(20), GermplasmServiceBrapiImplTest.NOLOC,
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20),
@@ -373,7 +371,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 		assertThat(germplasmDTO.getGid(), equalTo(gid.toString()));
 		assertThat(germplasmDTO.getGermplasmDbId(), equalTo(germplasm.getGermplasmUUID()));
 		assertThat(germplasmDTO.getBreedingMethodDbId(), equalTo(methodNew.getMid().toString()));
-		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo(location));
+		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo(GermplasmServiceBrapiImplTest.NOLOC));
 		assertThat(germplasmDTO.getAcquisitionDate(), equalTo(Util.tryParseDate(newCreationDate, Util.FRONTEND_DATE_FORMAT)));
 		assertThat(germplasmDTO.getEntryNumber(), nullValue());
 		assertThat(germplasmDTO.getDefaultDisplayName(), equalTo(request.getDefaultDisplayName()));
@@ -399,7 +397,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 
 		// Specify null for those fields we don't want to update like breeding method, location, germplasm date
 		final GermplasmUpdateRequest request = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), null,
-			null, RandomStringUtils.randomAlphabetic(20), null,
+			null, RandomStringUtils.randomAlphabetic(20), GermplasmServiceBrapiImplTest.NOLOC,
 			null,
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20),
@@ -418,7 +416,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 		// Germplasm details remain unchanged
 		assertThat(germplasmDTO.getGermplasmDbId(), equalTo(germplasm.getGermplasmUUID()));
 		assertThat(germplasmDTO.getBreedingMethodDbId(), equalTo(germplasm.getMethodId().toString()));
-		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo("UKN"));
+		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo(GermplasmServiceBrapiImplTest.NOLOC));
 		assertThat(germplasmDTO.getAcquisitionDate(), equalTo(Util.tryParseDate(this.creationDate, Util.DATE_AS_NUMBER_FORMAT)));
 		assertThat(germplasmDTO.getDefaultDisplayName(), equalTo(request.getDefaultDisplayName()));
 		assertThat(germplasmDTO.getGermplasmName(), equalTo(request.getDefaultDisplayName()));
@@ -438,12 +436,12 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 	@Test
 	public void test_updateGermplasm_UpdateSynonymsAndAttributes_Ok() {
 		final Method method = this.createBreedingMethod("GEN", 2);
-		final Germplasm germplasm = this.createGermplasm(method, this.germplasmUUID, null, 2, 0, 0, this.germplasmPUI);
 
+		final Germplasm germplasm = this.createGermplasm(method, this.germplasmUUID, null, 2, 0, 0, this.germplasmPUI);
 		// Specify null for those fields we don't want to update like breeding method, location, germplasm date
 		// Save the first version of names and attributes
 		final GermplasmUpdateRequest request1 = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), null,
-			null, RandomStringUtils.randomAlphabetic(20), null,
+			null, RandomStringUtils.randomAlphabetic(20), GermplasmServiceBrapiImplTest.NOLOC,
 			null,
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20),
@@ -474,7 +472,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 		// Germplasm details remain unchanged
 		assertThat(germplasmDTO.getGermplasmDbId(), equalTo(germplasm.getGermplasmUUID()));
 		assertThat(germplasmDTO.getBreedingMethodDbId(), equalTo(germplasm.getMethodId().toString()));
-		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo("UKN"));
+		assertThat(germplasmDTO.getCountryOfOriginCode(), equalTo(GermplasmServiceBrapiImplTest.NOLOC));
 		assertThat(germplasmDTO.getAcquisitionDate(), equalTo(Util.tryParseDate(this.creationDate, Util.DATE_AS_NUMBER_FORMAT)));
 		assertThat(germplasmDTO.getDefaultDisplayName(), equalTo(request2.getDefaultDisplayName()));
 		assertThat(germplasmDTO.getGermplasmName(), equalTo(request2.getDefaultDisplayName()));
@@ -499,7 +497,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 
 		final String creationDate = "2020-10-24";
 		final GermplasmUpdateRequest request = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), creationDate, null,
-			RandomStringUtils.randomAlphabetic(20), "UKN",
+			RandomStringUtils.randomAlphabetic(20), GermplasmServiceBrapiImplTest.NOLOC,
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20),
@@ -527,7 +525,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 
 		final String creationDate = "2020-10-24";
 		final GermplasmUpdateRequest request = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), creationDate, null,
-			RandomStringUtils.randomAlphabetic(20), "UKN",
+			RandomStringUtils.randomAlphabetic(20), GermplasmServiceBrapiImplTest.NOLOC,
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20),
@@ -553,7 +551,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 
 		final String creationDate = "2020-10-24";
 		final GermplasmUpdateRequest request = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), creationDate, null,
-			RandomStringUtils.randomAlphabetic(20), "UKN",
+			RandomStringUtils.randomAlphabetic(20), GermplasmServiceBrapiImplTest.NOLOC,
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20),
@@ -578,7 +576,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 		// New method is "DER" type while old one is "GEN" type. Expecting to cause method mutation validation error
 		final Method methodNew = this.createBreedingMethod("DER", 2);
 		final GermplasmUpdateRequest request = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), creationDate,
-			methodNew.getMid().toString(), RandomStringUtils.randomAlphabetic(20), "UKN",
+			methodNew.getMid().toString(), RandomStringUtils.randomAlphabetic(20), GermplasmServiceBrapiImplTest.NOLOC,
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20),
@@ -599,7 +597,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 		// New method is "DER" type while old one is "GEN" type. Error shouldn't throw because there are no descendants
 		final Method methodNew = this.createBreedingMethod("DER", 2);
 		final GermplasmUpdateRequest request = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), creationDate,
-			methodNew.getMid().toString(), RandomStringUtils.randomAlphabetic(20), "UKN",
+			methodNew.getMid().toString(), RandomStringUtils.randomAlphabetic(20), GermplasmServiceBrapiImplTest.NOLOC,
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20),
@@ -622,7 +620,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 		// New method has mpgrn = 1 while old one has mpgrn = 2. Expecting to cause validation error that mpgrn should be the same
 		final Method methodNew = this.createBreedingMethod("GEN", 1);
 		final GermplasmUpdateRequest request = new GermplasmUpdateRequest(RandomStringUtils.randomAlphabetic(20), creationDate,
-			methodNew.getMid().toString(), RandomStringUtils.randomAlphabetic(20), "UKN",
+			methodNew.getMid().toString(), RandomStringUtils.randomAlphabetic(20), GermplasmServiceBrapiImplTest.NOLOC,
 			RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20),
 			RandomStringUtils.randomAlphabetic(20),
@@ -659,7 +657,7 @@ public class GermplasmServiceBrapiImplTest extends IntegrationTestBase {
 		assertNull(germplasm.getModifiedBy());
 		assertNull(germplasm.getModifiedDate());
 
-		return germplasm;
+		return germplasm;//
 	}
 
 	private Germplasm createGermplasmWithDescendants(final Method method) {

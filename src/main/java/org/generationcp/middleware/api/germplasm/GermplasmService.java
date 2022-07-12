@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasm;
 
+import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.domain.germplasm.GermplasmBasicDetailsDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
 import org.generationcp.middleware.domain.germplasm.GermplasmMergedDto;
@@ -91,5 +92,13 @@ public interface GermplasmService {
 	Optional<Germplasm> findOneByMethodId(Integer breedingMethodDbId);
 
 	boolean isLocationUsedInGermplasm(Integer locationId);
+
+	/**
+	 * Returns the group and immediate source name for a given germplasms
+	 *
+	 * @param gids
+	 * @return a {@link Map} of {@link Pair} where the left value corresponds to the group source name and the right value to the immediate source name
+	 */
+	Map<Integer, Pair<String, String>> getDerivativeParentsMapByGids(final Set<Integer> gids);
 
 }

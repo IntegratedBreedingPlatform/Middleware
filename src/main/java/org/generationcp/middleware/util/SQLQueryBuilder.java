@@ -2,7 +2,6 @@ package org.generationcp.middleware.util;
 
 import org.generationcp.middleware.dao.util.DAOQueryUtils;
 import org.hibernate.SQLQuery;
-import org.hibernate.type.Type;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,31 +41,6 @@ public class SQLQueryBuilder {
 
 	public void addScalarsToQuery(final SQLQuery query) {
 		this.scalars.forEach(scalar -> query.addScalar(scalar.getColumnAlias(), scalar.getType()));
-	}
-
-	public static class Scalar {
-
-		private final String columnAlias;
-		private final Type type;
-
-		public Scalar(final String columnAlias) {
-			this.columnAlias = columnAlias;
-			this.type = null;
-		}
-
-		public Scalar(final String columnAlias, final Type type) {
-			this.columnAlias = columnAlias;
-			this.type = type;
-		}
-
-		public String getColumnAlias() {
-			return columnAlias;
-		}
-
-		public Type getType() {
-			return type;
-		}
-
 	}
 
 }

@@ -83,7 +83,7 @@ public class CvTermDaoTest extends IntegrationTestBase {
 	private Map<String, VariableType> createVarNameWithTypeMapTestData() {
 		final Map<String, VariableType> varNameWithTypeMap = new HashMap<String, VariableType>();
 		varNameWithTypeMap.put("TRIAL_INSTANCE", VariableType.ENVIRONMENT_DETAIL);
-		varNameWithTypeMap.put("ENTRY_NO", VariableType.GERMPLASM_DESCRIPTOR);
+		varNameWithTypeMap.put("ENTRY_NO", VariableType.ENTRY_DETAIL);
 		varNameWithTypeMap.put("DESIGNATION", VariableType.GERMPLASM_DESCRIPTOR);
 		varNameWithTypeMap.put("GID", VariableType.GERMPLASM_DESCRIPTOR);
 		varNameWithTypeMap.put("CROSS", VariableType.GERMPLASM_DESCRIPTOR);
