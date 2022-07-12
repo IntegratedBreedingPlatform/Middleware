@@ -42,8 +42,11 @@ import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
+import org.generationcp.middleware.service.api.study.ObservationLevel;
+import org.generationcp.middleware.service.api.study.ObservationLevelFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -279,6 +282,17 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		final Set<String> geolocationIds) {
 		return this.daoFactory.getExperimentPropertyDao().getPlotObservationLevelRelationshipsByGeolocations(geolocationIds);
 	}
+
+	@Override
+	public long countObservationLevels(final ObservationLevelFilter observationLevelFilter) {
+		return 0;
+	}
+
+	@Override
+	public List<ObservationLevel> getObservationLevels(ObservationLevelFilter observationLevelFilter, Pageable pageable) {
+		return new ArrayList<>();
+	}
+
 
 	private boolean isObservationUnitForMeans(final ObservationUnitImportRequestDto observationUnitDto) {
 		return observationUnitDto.getObservationUnitPosition() != null

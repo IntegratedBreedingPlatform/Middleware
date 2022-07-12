@@ -2,6 +2,9 @@ package org.generationcp.middleware.api.brapi.v2.observationunit;
 
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
+import org.generationcp.middleware.service.api.study.ObservationLevel;
+import org.generationcp.middleware.service.api.study.ObservationLevelFilter;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
@@ -33,5 +36,9 @@ public interface ObservationUnitService {
 	List<String> importObservationUnits(String crop, List<ObservationUnitImportRequestDto> observationUnitImportRequestDtos);
 
 	Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocations(Set<String> geolocationIds);
+
+	long countObservationLevels(ObservationLevelFilter observationLevelFilter);
+
+	List<ObservationLevel> getObservationLevels(ObservationLevelFilter observationLevelFilter, Pageable pageable);
 
 }
