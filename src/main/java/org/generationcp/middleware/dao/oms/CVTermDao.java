@@ -1900,7 +1900,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			sqlQuery.setParameter(CVTermDao.PROGRAMUUID, programUUID);
 			sqlQuery.setParameter(CVTermDao.QUERY_PARAMETER, '%' + query + '%');
-			if(!isEmpty(variableTypeIds)) {
+			if (!isEmpty(variableTypeIds)) {
 				sqlQuery.setParameterList("variableTypeIds", variableTypeIds);
 			}
 			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
