@@ -122,8 +122,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		+ "FROM nd_experiment e INNER JOIN stock s ON s.stock_id = e.stock_id "
 		+ "WHERE (" + TermId.ENTRY_NO.getId() + "= :variableId AND s.uniquename IS NOT NULL)  OR (" + TermId.GID.getId()
 		+ " = :variableId AND s.dbxref_id IS NOT NULL) "
-		+ "OR (" + TermId.DESIG.getId() + " = :variableId AND s.name IS NOT NULL) OR (" + TermId.ENTRY_CODE.getId()
-		+ " = :variableId AND s.value IS NOT NULL)";
+		+ "OR (" + TermId.DESIG.getId() + " = :variableId AND s.name IS NOT NULL)";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP = "SELECT count(e.nd_experiment_id) "
 		+ "FROM nd_experiment e INNER JOIN stockprop sp ON sp.stock_id = e.stock_id "
@@ -921,8 +920,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			} else if (VariableType.EXPERIMENTAL_DESIGN.getId() == variableTypeId
 				|| VariableType.TREATMENT_FACTOR.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_EXPERIMENTPROP;
-			} else if (TermId.ENTRY_NO.getId() == variableId || TermId.GID.getId() == variableId || TermId.DESIG.getId() == variableId
-				|| TermId.ENTRY_CODE.getId() == variableId) {
+			} else if (TermId.ENTRY_NO.getId() == variableId || TermId.GID.getId() == variableId || TermId.DESIG.getId() == variableId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCK;
 			} else if (VariableType.GERMPLASM_DESCRIPTOR.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP;

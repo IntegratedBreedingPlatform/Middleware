@@ -180,6 +180,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         Assert.assertNotNull(observationUnitRow.getVariables().get("TRIAL_INSTANCE"));
         Assert.assertNotNull(observationUnitRow.getVariables().get("ENTRY_NO"));
         Assert.assertNotNull(observationUnitRow.getVariables().get("ENTRY_CODE"));
+        Assert.assertNotNull(observationUnitRow.getVariables().get("ENTRY_TYPE"));
         Assert.assertNotNull(observationUnitRow.getVariables().get("GID"));
         Assert.assertNotNull(observationUnitRow.getVariables().get("DESIGNATION"));
         Assert.assertNotNull(observationUnitRow.getVariables().get("CROSS"));

@@ -100,7 +100,8 @@ public class WorkbookParser {
 		GERMPLASM_DECRIPTORS("GERMPLASM DESCRIPTORS", PhenotypicType.GERMPLASM, PhenotypicType.GERMPLASM.getLabelList().get(0), VariableType.GERMPLASM_DESCRIPTOR),
 		OBSERVATION_UNIT("OBSERVATION UNIT", PhenotypicType.TRIAL_DESIGN, PhenotypicType.TRIAL_DESIGN.getLabelList().get(1), VariableType.EXPERIMENTAL_DESIGN),
 		TRAIT("TRAITS", PhenotypicType.VARIATE, PhenotypicType.VARIATE.getLabelList().get(1), VariableType.TRAIT),
-		SELECTIONS("SELECTIONS", PhenotypicType.VARIATE, PhenotypicType.VARIATE.getLabelList().get(1), VariableType.SELECTION_METHOD);
+		SELECTIONS("SELECTIONS", PhenotypicType.VARIATE, PhenotypicType.VARIATE.getLabelList().get(1), VariableType.SELECTION_METHOD),
+		ENTRY_DETAILS("ENTRY DETAILS", PhenotypicType.ENTRY_DETAIL, PhenotypicType.ENTRY_DETAIL.getLabelList().get(0), VariableType.ENTRY_DETAIL);
 
 		private final String name;
 
@@ -223,7 +224,7 @@ public class WorkbookParser {
 		final List<MeasurementVariable> conditions = new ArrayList<>();
 		final List<MeasurementVariable> constants = new ArrayList<>();
 		final List<MeasurementVariable> traits = new ArrayList<>();
-
+		final List<MeasurementVariable> entryDetails = new ArrayList<>();
 
 		// Read the study details (metadata: name, objective, start/end date etc..)
 		// The first 7 rows are reserved from study details
@@ -241,6 +242,8 @@ public class WorkbookParser {
 		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
 		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.GERMPLASM_DECRIPTORS));
 		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
+		entryDetails.addAll(this.readMeasurementVariables(excelWorkbook, Section.ENTRY_DETAILS));
+		this.incrementDescriptionSheetRowIndex(excelWorkbook); // Skip blank rows between sections
 		factors.addAll(this.readMeasurementVariables(excelWorkbook, Section.OBSERVATION_UNIT));
 
 		if (isReadTraits) {
@@ -254,6 +257,7 @@ public class WorkbookParser {
 		workbook.setConditions(conditions);
 		workbook.setVariates(traits);
 		workbook.setConstants(constants);
+		workbook.setEntryDetails(entryDetails);
 
 		if (!this.errorMessages.isEmpty() && performValidation) {
 			throw new WorkbookParserException(this.errorMessages);

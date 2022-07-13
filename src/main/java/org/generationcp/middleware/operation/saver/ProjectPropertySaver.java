@@ -181,7 +181,7 @@ public class ProjectPropertySaver extends Saver {
 
 		if (variables != null) {
 
-			int rank = this.getNextRank(study);
+			int rank = study.getNextPropertyRank();
 			final Set<Integer> geoIds = this.daoFactory.getGeolocationDao().getLocationIds(study.getProjectId());
 			final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(geoIds.iterator().next());
 			Hibernate.initialize(geolocation.getProperties());
@@ -209,18 +209,6 @@ public class ProjectPropertySaver extends Saver {
 		}
 	}
 
-	private int getNextRank(final DmsProject project) {
-		int nextRank = 1;
-		if (project.getProperties() != null) {
-			for (final ProjectProperty property : project.getProperties()) {
-				if (property.getRank() >= nextRank) {
-					nextRank = property.getRank() + 1;
-				}
-			}
-		}
-		return nextRank;
-	}
-
 	private boolean isInGeolocation(final int termId) {
 		return TermId.TRIAL_INSTANCE_FACTOR.getId() == termId || TermId.LATITUDE.getId() == termId || TermId.LONGITUDE.getId() == termId
 				|| TermId.GEODETIC_DATUM.getId() == termId || TermId.ALTITUDE.getId() == termId;
@@ -230,8 +218,8 @@ public class ProjectPropertySaver extends Saver {
 			final MeasurementVariable variable, final int rank, final boolean isConstant, final Geolocation geolocation) {
 
 		if (PhenotypicType.TRIAL_ENVIRONMENT == variable.getRole()) {
-			final int datasetRank = this.getNextRank(trialDataset);
-			final int measurementRank = this.getNextRank(measurementDataset);
+			final int datasetRank = trialDataset.getNextPropertyRank();
+			final int measurementRank = measurementDataset.getNextPropertyRank();
 
 			this.insertVariable(trialDataset, variable, datasetRank);
 
@@ -251,7 +239,7 @@ public class ProjectPropertySaver extends Saver {
 			if (isConstant) {
 				if (PhenotypicType.TRIAL_ENVIRONMENT.getLabelList().contains(variable.getLabel())) {
 					// a trial constant
-					final int datasetRank = this.getNextRank(trialDataset);
+					final int datasetRank = trialDataset.getNextPropertyRank();
 					this.insertVariable(trialDataset, variable, datasetRank);
 					this.getPhenotypeSaver().saveOrUpdatePhenotypeValue(trialDataset.getProjectId(), variable.getTermId(),
 							variable.getValue(), variable.getDataTypeId());
@@ -262,7 +250,7 @@ public class ProjectPropertySaver extends Saver {
 							variable.getValue(), variable.getDataTypeId());
 				}
 			} else {
-				final int measurementRank = this.getNextRank(measurementDataset);
+				final int measurementRank = measurementDataset.getNextPropertyRank();
 				this.insertVariable(measurementDataset, variable, measurementRank);
 			}
 		} else {
@@ -421,7 +409,7 @@ public class ProjectPropertySaver extends Saver {
 				}
 				switch (operation) {
 					case ADD:
-						final int rank = this.getNextRank(measurementDataset);
+						final int rank = measurementDataset.getNextPropertyRank();
 						this.insertVariable(measurementDataset, variable, rank);
 						break;
 

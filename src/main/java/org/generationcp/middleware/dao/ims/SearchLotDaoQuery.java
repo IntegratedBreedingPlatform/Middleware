@@ -78,9 +78,8 @@ final class SearchLotDaoQuery {
 				baseQuery += formatLotAttributeJoin(alias, attributeVariableId);
 			}
 		}
-		String selectBaseQuery = String.format(baseQuery, selectExpression);
-		selectBaseQuery += DELETED_CONDITION;
-		return selectBaseQuery;
+
+		return String.format(baseQuery, selectExpression).concat(DELETED_CONDITION);
 	}
 
 
@@ -94,8 +93,7 @@ final class SearchLotDaoQuery {
 				baseQuery += formatLotAttributeJoin(alias, attributeVariableId);
 			}
 		}
-		baseQuery += DELETED_CONDITION;
-		return String.format(baseQuery, " count(1) ");
+		return String.format(baseQuery.concat(DELETED_CONDITION), " count(1) ");
 	}
 
 	public static void addSearchLotsQueryFiltersAndGroupBy(

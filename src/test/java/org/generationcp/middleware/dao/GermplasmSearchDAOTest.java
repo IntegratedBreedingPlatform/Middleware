@@ -414,7 +414,7 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 
 		// Create propertyId list with all addable columns.
 		propertyIds.add(GermplasmSearchDAO.IMMEDIATE_SOURCE_GID);
-		propertyIds.add(GermplasmSearchDAO.IMMEDIATE_SOURCE_PREFERRED_NAME);
+		propertyIds.add(GermplasmSearchDAO.IMMEDIATE_SOURCE_NAME);
 
 		searchParameter.setAddedColumnsPropertyIds(propertyIds);
 
@@ -1717,12 +1717,12 @@ public class GermplasmSearchDAOTest extends IntegrationTestBase {
 				StringUtils.isEmpty(germplasm.getImmediateSourceGID()));
 		}
 
-		if (propertyIds.contains(GermplasmSearchDAO.IMMEDIATE_SOURCE_PREFERRED_NAME)) {
+		if (propertyIds.contains(GermplasmSearchDAO.IMMEDIATE_SOURCE_NAME)) {
 			Assert.assertEquals("Result germplasm should contain Immediate Source Preferred Name", this.maleParentPreferredName.getNval(),
-				germplasm.getImmediateSourcePreferredName());
+				germplasm.getImmediateSourceName());
 		} else {
 			Assert.assertTrue("Result germplasm should not contain Immediate Source Preferred Name",
-				StringUtils.isEmpty(germplasm.getImmediateSourcePreferredName()));
+				StringUtils.isEmpty(germplasm.getImmediateSourceName()));
 		}
 
 		if (propertyIds.contains(NOTE_ATTRIBUTE)) {

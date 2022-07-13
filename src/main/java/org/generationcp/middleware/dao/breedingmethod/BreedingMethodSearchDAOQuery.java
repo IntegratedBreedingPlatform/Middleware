@@ -8,6 +8,7 @@ import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.pojos.MethodClass;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.util.SQLQueryBuilder;
+import org.generationcp.middleware.util.Scalar;
 import org.generationcp.middleware.util.Util;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
@@ -116,23 +117,23 @@ public class BreedingMethodSearchDAOQuery {
   }
 
   private static void addCommonScalars(final SQLQueryBuilder sqlQueryBuilder, final String programUUID) {
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(ID_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(NAME_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(TYPE_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(DESCRIPTION_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(GROUP_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(ABBREVIATION_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(DATE_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(CLASS_ID_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(CLASS_NAME_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(NUMBER_OF_PROGENITORS_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(SEPARATOR_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(PREFIX_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(COUNT_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(SUFFIX_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(ID_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(NAME_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(TYPE_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(DESCRIPTION_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(GROUP_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(ABBREVIATION_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(DATE_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(CLASS_ID_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(CLASS_NAME_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(NUMBER_OF_PROGENITORS_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(SEPARATOR_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(PREFIX_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(COUNT_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(SUFFIX_ALIAS));
     if (!StringUtils.isEmpty(programUUID)) {
-      sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(FAVORITE_PROGRAM_UUID_ALIAS));
-      sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(FAVORITE_PROGRAM_ID_ALIAS));
+      sqlQueryBuilder.addScalar(new Scalar(FAVORITE_PROGRAM_UUID_ALIAS));
+      sqlQueryBuilder.addScalar(new Scalar(FAVORITE_PROGRAM_ID_ALIAS));
     }
   }
 

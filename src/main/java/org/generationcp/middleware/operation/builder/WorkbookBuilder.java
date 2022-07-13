@@ -60,6 +60,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class WorkbookBuilder extends Builder {
 
@@ -100,13 +101,26 @@ public class WorkbookBuilder extends Builder {
 		final Integer dataSetId = workbook.getMeasurementDatesetId();
 		final VariableTypeList variables = this.dataSetBuilder.getVariableTypes(dataSetId);
 		final List<Experiment> experiments =
-			this.studyDataManager.getExperiments(dataSetId, instanceNumbers, repNumbers);
+			this.studyDataManager.getExperimentsWithGidAndCross(dataSetId, instanceNumbers, repNumbers);
 		final Map<Integer, String> samples = this.getExperimentSampleMap(workbook.getStudyDetails().getId());
 		// Do not rely on workbook variates, instead query the latest record from DB
 		final List<MeasurementVariable> selectionsAndTraits = this.daoFactory.getDmsProjectDAO()
 			.getObservationSetVariables(dataSetId, Arrays.asList(VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
+
+		this.addFactorToWorkbookIfNotPresent(workbook, TermId.GID);
+		// Forcing to add CROSS variable because we need cross values to show them in Advance Study > REVIEW ADVANCED LINES
+		this.addFactorToWorkbookIfNotPresent(workbook, TermId.CROSS);
+
 		workbook.setObservations(this.buildObservations(experiments, variables.getVariates(), workbook.getFactors(), selectionsAndTraits,
 			workbook.getConditions(), samples));
+	}
+
+	private void addFactorToWorkbookIfNotPresent(final Workbook workbook, final TermId termId) {
+		final boolean factorPresent =
+			workbook.getFactors().stream().anyMatch(measurementVariable -> measurementVariable.getTermId() == termId.getId());
+		if (!factorPresent) {
+			workbook.getFactors().add(new MeasurementVariable(termId.getId()));
+		}
 	}
 
 	public Workbook create(final int id) {
@@ -157,6 +171,7 @@ public class WorkbookBuilder extends Builder {
 		variables = this.removeTrialDatasetVariables(variables, trialEnvironmentVariables);
 		final Set<MeasurementVariable> conditions = this.buildConditionVariables(conditionVariables, trialEnvironmentVariables);
 		final List<MeasurementVariable> factors = this.buildFactors(variables);
+		final List<MeasurementVariable> entryDetails = this.buildEntryDetails(variables);
 		final Set<MeasurementVariable> constants = this.buildStudyMeasurementVariables(constantVariables, false, true);
 		constants.addAll(this.buildStudyMeasurementVariables(trialConstantVariables, false, false));
 		final List<MeasurementVariable> variates = this.buildVariates(variables, new ArrayList<>(constants));
@@ -207,6 +222,7 @@ public class WorkbookBuilder extends Builder {
 
 		workbook.setStudyDetails(studyDetails);
 		workbook.setFactors(factors);
+		workbook.setEntryDetails(entryDetails);
 		workbook.setVariates(variates);
 		workbook.setConditions(new ArrayList<>(conditions));
 		workbook.setConstants(new ArrayList<>(constants));
@@ -316,8 +332,6 @@ public class WorkbookBuilder extends Builder {
 		VariableTypeList variables = null;
 		if (dataSetId != null) {
 			variables = this.dataSetBuilder.getVariableTypes(dataSetId);
-			// variable type roles are being set inside getexperiment
-			this.studyDataManager.getExperiments(dataSetId, 0, Integer.MAX_VALUE, variables);
 		}
 
 		final List<MeasurementVariable> factors = this.buildFactors(variables);
@@ -325,6 +339,7 @@ public class WorkbookBuilder extends Builder {
 		final Set<MeasurementVariable> conditions = this.buildStudyMeasurementVariables(study.getConditions(), true, true);
 		final Set<MeasurementVariable> constants = this.buildStudyMeasurementVariables(study.getConstants(), false, true);
 		final List<TreatmentVariable> treatmentFactors = this.buildTreatmentFactors(variables);
+		final List<MeasurementVariable> entryDetails = this.buildEntryDetails(variables);
 		if (dataSetId != null) {
 			this.setTreatmentFactorValues(treatmentFactors, dataSetId);
 		}
@@ -390,6 +405,7 @@ public class WorkbookBuilder extends Builder {
 		workbook.setConditions(new ArrayList<>(conditions));
 		workbook.setConstants(new ArrayList<>(constants));
 		workbook.setTreatmentFactors(treatmentFactors);
+		workbook.setEntryDetails(entryDetails);
 		workbook.setExperimentalDesignVariables(experimentalDesignVariables);
 		return workbook;
 	}
@@ -713,6 +729,16 @@ public class WorkbookBuilder extends Builder {
 		return factors;
 	}
 
+	private List<MeasurementVariable> buildEntryDetails(final VariableTypeList variables) {
+		if (variables != null) {
+			return variables.getVariableTypes().stream()
+				.filter(variableType -> variableType.getVariableType() == VariableType.ENTRY_DETAIL)
+				.map(variableType -> this.getMeasurementVariableTransformer().transform(variableType, true, false))
+				.collect(Collectors.toList());
+		}
+		return new ArrayList<>();
+	}
+
 	private List<MeasurementVariable> removeConstantsFromVariates(
 		final List<MeasurementVariable> variates,
 		final List<MeasurementVariable> constants) {
@@ -952,4 +978,5 @@ public class WorkbookBuilder extends Builder {
 			treatmentVariable.setValues(values);
 		}
 	}
+
 }

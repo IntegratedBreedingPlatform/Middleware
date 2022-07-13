@@ -6,6 +6,7 @@ import org.generationcp.middleware.pojos.AbstractEntity;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 
 import javax.persistence.Basic;
@@ -78,6 +79,10 @@ public class FileMetadata extends AbstractEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "nd_geolocation_id")
 	private Geolocation geolocation;
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "lotid")
+	private Lot lot;
 
 	@OneToMany
 	@JoinTable(
@@ -204,6 +209,14 @@ public class FileMetadata extends AbstractEntity {
 
 	public void setGeolocation(final Geolocation geolocation) {
 		this.geolocation = geolocation;
+	}
+
+	public Lot getLot() {
+		return this.lot;
+	}
+
+	public void setLot(final Lot lot) {
+		this.lot = lot;
 	}
 
 	public List<CVTerm> getVariables() {

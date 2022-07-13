@@ -200,7 +200,7 @@ public class ExtendedLotDto extends LotDto {
 	}
 
 	public Map<Integer, Object> getAttributeTypesValueMap() {
-		return attributeTypesValueMap;
+		return this.attributeTypesValueMap;
 	}
 
 	public void setAttributeTypesValueMap(final Map<Integer, Object> attributeTypesValueMap) {

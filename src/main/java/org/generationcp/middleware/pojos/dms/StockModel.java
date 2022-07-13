@@ -11,10 +11,10 @@
 
 package org.generationcp.middleware.pojos.dms;
 
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
+import org.generationcp.middleware.util.CrossExpansionUtil;
 import org.hibernate.annotations.BatchSize;
 
 import javax.persistence.Basic;
@@ -29,7 +29,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -40,13 +39,14 @@ import java.util.Set;
  * http://gmod.org/wiki/Chado_Tables#Table:_stock
  * <p>
  * Any stock can be globally identified by the combination of organism, uniquename and stock type. A stock is the physical entities, either
- * living or preserved, held by collections. Stocks belong to a collection; they have IDs, type, organism, description and may have a
+ * living or preserved, held by col
+ * lections. Stocks belong to a collection; they have IDs, type, organism, description and may have a
  * genotype.
  *
  * @author Joyce Avestro
  */
 @Entity
-@Table(name = "stock", uniqueConstraints = {@UniqueConstraint(columnNames = {"organism_id", "uniquename", "type_id"})})
+@Table(name = "stock")
 public class StockModel implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -77,21 +77,11 @@ public class StockModel implements Serializable {
 	@Column(name = "uniquename")
 	private String uniqueName;
 
-	@Column(name = "value")
-	private String value;
-
 	/**
 	 * The description is the genetic description provided in the stock list.
 	 */
 	@Column(name = "description")
 	private String description;
-
-	/**
-	 * The type_id foreign key links to a controlled vocabulary of stock types. The would include living stock, genomic DNA, preserved
-	 * specimen. Secondary cvterms for stocks would go in stock_cvterm. References cvterm
-	 */
-	@Column(name = "type_id")
-	private Integer typeId;
 
 	@Basic(optional = false)
 	@Column(name = "is_obsolete")
@@ -101,6 +91,9 @@ public class StockModel implements Serializable {
 	@JoinColumn(name = "project_id")
 	private DmsProject project;
 
+	@Column(name = "cross_value")
+	private String cross;
+
 	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "stockModel")
 	@BatchSize(size = 5000)
 	private Set<StockProperty> properties;
@@ -108,16 +101,14 @@ public class StockModel implements Serializable {
 	public StockModel() {
 	}
 
-	public StockModel(final Integer stockId, final Integer organismId, final String name, final String uniqueName, final String value,
-		final String description, final Integer typeId, final Boolean isObsolete) {
+	public StockModel(final Integer stockId, final Integer organismId, final String name, final String uniqueName,
+		final String description, final Boolean isObsolete) {
 		super();
 		this.stockId = stockId;
 		this.organismId = organismId;
 		this.name = name;
 		this.uniqueName = uniqueName;
-		this.value = value;
 		this.description = description;
-		this.typeId = typeId;
 		this.isObsolete = isObsolete;
 	}
 
@@ -125,19 +116,16 @@ public class StockModel implements Serializable {
 		this.setProject(new DmsProject(studyId));
 		this.setName(studyEntryDto.getDesignation());
 		this.setGermplasm(new Germplasm(Integer.valueOf(studyEntryDto.getGid())));
-		this.setTypeId(TermId.ENTRY_CODE.getId());
-		this.setValue(studyEntryDto.getEntryCode());
 		this.setUniqueName(studyEntryDto.getEntryNumber().toString());
 		this.setIsObsolete(false);
+		this.setCross(studyEntryDto.getCross());
 
 		final Set<StockProperty> stockProperties = new HashSet<>();
 		final Iterator<Map.Entry<Integer, StudyEntryPropertyData>> iterator = studyEntryDto.getProperties().entrySet().iterator();
 		while (iterator.hasNext()) {
 			final StudyEntryPropertyData studyEntryPropertyData = iterator.next().getValue();
-			final StockProperty stockProperty = new StockProperty();
-			stockProperty.setStock(this);
-			stockProperty.setTypeId(studyEntryPropertyData.getVariableId());
-			stockProperty.setValue(studyEntryPropertyData.getValue());
+			final StockProperty stockProperty = new StockProperty(this, studyEntryPropertyData.getVariableId(),
+				studyEntryPropertyData.getValue(), studyEntryPropertyData.getCategoricalValueId());
 			stockProperties.add(stockProperty);
 		}
 		this.setProperties(stockProperties);
@@ -183,14 +171,6 @@ public class StockModel implements Serializable {
 		this.uniqueName = uniqueName;
 	}
 
-	public String getValue() {
-		return this.value;
-	}
-
-	public void setValue(String value) {
-		this.value = value;
-	}
-
 	public String getDescription() {
 		return this.description;
 	}
@@ -199,20 +179,20 @@ public class StockModel implements Serializable {
 		this.description = description;
 	}
 
-	public Integer getTypeId() {
-		return this.typeId;
-	}
-
-	public void setTypeId(Integer typeId) {
-		this.typeId = typeId;
-	}
-
 	public Boolean getIsObsolete() {
 		return this.isObsolete;
 	}
 
 	public void setIsObsolete(Boolean isObsolete) {
 		this.isObsolete = isObsolete;
+	}
+
+	public String getCross() {
+		return cross;
+	}
+
+	public void setCross(final String cross) {
+		this.cross = cross;
 	}
 
 	public Set<StockProperty> getProperties() {
@@ -231,6 +211,11 @@ public class StockModel implements Serializable {
 		this.project = project;
 	}
 
+	public void truncateCrossValueIfNeeded() {
+		String cross = CrossExpansionUtil.truncateCrossValueIfNeeded(this.getCross());
+		this.setCross(cross);
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -241,9 +226,7 @@ public class StockModel implements Serializable {
 		result = prime * result + (this.name == null ? 0 : this.name.hashCode());
 		result = prime * result + (this.organismId == null ? 0 : this.organismId.hashCode());
 		result = prime * result + (this.stockId == null ? 0 : this.stockId.hashCode());
-		result = prime * result + (this.typeId == null ? 0 : this.typeId.hashCode());
 		result = prime * result + (this.uniqueName == null ? 0 : this.uniqueName.hashCode());
-		result = prime * result + (this.value == null ? 0 : this.value.hashCode());
 		return result;
 	}
 
@@ -301,25 +284,11 @@ public class StockModel implements Serializable {
 		} else if (!this.stockId.equals(other.stockId)) {
 			return false;
 		}
-		if (this.typeId == null) {
-			if (other.typeId != null) {
-				return false;
-			}
-		} else if (!this.typeId.equals(other.typeId)) {
-			return false;
-		}
 		if (this.uniqueName == null) {
 			if (other.uniqueName != null) {
 				return false;
 			}
 		} else if (!this.uniqueName.equals(other.uniqueName)) {
-			return false;
-		}
-		if (this.value == null) {
-			if (other.value != null) {
-				return false;
-			}
-		} else if (!this.value.equals(other.value)) {
 			return false;
 		}
 		return true;
@@ -338,12 +307,8 @@ public class StockModel implements Serializable {
 		builder.append(this.name);
 		builder.append(", uniqueName=");
 		builder.append(this.uniqueName);
-		builder.append(", value=");
-		builder.append(this.value);
 		builder.append(", description=");
 		builder.append(this.description);
-		builder.append(", typeId=");
-		builder.append(this.typeId);
 		builder.append(", isObsolete=");
 		builder.append(this.isObsolete);
 		builder.append(", project=");

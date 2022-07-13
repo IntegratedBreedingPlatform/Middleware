@@ -26,7 +26,7 @@ public class ColumnLabelsTest {
 			ColumnLabels.FGID.getName(), ColumnLabels.CROSS_FEMALE_PREFERRED_NAME.getName(),
 			ColumnLabels.MGID.getName(), ColumnLabels.CROSS_MALE_PREFERRED_NAME.getName(),
 			ColumnLabels.GROUP_SOURCE_GID.getName(),ColumnLabels.GROUP_SOURCE_PREFERRED_NAME.getName(),
-			ColumnLabels.IMMEDIATE_SOURCE_GID.getName(),ColumnLabels.IMMEDIATE_SOURCE_PREFERRED_NAME.getName());
+			ColumnLabels.IMMEDIATE_SOURCE_GID.getName(),ColumnLabels.IMMEDIATE_SOURCE_NAME.getName());
 
 	@Before
 	public void setup() {
