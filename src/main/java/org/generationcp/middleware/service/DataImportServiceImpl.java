@@ -769,6 +769,8 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		this.addErrorForDuplicates(errors, stdVarMap);
 		stdVarMap = this.checkForDuplicates(workbook.getVariateVariables());
 		this.addErrorForDuplicates(errors, stdVarMap);
+		stdVarMap = this.checkForDuplicates(workbook.getEntryDetails());
+		this.addErrorForDuplicates(errors, stdVarMap);
 	}
 
 	private Map<String, List<MeasurementVariable>> checkForDuplicates(
@@ -1044,8 +1046,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// DMV : TODO change implem so that backend is agnostic to UI when
 		// determining messages
 		if (!entryDetailsTermIds.contains(TermId.ENTRY_NO.getId())) {
-			this.initializeIfNull(errors, Constants.MISSING_ENTRY);
-			errors.get(Constants.MISSING_ENTRY).add(new Message("error.entryno.doesnt.exist.wizard"));
+			this.initializeIfNull(errors, Constants.MISSING_ENTRY_NO);
+			errors.get(Constants.MISSING_ENTRY_NO).add(new Message("error.entryno.doesnt.exist.wizard"));
+		}
+
+		if (workbook.getImportType() != null && workbook.getImportType().intValue() == DatasetTypeEnum.PLOT_DATA.getId() && !entryDetailsTermIds.contains(TermId.ENTRY_TYPE.getId())) {
+			this.initializeIfNull(errors, Constants.MISSING_ENTRY_TYPE);
+			errors.get(Constants.MISSING_ENTRY_TYPE).add(new Message("error.entrytype.doesnt.exist.wizard"));
 		}
 
 		if (!factorsTermIds.contains(TermId.GID.getId())) {
