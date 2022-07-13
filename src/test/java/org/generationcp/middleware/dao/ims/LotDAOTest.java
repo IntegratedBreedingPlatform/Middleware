@@ -13,8 +13,15 @@ import org.generationcp.middleware.data.initializer.InventoryDetailsTestDataInit
 import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
+import org.generationcp.middleware.domain.oms.CvId;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.shared.AttributeRequestDto;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -23,13 +30,17 @@ import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionType;
+import org.generationcp.middleware.pojos.oms.CVTerm;
+import org.generationcp.middleware.pojos.oms.CVTermProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.inventory.LotAttributeService;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigInteger;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,6 +59,7 @@ public class LotDAOTest extends IntegrationTestBase {
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	private Lot lot1, lot2, lot3;
+	private Variable testVariable;
 	private Transaction transaction1, transaction2, transaction3;
 	private Location location;
 	private Germplasm germplasm1, germplasm2;
@@ -59,6 +71,9 @@ public class LotDAOTest extends IntegrationTestBase {
 
 	private static final String LST = "LST";
 	private static final String LIST = "LIST";
+
+	@Autowired
+	private LotAttributeService lotAttributeService;
 
 	@Before
 	public void setUp() throws Exception {
@@ -186,6 +201,28 @@ public class LotDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
+	public void testSearchLotsByAttribute() {
+		Variable testVariable = this.createTestVariable();
+
+		this.lotAttributeService.createLotAttribute(this.lot1.getId(), new AttributeRequestDto(
+			testVariable.getId(), "attribute for lot1","20220101", 1));
+		this.lotAttributeService.createLotAttribute(this.lot2.getId(), new AttributeRequestDto(
+			testVariable.getId(), "attribute for lot2","20220101", 1));
+		this.lotAttributeService.createLotAttribute(this.lot3.getId(), new AttributeRequestDto(
+			testVariable.getId(), "attribute for lot3","20220101", 1));
+
+		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
+		lotsSearchDto.setAttributes(Collections.singletonMap(testVariable.getId(),"attribute"));
+
+		List<ExtendedLotDto> extendedLotDtos = this.lotDAO.searchLots(lotsSearchDto, null, null);
+		Assert.assertEquals(extendedLotDtos.size(), 3);
+
+		lotsSearchDto.setAttributes(Collections.singletonMap(testVariable.getId(),"lot1"));
+		extendedLotDtos = this.lotDAO.searchLots(lotsSearchDto, null, null);
+		Assert.assertEquals(extendedLotDtos.size(), 1);
+	}
+
+	@Test
 	public void testSearchLotsByGermplasmListIds() {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setGermplasmListIds(Lists.newArrayList(this.germplasmList.getId()));
@@ -252,6 +289,32 @@ public class LotDAOTest extends IntegrationTestBase {
 						RandomStringUtils.randomAlphabetic(6), 0, 99995);
 
 		this.manager.addGermplasmListData(listData1);
+	}
+
+	private Variable createTestVariable() {
+		// Create traitVariable
+		final CVTerm cvTermVariable = this.daoFactory.getCvTermDao()
+			.save("LOT_ATTRIBUTE", RandomStringUtils.randomAlphanumeric(10), CvId.VARIABLES);
+		final CVTerm property = this.daoFactory.getCvTermDao().save(RandomStringUtils.randomAlphanumeric(10), "", CvId.PROPERTIES);
+		final CVTerm scale = this.daoFactory.getCvTermDao().save(RandomStringUtils.randomAlphanumeric(10), "", CvId.SCALES);
+		this.daoFactory.getCvTermRelationshipDao().save(scale.getCvTermId(), TermId.HAS_TYPE.getId(), DataType.NUMERIC_VARIABLE.getId());
+		final CVTerm method = this.daoFactory.getCvTermDao().save(RandomStringUtils.randomAlphanumeric(10), "", CvId.METHODS);
+		final CVTerm numericDataType = this.daoFactory.getCvTermDao().getById(DataType.NUMERIC_VARIABLE.getId());
+
+		// Assign Property, Scale, Method
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(cvTermVariable.getCvTermId(), TermId.HAS_PROPERTY.getId(), property.getCvTermId());
+		this.daoFactory.getCvTermRelationshipDao()
+			.save(cvTermVariable.getCvTermId(), TermId.HAS_SCALE.getId(), scale.getCvTermId());
+		this.daoFactory.getCvTermRelationshipDao().save(cvTermVariable.getCvTermId(), TermId.HAS_METHOD.getId(), method.getCvTermId());
+
+		this.daoFactory.getCvTermPropertyDao()
+			.save(new CVTermProperty(null, cvTermVariable.getCvTermId(), TermId.VARIABLE_TYPE.getId(),
+				VariableType.INVENTORY_ATTRIBUTE.getName(), 0));
+
+		final VariableFilter variableFilter = new VariableFilter();
+		variableFilter.addVariableId(cvTermVariable.getCvTermId());
+		return this.daoFactory.getCvTermDao().getVariablesWithFilterById(variableFilter).values().stream().findFirst().get();
 
 	}
 }
