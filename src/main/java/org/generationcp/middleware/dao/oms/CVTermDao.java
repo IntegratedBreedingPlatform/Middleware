@@ -1887,7 +1887,8 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				+ " vpo.expected_max AS " + CVTermDao.VARIABLE_EXPECTED_MAX
 				+ " FROM cvterm v INNER JOIN cvtermprop cp ON cp.type_id = " + TermId.VARIABLE_TYPE.getId()
 				+ " and v.cvterm_id = cp.cvterm_id " //
-				+ " INNER JOIN cvterm varType on varType.name = cp.value AND varType.cvterm_id in (:variableTypeIds) " //
+				+ " INNER JOIN cvterm varType on varType.name = cp.value "
+				+ (!isEmpty(variableTypeIds) ? " AND varType.cvterm_id in (:variableTypeIds) " : "") //
 				+ " left join (select mr.subject_id vid, m.cvterm_id mid, m.name mn, m.definition md from cvterm_relationship mr inner join cvterm m on m.cvterm_id = mr.object_id and mr.type_id = 1210) vmr on vmr.vid = v.cvterm_id "
 				+ " left join (select pr.subject_id vid, p.cvterm_id pid, p.name pn, p.definition pd from cvterm_relationship pr inner join cvterm p on p.cvterm_id = pr.object_id and pr.type_id = 1200) vpr on vpr.vid = v.cvterm_id "
 				+ " left join (select sr.subject_id vid, s.cvterm_id sid, s.name sn, s.definition sd from cvterm_relationship sr inner join cvterm s on s.cvterm_id = sr.object_id and sr.type_id = 1220) vsr on vsr.vid = v.cvterm_id "
@@ -1899,8 +1900,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			sqlQuery.setParameter(CVTermDao.PROGRAMUUID, programUUID);
 			sqlQuery.setParameter(CVTermDao.QUERY_PARAMETER, '%' + query + '%');
-			sqlQuery.setParameterList("variableTypeIds", variableTypeIds);
-
+			if(!isEmpty(variableTypeIds)) {
+				sqlQuery.setParameterList("variableTypeIds", variableTypeIds);
+			}
 			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 			sqlQuery.addScalar(CVTermDao.VARIABLE_ID);
 			sqlQuery.addScalar(CVTermDao.VARIABLE_NAME);
