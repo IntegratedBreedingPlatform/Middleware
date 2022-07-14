@@ -60,7 +60,7 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	private List<String> germplasmUUIDs;
 
-	private Map<Integer, Object> attributeFilters;
+	private Map<Integer, Object> attributes;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date createdDateFrom;
@@ -340,12 +340,12 @@ public class LotsSearchDto extends SearchRequestDto {
 		this.germplasmUUIDs = germplasmUUIDs;
 	}
 
-	public Map<Integer, Object> getAttributeFilters() {
-		return this.attributeFilters;
+	public Map<Integer, Object> getAttributes() {
+		return this.attributes;
 	}
 
-	public void setAttributeFilters(final Map<Integer, Object> attributeFilters) {
-		this.attributeFilters = attributeFilters;
+	public void setAttributes(final Map<Integer, Object> attributes) {
+		this.attributes = attributes;
 	}
 
 	@Override
