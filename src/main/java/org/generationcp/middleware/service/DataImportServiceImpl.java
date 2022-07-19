@@ -1041,29 +1041,38 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		final Set<Integer> factorsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getFactors());
 		final Set<Integer> trialVariablesTermIds = this.getTermIdsOfMeasurementVariables(workbook.getTrialVariables());
-		final Set<Integer> entryDetailsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getEntryDetails());
+		final Optional<MeasurementVariable> entryTypeOptinal = findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getEntryDetails());
+		final Optional<MeasurementVariable> entryNoOptinal = findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), workbook.getEntryDetails());
 
 		// DMV : TODO change implem so that backend is agnostic to UI when
 		// determining messages
-		if (!entryDetailsTermIds.contains(TermId.ENTRY_NO.getId())) {
+		if (!entryNoOptinal.isPresent()) {
 			this.initializeIfNull(errors, Constants.MISSING_ENTRY_NO);
 			errors.get(Constants.MISSING_ENTRY_NO).add(new Message("error.entryno.doesnt.exist.wizard"));
+		} else if (!entryNoOptinal.get().getName().equals(TermId.ENTRY_NO.name())) {
+			final MeasurementVariable entryNo = entryNoOptinal.get();
+			this.initializeIfNull(errors, entryNo.getName() + ":" + entryNo.getTermId());
+			errors.get(entryNo.getName() + ":" + entryNo.getTermId()).add(new Message("error.entryno.doesnt.allow.use.alias.name"));
 		}
 
-		if (workbook.getImportType() != null && workbook.getImportType().intValue() == DatasetTypeEnum.PLOT_DATA.getId() && !entryDetailsTermIds.contains(TermId.ENTRY_TYPE.getId())) {
-			this.initializeIfNull(errors, Constants.MISSING_ENTRY_TYPE);
-			errors.get(Constants.MISSING_ENTRY_TYPE).add(new Message("error.entrytype.doesnt.exist.wizard"));
+		if (workbook.getImportType() != null && workbook.getImportType().intValue() == DatasetTypeEnum.PLOT_DATA.getId()) {
+			if (entryTypeOptinal.isPresent() && !entryTypeOptinal.get().getName().equals(TermId.ENTRY_TYPE.name())) {
+				final MeasurementVariable entryType = entryTypeOptinal.get();
+
+				this.initializeIfNull(errors, entryType.getName() + ":" + entryType.getTermId());
+				errors.get(entryType.getName() + ":" + entryType.getTermId())
+					.add(new Message("error.entrytype.doesnt.allow.use.alias.name"));
+			}
+
+			if (!factorsTermIds.contains(TermId.PLOT_NO.getId()) && !factorsTermIds.contains(TermId.PLOT_NNO.getId())) {
+				this.initializeIfNull(errors, Constants.MISSING_PLOT);
+				errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
+			}
 		}
 
 		if (!factorsTermIds.contains(TermId.GID.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_GID);
 			errors.get(Constants.MISSING_GID).add(new Message("error.gid.doesnt.exist.wizard"));
-		}
-
-		if ((workbook.getImportType() == null || workbook.getImportType() == DatasetTypeEnum.PLOT_DATA.getId()) && !factorsTermIds
-			.contains(TermId.PLOT_NO.getId()) && !factorsTermIds.contains(TermId.PLOT_NNO.getId())) {
-			this.initializeIfNull(errors, Constants.MISSING_PLOT);
-			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
 		}
 
 		if (!trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {
