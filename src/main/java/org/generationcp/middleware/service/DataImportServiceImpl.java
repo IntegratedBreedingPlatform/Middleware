@@ -436,15 +436,23 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public void addEntryTypeVariableIfNotExists(final Workbook workbook,
 		final String programUUID) {
 
-		final Optional<MeasurementVariable> entryTypeFactor = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getEntryDetails());
+		Optional<MeasurementVariable> entryTypeDetail = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getEntryDetails());
 		final Optional<List<MeasurementRow>> rowsWithoutTermId = this.findMeasurementRowWithoutTermId(TermId.ENTRY_TYPE.getId(), workbook.getObservations());
 
-		// ENTRY_TYPE Not existing in Factors and in Observation
-		if (!entryTypeFactor.isPresent() && rowsWithoutTermId.isPresent()) {
-			final MeasurementVariable entryType = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.ENTRY_DETAIL, programUUID);
-			workbook.getFactors().add(entryType);
-			final MeasurementData data = new MeasurementData(entryType.getLabel(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false, entryType.getDataType(), entryType);
-			workbook.getObservations().forEach(row->row.getDataList().add(data));
+		// ENTRY_TYPE Not existing in EntryDetails
+		if (!entryTypeDetail.isPresent()) {
+			final MeasurementVariable entryType =
+				this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.ENTRY_DETAIL, programUUID);
+			workbook.getEntryDetails().add(entryType);
+		}
+		entryTypeDetail = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getEntryDetails());
+
+		// ENTRY_TYPE Not existing in Observation
+		if (rowsWithoutTermId.isPresent()) {
+			final MeasurementData data =
+				new MeasurementData("", String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false,
+					entryTypeDetail.get().getDataType(), entryTypeDetail.get());
+			workbook.getObservations().forEach(row -> row.getDataList().add(data));
 		}
 	}
 
