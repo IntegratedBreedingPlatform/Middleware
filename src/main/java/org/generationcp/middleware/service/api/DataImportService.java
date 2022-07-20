@@ -11,10 +11,8 @@
 
 package org.generationcp.middleware.service.api;
 
-import java.io.File;
-import java.util.List;
-import java.util.Map;
-
+import com.google.common.base.Optional;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.exceptions.MiddlewareException;
@@ -24,7 +22,9 @@ import org.generationcp.middleware.operation.parser.WorkbookParser;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.Message;
 
-import com.google.common.base.Optional;
+import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 /**
  * This is the API for importing data to new schema. The methods here involve
@@ -196,4 +196,6 @@ public interface DataImportService {
 	void processExperimentalDesign(Workbook workbook, String programUUID, String exptDesignValueFromObsSheet) throws WorkbookParserException;
 
 	void addEntryTypeVariableIfNotExists(Workbook workbook, String programUUID);
+
+	void addEntryTypeByDefaultIfNotExists(Sheet sheet, int headerRowIndex, int dataSetType);
 }

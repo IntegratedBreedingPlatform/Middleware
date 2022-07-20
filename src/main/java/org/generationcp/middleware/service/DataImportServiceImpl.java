@@ -12,6 +12,7 @@ package org.generationcp.middleware.service;
 
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -42,6 +43,7 @@ import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
+import org.generationcp.middleware.util.PoiUtil;
 import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
@@ -52,6 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -453,6 +456,24 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 				new MeasurementData("", String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false,
 					entryTypeDetail.get().getDataType(), entryTypeDetail.get());
 			workbook.getObservations().forEach(row -> row.getDataList().add(data));
+		}
+	}
+
+	@Override
+	public void addEntryTypeByDefaultIfNotExists(final Sheet sheet, final int headerRowIndex, final int dataSetType) {
+		final String[] headerArray = PoiUtil.rowAsStringArray(sheet, headerRowIndex);
+		final List<String> headers = Arrays.asList(headerArray);
+		if (dataSetType == DatasetTypeEnum.PLOT_DATA.getId()
+			&& !headers.contains(TermId.ENTRY_TYPE.name())) {
+			// Force add ENTRY TYPE with T value by default when importing a PLOT_DATA,
+			// and the ENTRY TYPE did not include in the file.
+			final int entryTypeIdx = PoiUtil.rowAsStringArray(sheet, 0).length;
+			PoiUtil.getCell(sheet, entryTypeIdx, 0).setCellValue(TermId.ENTRY_TYPE.name());
+			final Integer lastRow = PoiUtil.getLastRowNum(sheet);
+			for (int i = 0; i <= lastRow; i++) {
+				PoiUtil.getCell(sheet, entryTypeIdx, i).setCellValue(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue());
+			}
+
 		}
 	}
 
