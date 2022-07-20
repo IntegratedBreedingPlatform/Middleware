@@ -453,7 +453,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		// ENTRY_TYPE Not existing in Observation
 		if (rowsWithoutTermId.isPresent()) {
 			final MeasurementData data =
-				new MeasurementData("", String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false,
+				new MeasurementData(TermId.ENTRY_TYPE.name(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false,
 					entryTypeDetail.get().getDataType(), entryTypeDetail.get());
 			workbook.getObservations().forEach(row -> row.getDataList().add(data));
 		}
