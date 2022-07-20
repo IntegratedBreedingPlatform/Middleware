@@ -197,5 +197,5 @@ public interface DataImportService {
 
 	void addEntryTypeVariableIfNotExists(Workbook workbook, String programUUID);
 
-	void addEntryTypeByDefaultIfNotExists(Sheet sheet, int headerRowIndex, int dataSetType);
+	void addEntryTypeWhenNotFoundInSheet(Sheet sheet, int headerRowIndex, int dataSetType);
 }

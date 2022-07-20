@@ -460,7 +460,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	}
 
 	@Override
-	public void addEntryTypeByDefaultIfNotExists(final Sheet sheet, final int headerRowIndex, final int dataSetType) {
+	public void addEntryTypeWhenNotFoundInSheet(final Sheet sheet, final int headerRowIndex, final int dataSetType) {
 		final String[] headerArray = PoiUtil.rowAsStringArray(sheet, headerRowIndex);
 		final List<String> headers = Arrays.asList(headerArray);
 		if (dataSetType == DatasetTypeEnum.PLOT_DATA.getId()
