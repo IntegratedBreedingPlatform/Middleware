@@ -1190,7 +1190,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		final String entryNoColumnName = standardVariableNameMap.get(TermId.ENTRY_NO.getId());
 		final String entryNumber = (String) row.get(entryNoColumnName);
-		if (NumberUtils.isDigits(trialInstance)) {
+		if (NumberUtils.isDigits(entryNumber)) {
 			observationUnitRow.setEntryNumber(Integer.valueOf(entryNumber));
 		}
 		observationVariables.put(entryNoColumnName, new ObservationUnitData(entryNumber));
