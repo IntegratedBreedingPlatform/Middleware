@@ -19,7 +19,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	private List<MeasurementVariableDto> environmentConditions;
 	private List<String> genericGermplasmDescriptors;
 	private List<String> additionalDesignFactors;
-	private List<MeasurementVariableDto> selectionMethodsAndTraits;
+	private List<MeasurementVariableDto> selectionMethodsAndTraitsAndAnalysisSummary;
 	private List<MeasurementVariableDto> entryDetails;
 	private int datasetId;
 	private Integer instanceId;
@@ -142,11 +142,11 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 
 	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors,
 		final List<String> additionalDesignFactors,
-		final List<MeasurementVariableDto> selectionMethodsAndTraits) {
+		final List<MeasurementVariableDto> selectionMethodsAndTraitsAndAnalysisSummary) {
 		this();
 		this.genericGermplasmDescriptors = genericGermplasmDescriptors;
 		this.additionalDesignFactors = additionalDesignFactors;
-		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
+		this.selectionMethodsAndTraitsAndAnalysisSummary = selectionMethodsAndTraitsAndAnalysisSummary;
 		this.datasetId = datasetId;
 		this.instanceId = instanceId;
 	}
@@ -183,12 +183,12 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		this.additionalDesignFactors = additionalDesignFactors;
 	}
 
-	public List<MeasurementVariableDto> getSelectionMethodsAndTraits() {
-		return this.selectionMethodsAndTraits;
+	public List<MeasurementVariableDto> getSelectionMethodsAndTraitsAndAnalysisSummary() {
+		return this.selectionMethodsAndTraitsAndAnalysisSummary;
 	}
 
-	public void setSelectionMethodsAndTraits(final List<MeasurementVariableDto> selectionMethodsAndTraits) {
-		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
+	public void setSelectionMethodsAndTraitsAndAnalysisSummary(final List<MeasurementVariableDto> selectionMethodsAndTraitsAndAnalysisSummary) {
+		this.selectionMethodsAndTraitsAndAnalysisSummary = selectionMethodsAndTraitsAndAnalysisSummary;
 	}
 
 	public List<MeasurementVariableDto> getEntryDetails() {

@@ -683,24 +683,18 @@ public class DatasetServiceImpl implements DatasetService {
 		final Map<Integer, String> designFactors = this.studyService.getAdditionalDesignFactors(studyId);
 		searchDTO.setAdditionalDesignFactors(Lists.newArrayList(designFactors.values()));
 
-		final List<MeasurementVariableDto> selectionMethodsAndTraits =
+		final List<MeasurementVariableDto> selectionMethodsAndTraitsAndAnalysisSummary =
 			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
-				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
-		searchDTO.setSelectionMethodsAndTraits(selectionMethodsAndTraits);
+				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId(), VariableType.ANALYSIS_SUMMARY.getId());
+		searchDTO.setSelectionMethodsAndTraitsAndAnalysisSummary(selectionMethodsAndTraitsAndAnalysisSummary);
 
 		final DmsProject project = this.daoFactory.getDmsProjectDAO().getById(datasetId);
-		final int plotDatasetId = DatasetTypeEnum.PLOT_DATA.getId() == project.getDatasetType().getDatasetTypeId() //
-			? datasetId //
-			: project.getParent().getProjectId();
+		final int plotDatasetId = project.getDatasetType().isSubObservationType() //
+			?  project.getParent().getProjectId() : datasetId;
 		final List<MeasurementVariableDto> entryDetails =
 			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(plotDatasetId,
 				VariableType.ENTRY_DETAIL.getId());
 
-		if (DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId() == project.getDatasetType().getDatasetTypeId()) {
-			final List<MeasurementVariableDto> analysisSummaryVariables =
-				this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId, VariableType.ANALYSIS_SUMMARY.getId());
-			searchDTO.setSelectionMethodsAndTraits(analysisSummaryVariables);
-		}
 		searchDTO.setEntryDetails(entryDetails);
 	}
 
