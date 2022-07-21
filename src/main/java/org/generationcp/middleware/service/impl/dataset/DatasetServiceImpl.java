@@ -50,6 +50,8 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyEntryDescriptorColumns;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.Util;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -78,6 +80,7 @@ import java.util.stream.Collectors;
  */
 @Transactional
 public class DatasetServiceImpl implements DatasetService {
+	private static final Logger LOG = LoggerFactory.getLogger(DatasetServiceImpl.class);
 
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
@@ -129,6 +132,16 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.TRAIT.getId(),
 		VariableType.SELECTION_METHOD.getId());
 
+	protected static final List<Integer> ANALYSIS_SUMMARY_VARIABLE_TYPES = Lists.newArrayList(
+		VariableType.ENVIRONMENT_DETAIL.getId(),
+		VariableType.ANALYSIS_SUMMARY.getId());
+
+	protected static final List<Integer> MEANS_VARIABLE_TYPES = Lists.newArrayList(
+		VariableType.ENVIRONMENT_DETAIL.getId(),
+		VariableType.GERMPLASM_DESCRIPTOR.getId(),
+		VariableType.ENTRY_DETAIL.getId(),
+		VariableType.TRAIT.getId());
+
 	private static final List<Integer> STANDARD_ENVIRONMENT_FACTORS = Lists.newArrayList(
 		TermId.LOCATION_ID.getId(),
 		TermId.TRIAL_INSTANCE_FACTOR.getId(),
@@ -173,10 +186,24 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public List<MeasurementVariable> getObservationSetColumns(final Integer studyId, final Integer observationSetId,
 		final Boolean draftMode) {
-		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
 		final DatasetDTO datasetDTO = this.getDataset(observationSetId);
+		// Analysis Summary Variables
+		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
+			return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
+				ANALYSIS_SUMMARY_VARIABLE_TYPES);
+		} else if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.MEANS_DATA.getId())) {
+			return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
+				MEANS_VARIABLE_TYPES);
+		} else {
+			return this.getObservationsColumns(datasetDTO, studyId, draftMode);
+		}
+	}
+
+	private List<MeasurementVariable> getObservationsColumns(final DatasetDTO datasetDTO, final Integer studyId, final Boolean draftMode) {
+		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
 		final Supplier<Integer> observationSetIdSupplier;
 		final boolean addStockIdColumn;
+		final Integer observationSetId = datasetDTO.getDatasetId();
 		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			//PLOTDATA
 			observationSetIdSupplier = () -> observationSetId;
@@ -251,7 +278,11 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		sortedColumns.addAll(variateColumns);
+		this.addTrialInstanceColumn(studyId, sortedColumns);
+		return sortedColumns;
+	}
 
+	private void addTrialInstanceColumn(final Integer studyId, final List<MeasurementVariable> sortedColumns) {
 		final DmsProject environmentDataset =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
 		final CVTerm trialInstanceVariable = this.daoFactory.getCvTermDao().getById(TermId.TRIAL_INSTANCE_FACTOR.getId());
@@ -265,8 +296,6 @@ public class DatasetServiceImpl implements DatasetService {
 		trialInstanceCol.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
 		trialInstanceCol.setFactor(true);
 		sortedColumns.add(0, trialInstanceCol);
-
-		return sortedColumns;
 	}
 
 	private MeasurementVariable addTermIdColumn(final TermId termId, final VariableType variableType, final String name,
@@ -666,6 +695,12 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<MeasurementVariableDto> entryDetails =
 			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(plotDatasetId,
 				VariableType.ENTRY_DETAIL.getId());
+
+		if (DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId() == project.getDatasetType().getDatasetTypeId()) {
+			final List<MeasurementVariableDto> analysisSummaryVariables =
+				this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId, VariableType.ANALYSIS_SUMMARY.getId());
+			searchDTO.setSelectionMethodsAndTraits(analysisSummaryVariables);
+		}
 		searchDTO.setEntryDetails(entryDetails);
 	}
 

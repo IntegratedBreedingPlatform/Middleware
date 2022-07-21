@@ -453,6 +453,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			final String sql = this.getObservationUnitTableQuery(searchDto, observationVariableName, standardDatasetVariablesMap.get(TermId.PLOT_NO.getId()), finalColumnsQueryMap, pageable);
 			final SQLQuery query = this.createQueryAndAddScalar(searchDto, sql, standardDatasetVariablesMap, addOnlyFilterColumns);
 			this.setParameters(searchDto, query, pageable);
+			LOG.error(query.getQueryString());
 			return query.list();
 
 		} catch (final Exception e) {
@@ -707,7 +708,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "	project p "
 			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
 			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id "
-			+ "	INNER JOIN stock s ON s.stock_id = nde.stock_id "
+			+ "	LEFT JOIN stock s ON s.stock_id = nde.stock_id "
 			+ " LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id "
 			+ " LEFT JOIN cvterm cvterm_entry_variable ON (cvterm_entry_variable.cvterm_id = sp.type_id) "
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
@@ -1167,13 +1168,18 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		final String gidColumnName = standardVariableNameMap.get(TermId.GID.getId());
 		final Integer gid = (Integer) row.get(gidColumnName);
-		observationUnitRow.setGid(gid);
-		observationVariables.put(gidColumnName, new ObservationUnitData(gid.toString()));
+		if (gid != null) {
+			observationUnitRow.setGid(gid);
+			observationVariables.put(gidColumnName, new ObservationUnitData(gid.toString()));
+		}
+
 
 		final String designationColumnName = standardVariableNameMap.get(TermId.DESIG.getId());
 		final String designation = (String) row.get(designationColumnName);
-		observationUnitRow.setDesignation(designation);
-		observationVariables.put(designationColumnName, new ObservationUnitData(designation));
+		if (designation != null) {
+			observationUnitRow.setDesignation(designation);
+			observationVariables.put(designationColumnName, new ObservationUnitData(designation));
+		}
 
 		if (row.containsKey(STOCK_ID)) {
 			final String stockId = (String) row.get(STOCK_ID);
