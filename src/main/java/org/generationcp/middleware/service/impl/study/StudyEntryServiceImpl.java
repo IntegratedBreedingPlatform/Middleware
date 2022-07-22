@@ -19,6 +19,9 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
+import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
@@ -31,6 +34,7 @@ import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
 import org.generationcp.middleware.util.CrossExpansionProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -39,6 +43,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -47,6 +52,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 @Transactional
@@ -66,6 +72,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	@Resource
 	private CrossExpansionProperties crossExpansionProperties;
+
+	@Autowired
+	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	private final DaoFactory daoFactory;
 
@@ -298,11 +307,48 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId) {
+	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId, final String programUUID) {
 		final DmsProject plotDataset = this.getPlotDataset(studyId);
-		return StudyEntryDescriptorColumns.getColumnsSortedByRank()
-			.map(column -> this.buildStudyEntryColumnDTO(column, plotDataset.getProperties()))
+
+		final List<Integer> projectVariableIds = plotDataset.getProperties().stream()
+			.map(ProjectProperty::getVariableId)
 			.collect(Collectors.toList());
+		final List<StudyEntryColumnDTO> columns = StudyEntryGermplasmDescriptorColumns.getColumnsSortedByRank()
+			.map(column -> new StudyEntryColumnDTO(column.getId(),
+				column.getName(),
+				null,
+				VariableType.GERMPLASM_DESCRIPTOR.getId(),
+				projectVariableIds.contains(column.getId())))
+			.collect(Collectors.toList());
+
+		final List<StockModel> entries = this.daoFactory.getStockDao().getStocksForStudy(studyId);
+		final List<Integer> gids = entries.stream().map(stockModel -> stockModel.getGermplasm().getGid()).collect(toList());
+		final List<Attribute> attributes = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(gids);
+		if (!CollectionUtils.isEmpty(attributes)) {
+			final VariableFilter variableFilter = new VariableFilter();
+			variableFilter.setProgramUuid(programUUID);
+			attributes
+				.stream()
+				.map(Attribute::getTypeId)
+				.forEach(variableFilter::addVariableId);
+			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+			final List<StudyEntryColumnDTO> germplasmAttributeColumns = variables
+				.stream()
+				.sorted(this.getVariableComparator())
+				.map(variable -> {
+					Integer typeId = null;
+					// get first value because germplasm attributes/passport are not combinables with other types
+					if (!org.springframework.util.CollectionUtils.isEmpty(variable.getVariableTypes())) {
+						typeId = variable.getVariableTypes().iterator().next().getId();
+					}
+					return new StudyEntryColumnDTO(variable.getId(), variable.getName(), variable.getAlias(), typeId,
+						projectVariableIds.contains(variable.getId()));
+				})
+				.collect(toList());
+			columns.addAll(germplasmAttributeColumns);
+		}
+
+		return columns;
 	}
 
 	private void setCrossValues(final List<StockModel> entries, final Set<Integer> gids, final Integer level) {
@@ -319,16 +365,17 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
 	}
 
-	private StudyEntryColumnDTO buildStudyEntryColumnDTO(final StudyEntryDescriptorColumns column, final List<ProjectProperty> projectProperties) {
-		return new StudyEntryColumnDTO(column.getId(), column.getName(),
-			projectProperties.stream().anyMatch(projectProperty -> projectProperty.getVariableId().equals(column.getId())));
-	}
-
 	private void setStudyGenerationLevel(final Integer listId, final Integer studyId) {
 		final Integer generationLevel = this.germplasmListService.getGermplasmListById(listId).get().getGenerationLevel();
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 		study.setGenerationLevel(generationLevel);
 		this.daoFactory.getDmsProjectDAO().save(study);
 	}
+
+	private Comparator<Variable> getVariableComparator() {
+		return Comparator.comparing(Variable::getAlias, Comparator.nullsLast(Comparator.naturalOrder()))
+			.thenComparing(Variable::getName);
+	}
+
 
 }
