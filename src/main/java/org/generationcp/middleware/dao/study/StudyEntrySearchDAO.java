@@ -28,7 +28,6 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -65,8 +64,15 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		+ " %s " // usage of join clause
 		+ " WHERE s.project_id = :studyId %s" // usage of where clause
 		+ "			%s" // usage of group clause
-		+ "			%s"; // usage of order clause+
+		+ "			%s" // usage of having clause
+		+ "			%s"; // usage of order clause
 	private static final String COUNT_EXPRESSION = " COUNT(DISTINCT S.stock_id) ";
+	public static final String LOT_AVAILABLE_EXPRESSION =
+		"IF(COUNT(DISTINCT IFNULL(l.scaleid, 'null')) = 1, IFNULL((SELECT SUM(CASE WHEN imt.trnstat = "
+			+ TransactionStatus.CONFIRMED.getIntValue()
+			+ "  OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue()
+			+ " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) "
+			+ "  FROM ims_transaction imt INNER JOIN ims_lot lo ON lo.lotid = imt.lotid WHERE lo.eid = l.eid),0), 'Mixed')";
 
 	// Aliases
 	private static final String ENTRY_ID_ALIAS = "entryId";
@@ -120,8 +126,11 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		final String joinClause = this.getJoinClause(joins);
 		final String selectClause = selects.stream().collect(Collectors.joining(","));
 		final String orderClause = this.getOrderClause(pageable);
+
+		// Use HAVING clause to filter the records by AVAILABLE BALANCE
+		final String havingClause = this.getHavingClause(studyEntrySearchDto.getFilter());
 		final String sql =
-			this.formatQuery(selectClause, joinClause, whereClause, " GROUP BY s.stock_id ", orderClause);
+			this.formatQuery(selectClause, joinClause, whereClause, " GROUP BY s.stock_id ", havingClause, orderClause);
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
 		query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
@@ -143,8 +152,17 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		joins.addAll(this.getJoinsByFilter(filter));
 		final String joinClause = this.getJoinClause(joins);
 		final String whereClause = this.addFilters(filter, queryParams);
-		final String sql =
-			this.formatQuery(COUNT_EXPRESSION, joinClause, whereClause, "", "");
+		final String havingClause = this.getHavingClause(filter);
+
+		// Compute the AVAILABLE BALANCE first so that we can filter the rows using HAVING clause.
+		final Set<String> selects = new LinkedHashSet<>();
+		selects.add("s.stock_id");
+		selects.add(LOT_AVAILABLE_EXPRESSION + " AS " + LOT_AVAILABLE_BALANCE_ALIAS);
+		final String derivedTableQuery =
+			this.formatQuery(selects.stream().collect(Collectors.joining(",")), joinClause, whereClause, " GROUP BY s.stock_id ", havingClause,"");
+
+		// Then count the rows from the derived table.
+		final String sql = String.format("SELECT COUNT(stock_id) FROM (%s) a", derivedTableQuery);
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
 		DAOQueryUtils.addParamsToQuery(query, queryParams);
@@ -175,14 +193,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		selectClause.add(this.addSelectExpression(scalars, "s.dbxref_id", GID_ALIAS, IntegerType.INSTANCE));
 		selectClause.add(this.addSelectExpression(scalars, "s.name", DESIGNATION_ALIAS, StringType.INSTANCE));
 		selectClause.add(this.addSelectExpression(scalars, "COUNT(DISTINCT (l.lotid))", LOT_COUNT_ALIAS, IntegerType.INSTANCE));
-
-		final String lotAvailableExpression =
-			"IF(COUNT(DISTINCT IFNULL(l.scaleid, 'null')) = 1, IFNULL((SELECT SUM(CASE WHEN imt.trnstat = "
-				+ TransactionStatus.CONFIRMED.getIntValue()
-				+ "  OR (imt.trnstat = " + TransactionStatus.PENDING.getIntValue()
-				+ " AND imt.trntype = " + TransactionType.WITHDRAWAL.getId() + ") THEN imt.trnqty ELSE 0 END) "
-				+ "  FROM ims_transaction imt INNER JOIN ims_lot lo ON lo.lotid = imt.lotid WHERE lo.eid = l.eid),0), 'Mixed')";
-		selectClause.add(this.addSelectExpression(scalars, lotAvailableExpression, LOT_AVAILABLE_BALANCE_ALIAS, StringType.INSTANCE));
+		selectClause.add(this.addSelectExpression(scalars, LOT_AVAILABLE_EXPRESSION, LOT_AVAILABLE_BALANCE_ALIAS, StringType.INSTANCE));
 
 		selectClause.add(this.addSelectExpression(scalars, "IF(COUNT(DISTINCT ifnull(l.scaleid, 'null')) = 1, IFNULL(c.name,'-'), 'Mixed')",
 			LOT_UNIT_ALIAS, StringType.INSTANCE));
@@ -318,6 +329,12 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 
 			for (final Map.Entry<String, String> entry : filteredTextValues.entrySet()) {
 				final String variableId = entry.getKey();
+
+				// Skip WHERE filter for LOT AVAILABLE BALANCE. AVAILABLE BALANCE will be filtered using the HAVING clause.
+				if (String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId()).equals(variableId)) {
+					continue;
+				}
+
 				if (factorsFilterMap.get(variableId) == null) {
 					queryParams.put(variableId + "_Id", variableId);
 				}
@@ -357,6 +374,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			final String matchClause = performLikeOperation ? " LIKE :" + finalId + "_text " : " IN (:" + finalId + "_values) ";
 			sql.append(" AND ").append(filterClause).append(matchClause);
 			if (variableId.equalsIgnoreCase(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId())) ||
+				variableId.equalsIgnoreCase(String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId())) ||
 				variableId.equalsIgnoreCase(String.valueOf(TermId.GID_UNIT.getId())))
 				sql.append(") ");
 			return;
@@ -376,6 +394,19 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 				+ "WHERE sp.stock_id = s.stock_id AND sp.type_id = :" + variableId
 				+ "_Id AND ").append(stockMatchClause).append(" )");
 		}
+	}
+
+	private String getHavingClause(final StudyEntrySearchDto.Filter filter) {
+
+		if (Objects.isNull(filter) || CollectionUtils.isEmpty(filter.getFilteredTextValues())) {
+			return StringUtils.EMPTY;
+		}
+
+		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId()))) {
+			return String.format("HAVING %s LIKE '%%%s%%'", LOT_AVAILABLE_BALANCE_ALIAS, filter.getFilteredTextValues().get(String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId())));
+		}
+
+		return StringUtils.EMPTY;
 	}
 
 	private String getOrderClause(final Pageable pageable) {
@@ -404,9 +435,9 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		return "";
 	}
 
-	private String formatQuery(final String selectExpression, final String joinClause, final String whereClause, final String groupClause,
+	private String formatQuery(final String selectExpression, final String joinClause, final String whereClause, final String groupClause, final String havingClause,
 		final String orderClause) {
-		return String.format(BASE_QUERY, selectExpression, joinClause, whereClause, groupClause, orderClause);
+		return String.format(BASE_QUERY, selectExpression, joinClause, whereClause, groupClause, havingClause, orderClause);
 	}
 
 	private List<StudyEntryDto> mapResults(final List<Map<String, Object>> results, final StudyEntrySearchDto studyEntrySearchDto) {
