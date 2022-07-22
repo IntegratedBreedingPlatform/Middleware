@@ -47,7 +47,7 @@ import org.generationcp.middleware.service.api.dataset.ObservationUnitsSearchDTO
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
-import org.generationcp.middleware.service.impl.study.StudyEntryDescriptorColumns;
+import org.generationcp.middleware.service.impl.study.StudyEntryGermplasmDescriptorColumns;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -211,7 +211,7 @@ public class DatasetServiceImpl implements DatasetService {
 			sortedColumns.add(entryDetails.remove(TermId.ENTRY_TYPE.getId()));
 		}
 
-		descriptors.sort(Comparator.comparing(descriptor -> StudyEntryDescriptorColumns.getRankByTermId(descriptor.getTermId())));
+		descriptors.sort(Comparator.comparing(descriptor -> StudyEntryGermplasmDescriptorColumns.getRankByTermId(descriptor.getTermId())));
 		sortedColumns.addAll(descriptors);
 
 		if (addStockIdColumn) {
