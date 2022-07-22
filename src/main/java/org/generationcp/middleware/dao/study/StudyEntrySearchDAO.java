@@ -28,6 +28,7 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,6 +42,11 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	private static final Map<String, String> factorsFilterMap = new HashMap() {{
 		this.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
 		this.put(String.valueOf(TermId.DESIG.getId()), "s.name");
+		this.put(String.valueOf(TermId.GUID.getId()), "g.germplsm_uuid");
+		this.put(String.valueOf(TermId.CROSS.getId()), "s.cross_value");
+		this.put(String.valueOf(TermId.GROUPGID.getId()), "g.mgid");
+		this.put(String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()), "immediateSource.nval");
+		this.put(String.valueOf(TermId.GROUP_SOURCE_NAME.getId()), "groupSourceName.nval");
 		this.put(String.valueOf(TermId.ENTRY_NO.getId()), "uniquename");
 		this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()),
 			"EXISTS (SELECT 1 FROM ims_lot l1 WHERE l1.eid = s.dbxref_id and l1.status = " +
@@ -134,6 +140,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		queryParams.put("studyId", studyId);
 
 		final Set<String> joins = this.getFixedJoins();
+		joins.addAll(this.getJoinsByFilter(filter));
 		final String joinClause = this.getJoinClause(joins);
 		final String whereClause = this.addFilters(filter, queryParams);
 		final String sql =
@@ -143,6 +150,23 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		DAOQueryUtils.addParamsToQuery(query, queryParams);
 
 		return ((BigInteger) query.uniqueResult()).longValue();
+	}
+
+	private Set<String> getJoinsByFilter(final StudyEntrySearchDto.Filter filter) {
+		final Set<String> joins = new LinkedHashSet<>();
+		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.GUID.getId())) ||
+			filter.getFilteredValues().containsKey(String.valueOf(TermId.GROUPGID.getId()))) {
+			joins.add(GERMPLASM_JOIN);
+		}
+		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()))) {
+			joins.add(GERMPLASM_JOIN);
+			joins.add(IMMEDIATE_SOURCE_NAME_JOIN);
+		}
+		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.GROUP_SOURCE_NAME.getId()))) {
+			joins.add(GERMPLASM_JOIN);
+			joins.add(GROUP_SOURCE_NAME_JOIN);
+		}
+		return joins;
 	}
 
 	private void addFixedScalars(final List<Scalar> scalars, final List<String> selectClause) {
@@ -340,7 +364,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 
 		// Otherwise, look in "props" tables
 		// If doing text searching, perform LIKE operation. Otherwise perform value "IN" operation
-		if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType)) {
+		if (VariableType.GERMPLASM_DESCRIPTOR.name().equals(variableType) || VariableType.ENTRY_DETAIL.name().equals(variableType)) {
 			// IF searching by list of values, search for the values in:
 			// 1)cvterm.name (for categorical variables) or
 			// 2)perform IN operation on stockprop.value
