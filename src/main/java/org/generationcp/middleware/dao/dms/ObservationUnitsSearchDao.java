@@ -460,7 +460,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			final String sql = this.getObservationUnitTableQuery(searchDto, observationVariableName, standardDatasetVariablesMap.get(TermId.PLOT_NO.getId()), finalColumnsQueryMap, pageable);
 			final SQLQuery query = this.createQueryAndAddScalar(searchDto, sql, standardDatasetVariablesMap, addOnlyFilterColumns);
 			this.setParameters(searchDto, query, pageable);
-			LOG.error(query.getQueryString());
 			return query.list();
 
 		} catch (final Exception e) {

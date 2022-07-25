@@ -289,14 +289,14 @@ public class DatasetServiceImpl implements DatasetService {
 	private void addVariableColumn(final Integer studyId, final List<MeasurementVariable> sortedColumns, final Integer termId) {
 		final DmsProject environmentDataset =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
-		final CVTerm trialInstanceVariable = this.daoFactory.getCvTermDao().getById(termId);
+		final CVTerm cvTerm = this.daoFactory.getCvTermDao().getById(termId);
 		final Optional<ProjectProperty> variableAlias =
 			this.daoFactory.getProjectPropertyDAO().getByProjectId(environmentDataset.getProjectId()).stream()
 				.filter(prop -> termId == prop.getVariableId()).findFirst();
 
 		final MeasurementVariable measurementVariable = new MeasurementVariable();
-		measurementVariable.setName(trialInstanceVariable.getName());
-		measurementVariable.setAlias(variableAlias.isPresent() ? variableAlias.get().getAlias() : trialInstanceVariable.getName());
+		measurementVariable.setName(cvTerm.getName());
+		measurementVariable.setAlias(variableAlias.isPresent() ? variableAlias.get().getAlias() : cvTerm.getName());
 		measurementVariable.setTermId(termId);
 		measurementVariable.setFactor(true);
 		sortedColumns.add(0, measurementVariable);
