@@ -12,6 +12,7 @@ package org.generationcp.middleware.service;
 
 import com.google.common.base.Optional;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -42,6 +43,7 @@ import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.util.Message;
+import org.generationcp.middleware.util.PoiUtil;
 import org.generationcp.middleware.util.StringUtil;
 import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
@@ -52,6 +54,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -436,15 +439,41 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	public void addEntryTypeVariableIfNotExists(final Workbook workbook,
 		final String programUUID) {
 
-		final Optional<MeasurementVariable> entryTypeFactor = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getEntryDetails());
+		Optional<MeasurementVariable> entryTypeDetail = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getEntryDetails());
 		final Optional<List<MeasurementRow>> rowsWithoutTermId = this.findMeasurementRowWithoutTermId(TermId.ENTRY_TYPE.getId(), workbook.getObservations());
 
-		// ENTRY_TYPE Not existing in Factors and in Observation
-		if (!entryTypeFactor.isPresent() && rowsWithoutTermId.isPresent()) {
-			final MeasurementVariable entryType = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.ENTRY_DETAIL, programUUID);
-			workbook.getFactors().add(entryType);
-			final MeasurementData data = new MeasurementData(entryType.getLabel(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false, entryType.getDataType(), entryType);
-			workbook.getObservations().forEach(row->row.getDataList().add(data));
+		// ENTRY_TYPE Not existing in EntryDetails
+		if (!entryTypeDetail.isPresent()) {
+			final MeasurementVariable entryType =
+				this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), null, Operation.ADD, PhenotypicType.ENTRY_DETAIL, programUUID);
+			workbook.getEntryDetails().add(entryType);
+		}
+		entryTypeDetail = this.findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getEntryDetails());
+
+		// ENTRY_TYPE Not existing in Observation
+		if (rowsWithoutTermId.isPresent()) {
+			final MeasurementData data =
+				new MeasurementData(TermId.ENTRY_TYPE.name(), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()), false,
+					entryTypeDetail.get().getDataType(), entryTypeDetail.get());
+			workbook.getObservations().forEach(row -> row.getDataList().add(data));
+		}
+	}
+
+	@Override
+	public void addEntryTypeWhenNotFoundInSheet(final Sheet sheet, final int headerRowIndex, final int dataSetType) {
+		final String[] headerArray = PoiUtil.rowAsStringArray(sheet, headerRowIndex);
+		final List<String> headers = Arrays.asList(headerArray);
+		if (dataSetType == DatasetTypeEnum.PLOT_DATA.getId()
+			&& !headers.contains(TermId.ENTRY_TYPE.name())) {
+			// Force add ENTRY TYPE with T value by default when importing a PLOT_DATA,
+			// and the ENTRY TYPE did not include in the file.
+			final int entryTypeIdx = PoiUtil.rowAsStringArray(sheet, 0).length;
+			PoiUtil.getCell(sheet, entryTypeIdx, 0).setCellValue(TermId.ENTRY_TYPE.name());
+			final Integer lastRow = PoiUtil.getLastRowNum(sheet);
+			for (int i = 0; i <= lastRow; i++) {
+				PoiUtil.getCell(sheet, entryTypeIdx, i).setCellValue(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue());
+			}
+
 		}
 	}
 
@@ -1041,29 +1070,38 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		final Set<Integer> factorsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getFactors());
 		final Set<Integer> trialVariablesTermIds = this.getTermIdsOfMeasurementVariables(workbook.getTrialVariables());
-		final Set<Integer> entryDetailsTermIds = this.getTermIdsOfMeasurementVariables(workbook.getEntryDetails());
+		final Optional<MeasurementVariable> entryTypeOptinal = findMeasurementVariableByTermId(TermId.ENTRY_TYPE.getId(), workbook.getEntryDetails());
+		final Optional<MeasurementVariable> entryNoOptinal = findMeasurementVariableByTermId(TermId.ENTRY_NO.getId(), workbook.getEntryDetails());
 
 		// DMV : TODO change implem so that backend is agnostic to UI when
 		// determining messages
-		if (!entryDetailsTermIds.contains(TermId.ENTRY_NO.getId())) {
+		if (!entryNoOptinal.isPresent()) {
 			this.initializeIfNull(errors, Constants.MISSING_ENTRY_NO);
 			errors.get(Constants.MISSING_ENTRY_NO).add(new Message("error.entryno.doesnt.exist.wizard"));
+		} else if (!entryNoOptinal.get().getName().equals(TermId.ENTRY_NO.name())) {
+			final MeasurementVariable entryNo = entryNoOptinal.get();
+			this.initializeIfNull(errors, entryNo.getName() + ":" + entryNo.getTermId());
+			errors.get(entryNo.getName() + ":" + entryNo.getTermId()).add(new Message("error.entryno.doesnt.allow.use.alias.name"));
 		}
 
-		if (workbook.getImportType() != null && workbook.getImportType().intValue() == DatasetTypeEnum.PLOT_DATA.getId() && !entryDetailsTermIds.contains(TermId.ENTRY_TYPE.getId())) {
-			this.initializeIfNull(errors, Constants.MISSING_ENTRY_TYPE);
-			errors.get(Constants.MISSING_ENTRY_TYPE).add(new Message("error.entrytype.doesnt.exist.wizard"));
+		if (workbook.getImportType() != null && workbook.getImportType().intValue() == DatasetTypeEnum.PLOT_DATA.getId()) {
+			if (entryTypeOptinal.isPresent() && !entryTypeOptinal.get().getName().equals(TermId.ENTRY_TYPE.name())) {
+				final MeasurementVariable entryType = entryTypeOptinal.get();
+
+				this.initializeIfNull(errors, entryType.getName() + ":" + entryType.getTermId());
+				errors.get(entryType.getName() + ":" + entryType.getTermId())
+					.add(new Message("error.entrytype.doesnt.allow.use.alias.name"));
+			}
+
+			if (!factorsTermIds.contains(TermId.PLOT_NO.getId()) && !factorsTermIds.contains(TermId.PLOT_NNO.getId())) {
+				this.initializeIfNull(errors, Constants.MISSING_PLOT);
+				errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
+			}
 		}
 
 		if (!factorsTermIds.contains(TermId.GID.getId())) {
 			this.initializeIfNull(errors, Constants.MISSING_GID);
 			errors.get(Constants.MISSING_GID).add(new Message("error.gid.doesnt.exist.wizard"));
-		}
-
-		if ((workbook.getImportType() == null || workbook.getImportType() == DatasetTypeEnum.PLOT_DATA.getId()) && !factorsTermIds
-			.contains(TermId.PLOT_NO.getId()) && !factorsTermIds.contains(TermId.PLOT_NNO.getId())) {
-			this.initializeIfNull(errors, Constants.MISSING_PLOT);
-			errors.get(Constants.MISSING_PLOT).add(new Message("error.plot.doesnt.exist.wizard"));
 		}
 
 		if (!trialVariablesTermIds.contains(TermId.TRIAL_INSTANCE_FACTOR.getId())) {

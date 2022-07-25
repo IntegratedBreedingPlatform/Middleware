@@ -5,7 +5,6 @@ public class Constants {
 
 	public static final String GLOBAL = "GLOBAL";
 	public static final String MISSING_ENTRY_NO = "MISSING_ENTRY_NO";
-	public static final String MISSING_ENTRY_TYPE = "MISSING_ENTRY_TYPE";
 	public static final String MISSING_TRIAL = "MISSING_TRIAL";
 	public static final String MISSING_PLOT = "MISSING_PLOT";
 	public static final String MESSAGE_KEY_GENERIC_ERROR = "error.generic.unhandled.exception";
