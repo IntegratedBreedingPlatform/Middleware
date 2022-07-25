@@ -27,7 +27,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -115,10 +114,12 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		final Set<String> joins = this.getFixedJoins();
 
 		this.addFixedScalars(scalars, selects);
-		this.addGroupGidScalar(scalars, selects, joins, studyEntrySearchDto.getVariableEntryDescriptors());
-		this.addGuidScalar(scalars, selects, joins, studyEntrySearchDto.getVariableEntryDescriptors());
-		this.addSourceScalar(scalars, selects, joins, studyEntrySearchDto.getFixedEntryDescriptors());
-		this.addGroupSourceNameScalar(scalars, selects, joins, studyEntrySearchDto.getVariableEntryDescriptors());
+		this.addGroupGidScalar(scalars, selects, studyEntrySearchDto.getVariableEntryDescriptors());
+		this.addGuidScalar(scalars, selects, studyEntrySearchDto.getVariableEntryDescriptors());
+		this.addSourceScalar(scalars, selects, studyEntrySearchDto.getFixedEntryDescriptors());
+		this.addGroupSourceNameScalar(scalars, selects, studyEntrySearchDto.getVariableEntryDescriptors());
+
+		this.addJoins(joins, studyEntrySearchDto);
 
 		if (!CollectionUtils.isEmpty(studyEntrySearchDto.getVariableEntryDescriptors())) {
 			studyEntrySearchDto.getVariableEntryDescriptors().stream()
@@ -151,17 +152,17 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		return this.mapResults(results, studyEntrySearchDto);
 	}
 
-	public long countFilteredStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter) {
+	public long countFilteredStudyEntries(final int studyId, final StudyEntrySearchDto studyEntrySearchDto) {
 		final Map<String, Object> queryParams = new HashMap<>();
 		queryParams.put("studyId", studyId);
 
 		final Set<String> joins = this.getFixedJoins();
-		joins.addAll(this.getJoinsByFilter(filter));
+		this.addJoins(joins, studyEntrySearchDto);
 		final String joinClause = this.getJoinClause(joins);
-		final String whereClause = this.addFilters(filter, queryParams);
-		final String havingClause = this.getHavingClause(filter);
+		final String whereClause = this.addFilters(studyEntrySearchDto.getFilter(), queryParams);
+		final String havingClause = this.getHavingClause(studyEntrySearchDto.getFilter());
 
-		// Compute the AVAILABLE BALANCE first so that we can filter the rows using HAVING clause.
+		// Compute the AVAILABLE BALANCE first for each entry so that we can filter the rows by AVAILABLE BALANCE using HAVING clause.
 		final Set<String> selects = new LinkedHashSet<>();
 		selects.add("s.stock_id");
 		selects.add(LOT_AVAILABLE_EXPRESSION + " AS " + LOT_AVAILABLE_BALANCE_ALIAS);
@@ -169,7 +170,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			this.formatQuery(selects.stream().collect(Collectors.joining(",")), joinClause, whereClause, " GROUP BY s.stock_id ",
 				havingClause, "");
 
-		// Then count the rows from the derived table.
+		// Then count the rows from the derived table result.
 		final String sql = String.format("SELECT COUNT(stock_id) FROM (%s) a", derivedTableQuery);
 
 		final SQLQuery query = this.getSession().createSQLQuery(sql);
@@ -178,25 +179,24 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
-	private Set<String> getJoinsByFilter(final StudyEntrySearchDto.Filter filter) {
-		final Set<String> joins = new LinkedHashSet<>();
-		if (filter == null || CollectionUtils.isEmpty(filter.getFilteredTextValues())) {
-			return Collections.emptySet();
-		}
-
-		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.GUID.getId())) ||
-			filter.getFilteredValues().containsKey(String.valueOf(TermId.GROUPGID.getId()))) {
-			joins.add(GERMPLASM_JOIN);
-		}
-		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()))) {
-			joins.add(GERMPLASM_JOIN);
-			joins.add(IMMEDIATE_SOURCE_NAME_JOIN);
-		}
-		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.GROUP_SOURCE_NAME.getId()))) {
-			joins.add(GERMPLASM_JOIN);
-			joins.add(GROUP_SOURCE_NAME_JOIN);
-		}
-		return joins;
+	private void addJoins(final Set<String> joins, final StudyEntrySearchDto studyEntrySearchDto) {
+		studyEntrySearchDto.getVariableEntryDescriptors().forEach(entryDescriptor -> {
+			final int termId = entryDescriptor.getTermId();
+			if (TermId.GROUPGID.getId() == termId || TermId.GUID.getId() == termId) {
+				joins.add(GERMPLASM_JOIN);
+			}
+			if (TermId.GROUP_SOURCE_NAME.getId() == termId) {
+				joins.add(GERMPLASM_JOIN);
+				joins.add(GROUP_SOURCE_NAME_JOIN);
+			}
+		});
+		studyEntrySearchDto.getFixedEntryDescriptors().forEach(fixedEntryDescriptor -> {
+			final int termId = fixedEntryDescriptor.getTermId();
+			if (TermId.IMMEDIATE_SOURCE_NAME.getId() == termId) {
+				joins.add(GERMPLASM_JOIN);
+				joins.add(IMMEDIATE_SOURCE_NAME_JOIN);
+			}
+		});
 	}
 
 	private void addFixedScalars(final List<Scalar> scalars, final List<String> selectClause) {
@@ -231,69 +231,61 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			StringType.INSTANCE));
 	}
 
-	private void addGroupGidScalar(final List<Scalar> scalars, final List<String> selectClause, final Set<String> joins,
+	private void addGroupGidScalar(final List<Scalar> scalars, final List<String> selectClause,
 		final List<MeasurementVariable> entryDescriptors) {
 		if (!CollectionUtils.isEmpty(entryDescriptors)) {
 			entryDescriptors.stream()
 				.filter(measurementVariable -> measurementVariable.getTermId() == TermId.GROUPGID.getId())
 				.findFirst()
-				.ifPresent(measurementVariable -> {
-					selectClause.add(this.addSelectExpression(scalars, "g.mgid", GROUP_GID_ALIAS, IntegerType.INSTANCE));
-					joins.add(GERMPLASM_JOIN);
-				});
+				.ifPresent(measurementVariable ->
+					selectClause.add(this.addSelectExpression(scalars, "g.mgid", GROUP_GID_ALIAS, IntegerType.INSTANCE))
+				);
 		}
 	}
 
-	private void addGuidScalar(final List<Scalar> scalars, final List<String> selectClause, final Set<String> joins,
+	private void addGuidScalar(final List<Scalar> scalars, final List<String> selectClause,
 		final List<MeasurementVariable> entryDescriptors) {
 		if (!CollectionUtils.isEmpty(entryDescriptors)) {
 			entryDescriptors.stream()
 				.filter(measurementVariable -> measurementVariable.getTermId() == TermId.GUID.getId())
 				.findFirst()
-				.ifPresent(measurementVariable -> {
-					selectClause.add(this.addSelectExpression(scalars, "g.germplsm_uuid", GUID_ALIAS, StringType.INSTANCE));
-					joins.add(GERMPLASM_JOIN);
-				});
+				.ifPresent(measurementVariable ->
+					selectClause.add(this.addSelectExpression(scalars, "g.germplsm_uuid", GUID_ALIAS, StringType.INSTANCE))
+				);
 		}
 	}
 
-	private void addSourceScalar(final List<Scalar> scalars, final List<String> selectClause, final Set<String> joins,
+	private void addSourceScalar(final List<Scalar> scalars, final List<String> selectClause,
 		final List<MeasurementVariable> entryDescriptors) {
 		if (!CollectionUtils.isEmpty(entryDescriptors)) {
 			entryDescriptors.stream()
 				.filter(measurementVariable -> measurementVariable.getTermId() == TermId.IMMEDIATE_SOURCE_NAME.getId())
 				.findFirst()
-				.ifPresent(measurementVariable -> {
+				.ifPresent(measurementVariable ->
 					selectClause.add(this.addSelectExpression(scalars,
 						"( CASE \n"
 							+ " WHEN g.gnpgs = -1 \n"
 							+ " AND g.gpid2 IS NOT NULL\n"
 							+ " AND g.gpid2 <> 0 THEN immediateSource.nval\n"
-							+ " ELSE '-' END ) ", TermId.IMMEDIATE_SOURCE_NAME.name(), StringType.INSTANCE));
-
-					joins.add(GERMPLASM_JOIN);
-					joins.add(IMMEDIATE_SOURCE_NAME_JOIN);
-				});
+							+ " ELSE '-' END ) ", TermId.IMMEDIATE_SOURCE_NAME.name(), StringType.INSTANCE))
+				);
 		}
 	}
 
-	private void addGroupSourceNameScalar(final List<Scalar> scalars, final List<String> selectClause, final Set<String> joins,
+	private void addGroupSourceNameScalar(final List<Scalar> scalars, final List<String> selectClause,
 		final List<MeasurementVariable> entryDescriptors) {
 		if (!CollectionUtils.isEmpty(entryDescriptors)) {
 			entryDescriptors.stream()
 				.filter(measurementVariable -> measurementVariable.getTermId() == TermId.GROUP_SOURCE_NAME.getId())
 				.findFirst()
-				.ifPresent(measurementVariable -> {
+				.ifPresent(measurementVariable ->
 					selectClause.add(this.addSelectExpression(scalars,
 						"( CASE \n"
 							+ " WHEN g.gnpgs = -1 \n"
 							+ " AND g.gpid1 IS NOT NULL \n"
 							+ " AND g.gpid1 <> 0 THEN groupSourceName.nval \n"
-							+ "ELSE '-' END ) ", TermId.GROUP_SOURCE_NAME.name(), StringType.INSTANCE));
-
-					joins.add(GERMPLASM_JOIN);
-					joins.add(GROUP_SOURCE_NAME_JOIN);
-				});
+							+ "ELSE '-' END ) ", TermId.GROUP_SOURCE_NAME.name(), StringType.INSTANCE))
+				);
 		}
 	}
 
