@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.pojos.dms.StockProperty;
@@ -50,5 +51,7 @@ public interface StudyEntryService {
 	Integer getCrossGenerationLevel(Integer studyId);
 
 	List<StudyEntryColumnDTO> getStudyEntryColumns(Integer studyId);
+
+	List<Variable> getStudyEntryDetails(String cropName, String programUUID, Integer studyId, Integer variableTypeId);
 
 }
