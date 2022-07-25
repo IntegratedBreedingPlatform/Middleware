@@ -84,6 +84,8 @@ public class DatasetServiceImpl implements DatasetService {
 
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
+	private static final String LOCATION_NAME = "LOCATION_NAME";
+
 	private static final List<Integer> SUBOBS_COLUMNS_ALL_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.GERMPLASM_DESCRIPTOR.getId(),
 		VariableType.ENTRY_DETAIL.getId(),//
@@ -133,11 +135,9 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.SELECTION_METHOD.getId());
 
 	protected static final List<Integer> ANALYSIS_SUMMARY_VARIABLE_TYPES = Lists.newArrayList(
-		VariableType.ENVIRONMENT_DETAIL.getId(),
 		VariableType.ANALYSIS_SUMMARY.getId());
 
 	protected static final List<Integer> MEANS_VARIABLE_TYPES = Lists.newArrayList(
-		VariableType.ENVIRONMENT_DETAIL.getId(),
 		VariableType.GERMPLASM_DESCRIPTOR.getId(),
 		VariableType.ENTRY_DETAIL.getId(),
 		VariableType.TRAIT.getId());
@@ -189,11 +189,18 @@ public class DatasetServiceImpl implements DatasetService {
 		final DatasetDTO datasetDTO = this.getDataset(observationSetId);
 		// Analysis Summary Variables
 		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
-			return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
+			final List<MeasurementVariable> columns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
 				ANALYSIS_SUMMARY_VARIABLE_TYPES);
+			this.addVariableColumn(studyId, columns, TermId.LOCATION_ID.getId());
+			//Set alias for LOCATION_ID to LOCATION_NAME
+			columns.get(0).setAlias(LOCATION_NAME);
+			this.addVariableColumn(studyId, columns, TermId.TRIAL_INSTANCE_FACTOR.getId());
+			return columns;
 		} else if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.MEANS_DATA.getId())) {
-			return this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
+			final List<MeasurementVariable> columns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
 				MEANS_VARIABLE_TYPES);
+			this.addVariableColumn(studyId, columns, TermId.TRIAL_INSTANCE_FACTOR.getId());
+			return columns;
 		} else {
 			return this.getObservationsColumns(datasetDTO, studyId, draftMode);
 		}
@@ -278,24 +285,24 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		sortedColumns.addAll(variateColumns);
-		this.addTrialInstanceColumn(studyId, sortedColumns);
+		this.addVariableColumn(studyId, sortedColumns, TermId.TRIAL_INSTANCE_FACTOR.getId());
 		return sortedColumns;
 	}
 
-	private void addTrialInstanceColumn(final Integer studyId, final List<MeasurementVariable> sortedColumns) {
+	private void addVariableColumn(final Integer studyId, final List<MeasurementVariable> sortedColumns, final Integer termId) {
 		final DmsProject environmentDataset =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId()).get(0);
-		final CVTerm trialInstanceVariable = this.daoFactory.getCvTermDao().getById(TermId.TRIAL_INSTANCE_FACTOR.getId());
+		final CVTerm trialInstanceVariable = this.daoFactory.getCvTermDao().getById(termId);
 		final Optional<ProjectProperty> variableAlias =
 			this.daoFactory.getProjectPropertyDAO().getByProjectId(environmentDataset.getProjectId()).stream()
-				.filter(prop -> TermId.TRIAL_INSTANCE_FACTOR.getId() == prop.getVariableId()).findFirst();
+				.filter(prop -> termId == prop.getVariableId()).findFirst();
 
-		final MeasurementVariable trialInstanceCol = new MeasurementVariable();
-		trialInstanceCol.setName(trialInstanceVariable.getName());
-		trialInstanceCol.setAlias(variableAlias.isPresent() ? variableAlias.get().getAlias() : trialInstanceVariable.getName());
-		trialInstanceCol.setTermId(TermId.TRIAL_INSTANCE_FACTOR.getId());
-		trialInstanceCol.setFactor(true);
-		sortedColumns.add(0, trialInstanceCol);
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setName(trialInstanceVariable.getName());
+		measurementVariable.setAlias(variableAlias.isPresent() ? variableAlias.get().getAlias() : trialInstanceVariable.getName());
+		measurementVariable.setTermId(termId);
+		measurementVariable.setFactor(true);
+		sortedColumns.add(0, measurementVariable);
 	}
 
 	private MeasurementVariable addTermIdColumn(final TermId termId, final VariableType variableType, final String name,

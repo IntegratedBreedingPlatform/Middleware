@@ -61,7 +61,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final String GERMPLASM_JOIN = " INNER JOIN germplsm g on g.gid = s.dbxref_id ";
 	private static final String IMMEDIATE_SOURCE_NAME_JOIN = " LEFT JOIN names immediateSource  ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
 	private static final String GROUP_SOURCE_NAME_JOIN =
-		"LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0";
+		" LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0";
+	private static final String LOCATION_JOIN = " LEFT JOIN nd_geolocationprop gprop on gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = " + TermId.LOCATION_ID.getId()
+		+ " LEFT JOIN location loc on loc.locid = gprop.value ";
 
 	static {
 		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
@@ -81,6 +83,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		factorsFilterMap.put(String.valueOf(TermId.GUID.getId()), "g.germplsm_uuid");
 		factorsFilterMap.put(String.valueOf(TermId.GROUP_SOURCE_NAME.getId()), "groupSourceName.nval");
 		factorsFilterMap.put(String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()), "immediateSource.nval");
+		factorsFilterMap.put(String.valueOf(TermId.LOCATION_ID.getId()), "loc.lname");
 	}
 
 	private static final Map<String, String> geolocSpecialFactorsMap = new HashMap<>();
@@ -300,6 +303,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (this.checkFilterContainsFactor(filter, TermId.GROUP_SOURCE_NAME.getId())) {
 			joins.add(GROUP_SOURCE_NAME_JOIN);
+		}
+
+		if (this.checkFilterContainsFactor(filter, TermId.LOCATION_ID.getId())) {
+			joins.add(LOCATION_JOIN);
 		}
 
 		joins.forEach(sql::append);
@@ -725,7 +732,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			// FIXME won't work for sub-sub-obs
 			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
 
-		this.addSelectQueryJoins(sql, searchDto.getGenericGermplasmDescriptors());
+		this.addSelectQueryJoins(sql, searchDto.getGenericGermplasmDescriptors(), searchDto.getFilter());
 
 		sql.append(" WHERE p.project_id = :datasetId ");
 
@@ -738,7 +745,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 	}
 
-	private void addSelectQueryJoins(final StringBuilder sql, final List<String> genericGermplasmDescriptors) {
+	private void addSelectQueryJoins(final StringBuilder sql, final List<String> genericGermplasmDescriptors,
+		final ObservationUnitsSearchDTO.Filter filter) {
 		final Set<String> joins = new LinkedHashSet<>();
 
 		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUPGID) ||
@@ -754,6 +762,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUP_SOURCE_NAME)) {
 			sql.append(GROUP_SOURCE_NAME_JOIN);
+		}
+
+		if (this.checkFilterContainsFactor(filter, TermId.LOCATION_ID.getId())) {
+			joins.add(LOCATION_JOIN);
 		}
 
 		joins.forEach(sql::append);
@@ -857,13 +869,14 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private void appendVariableIdAndOperationToFilterQuery(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter,
 		final String filterByDraftOrValue, final Set<String> variableIds, final boolean performLikeOperation) {
 		final Integer variableId = filter.getVariableId();
-		final List<String> traitAndSelectionVariableTypes = Arrays.asList(VariableType.TRAIT.name(), VariableType.SELECTION_METHOD.name());
+		final List<String> variableTypes = Arrays.asList(VariableType.TRAIT.name(), VariableType.SELECTION_METHOD.name(),
+			VariableType.ANALYSIS_SUMMARY.name());
 		for (final String observableId : variableIds) {
 			if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
 				continue;
 			}
 			final String variableTypeString = filter.getVariableTypeMap().get(observableId);
-			if (traitAndSelectionVariableTypes.contains(variableTypeString)) {
+			if (variableTypes.contains(variableTypeString)) {
 				this.appendTraitValueFilteringToQuery(sql, filterByDraftOrValue, observableId, performLikeOperation);
 
 			} else {
