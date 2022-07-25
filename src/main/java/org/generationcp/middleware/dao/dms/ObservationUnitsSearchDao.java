@@ -148,7 +148,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ "nd_experiment nde "
 				+ "    inner join project p on p.project_id = nde.project_id "
 				+ "    inner join nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id "
-				+ "    inner join stock s ON s.stock_id = nde.stock_id "
+				+ "    left join stock s ON s.stock_id = nde.stock_id "
 				// FIXME won't work for sub-sub-obs
 				+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
 

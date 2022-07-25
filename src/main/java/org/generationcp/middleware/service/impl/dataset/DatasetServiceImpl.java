@@ -50,8 +50,6 @@ import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyEntryDescriptorColumns;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.Util;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -80,7 +78,6 @@ import java.util.stream.Collectors;
  */
 @Transactional
 public class DatasetServiceImpl implements DatasetService {
-	private static final Logger LOG = LoggerFactory.getLogger(DatasetServiceImpl.class);
 
 	public static final String DATE_FORMAT = "YYYYMMDD HH:MM:SS";
 
