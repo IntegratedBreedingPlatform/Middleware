@@ -1216,36 +1216,41 @@ public class DatasetServiceImpl implements DatasetService {
 	@Override
 	public void updateDatasetProperties(final Integer studyId, final List<Integer> variableIds) {
 		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
-		final List<Integer> germplasmDescriptorPropertyIds = plotDataset.getProperties()
+		final List<Integer> descriptorPropertyIds = plotDataset.getProperties()
 			.stream()
-			.filter(projectProperty ->
-				projectProperty.getTypeId().equals(VariableType.GERMPLASM_DESCRIPTOR.getId()) && !projectProperty.getVariableId()
-					.equals(TermId.OBS_UNIT_ID.getId()))
+			.filter(projectProperty -> !projectProperty.getVariableId().equals(TermId.OBS_UNIT_ID.getId()) &&
+				(projectProperty.getTypeId().equals(VariableType.GERMPLASM_DESCRIPTOR.getId()) ||
+					projectProperty.getTypeId().equals(VariableType.GERMPLASM_ATTRIBUTE.getId()) ||
+					projectProperty.getTypeId().equals(VariableType.GERMPLASM_PASSPORT.getId())))
 			.map(ProjectProperty::getVariableId)
 			.collect(Collectors.toList());
 
 		final List<Integer> newPropertyVariableIds = variableIds.stream()
-				.filter(variableId -> !germplasmDescriptorPropertyIds.contains(variableId)).collect(Collectors.toList());
+				.filter(variableId -> !descriptorPropertyIds.contains(variableId)).collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(newPropertyVariableIds)) {
 			final AtomicInteger nextRank =
 				new AtomicInteger(this.daoFactory.getProjectPropertyDAO().getNextRank(plotDataset.getProjectId()));
 
 			final VariableFilter variableFilter = new VariableFilter();
 			newPropertyVariableIds.forEach(variableFilter::addVariableId);
-			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
-			final Map<Integer, String> variableAliasByIds = variables.stream()
-				.collect(Collectors.toMap(Variable::getId,
-					variable -> StringUtils.isEmpty(variable.getAlias()) ? variable.getName() : variable.getAlias()));
+			this.ontologyVariableDataManager.getWithFilter(variableFilter)
+				.stream()
+				.forEach(variable -> {
+					Integer typeId = null;
+					// get first value because germplasm attributes/passport are not combinables with other types
+					if (!org.springframework.util.CollectionUtils.isEmpty(variable.getVariableTypes())) {
+						typeId = variable.getVariableTypes().iterator().next().getId();
+					}
 
-			newPropertyVariableIds.forEach(variableId -> {
-				final ProjectProperty projectProperty =
-					new ProjectProperty(plotDataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, nextRank.getAndIncrement(),
-						variableId, variableAliasByIds.get(variableId));
-				this.daoFactory.getProjectPropertyDAO().save(projectProperty);
-			});
+					final String alias = StringUtils.isEmpty(variable.getAlias()) ? variable.getName() : variable.getAlias();
+					final ProjectProperty projectProperty =
+						new ProjectProperty(plotDataset, typeId, null, nextRank.getAndIncrement(),
+							variable.getId(), alias);
+					this.daoFactory.getProjectPropertyDAO().save(projectProperty);
+				});
 		}
 
-		final List<Integer> removeVariableIds = germplasmDescriptorPropertyIds.stream()
+		final List<Integer> removeVariableIds = descriptorPropertyIds.stream()
 			.filter(variableId -> !variableIds.contains(variableId)).collect(Collectors.toList());
 		if (!CollectionUtils.isEmpty(removeVariableIds)) {
 			this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(plotDataset.getProjectId(), removeVariableIds);

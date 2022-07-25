@@ -78,13 +78,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	private final DaoFactory daoFactory;
 
-	// TODO: remove ENTRY_NO. Please, check this ticket https://ibplatform.atlassian.net/browse/IBP-5793 for a cleanup.
-	private static final List<Integer> FIXED_GERMPLASM_DESCRIPTOR_IDS = Lists
-		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.IMMEDIATE_SOURCE_NAME.getId());
-
-	private static final List<Integer> REMOVABLE_GERMPLASM_DESCRIPTOR_IDS = Lists
-		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId(), TermId.IMMEDIATE_SOURCE_NAME.getId());
-
 	public StudyEntryServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
@@ -111,20 +104,15 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		final List<MeasurementVariable> entryVariables =
 			this.datasetService.getObservationSetVariables(plotDatasetId,
-				Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
-
-		final List<MeasurementVariable> fixedEntryVariables =
-			entryVariables.stream().filter(d -> FIXED_GERMPLASM_DESCRIPTOR_IDS.contains(d.getTermId())).collect(
-				Collectors.toList());
-
-		//Remove the ones that are stored in stock and that in the future will not be descriptors
-		final List<MeasurementVariable> variableEntryDescriptors =
-			entryVariables.stream().filter(d -> !REMOVABLE_GERMPLASM_DESCRIPTOR_IDS.contains(d.getTermId())).collect(
-				Collectors.toList());
+				Lists.newArrayList(VariableType.GERMPLASM_ATTRIBUTE.getId(),
+					VariableType.GERMPLASM_PASSPORT.getId(),
+					VariableType.GERMPLASM_DESCRIPTOR.getId(),
+					VariableType.ENTRY_DETAIL.getId()));
+		entryVariables.removeIf(variable -> variable.getTermId() == TermId.OBS_UNIT_ID.getId());
 
 		return
 			this.daoFactory.getStudyEntrySearchDAO()
-				.getStudyEntries(new StudyEntrySearchDto(studyId, fixedEntryVariables, variableEntryDescriptors, filter), pageable);
+				.getStudyEntries(new StudyEntrySearchDto(studyId, filter), entryVariables, pageable);
 	}
 
 	@Override
@@ -376,6 +364,5 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		return Comparator.comparing(Variable::getAlias, Comparator.nullsLast(Comparator.naturalOrder()))
 			.thenComparing(Variable::getName);
 	}
-
 
 }

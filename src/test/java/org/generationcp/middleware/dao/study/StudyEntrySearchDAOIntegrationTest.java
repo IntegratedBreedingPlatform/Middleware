@@ -151,13 +151,8 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyEntries_EntryProps() {
 		final List<StudyEntryDto> studyEntryDtos = this.studyEntrySearchDAO
-			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), germplasmDescriptors, null), null);
+			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), null), germplasmDescriptors, null);
 		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
-		for (final StudyEntryDto studyEntryDto: studyEntryDtos) {
-			for (final MeasurementVariable measurementVariable: germplasmDescriptors) {
-				Assert.assertEquals(Boolean.TRUE, studyEntryDto.getProperties().containsKey(measurementVariable.getTermId()));
-			}
-		}
 	}
 
 	@Test
@@ -212,7 +207,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 
 		//Assertions
 		final List<StudyEntryDto> studyEntryDtos = this.studyEntrySearchDAO
-			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), new ArrayList<>(), null), null);
+			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), null), new ArrayList<>(), null);
 		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
 
 		final StudyEntryDto studyEntryDtoGidMixed = studyEntryDtos.stream().filter(i->i.getGid().equals(gidMixed)).findAny().get();
@@ -228,7 +223,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		//Sort by gid asc
 		final Pageable sortedByGidsAscPageable = new PageRequest(0, 20, new Sort(Sort.Direction.ASC, TermId.GID.name()));
 		final List<StudyEntryDto> studyEntryDtosSortedByGidsAsc = this.studyEntrySearchDAO
-			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), new ArrayList<>(), null), sortedByGidsAscPageable);
+			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), null), new ArrayList<>(), sortedByGidsAscPageable);
 		Assert.assertEquals(studyEntryDtosSortedByGidsAsc.size(), TEST_COUNT);
 		assertThat(studyEntryDtosSortedByGidsAsc.get(0).getGid(), is(this.gids.get(0)));
 		assertThat(studyEntryDtosSortedByGidsAsc.get(1).getGid(), is(this.gids.get(1)));
@@ -237,7 +232,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		//Sort by gid desc
 		final Pageable sortedByGidsDescPageable = new PageRequest(0, 20, new Sort(Sort.Direction.DESC, TermId.GID.name()));
 		final List<StudyEntryDto> studyEntryDtosSortedByGidsDesc = this.studyEntrySearchDAO
-			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), new ArrayList<>(), null), sortedByGidsDescPageable);
+			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), null), new ArrayList<>(), sortedByGidsDescPageable);
 		Assert.assertEquals(studyEntryDtosSortedByGidsDesc.size(), TEST_COUNT);
 		assertThat(studyEntryDtosSortedByGidsDesc.get(0).getGid(), is(this.gids.get(2)));
 		assertThat(studyEntryDtosSortedByGidsDesc.get(1).getGid(), is(this.gids.get(1)));
@@ -252,7 +247,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 			put(String.valueOf(TermId.GID.getId()), null);
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByGid = this.studyEntrySearchDAO
-			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByGid), null);
+			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), filterByGid), new ArrayList<>(), null);
 		Assert.assertEquals(studyEntryDtosFilterByGid.size(), 1);
 		assertThat(studyEntryDtosFilterByGid.get(0).getGid(), is(this.gids.get(1)));
 
@@ -265,7 +260,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 			put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), null);
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByLotCount = this.studyEntrySearchDAO
-			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByLotCount), null);
+			.getStudyEntries(new StudyEntrySearchDto(project.getProjectId(), filterByLotCount), new ArrayList<>(), null);
 		Assert.assertEquals(studyEntryDtosFilterByLotCount.size(), 1);
 		assertThat(studyEntryDtosFilterByLotCount.get(0).getGid(), is(this.gids.get(2)));
 	}
