@@ -116,7 +116,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
             this.daoFactory =new DaoFactory(this.sessionProvder);
         }
         if (this.germplasmTestDataGenerator == null) {
-            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
+            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
         }
 
         if (this.studyId == null) {
@@ -364,7 +364,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         return summaryData;
     }
 
-    private VariableFilter createVariableFilter(final String variableType, List<String> analysisMethodNames) {
+    private VariableFilter createVariableFilter(final String variableType, final List<String> analysisMethodNames) {
         final Variable testVariable = this.createTestVariable(RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10), RandomStringUtils.randomAlphanumeric(10),
             RandomStringUtils.randomAlphanumeric(10), Arrays.asList(VariableType.TRAIT, VariableType.SELECTION_METHOD));
 

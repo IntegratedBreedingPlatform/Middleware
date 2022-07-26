@@ -85,7 +85,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 		this.obsUnitSearchDao = new ObservationUnitsSearchDao();
 		this.obsUnitSearchDao.setSession(this.sessionProvder.getSession());
-		DmsProjectDao dmsProjectDao = new DmsProjectDao();
+		final DmsProjectDao dmsProjectDao = new DmsProjectDao();
 		dmsProjectDao.setSession(this.sessionProvder.getSession());
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);
@@ -649,7 +649,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		scale.setMaxValue("100");
 		this.scaleManager.addScale(scale);
 
-		OntologyVariableInfo variableInfo = new OntologyVariableInfo();
+		final OntologyVariableInfo variableInfo = new OntologyVariableInfo();
 		variableInfo.setProgramUuid(this.plot.getProgramUUID());
 		variableInfo.setName(traitName);
 		variableInfo.setDescription("Test Variable");

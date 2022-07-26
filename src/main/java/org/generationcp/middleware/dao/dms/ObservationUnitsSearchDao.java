@@ -828,7 +828,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		String direction = "asc";
 		if (pageable != null && pageable.getSort() != null) {
 			sortBy = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getProperty() : "";
-			String sortOrder = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getDirection().name() : "";
+			final String sortOrder = pageable.getSort().iterator().hasNext() ? pageable.getSort().iterator().next().getDirection().name() : "";
 			direction = StringUtils.isNotBlank(sortOrder) ? sortOrder : "asc";
 		}
 		if (observationUnitNoName != null && StringUtils.isNotBlank(sortBy) && observationUnitNoName.equalsIgnoreCase(sortBy)

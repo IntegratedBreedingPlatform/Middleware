@@ -124,7 +124,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		}
 
 		public Map<String, String> getVariableTypeMap() {
-			return variableTypeMap;
+			return this.variableTypeMap;
 		}
 
 		public void setVariableTypeMap(final Map<String, String> variableTypeMap) {
@@ -192,7 +192,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	}
 
 	public List<MeasurementVariableDto> getEntryDetails() {
-		return entryDetails;
+		return this.entryDetails;
 	}
 
 	public void setEntryDetails(final List<MeasurementVariableDto> entryDetails) {
