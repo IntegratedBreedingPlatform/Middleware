@@ -695,8 +695,9 @@ public class DatasetServiceImpl implements DatasetService {
 		searchDTO.setSelectionMethodsAndTraitsAndAnalysisSummary(selectionMethodsAndTraitsAndAnalysisSummary);
 
 		final DmsProject project = this.daoFactory.getDmsProjectDAO().getById(datasetId);
-		final int plotDatasetId = project.getDatasetType().isSubObservationType() //
-			?  project.getParent().getProjectId() : datasetId;
+		final int plotDatasetId = (DatasetTypeEnum.PLOT_DATA.getId() == project.getDatasetType().getDatasetTypeId()
+			|| DatasetTypeEnum.ANALYSIS_RESULTS_DATASET_IDS.contains(datasetId))
+			?  datasetId : project.getParent().getProjectId();
 		final List<MeasurementVariableDto> entryDetails =
 			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(plotDatasetId,
 				VariableType.ENTRY_DETAIL.getId());
