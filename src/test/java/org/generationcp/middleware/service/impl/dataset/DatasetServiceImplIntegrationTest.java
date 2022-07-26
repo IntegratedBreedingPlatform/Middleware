@@ -207,6 +207,7 @@ public class DatasetServiceImplIntegrationTest extends IntegrationTestBase {
         this.subObsDatasetId = datasetDTO.getDatasetId();
         this.datasetService.addDatasetVariable(datasetDTO.getDatasetId(), 20451, VariableType.TRAIT, TRAIT_NAME);
         this.datasetService.addDatasetVariable(datasetDTO.getDatasetId(), 8263, VariableType.SELECTION_METHOD, SELECTION_NAME);
+        this.sessionProvder.getSession().flush();
     }
 
 
