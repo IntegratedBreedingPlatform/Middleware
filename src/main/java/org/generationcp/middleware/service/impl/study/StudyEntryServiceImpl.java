@@ -322,7 +322,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
 			final List<StudyEntryColumnDTO> germplasmAttributeColumns = variables
 				.stream()
-				.sorted(this.getVariableComparator())
+				.sorted(Comparator.comparing(Variable::getName))
 				.map(variable -> {
 					Integer typeId = null;
 					// get first value because germplasm attributes/passport are not combinables with other types
@@ -358,11 +358,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
 		study.setGenerationLevel(generationLevel);
 		this.daoFactory.getDmsProjectDAO().save(study);
-	}
-
-	private Comparator<Variable> getVariableComparator() {
-		return Comparator.comparing(Variable::getAlias, Comparator.nullsLast(Comparator.naturalOrder()))
-			.thenComparing(Variable::getName);
 	}
 
 }
