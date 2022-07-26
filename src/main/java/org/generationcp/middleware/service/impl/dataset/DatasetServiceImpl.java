@@ -1214,7 +1214,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void updatePlotDatasetProperties(final Integer studyId, final List<Integer> variableIds) {
+	public void updatePlotDatasetProperties(final Integer studyId, final List<Integer> variableIds, final String programUUID) {
 		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
 		final List<Integer> descriptorPropertyIds = plotDataset.getProperties()
 			.stream()
@@ -1232,6 +1232,7 @@ public class DatasetServiceImpl implements DatasetService {
 				new AtomicInteger(this.daoFactory.getProjectPropertyDAO().getNextRank(plotDataset.getProjectId()));
 
 			final VariableFilter variableFilter = new VariableFilter();
+			variableFilter.setProgramUuid(programUUID);
 			newPropertyVariableIds.forEach(variableFilter::addVariableId);
 			this.ontologyVariableDataManager.getWithFilter(variableFilter)
 				.stream()

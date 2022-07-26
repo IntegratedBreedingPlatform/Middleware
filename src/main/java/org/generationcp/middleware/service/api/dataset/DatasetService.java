@@ -420,6 +420,6 @@ public interface DatasetService {
 
 	long countObservationsByVariableIdAndValue(final Integer variableId, final String value);
 
-	void updatePlotDatasetProperties(Integer studyId, List<Integer> variableIds);
+	void updatePlotDatasetProperties(Integer studyId, List<Integer> variableIds, final String programUUID);
 
 }
