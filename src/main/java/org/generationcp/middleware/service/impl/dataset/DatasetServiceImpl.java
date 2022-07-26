@@ -188,6 +188,8 @@ public class DatasetServiceImpl implements DatasetService {
 		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
 			final List<MeasurementVariable> columns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
 				ANALYSIS_SUMMARY_VARIABLE_TYPES);
+			// Sort by TermId to group related summary statics variables together
+			columns.sort(Comparator.comparing(MeasurementVariable::getTermId));
 			this.addVariableColumn(studyId, columns, TermId.LOCATION_ID.getId());
 			//Set alias for LOCATION_ID to LOCATION_NAME
 			columns.get(0).setAlias(LOCATION_NAME);
