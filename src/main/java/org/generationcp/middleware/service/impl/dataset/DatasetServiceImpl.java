@@ -60,6 +60,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
@@ -131,12 +132,10 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.TRAIT.getId(),
 		VariableType.SELECTION_METHOD.getId());
 
-	protected static final List<Integer> ANALYSIS_SUMMARY_VARIABLE_TYPES = Lists.newArrayList(
-		VariableType.ANALYSIS_SUMMARY.getId());
-
 	protected static final List<Integer> MEANS_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.GERMPLASM_DESCRIPTOR.getId(),
 		VariableType.ENTRY_DETAIL.getId(),
+		VariableType.ANALYSIS.getId(),
 		VariableType.TRAIT.getId());
 
 	private static final List<Integer> STANDARD_ENVIRONMENT_FACTORS = Lists.newArrayList(
@@ -187,7 +186,7 @@ public class DatasetServiceImpl implements DatasetService {
 		// Analysis Summary Variables
 		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
 			final List<MeasurementVariable> columns = this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId,
-				ANALYSIS_SUMMARY_VARIABLE_TYPES);
+				Collections.singletonList(VariableType.ANALYSIS_SUMMARY.getId()));
 			// Sort by TermId to group related summary statics variables together
 			columns.sort(Comparator.comparing(MeasurementVariable::getTermId));
 			this.addVariableColumn(studyId, columns, TermId.LOCATION_ID.getId());

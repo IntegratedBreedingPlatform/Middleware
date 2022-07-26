@@ -869,7 +869,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final String filterByDraftOrValue, final Set<String> variableIds, final boolean performLikeOperation) {
 		final Integer variableId = filter.getVariableId();
 		final List<String> variableTypes = Arrays.asList(VariableType.TRAIT.name(), VariableType.SELECTION_METHOD.name(),
-			VariableType.ANALYSIS_SUMMARY.name());
+			VariableType.ANALYSIS.name(), VariableType.ANALYSIS_SUMMARY.name());
 		for (final String observableId : variableIds) {
 			if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
 				continue;
