@@ -696,7 +696,7 @@ public class DatasetServiceImpl implements DatasetService {
 
 		final DmsProject project = this.daoFactory.getDmsProjectDAO().getById(datasetId);
 		final int plotDatasetId = (DatasetTypeEnum.PLOT_DATA.getId() == project.getDatasetType().getDatasetTypeId()
-			|| DatasetTypeEnum.ANALYSIS_RESULTS_DATASET_IDS.contains(datasetId))
+			|| DatasetTypeEnum.ANALYSIS_RESULTS_DATASET_IDS.contains(project.getDatasetType().getDatasetTypeId()))
 			?  datasetId : project.getParent().getProjectId();
 		final List<MeasurementVariableDto> entryDetails =
 			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(plotDatasetId,
