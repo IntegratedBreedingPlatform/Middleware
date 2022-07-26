@@ -1214,7 +1214,7 @@ public class DatasetServiceImpl implements DatasetService {
 	}
 
 	@Override
-	public void updateDatasetProperties(final Integer studyId, final List<Integer> variableIds) {
+	public void updatePlotDatasetProperties(final Integer studyId, final List<Integer> variableIds) {
 		final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
 		final List<Integer> descriptorPropertyIds = plotDataset.getProperties()
 			.stream()
