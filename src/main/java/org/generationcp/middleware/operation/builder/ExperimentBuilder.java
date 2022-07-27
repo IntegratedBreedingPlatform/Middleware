@@ -12,9 +12,12 @@
 package org.generationcp.middleware.operation.builder;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import com.jamonapi.Monitor;
 import com.jamonapi.MonitorFactory;
 import org.apache.commons.lang3.tuple.Pair;
+import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
@@ -25,6 +28,11 @@ import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.ManagerFactory;
+import org.generationcp.middleware.manager.PedigreeDataManagerImpl;
+import org.generationcp.middleware.manager.api.PedigreeDataManager;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -32,6 +40,9 @@ import org.generationcp.middleware.pojos.dms.GeolocationProperty;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.pedigree.PedigreeFactory;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +61,26 @@ public class ExperimentBuilder extends Builder {
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentBuilder.class);
 	private DaoFactory daoFactory;
 
+	private PedigreeService pedigreeService;
+
+	private CrossExpansionProperties crossExpansionProperties;
+
+	private PedigreeDataManager pedigreeDataManager;
+
 	public ExperimentBuilder(final HibernateSessionProvider sessionProviderForLocal) {
 		super(sessionProviderForLocal);
 		this.daoFactory = new DaoFactory(sessionProviderForLocal);
+		this.pedigreeDataManager = new PedigreeDataManagerImpl(sessionProviderForLocal);
+		this.pedigreeService = this.getPedigreeService();
+		this.crossExpansionProperties = new CrossExpansionProperties();
+	}
+
+	private PedigreeService getPedigreeService() {
+		if (ManagerFactory.getCurrentManagerFactoryThreadLocal().get() != null) {
+			return ManagerFactory.getCurrentManagerFactoryThreadLocal().get().getPedigreeService();
+		}
+		// we will just return default pedigree service
+		return PedigreeFactory.getPedigreeService(this.sessionProvider, null, null);
 	}
 
 	public long count(final int dataSetId) {
@@ -72,8 +100,11 @@ public class ExperimentBuilder extends Builder {
 			this.daoFactory.getExperimentDao().getExperiments(projectId, type.getId(), start, numOfRows);
 		final Map<Integer, Pair<String, String>> derivativeParentsMapByGids =
 			this.getDerivativeParentsMapByGids(experimentModels, variableTypes);
+		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable =
+			this.generatePedigreeTable(experimentModels, variableTypes);
+
 		return experimentModels.stream()
-			.map(experimentModel -> this.createExperiment(experimentModel, variableTypes, hasVariableType, derivativeParentsMapByGids))
+			.map(experimentModel -> this.createExperiment(experimentModel, variableTypes, hasVariableType, derivativeParentsMapByGids, pedigreeTreeNodeTable))
 			.collect(Collectors.toList());
 	}
 
@@ -133,9 +164,23 @@ public class ExperimentBuilder extends Builder {
 		// to improve, we will get all the stocks already and saved it in a map and pass it as a parameter to avoid multiple query in DB
 		final Map<Integer, StockModel> stockModelMap = this.getStockModelMap(experimentModels);
 		final Map<Integer, Pair<String, String>> derivativeParentsMapByGids = this.getDerivativeParentsMapByGids(experimentModels, variableTypes);
+		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable = this.generatePedigreeTable(experimentModels, variableTypes);
 		return experimentModels.stream()
-			.map(experimentModel -> this.createExperiment(experimentModel, variableTypes, stockModelMap, derivativeParentsMapByGids))
+			.map(experimentModel -> this.createExperiment(experimentModel, variableTypes, stockModelMap, derivativeParentsMapByGids,pedigreeTreeNodeTable))
 			.collect(Collectors.toList());
+	}
+
+	private Table<Integer, String, Optional<Germplasm>> generatePedigreeTable(final List<ExperimentModel> experimentModels,
+		final VariableTypeList variableTypes) {
+		Table<Integer, String, Optional<Germplasm>> table = HashBasedTable.create();
+		if (variableTypes.getVariableTypes().stream().anyMatch(this::entryVariablesHasParent)) {
+			final Set<Integer> gids =
+				experimentModels.stream().map(experimentModel -> experimentModel.getStock().getGermplasm().getGid())
+					.collect(Collectors.toSet());
+			final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
+			table = this.pedigreeDataManager.generatePedigreeTable(gids, level, false);
+		}
+		return table;
 	}
 
 	private Map<Integer, Pair<String, String>> getDerivativeParentsMapByGids(final List<ExperimentModel> experimentModels, final VariableTypeList variableTypes) {
@@ -145,9 +190,12 @@ public class ExperimentBuilder extends Builder {
 				experimentModels.stream().map(experimentModel -> experimentModel.getStock().getGermplasm().getGid())
 					.collect(Collectors.toSet());
 
-			final Map<Integer, Pair<String, String>> derivativeParents =
-				this.getGermplasmService().getDerivativeParentsMapByGids(gids);
-			derivativeParentsMapByGids.putAll(derivativeParents);
+			if (!gids.isEmpty()) {
+				final Map<Integer, Pair<String, String>> derivativeParents =
+					this.getGermplasmService().getDerivativeParentsMapByGids(gids);
+				derivativeParentsMapByGids.putAll(derivativeParents);
+			}
+
 		}
 		return derivativeParentsMapByGids;
 	}
@@ -156,7 +204,7 @@ public class ExperimentBuilder extends Builder {
 		final Map<Integer, StockModel> stockModelMap, final Map<Integer, Pair<String, String>> derivativeParentsMapByGids) {
 		final Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
-		experiment.setFactors(this.getFactors(experimentModel, variableTypes, stockModelMap, derivativeParentsMapByGids));
+		experiment.setFactors(this.getFactors(experimentModel, variableTypes, stockModelMap, derivativeParentsMapByGids, null));
 		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
 		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
 		experiment.setObsUnitId(experimentModel.getObsUnitId());
@@ -164,10 +212,23 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	private Experiment createExperiment(final ExperimentModel experimentModel, final VariableTypeList variableTypes,
-		final boolean hasVariableType, final Map<Integer, Pair<String, String>> derivativeParentsMapByGids) {
+		final Map<Integer, StockModel> stockModelMap, final Map<Integer, Pair<String, String>> derivativeParentsMapByGids,
+		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable) {
 		final Experiment experiment = new Experiment();
 		experiment.setId(experimentModel.getNdExperimentId());
-		experiment.setFactors(this.getFactors(experimentModel, variableTypes, hasVariableType, derivativeParentsMapByGids));
+		experiment.setFactors(this.getFactors(experimentModel, variableTypes, stockModelMap, derivativeParentsMapByGids, pedigreeTreeNodeTable));
+		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
+		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
+		experiment.setObsUnitId(experimentModel.getObsUnitId());
+		return experiment;
+	}
+
+	private Experiment createExperiment(final ExperimentModel experimentModel, final VariableTypeList variableTypes,
+		final boolean hasVariableType, final Map<Integer, Pair<String, String>> derivativeParentsMapByGids,
+		final Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable) {
+		final Experiment experiment = new Experiment();
+		experiment.setId(experimentModel.getNdExperimentId());
+		experiment.setFactors(this.getFactors(experimentModel, variableTypes, hasVariableType, derivativeParentsMapByGids, pedigreeTreeNodeTable));
 		experiment.setVariates(this.getVariates(experimentModel, variableTypes));
 		experiment.setLocationId(experimentModel.getGeoLocation().getLocationId());
 		return experiment;
@@ -214,10 +275,11 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	private VariableList getFactors(final ExperimentModel experimentModel, final VariableTypeList variableTypes,
-		final Map<Integer, StockModel> stockModelMap, final Map<Integer, Pair<String, String>> derivativeParentsMapByGids) {
+		final Map<Integer, StockModel> stockModelMap, final Map<Integer, Pair<String, String>> derivativeParentsMapByGids,
+		final Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable) {
 		final VariableList factors = new VariableList();
 
-		this.addPlotExperimentFactors(factors, experimentModel, variableTypes, stockModelMap, derivativeParentsMapByGids);
+		this.addPlotExperimentFactors(factors, experimentModel, variableTypes, stockModelMap, derivativeParentsMapByGids, pedigreeTreeNodeTable);
 
 		this.addLocationFactors(experimentModel, factors, variableTypes);
 
@@ -225,10 +287,11 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	private VariableList getFactors(final ExperimentModel experimentModel, final VariableTypeList variableTypes,
-		final boolean hasVariableType, final Map<Integer, Pair<String, String>> derivativeParentsMapByGids) {
+		final boolean hasVariableType, final Map<Integer, Pair<String, String>> derivativeParentsMapByGids,
+		final Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable) {
 		final VariableList factors = new VariableList();
 
-		this.addPlotExperimentFactors(factors, experimentModel, variableTypes, hasVariableType, derivativeParentsMapByGids);
+		this.addPlotExperimentFactors(factors, experimentModel, variableTypes, hasVariableType, derivativeParentsMapByGids, pedigreeTreeNodeTable);
 
 		this.addLocationFactors(experimentModel, factors, variableTypes);
 
@@ -283,17 +346,19 @@ public class ExperimentBuilder extends Builder {
 
 	private void addPlotExperimentFactors(final VariableList variables, final ExperimentModel experimentModel,
 		final VariableTypeList variableTypes,
-		final Map<Integer, StockModel> stockModelMap, final Map<Integer, Pair<String, String>> derivativeParentsMapByGids) {
+		final Map<Integer, StockModel> stockModelMap, final Map<Integer, Pair<String, String>> derivativeParentsMapByGids,
+		final Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable) {
 		this.addExperimentFactors(variables, experimentModel, variableTypes);
-		this.addGermplasmFactors(variables, experimentModel, variableTypes, stockModelMap, derivativeParentsMapByGids);
+		this.addGermplasmFactors(variables, experimentModel, variableTypes, stockModelMap, derivativeParentsMapByGids, pedigreeTreeNodeTable);
 		this.addObsUnitIdFactor(variables, experimentModel, variableTypes);
 	}
 
 	private void addPlotExperimentFactors(final VariableList variables, final ExperimentModel experimentModel,
 		final VariableTypeList variableTypes, final boolean hasVariableType,
-		final Map<Integer, Pair<String, String>> derivativeParentsMapByGids) {
+		final Map<Integer, Pair<String, String>> derivativeParentsMapByGids,
+		final Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable) {
 		this.addExperimentFactors(variables, experimentModel, variableTypes, hasVariableType);
-		this.addGermplasmFactors(variables, experimentModel, variableTypes, null, derivativeParentsMapByGids);
+		this.addGermplasmFactors(variables, experimentModel, variableTypes, null, derivativeParentsMapByGids, pedigreeTreeNodeTable);
 	}
 
 	private void addObsUnitIdFactor(final VariableList factors, final ExperimentModel experimentModel,
@@ -308,7 +373,8 @@ public class ExperimentBuilder extends Builder {
 	}
 
 	void addGermplasmFactors(final VariableList factors, final ExperimentModel experimentModel, final VariableTypeList variableTypes,
-		final Map<Integer, StockModel> stockModelMap, final Map<Integer, Pair<String, String>> derivativeParentsMapByGids) {
+		final Map<Integer, StockModel> stockModelMap, final Map<Integer, Pair<String, String>> derivativeParentsMapByGids,
+		final Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable) {
 		StockModel stockModel = experimentModel.getStock();
 		if (stockModel != null) {
 			final Integer stockId = stockModel.getStockId();
@@ -353,7 +419,60 @@ public class ExperimentBuilder extends Builder {
 					derivativeParentsMapByGids.get(stockModel.getGermplasm().getGid()).getLeft();
 				factors.add(new Variable(groupSourceNameVariableType, groupSourceName));
 			}
+
+			if (variableTypes.getVariableTypes().stream().anyMatch(this::entryVariablesHasParent)) {
+				this.generatePedigreeTable(pedigreeTreeNodeTable, stockModel, variableTypes, factors);
+			}
 		}
+	}
+
+	private void generatePedigreeTable(
+		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable,
+		final StockModel stockModel, final VariableTypeList variableTypes,
+		final VariableList factors) {
+
+		final Integer gid = stockModel.getGermplasm().getGid();
+		final DMSVariableType femaleParentNameVariableType = variableTypes.findById(TermId.FEMALE_PARENT_NAME);
+		final DMSVariableType femaleParentGidVariableType = variableTypes.findById(TermId.FEMALE_PARENT_GID);
+		final DMSVariableType maleParentNameVariableType = variableTypes.findById(TermId.MALE_PARENT_NAME);
+		final DMSVariableType maleParentGidVariableType = variableTypes.findById(TermId.MALE_PARENT_GID);
+
+		final Optional<Germplasm> femaleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.FGID.getName());
+		femaleParent.ifPresent(value -> {
+			final Germplasm germplasm = value;
+			if (femaleParentNameVariableType != null) {
+				factors.add(new Variable(femaleParentNameVariableType, germplasm.getPreferredName().getNval()));
+			}
+			if (femaleParentGidVariableType != null) {
+				factors.add(new Variable(femaleParentGidVariableType,
+					germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN));
+			}
+
+		});
+
+		final Optional<Germplasm> maleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.MGID.getName());
+		if (maleParent.isPresent()) {
+			final Germplasm germplasm = maleParent.get();
+
+			if (maleParentGidVariableType != null) {
+				factors.add(
+					new Variable(maleParentGidVariableType, germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN));
+			}
+
+			if (maleParentNameVariableType != null) {
+				factors.add(
+					new Variable(maleParentNameVariableType, germplasm.getPreferredName().getNval()));
+			}
+
+		}
+
+	}
+
+	private boolean entryVariablesHasParent(final DMSVariableType variableType) {
+		return variableType.getId() == TermId.FEMALE_PARENT_GID.getId() ||
+			variableType.getId() == TermId.FEMALE_PARENT_NAME.getId()||
+			variableType.getId() ==  TermId.MALE_PARENT_GID.getId() ||
+			variableType.getId() ==  TermId.MALE_PARENT_NAME.getId();
 	}
 
 	protected Variable createGermplasmFactor(final StockModel stockModel, final DMSVariableType variableType) {
