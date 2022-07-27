@@ -109,7 +109,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
 				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 		for (final StudyEntryDto studyEntryDto : studyEntryDtos) {
 			for (final Map.Entry<Integer, StudyEntryPropertyData> property : studyEntryDto.getProperties().entrySet()) {
 				this.variableEntryDescriptors.stream().anyMatch(m -> m.getTermId() == property.getKey().intValue());
@@ -181,16 +181,16 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		//Assertions
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), null), null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 
 		final StudyEntryDto studyEntryDtoGidMixed = studyEntryDtos.stream().filter(i -> i.getGid().equals(gidMixed)).findAny().get();
-		Assert.assertEquals(studyEntryDtoGidMixed.getUnit(), "Mixed");
-		Assert.assertEquals(studyEntryDtoGidMixed.getAvailableBalance(), "Mixed");
+		Assert.assertEquals("Mixed", studyEntryDtoGidMixed.getUnit());
+		Assert.assertEquals("Mixed", studyEntryDtoGidMixed.getAvailableBalance());
 		Assert.assertEquals(studyEntryDtoGidMixed.getLotCount(), new Integer(2));
 
 		final StudyEntryDto studyEntryDtoGidUnique = studyEntryDtos.stream().filter(i -> i.getGid().equals(gidUniqueUnit)).findAny().get();
 		Assert.assertEquals(studyEntryDtoGidUnique.getUnit(), units.get(0).getName());
-		Assert.assertEquals(studyEntryDtoGidUnique.getAvailableBalance(), "60");
+		Assert.assertEquals("60", studyEntryDtoGidUnique.getAvailableBalance());
 		Assert.assertEquals(studyEntryDtoGidUnique.getLotCount(), new Integer(2));
 
 		//Sort by gid asc
@@ -198,7 +198,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtosSortedByGidsAsc = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), null),
 				sortedByGidsAscPageable);
-		Assert.assertEquals(studyEntryDtosSortedByGidsAsc.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosSortedByGidsAsc.size());
 		assertThat(studyEntryDtosSortedByGidsAsc.get(0).getGid(), is(this.gids.get(0)));
 		assertThat(studyEntryDtosSortedByGidsAsc.get(1).getGid(), is(this.gids.get(1)));
 		assertThat(studyEntryDtosSortedByGidsAsc.get(2).getGid(), is(this.gids.get(2)));
@@ -208,23 +208,23 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtosSortedByGidsDesc = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), null),
 				sortedByGidsDescPageable);
-		Assert.assertEquals(studyEntryDtosSortedByGidsDesc.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosSortedByGidsDesc.size());
 		assertThat(studyEntryDtosSortedByGidsDesc.get(0).getGid(), is(this.gids.get(2)));
 		assertThat(studyEntryDtosSortedByGidsDesc.get(1).getGid(), is(this.gids.get(1)));
 		assertThat(studyEntryDtosSortedByGidsDesc.get(2).getGid(), is(this.gids.get(0)));
 
 		//Filter by lot count
 		final StudyEntrySearchDto.Filter filterByLotCount = new StudyEntrySearchDto.Filter();
-		filterByLotCount.setFilteredValues(new HashMap() {{
-			this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), Arrays.asList(0));
+		filterByLotCount.setFilteredValues(new HashMap<String, List<String>>() {{
+			this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), Arrays.asList("0"));
 		}});
-		filterByLotCount.setVariableTypeMap(new HashMap() {{
+		filterByLotCount.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), null);
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByLotCount = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByLotCount),
 				null);
-		Assert.assertEquals(studyEntryDtosFilterByLotCount.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilterByLotCount.size());
 		assertThat(studyEntryDtosFilterByLotCount.get(0).getGid(), is(this.gids.get(2)));
 
 	}
@@ -235,21 +235,21 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
 				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 
 		// Filter by Entry No
 		final StudyEntrySearchDto.Filter filterByEntryNo = new StudyEntrySearchDto.Filter();
-		filterByEntryNo.setFilteredValues(new HashMap() {{
+		filterByEntryNo.setFilteredValues(new HashMap<String, List<String>>() {{
 			this.put(String.valueOf(TermId.ENTRY_NO.getId()), Arrays.asList(String.valueOf(studyEntryDtos.get(0).getEntryNumber())));
 		}});
-		filterByEntryNo.setVariableTypeMap(new HashMap() {{
+		filterByEntryNo.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.ENTRY_NO.getId()), VariableType.ENTRY_DETAIL.getName());
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByEntryNo = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(
 				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByEntryNo),
 				null);
-		Assert.assertEquals(studyEntryDtosFilterByEntryNo.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilterByEntryNo.size());
 		assertThat(studyEntryDtosFilterByEntryNo.get(0).getEntryNumber(), is(studyEntryDtos.get(0).getEntryNumber()));
 
 	}
@@ -260,24 +260,24 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
 				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 
 		final String entryTypeSearchString = studyEntryDtos.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).getValue();
 
 		// Filter by Entry Type
 		final StudyEntrySearchDto.Filter filterByEntryType = new StudyEntrySearchDto.Filter();
-		filterByEntryType.setFilteredValues(new HashMap() {{
+		filterByEntryType.setFilteredValues(new HashMap<String, List<String>>() {{
 			this.put(String.valueOf(TermId.ENTRY_TYPE.getId()),
 				Arrays.asList(entryTypeSearchString));
 		}});
-		filterByEntryType.setVariableTypeMap(new HashMap() {{
+		filterByEntryType.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.ENTRY_TYPE.getId()), VariableType.ENTRY_DETAIL.name());
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByEntryType = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(
 				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByEntryType),
 				null);
-		Assert.assertEquals(studyEntryDtosFilterByEntryType.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilterByEntryType.size());
 		assertThat(studyEntryDtosFilterByEntryType.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).getValue(),
 			is(entryTypeSearchString));
 
@@ -289,21 +289,21 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
 				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 
 		// Filter by GID
 		final StudyEntrySearchDto.Filter filterByGID = new StudyEntrySearchDto.Filter();
-		filterByGID.setFilteredValues(new HashMap() {{
+		filterByGID.setFilteredValues(new HashMap<String, List<String>>() {{
 			this.put(String.valueOf(TermId.GID.getId()), Arrays.asList(String.valueOf(studyEntryDtos.get(0).getGid())));
 		}});
-		filterByGID.setVariableTypeMap(new HashMap() {{
+		filterByGID.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID.getId()), null);
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByGID = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(
 				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByGID),
 				null);
-		Assert.assertEquals(studyEntryDtosFilterByGID.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilterByGID.size());
 		assertThat(studyEntryDtosFilterByGID.get(0).getGid(), is(studyEntryDtos.get(0).getGid()));
 
 	}
@@ -314,21 +314,21 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
 				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 
 		// Filter by GUID
 		final StudyEntrySearchDto.Filter filterByGUID = new StudyEntrySearchDto.Filter();
-		filterByGUID.setFilteredTextValues(new HashMap() {{
+		filterByGUID.setFilteredTextValues(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GUID.getId()), String.valueOf(studyEntryDtos.get(0).getGuid()));
 		}});
-		filterByGUID.setVariableTypeMap(new HashMap() {{
+		filterByGUID.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GUID.getId()), null);
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByGUID = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(
 				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByGUID),
 				null);
-		Assert.assertEquals(studyEntryDtosFilterByGUID.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilterByGUID.size());
 		assertThat(studyEntryDtosFilterByGUID.get(0).getGuid(), is(studyEntryDtos.get(0).getGuid()));
 
 	}
@@ -339,21 +339,21 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
 				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 
 		// Filter by Designation
 		final StudyEntrySearchDto.Filter filterByDesignation = new StudyEntrySearchDto.Filter();
-		filterByDesignation.setFilteredTextValues(new HashMap() {{
+		filterByDesignation.setFilteredTextValues(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.DESIG.getId()), String.valueOf(studyEntryDtos.get(0).getDesignation()));
 		}});
-		filterByDesignation.setVariableTypeMap(new HashMap() {{
+		filterByDesignation.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.DESIG.getId()), null);
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByDesignation = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(
 				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByDesignation),
 				null);
-		Assert.assertEquals(studyEntryDtosFilterByDesignation.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilterByDesignation.size());
 		assertThat(studyEntryDtosFilterByDesignation.get(0).getDesignation(), is(studyEntryDtos.get(0).getDesignation()));
 	}
 
@@ -363,21 +363,21 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
 				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 
 		// Filter by Cross
 		final StudyEntrySearchDto.Filter filterByCross = new StudyEntrySearchDto.Filter();
-		filterByCross.setFilteredTextValues(new HashMap() {{
+		filterByCross.setFilteredTextValues(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.CROSS.getId()), String.valueOf(studyEntryDtos.get(0).getCross()));
 		}});
-		filterByCross.setVariableTypeMap(new HashMap() {{
+		filterByCross.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.CROSS.getId()), null);
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByCross = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(
 				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByCross),
 				null);
-		Assert.assertEquals(studyEntryDtosFilterByCross.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilterByCross.size());
 		assertThat(studyEntryDtosFilterByCross.get(0).getCross(), is(studyEntryDtos.get(0).getCross()));
 	}
 
@@ -386,21 +386,21 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
 				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 
 		// Filter by Group GID
 		final StudyEntrySearchDto.Filter filterByGroupGID = new StudyEntrySearchDto.Filter();
-		filterByGroupGID.setFilteredValues(new HashMap() {{
+		filterByGroupGID.setFilteredValues(new HashMap<String, List<String>>() {{
 			this.put(String.valueOf(TermId.GROUPGID.getId()), Arrays.asList(String.valueOf(studyEntryDtos.get(0).getGroupGid())));
 		}});
-		filterByGroupGID.setVariableTypeMap(new HashMap() {{
+		filterByGroupGID.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GROUPGID.getId()), null);
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByGroupGID = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(
 				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByGroupGID),
 				null);
-		Assert.assertEquals(studyEntryDtosFilterByGroupGID.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilterByGroupGID.size());
 		assertThat(studyEntryDtosFilterByGroupGID.get(0).getGroupGid(), is(studyEntryDtos.get(0).getGroupGid()));
 	}
 
@@ -410,18 +410,18 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 			.getStudyEntries(
 				new StudyEntrySearchDto(this.project.getProjectId(), this.fixedEntryDescriptors, this.variableEntryDescriptors, null),
 				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 
 		final String immediateSourceNameSearchString =
 			studyEntryDtos.get(0).getProperties().get(TermId.IMMEDIATE_SOURCE_NAME.getId()).getValue();
 
 		// Filter by Entry Type
 		final StudyEntrySearchDto.Filter filterByImmediateSourceName = new StudyEntrySearchDto.Filter();
-		filterByImmediateSourceName.setFilteredTextValues(new HashMap() {{
+		filterByImmediateSourceName.setFilteredTextValues(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()),
 				immediateSourceNameSearchString);
 		}});
-		filterByImmediateSourceName.setVariableTypeMap(new HashMap() {{
+		filterByImmediateSourceName.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()), VariableType.GERMPLASM_DESCRIPTOR.name());
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByImmediateSourceName = this.daoFactory.getStudyEntrySearchDAO()
@@ -429,7 +429,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 				new StudyEntrySearchDto(this.project.getProjectId(), this.fixedEntryDescriptors, this.variableEntryDescriptors,
 					filterByImmediateSourceName),
 				null);
-		Assert.assertEquals(studyEntryDtosFilterByImmediateSourceName.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilterByImmediateSourceName.size());
 		assertThat(studyEntryDtosFilterByImmediateSourceName.get(0).getProperties().get(TermId.IMMEDIATE_SOURCE_NAME.getId()).getValue(),
 			is(immediateSourceNameSearchString));
 
@@ -440,17 +440,17 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
 				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 
 		final String groupSourceNameSearchString = studyEntryDtos.get(0).getProperties().get(TermId.GROUP_SOURCE_NAME.getId()).getValue();
 
 		// Filter by Entry Type
 		final StudyEntrySearchDto.Filter filterByGroupSourceName = new StudyEntrySearchDto.Filter();
-		filterByGroupSourceName.setFilteredTextValues(new HashMap() {{
+		filterByGroupSourceName.setFilteredTextValues(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GROUP_SOURCE_NAME.getId()),
 				groupSourceNameSearchString);
 		}});
-		filterByGroupSourceName.setVariableTypeMap(new HashMap() {{
+		filterByGroupSourceName.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GROUP_SOURCE_NAME.getId()), VariableType.GERMPLASM_DESCRIPTOR.name());
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByGroupSourceName = this.daoFactory.getStudyEntrySearchDAO()
@@ -458,7 +458,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors,
 					filterByGroupSourceName),
 				null);
-		Assert.assertEquals(studyEntryDtosFilterByGroupSourceName.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilterByGroupSourceName.size());
 		assertThat(studyEntryDtosFilterByGroupSourceName.get(0).getProperties().get(TermId.GROUP_SOURCE_NAME.getId()).getValue(),
 			is(groupSourceNameSearchString));
 	}
@@ -526,16 +526,16 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 
 		//Filter by lot count
 		final StudyEntrySearchDto.Filter filterByLotCount = new StudyEntrySearchDto.Filter();
-		filterByLotCount.setFilteredValues(new HashMap() {{
-			this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), Arrays.asList(0));
+		filterByLotCount.setFilteredValues(new HashMap<String, List<String>>() {{
+			this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), Arrays.asList("0"));
 		}});
-		filterByLotCount.setVariableTypeMap(new HashMap() {{
+		filterByLotCount.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), null);
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByLotCount = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByLotCount),
 				null);
-		Assert.assertEquals(studyEntryDtosFilterByLotCount.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilterByLotCount.size());
 		assertThat(studyEntryDtosFilterByLotCount.get(0).getGid(), is(this.gids.get(2)));
 
 	}
@@ -604,21 +604,21 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
 				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 
 		//Filter by lot count
 		final StudyEntrySearchDto.Filter filterByAvailableBalance = new StudyEntrySearchDto.Filter();
-		filterByAvailableBalance.setFilteredTextValues(new HashMap() {{
+		filterByAvailableBalance.setFilteredTextValues(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId()), "60");
 		}});
-		filterByAvailableBalance.setVariableTypeMap(new HashMap() {{
+		filterByAvailableBalance.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId()), null);
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByAvailableBalance = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(
 				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByAvailableBalance),
 				null);
-		Assert.assertEquals(studyEntryDtosFilterByAvailableBalance.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilterByAvailableBalance.size());
 		assertThat(studyEntryDtosFilterByAvailableBalance.get(0).getAvailableBalance(), is("60"));
 	}
 
@@ -687,21 +687,21 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
 				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 
 		//Filter by lot count
 		final StudyEntrySearchDto.Filter filterByUnit = new StudyEntrySearchDto.Filter();
-		filterByUnit.setFilteredTextValues(new HashMap() {{
+		filterByUnit.setFilteredTextValues(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID_UNIT.getId()), "Mixed");
 		}});
-		filterByUnit.setVariableTypeMap(new HashMap() {{
+		filterByUnit.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID_UNIT.getId()), null);
 		}});
 		final List<StudyEntryDto> studyEntryDtosFilterByUnit = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(
 				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByUnit),
 				null);
-		Assert.assertEquals(studyEntryDtosFilterByUnit.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilterByUnit.size());
 		assertThat(studyEntryDtosFilterByUnit.get(0).getUnit(), is("Mixed"));
 	}
 
@@ -716,11 +716,11 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final String searchString = studyEntryDtos.get(0).getProperties().get(this.customEntryDetailTerm1.getCvTermId()).getValue();
 
 		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
-		filter.setFilteredTextValues(new HashMap() {{
+		filter.setFilteredTextValues(new HashMap<String, String>() {{
 			this.put(String.valueOf(StudyEntrySearchDAOIntegrationTest.this.customEntryDetailTerm1.getCvTermId()),
 				searchString);
 		}});
-		filter.setVariableTypeMap(new HashMap() {{
+		filter.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(StudyEntrySearchDAOIntegrationTest.this.customEntryDetailTerm1.getCvTermId()),
 				VariableType.ENTRY_DETAIL.name());
 		}});
@@ -729,7 +729,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors,
 					filter),
 				null);
-		Assert.assertEquals(studyEntryDtosFilter1.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosFilter1.size());
 		assertThat(
 			studyEntryDtosFilter1.get(0).getProperties().get(this.customEntryDetailTerm1.getCvTermId())
 				.getValue(),
@@ -743,17 +743,17 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
 				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
 
 		final String searchString = studyEntryDtos.get(0).getProperties().get(this.customEntryDetailTerm2.getCvTermId()).getValue();
 
 		// Filter by Entry Type
 		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
-		filter.setFilteredTextValues(new HashMap() {{
+		filter.setFilteredTextValues(new HashMap<String, String>() {{
 			this.put(String.valueOf(StudyEntrySearchDAOIntegrationTest.this.customEntryDetailTerm2.getCvTermId()),
 				searchString);
 		}});
-		filter.setVariableTypeMap(new HashMap() {{
+		filter.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(StudyEntrySearchDAOIntegrationTest.this.customEntryDetailTerm2.getCvTermId()),
 				VariableType.ENTRY_DETAIL.name());
 		}});
@@ -762,7 +762,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors,
 					filter),
 				null);
-		Assert.assertEquals(studyEntryDtosResult.size(), 1);
+		Assert.assertEquals(1, studyEntryDtosResult.size());
 		assertThat(
 			studyEntryDtosResult.get(0).getProperties().get(this.customEntryDetailTerm2.getCvTermId())
 				.getValue(),
