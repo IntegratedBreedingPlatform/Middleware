@@ -35,7 +35,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	private String draw;
 
 	private Filter filter;
-
+	private List<MeasurementVariableDto> passportAndAttributes;
 
 	public class Filter {
 
@@ -253,6 +253,14 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 
 	public void setFilterColumns(final List<String> filterColumns) {
 		this.filterColumns = filterColumns;
+	}
+
+	public List<MeasurementVariableDto> getPassportAndAttributes() {
+		return passportAndAttributes;
+	}
+
+	public void setPassportAndAttributes(final List<MeasurementVariableDto> passportAndAttributes) {
+		this.passportAndAttributes = passportAndAttributes;
 	}
 
 	@Override

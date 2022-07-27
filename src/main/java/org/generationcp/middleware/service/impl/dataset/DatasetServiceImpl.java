@@ -192,12 +192,24 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 
 		final List<MeasurementVariable> descriptors = new ArrayList<>();
+		final List<MeasurementVariable> attributes = new ArrayList<>();
+		final List<MeasurementVariable> passports = new ArrayList<>();
 		final Map<Integer, MeasurementVariable> entryDetails = new LinkedHashMap<>();
 		final List<MeasurementVariable> otherVariables = new ArrayList<>();
-		this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetIdSupplier.get(), PLOT_COLUMNS_FACTOR_VARIABLE_TYPES)
+
+
+		final List<Integer> variableTypeIds = new ArrayList<>();
+		variableTypeIds.addAll(PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
+		variableTypeIds.add(VariableType.GERMPLASM_ATTRIBUTE.getId());
+		variableTypeIds.add(VariableType.GERMPLASM_PASSPORT.getId());
+		this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetIdSupplier.get(), variableTypeIds)
 			.forEach(variable -> {
 				if (VariableType.GERMPLASM_DESCRIPTOR == variable.getVariableType()) {
 					descriptors.add(variable);
+				} else if (VariableType.GERMPLASM_ATTRIBUTE == variable.getVariableType()) {
+					attributes.add(variable);
+				} else if (VariableType.GERMPLASM_PASSPORT == variable.getVariableType()) {
+					passports.add(variable);
 				} else if (VariableType.ENTRY_DETAIL == variable.getVariableType()) {
 					entryDetails.put(variable.getTermId(), variable);
 				} else {
@@ -217,6 +229,11 @@ public class DatasetServiceImpl implements DatasetService {
 		if (addStockIdColumn) {
 			sortedColumns.add(this.addTermIdColumn(TermId.STOCK_ID, VariableType.GERMPLASM_DESCRIPTOR, null, true));
 		}
+
+		passports.sort(Comparator.comparing(MeasurementVariable::getName));
+		sortedColumns.addAll(passports);
+		attributes.sort(Comparator.comparing(MeasurementVariable::getName));
+		sortedColumns.addAll(attributes);
 
 		sortedColumns.addAll(otherVariables);
 
@@ -656,6 +673,11 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
 				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId());
 		searchDTO.setSelectionMethodsAndTraits(selectionMethodsAndTraits);
+
+		final List<MeasurementVariableDto> passportAndAttributes =
+			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
+				VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId());
+		searchDTO.setPassportAndAttributes(passportAndAttributes);
 
 		final DmsProject project = this.daoFactory.getDmsProjectDAO().getById(datasetId);
 		final int plotDatasetId = DatasetTypeEnum.PLOT_DATA.getId() == project.getDatasetType().getDatasetTypeId() //
