@@ -8,6 +8,7 @@ import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.program.ProgramService;
+import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
@@ -25,9 +26,12 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
+import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -37,6 +41,7 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.InstanceDetailsDTO;
@@ -49,6 +54,7 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyEntryDescriptorColumns;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -151,6 +157,15 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private DerivedVariableService derivedVariableService;
+
+	@Autowired
+	private PedigreeService pedigreeService;
+
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
+
+	@Autowired
+	private PedigreeDataManager pedigreeDataManager;
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -633,7 +648,13 @@ public class DatasetServiceImpl implements DatasetService {
 
 		this.updateSearchDto(studyId, datasetId, searchDTO);
 
-		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
+		final List<ObservationUnitRow> list = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
+
+		if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
+			final Set<Integer> gids = list.stream().map(s -> s.getGid()).collect(Collectors.toSet());
+			this.addParentsFromPedigreeTable(gids, list);
+		}
+		return list;
 	}
 
 	@Override
@@ -686,6 +707,10 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, new PageRequest(0, Integer.MAX_VALUE));
 		this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 
+		if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
+			final Set<Integer> gids = observationUnits.stream().map(s -> s.getGid()).collect(Collectors.toSet());
+			this.addParentsFromPedigreeTable(gids, observationUnits);
+		}
 		return observationUnits;
 	}
 
@@ -1189,6 +1214,11 @@ public class DatasetServiceImpl implements DatasetService {
 				this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, null);
 			this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 			instanceMap.put(instanceId, observationUnits);
+
+			if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
+				final Set<Integer> gids = observationUnits.stream().map(s -> s.getGid()).collect(Collectors.toSet());
+				this.addParentsFromPedigreeTable(gids, observationUnits);
+			}
 		}
 		return instanceMap;
 	}
@@ -1420,4 +1450,44 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getTransactionDAO().countSearchTransactions(transactionsSearchDto) > 0;
 	}
 
+	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<ObservationUnitRow> list) {
+		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
+		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable =
+			this.pedigreeDataManager.generatePedigreeTable(gids, level, false);
+
+		list.forEach(observationUnitRow -> {
+			final Integer gid = observationUnitRow.getGid();
+
+			final Optional<Germplasm> femaleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.FGID.getName());
+			femaleParent.ifPresent(value -> {
+				final Germplasm germplasm = value;
+				observationUnitRow.getVariables().put(
+					TermId.FEMALE_PARENT_GID.name(),
+					new ObservationUnitData(TermId.FEMALE_PARENT_GID.getId(),
+						germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN));
+				observationUnitRow.getVariables().put(
+					TermId.FEMALE_PARENT_NAME.name(),
+					new ObservationUnitData(TermId.FEMALE_PARENT_NAME.getId(), germplasm.getPreferredName().getNval()));
+			});
+
+			final Optional<Germplasm> maleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.MGID.getName());
+			if (maleParent.isPresent()) {
+				final Germplasm germplasm = maleParent.get();
+				observationUnitRow.getVariables().put(
+					TermId.MALE_PARENT_GID.name(),
+					new ObservationUnitData(TermId.MALE_PARENT_GID.getId(),germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN));
+				observationUnitRow.getVariables().put(
+					TermId.MALE_PARENT_NAME.name(),
+					new ObservationUnitData(TermId.MALE_PARENT_NAME.getId(),germplasm.getPreferredName().getNval()));
+			}
+
+		});
+	}
+
+	private boolean hasParentGermplasmDescriptors(final String germplasmDescriptor) {
+		return TermId.FEMALE_PARENT_GID.name().equals(germplasmDescriptor) ||
+			TermId.FEMALE_PARENT_NAME.name().equals(germplasmDescriptor) ||
+			TermId.MALE_PARENT_GID.name().equals(germplasmDescriptor) ||
+			TermId.MALE_PARENT_NAME.name().equals(germplasmDescriptor);
+	}
 }

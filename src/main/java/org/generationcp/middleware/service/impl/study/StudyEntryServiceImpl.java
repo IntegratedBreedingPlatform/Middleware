@@ -4,6 +4,7 @@ package org.generationcp.middleware.service.impl.study;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
@@ -19,7 +20,9 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -67,6 +70,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Resource
 	private CrossExpansionProperties crossExpansionProperties;
 
+	@Resource
+	private PedigreeDataManager pedigreeDataManager;
+
 	private final DaoFactory daoFactory;
 
 	// TODO: remove ENTRY_NO. Please, check this ticket https://ibplatform.atlassian.net/browse/IBP-5793 for a cleanup.
@@ -74,7 +80,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.IMMEDIATE_SOURCE_NAME.getId());
 
 	private static final List<Integer> REMOVABLE_GERMPLASM_DESCRIPTOR_IDS = Lists
-		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId(), TermId.IMMEDIATE_SOURCE_NAME.getId());
+		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId(), TermId.IMMEDIATE_SOURCE_NAME.getId(), TermId.FEMALE_PARENT_GID.getId(), TermId.FEMALE_PARENT_NAME.getId(), TermId.MALE_PARENT_GID.getId(), TermId.MALE_PARENT_NAME.getId());
 
 	public StudyEntryServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -113,9 +119,17 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			entryVariables.stream().filter(d -> !REMOVABLE_GERMPLASM_DESCRIPTOR_IDS.contains(d.getTermId())).collect(
 				Collectors.toList());
 
-		return
+		List<StudyEntryDto> studyEntries =
 			this.daoFactory.getStudyEntrySearchDAO()
 				.getStudyEntries(new StudyEntrySearchDto(studyId, fixedEntryVariables, variableEntryDescriptors, filter), pageable);
+
+		if (entryVariables.stream().anyMatch(this::entryVariablesHasParent)) {
+			final Set<Integer> gids = studyEntries.stream().map(s -> s.getGid()).collect(Collectors.toSet());
+			this.addParentsFromPedigreeTable(gids, studyEntries);
+		}
+
+		return studyEntries;
+
 	}
 
 	@Override
@@ -331,4 +345,42 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		this.daoFactory.getDmsProjectDAO().save(study);
 	}
 
+	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<StudyEntryDto>  studyEntries) {
+		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
+		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable =
+			this.pedigreeDataManager.generatePedigreeTable(gids, level, false);
+
+		studyEntries.forEach(studyEntry -> {
+			final Integer gid = studyEntry.getGid();
+
+			final Optional<Germplasm> femaleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.FGID.getName());
+			femaleParent.ifPresent(value -> {
+				final Germplasm germplasm = value;
+				studyEntry.getProperties().put(
+					TermId.FEMALE_PARENT_GID.getId(),
+					new StudyEntryPropertyData(germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN));
+				studyEntry.getProperties().put(
+					TermId.FEMALE_PARENT_NAME.getId(),
+					new StudyEntryPropertyData(germplasm.getPreferredName().getNval()));
+			});
+
+			final Optional<Germplasm> maleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.MGID.getName());
+			if (maleParent.isPresent()) {
+				final Germplasm germplasm = maleParent.get();
+				studyEntry.getProperties().put(
+					TermId.MALE_PARENT_GID.getId(),
+					new StudyEntryPropertyData(germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN));
+				studyEntry.getProperties().put(
+					TermId.MALE_PARENT_NAME.getId(),
+					new StudyEntryPropertyData(germplasm.getPreferredName().getNval()));
+			}
+		});
+	}
+
+	private boolean entryVariablesHasParent(final MeasurementVariable measurementVariable) {
+		return measurementVariable.getTermId() == TermId.FEMALE_PARENT_GID.getId() ||
+			measurementVariable.getTermId() == TermId.FEMALE_PARENT_NAME.getId()||
+			measurementVariable.getTermId() ==  TermId.MALE_PARENT_GID.getId() ||
+			measurementVariable.getTermId() ==  TermId.MALE_PARENT_NAME.getId();
+	}
 }
