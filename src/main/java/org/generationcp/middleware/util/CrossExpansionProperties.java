@@ -60,12 +60,6 @@ public class CrossExpansionProperties {
 		try {
 			final Resource resource = new ClassPathResource("crossing.properties");
 			this.props = PropertiesLoaderUtils.loadProperties(resource);
-			final String defaultGenerationLevel = this.props.getProperty("default.generation.level");
-			final String pedigreeProfile = this.props.getProperty("pedigree.profile");
-			final List<String> list = Arrays.asList(this.props.getProperty("hybrid.breeding.methods").split(","));
-			this.setDefaultLevel(Integer.parseInt(defaultGenerationLevel));
-			this.setProfile(pedigreeProfile);
-			this.setHybridBreedingMethods(list.stream().map(Integer::valueOf).collect(Collectors.toSet()));
 		} catch (final IOException e) {
 			final String errorMessage = "Unable to access crossing.properties. Please contact your administrator for further assistance.";
 			CrossExpansionProperties.LOG.error(errorMessage, e);
