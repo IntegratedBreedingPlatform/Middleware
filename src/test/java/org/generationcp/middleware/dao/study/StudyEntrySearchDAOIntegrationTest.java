@@ -1,7 +1,7 @@
 package org.generationcp.middleware.dao.study;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.dao.ims.LotDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
@@ -37,6 +37,7 @@ import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
+import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,7 +52,9 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -70,6 +73,9 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 	private DmsProject plot;
 	private List<MeasurementVariable> fixedEntryDescriptors;
 	private List<MeasurementVariable> variableEntryDescriptors;
+
+	private CVTerm customEntryDetailTerm1;
+	private CVTerm customEntryDetailTerm2;
 
 	private IntegrationTestDataInitializer testDataInitializer;
 
@@ -105,8 +111,8 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 				null);
 		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
 		for (final StudyEntryDto studyEntryDto : studyEntryDtos) {
-			for (final MeasurementVariable measurementVariable : this.variableEntryDescriptors) {
-				Assert.assertEquals(Boolean.TRUE, studyEntryDto.getProperties().containsKey(measurementVariable.getTermId()));
+			for (final Map.Entry<Integer, StudyEntryPropertyData> property : studyEntryDto.getProperties().entrySet()) {
+				this.variableEntryDescriptors.stream().anyMatch(m -> m.getTermId() == property.getKey().intValue());
 			}
 		}
 	}
@@ -207,19 +213,6 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		assertThat(studyEntryDtosSortedByGidsDesc.get(1).getGid(), is(this.gids.get(1)));
 		assertThat(studyEntryDtosSortedByGidsDesc.get(2).getGid(), is(this.gids.get(0)));
 
-		//Filter by gid
-		final StudyEntrySearchDto.Filter filterByGid = new StudyEntrySearchDto.Filter();
-		filterByGid.setFilteredValues(new HashMap() {{
-			this.put(String.valueOf(TermId.GID.getId()), Arrays.asList(StudyEntrySearchDAOIntegrationTest.this.gids.get(1)));
-		}});
-		filterByGid.setVariableTypeMap(new HashMap() {{
-			this.put(String.valueOf(TermId.GID.getId()), null);
-		}});
-		final List<StudyEntryDto> studyEntryDtosFilterByGid = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByGid), null);
-		Assert.assertEquals(studyEntryDtosFilterByGid.size(), 1);
-		assertThat(studyEntryDtosFilterByGid.get(0).getGid(), is(this.gids.get(1)));
-
 		//Filter by lot count
 		final StudyEntrySearchDto.Filter filterByLotCount = new StudyEntrySearchDto.Filter();
 		filterByLotCount.setFilteredValues(new HashMap() {{
@@ -262,31 +255,6 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyEntries_FilterByGID() {
-
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
-				null);
-		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
-
-		// Filter by GID
-		final StudyEntrySearchDto.Filter filterByGID = new StudyEntrySearchDto.Filter();
-		filterByGID.setFilteredValues(new HashMap() {{
-			this.put(String.valueOf(TermId.GID.getId()), Arrays.asList(String.valueOf(studyEntryDtos.get(0).getGid())));
-		}});
-		filterByGID.setVariableTypeMap(new HashMap() {{
-			this.put(String.valueOf(TermId.GID.getId()), null);
-		}});
-		final List<StudyEntryDto> studyEntryDtosFilterByGID = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(
-				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByGID),
-				null);
-		Assert.assertEquals(studyEntryDtosFilterByGID.size(), 1);
-		assertThat(studyEntryDtosFilterByGID.get(0).getGid(), is(studyEntryDtos.get(0).getGid()));
-
-	}
-
-	@Test
 	public void testGetStudyEntries_FilterByEntryType() {
 
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
@@ -313,6 +281,127 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		assertThat(studyEntryDtosFilterByEntryType.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).getValue(),
 			is(entryTypeSearchString));
 
+	}
+
+	@Test
+	public void testGetStudyEntries_FilterByGID() {
+
+		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				null);
+		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+
+		// Filter by GID
+		final StudyEntrySearchDto.Filter filterByGID = new StudyEntrySearchDto.Filter();
+		filterByGID.setFilteredValues(new HashMap() {{
+			this.put(String.valueOf(TermId.GID.getId()), Arrays.asList(String.valueOf(studyEntryDtos.get(0).getGid())));
+		}});
+		filterByGID.setVariableTypeMap(new HashMap() {{
+			this.put(String.valueOf(TermId.GID.getId()), null);
+		}});
+		final List<StudyEntryDto> studyEntryDtosFilterByGID = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByGID),
+				null);
+		Assert.assertEquals(studyEntryDtosFilterByGID.size(), 1);
+		assertThat(studyEntryDtosFilterByGID.get(0).getGid(), is(studyEntryDtos.get(0).getGid()));
+
+	}
+
+	@Test
+	public void testGetStudyEntries_FilterByGUID() {
+
+		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				null);
+		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+
+		// Filter by GUID
+		final StudyEntrySearchDto.Filter filterByGUID = new StudyEntrySearchDto.Filter();
+		filterByGUID.setFilteredTextValues(new HashMap() {{
+			this.put(String.valueOf(TermId.GUID.getId()), String.valueOf(studyEntryDtos.get(0).getGuid()));
+		}});
+		filterByGUID.setVariableTypeMap(new HashMap() {{
+			this.put(String.valueOf(TermId.GUID.getId()), null);
+		}});
+		final List<StudyEntryDto> studyEntryDtosFilterByGUID = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByGUID),
+				null);
+		Assert.assertEquals(studyEntryDtosFilterByGUID.size(), 1);
+		assertThat(studyEntryDtosFilterByGUID.get(0).getGuid(), is(studyEntryDtos.get(0).getGuid()));
+
+	}
+
+	@Test
+	public void testGetStudyEntries_FilterByDesignation() {
+
+		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				null);
+		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+
+		// Filter by Designation
+		final StudyEntrySearchDto.Filter filterByDesignation = new StudyEntrySearchDto.Filter();
+		filterByDesignation.setFilteredTextValues(new HashMap() {{
+			this.put(String.valueOf(TermId.DESIG.getId()), String.valueOf(studyEntryDtos.get(0).getDesignation()));
+		}});
+		filterByDesignation.setVariableTypeMap(new HashMap() {{
+			this.put(String.valueOf(TermId.DESIG.getId()), null);
+		}});
+		final List<StudyEntryDto> studyEntryDtosFilterByDesignation = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByDesignation),
+				null);
+		Assert.assertEquals(studyEntryDtosFilterByDesignation.size(), 1);
+		assertThat(studyEntryDtosFilterByDesignation.get(0).getDesignation(), is(studyEntryDtos.get(0).getDesignation()));
+	}
+
+	@Test
+	public void testGetStudyEntries_FilterByCross() {
+
+		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				null);
+		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+
+		// Filter by Cross
+		final StudyEntrySearchDto.Filter filterByCross = new StudyEntrySearchDto.Filter();
+		filterByCross.setFilteredTextValues(new HashMap() {{
+			this.put(String.valueOf(TermId.CROSS.getId()), String.valueOf(studyEntryDtos.get(0).getCross()));
+		}});
+		filterByCross.setVariableTypeMap(new HashMap() {{
+			this.put(String.valueOf(TermId.CROSS.getId()), null);
+		}});
+		final List<StudyEntryDto> studyEntryDtosFilterByCross = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByCross),
+				null);
+		Assert.assertEquals(studyEntryDtosFilterByCross.size(), 1);
+		assertThat(studyEntryDtosFilterByCross.get(0).getCross(), is(studyEntryDtos.get(0).getCross()));
+	}
+
+	@Test
+	public void testGetStudyEntries_FilterByGroupGID() {
+		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				null);
+		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+
+		// Filter by Group GID
+		final StudyEntrySearchDto.Filter filterByGroupGID = new StudyEntrySearchDto.Filter();
+		filterByGroupGID.setFilteredValues(new HashMap() {{
+			this.put(String.valueOf(TermId.GROUPGID.getId()), Arrays.asList(String.valueOf(studyEntryDtos.get(0).getGroupGid())));
+		}});
+		filterByGroupGID.setVariableTypeMap(new HashMap() {{
+			this.put(String.valueOf(TermId.GROUPGID.getId()), null);
+		}});
+		final List<StudyEntryDto> studyEntryDtosFilterByGroupGID = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByGroupGID),
+				null);
+		Assert.assertEquals(studyEntryDtosFilterByGroupGID.size(), 1);
+		assertThat(studyEntryDtosFilterByGroupGID.get(0).getGroupGid(), is(studyEntryDtos.get(0).getGroupGid()));
 	}
 
 	@Test
@@ -375,23 +464,310 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetStudyEntries_FilterByCross() {
-		// TODO:
+	public void testGetStudyEntries_FilterByLotCount() {
+		//Get Units
+		final VariableFilter unitFilter = new VariableFilter();
+		unitFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+		final List<Variable> units = this.ontologyVariableDataManager.getWithFilter(unitFilter);
+
+		//Create location
+		this.createLocationForSearchLotTest();
+
+		//Create lots for the GID's
+		final Integer gidMixed = this.gids.get(0);
+		final Integer gidUniqueUnit = this.gids.get(1);
+
+		//Create Inventory Data
+		final Lot lot1 = InventoryDetailsTestDataInitializer
+			.createLot(1, GERMPLASM, gidMixed, this.location.getLocid(), units.get(0).getId(), 0, 1, "Comments", RandomStringUtils
+				.randomAlphabetic(35));
+
+		final Lot lot2 =
+			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, gidMixed, this.location.getLocid(), units.get(1).getId(), 0, 1,
+				"Comments", RandomStringUtils
+					.randomAlphabetic(35));
+
+		final Lot lot3 =
+			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, gidUniqueUnit, this.location.getLocid(), units.get(0).getId(), 0, 1,
+				"Comments", RandomStringUtils
+					.randomAlphabetic(35));
+
+		final Lot lot4 =
+			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, gidUniqueUnit, this.location.getLocid(), units.get(0).getId(), 0, 1,
+				"Comments", RandomStringUtils
+					.randomAlphabetic(35));
+
+		final Transaction transaction1 = InventoryDetailsTestDataInitializer
+			.createTransaction(20.0, TransactionStatus.CONFIRMED.getIntValue(), TransactionType.DEPOSIT.getValue(), lot1,
+				this.findAdminUser(), 1, 1, LIST, TransactionType.DEPOSIT.getId());
+
+		final Transaction transaction2 = InventoryDetailsTestDataInitializer
+			.createTransaction(30.0, TransactionStatus.CONFIRMED.getIntValue(), TransactionType.DEPOSIT.getValue(), lot2,
+				this.findAdminUser(), 1, 1, LIST, TransactionType.DEPOSIT.getId());
+
+		final Transaction transaction3 = InventoryDetailsTestDataInitializer
+			.createTransaction(10.0, TransactionStatus.CONFIRMED.getIntValue(), TransactionType.DEPOSIT.getValue(), lot3,
+				this.findAdminUser(), 1, 1, LIST, TransactionType.DEPOSIT.getId());
+
+		final Transaction transaction4 = InventoryDetailsTestDataInitializer
+			.createTransaction(50.0, TransactionStatus.CONFIRMED.getIntValue(), TransactionType.DEPOSIT.getValue(), lot4,
+				this.findAdminUser(), 1, 1, LIST, TransactionType.DEPOSIT.getId());
+
+		final LotDAO lotDAO = this.daoFactory.getLotDao();
+		lotDAO.save(lot1);
+		lotDAO.save(lot2);
+		lotDAO.save(lot3);
+		lotDAO.save(lot4);
+		final TransactionDAO transactionDAO = this.daoFactory.getTransactionDAO();
+		transactionDAO.save(transaction1);
+		transactionDAO.save(transaction2);
+		transactionDAO.save(transaction3);
+		transactionDAO.save(transaction4);
+
+		//Filter by lot count
+		final StudyEntrySearchDto.Filter filterByLotCount = new StudyEntrySearchDto.Filter();
+		filterByLotCount.setFilteredValues(new HashMap() {{
+			this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), Arrays.asList(0));
+		}});
+		filterByLotCount.setVariableTypeMap(new HashMap() {{
+			this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), null);
+		}});
+		final List<StudyEntryDto> studyEntryDtosFilterByLotCount = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByLotCount),
+				null);
+		Assert.assertEquals(studyEntryDtosFilterByLotCount.size(), 1);
+		assertThat(studyEntryDtosFilterByLotCount.get(0).getGid(), is(this.gids.get(2)));
+
 	}
 
 	@Test
 	public void testGetStudyEntries_FilterByAvailableBalance() {
-		// TODO:
+		//Get Units
+		final VariableFilter unitFilter = new VariableFilter();
+		unitFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+		final List<Variable> units = this.ontologyVariableDataManager.getWithFilter(unitFilter);
+
+		//Create location
+		this.createLocationForSearchLotTest();
+
+		//Create lots for the GID's
+		final Integer gidMixed = this.gids.get(0);
+		final Integer gidUniqueUnit = this.gids.get(1);
+
+		//Create Inventory Data
+		final Lot lot1 = InventoryDetailsTestDataInitializer
+			.createLot(1, GERMPLASM, gidMixed, this.location.getLocid(), units.get(0).getId(), 0, 1, "Comments", RandomStringUtils
+				.randomAlphabetic(35));
+
+		final Lot lot2 =
+			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, gidMixed, this.location.getLocid(), units.get(1).getId(), 0, 1,
+				"Comments", RandomStringUtils
+					.randomAlphabetic(35));
+
+		final Lot lot3 =
+			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, gidUniqueUnit, this.location.getLocid(), units.get(0).getId(), 0, 1,
+				"Comments", RandomStringUtils
+					.randomAlphabetic(35));
+
+		final Lot lot4 =
+			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, gidUniqueUnit, this.location.getLocid(), units.get(0).getId(), 0, 1,
+				"Comments", RandomStringUtils
+					.randomAlphabetic(35));
+
+		final Transaction transaction1 = InventoryDetailsTestDataInitializer
+			.createTransaction(20.0, TransactionStatus.CONFIRMED.getIntValue(), TransactionType.DEPOSIT.getValue(), lot1,
+				this.findAdminUser(), 1, 1, LIST, TransactionType.DEPOSIT.getId());
+
+		final Transaction transaction2 = InventoryDetailsTestDataInitializer
+			.createTransaction(30.0, TransactionStatus.CONFIRMED.getIntValue(), TransactionType.DEPOSIT.getValue(), lot2,
+				this.findAdminUser(), 1, 1, LIST, TransactionType.DEPOSIT.getId());
+
+		final Transaction transaction3 = InventoryDetailsTestDataInitializer
+			.createTransaction(10.0, TransactionStatus.CONFIRMED.getIntValue(), TransactionType.DEPOSIT.getValue(), lot3,
+				this.findAdminUser(), 1, 1, LIST, TransactionType.DEPOSIT.getId());
+
+		final Transaction transaction4 = InventoryDetailsTestDataInitializer
+			.createTransaction(50.0, TransactionStatus.CONFIRMED.getIntValue(), TransactionType.DEPOSIT.getValue(), lot4,
+				this.findAdminUser(), 1, 1, LIST, TransactionType.DEPOSIT.getId());
+
+		final LotDAO lotDAO = this.daoFactory.getLotDao();
+		lotDAO.save(lot1);
+		lotDAO.save(lot2);
+		lotDAO.save(lot3);
+		lotDAO.save(lot4);
+		final TransactionDAO transactionDAO = this.daoFactory.getTransactionDAO();
+		transactionDAO.save(transaction1);
+		transactionDAO.save(transaction2);
+		transactionDAO.save(transaction3);
+		transactionDAO.save(transaction4);
+
+		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				null);
+		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+
+		//Filter by lot count
+		final StudyEntrySearchDto.Filter filterByAvailableBalance = new StudyEntrySearchDto.Filter();
+		filterByAvailableBalance.setFilteredTextValues(new HashMap() {{
+			this.put(String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId()), "60");
+		}});
+		filterByAvailableBalance.setVariableTypeMap(new HashMap() {{
+			this.put(String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId()), null);
+		}});
+		final List<StudyEntryDto> studyEntryDtosFilterByAvailableBalance = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByAvailableBalance),
+				null);
+		Assert.assertEquals(studyEntryDtosFilterByAvailableBalance.size(), 1);
+		assertThat(studyEntryDtosFilterByAvailableBalance.get(0).getAvailableBalance(), is("60"));
 	}
 
 	@Test
 	public void testGetStudyEntries_FilterByUnit() {
-		// TODO:
+
+		//Get Units
+		final VariableFilter unitFilter = new VariableFilter();
+		unitFilter.addPropertyId(TermId.INVENTORY_AMOUNT_PROPERTY.getId());
+		final List<Variable> units = this.ontologyVariableDataManager.getWithFilter(unitFilter);
+
+		//Create location
+		this.createLocationForSearchLotTest();
+
+		//Create lots for the GID's
+		final Integer gidMixed = this.gids.get(0);
+		final Integer gidUniqueUnit = this.gids.get(1);
+
+		//Create Inventory Data
+		final Lot lot1 = InventoryDetailsTestDataInitializer
+			.createLot(1, GERMPLASM, gidMixed, this.location.getLocid(), units.get(0).getId(), 0, 1, "Comments", RandomStringUtils
+				.randomAlphabetic(35));
+
+		final Lot lot2 =
+			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, gidMixed, this.location.getLocid(), units.get(1).getId(), 0, 1,
+				"Comments", RandomStringUtils
+					.randomAlphabetic(35));
+
+		final Lot lot3 =
+			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, gidUniqueUnit, this.location.getLocid(), units.get(0).getId(), 0, 1,
+				"Comments", RandomStringUtils
+					.randomAlphabetic(35));
+
+		final Lot lot4 =
+			InventoryDetailsTestDataInitializer.createLot(1, GERMPLASM, gidUniqueUnit, this.location.getLocid(), units.get(0).getId(), 0, 1,
+				"Comments", RandomStringUtils
+					.randomAlphabetic(35));
+
+		final Transaction transaction1 = InventoryDetailsTestDataInitializer
+			.createTransaction(20.0, TransactionStatus.CONFIRMED.getIntValue(), TransactionType.DEPOSIT.getValue(), lot1,
+				this.findAdminUser(), 1, 1, LIST, TransactionType.DEPOSIT.getId());
+
+		final Transaction transaction2 = InventoryDetailsTestDataInitializer
+			.createTransaction(30.0, TransactionStatus.CONFIRMED.getIntValue(), TransactionType.DEPOSIT.getValue(), lot2,
+				this.findAdminUser(), 1, 1, LIST, TransactionType.DEPOSIT.getId());
+
+		final Transaction transaction3 = InventoryDetailsTestDataInitializer
+			.createTransaction(10.0, TransactionStatus.CONFIRMED.getIntValue(), TransactionType.DEPOSIT.getValue(), lot3,
+				this.findAdminUser(), 1, 1, LIST, TransactionType.DEPOSIT.getId());
+
+		final Transaction transaction4 = InventoryDetailsTestDataInitializer
+			.createTransaction(50.0, TransactionStatus.CONFIRMED.getIntValue(), TransactionType.DEPOSIT.getValue(), lot4,
+				this.findAdminUser(), 1, 1, LIST, TransactionType.DEPOSIT.getId());
+
+		final LotDAO lotDAO = this.daoFactory.getLotDao();
+		lotDAO.save(lot1);
+		lotDAO.save(lot2);
+		lotDAO.save(lot3);
+		lotDAO.save(lot4);
+		final TransactionDAO transactionDAO = this.daoFactory.getTransactionDAO();
+		transactionDAO.save(transaction1);
+		transactionDAO.save(transaction2);
+		transactionDAO.save(transaction3);
+		transactionDAO.save(transaction4);
+
+		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				null);
+		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+
+		//Filter by lot count
+		final StudyEntrySearchDto.Filter filterByUnit = new StudyEntrySearchDto.Filter();
+		filterByUnit.setFilteredTextValues(new HashMap() {{
+			this.put(String.valueOf(TermId.GID_UNIT.getId()), "Mixed");
+		}});
+		filterByUnit.setVariableTypeMap(new HashMap() {{
+			this.put(String.valueOf(TermId.GID_UNIT.getId()), null);
+		}});
+		final List<StudyEntryDto> studyEntryDtosFilterByUnit = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByUnit),
+				null);
+		Assert.assertEquals(studyEntryDtosFilterByUnit.size(), 1);
+		assertThat(studyEntryDtosFilterByUnit.get(0).getUnit(), is("Mixed"));
 	}
 
 	@Test
-	public void testGetStudyEntries_FilterByEntryDetail() {
-		// TODO:
+	public void testGetStudyEntries_FilterByCustomEntryDetail1() {
+
+		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				null);
+		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
+
+		final String searchString = studyEntryDtos.get(0).getProperties().get(this.customEntryDetailTerm1.getCvTermId()).getValue();
+
+		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
+		filter.setFilteredTextValues(new HashMap() {{
+			this.put(String.valueOf(StudyEntrySearchDAOIntegrationTest.this.customEntryDetailTerm1.getCvTermId()),
+				searchString);
+		}});
+		filter.setVariableTypeMap(new HashMap() {{
+			this.put(String.valueOf(StudyEntrySearchDAOIntegrationTest.this.customEntryDetailTerm1.getCvTermId()),
+				VariableType.ENTRY_DETAIL.name());
+		}});
+		final List<StudyEntryDto> studyEntryDtosFilter1 = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors,
+					filter),
+				null);
+		Assert.assertEquals(studyEntryDtosFilter1.size(), 1);
+		assertThat(
+			studyEntryDtosFilter1.get(0).getProperties().get(this.customEntryDetailTerm1.getCvTermId())
+				.getValue(),
+			is(searchString));
+
+	}
+
+	@Test
+	public void testGetStudyEntries_FilterByCustomEntryDetail2() {
+
+		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				null);
+		Assert.assertEquals(studyEntryDtos.size(), TEST_COUNT);
+
+		final String searchString = studyEntryDtos.get(0).getProperties().get(this.customEntryDetailTerm2.getCvTermId()).getValue();
+
+		// Filter by Entry Type
+		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
+		filter.setFilteredTextValues(new HashMap() {{
+			this.put(String.valueOf(StudyEntrySearchDAOIntegrationTest.this.customEntryDetailTerm2.getCvTermId()),
+				searchString);
+		}});
+		filter.setVariableTypeMap(new HashMap() {{
+			this.put(String.valueOf(StudyEntrySearchDAOIntegrationTest.this.customEntryDetailTerm2.getCvTermId()),
+				VariableType.ENTRY_DETAIL.name());
+		}});
+		final List<StudyEntryDto> studyEntryDtosResult = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors,
+					filter),
+				null);
+		Assert.assertEquals(studyEntryDtosResult.size(), 1);
+		assertThat(
+			studyEntryDtosResult.get(0).getProperties().get(this.customEntryDetailTerm2.getCvTermId())
+				.getValue(),
+			is(searchString));
+
 	}
 
 	private DmsProject createProject(final DmsProject parent) {
@@ -410,7 +786,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		return project;
 	}
 
-	private CVTerm createVariate() {
+	private CVTerm createNewTerm() {
 		final CVTerm variateTerm = CVTermTestDataInitializer.createTerm(RandomStringUtils.randomAlphanumeric(50), CvId.VARIABLES.getId());
 		this.daoFactory.getCvTermDao().save(variateTerm);
 		return variateTerm;
@@ -423,7 +799,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		this.gids = new ArrayList<>();
 
 		for (int i = 1; i <= count; i++) {
-			final Germplasm germplasm = this.createDerivativeGermplasm();
+			final Germplasm germplasm = this.createDerivativeGermplasm(i);
 			this.gids.add(germplasm.getGid());
 			final StockModel stockModel = this.createTestStock(study, germplasm, i);
 			this.createTestExperiment(study, stockModel);
@@ -431,13 +807,14 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 
 	}
 
-	private Germplasm createDerivativeGermplasm() {
+	private Germplasm createDerivativeGermplasm(final int groupGID) {
 		final Germplasm groupSource = this.createGermplasm();
 		final Germplasm immediateSource = this.createGermplasm();
 		final Germplasm germplasm = this.createGermplasm();
 		germplasm.setGnpgs(-1);
 		germplasm.setGpid1(groupSource.getGid());
 		germplasm.setGpid2(immediateSource.getGid());
+		germplasm.setMgid(groupGID);
 		this.daoFactory.getGermplasmDao().update(germplasm);
 		this.sessionProvder.getSession().flush();
 		this.daoFactory.getGermplasmDao().refresh(germplasm);
@@ -447,6 +824,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 	private Germplasm createGermplasm() {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
 		germplasm.setGid(null);
+		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
 		this.daoFactory.getGermplasmDao().save(germplasm);
 		this.daoFactory.getGermplasmDao().refresh(germplasm);
 		this.addName(germplasm, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), RandomStringUtils.randomAlphanumeric(10), 0, 0, 1);
@@ -500,68 +878,58 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 
 	private List<MeasurementVariable> createFixedEntryDescriptors(final DmsProject project) {
 
+		final List<MeasurementVariable> variableFixedEntryDescriptors = new ArrayList<MeasurementVariable>();
+
 		final CVTerm immediateSourceTerm = this.daoFactory.getCvTermDao().getById(TermId.IMMEDIATE_SOURCE_NAME.getId());
-		this.testDataInitializer.addProjectProp(project, immediateSourceTerm.getCvTermId(), immediateSourceTerm.getName(),
-			VariableType.GERMPLASM_DESCRIPTOR,
-			null, 1);
+		variableFixedEntryDescriptors.add(
+			this.addVariableToProject(null, immediateSourceTerm, project, VariableType.GERMPLASM_DESCRIPTOR, DataType.CHARACTER_VARIABLE,
+				1));
 
-		final MeasurementVariable immediateSourceName = new MeasurementVariable();
-		immediateSourceName.setTermId(immediateSourceTerm.getCvTermId());
-		immediateSourceName.setName(immediateSourceTerm.getName());
-		immediateSourceName.setDescription(immediateSourceTerm.getDefinition());
-		immediateSourceName.setVariableType(VariableType.GERMPLASM_DESCRIPTOR);
-		immediateSourceName.setDataType(DataType.CHARACTER_VARIABLE.getName());
-
-		return Lists.newArrayList(immediateSourceName);
+		return variableFixedEntryDescriptors;
 	}
 
 	private List<MeasurementVariable> createVariableEntryDescriptors(final DmsProject project) {
 
-		final CVTerm descriptor1 = this.createVariate();
-		final CVTerm descriptor2 = this.createVariate();
+		final List<MeasurementVariable> variableEntryDescriptors = new ArrayList<MeasurementVariable>();
 
+		final CVTerm guidTerm = this.daoFactory.getCvTermDao().getById(TermId.GUID.getId());
 		final CVTerm entryTypeTerm = this.daoFactory.getCvTermDao().getById(TermId.ENTRY_TYPE.getId());
-		this.testDataInitializer.addProjectProp(project, entryTypeTerm.getCvTermId(), entryTypeTerm.getName(), VariableType.ENTRY_DETAIL,
-			null, 1);
 		final CVTerm groupSourceTerm = this.daoFactory.getCvTermDao().getById(TermId.GROUP_SOURCE_NAME.getId());
-		this.testDataInitializer.addProjectProp(project, groupSourceTerm.getCvTermId(), groupSourceTerm.getName(),
-			VariableType.GERMPLASM_DESCRIPTOR,
-			null, 1);
-		this.testDataInitializer.addProjectProp(project, descriptor1.getCvTermId(), "alias1", VariableType.GERMPLASM_DESCRIPTOR,
-			null, 1);
-		this.testDataInitializer.addProjectProp(project, descriptor2.getCvTermId(), "alias2", VariableType.GERMPLASM_DESCRIPTOR,
-			null, 1);
+		final CVTerm groupGIDTerm = this.daoFactory.getCvTermDao().getById(TermId.GROUPGID.getId());
+		this.customEntryDetailTerm1 = this.createNewTerm();
+		this.customEntryDetailTerm2 = this.createNewTerm();
 
-		final MeasurementVariable entryType = new MeasurementVariable();
-		entryType.setTermId(entryTypeTerm.getCvTermId());
-		entryType.setName(entryTypeTerm.getName());
-		entryType.setDescription(entryTypeTerm.getDefinition());
-		entryType.setVariableType(VariableType.ENTRY_DETAIL);
-		entryType.setDataType(DataType.CATEGORICAL_VARIABLE.getName());
+		variableEntryDescriptors.add(
+			this.addVariableToProject(null, guidTerm, project, VariableType.GERMPLASM_DESCRIPTOR, DataType.CHARACTER_VARIABLE, 1));
+		variableEntryDescriptors.add(
+			this.addVariableToProject(null, entryTypeTerm, project, VariableType.ENTRY_DETAIL, DataType.CATEGORICAL_VARIABLE, 2));
+		variableEntryDescriptors.add(
+			this.addVariableToProject(null, groupSourceTerm, project, VariableType.GERMPLASM_DESCRIPTOR, DataType.CHARACTER_VARIABLE, 3));
+		variableEntryDescriptors.add(
+			this.addVariableToProject(null, groupGIDTerm, project, VariableType.GERMPLASM_DESCRIPTOR, DataType.GERMPLASM_LIST, 4));
+		variableEntryDescriptors.add(
+			this.addVariableToProject("alias1", this.customEntryDetailTerm1, project, VariableType.ENTRY_DETAIL,
+				DataType.CATEGORICAL_VARIABLE,
+				5));
+		variableEntryDescriptors.add(
+			this.addVariableToProject("alias2", this.customEntryDetailTerm2, project, VariableType.ENTRY_DETAIL,
+				DataType.CHARACTER_VARIABLE,
+				6));
+		return variableEntryDescriptors;
+	}
 
-		// FIXME: Why group source is not part of fixed entry descriptors?
-		final MeasurementVariable groupSourceName = new MeasurementVariable();
-		groupSourceName.setTermId(groupSourceTerm.getCvTermId());
-		groupSourceName.setName(groupSourceTerm.getName());
-		groupSourceName.setDescription(groupSourceTerm.getDefinition());
-		groupSourceName.setVariableType(VariableType.GERMPLASM_DESCRIPTOR);
-		groupSourceName.setDataType(DataType.CHARACTER_VARIABLE.getName());
-
-		final MeasurementVariable m1 = new MeasurementVariable();
-		m1.setTermId(descriptor1.getCvTermId());
-		m1.setName(descriptor1.getName());
-		m1.setDescription(descriptor1.getDefinition());
-		m1.setVariableType(VariableType.ENTRY_DETAIL);
-		m1.setDataType(DataType.CATEGORICAL_VARIABLE.getName());
-
-		final MeasurementVariable m2 = new MeasurementVariable();
-		m2.setTermId(descriptor2.getCvTermId());
-		m2.setName(descriptor2.getName());
-		m2.setDescription(descriptor2.getDefinition());
-		m2.setVariableType(VariableType.ENTRY_DETAIL);
-		m2.setDataType(DataType.CATEGORICAL_VARIABLE.getName());
-
-		return Lists.newArrayList(entryType, groupSourceName, m1, m2);
+	private MeasurementVariable addVariableToProject(final String alias, final CVTerm cvTerm, final DmsProject project,
+		final VariableType variableType, final DataType dataType, final int rank) {
+		this.testDataInitializer.addProjectProp(project, cvTerm.getCvTermId(), StringUtils.isEmpty(alias) ? cvTerm.getName() : alias,
+			variableType,
+			null, rank);
+		final MeasurementVariable measurementVariable = new MeasurementVariable();
+		measurementVariable.setTermId(cvTerm.getCvTermId());
+		measurementVariable.setName(cvTerm.getName());
+		measurementVariable.setDescription(cvTerm.getDefinition());
+		measurementVariable.setVariableType(variableType);
+		measurementVariable.setDataType(dataType.getName());
+		return measurementVariable;
 	}
 
 	private Name addName(final Germplasm germplasm, final Integer nameId, final String nameVal, final Integer locId, final Integer date,
