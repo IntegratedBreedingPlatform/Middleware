@@ -7,8 +7,43 @@
 	<changeSet author="cuenyad" id="v21.4.0-1">
 			<preConditions onFail="MARK_RAN">
 				<and>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'Female Parent' and cv_id = 1010 and is_obsolete = 0 and cvterm_id = 8341;</sqlCheck>
+				</and>
+			</preConditions>
+			<comment>Add 'Female Parent' property</comment>
+			<sql dbms="mysql" splitStatements="true">
+				INSERT INTO CVTERM (cvterm_id, cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+				VALUES (8341, 1010, 'Female Parent', 'Female Parent', 0, 0, 0);
+
+				INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+				VALUES (1225, 8341, 1087);
+			</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.4.0-2">
+			<preConditions onFail="MARK_RAN">
+				<and>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'Male Parent' and cv_id = 1010 and is_obsolete = 0 and cvterm_id = 8344;</sqlCheck>
+				</and>
+			</preConditions>
+			<comment>Add 'Male Parent' property</comment>
+			<sql dbms="mysql" splitStatements="true">
+				INSERT INTO CVTERM (cvterm_id, cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+				VALUES (8344, 1010, 'Male Parent', 'Male Parent', 0, 0, 0);
+
+				INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+				VALUES (1225, 8344, 1087);
+			</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.4.0-3">
+			<preConditions onFail="MARK_RAN">
+				<and>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'FEMALE_PARENT_NAME' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8236;</sqlCheck>
+					<sqlCheck expectedResult="1">select count(*) from cvterm where name = 'Female Parent' and cv_id = 1010 and is_obsolete = 0 and cvterm_id = 8341;</sqlCheck>
+					<sqlCheck expectedResult="1">select count(*) from cvterm_relationship where type_id = 1225 and subject_id = 8341 and object_id = 1087;</sqlCheck>
+
 				</and>
 			</preConditions>
 			<comment>Add 'FEMALE PARENT NAME' as germplasm descriptor</comment>
@@ -18,7 +53,7 @@
 
 				INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
 				VALUES
-					(1200, 8236, 2205),
+					(1200, 8236, 8341),
 					(1210, 8236, 4030),
 					(1220, 8236, 1908);
 
@@ -28,11 +63,13 @@
 			</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v21.4.0-2">
+	<changeSet author="cuenyad" id="v21.4.0-4">
 			<preConditions onFail="MARK_RAN">
 				<and>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'FEMALE_PARENT_GID' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8237;</sqlCheck>
+					<sqlCheck expectedResult="1">select count(*) from cvterm where name = 'Female Parent' and cv_id = 1010 and is_obsolete = 0 and cvterm_id = 8341;</sqlCheck>
+					<sqlCheck expectedResult="1">select count(*) from cvterm_relationship where type_id = 1225 and subject_id = 8341 and object_id = 1087;</sqlCheck>
 				</and>
 			</preConditions>
 			<comment>Add 'FEMALE PARENT GID' as germplasm descriptor</comment>
@@ -42,7 +79,7 @@
 
 				INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
 				VALUES
-					(1200, 8237, 2205),
+					(1200, 8237, 8341),
 					(1210, 8237, 4030),
 					(1220, 8237, 1907);
 
@@ -52,11 +89,13 @@
 			</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v21.4.0-3">
+	<changeSet author="cuenyad" id="v21.4.0-5">
 			<preConditions onFail="MARK_RAN">
 				<and>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'MALE_PARENT_NAME' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8238;</sqlCheck>
+					<sqlCheck expectedResult="1">select count(*) from cvterm where name = 'Male Parent' and cv_id = 1010 and is_obsolete = 0 and cvterm_id = 8344;</sqlCheck>
+					<sqlCheck expectedResult="1">select count(*) from cvterm_relationship where type_id = 1225 and subject_id = 8344 and object_id = 1087;</sqlCheck>
 				</and>
 			</preConditions>
 			<comment>Add 'MALE PARENT NAME' as germplasm descriptor</comment>
@@ -66,7 +105,7 @@
 
 				INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
 				VALUES
-					(1200, 8238, 2205),
+					(1200, 8238, 8344),
 					(1210, 8238, 4030),
 					(1220, 8238, 1908);
 
@@ -76,11 +115,13 @@
 			</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v21.4.0-4">
+	<changeSet author="cuenyad" id="v21.4.0-6">
 			<preConditions onFail="MARK_RAN">
 				<and>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'MALE_PARENT_GID' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8239;</sqlCheck>
+					<sqlCheck expectedResult="1">select count(*) from cvterm where name = 'Male Parent' and cv_id = 1010 and is_obsolete = 0 and cvterm_id = 8344;</sqlCheck>
+					<sqlCheck expectedResult="1">select count(*) from cvterm_relationship where type_id = 1225 and subject_id = 8344 and object_id = 1087;</sqlCheck>
 				</and>
 			</preConditions>
 			<comment>Add 'MALE PARENT GID' as germplasm descriptor</comment>
@@ -90,7 +131,7 @@
 
 				INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
 				VALUES
-					(1200, 8239, 2205),
+					(1200, 8239, 8344),
 					(1210, 8239, 4030),
 					(1220, 8239, 1907);
 
