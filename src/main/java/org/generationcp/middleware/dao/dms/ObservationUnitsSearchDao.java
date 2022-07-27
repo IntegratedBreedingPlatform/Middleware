@@ -508,7 +508,9 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			this.addScalarForTraits(searchDto.getSelectionMethodsAndTraits(), query, true);
 			this.addScalarForEntryDetails(searchDto.getEntryDetails(), query);
 
-			searchDto.getPassportAndAttributes().forEach(variableDto -> query.addScalar(this.formatVariableAlias(variableDto.getId())));
+			if (!CollectionUtils.isEmpty(searchDto.getPassportAndAttributes())) {
+				searchDto.getPassportAndAttributes().forEach(variableDto -> query.addScalar(this.formatVariableAlias(variableDto.getId())));
+			}
 
 			for (final String gpDescriptor : searchDto.getGenericGermplasmDescriptors()) {
 				query.addScalar(gpDescriptor, new StringType());
@@ -700,10 +702,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			columns.add(" g.germplsm_uuid AS " + TermId.GUID.name());
 		}
 
-		searchDto.getPassportAndAttributes().forEach(measurementVariable -> {
-			final String alias = this.formatVariableAlias(measurementVariable.getId());
-			columns.add(String.format("%1$s.aval AS %1$s", alias));
-		});
+		if (!CollectionUtils.isEmpty(searchDto.getPassportAndAttributes())) {
+			for (MeasurementVariableDto measurementVariable : searchDto.getPassportAndAttributes()) {
+				final String alias = this.formatVariableAlias(measurementVariable.getId());
+				columns.add(String.format("%1$s.aval AS %1$s", alias));
+			}
+		}
 
 		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT  ");
 
@@ -783,11 +787,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private void addGermplasmAttributeAndPassportJoins(final StringBuilder sql, final List<MeasurementVariableDto> passportAndAttributes) {
-		passportAndAttributes.forEach(measurementVariableDto -> {
-			final String alias = this.formatVariableAlias(measurementVariableDto.getId());
-			final String join = String.format(GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN, alias, measurementVariableDto.getId());
-			sql.append(join);
-		});
+		if (!CollectionUtils.isEmpty(passportAndAttributes)) {
+			passportAndAttributes.forEach(measurementVariableDto -> {
+				final String alias = this.formatVariableAlias(measurementVariableDto.getId());
+				final String join = String.format(GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN, alias, measurementVariableDto.getId());
+				sql.append(join);
+			});
+		}
 	}
 
 	private void addFilters(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter, final Boolean draftMode) {
@@ -1250,8 +1256,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			observationVariables.put(designFactor, new ObservationUnitData((String) row.get(designFactor)));
 		}
 
-		searchDto.getPassportAndAttributes().forEach(variable ->
-			observationVariables.put(variable.getName(), new ObservationUnitData((String) row.get(this.formatVariableAlias(variable.getId())))));
+		if (!CollectionUtils.isEmpty(searchDto.getPassportAndAttributes())) {
+			searchDto.getPassportAndAttributes().forEach(variable ->
+				observationVariables.put(variable.getName(), new ObservationUnitData((String) row.get(this.formatVariableAlias(variable.getId())))));
+		}
 
 		// Variables retrieved from Environment Details/Conditions are loaded in a separate Map object to ensure that no duplicate variables are
 		// added to a map. Because it's possible that a variable exists in both environment and observation/subobservation
