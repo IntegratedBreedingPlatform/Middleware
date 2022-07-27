@@ -123,6 +123,10 @@ public class CrossExpansionProperties {
 				throw new MiddlewareException(errorMessage, e);
 			}
 		}
+		final String defaultGenerationLevel = this.props.getProperty("default.generation.level");
+		if (StringUtils.isNotBlank(defaultGenerationLevel)) {
+			this.setDefaultLevel(Integer.parseInt(defaultGenerationLevel));
+		}
 		return this.getDefaultLevel();
 	}
 
