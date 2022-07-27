@@ -3,12 +3,14 @@ package org.generationcp.middleware.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -58,6 +60,12 @@ public class CrossExpansionProperties {
 		try {
 			final Resource resource = new ClassPathResource("crossing.properties");
 			this.props = PropertiesLoaderUtils.loadProperties(resource);
+			final String defaultGenerationLevel = this.props.getProperty("default.generation.level");
+			final String pedigreeProfile = this.props.getProperty("pedigree.profile");
+			final List<String> list = Arrays.asList(this.props.getProperty("hybrid.breeding.methods").split(","));
+			this.setDefaultLevel(Integer.parseInt(defaultGenerationLevel));
+			this.setProfile(pedigreeProfile);
+			this.setHybridBreedingMethods(list.stream().map(Integer::valueOf).collect(Collectors.toSet()));
 		} catch (final IOException e) {
 			final String errorMessage = "Unable to access crossing.properties. Please contact your administrator for further assistance.";
 			CrossExpansionProperties.LOG.error(errorMessage, e);
