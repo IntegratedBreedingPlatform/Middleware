@@ -3,7 +3,6 @@ package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -21,7 +20,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -98,7 +96,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public long countFilteredStudyEntries(int studyId, StudyEntrySearchDto.Filter filter) {
+	public long countFilteredStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter) {
 		final StudyEntrySearchDto searchDto = this.buildStudyEntrySearchDto(studyId, filter);
 		return this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(studyId, searchDto);
 	}
@@ -367,15 +365,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 				c -> (c.getVariableType().getId().equals(variableTypeId)
 					|| variableTypeId == null)).map(MeasurementVariable::getTermId)
 			.collect(Collectors.toList());
-		if (!CollectionUtils.isEmpty(variableIds)) {
-			final VariableFilter variableFilter = new VariableFilter();
-			if (StringUtils.isNotEmpty(programUUID)) {
-				variableFilter.setProgramUuid(programUUID);
-			}
-			variableIds
-				.forEach(variableFilter::addVariableId);
-			return this.ontologyVariableDataManager.getWithFilter(variableFilter);
-		}
-		return Collections.emptyList();
+		return this.ontologyVariableDataManager.getVariablesByIds(variableIds, programUUID);
 	}
 }
