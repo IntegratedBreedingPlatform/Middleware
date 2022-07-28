@@ -88,7 +88,7 @@ public class StudyEntryObservationServiceImplIntegrationTest extends Integration
 		// Update observation
 		final String updatedValue = "updatedValue";
 		final StockPropertyData updatedStockPropertyData = new StockPropertyData(stockModel.getStockId(), variable.getCvTermId(), updatedValue, null);
-		this.studyEntryObservationService.updateObservation(updatedStockPropertyData);
+		this.studyEntryObservationService.updateObservation(updatedStockPropertyData, false);
 
 		// Assert recently updated observation
 		final StockProperty updatedObservation =

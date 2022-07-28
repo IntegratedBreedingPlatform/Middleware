@@ -8,7 +8,7 @@ public interface StudyEntryObservationService {
 
 	Integer createObservation(StockPropertyData stockPropertyData);
 
-	Integer updateObservation(StockPropertyData stockPropertyData);
+	Integer updateObservation(StockPropertyData stockPropertyData, boolean allowCreate);
 
 	void deleteObservation(Integer stockPropertyId);
 

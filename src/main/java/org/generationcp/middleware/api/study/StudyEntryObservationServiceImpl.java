@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Transactional
 @Service
@@ -32,12 +33,18 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	}
 
 	@Override
-	public Integer updateObservation(final StockPropertyData stockPropertyData) {
-		final StockProperty stockProperty =
-			this.daoFactory.getStockPropertyDao().getByStockIdAndTypeId(stockPropertyData.getStockId(), stockPropertyData.getVariableId())
-				.orElseThrow(() -> new MiddlewareException(
-					"Stock property: " + stockPropertyData.getStockId() + " with type: " + stockPropertyData.getVariableId()
-						+ " not found."));
+	public Integer updateObservation(final StockPropertyData stockPropertyData, final boolean allowCreate) {
+		final Optional<StockProperty> stockPropertyOptional = this.daoFactory.getStockPropertyDao().getByStockIdAndTypeId(
+			stockPropertyData.getStockId(), stockPropertyData.getVariableId());
+
+		if (!stockPropertyOptional.isPresent() && allowCreate) {
+			return this.createObservation(stockPropertyData);
+		}
+
+		final StockProperty stockProperty = stockPropertyOptional
+			.orElseThrow(() -> new MiddlewareException(
+				"Stock property: " + stockPropertyData.getStockId() + " with type: " + stockPropertyData.getVariableId()
+					+ " not found."));
 		stockProperty.setValue(stockPropertyData.getValue());
 		stockProperty.setCategoricalValueId(stockPropertyData.getCategoricalValueId());
 		this.daoFactory.getStockPropertyDao().update(stockProperty);
