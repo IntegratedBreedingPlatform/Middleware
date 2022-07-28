@@ -1,5 +1,6 @@
 package org.generationcp.middleware.dao.study;
 
+import com.google.common.collect.Ordering;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
@@ -55,8 +56,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
 public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
@@ -221,10 +224,13 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		filterByLotCount.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), null);
 		}});
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByLotCount);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
 		final List<StudyEntryDto> studyEntryDtosFilterByLotCount = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByLotCount),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilterByLotCount.size());
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByLotCount.size());
 		assertThat(studyEntryDtosFilterByLotCount.get(0).getGid(), is(this.gids.get(2)));
 
 	}
@@ -232,37 +238,68 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyEntries_FilterByEntryNo() {
 
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
-				null);
-		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, "ENTRY_NO")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(Ordering.natural().reverse()
+			.isOrdered(studyEntryDtosDescending.stream().map(StudyEntryDto::getEntryNumber).collect(Collectors.toList())));
+
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "ENTRY_NO")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(studyEntryDtosAscending.stream().map(StudyEntryDto::getEntryNumber).collect(Collectors.toList())));
 
 		// Filter by Entry No
 		final StudyEntrySearchDto.Filter filterByEntryNo = new StudyEntrySearchDto.Filter();
 		filterByEntryNo.setFilteredValues(new HashMap<String, List<String>>() {{
-			this.put(String.valueOf(TermId.ENTRY_NO.getId()), Arrays.asList(String.valueOf(studyEntryDtos.get(0).getEntryNumber())));
+			this.put(String.valueOf(TermId.ENTRY_NO.getId()),
+				Arrays.asList(String.valueOf(studyEntryDtosAscending.get(0).getEntryNumber())));
 		}});
 		filterByEntryNo.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.ENTRY_NO.getId()), VariableType.ENTRY_DETAIL.getName());
 		}});
+
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByEntryNo);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosFilterByEntryNo = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(
-				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByEntryNo),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilterByEntryNo.size());
-		assertThat(studyEntryDtosFilterByEntryNo.get(0).getEntryNumber(), is(studyEntryDtos.get(0).getEntryNumber()));
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByEntryNo.size());
+		assertThat(studyEntryDtosFilterByEntryNo.get(0).getEntryNumber(), is(studyEntryDtosAscending.get(0).getEntryNumber()));
 
 	}
 
 	@Test
 	public void testGetStudyEntries_FilterByEntryType() {
 
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
-				null);
-		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, "ENTRY_TYPE")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(e -> e.getProperties().get(TermId.ENTRY_TYPE.getId()).getValue())
+					.collect(Collectors.toList())));
 
-		final String entryTypeSearchString = studyEntryDtos.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).getValue();
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "ENTRY_TYPE")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(e -> e.getProperties().get(TermId.ENTRY_TYPE.getId()).getValue())
+					.collect(Collectors.toList())));
+
+		final String entryTypeSearchString = studyEntryDtosAscending.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).getValue();
 
 		// Filter by Entry Type
 		final StudyEntrySearchDto.Filter filterByEntryType = new StudyEntrySearchDto.Filter();
@@ -273,11 +310,15 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		filterByEntryType.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.ENTRY_TYPE.getId()), VariableType.ENTRY_DETAIL.name());
 		}});
+
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByEntryType);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosFilterByEntryType = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(
-				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByEntryType),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilterByEntryType.size());
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByEntryType.size());
 		assertThat(studyEntryDtosFilterByEntryType.get(0).getProperties().get(TermId.ENTRY_TYPE.getId()).getValue(),
 			is(entryTypeSearchString));
 
@@ -286,30 +327,69 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyEntries_FilterByGID() {
 
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
-				null);
-		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, "GID")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(StudyEntryDto::getGid)
+					.collect(Collectors.toList())));
+
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "GID")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(StudyEntryDto::getGid)
+					.collect(Collectors.toList())));
 
 		// Filter by GID
 		final StudyEntrySearchDto.Filter filterByGID = new StudyEntrySearchDto.Filter();
 		filterByGID.setFilteredValues(new HashMap<String, List<String>>() {{
-			this.put(String.valueOf(TermId.GID.getId()), Arrays.asList(String.valueOf(studyEntryDtos.get(0).getGid())));
+			this.put(String.valueOf(TermId.GID.getId()), Arrays.asList(String.valueOf(studyEntryDtosAscending.get(0).getGid())));
 		}});
 		filterByGID.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID.getId()), null);
 		}});
+
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByGID);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosFilterByGID = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(
-				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByGID),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilterByGID.size());
-		assertThat(studyEntryDtosFilterByGID.get(0).getGid(), is(studyEntryDtos.get(0).getGid()));
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByGID.size());
+		assertThat(studyEntryDtosFilterByGID.get(0).getGid(), is(studyEntryDtosAscending.get(0).getGid()));
 
 	}
 
 	@Test
 	public void testGetStudyEntries_FilterByGUID() {
+
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, "GUID")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(StudyEntryDto::getGuid)
+					.collect(Collectors.toList())));
+
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "GUID")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(StudyEntryDto::getGuid)
+					.collect(Collectors.toList())));
 
 		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
@@ -324,11 +404,15 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		filterByGUID.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GUID.getId()), null);
 		}});
+
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByGUID);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosFilterByGUID = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(
-				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByGUID),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilterByGUID.size());
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByGUID.size());
 		assertThat(studyEntryDtosFilterByGUID.get(0).getGuid(), is(studyEntryDtos.get(0).getGuid()));
 
 	}
@@ -336,86 +420,161 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyEntries_FilterByDesignation() {
 
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
-				null);
-		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, "DESIGNATION")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(StudyEntryDto::getDesignation)
+					.collect(Collectors.toList())));
+
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "DESIGNATION")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(StudyEntryDto::getDesignation)
+					.collect(Collectors.toList())));
 
 		// Filter by Designation
 		final StudyEntrySearchDto.Filter filterByDesignation = new StudyEntrySearchDto.Filter();
 		filterByDesignation.setFilteredTextValues(new HashMap<String, String>() {{
-			this.put(String.valueOf(TermId.DESIG.getId()), String.valueOf(studyEntryDtos.get(0).getDesignation()));
+			this.put(String.valueOf(TermId.DESIG.getId()), String.valueOf(studyEntryDtosAscending.get(0).getDesignation()));
 		}});
 		filterByDesignation.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.DESIG.getId()), null);
 		}});
+
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByDesignation);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosFilterByDesignation = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(
-				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByDesignation),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilterByDesignation.size());
-		assertThat(studyEntryDtosFilterByDesignation.get(0).getDesignation(), is(studyEntryDtos.get(0).getDesignation()));
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByDesignation.size());
+		assertThat(studyEntryDtosFilterByDesignation.get(0).getDesignation(), is(studyEntryDtosAscending.get(0).getDesignation()));
 	}
 
 	@Test
 	public void testGetStudyEntries_FilterByCross() {
 
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
-				null);
-		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, "CROSS")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(StudyEntryDto::getCross)
+					.collect(Collectors.toList())));
+
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "CROSS")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(StudyEntryDto::getCross)
+					.collect(Collectors.toList())));
 
 		// Filter by Cross
 		final StudyEntrySearchDto.Filter filterByCross = new StudyEntrySearchDto.Filter();
 		filterByCross.setFilteredTextValues(new HashMap<String, String>() {{
-			this.put(String.valueOf(TermId.CROSS.getId()), String.valueOf(studyEntryDtos.get(0).getCross()));
+			this.put(String.valueOf(TermId.CROSS.getId()), String.valueOf(studyEntryDtosAscending.get(0).getCross()));
 		}});
 		filterByCross.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.CROSS.getId()), null);
 		}});
+
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByCross);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosFilterByCross = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(
-				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByCross),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilterByCross.size());
-		assertThat(studyEntryDtosFilterByCross.get(0).getCross(), is(studyEntryDtos.get(0).getCross()));
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByCross.size());
+		assertThat(studyEntryDtosFilterByCross.get(0).getCross(), is(studyEntryDtosAscending.get(0).getCross()));
 	}
 
 	@Test
 	public void testGetStudyEntries_FilterByGroupGID() {
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
-				null);
-		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, "GROUPGID")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(StudyEntryDto::getGroupGid)
+					.collect(Collectors.toList())));
+
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "GROUPGID")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(StudyEntryDto::getGroupGid)
+					.collect(Collectors.toList())));
 
 		// Filter by Group GID
 		final StudyEntrySearchDto.Filter filterByGroupGID = new StudyEntrySearchDto.Filter();
 		filterByGroupGID.setFilteredValues(new HashMap<String, List<String>>() {{
-			this.put(String.valueOf(TermId.GROUPGID.getId()), Arrays.asList(String.valueOf(studyEntryDtos.get(0).getGroupGid())));
+			this.put(String.valueOf(TermId.GROUPGID.getId()), Arrays.asList(String.valueOf(studyEntryDtosAscending.get(0).getGroupGid())));
 		}});
 		filterByGroupGID.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GROUPGID.getId()), null);
 		}});
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByGroupGID);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosFilterByGroupGID = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(
-				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByGroupGID),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilterByGroupGID.size());
-		assertThat(studyEntryDtosFilterByGroupGID.get(0).getGroupGid(), is(studyEntryDtos.get(0).getGroupGid()));
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByGroupGID.size());
+		assertThat(studyEntryDtosFilterByGroupGID.get(0).getGroupGid(), is(studyEntryDtosAscending.get(0).getGroupGid()));
 	}
 
 	@Test
 	public void testGetStudyEntries_FilterByImmediateSourceName() {
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(
 				new StudyEntrySearchDto(this.project.getProjectId(), this.fixedEntryDescriptors, this.variableEntryDescriptors, null),
-				null);
-		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, "IMMEDIATE_SOURCE_NAME")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(e -> {
+						System.out.println(e.getProperties().get(TermId.IMMEDIATE_SOURCE_NAME.getId()).getValue());
+						return e.getProperties().get(TermId.IMMEDIATE_SOURCE_NAME.getId()).getValue();
+					})
+					.collect(Collectors.toList())));
+
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), this.fixedEntryDescriptors, this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "IMMEDIATE_SOURCE_NAME")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(e -> e.getProperties().get(TermId.IMMEDIATE_SOURCE_NAME.getId()).getValue())
+					.collect(Collectors.toList())));
 
 		final String immediateSourceNameSearchString =
-			studyEntryDtos.get(0).getProperties().get(TermId.IMMEDIATE_SOURCE_NAME.getId()).getValue();
+			studyEntryDtosAscending.get(0).getProperties().get(TermId.IMMEDIATE_SOURCE_NAME.getId()).getValue();
 
-		// Filter by Entry Type
+		// Filter by Immediate Source Name
 		final StudyEntrySearchDto.Filter filterByImmediateSourceName = new StudyEntrySearchDto.Filter();
 		filterByImmediateSourceName.setFilteredTextValues(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()),
@@ -424,12 +583,15 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		filterByImmediateSourceName.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()), VariableType.GERMPLASM_DESCRIPTOR.name());
 		}});
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), this.fixedEntryDescriptors, this.variableEntryDescriptors,
+				filterByImmediateSourceName);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosFilterByImmediateSourceName = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(
-				new StudyEntrySearchDto(this.project.getProjectId(), this.fixedEntryDescriptors, this.variableEntryDescriptors,
-					filterByImmediateSourceName),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilterByImmediateSourceName.size());
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByImmediateSourceName.size());
 		assertThat(studyEntryDtosFilterByImmediateSourceName.get(0).getProperties().get(TermId.IMMEDIATE_SOURCE_NAME.getId()).getValue(),
 			is(immediateSourceNameSearchString));
 
@@ -437,12 +599,30 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetStudyEntries_FilterByGroupSourceName() {
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
-				null);
-		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, "GROUP_SOURCE_NAME")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(e -> e.getProperties().get(TermId.GROUP_SOURCE_NAME.getId()).getValue())
+					.collect(Collectors.toList())));
 
-		final String groupSourceNameSearchString = studyEntryDtos.get(0).getProperties().get(TermId.GROUP_SOURCE_NAME.getId()).getValue();
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "GROUP_SOURCE_NAME")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(e -> e.getProperties().get(TermId.GROUP_SOURCE_NAME.getId()).getValue())
+					.collect(Collectors.toList())));
+
+		final String groupSourceNameSearchString =
+			studyEntryDtosAscending.get(0).getProperties().get(TermId.GROUP_SOURCE_NAME.getId()).getValue();
 
 		// Filter by Entry Type
 		final StudyEntrySearchDto.Filter filterByGroupSourceName = new StudyEntrySearchDto.Filter();
@@ -453,12 +633,15 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		filterByGroupSourceName.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GROUP_SOURCE_NAME.getId()), VariableType.GERMPLASM_DESCRIPTOR.name());
 		}});
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors,
+				filterByGroupSourceName);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosFilterByGroupSourceName = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(
-				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors,
-					filterByGroupSourceName),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilterByGroupSourceName.size());
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByGroupSourceName.size());
 		assertThat(studyEntryDtosFilterByGroupSourceName.get(0).getProperties().get(TermId.GROUP_SOURCE_NAME.getId()).getValue(),
 			is(groupSourceNameSearchString));
 	}
@@ -524,6 +707,28 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		transactionDAO.save(transaction3);
 		transactionDAO.save(transaction4);
 
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()))));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(StudyEntryDto::getLotCount)
+					.collect(Collectors.toList())));
+
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()))));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(StudyEntryDto::getLotCount)
+					.collect(Collectors.toList())));
+
 		//Filter by lot count
 		final StudyEntrySearchDto.Filter filterByLotCount = new StudyEntrySearchDto.Filter();
 		filterByLotCount.setFilteredValues(new HashMap<String, List<String>>() {{
@@ -532,10 +737,14 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		filterByLotCount.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()), null);
 		}});
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByLotCount);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosFilterByLotCount = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByLotCount),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilterByLotCount.size());
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByLotCount.size());
 		assertThat(studyEntryDtosFilterByLotCount.get(0).getGid(), is(this.gids.get(2)));
 
 	}
@@ -601,12 +810,29 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		transactionDAO.save(transaction3);
 		transactionDAO.save(transaction4);
 
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
-				null);
-		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId()))));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(StudyEntryDto::getAvailableBalance)
+					.collect(Collectors.toList())));
 
-		//Filter by lot count
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId()))));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(StudyEntryDto::getAvailableBalance)
+					.collect(Collectors.toList())));
+
+		//Filter by available balance
 		final StudyEntrySearchDto.Filter filterByAvailableBalance = new StudyEntrySearchDto.Filter();
 		filterByAvailableBalance.setFilteredTextValues(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId()), "60");
@@ -614,11 +840,14 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		filterByAvailableBalance.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId()), null);
 		}});
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByAvailableBalance);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosFilterByAvailableBalance = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(
-				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), new ArrayList<>(), filterByAvailableBalance),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilterByAvailableBalance.size());
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByAvailableBalance.size());
 		assertThat(studyEntryDtosFilterByAvailableBalance.get(0).getAvailableBalance(), is("60"));
 	}
 
@@ -684,12 +913,29 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		transactionDAO.save(transaction3);
 		transactionDAO.save(transaction4);
 
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
-				null);
-		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, String.valueOf(TermId.GID_UNIT.getId()))));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(StudyEntryDto::getUnit)
+					.collect(Collectors.toList())));
 
-		//Filter by lot count
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, String.valueOf(TermId.GID_UNIT.getId()))));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(StudyEntryDto::getUnit)
+					.collect(Collectors.toList())));
+
+		//Filter by unit
 		final StudyEntrySearchDto.Filter filterByUnit = new StudyEntrySearchDto.Filter();
 		filterByUnit.setFilteredTextValues(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID_UNIT.getId()), "Mixed");
@@ -697,23 +943,46 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		filterByUnit.setVariableTypeMap(new HashMap<String, String>() {{
 			this.put(String.valueOf(TermId.GID_UNIT.getId()), null);
 		}});
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByUnit);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosFilterByUnit = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(
-				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, filterByUnit),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilterByUnit.size());
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByUnit.size());
 		assertThat(studyEntryDtosFilterByUnit.get(0).getUnit(), is("Mixed"));
 	}
 
 	@Test
 	public void testGetStudyEntries_FilterByCustomEntryDetail1() {
 
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
-				null);
-		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, this.customEntryDetailTerm1.getName())));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(e -> e.getProperties().get(this.customEntryDetailTerm1.getCvTermId())
+						.getValue())
+					.collect(Collectors.toList())));
 
-		final String searchString = studyEntryDtos.get(0).getProperties().get(this.customEntryDetailTerm1.getCvTermId()).getValue();
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, this.customEntryDetailTerm1.getName())));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(e -> e.getProperties().get(this.customEntryDetailTerm1.getCvTermId())
+						.getValue())
+					.collect(Collectors.toList())));
+
+		final String searchString =
+			studyEntryDtosAscending.get(0).getProperties().get(this.customEntryDetailTerm1.getCvTermId()).getValue();
 
 		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
 		filter.setFilteredTextValues(new HashMap<String, String>() {{
@@ -724,12 +993,16 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 			this.put(String.valueOf(StudyEntrySearchDAOIntegrationTest.this.customEntryDetailTerm1.getCvTermId()),
 				VariableType.ENTRY_DETAIL.name());
 		}});
+
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors,
+				filter);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosFilter1 = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(
-				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors,
-					filter),
-				null);
-		Assert.assertEquals(1, studyEntryDtosFilter1.size());
+			.getStudyEntries(studyEntrySearchDto, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilter1.size());
 		assertThat(
 			studyEntryDtosFilter1.get(0).getProperties().get(this.customEntryDetailTerm1.getCvTermId())
 				.getValue(),
@@ -740,12 +1013,32 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testGetStudyEntries_FilterByCustomEntryDetail2() {
 
-		final List<StudyEntryDto> studyEntryDtos = this.daoFactory.getStudyEntrySearchDAO()
-			.getStudyEntries(new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
-				null);
-		Assert.assertEquals(TEST_COUNT, studyEntryDtos.size());
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, this.customEntryDetailTerm2.getName())));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(e -> e.getProperties().get(this.customEntryDetailTerm2.getCvTermId())
+						.getValue())
+					.collect(Collectors.toList())));
 
-		final String searchString = studyEntryDtos.get(0).getProperties().get(this.customEntryDetailTerm2.getCvTermId()).getValue();
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors, null),
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, this.customEntryDetailTerm2.getName())));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(e -> e.getProperties().get(this.customEntryDetailTerm2.getCvTermId())
+						.getValue())
+					.collect(Collectors.toList())));
+
+		final String searchString =
+			studyEntryDtosAscending.get(0).getProperties().get(this.customEntryDetailTerm2.getCvTermId()).getValue();
 
 		// Filter by Entry Type
 		final StudyEntrySearchDto.Filter filter = new StudyEntrySearchDto.Filter();
@@ -757,12 +1050,18 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 			this.put(String.valueOf(StudyEntrySearchDAOIntegrationTest.this.customEntryDetailTerm2.getCvTermId()),
 				VariableType.ENTRY_DETAIL.name());
 		}});
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors,
+				filter);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(this.project.getProjectId(), studyEntrySearchDto);
+		assertEquals(1, filteredCount);
 		final List<StudyEntryDto> studyEntryDtosResult = this.daoFactory.getStudyEntrySearchDAO()
 			.getStudyEntries(
 				new StudyEntrySearchDto(this.project.getProjectId(), new ArrayList<>(), this.variableEntryDescriptors,
 					filter),
 				null);
-		Assert.assertEquals(1, studyEntryDtosResult.size());
+		Assert.assertEquals(filteredCount, studyEntryDtosResult.size());
 		assertThat(
 			studyEntryDtosResult.get(0).getProperties().get(this.customEntryDetailTerm2.getCvTermId())
 				.getValue(),
@@ -827,24 +1126,25 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
 		this.daoFactory.getGermplasmDao().save(germplasm);
 		this.daoFactory.getGermplasmDao().refresh(germplasm);
-		this.addName(germplasm, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), RandomStringUtils.randomAlphanumeric(10), 0, 0, 1);
+		this.addName(germplasm, GermplasmNameType.LINE_NAME.getUserDefinedFieldID(), RandomStringUtils.randomAlphabetic(8).toUpperCase(), 0,
+			0, 1);
 		return germplasm;
 	}
 
 	private StockModel createTestStock(final DmsProject study, final Germplasm germplasm, final int entryNumber) {
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName(String.valueOf(entryNumber));
-		stockModel.setName(RandomStringUtils.randomAlphanumeric(10));
+		stockModel.setName(RandomStringUtils.randomAlphabetic(10).toUpperCase());
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
 		stockModel.setCross("-");
 		stockModel.setProject(study);
-		stockModel.setCross(RandomStringUtils.randomAlphanumeric(10));
+		stockModel.setCross(RandomStringUtils.randomAlphabetic(10).toUpperCase());
 		final int i = 1;
 		final Set<StockProperty> properties = new HashSet<>();
 		for (final MeasurementVariable measurementVariable : this.variableEntryDescriptors) {
 			final StockProperty stockProperty =
-				new StockProperty(stockModel, measurementVariable.getTermId(), RandomStringUtils.randomAlphanumeric(8), null);
+				new StockProperty(stockModel, measurementVariable.getTermId(), RandomStringUtils.randomAlphabetic(10).toUpperCase(), null);
 			properties.add(stockProperty);
 		}
 		stockModel.setProperties(properties);

@@ -433,6 +433,8 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 				orderColumn = Optional.of(LOT_COUNT_ALIAS);
 			} else if (String.valueOf(TermId.GID_UNIT.getId()).equalsIgnoreCase(sortBy)) {
 				orderColumn = Optional.of(LOT_UNIT_ALIAS);
+			} else if (String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId()).equalsIgnoreCase(sortBy)) {
+				orderColumn = Optional.of(LOT_AVAILABLE_BALANCE_ALIAS);
 			}
 		} else if (StringUtils.isNotBlank(sortBy)) {
 			orderColumn = Optional.of(sortBy);
