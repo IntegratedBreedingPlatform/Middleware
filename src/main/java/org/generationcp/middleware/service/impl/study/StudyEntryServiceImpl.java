@@ -78,7 +78,8 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	// TODO: remove ENTRY_NO. Please, check this ticket https://ibplatform.atlassian.net/browse/IBP-5793 for a cleanup.
 	private static final List<Integer> FIXED_GERMPLASM_DESCRIPTOR_IDS = Lists
-		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.IMMEDIATE_SOURCE_NAME.getId());
+		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.IMMEDIATE_SOURCE_NAME.getId(),
+			TermId.FEMALE_PARENT_GID.getId(), TermId.FEMALE_PARENT_NAME.getId(), TermId.MALE_PARENT_GID.getId(), TermId.MALE_PARENT_NAME.getId());
 
 	private static final List<Integer> REMOVABLE_GERMPLASM_DESCRIPTOR_IDS = Lists
 		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId(),
@@ -108,7 +109,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		final StudyEntrySearchDto searchDto = this.buildStudyEntrySearchDto(studyId, filter);
 		final List<StudyEntryDto> studyEntries = this.daoFactory.getStudyEntrySearchDAO().getStudyEntries(searchDto, pageable);
 
-		if (searchDto.getVariableEntryDescriptors().stream().anyMatch(this::entryVariablesHasParent)) {
+		if (searchDto.getFixedEntryDescriptors().stream().anyMatch(this::entryVariablesHasParent)) {
 			final Set<Integer> gids = studyEntries.stream().map(s -> s.getGid()).collect(Collectors.toSet());
 			this.addParentsFromPedigreeTable(gids, studyEntries);
 		}
