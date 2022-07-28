@@ -114,40 +114,15 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		final List<String> selects = new ArrayList<>();
 		final Set<String> joins = this.getFixedJoins();
 
-		final List<Integer> germplasmDescriptorsIds = new ArrayList<>();
-		entryVariables.forEach(variable -> {
-			if (variable.getVariableType() == VariableType.GERMPLASM_DESCRIPTOR) {
-				germplasmDescriptorsIds.add(variable.getTermId());
-				return;
-			}
-
-			if (variable.getVariableType() == VariableType.GERMPLASM_ATTRIBUTE || variable.getVariableType() == VariableType.GERMPLASM_PASSPORT) {
-				this.addGermplasmAttributeScalars(scalars, selects, joins, variable.getTermId());
-				return;
-			}
-
-			if (variable.getVariableType() == VariableType.ENTRY_DETAIL && variable.getTermId() != TermId.ENTRY_NO.getId()) {
-				this.addEntryDetailScalars(scalars, selects, variable.getName(), variable.getDataType());
-			}
-
-		});
-
 		this.addFixedScalars(scalars, selects);
 		this.addGroupGidScalar(scalars, selects, entryVariables);
 		this.addGuidScalar(scalars, selects, entryVariables);
 		this.addImmediateSourceScalar(scalars, selects, entryVariables);
 		this.addGroupSourceNameScalar(scalars, selects, entryVariables);
+		this.addGermplasmAttributeScalars(scalars, selects, entryVariables);
+		this.addEntryDetailScalars(scalars, selects, entryVariables);
 
 		this.addJoins(joins, entryVariables);
-
-		if (!CollectionUtils.isEmpty(entryVariables)) {
-			entryVariables.stream()
-				.filter(measurementVariable -> measurementVariable.getTermId() != TermId.GROUPGID.getId()
-					&& measurementVariable.getTermId() != TermId.GUID.getId())
-				.forEach(measurementVariable -> this
-					.addEntryDetailScalars(scalars, selects, measurementVariable.getName(),
-						measurementVariable.getDataType()));
-		}
 
 		final String whereClause = this.addFilters(studyEntrySearchDto.getFilter(), queryParams);
 		final String joinClause = this.getJoinClause(joins);
@@ -177,6 +152,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 
 		final Set<String> joins = this.getFixedJoins();
 		this.addJoins(joins, entryVariables);
+
 		final String joinClause = this.getJoinClause(joins);
 		final String whereClause = this.addFilters(studyEntrySearchDto.getFilter(), queryParams);
 		final String havingClause = this.getHavingClause(studyEntrySearchDto.getFilter());
@@ -199,18 +175,30 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	}
 
 	private void addJoins(final Set<String> joins, final List<MeasurementVariable> entryVariables) {
-		entryVariables.forEach(entryDescriptor -> {
-			final int termId = entryDescriptor.getTermId();
+		entryVariables.forEach(variable -> {
+			final int termId = variable.getTermId();
 			if (TermId.GROUPGID.getId() == termId || TermId.GUID.getId() == termId) {
 				joins.add(GERMPLASM_JOIN);
+				return;
 			}
 			if (TermId.GROUP_SOURCE_NAME.getId() == termId) {
 				joins.add(GERMPLASM_JOIN);
 				joins.add(GROUP_SOURCE_NAME_JOIN);
+				return;
 			}
 			if (TermId.IMMEDIATE_SOURCE_NAME.getId() == termId) {
 				joins.add(GERMPLASM_JOIN);
 				joins.add(IMMEDIATE_SOURCE_NAME_JOIN);
+				return;
+			}
+			if (variable.getVariableType() == VariableType.GERMPLASM_ATTRIBUTE ||
+				variable.getVariableType() == VariableType.GERMPLASM_PASSPORT) {
+				final String alias = this.formatVariableAlias(termId);
+				final String join = String.format("LEFT JOIN atributs %1$s ON g.gid = %1$s.gid AND %1$s.atype = %2$s", alias,
+					termId);
+				joins.add(GERMPLASM_JOIN);
+				joins.add(join);
+				return;
 			}
 		});
 	}
@@ -229,33 +217,38 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	}
 
 	private void addGermplasmAttributeScalars(final List<Scalar> scalars, final List<String> selectClause,
-		final Set<String> joins, final Integer variableId) {
-
-		final String alias = this.formatVariableAlias(variableId);
-		selectClause.add(this.addSelectExpression(scalars, String.format("%s.aval", alias), alias, StringType.INSTANCE));
-
-		final String join = String.format("LEFT JOIN atributs %1$s ON g.gid = %1$s.gid AND %1$s.atype = %2$s", alias, variableId);
-		joins.add(GERMPLASM_JOIN);
-		joins.add(join);
+		final List<MeasurementVariable> entryVariables) {
+		entryVariables.stream()
+			.filter(variable -> variable.getVariableType() == VariableType.GERMPLASM_ATTRIBUTE ||
+				variable.getVariableType() == VariableType.GERMPLASM_PASSPORT)
+			.forEach(variable -> {
+				final String alias = this.formatVariableAlias(variable.getTermId());
+				selectClause.add(this.addSelectExpression(scalars, String.format("%s.aval", alias), alias, StringType.INSTANCE));
+			});
 	}
 
-	private void addEntryDetailScalars(final List<Scalar> scalars, final List<String> selectClause, final String entryName,
-		final String dataType) {
-		selectClause.add(
-			this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.value, NULL))", entryName), entryName,
-				StringType.INSTANCE));
-		selectClause.add(
-			this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.stockprop_id, NULL))", entryName),
-				entryName + "_propertyId", IntegerType.INSTANCE));
-		selectClause.add(
-			this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.type_id, NULL))", entryName),
-				entryName + "_variableId", IntegerType.INSTANCE));
+	private void addEntryDetailScalars(final List<Scalar> scalars, final List<String> selectClause, final List<MeasurementVariable> entryVariables) {
+		entryVariables
+			.stream()
+			.filter(variable -> variable.getVariableType() == VariableType.ENTRY_DETAIL && variable.getTermId() != TermId.ENTRY_NO.getId())
+			.forEach(variable -> {
+				final String entryName = variable.getName();
+				selectClause.add(
+					this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.value, NULL))", entryName), entryName,
+						StringType.INSTANCE));
+				selectClause.add(
+					this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.stockprop_id, NULL))", entryName),
+						entryName + "_propertyId", IntegerType.INSTANCE));
+				selectClause.add(
+					this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.type_id, NULL))", entryName),
+						entryName + "_variableId", IntegerType.INSTANCE));
 
-		final String valueColumnReference =
-			(DataType.CATEGORICAL_VARIABLE.getName().equals(dataType)) ? "cvalue_id" : "value";
-		selectClause.add(this.addSelectExpression(scalars,
-			String.format("MAX(IF(cvterm_variable.name = '%s', sp.%s, NULL))", entryName, valueColumnReference), entryName + "_value",
-			StringType.INSTANCE));
+				final String valueColumnReference =
+					(DataType.CATEGORICAL_VARIABLE.getName().equals(variable.getDataType())) ? "cvalue_id" : "value";
+				selectClause.add(this.addSelectExpression(scalars,
+					String.format("MAX(IF(cvterm_variable.name = '%s', sp.%s, NULL))", entryName, valueColumnReference), entryName + "_value",
+					StringType.INSTANCE));
+			});
 	}
 
 	private void addGroupGidScalar(final List<Scalar> scalars, final List<String> selectClause,
@@ -370,7 +363,10 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 					continue;
 				}
 
-				if (factorsFilterMap.get(variableId) == null) {
+				final String variableType = filter.getVariableTypeMap().get(variableId);
+				if (!VariableType.GERMPLASM_ATTRIBUTE.name().equals(variableType) &&
+					!VariableType.GERMPLASM_PASSPORT.name().equals(variableType) &&
+					factorsFilterMap.get(variableId) == null) {
 					queryParams.put(variableId + "_Id", variableId);
 				}
 				final String finalId = variableId.replace("-", "");
@@ -412,6 +408,12 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 				variableId.equalsIgnoreCase(String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId())) ||
 				variableId.equalsIgnoreCase(String.valueOf(TermId.GID_UNIT.getId())))
 				sql.append(") ");
+			return;
+		}
+
+		if (VariableType.GERMPLASM_PASSPORT.name().equals(variableType) || VariableType.GERMPLASM_ATTRIBUTE.name().equals(variableType)) {
+			final String alias = this.formatVariableAlias(variableId);
+			sql.append(String.format(" AND %s.aval LIKE :%s_text", alias, variableId));
 			return;
 		}
 
@@ -541,7 +543,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		}).collect(Collectors.toList());
 	}
 
-	private String formatVariableAlias(final Integer variableId) {
+	private String formatVariableAlias(final Object variableId) {
 		return String.format("VARIABLE_%s", variableId);
 	}
 
