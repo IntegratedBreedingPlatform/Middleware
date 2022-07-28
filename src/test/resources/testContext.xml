@@ -11,7 +11,7 @@
 						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
 						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
 
-	<context:property-placeholder location="classpath:test.properties" />
+	<context:property-placeholder location="classpath:test.properties, classpath:crossing.properties" />
 	<util:properties id="testProperties" location="classpath:test.properties"/>
 	<context:annotation-config />
 
