@@ -70,7 +70,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	private static final String LOT_COUNT_ALIAS = "lotCount";
 	private static final String LOT_AVAILABLE_BALANCE_ALIAS = "availableBalance";
 	private static final String LOT_UNIT_ALIAS = "unit";
-	private static final String CROSS_ALIAS = "crossValue";
+	private static final String CROSS_ALIAS = "cross";
 	private static final String GROUP_GID_ALIAS = "groupGID";
 	private static final String GUID_ALIAS = "guid";
 
@@ -105,7 +105,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 
 		if (!CollectionUtils.isEmpty(studyEntrySearchDto.getVariableEntryDescriptors())) {
 			studyEntrySearchDto.getVariableEntryDescriptors().stream()
-				.filter(measurementVariable -> measurementVariable.getTermId() != TermId.GROUPGID.getId())
+				.filter(measurementVariable -> measurementVariable.getTermId() != TermId.GROUPGID.getId() && measurementVariable.getTermId() != TermId.GUID.getId())
 				.forEach(measurementVariable -> this
 				.addVariableEntryDescriptorsScalars(scalars, selects, measurementVariable.getName(), measurementVariable.getDataType()));
 		}
