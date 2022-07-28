@@ -119,7 +119,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 			entryVariables.stream().filter(d -> !REMOVABLE_GERMPLASM_DESCRIPTOR_IDS.contains(d.getTermId())).collect(
 				Collectors.toList());
 
-		List<StudyEntryDto> studyEntries =
+		final List<StudyEntryDto> studyEntries =
 			this.daoFactory.getStudyEntrySearchDAO()
 				.getStudyEntries(new StudyEntrySearchDto(studyId, fixedEntryVariables, variableEntryDescriptors, filter), pageable);
 
