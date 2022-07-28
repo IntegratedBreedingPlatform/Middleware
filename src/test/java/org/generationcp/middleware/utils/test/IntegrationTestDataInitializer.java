@@ -398,7 +398,7 @@ public class IntegrationTestDataInitializer {
 
 	public ObservationUnitsSearchDTO createTestObservationUnitsDTO() {
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = new ObservationUnitsSearchDTO();
-		observationUnitsSearchDTO.setSelectionMethodsAndTraitsAndAnalysisSummary(new ArrayList<MeasurementVariableDto>());
+		observationUnitsSearchDTO.setDatasetVariables(new ArrayList<MeasurementVariableDto>());
 		observationUnitsSearchDTO.setEnvironmentConditions(new ArrayList<MeasurementVariableDto>());
 		observationUnitsSearchDTO.setAdditionalDesignFactors(new ArrayList<String>());
 		observationUnitsSearchDTO.setGenericGermplasmDescriptors(new ArrayList<String>());

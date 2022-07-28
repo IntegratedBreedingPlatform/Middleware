@@ -139,7 +139,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
 		observationUnitsSearchDTO.setDatasetId(plantSubObsDataset.getProjectId());
 		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
-		observationUnitsSearchDTO.setSelectionMethodsAndTraitsAndAnalysisSummary(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
 		observationUnitsSearchDTO.setEnvironmentDetails(Collections.singletonList(environmentDetailDto));
 		observationUnitsSearchDTO.setEnvironmentConditions(Collections.singletonList(environmentConditionDto));
 		observationUnitsSearchDTO.setFilter(observationUnitsSearchDTO.new Filter());
@@ -224,7 +224,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
 		observationUnitsSearchDTO.setDatasetId(plantSubObsDataset.getProjectId());
 		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
-		observationUnitsSearchDTO.setSelectionMethodsAndTraitsAndAnalysisSummary(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
 
 		// Filter by Overwritten
 		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
@@ -289,7 +289,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
 		final Integer datasetId = plantSubObsDataset.getProjectId();
 		observationUnitsSearchDTO.setDatasetId(datasetId);
-		observationUnitsSearchDTO.setSelectionMethodsAndTraitsAndAnalysisSummary(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
 
 		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
 		final Map<String, String> variableTypeMap = new HashMap<>();
@@ -355,7 +355,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
 		final Integer datasetId = this.plot.getProjectId();
 		observationUnitsSearchDTO.setDatasetId(datasetId);
-		observationUnitsSearchDTO.setSelectionMethodsAndTraitsAndAnalysisSummary(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
 
 		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
 		final Map<String, String> variableTypeMap = new HashMap<>();
@@ -422,7 +422,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
 		final Integer datasetId = this.plot.getProjectId();
 		observationUnitsSearchDTO.setDatasetId(datasetId);
-		observationUnitsSearchDTO.setSelectionMethodsAndTraitsAndAnalysisSummary(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
 		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
 
 		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
@@ -455,7 +455,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
 		final Integer datasetId = this.plot.getProjectId();
 		observationUnitsSearchDTO.setDatasetId(datasetId);
-		observationUnitsSearchDTO.setSelectionMethodsAndTraitsAndAnalysisSummary(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
 		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
 
 		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
@@ -489,7 +489,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
 		final Integer datasetId = this.plot.getProjectId();
 		observationUnitsSearchDTO.setDatasetId(datasetId);
-		observationUnitsSearchDTO.setSelectionMethodsAndTraitsAndAnalysisSummary(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
 		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
 
 		final ObservationUnitsSearchDTO.Filter filter = observationUnitsSearchDTO.new Filter();
@@ -536,7 +536,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = this.testDataInitializer.createTestObservationUnitsDTO();
 		observationUnitsSearchDTO.setDatasetId(plantSubObsDataset.getProjectId());
 		observationUnitsSearchDTO.setInstanceId(geolocation.getLocationId());
-		observationUnitsSearchDTO.setSelectionMethodsAndTraitsAndAnalysisSummary(Collections.singletonList(measurementVariableDto));
+		observationUnitsSearchDTO.setDatasetVariables(Collections.singletonList(measurementVariableDto));
 		observationUnitsSearchDTO.setFilter(observationUnitsSearchDTO.new Filter());
 		observationUnitsSearchDTO.setEntryDetails(Arrays.asList(
 			new MeasurementVariableDto(TermId.ENTRY_NO.getId(),"ENTRY_NO"), //

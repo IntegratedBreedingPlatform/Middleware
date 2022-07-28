@@ -688,11 +688,6 @@ public class DatasetServiceImpl implements DatasetService {
 		final Map<Integer, String> designFactors = this.studyService.getAdditionalDesignFactors(studyId);
 		searchDTO.setAdditionalDesignFactors(Lists.newArrayList(designFactors.values()));
 
-		final List<MeasurementVariableDto> selectionMethodsAndTraitsAndAnalysisSummary =
-			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
-				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId(), VariableType.ANALYSIS_SUMMARY.getId());
-		searchDTO.setSelectionMethodsAndTraitsAndAnalysisSummary(selectionMethodsAndTraitsAndAnalysisSummary);
-
 		final DmsProject project = this.daoFactory.getDmsProjectDAO().getById(datasetId);
 		final int plotDatasetId = (DatasetTypeEnum.PLOT_DATA.getId() == project.getDatasetType().getDatasetTypeId()
 			|| DatasetTypeEnum.ANALYSIS_RESULTS_DATASET_IDS.contains(project.getDatasetType().getDatasetTypeId()))
@@ -700,8 +695,20 @@ public class DatasetServiceImpl implements DatasetService {
 		final List<MeasurementVariableDto> entryDetails =
 			this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(plotDatasetId,
 				VariableType.ENTRY_DETAIL.getId());
-
 		searchDTO.setEntryDetails(entryDetails);
+
+
+		if (project.getDatasetType().getDatasetTypeId() == DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId()) {
+			searchDTO.setDatasetVariables(this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
+				VariableType.ANALYSIS_SUMMARY.getId()));
+		} else if (project.getDatasetType().getDatasetTypeId() == DatasetTypeEnum.MEANS_DATA.getId()) {
+			searchDTO.setDatasetVariables(this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
+				VariableType.TRAIT.getId(), VariableType.ANALYSIS.getId()));
+		} else {
+			//for Plot and Subobservation datasets
+			searchDTO.setDatasetVariables(this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
+				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
+		}
 	}
 
 	@Override

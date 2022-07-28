@@ -325,7 +325,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ " MAX(IF(cvterm_variable.name = '%s', ph.draft_cvalue_id, NULL)) AS '%s', "
 			;
 
-		for (final MeasurementVariableDto measurementVariable : searchDto.getSelectionMethodsAndTraitsAndAnalysisSummary()) {
+		for (final MeasurementVariableDto measurementVariable : searchDto.getDatasetVariables()) {
 			if (measurementVariable.getId().equals(searchDto.getFilter().getVariableId())) {
 				sql.append(String.format(
 					traitClauseFormat,
@@ -496,7 +496,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		} else {
 			this.addScalar(query, standardVariableNamesMap);
 
-			this.addScalarForTraits(searchDto.getSelectionMethodsAndTraitsAndAnalysisSummary(), query, true);
+			this.addScalarForTraits(searchDto.getDatasetVariables(), query, true);
 			this.addScalarForEntryDetails(searchDto.getEntryDetails(), query);
 
 			for (final String gpDescriptor : searchDto.getGenericGermplasmDescriptors()) {
@@ -587,13 +587,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				+ " MAX(IF(cvterm_variable.name = '%1$s', ph.cvalue_id, NULL)) AS '%1$s_CvalueId', "
 				+ " MAX(IF(cvterm_variable.name = '%1$s', ph.draft_value, NULL)) AS '%1$s_DraftValue',"
 				+ " MAX(IF(cvterm_variable.name = '%1$s', ph.draft_cvalue_id, NULL)) AS '%1$s_DraftCvalueId'";
-			searchDto.getSelectionMethodsAndTraitsAndAnalysisSummary().forEach(measurementVariable -> columns.add(String.format(traitClauseFormat, measurementVariable.getName())));
+			searchDto.getDatasetVariables().forEach(measurementVariable -> columns.add(String.format(traitClauseFormat, measurementVariable.getName())));
 		} else {
 
 			final String traitClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.value, NULL)) AS '%s'";
 			final String traitDraftClauseFormat = " MAX(IF(cvterm_variable.name = '%s', ph.draft_value, NULL)) AS '%s'";
 
-			for (final MeasurementVariableDto measurementVariable : searchDto.getSelectionMethodsAndTraitsAndAnalysisSummary()) {
+			for (final MeasurementVariableDto measurementVariable : searchDto.getDatasetVariables()) {
 				if (filterColumns.contains(measurementVariable.getName())) {
 					columns.add(String.format(
 						Boolean.TRUE.equals(searchDto.getDraftMode()) ? traitDraftClauseFormat : traitClauseFormat,
@@ -843,7 +843,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		if (Boolean.TRUE.equals(searchDto.getDraftMode())) {
-			for (final MeasurementVariableDto selectionMethodsAndTrait : searchDto.getSelectionMethodsAndTraitsAndAnalysisSummary()) {
+			for (final MeasurementVariableDto selectionMethodsAndTrait : searchDto.getDatasetVariables()) {
 				if (orderColumn.equals(selectionMethodsAndTrait.getName())) {
 					orderColumn = orderColumn + "_DraftValue";
 					break;
@@ -1045,7 +1045,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private String addScalarForSpecificTrait(final ObservationUnitsSearchDTO params, final SQLQuery query) {
-		for (final MeasurementVariableDto measurementVariable : params.getSelectionMethodsAndTraitsAndAnalysisSummary()) {
+		for (final MeasurementVariableDto measurementVariable : params.getDatasetVariables()) {
 			if (measurementVariable.getId().equals(params.getFilter().getVariableId())) {
 				query.addScalar(measurementVariable.getName()); // Value
 				query.addScalar(measurementVariable.getName() + "_PhenotypeId", new IntegerType());
@@ -1068,7 +1068,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				final ObservationUnitRow observationUnitRow = new ObservationUnitRow();
 				final Map<String, ObservationUnitData> variables = new HashMap<>();
 
-				for (final MeasurementVariableDto variable : searchDto.getSelectionMethodsAndTraitsAndAnalysisSummary()) {
+				for (final MeasurementVariableDto variable : searchDto.getDatasetVariables()) {
 
 					final Integer observationUnitId = (Integer) row.get(OBSERVATION_UNIT_ID);
 					if (variable.getId().equals(searchDto.getFilter().getVariableId())) {
@@ -1144,7 +1144,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		final Map<String, ObservationUnitData> environmentVariables = new HashMap<>();
 		final Map<String, ObservationUnitData> observationVariables = new HashMap<>();
 
-		for (final MeasurementVariableDto variable : searchDto.getSelectionMethodsAndTraitsAndAnalysisSummary()) {
+		for (final MeasurementVariableDto variable : searchDto.getDatasetVariables()) {
 			final String status = (String) row.get(variable.getName() + "_Status");
 			final ObservationUnitData observationUnitData = new ObservationUnitData(
 				(Integer) row.get(variable.getName() + "_PhenotypeId"),
@@ -1261,7 +1261,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			final Map<Integer, String> standardDatasetVariablesMap = this.getStandardDatasetVariablesMap(finalColumnsQueryMap);
 			final List<Map<String, Object>> resultList =
 				this.getObservationUnitsQueryResult(searchDto, observationVariableName, standardDatasetVariablesMap, finalColumnsQueryMap, pageable, true);
-			return this.convertSelectionAndTraitColumnsValueType(resultList, searchDto.getSelectionMethodsAndTraitsAndAnalysisSummary());
+			return this.convertSelectionAndTraitColumnsValueType(resultList, searchDto.getDatasetVariables());
 
 		} catch (final Exception e) {
 			final String error = "An internal error has ocurred when trying to execute the operation " + e.getMessage();

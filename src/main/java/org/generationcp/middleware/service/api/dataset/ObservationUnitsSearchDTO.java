@@ -19,7 +19,11 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	private List<MeasurementVariableDto> environmentConditions;
 	private List<String> genericGermplasmDescriptors;
 	private List<String> additionalDesignFactors;
-	private List<MeasurementVariableDto> selectionMethodsAndTraitsAndAnalysisSummary;
+	// Contains variables with variable types depending on the dataset type
+	// Plot and Subobservations: TRAIT and SELECTION_METHOD
+	// MEANS_DATA: TRAIT and ANALYSIS
+	// SUMMARY_STATISTICS_DATA: ANALYSIS_SUMMARY
+	private List<MeasurementVariableDto> datasetVariables;
 	private List<MeasurementVariableDto> entryDetails;
 	private int datasetId;
 	private Integer instanceId;
@@ -142,11 +146,11 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 
 	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors,
 		final List<String> additionalDesignFactors,
-		final List<MeasurementVariableDto> selectionMethodsAndTraitsAndAnalysisSummary) {
+		final List<MeasurementVariableDto> datasetVariables) {
 		this();
 		this.genericGermplasmDescriptors = genericGermplasmDescriptors;
 		this.additionalDesignFactors = additionalDesignFactors;
-		this.selectionMethodsAndTraitsAndAnalysisSummary = selectionMethodsAndTraitsAndAnalysisSummary;
+		this.datasetVariables = datasetVariables;
 		this.datasetId = datasetId;
 		this.instanceId = instanceId;
 	}
@@ -183,12 +187,12 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		this.additionalDesignFactors = additionalDesignFactors;
 	}
 
-	public List<MeasurementVariableDto> getSelectionMethodsAndTraitsAndAnalysisSummary() {
-		return this.selectionMethodsAndTraitsAndAnalysisSummary;
+	public List<MeasurementVariableDto> getDatasetVariables() {
+		return this.datasetVariables;
 	}
 
-	public void setSelectionMethodsAndTraitsAndAnalysisSummary(final List<MeasurementVariableDto> selectionMethodsAndTraitsAndAnalysisSummary) {
-		this.selectionMethodsAndTraitsAndAnalysisSummary = selectionMethodsAndTraitsAndAnalysisSummary;
+	public void setDatasetVariables(final List<MeasurementVariableDto> datasetVariables) {
+		this.datasetVariables = datasetVariables;
 	}
 
 	public List<MeasurementVariableDto> getEntryDetails() {
