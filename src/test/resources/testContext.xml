@@ -425,4 +425,8 @@
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
+	<bean id="roleTypeService" class="org.generationcp.middleware.api.role.RoleTypeServiceImpl">
+		<constructor-arg ref="workbenchSessionProvider" />
+	</bean>
+
 </beans>
