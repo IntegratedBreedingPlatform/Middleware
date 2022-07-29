@@ -19,7 +19,11 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	private List<MeasurementVariableDto> environmentConditions;
 	private List<String> genericGermplasmDescriptors;
 	private List<String> additionalDesignFactors;
-	private List<MeasurementVariableDto> selectionMethodsAndTraits;
+	// Contains variables with variable types depending on the dataset type
+	// Plot and Subobservations: TRAIT and SELECTION_METHOD
+	// MEANS_DATA: TRAIT and ANALYSIS
+	// SUMMARY_STATISTICS_DATA: ANALYSIS_SUMMARY
+	private List<MeasurementVariableDto> datasetVariables;
 	private List<MeasurementVariableDto> entryDetails;
 	private int datasetId;
 	private Integer instanceId;
@@ -124,7 +128,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		}
 
 		public Map<String, String> getVariableTypeMap() {
-			return variableTypeMap;
+			return this.variableTypeMap;
 		}
 
 		public void setVariableTypeMap(final Map<String, String> variableTypeMap) {
@@ -142,11 +146,11 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 
 	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors,
 		final List<String> additionalDesignFactors,
-		final List<MeasurementVariableDto> selectionMethodsAndTraits) {
+		final List<MeasurementVariableDto> datasetVariables) {
 		this();
 		this.genericGermplasmDescriptors = genericGermplasmDescriptors;
 		this.additionalDesignFactors = additionalDesignFactors;
-		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
+		this.datasetVariables = datasetVariables;
 		this.datasetId = datasetId;
 		this.instanceId = instanceId;
 	}
@@ -183,16 +187,16 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		this.additionalDesignFactors = additionalDesignFactors;
 	}
 
-	public List<MeasurementVariableDto> getSelectionMethodsAndTraits() {
-		return this.selectionMethodsAndTraits;
+	public List<MeasurementVariableDto> getDatasetVariables() {
+		return this.datasetVariables;
 	}
 
-	public void setSelectionMethodsAndTraits(final List<MeasurementVariableDto> selectionMethodsAndTraits) {
-		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
+	public void setDatasetVariables(final List<MeasurementVariableDto> datasetVariables) {
+		this.datasetVariables = datasetVariables;
 	}
 
 	public List<MeasurementVariableDto> getEntryDetails() {
-		return entryDetails;
+		return this.entryDetails;
 	}
 
 	public void setEntryDetails(final List<MeasurementVariableDto> entryDetails) {
