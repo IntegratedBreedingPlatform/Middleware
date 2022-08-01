@@ -832,4 +832,20 @@
         </sql>
 	</changeSet>
 
+
+	<changeSet author="lkovacic" id="v21.3.0-48">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from crop_parameter where `key` = 'default-brapi-sync-source'
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Create crop parameter 'Default brapi-sync source'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO crop_parameter (`key`, description)
+			VALUES ('default-brapi-sync-source', 'Default Brapi-sync source URL)');
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

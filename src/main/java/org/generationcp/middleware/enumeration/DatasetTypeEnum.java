@@ -1,6 +1,8 @@
 package org.generationcp.middleware.enumeration;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public enum DatasetTypeEnum {
@@ -17,6 +19,8 @@ public enum DatasetTypeEnum {
 	WEATHER_DATA(10, "WD"),
 	MEANS_OVER_TRIAL_INSTANCES(11, "OM"),
 	SUMMARY_STATISTICS_DATA(12, "SUMMARY_STATISTICS");
+
+	public static final List<Integer> ANALYSIS_RESULTS_DATASET_IDS = Arrays.asList(MEANS_DATA.getId(), SUMMARY_STATISTICS_DATA.getId());
 
 	private static final Map<Integer, DatasetTypeEnum> lookup = new HashMap<>();
 	private static final Map<String, DatasetTypeEnum> lookupByName = new HashMap<>();

@@ -105,7 +105,7 @@ public interface OntologyVariableDataManager {
 
 	void fillVariableUsage(Variable variable);
 
-	List<Variable> searchAttributeVariables(String query, String programUUID);
+	List<Variable> searchAttributeVariables(String query, List<Integer> variableTypeIds, String programUUID);
 
 	boolean hasUsage(int variableId);
 
