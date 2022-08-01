@@ -6,9 +6,14 @@
 
 	<changeSet author="lkovacic" id="v21.4.0-1">
 		<preConditions onFail="MARK_RAN">
-			<not>
-				<indexExists tableName="methods" indexName="methods_mcode_uindex"/>
-			</not>
+			<and>
+				<sqlCheck expectedResult="0">
+                	select COUNT(1) FROM (SELECT COUNT(1) FROM methods GROUP BY mcode HAVING COUNT(1) > 1) as CNT;
+            	</sqlCheck>
+				<not>
+					<indexExists tableName="methods" indexName="methods_mcode_uindex"/>
+				</not>
+			</and>
 		</preConditions>
 		<comment>Create unique index to 'methods.mcode'</comment>
 		<createIndex indexName="methods_mcode_uindex" tableName="methods" unique="true">
