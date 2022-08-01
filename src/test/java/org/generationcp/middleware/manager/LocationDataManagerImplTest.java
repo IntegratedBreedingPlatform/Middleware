@@ -13,6 +13,7 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.dao.CountryDAO;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.LocationDataManager;
@@ -39,6 +40,7 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	private Project commonTestProject;
+	private CountryDAO countryDAO;
 
 	@Before
 	public void setUp() throws Exception {
@@ -48,6 +50,9 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
 		}
+
+		this.countryDAO = new CountryDAO();
+		this.countryDAO.setSession(this.sessionProvder.getSession());
 	}
 
 	@Test
@@ -133,27 +138,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testAddLocation() throws MiddlewareQueryException {
-		final Country country = this.manager.getCountryById(1);
-		final Location province = this.manager.getLocationByID(1001);
-		final Location location = new Location();
-		location.setCountry(country);
-		location.setLabbr("");
-		location.setLname("TEST-LOCATION-1");
-		location.setLrplce(1);
-		location.setLtype(1);
-		location.setNllp(1);
-		location.setProvince(province);
-		location.setSnl2id(1);
-		location.setSnl3id(1);
-
-		// add the location
-		final Integer id = this.manager.addLocation(location);
-		Debug.println(IntegrationTestBase.INDENT, "testAddLocation(" + location + "): " + id + "  \n  " + this.manager
-			.getLocationsByName("TEST-LOCATION-1", 0, 5, Operation.EQUAL));
-	}
-
-	@Test
 	public void testGetUserDefinedFieldByFieldTable() throws MiddlewareQueryException {
 		final String tableName = "LOCATION";
 		final String fieldType = "LTYPE";
@@ -168,15 +152,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	public void testGetAllBreedingLocations() throws MiddlewareQueryException {
 		final List<Location> locations = this.manager.getAllBreedingLocations();
 		Debug.println(IntegrationTestBase.INDENT, "getAllBreedingLocations()  " + locations);
-	}
-
-	@Test
-	public void testGetCountryById() {
-		final int id = 1;
-		final Country countries = this.manager.getCountryById(id);
-		Assert.assertNotNull(countries);
-		Debug.println(IntegrationTestBase.INDENT, "testGetCountryById(" + id + "): ");
-		Debug.println(IntegrationTestBase.INDENT, countries);
 	}
 
 	@Test

@@ -17,7 +17,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
-import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Locdes;
@@ -104,11 +103,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	}
 
 	@Override
-	public Country getCountryById(final Integer id) {
-		return this.daoFactory.getCountryDao().getById(id, false);
-	}
-
-	@Override
 	public Location getLocationByID(final Integer id) {
 		return this.daoFactory.getLocationDAO().getById(id, false);
 	}
@@ -117,24 +111,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 	@Override
 	public List<Location> getLocationsByIDs(final List<Integer> ids) {
 		return this.daoFactory.getLocationDAO().getLocationByIds(ids);
-	}
-
-	@Override
-	public Integer addLocation(final Location location) {
-
-		try {
-
-			final LocationDAO dao = this.daoFactory.getLocationDAO();
-
-			final Location recordSaved = dao.saveOrUpdate(location);
-			return recordSaved.getLocid();
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException(
-				"Error encountered while saving Location: LocationDataManager.addLocation(location=" + location + "): " + e
-					.getMessage(), e);
-		}
 	}
 
 	@Override

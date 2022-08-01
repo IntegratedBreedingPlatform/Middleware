@@ -2,6 +2,8 @@
 package org.generationcp.middleware.data.initializer;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.dao.CountryDAO;
+import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
@@ -65,6 +67,8 @@ public class StudyTestDataInitializer {
 	private final LocationDataManager locationDataManager;
 	private Integer geolocationId;
 	private final HibernateSessionProvider sessionProvider;
+	private CountryDAO countryDAO;
+	private LocationDAO locationDAO;
 
 	public StudyTestDataInitializer(
 		final StudyDataManagerImpl studyDataManagerImpl, final OntologyDataManager ontologyDataManager,
@@ -74,6 +78,9 @@ public class StudyTestDataInitializer {
 		this.commonTestProject = testProject;
 		this.locationDataManager = locationDataManager;
 		this.sessionProvider = provider;
+		this.countryDAO = new CountryDAO();
+		this.countryDAO.setSession(this.sessionProvider.getSession());
+		this.locationDAO = new LocationDAO(this.sessionProvider.getSession());
 	}
 
 	public StudyReference addTestStudy() throws Exception {
@@ -326,7 +333,7 @@ public class StudyTestDataInitializer {
 	}
 
 	public Integer addTestLocation(final String locationName) {
-		final Country country = this.locationDataManager.getCountryById(1);
+		final Country country = this.countryDAO.getById(1);
 		final Location province = this.locationDataManager.getLocationByID(1001);
 
 		final Location location = new Location();
@@ -341,7 +348,7 @@ public class StudyTestDataInitializer {
 		location.setSnl3id(1);
 
 		// add the location
-		return this.locationDataManager.addLocation(location);
+		return this.locationDAO.save(location).getLocid();
 	}
 
 	public List<Integer> addStudyGermplasm(final Integer studyId, final Integer startingEntryNumber, final List<Integer> gids) throws Exception {

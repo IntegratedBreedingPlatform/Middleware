@@ -12,7 +12,6 @@ package org.generationcp.middleware.manager.api;
 
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UDTableType;
@@ -85,31 +84,12 @@ public interface LocationDataManager {
 	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType);
 
 	/**
-	 * Returns the country record identified by the given id.
-	 *
-	 * @param id - id of the country record
-	 * @return the Country POJO representing the record
-	 */
-	Country getCountryById(Integer id);
-
-	/**
 	 * Returns the location record identified by the given id.
 	 *
 	 * @param id - id of the location record
 	 * @return the Location POJO representing the record
 	 */
 	Location getLocationByID(Integer id);
-
-	/**
-	 * Inserts a single {@code Location} object into the database.
-	 *
-	 * @param location - The {@code Location} object to be persisted to the database.
-	 *                 Must be a valid {@code Location} object.
-	 * @return Returns the id of the {@code Location} record inserted in the
-	 * database. Returns the id of the newly-added Germplasm
-	 * {@code Name}s.
-	 */
-	Integer addLocation(Location location);
 
 	/**
 	 * Adds location and locdes.
