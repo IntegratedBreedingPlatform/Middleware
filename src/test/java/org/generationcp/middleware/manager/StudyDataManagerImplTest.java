@@ -17,7 +17,9 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.api.program.ProgramService;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
@@ -49,9 +51,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
@@ -106,9 +106,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private GermplasmDataManager germplasmDataDM;
-
-	@Autowired
-	private LocationDataManager locationManager;
 
 	@Autowired
 	private UserService userService;
@@ -179,7 +176,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		StudyDataManagerImplTest.crossExpansionProperties = new CrossExpansionProperties(mockProperties);
 		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject,
-			this.locationManager, this.sessionProvder);
+			this.sessionProvder);
 
 		this.studyReference = this.studyTDI.addTestStudy();
 
@@ -435,7 +432,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNotNull() {
-		final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
+		final LocationService locationService = Mockito.mock(LocationService.class);
 
 		final FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
 			FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
@@ -443,7 +440,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList();
 
-		this.manager.setLocationDataManager(locationDataManager);
+		this.manager.setLocationService(locationService);
 
 		try {
 			final FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
@@ -452,7 +449,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			trialInstance.setLocationId(this.studyTDI.addTestLocation(StudyDataManagerImplTest.LOCATION_NAME));
 			fieldMapBlockInfo.setFieldId(trialInstance.getFieldId());
 
-			Mockito.when(locationDataManager.getBlockInformation(trialInstance.getBlockId())).thenReturn(fieldMapBlockInfo);
+			Mockito.when(locationService.getBlockInformation(trialInstance.getBlockId())).thenReturn(fieldMapBlockInfo);
 			this.manager.updateFieldMapWithBlockInformation(infos, true);
 
 			final FieldMapTrialInstanceInfo resultTrialInstance =
@@ -490,7 +487,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNull() {
-		final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
+		final LocationService locationService = Mockito.mock(LocationService.class);
 
 		final FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
 			FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
@@ -500,10 +497,10 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
 		trialInstance.setBlockId(null);
 
-		this.manager.setLocationDataManager(locationDataManager);
+		this.manager.setLocationService(locationService);
 
 		try {
-			Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
+			Mockito.when(locationService.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
 			this.manager.updateFieldMapWithBlockInformation(infos, false);
 
 			Assert.assertNotNull(

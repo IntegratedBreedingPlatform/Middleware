@@ -184,7 +184,7 @@ public interface GermplasmDataManager {
 	List<UserDefinedField> getUserDefinedFieldByFieldTableNameAndType(String tableName, String fieldType);
 
 	/**
-	 * Please use LocationDataManager.getLocationById().
+	 * Please use LocationService.getLocationById().
 	 * <p>
 	 * Returns the location record identified by the given id.
 	 *

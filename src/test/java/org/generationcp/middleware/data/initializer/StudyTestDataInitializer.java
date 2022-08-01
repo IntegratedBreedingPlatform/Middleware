@@ -22,7 +22,6 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
@@ -64,7 +63,6 @@ public class StudyTestDataInitializer {
 	private final StudyDataManagerImpl studyDataManager;
 	private final OntologyDataManager ontologyManager;
 	private final Project commonTestProject;
-	private final LocationDataManager locationDataManager;
 	private Integer geolocationId;
 	private final HibernateSessionProvider sessionProvider;
 	private CountryDAO countryDAO;
@@ -72,11 +70,10 @@ public class StudyTestDataInitializer {
 
 	public StudyTestDataInitializer(
 		final StudyDataManagerImpl studyDataManagerImpl, final OntologyDataManager ontologyDataManager,
-		final Project testProject, final LocationDataManager locationDataManager, final HibernateSessionProvider provider) {
+		final Project testProject, final HibernateSessionProvider provider) {
 		this.studyDataManager = studyDataManagerImpl;
 		this.ontologyManager = ontologyDataManager;
 		this.commonTestProject = testProject;
-		this.locationDataManager = locationDataManager;
 		this.sessionProvider = provider;
 		this.countryDAO = new CountryDAO();
 		this.countryDAO.setSession(this.sessionProvider.getSession());
@@ -334,7 +331,7 @@ public class StudyTestDataInitializer {
 
 	public Integer addTestLocation(final String locationName) {
 		final Country country = this.countryDAO.getById(1);
-		final Location province = this.locationDataManager.getLocationByID(1001);
+		final Location province = this.locationDAO.getById(1001);
 
 		final Location location = new Location();
 		location.setCountry(country);
