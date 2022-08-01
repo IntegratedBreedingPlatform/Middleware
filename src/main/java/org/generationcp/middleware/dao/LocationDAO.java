@@ -22,7 +22,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.util.SQLQueryBuilder;
@@ -203,40 +202,6 @@ public class LocationDAO extends GenericDAO<Location, Integer> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error with getLocationDTO(locationId=" + locationId + "): " + e.getMessage(), e);
 		}
-	}
-
-	public List<LocationDetails> getLocationDetails(final Integer locationId, final Integer start, final Integer numOfRows) {
-		try {
-
-			final StringBuilder query = new StringBuilder().append("select l.lname as location_name,l.locid,l.ltype as ltype,")
-				.append(" g.lat as latitude, g.lon as longitude, g.alt as altitude,")
-				.append(" c.cntryid as cntryid, c.isofull as country_full_name, l.labbr as location_abbreviation,")
-				.append(" ud.fname as location_type,").append(" ud.fdesc as location_description,")
-				.append(" c.isoabbr as cntry_name, province.lname AS province_name, province.locid as province_id")
-				.append(" from location l")
-				.append(" left join georef g on l.locid = g.locid")
-				.append(" left join cntry c on l.cntryid = c.cntryid")
-				.append(" left join udflds ud on ud.fldno = l.ltype")
-				.append(" left join location province on l.snl1id = province.locid");
-
-			if (locationId != null) {
-				query.append(" where l.locid = :id");
-
-				final SQLQuery sqlQuery = this.getSession().createSQLQuery(query.toString());
-				sqlQuery.setParameter("id", locationId);
-				sqlQuery.setFirstResult(start);
-				sqlQuery.setMaxResults(numOfRows);
-				sqlQuery.addEntity(LocationDetails.class);
-
-				return sqlQuery.list();
-			}
-
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getLocationDetails", "id", String.valueOf(locationId), e.getMessage(),
-					LocationDAO.CLASS_NAME_LOCATION), e);
-		}
-		return new ArrayList<>();
 	}
 
 	@Override

@@ -36,7 +36,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
@@ -108,9 +107,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	private StockBuilder stockBuilder;
 
 	@Resource
-	private LocationDataManager locationDataManager;
-
-	@Resource
 	private LocationService locationService;
 
 	@Resource
@@ -145,12 +141,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Location> getAllLocations() {
-		return this.locationDataManager.getAllLocations();
+		return this.locationService.getAllLocations();
 	}
 
 	@Override
 	public List<Location> getAllBreedingLocations() {
-		return this.locationDataManager.getAllBreedingLocations();
+		return this.locationService.getAllBreedingLocations();
 	}
 
 	@Override
@@ -171,16 +167,16 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		if (isBreedingLocation) {
-			return this.locationDataManager.getAllBreedingLocations(locationIds);
+			return this.locationService.getAllBreedingLocations(locationIds);
 		}
 
-		return this.locationDataManager.getAllSeedingLocations(locationIds);
+		return this.locationService.getAllSeedingLocations(locationIds);
 
 	}
 
 	@Override
 	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds) {
-		return this.locationDataManager.getLocationsByIDs(locationIds);
+		return this.locationService.getLocationsByIDs(locationIds);
 	}
 
 	@Override
@@ -451,22 +447,22 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Location> getAllFieldLocations(final int locationId) {
-		return this.locationDataManager.getAllFieldLocations(locationId);
+		return this.locationService.getAllFieldLocations(locationId);
 	}
 
 	@Override
 	public List<Location> getAllBlockLocations(final int fieldId) {
-		return this.locationDataManager.getAllBlockLocations(fieldId);
+		return this.locationService.getAllBlockLocations(fieldId);
 	}
 
 	@Override
 	public FieldmapBlockInfo getBlockInformation(final int blockId) {
-		return this.locationDataManager.getBlockInformation(blockId);
+		return this.locationService.getBlockInformation(blockId);
 	}
 
 	@Override
 	public List<Location> getAllFields() {
-		return this.locationDataManager.getAllFields();
+		return this.locationService.getAllFields();
 	}
 
 	@Override
@@ -483,12 +479,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public int addLocation(final String locationName, final Integer parentId, final Integer currentUserId, final String locCode,
 			final String parentCode) {
 
-		final Integer lType = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locCode);
+		final Integer lType = this.locationService.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locCode);
 		final Location location = new Location(null, lType, 0, locationName, null, 0, 0, null, null, 0);
 
-		final Integer dType = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, parentCode);
+		final Integer dType = this.locationService.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, parentCode);
 		final Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentId), 0, 0);
-		return this.locationDataManager.addLocationAndLocdes(location, locdes);
+		return this.locationService.addLocationAndLocdes(location, locdes);
 	}
 
 	@Override
@@ -531,12 +527,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Location getLocationById(final int id) {
-		return this.locationDataManager.getLocationByID(id);
+		return this.locationService.getLocationByID(id);
 	}
 
 	@Override
 	public Location getLocationByName(final String locationName, final Operation op) {
-		final List<Location> locations = this.locationDataManager.getLocationsByName(locationName, 0, 1, op);
+		final List<Location> locations = this.locationService.getLocationsByName(locationName, 0, 1, op);
 		if (locations != null && !locations.isEmpty()) {
 			return locations.get(0);
 		}
@@ -723,8 +719,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		this.germplasmListManager = germplasmListManager;
 	}
 
-	protected void setLocationDataManager(final LocationDataManager locationDataManager) {
-		this.locationDataManager = locationDataManager;
+	protected void setLocationService(final LocationService locationService) {
+		this.locationService = locationService;
 	}
 
 	@Override

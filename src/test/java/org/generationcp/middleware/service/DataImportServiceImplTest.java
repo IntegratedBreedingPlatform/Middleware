@@ -3,6 +3,7 @@ package org.generationcp.middleware.service;
 import com.google.common.base.Optional;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.data.initializer.StandardVariableTestDataInitializer;
 import org.generationcp.middleware.data.initializer.WorkbookTestDataInitializer;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -19,7 +20,6 @@ import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.WorkbookParserException;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
@@ -31,7 +31,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
-import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
@@ -77,9 +76,6 @@ public class DataImportServiceImplTest {
 	private GermplasmSearchService germplasmSearchService;
 
 	@Mock
-	private LocationDataManager locationDataManager;
-
-	@Mock
 	private org.apache.poi.ss.usermodel.Workbook excelWorkbook;
 
 	@Mock
@@ -87,6 +83,9 @@ public class DataImportServiceImplTest {
 
 	@Mock
 	private TermDataManager termDataManager;
+
+	@Mock
+	private LocationService locationService;
 
 	private Workbook workbook;
 
@@ -125,7 +124,7 @@ public class DataImportServiceImplTest {
 		unspecifiedLocation.setLname(Location.UNSPECIFIED_LOCATION);
 		unspecifiedLocation.setLocid(UNSPECIFIED_LOCATION_LOCID);
 		locations.add(unspecifiedLocation);
-		Mockito.when(this.locationDataManager.retrieveLocIdOfUnspecifiedLocation()).thenReturn(String.valueOf(UNSPECIFIED_LOCATION_LOCID));
+		Mockito.when(this.locationService.retrieveLocIdOfUnspecifiedLocation()).thenReturn(String.valueOf(UNSPECIFIED_LOCATION_LOCID));
 
 
 		final StandardVariable locationVariable = StandardVariableTestDataInitializer.createStandardVariable();
