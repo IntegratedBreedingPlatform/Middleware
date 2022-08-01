@@ -8,15 +8,12 @@
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *******************************************************************************/
 
-package org.generationcp.middleware.manager;
+package org.generationcp.middleware.api.role;
 
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.manager.WorkbenchDaoFactory;
 import org.generationcp.middleware.pojos.workbench.Role;
-import org.generationcp.middleware.pojos.workbench.RoleType;
-import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,20 +21,20 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 /**
- * Implementation of the WorkbenchDataManager interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
+ * Implementation of the RoleServiceImpl interface. To instantiate this class, a Hibernate Session must be passed to its constructor.
  */
 @Transactional
-public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
+public class RoleServiceImpl implements RoleService {
 
 	private HibernateSessionProvider sessionProvider;
 
 	private WorkbenchDaoFactory workbenchDaoFactory;
 
-	public WorkbenchDataManagerImpl() {
+	public RoleServiceImpl() {
 		super();
 	}
 
-	public WorkbenchDataManagerImpl(final HibernateSessionProvider sessionProvider) {
+	public RoleServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
 		this.workbenchDaoFactory = new WorkbenchDaoFactory(sessionProvider);
 	}
@@ -59,23 +56,13 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	}
 
 	@Override
-	public List<RoleType> getRoleTypes() {
-		return this.workbenchDaoFactory.getRoleTypeDAO().getRoleTypes();
-	}
-
-	@Override
-	public RoleType getRoleType(final Integer id) {
-		return this.workbenchDaoFactory.getRoleTypeDAO().getById(id);
-	}
-
-	@Override
 	public Role saveRole(final Role role) {
 
 		try {
 			this.workbenchDaoFactory.getRoleDao().saveOrUpdate(role);
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException(
-				"Cannot save Role: WorkbenchDataManager.saveRole(role=" + role + "): " + e.getMessage(), e);
+				"Cannot save Role: RoleService.saveRole(role=" + role + "): " + e.getMessage(), e);
 		}
 
 		return role;
