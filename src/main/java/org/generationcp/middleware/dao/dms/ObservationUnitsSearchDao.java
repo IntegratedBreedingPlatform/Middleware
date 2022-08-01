@@ -2,6 +2,7 @@ package org.generationcp.middleware.dao.dms;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.GenericDAO;
@@ -32,6 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -45,6 +47,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		.getId(), TermId.GID.getId(), TermId.DESIG.getId(), TermId.ENTRY_TYPE.getId(), TermId.ENTRY_NO.getId(), TermId.REP_NO
 		.getId(), TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId(), TermId.ROW.getId(), TermId.COL.getId(), TermId.FIELDMAP_RANGE.getId(), TermId.FIELDMAP_COLUMN
 		.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId());
+
+
+	private static final List<Integer> REMOVE_FILTERS = Lists.newArrayList(TermId.FEMALE_PARENT_GID.getId(),
+		TermId.FEMALE_PARENT_NAME.getId(), TermId.MALE_PARENT_GID.getId(), TermId.MALE_PARENT_NAME.getId());
+	private static final String LIMIT_CLAUSE = " LIMIT 5000 ";
+
 	private static final String SUM_OF_SAMPLES_ID = "-2";
 	private static final String OBSERVATION_UNIT_ID = "observationUnitId";
 	static final String PARENT_OBS_UNIT_ID = "PARENT_OBS_UNIT_ID";
@@ -480,6 +488,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			query.setParameter("datasetEnvironmentId", String.valueOf(searchDto.getEnvironmentDatasetId()));
 		}
 
+		if (!CollectionUtils.isEmpty(searchDto.getFilter().getPreFilteredGids())) {
+			query.setParameterList("preFilteredGids", searchDto.getFilter().getPreFilteredGids());
+		}
+
 		addQueryParams(query, searchDto.getFilter());
 
 		addPaginationToSQLQuery(query, pageable);
@@ -818,6 +830,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			this.appendTraitStatusFilterToQuery(sql, filterByVariableSQL, " AND ph2.value =  '" + Phenotype.MISSING_VALUE + "'");
 		}
 
+		if (!CollectionUtils.isEmpty(filter.getPreFilteredGids())) {
+			sql.append(" and s.dbxref_id in (:preFilteredGids) ");
+		}
+
 	}
 
 	private void addOrder(final StringBuilder sql, final ObservationUnitsSearchDTO searchDto, final String observationUnitNoName,
@@ -874,6 +890,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
 				continue;
 			}
+
+			if (observableId != null && REMOVE_FILTERS.contains(Integer.valueOf(observableId))) {
+				continue;
+			}
+
 			final String variableTypeString = filter.getVariableTypeMap().get(observableId);
 			if (variableTypes.contains(variableTypeString)) {
 				this.appendTraitValueFilteringToQuery(sql, filterByDraftOrValue, observableId, performLikeOperation);
@@ -1024,6 +1045,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				if (variableId != null && !variableId.equals(Integer.valueOf(observableId))) {
 					continue;
 				}
+
+				if (observableId != null && REMOVE_FILTERS.contains(Integer.valueOf(observableId))) {
+					continue;
+				}
 				final String variableType = filter.getVariableTypeMap().get(observableId);
 				if (!VariableType.OBSERVATION_UNIT.name().equals(variableType) && factorsFilterMap.get(observableId) == null) {
 					query.setParameter(observableId + "_Id", observableId);
@@ -1041,6 +1066,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (filter.getFilteredNdExperimentIds() != null && !filter.getFilteredNdExperimentIds().isEmpty()) {
 			query.setParameterList("filteredNdExperimentIds", filter.getFilteredNdExperimentIds());
+		}
+
+		if (!CollectionUtils.isEmpty(filter.getPreFilteredGids())) {
+			query.setParameterList("preFilteredGids", filter.getPreFilteredGids());
 		}
 	}
 
@@ -1304,4 +1333,88 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		return !CollectionUtils.isEmpty(filter.getFilteredTextValues()) && filter.getFilteredTextValues().keySet().contains(String.valueOf(variableId));
 	}
 
+	public Set<Integer> addPreFilteredGids(final ObservationUnitsSearchDTO.Filter filter) {
+		final Set<Integer> preFilteredGids = new HashSet<>();
+		String femaleName = null;
+		String maleName = null;
+		String femaleGid = null;
+		String maleGid = null;
+
+		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.FEMALE_PARENT_NAME.getId()))) {
+			femaleName = filter.getFilteredTextValues().get(String.valueOf(TermId.FEMALE_PARENT_NAME.getId()));
+		}
+
+		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.FEMALE_PARENT_GID.getId()))) {
+			femaleGid = filter.getFilteredTextValues().get(String.valueOf(TermId.FEMALE_PARENT_GID.getId()));
+		}
+
+		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.MALE_PARENT_NAME.getId()))) {
+			maleName = filter.getFilteredTextValues().get(String.valueOf(TermId.MALE_PARENT_NAME.getId()));
+		}
+
+		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.MALE_PARENT_GID.getId()))) {
+			maleGid = filter.getFilteredTextValues().get(String.valueOf(TermId.MALE_PARENT_GID.getId()));
+		}
+
+		if (StringUtils.isNotBlank(femaleName) || StringUtils.isNotBlank(femaleGid)) {
+			StringBuilder sql = new StringBuilder("select g.gid from names n \n");//
+			sql.append("   straight_join germplsm female_parent on n.gid = female_parent.gid \n");//
+			sql.append("   straight_join germplsm group_source on female_parent.gid = group_source.gpid1 and group_source.gnpgs > 0 \n");//
+			sql.append("   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n");  //
+			sql.append("                            or g.gnpgs > 0 and group_source.gid = g.gid \n"); //
+			sql.append(" where n.nstat = 1 \n");
+			if (StringUtils.isNotBlank(femaleName)) {
+				sql.append(" and n.nval = :femaleName "); //
+			}
+			if (StringUtils.isNotBlank(femaleGid)) {
+				sql.append(" and female_parent.gid = :femaleGid "); //
+			}
+			sql.append(LIMIT_CLAUSE); //
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+
+			if (StringUtils.isNotBlank(femaleName)) {
+				query.setParameter("femaleName", femaleName); //
+			}
+			if (StringUtils.isNotBlank(femaleGid)) {
+				query.setParameter("femaleGid", femaleGid); //
+			}
+
+			final List<Integer> gids =  query.list();
+			if (!gids.isEmpty()) {
+				preFilteredGids.addAll(gids);
+			}
+		}
+
+		if (StringUtils.isNotBlank(maleName) || StringUtils.isNotBlank(maleGid)) {
+			StringBuilder sql = new StringBuilder("select g.gid from names n \n");//
+			sql.append("   straight_join germplsm male_parent on n.gid = male_parent.gid \n");//
+			sql.append("   straight_join germplsm group_source on male_parent.gid = group_source.gpid2 and group_source.gnpgs > 0 \n");//
+			sql.append("   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n");  //
+			sql.append("                            or g.gnpgs > 0 and group_source.gid = g.gid \n"); //
+			sql.append(" where n.nstat = 1 \n");
+
+			if (StringUtils.isNotBlank(maleName)) {
+				sql.append(" and n.nval = :maleName "); //
+			}
+			if (StringUtils.isNotBlank(maleGid)) {
+				sql.append(" and male_parent.gid = :maleGid "); //
+			}
+			sql.append(LIMIT_CLAUSE); //
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+
+			if (StringUtils.isNotBlank(maleName)) {
+				query.setParameter("maleName", maleName); //
+			}
+			if (StringUtils.isNotBlank(maleGid)) {
+				query.setParameter("maleGid", maleGid); //
+			}
+
+			final List<Integer> gids =  query.list();
+			if (!gids.isEmpty()) {
+				preFilteredGids.addAll(gids);
+			}
+		}
+		return preFilteredGids;
+	}
 }

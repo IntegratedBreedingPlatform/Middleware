@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @AutoProperty
 public class StudyEntrySearchDto {
@@ -40,6 +41,8 @@ public class StudyEntrySearchDto {
 		private Map<String, List<String>> filteredValues;
 		private Map<String, String> filteredTextValues;
 		private Map<String, String> variableTypeMap;
+		// FIXME: Remove it after solver the filter for Female and Male Parents into the query.
+		private Set<Integer> preFilteredGids;
 
 		public Filter() {
 			this.entryNumbers = new ArrayList<>();
@@ -88,6 +91,13 @@ public class StudyEntrySearchDto {
 			this.variableTypeMap = variableTypeMap;
 		}
 
+		public Set<Integer> getPreFilteredGids() {
+			return this.preFilteredGids;
+		}
+
+		public void setPreFilteredGids(final Set<Integer> preFilteredGids) {
+			this.preFilteredGids = preFilteredGids;
+		}
 	}
 
 	public int getStudyId() {

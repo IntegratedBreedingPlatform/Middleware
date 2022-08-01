@@ -101,12 +101,35 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Override
 	public long countFilteredStudyEntries(int studyId, StudyEntrySearchDto.Filter filter) {
 		final StudyEntrySearchDto searchDto = this.buildStudyEntrySearchDto(studyId, filter);
+		if(filter != null){
+			this.addPreFilteredGids(filter);
+		}
+
 		return this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(studyId, searchDto);
+	}
+
+	private void addPreFilteredGids(final StudyEntrySearchDto.Filter filter) {
+		Set<String> textKeys = filter.getFilteredTextValues().keySet();
+		if(textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_GID.getId())) ||
+			textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_NAME.getId())) ||
+			textKeys.contains(String.valueOf(TermId.MALE_PARENT_GID.getId())) ||
+			textKeys.contains(String.valueOf(TermId.MALE_PARENT_NAME.getId()))
+		){
+			filter.setPreFilteredGids(this.daoFactory.getStudyEntrySearchDAO().addPreFilteredGids(filter));
+		}
+
 	}
 
 	@Override
 	public List<StudyEntryDto> getStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 		final StudyEntrySearchDto searchDto = this.buildStudyEntrySearchDto(studyId, filter);
+
+		// FIXME: It was implemented pre-filters to FEMALE and MALE Parents by NAME or GID.
+		//  Is need a workaround solution to implement filters into the query if possible.
+		if (filter != null) {
+			this.addPreFilteredGids(filter);
+		}
+
 		final List<StudyEntryDto> studyEntries = this.daoFactory.getStudyEntrySearchDAO().getStudyEntries(searchDto, pageable);
 
 		if (searchDto.getFixedEntryDescriptors().stream().anyMatch(this::entryVariablesHasParent)) {
