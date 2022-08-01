@@ -18,7 +18,6 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.utils.test.Debug;
@@ -100,13 +99,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 			"Returned result must not be null and must be an empty list",
 			locationsByIdNullTest != null && locationsByIdNullTest.isEmpty());
 
-	}
-
-	@Test
-	public void testLocationDetails() {
-		final List<LocationDetails> locationList = this.manager.getLocationDetailsByLocId(1, 1, 1);
-		Assert.assertNotNull(locationList);
-		Debug.printObjects(IntegrationTestBase.INDENT, locationList);
 	}
 
 	@Test
@@ -197,16 +189,6 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetLocationDetailsByLocId() {
-		final int locationId = 1001;
-		final List<LocationDetails> locdetails = this.manager.getLocationDetailsByLocId(locationId, 0, 100);
-		Assert.assertNotNull(locdetails);
-		Assert.assertFalse(locdetails.isEmpty());
-		Debug.println(IntegrationTestBase.INDENT, "testGetLocationDetailsByLocId(" + locationId + "): ");
-		Debug.printObjects(IntegrationTestBase.INDENT, locdetails);
-	}
-
-	@Test
 	public void testGetAllFieldLocations() {
 		final int locationId = 17649; // TODO replace later with get field by id OR get first BREED ltype from location
 		final List<Location> result = this.manager.getAllFieldLocations(locationId);
@@ -257,12 +239,11 @@ public class LocationDataManagerImplTest extends IntegrationTestBase {
 			Assert.assertEquals("90.5", aculcoLoc.getGeoref().getLon().toString());
 			Assert.assertEquals("2080", aculcoLoc.getGeoref().getAlt().toString());
 
-			final List<LocationDetails> locationDetails =
-				this.manager.getLocationDetailsByLocId(aculcoLoc.getLocid(), 0, Integer.MAX_VALUE);
+			final Location location = this.manager.getLocationByID(aculcoLoc.getLocid());
 
-			Assert.assertEquals(aculcoLoc.getGeoref().getLat(), locationDetails.get(0).getLatitude());
-			Assert.assertEquals(aculcoLoc.getGeoref().getLon(), locationDetails.get(0).getLongitude());
-			Assert.assertEquals(aculcoLoc.getGeoref().getAlt(), locationDetails.get(0).getAltitude());
+			Assert.assertEquals(aculcoLoc.getGeoref().getLat(), location.getLatitude());
+			Assert.assertEquals(aculcoLoc.getGeoref().getLon(), location.getLongitude());
+			Assert.assertEquals(aculcoLoc.getGeoref().getAlt(), location.getAltitude());
 		}
 	}
 

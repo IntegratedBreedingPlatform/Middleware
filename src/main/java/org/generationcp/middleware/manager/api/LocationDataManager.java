@@ -14,7 +14,6 @@ import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
@@ -28,18 +27,6 @@ import java.util.Map;
  * @author Joyce Avestro
  */
 public interface LocationDataManager {
-
-	/**
-	 * Returns the germplasm records that were created at the locations with
-	 * names matching the given parameter.
-	 *
-	 * @param locationId - location id to search details from
-	 * @param start      - the starting index of the sublist of results to be returned
-	 * @param numOfRows  - the number of rows to be included in the sublist of results
-	 *                   to be returned
-	 * @return List of Germplasm POJOs
-	 */
-	List<LocationDetails> getLocationDetailsByLocId(Integer locationId, int start, int numOfRows);
 
 	/**
 	 * Returns all Location information from central and local databases.

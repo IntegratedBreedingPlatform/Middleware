@@ -19,7 +19,6 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationDetails;
 import org.generationcp.middleware.pojos.LocationType;
 import org.generationcp.middleware.pojos.Locdes;
 import org.generationcp.middleware.pojos.LocdesType;
@@ -159,11 +158,6 @@ public class LocationDataManagerImpl extends DataManager implements LocationData
 					+ e.getMessage(), e);
 		}
 		return idLocationSaved;
-	}
-
-	@Override
-	public List<LocationDetails> getLocationDetailsByLocId(final Integer locationId, final int start, final int numOfRows) {
-		return this.daoFactory.getLocationDAO().getLocationDetails(locationId, start, numOfRows);
 	}
 
 	@Override
