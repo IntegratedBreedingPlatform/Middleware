@@ -13,10 +13,7 @@ package org.generationcp.middleware.manager;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.WorkbenchDataManager;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Role;
-import org.generationcp.middleware.pojos.workbench.RoleType;
-import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 import org.hibernate.Session;
 import org.springframework.transaction.annotation.Transactional;
@@ -56,16 +53,6 @@ public class WorkbenchDataManagerImpl implements WorkbenchDataManager {
 	@Override
 	public List<Role> getRoles(final RoleSearchDto roleSearchDto) {
 		return this.workbenchDaoFactory.getRoleDao().getRoles(roleSearchDto);
-	}
-
-	@Override
-	public List<RoleType> getRoleTypes() {
-		return this.workbenchDaoFactory.getRoleTypeDAO().getRoleTypes();
-	}
-
-	@Override
-	public RoleType getRoleType(final Integer id) {
-		return this.workbenchDaoFactory.getRoleTypeDAO().getById(id);
 	}
 
 	@Override
