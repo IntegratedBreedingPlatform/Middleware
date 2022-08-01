@@ -9,6 +9,7 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.file.FileMetadataFilterRequest;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.constant.SystemNameTypes;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.data.initializer.GermplasmListDataTestDataInitializer;
@@ -34,7 +35,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.GermplasmNameType;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Bibref;
 import org.generationcp.middleware.pojos.Country;
@@ -120,7 +120,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	private StudyEntryService studyEntryService;
 
 	@Autowired
-	private LocationDataManager locationDataManager;
+	private LocationService locationService;
 
 	private Integer noLocationId, variableTypeId, attributeId, clientId, userId, puiNameTypeId;
 	private String creationDate, name, germplasmPUI, germplasmUUID, reference, note;
@@ -2728,7 +2728,7 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	}
 
 	private Lot addLot(final int gid) {
-		final Integer id = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.name());
+		final Integer id = this.locationService.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.name());
 		final Lot lot =
 			new Lot(null, this.userId, EntityType.GERMPLSM.name(), gid, 6000, TermId.SEED_AMOUNT_G.getId(),
 				LotStatus.ACTIVE.getIntValue(), 0,

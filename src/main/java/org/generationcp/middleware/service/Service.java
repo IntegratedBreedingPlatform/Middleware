@@ -11,19 +11,19 @@
 
 package org.generationcp.middleware.service;
 
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.LocationServiceImpl;
+import org.generationcp.middleware.api.role.RoleService;
+import org.generationcp.middleware.api.role.RoleServiceImpl;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.exceptions.PhenotypeException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.GermplasmDataManagerImpl;
 import org.generationcp.middleware.manager.InventoryDataManagerImpl;
-import org.generationcp.middleware.manager.LocationDataManagerImpl;
 import org.generationcp.middleware.manager.OntologyDataManagerImpl;
-import org.generationcp.middleware.api.role.RoleServiceImpl;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.manager.ontology.OntologyMethodDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyPropertyDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.OntologyScaleDataManagerImpl;
@@ -119,10 +119,6 @@ public abstract class Service {
 
 	protected final TermBuilder getTermBuilder() {
 		return new TermBuilder(this.sessionProvider);
-	}
-
-	protected LocationDataManager getLocationDataManager() {
-		return new LocationDataManagerImpl(this.sessionProvider);
 	}
 
 	protected final SampleListService getSampleListService() {
