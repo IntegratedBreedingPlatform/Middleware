@@ -724,8 +724,7 @@ public class DatasetServiceImpl implements DatasetService {
 		} else {
 			//for Plot and Subobservation datasets
 			searchDTO.setDatasetVariables(this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
-				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId(), VariableType.GERMPLASM_ATTRIBUTE.getId(),
-				VariableType.GERMPLASM_PASSPORT.getId()));
+				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 
 			final List<MeasurementVariableDto> passportAndAttributes =
 				this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,

@@ -99,6 +99,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		" LEFT JOIN names immediateSource ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
 	private static final String GROUP_SOURCE_NAME_JOIN =
 		"LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0";
+	private static final String GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN = "LEFT JOIN atributs %1$s ON s.dbxref_id = %1$s.gid AND %1$s.atype = %2$s";
 
 	public StudyEntrySearchDAO(final Session session) {
 		super(session);
@@ -194,9 +195,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			if (variable.getVariableType() == VariableType.GERMPLASM_ATTRIBUTE ||
 				variable.getVariableType() == VariableType.GERMPLASM_PASSPORT) {
 				final String alias = this.formatVariableAlias(termId);
-				final String join = String.format("LEFT JOIN atributs %1$s ON g.gid = %1$s.gid AND %1$s.atype = %2$s", alias,
-					termId);
-				joins.add(GERMPLASM_JOIN);
+				final String join = String.format(GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN, alias, termId);
 				joins.add(join);
 				return;
 			}

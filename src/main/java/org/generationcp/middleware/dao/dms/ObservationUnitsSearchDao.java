@@ -64,7 +64,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		" LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0";
 	private static final String LOCATION_JOIN = " LEFT JOIN nd_geolocationprop gprop on gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = " + TermId.LOCATION_ID.getId()
 		+ " LEFT JOIN location loc on loc.locid = gprop.value ";
-	private static final String GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN = " LEFT JOIN atributs %1$s ON g.gid = %1$s.gid AND %1$s.atype = %2$s ";
+	private static final String GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN = " LEFT JOIN atributs %1$s ON s.dbxref_id = %1$s.gid AND %1$s.atype = %2$s ";
 
 	static {
 		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
@@ -318,8 +318,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 				return VariableType.GERMPLASM_ATTRIBUTE.name().equals(variableType)
 					|| VariableType.GERMPLASM_PASSPORT.name().equals(variableType);
 			}).forEach(mapEntry -> {
-				joins.add(GERMPLASM_JOIN);
-
 				final String alias = this.formatVariableAlias(mapEntry.getKey());
 				final String join = String.format(GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN, alias, mapEntry.getKey());
 				joins.add(join);
