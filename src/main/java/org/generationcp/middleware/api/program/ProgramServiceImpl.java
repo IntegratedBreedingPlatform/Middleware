@@ -239,7 +239,7 @@ public class ProgramServiceImpl implements ProgramService {
 		} catch (final Exception e) {
 
 			throw new MiddlewareQueryException(
-				"Error encountered while adding addProjectActivity: WorkbenchDataManager.addOrUpdateProjectActivityData(projectActivityList="
+				"Error encountered while adding addProjectActivity: ProgramService.addOrUpdateProjectActivityData(projectActivityList="
 					+ projectActivityList + ", operation=" + operation + "): " + e.getMessage(), e);
 		}
 
