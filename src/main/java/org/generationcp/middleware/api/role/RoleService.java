@@ -8,14 +8,14 @@
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *******************************************************************************/
 
-package org.generationcp.middleware.manager.api;
+package org.generationcp.middleware.api.role;
 
 import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 
 import java.util.List;
 
-public interface WorkbenchDataManager {
+public interface RoleService {
 
 	/**
 	 * Close the sessionProvider

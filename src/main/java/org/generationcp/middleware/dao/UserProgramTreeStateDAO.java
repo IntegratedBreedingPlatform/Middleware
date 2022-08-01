@@ -28,7 +28,7 @@ public class UserProgramTreeStateDAO extends GenericDAO<UserProgramTreeState,Int
 				return userProgramTreeStates.get(0);
 			}
 		} catch (final HibernateException e) {
-			this.logAndThrowException("error in: WorkbenchDataManager.getUserProgramTreeStateByUserIdProgramUuidAndType(programId="
+			this.logAndThrowException("error in: UserProgramTreeStateDAO.getUserProgramTreeState(programId="
 				+ programUuid + "): " + e.getMessage(), e);
 		}
 

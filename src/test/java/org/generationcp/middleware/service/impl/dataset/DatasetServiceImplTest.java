@@ -28,7 +28,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -141,7 +141,7 @@ public class DatasetServiceImplTest {
 	private FileMetadataDAO fileMetadataDAO;
 
 	@Mock
-	private WorkbenchDataManager workbenchDataManager;
+	private RoleService roleService;
 
 	@Mock
 	private DerivedVariableService derivedVariableService;
@@ -175,7 +175,7 @@ public class DatasetServiceImplTest {
 
 		this.datasetService.setDaoFactory(this.daoFactory);
 		this.datasetService.setStudyService(this.studyService);
-		this.datasetService.setWorkbenchDataManager(this.workbenchDataManager);
+		this.datasetService.setRoleService(this.roleService);
 		when(this.daoFactory.getPhenotypeDAO()).thenReturn(this.phenotypeDao);
 		when(this.daoFactory.getDmsProjectDAO()).thenReturn(this.dmsProjectDao);
 		when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
