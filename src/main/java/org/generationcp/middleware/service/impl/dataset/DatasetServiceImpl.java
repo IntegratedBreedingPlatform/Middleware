@@ -206,20 +206,19 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private List<MeasurementVariable> getObservationsColumns(final DatasetDTO datasetDTO, final Integer studyId, final Boolean draftMode) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
-		final Supplier<Integer> observationSetIdSupplier;
+		final Integer observationSetId;
 		final boolean addStockIdColumn;
-		final Integer observationSetId = datasetDTO.getDatasetId();
 		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			//PLOTDATA
-			observationSetIdSupplier = () -> observationSetId;
+			observationSetId = datasetDTO.getDatasetId();
 			//STOCK ID
 			addStockIdColumn = this.shouldAddStockIdColumn(studyId);
 		} else {
 			//SUBOBS
-			final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(observationSetId).getParent();
+			final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(datasetDTO.getDatasetId()).getParent();
 			// TODO get immediate parent columns
 			// (ie. Plot subdivided into plant and then into fruits, then immediate parent column would be PLANT_NO)
-			observationSetIdSupplier = () -> plotDataset.getProjectId();
+			observationSetId = plotDataset.getProjectId();
 			addStockIdColumn = false;
 		}
 
@@ -234,7 +233,7 @@ public class DatasetServiceImpl implements DatasetService {
 		variableTypeIds.addAll(PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
 		variableTypeIds.add(VariableType.GERMPLASM_ATTRIBUTE.getId());
 		variableTypeIds.add(VariableType.GERMPLASM_PASSPORT.getId());
-		this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetIdSupplier.get(), variableTypeIds)
+		this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId, variableTypeIds)
 			.forEach(variable -> {
 				if (VariableType.GERMPLASM_DESCRIPTOR == variable.getVariableType()) {
 					descriptors.add(variable);
@@ -726,8 +725,16 @@ public class DatasetServiceImpl implements DatasetService {
 			searchDTO.setDatasetVariables(this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
 				VariableType.TRAIT.getId(), VariableType.SELECTION_METHOD.getId()));
 
+			final Integer observationSetId;
+			if (DatasetTypeEnum.PLOT_DATA.getId() == project.getDatasetType().getDatasetTypeId()) {
+				observationSetId = datasetId;
+			} else {
+				final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(datasetId).getParent();
+				observationSetId = plotDataset.getProjectId();
+			}
+
 			final List<MeasurementVariableDto> passportAndAttributes =
-				this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(datasetId,
+				this.daoFactory.getProjectPropertyDAO().getVariablesForDataset(observationSetId,
 					VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId());
 			searchDTO.setPassportAndAttributes(passportAndAttributes);
 		}
