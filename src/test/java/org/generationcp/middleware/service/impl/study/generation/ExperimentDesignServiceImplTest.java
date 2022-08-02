@@ -21,7 +21,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -65,9 +64,6 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	private OntologyDataManager ontologyManager;
 
 	@Autowired
-	private LocationDataManager locationManager;
-
-	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	private DaoFactory daoFactory;
@@ -106,7 +102,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 
 		this.studyTDI =
 			new StudyTestDataInitializer(this.studyDataManager, this.ontologyManager, this.commonTestProject,
-				this.locationManager, this.sessionProvder);
+				this.sessionProvder);
 
 		// Create a study with environments
 		if (this.studyReference == null) {

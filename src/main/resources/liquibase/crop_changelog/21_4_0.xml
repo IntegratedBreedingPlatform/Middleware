@@ -4,7 +4,24 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="cuenyad" id="v21.4.0-1">
+		<changeSet author="lkovacic" id="v21.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="0">
+                	select COUNT(1) FROM (SELECT COUNT(1) FROM methods GROUP BY mcode HAVING COUNT(1) > 1) as CNT;
+            	</sqlCheck>
+				<not>
+					<indexExists tableName="methods" indexName="methods_mcode_uindex"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment>Create unique index to 'methods.mcode'</comment>
+		<createIndex indexName="methods_mcode_uindex" tableName="methods" unique="true">
+			<column name="mcode" type="varchar" />
+		</createIndex>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.4.0-2">
 			<preConditions onFail="MARK_RAN">
 				<and>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'Female Parent' and cv_id = 1010 and is_obsolete = 0;</sqlCheck>
@@ -21,7 +38,7 @@
 			</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v21.4.0-2">
+	<changeSet author="cuenyad" id="v21.4.0-3">
 			<preConditions onFail="MARK_RAN">
 				<and>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'Male Parent' and cv_id = 1010 and is_obsolete = 0;</sqlCheck>
@@ -38,7 +55,7 @@
 			</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v21.4.0-3">
+	<changeSet author="cuenyad" id="v21.4.0-4">
 			<preConditions onFail="MARK_RAN">
 				<and>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'FEMALE_PARENT_NAME' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
@@ -63,7 +80,7 @@
 			</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v21.4.0-4">
+	<changeSet author="cuenyad" id="v21.4.0-5">
 			<preConditions onFail="MARK_RAN">
 				<and>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'FEMALE_PARENT_GID' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
@@ -88,7 +105,7 @@
 			</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v21.4.0-5">
+	<changeSet author="cuenyad" id="v21.4.0-6">
 			<preConditions onFail="MARK_RAN">
 				<and>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'MALE_PARENT_NAME' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
@@ -113,7 +130,7 @@
 			</sql>
 	</changeSet>
 
-	<changeSet author="cuenyad" id="v21.4.0-6">
+	<changeSet author="cuenyad" id="v21.4.0-7">
 			<preConditions onFail="MARK_RAN">
 				<and>
 					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'MALE_PARENT_GID' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>

@@ -107,10 +107,6 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
-    <bean id="locationDataManager" class="org.generationcp.middleware.manager.LocationDataManagerImpl">
-        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
-    </bean>
-
     <bean id="crossStudyDataManager" class="org.generationcp.middleware.manager.CrossStudyDataManagerImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>

@@ -13,7 +13,6 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.exceptions.UnpermittedDeletionException;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -50,9 +49,6 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 
 	@Autowired
 	private OntologyDataManager ontologyManager;
-
-	@Autowired
-	private LocationDataManager locationManager;
 
 	@Autowired
 	private FieldbookService fieldbookService;
@@ -506,7 +502,7 @@ public class StudySearchDaoTest extends IntegrationTestBase {
 		studyDataManager.setSessionProvider(this.sessionProvder);
 
 		final StudyTestDataInitializer studyTestDataInitializer =
-			new StudyTestDataInitializer(studyDataManager, this.ontologyManager, project, this.locationManager, this.sessionProvder);
+			new StudyTestDataInitializer(studyDataManager, this.ontologyManager, project, this.sessionProvder);
 
 		// First 3 studies have location and season variables at study level
 		// We need to add datasets to studies
