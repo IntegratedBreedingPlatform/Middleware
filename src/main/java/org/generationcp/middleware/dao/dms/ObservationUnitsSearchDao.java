@@ -756,8 +756,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			// FIXME won't work for sub-sub-obs
 			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
 
-		this.addSelectQueryJoins(sql, searchDto.getGenericGermplasmDescriptors(), searchDto.getFilter());
-		this.addGermplasmAttributeAndPassportJoins(sql, searchDto.getPassportAndAttributes());
+		this.addSelectQueryJoins(sql, searchDto.getGenericGermplasmDescriptors(), searchDto.getPassportAndAttributes(),
+			searchDto.getFilter());
 
 		sql.append(" WHERE p.project_id = :datasetId ");
 
@@ -771,7 +771,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private void addSelectQueryJoins(final StringBuilder sql, final List<String> genericGermplasmDescriptors,
-		final ObservationUnitsSearchDTO.Filter filter) {
+		final List<MeasurementVariableDto> passportAndAttributes, final ObservationUnitsSearchDTO.Filter filter) {
 		final Set<String> joins = new LinkedHashSet<>();
 
 		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUPGID) ||
@@ -793,17 +793,15 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			joins.add(LOCATION_JOIN);
 		}
 
-		joins.forEach(sql::append);
-	}
-
-	private void addGermplasmAttributeAndPassportJoins(final StringBuilder sql, final List<MeasurementVariableDto> passportAndAttributes) {
 		if (!CollectionUtils.isEmpty(passportAndAttributes)) {
 			passportAndAttributes.forEach(measurementVariableDto -> {
 				final String alias = this.formatVariableAlias(measurementVariableDto.getId());
 				final String join = String.format(GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN, alias, measurementVariableDto.getId());
-				sql.append(join);
+				joins.add(join);
 			});
 		}
+
+		joins.forEach(sql::append);
 	}
 
 	private void addFilters(final StringBuilder sql, final ObservationUnitsSearchDTO.Filter filter, final Boolean draftMode) {
