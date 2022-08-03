@@ -20,7 +20,6 @@
         <mapping class="org.generationcp.middleware.pojos.PhenotypeExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.AttributeExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.Location"/>
-        <mapping class="org.generationcp.middleware.pojos.LocationDetails"/>
         <mapping class="org.generationcp.middleware.pojos.Locdes"/>
         <mapping class="org.generationcp.middleware.pojos.Method"/>
         <mapping class="org.generationcp.middleware.pojos.Name"/>

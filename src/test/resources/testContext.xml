@@ -42,8 +42,8 @@
 		<property name="userTransaction" ref="atomikosUserTransaction" />
 	</bean>
 
-	<bean id="workbenchDataManager"
-		class="org.generationcp.middleware.manager.WorkbenchDataManagerImpl"
+	<bean id="roleService"
+		class="org.generationcp.middleware.api.role.RoleServiceImpl"
 		destroy-method="close">
 		<constructor-arg ref="workbenchSessionProvider" />
 	</bean>
@@ -104,10 +104,6 @@
     </bean>
 
     <bean id="pedigreeDataManager" class="org.generationcp.middleware.manager.PedigreeDataManagerImpl">
-        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
-    </bean>
-
-    <bean id="locationDataManager" class="org.generationcp.middleware.manager.LocationDataManagerImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
@@ -423,6 +419,10 @@
 
 	<bean id="studyEntryObservationService" class="org.generationcp.middleware.api.study.StudyEntryObservationServiceImpl">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
+	<bean id="roleTypeService" class="org.generationcp.middleware.api.role.RoleTypeServiceImpl">
+		<constructor-arg ref="workbenchSessionProvider" />
 	</bean>
 
 </beans>

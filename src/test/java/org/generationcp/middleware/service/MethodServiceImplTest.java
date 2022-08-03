@@ -3,7 +3,7 @@ package org.generationcp.middleware.service;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.dao.MethodDAO;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.junit.Assert;
@@ -16,7 +16,7 @@ import java.util.List;
 public class MethodServiceImplTest extends IntegrationTestBase {
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private RoleService roleService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;

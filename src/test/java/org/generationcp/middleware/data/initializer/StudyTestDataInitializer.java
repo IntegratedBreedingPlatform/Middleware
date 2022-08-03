@@ -2,6 +2,8 @@
 package org.generationcp.middleware.data.initializer;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.dao.CountryDAO;
+import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
@@ -20,7 +22,6 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
 import org.generationcp.middleware.operation.saver.GeolocationSaver;
@@ -62,18 +63,21 @@ public class StudyTestDataInitializer {
 	private final StudyDataManagerImpl studyDataManager;
 	private final OntologyDataManager ontologyManager;
 	private final Project commonTestProject;
-	private final LocationDataManager locationDataManager;
 	private Integer geolocationId;
 	private final HibernateSessionProvider sessionProvider;
+	private CountryDAO countryDAO;
+	private LocationDAO locationDAO;
 
 	public StudyTestDataInitializer(
 		final StudyDataManagerImpl studyDataManagerImpl, final OntologyDataManager ontologyDataManager,
-		final Project testProject, final LocationDataManager locationDataManager, final HibernateSessionProvider provider) {
+		final Project testProject, final HibernateSessionProvider provider) {
 		this.studyDataManager = studyDataManagerImpl;
 		this.ontologyManager = ontologyDataManager;
 		this.commonTestProject = testProject;
-		this.locationDataManager = locationDataManager;
 		this.sessionProvider = provider;
+		this.countryDAO = new CountryDAO();
+		this.countryDAO.setSession(this.sessionProvider.getSession());
+		this.locationDAO = new LocationDAO(this.sessionProvider.getSession());
 	}
 
 	public StudyReference addTestStudy() throws Exception {
@@ -326,8 +330,8 @@ public class StudyTestDataInitializer {
 	}
 
 	public Integer addTestLocation(final String locationName) {
-		final Country country = this.locationDataManager.getCountryById(1);
-		final Location province = this.locationDataManager.getLocationByID(1001);
+		final Country country = this.countryDAO.getById(1);
+		final Location province = this.locationDAO.getById(1001);
 
 		final Location location = new Location();
 		location.setCountry(country);
@@ -341,7 +345,7 @@ public class StudyTestDataInitializer {
 		location.setSnl3id(1);
 
 		// add the location
-		return this.locationDataManager.addLocation(location);
+		return this.locationDAO.save(location).getLocid();
 	}
 
 	public List<Integer> addStudyGermplasm(final Integer studyId, final Integer startingEntryNumber, final List<Integer> gids) throws Exception {

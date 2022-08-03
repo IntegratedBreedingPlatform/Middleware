@@ -8,20 +8,14 @@
  * of the Generation Challenge Programme Amended Consortium Agreement (http://bit.ly/KQX1nL)
  *******************************************************************************/
 
-package org.generationcp.middleware.manager.api;
+package org.generationcp.middleware.api.role;
 
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Role;
-import org.generationcp.middleware.pojos.workbench.RoleType;
-import org.generationcp.middleware.pojos.workbench.Tool;
 import org.generationcp.middleware.service.api.user.RoleSearchDto;
 
 import java.util.List;
 
-/**
- * This is the API used by the Workbench to retrieve Workbench project information.
- */
-public interface WorkbenchDataManager {
+public interface RoleService {
 
 	/**
 	 * Close the sessionProvider
@@ -34,23 +28,6 @@ public interface WorkbenchDataManager {
 	 * @return
 	 */
 	List<Role> getRoles(RoleSearchDto roleSearchDto);
-
-	/**
-	 * Returns list of roleTypes
-	 *
-	 * @return
-	 */
-	List<RoleType> getRoleTypes();
-
-	// TODO Move role methods to RoleServiceImp
-
-	/**
-	 * Get role type
-	 *
-	 * @param id
-	 * @return ROle Type
-	 */
-	RoleType getRoleType(Integer id);
 
 	/**
 	 * Save role
