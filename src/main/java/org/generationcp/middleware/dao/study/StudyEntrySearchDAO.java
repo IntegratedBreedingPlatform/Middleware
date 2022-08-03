@@ -99,12 +99,14 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		" LEFT JOIN names immediateSource ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
 	private static final String GROUP_SOURCE_NAME_JOIN =
 		"LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0";
+	private static final String GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN = "LEFT JOIN atributs %1$s ON s.dbxref_id = %1$s.gid AND %1$s.atype = %2$s";
 
 	public StudyEntrySearchDAO(final Session session) {
 		super(session);
 	}
 
-	public List<StudyEntryDto> getStudyEntries(final StudyEntrySearchDto studyEntrySearchDto, final Pageable pageable) {
+	public List<StudyEntryDto> getStudyEntries(final StudyEntrySearchDto studyEntrySearchDto, final List<MeasurementVariable> entryVariables,
+		final Pageable pageable) {
 
 		final Map<String, Object> queryParams = new HashMap<>();
 		queryParams.put("studyId", studyEntrySearchDto.getStudyId());
@@ -114,21 +116,14 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		final Set<String> joins = this.getFixedJoins();
 
 		this.addFixedScalars(scalars, selects);
-		this.addGroupGidScalar(scalars, selects, studyEntrySearchDto.getVariableEntryDescriptors());
-		this.addGuidScalar(scalars, selects, studyEntrySearchDto.getVariableEntryDescriptors());
-		this.addSourceScalar(scalars, selects, studyEntrySearchDto.getFixedEntryDescriptors());
-		this.addGroupSourceNameScalar(scalars, selects, studyEntrySearchDto.getVariableEntryDescriptors());
+		this.addGroupGidScalar(scalars, selects, entryVariables);
+		this.addGuidScalar(scalars, selects, entryVariables);
+		this.addImmediateSourceScalar(scalars, selects, entryVariables);
+		this.addGroupSourceNameScalar(scalars, selects, entryVariables);
+		this.addGermplasmAttributeScalars(scalars, selects, entryVariables);
+		this.addEntryDetailScalars(scalars, selects, entryVariables);
 
-		this.addJoins(joins, studyEntrySearchDto);
-
-		if (!CollectionUtils.isEmpty(studyEntrySearchDto.getVariableEntryDescriptors())) {
-			studyEntrySearchDto.getVariableEntryDescriptors().stream()
-				.filter(measurementVariable -> measurementVariable.getTermId() != TermId.GROUPGID.getId()
-					&& measurementVariable.getTermId() != TermId.GUID.getId())
-				.forEach(measurementVariable -> this
-					.addVariableEntryDescriptorsScalars(scalars, selects, measurementVariable.getName(),
-						measurementVariable.getDataType()));
-		}
+		this.addJoins(joins, entryVariables);
 
 		final String whereClause = this.addFilters(studyEntrySearchDto.getFilter(), queryParams);
 		final String joinClause = this.getJoinClause(joins);
@@ -149,15 +144,16 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		GenericDAO.addPaginationToSQLQuery(query, pageable);
 
 		final List<Map<String, Object>> results = query.list();
-		return this.mapResults(results, studyEntrySearchDto);
+		return this.mapResults(results, entryVariables);
 	}
 
-	public long countFilteredStudyEntries(final int studyId, final StudyEntrySearchDto studyEntrySearchDto) {
+	public long countFilteredStudyEntries(final StudyEntrySearchDto studyEntrySearchDto, final List<MeasurementVariable> entryVariables) {
 		final Map<String, Object> queryParams = new HashMap<>();
-		queryParams.put("studyId", studyId);
+		queryParams.put("studyId", studyEntrySearchDto.getStudyId());
 
 		final Set<String> joins = this.getFixedJoins();
-		this.addJoins(joins, studyEntrySearchDto);
+		this.addJoins(joins, entryVariables);
+
 		final String joinClause = this.getJoinClause(joins);
 		final String whereClause = this.addFilters(studyEntrySearchDto.getFilter(), queryParams);
 		final String havingClause = this.getHavingClause(studyEntrySearchDto.getFilter());
@@ -179,22 +175,29 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
-	private void addJoins(final Set<String> joins, final StudyEntrySearchDto studyEntrySearchDto) {
-		studyEntrySearchDto.getVariableEntryDescriptors().forEach(entryDescriptor -> {
-			final int termId = entryDescriptor.getTermId();
+	private void addJoins(final Set<String> joins, final List<MeasurementVariable> entryVariables) {
+		entryVariables.forEach(variable -> {
+			final int termId = variable.getTermId();
 			if (TermId.GROUPGID.getId() == termId || TermId.GUID.getId() == termId) {
 				joins.add(GERMPLASM_JOIN);
+				return;
 			}
 			if (TermId.GROUP_SOURCE_NAME.getId() == termId) {
 				joins.add(GERMPLASM_JOIN);
 				joins.add(GROUP_SOURCE_NAME_JOIN);
+				return;
 			}
-		});
-		studyEntrySearchDto.getFixedEntryDescriptors().forEach(fixedEntryDescriptor -> {
-			final int termId = fixedEntryDescriptor.getTermId();
 			if (TermId.IMMEDIATE_SOURCE_NAME.getId() == termId) {
 				joins.add(GERMPLASM_JOIN);
 				joins.add(IMMEDIATE_SOURCE_NAME_JOIN);
+				return;
+			}
+			if (variable.getVariableType() == VariableType.GERMPLASM_ATTRIBUTE ||
+				variable.getVariableType() == VariableType.GERMPLASM_PASSPORT) {
+				final String alias = this.formatVariableAlias(termId);
+				final String join = String.format(GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN, alias, termId);
+				joins.add(join);
+				return;
 			}
 		});
 	}
@@ -212,23 +215,39 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		selectClause.add(this.addSelectExpression(scalars, "s.cross_value", CROSS_ALIAS, StringType.INSTANCE));
 	}
 
-	private void addVariableEntryDescriptorsScalars(final List<Scalar> scalars, final List<String> selectClause, final String entryName,
-		final String dataType) {
-		selectClause.add(
-			this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.value, NULL))", entryName), entryName,
-				StringType.INSTANCE));
-		selectClause.add(
-			this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.stockprop_id, NULL))", entryName),
-				entryName + "_propertyId", IntegerType.INSTANCE));
-		selectClause.add(
-			this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.type_id, NULL))", entryName),
-				entryName + "_variableId", IntegerType.INSTANCE));
+	private void addGermplasmAttributeScalars(final List<Scalar> scalars, final List<String> selectClause,
+		final List<MeasurementVariable> entryVariables) {
+		entryVariables.stream()
+			.filter(variable -> variable.getVariableType() == VariableType.GERMPLASM_ATTRIBUTE ||
+				variable.getVariableType() == VariableType.GERMPLASM_PASSPORT)
+			.forEach(variable -> {
+				final String alias = this.formatVariableAlias(variable.getTermId());
+				selectClause.add(this.addSelectExpression(scalars, String.format("%s.aval", alias), alias, StringType.INSTANCE));
+			});
+	}
 
-		final String valueColumnReference =
-			(DataType.CATEGORICAL_VARIABLE.getName().equals(dataType)) ? "cvalue_id" : "value";
-		selectClause.add(this.addSelectExpression(scalars,
-			String.format("MAX(IF(cvterm_variable.name = '%s', sp.%s, NULL))", entryName, valueColumnReference), entryName + "_value",
-			StringType.INSTANCE));
+	private void addEntryDetailScalars(final List<Scalar> scalars, final List<String> selectClause, final List<MeasurementVariable> entryVariables) {
+		entryVariables
+			.stream()
+			.filter(variable -> variable.getVariableType() == VariableType.ENTRY_DETAIL && variable.getTermId() != TermId.ENTRY_NO.getId())
+			.forEach(variable -> {
+				final String entryName = variable.getName();
+				selectClause.add(
+					this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.value, NULL))", entryName), entryName,
+						StringType.INSTANCE));
+				selectClause.add(
+					this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.stockprop_id, NULL))", entryName),
+						entryName + "_propertyId", IntegerType.INSTANCE));
+				selectClause.add(
+					this.addSelectExpression(scalars, String.format("MAX(IF(cvterm_variable.name = '%s', sp.type_id, NULL))", entryName),
+						entryName + "_variableId", IntegerType.INSTANCE));
+
+				final String valueColumnReference =
+					(DataType.CATEGORICAL_VARIABLE.getName().equals(variable.getDataType())) ? "cvalue_id" : "value";
+				selectClause.add(this.addSelectExpression(scalars,
+					String.format("MAX(IF(cvterm_variable.name = '%s', sp.%s, NULL))", entryName, valueColumnReference), entryName + "_value",
+					StringType.INSTANCE));
+			});
 	}
 
 	private void addGroupGidScalar(final List<Scalar> scalars, final List<String> selectClause,
@@ -255,7 +274,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		}
 	}
 
-	private void addSourceScalar(final List<Scalar> scalars, final List<String> selectClause,
+	private void addImmediateSourceScalar(final List<Scalar> scalars, final List<String> selectClause,
 		final List<MeasurementVariable> entryDescriptors) {
 		if (!CollectionUtils.isEmpty(entryDescriptors)) {
 			entryDescriptors.stream()
@@ -343,7 +362,10 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 					continue;
 				}
 
-				if (factorsFilterMap.get(variableId) == null) {
+				final String variableType = filter.getVariableTypeMap().get(variableId);
+				if (!VariableType.GERMPLASM_ATTRIBUTE.name().equals(variableType) &&
+					!VariableType.GERMPLASM_PASSPORT.name().equals(variableType) &&
+					factorsFilterMap.get(variableId) == null) {
 					queryParams.put(variableId + "_Id", variableId);
 				}
 				final String finalId = variableId.replace("-", "");
@@ -385,6 +407,12 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 				variableId.equalsIgnoreCase(String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId())) ||
 				variableId.equalsIgnoreCase(String.valueOf(TermId.GID_UNIT.getId())))
 				sql.append(") ");
+			return;
+		}
+
+		if (VariableType.GERMPLASM_PASSPORT.name().equals(variableType) || VariableType.GERMPLASM_ATTRIBUTE.name().equals(variableType)) {
+			final String alias = this.formatVariableAlias(variableId);
+			sql.append(String.format(" AND %s.aval LIKE :%s_text", alias, variableId));
 			return;
 		}
 
@@ -452,7 +480,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		return String.format(BASE_QUERY, selectExpression, joinClause, whereClause, groupClause, havingClause, orderClause);
 	}
 
-	private List<StudyEntryDto> mapResults(final List<Map<String, Object>> results, final StudyEntrySearchDto studyEntrySearchDto) {
+	private List<StudyEntryDto> mapResults(final List<Map<String, Object>> results, final List<MeasurementVariable> entryVariables) {
 		return results.stream().map(row -> {
 			final Integer entryId = (Integer) row.get(ENTRY_ID_ALIAS);
 			final Integer entryNumber = (Integer) row.get(ENTRY_NO_ALIAS);
@@ -468,45 +496,54 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			final StudyEntryDto studyEntryDto =
 				new StudyEntryDto(entryId, entryNumber, gid, designation, lotCount, availableBalance, unit, cross, groupGid, guid);
 			final Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
-			for (final MeasurementVariable entryDescriptor : studyEntrySearchDto.getVariableEntryDescriptors()) {
-				if (entryDescriptor.getTermId() == TermId.GROUPGID.getId() || entryDescriptor.getTermId() == TermId.GUID.getId()) {
-					continue;
-				}
+			entryVariables.stream()
+				.filter(variable -> VariableType.ENTRY_DETAIL == variable.getVariableType())
+				.forEach(variable -> {
+					final String value;
+					final Integer categoricalValueId;
+					if (variable.getDataType().equals(DataType.CATEGORICAL_VARIABLE.getName())) {
+						value = (String) row.get(variable.getName());
+						categoricalValueId = row.get(variable.getName() + "_value") != null ?
+							Integer.valueOf((String) row.get(variable.getName() + "_value")) : null;
+					} else {
+						value = (String) row.get(variable.getName() + "_value");
+						categoricalValueId = null;
+					}
 
-				final String value;
-				final Integer categoricalValueId;
-				if (entryDescriptor.getDataType().equals(DataType.CATEGORICAL_VARIABLE.getName())) {
-					value = (String) row.get(entryDescriptor.getName());
-					categoricalValueId = row.get(entryDescriptor.getName() + "_value") != null ?
-						Integer.valueOf((String) row.get(entryDescriptor.getName() + "_value")) : null;
-				} else {
-					value = (String) row.get(entryDescriptor.getName() + "_value");
-					categoricalValueId = null;
-				}
+					final StudyEntryPropertyData studyEntryPropertyData =
+						new StudyEntryPropertyData((Integer) row.get(variable.getName() + "_propertyId"),
+							(Integer) row.get(variable.getName() + "_variableId"),
+							value,
+							categoricalValueId);
+					properties.put(variable.getTermId(), studyEntryPropertyData);
+				});
 
-				final StudyEntryPropertyData studyEntryPropertyData =
-					new StudyEntryPropertyData((Integer) row.get(entryDescriptor.getName() + "_propertyId"),
-						(Integer) row.get(entryDescriptor.getName() + "_variableId"),
-						value,
-						categoricalValueId);
-				properties.put(entryDescriptor.getTermId(), studyEntryPropertyData);
-			}
+			entryVariables.stream()
+				.filter(variable -> VariableType.GERMPLASM_ATTRIBUTE == variable.getVariableType() ||
+					VariableType.GERMPLASM_PASSPORT == variable.getVariableType())
+				.forEach(variable -> {
+					final String variableAlias = this.formatVariableAlias(variable.getTermId());
+					final String value = (String) row.get(variableAlias);
+					properties.put(variable.getTermId(), new StudyEntryPropertyData(value));
+				});
+
 			//These elements should not be listed as germplasm descriptors, this is a way to match values between column
 			//and table cells. In the near future this block should be removed
-			this.addFixedVariableIfPresent(TermId.GID, String.valueOf(studyEntryDto.getGid()),
-				studyEntrySearchDto.getFixedEntryDescriptors(), properties);
-			this.addFixedVariableIfPresent(TermId.DESIG, studyEntryDto.getDesignation(), studyEntrySearchDto.getFixedEntryDescriptors(),
-				properties);
-			this.addFixedVariableIfPresent(TermId.ENTRY_NO, String.valueOf(studyEntryDto.getEntryNumber()),
-				studyEntrySearchDto.getFixedEntryDescriptors(), properties);
+			this.addFixedVariableIfPresent(TermId.GID, String.valueOf(studyEntryDto.getGid()), entryVariables, properties);
+			this.addFixedVariableIfPresent(TermId.DESIG, studyEntryDto.getDesignation(), entryVariables, properties);
+			this.addFixedVariableIfPresent(TermId.ENTRY_NO, String.valueOf(studyEntryDto.getEntryNumber()),	entryVariables, properties);
 			this.addFixedVariableIfPresent(TermId.IMMEDIATE_SOURCE_NAME, String.valueOf(row.get(TermId.IMMEDIATE_SOURCE_NAME.name())),
-				studyEntrySearchDto.getFixedEntryDescriptors(), properties);
+				entryVariables, properties);
 			this.addFixedVariableIfPresent(TermId.GROUP_SOURCE_NAME, String.valueOf(row.get(TermId.GROUP_SOURCE_NAME.name())),
-				studyEntrySearchDto.getVariableEntryDescriptors(), properties);
+				entryVariables, properties);
 
 			studyEntryDto.setProperties(properties);
 			return studyEntryDto;
 		}).collect(Collectors.toList());
+	}
+
+	private String formatVariableAlias(final Object variableId) {
+		return String.format("VARIABLE_%s", variableId);
 	}
 
 }

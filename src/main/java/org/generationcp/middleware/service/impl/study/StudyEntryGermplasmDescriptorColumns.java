@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
-public enum StudyEntryDescriptorColumns {
+public enum StudyEntryGermplasmDescriptorColumns {
 
 	GID(TermId.GID, TermId.GID.name(), 1),
 	GUID(TermId.GUID, TermId.GUID.name(), 2),
@@ -20,7 +20,7 @@ public enum StudyEntryDescriptorColumns {
 	private final String name;
 	private final int rank;
 
-	StudyEntryDescriptorColumns(final TermId termId, final String name, final int rank) {
+	StudyEntryGermplasmDescriptorColumns(final TermId termId, final String name, final int rank) {
 		this.termId = termId;
 		this.name = name;
 		this.rank = rank;
@@ -39,17 +39,17 @@ public enum StudyEntryDescriptorColumns {
 	}
 
 	public static int getRankByTermId(final int termId) {
-		final StudyEntryDescriptorColumns column = StudyEntryDescriptorColumns.getByTermId(termId);
+		final StudyEntryGermplasmDescriptorColumns column = StudyEntryGermplasmDescriptorColumns.getByTermId(termId);
 		return column == null ? Integer.MAX_VALUE : column.getRank();
 	}
 
-	public static Stream<StudyEntryDescriptorColumns> getColumnsSortedByRank() {
-		return Arrays.stream(StudyEntryDescriptorColumns.values())
-			.sorted(Comparator.comparingInt(StudyEntryDescriptorColumns::getRank));
+	public static Stream<StudyEntryGermplasmDescriptorColumns> getColumnsSortedByRank() {
+		return Arrays.stream(StudyEntryGermplasmDescriptorColumns.values())
+			.sorted(Comparator.comparingInt(StudyEntryGermplasmDescriptorColumns::getRank));
 	}
 
-	private static StudyEntryDescriptorColumns getByTermId(final int termId) {
-		return Arrays.stream(StudyEntryDescriptorColumns.values())
+	private static StudyEntryGermplasmDescriptorColumns getByTermId(final int termId) {
+		return Arrays.stream(StudyEntryGermplasmDescriptorColumns.values())
 			.filter(c -> c.getId() == termId)
 			.findFirst()
 			.orElse(null);
