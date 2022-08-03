@@ -1,4 +1,4 @@
-package org.generationcp.middleware.service.api.study;
+package org.generationcp.middleware.api.brapi.v2.observationlevel;
 
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;

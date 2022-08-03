@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.brapi.v2.observationunit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.map.LinkedMap;
 import org.apache.commons.collections.map.MultiKeyMap;
@@ -12,7 +13,9 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -38,13 +41,16 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
-import org.generationcp.middleware.service.api.study.ObservationLevel;
-import org.generationcp.middleware.service.api.study.ObservationLevelFilter;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelFilter;
+import org.generationcp.middleware.service.api.study.StudyInstanceService;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,9 +60,11 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -98,6 +106,12 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	@Resource
 	private CrossExpansionProperties crossExpansionProperties;
+
+	@Resource
+	private StudyInstanceService studyInstanceService;
+
+	@Resource
+	private DatasetService datasetService;
 
 	private final HibernateSessionProvider sessionProvider;
 	private final DaoFactory daoFactory;
@@ -299,15 +313,108 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	}
 
 	@Override
-	public long countObservationLevels(final ObservationLevelFilter observationLevelFilter) {
-		return 0;
+	public List<ObservationLevel> getObservationLevels(ObservationLevelFilter observationLevelFilter) {
+		final List<ObservationLevel> observationLevels = new ArrayList<>();
+		if (StringUtils.isEmpty(observationLevelFilter.getTrialDbId()) && StringUtils.isEmpty(observationLevelFilter.getStudyDbId())) {
+			final Iterator<ObservationLevelEnum> iterator = Arrays.stream(ObservationLevelEnum.values()).iterator();
+			while (iterator.hasNext()) {
+				final ObservationLevelEnum next = iterator.next();
+				observationLevels.add(new ObservationLevel(next));
+			}
+		} else if (StringUtils.isNotEmpty(observationLevelFilter.getStudyDbId())) {
+			// Get Observation Levels present in the Instance(Study in BrAPI context)
+			this.getObservationLevelsForStudy(observationLevelFilter, observationLevels);
+		} else if (StringUtils.isNotEmpty(observationLevelFilter.getTrialDbId())) {
+			// Get Observation Levels present in the Study(Trial in BrAPI context)
+			this.getObservationLevelsForTrial(observationLevelFilter, observationLevels);
+		}
+		return observationLevels;
 	}
 
-	@Override
-	public List<ObservationLevel> getObservationLevels(ObservationLevelFilter observationLevelFilter, Pageable pageable) {
-		return new ArrayList<>();
+	private void getObservationLevelsForStudy(final ObservationLevelFilter observationLevelFilter, final List<ObservationLevel> observationLevels) {
+		final Integer instanceId = Integer.valueOf(observationLevelFilter.getStudyDbId());
+		final Integer studyId = Integer.valueOf(observationLevelFilter.getTrialDbId());
+		observationLevels.add(new ObservationLevel(ObservationLevelEnum.STUDY));
+		final StudyInstance studyInstance = this.studyInstanceService.getStudyInstance(studyId, instanceId).get();
+		if(studyInstance.isHasExperimentalDesign()) {
+			if(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, (DatasetTypeEnum.SUMMARY_STATISTICS_DATA)) != null) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUMMARY_STATISTICS));
+			}
+			if(studyInstance.isHasFieldmap()) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.FIELD));
+			}
+			if(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, (DatasetTypeEnum.MEANS_DATA)) != null) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.MEANS));
+			}
+
+			final DatasetDTO plotDataset =
+				this.datasetService.getDatasets(studyId, Sets.newHashSet(DatasetTypeEnum.PLOT_DATA.getId())).get(0);
+			this.addPlotRelatedObservationLevels(observationLevels, plotDataset);
+
+			if(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, (DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS)) != null) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUB_PLOT));
+			}
+			if(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, (DatasetTypeEnum.PLANT_SUBOBSERVATIONS)) != null) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.PLANT));
+			}
+			if(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, (DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS)) != null) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.TIME_SERIES));
+			}
+			if(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, (DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS)) != null) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.CUSTOM));
+			}
+		} else {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.PLOT));
+		}
+
 	}
 
+	private void addPlotRelatedObservationLevels(final List<ObservationLevel> observationLevels, final DatasetDTO plotDataset) {
+		final List<ProjectProperty> projectProperties = this.daoFactory.getProjectPropertyDAO()
+			.getByProjectId(plotDataset.getDatasetId());
+		final Map<Integer, ProjectProperty> projectPropertyMap = projectProperties.stream()
+			.collect(Collectors.toMap(ProjectProperty::getVariableId, Function.identity()));
+		if (projectPropertyMap.containsKey(TermId.BLOCK_NO.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.BLOCK));
+		}
+		if (projectPropertyMap.containsKey(TermId.REP_NO.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.REP));
+		}
+		observationLevels.add(new ObservationLevel(ObservationLevelEnum.PLOT));
+	}
+
+	private void getObservationLevelsForTrial(final ObservationLevelFilter observationLevelFilter, final List<ObservationLevel> observationLevels) {
+		observationLevels.add(new ObservationLevel(ObservationLevelEnum.STUDY));
+		final List<DatasetDTO> datasets = this.daoFactory.getDmsProjectDAO()
+			.getDatasets(Integer.valueOf(observationLevelFilter.getTrialDbId()));
+		final Map<Integer, DatasetDTO> datasetDTOMap = datasets.stream()
+			.collect(Collectors.toMap(DatasetDTO::getDatasetTypeId, Function.identity()));
+		if(datasetDTOMap.containsKey(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUMMARY_STATISTICS));
+		}
+		if(datasetDTOMap.containsKey(DatasetTypeEnum.PLOT_DATA.getId()) &&
+			this.daoFactory.getExperimentDao().hasFieldmap(datasetDTOMap.get(DatasetTypeEnum.PLOT_DATA.getId()).getDatasetId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.FIELD));
+		}
+		if(datasetDTOMap.containsKey(DatasetTypeEnum.MEANS_DATA.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.MEANS));
+		}
+		if(datasetDTOMap.containsKey(DatasetTypeEnum.PLOT_DATA.getId())) {
+			this.addPlotRelatedObservationLevels(observationLevels, datasetDTOMap.get(DatasetTypeEnum.PLOT_DATA.getId()));
+		}
+		if(datasetDTOMap.containsKey(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUB_PLOT));
+		}
+		if(datasetDTOMap.containsKey(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.PLANT));
+		}
+		if(datasetDTOMap.containsKey(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.TIME_SERIES));
+		}
+		if(datasetDTOMap.containsKey(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.CUSTOM));
+		}
+	}
 
 	private boolean isObservationUnitForMeans(final ObservationUnitImportRequestDto observationUnitDto) {
 		return observationUnitDto.getObservationUnitPosition() != null

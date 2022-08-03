@@ -1,4 +1,4 @@
-package org.generationcp.middleware.service.api.study;
+package org.generationcp.middleware.api.brapi.v2.observationlevel;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import org.pojomatic.annotations.AutoProperty;
@@ -10,6 +10,11 @@ public class ObservationLevel {
 	private String levelName;
 
 	private Integer levelOrder;
+
+	public ObservationLevel(final ObservationLevelEnum observationLevelEnum) {
+		this.levelOrder = observationLevelEnum.getLevelOrder();
+		this.levelName = observationLevelEnum.getLevelName();
+	}
 
 	public ObservationLevel(final Integer levelOrder, final String levelName) {
 		this.levelOrder = levelOrder;
