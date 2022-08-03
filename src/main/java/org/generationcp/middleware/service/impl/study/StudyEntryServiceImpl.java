@@ -86,7 +86,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	private final DaoFactory daoFactory;
 
 	public StudyEntryServiceImpl(final HibernateSessionProvider sessionProvider) {
-		this.daoFactory = new DaoFactory(sessionProvgeider);
+		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 
 	@Override
