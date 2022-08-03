@@ -182,7 +182,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				allEnvironments.stream()
 					.filter(instance -> !instanceNumbersToDelete.contains(Integer.valueOf(instance.getDescription()))
 						&& Integer.valueOf(instance.getDescription()) > startingInstanceNumber).collect(
-					Collectors.toList());
+						Collectors.toList());
 			// Unfortunately, not possible in MySQL 5 to do batch update as row_number function is only available in MySQL 8
 			// Also tried using MySQL variable assignment like @instance_number:=@instance_number + 1 but it causes Hibernate error
 			// as it's being treated as named parameter. Hopefully can be optimized when we upgrade Hibernate and/or MySQL version
@@ -353,6 +353,11 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 	public Optional<Integer> getDatasetIdForInstanceIdAndDatasetType(final Integer instanceId, final DatasetTypeEnum datasetTypeEnum) {
 		return
 			Optional.ofNullable(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, datasetTypeEnum));
+	}
+
+	@Override
+	public void deleteInstanceGeoreferences(final Integer instanceId) {
+		this.daoFactory.getExperimentDao().deleteGeoreferencesByExperimentTypeAndInstanceId(ExperimentType.PLOT.getTermId(), instanceId);
 	}
 
 	private Geolocation createNextGeolocation(final List<Integer> instanceNumbers, final boolean hasExperimentalDesign) {
