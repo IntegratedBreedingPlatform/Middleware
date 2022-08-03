@@ -206,19 +206,20 @@ public class DatasetServiceImpl implements DatasetService {
 
 	private List<MeasurementVariable> getObservationsColumns(final DatasetDTO datasetDTO, final Integer studyId, final Boolean draftMode) {
 		// TODO get plot dataset even if subobs is not a direct descendant (ie. sub-sub-obs)
-		final Integer observationSetId;
+		final Supplier<Integer> observationSetIdSupplier;
 		final boolean addStockIdColumn;
+		final Integer observationSetId = datasetDTO.getDatasetId();
 		if (datasetDTO.getDatasetTypeId().equals(DatasetTypeEnum.PLOT_DATA.getId())) {
 			//PLOTDATA
-			observationSetId = datasetDTO.getDatasetId();
+			observationSetIdSupplier = () -> observationSetId;
 			//STOCK ID
 			addStockIdColumn = this.shouldAddStockIdColumn(studyId);
 		} else {
 			//SUBOBS
-			final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(datasetDTO.getDatasetId()).getParent();
+			final DmsProject plotDataset = this.daoFactory.getDmsProjectDAO().getById(observationSetId).getParent();
 			// TODO get immediate parent columns
 			// (ie. Plot subdivided into plant and then into fruits, then immediate parent column would be PLANT_NO)
-			observationSetId = plotDataset.getProjectId();
+			observationSetIdSupplier = () -> plotDataset.getProjectId();
 			addStockIdColumn = false;
 		}
 
@@ -233,7 +234,7 @@ public class DatasetServiceImpl implements DatasetService {
 		variableTypeIds.addAll(PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
 		variableTypeIds.add(VariableType.GERMPLASM_ATTRIBUTE.getId());
 		variableTypeIds.add(VariableType.GERMPLASM_PASSPORT.getId());
-		this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetId, variableTypeIds)
+		this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetIdSupplier.get(), variableTypeIds)
 			.forEach(variable -> {
 				if (VariableType.GERMPLASM_DESCRIPTOR == variable.getVariableType()) {
 					descriptors.add(variable);
