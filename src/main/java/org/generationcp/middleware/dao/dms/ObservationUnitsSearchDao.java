@@ -72,6 +72,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		" LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0";
 	private static final String LOCATION_JOIN = " LEFT JOIN nd_geolocationprop gprop on gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = " + TermId.LOCATION_ID.getId()
 		+ " LEFT JOIN location loc on loc.locid = gprop.value ";
+	private static final String GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN = " LEFT JOIN atributs %1$s ON s.dbxref_id = %1$s.gid AND %1$s.atype = %2$s ";
 
 	static {
 		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
@@ -317,6 +318,19 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			joins.add(LOCATION_JOIN);
 		}
 
+		filter.getFilteredTextValues()
+			.entrySet()
+			.stream()
+			.filter(mapEntry -> {
+				final String variableType = filter.getVariableTypeMap().get(mapEntry.getKey());
+				return VariableType.GERMPLASM_ATTRIBUTE.name().equals(variableType)
+					|| VariableType.GERMPLASM_PASSPORT.name().equals(variableType);
+			}).forEach(mapEntry -> {
+				final String alias = this.formatVariableAlias(mapEntry.getKey());
+				final String join = String.format(GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN, alias, mapEntry.getKey());
+				joins.add(join);
+			});
+
 		joins.forEach(sql::append);
 	}
 
@@ -511,6 +525,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			this.addScalarForTraits(searchDto.getDatasetVariables(), query, true);
 			this.addScalarForEntryDetails(searchDto.getEntryDetails(), query);
 
+			if (!CollectionUtils.isEmpty(searchDto.getPassportAndAttributes())) {
+				searchDto.getPassportAndAttributes().forEach(variableDto -> query.addScalar(this.formatVariableAlias(variableDto.getId())));
+			}
+
 			for (final String gpDescriptor : searchDto.getGenericGermplasmDescriptors()) {
 				query.addScalar(gpDescriptor, new StringType());
 			}
@@ -701,6 +719,13 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			columns.add(" g.germplsm_uuid AS " + TermId.GUID.name());
 		}
 
+		if (!CollectionUtils.isEmpty(searchDto.getPassportAndAttributes())) {
+			for (MeasurementVariableDto measurementVariable : searchDto.getPassportAndAttributes()) {
+				final String alias = this.formatVariableAlias(measurementVariable.getId());
+				columns.add(String.format("%1$s.aval AS %1$s", alias));
+			}
+		}
+
 		final StringBuilder sql = new StringBuilder("SELECT * FROM (SELECT  ");
 
 		sql.append(Joiner.on(", ").join(columns));
@@ -743,7 +768,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			// FIXME won't work for sub-sub-obs
 			+ " INNER JOIN nd_experiment plot ON plot.nd_experiment_id = nde.parent_id OR ( plot.nd_experiment_id = nde.nd_experiment_id and nde.parent_id is null ) ");
 
-		this.addSelectQueryJoins(sql, searchDto.getGenericGermplasmDescriptors(), searchDto.getFilter());
+		this.addSelectQueryJoins(sql, searchDto.getGenericGermplasmDescriptors(), searchDto.getPassportAndAttributes(),
+			searchDto.getFilter());
 
 		sql.append(" WHERE p.project_id = :datasetId ");
 
@@ -757,7 +783,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	}
 
 	private void addSelectQueryJoins(final StringBuilder sql, final List<String> genericGermplasmDescriptors,
-		final ObservationUnitsSearchDTO.Filter filter) {
+		final List<MeasurementVariableDto> passportAndAttributes, final ObservationUnitsSearchDTO.Filter filter) {
 		final Set<String> joins = new LinkedHashSet<>();
 
 		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUPGID) ||
@@ -777,6 +803,14 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (this.checkFilterContainsFactor(filter, TermId.LOCATION_ID.getId())) {
 			joins.add(LOCATION_JOIN);
+		}
+
+		if (!CollectionUtils.isEmpty(passportAndAttributes)) {
+			passportAndAttributes.forEach(measurementVariableDto -> {
+				final String alias = this.formatVariableAlias(measurementVariableDto.getId());
+				final String join = String.format(GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN, alias, measurementVariableDto.getId());
+				joins.add(join);
+			});
 		}
 
 		joins.forEach(sql::append);
@@ -987,6 +1021,12 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			return;
 		}
 
+		if (VariableType.GERMPLASM_PASSPORT.name().equals(variableType) || VariableType.GERMPLASM_ATTRIBUTE.name().equals(variableType)) {
+			final String alias = this.formatVariableAlias(variableId);
+			sql.append(String.format(" AND %s.aval LIKE :%s_text", alias, variableId));
+			return;
+		}
+
 		// Otherwise, look in "props" tables
 		// If doing text searching, perform LIKE operation. Otherwise perform value "IN" operation
 		if (EXP_PROPS_VAR_TYPES.contains(variableType)) {
@@ -1050,7 +1090,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 					continue;
 				}
 				final String variableType = filter.getVariableTypeMap().get(observableId);
-				if (!VariableType.OBSERVATION_UNIT.name().equals(variableType) && factorsFilterMap.get(observableId) == null) {
+				if (!VariableType.OBSERVATION_UNIT.name().equals(variableType) &&
+					!VariableType.GERMPLASM_ATTRIBUTE.name().equals(variableType) &&
+					!VariableType.GERMPLASM_PASSPORT.name().equals(variableType) &&
+					factorsFilterMap.get(observableId) == null) {
 					query.setParameter(observableId + "_Id", observableId);
 				}
 
@@ -1256,6 +1299,11 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			observationVariables.put(designFactor, new ObservationUnitData((String) row.get(designFactor)));
 		}
 
+		if (!CollectionUtils.isEmpty(searchDto.getPassportAndAttributes())) {
+			searchDto.getPassportAndAttributes().forEach(variable ->
+				observationVariables.put(variable.getName(), new ObservationUnitData((String) row.get(this.formatVariableAlias(variable.getId())))));
+		}
+
 		// Variables retrieved from Environment Details/Conditions are loaded in a separate Map object to ensure that no duplicate variables are
 		// added to a map. Because it's possible that a variable exists in both environment and observation/subobservation
 		// levels.
@@ -1331,6 +1379,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	private boolean checkFilterContainsFactor(final ObservationUnitsSearchDTO.Filter filter, final int variableId) {
 		return !CollectionUtils.isEmpty(filter.getFilteredTextValues()) && filter.getFilteredTextValues().keySet().contains(String.valueOf(variableId));
+	}
+
+	private String formatVariableAlias(final Object variableId) {
+		return String.format("VARIABLE_%s", variableId);
 	}
 
 	public Set<Integer> addPreFilteredGids(final ObservationUnitsSearchDTO.Filter filter) {
