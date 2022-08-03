@@ -9,6 +9,9 @@ public class ObservationLevelFilter {
 	private String trialDbId;
 	private String programDbId;
 
+	public ObservationLevelFilter() {
+	}
+
 	public ObservationLevelFilter(final String studyDbId, final String trialDbId, final String programDbId) {
 		this.studyDbId = studyDbId;
 		this.trialDbId = trialDbId;
