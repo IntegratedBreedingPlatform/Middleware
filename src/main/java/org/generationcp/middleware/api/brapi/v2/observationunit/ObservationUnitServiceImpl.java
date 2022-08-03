@@ -54,7 +54,6 @@ import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
@@ -337,13 +336,15 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		observationLevels.add(new ObservationLevel(ObservationLevelEnum.STUDY));
 		final StudyInstance studyInstance = this.studyInstanceService.getStudyInstance(studyId, instanceId).get();
 		if(studyInstance.isHasExperimentalDesign()) {
-			if(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, (DatasetTypeEnum.SUMMARY_STATISTICS_DATA)) != null) {
+			final List<Integer> datasetTypeIdsOfEnvironment = this.daoFactory.getDmsProjectDAO()
+				.getDatasetTypeIdsOfEnvironment(instanceId);
+			if(datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUMMARY_STATISTICS));
 			}
 			if(studyInstance.isHasFieldmap()) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.FIELD));
 			}
-			if(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, (DatasetTypeEnum.MEANS_DATA)) != null) {
+			if(datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.MEANS_DATA.getId())) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.MEANS));
 			}
 
@@ -351,16 +352,16 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 				this.datasetService.getDatasets(studyId, Sets.newHashSet(DatasetTypeEnum.PLOT_DATA.getId())).get(0);
 			this.addPlotRelatedObservationLevels(observationLevels, plotDataset);
 
-			if(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, (DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS)) != null) {
+			if(datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUB_PLOT));
 			}
-			if(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, (DatasetTypeEnum.PLANT_SUBOBSERVATIONS)) != null) {
+			if(datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.PLANT));
 			}
-			if(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, (DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS)) != null) {
+			if(datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId())) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.TIME_SERIES));
 			}
-			if(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, (DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS)) != null) {
+			if(datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId())) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.CUSTOM));
 			}
 		} else {

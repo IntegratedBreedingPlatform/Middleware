@@ -1972,6 +1972,22 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		}
 	}
 
+	public List<Integer> getDatasetTypeIdsOfEnvironment(final Integer environmentId) {
+		try {
+			final Query query = this.getSession().createSQLQuery("SELECT DISTINCT dataset.dataset_type_id"
+				+ " FROM project p "
+				+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id"
+				+ " INNER JOIN project dataset ON dataset.study_id = p.study_id"
+				+ " INNER JOIN project study ON p.study_id = study.project_id AND study.deleted != " + DELETED_STUDY
+				+ " WHERE nde.nd_geolocation_id = :environmentId AND nde.type_id = " + ExperimentType.TRIAL_ENVIRONMENT.getTermId());
+			query.setParameter("environmentId", environmentId);
+			return query.list();
+		} catch (final HibernateException e) {
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+	}
+
 	public boolean isValidDatasetId(final Integer datasetId) {
 		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
 		criteria.add(Restrictions.eq("projectId", datasetId));
