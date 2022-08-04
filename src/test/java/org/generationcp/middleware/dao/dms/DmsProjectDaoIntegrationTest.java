@@ -35,7 +35,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.ObservationLevel;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
