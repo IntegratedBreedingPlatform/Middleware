@@ -49,6 +49,6 @@ public interface StudyEntryService {
 
 	Integer getCrossGenerationLevel(Integer studyId);
 
-	List<StudyEntryColumnDTO> getStudyEntryColumns(Integer studyId);
+	List<StudyEntryColumnDTO> getStudyEntryColumns(Integer studyId, final String programUUID);
 
 }
