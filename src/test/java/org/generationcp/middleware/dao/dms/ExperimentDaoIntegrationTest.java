@@ -62,7 +62,8 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 	public void testSaveOrUpdate() {
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 5);
+		final List<ExperimentModel> experimentModels =
+			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 5);
 
 		// Verify that new experiments have auto-generated UUIDs as values for obs_unit_id
 		for (final ExperimentModel experiment : experimentModels) {
@@ -122,14 +123,16 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 		final DmsProject plantSubObsDataset =
 			this.testDataInitializer.createDmsProject("Plant SubObs Dataset", "Plot Dataset-Description", this.study, this.plot,
 				DatasetTypeEnum.PLANT_SUBOBSERVATIONS);
-		this.testDataInitializer.addProjectProp(plantSubObsDataset, 8206, observationUnitVariableName, VariableType.OBSERVATION_UNIT, "", 1);
+		this.testDataInitializer.addProjectProp(plantSubObsDataset, 8206, observationUnitVariableName, VariableType.OBSERVATION_UNIT, "",
+			1);
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
 		final ExperimentModel plotExperimentModel =
 			this.testDataInitializer.createTestExperiment(this.plot, geolocation, TermId.PLOT_EXPERIMENT.getId(), null, null);
 		final List<ExperimentModel> subObsExperimentsInstance =
 			this.testDataInitializer
-				.createTestExperimentsWithStock(this.study, plantSubObsDataset, plotExperimentModel, geolocation, noOfSubObservationExperiment);
+				.createTestExperimentsWithStock(this.study, plantSubObsDataset, plotExperimentModel, geolocation,
+					noOfSubObservationExperiment);
 
 		final CVTerm trait1 = this.testDataInitializer.createTrait(traitName);
 		this.testDataInitializer.addPhenotypes(subObsExperimentsInstance, trait1.getCvTermId(), RandomStringUtils.randomNumeric(5));
@@ -138,11 +141,13 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 
 		this.sessionProvder.getSession().flush();
 
-		Map<Integer, Map<String, List<Object>>> map = this.experimentDao.getValuesFromObservations(study.getProjectId(), Lists.newArrayList(DatasetTypeEnum.PLOT_DATA.getId(), DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId()), inputVariableDatasetMap);
+		Map<Integer, Map<String, List<Object>>> map = this.experimentDao.getValuesFromObservations(study.getProjectId(),
+			Lists.newArrayList(DatasetTypeEnum.PLOT_DATA.getId(), DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId()), inputVariableDatasetMap);
 
 		Assert.assertNotNull(map.get(plotExperimentModel.getNdExperimentId()));
 		Assert.assertNotNull(map.get(plotExperimentModel.getNdExperimentId()).get(trait1.getCvTermId().toString()));
-		Assert.assertEquals(noOfSubObservationExperiment, map.get(plotExperimentModel.getNdExperimentId()).get(trait1.getCvTermId().toString()).size());
+		Assert.assertEquals(noOfSubObservationExperiment,
+			map.get(plotExperimentModel.getNdExperimentId()).get(trait1.getCvTermId().toString()).size());
 	}
 
 	@Test
@@ -190,7 +195,8 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 	public void testGetExperimentSamplesDTOMap() {
 
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 1);
+		final List<ExperimentModel> experimentModels =
+			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 1);
 
 		final WorkbenchUser user = this.testDataInitializer.createUserForTesting();
 		final SampleList sampleList = this.testDataInitializer.createTestSampleList("MyList", user.getUserid());
@@ -209,18 +215,56 @@ public class ExperimentDaoIntegrationTest extends IntegrationTestBase {
 	@Test
 	public void testUpdateEntryId() {
 		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
-		final List<ExperimentModel> experimentModels = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 5);
+		final List<ExperimentModel> experimentModels =
+			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, null, geolocation, 5);
 		final List<StockModel> entries = this.stockDao.getStocksForStudy(study.getProjectId());
 		final ExperimentModel experimentModelToModify = experimentModels.get(0);
-		final List<ExperimentModel> children = this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, experimentModelToModify, geolocation, 5);
-		final Integer newStockModelId = entries.stream().filter(i->!i.getStockId().equals(experimentModelToModify.getStock().getStockId())).findFirst().get().getStockId();
+		final List<ExperimentModel> children =
+			this.testDataInitializer.createTestExperimentsWithStock(this.study, this.plot, experimentModelToModify, geolocation, 5);
+		final Integer newStockModelId =
+			entries.stream().filter(i -> !i.getStockId().equals(experimentModelToModify.getStock().getStockId())).findFirst().get()
+				.getStockId();
 		this.experimentDao.updateEntryId(Collections.singletonList(experimentModelToModify.getNdExperimentId()), newStockModelId);
 		this.experimentDao.refresh(experimentModelToModify);
 		assertEquals(newStockModelId, experimentModelToModify.getStock().getStockId());
-		for (final ExperimentModel model: children) {
+		for (final ExperimentModel model : children) {
 			this.experimentDao.refresh(model);
 			assertEquals(newStockModelId, model.getStock().getStockId());
 		}
+	}
+
+	@Test
+	public void testDeleteGeoreferencesByExperimentTypeAndInstanceId() {
+
+		final Geolocation geolocation = this.testDataInitializer.createTestGeolocation("1", 101);
+
+		// Create experiments with test georeference
+		final ExperimentModel experimentModel1 = new ExperimentModel();
+		experimentModel1.setGeoLocation(geolocation);
+		experimentModel1.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+		experimentModel1.setProject(this.plot);
+		experimentModel1.setJsonProps("test data 1");
+		this.experimentDao.save(experimentModel1);
+
+		final ExperimentModel experimentModel2 = new ExperimentModel();
+		experimentModel2.setGeoLocation(geolocation);
+		experimentModel2.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+		experimentModel2.setProject(this.plot);
+		experimentModel2.setJsonProps("test data 2");
+		this.experimentDao.save(experimentModel2);
+
+		Assert.assertNotNull(experimentModel1.getJsonProps());
+		Assert.assertNotNull(experimentModel2.getJsonProps());
+
+		// Delete the jsonprops (georeference) column of the experiment
+		this.experimentDao.deleteGeoreferencesByExperimentTypeAndInstanceId(TermId.PLOT_EXPERIMENT.getId(), geolocation.getLocationId());
+
+		this.sessionProvder.getSession().refresh(experimentModel1);
+		this.sessionProvder.getSession().refresh(experimentModel2);
+
+		Assert.assertNull(experimentModel1.getJsonProps());
+		Assert.assertNull(experimentModel2.getJsonProps());
+
 	}
 
 }

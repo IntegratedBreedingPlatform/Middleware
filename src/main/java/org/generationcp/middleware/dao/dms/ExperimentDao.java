@@ -169,6 +169,15 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		return null;
 	}
 
+	public void deleteGeoreferencesByExperimentTypeAndInstanceId(final Integer experimentType, final Integer instanceId) {
+		final String hqlUpdate =
+			"UPDATE ExperimentModel e set e.jsonProps = null where e.typeId = :experimentType AND e.geoLocation.locationId = :instanceId";
+		this.getSession().createQuery(hqlUpdate)
+			.setParameter("experimentType", experimentType)
+			.setParameter("instanceId", instanceId)
+			.executeUpdate();
+	}
+
 	public ExperimentModel getExperimentByTypeInstanceId(final Integer experimentType, final Integer instanceId) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
