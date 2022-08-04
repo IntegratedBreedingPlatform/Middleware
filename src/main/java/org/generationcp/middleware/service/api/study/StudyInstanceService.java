@@ -46,4 +46,5 @@ public interface StudyInstanceService {
 
 	Optional<Integer> getDatasetIdForInstanceIdAndDatasetType(Integer instanceId, DatasetTypeEnum datasetTypeEnum);
 
+	void deleteInstanceGeoreferences(Integer instanceId);
 }
