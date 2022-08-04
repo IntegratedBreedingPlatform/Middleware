@@ -97,6 +97,16 @@ public class PlantingPreparationDTO {
 		private String designation;
 		private Map<String, StockDTO> stockByStockId = new LinkedHashMap<>();
 		private List<ObservationUnitDTO> observationUnits = new ArrayList<>();
+		private Map<Integer, VariableDTO> enrtyDetailByVariableId = new LinkedHashMap<>();
+
+		public Map<Integer, VariableDTO> getEnrtyDetailByVariableId() {
+			return this.enrtyDetailByVariableId;
+		}
+
+		public void setEnrtyDetailByVariableId(
+			final Map<Integer, VariableDTO> enrtyDetailByVariableId) {
+			this.enrtyDetailByVariableId = enrtyDetailByVariableId;
+		}
 
 		public Integer getEntryNo() {
 			return this.entryNo;
@@ -147,6 +157,38 @@ public class PlantingPreparationDTO {
 		}
 	}
 
+	public static class VariableDTO {
+
+		private Integer variableId;
+
+		private String name;
+
+		private Integer value;
+
+		public Integer getVariableId() {
+			return this.variableId;
+		}
+
+		public void setVariableId(final Integer variableId) {
+			this.variableId = variableId;
+		}
+
+		public String getName() {
+			return this.name;
+		}
+
+		public void setName(final String name) {
+			this.name = name;
+		}
+
+		public Integer getValue() {
+			return this.value;
+		}
+
+		public void setValue(final Integer value) {
+			this.value = value;
+		}
+	}
 
 	private List<PlantingPreparationEntryDTO> entries;
 
