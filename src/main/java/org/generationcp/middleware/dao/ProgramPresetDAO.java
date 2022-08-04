@@ -28,7 +28,7 @@ public class ProgramPresetDAO extends GenericDAO<ProgramPreset, Integer> {
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-				"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(programId=" + programUUID + "): " + e.getMessage(), e);
+				"error in: ProgramPresetDAO.getAllProgramPresetFromProgram(programId=" + programUUID + "): " + e.getMessage(), e);
 		}
 
 		return new ArrayList<ProgramPreset>();
@@ -46,7 +46,7 @@ public class ProgramPresetDAO extends GenericDAO<ProgramPreset, Integer> {
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-				"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(programId=" + programUUID + "): " + e.getMessage(), e);
+				"error in: ProgramPresetDAO.getProgramPresetFromProgramAndTool(programId=" + programUUID + "): " + e.getMessage(), e);
 		}
 
 		return new ArrayList<ProgramPreset>();
@@ -67,7 +67,7 @@ public class ProgramPresetDAO extends GenericDAO<ProgramPreset, Integer> {
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-				"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(programId=" + programUUID + "): " + e.getMessage(), e);
+				"error in: ProgramPresetDAO.getProgramPresetFromProgramAndTool(programId=" + programUUID + "): " + e.getMessage(), e);
 		}
 
 		return new ArrayList<ProgramPreset>();
@@ -87,7 +87,7 @@ public class ProgramPresetDAO extends GenericDAO<ProgramPreset, Integer> {
 			return criteria.list();
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-				"error in: WorkbenchDataManager.getAllProgramPresetFromProgram(programId=" + programUUID + "): " + e.getMessage(), e);
+				"error in: ProgramPresetDAO.getProgramPresetFromProgramAndToolByName(programId=" + programUUID + "): " + e.getMessage(), e);
 		}
 
 		return new ArrayList<ProgramPreset>();
@@ -102,7 +102,7 @@ public class ProgramPresetDAO extends GenericDAO<ProgramPreset, Integer> {
 
 		} catch (HibernateException e) {
 			this.logAndThrowException(
-				"Cannot perform: WorkbenchDataManager.deleteProgramPreset(programPresetName=" + programPreset.getName() + "): "
+				"Cannot perform: ProgramPresetDAO.saveOrUpdateProgramPreset(programPresetName=" + programPreset.getName() + "): "
 					+ e.getMessage(), e);
 		}
 		return null;
@@ -113,7 +113,7 @@ public class ProgramPresetDAO extends GenericDAO<ProgramPreset, Integer> {
 			ProgramPreset preset = getById(programPresetId);
 			getSession().delete(preset);
 		} catch (HibernateException e) {
-			this.logAndThrowException("Cannot delete preset: WorkbenchDataManager.deleteProgramPreset(programPresetId=" + programPresetId
+			this.logAndThrowException("Cannot delete preset: ProgramPresetDAO.deleteProgramPreset(programPresetId=" + programPresetId
 				+ "): " + e.getMessage(), e);
 		}
 	}

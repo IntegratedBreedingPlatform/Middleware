@@ -20,6 +20,8 @@ import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
+import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
+import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -42,6 +44,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +53,7 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 @Transactional
@@ -75,14 +79,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	private final DaoFactory daoFactory;
 
-	// TODO: remove ENTRY_NO. Please, check this ticket https://ibplatform.atlassian.net/browse/IBP-5793 for a cleanup.
-	private static final List<Integer> FIXED_GERMPLASM_DESCRIPTOR_IDS = Lists
-		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.IMMEDIATE_SOURCE_NAME.getId());
-
-	private static final List<Integer> REMOVABLE_GERMPLASM_DESCRIPTOR_IDS = Lists
-		.newArrayList(TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.GID.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId(),
-			TermId.IMMEDIATE_SOURCE_NAME.getId());
-
 	public StudyEntryServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
@@ -96,15 +92,17 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public long countFilteredStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter) {
-		final StudyEntrySearchDto searchDto = this.buildStudyEntrySearchDto(studyId, filter);
-		return this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(studyId, searchDto);
+	public long countFilteredStudyEntries(int studyId, StudyEntrySearchDto.Filter filter) {
+		final List<MeasurementVariable> entryVariables = this.getStudyVariables(studyId);
+		return this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(new StudyEntrySearchDto(studyId, filter), entryVariables);
 	}
 
 	@Override
 	public List<StudyEntryDto> getStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
-		final StudyEntrySearchDto searchDto = this.buildStudyEntrySearchDto(studyId, filter);
-		return this.daoFactory.getStudyEntrySearchDAO().getStudyEntries(searchDto, pageable);
+		final List<MeasurementVariable> entryVariables = this.getStudyVariables(studyId);
+		return
+			this.daoFactory.getStudyEntrySearchDAO()
+				.getStudyEntries(new StudyEntrySearchDto(studyId, filter), entryVariables, pageable);
 	}
 
 	@Override
@@ -291,32 +289,63 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId) {
+	public List<StudyEntryColumnDTO> getStudyEntryColumns(final Integer studyId, final String programUUID) {
 		final DmsProject plotDataset = this.getPlotDataset(studyId);
-		return StudyEntryDescriptorColumns.getColumnsSortedByRank()
-			.map(column -> this.buildStudyEntryColumnDTO(column, plotDataset.getProperties()))
+
+		final List<Integer> projectVariableIds = plotDataset.getProperties().stream()
+			.map(ProjectProperty::getVariableId)
 			.collect(Collectors.toList());
+		final List<StudyEntryColumnDTO> columns = StudyEntryGermplasmDescriptorColumns.getColumnsSortedByRank()
+			.map(column -> new StudyEntryColumnDTO(column.getId(),
+				column.getName(),
+				null,
+				VariableType.GERMPLASM_DESCRIPTOR.getId(),
+				projectVariableIds.contains(column.getId())))
+			.collect(Collectors.toList());
+
+		final List<StockModel> entries = this.daoFactory.getStockDao().getStocksForStudy(studyId);
+		final List<Integer> gids = entries.stream().map(stockModel -> stockModel.getGermplasm().getGid()).collect(toList());
+		final List<Attribute> attributes = this.daoFactory.getAttributeDAO().getAttributeValuesGIDList(gids);
+		if (!CollectionUtils.isEmpty(attributes)) {
+			final VariableFilter variableFilter = new VariableFilter();
+			variableFilter.setProgramUuid(programUUID);
+			attributes
+				.stream()
+				.map(Attribute::getTypeId)
+				.forEach(variableFilter::addVariableId);
+			final List<Variable> variables = this.ontologyVariableDataManager.getWithFilter(variableFilter);
+			final List<StudyEntryColumnDTO> germplasmAttributeColumns = variables
+				.stream()
+				.sorted(Comparator.comparing(Variable::getName))
+				.map(variable -> {
+					Integer typeId = null;
+					// get first value because germplasm attributes/passport are not combinables with other types
+					if (!org.springframework.util.CollectionUtils.isEmpty(variable.getVariableTypes())) {
+						typeId = variable.getVariableTypes().iterator().next().getId();
+					}
+					return new StudyEntryColumnDTO(variable.getId(), variable.getName(), variable.getAlias(), typeId,
+						projectVariableIds.contains(variable.getId()));
+				})
+				.collect(toList());
+			columns.addAll(germplasmAttributeColumns);
+		}
+
+		return columns;
 	}
 
-	private StudyEntrySearchDto buildStudyEntrySearchDto(final int studyId, final StudyEntrySearchDto.Filter filter) {
+	private List<MeasurementVariable> getStudyVariables(final Integer studyId) {
 		final Integer plotDatasetId =
 			this.datasetService.getDatasets(studyId, new HashSet<>(Collections.singletonList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
 				.getDatasetId();
 
-		final List<MeasurementVariable> entryVariables =
+		final List<MeasurementVariable> variables =
 			this.datasetService.getObservationSetVariables(plotDatasetId,
-				Lists.newArrayList(VariableType.GERMPLASM_DESCRIPTOR.getId(), VariableType.ENTRY_DETAIL.getId()));
-
-		final List<MeasurementVariable> fixedEntryVariables =
-			entryVariables.stream().filter(d -> FIXED_GERMPLASM_DESCRIPTOR_IDS.contains(d.getTermId())).collect(
-				Collectors.toList());
-
-		//Remove the ones that are stored in stock and that in the future will not be descriptors
-		final List<MeasurementVariable> variableEntryDescriptors =
-			entryVariables.stream().filter(d -> !REMOVABLE_GERMPLASM_DESCRIPTOR_IDS.contains(d.getTermId())).collect(
-				Collectors.toList());
-
-		return new StudyEntrySearchDto(studyId, fixedEntryVariables, variableEntryDescriptors, filter);
+				Lists.newArrayList(VariableType.GERMPLASM_ATTRIBUTE.getId(),
+					VariableType.GERMPLASM_PASSPORT.getId(),
+					VariableType.GERMPLASM_DESCRIPTOR.getId(),
+					VariableType.ENTRY_DETAIL.getId()));
+		variables.removeIf(variable -> variable.getTermId() == TermId.OBS_UNIT_ID.getId());
+		return variables;
 	}
 
 	private void setCrossValues(final List<StockModel> entries, final Set<Integer> gids, final Integer level) {
@@ -331,12 +360,6 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 	private DmsProject getPlotDataset(final Integer studyId) {
 		return this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0);
-	}
-
-	private StudyEntryColumnDTO buildStudyEntryColumnDTO(final StudyEntryDescriptorColumns column,
-		final List<ProjectProperty> projectProperties) {
-		return new StudyEntryColumnDTO(column.getId(), column.getName(),
-			projectProperties.stream().anyMatch(projectProperty -> projectProperty.getVariableId().equals(column.getId())));
 	}
 
 	private void setStudyGenerationLevel(final Integer listId, final Integer studyId) {

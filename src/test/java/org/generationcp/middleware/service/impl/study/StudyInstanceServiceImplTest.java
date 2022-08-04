@@ -18,7 +18,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -60,9 +59,6 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private OntologyDataManager ontologyManager;
-
-	@Autowired
-	private LocationDataManager locationManager;
 
 	@Autowired
 	private CropService cropService;
@@ -107,7 +103,7 @@ public class StudyInstanceServiceImplTest extends IntegrationTestBase {
 
 		this.studyTestDataInitializer =
 			new StudyTestDataInitializer(this.studyDataManager, this.ontologyManager, this.commonTestProject,
-				this.locationManager, this.sessionProvder);
+				this.sessionProvder);
 
 		this.cropType = this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.name());
 

@@ -8,14 +8,18 @@ public class StudyEntryColumnDTO {
 
 	private int id;
 	private String name;
+	private String alias;
+	private Integer typeId;
 	private boolean selected;
 
 	public StudyEntryColumnDTO() {
 	}
 
-	public StudyEntryColumnDTO(final int id, final String name, final boolean selected) {
+	public StudyEntryColumnDTO(final int id, final String name, final String alias, final Integer typeId, final boolean selected) {
 		this.id = id;
 		this.name = name;
+		this.alias = alias;
+		this.typeId = typeId;
 		this.selected = selected;
 	}
 
@@ -33,6 +37,22 @@ public class StudyEntryColumnDTO {
 
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	public String getAlias() {
+		return alias;
+	}
+
+	public void setAlias(final String alias) {
+		this.alias = alias;
+	}
+
+	public Integer getTypeId() {
+		return typeId;
+	}
+
+	public void setTypeId(final Integer typeId) {
+		this.typeId = typeId;
 	}
 
 	public boolean isSelected() {

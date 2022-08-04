@@ -15,6 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchRequest;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
@@ -35,7 +36,6 @@ import org.generationcp.middleware.exceptions.WorkbookParserException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.ontology.api.TermDataManager;
 import org.generationcp.middleware.operation.parser.WorkbookParser;
@@ -92,13 +92,13 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 	private GermplasmSearchService germplasmSearchService;
 
 	@Resource
-	private LocationDataManager locationDataManager;
-
-	@Resource
 	private TermDataManager termDataManager;
 
 	@Resource
 	private WorkbookSaver workbookSaver;
+
+	@Resource
+	private LocationService locationService;
 
 	private DaoFactory daoFactory;
 
@@ -378,7 +378,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 		final Optional<MeasurementVariable> locationIdMeasurementVariable =
 			this.findMeasurementVariableByTermId(TermId.LOCATION_ID.getId(), measurementVariables);
 		if (locationIdMeasurementVariable.isPresent() && StringUtils.isEmpty(locationIdMeasurementVariable.get().getValue())) {
-			locationIdMeasurementVariable.get().setValue(this.locationDataManager.retrieveLocIdOfUnspecifiedLocation());
+			locationIdMeasurementVariable.get().setValue(this.locationService.retrieveLocIdOfUnspecifiedLocation());
 		}
 
 	}
@@ -500,7 +500,7 @@ public class DataImportServiceImpl extends Service implements DataImportService 
 
 		// Creates a LOCATION_ID Variable with default value of "Unspecified Location".
 		// This variable will be added to an imported study with no LOCATION_ID Variable specified in the file.
-		final String unspecifiedLocationId = this.locationDataManager.retrieveLocIdOfUnspecifiedLocation();
+		final String unspecifiedLocationId = this.locationService.retrieveLocIdOfUnspecifiedLocation();
 		final MeasurementVariable variable =
 			this.createMeasurementVariable(TermId.LOCATION_ID.getId(), unspecifiedLocationId, Operation.ADD,
 				PhenotypicType.TRIAL_ENVIRONMENT, programUUID);

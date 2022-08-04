@@ -15,11 +15,11 @@ import static java.util.Optional.ofNullable;
 
 @Service
 @Transactional
-public class CropParameterImpl implements CropParameterService {
+public class CropParameterServiceImpl implements CropParameterService {
 
 	private final DaoFactory daoFactory;
 
-	public CropParameterImpl(final HibernateSessionProvider sessionProvider) {
+	public CropParameterServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 	}
 

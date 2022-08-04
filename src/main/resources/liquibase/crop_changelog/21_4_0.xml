@@ -1,0 +1,24 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="lkovacic" id="v21.4.0-1">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<sqlCheck expectedResult="0">
+                	select COUNT(1) FROM (SELECT COUNT(1) FROM methods GROUP BY mcode HAVING COUNT(1) > 1) as CNT;
+            	</sqlCheck>
+				<not>
+					<indexExists tableName="methods" indexName="methods_mcode_uindex"/>
+				</not>
+			</and>
+		</preConditions>
+		<comment>Create unique index to 'methods.mcode'</comment>
+		<createIndex indexName="methods_mcode_uindex" tableName="methods" unique="true">
+			<column name="mcode" type="varchar" />
+		</createIndex>
+	</changeSet>
+
+</databaseChangeLog>

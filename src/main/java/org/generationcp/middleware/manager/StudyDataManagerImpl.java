@@ -14,6 +14,7 @@ package org.generationcp.middleware.manager;
 import com.google.common.base.Function;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
@@ -48,7 +49,6 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
@@ -92,7 +92,6 @@ import java.util.stream.Collectors;
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
 	private PedigreeService pedigreeService;
-	private LocationDataManager locationDataManager;
 	private DaoFactory daoFactory;
 	private StandardVariableBuilder standardVariableBuilder;
 
@@ -108,11 +107,13 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Resource
 	private TrialEnvironmentBuilder trialEnvironmentBuilder;
 
+	@Resource
+	private LocationService locationService;
+
 	public StudyDataManagerImpl() {
 	}
 
 	private void init(final HibernateSessionProvider sessionProvider) {
-		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.standardVariableBuilder = new StandardVariableBuilder(sessionProvider);
@@ -849,7 +850,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		if (dataset != null && dataset.getTrialInstances() != null) {
 			for (final FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
 				if (trial.getBlockId() != null) {
-					trial.updateBlockInformation(this.locationDataManager.getBlockInformation(trial.getBlockId()));
+					trial.updateBlockInformation(this.locationService.getBlockInformation(trial.getBlockId()));
 				} else if (!Util.isEmpty(trial.getFieldMapLabels())) {
 					// Row and Column should not be empty
 					final List<FieldMapLabel> rows =
@@ -944,8 +945,8 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return this.daoFactory.getPhenotypeDAO().containsAtLeast2CommonEntriesWithValues(projectId, locationId, germplasmTermId);
 	}
 
-	public void setLocationDataManager(final LocationDataManager locationDataManager) {
-		this.locationDataManager = locationDataManager;
+	public void setLocationService(final LocationService locationService) {
+		this.locationService = locationService;
 	}
 
 	public void setUserService(final UserService userService) {
@@ -1119,7 +1120,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public FieldmapBlockInfo getBlockInformation(final int blockId) {
-		return this.locationDataManager.getBlockInformation(blockId);
+		return this.locationService.getBlockInformation(blockId);
 	}
 
 	@Override

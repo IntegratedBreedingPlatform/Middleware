@@ -8,7 +8,6 @@ import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationDetails;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Before;
@@ -78,42 +77,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
 		final long countLocation = this.locationDAO.countSearchLocation(locationSearchRequest, null);
 		MatcherAssert.assertThat("Expected country location size equals to zero by this locationType = 000100000405", countLocation == 0);
-
-	}
-
-	@Test
-	public void testGetLocationDetails() {
-
-		final int ltype = 405;
-		final String labbr = "ABCDEFG";
-		final String lname = "MyLocation";
-
-		// Country ID 1 = "Democratic Republic of Afghanistan"
-		final int cntryid = 1;
-		final Country country = this.countryDAO.getById(cntryid);
-		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
-		location.setCountry(country);
-		// Province Badakhshan
-		final int provinceId = 1001;
-		final Location province = this.locationDAO.getById(provinceId);
-		location.setProvince(province);
-
-		this.locationDAO.saveOrUpdate(location);
-
-		final List<LocationDetails> result = this.locationDAO.getLocationDetails(location.getLocid(), 0, Integer.MAX_VALUE);
-		final LocationDetails locationDetails = result.get(0);
-
-		Assert.assertEquals(lname, locationDetails.getLocationName());
-		Assert.assertEquals(location.getLocid(), locationDetails.getLocid());
-		Assert.assertEquals(ltype, locationDetails.getLtype().intValue());
-		Assert.assertEquals(labbr, locationDetails.getLocationAbbreviation());
-		Assert.assertEquals(cntryid, locationDetails.getCntryid().intValue());
-		Assert.assertEquals(province.getLname(), locationDetails.getProvinceName());
-		Assert.assertEquals(provinceId, locationDetails.getProvinceId().intValue());
-
-		Assert.assertEquals("COUNTRY", locationDetails.getLocationType());
-		Assert.assertEquals("-", locationDetails.getLocationDescription());
-		Assert.assertEquals("Democratic Republic of Afghanistan", locationDetails.getCountryFullName());
 
 	}
 

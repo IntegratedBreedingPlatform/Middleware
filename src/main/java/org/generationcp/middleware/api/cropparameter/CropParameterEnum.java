@@ -2,7 +2,8 @@ package org.generationcp.middleware.api.cropparameter;
 
 public enum CropParameterEnum {
 	BTYPE("btype"),
-	DEFAULT_BRAPI_SYNC_SOURCE("default-brapi-sync-source");
+	DEFAULT_BRAPI_SYNC_SOURCE("default-brapi-sync-source"),
+	DS_BRAPP_URL("ds_brapp_url");
 
 	private final String key;
 

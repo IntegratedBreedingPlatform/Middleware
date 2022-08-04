@@ -13,6 +13,8 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
+import org.generationcp.middleware.api.cropparameter.CropParameterService;
+import org.generationcp.middleware.api.cropparameter.CropParameterServiceImpl;
 import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.file.FileMetadataServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
@@ -41,7 +43,6 @@ import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.PresetService;
@@ -161,10 +162,6 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmListManager getGermplasmListManager() {
 		return new GermplasmListManagerImpl(this.sessionProvider);
-	}
-
-	public LocationDataManager getLocationDataManager() {
-		return new LocationDataManagerImpl(this.sessionProvider);
 	}
 
 	public LocationService getLocationService() {
@@ -296,6 +293,10 @@ public class ManagerFactory implements Serializable {
 
 	public SampleListService getSampleListService() {
 		return new SampleListServiceImpl(this.sessionProvider);
+	}
+
+	public CropParameterService getCropParameterService() {
+		return new CropParameterServiceImpl(this.sessionProvider);
 	}
 
 	public SampleService getSampleService() {
