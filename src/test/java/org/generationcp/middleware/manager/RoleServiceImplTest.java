@@ -31,7 +31,7 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 
-public class WorkbenchDataManagerImplTest extends IntegrationTestBase {
+public class RoleServiceImplTest extends IntegrationTestBase {
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;

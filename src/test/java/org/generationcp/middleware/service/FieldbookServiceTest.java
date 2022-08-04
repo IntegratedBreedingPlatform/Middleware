@@ -14,10 +14,8 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -34,12 +32,6 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 
 	@Autowired
 	private OntologyDataManager ontologyManager;
-
-	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-
-	@Autowired
-	private LocationDataManager locationManager;
 
 	@Autowired
 	private UserService userService;
@@ -85,7 +77,7 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
 
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject,
-			this.locationManager, this.sessionProvder);
+			this.sessionProvder);
 
 		this.studyReference = this.studyTDI.addTestStudy();
 		this.studyTDI.createEnvironmentDataset(this.crop, this.studyReference.getId(), "1", String.valueOf(TermId.SEASON_DRY.getId()));

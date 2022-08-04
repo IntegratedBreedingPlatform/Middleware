@@ -43,7 +43,6 @@ import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.PresetService;
@@ -163,10 +162,6 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmListManager getGermplasmListManager() {
 		return new GermplasmListManagerImpl(this.sessionProvider);
-	}
-
-	public LocationDataManager getLocationDataManager() {
-		return new LocationDataManagerImpl(this.sessionProvider);
 	}
 
 	public LocationService getLocationService() {

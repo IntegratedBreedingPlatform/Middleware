@@ -26,7 +26,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyDataHelper;
 import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
@@ -55,9 +54,6 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 
 	@Autowired
 	private OntologyDataManager ontologyManager;
-
-	@Autowired
-	private LocationDataManager locationManager;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -103,7 +99,7 @@ public class ProjectPropertySaverTest extends IntegrationTestBase {
 		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
 		this.studyTDI =
 			new StudyTestDataInitializer(this.studyDataManager, this.ontologyManager, this.commonTestProject,
-				this.locationManager, this.sessionProvder);
+				this.sessionProvder);
 		this.studyReference = this.studyTDI.addTestStudy();
 	}
 

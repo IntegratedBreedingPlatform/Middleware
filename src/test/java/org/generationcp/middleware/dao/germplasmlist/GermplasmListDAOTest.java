@@ -14,7 +14,6 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
@@ -53,7 +52,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	private static final String TEST_GERMPLASM_LIST_DESC = "TestGermplasmListDesc";
 	private static final long TEST_GERMPLASM_LIST_DATE = 20141103;
 	private static final String TEST_GERMPLASM_LIST_TYPE_LST = "LST";
-	private static final String TEST_GERMPLASM_LIST_TYPE_FOLDER = "FOLDER";
 	private static final String TEST_LIST_DESCRIPTION = "Test List Description";
 	private static final String TEST_LIST_NOTES = "Test List Notes";
 	private static final String PARENT_FOLDER_NAME = "Integration Test";
@@ -67,9 +65,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Autowired
 	private OntologyDataManager ontologyManager;
-
-	@Autowired
-	private LocationDataManager locationManager;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -128,7 +123,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		final StudyDataManagerImpl studyDataManager = new StudyDataManagerImpl(this.sessionProvder);
 		this.studyTDI = new StudyTestDataInitializer(studyDataManager, this.ontologyManager, this.commonTestProject,
-			this.locationManager, this.sessionProvder);
+			this.sessionProvder);
 
 
 	}
