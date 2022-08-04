@@ -183,6 +183,10 @@ public class PlantingServiceImpl implements PlantingService {
 		final PlantingPreparationDTO plantingPreparationDTO =
 			this.searchPlantingPreparation(studyId, datasetId, plantingRequestDto.getSelectedObservationUnits());
 
+		final Map<Integer, Map<Integer, PlantingPreparationDTO.VariableDTO>> variableMapByEntryNo = new LinkedHashMap<>();
+		plantingPreparationDTO.getEntries()
+			.forEach(entry -> variableMapByEntryNo.put(entry.getEntryNo(), entry.getEntryDetailByVariableId()));
+
 		final List<Integer> requestedEntryNos =
 			plantingRequestDto.getLotPerEntryNo().stream().map(PlantingRequestDto.LotEntryNumber::getEntryNo).collect(
 				Collectors.toList());
@@ -225,8 +229,7 @@ public class PlantingServiceImpl implements PlantingService {
 			//Find instructions for the unit
 			final PlantingRequestDto.WithdrawalInstruction withdrawalInstruction =
 				plantingRequestDto.getWithdrawalsPerUnit().get(lot.getUnitName());
-			final Double amount = (withdrawalInstruction.isWithdrawAllAvailableBalance()) ? lot.getAvailableBalance() :
-				withdrawalInstruction.getWithdrawalAmount();
+			final Double amount = this.defineAmount(lotEntryNumber.getEntryNo(), lot, withdrawalInstruction, variableMapByEntryNo);
 			final BigDecimal totalToWithdraw =
 				(withdrawalInstruction.isWithdrawAllAvailableBalance()) ? new BigDecimal(amount) :
 					(new BigDecimal(amount).multiply(new BigDecimal(ndExperimentIds.size())).setScale(3, RoundingMode.HALF_DOWN).stripTrailingZeros());
@@ -260,6 +263,20 @@ public class PlantingServiceImpl implements PlantingService {
 				}
 			}
 		}
+	}
+
+	private Double defineAmount(final Integer entryNo, final ExtendedLotDto lot,
+		final PlantingRequestDto.WithdrawalInstruction withdrawalInstruction,
+		final Map<Integer, Map<Integer, PlantingPreparationDTO.VariableDTO>> variableMapByEntryNo) {
+
+		if (withdrawalInstruction.isWithdrawAllAvailableBalance()) {
+			return lot.getAvailableBalance();
+		} else if (withdrawalInstruction.isWithdrawUsingEntryDetail()) {
+			final Integer amount = variableMapByEntryNo.get(entryNo).get(withdrawalInstruction.getEntryDetailsVariableId()).getValue();
+			return Double.valueOf(amount);
+		}
+		return withdrawalInstruction.getWithdrawalAmount();
+
 	}
 
 	@Override
