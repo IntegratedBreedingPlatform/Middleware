@@ -1,11 +1,16 @@
 package org.generationcp.middleware.service.impl.inventory;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.planting.PlantingMetadata;
 import org.generationcp.middleware.domain.inventory.planting.PlantingRequestDto;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -28,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -62,6 +68,10 @@ public class PlantingServiceImpl implements PlantingService {
 
 		this.processSearchComposite(searchDTO);
 
+		// List Numeric Entry Details variables without ENTRY_NO.
+		final List<MeasurementVariable> entryDetails = this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.ENTRY_DETAIL.getId())) //
+			.stream().filter( var -> DataType.NUMERIC_VARIABLE.getId().equals(var.getDataTypeId()) && TermId.ENTRY_NO.getId() != var.getTermId()).collect(Collectors.toList());
+
 		// observation units
 		final List<ObservationUnitRow> observationUnitRows =
 			this.datasetService.getObservationUnitRows(studyId, datasetId, searchDTO.getSearchRequest(), null);
@@ -80,7 +90,7 @@ public class PlantingServiceImpl implements PlantingService {
 				entry.setEntryNo(observationUnitRow.getEntryNumber());
 				entry.setGid(gid);
 				entry.setDesignation(observationUnitRow.getDesignation());
-				entry.setEntryType(observationUnitRow.getVariables().get("ENTRY_TYPE").getValue());
+				entry.setEntryType(observationUnitRow.getVariables().get(TermId.ENTRY_TYPE.name()).getValue());
 
 				entriesByEntryNo.put(observationUnitRow.getEntryNumber(), entry);
 
@@ -88,6 +98,17 @@ public class PlantingServiceImpl implements PlantingService {
 					entriesByGid.put(gid, new ArrayList<>());
 				}
 				entriesByGid.get(gid).add(entry);
+
+				for (final MeasurementVariable entryDetail : entryDetails) {
+					final PlantingPreparationDTO.VariableDTO variable = new PlantingPreparationDTO.VariableDTO();
+					variable.setVariableId(entryDetail.getTermId());
+					variable.setName(entryDetail.getName());
+					final String value = observationUnitRow.getVariables().get(entryDetail.getName()).getValue();
+					if (StringUtils.isNotBlank(value)) {
+						variable.setValue(Integer.valueOf(value));
+					}
+					entriesByEntryNo.get(observationUnitRow.getEntryNumber()).getEntryDetailByVariableId().put(variable.getVariableId(), variable);
+				}
 			}
 
 			final PlantingPreparationDTO.PlantingPreparationEntryDTO.ObservationUnitDTO observationUnit =
