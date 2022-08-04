@@ -50,6 +50,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationTestBase {
@@ -136,7 +137,16 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		Assert.assertTrue(!variables.isEmpty());
 		Debug.println(IntegrationTestBase.INDENT, "From Total Variables:  " + variables.size());
 	}
-	
+
+	@Test
+	public void testGetAllVariablesById() {
+		final List<Variable> variables = this.variableManager.getVariablesByIds(
+			Arrays.asList(this.testVariableInfo.getId()), null
+		);
+		Assert.assertTrue(!variables.isEmpty());
+		Debug.println(IntegrationTestBase.INDENT, "From Total Variables:  " + variables.size());
+	}
+
 	@Test
 	public void testGetVariablesForCurrentProgramUsingFilter() {
 		final VariableFilter variableFilter = new VariableFilter();

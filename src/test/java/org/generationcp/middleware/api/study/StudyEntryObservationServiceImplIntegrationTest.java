@@ -98,6 +98,11 @@ public class StudyEntryObservationServiceImplIntegrationTest extends Integration
 		// Delete observation
 		this.studyEntryObservationService.deleteObservation(newObservation.getStockPropId());
 		assertFalse(this.daoFactory.getStockPropertyDao().getByStockIdAndTypeId(stockModel.getStockId(), variable.getCvTermId()).isPresent());
+
+		// recreate observation using update observation where allowCreate is true
+		this.studyEntryObservationService.updateObservation(updatedStockPropertyData, true);
+		this.assertObservation(updatedObservation, stockModel.getStockId(), variable.getCvTermId(), updatedValue);
+
 	}
 
 	private void assertObservation(final StockProperty observation, final Integer stockId, final Integer typeId, final String value) {
