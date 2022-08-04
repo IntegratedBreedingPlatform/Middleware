@@ -359,7 +359,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 
 		final List<MeasurementVariable> entryVariables =
 			this.datasetService.getObservationSetVariables(plotDatasetId,
-				Lists.newArrayList(VariableType.ENTRY_DETAIL.getId()));
+				Lists.newArrayList(variableTypeId));
 
 		final List<Integer> variableIds = entryVariables.stream().filter(
 				c -> (c.getVariableType().getId().equals(variableTypeId)
