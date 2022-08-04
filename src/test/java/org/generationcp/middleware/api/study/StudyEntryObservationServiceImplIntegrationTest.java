@@ -88,7 +88,7 @@ public class StudyEntryObservationServiceImplIntegrationTest extends Integration
 		// Update observation
 		final String updatedValue = "updatedValue";
 		final StockPropertyData updatedStockPropertyData = new StockPropertyData(stockModel.getStockId(), variable.getCvTermId(), updatedValue, null);
-		this.studyEntryObservationService.updateObservation(updatedStockPropertyData, false);
+		this.studyEntryObservationService.updateObservation(updatedStockPropertyData);
 
 		// Assert recently updated observation
 		final StockProperty updatedObservation =
@@ -100,7 +100,7 @@ public class StudyEntryObservationServiceImplIntegrationTest extends Integration
 		assertFalse(this.daoFactory.getStockPropertyDao().getByStockIdAndTypeId(stockModel.getStockId(), variable.getCvTermId()).isPresent());
 
 		// recreate observation using update observation where allowCreate is true
-		this.studyEntryObservationService.updateObservation(updatedStockPropertyData, true);
+		this.studyEntryObservationService.createOrUpdateObservation(updatedStockPropertyData);
 		this.assertObservation(updatedObservation, stockModel.getStockId(), variable.getCvTermId(), updatedValue);
 
 	}

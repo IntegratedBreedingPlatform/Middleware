@@ -23,6 +23,18 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	}
 
 	@Override
+	public Integer createOrUpdateObservation(final StockPropertyData stockPropertyData) {
+		final Optional<StockProperty> stockPropertyOptional = this.daoFactory.getStockPropertyDao().getByStockIdAndTypeId(
+			stockPropertyData.getStockId(), stockPropertyData.getVariableId());
+
+		if (stockPropertyOptional.isPresent()) {
+			return this.updateStockProperty(stockPropertyOptional.get(), stockPropertyData);
+		}
+
+		return this.createObservation(stockPropertyData);
+	}
+
+	@Override
 	public Integer createObservation(final StockPropertyData stockPropertyData) {
 		final StockModel stockModel = this.daoFactory.getStockDao().getById(stockPropertyData.getStockId());
 		final StockProperty stockProperty = new StockProperty(stockModel, stockPropertyData.getVariableId(), stockPropertyData.getValue(),
@@ -33,23 +45,14 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	}
 
 	@Override
-	public Integer updateObservation(final StockPropertyData stockPropertyData, final boolean allowCreate) {
-		final Optional<StockProperty> stockPropertyOptional = this.daoFactory.getStockPropertyDao().getByStockIdAndTypeId(
-			stockPropertyData.getStockId(), stockPropertyData.getVariableId());
+	public Integer updateObservation(final StockPropertyData stockPropertyData) {
+		final StockProperty stockProperty =
+			this.daoFactory.getStockPropertyDao().getByStockIdAndTypeId(stockPropertyData.getStockId(), stockPropertyData.getVariableId())
+				.orElseThrow(() -> new MiddlewareException(
+					"Stock property: " + stockPropertyData.getStockId() + " with type: " + stockPropertyData.getVariableId()
+						+ " not found."));
 
-		if (!stockPropertyOptional.isPresent() && allowCreate) {
-			return this.createObservation(stockPropertyData);
-		}
-
-		final StockProperty stockProperty = stockPropertyOptional
-			.orElseThrow(() -> new MiddlewareException(
-				"Stock property: " + stockPropertyData.getStockId() + " with type: " + stockPropertyData.getVariableId()
-					+ " not found."));
-		stockProperty.setValue(stockPropertyData.getValue());
-		stockProperty.setCategoricalValueId(stockPropertyData.getCategoricalValueId());
-		this.daoFactory.getStockPropertyDao().update(stockProperty);
-
-		return stockProperty.getStockPropId();
+		return this.updateStockProperty(stockProperty, stockPropertyData);
 	}
 
 	@Override
@@ -61,6 +64,14 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	@Override
 	public long countObservationsByStudyAndVariables(final Integer studyId, final List<Integer> variableIds) {
 		return this.daoFactory.getStockPropertyDao().countObservationsByStudyIdAndVariableIds(studyId, variableIds);
+	}
+
+	private Integer updateStockProperty(final StockProperty stockProperty, final StockPropertyData stockPropertyData) {
+		stockProperty.setValue(stockPropertyData.getValue());
+		stockProperty.setCategoricalValueId(stockPropertyData.getCategoricalValueId());
+		this.daoFactory.getStockPropertyDao().update(stockProperty);
+
+		return stockProperty.getStockPropId();
 	}
 
 }
