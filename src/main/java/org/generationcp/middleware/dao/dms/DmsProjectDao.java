@@ -39,7 +39,7 @@ import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.service.api.study.ExperimentalDesign;
-import org.generationcp.middleware.service.api.study.ObservationLevel;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.service.api.study.SeasonDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
@@ -1966,6 +1966,22 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.setParameter("environmentId", environmentId);
 			query.setParameter("datasetTypeId", datasetType.getId());
 			return (Integer) query.uniqueResult();
+		} catch (final HibernateException e) {
+			LOG.error(e.getMessage(), e);
+			throw new MiddlewareQueryException(e.getMessage(), e);
+		}
+	}
+
+	public List<Integer> getDatasetTypeIdsOfEnvironment(final Integer environmentId) {
+		try {
+			final Query query = this.getSession().createSQLQuery("SELECT DISTINCT dataset.dataset_type_id"
+				+ " FROM project p "
+				+ " INNER JOIN nd_experiment nde ON nde.project_id = p.project_id"
+				+ " INNER JOIN project dataset ON dataset.study_id = p.study_id"
+				+ " INNER JOIN project study ON p.study_id = study.project_id AND study.deleted != " + DELETED_STUDY
+				+ " WHERE nde.nd_geolocation_id = :environmentId AND nde.type_id = " + ExperimentType.TRIAL_ENVIRONMENT.getTermId());
+			query.setParameter("environmentId", environmentId);
+			return query.list();
 		} catch (final HibernateException e) {
 			LOG.error(e.getMessage(), e);
 			throw new MiddlewareQueryException(e.getMessage(), e);

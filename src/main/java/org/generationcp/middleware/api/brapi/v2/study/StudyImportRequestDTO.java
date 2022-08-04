@@ -4,7 +4,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.service.api.study.DataLink;
 import org.generationcp.middleware.service.api.study.EnvironmentParameter;
 import org.generationcp.middleware.service.api.study.ExperimentalDesign;
-import org.generationcp.middleware.service.api.study.ObservationLevel;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.service.api.user.ContactDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
