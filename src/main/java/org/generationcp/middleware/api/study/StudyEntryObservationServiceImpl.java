@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Transactional
 @Service
@@ -20,18 +19,6 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 
 	public StudyEntryObservationServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
-	}
-
-	@Override
-	public Integer createOrUpdateObservation(final StockPropertyData stockPropertyData) {
-		final Optional<StockProperty> stockPropertyOptional = this.daoFactory.getStockPropertyDao().getByStockIdAndTypeId(
-			stockPropertyData.getStockId(), stockPropertyData.getVariableId());
-
-		if (stockPropertyOptional.isPresent()) {
-			return this.updateStockProperty(stockPropertyOptional.get(), stockPropertyData);
-		}
-
-		return this.createObservation(stockPropertyData);
 	}
 
 	@Override
@@ -51,8 +38,11 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 				.orElseThrow(() -> new MiddlewareException(
 					"Stock property: " + stockPropertyData.getStockId() + " with type: " + stockPropertyData.getVariableId()
 						+ " not found."));
+		stockProperty.setValue(stockPropertyData.getValue());
+		stockProperty.setCategoricalValueId(stockPropertyData.getCategoricalValueId());
+		this.daoFactory.getStockPropertyDao().update(stockProperty);
 
-		return this.updateStockProperty(stockProperty, stockPropertyData);
+		return stockProperty.getStockPropId();
 	}
 
 	@Override
@@ -65,13 +55,4 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	public long countObservationsByStudyAndVariables(final Integer studyId, final List<Integer> variableIds) {
 		return this.daoFactory.getStockPropertyDao().countObservationsByStudyIdAndVariableIds(studyId, variableIds);
 	}
-
-	private Integer updateStockProperty(final StockProperty stockProperty, final StockPropertyData stockPropertyData) {
-		stockProperty.setValue(stockPropertyData.getValue());
-		stockProperty.setCategoricalValueId(stockPropertyData.getCategoricalValueId());
-		this.daoFactory.getStockPropertyDao().update(stockProperty);
-
-		return stockProperty.getStockPropId();
-	}
-
 }

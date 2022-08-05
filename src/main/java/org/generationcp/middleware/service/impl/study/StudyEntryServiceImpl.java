@@ -3,7 +3,9 @@ package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.api.study.StudyEntryObservationService;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
@@ -30,6 +32,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
+import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.generationcp.middleware.service.api.study.StudyEntryColumnDTO;
 import org.generationcp.middleware.service.api.study.StudyEntryDto;
 import org.generationcp.middleware.service.api.study.StudyEntryPropertyData;
@@ -74,6 +77,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Resource
 	private CrossExpansionProperties crossExpansionProperties;
 
+	@Resource
+	private StudyEntryObservationService studyEntryObservationService;
+
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
@@ -92,7 +98,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public long countFilteredStudyEntries(int studyId, StudyEntrySearchDto.Filter filter) {
+	public long countFilteredStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter) {
 		final List<MeasurementVariable> entryVariables = this.getStudyVariables(studyId);
 		return this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(new StudyEntrySearchDto(studyId, filter), entryVariables);
 	}
@@ -389,5 +395,40 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 					|| variableTypeId == null)).map(MeasurementVariable::getTermId)
 			.collect(Collectors.toList());
 		return this.ontologyVariableDataManager.getVariablesByIds(variableIds, programUUID);
+	}
+
+	@Override
+	public void importUpdates(final Integer studyId, final List<StudyEntryDto> studyEntries,
+		final Map<String, List<StockPropertyData>> entryNoStockPropMap) {
+		final List<Integer> stockIds = studyEntries.stream().map(StudyEntryDto::getEntryId).collect(Collectors.toList());
+		final MultiKeyMap stockPropertyMap = this.daoFactory.getStockPropertyDao().getStockPropertiesMap(stockIds);
+
+		studyEntries.forEach(entry ->
+			this.processStudyEntry(studyId, entryNoStockPropMap.get(String.valueOf(entry.getEntryNumber())),
+				entry.getEntryId(), stockPropertyMap)
+		);
+	}
+
+	private void processStudyEntry(final Integer studyId, final List<StockPropertyData> stockPropDataList,
+		final Integer stockId, final MultiKeyMap stockPropertyMap) {
+		if (!CollectionUtils.isEmpty(stockPropDataList)) {
+			stockPropDataList.forEach(stockProp -> {
+				stockProp.setStockId(stockId);
+				final boolean hasStockProperty = stockPropertyMap.containsKey(stockProp.getStockId(), stockProp.getVariableId());
+
+				if (stockProp.hasValue() && !stockProp.getValue().isEmpty()) {
+					if (hasStockProperty) {
+						this.studyEntryObservationService.updateObservation(stockProp);
+					} else {
+						this.studyEntryObservationService.createObservation(stockProp);
+					}
+				} else {
+					if (hasStockProperty) {
+						final StockProperty sp = (StockProperty) stockPropertyMap.get(stockProp.getStockId(), stockProp.getVariableId());
+						this.studyEntryObservationService.deleteObservation(sp.getStockPropId());
+					}
+				}
+			});
+		}
 	}
 }

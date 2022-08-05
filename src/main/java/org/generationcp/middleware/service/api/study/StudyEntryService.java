@@ -5,6 +5,7 @@ import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
 import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -54,4 +55,5 @@ public interface StudyEntryService {
 
 	List<Variable> getStudyEntryDetails(String cropName, String programUUID, Integer studyId, Integer variableTypeId);
 
+	void importUpdates(Integer studyId, List<StudyEntryDto> studyEntries, Map<String, List<StockPropertyData>> entryNoStockPropMap);
 }

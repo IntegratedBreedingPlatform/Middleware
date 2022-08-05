@@ -67,7 +67,8 @@ public class StudyEntryObservationServiceImplIntegrationTest extends Integration
 
 		final Germplasm germplasm = this.germplasmTestDataGenerator.createGermplasm("BLE");
 		final StockModel stockModel =
-			new StockModel(plotDataset.getProjectId(), new StudyEntryDto(1, 1, germplasm.getGid(), germplasm.getGermplasmPreferredName(), null,null,null,"-",null,null));
+			new StockModel(plotDataset.getProjectId(),
+				new StudyEntryDto(1, 1, germplasm.getGid(), germplasm.getGermplasmPreferredName(), null, null, null, "-", null, null));
 		this.daoFactory.getStockDao().save(stockModel);
 
 		final CVTerm variable =
@@ -77,7 +78,8 @@ public class StudyEntryObservationServiceImplIntegrationTest extends Integration
 
 		// Create observation
 		final String newValue = "newValue";
-		final StockPropertyData newStockPropertyData = new StockPropertyData(stockModel.getStockId(), variable.getCvTermId(), newValue, null);
+		final StockPropertyData newStockPropertyData =
+			new StockPropertyData(stockModel.getStockId(), variable.getCvTermId(), newValue, null);
 		this.studyEntryObservationService.createObservation(newStockPropertyData);
 
 		// Assert recently created observation
@@ -87,7 +89,8 @@ public class StudyEntryObservationServiceImplIntegrationTest extends Integration
 
 		// Update observation
 		final String updatedValue = "updatedValue";
-		final StockPropertyData updatedStockPropertyData = new StockPropertyData(stockModel.getStockId(), variable.getCvTermId(), updatedValue, null);
+		final StockPropertyData updatedStockPropertyData =
+			new StockPropertyData(stockModel.getStockId(), variable.getCvTermId(), updatedValue, null);
 		this.studyEntryObservationService.updateObservation(updatedStockPropertyData);
 
 		// Assert recently updated observation
@@ -97,12 +100,8 @@ public class StudyEntryObservationServiceImplIntegrationTest extends Integration
 
 		// Delete observation
 		this.studyEntryObservationService.deleteObservation(newObservation.getStockPropId());
-		assertFalse(this.daoFactory.getStockPropertyDao().getByStockIdAndTypeId(stockModel.getStockId(), variable.getCvTermId()).isPresent());
-
-		// recreate observation using update observation where allowCreate is true
-		this.studyEntryObservationService.createOrUpdateObservation(updatedStockPropertyData);
-		this.assertObservation(updatedObservation, stockModel.getStockId(), variable.getCvTermId(), updatedValue);
-
+		assertFalse(
+			this.daoFactory.getStockPropertyDao().getByStockIdAndTypeId(stockModel.getStockId(), variable.getCvTermId()).isPresent());
 	}
 
 	private void assertObservation(final StockProperty observation, final Integer stockId, final Integer typeId, final String value) {
