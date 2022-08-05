@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.study;
 
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.StockDao;
@@ -98,7 +99,7 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	}
 
 	@Override
-	public long countFilteredStudyEntries(int studyId, StudyEntrySearchDto.Filter filter) {
+	public long countFilteredStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter) {
 		final List<MeasurementVariable> entryVariables = this.getStudyVariables(studyId);
 		if(filter != null){
 			this.addPreFilteredGids(filter);
@@ -408,6 +409,30 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 		});
 	}
 
+	@Override
+	public List<Variable> getStudyEntryDetails(final String cropName, final String programUUID,
+		final Integer studyId, final Integer variableTypeId) {
+
+		final Integer plotDatasetId =
+			this.datasetService.getDatasets(studyId, new HashSet<>(Collections.singletonList(DatasetTypeEnum.PLOT_DATA.getId()))).get(0)
+				.getDatasetId();
+
+		final List<MeasurementVariable> entryVariables =
+			this.datasetService.getObservationSetVariables(plotDatasetId,
+				Lists.newArrayList(variableTypeId));
+
+		final List<Integer> variableIds = entryVariables.stream().filter(
+				c -> (c.getVariableType().getId().equals(variableTypeId)
+					|| variableTypeId == null)).map(MeasurementVariable::getTermId)
+			.collect(Collectors.toList());
+		return this.ontologyVariableDataManager.getVariablesByIds(variableIds, programUUID);
+	}
+
+	@Override
+	public MultiKeyMap getStudyEntryStockPropertyMap(final Integer studyId, final List<StudyEntryDto> studyEntries) {
+		final List<Integer> stockIds = studyEntries.stream().map(StudyEntryDto::getEntryId).collect(Collectors.toList());
+		return this.daoFactory.getStockPropertyDao().getStockPropertiesMap(stockIds);
+	}
 	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<StudyEntryDto>  studyEntries) {
 		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
 		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable =
