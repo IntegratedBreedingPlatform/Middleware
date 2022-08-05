@@ -52,6 +52,8 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		private Set<Integer> filteredNdExperimentIds;
 		private Map<String, String> variableTypeMap;
 		private Integer variableId;
+		// FIXME: Remove it after solver the filter for Female and Male Parents into the query.
+		private Set<Integer> preFilteredGids;
 
 		public Filter() {
 			this.byMissing = false;
@@ -133,6 +135,14 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 
 		public void setVariableTypeMap(final Map<String, String> variableTypeMap) {
 			this.variableTypeMap = variableTypeMap;
+		}
+
+		public Set<Integer> getPreFilteredGids() {
+			return this.preFilteredGids;
+		}
+
+		public void setPreFilteredGids(final Set<Integer> preFilteredGids) {
+			this.preFilteredGids = preFilteredGids;
 		}
 
 	}

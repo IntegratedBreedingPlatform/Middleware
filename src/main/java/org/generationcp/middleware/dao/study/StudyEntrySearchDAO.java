@@ -1,5 +1,6 @@
 package org.generationcp.middleware.dao.study;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.generationcp.middleware.dao.AbstractGenericSearchDAO;
@@ -28,6 +29,7 @@ import org.springframework.util.CollectionUtils;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +41,10 @@ import java.util.stream.Collectors;
 public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, Integer> {
 
 	private static final Map<String, String> factorsFilterMap;
+
+	private static final List<Integer> REMOVE_FILTERS = Lists.newArrayList(TermId.FEMALE_PARENT_GID.getId(),
+		TermId.FEMALE_PARENT_NAME.getId(), TermId.MALE_PARENT_GID.getId(), TermId.MALE_PARENT_NAME.getId());
+	private static final String LIMIT_CLAUSE = " LIMIT 5000 ";
 
 	static {
 		factorsFilterMap = new HashMap<>();
@@ -318,11 +324,17 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	}
 
 	private String addFilters(final StudyEntrySearchDto.Filter filter, final Map<String, Object> queryParams) {
+
+		final StringBuilder whereClause = new StringBuilder();
+		if (filter!= null && !CollectionUtils.isEmpty(filter.getPreFilteredGids())) {
+			whereClause.append(" and s.dbxref_id in (:preFilteredGids) ");
+			queryParams.put("preFilteredGids", filter.getPreFilteredGids());
+		}
+
 		if (filter == null) {
 			return "";
 		}
 
-		final StringBuilder whereClause = new StringBuilder();
 		if (!CollectionUtils.isEmpty(filter.getEntryNumbers())) {
 			whereClause.append(" AND s.uniquename in (:entryNumbers)");
 			queryParams.put("entryNumbers", filter.getEntryNumbers());
@@ -357,6 +369,9 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			for (final Map.Entry<String, String> entry : filteredTextValues.entrySet()) {
 				final String variableId = entry.getKey();
 
+				if (REMOVE_FILTERS.contains(Integer.valueOf(variableId))) {
+					continue;
+				}
 				// Skip WHERE filter for LOT AVAILABLE BALANCE. AVAILABLE BALANCE will be filtered using the HAVING clause.
 				if (String.valueOf(TermId.GID_AVAILABLE_BALANCE.getId()).equals(variableId)) {
 					continue;
@@ -391,6 +406,9 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		final StudyEntrySearchDto.Filter filter,
 		final Set<String> variableIds, final boolean performLikeOperation) {
 		for (final String variableId : variableIds) {
+			if (REMOVE_FILTERS.contains(Integer.valueOf(variableId))) {
+				continue;
+			}
 			final String variableTypeString = filter.getVariableTypeMap().get(variableId);
 			this.applyFactorsFilter(sql, variableId, variableTypeString, performLikeOperation);
 		}
@@ -546,4 +564,91 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		return String.format("VARIABLE_%s", variableId);
 	}
 
+	public Set<Integer>  addPreFilteredGids(final StudyEntrySearchDto.Filter filter) {
+		String femaleName = null;
+		String maleName = null;
+		String femaleGid = null;
+		String maleGid = null;
+		final Set<Integer> preFilteredGids = new HashSet<Integer>();
+		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.FEMALE_PARENT_NAME.getId()))) {
+			femaleName = filter.getFilteredTextValues().get(String.valueOf(TermId.FEMALE_PARENT_NAME.getId()));
+		}
+
+		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.FEMALE_PARENT_GID.getId()))) {
+			final String filterValue = filter.getFilteredTextValues().get(String.valueOf(TermId.FEMALE_PARENT_GID.getId()));
+			femaleGid = filterValue.equalsIgnoreCase("UNKNOWN") ? "0" : filterValue;
+
+		}
+
+		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.MALE_PARENT_NAME.getId()))) {
+			maleName = filter.getFilteredTextValues().get(String.valueOf(TermId.MALE_PARENT_NAME.getId()));
+		}
+
+		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.MALE_PARENT_GID.getId()))) {
+			final String filterValue = filter.getFilteredTextValues().get(String.valueOf(TermId.MALE_PARENT_GID.getId()));
+			maleGid = filterValue.equalsIgnoreCase("UNKNOWN") ? "0" : filterValue;
+		}
+
+		if (StringUtils.isNotBlank(femaleName) || StringUtils.isNotBlank(femaleGid)) {
+			StringBuilder sql = new StringBuilder("select g.gid from names n \n");//
+			sql.append("   straight_join germplsm female_parent on n.gid = female_parent.gid \n");//
+			sql.append("   straight_join germplsm group_source on female_parent.gid = group_source.gpid1 and group_source.gnpgs > 0 \n");//
+			sql.append("   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n");  //
+			sql.append("                            or g.gnpgs > 0 and group_source.gid = g.gid \n"); //
+			sql.append(" where n.nstat = 1 \n");
+			if (StringUtils.isNotBlank(femaleName)) {
+				sql.append(" and n.nval = :femaleName "); //
+			}
+			if (StringUtils.isNotBlank(femaleGid)) {
+				sql.append(" and female_parent.gid = :femaleGid "); //
+			}
+			sql.append(LIMIT_CLAUSE); //
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+
+			if (StringUtils.isNotBlank(femaleName)) {
+				query.setParameter("femaleName", femaleName); //
+			}
+			if (StringUtils.isNotBlank(femaleGid)) {
+				query.setParameter("femaleGid", femaleGid); //
+			}
+
+			final List<Integer> gids = query.list();
+			if (!gids.isEmpty()) {
+				preFilteredGids.addAll(gids);
+			}
+		}
+
+		if (StringUtils.isNotBlank(maleName) || StringUtils.isNotBlank(maleGid)) {
+			StringBuilder sql = new StringBuilder("select g.gid from names n \n");//
+			sql.append("   straight_join germplsm male_parent on n.gid = male_parent.gid \n");//
+			sql.append("   straight_join germplsm group_source on male_parent.gid = group_source.gpid2 and group_source.gnpgs > 0 \n");//
+			sql.append("   straight_join germplsm g on g.gnpgs < 0 and group_source.gid = g.gpid1 \n");  //
+			sql.append("                            or g.gnpgs > 0 and group_source.gid = g.gid \n"); //
+			sql.append(" where n.nstat = 1 \n");
+
+			if (StringUtils.isNotBlank(maleName)) {
+				sql.append(" and n.nval = :maleName "); //
+			}
+			if (StringUtils.isNotBlank(maleGid)) {
+				sql.append(" and male_parent.gid = :maleGid "); //
+			}
+			sql.append(LIMIT_CLAUSE); //
+
+			final SQLQuery query = this.getSession().createSQLQuery(sql.toString());
+
+			if (StringUtils.isNotBlank(maleName)) {
+				query.setParameter("maleName", maleName); //
+			}
+			if (StringUtils.isNotBlank(maleGid)) {
+				query.setParameter("maleGid", maleGid); //
+			}
+
+			final List<Integer> gids = query.list();
+			if (!gids.isEmpty()) {
+				preFilteredGids.addAll(gids);
+			}
+		}
+
+		return preFilteredGids;
+	}
 }

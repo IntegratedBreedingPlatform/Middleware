@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
+import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.germplasm.GermplasmDto;
@@ -20,11 +21,13 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
+import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.dms.StockModel;
@@ -78,6 +81,9 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
+	@Resource
+	private PedigreeDataManager pedigreeDataManager;
+
 	private final DaoFactory daoFactory;
 
 	public StudyEntryServiceImpl(final HibernateSessionProvider sessionProvider) {
@@ -95,15 +101,45 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	@Override
 	public long countFilteredStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter) {
 		final List<MeasurementVariable> entryVariables = this.getStudyVariables(studyId);
+		if(filter != null){
+			this.addPreFilteredGids(filter);
+		}
+
 		return this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(new StudyEntrySearchDto(studyId, filter), entryVariables);
+	}
+
+	private void addPreFilteredGids(final StudyEntrySearchDto.Filter filter) {
+		Set<String> textKeys = filter.getFilteredTextValues().keySet();
+		if(textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_GID.getId())) ||
+			textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_NAME.getId())) ||
+			textKeys.contains(String.valueOf(TermId.MALE_PARENT_GID.getId())) ||
+			textKeys.contains(String.valueOf(TermId.MALE_PARENT_NAME.getId()))
+		){
+			filter.setPreFilteredGids(this.daoFactory.getStudyEntrySearchDAO().addPreFilteredGids(filter));
+		}
+
 	}
 
 	@Override
 	public List<StudyEntryDto> getStudyEntries(final int studyId, final StudyEntrySearchDto.Filter filter, final Pageable pageable) {
 		final List<MeasurementVariable> entryVariables = this.getStudyVariables(studyId);
-		return
+
+		// FIXME: It was implemented pre-filters to FEMALE and MALE Parents by NAME or GID.
+		//  Is need a workaround solution to implement filters into the query if possible.
+		if (filter != null) {
+			this.addPreFilteredGids(filter);
+		}
+
+		final List<StudyEntryDto> studyEntries =
 			this.daoFactory.getStudyEntrySearchDAO()
 				.getStudyEntries(new StudyEntrySearchDto(studyId, filter), entryVariables, pageable);
+
+		if (entryVariables.stream().anyMatch(this::entryVariablesHasParent)) {
+			final Set<Integer> gids = studyEntries.stream().map(s -> s.getGid()).collect(Collectors.toSet());
+			this.addParentsFromPedigreeTable(gids, studyEntries);
+		}
+
+		return studyEntries;
 	}
 
 	@Override
@@ -396,5 +432,43 @@ public class StudyEntryServiceImpl implements StudyEntryService {
 	public MultiKeyMap getStudyEntryStockPropertyMap(final Integer studyId, final List<StudyEntryDto> studyEntries) {
 		final List<Integer> stockIds = studyEntries.stream().map(StudyEntryDto::getEntryId).collect(Collectors.toList());
 		return this.daoFactory.getStockPropertyDao().getStockPropertiesMap(stockIds);
+	}
+	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<StudyEntryDto>  studyEntries) {
+		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
+		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable =
+			this.pedigreeDataManager.generatePedigreeTable(gids, level, false);
+
+		studyEntries.forEach(studyEntry -> {
+			final Integer gid = studyEntry.getGid();
+
+			final Optional<Germplasm> femaleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.FGID.getName());
+			femaleParent.ifPresent(value -> {
+				final Germplasm germplasm = value;
+				studyEntry.getProperties().put(
+					TermId.FEMALE_PARENT_GID.getId(),
+					new StudyEntryPropertyData(germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN));
+				studyEntry.getProperties().put(
+					TermId.FEMALE_PARENT_NAME.getId(),
+					new StudyEntryPropertyData(germplasm.getPreferredName().getNval()));
+			});
+
+			final Optional<Germplasm> maleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.MGID.getName());
+			if (maleParent.isPresent()) {
+				final Germplasm germplasm = maleParent.get();
+				studyEntry.getProperties().put(
+					TermId.MALE_PARENT_GID.getId(),
+					new StudyEntryPropertyData(germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN));
+				studyEntry.getProperties().put(
+					TermId.MALE_PARENT_NAME.getId(),
+					new StudyEntryPropertyData(germplasm.getPreferredName().getNval()));
+			}
+		});
+	}
+
+	private boolean entryVariablesHasParent(final MeasurementVariable measurementVariable) {
+		return measurementVariable.getTermId() == TermId.FEMALE_PARENT_GID.getId() ||
+			measurementVariable.getTermId() == TermId.FEMALE_PARENT_NAME.getId()||
+			measurementVariable.getTermId() ==  TermId.MALE_PARENT_GID.getId() ||
+			measurementVariable.getTermId() ==  TermId.MALE_PARENT_NAME.getId();
 	}
 }
