@@ -68,7 +68,7 @@ public class PlantingServiceImpl implements PlantingService {
 
 		this.processSearchComposite(searchDTO);
 
-		// List Numeric Entry Details variables without ENTRY_NO.
+		// List Numeric Entry Details variables that are not system variable.
 		final List<MeasurementVariable> entryDetails = this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.ENTRY_DETAIL.getId())) //
 			.stream().filter( var -> DataType.NUMERIC_VARIABLE.getId().equals(var.getDataTypeId()) && !var.isSystemVariable()).collect(Collectors.toList());
 
