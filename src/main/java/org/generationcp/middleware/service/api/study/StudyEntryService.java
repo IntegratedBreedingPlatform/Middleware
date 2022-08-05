@@ -1,6 +1,7 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
@@ -55,5 +56,5 @@ public interface StudyEntryService {
 
 	List<Variable> getStudyEntryDetails(String cropName, String programUUID, Integer studyId, Integer variableTypeId);
 
-	void importUpdates(Integer studyId, List<StudyEntryDto> studyEntries, Map<String, List<StockPropertyData>> entryNoStockPropMap);
+	MultiKeyMap getStudyEntryStockPropertyMap(Integer studyId, List<StudyEntryDto> studyEntries);
 }
