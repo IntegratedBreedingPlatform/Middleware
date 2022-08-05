@@ -24,7 +24,6 @@ import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
-import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
@@ -43,7 +42,6 @@ import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -576,16 +574,7 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 				c -> c.getCvtermId() != null && (c.getTypeId().equals(variableTypeId)
 					|| variableTypeId == null)).map(GermplasmListDataView::getCvtermId)
 			.collect(Collectors.toList());
-		if (!CollectionUtils.isEmpty(variableIds)) {
-			final VariableFilter variableFilter = new VariableFilter();
-			if (StringUtils.isNotEmpty(programUUID)) {
-				variableFilter.setProgramUuid(programUUID);
-			}
-			variableIds
-				.forEach(variableFilter::addVariableId);
-			return this.ontologyVariableDataManager.getWithFilter(variableFilter);
-		}
-		return Collections.emptyList();
+		return this.ontologyVariableDataManager.getVariablesByIds(variableIds, programUUID);
 	}
 
 	@Override
@@ -666,7 +655,8 @@ public class GermplasmListServiceImpl implements GermplasmListService {
 	}
 
 	@Override
-	public Map<Integer, Map<Integer, String>> getObservationValuesByListAndVariableIds(final Integer listId, final Set<Integer> variableIds) {
+	public Map<Integer, Map<Integer, String>> getObservationValuesByListAndVariableIds(final Integer listId,
+		final Set<Integer> variableIds) {
 		return this.daoFactory.getGermplasmListDataDetailDAO().getObservationValuesByListAndVariableIds(listId, variableIds);
 	}
 

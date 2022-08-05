@@ -52,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -334,7 +335,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 						+ leftJoinsProgramUUIDDependant
 						+ "WHERE (v.cv_id = 1040) " + filterClause)
 				.addScalar("vid").addScalar("vn").addScalar("vd").addScalar("pid").addScalar("pn").addScalar("pd").addScalar("mid")
-				.addScalar("mn").addScalar("md").addScalar("sid").addScalar("sn").addScalar("sd").addScalar("is_system").addScalar("p_alias")
+				.addScalar("mn").addScalar("md").addScalar("sid").addScalar("sn").addScalar("sd").addScalar("is_system")
+				.addScalar("p_alias")
 				.addScalar("p_min_value")
 				.addScalar("p_max_value").addScalar("fid");
 
@@ -379,7 +381,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				}
 
 				variable.setScale(sMap.get(scaleId));
-				variable.setIsSystem((Boolean)items[12]);
+				variable.setIsSystem((Boolean) items[12]);
 
 				// Alias, Expected Min Value, Expected Max Value
 				final String pAlias = (String) items[13];
@@ -1088,5 +1090,19 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			this.areVariablesUsedInAttributes(Lists.newArrayList(variableId)) ||
 			this.isVariableUsedInBreedingMethods(variableId) ||
 			this.isVariableAssignedToLists(variableId);
+	}
+
+	@Override
+	public List<Variable> getVariablesByIds(final List<Integer> variableIds, final String programUUID) {
+		if (!CollectionUtils.isEmpty(variableIds)) {
+			final VariableFilter variableFilter = new VariableFilter();
+			if (StringUtils.isNotEmpty(programUUID)) {
+				variableFilter.setProgramUuid(programUUID);
+			}
+			variableIds
+				.forEach(variableFilter::addVariableId);
+			return this.getWithFilter(variableFilter);
+		}
+		return Collections.emptyList();
 	}
 }
