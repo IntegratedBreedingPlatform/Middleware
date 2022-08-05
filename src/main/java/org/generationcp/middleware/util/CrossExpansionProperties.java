@@ -3,12 +3,14 @@ package org.generationcp.middleware.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -120,6 +122,10 @@ public class CrossExpansionProperties {
 				CrossExpansionProperties.LOG.error(errorMessage);
 				throw new MiddlewareException(errorMessage, e);
 			}
+		}
+		final String defaultGenerationLevel = this.props.getProperty("default.generation.level");
+		if (StringUtils.isNotBlank(defaultGenerationLevel)) {
+			this.setDefaultLevel(Integer.parseInt(defaultGenerationLevel));
 		}
 		return this.getDefaultLevel();
 	}

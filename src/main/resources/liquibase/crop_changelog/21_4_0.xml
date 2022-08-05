@@ -4,7 +4,7 @@
 				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
-	<changeSet author="lkovacic" id="v21.4.0-1">
+		<changeSet author="lkovacic" id="v21.4.0-1">
 		<preConditions onFail="MARK_RAN">
 			<and>
 				<sqlCheck expectedResult="0">
@@ -19,6 +19,140 @@
 		<createIndex indexName="methods_mcode_uindex" tableName="methods" unique="true">
 			<column name="mcode" type="varchar" />
 		</createIndex>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.4.0-2">
+			<preConditions onFail="MARK_RAN">
+				<and>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'Female Parent' and cv_id = 1010 and is_obsolete = 0;</sqlCheck>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8341;</sqlCheck>
+				</and>
+			</preConditions>
+			<comment>Add 'Female Parent' property</comment>
+			<sql dbms="mysql" splitStatements="true">
+				INSERT INTO CVTERM (cvterm_id, cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+				VALUES (8341, 1010, 'Female Parent', 'Female Parent', 0, 0, 0);
+
+				INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+				VALUES (1225, 8341, 1087);
+			</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.4.0-3">
+			<preConditions onFail="MARK_RAN">
+				<and>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'Male Parent' and cv_id = 1010 and is_obsolete = 0;</sqlCheck>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8344;</sqlCheck>
+				</and>
+			</preConditions>
+			<comment>Add 'Male Parent' property</comment>
+			<sql dbms="mysql" splitStatements="true">
+				INSERT INTO CVTERM (cvterm_id, cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+				VALUES (8344, 1010, 'Male Parent', 'Male Parent', 0, 0, 0);
+
+				INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+				VALUES (1225, 8344, 1087);
+			</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.4.0-4">
+			<preConditions onFail="MARK_RAN">
+				<and>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'FEMALE_PARENT_NAME' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8343;</sqlCheck>
+					<sqlCheck expectedResult="1">select count(*) from cvterm where name = 'Female Parent' and cv_id = 1010 and is_obsolete = 0 and cvterm_id = 8341;</sqlCheck>
+				</and>
+			</preConditions>
+			<comment>Add 'FEMALE PARENT NAME' as germplasm descriptor</comment>
+			<sql dbms="mysql" splitStatements="true">
+				INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+				VALUES (8343, 1040, 'FEMALE_PARENT_NAME','Name of Female Parent', NULL, 0, 0, 1);
+
+				INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+				VALUES
+					(1200, 8343, 8341),
+					(1210, 8343, 4030),
+					(1220, 8343, 1908);
+
+				INSERT INTO cvtermprop (cvterm_id, type_id, value, rank) VALUES
+					(8343, 1800, 'Germplasm Descriptor', 0),
+					(8343, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+			</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.4.0-5">
+			<preConditions onFail="MARK_RAN">
+				<and>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'FEMALE_PARENT_GID' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8342;</sqlCheck>
+					<sqlCheck expectedResult="1">select count(*) from cvterm where name = 'Female Parent' and cv_id = 1010 and is_obsolete = 0 and cvterm_id = 8341;</sqlCheck>
+				</and>
+			</preConditions>
+			<comment>Add 'FEMALE PARENT GID' as germplasm descriptor</comment>
+			<sql dbms="mysql" splitStatements="true">
+				INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+				VALUES (8342, 1040, 'FEMALE_PARENT_GID','Gid of Female Parent', NULL, 0, 0, 1);
+
+				INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+				VALUES
+					(1200, 8342, 8341),
+					(1210, 8342, 4030),
+					(1220, 8342, 1907);
+
+				INSERT INTO cvtermprop (cvterm_id, type_id, value, `rank`) VALUES
+					(8342, 1800, 'Germplasm Descriptor', 0),
+					(8342, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+			</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.4.0-6">
+			<preConditions onFail="MARK_RAN">
+				<and>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'MALE_PARENT_NAME' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8346;</sqlCheck>
+					<sqlCheck expectedResult="1">select count(*) from cvterm where name = 'Male Parent' and cv_id = 1010 and is_obsolete = 0 and cvterm_id = 8344;</sqlCheck>
+				</and>
+			</preConditions>
+			<comment>Add 'MALE PARENT NAME' as germplasm descriptor</comment>
+			<sql dbms="mysql" splitStatements="true">
+				INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+				VALUES (8346, 1040, 'MALE_PARENT_NAME','Name of Male Parent', NULL, 0, 0, 1);
+
+				INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+				VALUES
+					(1200, 8346, 8344),
+					(1210, 8346, 4030),
+					(1220, 8346, 1908);
+
+				INSERT INTO cvtermprop (cvterm_id, type_id, value, rank) VALUES
+					(8346, 1800, 'Germplasm Descriptor', 0),
+					(8346, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+			</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.4.0-7">
+			<preConditions onFail="MARK_RAN">
+				<and>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'MALE_PARENT_GID' and cv_id = 1040 and is_obsolete = 0;</sqlCheck>
+					<sqlCheck expectedResult="0">select count(*) from cvterm where cvterm_id = 8345;</sqlCheck>
+					<sqlCheck expectedResult="1">select count(*) from cvterm where name = 'Male Parent' and cv_id = 1010 and is_obsolete = 0 and cvterm_id = 8344;</sqlCheck>
+				</and>
+			</preConditions>
+			<comment>Add 'MALE PARENT GID' as germplasm descriptor</comment>
+			<sql dbms="mysql" splitStatements="true">
+				INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+				VALUES (8345, 1040, 'MALE_PARENT_GID','Gid of Male Parent', NULL, 0, 0, 1);
+
+				INSERT INTO cvterm_relationship(type_id, subject_id, object_id)
+				VALUES
+					(1200, 8345, 8344),
+					(1210, 8345, 4030),
+					(1220, 8345, 1907);
+
+				INSERT INTO cvtermprop (cvterm_id, type_id, value, `rank`) VALUES
+					(8345, 1800, 'Germplasm Descriptor', 0),
+					(8345, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+			</sql>
 	</changeSet>
 
 </databaseChangeLog>

@@ -8,6 +8,8 @@ import com.google.common.collect.Table;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.program.ProgramService;
+import org.generationcp.middleware.api.role.RoleService;
+import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
@@ -25,9 +27,11 @@ import org.generationcp.middleware.exceptions.MiddlewareException;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.api.role.RoleService;
+import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
+import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -37,6 +41,7 @@ import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
+import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.InstanceDetailsDTO;
@@ -49,6 +54,7 @@ import org.generationcp.middleware.service.api.study.MeasurementVariableDto;
 import org.generationcp.middleware.service.api.study.StudyService;
 import org.generationcp.middleware.service.impl.study.StudyEntryGermplasmDescriptorColumns;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -160,6 +166,15 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Autowired
 	private DerivedVariableService derivedVariableService;
+
+	@Autowired
+	private PedigreeService pedigreeService;
+
+	@Autowired
+	private CrossExpansionProperties crossExpansionProperties;
+
+	@Autowired
+	private PedigreeDataManager pedigreeDataManager;
 
 	public DatasetServiceImpl() {
 		// no-arg constuctor is required by CGLIB proxying used by Spring 3x and older.
@@ -685,8 +700,18 @@ public class DatasetServiceImpl implements DatasetService {
 		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
 
 		this.updateSearchDto(studyId, datasetId, searchDTO);
+		// FIXME: It was implemented pre-filters to FEMALE and MALE Parents by NAME or GID.
+		//  Is need a workaround solution to implement filters into the query if possible.
+		if(searchDTO.getFilter() != null){
+			this.addPreFilteredGids(searchDTO.getFilter());
+		}
+		final List<ObservationUnitRow> list = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
 
-		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
+		if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
+			final Set<Integer> gids = list.stream().map(s -> s.getGid()).collect(Collectors.toSet());
+			this.addParentsFromPedigreeTable(gids, list);
+		}
+		return list;
 	}
 
 	@Override
@@ -694,7 +719,11 @@ public class DatasetServiceImpl implements DatasetService {
 		final int studyId, final int datasetId, final ObservationUnitsSearchDTO searchDTO, final Pageable pageable) {
 
 		this.updateSearchDto(studyId, datasetId, searchDTO);
-
+		// FIXME: It was implemented pre-filters to FEMALE and MALE Parents by NAME or GID.
+		//  Is need a workaround solution to implement filters into the query if possible.
+		if(searchDTO.getFilter() != null){
+			this.addPreFilteredGids(searchDTO.getFilter());
+		}
 		return this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTableMapList(searchDTO, pageable);
 	}
 
@@ -760,6 +789,10 @@ public class DatasetServiceImpl implements DatasetService {
 			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, new PageRequest(0, Integer.MAX_VALUE));
 		this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 
+		if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
+			final Set<Integer> gids = observationUnits.stream().map(s -> s.getGid()).collect(Collectors.toSet());
+			this.addParentsFromPedigreeTable(gids, observationUnits);
+		}
 		return observationUnits;
 	}
 
@@ -796,6 +829,11 @@ public class DatasetServiceImpl implements DatasetService {
 	public long countFilteredObservationUnitsForDataset(
 		final Integer datasetId, final Integer instanceId, final Boolean draftMode,
 		final ObservationUnitsSearchDTO.Filter filter) {
+		// FIXME: It was implemented pre-filters to FEMALE and MALE Parents by NAME or GID.
+		//  Is need a workaround solution to implement filters into the query if possible.
+		if(filter != null){
+			this.addPreFilteredGids(filter);
+		}
 		return this.daoFactory.getObservationUnitsSearchDAO().countObservationUnitsForDataset(datasetId, instanceId, draftMode, filter);
 	}
 
@@ -980,6 +1018,11 @@ public class DatasetServiceImpl implements DatasetService {
 		final String variableId = searchDTO.getFilter().getVariableId().toString();
 		final List<Phenotype> phenotypes = new ArrayList<>();
 		this.updateSearchDto(studyId, datasetId, searchDTO);
+		// FIXME: It was implemented pre-filters to FEMALE and MALE Parents by NAME or GID.
+		//  Is need a workaround solution to implement filters into the query if possible.
+		if(searchDTO.getFilter() != null){
+			this.addPreFilteredGids(searchDTO.getFilter());
+		}
 
 		final List<ObservationUnitRow> observationUnitsByVariable =
 			this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitsByVariable(searchDTO);
@@ -1022,7 +1065,9 @@ public class DatasetServiceImpl implements DatasetService {
 		final String newValue = paramDTO.getNewValue();
 		final String variableId = paramDTO.getObservationUnitsSearchDTO().getFilter().getVariableId().toString();
 		final List<Phenotype> phenotypes = new ArrayList<>();
-
+		if(paramDTO.getObservationUnitsSearchDTO().getFilter() != null){
+			this.addPreFilteredGids(paramDTO.getObservationUnitsSearchDTO().getFilter());
+		}
 		this.updateSearchDto(studyId, datasetId, paramDTO.getObservationUnitsSearchDTO());
 		final Boolean draftMode = paramDTO.getObservationUnitsSearchDTO().getDraftMode();
 		final List<ObservationUnitRow> observationUnitsByVariable =
@@ -1263,6 +1308,11 @@ public class DatasetServiceImpl implements DatasetService {
 				this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, null);
 			this.addStudyVariablesToUnitRows(observationUnits, studyVariables);
 			instanceMap.put(instanceId, observationUnits);
+
+			if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
+				final Set<Integer> gids = observationUnits.stream().map(s -> s.getGid()).collect(Collectors.toSet());
+				this.addParentsFromPedigreeTable(gids, observationUnits);
+			}
 		}
 		return instanceMap;
 	}
@@ -1489,8 +1539,11 @@ public class DatasetServiceImpl implements DatasetService {
 
 	@Override
 	public FilteredPhenotypesInstancesCountDTO countFilteredInstancesAndPhenotypes(
-		final Integer datasetId, final ObservationUnitsSearchDTO filter) {
-		return this.daoFactory.getObservationUnitsSearchDAO().countFilteredInstancesAndPhenotypes(datasetId, filter);
+		final Integer datasetId, final ObservationUnitsSearchDTO observationUnitsSearchDTO) {
+		if(observationUnitsSearchDTO.getFilter() != null){
+			this.addPreFilteredGids(observationUnitsSearchDTO.getFilter());
+		}
+		return this.daoFactory.getObservationUnitsSearchDAO().countFilteredInstancesAndPhenotypes(datasetId, observationUnitsSearchDTO);
 	}
 
 	private boolean shouldAddStockIdColumn(final Integer studyId) {
@@ -1500,4 +1553,55 @@ public class DatasetServiceImpl implements DatasetService {
 		return this.daoFactory.getTransactionDAO().countSearchTransactions(transactionsSearchDto) > 0;
 	}
 
+	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<ObservationUnitRow> list) {
+		final Integer level = this.crossExpansionProperties.getCropGenerationLevel(this.pedigreeService.getCropName());
+		final com.google.common.collect.Table<Integer, String, Optional<Germplasm>> pedigreeTreeNodeTable =
+			this.pedigreeDataManager.generatePedigreeTable(gids, level, false);
+
+		list.forEach(observationUnitRow -> {
+			final Integer gid = observationUnitRow.getGid();
+
+			final Optional<Germplasm> femaleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.FGID.getName());
+			femaleParent.ifPresent(value -> {
+				final Germplasm germplasm = value;
+				observationUnitRow.getVariables().put(
+					TermId.FEMALE_PARENT_GID.name(),
+					new ObservationUnitData(TermId.FEMALE_PARENT_GID.getId(),
+						germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN));
+				observationUnitRow.getVariables().put(
+					TermId.FEMALE_PARENT_NAME.name(),
+					new ObservationUnitData(TermId.FEMALE_PARENT_NAME.getId(), germplasm.getPreferredName().getNval()));
+			});
+
+			final Optional<Germplasm> maleParent = pedigreeTreeNodeTable.get(gid, ColumnLabels.MGID.getName());
+			if (maleParent.isPresent()) {
+				final Germplasm germplasm = maleParent.get();
+				observationUnitRow.getVariables().put(
+					TermId.MALE_PARENT_GID.name(),
+					new ObservationUnitData(TermId.MALE_PARENT_GID.getId(),germplasm.getGid() != 0 ? String.valueOf(germplasm.getGid()) : Name.UNKNOWN));
+				observationUnitRow.getVariables().put(
+					TermId.MALE_PARENT_NAME.name(),
+					new ObservationUnitData(TermId.MALE_PARENT_NAME.getId(),germplasm.getPreferredName().getNval()));
+			}
+
+		});
+	}
+
+	private boolean hasParentGermplasmDescriptors(final String germplasmDescriptor) {
+		return TermId.FEMALE_PARENT_GID.name().equals(germplasmDescriptor) ||
+			TermId.FEMALE_PARENT_NAME.name().equals(germplasmDescriptor) ||
+			TermId.MALE_PARENT_GID.name().equals(germplasmDescriptor) ||
+			TermId.MALE_PARENT_NAME.name().equals(germplasmDescriptor);
+	}
+
+	private void addPreFilteredGids(final ObservationUnitsSearchDTO.Filter filter) {
+		Set<String> textKeys = filter.getFilteredTextValues().keySet();
+		if(textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_GID.getId())) ||
+			textKeys.contains(String.valueOf(TermId.FEMALE_PARENT_NAME.getId())) ||
+			textKeys.contains(String.valueOf(TermId.MALE_PARENT_GID.getId())) ||
+			textKeys.contains(String.valueOf(TermId.MALE_PARENT_NAME.getId()))
+		){
+			filter.setPreFilteredGids(this.daoFactory.getObservationUnitsSearchDAO().addPreFilteredGids(filter));
+		}
+	}
 }
