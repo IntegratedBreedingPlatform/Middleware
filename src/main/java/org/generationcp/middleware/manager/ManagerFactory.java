@@ -37,8 +37,6 @@ import org.generationcp.middleware.api.ontology.OntologyVariableService;
 import org.generationcp.middleware.api.ontology.OntologyVariableServiceImpl;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.api.program.ProgramFavoriteServiceImpl;
-import org.generationcp.middleware.api.study.StudyEntryObservationService;
-import org.generationcp.middleware.api.study.StudyEntryObservationServiceImpl;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.CrossStudyDataManager;
 import org.generationcp.middleware.manager.api.GenotypicDataManager;
@@ -347,10 +345,6 @@ public class ManagerFactory implements Serializable {
 
 	public StudyEntryService getStudyEntryService() {
 		return new StudyEntryServiceImpl(this.sessionProvider);
-	}
-
-	public StudyEntryObservationService getStudyEntryObservationService() {
-		return new StudyEntryObservationServiceImpl(this.sessionProvider);
 	}
 
 	public GermplasmStudySourceService getGermplasmStudySourceService() {
