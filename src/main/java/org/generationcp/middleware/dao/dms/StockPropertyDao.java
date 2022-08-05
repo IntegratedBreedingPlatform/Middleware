@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.dao.dms;
 
+import org.apache.commons.collections.map.LinkedMap;
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.StockProperty;
@@ -30,13 +32,16 @@ import java.util.Optional;
  */
 public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 
+	public static final String MODEL_STOCK_ID = "stockModel.stockId";
+	public static final String TYPE_ID = "typeId";
+
 	@SuppressWarnings("unchecked")
 	public List<Integer> getStockIdsByPropertyTypeAndValue(final Integer typeId, final String value) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("typeId", typeId));
+			criteria.add(Restrictions.eq(TYPE_ID, typeId));
 			criteria.add(Restrictions.eq("value", value));
-			criteria.setProjection(Projections.property("stockModel.stockId"));
+			criteria.setProjection(Projections.property(MODEL_STOCK_ID));
 
 			return criteria.list();
 
@@ -78,7 +83,7 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 			final SQLQuery query = this.getSession().createSQLQuery(queryString);
 			query.setParameter("value", value);
 			query.setParameter("entryTypeId", entryTypeId);
-			query.setParameter("typeId", typeId);
+			query.setParameter(TYPE_ID, typeId);
 			query.setParameterList("stockIds", stockIds);
 			return query.executeUpdate() > 0;
 
@@ -88,10 +93,27 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 		}
 	}
 
+	/**
+	 * @param stockIds list of stock IDs to filter
+	 * @return MultiKeyMap with stock ID and type ID as keys and StockProperty object as value
+	 */
+	public MultiKeyMap getStockPropertiesMap(final List<Integer> stockIds) {
+		final Criteria criteria = this.getSession().createCriteria(StockProperty.class);
+		criteria.add(Restrictions.in(MODEL_STOCK_ID, stockIds));
+		final List<StockProperty> stockPropertyList = criteria.list();
+
+		final MultiKeyMap stockPropertyMap = MultiKeyMap.decorate(new LinkedMap());
+		stockPropertyList.forEach(stockProperty ->
+			stockPropertyMap.put(stockProperty.getStock().getStockId(), stockProperty.getTypeId(), stockProperty)
+		);
+
+		return stockPropertyMap;
+	}
+
 	public Optional<StockProperty> getByStockIdAndTypeId(final Integer stockId, final Integer typeId) {
 		final Criteria criteria = this.getSession().createCriteria(StockProperty.class);
-		criteria.add(Restrictions.eq("stockModel.stockId", stockId));
-		criteria.add(Restrictions.eq("typeId", typeId));
+		criteria.add(Restrictions.eq(MODEL_STOCK_ID, stockId));
+		criteria.add(Restrictions.eq(TYPE_ID, typeId));
 		return Optional.ofNullable((StockProperty) criteria.uniqueResult());
 	}
 
@@ -103,7 +125,7 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 		criteria.createAlias("stockModel", "stockModel");
 		criteria.createAlias("stockModel.project", "study");
 		criteria.add(Restrictions.eq("study.projectId", studyId));
-		criteria.add(Restrictions.in("typeId", variableIds));
+		criteria.add(Restrictions.in(TYPE_ID, variableIds));
 		criteria.setProjection(Projections.rowCount());
 		return (Long) criteria.uniqueResult();
 	}

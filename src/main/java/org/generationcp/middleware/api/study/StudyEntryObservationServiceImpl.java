@@ -55,5 +55,4 @@ public class StudyEntryObservationServiceImpl implements StudyEntryObservationSe
 	public long countObservationsByStudyAndVariables(final Integer studyId, final List<Integer> variableIds) {
 		return this.daoFactory.getStockPropertyDao().countObservationsByStudyIdAndVariableIds(studyId, variableIds);
 	}
-
 }
