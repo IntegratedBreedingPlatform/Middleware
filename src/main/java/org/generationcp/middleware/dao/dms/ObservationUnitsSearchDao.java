@@ -1397,7 +1397,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.FEMALE_PARENT_GID.getId()))) {
-			femaleGid = filter.getFilteredTextValues().get(String.valueOf(TermId.FEMALE_PARENT_GID.getId()));
+			final String filterValue = filter.getFilteredTextValues().get(String.valueOf(TermId.FEMALE_PARENT_GID.getId()));
+			femaleGid = filterValue.equalsIgnoreCase("UNKNOWN") ? "0" : filterValue;
 		}
 
 		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.MALE_PARENT_NAME.getId()))) {
@@ -1405,7 +1406,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		}
 
 		if (filter.getFilteredTextValues().containsKey(String.valueOf(TermId.MALE_PARENT_GID.getId()))) {
-			maleGid = filter.getFilteredTextValues().get(String.valueOf(TermId.MALE_PARENT_GID.getId()));
+			final String filterValue = filter.getFilteredTextValues().get(String.valueOf(TermId.MALE_PARENT_GID.getId()));
+			maleGid = filterValue.equalsIgnoreCase("UNKNOWN") ? "0" : filterValue;
 		}
 
 		if (StringUtils.isNotBlank(femaleName) || StringUtils.isNotBlank(femaleGid)) {
