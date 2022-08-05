@@ -100,14 +100,9 @@ public class PlantingServiceImpl implements PlantingService {
 				entriesByGid.get(gid).add(entry);
 
 				for (final MeasurementVariable entryDetail : entryDetails) {
-					final PlantingPreparationDTO.VariableDTO variable = new PlantingPreparationDTO.VariableDTO();
-					variable.setVariableId(entryDetail.getTermId());
-					variable.setName(entryDetail.getName());
 					final String value = observationUnitRow.getVariables().get(entryDetail.getName()).getValue();
-					if (StringUtils.isNotBlank(value)) {
-						variable.setValue(Integer.valueOf(value));
-					}
-					entriesByEntryNo.get(observationUnitRow.getEntryNumber()).getEntryDetailByVariableId().put(variable.getVariableId(), variable);
+					entriesByEntryNo.get(observationUnitRow.getEntryNumber()).getEntryDetailVariableId()
+						.put(entryDetail.getTermId(), StringUtils.isEmpty(value) ? null: Double.valueOf(value));
 				}
 			}
 
@@ -183,9 +178,9 @@ public class PlantingServiceImpl implements PlantingService {
 		final PlantingPreparationDTO plantingPreparationDTO =
 			this.searchPlantingPreparation(studyId, datasetId, plantingRequestDto.getSelectedObservationUnits());
 
-		final Map<Integer, Map<Integer, PlantingPreparationDTO.VariableDTO>> variableMapByEntryNo = new LinkedHashMap<>();
+		final Map<Integer, Map<Integer, Double>> variableMapByEntryNo = new LinkedHashMap<>();
 		plantingPreparationDTO.getEntries()
-			.forEach(entry -> variableMapByEntryNo.put(entry.getEntryNo(), entry.getEntryDetailByVariableId()));
+			.forEach(entry -> variableMapByEntryNo.put(entry.getEntryNo(), entry.getEntryDetailVariableId()));
 
 		final List<Integer> requestedEntryNos =
 			plantingRequestDto.getLotPerEntryNo().stream().map(PlantingRequestDto.LotEntryNumber::getEntryNo).collect(
@@ -267,13 +262,12 @@ public class PlantingServiceImpl implements PlantingService {
 
 	private Double defineAmount(final Integer entryNo, final ExtendedLotDto lot,
 		final PlantingRequestDto.WithdrawalInstruction withdrawalInstruction,
-		final Map<Integer, Map<Integer, PlantingPreparationDTO.VariableDTO>> variableMapByEntryNo) {
+		final Map<Integer, Map<Integer, Double>> variableMapByEntryNo) {
 
 		if (withdrawalInstruction.isWithdrawAllAvailableBalance()) {
 			return lot.getAvailableBalance();
 		} else if (withdrawalInstruction.isWithdrawUsingEntryDetail()) {
-			final Integer amount = variableMapByEntryNo.get(entryNo).get(withdrawalInstruction.getEntryDetailsVariableId()).getValue();
-			return Double.valueOf(amount);
+			return variableMapByEntryNo.get(entryNo).get(withdrawalInstruction.getEntryDetailVariableId());
 		}
 		return withdrawalInstruction.getWithdrawalAmount();
 

@@ -20,7 +20,7 @@ public class PlantingRequestDto {
 
 		private boolean withdrawUsingEntryDetail;
 
-		private Integer entryDetailsVariableId;
+		private Integer entryDetailVariableId;
 
 		private Double withdrawalAmount;
 
@@ -56,12 +56,12 @@ public class PlantingRequestDto {
 			this.withdrawUsingEntryDetail = withdrawUsingEntryDetail;
 		}
 
-		public Integer getEntryDetailsVariableId() {
-			return this.entryDetailsVariableId;
+		public Integer getEntryDetailVariableId() {
+			return this.entryDetailVariableId;
 		}
 
-		public void setEntryDetailsVariableId(final Integer entryDetailsVariableId) {
-			this.entryDetailsVariableId = entryDetailsVariableId;
+		public void setEntryDetailVariableId(final Integer entryDetailVariableId) {
+			this.entryDetailVariableId = entryDetailVariableId;
 		}
 
 		@Override
@@ -80,9 +80,9 @@ public class PlantingRequestDto {
 		}
 
 		public boolean isValid() {
-			return (!isWithdrawAllAvailableBalance() && !isWithdrawUsingEntryDetail() && entryDetailsVariableId == null && withdrawalAmount != null && withdrawalAmount > 0)
-				|| (groupTransactions && isWithdrawAllAvailableBalance() && !isWithdrawUsingEntryDetail() && entryDetailsVariableId == null && withdrawalAmount == null)
-				|| (!isWithdrawAllAvailableBalance() && isWithdrawUsingEntryDetail() && entryDetailsVariableId != null && withdrawalAmount == null);
+			return (!isWithdrawAllAvailableBalance() && !isWithdrawUsingEntryDetail() && entryDetailVariableId == null && withdrawalAmount != null && withdrawalAmount > 0)
+				|| (groupTransactions && isWithdrawAllAvailableBalance() && !isWithdrawUsingEntryDetail() && entryDetailVariableId == null && withdrawalAmount == null)
+				|| (!isWithdrawAllAvailableBalance() && isWithdrawUsingEntryDetail() && entryDetailVariableId != null && withdrawalAmount == null);
 		}
 	}
 

@@ -97,15 +97,15 @@ public class PlantingPreparationDTO {
 		private String designation;
 		private Map<String, StockDTO> stockByStockId = new LinkedHashMap<>();
 		private List<ObservationUnitDTO> observationUnits = new ArrayList<>();
-		private Map<Integer, VariableDTO> entryDetailByVariableId = new LinkedHashMap<>();
+		private Map<Integer, Double> entryDetailVariableId = new LinkedHashMap<>();
 
-		public Map<Integer, VariableDTO> getEntryDetailByVariableId() {
-			return this.entryDetailByVariableId;
+		public Map<Integer, Double> getEntryDetailVariableId() {
+			return this.entryDetailVariableId;
 		}
 
-		public void setEntryDetailByVariableId(
-			final Map<Integer, VariableDTO> entryDetailByVariableId) {
-			this.entryDetailByVariableId = entryDetailByVariableId;
+		public void setEntryDetailVariableId(
+			final Map<Integer, Double> entryDetailVariableId) {
+			this.entryDetailVariableId = entryDetailVariableId;
 		}
 
 		public Integer getEntryNo() {
@@ -154,39 +154,6 @@ public class PlantingPreparationDTO {
 
 		public void setObservationUnits(final List<ObservationUnitDTO> observationUnits) {
 			this.observationUnits = observationUnits;
-		}
-	}
-
-	public static class VariableDTO {
-
-		private Integer variableId;
-
-		private String name;
-
-		private Integer value;
-
-		public Integer getVariableId() {
-			return this.variableId;
-		}
-
-		public void setVariableId(final Integer variableId) {
-			this.variableId = variableId;
-		}
-
-		public String getName() {
-			return this.name;
-		}
-
-		public void setName(final String name) {
-			this.name = name;
-		}
-
-		public Integer getValue() {
-			return this.value;
-		}
-
-		public void setValue(final Integer value) {
-			this.value = value;
 		}
 	}
 
