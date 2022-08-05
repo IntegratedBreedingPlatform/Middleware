@@ -70,7 +70,7 @@ public class PlantingServiceImpl implements PlantingService {
 
 		// List Numeric Entry Details variables without ENTRY_NO.
 		final List<MeasurementVariable> entryDetails = this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.ENTRY_DETAIL.getId())) //
-			.stream().filter( var -> DataType.NUMERIC_VARIABLE.getId().equals(var.getDataTypeId()) && TermId.ENTRY_NO.getId() != var.getTermId()).collect(Collectors.toList());
+			.stream().filter( var -> DataType.NUMERIC_VARIABLE.getId().equals(var.getDataTypeId()) && !var.isSystemVariable()).collect(Collectors.toList());
 
 		// observation units
 		final List<ObservationUnitRow> observationUnitRows =
