@@ -104,14 +104,18 @@ public class DatasetServiceImpl implements DatasetService {
 		VariableType.TREATMENT_FACTOR.getId(), //
 		VariableType.OBSERVATION_UNIT.getId(), //
 		VariableType.TRAIT.getId(), //
-		VariableType.SELECTION_METHOD.getId());
+		VariableType.SELECTION_METHOD.getId(),
+		VariableType.GERMPLASM_ATTRIBUTE.getId(),
+		VariableType.GERMPLASM_PASSPORT.getId());
 
 	private static final List<Integer> PLOT_COLUMNS_FACTOR_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.GERMPLASM_DESCRIPTOR.getId(),
 		VariableType.ENTRY_DETAIL.getId(),//
 		VariableType.EXPERIMENTAL_DESIGN.getId(),
 		VariableType.TREATMENT_FACTOR.getId(),
-		VariableType.OBSERVATION_UNIT.getId());
+		VariableType.OBSERVATION_UNIT.getId(),
+		VariableType.GERMPLASM_ATTRIBUTE.getId(),
+		VariableType.GERMPLASM_PASSPORT.getId());
 
 	protected static final List<Integer> ENVIRONMENT_DATASET_VARIABLE_TYPES = Lists.newArrayList(
 		VariableType.ENVIRONMENT_DETAIL.getId(),
@@ -244,12 +248,7 @@ public class DatasetServiceImpl implements DatasetService {
 		final Map<Integer, MeasurementVariable> entryDetails = new LinkedHashMap<>();
 		final List<MeasurementVariable> otherVariables = new ArrayList<>();
 
-
-		final List<Integer> variableTypeIds = new ArrayList<>();
-		variableTypeIds.addAll(PLOT_COLUMNS_FACTOR_VARIABLE_TYPES);
-		variableTypeIds.add(VariableType.GERMPLASM_ATTRIBUTE.getId());
-		variableTypeIds.add(VariableType.GERMPLASM_PASSPORT.getId());
-		this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetIdSupplier.get(), variableTypeIds)
+		this.daoFactory.getDmsProjectDAO().getObservationSetVariables(observationSetIdSupplier.get(), PLOT_COLUMNS_FACTOR_VARIABLE_TYPES)
 			.forEach(variable -> {
 				if (VariableType.GERMPLASM_DESCRIPTOR == variable.getVariableType()) {
 					descriptors.add(variable);
