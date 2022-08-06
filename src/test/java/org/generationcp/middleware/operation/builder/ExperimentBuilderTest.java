@@ -189,7 +189,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		variableTypes.add(this.createDMSVariableType(TermId.CROSS));
 
 		final VariableList factors = new VariableList();
-		builder.addGermplasmFactors(factors, experimentModel, variableTypes, stockMap, null, null);
+		builder.addGermplasmFactors(factors, experimentModel, variableTypes, stockMap, null, null, null);
 		final List<Variable> variables = factors.getVariables();
 		Assert.assertEquals(7, variables.size());
 		final Iterator<Variable> iterator = variables.iterator();
@@ -216,7 +216,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_TYPE));
 		
 		final VariableList factors = new VariableList();
-		builder.addGermplasmFactors(factors, experimentModel, variableTypes, stockMap, null, null);
+		builder.addGermplasmFactors(factors, experimentModel, variableTypes, stockMap, null, null, null);
 		Assert.assertTrue(factors.getVariables().isEmpty());
 	}
 	
