@@ -87,6 +87,8 @@ public class MeasurementVariable {
 
 	private String cropOntology;
 
+	private boolean isSystemVariable;
+
 	public MeasurementVariable() {
 	}
 
@@ -242,6 +244,14 @@ public class MeasurementVariable {
 		this.value = value;
 	}
 
+	public boolean isSystemVariable() {
+		return this.isSystemVariable;
+	}
+
+	public void setIsSystemVariable(final boolean system) {
+		this.isSystemVariable = system;
+	}
+
 	public String getLabel() {
 		if (this.label == null) {
 			this.label = "";
@@ -265,6 +275,8 @@ public class MeasurementVariable {
 		builder.append(this.name);
 		builder.append(", description=");
 		builder.append(this.description);
+		builder.append(", isSystemVariable=");
+		builder.append(this.isSystemVariable);
 		builder.append(", scale=");
 		builder.append(this.scale);
 		builder.append(", method=");

@@ -1,11 +1,16 @@
 package org.generationcp.middleware.service.impl.inventory;
 
 import com.google.common.base.Preconditions;
+import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
 import org.generationcp.middleware.domain.inventory.planting.PlantingMetadata;
 import org.generationcp.middleware.domain.inventory.planting.PlantingRequestDto;
+import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.DataType;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -28,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -62,6 +68,10 @@ public class PlantingServiceImpl implements PlantingService {
 
 		this.processSearchComposite(searchDTO);
 
+		// List Numeric Entry Details variables that are not system variable.
+		final List<MeasurementVariable> entryDetails = this.datasetService.getObservationSetVariables(datasetId, Arrays.asList(VariableType.ENTRY_DETAIL.getId())) //
+			.stream().filter( var -> DataType.NUMERIC_VARIABLE.getId().equals(var.getDataTypeId()) && !var.isSystemVariable()).collect(Collectors.toList());
+
 		// observation units
 		final List<ObservationUnitRow> observationUnitRows =
 			this.datasetService.getObservationUnitRows(studyId, datasetId, searchDTO.getSearchRequest(), null);
@@ -80,7 +90,7 @@ public class PlantingServiceImpl implements PlantingService {
 				entry.setEntryNo(observationUnitRow.getEntryNumber());
 				entry.setGid(gid);
 				entry.setDesignation(observationUnitRow.getDesignation());
-				entry.setEntryType(observationUnitRow.getVariables().get("ENTRY_TYPE").getValue());
+				entry.setEntryType(observationUnitRow.getVariables().get(TermId.ENTRY_TYPE.name()).getValue());
 
 				entriesByEntryNo.put(observationUnitRow.getEntryNumber(), entry);
 
@@ -88,6 +98,12 @@ public class PlantingServiceImpl implements PlantingService {
 					entriesByGid.put(gid, new ArrayList<>());
 				}
 				entriesByGid.get(gid).add(entry);
+
+				for (final MeasurementVariable entryDetail : entryDetails) {
+					final String value = observationUnitRow.getVariables().get(entryDetail.getName()).getValue();
+					entriesByEntryNo.get(observationUnitRow.getEntryNumber()).getEntryDetailVariableId()
+						.put(entryDetail.getTermId(), StringUtils.isEmpty(value) ? null: Double.valueOf(value));
+				}
 			}
 
 			final PlantingPreparationDTO.PlantingPreparationEntryDTO.ObservationUnitDTO observationUnit =
@@ -162,6 +178,10 @@ public class PlantingServiceImpl implements PlantingService {
 		final PlantingPreparationDTO plantingPreparationDTO =
 			this.searchPlantingPreparation(studyId, datasetId, plantingRequestDto.getSelectedObservationUnits());
 
+		final Map<Integer, Map<Integer, Double>> variableMapByEntryNo = new LinkedHashMap<>();
+		plantingPreparationDTO.getEntries()
+			.forEach(entry -> variableMapByEntryNo.put(entry.getEntryNo(), entry.getEntryDetailVariableId()));
+
 		final List<Integer> requestedEntryNos =
 			plantingRequestDto.getLotPerEntryNo().stream().map(PlantingRequestDto.LotEntryNumber::getEntryNo).collect(
 				Collectors.toList());
@@ -204,8 +224,7 @@ public class PlantingServiceImpl implements PlantingService {
 			//Find instructions for the unit
 			final PlantingRequestDto.WithdrawalInstruction withdrawalInstruction =
 				plantingRequestDto.getWithdrawalsPerUnit().get(lot.getUnitName());
-			final Double amount = (withdrawalInstruction.isWithdrawAllAvailableBalance()) ? lot.getAvailableBalance() :
-				withdrawalInstruction.getWithdrawalAmount();
+			final Double amount = this.defineAmount(lotEntryNumber.getEntryNo(), lot, withdrawalInstruction, variableMapByEntryNo);
 			final BigDecimal totalToWithdraw =
 				(withdrawalInstruction.isWithdrawAllAvailableBalance()) ? new BigDecimal(amount) :
 					(new BigDecimal(amount).multiply(new BigDecimal(ndExperimentIds.size())).setScale(3, RoundingMode.HALF_DOWN).stripTrailingZeros());
@@ -239,6 +258,19 @@ public class PlantingServiceImpl implements PlantingService {
 				}
 			}
 		}
+	}
+
+	private Double defineAmount(final Integer entryNo, final ExtendedLotDto lot,
+		final PlantingRequestDto.WithdrawalInstruction withdrawalInstruction,
+		final Map<Integer, Map<Integer, Double>> variableMapByEntryNo) {
+
+		if (withdrawalInstruction.isWithdrawAllAvailableBalance()) {
+			return lot.getAvailableBalance();
+		} else if (withdrawalInstruction.isWithdrawUsingEntryDetail()) {
+			return variableMapByEntryNo.get(entryNo).get(withdrawalInstruction.getEntryDetailVariableId());
+		}
+		return withdrawalInstruction.getWithdrawalAmount();
+
 	}
 
 	@Override
