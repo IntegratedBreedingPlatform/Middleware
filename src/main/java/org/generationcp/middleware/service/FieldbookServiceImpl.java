@@ -75,6 +75,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -753,13 +754,16 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void deleteAllFieldMapsByTrialInstanceIds(final List<Integer> geolocationId, final Integer projectId,
-		final boolean deleteProjectProp) {
-		this.daoFactory.getExperimentPropertyDao().deleteExperimentPropByLocationIds(geolocationId, FIELDMAP_TERM_IDS);
-		final List<Integer> blockIdsToDelete =
-			this.daoFactory.getGeolocationPropertyDao().deleteBlockPropertiesByGeolocationId(geolocationId);
+	public List<String> deleteAllFieldMapsByTrialInstanceIds(final List<Integer> geolocationIds, final Integer projectId,
+		final boolean deleteProjectProp, final boolean deleteFieldAndBlock) {
+		this.daoFactory.getExperimentPropertyDao().deleteExperimentPropByLocationIds(geolocationIds, FIELDMAP_TERM_IDS);
+		final Map<Integer, Integer> blocksToDeleteMap = this.daoFactory.getGeolocationPropertyDao()
+			.deleteBlockPropertiesByGeolocationId(geolocationIds);
+		final List<Integer> blockIdsToDelete = new ArrayList<>(blocksToDeleteMap.values());
+		final List<Integer> instancesWithSharedBlock = geolocationIds.stream().filter(
+			id -> !blocksToDeleteMap.containsKey(id)).collect(Collectors.toList());
 
-		if (CollectionUtils.isNotEmpty(blockIdsToDelete)) {
+		if (deleteFieldAndBlock && CollectionUtils.isNotEmpty(blockIdsToDelete)) {
 			this.locationService.deleteBlockFieldLocationByBlockId(blockIdsToDelete);
 		}
 
@@ -767,6 +771,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(
 				projectId, Arrays.asList(TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId()));
 		}
+
+		if (deleteFieldAndBlock) {
+			return this.daoFactory.getGeolocationDao().getInstanceNumbersFromIds(instancesWithSharedBlock);
+		}
+
+		return Collections.EMPTY_LIST;
 	}
 
 }

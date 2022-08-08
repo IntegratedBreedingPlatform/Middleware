@@ -42,6 +42,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link Geolocation}.
@@ -483,6 +484,14 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 			return maxInstanceNumber.intValue() + 1;
 		}
 		return 1;
+	}
+
+	public List<String> getInstanceNumbersFromIds (final List<Integer> instanceIds) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.in("locationId", instanceIds));
+		List<Geolocation> instances = criteria.list();
+
+		return instances.stream().map(Geolocation::getDescription).collect(Collectors.toList());
 	}
 
 	public void deleteGeolocations(final List<Integer> locationIds) {

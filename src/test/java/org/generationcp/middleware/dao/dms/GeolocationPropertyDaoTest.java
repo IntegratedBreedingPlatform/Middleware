@@ -17,6 +17,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -170,8 +171,9 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 		Assert.assertNotNull(studyProperties);
 		Assert.assertFalse(studyProperties.isEmpty());
 
-		final List<Integer> blockIdsToDelete =
-			this.geolocationPropDao.deleteBlockPropertiesByGeolocationId(Arrays.asList(geolocationIdMain));
+		final Map<Integer, Integer> blocksToDeleteMap = this.geolocationPropDao
+			.deleteBlockPropertiesByGeolocationId(Arrays.asList(geolocationIdMain));
+		final List<Integer> blockIdsToDelete = new ArrayList<>(blocksToDeleteMap.values());
 		Assert.assertNotNull(blockIdsToDelete);
 		Assert.assertFalse(blockIdsToDelete.isEmpty());
 
@@ -196,8 +198,9 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 		final Integer geolocationIdDataset2 =
 			this.createEnvironmentData(this.study, Arrays.asList(TermId.BLOCK_ID.getId()));
 
-		final List<Integer> blockIdsToDelete =
-			this.geolocationPropDao.deleteBlockPropertiesByGeolocationId(Arrays.asList(geolocationIdMain));
+		final Map<Integer, Integer> blocksToDeleteMap = this.geolocationPropDao
+			.deleteBlockPropertiesByGeolocationId(Arrays.asList(geolocationIdMain));
+		final List<Integer> blockIdsToDelete = new ArrayList<>(blocksToDeleteMap.values());
 		Assert.assertNotNull(blockIdsToDelete);
 		Assert.assertTrue(blockIdsToDelete.isEmpty());
 
