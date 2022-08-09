@@ -1,0 +1,37 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="mderamos" id="v21.5.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from crop_parameter where `key` = 'sta_brapp_url'
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Create crop parameter 'sta_brapp_url'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO crop_parameter (`key`, description)
+			VALUES ('sta_brapp_url', 'Endpoint where the STA BrAPP is deployed');
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v21.5.0-2">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(1) from crop_parameter where `key` = 'ds_brapp_url'
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Create crop parameter 'ds_brapp_url'
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO crop_parameter (`key`, description)
+			VALUES ('ds_brapp_url', 'Endpoint where the decision support BrAPP is deployed');
+		</sql>
+	</changeSet>
+
+</databaseChangeLog>
