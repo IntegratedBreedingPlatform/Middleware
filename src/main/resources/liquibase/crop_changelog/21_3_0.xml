@@ -166,9 +166,9 @@
 		<sql dbms="mysql" splitStatements="true">
  			DELETE
 			FROM stockprop
-			WHERE stock_id IN (
-				SELECT inn.stock_id FROM (
-					SELECT sp.stock_id
+			WHERE stockprop_id IN (
+				SELECT inn.stockprop_id FROM (
+					SELECT sp.stockprop_id
 					FROM stockprop sp
 							 INNER JOIN stock s ON s.stock_id = sp.stock_id
 							 INNER JOIN project p on p.parent_project_id = s.project_id AND p.dataset_type_id = 4
