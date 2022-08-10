@@ -772,7 +772,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				projectId, Arrays.asList(TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId()));
 		}
 
-		if (deleteFieldAndBlock) {
+		if (deleteFieldAndBlock && CollectionUtils.isNotEmpty(instancesWithSharedBlock)) {
 			return this.daoFactory.getGeolocationDao().getInstanceNumbersFromIds(instancesWithSharedBlock);
 		}
 
