@@ -19,16 +19,18 @@ import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.api.program.ProgramService;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.domain.search_request.brapi.v2.VariableSearchRequestDTO;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
+import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -45,6 +47,7 @@ import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -223,7 +226,7 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		observationDto.setExternalReferences(Collections.singletonList(externalReferenceDTO));
 		observationDto.setValue(value);
 		final List<ObservationDto> observationDtos = this.observationServiceBrapi
-				.createObservations(Collections.singletonList(observationDto));
+			.createObservations(Collections.singletonList(observationDto));
 
 		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
 		observationSearchRequestDto.setObservationDbIds(
@@ -239,6 +242,50 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(REF_ID, resultObservationDto.getExternalReferences().get(0).getReferenceID());
 		Assert.assertEquals(REF_SOURCE, resultObservationDto.getExternalReferences().get(0).getReferenceSource());
 
+	}
+
+	@Test
+	public void testCreateObservations_VariableIsNotYetAssociatedToStudy() {
+
+		// Create a new trait but don't add it to the plot dataset.
+		// CreateObservation method should automatically assign the variable to the dataset if it is not yet present, PLOT dataset in case of TRAIT
+		final CVTerm traitVariable =
+			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.TRAIT);
+		// Create a new analysis variable
+		final CVTerm analysisVariable =
+			this.testDataInitializer.createVariableWithScale(DataType.NUMERIC_VARIABLE, VariableType.ANALYSIS);
+
+		final ObservationDto observationDtoForTrait = this.createObservationDto("1", traitVariable);
+		final ObservationDto observationDtoForAnalysis = this.createObservationDto("2", analysisVariable);
+		final List<ObservationDto> observationDtos = this.observationServiceBrapi
+			.createObservations(Arrays.asList(observationDtoForTrait, observationDtoForAnalysis));
+
+		final Integer geolocationId = Integer.valueOf(this.studyInstanceDto.getStudyDbId());
+
+		final Map<Integer, Map<Integer, ProjectProperty>> traitsByGeolocationIdsMap =
+			this.daoFactory.getProjectPropertyDAO().getProjectPropertiesMapByGeolocationIds(
+				new HashSet<Integer>(Arrays.asList(geolocationId)), Arrays.asList(
+					DatasetTypeEnum.PLOT_DATA), Arrays.asList(VariableType.TRAIT, VariableType.ANALYSIS));
+
+		Assert.assertTrue(traitsByGeolocationIdsMap.containsKey(geolocationId));
+		Assert.assertTrue(traitsByGeolocationIdsMap.get(geolocationId).containsKey(traitVariable.getCvTermId()));
+		// Only TRAIT observation variable can be associated automatically to the plot dataset.
+		Assert.assertFalse(traitsByGeolocationIdsMap.get(geolocationId).containsKey(analysisVariable.getCvTermId()));
+
+	}
+
+	private ObservationDto createObservationDto(final String value, final CVTerm traitVariable) {
+		final ObservationDto observationDtoForTrait = new ObservationDto();
+		observationDtoForTrait.setGermplasmDbId(this.germplasm.getGermplasmUUID());
+		observationDtoForTrait.setStudyDbId(this.studyInstanceDto.getStudyDbId());
+		observationDtoForTrait.setObservationVariableDbId(traitVariable.getCvTermId().toString());
+		observationDtoForTrait.setObservationUnitDbId(this.observationUnitDbId);
+		final ExternalReferenceDTO externalReferenceDTO = new ExternalReferenceDTO();
+		externalReferenceDTO.setReferenceID(REF_ID);
+		externalReferenceDTO.setReferenceSource(REF_SOURCE);
+		observationDtoForTrait.setExternalReferences(Collections.singletonList(externalReferenceDTO));
+		observationDtoForTrait.setValue(value);
+		return observationDtoForTrait;
 	}
 
 	private List<ObservationDto> createObservationDtos() {

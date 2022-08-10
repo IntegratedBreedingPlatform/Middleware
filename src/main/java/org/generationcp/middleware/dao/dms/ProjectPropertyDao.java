@@ -36,6 +36,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link ProjectProperty}.
@@ -306,11 +308,11 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	private Map<Integer, String> findPlotDatasetVariablesByTypesForStudy(final int studyIdentifier, final List<Integer> variableTypeIds) {
 		final String variablesQuery =
 			" SELECT cvt.name, cvt.cvterm_id "
-			+ " FROM  projectprop pp "
-			+ " INNER JOIN project ds ON ds.project_id = pp.project_ID AND ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-			+ " INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
-			+ " WHERE pp.type_id IN (:variableTypeIds)"
-			+ " AND ds.study_id = :studyId";
+				+ " FROM  projectprop pp "
+				+ " INNER JOIN project ds ON ds.project_id = pp.project_ID AND ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
+				+ " INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
+				+ " WHERE pp.type_id IN (:variableTypeIds)"
+				+ " AND ds.study_id = :studyId";
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(variablesQuery);
 		sqlQuery.addScalar("name");
 		sqlQuery.addScalar("cvterm_id");
@@ -410,6 +412,36 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 			return Collections.unmodifiableList(measurementVariables);
 		}
 		return Collections.unmodifiableList(Collections.<MeasurementVariableDto>emptyList());
+	}
+
+	public Map<Integer, Map<Integer, ProjectProperty>> getProjectPropertiesMapByGeolocationIds(final Set<Integer> geolocationIds,
+		final List<DatasetTypeEnum> datasetTypes, final List<VariableType> variableTypes) {
+		final StringBuilder sql = new StringBuilder("SELECT {pp.*}, e.nd_geolocation_id as geolocationId");
+		sql.append(" FROM projectprop pp");
+		sql.append(" INNER JOIN project p ON pp.project_id = p.project_id");
+		sql.append(" INNER JOIN nd_experiment e ON e.project_id = p.project_id");
+		sql.append(" WHERE e.nd_geolocation_id IN (:geolocationIds)");
+		sql.append(" AND p.dataset_type_id IN (:datasetTypes)");
+		sql.append(" AND pp.type_id IN (:variableTypes)");
+
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql.toString());
+		sqlQuery.addEntity("pp", ProjectProperty.class);
+		sqlQuery.addScalar("geolocationId");
+		sqlQuery.setParameterList("geolocationIds", geolocationIds);
+		sqlQuery.setParameterList("datasetTypes", datasetTypes.stream().map(DatasetTypeEnum::getId).collect(Collectors.toList()));
+		sqlQuery.setParameterList("variableTypes", variableTypes.stream().map(VariableType::getId).collect(Collectors.toList()));
+
+		final Map<Integer, Map<Integer, ProjectProperty>> map = new HashMap<>();
+
+		final List<Object[]> list = sqlQuery.list();
+
+		for (final Object[] row : list) {
+			final ProjectProperty projectProperty = (ProjectProperty) row[0];
+			final Integer geolocationId = (Integer) row[1];
+			map.putIfAbsent(geolocationId, new HashMap<>());
+			map.get(geolocationId).putIfAbsent(projectProperty.getVariableId(), projectProperty);
+		}
+		return map;
 	}
 
 }
