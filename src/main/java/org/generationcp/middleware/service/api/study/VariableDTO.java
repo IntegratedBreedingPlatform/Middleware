@@ -17,7 +17,8 @@ public class VariableDTO {
 
 	public enum ContextOfUseEnum {
 		PLOT,
-		MEANS
+		MEANS,
+		SUMMARY
 	}
 
 	@JsonView({BrapiView.BrapiV2.class, BrapiView.BrapiV2_1.class})

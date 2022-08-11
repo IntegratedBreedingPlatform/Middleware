@@ -26,7 +26,6 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +36,8 @@ import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
+import static java.util.stream.Collectors.toSet;
 
 @Service
 @Transactional
@@ -77,15 +78,16 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 	@Override
 	public List<ObservationDto> createObservations(final List<ObservationDto> observations) {
 
-		// Automatically associate variables (TRAITS) to the study.
-		this.associateVariablesToStudy(observations);
-
 		final List<Integer> observationDbIds = new ArrayList<>();
 		final Map<String, ExperimentModel> experimentModelMap = this.daoFactory.getExperimentDao()
 			.getByObsUnitIds(observations.stream().map(ObservationDto::getObservationUnitDbId).collect(Collectors.toList())).stream()
 			.collect(Collectors.toMap(ExperimentModel::getObsUnitId, Function.identity()));
 		final Map<Integer, List<ValueReference>> validValuesForCategoricalVariables =
 			this.getCategoriesForCategoricalVariables(observations);
+
+		// Automatically associate variables to the study. This is to ensure that the TRAIT, ANALYSIS, ANALYSIS variables
+		// are added to their respective dataset before creating the observation.
+		this.associateVariablesToDatasets(observations, experimentModelMap);
 
 		final PhenotypeDao dao = this.daoFactory.getPhenotypeDAO();
 		for (final ObservationDto observation : observations) {
@@ -128,55 +130,82 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		}
 	}
 
-	private void associateVariablesToStudy(final List<ObservationDto> observations) {
+	private void associateVariablesToDatasets(final List<ObservationDto> observations,
+		final Map<String, ExperimentModel> experimentModelMap) {
 
-		// Get the observationVariableDbIds grouped by studyDbIds
-		final Map<Integer, List<Integer>> studyDbIdsVariablesMap =
-			observations.stream().collect(Collectors.groupingBy(o -> Integer.valueOf(o.getStudyDbId()),
-				Collectors.mapping(o -> Integer.valueOf(o.getObservationVariableDbId()), toList())));
+		// Get the variables grouped by dataset from the request observations
+		final Map<Integer, Set<Integer>> projectVariablesMap =
+			observations.stream()
+				.collect(Collectors.groupingBy(o -> experimentModelMap.get(o.getObservationUnitDbId()).getProject().getProjectId(),
+					Collectors.mapping(o -> Integer.valueOf(o.getObservationVariableDbId()), toSet())));
 
-		// Get the existing TRAIT variables associated to the specified studyDbIds from the PLOT dataset.
-		final Map<Integer, Map<Integer, ProjectProperty>> traitsByGeolocationIdsMap = this.daoFactory.getProjectPropertyDAO()
-			.getProjectPropertiesMapByGeolocationIds(studyDbIdsVariablesMap.keySet(), Arrays.asList(DatasetTypeEnum.PLOT_DATA),
-				Arrays.asList(
-					VariableType.TRAIT));
+		final Map<Integer, DmsProject> dmsProjectMap = this.daoFactory.getDmsProjectDAO().getByIds(projectVariablesMap.keySet()).stream()
+			.collect(toMap(DmsProject::getProjectId, Function.identity()));
 
-		final List<Integer> variableIdsFromRequest = studyDbIdsVariablesMap.values().stream().flatMap(List::stream).collect(toList());
+		// Get the variables from the request observations
+		final Set<Integer> variableIdsFromRequest = projectVariablesMap.values().stream().flatMap(Set::stream).collect(Collectors.toSet());
 		final VariableFilter variableFilter = new VariableFilter();
 		variableIdsFromRequest.forEach(variableFilter::addVariableId);
 		final Map<Integer, Variable> variablesMap =
 			this.daoFactory.getCvTermDao().getVariablesWithFilterById(variableFilter);
 
+		// Get the variableTypes of the variables from the request
 		final Map<Integer, List<VariableType>> variableTypesOfVariables =
-			this.daoFactory.getCvTermPropertyDao().getByCvTermIdsAndType(variableIdsFromRequest, TermId.VARIABLE_TYPE.getId()).stream()
+			this.daoFactory.getCvTermPropertyDao()
+				.getByCvTermIdsAndType(new ArrayList<>(variableIdsFromRequest), TermId.VARIABLE_TYPE.getId()).stream()
 				.collect(groupingBy(CVTermProperty::getCvTermId, Collectors.mapping(o -> VariableType.getByName(o.getValue()), toList())));
 
-		studyDbIdsVariablesMap.entrySet().forEach(entry -> {
-			final Integer studyDbId = entry.getKey();
-			final List<Integer> variableIds = entry.getValue();
-			final Integer plotDataSetId =
-				this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(studyDbId, DatasetTypeEnum.PLOT_DATA);
+		// Get the existing variables associated to the datasets
+		final Map<Integer, Map<Integer, ProjectProperty>> datasetVariablesMap =
+			this.daoFactory.getProjectPropertyDAO().getPropsForProjectIds(new ArrayList<>(projectVariablesMap.keySet())).entrySet().stream()
+				.collect(toMap(Map.Entry::getKey,
+					entry -> entry.getValue().stream().collect(toMap(ProjectProperty::getVariableId, Function.identity()))));
+
+		// Associate the variables to their respective datasets
+		projectVariablesMap.entrySet().forEach(entry -> {
+			final DmsProject dmsProject = dmsProjectMap.get(entry.getKey());
+			final Set<Integer> variableIds = entry.getValue();
 			variableIds.forEach(variableId -> {
-				if (traitsByGeolocationIdsMap.containsKey(studyDbId) && !traitsByGeolocationIdsMap.get(studyDbId).containsKey(variableId)) {
-					// Add a new projectprop record if the variable doesn't exist in the PLOT dataset.
-					final Variable variable = variablesMap.get(variableId);
-					if (variableTypesOfVariables.containsKey(variableId) && variableTypesOfVariables.get(variableId)
-						.contains(VariableType.TRAIT)) {
-						this.addProjectPropertyToDataset(plotDataSetId, variable, VariableType.TRAIT);
-					}
-				}
+
+				// Do not proceed if variable already exists in the target dataset
+				if (datasetVariablesMap.containsKey(dmsProject.getProjectId()) && datasetVariablesMap.get(dmsProject.getProjectId())
+					.containsKey(variableId))
+					return;
+				// Do not proceed if variable doesn't have variable types
+				if (!variableTypesOfVariables.containsKey(variableId))
+					return;
+
+				this.assignVariableToDataset(variableTypesOfVariables, dmsProject, variableId, variablesMap.get(variableId));
+
 			});
 		});
 	}
 
-	private void addProjectPropertyToDataset(final int projectId, final Variable variable, final VariableType variableType) {
+	private void assignVariableToDataset(final Map<Integer, List<VariableType>> variableTypesOfVariables, final DmsProject dmsProject,
+		final Integer variableId, final Variable variable) {
+		if ((dmsProject.getDatasetType().isObservationType() || dmsProject.getDatasetType().isSubObservationType())
+			&& variableTypesOfVariables.get(variableId).contains(VariableType.TRAIT)) {
+			this.addProjectPropertyToDataset(dmsProject, variable, VariableType.TRAIT);
+		} else if ((dmsProject.getDatasetType().isObservationType() || dmsProject.getDatasetType().isSubObservationType())
+			&& variableTypesOfVariables.get(variableId).contains(VariableType.SELECTION_METHOD)) {
+			this.addProjectPropertyToDataset(dmsProject, variable, VariableType.SELECTION_METHOD);
+		} else if (dmsProject.getDatasetType().getDatasetTypeId() == DatasetTypeEnum.MEANS_DATA.getId()
+			&& variableTypesOfVariables.get(variableId).contains(VariableType.ANALYSIS)) {
+			this.addProjectPropertyToDataset(dmsProject, variable, VariableType.ANALYSIS);
+		} else if (dmsProject.getDatasetType().getDatasetTypeId() == DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId()
+			&& variableTypesOfVariables.get(variableId).contains(VariableType.ANALYSIS_SUMMARY)) {
+			this.addProjectPropertyToDataset(dmsProject, variable, VariableType.ANALYSIS_SUMMARY);
+		}
+	}
+
+	private void addProjectPropertyToDataset(final DmsProject dmsProject, final Variable variable, final VariableType variableType) {
 		final ProjectPropertyDao projectPropertyDao = this.daoFactory.getProjectPropertyDAO();
 		final ProjectProperty projectProperty = new ProjectProperty();
-		projectProperty.setProject(new DmsProject(projectId));
+		projectProperty.setProject(dmsProject);
 		projectProperty.setTypeId(variableType.getId());
-		projectProperty.setAlias(StringUtils.isEmpty(variable.getAlias()) ? variable.getAlias() : variable.getName());
+		projectProperty.setAlias(StringUtils.isEmpty(variable.getAlias()) ? variable.getName() : variable.getAlias());
 		projectProperty.setVariableId(Integer.valueOf(variable.getId()));
-		projectProperty.setRank(projectPropertyDao.getNextRank(projectId));
+		projectProperty.setRank(projectPropertyDao.getNextRank(dmsProject.getProjectId()));
 		projectPropertyDao.save(projectProperty);
 	}
 
@@ -184,7 +213,6 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		final Set<Integer> variableIds =
 			observations.stream().map(o -> Integer.valueOf(o.getObservationVariableDbId())).collect(Collectors.toSet());
 		return this.daoFactory.getCvTermRelationshipDao().getCategoriesForCategoricalVariables(new ArrayList<>(variableIds));
-
 	}
 
 	private Optional<Integer> resolveCategoricalIdValue(final Integer variableId, final String value,

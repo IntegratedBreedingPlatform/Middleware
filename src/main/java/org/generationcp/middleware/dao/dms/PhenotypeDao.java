@@ -1555,9 +1555,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		stringBuilder.append("phenotype p ");
 		stringBuilder.append("INNER JOIN nd_experiment obs_unit ON p.nd_experiment_id = obs_unit.nd_experiment_id ");
 		stringBuilder.append("INNER JOIN nd_geolocation instance ON instance.nd_geolocation_id = obs_unit.nd_geolocation_id ");
-		stringBuilder.append("INNER JOIN stock ON obs_unit.stock_id = stock.stock_id ");
-		stringBuilder.append("INNER JOIN germplsm ON stock.dbxref_id = germplsm.gid ");
-		stringBuilder.append("INNER JOIN names ON stock.dbxref_id = names.gid AND names.nstat = 1 ");
+		stringBuilder.append("LEFT JOIN stock ON obs_unit.stock_id = stock.stock_id ");
+		stringBuilder.append("LEFT JOIN germplsm ON stock.dbxref_id = germplsm.gid ");
+		stringBuilder.append("LEFT JOIN names ON stock.dbxref_id = names.gid AND names.nstat = 1 ");
 		stringBuilder.append("INNER JOIN cvterm ON p.observable_id = cvterm.cvterm_id ");
 		stringBuilder.append("INNER JOIN project plot ON plot.project_id = obs_unit.project_id ");
 		stringBuilder.append("INNER JOIN project trial ON plot.study_id = trial.project_id ");
