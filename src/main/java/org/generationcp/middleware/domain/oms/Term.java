@@ -33,6 +33,8 @@ public class Term implements Serializable {
 
 	private Boolean obsolete;
 
+	private Boolean isSystem;
+
 	public Term() {
 	}
 
@@ -93,6 +95,7 @@ public class Term implements Serializable {
 		term.setDefinition(cvTerm.getDefinition());
 		term.setVocabularyId(cvTerm.getCv());
 		term.setObsolete(cvTerm.isObsolete());
+		term.setSystem(cvTerm.getIsSystem());
 		return term;
 	}
 
@@ -103,6 +106,7 @@ public class Term implements Serializable {
 		cvTerm.setName(this.getName());
 		cvTerm.setDefinition(this.getDefinition());
 		cvTerm.setIsObsolete(this.isObsolete());
+		cvTerm.setIsSystem(this.isSystem());
 		cvTerm.setIsRelationshipType(false);
 		return cvTerm;
 	}
@@ -113,6 +117,7 @@ public class Term implements Serializable {
 		Debug.println(indent, "Name: " + this.getName());
 		Debug.println(indent, "Definition: " + this.getDefinition());
 		Debug.println(indent, "Obsolete: " + this.obsolete);
+		Debug.println(indent, "IsSystem: " + this.isSystem);
 	}
 
 	@Override
@@ -135,7 +140,7 @@ public class Term implements Serializable {
 	@Override
 	public String toString() {
 		return "Term [id=" + this.id + ", name=" + this.name + ", definition=" + this.definition + ", vocabularyId=" + this.vocabularyId
-				+ ", obsolete=" + this.obsolete + "]";
+				+ ", obsolete=" + this.obsolete + ",IsSystem= " + this.isSystem + "]";
 	}
 
 	public void setObsolete(Boolean obsolete) {
@@ -144,5 +149,13 @@ public class Term implements Serializable {
 
 	public boolean isObsolete() {
 		return this.obsolete == null ? false : this.obsolete;
+	}
+
+	public boolean isSystem() {
+		return this.isSystem == null ? false : this.isSystem;
+	}
+
+	public void setSystem(final Boolean system) {
+		this.isSystem = system;
 	}
 }
