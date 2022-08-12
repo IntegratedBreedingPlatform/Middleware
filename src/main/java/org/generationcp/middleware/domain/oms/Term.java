@@ -64,7 +64,7 @@ public class Term implements Serializable {
 		return this.vocabularyId;
 	}
 
-	public void setVocabularyId(int vocabularyId) {
+	public void setVocabularyId(final int vocabularyId) {
 		this.vocabularyId = vocabularyId;
 	}
 
@@ -72,7 +72,7 @@ public class Term implements Serializable {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -80,11 +80,11 @@ public class Term implements Serializable {
 		return this.definition;
 	}
 
-	public void setDefinition(String definition) {
+	public void setDefinition(final String definition) {
 		this.definition = definition;
 	}
 
-	public static Term fromCVTerm(CVTerm cvTerm) {
+	public static Term fromCVTerm(final CVTerm cvTerm) {
 		if (cvTerm == null) {
 			return null;
 		}
@@ -111,7 +111,7 @@ public class Term implements Serializable {
 		return cvTerm;
 	}
 
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "Id: " + this.getId());
 		Debug.println(indent, "Vocabulary: " + this.getVocabularyId());
 		Debug.println(indent, "Name: " + this.getName());
@@ -126,7 +126,7 @@ public class Term implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -143,7 +143,7 @@ public class Term implements Serializable {
 				+ ", obsolete=" + this.obsolete + ",IsSystem= " + this.isSystem + "]";
 	}
 
-	public void setObsolete(Boolean obsolete) {
+	public void setObsolete(final Boolean obsolete) {
 		this.obsolete = obsolete;
 	}
 
