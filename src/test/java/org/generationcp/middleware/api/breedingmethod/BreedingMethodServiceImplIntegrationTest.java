@@ -1,14 +1,17 @@
 package org.generationcp.middleware.api.breedingmethod;
 
 import com.google.common.collect.ImmutableSet;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.dao.MethodDAO;
+import org.generationcp.middleware.dao.UserDefinedFieldDAO;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.MethodClass;
 import org.generationcp.middleware.pojos.MethodGroup;
 import org.generationcp.middleware.pojos.MethodType;
+import org.generationcp.middleware.pojos.UserDefinedField;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,11 +41,13 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 
 	private BreedingMethodServiceImpl breedingMethodService;
 	private MethodDAO methodDAO;
+	private UserDefinedFieldDAO userDefinedFieldDAO;
 
 	@Before
 	public void setUp() {
 		this.breedingMethodService = new BreedingMethodServiceImpl(this.sessionProvder);
 		this.methodDAO = new MethodDAO(this.sessionProvder.getSession());
+		this.userDefinedFieldDAO = new UserDefinedFieldDAO(this.sessionProvder.getSession());
 	}
 
 	@Test
@@ -77,6 +82,38 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 		//Should get all methods without program and also the method previously created
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
 		searchRequest.setMethodAbbreviations(Collections.singletonList(newMethodCode));
+		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.searchBreedingMethods(searchRequest, null, null);
+		assertNotNull(breedingMethods);
+		assertThat(breedingMethods.size(), is(1));
+		assertThat(breedingMethods, hasItem(hasProperty("code", is(newMethodCode))));
+	}
+
+	@Test
+	public void testSearchBreedingMethodsByCodes_FilterBySnameTypeCode_Ok() {
+		final String newMethodCode = RandomStringUtils.randomAlphabetic(5);
+
+		final UserDefinedField nameField = new UserDefinedField();
+		nameField.setFtable("NAMES");
+		nameField.setFtype("NAME");
+		nameField.setFcode(RandomStringUtils.randomAlphabetic(5));
+		nameField.setFname("Test");
+		nameField.setFfmt("-");
+		nameField.setFdesc("-");
+		nameField.setLfldno(0);
+		nameField.setLfldno(0);
+		nameField.setFuid(0);
+		nameField.setFdate(20221212);
+		nameField.setScaleid(0);
+
+		this.userDefinedFieldDAO.save(nameField);
+
+		final Method newMethod = new Method(null, "NEW", "S", newMethodCode, "New Method", "New Method", 0, 0, 0, 0, 0, 0, 0, 0);
+		newMethod.setSnametype(nameField.getFldno());
+		this.methodDAO.save(newMethod);
+
+		//Should get all methods without program and also the method previously created
+		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
+		searchRequest.setSnameTypeCodes(Collections.singletonList(nameField.getFcode()));
 		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.searchBreedingMethods(searchRequest, null, null);
 		assertNotNull(breedingMethods);
 		assertThat(breedingMethods.size(), is(1));
