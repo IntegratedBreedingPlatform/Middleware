@@ -35,7 +35,7 @@ public class BreedingMethodSearchDAOQuery {
     FAVORITE_PROGRAM_UUID(FAVORITE_PROGRAM_UUID_ALIAS),
     SNAME_TYPE_CODE(SNAME_TYPE_CODE_ALIAS);
 
-    private String value;
+    private final String value;
 
     SortColumn(final String value) {
       this.value = value;
@@ -171,7 +171,7 @@ public class BreedingMethodSearchDAOQuery {
     return joinBuilder.toString();
   }
 
-  private static String getProgramFavoriteJoinQuery(String programUUID) {
+  private static String getProgramFavoriteJoinQuery(final String programUUID) {
     return String.format(PROGRAM_FAVORITE_JOIN_QUERY, programUUID);
   }
 

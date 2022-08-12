@@ -76,7 +76,7 @@ public class BreedingMethodNewRequest {
 	}
 
 	public String getSeparator() {
-		return separator;
+		return this.separator;
 	}
 
 	public void setSeparator(final String separator) {
@@ -84,7 +84,7 @@ public class BreedingMethodNewRequest {
 	}
 
 	public String getPrefix() {
-		return prefix;
+		return this.prefix;
 	}
 
 	public void setPrefix(final String prefix) {
@@ -92,7 +92,7 @@ public class BreedingMethodNewRequest {
 	}
 
 	public String getCount() {
-		return count;
+		return this.count;
 	}
 
 	public void setCount(final String count) {
@@ -100,7 +100,7 @@ public class BreedingMethodNewRequest {
 	}
 
 	public String getSuffix() {
-		return suffix;
+		return this.suffix;
 	}
 
 	public void setSuffix(final String suffix) {
@@ -108,7 +108,7 @@ public class BreedingMethodNewRequest {
 	}
 
 	public String getSnameTypeCode() {
-		return snameTypeCode;
+		return this.snameTypeCode;
 	}
 
 	public void setSnameTypeCode(final String snameTypeCode) {
