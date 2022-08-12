@@ -53,6 +53,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -757,8 +758,11 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public List<String> deleteAllFieldMapsByTrialInstanceIds(final List<Integer> geolocationIds, final Integer projectId,
 		final boolean deleteProjectProp, final boolean deleteFieldAndBlock) {
 		this.daoFactory.getExperimentPropertyDao().deleteExperimentPropByLocationIds(geolocationIds, FIELDMAP_TERM_IDS);
+
 		final Map<Integer, Integer> blocksToDeleteMap = this.daoFactory.getGeolocationPropertyDao()
-			.deleteBlockPropertiesByGeolocationId(geolocationIds);
+			.getSafeToDeleteLocationBlockIdMap(geolocationIds);
+		this.daoFactory.getGeolocationPropertyDao().deleteBlockPropertiesByGeolocationId(geolocationIds);
+
 		final List<Integer> blockIdsToDelete = new ArrayList<>(blocksToDeleteMap.values());
 		final List<Integer> instancesWithSharedBlock = geolocationIds.stream().filter(
 			id -> !blocksToDeleteMap.containsKey(id)).collect(Collectors.toList());
@@ -773,7 +777,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		if (deleteFieldAndBlock && CollectionUtils.isNotEmpty(instancesWithSharedBlock)) {
-			return this.daoFactory.getGeolocationDao().getInstanceNumbersFromIds(instancesWithSharedBlock);
+			List<Geolocation> geolocationList = this.daoFactory.getGeolocationDao().getByIds(instancesWithSharedBlock);
+			return geolocationList.stream().map(Geolocation::getDescription).collect(Collectors.toList());
 		}
 
 		return Collections.EMPTY_LIST;

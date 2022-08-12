@@ -93,15 +93,10 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		}
 	}
 
-	public Map<Integer, Integer> deleteBlockPropertiesByGeolocationId(final List<Integer> geolocationIds) {
-		try {
-			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
-			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
-			// statement
-			this.getSession().flush();
-
-			// block IDs to return to be used for locdes deletion
-			// only return if no other geolocation uses the block
+	public Map<Integer, Integer> getSafeToDeleteLocationBlockIdMap (final List<Integer> geolocationIds) {
+		// block IDs to return to be used for locdes deletion
+		// only return if no other geolocation uses the block
+		try{
 			SQLQuery sqlQuery1 = this.getSession().createSQLQuery(GET_BLOCK_IDS_TO_DELETE)
 				.addScalar("nd_geolocation_id")
 				.addScalar("value");
@@ -112,12 +107,27 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 			final Map<Integer, Integer> geolocationIdBlockIdMap = new HashMap<>();
 			result.forEach(geoprop -> geolocationIdBlockIdMap.put((Integer) geoprop[0], Integer.valueOf((String) geoprop[1])));
 
-			sqlQuery1 = this.getSession().createSQLQuery(DELETE_GEOLOCATIONPROP_BY_ID_TYPE);
+			return  geolocationIdBlockIdMap;
+		} catch (final HibernateException e) {
+			final String message = "Error in deletePropertiesByGeolocationId("
+				+ geolocationIds.stream().map(id -> id.toString()).collect(Collectors.joining(","))
+				+ ") in GeolocationPropertyDao: " + e.getMessage();
+			GeolocationPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public void deleteBlockPropertiesByGeolocationId(final List<Integer> geolocationIds) {
+		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+
+			SQLQuery sqlQuery1 = this.getSession().createSQLQuery(DELETE_GEOLOCATIONPROP_BY_ID_TYPE);
 			sqlQuery1.setParameterList("geolocationIds", geolocationIds);
 			sqlQuery1.setParameter("variableIds", TermId.BLOCK_ID.getId());
 			sqlQuery1.executeUpdate();
-
-			return geolocationIdBlockIdMap;
 		} catch (final HibernateException e) {
 			final String message = "Error in deletePropertiesByGeolocationId("
 				+ geolocationIds.stream().map(id -> id.toString()).collect(Collectors.joining(","))
