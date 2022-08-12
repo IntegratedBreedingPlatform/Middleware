@@ -12,8 +12,6 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
@@ -39,7 +37,6 @@ import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.Phenotype.ValueStatus;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
-import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
 import org.generationcp.middleware.service.impl.study.PhenotypeQuery;
 import org.generationcp.middleware.util.Debug;
 import org.generationcp.middleware.util.StringUtil;
@@ -66,16 +63,12 @@ import org.springframework.util.CollectionUtils;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.groupingBy;
 
 /**
  * DAO class for {@link Phenotype}.
@@ -1555,6 +1548,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		stringBuilder.append("phenotype p ");
 		stringBuilder.append("INNER JOIN nd_experiment obs_unit ON p.nd_experiment_id = obs_unit.nd_experiment_id ");
 		stringBuilder.append("INNER JOIN nd_geolocation instance ON instance.nd_geolocation_id = obs_unit.nd_geolocation_id ");
+		// Use LEFT JOIN to stock, germplsm and names so that we can also retrieve the SUMMARY_STATISTICS records -- which don't have germplasm associated to it.
 		stringBuilder.append("LEFT JOIN stock ON obs_unit.stock_id = stock.stock_id ");
 		stringBuilder.append("LEFT JOIN germplsm ON stock.dbxref_id = germplsm.gid ");
 		stringBuilder.append("LEFT JOIN names ON stock.dbxref_id = names.gid AND names.nstat = 1 ");
@@ -1568,8 +1562,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			"LEFT OUTER JOIN nd_geolocationprop geopropSeason ON geopropSeason.nd_geolocation_id = instance.nd_geolocation_id ");
 		stringBuilder.append("AND geopropSeason.type_id = " + TermId.SEASON_VAR.getId() + " ");
 		stringBuilder.append("LEFT OUTER JOIN cvterm cvtermSeason ON cvtermSeason.cvterm_id = geopropSeason.value ");
-
 		stringBuilder.append("WHERE 1=1 ");
+		// Exclude the SUMMARY (environments dataset) records
+		stringBuilder.append("AND plot.dataset_type_id <> " + DatasetTypeEnum.SUMMARY_DATA.getId() + " ");
 	}
 
 	private void addObservationSearchQueryParams(final ObservationSearchRequestDto observationSearchRequestDto, final SQLQuery sqlQuery) {
