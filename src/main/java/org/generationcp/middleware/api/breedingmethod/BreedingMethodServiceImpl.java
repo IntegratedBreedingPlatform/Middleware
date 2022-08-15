@@ -140,6 +140,9 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 			germplasmNameTypeDTOs =
 				this.germplasmNameTypeService.filterGermplasmNameTypes(Collections.singleton(breedingMethod.getSnameTypeCode()));
 			method.setSnametype(germplasmNameTypeDTOs.get(0).getId());
+		} else {
+			// Set to null for scenario where the user removed the snametype value
+			method.setSnametype(null);
 		}
 
 		final BreedingMethodMapper mapper = new BreedingMethodMapper();
