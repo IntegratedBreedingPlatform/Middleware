@@ -34,4 +34,135 @@
 		</sql>
 	</changeSet>
 
+	<changeSet author="cuenyad" id="v21.5.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'STABrAPP BLUES - LME4' and is_obsolete = 0 and cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'STABrAPP BLUES - LME4' method</comment>
+        <sql>
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+			VALUES (1020, 'STABrAPP BLUES - LME4', 'STABrAPP BLUES - LME4', null, 0, 0, 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'STABrAPP BLUPS - LME4' and is_obsolete = 0 and cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'STABrAPP BLUPS - LME4' method</comment>
+        <sql>
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+			VALUES (1020, 'STABrAPP BLUPS - LME4', 'STABrAPP BLUPS - LME4', null, 0, 0, 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-5">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'STABrAPP SEBLUES - LME4' and is_obsolete = 0 and cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'STABrAPP SEBLUES - LME4' method</comment>
+        <sql>
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+			VALUES (1020, 'STABrAPP SEBLUES - LME4', 'STABrAPP SEBLUES - LME4', null, 0, 0, 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-6">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'STABrAPP SEBLUPS - LME4' and is_obsolete = 0 and cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'STABrAPP SEBLUPS - LME4' method</comment>
+        <sql>
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+			VALUES (1020, 'STABrAPP SEBLUPS - LME4', 'STABrAPP SEBLUPS - LME4', null, 0, 0, 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-7">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'STABrAPP BLUES - SpATS' and is_obsolete = 0 and cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'STABrAPP BLUES - SpATS' method</comment>
+        <sql>
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+			VALUES (1020, 'STABrAPP BLUES - SpATS', 'STABrAPP BLUES - SpATS', null, 0, 0, 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-8">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'STABrAPP BLUPS - SpATS' and is_obsolete = 0 and cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'STABrAPP BLUPS - SpATS' method</comment>
+        <sql>
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+			VALUES (1020, 'STABrAPP BLUPS - SpATS', 'STABrAPP BLUPS - SpATS', null, 0, 0, 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-9">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'STABrAPP SEBLUES - SpATS' and is_obsolete = 0 and cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'STABrAPP SEBLUES - SpATS' method</comment>
+        <sql>
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+			VALUES (1020, 'STABrAPP SEBLUES - SpATS', 'STABrAPP SEBLUES - SpATS', null, 0, 0, 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-10">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'STABrAPP SEBLUPS - SpATS' and is_obsolete = 0 and cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'STABrAPP SEBLUPS - SpATS' method</comment>
+        <sql>
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+			VALUES (1020, 'STABrAPP SEBLUPS - SpATS', 'STABrAPP SEBLUPS - SpATS', null, 0, 0, 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-11">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'STABrAPP BLUES - ASREML' and is_obsolete = 0 and cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'STABrAPP BLUES - ASREML' method</comment>
+        <sql>
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+			VALUES (1020, 'STABrAPP BLUES - ASREML', 'STABrAPP BLUES - ASREML', null, 0, 0, 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-12">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'STABrAPP BLUPS - ASREML' and is_obsolete = 0 and cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'STABrAPP BLUPS - ASREML' method</comment>
+        <sql>
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+			VALUES (1020, 'STABrAPP BLUPS - ASREML', 'STABrAPP BLUPS - ASREML', null, 0, 0, 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-13">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'STABrAPP SEBLUES - ASREML' and is_obsolete = 0 and cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'STABrAPP SEBLUES - ASREML' method</comment>
+        <sql>
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+			VALUES (1020, 'STABrAPP SEBLUES - ASREML', 'STABrAPP SEBLUES - ASREML', null, 0, 0, 1);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-14">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">select count(*) from cvterm where name = 'STABrAPP SEBLUPS - ASREML' and is_obsolete = 0 and cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'STABrAPP SEBLUPS - ASREML' method</comment>
+        <sql>
+			INSERT INTO cvterm (cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype, is_system)
+			VALUES (1020, 'STABrAPP SEBLUPS - ASREML', 'STABrAPP SEBLUPS - ASREML', null, 0, 0, 1);
+        </sql>
+    </changeSet>
 </databaseChangeLog>

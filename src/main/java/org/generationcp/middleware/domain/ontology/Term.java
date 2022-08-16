@@ -35,6 +35,7 @@ public abstract class Term extends org.generationcp.middleware.domain.oms.Term {
 		this.setDefinition(term.getDefinition());
 		this.setVocabularyId(term.getVocabularyId());
 		this.setObsolete(term.isObsolete());
+		this.setSystem(term.isSystem());
 	}
 
 	private Date dateCreated;
