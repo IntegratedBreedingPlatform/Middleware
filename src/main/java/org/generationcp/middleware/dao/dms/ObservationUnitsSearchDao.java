@@ -13,6 +13,7 @@ import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
+import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
 import org.generationcp.middleware.service.api.dataset.FilteredPhenotypesInstancesCountDTO;
 import org.generationcp.middleware.service.api.dataset.ObservationUnitData;
@@ -84,7 +85,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		factorsFilterMap.put(String.valueOf(TermId.OBS_UNIT_ID.getId()), "nde.obs_unit_id");
 		factorsFilterMap.put(String.valueOf(TermId.STOCK_ID.getId()),
 			"EXISTS ( SELECT 1 FROM ims_experiment_transaction ndt \n"
-			+ "   inner join ims_transaction tr on tr.trnid = ndt.trnid and ndt.type = " + ExperimentTransactionType.PLANTING.getId() + "  and tr.trntype = " + TransactionType.WITHDRAWAL.getId()
+			+ "   inner join ims_transaction tr on tr.trnid = ndt.trnid and ndt.type = " + ExperimentTransactionType.PLANTING.getId()
+			+ "   and tr.trntype = " + TransactionType.WITHDRAWAL.getId() +  "  and tr.trnstat != " + TransactionStatus.CANCELLED.getIntValue()
 			+ "   inner join ims_lot lot on lot.lotid = tr.lotid \n"
 			+ "    WHERE ndt.nd_experiment_id = nde.nd_experiment_id \n"
 			+ "     and lot.stock_id");
@@ -138,7 +140,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "         + coalesce(child_sample_count.count, 0), 0), '-') AS 'SUM_OF_SAMPLES'");
 		mainVariablesMap.put(STOCK_ID,"    coalesce(nullif((SELECT distinct(lot.stock_id) "
 			+ "        FROM ims_experiment_transaction  ndt "
-			+ "			inner join ims_transaction tr on tr.trnid = ndt.trnid and ndt.type = " + ExperimentTransactionType.PLANTING.getId() + " and tr.trntype = " + TransactionType.WITHDRAWAL.getId()
+			+ "			inner join ims_transaction tr on tr.trnid = ndt.trnid and ndt.type = " + ExperimentTransactionType.PLANTING.getId()
+			+ "			and tr.trntype = " + TransactionType.WITHDRAWAL.getId() +  "  and tr.trnstat != " + TransactionStatus.CANCELLED.getIntValue()
 			+ "			inner join ims_lot lot on lot.lotid = tr.lotid \n"
 			+ "        WHERE ndt.nd_experiment_id = nde.nd_experiment_id), '-') ) AS 'STOCK_ID'");
 		mainVariablesMap.put(FILE_COUNT, 
