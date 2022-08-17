@@ -53,6 +53,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -75,6 +76,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -753,13 +755,19 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public void deleteAllFieldMapsByTrialInstanceIds(final List<Integer> geolocationId, final Integer projectId,
-		final boolean deleteProjectProp) {
-		this.daoFactory.getExperimentPropertyDao().deleteExperimentPropByLocationIds(geolocationId, FIELDMAP_TERM_IDS);
-		final List<Integer> blockIdsToDelete =
-			this.daoFactory.getGeolocationPropertyDao().deleteBlockPropertiesByGeolocationId(geolocationId);
+	public List<String> deleteAllFieldMapsByTrialInstanceIds(final List<Integer> geolocationIds, final Integer projectId,
+		final boolean deleteProjectProp, final boolean deleteFieldAndBlock) {
+		this.daoFactory.getExperimentPropertyDao().deleteExperimentPropByLocationIds(geolocationIds, FIELDMAP_TERM_IDS);
 
-		if (CollectionUtils.isNotEmpty(blockIdsToDelete)) {
+		final Map<Integer, Integer> blocksToDeleteMap = this.daoFactory.getGeolocationPropertyDao()
+			.getSafeToDeleteLocationBlockIdMap(geolocationIds);
+		this.daoFactory.getGeolocationPropertyDao().deleteBlockPropertiesByGeolocationId(geolocationIds);
+
+		final List<Integer> blockIdsToDelete = new ArrayList<>(blocksToDeleteMap.values());
+		final List<Integer> instancesWithSharedBlock = geolocationIds.stream().filter(
+			id -> !blocksToDeleteMap.containsKey(id)).collect(Collectors.toList());
+
+		if (deleteFieldAndBlock && CollectionUtils.isNotEmpty(blockIdsToDelete)) {
 			this.locationService.deleteBlockFieldLocationByBlockId(blockIdsToDelete);
 		}
 
@@ -767,6 +775,13 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(
 				projectId, Arrays.asList(TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId()));
 		}
+
+		if (deleteFieldAndBlock && CollectionUtils.isNotEmpty(instancesWithSharedBlock)) {
+			List<Geolocation> geolocationList = this.daoFactory.getGeolocationDao().getByIds(instancesWithSharedBlock);
+			return geolocationList.stream().map(Geolocation::getDescription).collect(Collectors.toList());
+		}
+
+		return Collections.EMPTY_LIST;
 	}
 
 }
