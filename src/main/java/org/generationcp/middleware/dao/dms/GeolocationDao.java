@@ -485,6 +485,12 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return 1;
 	}
 
+	public List<Geolocation> getByIds (final List<Integer> instanceIds) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.in("locationId", instanceIds));
+		return criteria.list();
+	}
+
 	public void deleteGeolocations(final List<Integer> locationIds) {
 		try {
 			final List<Geolocation> geolocations =
