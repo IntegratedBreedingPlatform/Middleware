@@ -1,7 +1,6 @@
 package org.generationcp.middleware.api.breedingmethod;
 
 import com.google.common.base.Preconditions;
-import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
@@ -20,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -71,9 +69,6 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 		if (!Objects.isNull(methodEntity)) {
 			final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO(methodEntity);
 			breedingMethodDTO.setFavorite(programOptional.isPresent() ? programFavorite.isPresent() : null);
-			if (methodEntity.getSnametype() != null) {
-				breedingMethodDTO.setSnameTypeCode(this.daoFactory.getUserDefinedFieldDAO().getById(methodEntity.getSnametype()).getFcode());
-			}
 			return Optional.of(breedingMethodDTO);
 		}
 		return Optional.empty();
@@ -97,20 +92,15 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 		mapper.map(breedingMethod, method);
 		method.setUser(ContextHolder.getLoggedInUserId());
 		method.setMdate(Util.getCurrentDateAsIntegerValue());
-
-		List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = new ArrayList<>();
-		if (StringUtils.isNotEmpty(breedingMethod.getSnameTypeCode())) {
-			germplasmNameTypeDTOs =
-				this.germplasmNameTypeService.filterGermplasmNameTypes(Collections.singleton(breedingMethod.getSnameTypeCode()));
-			method.setSnametype(germplasmNameTypeDTOs.get(0).getId());
-		}
-
 		final Method savedMethod = this.daoFactory.getMethodDAO().save(method);
 
 		final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO(savedMethod);
-
-		if (method.getSnametype() != null) {
-			breedingMethodDTO.setSnameTypeCode(germplasmNameTypeDTOs.get(0).getCode());
+		if (breedingMethod.getSnameTypeId() != null) {
+			final Optional<GermplasmNameTypeDTO> germplasmNameTypeDTOOptional =
+				this.germplasmNameTypeService.getNameTypeById(breedingMethodDTO.getSnameTypeId());
+			if (germplasmNameTypeDTOOptional.isPresent()) {
+				breedingMethodDTO.setSnameTypeCode(germplasmNameTypeDTOOptional.get().getCode());
+			}
 		}
 		return breedingMethodDTO;
 	}
@@ -135,23 +125,16 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 			}
 		}
 
-		List<GermplasmNameTypeDTO> germplasmNameTypeDTOs = new ArrayList<>();
-		if (StringUtils.isNotEmpty(breedingMethod.getSnameTypeCode())) {
-			germplasmNameTypeDTOs =
-				this.germplasmNameTypeService.filterGermplasmNameTypes(Collections.singleton(breedingMethod.getSnameTypeCode()));
-			method.setSnametype(germplasmNameTypeDTOs.get(0).getId());
-		} else {
-			// Set to null for scenario where the user removed the snametype value
-			method.setSnametype(null);
-		}
-
 		final BreedingMethodMapper mapper = new BreedingMethodMapper();
 		mapper.mapForUpdate(breedingMethod, method);
 		this.daoFactory.getMethodDAO().update(method);
 		final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO(method);
-
-		if (method.getSnametype() != null) {
-			breedingMethodDTO.setSnameTypeCode(germplasmNameTypeDTOs.get(0).getCode());
+		if (breedingMethod.getSnameTypeId() != null) {
+			final Optional<GermplasmNameTypeDTO> germplasmNameTypeDTOOptional =
+				this.germplasmNameTypeService.getNameTypeById(breedingMethodDTO.getSnameTypeId());
+			if (germplasmNameTypeDTOOptional.isPresent()) {
+				breedingMethodDTO.setSnameTypeCode(germplasmNameTypeDTOOptional.get().getCode());
+			}
 		}
 		return breedingMethodDTO;
 	}

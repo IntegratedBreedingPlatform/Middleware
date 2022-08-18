@@ -244,6 +244,7 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			breedingMethodDTO.setCreationDate((Date) row.get(BreedingMethodSearchDAOQuery.DATE_ALIAS));
 			breedingMethodDTO.setIsBulkingMethod(MethodHelper.isBulkingMethod(breedingMethodDTO.getMethodClass()));
 			breedingMethodDTO.setSnameTypeCode((String) row.get(BreedingMethodSearchDAOQuery.SNAME_TYPE_CODE_ALIAS));
+			breedingMethodDTO.setSnameTypeId((Integer) row.get(BreedingMethodSearchDAOQuery.SNAME_TYPE_ID_ALIAS));
 
 			final Integer programFavoriteId = (Integer) row.get(BreedingMethodSearchDAOQuery.FAVORITE_PROGRAM_ID_ALIAS);
 			if (programFavoriteId != null) {

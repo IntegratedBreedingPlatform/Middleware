@@ -17,7 +17,7 @@ public class BreedingMethodNewRequest {
 	private String prefix;
 	private String count;
 	private String suffix;
-	private String snameTypeCode;
+	private Integer snameTypeId;
 
 	public String getCode() {
 		return this.code;
@@ -107,12 +107,12 @@ public class BreedingMethodNewRequest {
 		this.suffix = suffix;
 	}
 
-	public String getSnameTypeCode() {
-		return this.snameTypeCode;
+	public Integer getSnameTypeId() {
+		return this.snameTypeId;
 	}
 
-	public void setSnameTypeCode(final String snameTypeCode) {
-		this.snameTypeCode = snameTypeCode;
+	public void setSnameTypeId(final Integer snameTypeId) {
+		this.snameTypeId = snameTypeId;
 	}
 
 	@Override

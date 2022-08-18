@@ -25,7 +25,7 @@ public class BreedingMethodSearchRequest {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date methodDateTo;
 	private List<Integer> methodClassIds = new ArrayList<>();
-	private List<String> snameTypeCodes = new ArrayList<>();
+	private List<Integer> snameTypeIds = new ArrayList<>();
 
 	public BreedingMethodSearchRequest() {
 
@@ -119,12 +119,12 @@ public class BreedingMethodSearchRequest {
 		this.methodClassIds = methodClassIds;
 	}
 
-	public List<String> getSnameTypeCodes() {
-		return this.snameTypeCodes;
+	public List<Integer> getSnameTypeIds() {
+		return this.snameTypeIds;
 	}
 
-	public void setSnameTypeCodes(final List<String> snameTypeCodes) {
-		this.snameTypeCodes = snameTypeCodes;
+	public void setSnameTypeIds(final List<Integer> snameTypeIds) {
+		this.snameTypeIds = snameTypeIds;
 	}
 
 	@Override

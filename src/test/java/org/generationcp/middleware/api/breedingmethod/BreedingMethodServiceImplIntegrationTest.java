@@ -113,7 +113,7 @@ public class BreedingMethodServiceImplIntegrationTest extends IntegrationTestBas
 
 		//Should get all methods without program and also the method previously created
 		final BreedingMethodSearchRequest searchRequest = new BreedingMethodSearchRequest();
-		searchRequest.setSnameTypeCodes(Collections.singletonList(nameField.getFcode()));
+		searchRequest.setSnameTypeIds(Collections.singletonList(nameField.getFldno()));
 		final List<BreedingMethodDTO> breedingMethods = this.breedingMethodService.searchBreedingMethods(searchRequest, null, null);
 		assertNotNull(breedingMethods);
 		assertThat(breedingMethods.size(), is(1));
