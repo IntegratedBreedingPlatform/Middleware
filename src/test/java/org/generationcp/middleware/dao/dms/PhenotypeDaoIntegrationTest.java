@@ -14,6 +14,7 @@ package org.generationcp.middleware.dao.dms;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -459,7 +460,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		final List<ObservationUnitDto> study1ObservationUnits = this.phenotypeDao.searchObservationUnits(1000, 1, dto2Study1);
 		study1ObservationUnits.forEach(observationUnitDto -> {
 			Assert.assertThat(observationUnitDto.getObservationUnitPosition().getObservationLevel().getLevelName(),
-				is(ObservationLevelMapper.ObservationLevelEnum.PLOT.getName()));
+				is(ObservationLevelEnum.PLOT.getLevelName()));
 		});
 
 		// Search by Geolocation ID
@@ -481,7 +482,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 		// Search by Dataset Type, just for current program
 		final ObservationUnitSearchRequestDTO dto6 = new ObservationUnitSearchRequestDTO();
 		dto6.setProgramDbIds(Collections.singletonList(uniqueID));
-		dto6.setObservationLevel(ObservationLevelMapper.ObservationLevelEnum.PLOT.getName());
+		dto6.setObservationLevel(ObservationLevelEnum.PLOT.getLevelName());
 		Assert.assertEquals(NO_OF_GERMPLASM, this.phenotypeDao.countObservationUnits(dto6));
 	}
 
