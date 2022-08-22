@@ -77,7 +77,8 @@ public class PedigreeUtil {
 
 		//Defined BOTH Immediate Source and Group Source
 		if (!"0".equals(progenitor2)) {
-			if (!progenitor2Germplasm.getGpid1().equals(progenitor1Germplasm.getGid())) {
+			final boolean firstDerivationWithWrongGroupSource = progenitor2Germplasm.getMethod().isGenerative() && !progenitor1.equals(progenitor2);
+			if (firstDerivationWithWrongGroupSource || !progenitor2Germplasm.getGpid1().equals(progenitor1Germplasm.getGid())) {
 				progenitorErrors.put("import.germplasm.invalid.immediate.source.group", new String[] {
 					String.valueOf(germplasm.getGid()),
 					String.valueOf(progenitor2Germplasm.getGid()),
