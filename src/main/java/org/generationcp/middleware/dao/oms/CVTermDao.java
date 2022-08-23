@@ -1654,8 +1654,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				+ "plotdataset.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId());
 			stringBuilder.append("	  LEFT JOIN project meansdataset ON meansdataset.project_id = pp.project_id AND "
 				+ "meansdataset.dataset_type_id = " + DatasetTypeEnum.MEANS_DATA.getId());
+			stringBuilder.append("	  LEFT JOIN project summarystatsdataset ON summarystatsdataset.project_id = pp.project_id AND "
+				+ "summarystatsdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId());
 			stringBuilder.append(
-				"	  LEFT JOIN project envdataset ON (envdataset.study_id = plotdataset.study_id || envdataset.study_id = meansdataset.study_id) AND "
+				"	  LEFT JOIN project envdataset ON (envdataset.study_id = plotdataset.study_id || envdataset.study_id = meansdataset.study_id || envdataset.study_id = summarystatsdataset.study_id) AND "
 					+ "envdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId());
 			stringBuilder.append("	  LEFT JOIN nd_experiment nde ON nde.project_id = envdataset.project_id AND nde.type_id = "
 				+ ExperimentType.TRIAL_ENVIRONMENT.getTermId());
@@ -1761,7 +1763,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			final String observationVariableName =
 				result.get(VARIABLE_ALIAS) != null && StringUtils.isNotEmpty(String.valueOf(result.get(VARIABLE_ALIAS))) ?
-				String.valueOf(result.get(VARIABLE_ALIAS)) : String.valueOf(result.get(VARIABLE_NAME));
+					String.valueOf(result.get(VARIABLE_ALIAS)) : String.valueOf(result.get(VARIABLE_NAME));
 
 			variableDto.setName(observationVariableName);
 			variableDto.setObservationVariableDbId(String.valueOf(result.get(VARIABLE_ID)));
@@ -1859,9 +1861,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	 * Return a list of variables that match definition, name or alias.
 	 * The programUUID is used to return the expected range and alias of the program if it exists.
 	 *
-	 * @param query       used like condition to match definition, name or alias.
+	 * @param query           used like condition to match definition, name or alias.
 	 * @param variableTypeIds variable type filter
-	 * @param programUUID program's unique id
+	 * @param programUUID     program's unique id
 	 * @return List of Variable or empty list if none found
 	 */
 	public List<Variable> searchAttributeVariables(final String query, final List<Integer> variableTypeIds, final String programUUID) {

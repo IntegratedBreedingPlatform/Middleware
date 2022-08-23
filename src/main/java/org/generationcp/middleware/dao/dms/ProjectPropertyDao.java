@@ -36,6 +36,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link ProjectProperty}.
@@ -306,11 +308,11 @@ public class ProjectPropertyDao extends GenericDAO<ProjectProperty, Integer> {
 	private Map<Integer, String> findPlotDatasetVariablesByTypesForStudy(final int studyIdentifier, final List<Integer> variableTypeIds) {
 		final String variablesQuery =
 			" SELECT cvt.name, cvt.cvterm_id "
-			+ " FROM  projectprop pp "
-			+ " INNER JOIN project ds ON ds.project_id = pp.project_ID AND ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
-			+ " INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
-			+ " WHERE pp.type_id IN (:variableTypeIds)"
-			+ " AND ds.study_id = :studyId";
+				+ " FROM  projectprop pp "
+				+ " INNER JOIN project ds ON ds.project_id = pp.project_ID AND ds.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId()
+				+ " INNER JOIN cvterm cvt ON cvt.cvterm_id = pp.variable_id "
+				+ " WHERE pp.type_id IN (:variableTypeIds)"
+				+ " AND ds.study_id = :studyId";
 		final SQLQuery sqlQuery = this.getSession().createSQLQuery(variablesQuery);
 		sqlQuery.addScalar("name");
 		sqlQuery.addScalar("cvterm_id");

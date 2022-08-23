@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.impl.study;
 
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 
 public class PhenotypeQuery {
 
@@ -42,9 +43,10 @@ public class PhenotypeQuery {
 		+ "  project dataset " //
 		+ "  INNER JOIN nd_experiment nde ON nde.project_id = dataset.project_id " //
 		+ "  INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
-		+ "  INNER JOIN stock s ON s.stock_id = nde.stock_id " //
+		// Use LEFT JOIN to stock and germplsm so that we can also retrieve the SUMMARY_STATISTICS records -- which don't have germplasm associated to them.
+		+ "  LEFT JOIN stock s ON s.stock_id = nde.stock_id " //
+		+ "  LEFT JOIN germplsm g ON g.gid = s.dbxref_id "
 		+ "  INNER JOIN project p ON p.project_id = dataset.study_id " //
-		+ "  INNER JOIN germplsm g ON g.gid = s.dbxref_id "
 		+ "  LEFT JOIN workbench.workbench_project wp ON p.program_uuid = wp.project_uuid " //
 		+ "  LEFT JOIN nd_experimentprop plotNumber ON plotNumber.nd_experiment_id = nde.nd_experiment_id AND plotNumber.type_id = "
 		+ TermId.PLOT_NO.getId() //
@@ -56,7 +58,9 @@ public class PhenotypeQuery {
 		+ "  LEFT JOIN nd_geolocationprop gp ON gl.nd_geolocation_id = gp.nd_geolocation_id AND gp.type_id = " + TermId.LOCATION_ID.getId()
 		+ " AND gp.nd_geolocation_id = gl.nd_geolocation_id " //
 		+ "  LEFT JOIN location l ON l.locid = gp.value " //
-		+ " WHERE p.deleted = 0 " //
+		+ " WHERE p.deleted = 0 "
+		// Exclude the SUMMARY (environments dataset) records
+		+ " AND dataset.dataset_type_id <> " + DatasetTypeEnum.SUMMARY_DATA.getId() + " " //
 		; //
 
 	public static final String PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER = " AND gl.nd_geolocation_id in (:studyDbIds) ";
