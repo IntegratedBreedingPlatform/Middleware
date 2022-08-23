@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.brapi;
 
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
@@ -89,23 +90,37 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		// are added to their respective dataset before creating the observation.
 		this.associateVariablesToDatasets(observations, experimentModelMap);
 
-		final PhenotypeDao dao = this.daoFactory.getPhenotypeDAO();
-		for (final ObservationDto observation : observations) {
-			final Phenotype phenotype = new Phenotype();
-			final Date currentDate = new Date();
-			phenotype.setCreatedDate(currentDate);
-			phenotype.setUpdatedDate(currentDate);
-			phenotype.setObservableId(Integer.valueOf(observation.getObservationVariableDbId()));
-			phenotype.setValue(observation.getValue());
-			final Optional<Integer> categoricalIdOptional =
-				this.resolveCategoricalIdValue(Integer.valueOf(observation.getObservationVariableDbId()), observation.getValue(),
-					validValuesForCategoricalVariables);
-			if (categoricalIdOptional.isPresent()) {
-				phenotype.setcValue(categoricalIdOptional.get());
+		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
+		final List<String> observationUnitDbIds = observations.stream().filter(o -> org.apache.commons.lang3.StringUtils.isNotEmpty(o.getObservationUnitDbId()))
+			.map(ObservationDto::getObservationUnitDbId).collect(Collectors.toList());
+		final List<String> variableIds = observations.stream().filter(o -> org.apache.commons.lang3.StringUtils.isNotEmpty(o.getObservationVariableDbId()))
+			.map(ObservationDto::getObservationVariableDbId).collect(Collectors.toList());
+
+		observationSearchRequestDto.setObservationUnitDbIds(observationUnitDbIds);
+		observationSearchRequestDto.setObservationVariableDbIds(variableIds);
+
+		final List<ObservationDto> existingObservations =
+			this.searchObservations(observationSearchRequestDto, null);
+		final MultiKeyMap existingObservationsMap = new MultiKeyMap();
+		if(org.apache.commons.collections.CollectionUtils.isNotEmpty(existingObservations)) {
+			for (final ObservationDto existingObservation : existingObservations) {
+				existingObservationsMap.put(existingObservation.getObservationUnitDbId(),
+					existingObservation.getObservationVariableDbId(), existingObservation);
 			}
-			phenotype.setExperiment(experimentModelMap.get(observation.getObservationUnitDbId()));
-			this.setPhenotypeExternalReferences(observation, phenotype);
-			final Phenotype saved = dao.save(phenotype);
+		}
+
+		for (final ObservationDto observation : observations) {
+
+			final Phenotype saved;
+			if (existingObservationsMap.containsKey(observation.getObservationUnitDbId(),
+				observation.getObservationVariableDbId())) {
+				saved = updateExistingPhenotype(validValuesForCategoricalVariables, observation,
+					(ObservationDto) existingObservationsMap.get(observation.getObservationUnitDbId(),
+						observation.getObservationVariableDbId()));
+			} else {
+				saved = createNewPhenotype(experimentModelMap, validValuesForCategoricalVariables,
+					observation);
+			}
 			observationDbIds.add(saved.getPhenotypeId());
 		}
 		this.sessionProvider.getSession().flush();
@@ -115,6 +130,50 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 			return this.searchObservations(searchRequestDTO, null);
 		} else {
 			return new ArrayList<>();
+		}
+	}
+
+	private Phenotype createNewPhenotype(final Map<String, ExperimentModel> experimentModelMap,
+		final Map<Integer, List<ValueReference>> validValuesForCategoricalVariables,
+		final ObservationDto observation) {
+		final Phenotype phenotype = new Phenotype();
+		this.updatePhenotypeValues(validValuesForCategoricalVariables, observation, phenotype);
+
+		final Date currentDate = new Date();
+		phenotype.setCreatedDate(currentDate);
+		phenotype.setUpdatedDate(currentDate);
+		phenotype.setObservableId(Integer.valueOf(observation.getObservationVariableDbId()));
+		phenotype.setExperiment(experimentModelMap.get(observation.getObservationUnitDbId()));
+		this.setPhenotypeExternalReferences(observation, phenotype);
+		return this.daoFactory.getPhenotypeDAO().save(phenotype);
+	}
+
+	private Phenotype updateExistingPhenotype(final Map<Integer, List<ValueReference>> validValuesForCategoricalVariables,
+		final ObservationDto inputObservation, final ObservationDto existingObservation) {
+
+		final PhenotypeDao dao = this.daoFactory.getPhenotypeDAO();
+		final Phenotype existingPhenotype = dao.getById(Integer.parseInt(existingObservation.getObservationDbId()));
+
+		if (!StringUtils.isEmpty(existingObservation.getValue()) && existingObservation.getValue()
+			.equalsIgnoreCase(inputObservation.getValue())) {
+			/*Phenotype exists and imported value is equal to value => Erase draft data*/
+			existingPhenotype.setDraftValue(null);
+			existingPhenotype.setDraftCValueId(null);
+		} else {
+			this.updatePhenotypeValues(validValuesForCategoricalVariables, inputObservation, existingPhenotype);
+		}
+
+		return dao.update(existingPhenotype);
+	}
+
+	private void updatePhenotypeValues(final Map<Integer, List<ValueReference>> validValuesForCategoricalVariables, final ObservationDto observation,
+		final Phenotype phenotype) {
+		phenotype.setDraftValue(observation.getValue());
+		final Optional<Integer> categoricalIdOptional =
+			this.resolveCategoricalIdValue(Integer.valueOf(observation.getObservationVariableDbId()), observation.getValue(),
+				validValuesForCategoricalVariables);
+		if (categoricalIdOptional.isPresent()) {
+			phenotype.setDraftCValueId(categoricalIdOptional.get());
 		}
 	}
 
