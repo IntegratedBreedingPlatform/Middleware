@@ -101,4 +101,5 @@ public interface GermplasmService {
 	 */
 	Map<Integer, Pair<String, String>> getDerivativeParentsMapByGids(final Set<Integer> gids);
 
+	Map<Integer, Integer> countGermplasmDerivativeProgeny(Set<Integer> gids);
 }

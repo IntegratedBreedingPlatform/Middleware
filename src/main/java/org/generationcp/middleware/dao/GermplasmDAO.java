@@ -1807,16 +1807,28 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		}
 	}
 
-	public long countGermplasmDerivativeProgeny(final Integer gid) {
+	public Map<Integer, Integer> countGermplasmDerivativeProgeny(final Set<Integer> gids) {
+
+		if (CollectionUtils.isEmpty(gids))
+			return new HashMap<>();
+
 		try {
 			final StringBuilder queryBuilder = new StringBuilder();
-			queryBuilder.append("SELECT COUNT(DISTINCT g.gid) FROM germplsm g ");
-			queryBuilder.append("WHERE g.gnpgs = -1 AND g.gpid2 = :gid AND g.deleted = 0  and g.grplce = 0");
+			queryBuilder.append("SELECT g.gpid2 as 'gid', COUNT(DISTINCT g.gid) as 'count' FROM germplsm g ");
+			queryBuilder.append("WHERE g.gnpgs = -1 AND g.gpid2 IN (:gids) AND g.deleted = 0  and g.grplce = 0 ");
+			queryBuilder.append("GROUP BY g.gpid2");
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryBuilder.toString());
-			sqlQuery.setParameter("gid", gid);
-			return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+			sqlQuery.addScalar("gid", new IntegerType());
+			sqlQuery.addScalar("count", new IntegerType());
+			sqlQuery.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
+			sqlQuery.setParameterList("gids", gids);
+			final List<Map<Integer, Integer>> results = sqlQuery.list();
+			if (!CollectionUtils.isEmpty(results)) {
+				return results.stream().collect(Collectors.toMap(map -> map.get("gid"), map -> map.get("count")));
+			}
+			return new HashMap<>();
 		} catch (final HibernateException e) {
-			final String errorMessage = "Error with countGermplasmDerivativeProgeny(gid=" + gid + ") " + e.getMessage();
+			final String errorMessage = "Error with countGermplasmDerivativeProgeny(gids=" + gids + ") " + e.getMessage();
 			GermplasmDAO.LOG.error(errorMessage, e);
 			throw new MiddlewareQueryException(errorMessage, e);
 		}
@@ -2009,7 +2021,8 @@ public class GermplasmDAO extends GenericDAO<Germplasm, Integer> {
 		final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) query.list();
 		final Map<Integer, Pair<String, String>> results = new HashMap<>();
 		queryResults.forEach(row -> {
-			results.put((Integer) row.get("gid"), new ImmutablePair<>((String) row.get("groupSourceName"), (String) row.get("immediateSourceName")));
+			results.put((Integer) row.get("gid"),
+				new ImmutablePair<>((String) row.get("groupSourceName"), (String) row.get("immediateSourceName")));
 		});
 		return results;
 	}

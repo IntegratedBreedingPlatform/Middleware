@@ -71,10 +71,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
+import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -154,9 +156,22 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 			.createGermplasm(20150101, 1, parentGermplsm.getGid(), -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
 		this.germplasmTestDataGenerator.addGermplasm(childDerivativeGermplsm, childDerivativeGermplsm.getPreferredName(), this.cropType);
 
-		final long germplasmDerivativeProgenyCount =
-			this.daoFactory.getGermplasmDao().countGermplasmDerivativeProgeny(parentGermplsm.getGid());
-		Assert.assertEquals((long) 1, germplasmDerivativeProgenyCount);
+		final Germplasm parentGermplsm2 =
+			GermplasmTestDataInitializer.createGermplasm(20150101, 1, 1, -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmTestDataGenerator.addGermplasm(parentGermplsm2, parentGermplsm.getPreferredName(), this.cropType);
+
+		final Germplasm childDerivativeGermplsm2 = GermplasmTestDataInitializer
+			.createGermplasm(20150101, 1, parentGermplsm2.getGid(), -1, 0, 0, 1, 1, 0, 1, 1, "MethodName", "LocationName");
+		this.germplasmTestDataGenerator.addGermplasm(childDerivativeGermplsm2, childDerivativeGermplsm2.getPreferredName(), this.cropType);
+
+		final Set<Integer> gids = new HashSet<>();
+		gids.add(parentGermplsm.getGid());
+		gids.add(parentGermplsm2.getGid());
+		final Map<Integer, Integer> germplasmDerivativeProgenyCountMap =
+			this.daoFactory.getGermplasmDao().countGermplasmDerivativeProgeny(gids);
+
+		Assert.assertEquals(1, germplasmDerivativeProgenyCountMap.get(parentGermplsm.getGid()).intValue());
+		Assert.assertEquals(1, germplasmDerivativeProgenyCountMap.get(parentGermplsm2.getGid()).intValue());
 	}
 
 	@Test
