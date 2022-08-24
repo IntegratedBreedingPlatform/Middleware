@@ -25,14 +25,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
@@ -52,8 +48,6 @@ import java.util.stream.Collectors;
 public class MethodDAO extends GenericDAO<Method, Integer> {
 
 	private static final String METHOD_NAME = "mname";
-
-	private static final Logger LOG = LoggerFactory.getLogger(MethodDAO.class);
 
 	private static final String COUNT_BREEDING_METHODS_WITH_VARIABLE =
 		" SELECT count(1) FROM methods where "
@@ -249,6 +243,8 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			breedingMethodDTO.setSuffix((String) row.get(BreedingMethodSearchDAOQuery.SUFFIX_ALIAS));
 			breedingMethodDTO.setCreationDate((Date) row.get(BreedingMethodSearchDAOQuery.DATE_ALIAS));
 			breedingMethodDTO.setIsBulkingMethod(MethodHelper.isBulkingMethod(breedingMethodDTO.getMethodClass()));
+			breedingMethodDTO.setSnameTypeCode((String) row.get(BreedingMethodSearchDAOQuery.SNAME_TYPE_CODE_ALIAS));
+			breedingMethodDTO.setSnameTypeId((Integer) row.get(BreedingMethodSearchDAOQuery.SNAME_TYPE_ID_ALIAS));
 
 			final Integer programFavoriteId = (Integer) row.get(BreedingMethodSearchDAOQuery.FAVORITE_PROGRAM_ID_ALIAS);
 			if (programFavoriteId != null) {

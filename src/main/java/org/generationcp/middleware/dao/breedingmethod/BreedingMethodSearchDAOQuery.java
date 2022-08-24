@@ -32,9 +32,10 @@ public class BreedingMethodSearchDAOQuery {
     TYPE(TYPE_ALIAS),
     DATE(DATE_ALIAS),
     CLASS_NAME(CLASS_NAME_ALIAS),
-    FAVORITE_PROGRAM_UUID(FAVORITE_PROGRAM_UUID_ALIAS);
+    FAVORITE_PROGRAM_UUID(FAVORITE_PROGRAM_UUID_ALIAS),
+    SNAME_TYPE_CODE(SNAME_TYPE_CODE_ALIAS);
 
-    private String value;
+    private final String value;
 
     SortColumn(final String value) {
       this.value = value;
@@ -62,6 +63,8 @@ public class BreedingMethodSearchDAOQuery {
   public static final String SUFFIX_ALIAS = "suffix";
   public static final String FAVORITE_PROGRAM_UUID_ALIAS = "favoriteProgramUUID";
   public static final String FAVORITE_PROGRAM_ID_ALIAS = "favoriteProgramId";
+  public static final String SNAME_TYPE_CODE_ALIAS = "snameTypeCode";
+  public static final String SNAME_TYPE_ID_ALIAS = "snameTypeId";
 
   private final static String BASE_QUERY = "SELECT %s " // usage of SELECT_EXPRESION / COUNT_EXPRESSION
       + " FROM methods m " + " %s " // usage of SELECT_JOINS
@@ -80,13 +83,16 @@ public class BreedingMethodSearchDAOQuery {
       + " m.separator AS " + SEPARATOR_ALIAS + ", "
       + " m.prefix AS " + PREFIX_ALIAS + ", "
       + " m.count AS " + COUNT_ALIAS + ", "
-      + " m.suffix AS " + SUFFIX_ALIAS;
+      + " m.suffix AS " + SUFFIX_ALIAS + ", "
+      + " snametype.fcode AS " + SNAME_TYPE_CODE_ALIAS + ", "
+      + " snametype.fldno AS " + SNAME_TYPE_ID_ALIAS;
 
   private final static String METHOD_CLASS_JOIN_QUERY = " LEFT JOIN cvterm term on term.cvterm_id = m.geneq "
       + " AND term.cvterm_id IN (%s) ";
   private final static String PROGRAM_FAVORITE_JOIN_QUERY =
       " LEFT JOIN program_favorites pf on pf.entity_id = m.mid AND entity_type = '"
           + ProgramFavorite.FavoriteType.METHODS.name() + "' AND program_uuid = '%s' ";
+  private final static String SNAME_TYPE_JOIN_QUERY = " LEFT JOIN udflds snametype on snametype.fldno = m.snametype ";
 
   private static final String COUNT_EXPRESSION = " COUNT(m.mid) ";
 
@@ -135,6 +141,8 @@ public class BreedingMethodSearchDAOQuery {
       sqlQueryBuilder.addScalar(new Scalar(FAVORITE_PROGRAM_UUID_ALIAS));
       sqlQueryBuilder.addScalar(new Scalar(FAVORITE_PROGRAM_ID_ALIAS));
     }
+    sqlQueryBuilder.addScalar(new Scalar(SNAME_TYPE_CODE_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(SNAME_TYPE_ID_ALIAS));
   }
 
   private static String getSelectExpression(final String programUUID) {
@@ -150,7 +158,7 @@ public class BreedingMethodSearchDAOQuery {
     final StringBuilder joins = new StringBuilder();
     final String methodClassTerms = MethodClass.getIds().stream().map(Objects::toString).collect(Collectors.joining(","));
     joins.append(String.format(METHOD_CLASS_JOIN_QUERY, methodClassTerms));
-
+    joins.append(SNAME_TYPE_JOIN_QUERY);
     if (!StringUtils.isEmpty(programUUID)) {
       joins.append(getProgramFavoriteJoinQuery(programUUID));
     }
@@ -159,13 +167,14 @@ public class BreedingMethodSearchDAOQuery {
 
   private static String getCountQueryJoins(final BreedingMethodSearchRequest request, final String programUUID) {
     final StringBuilder joinBuilder = new StringBuilder();
+    joinBuilder.append(SNAME_TYPE_JOIN_QUERY);
     if (request.getFilterFavoriteProgramUUID() != null) {
       joinBuilder.append(getProgramFavoriteJoinQuery(programUUID));
     }
     return joinBuilder.toString();
   }
 
-  private static String getProgramFavoriteJoinQuery(String programUUID) {
+  private static String getProgramFavoriteJoinQuery(final String programUUID) {
     return String.format(PROGRAM_FAVORITE_JOIN_QUERY, programUUID);
   }
 
@@ -220,13 +229,18 @@ public class BreedingMethodSearchDAOQuery {
       sqlQueryBuilder.setParameter("methodClassIds", request.getMethodClassIds());
     }
 
+    if (!CollectionUtils.isEmpty(request.getSnameTypeIds())) {
+      sqlQueryBuilder.append(" AND snametype.fldno IN (:snameTypeIds) ");
+      sqlQueryBuilder.setParameter("snameTypeIds", request.getSnameTypeIds());
+    }
+
     if (request.getFilterFavoriteProgramUUID() != null) {
       if (request.getFilterFavoriteProgramUUID() && !StringUtils.isEmpty(request.getFavoriteProgramUUID())) {
         sqlQueryBuilder.append(" AND pf.program_uuid = :favoriteProgramUUID ");
         sqlQueryBuilder.setParameter("favoriteProgramUUID", request.getFavoriteProgramUUID());
       } else {
-				sqlQueryBuilder.append(" AND pf.program_uuid is null ");
-			}
+        sqlQueryBuilder.append(" AND pf.program_uuid is null ");
+      }
     }
   }
 

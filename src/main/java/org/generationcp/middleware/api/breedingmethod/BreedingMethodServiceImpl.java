@@ -2,6 +2,8 @@ package org.generationcp.middleware.api.breedingmethod;
 
 import com.google.common.base.Preconditions;
 import org.generationcp.middleware.ContextHolder;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
+import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -15,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +31,9 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Transactional
 @Service
 public class BreedingMethodServiceImpl implements BreedingMethodService {
+
+	@Resource
+	private GermplasmNameTypeService germplasmNameTypeService;
 
 	private final DaoFactory daoFactory;
 
@@ -86,9 +92,17 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 		mapper.map(breedingMethod, method);
 		method.setUser(ContextHolder.getLoggedInUserId());
 		method.setMdate(Util.getCurrentDateAsIntegerValue());
-
 		final Method savedMethod = this.daoFactory.getMethodDAO().save(method);
-		return new BreedingMethodDTO(savedMethod);
+
+		final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO(savedMethod);
+		if (breedingMethod.getSnameTypeId() != null) {
+			final Optional<GermplasmNameTypeDTO> germplasmNameTypeDTOOptional =
+				this.germplasmNameTypeService.getNameTypeById(breedingMethodDTO.getSnameTypeId());
+			if (germplasmNameTypeDTOOptional.isPresent()) {
+				breedingMethodDTO.setSnameTypeCode(germplasmNameTypeDTOOptional.get().getCode());
+			}
+		}
+		return breedingMethodDTO;
 	}
 
 	@Override
@@ -114,7 +128,15 @@ public class BreedingMethodServiceImpl implements BreedingMethodService {
 		final BreedingMethodMapper mapper = new BreedingMethodMapper();
 		mapper.mapForUpdate(breedingMethod, method);
 		this.daoFactory.getMethodDAO().update(method);
-		return new BreedingMethodDTO(method);
+		final BreedingMethodDTO breedingMethodDTO = new BreedingMethodDTO(method);
+		if (breedingMethod.getSnameTypeId() != null) {
+			final Optional<GermplasmNameTypeDTO> germplasmNameTypeDTOOptional =
+				this.germplasmNameTypeService.getNameTypeById(breedingMethodDTO.getSnameTypeId());
+			if (germplasmNameTypeDTOOptional.isPresent()) {
+				breedingMethodDTO.setSnameTypeCode(germplasmNameTypeDTOOptional.get().getCode());
+			}
+		}
+		return breedingMethodDTO;
 	}
 
 	@Override
