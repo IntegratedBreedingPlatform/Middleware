@@ -12,6 +12,9 @@
 package org.generationcp.middleware.dao.dms;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import org.apache.commons.collections.ListUtils;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
@@ -941,12 +944,14 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.addScalar("blockNumber", new StringType()).addScalar("replicate", new StringType()).addScalar("COL").addScalar("ROW")
 			.addScalar("studyLocationDbId", new StringType()).addScalar("studyLocation", new StringType()).addScalar("entryType")
 			.addScalar("entryNumber", new StringType()).addScalar("programDbId", new StringType()).addScalar("trialDbId", new StringType())
-			.addScalar("trialDbName", new StringType()).addScalar("jsonProps").addScalar("datasetDbId", new StringType());
+			.addScalar("trialDbName", new StringType()).addScalar("jsonProps").addScalar("datasetDbId", new StringType())
+			.addScalar("experimentParentId");
 
 		// TODO get map with AliasToEntityMapResultTransformer.INSTANCE
 		final List<Object[]> results = sqlQuery.list();
 
-		final Map<Integer, ObservationUnitDto> observationUnitsByNdExpId = new LinkedHashMap<>();
+		final Map<Integer, ObservationUnitDto> observationUnitsByExperimentIdMap = new LinkedHashMap<>();
+		final Multimap<Integer, ObservationUnitDto> subObservationUnitsByExperimentParentIdMap = ArrayListMultimap.create();
 
 		if (results != null && !results.isEmpty()) {
 
@@ -955,7 +960,9 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final ObservationUnitDto observationUnit = new ObservationUnitDto();
 
 				final Integer ndExperimentId = (Integer) row[0];
+				final Integer experimentParentId = (Integer) row[27];
 				observationUnit.setExperimentId(ndExperimentId);
+				observationUnit.setExperimentParentId(experimentParentId);
 				observationUnit.setObservationUnitDbId((String) row[1]); // OBS_UNIT_ID
 				observationUnit.setObservationUnitName((String) row[2]);
 				final String datasetName = (String) row[3];
@@ -1035,12 +1042,27 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				observationUnit.setTrialDbId((String) row[23]);
 				observationUnit.setTrialName((String) row[24]);
 
-				observationUnitsByNdExpId.put(ndExperimentId, observationUnit);
+				// If observation unit has experiment parent ID it means it is a sub-observation
+				if (observationUnit.getExperimentParentId() != null) {
+					// This will group the sub-observations by their experiment parent ID
+					subObservationUnitsByExperimentParentIdMap.put(observationUnit.getExperimentParentId(), observationUnit);
+				} else {
+					// Else observation is not sub-observation
+					observationUnitsByExperimentIdMap.put(observationUnit.getExperimentId(), observationUnit);
+				}
+
 			}
 
-			// Get treatment factors
+			// Get the treatment factors.
+			// NOTE: For sub-observation units, the treatment factors and their values should come from sub-observation's parent observation.
 			final SQLQuery treatmentFactorsQuery = this.getSession().createSQLQuery(PhenotypeQuery.TREATMENT_FACTORS_SEARCH_OBSERVATIONS);
-			treatmentFactorsQuery.setParameterList("ndExperimentIds", observationUnitsByNdExpId.keySet());
+
+			// Collect the experimentIds of both observation (experimentId) and sub-observation (parentId)
+			final Set<Integer> experimentIds = new HashSet<>();
+			experimentIds.addAll(subObservationUnitsByExperimentParentIdMap.keySet());
+			experimentIds.addAll(observationUnitsByExperimentIdMap.keySet());
+
+			treatmentFactorsQuery.setParameterList("ndExperimentIds", experimentIds);
 			treatmentFactorsQuery.addScalar("factor").addScalar("modality").addScalar("nd_experiment_id");
 			final List<Object[]> treatmentFactorsResults = treatmentFactorsQuery.list();
 
@@ -1051,12 +1073,20 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 				final Treatment treatment = new Treatment();
 				treatment.setFactor(factor);
 				treatment.setModality(modality);
-				final ObservationUnitDto observationUnit = observationUnitsByNdExpId.get(ndExperimentId);
-				observationUnit.getTreatments().add(treatment);
+				if (subObservationUnitsByExperimentParentIdMap.containsKey(ndExperimentId)) {
+					// If sub-observation, add the treatment info to all sub-observations with the same experiment parent ID
+					subObservationUnitsByExperimentParentIdMap.get(ndExperimentId).forEach(observationUnitDto -> {
+						observationUnitDto.getTreatments().add(treatment);
+					});
+				} else if (observationUnitsByExperimentIdMap.containsKey(ndExperimentId)) {
+					// If not sub-observation, add the treatment info to the observation unit.
+					observationUnitsByExperimentIdMap.get(ndExperimentId).getTreatments().add(treatment);
+				}
 			}
 		}
 
-		return new ArrayList<>(observationUnitsByNdExpId.values());
+		return ListUtils.union(new ArrayList<>(observationUnitsByExperimentIdMap.values()),
+			new ArrayList<>(subObservationUnitsByExperimentParentIdMap.values()));
 	}
 
 	private static void addObservationUnitSearchFilter(final ObservationUnitSearchRequestDTO requestDTO, final StringBuilder queryString) {

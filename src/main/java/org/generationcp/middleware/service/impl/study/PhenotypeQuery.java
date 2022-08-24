@@ -38,7 +38,8 @@ public class PhenotypeQuery {
 		+ "  dataset.program_uuid as programDbId,"
 		+ "  p.project_id as trialDbId, " //
 		+ "  p.name as trialDbName, "//
-		+ "  dataset.project_id as datasetDbId "
+		+ "  dataset.project_id as datasetDbId, "
+		+ "  nde.parent_id as experimentParentId "
 		+ " FROM " //
 		+ "  project dataset " //
 		+ "  INNER JOIN nd_experiment nde ON nde.project_id = dataset.project_id " //
@@ -77,13 +78,20 @@ public class PhenotypeQuery {
 		;
 
 	public static final String TREATMENT_FACTORS_SEARCH_OBSERVATIONS = "SELECT DISTINCT "
-		+ "    CVT.NAME AS factor, pp.value AS modality, nde.nd_experiment_id as nd_experiment_id "
-		+ "FROM "
-		+ "    projectprop pp "
-		+ "        INNER JOIN "
-		+ "    CVTERM CVT ON PP.VARIABLE_ID = CVT.cvterm_id "
-		+ " INNER JOIN nd_experiment nde ON nde.project_id = pp.project_id"
-		+ " WHERE "
-		+ "    PP.type_id = " + TermId.MULTIFACTORIAL_INFO.getId()
-		+ " AND nde.nd_experiment_id in (:ndExperimentIds) ";
+		+ "CVT.NAME AS factor, "
+		// If treatment variable is categorical, return the actual selected categorical name, else return the treatment variable's value from experiment property.
+		+ "CASE WHEN cvterm_datatype.object_id = " + TermId.CATEGORICAL_VARIABLE.getId()
+		+ " THEN cvterm_value.name ELSE ndep.value END as modality, "
+		+ "nde.nd_experiment_id as nd_experiment_id "
+		+ "FROM projectprop pp "
+		+ "INNER JOIN cvterm cvt ON pp.VARIABLE_ID = cvt.cvterm_id "
+		+ "INNER JOIN nd_experiment nde ON nde.project_id = pp.project_id AND pp.type_id = " + TermId.MULTIFACTORIAL_INFO.getId() + " "
+		+ "INNER JOIN nd_experimentprop ndep ON nde.nd_experiment_id = ndep.nd_experiment_id AND pp.variable_id = ndep.type_id "
+		// Get the scale/datatype to determine if the variable is categorical, so that we can get the actual name of the selected categorical value
+		+ "INNER JOIN cvterm_relationship cvterm_scale ON cvterm_scale.type_id = " + TermId.HAS_SCALE.getId()
+		+ " AND cvterm_scale.subject_id = pp.variable_id "
+		+ "INNER JOIN cvterm_relationship cvterm_datatype ON cvterm_datatype.type_id = " + TermId.HAS_TYPE.getId()
+		+ " AND cvterm_datatype.subject_id = cvterm_scale.object_id "
+		+ "LEFT JOIN cvterm cvterm_value ON cvterm_value.cvterm_id = ndep.value "
+		+ "WHERE nde.nd_experiment_id in (:ndExperimentIds);";
 }
