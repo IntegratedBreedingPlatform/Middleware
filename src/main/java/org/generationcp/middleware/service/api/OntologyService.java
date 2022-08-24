@@ -568,15 +568,6 @@ public interface OntologyService {
 	boolean validateDeleteStandardVariableEnumeration(int standardVariableId, int enumerationId) throws MiddlewareQueryException;
 
 	/**
-	 * find all variables given the property
-	 * 
-	 * @param propertyId
-	 * @return
-	 * @throws MiddlewareQueryException
-	 */
-	List<StandardVariableReference> getStandardVariableReferencesByProperty(int propertyId) throws MiddlewareQueryException;
-
-	/**
 	 * Return all invenotry scales.
 	 * 
 	 * @return

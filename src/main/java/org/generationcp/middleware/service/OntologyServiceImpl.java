@@ -380,11 +380,6 @@ public class OntologyServiceImpl extends Service implements OntologyService {
 	}
 
 	@Override
-	public List<StandardVariableReference> getStandardVariableReferencesByProperty(int propertyId) throws MiddlewareQueryException {
-		return this.getStandardVariableBuilder().findAllByProperty(propertyId);
-	}
-
-	@Override
 	public List<Scale> getAllInventoryScales() throws MiddlewareQueryException {
 		return this.getTermBuilder().getAllInventoryScales();
 	}

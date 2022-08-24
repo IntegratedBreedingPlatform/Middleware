@@ -514,8 +514,4 @@ public class StandardVariableBuilder extends Builder {
 		final List<Phenotype> phenotypes = new ArrayList<>(this.daoFactory.getPhenotypeDAO().getByTypeAndValue(variateId, value, isEnum));
 		return !phenotypes.isEmpty();
 	}
-
-	public List<StandardVariableReference> findAllByProperty(final int propertyId) {
-		return new ArrayList<>(daoFactory.getCvTermDao().getStandardVariablesOfProperty(propertyId));
-	}
 }

@@ -1084,15 +1084,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	/**
-	 * Retrieves the standard variables of a property
-	 */
-	public List<StandardVariableReference> getStandardVariablesOfProperty(final Integer propertyId) {
-		final List<Integer> properties = new ArrayList<>();
-		properties.add(propertyId);
-		return this.getStandardVariablesOfProperties(properties).get(propertyId);
-	}
-
-	/**
 	 * Retrieves the standard variables of trait properties
 	 */
 	public Map<Integer, List<StandardVariableReference>> getStandardVariablesOfProperties(
