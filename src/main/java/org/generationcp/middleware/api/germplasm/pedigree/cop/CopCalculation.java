@@ -6,8 +6,11 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.api.germplasm.pedigree.GermplasmTreeNode;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.pojos.Methods;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -64,6 +67,8 @@ import static org.springframework.util.CollectionUtils.isEmpty;
  * @see <a target="_top" href="https://cropforge.github.io/iciswiki/articles/t/d/m/TDM_COP2.htm">Routine Computation and Visualization of Coefficients of Parentage Using the International Crop Information System</a>
  */
 public class CopCalculation {
+
+	private static final Logger LOG = LoggerFactory.getLogger(CopCalculation.class);
 
 	private static final double COP_DEFAULT = 0.0;
 	private static final int UNKNOWN_INBREEDING_GENERATIONS = 4;
@@ -134,8 +139,11 @@ public class CopCalculation {
 		 */
 
 		if (g1.getGid().equals(g2.getGid())) {
+			final double coi = this.coefficientOfInbreeding(g1);
 			// Equation 3
-			cop = (1 + this.coefficientOfInbreeding(g1)) / 2.0;
+			cop = (1 + coi) / 2.0;
+			debug("cop(gid=%s) = (1 + coi(%s)) / 2.0", g1.getGid(), g1.getGid());
+			debug("cop(gid=%s) = (1 + %s) / 2.0", g1.getGid(), coi);
 			return this.finish(g1, g2, start, cop);
 		}
 
@@ -157,8 +165,8 @@ public class CopCalculation {
 		 * Below here, only generative steps are considered
 		 */
 
-		final GermplasmTreeNode g01 = this.getGroupSource(g1);
-		final GermplasmTreeNode g02 = this.getGroupSource(g2);
+		final GermplasmTreeNode g01 = getGroupSource(g1);
+		final GermplasmTreeNode g02 = getGroupSource(g2);
 
 		if (this.hasUnknownCrossParents(g01) && this.hasUnknownCrossParents(g02)) {
 			cop = COP_DEFAULT;
@@ -179,9 +187,20 @@ public class CopCalculation {
 
 		final List<GermplasmTreeNode> parents = this.getCrossParents(highOrder);
 		if (!isEmpty(parents)) {
+			// Debug
+			final List<String> cops = new ArrayList<>();
+
 			// Equation 1 for multiple parents: (1/m) ∑ fPQi
 			for (final GermplasmTreeNode parent : parents) {
-				cop += this.coefficientOfParentage(parent, lowOrder);
+				final double cop1 = this.coefficientOfParentage(parent, lowOrder);
+				cops.add(String.valueOf(cop1));
+				cop += cop1;
+			}
+			if (LOG.isDebugEnabled()) {
+				if (cop > 0d) {
+					debug("cop(gid1=%s-gid2=%s) = (%s) / %s", g1.getGid(), g2.getGid(), String.join("+", cops), parents.size());
+					debug("cop(gid1=%s-gid2=%s) = (%s) / %s", g1.getGid(), g2.getGid(), cop, parents.size());
+				}
 			}
 			cop /= parents.size();
 		}
@@ -233,7 +252,12 @@ public class CopCalculation {
 		 * Unknown inbreeding generations:
 		 * 1 - (1 - 0) / 2^4 = 15/16 = 0.9375
 		 */
-		return 1 - ((1 - copz) / Math.pow(2.0, this.countInbreedingGenerations(g)));
+		final int inbreedingGenerationsCount = this.countInbreedingGenerations(g);
+		final double coi = 1 - ((1 - copz) / Math.pow(2.0, inbreedingGenerationsCount));
+		debug("coi(gid=%s) = 1 - ((1 - copz) / (2.0 ^ %s))", g.getGid(), inbreedingGenerationsCount);
+		debug("coi(gid=%s) = 1 - ((1 - %s) / (2.0 ^ %s))", g.getGid(), copz, inbreedingGenerationsCount);
+		debug("coi(gid=%s) = %s", g.getGid(), coi);
+		return coi;
 	}
 
 	private double getCopZ(final GermplasmTreeNode g, final GermplasmTreeNode g0) {
@@ -503,7 +527,8 @@ public class CopCalculation {
 	 * @param g2
 	 * @param g01 the group source of g1
 	 * @param g02 the group source of g2
-	 * @return Pair of (highest order, lowest order). The highest order is always the group source
+	 * @return Pair of (highest order, lowest order). The highest order is always the group source,
+	 * 		   which simplifies the next step (get the parents)
 	 */
 	private Pair<GermplasmTreeNode, GermplasmTreeNode> sortByOrder(
 		final GermplasmTreeNode g1,
