@@ -6,8 +6,8 @@ import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.generationcp.middleware.api.crop.CropService;
 import org.apache.commons.lang3.tuple.Pair;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeDTO;
@@ -850,7 +850,8 @@ public class GermplasmServiceImpl implements GermplasmService {
 			progenitorsDetailsDto.setBreedingMethodName(germplasmDto.getBreedingMethod());
 			progenitorsDetailsDto.setBreedingMethodCode(method.getMcode());
 			progenitorsDetailsDto.setBreedingMethodType(method.getMtype());
-			progenitorsDetailsDto.setNumberOfDerivativeProgeny(this.daoFactory.getGermplasmDao().countGermplasmDerivativeProgeny(gid));
+			progenitorsDetailsDto.setNumberOfDerivativeProgeny(
+				this.daoFactory.getGermplasmDao().countGermplasmDerivativeProgeny(Sets.newHashSet(gid)).getOrDefault(gid, 0));
 
 			final List<Integer> maleParentsGids = new ArrayList<>();
 			maleParentsGids.add(germplasmDto.getGpid2());
@@ -1052,6 +1053,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 	@Override
 	public Map<Integer, Pair<String, String>> getDerivativeParentsMapByGids(final Set<Integer> gids) {
 		return this.daoFactory.getGermplasmDao().getDerivativeParentsMapByGids(gids);
+	}
+
+	@Override
+	public Map<Integer, Integer> countGermplasmDerivativeProgeny(final Set<Integer> gids) {
+		return this.daoFactory.getGermplasmDao().countGermplasmDerivativeProgeny(gids);
 	}
 
 	private void migrateNames(final List<Integer> gidsNonSelectedGermplasm, final Germplasm targetGermplasm) {

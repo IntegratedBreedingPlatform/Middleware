@@ -1084,15 +1084,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	/**
-	 * Retrieves the standard variables of a property
-	 */
-	public List<StandardVariableReference> getStandardVariablesOfProperty(final Integer propertyId) {
-		final List<Integer> properties = new ArrayList<>();
-		properties.add(propertyId);
-		return this.getStandardVariablesOfProperties(properties).get(propertyId);
-	}
-
-	/**
 	 * Retrieves the standard variables of trait properties
 	 */
 	public Map<Integer, List<StandardVariableReference>> getStandardVariablesOfProperties(
@@ -1107,10 +1098,13 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		try {
 			final StringBuilder sqlString = new StringBuilder()
-				.append("SELECT cvterm_id, name, definition, cvr.object_id ")
+				.append("SELECT cvt.cvterm_id, cvt.name, cvt.definition, cvr.object_id ")
 				.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
 				.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.HAS_PROPERTY.getId())
-				.append(" AND cvr.object_id  IN (:propertyIds) ").append("ORDER BY cvr.object_id ");
+				.append(" AND cvr.object_id  IN (:propertyIds) ")
+				.append("INNER JOIN cvtermprop cvp ON cvp.cvterm_id = cvt.cvterm_id AND cvp.type_id = ").append(TermId.VARIABLE_TYPE.getId())
+				.append(" and cvp.value = '").append(VariableType.TRAIT.getName())
+				.append("' ORDER BY cvr.object_id ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 			query.setParameterList("propertyIds", propertyIds);
@@ -1654,8 +1648,10 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 				+ "plotdataset.dataset_type_id = " + DatasetTypeEnum.PLOT_DATA.getId());
 			stringBuilder.append("	  LEFT JOIN project meansdataset ON meansdataset.project_id = pp.project_id AND "
 				+ "meansdataset.dataset_type_id = " + DatasetTypeEnum.MEANS_DATA.getId());
+			stringBuilder.append("	  LEFT JOIN project summarystatsdataset ON summarystatsdataset.project_id = pp.project_id AND "
+				+ "summarystatsdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId());
 			stringBuilder.append(
-				"	  LEFT JOIN project envdataset ON (envdataset.study_id = plotdataset.study_id || envdataset.study_id = meansdataset.study_id) AND "
+				"	  LEFT JOIN project envdataset ON (envdataset.study_id = plotdataset.study_id || envdataset.study_id = meansdataset.study_id || envdataset.study_id = summarystatsdataset.study_id) AND "
 					+ "envdataset.dataset_type_id = " + DatasetTypeEnum.SUMMARY_DATA.getId());
 			stringBuilder.append("	  LEFT JOIN nd_experiment nde ON nde.project_id = envdataset.project_id AND nde.type_id = "
 				+ ExperimentType.TRIAL_ENVIRONMENT.getTermId());
@@ -1761,7 +1757,7 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 			final String observationVariableName =
 				result.get(VARIABLE_ALIAS) != null && StringUtils.isNotEmpty(String.valueOf(result.get(VARIABLE_ALIAS))) ?
-				String.valueOf(result.get(VARIABLE_ALIAS)) : String.valueOf(result.get(VARIABLE_NAME));
+					String.valueOf(result.get(VARIABLE_ALIAS)) : String.valueOf(result.get(VARIABLE_NAME));
 
 			variableDto.setName(observationVariableName);
 			variableDto.setObservationVariableDbId(String.valueOf(result.get(VARIABLE_ID)));
@@ -1859,9 +1855,9 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	 * Return a list of variables that match definition, name or alias.
 	 * The programUUID is used to return the expected range and alias of the program if it exists.
 	 *
-	 * @param query       used like condition to match definition, name or alias.
+	 * @param query           used like condition to match definition, name or alias.
 	 * @param variableTypeIds variable type filter
-	 * @param programUUID program's unique id
+	 * @param programUUID     program's unique id
 	 * @return List of Variable or empty list if none found
 	 */
 	public List<Variable> searchAttributeVariables(final String query, final List<Integer> variableTypeIds, final String programUUID) {
