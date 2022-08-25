@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.germplasm.pedigree.cop;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import org.apache.commons.lang3.tuple.Pair;
@@ -235,9 +236,25 @@ public class CopCalculation {
 		 */
 
 		/*
-		 * if only male parent (immediate source) is unknown => handle later by UNKNOWN_INBREEDING_GENERATIONS if btype=2.
+		 * handle case with break in the records. E.g:
+		 *  A
+		 *  |
+		 *  UNKNOWN
+		 *  |
+		 *  B
+		 *  |
+		 *  C
+		 *  |
+		 *  D
 		 */
-		if (isUnknown(g.getMaleParentNode()) && !BTypeEnum.SELF_FERTILIZING_F4.equals(this.btype)) {
+		GermplasmTreeNode source = g.getMaleParentNode();
+		while (!isUnknown(source) && isDerivative(source)) {
+			source = source.getMaleParentNode();
+		}
+		/*
+		 * if break in the records but btype=2 => handle later by UNKNOWN_INBREEDING_GENERATIONS.
+		 */
+		if (isUnknown(source) && !BTypeEnum.SELF_FERTILIZING_F4.equals(this.btype)) {
 			return this.btype.getValue();
 		}
 
@@ -249,7 +266,7 @@ public class CopCalculation {
 		 * If generative, then generations = 0
 		 * => F(g) = 1 - (1 - copz) / 2^0 = copz = f(g)
 		 *
-		 * Unknown inbreeding generations:
+		 * Unknown inbreeding generations (btype=2):
 		 * 1 - (1 - 0) / 2^4 = 15/16 = 0.9375
 		 */
 		final int inbreedingGenerationsCount = this.countInbreedingGenerations(g);
@@ -362,9 +379,10 @@ public class CopCalculation {
 
 	private int countInbreedingGenerations(final GermplasmTreeNode g) {
 		GermplasmTreeNode source = g.getMaleParentNode();
-		if (isUnknown(source)) {
+		if (isUnknown(source) && BTypeEnum.SELF_FERTILIZING_F4.equals(this.btype)) {
 			return UNKNOWN_INBREEDING_GENERATIONS;
 		}
+		Preconditions.checkArgument(!isUnknown(source), "programming error in coefficient of inbreeding: Unknown source found");
 		if (this.isGenerative(g)) {
 			return 0;
 		}
@@ -375,7 +393,9 @@ public class CopCalculation {
 			source = source.getMaleParentNode();
 		}
 		/*
-		 * TODO verify case with (some) known generations. E.g:
+		 * Graham: It is not so important what happens here - I guess I just go with fully inbred if BTYPE=1 (handle above)
+		 *  and F4 with BTYPE=2
+		 *
 		 *  A
 		 *  |
 		 *  UNKNOWN
@@ -386,10 +406,9 @@ public class CopCalculation {
 		 *  |
 		 *  D
 		 */
-		if (isDerivative(source)) {
+		if (isDerivative(source) && BTypeEnum.SELF_FERTILIZING_F4.equals(this.btype)) {
 			return UNKNOWN_INBREEDING_GENERATIONS;
 		}
-
 		return count;
 	}
 
