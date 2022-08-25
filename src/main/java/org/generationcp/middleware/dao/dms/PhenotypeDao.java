@@ -1069,24 +1069,26 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			for (final Object[] result : treatmentFactorsResults) {
 				final String factor = (String) result[0];
 				final String modality = (String) result[1];
-				final Integer ndExperimentId = (Integer) result[2];
+				final Integer experimentId = (Integer) result[2];
 				final Treatment treatment = new Treatment();
 				treatment.setFactor(factor);
 				treatment.setModality(modality);
-				if (subObservationUnitsByExperimentParentIdMap.containsKey(ndExperimentId)) {
-					// If sub-observation, add the treatment info to all sub-observations with the same experiment parent ID
-					subObservationUnitsByExperimentParentIdMap.get(ndExperimentId).forEach(observationUnitDto -> {
+
+				// Add the treatment info to all sub-observations with the same experiment parent ID
+				if (subObservationUnitsByExperimentParentIdMap.containsKey(experimentId)) {
+					subObservationUnitsByExperimentParentIdMap.get(experimentId).forEach(observationUnitDto -> {
 						observationUnitDto.getTreatments().add(treatment);
 					});
-				} else if (observationUnitsByExperimentIdMap.containsKey(ndExperimentId)) {
-					// If not sub-observation, add the treatment info to the observation unit.
-					observationUnitsByExperimentIdMap.get(ndExperimentId).getTreatments().add(treatment);
+				}
+				// Add the treatment info to the observation unit.
+				if (observationUnitsByExperimentIdMap.containsKey(experimentId)) {
+					observationUnitsByExperimentIdMap.get(experimentId).getTreatments().add(treatment);
 				}
 			}
 		}
 
-		return ListUtils.union(new ArrayList<>(observationUnitsByExperimentIdMap.values()),
-			new ArrayList<>(subObservationUnitsByExperimentParentIdMap.values()));
+		return ListUtils.union(new ArrayList<ObservationUnitDto>(observationUnitsByExperimentIdMap.values()),
+			new ArrayList<ObservationUnitDto>(subObservationUnitsByExperimentParentIdMap.values()));
 	}
 
 	private static void addObservationUnitSearchFilter(final ObservationUnitSearchRequestDTO requestDTO, final StringBuilder queryString) {
