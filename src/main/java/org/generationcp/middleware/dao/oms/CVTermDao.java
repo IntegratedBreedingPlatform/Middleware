@@ -1084,15 +1084,6 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 	}
 
 	/**
-	 * Retrieves the standard variables of a property
-	 */
-	public List<StandardVariableReference> getStandardVariablesOfProperty(final Integer propertyId) {
-		final List<Integer> properties = new ArrayList<>();
-		properties.add(propertyId);
-		return this.getStandardVariablesOfProperties(properties).get(propertyId);
-	}
-
-	/**
 	 * Retrieves the standard variables of trait properties
 	 */
 	public Map<Integer, List<StandardVariableReference>> getStandardVariablesOfProperties(
@@ -1107,10 +1098,13 @@ public class CVTermDao extends GenericDAO<CVTerm, Integer> {
 
 		try {
 			final StringBuilder sqlString = new StringBuilder()
-				.append("SELECT cvterm_id, name, definition, cvr.object_id ")
+				.append("SELECT cvt.cvterm_id, cvt.name, cvt.definition, cvr.object_id ")
 				.append("FROM cvterm cvt JOIN cvterm_relationship cvr ")
 				.append("ON cvt.cvterm_id = cvr.subject_id AND cvr.type_id = ").append(TermId.HAS_PROPERTY.getId())
-				.append(" AND cvr.object_id  IN (:propertyIds) ").append("ORDER BY cvr.object_id ");
+				.append(" AND cvr.object_id  IN (:propertyIds) ")
+				.append("INNER JOIN cvtermprop cvp ON cvp.cvterm_id = cvt.cvterm_id AND cvp.type_id = ").append(TermId.VARIABLE_TYPE.getId())
+				.append(" and cvp.value = '").append(VariableType.TRAIT.getName())
+				.append("' ORDER BY cvr.object_id ");
 
 			final SQLQuery query = this.getSession().createSQLQuery(sqlString.toString());
 			query.setParameterList("propertyIds", propertyIds);
