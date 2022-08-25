@@ -217,6 +217,7 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			this.germplasmDao.save(germplasm);
 			final Name germplasmName = GermplasmTestDataInitializer.createGermplasmName(germplasm.getGid());
 			this.germplasmNameDao.save(germplasmName);
+			germplasm.setPreferredName(germplasmName);
 			this.germplasm.add(germplasm);
 		}
 	}
@@ -437,8 +438,10 @@ public class PhenotypeDaoIntegrationTest extends IntegrationTestBase {
 			Assert.assertNotNull(obsUnitId);
 			final ExperimentModel experimentModel = this.experiments.get(obsUnitId);
 			Assert.assertNotNull(experimentModel);
-			Assert.assertEquals(experimentModel.getStock().getGermplasm().getGermplasmUUID(), result.getGermplasmDbId());
-			Assert.assertEquals(experimentModel.getStock().getName(), result.getGermplasmName());
+
+			final Germplasm experimentGermplasm = experimentModel.getStock().getGermplasm();
+			Assert.assertEquals(experimentGermplasm.getGermplasmUUID(), result.getGermplasmDbId());
+			Assert.assertEquals(experimentGermplasm.getPreferredName().getNval(), result.getGermplasmName());
 			Assert.assertEquals(experimentModel.getStock().getUniqueName(), result.getEntryNumber());
 			Assert.assertEquals(experimentModel.getGeoLocation().getLocationId().toString(), result.getStudyDbId());
 		}
