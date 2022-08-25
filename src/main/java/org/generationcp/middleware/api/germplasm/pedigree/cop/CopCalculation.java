@@ -223,7 +223,7 @@ public class CopCalculation {
 	 * @param g
 	 */
 	public double coefficientOfInbreeding(final GermplasmTreeNode g) {
-		final GermplasmTreeNode g0 = this.getGroupSource(g);
+		final GermplasmTreeNode g0 = getGroupSource(g);
 
 		/*
 		 * "BTYPE to implement some assumptions in the case of incomplete pedigree records.
@@ -274,7 +274,7 @@ public class CopCalculation {
 		 * "If the progenitors of a strain are unknown"
 		 */
 		if (isUnknown(g0.getFemaleParentNode()) && isUnknown(g0.getMaleParentNode())) {
-			return this.getCopZUnknownParents(g);
+			return this.getCopZUnknownParents();
 		}
 
 		/*
@@ -297,7 +297,7 @@ public class CopCalculation {
 		}
 	}
 
-	private double getCopZUnknownParents(final GermplasmTreeNode g) {
+	private double getCopZUnknownParents() {
 		if (this.isSelfFertilizing()) {
 			return this.btype.getValue();
 		} else {
@@ -338,11 +338,11 @@ public class CopCalculation {
 	 * @param node
 	 * @return max order of parent subtree + 1
 	 */
-	public int populateOrder(final GermplasmTreeNode node, final int orderParam) {
+	public static int populateOrder(final GermplasmTreeNode node, final int orderParam) {
 		if (isUnknown(node)) {
 			return orderParam;
 		}
-		final GermplasmTreeNode groupSource = this.getGroupSource(node);
+		final GermplasmTreeNode groupSource = getGroupSource(node);
 		int order = orderParam;
 		order = Math.max(
 			populateOrder(groupSource.getFemaleParentNode(), order),
@@ -370,7 +370,7 @@ public class CopCalculation {
 		}
 
 		int count = 1;
-		while (!isUnknown(source) && this.isDerivative(source) && !isUnknown(source.getMaleParentNode())) {
+		while (!isUnknown(source) && isDerivative(source) && !isUnknown(source.getMaleParentNode())) {
 			count++;
 			source = source.getMaleParentNode();
 		}
@@ -386,7 +386,7 @@ public class CopCalculation {
 		 *  |
 		 *  D
 		 */
-		if (this.isDerivative(source)) {
+		if (isDerivative(source)) {
 			return UNKNOWN_INBREEDING_GENERATIONS;
 		}
 
@@ -459,7 +459,7 @@ public class CopCalculation {
 	 * This method gets the group source (child of a cross) if the the line is derivative,
 	 * or the latest known ancestor or itself if there are no ancestors.
 	 */
-	private GermplasmTreeNode getGroupSource(final GermplasmTreeNode g) {
+	private static GermplasmTreeNode getGroupSource(final GermplasmTreeNode g) {
 		final GermplasmTreeNode g0;
 		if (isDerivative(g)) {
 			final GermplasmTreeNode groupSource = g.getFemaleParentNode();
@@ -505,7 +505,7 @@ public class CopCalculation {
 		return g != null && g.getNumberOfProgenitors() != null && g.getNumberOfProgenitors() > 0;
 	}
 
-	private boolean isDerivative(final GermplasmTreeNode g) {
+	private static boolean isDerivative(final GermplasmTreeNode g) {
 		return g != null && g.getNumberOfProgenitors() != null && g.getNumberOfProgenitors() < 0;
 	}
 
