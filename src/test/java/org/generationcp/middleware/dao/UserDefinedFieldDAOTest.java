@@ -65,25 +65,33 @@ public class UserDefinedFieldDAOTest extends IntegrationTestBase {
 		final UserDefinedField nameType1 = new UserDefinedField(null, "NAMES", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
 		final UserDefinedField nameType2 = new UserDefinedField(null, "NAMES", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
 		final UserDefinedField nameType3 = new UserDefinedField(null, "NAMES", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
+		final UserDefinedField nameType4 = new UserDefinedField(null, "NAMES", RandomStringUtils.randomAlphabetic(10), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(20), RandomStringUtils.randomAlphabetic(100), RandomStringUtils.randomAlphabetic(100), 1, 1, 20180909, null);
 		this.userDefinedFieldDao.save(nameType1);
 		this.userDefinedFieldDao.save(nameType2);
 		this.userDefinedFieldDao.save(nameType3);
-		this.nameTypes = Arrays.asList(nameType1, nameType2, nameType3);
+		this.userDefinedFieldDao.save(nameType4);
+		this.nameTypes = Arrays.asList(nameType1, nameType2, nameType3, nameType4);
 		
 		final Name name1 = NameTestDataInitializer.createName(nameType1.getFldno(), germplasm1.getGid(), RandomStringUtils.randomAlphabetic(100));
 		final Name name2 = NameTestDataInitializer.createName(nameType2.getFldno(), germplasm2.getGid(), RandomStringUtils.randomAlphabetic(100));
 		this.nameDao.save(name1);
 		this.nameDao.save(name2);
+
+		// Delete a name
+		final Name deletedName = NameTestDataInitializer.createName(nameType4.getFldno(), germplasm2.getGid(), RandomStringUtils.randomAlphabetic(100));
+		deletedName.setNstat(9);
+		this.nameDao.save(deletedName);
 	}
 
 	@Test
 	public void testGetNameTypesByGIDList() {
 		final List<UserDefinedField> nameTypesByGID = this.userDefinedFieldDao.getNameTypesByGIDList(this.gids);
 		Assert.assertNotNull(nameTypesByGID);
-		Assert.assertEquals(this.nameTypes.size()-1, nameTypesByGID.size());
+		Assert.assertEquals(2, nameTypesByGID.size());
 		Assert.assertTrue(nameTypesByGID.contains(this.nameTypes.get(0)));
 		Assert.assertTrue(nameTypesByGID.contains(this.nameTypes.get(1)));
 		Assert.assertFalse(nameTypesByGID.contains(this.nameTypes.get(2)));
+		Assert.assertFalse(nameTypesByGID.contains(this.nameTypes.get(3)));
 	}
 
 	@Test
