@@ -1165,7 +1165,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 
 		if (requestDTO.getObservationLevel() != null) {
-			sqlQuery.setParameter("datasetType", requestDTO.getObservationLevel());
+			sqlQuery.setParameter("datasetType", ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(requestDTO.getObservationLevel()));
 		}
 
 		if (requestDTO.getObservationTimeStampRangeStart() != null) {
