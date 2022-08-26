@@ -36,6 +36,7 @@ import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
+import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.ProjectProperty;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -210,7 +211,6 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 			observationDtos.stream().map(o -> Integer.valueOf(o.getObservationDbId())).collect(Collectors.toList()));
 		final ObservationDto observationDto = this.observationServiceBrapi
 			.searchObservations(observationSearchRequestDto, null).get(0);
-		Assert.assertEquals(VALUE, observationDto.getValue());
 		Assert.assertEquals(observationDtos.get(0).getObservationDbId().toString(), observationDto.getObservationDbId());
 		Assert.assertEquals(this.observationUnitDbId, observationDto.getObservationUnitDbId());
 		Assert.assertEquals(this.variableDTO.getObservationVariableDbId(), observationDto.getObservationVariableDbId());
@@ -218,6 +218,12 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(1, observationDto.getExternalReferences().size());
 		Assert.assertEquals(REF_ID, observationDto.getExternalReferences().get(0).getReferenceID());
 		Assert.assertEquals(REF_SOURCE, observationDto.getExternalReferences().get(0).getReferenceSource());
+
+		Integer experimentId = this.daoFactory.getExperimentDao()
+			.getByObsUnitIds(Arrays.asList(observationDto.getObservationUnitDbId())).get(0).getNdExperimentId();
+		Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+			experimentId, Integer.parseInt(observationDto.getObservationVariableDbId()));
+		Assert.assertEquals(VALUE, phenotype.getDraftValue());
 	}
 
 	@Test
@@ -251,7 +257,6 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 			observationDtos.stream().map(o -> Integer.valueOf(o.getObservationDbId())).collect(Collectors.toList()));
 		final ObservationDto resultObservationDto = this.observationServiceBrapi
 			.searchObservations(observationSearchRequestDto, null).get(0);
-		Assert.assertEquals(value, resultObservationDto.getValue());
 		Assert.assertEquals(observationDtos.get(0).getObservationDbId(), resultObservationDto.getObservationDbId());
 		Assert.assertEquals(this.observationUnitDbId, resultObservationDto.getObservationUnitDbId());
 		Assert.assertEquals(categoricalVariableDto.getObservationVariableDbId(), resultObservationDto.getObservationVariableDbId());
@@ -260,6 +265,11 @@ public class ObservationServiceBrapiImplTest extends IntegrationTestBase {
 		Assert.assertEquals(REF_ID, resultObservationDto.getExternalReferences().get(0).getReferenceID());
 		Assert.assertEquals(REF_SOURCE, resultObservationDto.getExternalReferences().get(0).getReferenceSource());
 
+		Integer experimentId = this.daoFactory.getExperimentDao()
+			.getByObsUnitIds(Arrays.asList(resultObservationDto.getObservationUnitDbId())).get(0).getNdExperimentId();
+		Phenotype phenotype = this.daoFactory.getPhenotypeDAO().getPhenotypeByExperimentIdAndObservableId(
+			experimentId, Integer.parseInt(resultObservationDto.getObservationVariableDbId()));
+		Assert.assertEquals(value, phenotype.getDraftValue());
 	}
 
 	@Test
