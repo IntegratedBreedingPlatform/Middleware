@@ -1478,7 +1478,7 @@
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
 		<comment>Add 'Lot insecticide treatment status property'</comment>
-        <sql>
+		<sql>
 			<!-- Create - Lot insecticide treatment status property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1010', 'Lot insecticide treatment status', 'The status of insecticide treatment.', '0', '0', '0');
@@ -1493,21 +1493,21 @@
 
 			<!-- Define Is a Inventory class  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
-        </sql>
+		</sql>
     </changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-72">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_GermDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot germination test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot germination test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_GermDate variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_GermDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_GermDate', 'L_GermDate', '0', '0', '0');
@@ -1521,7 +1521,7 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot germination test date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
 
 			<!--   Property, Method, Scale  -->
@@ -1529,21 +1529,21 @@
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-73">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_NextGermDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot next germination test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot next germination test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_NextGermDate variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_NextGermDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_NextGermDate', 'L_NextGermDate', '0', '0', '0');
@@ -1557,28 +1557,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot next germination test date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-74">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_NextRegDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot next regeneration date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot next regeneration date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_NextGermDate variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_NextRegDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_NextRegDate', 'L_NextRegDate', '0', '0', '0');
@@ -1592,28 +1592,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot next regeneration date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-75">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_DiscardDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot discard date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot discard date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_DiscardDate variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_DiscardDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_DiscardDate', 'L_DiscardDate', '0', '0', '0');
@@ -1627,28 +1627,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot discard date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-76">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_ExpirationDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot expiration Date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot expiration Date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_ExpirationDate variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_ExpirationDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_ExpirationDate', 'L_ExpirationDate', '0', '0', '0');
@@ -1662,28 +1662,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot expiration Date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-77">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_MoistDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot moisture test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot moisture test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_MoistDate variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_MoistDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_MoistDate', 'L_MoistDate', '0', '0', '0');
@@ -1697,28 +1697,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot moisture test date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-78">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_FungiTreatDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_FungiTreatDate variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_FungiTreatDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_FungiTreatDate', 'L_FungiTreatDate', '0', '0', '0');
@@ -1732,28 +1732,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot fungicide treatment date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-79">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_InsectTreatDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_InsectTreatDate variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_InsectTreatDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_InsectTreatDate', 'L_InsectTreatDate', '0', '0', '0');
@@ -1767,28 +1767,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot insecticide treatment date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-80">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_Viability test date' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_Viability test date variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_Viability test date variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_Viability test date', 'L_Viability test date', '0', '0', '0');
@@ -1802,28 +1802,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-81">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_PhytoReport' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot phytosanitary report' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot phytosanitary report' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_PhytoReport variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_PhytoReport variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_PhytoReport', 'L_PhytoReport', '0', '0', '0');
@@ -1837,28 +1837,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot phytosanitary report' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-82">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_Certification' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot certification' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot certification' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_Certification variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_Certification variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_Certification', 'L_Certification', '0', '0', '0');
@@ -1872,28 +1872,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot certification' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-83">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_QualityNotes' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot quality notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot quality notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot quality notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot quality notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_QualityNotes variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_QualityNotes variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_QualityNotes', 'L_QualityNotes', '0', '0', '0');
@@ -1907,28 +1907,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot quality notes' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot quality notes - Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-84">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_FungiTreatProd' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment product' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment product' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_FungiTreatProd variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_FungiTreatProd variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_FungiTreatProd', 'L_FungiTreatProd', '0', '0', '0');
@@ -1942,28 +1942,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot fungicide treatment product' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-85">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_InsectTreatProd' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment product' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment product' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_InsectTreatProd variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_InsectTreatProd variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_InsectTreatProd', 'L_InsectTreatProd', '0', '0', '0');
@@ -1977,28 +1977,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot insecticide treatment product' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-86">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_ProdNotes' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot production notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot production notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot production notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot production notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_ProdNotes variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_ProdNotes variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_ProdNotes', 'L_ProdNotes', '0', '0', '0');
@@ -2012,28 +2012,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot production notes' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot production notes - Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-87">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_PostHarvestNotes' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot postharvest notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot post harvest notes – Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot postharvest notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot post harvest notes – Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_PostHarvestNotes variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_PostHarvestNotes variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_PostHarvestNotes', 'L_PostHarvestNotes', '0', '0', '0');
@@ -2047,28 +2047,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot postharvest notes' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot post harvest notes – Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-88">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_StorageNotes' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot storage notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot storage notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot storage notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot storage notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_StorageNotes variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_StorageNotes variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_StorageNotes', 'L_StorageNotes', '0', '0', '0');
@@ -2082,28 +2082,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot storage notes' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot storage notes - Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-89">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_Vigour' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot vigour' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Vigour test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot vigour scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot vigour' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Vigour test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot vigour scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_Vigour variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_Vigour variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_Vigour', 'L_Vigour', '0', '0', '0');
@@ -2117,28 +2117,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot vigour' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Vigour test - Method' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot vigour scale' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot vigour scale' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-90">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_GermRate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot germination rate' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Germination test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot germination rate' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Germination test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_GermRate variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_GermRate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_GermRate', 'L_GermRate', '0', '0', '0');
@@ -2152,28 +2152,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot germination rate' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Germination test - Method' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-91">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_SingleSdWt' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot single seed weight' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Single seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'mg' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot single seed weight' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Single seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'mg' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_SingleSdWt variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_SingleSdWt variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_SingleSdWt', 'L_SingleSdWt', '0', '0', '0');
@@ -2187,28 +2187,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot single seed weight' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Single seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'mg' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'mg' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-92">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_TSdWt' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_TSdWt variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_TSdWt variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_TSdWt', 'L_TSdWt', '0', '0', '0');
@@ -2222,28 +2222,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-93">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_TSdWt' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_TSdWt variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_TSdWt variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_TSdWt', 'L_TSdWt', '0', '0', '0');
@@ -2257,28 +2257,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-94">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_ProdYear' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot production year' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Year (yyyy)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot production year' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Year (yyyy)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_ProdYear variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_ProdYear variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_ProdYear', 'L_ProdYear', '0', '0', '0');
@@ -2292,28 +2292,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot production year' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Year (yyyy)' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Year (yyyy)' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-95">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_PurityTest' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot physical purity test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Physical purity test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot physical purity test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Physical purity test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_PurityTest variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_PurityTest variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_PurityTest', 'L_PurityTest', '0', '0', '0');
@@ -2327,28 +2327,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot physical purity test' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Physical purity test - Method' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-96">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_GenPurityTest' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot genetic purity test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Genetic purity test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot genetic purity test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Genetic purity test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_GenPurityTest variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_GenPurityTest variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_GenPurityTest', 'L_GenPurityTest', '0', '0', '0');
@@ -2362,28 +2362,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot genetic purity test' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Genetic purity test - Method' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-97">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_MoistCont' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot moisture content' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Measured' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot moisture content' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Measured' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_MoistCont variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_MoistCont variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_MoistCont', 'L_MoistCont', '0', '0', '0');
@@ -2397,28 +2397,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot moisture content' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Measured' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-98">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_PureLiveSd' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot pure live seed' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Pure live seed - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot pure live seed' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Pure live seed - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_PureLiveSd variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_PureLiveSd variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_PureLiveSd', 'L_PureLiveSd', '0', '0', '0');
@@ -2432,28 +2432,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot pure live seed' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Pure live seed - Method' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-99">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_TotalViableSd' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot total viable seed' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Total viable seed - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot total viable seed' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Total viable seed - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_TotalViableSd variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_TotalViableSd variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_TotalViableSd', 'L_TotalViableSd', '0', '0', '0');
@@ -2467,28 +2467,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot total viable seed' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Total viable seed - Method' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-100">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_UseStatus' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot use status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot use status - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot use status scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot use status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot use status - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot use status scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_UseStatus variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_UseStatus variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_UseStatus', 'L_UseStatus', '0', '0', '0');
@@ -2502,28 +2502,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot use status' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot use status - Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot use status scale' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot use status scale' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-101">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_VarietyID' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot Variety ID test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Variety ID test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Variety ID scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot Variety ID test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Variety ID test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Variety ID scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_VarietyID variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_VarietyID variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_VarietyID', 'L_VarietyID', '0', '0', '0');
@@ -2537,28 +2537,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot Variety ID test' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Variety ID test - Method' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Variety ID scale' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Variety ID scale' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-102">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_SdClass' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot seed class' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Seed class scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot seed class' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Seed class scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_SdClass variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_SdClass variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_SdClass', 'L_SdClass', '0', '0', '0');
@@ -2572,28 +2572,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot seed class' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Seed class scale' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Seed class scale' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-103">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_FungiTreatStatus' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_FungiTreatStatus variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_FungiTreatStatus variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_FungiTreatStatus', 'L_FungiTreatStatus', '0', '0', '0');
@@ -2607,28 +2607,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment status' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment scale' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment scale' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-104">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_InsectTreatStatus' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_InsectTreatStatus variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_InsectTreatStatus variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_InsectTreatStatus', 'L_InsectTreatStatus', '0', '0', '0');
@@ -2642,28 +2642,28 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot insecticide treatment status' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot insecticide treatment scale' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot insecticide treatment scale' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 
 	<changeSet author="cuenyad" id="v21.5.0-105">
 		<preConditions onFail="MARK_RAN">
-        <and>
+		<and>
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_Viability test date' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
-            <sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
-        </and>
+		</and>
 		</preConditions>
 		<comment>Add 'L_Viability test date variable'</comment>
-        <sql>
+		<sql>
 			<!-- Create - L_Viability test date variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
 			VALUES ('1040', 'L_Viability test date', 'L_Viability test date', '0', '0', '0');
@@ -2677,13 +2677,13 @@
 
 			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
-            SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
 			<!--   Property, Method, Scale  -->
 			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
 				('1200', @CVTERM_ID, @PROPERTY_ID),
 				('1210', @CVTERM_ID, @METHOD_ID),
 				('1220', @CVTERM_ID, @SCALE_ID);
-        </sql>
-    </changeSet>
+		</sql>
+	</changeSet>
 </databaseChangeLog>
