@@ -45,6 +45,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
 
+	private static final int DELETED = 9;
+
 	private static final String SELECT_GERMPLASM_NAMES = "select n.nid as id, " //
 		+ "    n.gid as gid, " //
 		+ "    n.nval as name, " //
@@ -341,6 +343,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(Name.class);
 			criteria.createAlias("germplasm", "germplasm");
 			criteria.add(Restrictions.in("germplasm.gid", gids));
+			criteria.add(Restrictions.ne("nstat", DELETED));
 			if (!CollectionUtils.isEmpty(ntypeIds)) {
 				criteria.add(Restrictions.in("typeId", ntypeIds));
 			}

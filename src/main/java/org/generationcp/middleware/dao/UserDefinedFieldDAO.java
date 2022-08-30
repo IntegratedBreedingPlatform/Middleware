@@ -132,7 +132,7 @@ public class UserDefinedFieldDAO extends GenericDAO<UserDefinedField, Integer> {
 		List<UserDefinedField> returnList = new ArrayList<>();
 		if (gidList != null && !gidList.isEmpty()) {
 			try {
-				final String sql = "SELECT DISTINCT {u.*}" + " FROM names n" + " INNER JOIN udflds u" + " WHERE n.ntype=u.fldno"
+				final String sql = "SELECT DISTINCT {u.*} FROM names n INNER JOIN udflds u WHERE n.ntype=u.fldno AND n.nstat != 9 "
 					+ " AND n.gid in (:gidList)" + " ORDER BY u.fname";
 				final SQLQuery query = this.getSession().createSQLQuery(sql);
 				query.addEntity("u", UserDefinedField.class);
