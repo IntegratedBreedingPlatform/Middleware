@@ -1,5 +1,6 @@
 package org.generationcp.middleware.api.brapi;
 
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
@@ -27,6 +28,7 @@ import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -45,6 +47,8 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 
 	private final DaoFactory daoFactory;
 	private final HibernateSessionProvider sessionProvider;
+
+	private final Set<Integer> observationTypeVariables = new HashSet<>();
 
 	public ObservationServiceBrapiImpl(final HibernateSessionProvider sessionProvider) {
 		this.sessionProvider = sessionProvider;
@@ -89,23 +93,37 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 		// are added to their respective dataset before creating the observation.
 		this.associateVariablesToDatasets(observations, experimentModelMap);
 
-		final PhenotypeDao dao = this.daoFactory.getPhenotypeDAO();
-		for (final ObservationDto observation : observations) {
-			final Phenotype phenotype = new Phenotype();
-			final Date currentDate = new Date();
-			phenotype.setCreatedDate(currentDate);
-			phenotype.setUpdatedDate(currentDate);
-			phenotype.setObservableId(Integer.valueOf(observation.getObservationVariableDbId()));
-			phenotype.setValue(observation.getValue());
-			final Optional<Integer> categoricalIdOptional =
-				this.resolveCategoricalIdValue(Integer.valueOf(observation.getObservationVariableDbId()), observation.getValue(),
-					validValuesForCategoricalVariables);
-			if (categoricalIdOptional.isPresent()) {
-				phenotype.setcValue(categoricalIdOptional.get());
+		final ObservationSearchRequestDto observationSearchRequestDto = new ObservationSearchRequestDto();
+		final List<String> observationUnitDbIds = observations.stream().filter(o -> org.apache.commons.lang3.StringUtils.isNotEmpty(o.getObservationUnitDbId()))
+			.map(ObservationDto::getObservationUnitDbId).collect(Collectors.toList());
+		final List<String> variableIds = observations.stream().filter(o -> org.apache.commons.lang3.StringUtils.isNotEmpty(o.getObservationVariableDbId()))
+			.map(ObservationDto::getObservationVariableDbId).collect(Collectors.toList());
+
+		observationSearchRequestDto.setObservationUnitDbIds(observationUnitDbIds);
+		observationSearchRequestDto.setObservationVariableDbIds(variableIds);
+
+		final List<ObservationDto> existingObservations =
+			this.searchObservations(observationSearchRequestDto, null);
+		final MultiKeyMap existingObservationsMap = new MultiKeyMap();
+		if(org.apache.commons.collections.CollectionUtils.isNotEmpty(existingObservations)) {
+			for (final ObservationDto existingObservation : existingObservations) {
+				existingObservationsMap.put(existingObservation.getObservationUnitDbId(),
+					existingObservation.getObservationVariableDbId(), existingObservation);
 			}
-			phenotype.setExperiment(experimentModelMap.get(observation.getObservationUnitDbId()));
-			this.setPhenotypeExternalReferences(observation, phenotype);
-			final Phenotype saved = dao.save(phenotype);
+		}
+
+		for (final ObservationDto observation : observations) {
+
+			final Phenotype saved;
+			if (existingObservationsMap.containsKey(observation.getObservationUnitDbId(),
+				observation.getObservationVariableDbId())) {
+				saved = updateExistingPhenotype(validValuesForCategoricalVariables, observation,
+					(ObservationDto) existingObservationsMap.get(observation.getObservationUnitDbId(),
+						observation.getObservationVariableDbId()));
+			} else {
+				saved = createNewPhenotype(experimentModelMap, validValuesForCategoricalVariables,
+					observation);
+			}
 			observationDbIds.add(saved.getPhenotypeId());
 		}
 		this.sessionProvider.getSession().flush();
@@ -115,6 +133,61 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 			return this.searchObservations(searchRequestDTO, null);
 		} else {
 			return new ArrayList<>();
+		}
+	}
+
+	private Phenotype createNewPhenotype(final Map<String, ExperimentModel> experimentModelMap,
+		final Map<Integer, List<ValueReference>> validValuesForCategoricalVariables,
+		final ObservationDto observation) {
+		final Phenotype phenotype = new Phenotype();
+		this.updatePhenotypeValues(validValuesForCategoricalVariables, observation, phenotype);
+
+		final Date currentDate = new Date();
+		phenotype.setCreatedDate(currentDate);
+		phenotype.setUpdatedDate(currentDate);
+		phenotype.setObservableId(Integer.valueOf(observation.getObservationVariableDbId()));
+		phenotype.setExperiment(experimentModelMap.get(observation.getObservationUnitDbId()));
+		this.setPhenotypeExternalReferences(observation, phenotype);
+		return this.daoFactory.getPhenotypeDAO().save(phenotype);
+	}
+
+	private Phenotype updateExistingPhenotype(final Map<Integer, List<ValueReference>> validValuesForCategoricalVariables,
+		final ObservationDto inputObservation, final ObservationDto existingObservation) {
+
+		final PhenotypeDao dao = this.daoFactory.getPhenotypeDAO();
+		final Phenotype existingPhenotype = dao.getById(Integer.parseInt(existingObservation.getObservationDbId()));
+
+		if (!StringUtils.isEmpty(existingObservation.getValue()) && existingObservation.getValue()
+			.equalsIgnoreCase(inputObservation.getValue())) {
+			/*Phenotype exists and imported value is equal to value => Erase draft data*/
+			existingPhenotype.setDraftValue(null);
+			existingPhenotype.setDraftCValueId(null);
+		} else {
+			this.updatePhenotypeValues(validValuesForCategoricalVariables, inputObservation, existingPhenotype);
+		}
+
+		return dao.update(existingPhenotype);
+	}
+
+	private void updatePhenotypeValues(final Map<Integer, List<ValueReference>> validValuesForCategoricalVariables, final ObservationDto observation,
+		final Phenotype phenotype) {
+		final String variableId = observation.getObservationVariableDbId();
+		final boolean isObservationType = this.observationTypeVariables.contains(Integer.parseInt(variableId));
+
+		final Optional<Integer> categoricalIdOptional =
+			this.resolveCategoricalIdValue(Integer.valueOf(observation.getObservationVariableDbId()), observation.getValue(),
+				validValuesForCategoricalVariables);
+
+		if (isObservationType) {
+			phenotype.setDraftValue(observation.getValue());
+			if (categoricalIdOptional.isPresent()) {
+				phenotype.setDraftCValueId(categoricalIdOptional.get());
+			}
+		} else {
+			phenotype.setValue(observation.getValue());
+			if (categoricalIdOptional.isPresent()) {
+				phenotype.setcValue(categoricalIdOptional.get());
+			}
 		}
 	}
 
@@ -166,39 +239,42 @@ public class ObservationServiceBrapiImpl implements ObservationServiceBrapi {
 			final DmsProject dmsProject = dmsProjectMap.get(entry.getKey());
 			final Set<Integer> variableIds = entry.getValue();
 			variableIds.forEach(variableId -> {
-
-				// Do not proceed if variable already exists in the target dataset
-				if (datasetVariablesMap.containsKey(dmsProject.getProjectId()) && datasetVariablesMap.get(dmsProject.getProjectId())
-					.containsKey(variableId))
-					return;
 				// Do not proceed if variable doesn't have variable types
 				if (!variableTypesOfVariables.containsKey(variableId))
 					return;
 
-				this.assignVariableToDataset(variableTypesOfVariables, dmsProject, variableId, variablesMap.get(variableId));
+				boolean isVariableExistingInDataset = datasetVariablesMap.containsKey(dmsProject.getProjectId()) && datasetVariablesMap.get(dmsProject.getProjectId())
+					.containsKey(variableId);
+				this.assignVariableToDataset(variableTypesOfVariables, dmsProject, variableId, variablesMap.get(variableId), isVariableExistingInDataset);
 
 			});
 		});
 	}
 
 	private void assignVariableToDataset(final Map<Integer, List<VariableType>> variableTypesOfVariables, final DmsProject dmsProject,
-		final Integer variableId, final Variable variable) {
+		final Integer variableId, final Variable variable, final boolean isVariableExistingInDataset) {
 		if ((dmsProject.getDatasetType().isObservationType() || dmsProject.getDatasetType().isSubObservationType())
 			&& variableTypesOfVariables.get(variableId).contains(VariableType.TRAIT)) {
-			this.addProjectPropertyToDataset(dmsProject, variable, VariableType.TRAIT);
+			this.addProjectPropertyToDataset(dmsProject, variable, VariableType.TRAIT, isVariableExistingInDataset);
+			this.observationTypeVariables.add(variableId);
 		} else if ((dmsProject.getDatasetType().isObservationType() || dmsProject.getDatasetType().isSubObservationType())
 			&& variableTypesOfVariables.get(variableId).contains(VariableType.SELECTION_METHOD)) {
-			this.addProjectPropertyToDataset(dmsProject, variable, VariableType.SELECTION_METHOD);
+			this.addProjectPropertyToDataset(dmsProject, variable, VariableType.SELECTION_METHOD, isVariableExistingInDataset);
+			this.observationTypeVariables.add(variableId);
 		} else if (dmsProject.getDatasetType().getDatasetTypeId() == DatasetTypeEnum.MEANS_DATA.getId()
 			&& variableTypesOfVariables.get(variableId).contains(VariableType.ANALYSIS)) {
-			this.addProjectPropertyToDataset(dmsProject, variable, VariableType.ANALYSIS);
+			this.addProjectPropertyToDataset(dmsProject, variable, VariableType.ANALYSIS, isVariableExistingInDataset);
 		} else if (dmsProject.getDatasetType().getDatasetTypeId() == DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId()
 			&& variableTypesOfVariables.get(variableId).contains(VariableType.ANALYSIS_SUMMARY)) {
-			this.addProjectPropertyToDataset(dmsProject, variable, VariableType.ANALYSIS_SUMMARY);
+			this.addProjectPropertyToDataset(dmsProject, variable, VariableType.ANALYSIS_SUMMARY, isVariableExistingInDataset);
 		}
 	}
 
-	private void addProjectPropertyToDataset(final DmsProject dmsProject, final Variable variable, final VariableType variableType) {
+	private void addProjectPropertyToDataset(final DmsProject dmsProject, final Variable variable, final VariableType variableType,
+		final boolean isVariableExistingInDataset) {
+		if (isVariableExistingInDataset)
+			return;
+
 		final ProjectPropertyDao projectPropertyDao = this.daoFactory.getProjectPropertyDAO();
 		final ProjectProperty projectProperty = new ProjectProperty();
 		projectProperty.setProject(dmsProject);

@@ -13,7 +13,9 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelFilter;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Enumeration;
@@ -47,8 +49,6 @@ import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
-import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
-import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelFilter;
 import org.generationcp.middleware.service.api.study.StudyInstanceService;
 import org.generationcp.middleware.service.impl.study.StudyInstance;
 import org.generationcp.middleware.util.CrossExpansionProperties;
@@ -220,7 +220,8 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 		final Map<Integer, Integer> generationLevelByTrialIds = this.daoFactory.getDmsProjectDAO().getByIds(trialIds)
 			.stream()
-			.collect(Collectors.toMap(DmsProject::getProjectId, trial -> trial.getGenerationLevel() == null ? 1 : trial.getGenerationLevel()));
+			.collect(
+				Collectors.toMap(DmsProject::getProjectId, trial -> trial.getGenerationLevel() == null ? 1 : trial.getGenerationLevel()));
 		final Map<Integer, DmsProject> trialIdPlotDatasetMap =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.PLOT_DATA.getId()).stream()
 				.collect(Collectors.toMap(plotDataset -> plotDataset.getStudy().getProjectId(), Function.identity()));
@@ -312,7 +313,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	}
 
 	@Override
-	public List<ObservationLevel> getObservationLevels(ObservationLevelFilter observationLevelFilter) {
+	public List<ObservationLevel> getObservationLevels(final ObservationLevelFilter observationLevelFilter) {
 		final List<ObservationLevel> observationLevels = new ArrayList<>();
 		if (StringUtils.isEmpty(observationLevelFilter.getTrialDbId()) && StringUtils.isEmpty(observationLevelFilter.getStudyDbId())) {
 			final Iterator<ObservationLevelEnum> iterator = Arrays.stream(ObservationLevelEnum.values()).iterator();
@@ -330,21 +331,22 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		return observationLevels;
 	}
 
-	private void getObservationLevelsForStudy(final ObservationLevelFilter observationLevelFilter, final List<ObservationLevel> observationLevels) {
+	private void getObservationLevelsForStudy(final ObservationLevelFilter observationLevelFilter,
+		final List<ObservationLevel> observationLevels) {
 		final Integer instanceId = Integer.valueOf(observationLevelFilter.getStudyDbId());
 		final Integer studyId = Integer.valueOf(observationLevelFilter.getTrialDbId());
 		observationLevels.add(new ObservationLevel(ObservationLevelEnum.STUDY));
 		final StudyInstance studyInstance = this.studyInstanceService.getStudyInstance(studyId, instanceId).get();
-		if(studyInstance.isHasExperimentalDesign()) {
+		if (studyInstance.isHasExperimentalDesign()) {
 			final List<Integer> datasetTypeIdsOfEnvironment = this.daoFactory.getDmsProjectDAO()
 				.getDatasetTypeIdsOfEnvironment(instanceId);
-			if(datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
+			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUMMARY_STATISTICS));
 			}
-			if(studyInstance.isHasFieldmap()) {
+			if (studyInstance.isHasFieldmap()) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.FIELD));
 			}
-			if(datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.MEANS_DATA.getId())) {
+			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.MEANS_DATA.getId())) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.MEANS));
 			}
 
@@ -352,16 +354,16 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 				this.datasetService.getDatasets(studyId, Sets.newHashSet(DatasetTypeEnum.PLOT_DATA.getId())).get(0);
 			this.addPlotRelatedObservationLevels(observationLevels, plotDataset);
 
-			if(datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())) {
+			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUB_PLOT));
 			}
-			if(datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())) {
+			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.PLANT));
 			}
-			if(datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId())) {
-				observationLevels.add(new ObservationLevel(ObservationLevelEnum.TIME_SERIES));
+			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId())) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.TIMESERIES));
 			}
-			if(datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId())) {
+			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId())) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.CUSTOM));
 			}
 		} else {
@@ -384,35 +386,36 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		observationLevels.add(new ObservationLevel(ObservationLevelEnum.PLOT));
 	}
 
-	private void getObservationLevelsForTrial(final ObservationLevelFilter observationLevelFilter, final List<ObservationLevel> observationLevels) {
+	private void getObservationLevelsForTrial(final ObservationLevelFilter observationLevelFilter,
+		final List<ObservationLevel> observationLevels) {
 		observationLevels.add(new ObservationLevel(ObservationLevelEnum.STUDY));
 		final List<DatasetDTO> datasets = this.daoFactory.getDmsProjectDAO()
 			.getDatasets(Integer.valueOf(observationLevelFilter.getTrialDbId()));
 		final Map<Integer, DatasetDTO> datasetDTOMap = datasets.stream()
 			.collect(Collectors.toMap(DatasetDTO::getDatasetTypeId, Function.identity()));
-		if(datasetDTOMap.containsKey(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
 			observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUMMARY_STATISTICS));
 		}
-		if(datasetDTOMap.containsKey(DatasetTypeEnum.PLOT_DATA.getId()) &&
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.PLOT_DATA.getId()) &&
 			this.daoFactory.getExperimentDao().hasFieldmap(datasetDTOMap.get(DatasetTypeEnum.PLOT_DATA.getId()).getDatasetId())) {
 			observationLevels.add(new ObservationLevel(ObservationLevelEnum.FIELD));
 		}
-		if(datasetDTOMap.containsKey(DatasetTypeEnum.MEANS_DATA.getId())) {
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.MEANS_DATA.getId())) {
 			observationLevels.add(new ObservationLevel(ObservationLevelEnum.MEANS));
 		}
-		if(datasetDTOMap.containsKey(DatasetTypeEnum.PLOT_DATA.getId())) {
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.PLOT_DATA.getId())) {
 			this.addPlotRelatedObservationLevels(observationLevels, datasetDTOMap.get(DatasetTypeEnum.PLOT_DATA.getId()));
 		}
-		if(datasetDTOMap.containsKey(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())) {
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())) {
 			observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUB_PLOT));
 		}
-		if(datasetDTOMap.containsKey(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())) {
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())) {
 			observationLevels.add(new ObservationLevel(ObservationLevelEnum.PLANT));
 		}
-		if(datasetDTOMap.containsKey(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId())) {
-			observationLevels.add(new ObservationLevel(ObservationLevelEnum.TIME_SERIES));
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.TIMESERIES));
 		}
-		if(datasetDTOMap.containsKey(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId())) {
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId())) {
 			observationLevels.add(new ObservationLevel(ObservationLevelEnum.CUSTOM));
 		}
 	}
@@ -574,12 +577,14 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			if (!entryTypesMap.containsKey(dto.getProgramDbId())) {
 				entryTypesMap.put(dto.getProgramDbId(),
 					this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), dto.getProgramDbId()).getEnumerations()
-						.stream().collect(Collectors.toMap(enumeration -> enumeration.getDescription().toUpperCase(), enumeration -> enumeration)));
+						.stream()
+						.collect(Collectors.toMap(enumeration -> enumeration.getDescription().toUpperCase(), enumeration -> enumeration)));
 			}
 			entryType = entryTypesMap.get(dto.getProgramDbId()).get(dto.getObservationUnitPosition().getEntryType().toUpperCase());
 		}
 
-		final StockProperty stockProperty = new StockProperty(stockModel, TermId.ENTRY_TYPE.getId(), entryType.getName(), entryType.getId());
+		final StockProperty stockProperty =
+			new StockProperty(stockModel, TermId.ENTRY_TYPE.getId(), entryType.getName(), entryType.getId());
 		final Set<StockProperty> properties = new HashSet<>();
 		properties.add(stockProperty);
 		stockModel.setProperties(properties);
