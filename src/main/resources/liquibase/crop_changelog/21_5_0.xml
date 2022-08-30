@@ -170,7 +170,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot vigour scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot vigour scale'</comment>
+		<comment>Add 'Lot vigour scale' scale</comment>
         <sql>
 			<!-- Create Lot vigour scale -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -212,7 +212,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot use status scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot use status scale'</comment>
+		<comment>Add 'Lot use status scale' scale</comment>
         <sql>
 			<!-- Create Lot use status scale -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -251,7 +251,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Variety ID scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Variety ID scale'</comment>
+		<comment>Add 'Variety ID scale' scale</comment>
         <sql>
 			<!-- Create Variety ID scale -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -293,7 +293,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Seed class scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Seed class scale'</comment>
+		<comment>Add 'Seed class scale' scale</comment>
         <sql>
 			<!-- Create Seed class scale -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -339,7 +339,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot fungicide treatment scale'</comment>
+		<comment>Add 'Lot fungicide treatment scale' scale</comment>
         <sql>
 			<!-- Create Lot fungicide treatment scale -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -379,7 +379,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot insecticide treatment scale'</comment>
+		<comment>Add 'Lot insecticide treatment scale' scale</comment>
         <sql>
 			<!-- Create Lot insecticide treatment scale -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -419,7 +419,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'mg' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
 		</preConditions>
-		<comment>Add 'mg scale'</comment>
+		<comment>Add 'mg' scale</comment>
         <sql>
 			<!-- Create mg scale -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -441,7 +441,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'File stored method'</comment>
+		<comment>Add 'File stored' method</comment>
         <sql>
 			<!-- Create File stored method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -459,7 +459,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot quality notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot quality notes - Described method'</comment>
+		<comment>Add 'Lot quality notes - Described' method</comment>
         <sql>
 			<!-- Create Lot quality notes - Described method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -477,7 +477,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot production notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot production notes - Described method'</comment>
+		<comment>Add 'Lot production notes - Described' method</comment>
         <sql>
 			<!-- Create Lot production notes - Described method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -495,7 +495,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot post harvest notes – Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot post harvest notes – Described method'</comment>
+		<comment>Add 'Lot post harvest notes – Described' method</comment>
         <sql>
 			<!-- Create Lot post harvest notes – Described method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -513,7 +513,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot storage notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot storage notes - Described method'</comment>
+		<comment>Add 'Lot storage notes - Described' method</comment>
         <sql>
 			<!-- Create Lot storage notes - Described method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -531,7 +531,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Vigour test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Vigour test - Method'</comment>
+		<comment>Add 'Vigour test - Method' method</comment>
         <sql>
 			<!-- Create Vigour test - Method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -549,7 +549,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Germination test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Germination test - Method'</comment>
+		<comment>Add 'Germination test - Method' method</comment>
         <sql>
 			<!-- Create Germination test - Method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -567,7 +567,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Single seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Single seed weight - Method'</comment>
+		<comment>Add 'Single seed weight - Method' method</comment>
         <sql>
 			<!-- Create Single seed weight - Method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -585,7 +585,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Thousand seed weight - Method'</comment>
+		<comment>Add 'Thousand seed weight - Method' method</comment>
         <sql>
 			<!-- Create Thousand seed weight - Method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -603,7 +603,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Physical purity test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Physical purity test - Method'</comment>
+		<comment>Add 'Physical purity test - Method' method</comment>
         <sql>
 			<!-- Create Physical purity test - Method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -621,7 +621,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Genetic purity test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Genetic purity test - Method'</comment>
+		<comment>Add 'Genetic purity test - Method' method</comment>
         <sql>
 			<!-- Create Genetic purity test - Method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -639,7 +639,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Measured' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Measured method'</comment>
+		<comment>Add 'Measured' method</comment>
         <sql>
 			<!-- Create - Measured -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -657,7 +657,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Pure live seed - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Pure live seed - Method'</comment>
+		<comment>Add 'Pure live seed - Method' method</comment>
         <sql>
 			<!-- Create - Pure live seed - Method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -675,7 +675,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Total viable seed - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Total viable seed - Method'</comment>
+		<comment>Add 'Total viable seed - Method' method</comment>
         <sql>
 			<!-- Create - Total viable seed - Method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -693,7 +693,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot use status - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot use status - Described method'</comment>
+		<comment>Add 'Lot use status - Described' method</comment>
         <sql>
 			<!-- Create - Lot use status - Described -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -711,7 +711,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Variety ID test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Variety ID test - Method'</comment>
+		<comment>Add 'Variety ID test - Method' method</comment>
         <sql>
 			<!-- Create - Variety ID test - Method -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
