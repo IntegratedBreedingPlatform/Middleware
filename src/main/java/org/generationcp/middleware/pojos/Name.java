@@ -25,6 +25,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Optional;
 
 /**
  * POJO for names table.
@@ -212,8 +213,8 @@ public class Name extends AbstractEntity implements Serializable {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Name [nid=");
 		builder.append(this.nid);
-		builder.append(", germplasm=");
-		builder.append(this.germplasm);
+		builder.append(", gid=");
+		builder.append(Optional.ofNullable(this.germplasm).map(Germplasm::getGid).orElse(0));
 		builder.append(", typeId=");
 		builder.append(this.typeId);
 		builder.append(", nstat=");
