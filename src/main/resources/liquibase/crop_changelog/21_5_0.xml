@@ -1519,7 +1519,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot germination test date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot germination test date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -1555,7 +1555,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot next germination test date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot next germination test date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -1590,7 +1590,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot next regeneration date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot next regeneration date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -1625,7 +1625,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot discard date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot discard date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -1660,7 +1660,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot expiration Date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot expiration Date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -1695,7 +1695,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot moisture test date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot moisture test date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -1730,7 +1730,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot fungicide treatment date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -1765,7 +1765,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot insecticide treatment date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot insecticide treatment date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -1800,7 +1800,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -1835,7 +1835,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot phytosanitary report' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot phytosanitary report' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -1870,7 +1870,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot certification' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot certification' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -1905,7 +1905,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot quality notes' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot quality notes' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot quality notes - Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -1940,7 +1940,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot fungicide treatment product' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment product' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -1975,7 +1975,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot insecticide treatment product' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot insecticide treatment product' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -2010,7 +2010,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot production notes' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot production notes' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot production notes - Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -2045,7 +2045,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot postharvest notes' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot postharvest notes' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot post harvest notes – Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -2080,7 +2080,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot storage notes' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot storage notes' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot storage notes - Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -2115,7 +2115,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot vigour' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot vigour' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Vigour test - Method' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot vigour scale' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -2150,7 +2150,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot germination rate' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot germination rate' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Germination test - Method' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -2185,7 +2185,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot single seed weight' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot single seed weight' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Single seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'mg' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -2220,7 +2220,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -2255,7 +2255,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -2290,7 +2290,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot production year' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot production year' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Year (yyyy)' AND is_obsolete = 0 AND cv_id = 1030);
 
@@ -2325,7 +2325,7 @@
 				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
 				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
 
-			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name =  'Lot physical purity test' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot physical purity test' AND is_obsolete = 0 AND cv_id = 1010);
 			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Physical purity test - Method' AND is_obsolete = 0 AND cv_id = 1020);
 			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
 
