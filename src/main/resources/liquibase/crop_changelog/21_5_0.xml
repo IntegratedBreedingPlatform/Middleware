@@ -741,7 +741,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot germination test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot germination test date property'</comment>
+		<comment>Add 'Lot germination test date' property</comment>
         <sql>
 			<!-- Create - Lot germination test date property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -764,7 +764,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot next germination test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot next germination test date property'</comment>
+		<comment>Add 'Lot next germination test date' property</comment>
         <sql>
 			<!-- Create - Lot germination test date property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -787,7 +787,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot next regeneration date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot next regeneration date property'</comment>
+		<comment>Add 'Lot next regeneration date' property</comment>
         <sql>
 			<!-- Create - Lot next regeneration date property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -810,7 +810,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot discard date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot discard date property'</comment>
+		<comment>Add 'Lot discard date' property</comment>
         <sql>
 			<!-- Create - Lot discard date property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -833,7 +833,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot expiration Date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot expiration Date property'</comment>
+		<comment>Add 'Lot expiration Date' property</comment>
         <sql>
 			<!-- Create - Lot expiration Date property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -856,7 +856,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot moisture test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot moisture test date property'</comment>
+		<comment>Add 'Lot moisture test date' property</comment>
         <sql>
 			<!-- Create - Lot moisture test date property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -879,7 +879,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot fungicide treatment date property'</comment>
+		<comment>Add 'Lot fungicide treatment date' property</comment>
         <sql>
 			<!-- Create - Lot fungicide treatment date property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -902,7 +902,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot insecticide treatment date property'</comment>
+		<comment>Add 'Lot insecticide treatment date' property</comment>
         <sql>
 			<!-- Create - Lot insecticide treatment date property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -925,7 +925,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot viability test date property'</comment>
+		<comment>Add 'Lot viability test date' property</comment>
         <sql>
 			<!-- Create - Lot viability test date property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -948,7 +948,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot phytosanitary report' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot phytosanitary report property'</comment>
+		<comment>Add 'Lot phytosanitary report' property</comment>
         <sql>
 			<!-- Create - Lot phytosanitary report property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -971,7 +971,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot certification' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot certification property'</comment>
+		<comment>Add 'Lot certification' property</comment>
         <sql>
 			<!-- Create - Lot certification property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -994,7 +994,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot quality notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot quality notes property'</comment>
+		<comment>Add 'Lot quality notes' property</comment>
         <sql>
 			<!-- Create - Lot quality notes property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1017,7 +1017,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment product' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot fungicide treatment product property'</comment>
+		<comment>Add 'Lot fungicide treatment product' property</comment>
         <sql>
 			<!-- Create - Lot fungicide treatment product property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1040,7 +1040,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment product' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot fungicide treatment product property'</comment>
+		<comment>Add 'Lot fungicide treatment product' property</comment>
         <sql>
 			<!-- Create - Lot fungicide treatment product property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1063,7 +1063,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment product' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot insecticide treatment product property'</comment>
+		<comment>Add 'Lot insecticide treatment product' property</comment>
         <sql>
 			<!-- Create - Lot insecticide treatment product property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1086,7 +1086,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot production notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot production notes property'</comment>
+		<comment>Add 'Lot production notes' property</comment>
         <sql>
 			<!-- Create - Lot production notes property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1109,7 +1109,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot postharvest notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot postharvest notes property'</comment>
+		<comment>Add 'Lot postharvest notes' property</comment>
         <sql>
 			<!-- Create - Lot postharvest notes property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1132,7 +1132,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot storage notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot storage notes property'</comment>
+		<comment>Add 'Lot storage notes' property</comment>
         <sql>
 			<!-- Create - Lot storage notes property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1155,7 +1155,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot vigour' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot vigour property'</comment>
+		<comment>Add 'Lot vigour' property</comment>
         <sql>
 			<!-- Create - Lot vigour property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1178,7 +1178,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot germination rate' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot germination rate property'</comment>
+		<comment>Add 'Lot germination rate' property</comment>
         <sql>
 			<!-- Create - Lot germination rate property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1201,7 +1201,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot single seed weight' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot single seed weight property'</comment>
+		<comment>Add 'Lot single seed weight' property</comment>
         <sql>
 			<!-- Create - Lot single seed weight property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1224,7 +1224,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot thousand seed weight property'</comment>
+		<comment>Add 'Lot thousand seed weight' property</comment>
         <sql>
 			<!-- Create - Lot thousand seed weight property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1247,7 +1247,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot production year' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot production year property'</comment>
+		<comment>Add 'Lot production year' property</comment>
         <sql>
 			<!-- Create - Lot production year property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1270,7 +1270,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot physical purity test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot physical purity test property'</comment>
+		<comment>Add 'Lot physical purity test' property</comment>
         <sql>
 			<!-- Create - Lot physical purity test property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1293,7 +1293,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot genetic purity test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot genetic purity test property'</comment>
+		<comment>Add 'Lot genetic purity test' property</comment>
         <sql>
 			<!-- Create - Lot genetic purity test property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1316,7 +1316,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot moisture content' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot moisture content property'</comment>
+		<comment>Add 'Lot moisture content' property</comment>
         <sql>
 			<!-- Create - Lot moisture content property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1339,7 +1339,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot pure live seed' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot pure live seed property'</comment>
+		<comment>Add 'Lot pure live seed' property</comment>
         <sql>
 			<!-- Create - Lot pure live seed property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1362,7 +1362,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot total viable seed' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot total viable seed property'</comment>
+		<comment>Add 'Lot total viable seed' property</comment>
         <sql>
 			<!-- Create - Lot total viable seed property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1385,7 +1385,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot use status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot use status property'</comment>
+		<comment>Add 'Lot use status' property</comment>
         <sql>
 			<!-- Create - Lot use status property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1408,7 +1408,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot Variety ID test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot Variety ID test property'</comment>
+		<comment>Add 'Lot Variety ID test' property</comment>
         <sql>
 			<!-- Create - Lot Variety ID test property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1431,7 +1431,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot seed class' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot seed class property'</comment>
+		<comment>Add 'Lot seed class' property</comment>
         <sql>
 			<!-- Create - Lot seed class property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1454,7 +1454,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot fungicide treatment status property'</comment>
+		<comment>Add 'Lot fungicide treatment status' property</comment>
         <sql>
 			<!-- Create - Lot fungicide treatment status property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1477,7 +1477,7 @@
 		<preConditions onFail="MARK_RAN">
 			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
 		</preConditions>
-		<comment>Add 'Lot insecticide treatment status property'</comment>
+		<comment>Add 'Lot insecticide treatment status' property</comment>
 		<sql>
 			<!-- Create - Lot insecticide treatment status property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1506,7 +1506,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_GermDate variable'</comment>
+		<comment>Add 'L_GermDate' variable</comment>
 		<sql>
 			<!-- Create - L_GermDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1542,7 +1542,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_NextGermDate variable'</comment>
+		<comment>Add 'L_NextGermDate' variable</comment>
 		<sql>
 			<!-- Create - L_NextGermDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1577,7 +1577,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_NextGermDate variable'</comment>
+		<comment>Add 'L_NextGermDate' variable</comment>
 		<sql>
 			<!-- Create - L_NextRegDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1612,7 +1612,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_DiscardDate variable'</comment>
+		<comment>Add 'L_DiscardDate' variable</comment>
 		<sql>
 			<!-- Create - L_DiscardDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1647,7 +1647,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_ExpirationDate variable'</comment>
+		<comment>Add 'L_ExpirationDate' variable</comment>
 		<sql>
 			<!-- Create - L_ExpirationDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1682,7 +1682,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_MoistDate variable'</comment>
+		<comment>Add 'L_MoistDate' variable</comment>
 		<sql>
 			<!-- Create - L_MoistDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1717,7 +1717,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_FungiTreatDate variable'</comment>
+		<comment>Add 'L_FungiTreatDate' variable</comment>
 		<sql>
 			<!-- Create - L_FungiTreatDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1752,7 +1752,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_InsectTreatDate variable'</comment>
+		<comment>Add 'L_InsectTreatDate' variable</comment>
 		<sql>
 			<!-- Create - L_InsectTreatDate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1787,7 +1787,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_Viability test date variable'</comment>
+		<comment>Add 'L_Viability test date' variable</comment>
 		<sql>
 			<!-- Create - L_Viability test date variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1822,7 +1822,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_PhytoReport variable'</comment>
+		<comment>Add 'L_PhytoReport' variable</comment>
 		<sql>
 			<!-- Create - L_PhytoReport variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1857,7 +1857,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_Certification variable'</comment>
+		<comment>Add 'L_Certification' variable</comment>
 		<sql>
 			<!-- Create - L_Certification variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1892,7 +1892,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_QualityNotes variable'</comment>
+		<comment>Add 'L_QualityNotes' variable</comment>
 		<sql>
 			<!-- Create - L_QualityNotes variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1927,7 +1927,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_FungiTreatProd variable'</comment>
+		<comment>Add 'L_FungiTreatProd' variable</comment>
 		<sql>
 			<!-- Create - L_FungiTreatProd variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1962,7 +1962,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_InsectTreatProd variable'</comment>
+		<comment>Add 'L_InsectTreatProd' variable</comment>
 		<sql>
 			<!-- Create - L_InsectTreatProd variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -1997,7 +1997,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_ProdNotes variable'</comment>
+		<comment>Add 'L_ProdNotes' variable</comment>
 		<sql>
 			<!-- Create - L_ProdNotes variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2032,7 +2032,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_PostHarvestNotes variable'</comment>
+		<comment>Add 'L_PostHarvestNotes' variable</comment>
 		<sql>
 			<!-- Create - L_PostHarvestNotes variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2067,7 +2067,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_StorageNotes variable'</comment>
+		<comment>Add 'L_StorageNotes' variable</comment>
 		<sql>
 			<!-- Create - L_StorageNotes variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2102,7 +2102,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_Vigour variable'</comment>
+		<comment>Add 'L_Vigour' variable</comment>
 		<sql>
 			<!-- Create - L_Vigour variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2137,7 +2137,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_GermRate variable'</comment>
+		<comment>Add 'L_GermRate' variable</comment>
 		<sql>
 			<!-- Create - L_GermRate variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2172,7 +2172,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_SingleSdWt variable'</comment>
+		<comment>Add 'L_SingleSdWt' variable</comment>
 		<sql>
 			<!-- Create - L_SingleSdWt variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2207,7 +2207,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_TSdWt variable'</comment>
+		<comment>Add 'L_TSdWt' variable</comment>
 		<sql>
 			<!-- Create - L_TSdWt variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2242,7 +2242,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_TSdWt variable'</comment>
+		<comment>Add 'L_TSdWt' variable</comment>
 		<sql>
 			<!-- Create - L_TSdWt variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2277,7 +2277,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_ProdYear variable'</comment>
+		<comment>Add 'L_ProdYear' variable</comment>
 		<sql>
 			<!-- Create - L_ProdYear variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2312,7 +2312,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_PurityTest variable'</comment>
+		<comment>Add 'L_PurityTest' variable</comment>
 		<sql>
 			<!-- Create - L_PurityTest variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2347,7 +2347,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_GenPurityTest variable'</comment>
+		<comment>Add 'L_GenPurityTest' variable</comment>
 		<sql>
 			<!-- Create - L_GenPurityTest variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2382,7 +2382,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_MoistCont variable'</comment>
+		<comment>Add 'L_MoistCont' variable</comment>
 		<sql>
 			<!-- Create - L_MoistCont variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2417,7 +2417,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_PureLiveSd variable'</comment>
+		<comment>Add 'L_PureLiveSd' variable</comment>
 		<sql>
 			<!-- Create - L_PureLiveSd variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2452,7 +2452,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_TotalViableSd variable'</comment>
+		<comment>Add 'L_TotalViableSd' variable</comment>
 		<sql>
 			<!-- Create - L_TotalViableSd variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2487,7 +2487,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_UseStatus variable'</comment>
+		<comment>Add 'L_UseStatus' variable</comment>
 		<sql>
 			<!-- Create - L_UseStatus variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2522,7 +2522,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_VarietyID variable'</comment>
+		<comment>Add 'L_VarietyID' variable</comment>
 		<sql>
 			<!-- Create - L_VarietyID variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2557,7 +2557,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_SdClass variable'</comment>
+		<comment>Add 'L_SdClass' variable</comment>
 		<sql>
 			<!-- Create - L_SdClass variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2592,7 +2592,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_FungiTreatStatus variable'</comment>
+		<comment>Add 'L_FungiTreatStatus' variable</comment>
 		<sql>
 			<!-- Create - L_FungiTreatStatus variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2627,7 +2627,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_InsectTreatStatus variable'</comment>
+		<comment>Add 'L_InsectTreatStatus' variable</comment>
 		<sql>
 			<!-- Create - L_InsectTreatStatus variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
@@ -2662,7 +2662,7 @@
 			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
 		</and>
 		</preConditions>
-		<comment>Add 'L_Viability test date variable'</comment>
+		<comment>Add 'L_Viability test date' variable</comment>
 		<sql>
 			<!-- Create - L_Viability test date variable -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
