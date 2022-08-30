@@ -11,7 +11,9 @@ import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 
@@ -20,6 +22,8 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	public static final int MAX_GENERATIONS_COUNT = 5;
 	private static final ThreadLocal<Integer> GENERATIONS_COUNTER = new ThreadLocal<>();
 	private static final ThreadLocal<Boolean> CALCULATE_FULL = new ThreadLocal<>();
+
+	private final Map<Integer, GermplasmTreeNode> nodes = new HashMap<>();
 
 	public GermplasmPedigreeServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -196,6 +200,12 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	 */
 	private GermplasmTreeNode addParents(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
 		final boolean excludeDerivativeLines) {
+
+		final GermplasmTreeNode trackedNode = this.trackNodes(node);
+		if (trackedNode != null) {
+			return trackedNode;
+		}
+
 		if (level != 1) {
 			final int maleGid = germplasm.getMaleParent() == null ? 0 : germplasm.getMaleParent().getGid();
 			final int femaleGid = germplasm.getFemaleParent() == null ? 0 : germplasm.getFemaleParent().getGid();
@@ -348,6 +358,10 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 			this.incrementGenerationsCounter();
 			return this.getNumberOfGenerations(germplasm, true);
 		}
+	}
+
+	private GermplasmTreeNode trackNodes(final GermplasmTreeNode gid1Tree) {
+		return this.nodes.putIfAbsent(gid1Tree.getGid(), gid1Tree);
 	}
 
 }
