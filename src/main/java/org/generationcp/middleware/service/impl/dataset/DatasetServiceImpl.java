@@ -706,7 +706,9 @@ public class DatasetServiceImpl implements DatasetService {
 		}
 		final List<ObservationUnitRow> list = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
 
-		if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
+		final DmsProject dataset = this.daoFactory.getDmsProjectDAO().getById(datasetId);
+		if (!dataset.getDatasetType().getDatasetTypeId().equals(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId()) &&
+			searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
 			final Set<Integer> gids = list.stream().map(s -> s.getGid()).collect(Collectors.toSet());
 			this.addParentsFromPedigreeTable(gids, list);
 		}
