@@ -165,4 +165,2525 @@
 			VALUES (1020, 'STABrAPP SEBLUPS - ASREML', 'STABrAPP SEBLUPS - ASREML', null, 0, 0, 1);
         </sql>
     </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-15">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot vigour scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot vigour scale' scale</comment>
+        <sql>
+			<!-- Create Lot vigour scale -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1030', 'Lot vigour scale', 'Lot vigour scale', '0', '0', '0');
+
+			SET @LOT_VIGOUR_SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot vigour scale' AND cv_id = 1030);
+
+			<!-- Define creation date for Lot vigour scale -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@LOT_VIGOUR_SCALE_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			<!-- Define Categorical type for the scale -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1105', @LOT_VIGOUR_SCALE_ID, '1130');
+
+			<!-- Define categorical type for Lot vigour scale -->
+			INSERT INTO CV (name, definition) VALUES (@LOT_VIGOUR_SCALE_ID, 'Categorical values for 1-5 Lot vigour scale');
+
+			<!-- Associate the Categories to Lot vigour scale -->
+			SET @LOT_VIGOUR_SCALE_CV_ID = (SELECT cv_id FROM cv WHERE name = @LOT_VIGOUR_SCALE_ID);
+
+			<!-- Create Categories for Lot vigour scale -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system) VALUES
+			    (@LOT_VIGOUR_SCALE_CV_ID, '1', 'Very poor (VP)', '0', '0', '0'),
+			    (@LOT_VIGOUR_SCALE_CV_ID, '2', 'Poor (P)', '0', '0', '0'),
+			    (@LOT_VIGOUR_SCALE_CV_ID, '3', 'Fair (F)', '0', '0', '0'),
+			    (@LOT_VIGOUR_SCALE_CV_ID, '4', 'Good (G)', '0', '0', '0'),
+			    (@LOT_VIGOUR_SCALE_CV_ID, '5', 'Very Good (G)', '0', '0', '0');
+
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+			    ('1190', @LOT_VIGOUR_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = '1' AND cv_id = @LOT_VIGOUR_SCALE_CV_ID)),
+			    ('1190', @LOT_VIGOUR_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = '2' AND cv_id = @LOT_VIGOUR_SCALE_CV_ID)),
+			    ('1190', @LOT_VIGOUR_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = '3' AND cv_id = @LOT_VIGOUR_SCALE_CV_ID)),
+			    ('1190', @LOT_VIGOUR_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = '4' AND cv_id = @LOT_VIGOUR_SCALE_CV_ID)),
+			    ('1190', @LOT_VIGOUR_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = '5' AND cv_id = @LOT_VIGOUR_SCALE_CV_ID));
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-16">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot use status scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot use status scale' scale</comment>
+        <sql>
+			<!-- Create Lot use status scale -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1030', 'Lot use status scale', 'Lot use status scale', '0', '0', '0');
+
+			SET @LOT_USE_STATUS_SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot use status scale' AND cv_id = 1030);
+
+			<!-- Define creation date for Lot use status scale -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@LOT_USE_STATUS_SCALE_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			<!-- Define Categorical type for the scale -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1105', @LOT_USE_STATUS_SCALE_ID, '1130');
+
+			<!-- Define categorical type for Lot use status scale -->
+			INSERT INTO CV (name, definition) VALUES (@LOT_USE_STATUS_SCALE_ID, 'Categorical values for Lot use status scale');
+
+
+			<!-- Associate the Categories to Lot use status scale -->
+			SET @LOT_USE_STATUS_SCALE_CV_ID = (SELECT cv_id FROM cv WHERE name = @LOT_USE_STATUS_SCALE_ID);
+
+			<!-- Create Categories for Lot use status scale -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system) VALUES
+				(@LOT_USE_STATUS_SCALE_CV_ID, 'Open', 'Open for use', '0', '0', '0'),
+				(@LOT_USE_STATUS_SCALE_CV_ID, 'Restricted', 'Restricted use, contact owner', '0', '0', '0'),
+				(@LOT_USE_STATUS_SCALE_CV_ID, 'Regenerate', 'To be regenerated', '0', '0', '0');
+
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1190', @LOT_USE_STATUS_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'Open' AND cv_id = @LOT_USE_STATUS_SCALE_CV_ID)),
+				('1190', @LOT_USE_STATUS_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'Restricted' AND cv_id = @LOT_USE_STATUS_SCALE_CV_ID)),
+				('1190', @LOT_USE_STATUS_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'Regenerate' AND cv_id = @LOT_USE_STATUS_SCALE_CV_ID));
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-17">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Variety ID scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Variety ID scale' scale</comment>
+        <sql>
+			<!-- Create Variety ID scale -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1030', 'Variety ID scale', 'Variety ID scale', '0', '0', '0');
+
+			SET @VARIETY_ID_SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Variety ID scale' AND cv_id = 1030);
+
+			<!-- Define creation date for Variety ID scale -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@VARIETY_ID_SCALE_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			<!-- Define Categorical type for the scale -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1105', @VARIETY_ID_SCALE_ID, '1130');
+
+			<!-- Define categorical type for Variety ID scale -->
+			INSERT INTO CV (name, definition) VALUES (@VARIETY_ID_SCALE_ID, 'Categorical values for Variety ID scale');
+
+			<!-- Associate the Categories to Seed class scale -->
+			SET @VARIETY_ID_SCALE_CV_ID = (SELECT cv_id FROM cv WHERE name = @VARIETY_ID_SCALE_ID);
+
+			<!-- Create Categories for Variety ID scale -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system) VALUES
+				(@VARIETY_ID_SCALE_CV_ID, 'P', ' Pure', '0', '0', '0'),
+				(@VARIETY_ID_SCALE_CV_ID, 'Mix', 'Mixed', '0', '0', '0'),
+				(@VARIETY_ID_SCALE_CV_ID, 'ND', 'Not determined', '0', '0', '0'),
+				(@VARIETY_ID_SCALE_CV_ID, 'TBD', 'To be determined', '0', '0', '0'),
+				(@VARIETY_ID_SCALE_CV_ID, 'WID', 'Wrong ID', '0', '0', '0');
+
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1190', @VARIETY_ID_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'P' AND cv_id = @VARIETY_ID_SCALE_CV_ID)),
+				('1190', @VARIETY_ID_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'Mix' AND cv_id = @VARIETY_ID_SCALE_CV_ID)),
+				('1190', @VARIETY_ID_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'ND' AND cv_id = @VARIETY_ID_SCALE_CV_ID)),
+				('1190', @VARIETY_ID_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'TBD' AND cv_id = @VARIETY_ID_SCALE_CV_ID)),
+				('1190', @VARIETY_ID_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'WID' AND cv_id = @VARIETY_ID_SCALE_CV_ID));
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-18">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Seed class scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Seed class scale' scale</comment>
+        <sql>
+			<!-- Create Seed class scale -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1030', 'Seed class scale', 'Seed class scale', '0', '0', '0');
+
+			SET @SEED_CLASSS_SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Seed class scale' AND cv_id = 1030);
+
+			<!-- Define creation date for Seed class scale -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@SEED_CLASSS_SCALE_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			<!-- Define Categorical type for the scale -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1105', @SEED_CLASSS_SCALE_ID, '1130');
+
+			<!-- Define categorical type for Seed class scale -->
+			INSERT INTO CV (name, definition) VALUES (@SEED_CLASSS_SCALE_ID, 'Categorical values for Seed class scale');
+
+			<!-- Associate the Categories to Seed class scale -->
+			SET @SEED_CLASSS_SCALE_CV_ID = (SELECT cv_id FROM cv WHERE name = @SEED_CLASSS_SCALE_ID);
+
+			<!-- Create Categories for Seed class scale -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system) VALUES
+				(@SEED_CLASSS_SCALE_CV_ID, 'Seedstock', 'Seedstock', '0', '0', '0'),
+				(@SEED_CLASSS_SCALE_CV_ID, 'Nucleus', 'Nucleus seed', '0', '0', '0'),
+				(@SEED_CLASSS_SCALE_CV_ID, 'Breeder', 'Breeder seed', '0', '0', '0'),
+				(@SEED_CLASSS_SCALE_CV_ID, 'Foundation seed', 'Foundation seed', '0', '0', '0'),
+				(@SEED_CLASSS_SCALE_CV_ID, 'Certified', 'Certified seed', '0', '0', '0'),
+				(@SEED_CLASSS_SCALE_CV_ID, 'Registered', 'Registered seed', '0', '0', '0'),
+				(@SEED_CLASSS_SCALE_CV_ID, 'Truthfully labelled', 'Truthfully labelled seed', '0', '0', '0');
+
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1190', @SEED_CLASSS_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'Seedstock' AND cv_id = @SEED_CLASSS_SCALE_CV_ID)),
+				('1190', @SEED_CLASSS_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'Nucleus' AND cv_id = @SEED_CLASSS_SCALE_CV_ID)),
+				('1190', @SEED_CLASSS_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'Breeder' AND cv_id = @SEED_CLASSS_SCALE_CV_ID)),
+				('1190', @SEED_CLASSS_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'Foundation seed' AND cv_id = @SEED_CLASSS_SCALE_CV_ID)),
+				('1190', @SEED_CLASSS_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'Certified' AND cv_id = @SEED_CLASSS_SCALE_CV_ID)),
+				('1190', @SEED_CLASSS_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'Registered' AND cv_id = @SEED_CLASSS_SCALE_CV_ID)),
+				('1190', @SEED_CLASSS_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'Truthfully labelled' AND cv_id = @SEED_CLASSS_SCALE_CV_ID));
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-19">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot fungicide treatment scale' scale</comment>
+        <sql>
+			<!-- Create Lot fungicide treatment scale -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1030', 'Lot fungicide treatment scale', 'Lot fungicide treatment scale', '0', '0', '0');
+
+			SET @LOT_FUNGICIDE_TREATMENT_SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment scale' AND cv_id = 1030);
+
+			<!-- Define creation date for Lot fungicide treatment scale -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@LOT_FUNGICIDE_TREATMENT_SCALE_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			<!-- Define Categorical type for the scale -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1105', @LOT_FUNGICIDE_TREATMENT_SCALE_ID, '1130');
+
+			<!-- Define categorical type for Lot fungicide treatment scale -->
+			INSERT INTO CV (name, definition) VALUES (@LOT_FUNGICIDE_TREATMENT_SCALE_ID, 'Categorical values for Lot fungicide treatment scale');
+
+			<!-- Associate the Categories to Lot fungicide treatment scale -->
+			SET @LOT_TREATMENT_SCALE_CV_ID = (SELECT cv_id FROM cv WHERE name = @LOT_FUNGICIDE_TREATMENT_SCALE_ID);
+
+			<!-- Create Categories for Lot fungicide treatment scale -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system) VALUES
+				(@LOT_TREATMENT_SCALE_CV_ID, 'DNT', 'Do not treat', '0', '0', '0'),
+				(@LOT_TREATMENT_SCALE_CV_ID, 'TBT', 'To be treated', '0', '0', '0'),
+				(@LOT_TREATMENT_SCALE_CV_ID, 'Treated', 'Treated', '0', '0', '0'),
+				(@LOT_TREATMENT_SCALE_CV_ID, 'TBD', 'To be determined', '0', '0', '0');
+
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1190', @LOT_FUNGICIDE_TREATMENT_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'DNT' AND cv_id = @LOT_TREATMENT_SCALE_CV_ID)),
+				('1190', @LOT_FUNGICIDE_TREATMENT_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'TBT' AND cv_id = @LOT_TREATMENT_SCALE_CV_ID)),
+				('1190', @LOT_FUNGICIDE_TREATMENT_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'Treated' AND cv_id = @LOT_TREATMENT_SCALE_CV_ID)),
+				('1190', @LOT_FUNGICIDE_TREATMENT_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'TBD' AND cv_id = @LOT_TREATMENT_SCALE_CV_ID));
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-20">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot insecticide treatment scale' scale</comment>
+        <sql>
+			<!-- Create Lot insecticide treatment scale -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1030', 'Lot insecticide treatment scale', 'Lot insecticide treatment scale', '0', '0', '0');
+
+			SET @LOT_INSECTICIDE_TREATMENT_SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot insecticide treatment scale' AND cv_id = 1030);
+
+			<!-- Define creation date for Lot insecticide treatment scale -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@LOT_INSECTICIDE_TREATMENT_SCALE_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			<!-- Define Categorical type for the scale -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1105', @LOT_INSECTICIDE_TREATMENT_SCALE_ID, '1130');
+
+			<!-- Define categorical type for Lot insecticide treatment scale -->
+			INSERT INTO CV (name, definition) VALUES (@LOT_INSECTICIDE_TREATMENT_SCALE_ID, 'Categorical values for Lot insecticide treatment scale');
+
+			<!-- Associate the Categories to Lot insecticide treatment scale -->
+			SET @INSECTICIDE_TREATMENT_SCALE_CV_ID = (SELECT cv_id FROM cv WHERE name = @LOT_INSECTICIDE_TREATMENT_SCALE_ID);
+
+			<!-- Create Categories for Lot insecticide treatment scale -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system) VALUES
+				(@INSECTICIDE_TREATMENT_SCALE_CV_ID, 'DNT', 'Do not treat', '0', '0', '0'),
+				(@INSECTICIDE_TREATMENT_SCALE_CV_ID, 'TBT', 'To be treated', '0', '0', '0'),
+				(@INSECTICIDE_TREATMENT_SCALE_CV_ID, 'Treated', 'Treated', '0', '0', '0'),
+				(@INSECTICIDE_TREATMENT_SCALE_CV_ID, 'TBD', 'To be determined', '0', '0', '0');
+
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1190', @LOT_INSECTICIDE_TREATMENT_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'DNT' AND cv_id = @INSECTICIDE_TREATMENT_SCALE_CV_ID)),
+				('1190', @LOT_INSECTICIDE_TREATMENT_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'TBT' AND cv_id = @INSECTICIDE_TREATMENT_SCALE_CV_ID)),
+				('1190', @LOT_INSECTICIDE_TREATMENT_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'Treated' AND cv_id = @INSECTICIDE_TREATMENT_SCALE_CV_ID)),
+				('1190', @LOT_INSECTICIDE_TREATMENT_SCALE_ID, (SELECT cvterm_id FROM cvterm WHERE NAME = 'TBD' AND cv_id = @INSECTICIDE_TREATMENT_SCALE_CV_ID));
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-21">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'mg' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+		</preConditions>
+		<comment>Add 'mg' scale</comment>
+        <sql>
+			<!-- Create mg scale -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1030', 'mg', 'mg', '0', '0', '0');
+
+			SET @MG_SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'mg' AND cv_id = 1030);
+
+			<!-- Define creation date for mg scale -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@MG_SCALE_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			<!-- Define Numeric type for the scale -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1105', @MG_SCALE_ID, '1110');
+
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-22">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'File stored' method</comment>
+        <sql>
+			<!-- Create File stored method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'File stored', 'File stored', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'File stored' AND cv_id = 1020);
+
+			<!-- Define creation date for File stored method -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-23">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot quality notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot quality notes - Described' method</comment>
+        <sql>
+			<!-- Create Lot quality notes - Described method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Lot quality notes - Described', 'Record lot quality notes, after visual examination record "ok" when good quality seed, whereas other quality descriptors could be "moldy", "damaged", “insect damage”, "shriveled", etc.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot quality notes - Described' AND cv_id = 1020);
+
+			<!-- Define creation date for Lot quality notes - Described method -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-24">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot production notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot production notes - Described' method</comment>
+        <sql>
+			<!-- Create Lot production notes - Described method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Lot production notes - Described', 'Record the production field management notes.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot production notes - Described' AND cv_id = 1020);
+
+			<!-- Define creation date for Lot production notes - Described method -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-25">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot post harvest notes – Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot post harvest notes – Described' method</comment>
+        <sql>
+			<!-- Create Lot post harvest notes – Described method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Lot post harvest notes – Described', 'Record the postharvest management notes.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot post harvest notes – Described' AND cv_id = 1020);
+
+			<!-- Define creation date for Lot post harvest notes – Described method -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-26">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot storage notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot storage notes - Described' method</comment>
+        <sql>
+			<!-- Create Lot storage notes - Described method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Lot storage notes - Described', 'Record the storage management notes.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot storage notes - Described' AND cv_id = 1020);
+
+			<!-- Define creation date for Lot storage notes - Described method -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-27">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Vigour test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Vigour test - Method' method</comment>
+        <sql>
+			<!-- Create Vigour test - Method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Vigour test - Method', 'Use standard vigour test method and record the result.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Vigour test - Method' AND cv_id = 1020);
+
+			<!-- Define creation date for Vigour test - Method -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-28">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Germination test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Germination test - Method' method</comment>
+        <sql>
+			<!-- Create Germination test - Method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Germination test - Method', 'Use standard germination test method and record the result.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Germination test - Method' AND cv_id = 1020);
+
+			<!-- Define creation date for Germination test - Method -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-29">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Single seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Single seed weight - Method' method</comment>
+        <sql>
+			<!-- Create Single seed weight - Method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Single seed weight - Method', 'Measure and record single seed weight.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Single seed weight - Method' AND cv_id = 1020);
+
+			<!-- Define creation date for Single seed weight - Method -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-30">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Thousand seed weight - Method' method</comment>
+        <sql>
+			<!-- Create Thousand seed weight - Method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Thousand seed weight - Method', 'Measure and record thousand seed weight.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Thousand seed weight - Method' AND cv_id = 1020);
+
+			<!-- Define creation date for Thousand seed weight - Method -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-31">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Physical purity test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Physical purity test - Method' method</comment>
+        <sql>
+			<!-- Create Physical purity test - Method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Physical purity test - Method', 'Examinate the seed sample using standard physical purity test protocol. Compute using the formula: Weight of pure seeds / total weight of seed sample x 100', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Physical purity test - Method' AND cv_id = 1020);
+
+			<!-- Define creation date for Physical purity test - Method -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-32">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Genetic purity test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Genetic purity test - Method' method</comment>
+        <sql>
+			<!-- Create Genetic purity test - Method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Genetic purity test - Method', 'Compute using the formula: Genetic purity = number of pure seeds / total number of seeds x 100', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Genetic purity test - Method' AND cv_id = 1020);
+
+			<!-- Define creation date for Genetic purity test - Method -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-33">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Measured' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Measured' method</comment>
+        <sql>
+			<!-- Create - Measured -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Measured', 'Measured observation', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Measured' AND cv_id = 1020);
+
+			<!-- Define creation date for Measured -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-34">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Pure live seed - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Pure live seed - Method' method</comment>
+        <sql>
+			<!-- Create - Pure live seed - Method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Pure live seed - Method', 'Compute using the formula: PLS = (physical purity %) x (germination rate %) / 100 ', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Pure live seed - Method' AND cv_id = 1020);
+
+			<!-- Define creation date for Pure live seed - Method -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-35">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Total viable seed - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Total viable seed - Method' method</comment>
+        <sql>
+			<!-- Create - Total viable seed - Method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Total viable seed - Method', 'Use standard viability test.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Total viable seed - Method' AND cv_id = 1020);
+
+			<!-- Define creation date for Total viable seed - Method -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-36">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot use status - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot use status - Described' method</comment>
+        <sql>
+			<!-- Create - Lot use status - Described -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Lot use status - Described', 'Record lot use status.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot use status - Described' AND cv_id = 1020);
+
+			<!-- Define creation date for Lot use status - Described -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-37">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Variety ID test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Variety ID test - Method' method</comment>
+        <sql>
+			<!-- Create - Variety ID test - Method -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1020', 'Variety ID test - Method', 'Use standard viability test method and record the result.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Variety ID test - Method' AND cv_id = 1020);
+
+			<!-- Define creation date for Lot use status - Described -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-38">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Inventory' AND is_obsolete = 0 AND cv_id = 1011;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Inventory class'</comment>
+        <sql>
+			<!-- Create Inventory class -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1011', 'Inventory', 'Inventory', '0', '0', '0');
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-39">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot germination test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot germination test date' property</comment>
+        <sql>
+			<!-- Create - Lot germination test date property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot germination test date', 'The date of germination test.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot germination test date' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot germination test date property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-40">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot next germination test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot next germination test date' property</comment>
+        <sql>
+			<!-- Create - Lot germination test date property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot next germination test date', 'The next date for germination testing.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot next germination test date' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot germination test date property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-41">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot next regeneration date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot next regeneration date' property</comment>
+        <sql>
+			<!-- Create - Lot next regeneration date property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot next regeneration date', 'The next regeneration date planned for the lot.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot next regeneration date' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot next regeneration date property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-42">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot discard date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot discard date' property</comment>
+        <sql>
+			<!-- Create - Lot discard date property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot discard date', 'If described the date for lot discard.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot discard date' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot discard date property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-43">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot expiration Date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot expiration Date' property</comment>
+        <sql>
+			<!-- Create - Lot expiration Date property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot expiration Date', 'Do not distribute/sell after described date.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot expiration Date' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot expiration Date property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-44">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot moisture test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot moisture test date' property</comment>
+        <sql>
+			<!-- Create - Lot moisture test date property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot moisture test date', 'The date of moisture content test.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot moisture test date' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot moisture test date property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-45">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot fungicide treatment date' property</comment>
+        <sql>
+			<!-- Create - Lot fungicide treatment date property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot fungicide treatment date', 'The date of fungicide treatment.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment date' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot fungicide treatment date property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-46">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot insecticide treatment date' property</comment>
+        <sql>
+			<!-- Create - Lot insecticide treatment date property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot insecticide treatment date', 'The date of insecticide treatment.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot insecticide treatment date' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot insecticide treatment date property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-47">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot viability test date' property</comment>
+        <sql>
+			<!-- Create - Lot viability test date property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot viability test date', 'The date of viability test.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot viability test date' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot viability test date property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-48">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot phytosanitary report' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot phytosanitary report' property</comment>
+        <sql>
+			<!-- Create - Lot phytosanitary report property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot phytosanitary report', 'The phytosanitary report (file or report number) of the lot.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot phytosanitary report' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot phytosanitary report property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-49">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot certification' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot certification' property</comment>
+        <sql>
+			<!-- Create - Lot certification property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot certification', 'The certification (file or certificate number) of the lot.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot certification' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot certification property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-50">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot quality notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot quality notes' property</comment>
+        <sql>
+			<!-- Create - Lot quality notes property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot quality notes', 'The notes on quality.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot quality notes' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot quality notes property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-51">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment product' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot fungicide treatment product' property</comment>
+        <sql>
+			<!-- Create - Lot fungicide treatment product property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot fungicide treatment product', 'The fungicide product used.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment product' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot fungicide treatment product property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-52">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment product' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot fungicide treatment product' property</comment>
+        <sql>
+			<!-- Create - Lot fungicide treatment product property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot fungicide treatment product', 'The fungicide product used.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment product' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot fungicide treatment product property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-53">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment product' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot insecticide treatment product' property</comment>
+        <sql>
+			<!-- Create - Lot insecticide treatment product property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot insecticide treatment product', 'The insecticide product used.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot insecticide treatment product' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot insecticide treatment product property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-54">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot production notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot production notes' property</comment>
+        <sql>
+			<!-- Create - Lot production notes property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot production notes', 'The production field management notes of the lot.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot production notes' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot production notes property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-55">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot postharvest notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot postharvest notes' property</comment>
+        <sql>
+			<!-- Create - Lot postharvest notes property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot postharvest notes', 'The post-harvest management notes of the lot.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot postharvest notes' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot postharvest notes property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-56">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot storage notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot storage notes' property</comment>
+        <sql>
+			<!-- Create - Lot storage notes property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot storage notes', 'The storage management notes of the lot.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot storage notes' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot storage notes property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-57">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot vigour' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot vigour' property</comment>
+        <sql>
+			<!-- Create - Lot vigour property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot vigour', 'The vigour of the lot.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot vigour' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot vigour property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-58">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot germination rate' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot germination rate' property</comment>
+        <sql>
+			<!-- Create - Lot germination rate property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot germination rate', 'The rate of germination.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot germination rate' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot germination rate property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-59">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot single seed weight' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot single seed weight' property</comment>
+        <sql>
+			<!-- Create - Lot single seed weight property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot single seed weight', 'The weight of a single seed.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot single seed weight' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot single seed weight property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-60">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot thousand seed weight' property</comment>
+        <sql>
+			<!-- Create - Lot thousand seed weight property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot thousand seed weight', 'The weight of a thousand seed.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot thousand seed weight' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot thousand seed weight property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-61">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot production year' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot production year' property</comment>
+        <sql>
+			<!-- Create - Lot production year property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot production year', 'The production year of the lot.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot production year' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot production year property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-62">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot physical purity test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot physical purity test' property</comment>
+        <sql>
+			<!-- Create - Lot physical purity test property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot physical purity test', 'The physical purity is the proportion of seed by weight that is the labeled species; the rest of the material is inert, weed seed, or other crop seed.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot physical purity test' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot physical purity test property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-63">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot genetic purity test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot genetic purity test' property</comment>
+        <sql>
+			<!-- Create - Lot genetic purity test property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot genetic purity test', 'The genetic purity refers to trueness to type, or the degree of contamination of seeds caused by undesired genetic varieties or species.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot genetic purity test' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot genetic purity test property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-64">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot moisture content' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot moisture content' property</comment>
+        <sql>
+			<!-- Create - Lot moisture content property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot moisture content', 'The moisture content of the lot.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot moisture content' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot moisture content property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-65">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot pure live seed' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot pure live seed' property</comment>
+        <sql>
+			<!-- Create - Lot pure live seed property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot pure live seed', 'The pure live seed is the proportion of a quantity of seed that will germinate.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot pure live seed' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot pure live seed property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-66">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot total viable seed' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot total viable seed' property</comment>
+        <sql>
+			<!-- Create - Lot total viable seed property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot total viable seed', 'The total viable seed is the proportion of seed that will germinate (germination + dormant).', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot total viable seed' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot total viable seed property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-67">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot use status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot use status' property</comment>
+        <sql>
+			<!-- Create - Lot use status property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot use status', 'The use status of the lot.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot use status' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot use status property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-68">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot Variety ID test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot Variety ID test' property</comment>
+        <sql>
+			<!-- Create - Lot Variety ID test property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot Variety ID test', 'The variety ID test result of the lot.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot Variety ID test' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot Variety ID test property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-69">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot seed class' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot seed class' property</comment>
+        <sql>
+			<!-- Create - Lot seed class property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot seed class', 'The seed class of the lot.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot seed class' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot seed class property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-70">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot fungicide treatment status' property</comment>
+        <sql>
+			<!-- Create - Lot fungicide treatment status property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot fungicide treatment status', 'The status of fungicide treatment.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment status' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot fungicide treatment status property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+        </sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-71">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+		</preConditions>
+		<comment>Add 'Lot insecticide treatment status' property</comment>
+		<sql>
+			<!-- Create - Lot insecticide treatment status property -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1010', 'Lot insecticide treatment status', 'The status of insecticide treatment.', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot insecticide treatment status' AND cv_id = 1010);
+
+			<!-- Define creation date for Lot insecticide treatment status property -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank)
+			VALUES (@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0);
+
+			SET @INVENTORY_CLASS_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Inventory' AND cv_id = 1011);
+
+			<!-- Define Is a Inventory class  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES ('1225', @CVTERM_ID, @INVENTORY_CLASS_ID);
+		</sql>
+    </changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-72">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_GermDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot germination test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_GermDate' variable</comment>
+		<sql>
+			<!-- Create - L_GermDate variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_GermDate', 'L_GermDate', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_GermDate' AND cv_id = 1040);
+
+			<!-- Define creation date for L_GermDate variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot germination test date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-73">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_NextGermDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot next germination test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_NextGermDate' variable</comment>
+		<sql>
+			<!-- Create - L_NextGermDate variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_NextGermDate', 'L_NextGermDate', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_NextGermDate' AND cv_id = 1040);
+
+			<!-- Define creation date for L_NextGermDate variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot next germination test date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-74">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_NextRegDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot next regeneration date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_NextGermDate' variable</comment>
+		<sql>
+			<!-- Create - L_NextRegDate variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_NextRegDate', 'L_NextRegDate', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_NextRegDate' AND cv_id = 1040);
+
+			<!-- Define creation date for L_NextGermDate variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot next regeneration date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-75">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_DiscardDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot discard date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_DiscardDate' variable</comment>
+		<sql>
+			<!-- Create - L_DiscardDate variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_DiscardDate', 'L_DiscardDate', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_DiscardDate' AND cv_id = 1040);
+
+			<!-- Define creation date for L_DiscardDate variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot discard date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-76">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_ExpirationDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot expiration Date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_ExpirationDate' variable</comment>
+		<sql>
+			<!-- Create - L_ExpirationDate variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_ExpirationDate', 'L_ExpirationDate', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_ExpirationDate' AND cv_id = 1040);
+
+			<!-- Define creation date for L_ExpirationDate variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot expiration Date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-77">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_MoistDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot moisture test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_MoistDate' variable</comment>
+		<sql>
+			<!-- Create - L_MoistDate variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_MoistDate', 'L_MoistDate', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_MoistDate' AND cv_id = 1040);
+
+			<!-- Define creation date for L_MoistDate variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot moisture test date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-78">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_FungiTreatDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_FungiTreatDate' variable</comment>
+		<sql>
+			<!-- Create - L_FungiTreatDate variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_FungiTreatDate', 'L_FungiTreatDate', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_FungiTreatDate' AND cv_id = 1040);
+
+			<!-- Define creation date for L_FungiTreatDate variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-79">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_InsectTreatDate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_InsectTreatDate' variable</comment>
+		<sql>
+			<!-- Create - L_InsectTreatDate variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_InsectTreatDate', 'L_InsectTreatDate', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_InsectTreatDate' AND cv_id = 1040);
+
+			<!-- Define creation date for L_InsectTreatDate variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot insecticide treatment date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-80">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_Viability test date' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_Viability test date' variable</comment>
+		<sql>
+			<!-- Create - L_Viability test date variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_Viability test date', 'L_Viability test date', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_Viability test date' AND cv_id = 1040);
+
+			<!-- Define creation date for L_Viability test date variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Date (yyyymmdd)' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-81">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_PhytoReport' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot phytosanitary report' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_PhytoReport' variable</comment>
+		<sql>
+			<!-- Create - L_PhytoReport variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_PhytoReport', 'L_PhytoReport', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_PhytoReport' AND cv_id = 1040);
+
+			<!-- Define creation date for L_PhytoReport variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot phytosanitary report' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-82">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_Certification' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot certification' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_Certification' variable</comment>
+		<sql>
+			<!-- Create - L_Certification variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_Certification', 'L_Certification', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_Certification' AND cv_id = 1040);
+
+			<!-- Define creation date for L_Certification variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot certification' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'File stored' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-83">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_QualityNotes' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot quality notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot quality notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_QualityNotes' variable</comment>
+		<sql>
+			<!-- Create - L_QualityNotes variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_QualityNotes', 'L_QualityNotes', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_QualityNotes' AND cv_id = 1040);
+
+			<!-- Define creation date for L_QualityNotes variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot quality notes' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot quality notes - Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-84">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_FungiTreatProd' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment product' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_FungiTreatProd' variable</comment>
+		<sql>
+			<!-- Create - L_FungiTreatProd variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_FungiTreatProd', 'L_FungiTreatProd', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_FungiTreatProd' AND cv_id = 1040);
+
+			<!-- Define creation date for L_FungiTreatProd variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment product' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-85">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_InsectTreatProd' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment product' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_InsectTreatProd' variable</comment>
+		<sql>
+			<!-- Create - L_InsectTreatProd variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_InsectTreatProd', 'L_InsectTreatProd', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_InsectTreatProd' AND cv_id = 1040);
+
+			<!-- Define creation date for L_InsectTreatProd variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot insecticide treatment product' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-86">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_ProdNotes' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot production notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot production notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_ProdNotes' variable</comment>
+		<sql>
+			<!-- Create - L_ProdNotes variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_ProdNotes', 'L_ProdNotes', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_ProdNotes' AND cv_id = 1040);
+
+			<!-- Define creation date for L_ProdNotes variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot production notes' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot production notes - Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-87">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_PostHarvestNotes' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot postharvest notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot post harvest notes – Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_PostHarvestNotes' variable</comment>
+		<sql>
+			<!-- Create - L_PostHarvestNotes variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_PostHarvestNotes', 'L_PostHarvestNotes', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_PostHarvestNotes' AND cv_id = 1040);
+
+			<!-- Define creation date for L_PostHarvestNotes variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot postharvest notes' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot post harvest notes – Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-88">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_StorageNotes' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot storage notes' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot storage notes - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_StorageNotes' variable</comment>
+		<sql>
+			<!-- Create - L_StorageNotes variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_StorageNotes', 'L_StorageNotes', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_StorageNotes' AND cv_id = 1040);
+
+			<!-- Define creation date for L_StorageNotes variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot storage notes' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot storage notes - Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-89">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_Vigour' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot vigour' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Vigour test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot vigour scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_Vigour' variable</comment>
+		<sql>
+			<!-- Create - L_Vigour variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_Vigour', 'L_Vigour', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_Vigour' AND cv_id = 1040);
+
+			<!-- Define creation date for L_Vigour variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot vigour' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Vigour test - Method' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot vigour scale' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-90">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_GermRate' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot germination rate' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Germination test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_GermRate' variable</comment>
+		<sql>
+			<!-- Create - L_GermRate variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_GermRate', 'L_GermRate', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_GermRate' AND cv_id = 1040);
+
+			<!-- Define creation date for L_GermRate variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot germination rate' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Germination test - Method' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-91">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_SingleSdWt' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot single seed weight' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Single seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'mg' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_SingleSdWt' variable</comment>
+		<sql>
+			<!-- Create - L_SingleSdWt variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_SingleSdWt', 'L_SingleSdWt', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_SingleSdWt' AND cv_id = 1040);
+
+			<!-- Define creation date for L_SingleSdWt variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot single seed weight' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Single seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'mg' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-92">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_TSdWt' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_TSdWt' variable</comment>
+		<sql>
+			<!-- Create - L_TSdWt variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_TSdWt', 'L_TSdWt', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_TSdWt' AND cv_id = 1040);
+
+			<!-- Define creation date for L_TSdWt variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-93">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_TSdWt' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_TSdWt' variable</comment>
+		<sql>
+			<!-- Create - L_TSdWt variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_TSdWt', 'L_TSdWt', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_TSdWt' AND cv_id = 1040);
+
+			<!-- Define creation date for L_TSdWt variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot thousand seed weight' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Thousand seed weight - Method' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'g' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-94">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_ProdYear' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot production year' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Year (yyyy)' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_ProdYear' variable</comment>
+		<sql>
+			<!-- Create - L_ProdYear variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_ProdYear', 'L_ProdYear', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_ProdYear' AND cv_id = 1040);
+
+			<!-- Define creation date for L_ProdYear variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot production year' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Year (yyyy)' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-95">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_PurityTest' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot physical purity test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Physical purity test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_PurityTest' variable</comment>
+		<sql>
+			<!-- Create - L_PurityTest variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_PurityTest', 'L_PurityTest', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_PurityTest' AND cv_id = 1040);
+
+			<!-- Define creation date for L_PurityTest variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot physical purity test' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Physical purity test - Method' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-96">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_GenPurityTest' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot genetic purity test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Genetic purity test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_GenPurityTest' variable</comment>
+		<sql>
+			<!-- Create - L_GenPurityTest variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_GenPurityTest', 'L_GenPurityTest', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_GenPurityTest' AND cv_id = 1040);
+
+			<!-- Define creation date for L_GenPurityTest variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot genetic purity test' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Genetic purity test - Method' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-97">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_MoistCont' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot moisture content' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Measured' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_MoistCont' variable</comment>
+		<sql>
+			<!-- Create - L_MoistCont variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_MoistCont', 'L_MoistCont', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_MoistCont' AND cv_id = 1040);
+
+			<!-- Define creation date for L_MoistCont variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot moisture content' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Measured' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-98">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_PureLiveSd' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot pure live seed' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Pure live seed - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_PureLiveSd' variable</comment>
+		<sql>
+			<!-- Create - L_PureLiveSd variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_PureLiveSd', 'L_PureLiveSd', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_PureLiveSd' AND cv_id = 1040);
+
+			<!-- Define creation date for L_PureLiveSd variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot pure live seed' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Pure live seed - Method' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-99">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_TotalViableSd' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot total viable seed' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Total viable seed - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_TotalViableSd' variable</comment>
+		<sql>
+			<!-- Create - L_TotalViableSd variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_TotalViableSd', 'L_TotalViableSd', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_TotalViableSd' AND cv_id = 1040);
+
+			<!-- Define creation date for L_TotalViableSd variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot total viable seed' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Total viable seed - Method' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = '%' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-100">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_UseStatus' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot use status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot use status - Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot use status scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_UseStatus' variable</comment>
+		<sql>
+			<!-- Create - L_UseStatus variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_UseStatus', 'L_UseStatus', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_UseStatus' AND cv_id = 1040);
+
+			<!-- Define creation date for L_UseStatus variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot use status' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot use status - Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot use status scale' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-101">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_VarietyID' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot Variety ID test' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Variety ID test - Method' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Variety ID scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_VarietyID' variable</comment>
+		<sql>
+			<!-- Create - L_VarietyID variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_VarietyID', 'L_VarietyID', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_VarietyID' AND cv_id = 1040);
+
+			<!-- Define creation date for L_VarietyID variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot Variety ID test' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Variety ID test - Method' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Variety ID scale' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-102">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_SdClass' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot seed class' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Seed class scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_SdClass' variable</comment>
+		<sql>
+			<!-- Create - L_SdClass variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_SdClass', 'L_SdClass', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_SdClass' AND cv_id = 1040);
+
+			<!-- Define creation date for L_SdClass variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot seed class' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Seed class scale' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-103">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_FungiTreatStatus' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot fungicide treatment scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_FungiTreatStatus' variable</comment>
+		<sql>
+			<!-- Create - L_FungiTreatStatus variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_FungiTreatStatus', 'L_FungiTreatStatus', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_FungiTreatStatus' AND cv_id = 1040);
+
+			<!-- Define creation date for L_FungiTreatStatus variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment status' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot fungicide treatment scale' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-104">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_InsectTreatStatus' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment status' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot insecticide treatment scale' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_InsectTreatStatus' variable</comment>
+		<sql>
+			<!-- Create - L_InsectTreatStatus variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_InsectTreatStatus', 'L_InsectTreatStatus', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_InsectTreatStatus' AND cv_id = 1040);
+
+			<!-- Define creation date for L_InsectTreatStatus variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot insecticide treatment status' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot insecticide treatment scale' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v21.5.0-105">
+		<preConditions onFail="MARK_RAN">
+		<and>
+			<sqlCheck expectedResult="0">SELECT count(*) FROM cvterm WHERE name = 'L_Viability test date' AND is_obsolete = 0 AND cv_id = 1040;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030;</sqlCheck>
+			<sqlCheck expectedResult="1">SELECT count(*) FROM cvterm WHERE name = 'Inventory Attribute' AND is_obsolete = 0 AND cv_id = 1041;</sqlCheck>
+		</and>
+		</preConditions>
+		<comment>Add 'L_Viability test date' variable</comment>
+		<sql>
+			<!-- Create - L_Viability test date variable -->
+			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
+			VALUES ('1040', 'L_Viability test date', 'L_Viability test date', '0', '0', '0');
+
+			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'L_Viability test date' AND cv_id = 1040);
+
+			<!-- Define creation date for L_Viability test date variable -->
+			INSERT INTO cvtermprop(cvterm_id, type_id, value, rank) VALUES
+				(@CVTERM_ID, 8048, (SELECT DATE_FORMAT(CURRENT_TIMESTAMP(), '%Y-%m-%dT%T.000Z')), 0),
+				(@CVTERM_ID, 1800, 'Inventory Attribute', 1);
+
+			SET @PROPERTY_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot viability test date' AND is_obsolete = 0 AND cv_id = 1010);
+			SET @METHOD_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Described' AND is_obsolete = 0 AND cv_id = 1020);
+			SET @SCALE_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Text' AND is_obsolete = 0 AND cv_id = 1030);
+
+			<!--   Property, Method, Scale  -->
+			INSERT INTO cvterm_relationship (type_id, subject_id, object_id) VALUES
+				('1200', @CVTERM_ID, @PROPERTY_ID),
+				('1210', @CVTERM_ID, @METHOD_ID),
+				('1220', @CVTERM_ID, @SCALE_ID);
+		</sql>
+	</changeSet>
 </databaseChangeLog>
