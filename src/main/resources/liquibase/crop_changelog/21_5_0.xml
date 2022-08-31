@@ -952,7 +952,7 @@
         <sql>
 			<!-- Create - Lot phytosanitary report property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
-			VALUES ('1010', 'Lot phytosanitary report', 'The certification (file or certificate number) of the lot.', '0', '0', '0');
+			VALUES ('1010', 'Lot phytosanitary report', 'The phytosanitary report (file or report number) of the lot.', '0', '0', '0');
 
 			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot phytosanitary report' AND cv_id = 1010);
 
@@ -975,7 +975,7 @@
         <sql>
 			<!-- Create - Lot certification property -->
 			INSERT INTO CVTERM (cv_id, name, definition, is_obsolete, is_relationshiptype, is_system)
-			VALUES ('1010', 'Lot certification', 'The phytosanitary report (file or report number) of the lot.', '0', '0', '0');
+			VALUES ('1010', 'Lot certification', 'The certification (file or certificate number) of the lot.', '0', '0', '0');
 
 			SET @CVTERM_ID = (SELECT cvterm_id FROM cvterm WHERE name = 'Lot certification' AND cv_id = 1010);
 
