@@ -548,6 +548,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			//These elements should not be listed as germplasm descriptors, this is a way to match values between column
 			//and table cells. In the near future this block should be removed
 			this.addFixedVariableIfPresent(TermId.GID, String.valueOf(studyEntryDto.getGid()), entryVariables, properties);
+			this.addFixedVariableIfPresent(TermId.GUID, String.valueOf(studyEntryDto.getGuid()), entryVariables, properties);
 			this.addFixedVariableIfPresent(TermId.DESIG, studyEntryDto.getDesignation(), entryVariables, properties);
 			this.addFixedVariableIfPresent(TermId.ENTRY_NO, String.valueOf(studyEntryDto.getEntryNumber()),	entryVariables, properties);
 			this.addFixedVariableIfPresent(TermId.IMMEDIATE_SOURCE_NAME, String.valueOf(row.get(TermId.IMMEDIATE_SOURCE_NAME.name())),
