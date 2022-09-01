@@ -704,11 +704,16 @@ public class DatasetServiceImpl implements DatasetService {
 		if(searchDTO.getFilter() != null){
 			this.addPreFilteredGids(searchDTO.getFilter());
 		}
-		final List<ObservationUnitRow> list = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
 
+		// TODO: fix me! This is a workaround until the implementation of this ticket https://ibplatform.atlassian.net/browse/IBP-5837
 		final DmsProject dataset = this.daoFactory.getDmsProjectDAO().getById(datasetId);
-		if (!dataset.getDatasetType().getDatasetTypeId().equals(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId()) &&
-			searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
+		// There is no need of germplasm descriptors data if it's a summary statistics dataset
+		if (dataset.getDatasetType().getDatasetTypeId().equals(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
+			searchDTO.setGenericGermplasmDescriptors(new ArrayList<>());
+		}
+
+		final List<ObservationUnitRow> list = this.daoFactory.getObservationUnitsSearchDAO().getObservationUnitTable(searchDTO, pageable);
+		if (searchDTO.getGenericGermplasmDescriptors().stream().anyMatch(this::hasParentGermplasmDescriptors)) {
 			final Set<Integer> gids = list.stream().map(s -> s.getGid()).collect(Collectors.toSet());
 			this.addParentsFromPedigreeTable(gids, list);
 		}
