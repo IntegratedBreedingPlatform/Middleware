@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.germplasm.pedigree.cop;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Table;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.ArrayList;
@@ -103,12 +104,12 @@ public class CopResponse {
 
 		final List<String> header = new ArrayList<>(Lists.newArrayList("gid1", "gid2", "cop"));
 		array.add(header.toArray(new String[] {}));
-		for (Map.Entry<Integer, Map<Integer, Double>> rowMap : matrix.rowMap().entrySet()) {
-			for (Map.Entry<Integer, Double> colMap : rowMap.getValue().entrySet()) {
-				array.add(new String[]{
+		for (final Map.Entry<Integer, Map<Integer, Double>> rowMap : matrix.rowMap().entrySet()) {
+			for (final Map.Entry<Integer, Double> colMap : rowMap.getValue().entrySet()) {
+				array.add(new String[] {
 					rowMap.getKey().toString(),
 					colMap.getKey().toString(),
-					colMap.getValue().toString()
+					colMap.getValue() != null ? colMap.getValue().toString() : EMPTY
 				});
 			}
 		}
