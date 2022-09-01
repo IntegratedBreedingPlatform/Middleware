@@ -151,16 +151,21 @@
 		</sql>
 	</changeSet>
 
-	<changeSet author="clarysabel" id="v21.3.0-11">
+	<changeSet author="clarysabel" id="v21.3.0-11-fixed">
 		<preConditions onFail="MARK_RAN">
-			<sqlCheck expectedResult="1">
-				SELECT count(1) > 0
-				FROM  	 stockprop sp
-							 INNER JOIN stock s ON s.stock_id = sp.stock_id
-							 INNER JOIN project p ON p.parent_project_id = s.project_id AND p.dataset_type_id = 4
-							 LEFT JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = 1804 AND sp.type_id = pp.variable_id
-				WHERE pp.projectprop_id IS NULL
-			</sqlCheck>
+			<and>
+				<sqlCheck expectedResult="1">
+					SELECT count(1) > 0
+					FROM  	 stockprop sp
+								 INNER JOIN stock s ON s.stock_id = sp.stock_id
+								 INNER JOIN project p ON p.parent_project_id = s.project_id AND p.dataset_type_id = 4
+								 LEFT JOIN projectprop pp ON p.project_id = pp.project_id AND pp.type_id = 1804 AND sp.type_id = pp.variable_id
+					WHERE pp.projectprop_id IS NULL
+				</sqlCheck>
+				<sqlCheck expectedResult="1">
+					SELECT count(1) FROM cvtermprop WHERE cvterm_id = 8255 AND type_id = 1800 AND value = 'Germplasm Descriptor';
+				</sqlCheck>
+			</and>
 		</preConditions>
 		<comment>Delete rows in stockprop for data with no corresponding variable in projectprop</comment>
 		<sql dbms="mysql" splitStatements="true">
