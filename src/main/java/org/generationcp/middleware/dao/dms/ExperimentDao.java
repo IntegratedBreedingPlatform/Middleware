@@ -18,6 +18,7 @@ import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -1064,7 +1065,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "FROM nd_experiment e \n"
 			+ "INNER JOIN project proj ON proj.project_id = e.project_id AND proj.study_id = :studyId \n"
 			+ "INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id \n"
-			+ "WHERE proj.dataset_type_id IN (:datasetTypeIds) ");
+			+ "WHERE proj.dataset_type_id IN (:datasetTypeIds) AND p.value != '" + MeasurementData.MISSING_VALUE + "' ");
 
 		if (!inputVariableDatasetMap.isEmpty()) {
 			queryString.append("AND (");
