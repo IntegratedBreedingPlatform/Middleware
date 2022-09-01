@@ -708,7 +708,7 @@ public class DatasetServiceImpl implements DatasetService {
 		// TODO: fix me! This is a workaround until the implementation of this ticket https://ibplatform.atlassian.net/browse/IBP-5837
 		final DmsProject dataset = this.daoFactory.getDmsProjectDAO().getById(datasetId);
 		// There is no need of germplasm descriptors data if it's a summary statistics dataset
-		if (dataset.getDatasetType().getDatasetTypeId().equals(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
+		if (DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId() == dataset.getDatasetType().getDatasetTypeId()) {
 			searchDTO.setGenericGermplasmDescriptors(new ArrayList<>());
 		}
 
