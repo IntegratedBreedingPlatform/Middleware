@@ -320,7 +320,6 @@ public class GeolocationDaoTest extends IntegrationTestBase {
 		}
 		for (final Germplasm germplasm : this.germplasm) {
 			final StockModel stockModel = new StockModel();
-			stockModel.setName("Germplasm " + RandomStringUtils.randomAlphanumeric(5));
 			stockModel.setIsObsolete(false);
 			stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(10));
 			stockModel.setGermplasm(germplasm);

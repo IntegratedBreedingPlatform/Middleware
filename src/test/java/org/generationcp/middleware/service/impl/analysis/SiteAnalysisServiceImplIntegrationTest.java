@@ -331,7 +331,6 @@ public class SiteAnalysisServiceImplIntegrationTest extends IntegrationTestBase 
 			germplasm.setGid(null);
 			this.daoFactory.getGermplasmDao().save(germplasm);
 			final StockModel stockModel = new StockModel();
-			stockModel.setName(germplasm.getGermplasmPreferredName());
 			stockModel.setIsObsolete(false);
 			stockModel.setUniqueName(String.valueOf(i));
 			stockModel.setGermplasm(germplasm);

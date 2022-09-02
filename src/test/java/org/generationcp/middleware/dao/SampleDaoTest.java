@@ -419,7 +419,6 @@ public class SampleDaoTest extends IntegrationTestBase {
 			this.germplasmDao.save(germplasm);
 
 			final StockModel stockModel = new StockModel();
-			stockModel.setName("Germplasm " + i);
 			stockModel.setIsObsolete(false);
 			stockModel.setUniqueName(String.valueOf(i));
 			stockModel.setGermplasm(germplasm);

@@ -1876,7 +1876,6 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final StockModel stockModel =
 			new StockModel(null, null, RandomStringUtils.randomAlphabetic(5), RandomStringUtils.randomAlphabetic(5),
-				RandomStringUtils.randomAlphabetic(5),
 				false);
 		stockModel.setGermplasm(germplasm);
 		stockModel.setProject(dmsProject);

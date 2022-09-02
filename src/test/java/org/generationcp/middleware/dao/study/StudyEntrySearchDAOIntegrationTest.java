@@ -1128,7 +1128,6 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 	private StockModel createTestStock(final DmsProject study, final Germplasm germplasm, final int entryNumber) {
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName(String.valueOf(entryNumber));
-		stockModel.setName(RandomStringUtils.randomAlphabetic(10).toUpperCase());
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
 		stockModel.setCross("-");

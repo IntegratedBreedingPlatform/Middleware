@@ -354,7 +354,6 @@ public class StudyTestDataInitializer {
 		for (final Integer gid : gids) {
 			final StockModel stockModel = new StockModel();
 			stockModel.setUniqueName("1");
-			stockModel.setName("Germplasm " + RandomStringUtils.randomAlphanumeric(5));
 			stockModel.setIsObsolete(false);
 			stockModel.setGermplasm(new Germplasm(gid));
 			stockModel.setProject(new DmsProject(studyId));
@@ -365,14 +364,11 @@ public class StudyTestDataInitializer {
 					RandomStringUtils.randomAlphanumeric(5), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
 					RandomStringUtils.randomAlphanumeric(5));
 
-			final Map<Integer, String> preferredNamesByGIDs = new HashMap<>();
-			preferredNamesByGIDs.put(gid, designation);
-
 			final Map<Integer, String> pedigreeByGids = new HashMap<>();
 			pedigreeByGids.put(gid, designation);
 
 			final StockSaver stockSaver = new StockSaver(this.sessionProvider);
-			final int entryId = stockSaver.saveStock(studyId, variableList, preferredNamesByGIDs, pedigreeByGids);
+			final int entryId = stockSaver.saveStock(studyId, variableList, pedigreeByGids);
 			entryIds.add(entryId);
 			entryNumber++;
 		}

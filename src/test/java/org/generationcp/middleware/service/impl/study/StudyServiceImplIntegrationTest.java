@@ -109,7 +109,6 @@ public class StudyServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName(org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(10));
-		stockModel.setName(org.apache.commons.lang.RandomStringUtils.randomAlphanumeric(10));
 		stockModel.setIsObsolete(false);
 
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);

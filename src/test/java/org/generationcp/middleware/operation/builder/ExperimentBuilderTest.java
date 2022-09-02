@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -22,6 +23,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -143,7 +145,6 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final Variable variable = builder.createGermplasmFactor(stockModel, variableType);
 
 		Assert.assertNotNull(variable);
-		Assert.assertEquals(stockModel.getName(), variable.getValue());
 	}
 
 	@Test
@@ -195,7 +196,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final Iterator<Variable> iterator = variables.iterator();
 		verifyFactorVariable(iterator.next(), TermId.ENTRY_NO.getId(), stockModel.getUniqueName());
 		verifyFactorVariable(iterator.next(), TermId.GID.getId(), String.valueOf(stockModel.getGermplasm().getGid()));
-		verifyFactorVariable(iterator.next(), TermId.DESIG.getId(), stockModel.getName());
+		verifyFactorVariable(iterator.next(), TermId.DESIG.getId(), stockModel.getGermplasm().getPreferredName().getNval());
 		verifyFactorVariable(iterator.next(), TermId.ENTRY_CODE.getId(), findStockProperty(stockModel.getProperties(),TermId.ENTRY_CODE).getValue());
 		verifyFactorVariable(iterator.next(), TermId.ENTRY_TYPE.getId(), String.valueOf(findStockProperty(stockModel.getProperties(),TermId.ENTRY_TYPE).getCategoricalValueId()));
 		verifyFactorVariable(iterator.next(), TermId.GROUPGID.getId(), String.valueOf(stockModel.getGermplasm().getMgid()));
@@ -241,8 +242,12 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 
 		final Germplasm germplasm = new Germplasm(new Random().nextInt(Integer.MAX_VALUE));
 		germplasm.setMgid(new Random().nextInt(Integer.MAX_VALUE));
+		final Name name = new Name();
+		name.setGermplasm(germplasm);
+		name.setNval(RandomStringUtils.randomAlphanumeric(20));
+		name.setNstat(1);
+		germplasm.setNames(Collections.singletonList(name));
 		stockModel.setGermplasm(germplasm);
-		stockModel.setName(RandomStringUtils.randomAlphanumeric(20));
 
 		final Set<StockProperty> stockProperties = new HashSet<>();
 		final StockProperty entryCodeProperty = new StockProperty(stockModel, TermId.ENTRY_CODE.getId(), RandomStringUtils.randomAlphanumeric(20), null);
