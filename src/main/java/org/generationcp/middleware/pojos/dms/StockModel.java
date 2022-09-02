@@ -67,12 +67,6 @@ public class StockModel implements Serializable {
 	@Column(name = "organism_id")
 	private Integer organismId;
 
-	/**
-	 * The name is a human-readable local name for a stock.
-	 */
-	@Column(name = "name")
-	private String name;
-
 	@Basic(optional = false)
 	@Column(name = "uniquename")
 	private String uniqueName;
@@ -101,12 +95,11 @@ public class StockModel implements Serializable {
 	public StockModel() {
 	}
 
-	public StockModel(final Integer stockId, final Integer organismId, final String name, final String uniqueName,
+	public StockModel(final Integer stockId, final Integer organismId, final String uniqueName,
 		final String description, final Boolean isObsolete) {
 		super();
 		this.stockId = stockId;
 		this.organismId = organismId;
-		this.name = name;
 		this.uniqueName = uniqueName;
 		this.description = description;
 		this.isObsolete = isObsolete;
@@ -114,7 +107,6 @@ public class StockModel implements Serializable {
 
 	public StockModel(final Integer studyId, final StudyEntryDto studyEntryDto) {
 		this.setProject(new DmsProject(studyId));
-		this.setName(studyEntryDto.getDesignation());
 		this.setGermplasm(new Germplasm(Integer.valueOf(studyEntryDto.getGid())));
 		this.setUniqueName(studyEntryDto.getEntryNumber().toString());
 		this.setIsObsolete(false);
@@ -153,14 +145,6 @@ public class StockModel implements Serializable {
 
 	public void setOrganismId(Integer organismId) {
 		this.organismId = organismId;
-	}
-
-	public String getName() {
-		return this.name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
 	}
 
 	public String getUniqueName() {
@@ -223,7 +207,6 @@ public class StockModel implements Serializable {
 		result = prime * result + (this.germplasm == null ? 0 : this.germplasm.hashCode());
 		result = prime * result + (this.description == null ? 0 : this.description.hashCode());
 		result = prime * result + (this.isObsolete == null ? 0 : this.isObsolete.hashCode());
-		result = prime * result + (this.name == null ? 0 : this.name.hashCode());
 		result = prime * result + (this.organismId == null ? 0 : this.organismId.hashCode());
 		result = prime * result + (this.stockId == null ? 0 : this.stockId.hashCode());
 		result = prime * result + (this.uniqueName == null ? 0 : this.uniqueName.hashCode());
@@ -263,13 +246,6 @@ public class StockModel implements Serializable {
 		} else if (!this.isObsolete.equals(other.isObsolete)) {
 			return false;
 		}
-		if (this.name == null) {
-			if (other.name != null) {
-				return false;
-			}
-		} else if (!this.name.equals(other.name)) {
-			return false;
-		}
 		if (this.organismId == null) {
 			if (other.organismId != null) {
 				return false;
@@ -303,8 +279,6 @@ public class StockModel implements Serializable {
 		builder.append(this.germplasm);
 		builder.append(", organismId=");
 		builder.append(this.organismId);
-		builder.append(", name=");
-		builder.append(this.name);
 		builder.append(", uniqueName=");
 		builder.append(this.uniqueName);
 		builder.append(", description=");
