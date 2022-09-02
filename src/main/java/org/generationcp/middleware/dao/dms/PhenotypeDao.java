@@ -899,7 +899,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		String groupByGermplasm = "stock.stock_id";
 		if (germplasmTermId == TermId.DESIG.getId()) {
-			groupByGermplasm = "stock.name";
+			groupByGermplasm = "name.nval";
 		} else if (germplasmTermId == TermId.GID.getId()) {
 			groupByGermplasm = "stock.dbxref_id";
 		} else if (germplasmTermId == TermId.ENTRY_NO.getId()) {
@@ -909,6 +909,7 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		final StringBuilder sql = new StringBuilder().append(" SELECT phenotype.observable_id,count(phenotype.observable_id) ")
 			.append(" FROM nd_experiment nd_exp ")
 			.append(" INNER JOIN stock ON nd_exp.stock_id = stock.stock_id ")
+			.append(" LEFT JOIN names name ON name.gid = stock.dbxref_id AND name.nstat = 1 ")
 			.append(" LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id ").append(" where nd_exp.project_id = ")
 			.append(projectId).append(" and nd_exp.nd_geolocation_id = ").append(locationId)
 			.append(" and ((phenotype.value <> '' and phenotype.value is not null) or ")

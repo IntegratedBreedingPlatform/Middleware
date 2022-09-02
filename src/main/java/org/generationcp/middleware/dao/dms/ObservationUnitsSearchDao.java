@@ -44,10 +44,10 @@ import java.util.Set;
 public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ObservationUnitsSearchDao.class);
-	private static final List<Integer> STANDARD_DATASET_VARIABLE_IDS = Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId(), TermId.EXPERIMENT_DESIGN_FACTOR
-		.getId(), TermId.GID.getId(), TermId.DESIG.getId(), TermId.ENTRY_TYPE.getId(), TermId.ENTRY_NO.getId(), TermId.REP_NO
-		.getId(), TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId(), TermId.ROW.getId(), TermId.COL.getId(), TermId.FIELDMAP_RANGE.getId(), TermId.FIELDMAP_COLUMN
-		.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId());
+	private static final List<Integer> STANDARD_DATASET_VARIABLE_IDS = Arrays.asList(TermId.TRIAL_INSTANCE_FACTOR.getId(), TermId.LOCATION_ID.getId(),
+		TermId.EXPERIMENT_DESIGN_FACTOR.getId(), TermId.GID.getId(), TermId.ENTRY_TYPE.getId(), TermId.ENTRY_NO.getId(), TermId.REP_NO.getId(),
+		TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId(), TermId.ROW.getId(), TermId.COL.getId(), TermId.FIELDMAP_RANGE.getId(), TermId.DESIG.getId(),
+		TermId.FIELDMAP_COLUMN.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId());
 
 
 	private static final List<Integer> REMOVE_FILTERS = Lists.newArrayList(TermId.FEMALE_PARENT_GID.getId(),
@@ -68,6 +68,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final List<String> EXP_PROPS_VAR_TYPES =
 		Arrays.asList(VariableType.EXPERIMENTAL_DESIGN.name(), VariableType.TREATMENT_FACTOR.name());
 	private static final String GERMPLASM_JOIN = " INNER JOIN germplsm g on g.gid = s.dbxref_id ";
+	private static final String NAME_JOIN = " INNER JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1 ";
 	private static final String IMMEDIATE_SOURCE_NAME_JOIN = " LEFT JOIN names immediateSource  ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
 	private static final String GROUP_SOURCE_NAME_JOIN =
 		" LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0";
@@ -77,7 +78,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 	static {
 		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
-		factorsFilterMap.put(String.valueOf(TermId.DESIG.getId()), "s.name");
+		factorsFilterMap.put(String.valueOf(TermId.DESIG.getId()), "name.nval");
 		factorsFilterMap.put(String.valueOf(TermId.ENTRY_NO.getId()), "s.uniquename");
 		factorsFilterMap.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), "gl.description");
 		factorsFilterMap.put(SUM_OF_SAMPLES_ID,
@@ -117,7 +118,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		mainVariablesMap.put(String.valueOf(TermId.EXPERIMENT_DESIGN_FACTOR.getId()),
 			"    (SELECT edesign.name FROM nd_geolocationprop gprop INNER JOIN cvterm edesign on edesign.cvterm_id = gprop.value WHERE gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = 8135) AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.GID.getId()), "    s.dbxref_id AS '%s'");
-		mainVariablesMap.put(String.valueOf(TermId.DESIG.getId()), "    s.name AS '%s'");
+		mainVariablesMap.put(String.valueOf(TermId.DESIG.getId()), "    name.nval AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.REP_NO.getId()),
 			"    (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ndep.type_id = 8210) AS '%s'");
 		mainVariablesMap.put(String.valueOf(TermId.PLOT_NO.getId()),
@@ -305,8 +306,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if ((!CollectionUtils.isEmpty(filter.getFilteredValues()) && filter.getFilteredValues().keySet().contains(String.valueOf(TermId.GROUPGID.getId()))) ||
 				this.checkFilterContainsFactor(filter, TermId.GUID.getId()) ||
 				this.checkFilterContainsFactor(filter, TermId.IMMEDIATE_SOURCE_NAME.getId()) ||
-				this.checkFilterContainsFactor(filter, TermId.GROUP_SOURCE_NAME.getId())) {
+				this.checkFilterContainsFactor(filter, TermId.GROUP_SOURCE_NAME.getId()) ||
+			this.checkFilterContainsFactor(filter, TermId.DESIG.getId())) {
 			joins.add(GERMPLASM_JOIN);
+			joins.add(NAME_JOIN);
 		}
 
 		if (this.checkFilterContainsFactor(filter, TermId.IMMEDIATE_SOURCE_NAME.getId())) {
@@ -755,6 +758,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			+ "	INNER JOIN nd_experiment nde ON nde.project_id = p.project_id "
 			+ "	INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id "
 			+ "	LEFT JOIN stock s ON s.stock_id = nde.stock_id "
+			+ " INNER JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1"
 			+ " LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id "
 			+ " LEFT JOIN cvterm cvterm_entry_variable ON (cvterm_entry_variable.cvterm_id = sp.type_id) "
 			+ "	LEFT JOIN phenotype ph ON nde.nd_experiment_id = ph.nd_experiment_id "
@@ -792,8 +796,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUPGID) ||
 			this.hasDescriptor(genericGermplasmDescriptors, TermId.GUID) ||
 			this.hasDescriptor(genericGermplasmDescriptors, TermId.IMMEDIATE_SOURCE_NAME) ||
-			this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUP_SOURCE_NAME)) {
+			this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUP_SOURCE_NAME) ||
+			this.hasDescriptor(genericGermplasmDescriptors, TermId.DESIG)) {
 			sql.append(GERMPLASM_JOIN);
+			sql.append(NAME_JOIN);
 		}
 
 		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.IMMEDIATE_SOURCE_NAME)) {

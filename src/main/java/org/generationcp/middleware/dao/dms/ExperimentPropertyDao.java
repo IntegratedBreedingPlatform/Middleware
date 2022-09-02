@@ -97,7 +97,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					.append(" , site.value AS siteName ")
 					.append(" , nde.nd_experiment_id AS experimentId ")
 					.append(" , s.uniqueName AS entryNumber ")
-					.append(" , s.name AS germplasmName ")
+					.append(" , name.nval AS germplasmName ")
 					.append(" , epropRep.value AS rep ")
 					.append(" , epropPlot.value AS plotNo ")
 					.append(" , row.value AS row ")
@@ -120,6 +120,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					.append(" INNER JOIN project proj on proj.project_id = nde.project_id ")
 					.append(" INNER JOIN project st ON st.project_id = proj.study_id ")
 					.append(" INNER JOIN stock s ON s.stock_id = nde.stock_id ")
+					.append(" INNER JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1")
 					.append(" LEFT JOIN nd_experimentprop epropRep ON nde.nd_experiment_id = epropRep.nd_experiment_id ")
 					.append("       AND epropRep.type_id =  " + TermId.REP_NO.getId())
 					// 8210
