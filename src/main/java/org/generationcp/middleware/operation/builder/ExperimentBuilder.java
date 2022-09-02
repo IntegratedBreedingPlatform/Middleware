@@ -485,7 +485,7 @@ public class ExperimentBuilder extends Builder {
 			return new Variable(variableType, stockModel.getGermplasm().getGid());
 		}
 		if (standardVariable.getId() == TermId.DESIG.getId()) {
-			return new Variable(variableType, stockModel.getName());
+			return new Variable(variableType, stockModel.getGermplasm().getPreferredName().getNval());
 		}
 		final String val = this.findStockValue(variableType.getId(), stockModel.getProperties());
 
