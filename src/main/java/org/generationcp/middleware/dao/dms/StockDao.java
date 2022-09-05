@@ -412,8 +412,8 @@ public class StockDao extends GenericDAO<StockModel, Integer> {
 	}
 
 	public void createStudyEntries(final Integer studyId, final Integer listId) {
-		final String insertStockQuery = "INSERT INTO stock(dbxref_id, name, uniquename, project_id, cross_value) "
-			+ "SELECT ld.gid, (SELECT n.nval FROM names n WHERE nstat = 1 AND n.gid = ld.gid), ld.entryid, " + studyId + ", ld.grpname "
+		final String insertStockQuery = "INSERT INTO stock(dbxref_id, uniquename, project_id, cross_value) "
+			+ "SELECT ld.gid, ld.entryid, " + studyId + ", ld.grpname "
 			+ " FROM listdata ld WHERE ld.listid = " + listId;
 		this.getSession().createSQLQuery(insertStockQuery).executeUpdate();
 
