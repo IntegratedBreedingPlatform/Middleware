@@ -11,6 +11,7 @@ import org.generationcp.middleware.domain.sample.SampleDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
 import org.generationcp.middleware.pojos.dms.*;
@@ -416,7 +417,10 @@ public class SampleDaoTest extends IntegrationTestBase {
 		// Create one sample for each experiment.
 		for (int i = 1; i < sampleSize + 1; i++) {
 			final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
+			final Name name = new Name(null, germplasm, 1, 1, "Germplasm SP", 0, 0, 0);
+			germplasm.getNames().add(name);
 			this.germplasmDao.save(germplasm);
+			this.daoFactory.getNameDao().save(name);
 
 			final StockModel stockModel = new StockModel();
 			stockModel.setIsObsolete(false);
