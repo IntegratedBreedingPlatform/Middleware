@@ -20,6 +20,7 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.api.role.RoleServiceImpl;
 import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
@@ -279,7 +280,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		Assert.assertEquals("BUSINESS-KEY-TEST-LIST-1", sampleDetailsDTO.getSampleBusinessKey());
 		Assert.assertEquals(workbenchUser.getUserid(), sampleDetailsDTO.getTakenByUserId());
 		Assert.assertEquals("SAMPLE-TEST-LIST-1", sampleDetailsDTO.getSampleName());
-		Assert.assertEquals("Germplasm 1", sampleDetailsDTO.getDesignation());
+		Assert.assertEquals("Germplasm SP", sampleDetailsDTO.getDesignation());
 		Assert.assertEquals(sampleDetailsDTO.getDateFormat().format(new Date()), sampleDetailsDTO.getDisplayDate());
 		Assert.assertEquals(1, sampleDetailsDTO.getEntryNumber().intValue());
 		Assert.assertEquals(1, sampleDetailsDTO.getObservationUnitNumber().intValue());
@@ -380,8 +381,10 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 	private StockModel createTestStock(final DmsProject study, final ExperimentModel experimentModel) {
 		final Germplasm germplasm = GermplasmTestDataInitializer.createGermplasm(1);
-		germplasm.setGid(null);
-		this.germplasmDao.save(germplasm);
+		final Name name = new Name(null, germplasm, 1, 1, "Germplasm SP", 0, 0, 0);
+		germplasm.getNames().add(name);
+		this.daoFactory.getGermplasmDao().save(germplasm);
+		this.daoFactory.getNameDao().save(name);
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
