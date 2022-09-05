@@ -1172,6 +1172,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 	private List<MeasurementVariable> createEntryVariables(final DmsProject project) {
 
 		final CVTerm guidTerm = this.daoFactory.getCvTermDao().getById(TermId.GUID.getId());
+		final CVTerm designationTerm = this.daoFactory.getCvTermDao().getById(TermId.DESIG.getId());
 		final CVTerm entryTypeTerm = this.daoFactory.getCvTermDao().getById(TermId.ENTRY_TYPE.getId());
 		final CVTerm groupSourceTerm = this.daoFactory.getCvTermDao().getById(TermId.GROUP_SOURCE_NAME.getId());
 		final CVTerm groupGIDTerm = this.daoFactory.getCvTermDao().getById(TermId.GROUPGID.getId());
@@ -1200,6 +1201,8 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 			this.addVariableToProject("alias2", this.customEntryDetailTerm2, project, VariableType.ENTRY_DETAIL,
 				DataType.CHARACTER_VARIABLE,
 				6));
+		variables.add(
+			this.addVariableToProject(null, designationTerm, project, VariableType.GERMPLASM_DESCRIPTOR, DataType.CHARACTER_VARIABLE, 7));
 
 		return variables;
 	}
