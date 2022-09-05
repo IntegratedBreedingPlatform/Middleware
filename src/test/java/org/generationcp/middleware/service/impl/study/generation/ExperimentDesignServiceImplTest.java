@@ -409,7 +409,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		final ObservationUnitRow row = instancesRowMap.get(1).get(21);
 		final Integer gid = this.gids[2];
 		Assert.assertEquals(gid, row.getGid());
-		Assert.assertEquals(GERMPLASM_PREFIX + gid, row.getDesignation());
+		Assert.assertEquals("PREF-ABC" + row.getEntryNumber().intValue(), row.getDesignation());
 		Assert.assertEquals(3, row.getEntryNumber().intValue());
 		Assert.assertEquals(1, row.getTrialInstance().intValue());
 		Assert.assertNotNull(row.getObsUnitId());
@@ -422,7 +422,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals("1", row.getVariables().get(this.treatmentFactor.getName()).getValue());
 		Assert.assertEquals("100", row.getVariables().get(this.treatmentFactorLabel.getName()).getValue());
 		Assert.assertEquals("T", row.getVariables().get("ENTRY_TYPE").getValue());
-		Assert.assertEquals(GERMPLASM_PREFIX + gid, row.getVariables().get("DESIGNATION").getValue());
+		Assert.assertEquals("PREF-ABC" + row.getEntryNumber().intValue(), row.getVariables().get("DESIGNATION").getValue());
 		Assert.assertNotNull(row.getVariables().get("OBS_UNIT_ID").getValue());
 	}
 

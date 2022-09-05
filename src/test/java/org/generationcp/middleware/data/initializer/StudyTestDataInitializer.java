@@ -2,8 +2,6 @@
 package org.generationcp.middleware.data.initializer;
 
 import org.apache.commons.lang3.RandomStringUtils;
-import org.generationcp.middleware.dao.CountryDAO;
-import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
@@ -21,6 +19,7 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.operation.saver.ExperimentModelSaver;
@@ -65,8 +64,7 @@ public class StudyTestDataInitializer {
 	private final Project commonTestProject;
 	private Integer geolocationId;
 	private final HibernateSessionProvider sessionProvider;
-	private CountryDAO countryDAO;
-	private LocationDAO locationDAO;
+	private DaoFactory daoFactory;
 
 	public StudyTestDataInitializer(
 		final StudyDataManagerImpl studyDataManagerImpl, final OntologyDataManager ontologyDataManager,
@@ -75,9 +73,7 @@ public class StudyTestDataInitializer {
 		this.ontologyManager = ontologyDataManager;
 		this.commonTestProject = testProject;
 		this.sessionProvider = provider;
-		this.countryDAO = new CountryDAO();
-		this.countryDAO.setSession(this.sessionProvider.getSession());
-		this.locationDAO = new LocationDAO(this.sessionProvider.getSession());
+		this.daoFactory = new DaoFactory(this.sessionProvider);
 	}
 
 	public StudyReference addTestStudy() throws Exception {
@@ -330,8 +326,8 @@ public class StudyTestDataInitializer {
 	}
 
 	public Integer addTestLocation(final String locationName) {
-		final Country country = this.countryDAO.getById(1);
-		final Location province = this.locationDAO.getById(1001);
+		final Country country = this.daoFactory.getCountryDao().getById(1);
+		final Location province = this.daoFactory.getLocationDAO().getById(1001);
 
 		final Location location = new Location();
 		location.setCountry(country);
@@ -345,7 +341,7 @@ public class StudyTestDataInitializer {
 		location.setSnl3id(1);
 
 		// add the location
-		return this.locationDAO.save(location).getLocid();
+		return this.daoFactory.getLocationDAO().save(location).getLocid();
 	}
 
 	public List<Integer> addStudyGermplasm(final Integer studyId, final Integer startingEntryNumber, final List<Integer> gids) throws Exception {
@@ -358,7 +354,9 @@ public class StudyTestDataInitializer {
 			stockModel.setGermplasm(new Germplasm(gid));
 			stockModel.setProject(new DmsProject(studyId));
 
-			final String designation = StudyTestDataInitializer.GERMPLASM_PREFIX + gid;
+			final Germplasm germplasm = this.daoFactory.getGermplasmDao().getById(gid);
+			final String designation = germplasm.findPreferredName().getNval();
+
 			final VariableList variableList =
 				this.createGermplasm(String.valueOf(entryNumber), gid.toString(), designation,
 					RandomStringUtils.randomAlphanumeric(5), String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()),
