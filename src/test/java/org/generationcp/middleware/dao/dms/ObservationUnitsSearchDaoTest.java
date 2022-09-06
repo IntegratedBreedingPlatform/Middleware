@@ -326,7 +326,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		filteredValues.clear();
 		filteredValues.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), Collections.singletonList("2"));
 		// Filter by DESIGNATION using LIKE operation
-		filteredTextValues.put(String.valueOf(TermId.DESIG.getId()), "Germplasm");
+		filteredTextValues.put(String.valueOf(TermId.DESIG.getId()), "Name ");
 		assertEquals(noOfSubObservationExperiment,
 			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
 	}
@@ -399,7 +399,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		filteredValues.clear();
 		filteredValues.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), Collections.singletonList("2"));
 		// Filter by DESIGNATION using LIKE operation
-		filteredTextValues.put(String.valueOf(TermId.DESIG.getId()), "Germplasm");
+		filteredTextValues.put(String.valueOf(TermId.DESIG.getId()), "Name ");
 		assertEquals(3,
 			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
 	}
