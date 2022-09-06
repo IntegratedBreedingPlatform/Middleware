@@ -107,7 +107,7 @@ public class StockModel implements Serializable {
 
 	public StockModel(final Integer studyId, final StudyEntryDto studyEntryDto) {
 		this.setProject(new DmsProject(studyId));
-		this.setGermplasm(new Germplasm(Integer.valueOf(studyEntryDto.getGid())));
+		this.setGermplasm(new Germplasm(studyEntryDto.getGid()));
 		this.setUniqueName(studyEntryDto.getEntryNumber().toString());
 		this.setIsObsolete(false);
 		this.setCross(studyEntryDto.getCross());
