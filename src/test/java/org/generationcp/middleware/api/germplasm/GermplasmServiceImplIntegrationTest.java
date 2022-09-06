@@ -2027,9 +2027,9 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 
 		final Method method = this.createBreedingMethod(MethodType.DERIVATIVE.getCode(), -1);
 
-		final Germplasm targetGermplasm = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
-		final Germplasm germplasmToMerge1 = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
-		final Germplasm germplasmToMerge2 = this.createGermplasm(method, null, null, 0, 0, 0, null, null);
+		final Germplasm targetGermplasm = this.createGermplasmWithPreferredName(method, null, null, 0, 0, 0, null, null);
+		final Germplasm germplasmToMerge1 = this.createGermplasmWithPreferredName(method, null, null, 0, 0, 0, null, null);
+		final Germplasm germplasmToMerge2 = this.createGermplasmWithPreferredName(method, null, null, 0, 0, 0, null, null);
 
 		final DmsProject study = this.createStudy();
 		this.daoFactory.getStockDao().save(new StockModel(study.getProjectId(), this.createTestStudyEntry(1, germplasmToMerge1.getGid())));
@@ -2600,6 +2600,27 @@ public class GermplasmServiceImplIntegrationTest extends IntegrationTestBase {
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
 		final Integer gpid1, final Integer gpid2, final String germplasmPUI) {
 		return this.createGermplasm(method, germplasmUUID, location, gnpgs, gpid1, gpid2, null, germplasmPUI);
+	}
+
+	private Germplasm createGermplasmWithPreferredName(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
+		final Integer gpid1, final Integer gpid2, final Bibref reference, final String germplasmPUI) {
+
+		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2,
+			0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
+			0, 0, null, null, method);
+		germplasm.setBibref(reference);
+
+		final Name preferredName = new Name(null, germplasm, this.variableTypeId, 1, "Name " + germplasm.getGid(), this.noLocationId,
+			Integer.valueOf(this.creationDate), 0);
+		germplasm.getNames().add(preferredName);
+		this.daoFactory.getGermplasmDao().save(germplasm);
+
+		assertThat(germplasm.getCreatedBy(), is(this.userId));
+		assertNotNull(germplasm.getCreatedBy());
+		assertNull(germplasm.getModifiedBy());
+		assertNull(germplasm.getModifiedDate());
+
+		return germplasm;
 	}
 
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
