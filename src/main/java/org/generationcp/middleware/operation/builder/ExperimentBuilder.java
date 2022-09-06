@@ -485,7 +485,9 @@ public class ExperimentBuilder extends Builder {
 			return new Variable(variableType, stockModel.getGermplasm().getGid());
 		}
 		if (standardVariable.getId() == TermId.DESIG.getId()) {
-			return new Variable(variableType, stockModel.getGermplasm().getPreferredName().getNval());
+			// Fix to test cases where the names are not getting from the germplasm
+			final Name preferredName = stockModel.getGermplasm().getPreferredName();
+			return new Variable(variableType, preferredName != null ? preferredName.getNval() : "");
 		}
 		final String val = this.findStockValue(variableType.getId(), stockModel.getProperties());
 
