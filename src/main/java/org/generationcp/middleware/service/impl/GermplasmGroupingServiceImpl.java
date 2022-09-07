@@ -377,13 +377,12 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	@Override
-	public void copyParentalSelectionHistoryAtFixation(final Germplasm germplasm) {
+	public void copyParentalSelectionHistoryAtFixation(final Germplasm germplasm, final Germplasm parent) {
 		if (this.selHistAtFixationNameType == null) {
 			this.selHistAtFixationNameType =
 				this.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 		}
 
-		final Germplasm parent = this.daoFactory.getGermplasmDao().getById(germplasm.getGpid2());
 		final Name parentSelectionHistoryAtFixation =
 			this.findNameByType(parent, this.selHistAtFixationNameType);
 

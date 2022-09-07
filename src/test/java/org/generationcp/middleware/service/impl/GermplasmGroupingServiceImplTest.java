@@ -825,11 +825,8 @@ public class GermplasmGroupingServiceImplTest {
 				NameTestDataInitializer.createName(22, GermplasmGroupingServiceImplTest.PREFERRED_CODE, "CML-1-1-1", 5);
 		advancedGermplasm.getNames().add(normalAdvancingNameOfChild);
 
-		// Setup parent child relationship mock between the two via gpid2
-		Mockito.when(this.germplasmDAO.getById(advancedGermplasm.getGpid2())).thenReturn(advancedGermplasmSource);
-
 		// Invoke the service
-		this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(advancedGermplasm);
+		this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(advancedGermplasm, advancedGermplasmSource);
 
 		// Expect that the advanced germplasm now has two names (SELHISFIX name
 		// for parent gets added)
