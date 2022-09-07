@@ -2,6 +2,7 @@
 package org.generationcp.middleware.data.initializer;
 
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.util.Util;
 
@@ -38,7 +39,7 @@ public class GermplasmTestDataInitializer {
 		germplasm.setLgid(Integer.valueOf(0));
 		germplasm.setGrplce(Integer.valueOf(0));
 		germplasm.setLocationId(Integer.valueOf(1));
-		germplasm.setMethodId(Integer.valueOf(1));
+		germplasm.setMethod(new Method(1));
 		germplasm.setMgid(Integer.valueOf(0));
 		germplasm.setReferenceId(Integer.valueOf(1));
 		germplasm.setLgid(Integer.valueOf(0));
@@ -60,7 +61,7 @@ public class GermplasmTestDataInitializer {
 		germplasm.setLgid(lgId);
 		germplasm.setGrplce(grplace);
 		germplasm.setLocationId(locationId);
-		germplasm.setMethodId(methodId);
+		germplasm.setMethod(new Method(methodId));
 		germplasm.setMgid(mgId);
 		germplasm.setReferenceId(referenceId);
 		germplasm.setMethodName(methodName);

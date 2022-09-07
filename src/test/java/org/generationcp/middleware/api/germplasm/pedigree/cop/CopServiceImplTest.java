@@ -3,6 +3,7 @@ package org.generationcp.middleware.api.germplasm.pedigree.cop;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.hamcrest.core.Is;
 import org.junit.Assert;
@@ -157,7 +158,7 @@ public class CopServiceImplTest extends IntegrationTestBase {
 	private Germplasm createGermplasm(final String name, final int gnpgs, final int gpid1, final int gpid2) {
 		final Name preferredName = new Name();
 		preferredName.setNval(name);
-		final Germplasm germplasm = new Germplasm(null, 1, gnpgs, gpid1, gpid2, 0, 0, 0, 0, 0, 0, preferredName, null, null);
+		final Germplasm germplasm = new Germplasm(null, gnpgs, gpid1, gpid2, 0, 0, 0, 0, 0, 0, preferredName, null, new Method(1));
 		this.daoFactory.getGermplasmDao().save(germplasm);
 		this.sessionProvder.getSession().flush();
 		this.sessionProvder.getSession().refresh(germplasm);

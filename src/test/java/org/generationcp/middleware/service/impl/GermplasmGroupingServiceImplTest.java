@@ -321,7 +321,6 @@ public class GermplasmGroupingServiceImplTest {
 	@Test
 	public void testMarkFixedCase6() {
 		final Integer generativeMethodId = 123;
-		this.germplasmToFix.setMethodId(generativeMethodId);
 		final Integer expectedParentMGID = 111;
 		this.germplasmToFix.setMgid(expectedParentMGID);
 
@@ -364,7 +363,6 @@ public class GermplasmGroupingServiceImplTest {
 		final Integer generativeMethodId = 123;
 		final Method method = new Method(generativeMethodId);
 		method.setMtype("GEN");
-		child2.setMethodId(generativeMethodId);
 		child2.setMethod(method);
 
 		Mockito.when(this.germplasmDAO.getAllChildren(this.gidToFix)).thenReturn(Lists.newArrayList(child1, child2));
@@ -393,7 +391,7 @@ public class GermplasmGroupingServiceImplTest {
 		child2.setGid(3);
 		final Integer expectedChild2MGID = 333;
 		child2.setMgid(expectedChild2MGID);
-		child2.setMethodId(generativeMethodId);
+		child2.setMethod(method);
 
 		final Germplasm child3 = new Germplasm();
 		child2.setGid(4);
@@ -427,7 +425,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		final Germplasm crossGermplasm1 = new Germplasm();
 		crossGermplasm1.setGid(crossGid1);
-		crossGermplasm1.setMethodId(hybridMethodId);
+		crossGermplasm1.setMethod(new Method(hybridMethodId));
 		crossGermplasm1.setGpid1(crossGid1Parent1);
 		crossGermplasm1.setGpid2(crossGid1Parent2);
 		crossGermplasm1.setMgid(0);
@@ -454,8 +452,8 @@ public class GermplasmGroupingServiceImplTest {
 		final Integer nonHybridMethodId = 416;
 		final Germplasm crossGermplasm2 = new Germplasm();
 		crossGermplasm2.setGid(crossGid2);
-		crossGermplasm2.setMethodId(hybridMethodId);
-		crossGermplasm1.setMethodId(nonHybridMethodId);
+		crossGermplasm2.setMethod(new Method(hybridMethodId));
+		crossGermplasm1.setMethod(new Method(nonHybridMethodId));
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
 				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2, crossGermplasm2));
 		this.germplasmGroupingService.processGroupInheritanceForCrosses(GermplasmGroupingServiceImplTest.CROP, this.getGermplasmIdMethodIdMap(Lists.newArrayList(crossGermplasm1, crossGermplasm2)), false,
@@ -486,7 +484,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		final Germplasm crossGermplasm1 = new Germplasm();
 		crossGermplasm1.setGid(crossGid1);
-		crossGermplasm1.setMethodId(hybridMethodId);
+		crossGermplasm1.setMethod(new Method(hybridMethodId));
 		crossGermplasm1.setGpid1(crossGid1Parent1);
 		crossGermplasm1.setGpid2(crossGid1Parent2);
 		crossGermplasm1.setMgid(0);
@@ -505,8 +503,8 @@ public class GermplasmGroupingServiceImplTest {
 		final Integer nonHybridMethodId = 416;
 		final Germplasm crossGermplasm2 = new Germplasm();
 		crossGermplasm2.setGid(crossGid2);
-		crossGermplasm2.setMethodId(hybridMethodId);
-		crossGermplasm1.setMethodId(nonHybridMethodId);
+		crossGermplasm2.setMethod(new Method(hybridMethodId));
+		crossGermplasm1.setMethod(new Method(nonHybridMethodId));
 		Mockito.when(this.germplasmDAO.getById(crossGid2)).thenReturn(crossGermplasm2);
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
 				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2, crossGermplasm2));
@@ -536,7 +534,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		final Germplasm crossGermplasm1 = new Germplasm();
 		crossGermplasm1.setGid(crossGid1);
-		crossGermplasm1.setMethodId(hybridMethodId);
+		crossGermplasm1.setMethod(new Method(hybridMethodId));
 		crossGermplasm1.setGpid1(crossGid1Parent1);
 		crossGermplasm1.setGpid2(crossGid1Parent2);
 		crossGermplasm1.setMgid(0);
@@ -575,7 +573,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		final Germplasm crossGermplasm1 = new Germplasm();
 		crossGermplasm1.setGid(crossGid1);
-		crossGermplasm1.setMethodId(nonHybridMethodId);
+		crossGermplasm1.setMethod(new Method(nonHybridMethodId));
 		crossGermplasm1.setGpid1(crossGid1Parent1);
 		crossGermplasm1.setGpid2(crossGid1Parent2);
 		crossGermplasm1.setMgid(0);
@@ -609,7 +607,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		final Germplasm crossGermplasm1 = new Germplasm();
 		crossGermplasm1.setGid(crossGid1);
-		crossGermplasm1.setMethodId(hybridMethodId);
+		crossGermplasm1.setMethod(new Method(hybridMethodId));
 		crossGermplasm1.setGpid1(crossGid1Parent1);
 		crossGermplasm1.setGpid2(crossGid1Parent2);
 		crossGermplasm1.setMgid(0);
@@ -666,7 +664,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		final Germplasm crossGermplasm1 = new Germplasm();
 		crossGermplasm1.setGid(crossGid1);
-		crossGermplasm1.setMethodId(hybridMethodId);
+		crossGermplasm1.setMethod(new Method(hybridMethodId));
 		crossGermplasm1.setGpid1(crossGid1Parent1);
 		crossGermplasm1.setGpid2(crossGid1Parent2);
 		crossGermplasm1.setMgid(0);
@@ -693,8 +691,8 @@ public class GermplasmGroupingServiceImplTest {
 		final Integer nonHybridMethodId = 416;
 		final Germplasm crossGermplasm2 = new Germplasm();
 		crossGermplasm2.setGid(crossGid2);
-		crossGermplasm2.setMethodId(hybridMethodId);
-		crossGermplasm1.setMethodId(nonHybridMethodId);
+		crossGermplasm2.setMethod(new Method(hybridMethodId));
+		crossGermplasm1.setMethod(new Method(nonHybridMethodId));
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1, crossGid2), 2))
 				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2, crossGermplasm2));
 		this.germplasmGroupingService.processGroupInheritanceForCrosses(GermplasmGroupingServiceImplTest.CROP, this.getGermplasmIdMethodIdMap(Lists.newArrayList(crossGermplasm1, crossGermplasm2)), true,
@@ -721,7 +719,7 @@ public class GermplasmGroupingServiceImplTest {
 
 		final Germplasm crossGermplasm1 = new Germplasm();
 		crossGermplasm1.setGid(crossGid1);
-		crossGermplasm1.setMethodId(hybridMethodId);
+		crossGermplasm1.setMethod(new Method(hybridMethodId));
 		crossGermplasm1.setGpid1(crossGid1Parent1);
 		crossGermplasm1.setGpid2(0);
 		crossGermplasm1.setMgid(0);
@@ -938,7 +936,7 @@ public class GermplasmGroupingServiceImplTest {
 	}
 
 	private Map<Integer, Integer> getGermplasmIdMethodIdMap(final List<Germplasm> germplasm) {
-		return germplasm.stream().collect(Collectors.toMap(Germplasm::getGid, Germplasm::getMethodId));
+		return germplasm.stream().collect(Collectors.toMap(Germplasm::getGid, g -> g.getMethod().getMid()));
 	}
 
 }

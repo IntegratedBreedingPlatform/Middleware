@@ -5,6 +5,7 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.germplasm.GermplasmNameRequestDto;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.junit.Assert;
 import org.junit.Before;
@@ -94,8 +95,8 @@ public class GermplasmNameServiceImplIntegrationTest extends IntegrationTestBase
 	}
 
 	private Germplasm createGermplasm() {
-		final Germplasm germplasm = new Germplasm(null, 1, -1, 0, 0, 0, 0, 0, 0,
-			0, 0, null, null, null);
+		final Germplasm germplasm = new Germplasm(null, -1, 0, 0, 0, 0, 0, 0,
+			0, 0, null, null, new Method(1));
 		this.daoFactory.getGermplasmDao().save(germplasm);
 		return germplasm;
 	}

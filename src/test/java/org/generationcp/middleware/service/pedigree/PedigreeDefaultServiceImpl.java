@@ -115,8 +115,7 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 				} else {
 					GermplasmCross cross = new GermplasmCross();
 
-					Method method =
-							this.pedigreeDataManagerFactory.getGermplasmDataManager().getMethodByID(germplasmToExpand.getMethodId());
+					Method method = germplasmToExpand.getMethod();
 					if (method != null) {
 						String methodName = method.getMname();
 						if (methodName != null) {
@@ -531,7 +530,7 @@ public class PedigreeDefaultServiceImpl implements PedigreeService {
 						return cross;
 					} else {
 						this.logAndThrowException("Error with expanding cross, can not find method with id: "
-								+ germplasmToExpand.getMethodId());
+								+ germplasmToExpand.getMethod().getMid());
 					}
 				}
 			} else {

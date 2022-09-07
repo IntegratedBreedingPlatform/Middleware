@@ -149,7 +149,6 @@ public class AncestryTreeServiceTest {
 		germplasm.setGnpgs(2);
 		final Method method = new Method(methodId);
 		germplasm.setMethod(method);
-		germplasm.setMethodId(methodId);
 		this.germplasmMap.put(new CropGermplasmKey(AncestryTreeServiceTest.MAIZE, gid), germplasm);
 		this.methodsMap.put(new CropMethodKey(AncestryTreeServiceTest.MAIZE, methodId), method);
 		return germplasm;

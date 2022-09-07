@@ -191,10 +191,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	private Integer gid;
 
 	@Basic(optional = false)
-	@Column(name = "methn")
-	private Integer methodId;
-
-	@Basic(optional = false)
 	@Column(name = "gnpgs")
 	@XmlElement(name = "numberOfProgenitors")
 	private Integer gnpgs;
@@ -263,8 +259,8 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	@JoinColumn(name = "gref", insertable = false, updatable = false)
 	private Bibref bibref;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "methn", insertable = false, updatable = false)
+	@OneToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "methn")
 	private Method method;
 
 	@OneToMany(mappedBy = "germplasm", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
@@ -454,12 +450,11 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		this.deleted = false;
 	}
 
-	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
+	public Germplasm(final Integer gid, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
 		final Integer lgid, final Integer locationId, final Integer gdate, final Integer referenceId,
 		final Integer grplce, final Integer mgid, final Name preferredName, final String preferredAbbreviation, final Method method) {
 		this(gid);
 		this.gid = gid;
-		this.methodId = methodId;
 		this.gnpgs = gnpgs;
 		this.gpid1 = gpid1;
 		this.gpid2 = gpid2;
@@ -477,9 +472,8 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 
 	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
 		final Integer lgid, final Integer locationId, final Integer gdate, final Name preferredName) {
-
 		// gref =0, grplce = 0, mgid = 0
-		this(gid, methodId, gnpgs, gpid1, gpid2, lgid, locationId, gdate, 0, 0, 0, preferredName, null, null);
+		this(gid, gnpgs, gpid1, gpid2, lgid, locationId, gdate, 0, 0, 0, preferredName, null, new Method(methodId));
 	}
 
 	//TODO: cleanup - remove it.
@@ -566,14 +560,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 
 	public void setMgid(final Integer mgid) {
 		this.mgid = mgid;
-	}
-
-	public Integer getMethodId() {
-		return this.methodId;
-	}
-
-	public void setMethodId(final Integer methodId) {
-		this.methodId = methodId;
 	}
 
 	public Integer getLocationId() {
@@ -673,8 +659,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Germplasm [gid=");
 		builder.append(this.gid);
-		builder.append(", methodId=");
-		builder.append(this.methodId);
 		builder.append(", gnpgs=");
 		builder.append(this.gnpgs);
 		builder.append(", gpid1=");
@@ -994,7 +978,7 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		try {
 			germplasm = (Germplasm) super.clone();
 		} catch (final CloneNotSupportedException e) {
-			germplasm = new Germplasm(this.gid, this.methodId, this.gnpgs, this.gpid1, this.gpid2,
+			germplasm = new Germplasm(this.gid, null, this.gnpgs, this.gpid1, this.gpid2,
 				this.lgid, this.locationId, this.gdate, this.preferredName);
 			germplasm.setMethod((Method) this.method.clone());
 			//TODO Complete with other objects

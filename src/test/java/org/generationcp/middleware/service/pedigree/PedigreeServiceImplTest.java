@@ -74,7 +74,6 @@ public class PedigreeServiceImplTest extends IntegrationTestBase {
             method.setMname("Backcross");
         }
         germplasm.setMethod(method);
-        germplasm.setMethodId(methodId);
         this.germplasmMap.put(new CropGermplasmKey(PedigreeServiceImplTest.MAIZE, gid), germplasm);
         this.methodsMap.put(new CropMethodKey(PedigreeServiceImplTest.MAIZE, methodId), method);
         return germplasm;

@@ -15,6 +15,7 @@ import org.generationcp.middleware.pojos.GermplasmListColumnCategory;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.GermplasmListDataDetail;
 import org.generationcp.middleware.pojos.GermplasmListDataView;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.utils.test.IntegrationTestDataInitializer;
@@ -89,9 +90,9 @@ public class GermplasmListDataServiceIntegrationTest extends IntegrationTestBase
 			Long.valueOf(20141014), "LST", Integer.valueOf(1), "Test Germplasm List", null, 1);
 		this.daoFactory.getGermplasmListDAO().saveOrUpdate(germplasmList);
 
-		final Germplasm germplasm = new Germplasm(null, 1, 0, 0, 0,
+		final Germplasm germplasm = new Germplasm(null, 0, 0, 0,
 			0, 0, 0, 0,
-			0, 0, null, null, null);
+			0, 0, null, null, new Method(1));
 
 		final Germplasm savedGermplasm = this.daoFactory.getGermplasmDao().save(germplasm);
 

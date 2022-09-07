@@ -98,7 +98,7 @@ public class BackcrossAncestryTree {
 	}
 
 	private void getMethodName(final Germplasm germplasm, final GermplasmNode germplasmNode) {
-		final Optional<Method> method = this.methodCache.get(new CropMethodKey(this.cropName, germplasm.getMethodId()));
+		final Optional<Method> method = this.methodCache.get(new CropMethodKey(this.cropName, germplasm.getMethod().getMid()));
 		if (method.isPresent()) {
 			germplasmNode.setMethod(method.get());
 		}

@@ -144,7 +144,7 @@ public class MockDataUtil {
 	private static List<Germplasm> getChildren(int gid, Germplasm[] germplasmArr, char methodType) {
 		List<Germplasm> list = new ArrayList<Germplasm>();
 		for (int i = 0; i < germplasmArr.length; i++) {
-			if (germplasmArr[i].getGpid2() == gid && (methodType == 'D' || methodType == 'M' && germplasmArr[i].getMethodId() == 1)) {
+			if (germplasmArr[i].getGpid2() == gid && (methodType == 'D' || methodType == 'M' && germplasmArr[i].getMethod().getMid() == 1)) {
 				list.add(germplasmArr[i]);
 			}
 		}
@@ -156,7 +156,7 @@ public class MockDataUtil {
 	 */
 	private static Germplasm createTestGermplasm(int gid, int methodId, int gnpgs, int gpid2) {
 		Germplasm germplasm = new Germplasm(gid);
-		germplasm.setMethodId(methodId);
+		germplasm.setMethod(new Method(methodId));
 		germplasm.setGnpgs(gnpgs);
 		germplasm.setGpid2(gpid2);
 		return germplasm;
