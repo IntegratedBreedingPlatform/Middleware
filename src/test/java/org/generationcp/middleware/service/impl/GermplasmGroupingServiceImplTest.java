@@ -433,16 +433,19 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm crossGermplasm1Parent1 = new Germplasm();
 		crossGermplasm1Parent1.setGid(crossGid1Parent1);
 		crossGermplasm1Parent1.setMgid(crossGid1Parent1MGID);
+		crossGermplasm1Parent1.setMethod(new Method(1));
 
 		final Germplasm crossGermplasm1Parent2 = new Germplasm();
 		crossGermplasm1Parent2.setGid(crossGid1Parent2);
 		crossGermplasm1Parent2.setMgid(crossGid1Parent2MGID);
+		crossGermplasm1Parent2.setMethod(new Method(1));
 
 		// Setup previous cross with MGID.
 		final Germplasm previousCross = new Germplasm();
 		previousCross.setGid(123);
 		final Integer previousCrossMGID = 456;
 		previousCross.setMgid(previousCrossMGID);
+		previousCross.setMethod(new Method(1));
 		Mockito.when(this.germplasmDAO.getPreviousCrossesBetweenParentGroups(crossGermplasm1))
 				.thenReturn(Lists.newArrayList(previousCross));
 
@@ -492,10 +495,12 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm crossGermplasm1Parent1 = new Germplasm();
 		crossGermplasm1Parent1.setGid(crossGid1Parent1);
 		crossGermplasm1Parent1.setMgid(crossGid1Parent1MGID);
+		crossGermplasm1Parent1.setMethod(new Method(1));
 
 		final Germplasm crossGermplasm1Parent2 = new Germplasm();
 		crossGermplasm1Parent2.setGid(crossGid1Parent2);
 		crossGermplasm1Parent2.setMgid(crossGid1Parent2MGID);
+		crossGermplasm1Parent2.setMethod(new Method(1));
 
 		// Just to test, create another cross with non-hybrid method. Expect
 		// this to not be processed.
@@ -542,10 +547,12 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm crossGermplasm1Parent1 = new Germplasm();
 		crossGermplasm1Parent1.setGid(crossGid1Parent1);
 		crossGermplasm1Parent1.setMgid(null);
+		crossGermplasm1Parent1.setMethod(new Method(1));
 
 		final Germplasm crossGermplasm1Parent2 = new Germplasm();
 		crossGermplasm1Parent2.setGid(crossGid1Parent2);
 		crossGermplasm1Parent2.setMgid(null);
+		crossGermplasm1Parent2.setMethod(new Method(1));
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1), 2))
 				.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1, crossGermplasm1Parent2));
 
@@ -616,16 +623,19 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm crossGermplasm1Parent1 = new Germplasm();
 		crossGermplasm1Parent1.setGid(crossGid1Parent1);
 		crossGermplasm1Parent1.setMgid(crossGid1Parent1MGID);
+		crossGermplasm1Parent1.setMethod(new Method(1));
 		Mockito.when(this.germplasmDAO.getById(crossGid1Parent1)).thenReturn(crossGermplasm1Parent1);
 
 		final Germplasm crossGermplasm1Parent2 = new Germplasm();
 		crossGermplasm1Parent2.setGid(crossGid1Parent2);
 		crossGermplasm1Parent2.setMgid(crossGid1Parent2MGID);
+		crossGermplasm1Parent2.setMethod(new Method(2));
 		Mockito.when(this.germplasmDAO.getById(crossGid1Parent2)).thenReturn(crossGermplasm1Parent2);
 
 		// Setup previous cross with MGID.
 		final Germplasm previousCross = new Germplasm();
 		previousCross.setGid(123);
+		previousCross.setMethod(new Method(1));
 		// No mgid on previous cross
 		Mockito.when(this.germplasmDAO.getPreviousCrossesBetweenParentGroups(crossGermplasm1))
 				.thenReturn(Lists.newArrayList(previousCross));
@@ -672,14 +682,17 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm crossGermplasm1Parent1 = new Germplasm();
 		crossGermplasm1Parent1.setGid(crossGid1Parent1);
 		crossGermplasm1Parent1.setMgid(crossGid1Parent1MGID);
+		crossGermplasm1Parent1.setMethod(new Method(1));
 
 		final Germplasm crossGermplasm1Parent2 = new Germplasm();
 		crossGermplasm1Parent2.setGid(crossGid1Parent2);
 		crossGermplasm1Parent2.setMgid(crossGid1Parent2MGID);
+		crossGermplasm1Parent2.setMethod(new Method(1));
 
 		// Setup previous cross with MGID.
 		final Germplasm previousCross = new Germplasm();
 		previousCross.setGid(123);
+		previousCross.setMethod(new Method(1));
 		final Integer previousCrossMGID = 456;
 		previousCross.setMgid(previousCrossMGID);
 		Mockito.when(this.germplasmDAO.getPreviousCrossesBetweenParentGroups(crossGermplasm1))
@@ -727,6 +740,7 @@ public class GermplasmGroupingServiceImplTest {
 		final Germplasm crossGermplasm1Parent1 = new Germplasm();
 		crossGermplasm1Parent1.setGid(crossGid1Parent1);
 		crossGermplasm1Parent1.setMgid(null);
+		crossGermplasm1Parent1.setMethod(new Method(1));
 
 		Mockito.when(this.germplasmDataManager.getGermplasmWithAllNamesAndAncestry(ImmutableSet.of(crossGid1), 2))
 			.thenReturn(ImmutableList.of(crossGermplasm1, crossGermplasm1Parent1));
