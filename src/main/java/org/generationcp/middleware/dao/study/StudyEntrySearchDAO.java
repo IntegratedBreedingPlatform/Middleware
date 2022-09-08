@@ -95,6 +95,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	private static final String CROSS_ALIAS = "cross";
 	private static final String GROUP_GID_ALIAS = "groupGID";
 	private static final String GUID_ALIAS = "guid";
+	private static final String BREEDING_METHOD_ID_ALIAS = "breedingMethodId";
 
 	// Joins
 	private static final String LOT_JOIN = "LEFT JOIN ims_lot l ON l.eid = s.dbxref_id and l.status = " + LotStatus.ACTIVE.getIntValue();
@@ -129,6 +130,7 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		this.addGuidScalar(scalars, selects, entryVariables);
 		this.addImmediateSourceScalar(scalars, selects, entryVariables);
 		this.addGroupSourceNameScalar(scalars, selects, entryVariables);
+		this.addBreedingMethodIdScalar(scalars, selects, entryVariables);
 		this.addBreedingMethodAbbrScalar(scalars, selects, entryVariables);
 		this.addGermplasmAttributeScalars(scalars, selects, entryVariables);
 		this.addEntryDetailScalars(scalars, selects, entryVariables);
@@ -289,6 +291,18 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		}
 	}
 
+	private void addBreedingMethodIdScalar(final List<Scalar> scalars, final List<String> selectClause,
+		final List<MeasurementVariable> entryDescriptors) {
+		if (!CollectionUtils.isEmpty(entryDescriptors)) {
+			// automatically add breeding method ID if method abbr is present (required for breeding method modal link)
+			entryDescriptors.stream()
+				.filter(measurementVariable -> measurementVariable.getTermId() == TermId.BREEDING_METHOD_ABBR.getId())
+				.findFirst()
+				.ifPresent(measurementVariable ->
+					selectClause.add(this.addSelectExpression(scalars, "m.mid", BREEDING_METHOD_ID_ALIAS, StringType.INSTANCE))
+				);
+		}
+	}
 	private void addBreedingMethodAbbrScalar(final List<Scalar> scalars, final List<String> selectClause,
 		final List<MeasurementVariable> entryDescriptors) {
 		if (!CollectionUtils.isEmpty(entryDescriptors)) {
@@ -532,9 +546,12 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			final String cross = (String) row.get(CROSS_ALIAS);
 			final Integer groupGid = (Integer) row.get(GROUP_GID_ALIAS);
 			final String guid = (String) row.get(GUID_ALIAS);
+			final String breedingMethodId = (String) row.get(BREEDING_METHOD_ID_ALIAS);
 
 			final StudyEntryDto studyEntryDto =
-				new StudyEntryDto(entryId, entryNumber, gid, designation, lotCount, availableBalance, unit, cross, groupGid, guid);
+				new StudyEntryDto(entryId, entryNumber, gid, designation, lotCount, availableBalance, unit, cross,
+					groupGid, guid, breedingMethodId);
+
 			final Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 			entryVariables.stream()
 				.filter(variable -> VariableType.ENTRY_DETAIL == variable.getVariableType())

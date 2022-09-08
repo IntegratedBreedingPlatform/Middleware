@@ -34,6 +34,8 @@ public class StudyEntryDto implements Serializable {
 
 	private String guid;
 
+	private String breedingMethodId;
+
 	private Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 
 	public StudyEntryDto(){
@@ -55,7 +57,7 @@ public class StudyEntryDto implements Serializable {
 
 	public StudyEntryDto(final Integer entryId, final Integer entryNumber, final Integer gid,
 		final String designation, final Integer lotCount, final String availableBalance, final String unit, final String cross,
-		final Integer groupGid, final String guid){
+		final Integer groupGid, final String guid, final String breedingMethodId){
 		this.entryId = entryId;
 		this.entryNumber = entryNumber;
 		this.gid = gid;
@@ -66,6 +68,7 @@ public class StudyEntryDto implements Serializable {
 		this.cross = cross;
 		this.groupGid = groupGid;
 		this.guid = guid;
+		this.breedingMethodId = breedingMethodId;
 	}
 
 	public Integer getEntryId() {
@@ -154,6 +157,14 @@ public class StudyEntryDto implements Serializable {
 
 	public void setProperties(final Map<Integer, StudyEntryPropertyData> properties) {
 		this.properties = properties;
+	}
+
+	public String getBreedingMethodId() {
+		return this.breedingMethodId;
+	}
+
+	public void setBreedingMethodId(final String breedingMethodId) {
+		this.breedingMethodId = breedingMethodId;
 	}
 
 	@Override
