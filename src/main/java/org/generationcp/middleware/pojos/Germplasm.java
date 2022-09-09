@@ -337,18 +337,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	 * This variable is populated when the user tries to search germplasm list.
 	 */
 	@Transient
-	private String methodNumber = null;
-
-	/**
-	 * This variable is populated when the user tries to search germplasm list.
-	 */
-	@Transient
-	private String methodGroup = null;
-
-	/**
-	 * This variable is populated when the user tries to search germplasm list.
-	 */
-	@Transient
 	private String germplasmPreferredName = null;
 
 	/**
@@ -731,22 +719,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 
 	public void setDeleted(final Boolean deleted) {
 		this.deleted = deleted;
-	}
-
-	public String getMethodNumber() {
-		return this.methodNumber;
-	}
-
-	public void setMethodNumber(final String methodNumber) {
-		this.methodNumber = methodNumber;
-	}
-
-	public String getMethodGroup() {
-		return this.methodGroup;
-	}
-
-	public void setMethodGroup(final String methodGroup) {
-		this.methodGroup = methodGroup;
 	}
 
 	public String getGermplasmPreferredName() {
