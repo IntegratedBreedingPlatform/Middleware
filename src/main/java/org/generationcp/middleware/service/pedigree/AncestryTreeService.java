@@ -62,9 +62,12 @@ public class AncestryTreeService {
 				if(method.isPresent()) {
 					germplasmNode.setMethod(method.get());
 				}
-				String mname = method.get().getMname();
+				final String mname = method.get().getMname();
 				if(StringUtils.isNotBlank(mname) && mname.toLowerCase().contains("backcross")) {
-					final BackcrossAncestryTree backcrossAncestryTree = new BackcrossAncestryTree(germplasmAncestryCache, breedingMethodCache, cropName);
+					final BackcrossAncestryTree backcrossAncestryTree = new BackcrossAncestryTree(
+						this.germplasmAncestryCache,
+						this.breedingMethodCache,
+						this.cropName);
 					return backcrossAncestryTree.generateBackcrossAncestryTree(germplasm.get(), level);
 				}
 				this.buildAncestoryTree(germplasmNode, level);

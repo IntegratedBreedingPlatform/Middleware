@@ -777,7 +777,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		if (deleteFieldAndBlock && CollectionUtils.isNotEmpty(instancesWithSharedBlock)) {
-			List<Geolocation> geolocationList = this.daoFactory.getGeolocationDao().getByIds(instancesWithSharedBlock);
+			final List<Geolocation> geolocationList = this.daoFactory.getGeolocationDao().getByIds(instancesWithSharedBlock);
 			return geolocationList.stream().map(Geolocation::getDescription).collect(Collectors.toList());
 		}
 

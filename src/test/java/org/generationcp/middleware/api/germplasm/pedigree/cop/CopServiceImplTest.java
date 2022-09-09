@@ -5,8 +5,6 @@ import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
-import org.hamcrest.core.Is;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,25 +71,25 @@ public class CopServiceImplTest extends IntegrationTestBase {
 	 * @see CopCalculation
 	 */
 	private void createPedigree() {
-		this.E0 = createGermplasm("E0", 0, 0, 0);
-		this.F0 = createGermplasm("F0", 0, 0, 0);
-		this.E0F0 = createGermplasm("E0F0", 2, E0.getGid(), F0.getGid());
-		this.B1 = createGermplasm("B1", -1, E0F0.getGid(), 0);
-		this.A0 = createGermplasm("A0", 0, 0, 0);
-		this.A0B1 = createGermplasm("A0B1", 2, A0.getGid(), B1.getGid());
-		this.Z2P1 = createGermplasm("Z2P1", -1, A0B1.getGid(), A0B1.getGid());
-		this.Z2 = createGermplasm("Z2", -1, A0B1.getGid(), Z2P1.getGid());
-		this.R2P1 = createGermplasm("R2P1", -1, Z2.getGid(), Z2.getGid());
-		this.R2 = createGermplasm("R2", -1, Z2.getGid(), R2P1.getGid());
-		this.Q2P2 = createGermplasm("Q2P2", -1, Z2.getGid(), Z2.getGid());
-		this.Q2P1 = createGermplasm("Q2P1", -1, Z2.getGid(), Q2P2.getGid());
-		this.Q2 = createGermplasm("Q2", -1, Z2.getGid(), Q2P1.getGid());
-		this.B1R2 = createGermplasm("B1R2", 2, B1.getGid(), R2.getGid());
-		this.P3P4 = createGermplasm("P3P4", -1, B1R2.getGid(), B1R2.getGid());
-		this.P3P3 = createGermplasm("P3P3", -1, B1R2.getGid(), P3P4.getGid());
-		this.P3P2 = createGermplasm("P3P2", -1, B1R2.getGid(), P3P3.getGid());
-		this.P3P1 = createGermplasm("P3P1", -1, B1R2.getGid(), P3P2.getGid());
-		this.P3 = createGermplasm("P3", -1, B1R2.getGid(), P3P1.getGid());
+		this.E0 = this.createGermplasm("E0", 0, 0, 0);
+		this.F0 = this.createGermplasm("F0", 0, 0, 0);
+		this.E0F0 = this.createGermplasm("E0F0", 2, this.E0.getGid(), this.F0.getGid());
+		this.B1 = this.createGermplasm("B1", -1, this.E0F0.getGid(), 0);
+		this.A0 = this.createGermplasm("A0", 0, 0, 0);
+		this.A0B1 = this.createGermplasm("A0B1", 2, this.A0.getGid(), this.B1.getGid());
+		this.Z2P1 = this.createGermplasm("Z2P1", -1, this.A0B1.getGid(), this.A0B1.getGid());
+		this.Z2 = this.createGermplasm("Z2", -1, this.A0B1.getGid(), this.Z2P1.getGid());
+		this.R2P1 = this.createGermplasm("R2P1", -1, this.Z2.getGid(), this.Z2.getGid());
+		this.R2 = this.createGermplasm("R2", -1, this.Z2.getGid(), this.R2P1.getGid());
+		this.Q2P2 = this.createGermplasm("Q2P2", -1, this.Z2.getGid(), this.Z2.getGid());
+		this.Q2P1 = this.createGermplasm("Q2P1", -1, this.Z2.getGid(), this.Q2P2.getGid());
+		this.Q2 = this.createGermplasm("Q2", -1, this.Z2.getGid(), this.Q2P1.getGid());
+		this.B1R2 = this.createGermplasm("B1R2", 2, this.B1.getGid(), this.R2.getGid());
+		this.P3P4 = this.createGermplasm("P3P4", -1, this.B1R2.getGid(), this.B1R2.getGid());
+		this.P3P3 = this.createGermplasm("P3P3", -1, this.B1R2.getGid(), this.P3P4.getGid());
+		this.P3P2 = this.createGermplasm("P3P2", -1, this.B1R2.getGid(), this.P3P3.getGid());
+		this.P3P1 = this.createGermplasm("P3P1", -1, this.B1R2.getGid(), this.P3P2.getGid());
+		this.P3 = this.createGermplasm("P3", -1, this.B1R2.getGid(), this.P3P1.getGid());
 	}
 
 	@Test

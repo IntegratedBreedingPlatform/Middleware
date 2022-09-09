@@ -38,7 +38,7 @@ public class PedigreeServiceImplTest extends IntegrationTestBase {
 
         this.randomNumbers = new LinkedHashSet<>();
 
-        generateRandomGermplasm();
+        this.generateRandomGermplasm();
 
         final Properties mockProperties = Mockito.mock(Properties.class);
         Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
@@ -85,7 +85,7 @@ public class PedigreeServiceImplTest extends IntegrationTestBase {
         if (femaleSideNodes != 0) {
             final Integer femaleGid = iterator.next();
             final Germplasm generateTestGermplasm = this.generateTestGermplasm(femaleGid, 107);
-            generateTreeRecurring(generateTestGermplasm, femaleSideNodes - 1, maleSideNodes, recurringMale, iterator);
+            this.generateTreeRecurring(generateTestGermplasm, femaleSideNodes - 1, maleSideNodes, recurringMale, iterator);
             germplasm.setGpid1(femaleGid);
         }else {
             germplasm.setGpid1(0);
@@ -93,7 +93,7 @@ public class PedigreeServiceImplTest extends IntegrationTestBase {
 
         if (maleSideNodes != 0) {
             final Germplasm generateTestGermplasm = this.generateTestGermplasm(recurringMale, 107);
-            generateTreeRecurring(generateTestGermplasm, femaleSideNodes, maleSideNodes - 1, recurringMale, iterator);
+            this.generateTreeRecurring(generateTestGermplasm, femaleSideNodes, maleSideNodes - 1, recurringMale, iterator);
             germplasm.setGpid2(recurringMale);
         }else {
             germplasm.setGpid2(0);
@@ -104,11 +104,11 @@ public class PedigreeServiceImplTest extends IntegrationTestBase {
     @Test
     public void testGetCrossExpansions() {
         final Germplasm generateRandomGermplasm = this.generateRandomGermplasmRecurringMaleParent();
-        Set<Integer> set = new HashSet<>();
+        final Set<Integer> set = new HashSet<>();
         set.add(generateRandomGermplasm.getGid());
         try{
             this.pedigreeService.getCrossExpansions(set, 5, this.crossExpansionProperties);
-        }catch (MiddlewareException ex){
+        }catch (final MiddlewareException ex){
             Assert.assertTrue(ex.getMessage().contains("Problem building pedigree string for gid"));
         }
 

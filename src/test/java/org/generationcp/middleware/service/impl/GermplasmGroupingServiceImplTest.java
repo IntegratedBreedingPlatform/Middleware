@@ -283,7 +283,7 @@ public class GermplasmGroupingServiceImplTest {
 		this.germplasmGroupingService.markFixed(Collections.singletonList(this.gidToFix), false, true);
 
 		Assert.assertEquals("Expecting founder/parent mgid to be set to be the same as gid.", this.gidToFix,
-				germplasmToFix.getMgid());
+			this.germplasmToFix.getMgid());
 
 		Mockito.verify(this.germplasmDAO, Mockito.times(1)).save(ArgumentMatchers.any(Germplasm.class));
 	}

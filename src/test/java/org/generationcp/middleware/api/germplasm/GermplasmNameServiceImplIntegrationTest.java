@@ -34,7 +34,7 @@ public class GermplasmNameServiceImplIntegrationTest extends IntegrationTestBase
 	@Test
 	public void testCreateGermplasmName() {
 		final Germplasm germplasm = this.createGermplasm();
-		final GermplasmNameRequestDto germplasmNameRequestDto = createGermplasmNameRequestDto(Boolean.TRUE);
+		final GermplasmNameRequestDto germplasmNameRequestDto = this.createGermplasmNameRequestDto(Boolean.TRUE);
 		final Integer createNameId = this.createName(germplasm.getGid(), germplasmNameRequestDto);
 		final Name name = this.daoFactory.getNameDao().getById(createNameId);
 		Assert.assertEquals(createNameId, name.getNid());
@@ -48,7 +48,7 @@ public class GermplasmNameServiceImplIntegrationTest extends IntegrationTestBase
 	public void testUpdateGermplasmName() {
 
 		final Germplasm germplasm = this.createGermplasm();
-		final GermplasmNameRequestDto germplasmNameRequestDto = createGermplasmNameRequestDto(Boolean.TRUE);
+		final GermplasmNameRequestDto germplasmNameRequestDto = this.createGermplasmNameRequestDto(Boolean.TRUE);
 
 		final Integer createNameId = this.createName(germplasm.getGid(), germplasmNameRequestDto);
 		final Name name = this.daoFactory.getNameDao().getById(createNameId);
@@ -67,7 +67,7 @@ public class GermplasmNameServiceImplIntegrationTest extends IntegrationTestBase
 	@Test
 	public void testDeleteGermplasmName() {
 		final Germplasm germplasm = this.createGermplasm();
-		final GermplasmNameRequestDto germplasmNameRequestDto = createGermplasmNameRequestDto(Boolean.FALSE);
+		final GermplasmNameRequestDto germplasmNameRequestDto = this.createGermplasmNameRequestDto(Boolean.FALSE);
 		final Integer createNameId = this.createName(germplasm.getGid(), germplasmNameRequestDto);
 		final Name name = this.daoFactory.getNameDao().getById(createNameId);
 		Assert.assertEquals(createNameId, name.getNid());
