@@ -43,7 +43,6 @@ public class GermplasmTestDataInitializer {
 		germplasm.setMgid(Integer.valueOf(0));
 		germplasm.setReferenceId(Integer.valueOf(1));
 		germplasm.setLgid(Integer.valueOf(0));
-		germplasm.setMethodName("MethodName");
 		germplasm.setLocationName("LocationName");
 		germplasm.setPreferredName(GermplasmTestDataInitializer.createGermplasmName(id));
 		germplasm.setGermplasmUUID(UUID.randomUUID().toString());
@@ -64,7 +63,6 @@ public class GermplasmTestDataInitializer {
 		germplasm.setMethod(new Method(methodId));
 		germplasm.setMgid(mgId);
 		germplasm.setReferenceId(referenceId);
-		germplasm.setMethodName(methodName);
 		germplasm.setLocationName(locationName);
 		germplasm.setPreferredName(GermplasmTestDataInitializer.createGermplasmName(ThreadLocalRandom.current().nextInt(1, Integer
 			.MAX_VALUE)));

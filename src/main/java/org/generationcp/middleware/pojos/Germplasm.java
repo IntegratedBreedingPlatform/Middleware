@@ -327,14 +327,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 
 	/**
 	 * This variable is populated when the user tries to search germplasm list.
-	 * Previously, germplasm list is loaded and revisit the DB for each germplasm for getting method name.
-	 * This problem is removed by introducing this variable.
-	 */
-	@Transient
-	private String methodName = null;
-
-	/**
-	 * This variable is populated when the user tries to search germplasm list.
 	 * Previously, germplasm list is loaded and revisit the DB for each germplasm for getting location name.
 	 * This problem is removed by introducing this variable.
 	 */
@@ -352,12 +344,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 	 */
 	@Transient
 	private String methodGroup = null;
-
-	/**
-	 * This variable is populated when the user tries to search germplasm list.
-	 */
-	@Transient
-	private String methodCode = null;
 
 	/**
 	 * This variable is populated when the user tries to search germplasm list.
@@ -609,14 +595,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		return this.method;
 	}
 
-	public String getMethodName() {
-		return this.methodName;
-	}
-
-	public void setMethodName(final String methodName) {
-		this.methodName = methodName;
-	}
-
 	public String getLocationName() {
 		return this.locationName;
 	}
@@ -687,8 +665,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		builder.append(this.method);
 		builder.append(", inventoryInfo=");
 		builder.append(this.inventoryInfo);
-		builder.append(", methodName=");
-		builder.append(this.methodName);
 		builder.append(", locationName=");
 		builder.append(this.locationName);
 		builder.append("]");
@@ -811,14 +787,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 
 	public void setMaleParentPreferredID(final String maleParentPreferredID) {
 		this.maleParentPreferredID = maleParentPreferredID;
-	}
-
-	public String getMethodCode() {
-		return this.methodCode;
-	}
-
-	public void setMethodCode(final String methodCode) {
-		this.methodCode = methodCode;
 	}
 
 	public String getGermplasmPreferredId() {
