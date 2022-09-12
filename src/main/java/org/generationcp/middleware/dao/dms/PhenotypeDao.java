@@ -15,6 +15,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.apache.commons.collections.ListUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
 import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
@@ -72,6 +73,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link Phenotype}.
@@ -1149,7 +1151,48 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			queryString.append(" WHERE nde.nd_experiment_id = exref.nd_experiment_id AND exref.reference_source IN (:referenceSources)) ");
 		}
 
+		if (!CollectionUtils.isEmpty(requestDTO.getSeasonDbIds())) {
+			queryString.append(" AND cvtermSeason.cvterm_id IN (:seasonDbIds) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getObservationLevelRelationships())) {
+			queryString.append(handleObservationLevelRelationshipsFilter(requestDTO));
+		}
+
 		queryString.append(" ORDER BY nde.nd_experiment_id ");
+	}
+
+	private static StringBuilder handleObservationLevelRelationshipsFilter(final ObservationUnitSearchRequestDTO requestDTO) {
+		final StringBuilder queryString = new StringBuilder();
+		final List<String> observationLevelCodes = requestDTO.getObservationLevelRelationships()
+			.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelCode()))
+			.map(ObservationLevelRelationship::getLevelCode)
+			.collect(Collectors.toList());
+		if (!CollectionUtils.isEmpty(observationLevelCodes)) {
+			// currently, we only handle observation level codes for plot datasets
+			queryString.append(" AND (dataset_type.name = 'PLOT' AND plotNumber.value IN (:observationLevelCodes)) ");
+			requestDTO.setObservationLevelCodes(observationLevelCodes);
+		}
+
+		// dataset type name filter from observation level names
+		final Set<String> datasetTypeNames = requestDTO.getObservationLevelRelationships()
+			.stream().filter(obs -> StringUtils.isNotEmpty(obs.getLevelName()))
+			.map(obs -> ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(obs.getLevelName()))
+			.collect(Collectors.toSet());
+
+		// dataset type name filter from observation level orders
+		final List<Integer> observationLevelOrders = requestDTO.getObservationLevelRelationships()
+			.stream().filter(obs -> obs.getLevelOrder() != null)
+			.map(ObservationLevelRelationship::getLevelOrder)
+			.collect(Collectors.toList());
+		datasetTypeNames.addAll(ObservationLevelMapper.getDatasetTypeNamesByObservationLevelOrder(observationLevelOrders));
+
+		if (!CollectionUtils.isEmpty(datasetTypeNames)) {
+			queryString.append(" AND dataset_type.name IN (:datasetTypeNames) ");
+			requestDTO.setDatasetTypeNames(datasetTypeNames);
+		}
+
+		return queryString;
 	}
 
 	private static void addObservationUnitSearchQueryParams(final ObservationUnitSearchRequestDTO requestDTO, final SQLQuery sqlQuery) {
@@ -1165,7 +1208,8 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 		}
 
 		if (requestDTO.getObservationLevel() != null) {
-			sqlQuery.setParameter("datasetType", ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(requestDTO.getObservationLevel()));
+			sqlQuery.setParameter("datasetType",
+				ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(requestDTO.getObservationLevel()));
 		}
 
 		if (requestDTO.getObservationTimeStampRangeStart() != null) {
@@ -1202,6 +1246,18 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 
 		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
 			sqlQuery.setParameterList("referenceSources", requestDTO.getExternalReferenceSources());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getSeasonDbIds())) {
+			sqlQuery.setParameterList("seasonDbIds", requestDTO.getSeasonDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getObservationLevelCodes())) {
+			sqlQuery.setParameterList("observationLevelCodes", requestDTO.getObservationLevelCodes());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getDatasetTypeNames())) {
+			sqlQuery.setParameterList("datasetTypeNames", requestDTO.getDatasetTypeNames());
 		}
 	}
 
