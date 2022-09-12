@@ -557,8 +557,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public boolean hasFieldMap(final int datasetId) {
-		return this.getExperimentBuilder().hasFieldmap(datasetId);
+	public boolean hasFieldLayout(final int datasetId) {
+		return this.getExperimentBuilder().hasFieldLayout(datasetId);
 	}
 
 	@Override

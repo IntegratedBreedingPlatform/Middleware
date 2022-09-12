@@ -18,6 +18,7 @@ import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.dao.util.CommonQueryConstants;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.ExperimentType;
@@ -1264,16 +1265,12 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "	max(if(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", loc.locid, null)) as locationId, \n"  // 8190 = cvterm for LOCATION_ID
 				+ "	max(if(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", loc.lname, null)) as locationName, \n" +
 				"	max(if(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", loc.labbr, null)) as locationAbbreviation, \n" + // 8189 = cvterm for LOCATION_ABBR
-				"	max(if(geoprop.type_id = " + TermId.LOCATION_ABBR.getId() + ", geoprop.value, null)) as customLocationAbbreviation, \n" +
+				"	max(if(geoprop.type_id = " + TermId.LOCATION_ABBR.getId() + ", geoprop.value, null)) as customLocationAbbreviation, \n"
 				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
-				"	case when max(if(geoprop.type_id = 8583, geoprop.value, null)) is null then 0 else 1 end as hasFieldmap, \n"
-				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
 
 				// FIXME rewrite to be valid for the whole instance, not just the datasetId
 				// if instance has X/Y coordinates (fieldmap or row/col design)
-				+ "	case when (max(if(ndep.type_id = " + TermId.FIELDMAP_COLUMN.getId() + ", ndep.value, null)) is null) \n "
-				+ "		and (max(if(ndep.type_id = " + TermId.FIELDMAP_RANGE.getId() + ", ndep.value, null))) is null \n"
-				+ " 	then 0 else 1 end as hasFieldLayout, \n"
+				+ CommonQueryConstants.HAS_FIELD_LAYOUT_EXPRESSION +  ", \n"
 
 				// FIXME rewrite to be valid for the whole instance, not just the datasetId
 				// if instance has been georeferenced using the geojson editor
@@ -1348,7 +1345,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("locationName", new StringType());
 			query.addScalar("locationAbbreviation", new StringType());
 			query.addScalar("customLocationAbbreviation", new StringType());
-			query.addScalar("hasFieldmap", new BooleanType());
 			query.addScalar("hasGeoJSON", new BooleanType());
 			query.addScalar("hasFieldLayout", new BooleanType());
 			query.addScalar("hasInventory", new BooleanType());
