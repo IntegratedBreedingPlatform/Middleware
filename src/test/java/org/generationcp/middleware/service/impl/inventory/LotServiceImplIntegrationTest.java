@@ -231,12 +231,9 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		assertThat(keepLotIdMergedTransactions, hasSize(0));
 
 		//Check that the lot to keep has 20 as actual amount
-		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
-		lotsSearchDto.setLotIds(Arrays.asList(this.lot.getId()));
-		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, 1 );
 		final List<TransactionDto> availableBalanceTransactions = this.transactionService.getAvailableBalanceTransactions(this.lot.getId());
-		assertThat(lots, hasSize(1));
-		assertThat(lots.get(0).getAvailableBalance(), equalTo(20d));
+		assertNotNull(availableBalanceTransactions);
+		assertThat(availableBalanceTransactions, hasSize(1));
 
 		final TransactionDto transactionDto = availableBalanceTransactions.get(0);
 		assertThat(transactionDto.getLot().getLotId(), is(keepLotId));
