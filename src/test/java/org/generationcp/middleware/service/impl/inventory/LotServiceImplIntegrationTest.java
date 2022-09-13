@@ -234,8 +234,13 @@ public class LotServiceImplIntegrationTest extends IntegrationTestBase {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLotIds(Arrays.asList(this.lot.getId()));
 		final List<ExtendedLotDto> lots = this.daoFactory.getLotDao().searchLots(lotsSearchDto, null, 1 );
+		final List<TransactionDto> availableBalanceTransactions = this.transactionService.getAvailableBalanceTransactions(this.lot.getId());
 		assertThat(lots, hasSize(1));
 		assertThat(lots.get(0).getAvailableBalance(), equalTo(20d));
+
+		final TransactionDto transactionDto = availableBalanceTransactions.get(0);
+		assertThat(transactionDto.getLot().getLotId(), is(keepLotId));
+		assertThat(transactionDto.getAmount(), is(20d));
 
 		//Create lot 1 to be discarded on merge
 		this.createLot();
