@@ -1,0 +1,44 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="mderamos" id="v22.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="external_reference_file_metadata"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create external_reference_file_metadata table
+		</comment>
+		<createTable tableName="external_reference_file_metadata">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="file_id" type="int">
+				<constraints nullable="false" foreignKeyName="fk_external_reference_file_metadata" references="file_metadata(file_id)"/>
+			</column>
+			<column name="reference_id" type="varchar(2000)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="reference_source" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_by" type="int" defaultValue="0">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_date" type="timestamp">
+				<constraints nullable="true"/>
+			</column>
+			<column name="modified_by" type="int">
+				<constraints nullable="true" />
+			</column>
+		</createTable>
+	</changeSet>
+
+</databaseChangeLog>
