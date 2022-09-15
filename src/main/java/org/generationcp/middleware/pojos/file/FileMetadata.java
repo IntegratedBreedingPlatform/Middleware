@@ -3,6 +3,7 @@ package org.generationcp.middleware.pojos.file;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.generationcp.middleware.pojos.AbstractEntity;
+import org.generationcp.middleware.pojos.FileMetadataExternalReference;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
@@ -10,6 +11,7 @@ import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -90,6 +92,9 @@ public class FileMetadata extends AbstractEntity {
 		joinColumns = @JoinColumn(name = "file_metadata_id"),
 		inverseJoinColumns = @JoinColumn(name = "cvterm_id"))
 	private List<CVTerm> variables = new ArrayList<>();
+
+	@OneToMany(mappedBy = "fileMetadata", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<FileMetadataExternalReference> externalReferences = new ArrayList<>();
 
 	public Integer getFileId() {
 		return this.fileId;
@@ -224,6 +229,14 @@ public class FileMetadata extends AbstractEntity {
 			this.variables = new ArrayList<>();
 		}
 		return this.variables;
+	}
+
+	public List<FileMetadataExternalReference> getExternalReferences() {
+		return externalReferences;
+	}
+
+	public void setExternalReferences(List<FileMetadataExternalReference> externalReferences) {
+		this.externalReferences = externalReferences;
 	}
 
 	public void setVariables(final List<CVTerm> variables) {

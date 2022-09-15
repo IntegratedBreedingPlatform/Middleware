@@ -19,6 +19,7 @@
         <mapping class="org.generationcp.middleware.pojos.CvTermExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.PhenotypeExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.AttributeExternalReference"/>
+        <mapping class="org.generationcp.middleware.pojos.FileMetadataExternalReference"/>
         <mapping class="org.generationcp.middleware.pojos.Location"/>
         <mapping class="org.generationcp.middleware.pojos.Locdes"/>
         <mapping class="org.generationcp.middleware.pojos.Method"/>
