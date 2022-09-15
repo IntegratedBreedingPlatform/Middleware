@@ -68,7 +68,7 @@ public class StudyEntryObservationServiceImplIntegrationTest extends Integration
 		final Germplasm germplasm = this.germplasmTestDataGenerator.createGermplasm("BLE");
 		final StockModel stockModel =
 			new StockModel(plotDataset.getProjectId(),
-				new StudyEntryDto(1, 1, germplasm.getGid(), germplasm.getGermplasmPreferredName(), null, null, null, "-", null, null, null));
+				new StudyEntryDto(1, 1, germplasm.getGid(), germplasm.getGermplasmPreferredName(), null, null, null, "-", null, null));
 		this.daoFactory.getStockDao().save(stockModel);
 
 		final CVTerm variable =
