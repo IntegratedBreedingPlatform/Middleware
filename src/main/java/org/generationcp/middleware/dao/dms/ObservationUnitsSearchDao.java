@@ -74,6 +74,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 	private static final String LOCATION_JOIN = " LEFT JOIN nd_geolocationprop gprop on gprop.nd_geolocation_id = gl.nd_geolocation_id and gprop.type_id = " + TermId.LOCATION_ID.getId()
 		+ " LEFT JOIN location loc on loc.locid = gprop.value ";
 	private static final String GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN = " LEFT JOIN atributs %1$s ON s.dbxref_id = %1$s.gid AND %1$s.atype = %2$s ";
+	private static final String BREEDING_METHODS_ABBR_JOIN =
+		"LEFT JOIN methods m ON m.mid = g.methn ";
 
 	static {
 		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
@@ -94,6 +96,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		factorsFilterMap.put(String.valueOf(TermId.GUID.getId()), "g.germplsm_uuid");
 		factorsFilterMap.put(String.valueOf(TermId.GROUP_SOURCE_NAME.getId()), "groupSourceName.nval");
 		factorsFilterMap.put(String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()), "immediateSource.nval");
+		factorsFilterMap.put(String.valueOf(TermId.BREEDING_METHOD_ABBR.getId()), "m.mcode");
 		factorsFilterMap.put(String.valueOf(TermId.LOCATION_ID.getId()), "loc.lname");
 	}
 
@@ -305,6 +308,7 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if ((!CollectionUtils.isEmpty(filter.getFilteredValues()) && filter.getFilteredValues().keySet().contains(String.valueOf(TermId.GROUPGID.getId()))) ||
 				this.checkFilterContainsFactor(filter, TermId.GUID.getId()) ||
 				this.checkFilterContainsFactor(filter, TermId.IMMEDIATE_SOURCE_NAME.getId()) ||
+			this.checkFilterContainsFactor(filter, TermId.BREEDING_METHOD_ABBR.getId()) ||
 				this.checkFilterContainsFactor(filter, TermId.GROUP_SOURCE_NAME.getId())) {
 			joins.add(GERMPLASM_JOIN);
 		}
@@ -319,6 +323,10 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 
 		if (this.checkFilterContainsFactor(filter, TermId.LOCATION_ID.getId())) {
 			joins.add(LOCATION_JOIN);
+		}
+
+		if (this.checkFilterContainsFactor(filter, TermId.BREEDING_METHOD_ABBR.getId())) {
+			joins.add(BREEDING_METHODS_ABBR_JOIN);
 		}
 
 		filter.getFilteredTextValues()
@@ -657,6 +665,8 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 								+ " 			AND g.gpid1 <> 0 THEN groupSourceName.nval \n"
 								+ "				ELSE '-' "
 								+ "			END AS " + TermId.GROUP_SOURCE_NAME.name() + " ";
+					} else if (TermId.BREEDING_METHOD_ABBR.name().equals(gpFactor)) {
+						cvtermQuery = " m.mcode AS " + TermId.BREEDING_METHOD_ABBR.name() + " ";
 					} else {
 						cvtermQuery = String.format(germplasmDescriptorClauseFormat, "spropcvt.name = '" + gpFactor + "'", gpFactor);
 					}
@@ -792,12 +802,17 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUPGID) ||
 			this.hasDescriptor(genericGermplasmDescriptors, TermId.GUID) ||
 			this.hasDescriptor(genericGermplasmDescriptors, TermId.IMMEDIATE_SOURCE_NAME) ||
+			this.hasDescriptor(genericGermplasmDescriptors, TermId.BREEDING_METHOD_ABBR) ||
 			this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUP_SOURCE_NAME)) {
 			sql.append(GERMPLASM_JOIN);
 		}
 
 		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.IMMEDIATE_SOURCE_NAME)) {
 			sql.append(IMMEDIATE_SOURCE_NAME_JOIN);
+		}
+
+		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.BREEDING_METHOD_ABBR)) {
+			sql.append(BREEDING_METHODS_ABBR_JOIN);
 		}
 
 		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUP_SOURCE_NAME)) {
