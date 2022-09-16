@@ -420,6 +420,11 @@ public class ExperimentBuilder extends Builder {
 				factors.add(new Variable(groupSourceNameVariableType, groupSourceName));
 			}
 
+			final DMSVariableType breedingMethodAbbrVariableType = variableTypes.findById(TermId.BREEDING_METHOD_ABBR);
+			if (breedingMethodAbbrVariableType != null) {
+				factors.add(new Variable(breedingMethodAbbrVariableType, stockModel.getGermplasm().getMethod().getMcode()));
+			}
+
 			if (variableTypes.getVariableTypes().stream().anyMatch(this::entryVariablesHasParent)) {
 				this.generatePedigreeTable(pedigreeTreeNodeTable, stockModel, variableTypes, factors);
 			}
