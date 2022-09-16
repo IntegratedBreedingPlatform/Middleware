@@ -120,12 +120,9 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 	public Set<String> updatePedigreeNodes(final Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap,
 		final Multimap<String, Object[]> conflictErrors) {
 
-		final Set<String> updatedGermplasmDbIds = new HashSet<>();
-		final GermplasmDAO germplasmDAO = this.daoFactory.getGermplasmDao();
-
-		final List<Germplasm> germplasmForUpdate =
+		final Map<String, Germplasm> germplasmForUpdateMap =
 			this.daoFactory.getGermplasmDao().getByGIDsOrUUIDListWithMethodAndBibref(Collections.emptySet(),
-				pedigreeNodeDTOMap.keySet());
+				pedigreeNodeDTOMap.keySet()).stream().collect(Collectors.toMap(Germplasm::getGermplasmUUID, Function.identity()));
 
 		// Extract the germplasmDbIds of the parents
 		final Set<String>
@@ -141,74 +138,73 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 		final Map<String, Germplasm> germplasmProgenitorsMapByUUIDs =
 			progenitors.stream().collect(Collectors.toMap(g -> String.valueOf(g.getGermplasmUUID()), Function.identity()));
 
-		// Stop loop until all germplasm to be updated is already updated. TODO: Check if there's a better algorithm
-		while (!germplasmForUpdate.isEmpty()) {
-			final Iterator<Germplasm> iterator = germplasmForUpdate.listIterator();
-			while (iterator.hasNext()) {
-				final Germplasm germplasm = iterator.next();
-				if (pedigreeNodeDTOMap.containsKey(germplasm.getGermplasmUUID())) {
-					final PedigreeNodeDTO pedigreeNodeDTO = pedigreeNodeDTOMap.get(germplasm.getGermplasmUUID());
-
-					final Optional<PedigreeNodeReferenceDTO> parent1 = this.getParent1(pedigreeNodeDTO);
-					final Optional<PedigreeNodeReferenceDTO> parent2 = this.getParent2(pedigreeNodeDTO);
-					final List<PedigreeNodeReferenceDTO> otherParents = this.getOtherParents(pedigreeNodeDTO);
-
-					final boolean areParentsAlreadyUpdated =
-						this.areParentsAlreadyUpdated(pedigreeNodeDTOMap, updatedGermplasmDbIds,
-							this.combineParentsAsList(parent1, parent2, otherParents));
-
-					// If a parent is in the list of germplasm to be updated, make sure it is updated first before assigning
-					// it to the germplasm to be updated.
-					if (areParentsAlreadyUpdated) {
-						final Multimap<String, Object[]> conflictErrorsPerGermplasm = ArrayListMultimap.create();
-						PedigreeUtil.assignProgenitors(germplasm, germplasmProgenitorsMapByGIDs, conflictErrorsPerGermplasm,
-							this.resolveParentGid(parent1, germplasmProgenitorsMapByUUIDs),
-							this.resolveParentGid(parent2, germplasmProgenitorsMapByUUIDs),
-							germplasm.getMethod(),
-							otherParents.stream().map(o -> this.resolveParentGid(Optional.of(o), germplasmProgenitorsMapByUUIDs))
-								.collect(Collectors.toList()));
-
-						if (conflictErrorsPerGermplasm.isEmpty()) {
-							germplasmDAO.update(germplasm);
-							updatedGermplasmDbIds.add(germplasm.getGermplasmUUID());
-						} else {
-							// Detach the germplasm from session so that any changes to it will not be automatically persisted by the transaction.
-							germplasmDAO.evict(germplasm);
-							conflictErrors.putAll(conflictErrorsPerGermplasm);
-						}
-						// When germplasm is already updated, remove it from the list.
-						iterator.remove();
-					}
-				}
-			}
+		final Set<String> updatedGermplasmDbIds = new HashSet<>();
+		final Iterator<Map.Entry<String, Germplasm>> iterator = germplasmForUpdateMap.entrySet().iterator();
+		while (iterator.hasNext()) {
+			final Map.Entry<String, Germplasm> entry = iterator.next();
+			final Germplasm germplasm = entry.getValue();
+			this.updateGermplasm(germplasm, germplasmForUpdateMap, pedigreeNodeDTOMap, conflictErrors, updatedGermplasmDbIds,
+				germplasmProgenitorsMapByGIDs, germplasmProgenitorsMapByUUIDs);
 		}
-
 		return updatedGermplasmDbIds;
 	}
 
-	private boolean areParentsAlreadyUpdated(final Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap, final Set<String> updatedGermplasmDbIds,
-		final List<PedigreeNodeReferenceDTO> parents) {
+	private void updateGermplasm(final Germplasm germplasm,
+		final Map<String, Germplasm> germplasmForUpdateMap,
+		final Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap,
+		final Multimap<String, Object[]> conflictErrors,
+		final Set<String> updatedGermplasmDbIds,
+		final Map<String, Germplasm> germplasmProgenitorsMapByGIDs,
+		final Map<String, Germplasm> germplasmProgenitorsMapByUUIDs) {
 
-		for (final PedigreeNodeReferenceDTO parent : parents) {
-			// If a parent is in the list of germplasm to be updated, make sure it is updated first before assigning
-			// it to the germplasm to be updated.
-			if (pedigreeNodeDTOMap.containsKey(parent.getGermplasmDbId()) && !updatedGermplasmDbIds.contains(parent.getGermplasmDbId())) {
-				return false;
+		// Do not update germplasm if it is already updated.
+		if (germplasm != null && pedigreeNodeDTOMap.containsKey(germplasm.getGermplasmUUID()) && !updatedGermplasmDbIds.contains(
+			germplasm.getGermplasmUUID())) {
+
+			final PedigreeNodeDTO pedigreeNodeDTO = pedigreeNodeDTOMap.get(germplasm.getGermplasmUUID());
+			final Optional<PedigreeNodeReferenceDTO> parent1 = this.getParent1(pedigreeNodeDTO);
+			final Optional<PedigreeNodeReferenceDTO> parent2 = this.getParent2(pedigreeNodeDTO);
+			final List<PedigreeNodeReferenceDTO> otherParents = this.getOtherParents(pedigreeNodeDTO);
+
+			// If the parents of germplasm are to be updated, we should update them first before
+			// assigning to the germplasm.
+			if (parent1.isPresent() && StringUtils.isNotEmpty(parent1.get().getGermplasmDbId())) {
+				this.updateGermplasm(germplasmForUpdateMap.get(parent1.get().getGermplasmDbId()), germplasmForUpdateMap,
+					pedigreeNodeDTOMap,
+					conflictErrors, updatedGermplasmDbIds, germplasmProgenitorsMapByGIDs, germplasmProgenitorsMapByUUIDs);
 			}
-		}
-		return true;
-	}
+			if (parent2.isPresent() && StringUtils.isNotEmpty(parent2.get().getGermplasmDbId())) {
+				this.updateGermplasm(germplasmForUpdateMap.get(parent2.get().getGermplasmDbId()), germplasmForUpdateMap,
+					pedigreeNodeDTOMap,
+					conflictErrors, updatedGermplasmDbIds, germplasmProgenitorsMapByGIDs, germplasmProgenitorsMapByUUIDs);
+			}
+			otherParents.forEach(parent -> {
+				if (StringUtils.isNotEmpty(parent.getGermplasmDbId())) {
+					this.updateGermplasm(germplasmForUpdateMap.get(parent.getGermplasmDbId()), germplasmForUpdateMap,
+						pedigreeNodeDTOMap, conflictErrors, updatedGermplasmDbIds,
+						germplasmProgenitorsMapByGIDs, germplasmProgenitorsMapByUUIDs);
+				}
+			});
 
-	private List<PedigreeNodeReferenceDTO> combineParentsAsList(final Optional<PedigreeNodeReferenceDTO> parent1,
-		final Optional<PedigreeNodeReferenceDTO> parent2,
-		final List<PedigreeNodeReferenceDTO> otherParents) {
-		final List<PedigreeNodeReferenceDTO> parents = new ArrayList<>();
-		if (parent1.isPresent())
-			parents.add(parent1.get());
-		if (parent2.isPresent())
-			parents.add(parent2.get());
-		parents.addAll(otherParents);
-		return parents;
+			final Multimap<String, Object[]> conflictErrorsPerGermplasm = ArrayListMultimap.create();
+			PedigreeUtil.assignProgenitors(germplasm, germplasmProgenitorsMapByGIDs, conflictErrorsPerGermplasm,
+				this.resolveParentGid(parent1, germplasmProgenitorsMapByUUIDs),
+				this.resolveParentGid(parent2, germplasmProgenitorsMapByUUIDs),
+				germplasm.getMethod(),
+				otherParents.stream().map(o -> this.resolveParentGid(Optional.of(o), germplasmProgenitorsMapByUUIDs))
+					.collect(Collectors.toList()));
+
+			final GermplasmDAO germplasmDAO = this.daoFactory.getGermplasmDao();
+			if (conflictErrorsPerGermplasm.isEmpty()) {
+				germplasmDAO.update(germplasm);
+				updatedGermplasmDbIds.add(germplasm.getGermplasmUUID());
+			} else {
+				// Detach the germplasm from session so that any changes to it will not be automatically persisted by the transaction.
+				germplasmDAO.evict(germplasm);
+				conflictErrors.putAll(conflictErrorsPerGermplasm);
+			}
+
+		}
 	}
 
 	private Integer resolveParentGid(final Optional<PedigreeNodeReferenceDTO> parentReference,
