@@ -42,7 +42,7 @@ public class FileMetadataMapper {
 
 		if (!CollectionUtils.isEmpty(from.getExternalReferences())) {
 			final List<FileMetadataExternalReference> externalReferences = new ArrayList<>();
-			for (ExternalReferenceDTO externalReferenceDTO: from.getExternalReferences()) {
+			for (final ExternalReferenceDTO externalReferenceDTO: from.getExternalReferences()) {
 				final FileMetadataExternalReference fileMetadataExternalReference = new FileMetadataExternalReference(to,
 					externalReferenceDTO.getReferenceID(), externalReferenceDTO.getReferenceSource());
 				externalReferences.add(fileMetadataExternalReference);
@@ -79,7 +79,7 @@ public class FileMetadataMapper {
 
 		if(!CollectionUtils.isEmpty(fileMetadata.getExternalReferences())) {
 			final List<ExternalReferenceDTO> externalReferenceDTOS = new ArrayList<>();
-			for (FileMetadataExternalReference externalReference: fileMetadata.getExternalReferences()) {
+			for (final FileMetadataExternalReference externalReference: fileMetadata.getExternalReferences()) {
 				final ExternalReferenceDTO externalReferenceDTO = new ExternalReferenceDTO(fileMetadata.getFileId().toString(),
 					externalReference.getReferenceId(), externalReference.getSource());
 				externalReferenceDTOS.add(externalReferenceDTO);

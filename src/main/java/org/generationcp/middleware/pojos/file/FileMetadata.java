@@ -232,10 +232,10 @@ public class FileMetadata extends AbstractEntity {
 	}
 
 	public List<FileMetadataExternalReference> getExternalReferences() {
-		return externalReferences;
+		return this.externalReferences;
 	}
 
-	public void setExternalReferences(List<FileMetadataExternalReference> externalReferences) {
+	public void setExternalReferences(final List<FileMetadataExternalReference> externalReferences) {
 		this.externalReferences = externalReferences;
 	}
 
