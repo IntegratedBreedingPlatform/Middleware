@@ -141,69 +141,112 @@ public class PedigreeServiceBrapiImpl implements PedigreeServiceBrapi {
 		final Map<String, Germplasm> germplasmProgenitorsMapByUUIDs =
 			progenitors.stream().collect(Collectors.toMap(g -> String.valueOf(g.getGermplasmUUID()), Function.identity()));
 
-		germplasmForUpdate.stream().forEach(germplasm -> {
+		// Stop loop until all germplasm to be updated is already updated. TODO: Check if there's a better algorithm
+		while (!germplasmForUpdate.isEmpty()) {
+			final Iterator<Germplasm> iterator = germplasmForUpdate.listIterator();
+			while (iterator.hasNext()) {
+				final Germplasm germplasm = iterator.next();
+				if (pedigreeNodeDTOMap.containsKey(germplasm.getGermplasmUUID())) {
+					final PedigreeNodeDTO pedigreeNodeDTO = pedigreeNodeDTOMap.get(germplasm.getGermplasmUUID());
 
-			if (pedigreeNodeDTOMap.containsKey(germplasm.getGermplasmUUID())) {
-				final PedigreeNodeDTO pedigreeNodeDTO = pedigreeNodeDTOMap.get(germplasm.getGermplasmUUID());
-				final Integer femaleParentGid = this.resolveFemaleGid(pedigreeNodeDTO, germplasmProgenitorsMapByUUIDs);
-				final Integer maleParentGid = this.resolveMaleGid(pedigreeNodeDTO, germplasmProgenitorsMapByUUIDs);
-				final List<Integer> otherParentGids = this.resolveOtherParentGids(pedigreeNodeDTO, germplasmProgenitorsMapByUUIDs);
+					final Optional<PedigreeNodeReferenceDTO> parent1 = this.getParent1(pedigreeNodeDTO);
+					final Optional<PedigreeNodeReferenceDTO> parent2 = this.getParent2(pedigreeNodeDTO);
+					final List<PedigreeNodeReferenceDTO> otherParents = this.getOtherParents(pedigreeNodeDTO);
 
-				final Multimap<String, Object[]> conflictErrorsPerGermplasm = ArrayListMultimap.create();
-				PedigreeUtil.assignProgenitors(germplasm, germplasmProgenitorsMapByGIDs, conflictErrorsPerGermplasm, femaleParentGid,
-					maleParentGid, germplasm.getMethod(), otherParentGids);
+					final boolean areParentsAlreadyUpdated =
+						this.areParentsAlreadyUpdated(pedigreeNodeDTOMap, updatedGermplasmDbIds,
+							this.combineParentsAsList(parent1, parent2, otherParents));
 
-				if (conflictErrorsPerGermplasm.isEmpty()) {
-					germplasmDAO.update(germplasm);
-					updatedGermplasmDbIds.add(germplasm.getGermplasmUUID());
-				} else {
-					// Detach the germplasm from session so that any changes to it will not be automatically persisted by the transaction.
-					germplasmDAO.evict(germplasm);
-					conflictErrors.putAll(conflictErrorsPerGermplasm);
+					// If a parent is in the list of germplasm to be updated, make sure it is updated first before assigning
+					// it to the germplasm to be updated.
+					if (areParentsAlreadyUpdated) {
+						final Multimap<String, Object[]> conflictErrorsPerGermplasm = ArrayListMultimap.create();
+						PedigreeUtil.assignProgenitors(germplasm, germplasmProgenitorsMapByGIDs, conflictErrorsPerGermplasm,
+							this.resolveParentGid(parent1, germplasmProgenitorsMapByUUIDs),
+							this.resolveParentGid(parent2, germplasmProgenitorsMapByUUIDs),
+							germplasm.getMethod(),
+							otherParents.stream().map(o -> this.resolveParentGid(Optional.of(o), germplasmProgenitorsMapByUUIDs))
+								.collect(Collectors.toList()));
+
+						if (conflictErrorsPerGermplasm.isEmpty()) {
+							germplasmDAO.update(germplasm);
+							updatedGermplasmDbIds.add(germplasm.getGermplasmUUID());
+						} else {
+							// Detach the germplasm from session so that any changes to it will not be automatically persisted by the transaction.
+							germplasmDAO.evict(germplasm);
+							conflictErrors.putAll(conflictErrorsPerGermplasm);
+						}
+						// When germplasm is already updated, remove it from the list.
+						iterator.remove();
+					}
 				}
 			}
-		});
+		}
 
 		return updatedGermplasmDbIds;
 	}
 
-	private Integer resolveFemaleGid(final PedigreeNodeDTO pedigreeNodeDTO, final Map<String, Germplasm> germplasmProgenitorsMapByUUIDs) {
-		final Optional<PedigreeNodeReferenceDTO> femalePedigreeNodeReference = pedigreeNodeDTO.getParents().stream().filter(
+	private boolean areParentsAlreadyUpdated(final Map<String, PedigreeNodeDTO> pedigreeNodeDTOMap, final Set<String> updatedGermplasmDbIds,
+		final List<PedigreeNodeReferenceDTO> parents) {
+
+		for (final PedigreeNodeReferenceDTO parent : parents) {
+			// If a parent is in the list of germplasm to be updated, make sure it is updated first before assigning
+			// it to the germplasm to be updated.
+			if (pedigreeNodeDTOMap.containsKey(parent.getGermplasmDbId()) && !updatedGermplasmDbIds.contains(parent.getGermplasmDbId())) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private List<PedigreeNodeReferenceDTO> combineParentsAsList(final Optional<PedigreeNodeReferenceDTO> parent1,
+		final Optional<PedigreeNodeReferenceDTO> parent2,
+		final List<PedigreeNodeReferenceDTO> otherParents) {
+		final List<PedigreeNodeReferenceDTO> parents = new ArrayList<>();
+		if (parent1.isPresent())
+			parents.add(parent1.get());
+		if (parent2.isPresent())
+			parents.add(parent2.get());
+		parents.addAll(otherParents);
+		return parents;
+	}
+
+	private Integer resolveParentGid(final Optional<PedigreeNodeReferenceDTO> parentReference,
+		final Map<String, Germplasm> germplasmProgenitorsMapByUUIDs) {
+		if (parentReference.isPresent() && StringUtils.isNotEmpty(parentReference.get().getGermplasmDbId())) {
+			return germplasmProgenitorsMapByUUIDs.get(parentReference.get().getGermplasmDbId()).getGid();
+		}
+		return UNKNOWN;
+	}
+
+	private Optional<PedigreeNodeReferenceDTO> getParent1(final PedigreeNodeDTO pedigreeNodeDTO) {
+		return pedigreeNodeDTO.getParents().stream().filter(
 				pedigreeNodeReferenceDTO -> ParentType.FEMALE.name().equals(pedigreeNodeReferenceDTO.getParentType())
 					|| ParentType.POPULATION.name().equals(pedigreeNodeReferenceDTO.getParentType()))
 			.findAny();
-		if (femalePedigreeNodeReference.isPresent() && StringUtils.isNotEmpty(femalePedigreeNodeReference.get().getGermplasmDbId())) {
-			return germplasmProgenitorsMapByUUIDs.get(femalePedigreeNodeReference.get().getGermplasmDbId()).getGid();
-		}
-		return UNKNOWN;
 	}
 
-	private Integer resolveMaleGid(final PedigreeNodeDTO pedigreeNodeDTO, final Map<String, Germplasm> germplasmProgenitorsMapByUUIDs) {
-		final Optional<PedigreeNodeReferenceDTO> malePedigreeNodeReference = pedigreeNodeDTO.getParents().stream().filter(
+	private Optional<PedigreeNodeReferenceDTO> getParent2(final PedigreeNodeDTO pedigreeNodeDTO) {
+		return pedigreeNodeDTO.getParents().stream().filter(
 				pedigreeNodeReferenceDTO -> ParentType.MALE.name().equals(pedigreeNodeReferenceDTO.getParentType())
 					|| ParentType.SELF.name().equals(pedigreeNodeReferenceDTO.getParentType()))
 			.findFirst();
-		if (malePedigreeNodeReference.isPresent() && StringUtils.isNotEmpty(malePedigreeNodeReference.get().getGermplasmDbId())) {
-			return germplasmProgenitorsMapByUUIDs.get(malePedigreeNodeReference.get().getGermplasmDbId()).getGid();
-		}
-		return UNKNOWN;
 	}
 
-	private List<Integer> resolveOtherParentGids(final PedigreeNodeDTO pedigreeNodeDTO,
-		final Map<String, Germplasm> germplasmProgenitorsMapByUUIDs) {
+	private List<PedigreeNodeReferenceDTO> getOtherParents(final PedigreeNodeDTO pedigreeNodeDTO) {
 		final List<PedigreeNodeReferenceDTO> otherParentPedigreeNodeReferences = pedigreeNodeDTO.getParents().stream().filter(
 			pedigreeNodeReferenceDTO -> ParentType.MALE.name().equals(pedigreeNodeReferenceDTO.getParentType())).collect(
 			Collectors.toList());
 		if (!CollectionUtils.isEmpty(otherParentPedigreeNodeReferences)) {
-			final List<Integer> otherParentGids = new ArrayList<>();
+			final List<PedigreeNodeReferenceDTO> otherParents = new ArrayList<>();
 			final Iterator<PedigreeNodeReferenceDTO> iterator = otherParentPedigreeNodeReferences.iterator();
 			// Skip the first male parent
 			iterator.next();
 			while (iterator.hasNext()) {
 				final PedigreeNodeReferenceDTO pedigreeNodeReferenceDTO = iterator.next();
-				otherParentGids.add(germplasmProgenitorsMapByUUIDs.get(pedigreeNodeReferenceDTO.getGermplasmDbId()).getGid());
+				otherParents.add(pedigreeNodeReferenceDTO);
 			}
-			return otherParentGids;
+			return otherParents;
 		}
 		return new ArrayList<>();
 	}
