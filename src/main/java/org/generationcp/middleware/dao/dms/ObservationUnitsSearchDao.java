@@ -799,7 +799,6 @@ public class ObservationUnitsSearchDao extends GenericDAO<ExperimentModel, Integ
 			this.hasDescriptor(genericGermplasmDescriptors, TermId.GROUP_SOURCE_NAME) ||
 			this.hasDescriptor(genericGermplasmDescriptors, TermId.DESIG)) {
 			sql.append(GERMPLASM_JOIN);
-			sql.append(NAME_JOIN);
 		}
 
 		if (this.hasDescriptor(genericGermplasmDescriptors, TermId.IMMEDIATE_SOURCE_NAME)) {
