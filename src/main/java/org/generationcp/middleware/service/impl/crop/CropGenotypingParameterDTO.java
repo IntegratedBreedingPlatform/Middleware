@@ -13,6 +13,7 @@ public class CropGenotypingParameterDTO {
 	private String userName;
 	private String password;
 	private String programId;
+	private String baseUrl;
 
 	public String getCropName() {
 		return this.cropName;
@@ -68,6 +69,14 @@ public class CropGenotypingParameterDTO {
 
 	public void setGenotypingParameterId(final int genotypingParameterId) {
 		this.genotypingParameterId = genotypingParameterId;
+	}
+
+	public String getBaseUrl() {
+		return this.baseUrl;
+	}
+
+	public void setBaseUrl(final String baseUrl) {
+		this.baseUrl = baseUrl;
 	}
 
 	@Override

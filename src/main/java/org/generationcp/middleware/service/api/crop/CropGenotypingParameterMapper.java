@@ -14,6 +14,7 @@ public class CropGenotypingParameterMapper {
 		cropGenotypingParameterDTO.setUserName(cropGenotypingParameter.getUserName());
 		cropGenotypingParameterDTO.setPassword(cropGenotypingParameter.getPassword());
 		cropGenotypingParameterDTO.setProgramId(cropGenotypingParameter.getProgramId());
+		cropGenotypingParameterDTO.setBaseUrl(cropGenotypingParameter.getBaseUrl());
 		return cropGenotypingParameterDTO;
 	}
 
@@ -26,6 +27,7 @@ public class CropGenotypingParameterMapper {
 		cropGenotypingParameter.setUserName(cropGenotypingParameterDTO.getUserName());
 		cropGenotypingParameter.setPassword(cropGenotypingParameterDTO.getPassword());
 		cropGenotypingParameter.setProgramId(cropGenotypingParameterDTO.getProgramId());
+		cropGenotypingParameter.setBaseUrl(cropGenotypingParameter.getBaseUrl());
 		return cropGenotypingParameter;
 	}
 
@@ -37,6 +39,7 @@ public class CropGenotypingParameterMapper {
 		to.setUserName(from.getUserName());
 		to.setPassword(from.getPassword());
 		to.setProgramId(from.getProgramId());
+		to.setBaseUrl(from.getBaseUrl());
 		return cropGenotypingParameterDTO;
 	}
 
