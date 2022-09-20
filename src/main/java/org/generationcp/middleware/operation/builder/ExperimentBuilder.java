@@ -393,53 +393,15 @@ public class ExperimentBuilder extends Builder {
 			}
 
 			for (final DMSVariableType variableType : variableTypes.getVariableTypes()) {
-				final Variable var = this.createGermplasmFactor(stockModel, variableType);
+				final Variable var = this.createGermplasmFactor(stockModel, variableType, derivativeParentsMapByGids,
+					attributeMapByGidsAndAttributeId);
 				if (var != null) {
 					factors.add(var);
 				}
 			}
 
-			final DMSVariableType groupGidVariableType = variableTypes.findById(TermId.GROUPGID);
-			if (groupGidVariableType != null) {
-				factors.add(new Variable(groupGidVariableType, stockModel.getGermplasm().getMgid()));
-			}
-
-			final DMSVariableType guidVariableType = variableTypes.findById(TermId.GUID);
-			if (guidVariableType != null) {
-				factors.add(new Variable(guidVariableType, stockModel.getGermplasm().getGermplasmUUID()));
-			}
-
-			final DMSVariableType crossVariableType = variableTypes.findById(TermId.CROSS);
-			if (crossVariableType != null) {
-				factors.add(new Variable(crossVariableType, stockModel.getCross()));
-			}
-
-			final DMSVariableType immediateSourceNameVariableType = variableTypes.findById(TermId.IMMEDIATE_SOURCE_NAME);
-			if (immediateSourceNameVariableType != null) {
-				final String immediateSourceName =
-					derivativeParentsMapByGids.get(stockModel.getGermplasm().getGid()).getRight();
-				factors.add(new Variable(immediateSourceNameVariableType, immediateSourceName));
-			}
-
-			final DMSVariableType groupSourceNameVariableType = variableTypes.findById(TermId.GROUP_SOURCE_NAME);
-			if (groupSourceNameVariableType != null) {
-				final String groupSourceName =
-					derivativeParentsMapByGids.get(stockModel.getGermplasm().getGid()).getLeft();
-				factors.add(new Variable(groupSourceNameVariableType, groupSourceName));
-			}
-
 			if (variableTypes.getVariableTypes().stream().anyMatch(this::entryVariablesHasParent)) {
 				this.generatePedigreeTable(pedigreeTreeNodeTable, stockModel, variableTypes, factors);
-			}
-
-			if (this.checkVariableTypeIsGermplasmPassportOrAttribute(variableTypes)) {
-				final StockModel finalStockModel = stockModel;
-				variableTypes.getVariableTypes().stream().filter(variableType -> variableType.getVariableType() == VariableType.GERMPLASM_ATTRIBUTE ||
-					variableType.getVariableType() == VariableType.GERMPLASM_PASSPORT)
-					.forEach(variableType -> {
-						final String attributeValue = (String) attributeMapByGidsAndAttributeId.get(finalStockModel.getGermplasm().getGid(), variableType.getStandardVariable().getId());
-						factors.add(new Variable(variableType, attributeValue));
-					});
 			}
 		}
 	}
@@ -493,7 +455,9 @@ public class ExperimentBuilder extends Builder {
 			variableType.getId() ==  TermId.MALE_PARENT_NAME.getId();
 	}
 
-	protected Variable createGermplasmFactor(final StockModel stockModel, final DMSVariableType variableType) {
+	protected Variable createGermplasmFactor(final StockModel stockModel, final DMSVariableType variableType,
+		final Map<Integer, Pair<String, String>> derivativeParentsMapByGids,
+		final MultiKeyMap attributeMapByGidsAndAttributeId) {
 		final StandardVariable standardVariable = variableType.getStandardVariable();
 
 		if (standardVariable.getId() == TermId.ENTRY_NO.getId()) {
@@ -505,8 +469,37 @@ public class ExperimentBuilder extends Builder {
 		if (standardVariable.getId() == TermId.DESIG.getId()) {
 			return new Variable(variableType, stockModel.getName());
 		}
-		final String val = this.findStockValue(variableType.getId(), stockModel.getProperties());
 
+		if (standardVariable.getId() == TermId.GROUPGID.getId()) {
+			return new Variable(variableType, stockModel.getGermplasm().getMgid());
+		}
+
+		if (standardVariable.getId() == TermId.GUID.getId()) {
+			return new Variable(variableType, stockModel.getGermplasm().getGermplasmUUID());
+		}
+
+		if (standardVariable.getId() == TermId.CROSS.getId()) {
+			return new Variable(variableType, stockModel.getCross());
+		}
+
+		if (standardVariable.getId() == TermId.IMMEDIATE_SOURCE_NAME.getId()) {
+			final String immediateSourceName =
+				derivativeParentsMapByGids.get(stockModel.getGermplasm().getGid()).getRight();
+			return new Variable(variableType, immediateSourceName);
+		}
+
+		if (standardVariable.getId() == TermId.GROUP_SOURCE_NAME.getId()) {
+			final String groupSourceName =
+				derivativeParentsMapByGids.get(stockModel.getGermplasm().getGid()).getLeft();
+			return new Variable(variableType, groupSourceName);
+		}
+
+		if (this.variableTypeIsGermplasmPassportOrAttribute(variableType)) {
+			final String attributeValue = (String) attributeMapByGidsAndAttributeId.get(stockModel.getGermplasm().getGid(), variableType.getStandardVariable().getId());
+			return new Variable(variableType, attributeValue);
+		}
+
+		final String val = this.findStockValue(variableType.getId(), stockModel.getProperties());
 		if (standardVariable.isCategorical()) {
 			return new Variable(variableType, Strings.nullToEmpty(val));
 		}
@@ -587,8 +580,12 @@ public class ExperimentBuilder extends Builder {
 	private boolean checkVariableTypeIsGermplasmPassportOrAttribute(final VariableTypeList variableTypes) {
 		return variableTypes.getVariableTypes()
 			.stream()
-			.anyMatch(variableType -> variableType.getVariableType() == VariableType.GERMPLASM_ATTRIBUTE ||
-				variableType.getVariableType() == VariableType.GERMPLASM_PASSPORT);
+			.anyMatch(this::variableTypeIsGermplasmPassportOrAttribute);
+	}
+
+	private boolean variableTypeIsGermplasmPassportOrAttribute(DMSVariableType variableType) {
+		return variableType.getVariableType() == VariableType.GERMPLASM_ATTRIBUTE ||
+			variableType.getVariableType() == VariableType.GERMPLASM_PASSPORT;
 	}
 
 }
