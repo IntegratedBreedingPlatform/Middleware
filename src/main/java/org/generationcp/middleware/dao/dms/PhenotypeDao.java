@@ -1180,13 +1180,6 @@ public class PhenotypeDao extends GenericDAO<Phenotype, Integer> {
 			.map(obs -> ObservationLevelMapper.getDatasetTypeNameByObservationLevelName(obs.getLevelName()))
 			.collect(Collectors.toSet());
 
-		// dataset type name filter from observation level orders
-		final List<Integer> observationLevelOrders = requestDTO.getObservationLevelRelationships()
-			.stream().filter(obs -> obs.getLevelOrder() != null)
-			.map(ObservationLevelRelationship::getLevelOrder)
-			.collect(Collectors.toList());
-		datasetTypeNames.addAll(ObservationLevelMapper.getDatasetTypeNamesByObservationLevelOrder(observationLevelOrders));
-
 		if (!CollectionUtils.isEmpty(datasetTypeNames)) {
 			queryString.append(" AND dataset_type.name IN (:datasetTypeNames) ");
 			requestDTO.setDatasetTypeNames(datasetTypeNames);

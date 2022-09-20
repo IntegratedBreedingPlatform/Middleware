@@ -3,9 +3,6 @@ package org.generationcp.middleware.api.brapi.v2.observationunit;
 import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ObservationLevelMapper {
 
 	/**
@@ -51,24 +48,4 @@ public class ObservationLevelMapper {
 		return observationLevelName;
 	}
 
-	public static List<String> getDatasetTypeNamesByObservationLevelOrder(final List<Integer> observationLevelOrders) {
-		final List<String> datasetTypeNames = new ArrayList<>();
-		if (observationLevelOrders.contains(ObservationLevelEnum.PLOT.getLevelOrder())) {
-			datasetTypeNames.add(DatasetTypeEnum.PLOT_DATA.getName());
-		} else if (observationLevelOrders.contains(ObservationLevelEnum.PLANT.getLevelOrder())) {
-			datasetTypeNames.add(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getName());
-		} else if (observationLevelOrders.contains(ObservationLevelEnum.TIMESERIES.getLevelOrder())) {
-			datasetTypeNames.add(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getName());
-		} else if (observationLevelOrders.contains(ObservationLevelEnum.SUB_PLOT.getLevelOrder())) {
-			datasetTypeNames.add(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getName());
-		} else if (observationLevelOrders.contains(ObservationLevelEnum.CUSTOM.getLevelOrder())) {
-			datasetTypeNames.add(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getName());
-		} else if (observationLevelOrders.contains(ObservationLevelEnum.MEANS.getLevelOrder())) {
-			datasetTypeNames.add(DatasetTypeEnum.MEANS_DATA.getName());
-		} else if (observationLevelOrders.contains(ObservationLevelEnum.SUMMARY_STATISTICS.getLevelOrder())) {
-			datasetTypeNames.add(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getName());
-		}
-
-		return datasetTypeNames;
-	}
 }
