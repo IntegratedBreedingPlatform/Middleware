@@ -90,6 +90,9 @@ public class VariableServiceBrapiImpl implements VariableServiceBrapi {
 			for (final VariableDTO dto : variableDTOS) {
 				if (variableTypeMultimap.get(Integer.valueOf(dto.getObservationVariableDbId())).contains(VariableType.ANALYSIS)) {
 					dto.getContextOfUse().add(VariableDTO.ContextOfUseEnum.MEANS.toString());
+				} else if (variableTypeMultimap.get(Integer.valueOf(dto.getObservationVariableDbId()))
+					.contains(VariableType.ANALYSIS_SUMMARY)) {
+					dto.getContextOfUse().add(VariableDTO.ContextOfUseEnum.SUMMARY.toString());
 				} else {
 					dto.getContextOfUse().add(VariableDTO.ContextOfUseEnum.PLOT.toString());
 				}

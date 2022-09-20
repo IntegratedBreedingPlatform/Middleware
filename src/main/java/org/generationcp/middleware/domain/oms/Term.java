@@ -33,6 +33,8 @@ public class Term implements Serializable {
 
 	private Boolean obsolete;
 
+	private Boolean isSystem;
+
 	public Term() {
 	}
 
@@ -62,7 +64,7 @@ public class Term implements Serializable {
 		return this.vocabularyId;
 	}
 
-	public void setVocabularyId(int vocabularyId) {
+	public void setVocabularyId(final int vocabularyId) {
 		this.vocabularyId = vocabularyId;
 	}
 
@@ -70,7 +72,7 @@ public class Term implements Serializable {
 		return this.name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 
@@ -78,11 +80,11 @@ public class Term implements Serializable {
 		return this.definition;
 	}
 
-	public void setDefinition(String definition) {
+	public void setDefinition(final String definition) {
 		this.definition = definition;
 	}
 
-	public static Term fromCVTerm(CVTerm cvTerm) {
+	public static Term fromCVTerm(final CVTerm cvTerm) {
 		if (cvTerm == null) {
 			return null;
 		}
@@ -93,6 +95,7 @@ public class Term implements Serializable {
 		term.setDefinition(cvTerm.getDefinition());
 		term.setVocabularyId(cvTerm.getCv());
 		term.setObsolete(cvTerm.isObsolete());
+		term.setSystem(cvTerm.getIsSystem());
 		return term;
 	}
 
@@ -103,16 +106,18 @@ public class Term implements Serializable {
 		cvTerm.setName(this.getName());
 		cvTerm.setDefinition(this.getDefinition());
 		cvTerm.setIsObsolete(this.isObsolete());
+		cvTerm.setIsSystem(this.isSystem());
 		cvTerm.setIsRelationshipType(false);
 		return cvTerm;
 	}
 
-	public void print(int indent) {
+	public void print(final int indent) {
 		Debug.println(indent, "Id: " + this.getId());
 		Debug.println(indent, "Vocabulary: " + this.getVocabularyId());
 		Debug.println(indent, "Name: " + this.getName());
 		Debug.println(indent, "Definition: " + this.getDefinition());
 		Debug.println(indent, "Obsolete: " + this.obsolete);
+		Debug.println(indent, "IsSystem: " + this.isSystem);
 	}
 
 	@Override
@@ -121,7 +126,7 @@ public class Term implements Serializable {
 	}
 
 	@Override
-	public boolean equals(Object obj) {
+	public boolean equals(final Object obj) {
 		if (obj == null) {
 			return false;
 		}
@@ -135,14 +140,22 @@ public class Term implements Serializable {
 	@Override
 	public String toString() {
 		return "Term [id=" + this.id + ", name=" + this.name + ", definition=" + this.definition + ", vocabularyId=" + this.vocabularyId
-				+ ", obsolete=" + this.obsolete + "]";
+				+ ", obsolete=" + this.obsolete + ",IsSystem= " + this.isSystem + "]";
 	}
 
-	public void setObsolete(Boolean obsolete) {
+	public void setObsolete(final Boolean obsolete) {
 		this.obsolete = obsolete;
 	}
 
 	public boolean isObsolete() {
 		return this.obsolete == null ? false : this.obsolete;
+	}
+
+	public boolean isSystem() {
+		return this.isSystem == null ? false : this.isSystem;
+	}
+
+	public void setSystem(final Boolean system) {
+		this.isSystem = system;
 	}
 }

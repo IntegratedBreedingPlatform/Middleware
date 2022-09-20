@@ -5,6 +5,7 @@ import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.list.GermplasmListImportRequestDTO;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDataDAO;
 import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmListSearchRequestDTO;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -49,6 +50,9 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 
 	@Autowired
 	private GermplasmService germplasmService;
+
+	@Autowired
+	private GermplasmListDataService germplasmListDataService;
 
 	private final DaoFactory daoFactory;
 
@@ -100,6 +104,10 @@ public class GermplasmListServiceBrapiImpl implements GermplasmListServiceBrapi 
 		for(final GermplasmListImportRequestDTO importRequestDTO: importRequestDTOS) {
 			final GermplasmList germplasmList = this.saveGermplasmList(importRequestDTO);
 			this.saveGermplasmListData(germplasmList, importRequestDTO.getData(), crossExpansions, plotCodeValuesByGIDs, guuidGidMap);
+
+			// Add default columns
+			this.germplasmListDataService.saveDefaultView(germplasmList);
+
 			savedListIds.add(germplasmList.getId().toString());
 		}
 		final GermplasmListSearchRequestDTO germplasmListSearchRequestDTO = new GermplasmListSearchRequestDTO();

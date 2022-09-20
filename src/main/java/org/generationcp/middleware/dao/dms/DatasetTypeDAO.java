@@ -1,16 +1,19 @@
 package org.generationcp.middleware.dao.dms;
 
+import org.generationcp.middleware.api.brapi.v2.observationunit.ObservationLevelMapper;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
+import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.hibernate.HibernateException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DatasetTypeDAO extends GenericDAO<DatasetType, Integer> {
 
@@ -44,14 +47,21 @@ public class DatasetTypeDAO extends GenericDAO<DatasetType, Integer> {
 		final Criteria criteria = this.getObservationLevelsCriteria();
 		criteria.setFirstResult(pageSize * (pageNumber - 1));
 		criteria.setMaxResults(pageSize);
-		return criteria.list();
+
+		final List<String> datasetNames = criteria.list();
+
+		// Convert dataset names to brapi observation level name
+		return datasetNames.stream().map(datasetName -> {
+			final DatasetTypeEnum datasetTypeEnum = DatasetTypeEnum.getByName(datasetName);
+			return ObservationLevelMapper.getObservationLevelNameEnumByDataset(datasetTypeEnum);
+		}).collect(Collectors.toList());
 	}
 
 	public long countObservationLevels() {
-		try{
+		try {
 			final Criteria criteria = this.getObservationLevelsCriteria();
 			criteria.setProjection(Projections.rowCount());
-			return	((Long) criteria.uniqueResult()).longValue();
+			return ((Long) criteria.uniqueResult()).longValue();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in countObservationLevels(): " + e.getMessage(), e);
 		}

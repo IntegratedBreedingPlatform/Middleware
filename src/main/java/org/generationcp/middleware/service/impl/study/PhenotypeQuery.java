@@ -2,6 +2,7 @@ package org.generationcp.middleware.service.impl.study;
 
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 
 public class PhenotypeQuery {
 
@@ -13,7 +14,7 @@ public class PhenotypeQuery {
 		+ "  dataset_type.name AS datasetName, " //
 		+ "  NULL AS plantNumber, " // Until we have plant level observation
 		+ "  g.germplsm_uuid AS germplasmDbId, " //
-		+ "  s.name AS germplasmName, " //
+		+ "  names.nval AS germplasmName, " //
 		+ "  gl.description AS instanceNumber, " //
 		+ "  gl.nd_geolocation_id AS studyDbId, " //
 		+ "  concat(p.name, '_', gl.description) AS studyName, " //
@@ -37,14 +38,17 @@ public class PhenotypeQuery {
 		+ "  dataset.program_uuid as programDbId,"
 		+ "  p.project_id as trialDbId, " //
 		+ "  p.name as trialDbName, "//
-		+ "  dataset.project_id as datasetDbId "
+		+ "  dataset.project_id as datasetDbId, "
+		+ "  nde.parent_id as experimentParentId "
 		+ " FROM " //
 		+ "  project dataset " //
 		+ "  INNER JOIN nd_experiment nde ON nde.project_id = dataset.project_id " //
 		+ "  INNER JOIN nd_geolocation gl ON nde.nd_geolocation_id = gl.nd_geolocation_id " //
-		+ "  INNER JOIN stock s ON s.stock_id = nde.stock_id " //
+		// Use LEFT JOIN to stock and germplsm so that we can also retrieve the SUMMARY_STATISTICS records -- which don't have germplasm associated to them.
+		+ "  LEFT JOIN stock s ON s.stock_id = nde.stock_id " //
+		+ "  LEFT JOIN germplsm g ON g.gid = s.dbxref_id "
+		+ "  LEFT JOIN names ON names.gid = g.gid AND names.nstat = 1 " //
 		+ "  INNER JOIN project p ON p.project_id = dataset.study_id " //
-		+ "  INNER JOIN germplsm g ON g.gid = s.dbxref_id "
 		+ "  LEFT JOIN workbench.workbench_project wp ON p.program_uuid = wp.project_uuid " //
 		+ "  LEFT JOIN nd_experimentprop plotNumber ON plotNumber.nd_experiment_id = nde.nd_experiment_id AND plotNumber.type_id = "
 		+ TermId.PLOT_NO.getId() //
@@ -56,7 +60,9 @@ public class PhenotypeQuery {
 		+ "  LEFT JOIN nd_geolocationprop gp ON gl.nd_geolocation_id = gp.nd_geolocation_id AND gp.type_id = " + TermId.LOCATION_ID.getId()
 		+ " AND gp.nd_geolocation_id = gl.nd_geolocation_id " //
 		+ "  LEFT JOIN location l ON l.locid = gp.value " //
-		+ " WHERE p.deleted = 0 " //
+		+ " WHERE p.deleted = 0 "
+		// Exclude the SUMMARY (environments dataset) records
+		+ " AND dataset.dataset_type_id <> " + DatasetTypeEnum.SUMMARY_DATA.getId() + " " //
 		; //
 
 	public static final String PHENOTYPE_SEARCH_STUDY_DB_ID_FILTER = " AND gl.nd_geolocation_id in (:studyDbIds) ";
@@ -73,13 +79,20 @@ public class PhenotypeQuery {
 		;
 
 	public static final String TREATMENT_FACTORS_SEARCH_OBSERVATIONS = "SELECT DISTINCT "
-		+ "    CVT.NAME AS factor, pp.value AS modality, nde.nd_experiment_id as nd_experiment_id "
-		+ "FROM "
-		+ "    projectprop pp "
-		+ "        INNER JOIN "
-		+ "    CVTERM CVT ON PP.VARIABLE_ID = CVT.cvterm_id "
-		+ " INNER JOIN nd_experiment nde ON nde.project_id = pp.project_id"
-		+ " WHERE "
-		+ "    PP.type_id = " + TermId.MULTIFACTORIAL_INFO.getId()
-		+ " AND nde.nd_experiment_id in (:ndExperimentIds) ";
+		+ "CVT.NAME AS factor, "
+		// If treatment variable is categorical, return the actual selected categorical name, else return the treatment variable's value from experiment property.
+		+ "CASE WHEN cvterm_datatype.object_id = " + TermId.CATEGORICAL_VARIABLE.getId()
+		+ " THEN cvterm_value.name ELSE ndep.value END as modality, "
+		+ "nde.nd_experiment_id as nd_experiment_id "
+		+ "FROM projectprop pp "
+		+ "INNER JOIN cvterm cvt ON pp.VARIABLE_ID = cvt.cvterm_id "
+		+ "INNER JOIN nd_experiment nde ON nde.project_id = pp.project_id AND pp.type_id = " + TermId.MULTIFACTORIAL_INFO.getId() + " "
+		+ "INNER JOIN nd_experimentprop ndep ON nde.nd_experiment_id = ndep.nd_experiment_id AND pp.variable_id = ndep.type_id "
+		// Get the scale/datatype to determine if the variable is categorical, so that we can get the actual name of the selected categorical value
+		+ "INNER JOIN cvterm_relationship cvterm_scale ON cvterm_scale.type_id = " + TermId.HAS_SCALE.getId()
+		+ " AND cvterm_scale.subject_id = pp.variable_id "
+		+ "INNER JOIN cvterm_relationship cvterm_datatype ON cvterm_datatype.type_id = " + TermId.HAS_TYPE.getId()
+		+ " AND cvterm_datatype.subject_id = cvterm_scale.object_id "
+		+ "LEFT JOIN cvterm cvterm_value ON cvterm_value.cvterm_id = ndep.value "
+		+ "WHERE nde.nd_experiment_id in (:ndExperimentIds);";
 }

@@ -36,7 +36,7 @@ public interface OntologyDataManagerImplTestConstants {
 	public static int EXPECTED_TERM_METHOD_ID = 4020;
 
 	public static int NONEXISTING_TERM_TRAIT_CLASS_ID = 21744;
-	public static int EXPECTED_TERM_TRAIT_CLASS_ID = 1100;
+	public static int EXPECTED_TERM_TRAIT_CLASS_ID = 1340;
 
 	/* OLD constants used by the tests */
 	public static final Integer CV_TERM_ID = 1010;

@@ -123,8 +123,7 @@ public class Phenotype implements Serializable {
 	@Column(name = "draft_cvalue_id")
 	private Integer draftCValueId;
 
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-	@JoinColumn(name = "phenotype_id")
+	@OneToMany(mappedBy = "phenotype", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<PhenotypeExternalReference> externalReferences = new ArrayList<>();
 
 	@Transient

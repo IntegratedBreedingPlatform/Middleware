@@ -11,7 +11,11 @@ import org.generationcp.middleware.pojos.Progenitor;
 import org.generationcp.middleware.util.MaxPedigreeLevelReachedException;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import static org.generationcp.middleware.util.Debug.debug;
 
 public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 
@@ -20,6 +24,8 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	public static final int MAX_GENERATIONS_COUNT = 5;
 	private static final ThreadLocal<Integer> GENERATIONS_COUNTER = new ThreadLocal<>();
 	private static final ThreadLocal<Boolean> CALCULATE_FULL = new ThreadLocal<>();
+
+	private final Map<Integer, GermplasmTreeNode> nodes = new HashMap<>();
 
 	public GermplasmPedigreeServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
@@ -196,6 +202,9 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	 */
 	private GermplasmTreeNode addParents(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
 		final boolean excludeDerivativeLines) {
+
+		debug("GermplasmPedigreeServiceImpl.addParents(node=%s (%s), level=%s", node.getGid(), node.getPreferredName(), level);
+
 		if (level != 1) {
 			final int maleGid = germplasm.getMaleParent() == null ? 0 : germplasm.getMaleParent().getGid();
 			final int femaleGid = germplasm.getFemaleParent() == null ? 0 : germplasm.getFemaleParent().getGid();
@@ -220,6 +229,10 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 				this.addNodeForParents(node, level, germplasm, excludeDerivativeLines);
 			}
 		}
+
+		// node expansion has finished at this point, memoize to avoid re-evaluation
+		this.nodes.put(node.getGid(), node);
+
 		return node;
 	}
 
@@ -238,6 +251,12 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 			if (germplasm.getGnpgs() > 2) {
 				for (final Progenitor progenitor : germplasm.getOtherProgenitors()) {
 					final Germplasm otherParent = progenitor.getProgenitorGermplasm();
+					final GermplasmTreeNode memoizedNode = this.getMemoizedNode(otherParent, level);
+					if (memoizedNode != null) {
+						node.getOtherProgenitors().add(memoizedNode);
+						continue;
+					}
+
 					final GermplasmTreeNode maleParentNode = new GermplasmTreeNode(otherParent);
 					node.getOtherProgenitors().add(this.addParents(maleParentNode, level - 1, otherParent, excludeDerivativeLines));
 				}
@@ -254,6 +273,12 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	private void addMaleParentNode(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
 		final boolean excludeDerivativeLines) {
 		if (germplasm != null) {
+			final GermplasmTreeNode memoizedNode = this.getMemoizedNode(germplasm, level);
+			if (memoizedNode != null) {
+				node.setMaleParentNode(memoizedNode);
+				return;
+			}
+
 			final GermplasmTreeNode maleParentNode = new GermplasmTreeNode(germplasm);
 			node.setMaleParentNode(maleParentNode);
 			this.addParents(maleParentNode, level - 1, germplasm, excludeDerivativeLines);
@@ -263,6 +288,11 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 	private void addFemaleParentNode(final GermplasmTreeNode node, final int level, final Germplasm germplasm,
 		final boolean excludeDerivativeLines) {
 		if (germplasm != null) {
+			final GermplasmTreeNode memoizedNode = this.getMemoizedNode(germplasm, level);
+			if (memoizedNode != null) {
+				node.setFemaleParentNode(memoizedNode);
+				return;
+			}
 			final GermplasmTreeNode femaleParentNode = new GermplasmTreeNode(germplasm);
 			node.setFemaleParentNode(femaleParentNode);
 			this.addParents(femaleParentNode, level - 1, germplasm, excludeDerivativeLines);
@@ -348,6 +378,15 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 			this.incrementGenerationsCounter();
 			return this.getNumberOfGenerations(germplasm, true);
 		}
+	}
+
+	private GermplasmTreeNode getMemoizedNode(final Germplasm germplasm, final Object level) {
+		final GermplasmTreeNode node = this.nodes.get(germplasm.getGid());
+		if (node != null) {
+			debug("GermplasmPedigreeServiceImpl trackedNode (gid=%s (%s), level=%s",
+				node.getGid(), node.getPreferredName(), level);
+		}
+		return node;
 	}
 
 }

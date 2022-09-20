@@ -117,6 +117,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 	private static final String OBS_SET_CROP_ONTOLOGY_ID = "cropOntologyId";
 	private static final String OBS_SET_VARIABLE_VALUE = "variableValue";
 	private static final String OBS_SET_SCALE_ID = "scaleId";
+	private static final String OBS_SET_IS_SYSTEM_VARIABLE = "isSystem";
 
 	public static final String STUDY_NAME_BRAPI = "CONCAT(pmain.name, ' Environment Number ', geoloc.description)";
 
@@ -987,6 +988,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "   pp.variable_id AS " + OBS_SET_VARIABLE_ID + ", "  //
 				+ "   variable.name AS " + OBS_SET_VARIABLE_NAME + ", "  //
 				+ "   variable.definition AS " + OBS_SET_DESCRIPTION + ", "  //
+				+ "	  variable.is_system as " + OBS_SET_IS_SYSTEM_VARIABLE + ", "  //
 				+ "   pp.alias AS " + OBS_SET_ALIAS + ", "  //
 				+ "   pp.value as " + OBS_SET_VALUE + ", "
 				+ "   variableType.cvterm_id AS " + OBS_SET_VARIABLE_TYPE_ID + ", "  //
@@ -1045,6 +1047,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				.addScalar(OBS_SET_VARIABLE_ID)
 				.addScalar(OBS_SET_VARIABLE_NAME)
 				.addScalar(OBS_SET_DESCRIPTION)
+				.addScalar(OBS_SET_IS_SYSTEM_VARIABLE, new BooleanType())
 				.addScalar(OBS_SET_ALIAS)
 				.addScalar(OBS_SET_VALUE)
 				.addScalar(OBS_SET_VARIABLE_TYPE_ID)
@@ -1082,6 +1085,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 					measurementVariable.setAlias((String) result.get(OBS_SET_ALIAS));
 					measurementVariable.setValue((String) result.get(OBS_SET_VALUE));
 					measurementVariable.setDescription((String) result.get(OBS_SET_DESCRIPTION));
+					measurementVariable.setIsSystemVariable(Boolean.TRUE.equals(result.get(OBS_SET_IS_SYSTEM_VARIABLE)));
 					measurementVariable.setScale((String) result.get(OBS_SET_SCALE));
 					measurementVariable.setMethod((String) result.get(OBS_SET_METHOD));
 					measurementVariable.setProperty((String) result.get(OBS_SET_PROPERTY));

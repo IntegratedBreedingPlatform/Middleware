@@ -23,6 +23,7 @@ public class BreedingMethodMapper {
 		to.setMfprg(Method.NO_FEMALE_PARENTS_DEFAULT);
 		to.setReference(Method.METHOD_REFERENCE_DEFAULT);
 
+		to.setSnametype(from.getSnameTypeId());
 		to.setSeparator(from.getSeparator());
 		to.setPrefix(from.getPrefix());
 		to.setCount(from.getCount());
@@ -41,5 +42,6 @@ public class BreedingMethodMapper {
 			to.setPrefix(from.getPrefix());
 			to.setCount(from.getCount());
 			to.setSuffix(from.getSuffix());
+			to.setSnametype(from.getSnameTypeId());
 	}
 }
