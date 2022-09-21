@@ -3,7 +3,9 @@ package org.generationcp.middleware.api.brapi;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
+import org.generationcp.middleware.api.brapi.v2.study.StudyUpdateRequestDTO;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -26,7 +28,6 @@ import org.generationcp.middleware.service.api.ontology.CategoricalValueNameVali
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.study.EnvironmentParameter;
-import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
@@ -77,7 +78,6 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 	private final DaoFactory daoFactory;
 	private final HibernateSessionProvider sessionProvider;
 
-
 	public StudyServiceBrapiImpl(final HibernateSessionProvider sessionProvider) {
 		this.daoFactory = new DaoFactory(sessionProvider);
 		this.sessionProvider = sessionProvider;
@@ -85,7 +85,7 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 
 	@Override
 	public Optional<StudyDetailsDto> getStudyDetailsByInstance(final Integer instanceId) {
-			final StudyMetadata studyMetadata = this.daoFactory.getDmsProjectDAO().getStudyMetadataForInstanceId(instanceId);
+		final StudyMetadata studyMetadata = this.daoFactory.getDmsProjectDAO().getStudyMetadataForInstanceId(instanceId);
 		if (studyMetadata != null) {
 			final StudyDetailsDto studyDetailsDto = new StudyDetailsDto();
 			studyDetailsDto.setMetadata(studyMetadata);
@@ -265,7 +265,8 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 				Arrays.asList(VariableType.ENVIRONMENT_CONDITION.getName(), VariableType.ENVIRONMENT_DETAIL.getName()));
 
 		final List<Integer> categoricalVariableIds =
-			environmentVariablesMap.values().stream().filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
+			environmentVariablesMap.values().stream()
+				.filter(measurementVariable -> DataType.CATEGORICAL_VARIABLE.getId().equals(measurementVariable.getDataTypeId()))
 				.map(MeasurementVariable::getTermId).collect(Collectors.toList());
 
 		//Include season variable to the categorical values
@@ -310,6 +311,17 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 		final StudySearchFilter filter = new StudySearchFilter();
 		filter.setStudyDbIds(studyIds);
 		return this.getStudyInstancesWithMetadata(filter, null);
+	}
+
+	@Override
+	public StudyInstanceDto updateObservationVariable(final Integer studyDbId, final StudyUpdateRequestDTO studyUpdateRequestDTO) {
+
+		// For Study
+		// Update environmentParemeters
+		// Update locationDbId
+		// Update observationVariableDbIds
+
+		return null;
 	}
 
 	private Map<Integer, Location> getLocationsMap(final List<Integer> locationDbIds) {
@@ -447,8 +459,9 @@ public class StudyServiceBrapiImpl implements StudyServiceBrapi {
 					if (measurementVariable != null) {
 						measurementVariable.setValue(environmentParameter.getValue());
 						final DataType dataType = DataType.getById(measurementVariable.getDataTypeId());
-						final java.util.Optional<VariableValueValidator> dataValidator = DataType.CATEGORICAL_VARIABLE.equals(dataType) ? Optional.of(categoricalValueNameValidator) :
-							this.variableDataValidatorFactory.getValidator(dataType);
+						final java.util.Optional<VariableValueValidator> dataValidator =
+							DataType.CATEGORICAL_VARIABLE.equals(dataType) ? Optional.of(categoricalValueNameValidator) :
+								this.variableDataValidatorFactory.getValidator(dataType);
 						if (categoricalValuesMap.containsKey(measurementVariable.getTermId())) {
 							measurementVariable.setPossibleValues(categoricalValuesMap.get(measurementVariable.getTermId()));
 						}
