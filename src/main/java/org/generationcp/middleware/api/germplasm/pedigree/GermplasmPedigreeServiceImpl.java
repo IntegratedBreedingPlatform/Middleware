@@ -173,7 +173,7 @@ public class GermplasmPedigreeServiceImpl implements GermplasmPedigreeService {
 			//for MAN neighborhood, move the step count only if the ancestor is a MAN.
 			//otherwise, skip through the ancestor without changing the step count
 			if (methodType == 'M') {
-				final Method method = this.daoFactory.getMethodDAO().getById(germplasm.getMethodId());
+				final Method method = germplasm.getMethod();
 				if (method != null && "MAN".equals(method.getMtype())) {
 					nextStep--;
 				}

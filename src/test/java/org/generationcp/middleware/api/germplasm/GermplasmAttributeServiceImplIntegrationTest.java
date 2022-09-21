@@ -5,7 +5,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.domain.shared.AttributeRequestDto;
-import org.generationcp.middleware.domain.oms.CvId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -37,7 +36,7 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 	private static final String ATTRIBUTE_VALUE = RandomStringUtils.randomAlphanumeric(5);
 	private static final Integer LOCATION_ID = 1;
 	private static final String ATTRIBUTE_DATE = "20210316";
-	private Integer userId, attributeId;
+	private Integer userId;
 	private String creationDate;
 
 	private DaoFactory daoFactory;
@@ -53,7 +52,6 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 		this.daoFactory = new DaoFactory(this.sessionProvder);
 		this.userId = this.findAdminUser();
 		this.creationDate = "20201212";
-		this.attributeId = this.daoFactory.getCvTermDao().getByNameAndCvId(NOTE_ATTRIBUTE, CvId.VARIABLES.getId()).getCvTermId();
 	}
 
 	@Test
@@ -132,7 +130,7 @@ public class GermplasmAttributeServiceImplIntegrationTest  extends IntegrationTe
 
 	private Germplasm createGermplasm(final Method method, final String germplasmUUID, final Location location, final Integer gnpgs,
 		final Integer gpid1, final Integer gpid2, final Bibref reference) {
-		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, gpid2,
+		final Germplasm germplasm = new Germplasm(null, gnpgs, gpid1, gpid2,
 			0, (location == null) ? 0 : location.getLocid(), Integer.parseInt(this.creationDate), 0,
 			0, 0, null, null, method);
 		if (StringUtils.isNotEmpty(germplasmUUID)) {
