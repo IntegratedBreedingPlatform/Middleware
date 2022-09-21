@@ -280,7 +280,6 @@ public class IntegrationTestDataInitializer {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
-		stockModel.setName("Germplasm " + RandomStringUtils.randomAlphanumeric(5));
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
 		stockModel.setCross("-");

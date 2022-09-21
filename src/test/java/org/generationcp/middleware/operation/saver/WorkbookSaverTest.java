@@ -384,7 +384,7 @@ public class WorkbookSaverTest extends TestOutputFormatter {
 		workbook.getStudyDetails().setId(1);
 
 		final Random random = new Random();
-		final StockModel stock = new StockModel(random.nextInt(), random.nextInt(), RandomStringUtils.randomAlphabetic(10), "1",
+		final StockModel stock = new StockModel(random.nextInt(), random.nextInt(), "1",
 			RandomStringUtils.randomAlphabetic(10), false);
 		workbook.setObservations(MeasurementRowTestDataInitializer.
 			createMeasurementRowList(TermId.ENTRY_NO.getId(), TermId.ENTRY_NO.name(), "1",

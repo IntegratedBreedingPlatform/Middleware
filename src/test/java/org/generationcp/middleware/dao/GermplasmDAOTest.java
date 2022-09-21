@@ -730,7 +730,6 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
-		stockModel.setName("Germplasm 1");
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
 		stockModel.setCross("-");

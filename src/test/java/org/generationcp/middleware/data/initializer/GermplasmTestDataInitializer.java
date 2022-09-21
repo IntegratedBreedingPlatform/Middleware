@@ -7,6 +7,7 @@ import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.util.Util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
@@ -66,8 +67,10 @@ public class GermplasmTestDataInitializer {
 		germplasm.setMgid(mgId);
 		germplasm.setReferenceId(referenceId);
 		germplasm.setLocationName(locationName);
-		germplasm.setPreferredName(GermplasmTestDataInitializer.createGermplasmName(ThreadLocalRandom.current().nextInt(1, Integer
-			.MAX_VALUE)));
+		final Name name = GermplasmTestDataInitializer.createGermplasmName(ThreadLocalRandom.current().nextInt(1, Integer
+			.MAX_VALUE));
+		name.setNstat(1);
+		germplasm.setPreferredName(name);
 		return germplasm;
 	}
 

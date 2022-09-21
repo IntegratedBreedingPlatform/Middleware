@@ -574,7 +574,6 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			stockModel.setUniqueName(Integer.toString(entryNo));
 		}
 
-		stockModel.setName(germplasmDTO.getGermplasmName());
 		stockModel.setProject(new DmsProject(Integer.valueOf(dto.getTrialDbId())));
 		stockModel.setIsObsolete(false);
 

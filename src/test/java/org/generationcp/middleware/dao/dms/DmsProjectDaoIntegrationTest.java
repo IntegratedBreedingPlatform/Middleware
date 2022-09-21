@@ -317,7 +317,6 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
-		stockModel.setName("Germplasm 1");
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
 		stockModel.setCross("-");
@@ -701,7 +700,6 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			this.germplasmDao.save(germplasm);
 
 			final StockModel stockModel = new StockModel();
-			stockModel.setName("Germplasm " + i);
 			stockModel.setIsObsolete(false);
 			stockModel.setUniqueName(String.valueOf(i));
 			stockModel.setGermplasm(germplasm);

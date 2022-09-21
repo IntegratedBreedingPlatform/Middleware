@@ -29,4 +29,15 @@
 			</sql>
 	</changeSet>
 
+	<changeSet author="cuenyad" id="v22.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="stock" columnName="name"/>
+		</preConditions>
+		<comment> Remove name column from stock table</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE stock
+			DROP COLUMN name;
+		</sql>
+	</changeSet>
+
 </databaseChangeLog>

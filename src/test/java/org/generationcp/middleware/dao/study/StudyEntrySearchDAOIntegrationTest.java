@@ -1184,7 +1184,6 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 	private StockModel createTestStock(final DmsProject study, final Germplasm germplasm, final int entryNumber) {
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName(String.valueOf(entryNumber));
-		stockModel.setName(RandomStringUtils.randomAlphabetic(10).toUpperCase());
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
 		stockModel.setCross("-");
@@ -1229,6 +1228,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 	private List<MeasurementVariable> createEntryVariables(final DmsProject project) {
 
 		final CVTerm guidTerm = this.daoFactory.getCvTermDao().getById(TermId.GUID.getId());
+		final CVTerm designationTerm = this.daoFactory.getCvTermDao().getById(TermId.DESIG.getId());
 		final CVTerm entryTypeTerm = this.daoFactory.getCvTermDao().getById(TermId.ENTRY_TYPE.getId());
 		final CVTerm groupSourceTerm = this.daoFactory.getCvTermDao().getById(TermId.GROUP_SOURCE_NAME.getId());
 		final CVTerm groupGIDTerm = this.daoFactory.getCvTermDao().getById(TermId.GROUPGID.getId());
@@ -1261,6 +1261,9 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		variables.add(
 			this.addVariableToProject(null, breedingMethodAbbr, project, VariableType.GERMPLASM_DESCRIPTOR, DataType.CHARACTER_VARIABLE,
 				7));
+		variables.add(
+			this.addVariableToProject(null, designationTerm, project, VariableType.GERMPLASM_DESCRIPTOR, DataType.CHARACTER_VARIABLE,
+				8));
 
 		return variables;
 	}
