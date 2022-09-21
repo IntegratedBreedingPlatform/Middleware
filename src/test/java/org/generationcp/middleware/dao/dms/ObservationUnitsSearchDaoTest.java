@@ -158,7 +158,6 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		final ObservationUnitRow observationUnitRow = measurementRows.get(0);
 
 		final StockModel stock = plantExperimentModels.get(0).getStock();
-		assertEquals(stock.getName(), observationUnitRow.getDesignation());
 		assertEquals(stock.getGermplasm().getGid(), observationUnitRow.getGid());
 		assertEquals("-", observationUnitRow.getSamplesCount());
 		assertEquals(1, observationUnitRow.getEntryNumber().intValue());
@@ -179,7 +178,6 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		assertNull(dataMap.get(ENTRY_TYPE).getValue());
 		assertNull(dataMap.get(EXPT_DESIGN).getValue());
 		assertEquals("1", dataMap.get(ENTRY_NO).getValue());
-		assertEquals(stock.getName(), dataMap.get(DESIGNATION).getValue());
 		assertEquals("1", dataMap.get(TRIAL_INSTANCE).getValue());
 		assertNull(dataMap.get(ENTRY_CODE).getValue());
 		assertNull(dataMap.get(BLOCK_NO).getValue());
@@ -328,7 +326,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		filteredValues.clear();
 		filteredValues.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), Collections.singletonList("2"));
 		// Filter by DESIGNATION using LIKE operation
-		filteredTextValues.put(String.valueOf(TermId.DESIG.getId()), "Germplasm");
+		filteredTextValues.put(String.valueOf(TermId.DESIG.getId()), "Name ");
 		assertEquals(noOfSubObservationExperiment,
 			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
 	}
@@ -401,7 +399,7 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 		filteredValues.clear();
 		filteredValues.put(String.valueOf(TermId.TRIAL_INSTANCE_FACTOR.getId()), Collections.singletonList("2"));
 		// Filter by DESIGNATION using LIKE operation
-		filteredTextValues.put(String.valueOf(TermId.DESIG.getId()), "Germplasm");
+		filteredTextValues.put(String.valueOf(TermId.DESIG.getId()), "Name ");
 		assertEquals(3,
 			this.obsUnitSearchDao.countObservationUnitsForDataset(datasetId, null, false, filter).intValue());
 	}
@@ -576,7 +574,6 @@ public class ObservationUnitsSearchDaoTest extends IntegrationTestBase {
 
 		assertEquals("1", dataMap.get(TRIAL_INSTANCE));
 		assertEquals(stock.getGermplasm().getGid(), dataMap.get(GID));
-		assertEquals(stock.getName(), dataMap.get(DESIGNATION));
 		assertNull(dataMap.get(ENTRY_TYPE));
 		assertNull(dataMap.get(ENTRY_CODE));
 		assertEquals("1", dataMap.get(ENTRY_NO));

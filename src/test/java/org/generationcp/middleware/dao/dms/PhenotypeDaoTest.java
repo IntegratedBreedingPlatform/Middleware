@@ -210,7 +210,7 @@ public class PhenotypeDaoTest {
 		final int locationId = 2;
 		this.dao.containsAtLeast2CommonEntriesWithValues(projectId, locationId, TermId.DESIG.getId());
 
-		final String expectedSql = this.getContainsAtLeast2CommonEntriesQuery(projectId, locationId, "stock.name");
+		final String expectedSql = this.getContainsAtLeast2CommonEntriesQuery(projectId, locationId, "name.nval");
 		final ArgumentCaptor<String> sqlCaptor = ArgumentCaptor.forClass(String.class);
 		Mockito.verify(this.session).createSQLQuery(sqlCaptor.capture());
 		Assert.assertEquals(expectedSql, sqlCaptor.getValue());
@@ -256,6 +256,7 @@ public class PhenotypeDaoTest {
 		return " SELECT phenotype.observable_id,count(phenotype.observable_id) "
 			+ " FROM nd_experiment nd_exp "
 			+ " INNER JOIN stock ON nd_exp.stock_id = stock.stock_id "
+			+ " LEFT JOIN names name ON name.gid = stock.dbxref_id AND name.nstat = 1 "
 			+ " LEFT JOIN phenotype  ON nd_exp.nd_experiment_id = phenotype.nd_experiment_id  where nd_exp.project_id = "
 			+ projectId + " and nd_exp.nd_geolocation_id = " + locationId
 			+ " and ((phenotype.value <> '' and phenotype.value is not null) or "

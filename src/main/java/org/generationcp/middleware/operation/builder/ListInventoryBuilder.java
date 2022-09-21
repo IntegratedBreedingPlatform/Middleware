@@ -52,7 +52,7 @@ public class ListInventoryBuilder extends Builder {
 		}
 
 		if (listEntries != null && !listEntries.isEmpty()) {
-			this.retrieveLotCounts(listEntryIds, listEntries, gids, lrecIds);
+			this.retrieveLotCounts( listEntries, gids, lrecIds);
 			this.setAvailableBalanceScale(listEntries);
 			this.retrieveGroupId(listEntries, gids);
 		}
@@ -87,7 +87,7 @@ public class ListInventoryBuilder extends Builder {
 		}
 	}
 
-	private void retrieveLotCounts(final List<Integer> entryIds, final List<GermplasmListData> listEntries, final List<Integer> gids,
+	private void retrieveLotCounts(final List<GermplasmListData> listEntries, final List<Integer> gids,
 			final List<Integer> lrecIds) throws MiddlewareQueryException {
 
 		// NEED to pass specific GIDs instead of listdata.gid because of handling for CHANGES table

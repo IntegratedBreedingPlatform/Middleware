@@ -15,6 +15,7 @@ package org.generationcp.middleware.dao;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.manager.GermplasmNameType;
 import org.generationcp.middleware.pojos.Germplasm;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.junit.Assert;
 import org.junit.Before;
@@ -148,7 +149,7 @@ public class NameDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm = new Germplasm();
 		germplasm.setLocationId(0);
 		germplasm.setGdate(dateIntValue);
-		germplasm.setMethodId(1);
+		germplasm.setMethod(new Method(1));
 		germplasm.setGnpgs(0);
 		germplasm.setGpid1(0);
 		germplasm.setGpid2(0);

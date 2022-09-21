@@ -116,9 +116,9 @@ public class GermplasmGroupingServiceImplIntegrationTest extends IntegrationTest
 	}
 
 	private Germplasm createGermplasm(final String breedingMethodType, final Integer gnpgs,
-		final Integer gpid1, Integer mgid) {
+		final Integer gpid1, final Integer mgid) {
 		final Method method = this.createBreedingMethod(breedingMethodType);
-		final Germplasm germplasm = new Germplasm(null, method.getMid(), gnpgs, gpid1, 0,
+		final Germplasm germplasm = new Germplasm(null, gnpgs, gpid1, 0,
 			0, 0, Integer.parseInt(this.creationDate), 0,
 			0, mgid, null, null, method);
 

@@ -87,7 +87,7 @@ public class StockBuilder extends Builder {
 		} else if (id == TermId.GID.getId()) {
 			value = stockModel.getGermplasm() == null ? null : Integer.toString(stockModel.getGermplasm().getGid());
 		} else if (id == TermId.DESIG.getId()) {
-			value = stockModel.getName();
+			value = stockModel.getGermplasm() == null ? null : stockModel.getGermplasm().getPreferredName().getNval();
 		} else {
 			value = this.getPropertyValue(variableType.getId(), stockModel.getProperties());
 		}

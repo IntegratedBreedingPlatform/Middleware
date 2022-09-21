@@ -42,13 +42,6 @@ public class StockBuilderTest {
 	}
 	
 	@Test
-	public void testGetValueForDesignation() {
-		final StockModel stockModel = this.createStockModel();
-		final String value = this.stockBuilder.getValue(stockModel, this.createDMSVariableType(TermId.DESIG));
-		Assert.assertEquals(stockModel.getName(), value);
-	}
-	
-	@Test
 	public void testGetValueForExistingStockProperty() {
 		final StockModel stockModel = this.createStockModel();
 		final String value = this.stockBuilder.getValue(stockModel, this.createDMSVariableType(TermId.ENTRY_TYPE));
@@ -59,7 +52,6 @@ public class StockBuilderTest {
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(20));
 		stockModel.setGermplasm(new Germplasm(new Random().nextInt(Integer.MAX_VALUE)));
-		stockModel.setName(RandomStringUtils.randomAlphanumeric(20));
 
 		final Set<StockProperty> stockProperties = new HashSet<>();
 		final StockProperty stockProperty = new StockProperty(stockModel, TermId.ENTRY_TYPE.getId(), null, new Random().nextInt(Integer.MAX_VALUE));

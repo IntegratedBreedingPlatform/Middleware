@@ -49,12 +49,13 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	static {
 		factorsFilterMap = new HashMap<>();
 		factorsFilterMap.put(String.valueOf(TermId.GID.getId()), "s.dbxref_id");
-		factorsFilterMap.put(String.valueOf(TermId.DESIG.getId()), "s.name");
+		factorsFilterMap.put(String.valueOf(TermId.DESIG.getId()), "name.nval");
 		factorsFilterMap.put(String.valueOf(TermId.GUID.getId()), "g.germplsm_uuid");
 		factorsFilterMap.put(String.valueOf(TermId.CROSS.getId()), "s.cross_value");
 		factorsFilterMap.put(String.valueOf(TermId.GROUPGID.getId()), "g.mgid");
 		factorsFilterMap.put(String.valueOf(TermId.IMMEDIATE_SOURCE_NAME.getId()), "immediateSource.nval");
 		factorsFilterMap.put(String.valueOf(TermId.GROUP_SOURCE_NAME.getId()), "groupSourceName.nval");
+		factorsFilterMap.put(String.valueOf(TermId.BREEDING_METHOD_ABBR.getId()), "m.mcode");
 		factorsFilterMap.put(String.valueOf(TermId.ENTRY_NO.getId()), "uniquename");
 		factorsFilterMap.put(String.valueOf(TermId.GID_ACTIVE_LOTS_COUNT.getId()),
 			"EXISTS (SELECT 1 FROM ims_lot l1 WHERE l1.eid = s.dbxref_id and l1.status = " +
@@ -101,10 +102,13 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	private static final String STOCK_PROP_JOIN = "LEFT JOIN stockprop sp ON sp.stock_id = s.stock_id";
 	private static final String CVTERM_VARIABLE_JOIN = "LEFT JOIN cvterm cvterm_variable ON cvterm_variable.cvterm_id = sp.type_id";
 	private static final String GERMPLASM_JOIN = "INNER JOIN germplsm g ON g.gid = s.dbxref_id";
+	private static final String NAME_JOIN = "INNER JOIN names name ON name.gid = s.dbxref_id and name.nstat = 1";
 	private static final String IMMEDIATE_SOURCE_NAME_JOIN =
 		" LEFT JOIN names immediateSource ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 ";
 	private static final String GROUP_SOURCE_NAME_JOIN =
-		"LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0";
+		"LEFT JOIN names groupSourceName ON groupSourceName.gid = g.gpid1 AND g.gnpgs < 0 ";
+	private static final String BREEDING_METHODS_ABBR_JOIN =
+		"LEFT JOIN methods m ON m.mid = g.methn ";
 	private static final String GERMPLASM_PASSPORT_AND_ATTRIBUTE_JOIN = "LEFT JOIN atributs %1$s ON s.dbxref_id = %1$s.gid AND %1$s.atype = %2$s";
 
 	public StudyEntrySearchDAO(final Session session) {
@@ -122,10 +126,12 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		final Set<String> joins = this.getFixedJoins();
 
 		this.addFixedScalars(scalars, selects);
+		this.addDesignationScalar(scalars, selects, entryVariables);
 		this.addGroupGidScalar(scalars, selects, entryVariables);
 		this.addGuidScalar(scalars, selects, entryVariables);
 		this.addImmediateSourceScalar(scalars, selects, entryVariables);
 		this.addGroupSourceNameScalar(scalars, selects, entryVariables);
+		this.addBreedingMethodAbbrScalar(scalars, selects, entryVariables);
 		this.addGermplasmAttributeScalars(scalars, selects, entryVariables);
 		this.addEntryDetailScalars(scalars, selects, entryVariables);
 
@@ -151,6 +157,17 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 
 		final List<Map<String, Object>> results = query.list();
 		return this.mapResults(results, entryVariables);
+	}
+
+	private void addDesignationScalar(final List<Scalar> scalars, final List<String> selects, final List<MeasurementVariable> variables) {
+		if (!CollectionUtils.isEmpty(variables)) {
+			variables.stream()
+				.filter(measurementVariable -> measurementVariable.getTermId() == TermId.DESIG.getId())
+				.findFirst()
+				.ifPresent(measurementVariable ->
+					selects.add(this.addSelectExpression(scalars, "name.nval", DESIGNATION_ALIAS, StringType.INSTANCE))
+				);
+		}
 	}
 
 	public long countFilteredStudyEntries(final StudyEntrySearchDto studyEntrySearchDto, final List<MeasurementVariable> entryVariables) {
@@ -184,6 +201,12 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 	private void addJoins(final Set<String> joins, final List<MeasurementVariable> entryVariables) {
 		entryVariables.forEach(variable -> {
 			final int termId = variable.getTermId();
+
+			if (TermId.DESIG.getId() == termId) {
+				joins.add(GERMPLASM_JOIN);
+				joins.add(NAME_JOIN);
+				return;
+			}
 			if (TermId.GROUPGID.getId() == termId || TermId.GUID.getId() == termId) {
 				joins.add(GERMPLASM_JOIN);
 				return;
@@ -196,6 +219,11 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			if (TermId.IMMEDIATE_SOURCE_NAME.getId() == termId) {
 				joins.add(GERMPLASM_JOIN);
 				joins.add(IMMEDIATE_SOURCE_NAME_JOIN);
+				return;
+			}
+			if (TermId.BREEDING_METHOD_ABBR.getId() == termId) {
+				joins.add(GERMPLASM_JOIN);
+				joins.add(BREEDING_METHODS_ABBR_JOIN);
 				return;
 			}
 			if (variable.getVariableType() == VariableType.GERMPLASM_ATTRIBUTE ||
@@ -212,7 +240,6 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 		selectClause.add(this.addSelectExpression(scalars, "s.stock_id", ENTRY_ID_ALIAS, IntegerType.INSTANCE));
 		selectClause.add(this.addSelectExpression(scalars, "CONVERT(S.uniquename, UNSIGNED INT)", ENTRY_NO_ALIAS, IntegerType.INSTANCE));
 		selectClause.add(this.addSelectExpression(scalars, "s.dbxref_id", GID_ALIAS, IntegerType.INSTANCE));
-		selectClause.add(this.addSelectExpression(scalars, "s.name", DESIGNATION_ALIAS, StringType.INSTANCE));
 		selectClause.add(this.addSelectExpression(scalars, "COUNT(DISTINCT (l.lotid))", LOT_COUNT_ALIAS, IntegerType.INSTANCE));
 		selectClause.add(this.addSelectExpression(scalars, LOT_AVAILABLE_EXPRESSION, LOT_AVAILABLE_BALANCE_ALIAS, StringType.INSTANCE));
 
@@ -276,6 +303,19 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 				.findFirst()
 				.ifPresent(measurementVariable ->
 					selectClause.add(this.addSelectExpression(scalars, "g.germplsm_uuid", GUID_ALIAS, StringType.INSTANCE))
+				);
+		}
+	}
+
+	private void addBreedingMethodAbbrScalar(final List<Scalar> scalars, final List<String> selectClause,
+		final List<MeasurementVariable> entryDescriptors) {
+		if (!CollectionUtils.isEmpty(entryDescriptors)) {
+			entryDescriptors.stream()
+				.filter(measurementVariable -> measurementVariable.getTermId() == TermId.BREEDING_METHOD_ABBR.getId())
+				.findFirst()
+				.ifPresent(measurementVariable ->
+					selectClause.add(this.addSelectExpression(scalars, "m.mcode",
+						TermId.BREEDING_METHOD_ABBR.name(), StringType.INSTANCE))
 				);
 		}
 	}
@@ -512,7 +552,9 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			final String guid = (String) row.get(GUID_ALIAS);
 
 			final StudyEntryDto studyEntryDto =
-				new StudyEntryDto(entryId, entryNumber, gid, designation, lotCount, availableBalance, unit, cross, groupGid, guid);
+				new StudyEntryDto(entryId, entryNumber, gid, designation, lotCount, availableBalance, unit, cross,
+					groupGid, guid);
+
 			final Map<Integer, StudyEntryPropertyData> properties = new HashMap<>();
 			entryVariables.stream()
 				.filter(variable -> VariableType.ENTRY_DETAIL == variable.getVariableType())
@@ -554,6 +596,8 @@ public class StudyEntrySearchDAO extends AbstractGenericSearchDAO<StockModel, In
 			this.addFixedVariableIfPresent(TermId.IMMEDIATE_SOURCE_NAME, String.valueOf(row.get(TermId.IMMEDIATE_SOURCE_NAME.name())),
 				entryVariables, properties);
 			this.addFixedVariableIfPresent(TermId.GROUP_SOURCE_NAME, String.valueOf(row.get(TermId.GROUP_SOURCE_NAME.name())),
+				entryVariables, properties);
+			this.addFixedVariableIfPresent(TermId.BREEDING_METHOD_ABBR, String.valueOf(row.get(TermId.BREEDING_METHOD_ABBR.name())),
 				entryVariables, properties);
 
 			studyEntryDto.setProperties(properties);
