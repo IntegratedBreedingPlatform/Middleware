@@ -165,19 +165,30 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			final ObservationSearchRequestDto observationSearchRequest = new ObservationSearchRequestDto();
 			observationSearchRequest.setObservationUnitDbIds(
 				dtos.stream().map(ObservationUnitDto::getObservationUnitDbId).collect(Collectors.toList()));
-			final List<ObservationDto> observationDtos = this.observationService.searchObservations(observationSearchRequest, null);
-			final Map<String, List<PhenotypeSearchObservationDTO>> phenotypeObservationsMap = observationDtos.stream()
-				.map(observation -> new PhenotypeSearchObservationDTO(observation))
-				.collect(groupingBy(PhenotypeSearchObservationDTO::getObservationUnitDbId));
 
 			for (final ObservationUnitDto dto : dtos) {
 				dto.setExternalReferences(externalReferencesMap.get(dto.getExperimentId().toString()));
 				dto.getObservationUnitPosition().setObservationLevelRelationships(observationRelationshipsMap.get(dto.getExperimentId()));
-				dto.setObservations(phenotypeObservationsMap.get(dto.getObservationUnitDbId()));
+			}
+
+			if (requestDTO.getIncludeObservations()) {
+				this.addObservationsPerObservationUnit(observationSearchRequest, dtos);
 			}
 		}
 
 		return dtos;
+	}
+
+	private void addObservationsPerObservationUnit(final ObservationSearchRequestDto observationSearchRequest,
+		final List<ObservationUnitDto> observationUnitDtos) {
+		final List<ObservationDto> observationDtos = this.observationService.searchObservations(observationSearchRequest, null);
+		final Map<String, List<PhenotypeSearchObservationDTO>> phenotypeObservationsMap = observationDtos.stream()
+			.map(observation -> new PhenotypeSearchObservationDTO(observation))
+			.collect(groupingBy(PhenotypeSearchObservationDTO::getObservationUnitDbId));
+
+		for (final ObservationUnitDto dto : observationUnitDtos) {
+			dto.setObservations(phenotypeObservationsMap.get(dto.getObservationUnitDbId()));
+		}
 	}
 
 	@Override
@@ -343,7 +354,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUMMARY_STATISTICS));
 			}
-			if (studyInstance.isHasFieldmap()) {
+			if (studyInstance.getHasFieldLayout()) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.FIELD));
 			}
 			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.MEANS_DATA.getId())) {
@@ -397,7 +408,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUMMARY_STATISTICS));
 		}
 		if (datasetDTOMap.containsKey(DatasetTypeEnum.PLOT_DATA.getId()) &&
-			this.daoFactory.getExperimentDao().hasFieldmap(datasetDTOMap.get(DatasetTypeEnum.PLOT_DATA.getId()).getDatasetId())) {
+			this.daoFactory.getExperimentDao().hasFieldLayout(datasetDTOMap.get(DatasetTypeEnum.PLOT_DATA.getId()).getDatasetId())) {
 			observationLevels.add(new ObservationLevel(ObservationLevelEnum.FIELD));
 		}
 		if (datasetDTOMap.containsKey(DatasetTypeEnum.MEANS_DATA.getId())) {

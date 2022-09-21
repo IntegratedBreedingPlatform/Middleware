@@ -205,7 +205,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 		if (method != null && method.isGenerative()) {
 			GermplasmGroupingServiceImpl.LOG
 				.info("Method {} ({}), of the germplasm (gid {}) is generative. MGID assignment for generative germplasm is not supported.",
-					germplasm.getMethodId(), method.getMname(), germplasm.getGid());
+					germplasm.getMethod().getMid(), method.getMname(), germplasm.getGid());
 			return false;
 		}
 
@@ -377,13 +377,12 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 	}
 
 	@Override
-	public void copyParentalSelectionHistoryAtFixation(final Germplasm germplasm) {
+	public void copyParentalSelectionHistoryAtFixation(final Germplasm germplasm, final Germplasm parent) {
 		if (this.selHistAtFixationNameType == null) {
 			this.selHistAtFixationNameType =
 				this.getSelectionHistoryNameType(GermplasmGroupingServiceImpl.SELECTION_HISTORY_AT_FIXATION_NAME_CODE);
 		}
 
-		final Germplasm parent = this.daoFactory.getGermplasmDao().getById(germplasm.getGpid2());
 		final Name parentSelectionHistoryAtFixation =
 			this.findNameByType(parent, this.selHistAtFixationNameType);
 
@@ -435,22 +434,22 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 				if (cross != null) {
 					GermplasmGroupingServiceImpl.LOG
 						.info("Processing group inheritance for cross: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.",
-							cross.getGid(), cross.getGpid1(), cross.getGpid2(), cross.getMgid(), cross.getMethodId());
+							cross.getGid(), cross.getGpid1(), cross.getGpid2(), cross.getMgid(), cross.getMethod().getMid());
 				}
 
-				GermplasmGroupingServiceImpl.LOG.info("Breeding method {} of the cross is hybrid.", cross.getMethodId());
+				GermplasmGroupingServiceImpl.LOG.info("Breeding method {} of the cross is hybrid.", cross.getMethod().getMid());
 				final Germplasm parent1 = this.getGermplasmFromOptionalValue(cropName, germplasmCache, cross.getGpid1());
 				final Germplasm parent2 = this.getGermplasmFromOptionalValue(cropName, germplasmCache, cross.getGpid2());
 				if (parent1 != null) {
 					GermplasmGroupingServiceImpl.LOG
 						.info("Parent 1: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.", parent1.getGid(), parent1.getGpid1(),
-							parent1.getGpid2(), parent1.getMgid(), parent1.getMethodId());
+							parent1.getGpid2(), parent1.getMgid(), parent1.getMethod().getMid());
 				}
 
 				if (parent2 != null) {
 					GermplasmGroupingServiceImpl.LOG
 						.info("Parent 2: gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}.", parent2.getGid(), parent2.getGpid1(),
-							parent2.getGpid2(), parent2.getMgid(), parent2.getMethodId());
+							parent2.getGpid2(), parent2.getMgid(), parent2.getMethod().getMid());
 				}
 				final boolean parent1HasMGID = parent1 != null && parent1.getMgid() != null && parent1.getMgid() != 0;
 				final boolean parent2HasMGID = parent2 != null && parent2.getMgid() != null && parent2.getMgid() != 0;
@@ -487,7 +486,7 @@ public class GermplasmGroupingServiceImpl implements GermplasmGroupingService {
 							GermplasmGroupingServiceImpl.LOG
 								.info("\t[gid {}, gpid1: {}, gpid2: {}, mgid: {}, methodId: {}]", previousCross.getGid(),
 									previousCross.getGpid1(), previousCross.getGpid2(), previousCross.getMgid(),
-									previousCross.getMethodId());
+									previousCross.getMethod().getMid());
 						}
 
 						Germplasm oldestPreviousCrossWithMGID = null;

@@ -122,7 +122,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 			final Integer methodId =
 				(StringUtils.isNotEmpty(germplasmDto.getBreedingMethodDbId())) ? Integer.parseInt(germplasmDto.getBreedingMethodDbId()) :
 					unknownDerivativeMethod.getMid();
-			germplasm.setMethodId(methodId);
+			germplasm.setMethod(new Method(methodId));
 
 			germplasm.setGrplce(0);
 			germplasm.setMgid(0);
@@ -211,7 +211,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 		// Update breeding method if it is present
 		if (!StringUtils.isEmpty(germplasmUpdateRequest.getBreedingMethodDbId())) {
 			final Integer newBreedingMethodId = Integer.parseInt(germplasmUpdateRequest.getBreedingMethodDbId());
-			final Integer oldBreedingMethodId = germplasm.getMethodId();
+			final Integer oldBreedingMethodId = germplasm.getMethod().getMid();
 			if (!newBreedingMethodId.equals(oldBreedingMethodId)) {
 				final Map<Integer, Method> methodMap =
 					this.daoFactory.getMethodDAO().getMethodsByIds(Arrays.asList(oldBreedingMethodId, newBreedingMethodId)).stream()
@@ -221,7 +221,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 				if (this.daoFactory.getGermplasmDao().getGermplasmDescendantByGID(germplasm.getGid(), 0, Integer.MAX_VALUE).isEmpty() ||
 					this.germplasmMethodValidator
 						.isNewBreedingMethodValid(oldBreedingMethod, newBreedingMethod, germplasmDbId, conflictErrors)) {
-					germplasm.setMethodId(newBreedingMethodId);
+					germplasm.setMethod(newBreedingMethod);;
 				}
 			}
 		}

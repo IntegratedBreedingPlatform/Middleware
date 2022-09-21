@@ -530,7 +530,7 @@ public class GermplasmDataManagerIntegrationTest extends IntegrationTestBase {
 	private Germplasm createGermplasm() {
 		final Germplasm germplasm = new Germplasm();
 		germplasm.setGid(1166066);
-		germplasm.setMethodId(31);
+		germplasm.setMethod(new Method(31));
 		germplasm.setGnpgs(-1);
 		germplasm.setGrplce(0);
 		germplasm.setGpid1(0);

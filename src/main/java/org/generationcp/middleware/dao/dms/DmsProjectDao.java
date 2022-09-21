@@ -18,6 +18,7 @@ import org.generationcp.middleware.api.study.MyStudiesDTO;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.dao.GenericDAO;
+import org.generationcp.middleware.dao.util.CommonQueryConstants;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.ExperimentType;
@@ -1261,19 +1262,15 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 		try {
 			final String sql = "select \n	geoloc.nd_geolocation_id as instanceId, \n"
 				+ " geoloc.description as instanceNumber, \n"
-				+ "	max(if(geoprop.type_id = 8190, loc.locid, null)) as locationId, \n"  // 8190 = cvterm for LOCATION_ID
-				+ "	max(if(geoprop.type_id = 8190, loc.lname, null)) as locationName, \n" +
-				"	max(if(geoprop.type_id = 8190, loc.labbr, null)) as locationAbbreviation, \n" + // 8189 = cvterm for LOCATION_ABBR
-				"	max(if(geoprop.type_id = 8189, geoprop.value, null)) as customLocationAbbreviation, \n" +
+				+ "	max(if(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", loc.locid, null)) as locationId, \n"  // 8190 = cvterm for LOCATION_ID
+				+ "	max(if(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", loc.lname, null)) as locationName, \n" +
+				"	max(if(geoprop.type_id = " + TermId.LOCATION_ID.getId() + ", loc.labbr, null)) as locationAbbreviation, \n" + // 8189 = cvterm for LOCATION_ABBR
+				"	max(if(geoprop.type_id = " + TermId.LOCATION_ABBR.getId() + ", geoprop.value, null)) as customLocationAbbreviation, \n"
 				// 8189 = cvterm for CUSTOM_LOCATION_ABBR
-				"	case when max(if(geoprop.type_id = 8583, geoprop.value, null)) is null then 0 else 1 end as hasFieldmap, \n"
-				// 8583 = cvterm for BLOCK_ID (meaning instance has fieldmap)
 
 				// FIXME rewrite to be valid for the whole instance, not just the datasetId
 				// if instance has X/Y coordinates (fieldmap or row/col design)
-				+ "	case when (max(if(geoprop.type_id = 8583, geoprop.value, null)) is null) \n "
-				+ "		and (max(hasRowColDesign.nd_experiment_id)) is null \n"
-				+ " 	then 0 else 1 end as hasFieldLayout, \n"
+				+ CommonQueryConstants.HAS_FIELD_LAYOUT_EXPRESSION +  ", \n"
 
 				// FIXME rewrite to be valid for the whole instance, not just the datasetId
 				// if instance has been georeferenced using the geojson editor
@@ -1320,13 +1317,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ " inner join nd_experiment nde on nde.nd_geolocation_id = geoloc.nd_geolocation_id \n"
 				+ " inner join project proj on proj.project_id = nde.project_id \n"
 				+ " left outer join nd_geolocationprop geoprop on geoprop.nd_geolocation_id = geoloc.nd_geolocation_id \n"
-				+ "	left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = 8190 \n"
-				+ " left join ( \n"
-				+ " 	select ndep.nd_experiment_id \n"
-				+ " 	    from nd_experimentprop ndep \n"
-				+ " 	        INNER JOIN cvterm cvt ON cvt.cvterm_id = ndep.type_id \n"
-				+ " 	    WHERE cvt.name = 'ROW' \n"
-				+ " ) hasRowColDesign on nde.nd_experiment_id = hasRowColDesign.nd_experiment_id "
+				+ "	left outer join location loc on geoprop.value = loc.locid and geoprop.type_id = " + TermId.LOCATION_ID.getId() + " \n"
 				+ " left join (  \n"
 				+ "    select ne.nd_geolocation_id  \n"
 				+ "    from ims_experiment_transaction iet  \n"
@@ -1334,7 +1325,7 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 				+ "             inner join ims_transaction it on it.trnid = iet.trnid  \n"
 				+ "    where it.trnstat <> 9  \n"
 				+ ") hasInventory on hasInventory.nd_geolocation_id = geoloc.nd_geolocation_id "
-
+				+ " left join nd_experimentprop ndep on nde.nd_experiment_id = ndep.nd_experiment_id "
 				+ " where proj.project_id = :datasetId \n";
 
 			final StringBuilder sb = new StringBuilder(sql);
@@ -1354,7 +1345,6 @@ public class DmsProjectDao extends GenericDAO<DmsProject, Integer> {
 			query.addScalar("locationName", new StringType());
 			query.addScalar("locationAbbreviation", new StringType());
 			query.addScalar("customLocationAbbreviation", new StringType());
-			query.addScalar("hasFieldmap", new BooleanType());
 			query.addScalar("hasGeoJSON", new BooleanType());
 			query.addScalar("hasFieldLayout", new BooleanType());
 			query.addScalar("hasInventory", new BooleanType());

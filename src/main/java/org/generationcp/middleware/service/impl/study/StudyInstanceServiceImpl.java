@@ -101,7 +101,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 				final int instanceNumber = Integer.parseInt(geolocation.getDescription());
 				final StudyInstance studyInstance =
-					new StudyInstance(geolocation.getLocationId(), instanceNumber, false, false, false, true);
+					new StudyInstance(geolocation.getLocationId(), instanceNumber, false, false, true);
 
 				studyInstance.setLocationId(locationDTO.getId());
 				studyInstance.setLocationName(locationDTO.getName());

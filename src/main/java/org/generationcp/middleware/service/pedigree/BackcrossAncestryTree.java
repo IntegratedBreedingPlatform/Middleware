@@ -75,30 +75,28 @@ public class BackcrossAncestryTree {
 		}
 
 		// Male traversal
-		if (otherParentFemaleParentGid != null && otherParentFemaleParentGid.equals(recurringParentGid)) {
-			if(this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentMaleParentGid)).isPresent()) {
-				final Germplasm maleGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentMaleParentGid)).get();
-				GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, maleGermplasm, recurringParentNode, level);
-				germplasmNode.setFemaleParent(recurringParentNode);
-				germplasmNode.setMaleParent(generateBackcrossTree);
-			}
+		if (otherParentFemaleParentGid != null && otherParentFemaleParentGid.equals(recurringParentGid)
+			&& this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentMaleParentGid)).isPresent()) {
+			final Germplasm maleGermplasm = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentMaleParentGid)).get();
+			final GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, maleGermplasm, recurringParentNode, level);
+			germplasmNode.setFemaleParent(recurringParentNode);
+			germplasmNode.setMaleParent(generateBackcrossTree);
 		}
 
 		// Female Traversal
-		if (otherParentMaleParentGid != null && otherParentMaleParentGid.equals(recurringParentGid)) {
-			if(this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentFemaleParentGid)).isPresent()) {
-				final Germplasm female = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentFemaleParentGid)).get();
-				GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, female, recurringParentNode, level);
-				germplasmNode.setFemaleParent(generateBackcrossTree);
-				germplasmNode.setMaleParent(recurringParentNode);
-			}
+		if (otherParentMaleParentGid != null && otherParentMaleParentGid.equals(recurringParentGid)
+			&& this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentFemaleParentGid)).isPresent()) {
+			final Germplasm female = this.germplasmCache.getGermplasm(new CropGermplasmKey(this.cropName, otherParentFemaleParentGid)).get();
+			final GermplasmNode generateBackcrossTree = this.generateBackcrossTree(recurringParentGid, female, recurringParentNode, level);
+			germplasmNode.setFemaleParent(generateBackcrossTree);
+			germplasmNode.setMaleParent(recurringParentNode);
 		}
 
 		return germplasmNode;
 	}
 
 	private void getMethodName(final Germplasm germplasm, final GermplasmNode germplasmNode) {
-		final Optional<Method> method = this.methodCache.get(new CropMethodKey(this.cropName, germplasm.getMethodId()));
+		final Optional<Method> method = this.methodCache.get(new CropMethodKey(this.cropName, germplasm.getMethod().getMid()));
 		if (method.isPresent()) {
 			germplasmNode.setMethod(method.get());
 		}

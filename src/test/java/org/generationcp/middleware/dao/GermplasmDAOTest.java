@@ -318,7 +318,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		cross.setGpid1(femaleParent.getGid());
 		cross.setGpid2(maleParent.getGid());
 		cross.setGnpgs(2);
-		cross.setMethodId(generativeMethod.getMid());
+		cross.setMethod(generativeMethod);
 		cross.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		this.daoFactory.getGermplasmDao().save(cross);
 
@@ -326,7 +326,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		advance.setGpid1(cross.getGid());
 		advance.setGpid2(cross.getGid());
 		advance.setGnpgs(-1);
-		advance.setMethodId(derivativeMethod.getMid());
+		advance.setMethod(derivativeMethod);
 		advance.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		this.daoFactory.getGermplasmDao().save(advance);
 
@@ -334,7 +334,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		advance2.setGpid1(cross.getGid());
 		advance2.setGpid2(cross.getGid());
 		advance2.setGnpgs(-1);
-		advance2.setMethodId(maintenanceMethod.getMid());
+		advance2.setMethod(maintenanceMethod);
 		advance2.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		this.daoFactory.getGermplasmDao().save(advance2);
 
@@ -425,7 +425,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	public void testSaveGermplasmNamesThroughHibernateCascade() {
 
 		final Germplasm germplasm = new Germplasm();
-		germplasm.setMethodId(1);
+		germplasm.setMethod(new Method(1));
 		germplasm.setGnpgs(-1);
 		germplasm.setGpid1(0);
 		germplasm.setGpid2(0);
@@ -668,7 +668,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 
 		Assert.assertThat(germplasmDTO.getGermplasmDbId(), is(germplasm.getGermplasmUUID()));
 		Assert.assertThat(germplasmDTO.getGermplasmPUI(), nullValue());
-		Assert.assertThat(germplasmDTO.getBreedingMethodDbId(), is(germplasm.getMethodId().toString()));
+		Assert.assertThat(germplasmDTO.getBreedingMethodDbId(), is(germplasm.getMethod().getMid().toString()));
 		Assert.assertThat(germplasmDTO.getDefaultDisplayName(), is(displayName));
 		// Preferred Name is ACCNO
 		Assert.assertThat(germplasmDTO.getAccessionNumber(), is(displayName));
@@ -1194,7 +1194,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		germplasm.setGpid1(femaleParent.getGid());
 		germplasm.setGpid2(maleParent.getGid());
 		germplasm.setGnpgs(2);
-		germplasm.setMethodId(derivativeMethod.getMid());
+		germplasm.setMethod(derivativeMethod);
 		germplasm.setGermplasmUUID(RandomStringUtils.randomAlphanumeric(10));
 		this.daoFactory.getGermplasmDao().save(germplasm);
 
@@ -1208,7 +1208,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 		Assert.assertThat(actualGermplasm.getGpid2(), is(maleParent.getGid()));
 
 		final Germplasm newFemaleParent = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
-		newFemaleParent.setMethodId(derivativeMethod.getMid());
+		newFemaleParent.setMethod(derivativeMethod);
 		this.daoFactory.getGermplasmDao().save(newFemaleParent);
 
 		this.daoFactory.getGermplasmDao().updateGroupSource(femaleParent.getGid(), newFemaleParent.getGid());
@@ -1309,7 +1309,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	public void testCountGermplasmMatches_FilterByGids_RestrictByMethod() {
 		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Method method = this.daoFactory.getMethodDAO().getByCode("UDM");
-		germplasm1.setMethodId(method.getMid());
+		germplasm1.setMethod(method);
 		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Germplasm germplasm3 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 
@@ -1568,7 +1568,7 @@ public class GermplasmDAOTest extends IntegrationTestBase {
 	public void testFindGermplasmMatches_FilterByGids_RestrictByMethod() {
 		final Germplasm germplasm1 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Method method = this.daoFactory.getMethodDAO().getByCode("UDM");
-		germplasm1.setMethodId(method.getMid());
+		germplasm1.setMethod(method);
 		final Germplasm germplasm2 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 		final Germplasm germplasm3 = GermplasmTestDataInitializer.createGermplasmWithPreferredName();
 

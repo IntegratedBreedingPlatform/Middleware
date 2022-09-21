@@ -18,6 +18,7 @@ import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -885,9 +886,9 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	private Germplasm createGermplasm() {
 		final Name name = new Name(null, null, 1, 1, "Name", 0, 0, 0);
-		final Germplasm germplasm =
-			new Germplasm(null, UNKNOWN_GENERATIVE_METHOD_ID, 0, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(),
-				name);
+		final Germplasm germplasm = new Germplasm(null, 0, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(), 0, 0, 0, name, null,
+			new Method(UNKNOWN_GENERATIVE_METHOD_ID));
+
 		this.germplasmTestDataGenerator.addGermplasm(germplasm, name, this.cropType);
 		return germplasm;
 	}
