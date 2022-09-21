@@ -1,0 +1,85 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+	<changeSet author="rowena" id="v22.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="1">
+			SELECT COUNT(*)>1
+			FROM location l1
+				INNER JOIN location l2
+				WHERE l1.locid  &lt;l2.locid 
+				AND l1.lname = l2.lname AND l1.ltype = l2.ltype AND l1.cntryid = l2.cntryid 
+				AND l1.locid = l1.snl1id;
+			</sqlCheck>
+		</preConditions>
+		<comment>Update  location duplicates</comment>
+      <sql>
+      UPDATE germplsm g INNER JOIN location l1 INNER JOIN location l2
+		  SET glocn = l1.locid
+		  WHERE g.glocn = l2.locid AND l1.locid &lt; l2.locid AND l1.lname = l2.lname 
+		  AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
+		
+		 UPDATE atributs a INNER JOIN location l1 INNER JOIN location l2
+		 SET a.alocn = l1.locid 
+		 WHERE a.alocn = l2.locid AND l1.locid &lt; l2.locid AND l1.lname = l2.lname 
+		 AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
+
+     UPDATE atributs_invalid_atype_bkp a INNER JOIN location l1 INNER JOIN location l2
+		 SET a.alocn = l1.locid 
+		 WHERE a.alocn = l2.locid AND l1.locid &lt; l2.locid AND l1.lname = l2.lname 
+		 AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
+    
+    
+     UPDATE NAMES a INNER JOIN location l1 INNER JOIN location l2
+		 SET a.nlocn = l1.locid 
+		 WHERE a.nlocn = l2.locid AND l1.locid &lt; l2.locid AND l1.lname = l2.lname 
+		 AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
+			
+		 UPDATE ims_lot a INNER JOIN location l1 INNER JOIN location l2
+		 SET a.locid= l1.locid 
+		 WHERE a.locid = l2.locid AND l1.locid &lt; l2.locid AND l1.lname = l2.lname 
+		 AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
+			
+     UPDATE locdes a INNER JOIN location l1 INNER JOIN location l2
+     SET a.locid= l1.locid 
+		 WHERE a.locid = l2.locid AND l1.locid &lt; l2.locid AND l1.lname = l2.lname 
+		 AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
+			
+		 UPDATE nd_geolocationprop n INNER JOIN location l1 INNER JOIN location l2
+		 SET n.value= l1.locid 
+		 WHERE CAST(VALUE AS UNSIGNED) = l2.locid  AND type_id = 8190 
+		 AND l1.locid &lt;l2.locid AND l1.lname = l2.lname 
+     AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id ;
+			
+     UPDATE  program_favorites f INNER JOIN location l1 INNER JOIN location l2  
+     SET f.entity_id= l1.locid 
+     WHERE  f.entity_id = l2.locid  AND l1.locid &lt; l2.locid
+     AND l1.lname = l2.lname AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid 
+     AND l1.locid=l1.snl1id AND entity_type = "LOCATION";
+      
+     UPDATE atributs_aud g INNER JOIN location l1 INNER JOIN location l2  
+     SET g.alocn = l1.locid
+     WHERE  g.alocn = l2.locid  AND l1.locid &lt; l2.locid
+     AND l1.lname = l2.lname AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
+      
+     UPDATE names_aud g INNER JOIN location l1  INNER JOIN location l2
+     SET g.nlocn =   l1.locid
+     WHERE  g.nlocn = l2.locid  AND l1.locid &lt;l2.locid
+     AND l1.lname = l2.lname AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
+     
+     DELETE g FROM georef g INNER JOIN location l1 INNER JOIN location l2
+     WHERE g.locid = l2.locid AND l1.locid &lt; l2.locid AND l1.lname = l2.lname 
+     AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
+			
+     DELETE l2 FROM location l1 INNER JOIN location l2
+     WHERE l1.locid &lt; l2.locid AND l1.lname = l2.lname 
+     AND l1.ltype= l2.ltype AND l1.cntryid = l2.cntryid AND l1.locid=l1.snl1id;
+      			
+        </sql>
+    </changeSet>
+	
+</databaseChangeLog>
