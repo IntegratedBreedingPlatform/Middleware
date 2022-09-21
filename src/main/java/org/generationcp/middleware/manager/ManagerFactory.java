@@ -13,10 +13,14 @@ package org.generationcp.middleware.manager;
 
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodService;
 import org.generationcp.middleware.api.breedingmethod.BreedingMethodServiceImpl;
+import org.generationcp.middleware.api.cropparameter.CropParameterService;
+import org.generationcp.middleware.api.cropparameter.CropParameterServiceImpl;
 import org.generationcp.middleware.api.file.FileMetadataService;
 import org.generationcp.middleware.api.file.FileMetadataServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeService;
 import org.generationcp.middleware.api.germplasm.GermplasmAttributeServiceImpl;
+import org.generationcp.middleware.api.germplasm.GermplasmNameService;
+import org.generationcp.middleware.api.germplasm.GermplasmNameServiceImpl;
 import org.generationcp.middleware.api.germplasm.GermplasmService;
 import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
 import org.generationcp.middleware.api.germplasm.search.GermplasmSearchService;
@@ -25,8 +29,12 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListService;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListServiceImpl;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
 import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataServiceImpl;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.location.LocationServiceImpl;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeService;
 import org.generationcp.middleware.api.nametype.GermplasmNameTypeServiceImpl;
+import org.generationcp.middleware.api.ontology.OntologyVariableService;
+import org.generationcp.middleware.api.ontology.OntologyVariableServiceImpl;
 import org.generationcp.middleware.api.program.ProgramFavoriteService;
 import org.generationcp.middleware.api.program.ProgramFavoriteServiceImpl;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -35,7 +43,6 @@ import org.generationcp.middleware.manager.api.GenotypicDataManager;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
 import org.generationcp.middleware.manager.api.InventoryDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.PedigreeDataManager;
 import org.generationcp.middleware.manager.api.PresetService;
@@ -60,21 +67,21 @@ import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.operation.transformer.etl.StandardVariableTransformer;
 import org.generationcp.middleware.service.DataImportServiceImpl;
 import org.generationcp.middleware.service.FieldbookServiceImpl;
-import org.generationcp.middleware.service.InventoryServiceImpl;
 import org.generationcp.middleware.service.OntologyServiceImpl;
 import org.generationcp.middleware.service.api.DataImportService;
 import org.generationcp.middleware.service.api.FieldbookService;
 import org.generationcp.middleware.service.api.GermplasmGroupingService;
-import org.generationcp.middleware.service.api.InventoryService;
 import org.generationcp.middleware.service.api.KeySequenceRegisterService;
 import org.generationcp.middleware.service.api.OntologyService;
 import org.generationcp.middleware.service.api.PedigreeService;
 import org.generationcp.middleware.service.api.SampleListService;
 import org.generationcp.middleware.service.api.SampleService;
+import org.generationcp.middleware.service.api.analysis.SiteAnalysisService;
 import org.generationcp.middleware.service.api.dataset.DatasetTypeService;
 import org.generationcp.middleware.service.api.derived_variables.DerivedVariableService;
 import org.generationcp.middleware.service.api.derived_variables.FormulaService;
 import org.generationcp.middleware.service.api.gdms.DatasetService;
+import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactoryImpl;
 import org.generationcp.middleware.service.api.study.StudyEntryService;
@@ -84,10 +91,12 @@ import org.generationcp.middleware.service.api.study.generation.ExperimentDesign
 import org.generationcp.middleware.service.api.study.germplasm.source.GermplasmStudySourceService;
 import org.generationcp.middleware.service.impl.GermplasmGroupingServiceImpl;
 import org.generationcp.middleware.service.impl.KeySequenceRegisterServiceImpl;
+import org.generationcp.middleware.service.impl.analysis.SiteAnalysisServiceImpl;
 import org.generationcp.middleware.service.impl.dataset.DatasetTypeServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.DerivedVariableServiceImpl;
 import org.generationcp.middleware.service.impl.derived_variables.FormulaServiceImpl;
 import org.generationcp.middleware.service.impl.gdms.DatasetServiceImpl;
+import org.generationcp.middleware.service.impl.inventory.LotServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleListServiceImpl;
 import org.generationcp.middleware.service.impl.study.SampleServiceImpl;
 import org.generationcp.middleware.service.impl.study.StudyEntryServiceImpl;
@@ -155,8 +164,8 @@ public class ManagerFactory implements Serializable {
 		return new GermplasmListManagerImpl(this.sessionProvider);
 	}
 
-	public LocationDataManager getLocationDataManager() {
-		return new LocationDataManagerImpl(this.sessionProvider);
+	public LocationService getLocationService() {
+		return new LocationServiceImpl(this.sessionProvider);
 	}
 
 	public OntologyDataManager getOntologyDataManager() {
@@ -218,10 +227,6 @@ public class ManagerFactory implements Serializable {
 
 	public FieldbookService getFieldbookMiddlewareService() {
 		return new FieldbookServiceImpl(this.sessionProvider);
-	}
-
-	public InventoryService getInventoryMiddlewareService() {
-		return new InventoryServiceImpl(this.sessionProvider);
 	}
 
 	public DataImportService getDataImportService() {
@@ -290,6 +295,10 @@ public class ManagerFactory implements Serializable {
 		return new SampleListServiceImpl(this.sessionProvider);
 	}
 
+	public CropParameterService getCropParameterService() {
+		return new CropParameterServiceImpl(this.sessionProvider);
+	}
+
 	public SampleService getSampleService() {
 		return new SampleServiceImpl(this.sessionProvider);
 	}
@@ -342,10 +351,6 @@ public class ManagerFactory implements Serializable {
 		return new GermplasmStudySourceServiceImpl(this.sessionProvider);
 	}
 
-	public InventoryService getInventoryService() {
-		return new InventoryServiceImpl(this.sessionProvider);
-	}
-
 	public SearchRequestService getSearchRequestService() {
 		return new SearchRequestServiceImpl(this.sessionProvider);
 	}
@@ -368,6 +373,10 @@ public class ManagerFactory implements Serializable {
 
 	public GermplasmNameTypeService getGermplasmNameTypeService() {
 		return new GermplasmNameTypeServiceImpl(this.sessionProvider);
+	}
+
+	public GermplasmNameService getGermplasmNameService() {
+		return new GermplasmNameServiceImpl(this.sessionProvider);
 	}
 
 	public GermplasmAttributeService getGermplasmAttributeService() {
@@ -396,6 +405,18 @@ public class ManagerFactory implements Serializable {
 
 	public FileMetadataService getFileMetadataService() {
 		return new FileMetadataServiceImpl(this.sessionProvider);
+	}
+
+	public SiteAnalysisService getSiteAnalysisService() {
+		return new SiteAnalysisServiceImpl(this.sessionProvider);
+	}
+
+	public OntologyVariableService getOntologyVariableService() {
+		return new OntologyVariableServiceImpl(this.sessionProvider);
+	}
+
+	public LotService getLotService() {
+		return new LotServiceImpl(this.sessionProvider);
 	}
 
 }

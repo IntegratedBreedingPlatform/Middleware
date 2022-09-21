@@ -261,11 +261,11 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 	public void shouldGetAndCountProgenitorDetailsByGid() {
 		final String breedingMethodName1 = "name1";
 		final String breedingMethodType1 = "DER";
-		final Method method1 = this.createBreedingMethod(breedingMethodName1, breedingMethodType1);
+		final Method method1 = this.createBreedingMethod(breedingMethodName1, breedingMethodType1, "BLE1");
 
 		final String breedingMethodName2 = "name2";
 		final String breedingMethodType2 = "GEN";
-		final Method method2 = this.createBreedingMethod(breedingMethodName2, breedingMethodType2);
+		final Method method2 = this.createBreedingMethod(breedingMethodName2, breedingMethodType2, "BLE2");
 
 		List<Map<String, Object>> queriesParams = Arrays.asList(
 			this.createProgenitorDetailsAuditQueryParams(RevisionType.CREATION, method1.getMid(), 0, 0, -1),
@@ -308,9 +308,9 @@ public class GermplasmAuditDAOTest extends IntegrationTestBase {
 		this.assertProgenitorDetailsAuditChanges(changes.get(1), RevisionType.CREATION, 1, 3);
 	}
 
-	private Method createBreedingMethod(final String name, final String type) {
+	private Method createBreedingMethod(final String name, final String type, final String code) {
 		final Method method =
-			new Method(null, type, "S", "UGM", name, "description", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
+			new Method(null, type, "S", code, name, "description", Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0),
 				Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(0), Integer.valueOf(2), Integer.valueOf(19980610));
 		this.methodDAO.save(method);
 		return method;

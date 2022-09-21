@@ -1,13 +1,13 @@
 package org.generationcp.middleware.domain.inventory.manager;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.annotation.JsonInclude;
 import org.generationcp.middleware.domain.search_request.SearchRequestDto;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @AutoProperty
 public class LotsSearchDto extends SearchRequestDto {
@@ -59,6 +59,8 @@ public class LotsSearchDto extends SearchRequestDto {
 	private List<Integer> harvestingStudyIds;
 
 	private List<String> germplasmUUIDs;
+
+	private Map<Integer, Object> attributes;
 
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date createdDateFrom;
@@ -336,6 +338,14 @@ public class LotsSearchDto extends SearchRequestDto {
 
 	public void setGermplasmUUIDs(final List<String> germplasmUUIDs) {
 		this.germplasmUUIDs = germplasmUUIDs;
+	}
+
+	public Map<Integer, Object> getAttributes() {
+		return this.attributes;
+	}
+
+	public void setAttributes(final Map<Integer, Object> attributes) {
+		this.attributes = attributes;
 	}
 
 	@Override

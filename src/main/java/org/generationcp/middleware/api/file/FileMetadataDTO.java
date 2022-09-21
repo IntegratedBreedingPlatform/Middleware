@@ -23,6 +23,9 @@ public class FileMetadataDTO {
 	private Date fileTimestamp;
 	private String observationUnitUUID;
 	private Integer ndExperimentId;
+	private Integer instanceId;
+	private Integer lotId;
+
 	/**
 	 * TODO move BMSAPI VariableDetails to Middleware
 	 */
@@ -146,6 +149,22 @@ public class FileMetadataDTO {
 
 	public void setNdExperimentId(final Integer ndExperimentId) {
 		this.ndExperimentId = ndExperimentId;
+	}
+
+	public Integer getInstanceId() {
+		return this.instanceId;
+	}
+
+	public void setInstanceId(final Integer instanceId) {
+		this.instanceId = instanceId;
+	}
+
+	public Integer getLotId() {
+		return this.lotId;
+	}
+
+	public void setLotId(final Integer lotId) {
+		this.lotId = lotId;
 	}
 
 	public List<Variable> getVariables() {

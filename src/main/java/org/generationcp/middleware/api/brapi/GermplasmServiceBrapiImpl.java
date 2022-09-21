@@ -9,6 +9,7 @@ import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmImportRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.GermplasmUpdateRequest;
 import org.generationcp.middleware.api.brapi.v2.germplasm.Synonym;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
 import org.generationcp.middleware.api.germplasm.GermplasmMethodValidator;
 import org.generationcp.middleware.api.germplasm.GermplasmServiceImpl;
@@ -24,7 +25,6 @@ import org.generationcp.middleware.domain.search_request.brapi.v2.GermplasmSearc
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Attribute;
@@ -70,7 +70,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 	private OntologyVariableDataManager ontologyVariableDataManager;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	private final DaoFactory daoFactory;
 
@@ -100,7 +100,7 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 		final Map<String, Integer> locationsMap = this.getLocationsMapByLocAbbr(germplasmImportRequestList);
 		final Map<String, Variable> attributesMap = this.getAttributesMapByVariableName(germplasmImportRequestList);
 		final Map<String, Integer> nameTypesMap = this.getNameTypesMapByNameTypeCode(germplasmImportRequestList);
-		final CropType cropType = this.workbenchDataManager.getCropTypeByName(cropname);
+		final CropType cropType = this.cropService.getCropTypeByName(cropname);
 
 		//Set Unknown derivative method as default when no breeding method is specified
 		Method unknownDerivativeMethod = null;
@@ -218,8 +218,9 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 						.collect(Collectors.toMap(Method::getMid, Function.identity()));
 				final Method newBreedingMethod = methodMap.get(newBreedingMethodId);
 				final Method oldBreedingMethod = methodMap.get(oldBreedingMethodId);
-				if (this.germplasmMethodValidator
-					.isNewBreedingMethodValid(oldBreedingMethod, newBreedingMethod, germplasmDbId, conflictErrors)) {
+				if (this.daoFactory.getGermplasmDao().getGermplasmDescendantByGID(germplasm.getGid(), 0, Integer.MAX_VALUE).isEmpty() ||
+					this.germplasmMethodValidator
+						.isNewBreedingMethodValid(oldBreedingMethod, newBreedingMethod, germplasmDbId, conflictErrors)) {
 					germplasm.setMethodId(newBreedingMethodId);
 				}
 			}
@@ -456,7 +457,8 @@ public class GermplasmServiceBrapiImpl implements GermplasmServiceBrapi {
 
 		for (final Map.Entry<Integer, List<AttributeDTO>> gidAttributes : attributesByGidsMap.entrySet()) {
 			final Map<String, String> attributeCodeValueMap = new HashMap<>();
-			gidAttributes.getValue().stream().forEach(attributeDTO -> attributeCodeValueMap.put(attributeDTO.getAttributeCode(), attributeDTO.getValue()));
+			gidAttributes.getValue().stream()
+				.forEach(attributeDTO -> attributeCodeValueMap.put(attributeDTO.getAttributeCode(), attributeDTO.getValue()));
 			attributeMap.put(gidAttributes.getKey(), attributeCodeValueMap);
 		}
 

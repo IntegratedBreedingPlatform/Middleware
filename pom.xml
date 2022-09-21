@@ -4,7 +4,7 @@
 	<groupId>org.generationcp</groupId>
 	<artifactId>middleware</artifactId>
 	<packaging>jar</packaging>
-        <version>20.0</version>
+        <version>22.0</version>
 	<name>Middleware</name>
 
 	<properties>
@@ -358,6 +358,11 @@
 			<version>2.5.3</version>
 		</dependency>
 
+		<dependency>
+			<groupId>net.sf.opencsv</groupId>
+			<artifactId>opencsv</artifactId>
+			<version>2.0</version>
+		</dependency>
 
 	</dependencies>
 

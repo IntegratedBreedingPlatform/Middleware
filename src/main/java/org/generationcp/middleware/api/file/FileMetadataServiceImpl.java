@@ -5,7 +5,10 @@ import org.apache.commons.codec.binary.Hex;
 import org.generationcp.middleware.ContextHolder;
 import org.generationcp.middleware.api.brapi.v1.image.Image;
 import org.generationcp.middleware.api.brapi.v1.image.ImageNewRequest;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
+import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
@@ -13,12 +16,12 @@ import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.file.FileMetadata;
+import org.generationcp.middleware.pojos.ims.Lot;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.util.uid.FileUIDGenerator;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,10 +30,10 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
@@ -41,17 +44,18 @@ import static org.springframework.util.CollectionUtils.isEmpty;
 @Service
 public class FileMetadataServiceImpl implements FileMetadataService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(FileMetadataServiceImpl.class);
-
 	public static final String FILE_PATH_PREFIX_PROGRAMUUID = "programuuid-";
 	public static final String FILE_PATH_PREFIX_STUDYID = "studyid-";
 	public static final String FILE_PATH_PREFIX_OBSUNITUUID = "obsunituuid-";
+	public static final String FILE_PATH_PREFIX_INSTANCEID = "instanceid-";
 	/**
 	 * AWS S3 uses forward slash to identify folders
 	 */
 	public static final String FILE_PATH_SLASH = "/";
 	public static final String FILE_PATH_GERMPLASM_ROOT = "germplasm";
 	public static final String FILE_PATH_PREFIX_GERMPLASMUUID = "germplasmuuid-";
+	public static final String FILE_PATH_LOT_ROOT = "lot";
+	public static final String FILE_PATH_PREFIX_LOTUUID = "lotuuid-";
 
 	private DaoFactory daoFactory;
 
@@ -91,8 +95,7 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 
 		this.daoFactory.getFileMetadataDAO().save(fileMetadata);
 
-		final Image response = fileMetadataMapper.map(fileMetadata);
-		return response;
+		return fileMetadataMapper.map(fileMetadata);
 	}
 
 	@Override
@@ -132,12 +135,13 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public List<FileMetadataDTO> getAll(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
+	public List<FileMetadataDTO> getAll(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID,
+		final Integer instanceId, final Integer lotId) {
 		final List<FileMetadata> fileMetadataList = this.daoFactory.getFileMetadataDAO()
-			.getAll(variableIds, datasetId, germplasmUUID);
+			.getAll(variableIds, datasetId, germplasmUUID, instanceId, lotId);
 		final FileMetadataMapper fileMetadataMapper = new FileMetadataMapper();
 		final List<FileMetadataDTO> fileMetadataDTOList = new ArrayList<>();
-		for (FileMetadata fileMetadata : fileMetadataList) {
+		for (final FileMetadata fileMetadata : fileMetadataList) {
 			final FileMetadataDTO fileMetadataDTO = new FileMetadataDTO();
 			fileMetadataMapper.map(fileMetadata, fileMetadataDTO);
 			fileMetadataDTOList.add(fileMetadataDTO);
@@ -162,11 +166,27 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
+	public String getFilePathForEnvironment(final Integer instanceId, final String fileName) {
+		final Geolocation environment = this.daoFactory.getGeolocationDao().getById(instanceId);
+		this.validateEnvironment(environment, instanceId);
+		final Integer plotDatasetId = this.daoFactory.getDmsProjectDAO()
+			.getDatasetIdByEnvironmentIdAndDatasetType(instanceId, DatasetTypeEnum.PLOT_DATA);
+		final DatasetDTO plotDataset = this.daoFactory.getDmsProjectDAO().getDataset(plotDatasetId);
+		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(plotDataset.getParentDatasetId());
+		final String path = FILE_PATH_PREFIX_PROGRAMUUID + study.getProgramUUID()
+			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_STUDYID + study.getProjectId()
+			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_INSTANCEID + instanceId.toString()
+			+ FILE_PATH_SLASH + fileName;
+		this.validatePathNotExists(path);
+		return path;
+	}
+
+	@Override
 	public String getFilePathForGermplasm(final String germplasmUUID, final String fileName) {
 		final MessageDigest md5;
 		try {
 			md5 = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
+		} catch (final NoSuchAlgorithmException e) {
 			throw new IllegalStateException("No MD5 algorithm available!");
 		}
 		/*
@@ -191,10 +211,39 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		return path;
 	}
 
+	@Override
+	public String getFilePathForLot(final Integer lotId, final String fileName) {
+		final Lot lot = this.daoFactory.getLotDao().getById(lotId);
+		this.validateLot(lot, lotId);
+		final MessageDigest md5;
+		try {
+			md5 = MessageDigest.getInstance("MD5");
+		} catch (final NoSuchAlgorithmException e) {
+			throw new IllegalStateException("No MD5 algorithm available!");
+		}
+		final String hexString = Hex.encodeHexString(md5.digest(lot.getLotUuId().getBytes(StandardCharsets.UTF_8)));
+		final String path = FILE_PATH_LOT_ROOT
+			+ FILE_PATH_SLASH + hexString.charAt(0)
+			+ FILE_PATH_SLASH + hexString.charAt(1)
+			+ FILE_PATH_SLASH + hexString.charAt(2)
+			+ FILE_PATH_SLASH + hexString.charAt(3)
+			+ FILE_PATH_SLASH + hexString.charAt(4)
+			+ FILE_PATH_SLASH + FILE_PATH_PREFIX_LOTUUID + lot.getLotUuId()
+			+ FILE_PATH_SLASH + fileName;
+		this.validatePathNotExists(path);
+		return path;
+	}
+
 	private void validatePathNotExists(final String path) {
 		final FileMetadata fileMetadata = this.daoFactory.getFileMetadataDAO().getByPath(path);
 		if (fileMetadata != null) {
 			throw new MiddlewareRequestException("", "filemetadata.path.overwrite");
+		}
+	}
+
+	private void validateEnvironment(final Geolocation environment, final Integer instanceId) {
+		if (environment == null) {
+			throw new MiddlewareRequestException("", "filemetadata.geolocation.not.found", new String[] {instanceId.toString()});
 		}
 	}
 
@@ -204,28 +253,53 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 		}
 	}
 
+	private void validateLot(final Lot lot, final Integer lotId) {
+		if (lot == null) {
+			throw new MiddlewareRequestException("", "filemetadata.lot.not.found", new String[] {lotId.toString()});
+		}
+	}
+
 	@Override
 	public FileMetadataDTO save(
 		final FileMetadataDTO fileMetadataDTO,
 		final String observationUnitUUID,
 		final String germplasmUUID,
+		final Integer instanceId,
+		final Integer lotId,
 		final Integer termId
 	) {
 
 		final FileMetadata fileMetadata = new FileMetadata();
-		Preconditions.checkArgument(isBlank(observationUnitUUID) != isBlank(germplasmUUID));
+		//Check if only one of the parameters has value
+		final boolean valid = ((isBlank(observationUnitUUID)? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1)  + ((lotId == null)? 0 : 1)) == 1;
+		Preconditions.checkArgument(valid);
 
 		if (!isBlank(observationUnitUUID)) {
 			final Optional<ExperimentModel> experimentModelOptional = this.daoFactory.getExperimentDao().getByObsUnitId(observationUnitUUID);
 			this.validateObservationUnit(experimentModelOptional, observationUnitUUID);
 			fileMetadata.setExperimentModel(experimentModelOptional.get());
-		} else {
+		} else if (!isBlank(germplasmUUID)) {
 			final Optional<Germplasm> germplasmOptional = this.daoFactory.getGermplasmDao().getGermplasmByGUIDs(singletonList(germplasmUUID))
 				.stream().findFirst();
 			if (!germplasmOptional.isPresent()) {
 				throw new MiddlewareRequestException("", "filemetadata.germplasm.not.found", new String[] {germplasmUUID});
 			}
 			fileMetadata.setGermplasm(germplasmOptional.get());
+		} else if (instanceId != null) {
+			final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(instanceId);
+			if (geolocation == null) {
+				throw new MiddlewareRequestException("", "filemetadata.geolocation.not.found", new String[] {instanceId.toString()});
+			}
+			final ExperimentModel model = this.daoFactory.getExperimentDao()
+				.getExperimentByTypeInstanceId(ExperimentType.TRIAL_ENVIRONMENT.getTermId(), instanceId);
+			fileMetadata.setExperimentModel(model);
+			fileMetadata.setGeolocation(geolocation);
+		} else if (lotId != null) {
+			final Lot lot = this.daoFactory.getLotDao().getById(lotId);
+			if (lot == null) {
+				throw new MiddlewareRequestException("", "filemetadata.lot.not.found", new String[] {lotId.toString()});
+			}
+			fileMetadata.setLot(lot);
 		}
 
 		if (termId != null) {
@@ -286,17 +360,20 @@ public class FileMetadataServiceImpl implements FileMetadataService {
 	}
 
 	@Override
-	public void detachFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
-		Preconditions.checkArgument((datasetId == null) != isBlank(germplasmUUID));
-
-		this.daoFactory.getFileMetadataDAO().detachFiles(variableIds, datasetId, germplasmUUID);
+	public void detachFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID, final Integer instanceId,
+		final Integer lotId) {
+		final boolean valid = ((datasetId == null? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1) + ((lotId == null)? 0 : 1)) == 1;
+		Preconditions.checkArgument(valid);
+		this.daoFactory.getFileMetadataDAO().detachFiles(variableIds, datasetId, germplasmUUID, instanceId, lotId);
 	}
 
 	@Override
-	public void removeFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID) {
-		Preconditions.checkArgument((datasetId == null) != isBlank(germplasmUUID));
-
-		this.daoFactory.getFileMetadataDAO().removeFiles(variableIds, datasetId, germplasmUUID);
+	public void removeFiles(final List<Integer> variableIds, final Integer datasetId, final String germplasmUUID, final Integer instanceId,
+		final Integer lotId) {
+		final boolean valid = ((datasetId == null? 0 : 1) + (isBlank(germplasmUUID)? 0 : 1) + ((instanceId == null)? 0 : 1) + ((lotId == null)? 0 : 1)) == 1;
+		Preconditions.checkArgument(valid);
+		final List<Integer> instanceIds = instanceId == null? null : Collections.singletonList(instanceId);
+		this.daoFactory.getFileMetadataDAO().removeFiles(variableIds, datasetId, germplasmUUID, instanceIds, lotId);
 	}
 
 	@Override

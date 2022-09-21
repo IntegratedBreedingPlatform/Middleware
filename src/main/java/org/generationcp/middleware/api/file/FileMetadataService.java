@@ -17,13 +17,18 @@ public interface FileMetadataService {
 
 	FileMetadataDTO getByFileUUID(String fileUUID);
 
-	List<FileMetadataDTO> getAll(List<Integer> variableId, Integer datasetId, String germplasmUUID);
+	List<FileMetadataDTO> getAll(List<Integer> variableId, Integer datasetId, String germplasmUUID, Integer instanceId, Integer lotId);
 
 	String getFilePathForObservationUnit(String observationUnitDbId, String fileName);
 
+	String getFilePathForEnvironment(Integer instanceId, String fileName);
+
 	String getFilePathForGermplasm(String germplasmUUID, String fileName);
 
-	FileMetadataDTO save(FileMetadataDTO fileMetadataDTO, String observationUnitUUID, String germplasmUUID, Integer termId);
+	String getFilePathForLot(Integer lotId, String fileName);
+
+	FileMetadataDTO save(FileMetadataDTO fileMetadataDTO, String observationUnitUUID, String germplasmUUID, Integer instanceId, Integer lotId,
+		Integer termId);
 
 	List<FileMetadataDTO> search(FileMetadataFilterRequest filterRequest, String programUUID, Pageable pageable);
 
@@ -31,9 +36,9 @@ public interface FileMetadataService {
 
 	void delete(String fileUUID);
 
-	void detachFiles(List<Integer> variableIds, Integer datasetId, String germplasmUUID);
+	void detachFiles(List<Integer> variableIds, Integer datasetId, String germplasmUUID, Integer instanceId, Integer lotId);
 
-	void removeFiles(List<Integer> variableIds, Integer datasetId, String germplasmUUID);
+	void removeFiles(List<Integer> variableIds, Integer datasetId, String germplasmUUID, Integer instanceId, Integer lotId);
 
 	void updateGid(Integer newGid, List<String> targetFileUUIDs);
 

@@ -9,7 +9,6 @@ import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.ExperimentDesignType;
@@ -22,8 +21,6 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -57,21 +54,14 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	private static final Integer NO_REPS = 2;
 	private static final Integer NO_ENTRIES = 5;
 	private static final Integer NO_TREATMENTS = 3;
-	private static final List<TermId> GERMPLASM_VARIABLES =
-		Arrays.asList(TermId.ENTRY_TYPE, TermId.GID, TermId.DESIG, TermId.ENTRY_NO);
-	private static final List<TermId> PLOT_VARIABLES =
-		Arrays.asList(TermId.PLOT_NO, TermId.REP_NO);
+	private static final List<TermId> GERMPLASM_VARIABLES =	Arrays.asList(TermId.GID, TermId.DESIG);
+	private static final List<TermId> PLOT_VARIABLES = Arrays.asList(TermId.PLOT_NO, TermId.REP_NO);
+	private static final List<TermId> ENTRY_DETAIL_VARIABLES = Arrays.asList(TermId.ENTRY_TYPE, TermId.ENTRY_NO);
 	private static final String GERMPLASM_PREFIX = "GERMPLASM_PREFIX";
 	public static final String LOCATION_ID = "9011";
 
 	@Autowired
-	private GermplasmDataManager germplasmDataManager;
-
-	@Autowired
 	private OntologyDataManager ontologyManager;
-
-	@Autowired
-	private LocationDataManager locationManager;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -107,13 +97,12 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, new NameDAO(this.sessionProvder
-				.getSession()));
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 		}
 
 		this.studyTDI =
 			new StudyTestDataInitializer(this.studyDataManager, this.ontologyManager, this.commonTestProject,
-				this.locationManager, this.sessionProvder);
+				this.sessionProvder);
 
 		// Create a study with environments
 		if (this.studyReference == null) {
@@ -432,7 +421,7 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 		Assert.assertEquals("22", row.getVariables().get("PLOT_NO").getValue());
 		Assert.assertEquals("1", row.getVariables().get(this.treatmentFactor.getName()).getValue());
 		Assert.assertEquals("100", row.getVariables().get(this.treatmentFactorLabel.getName()).getValue());
-		Assert.assertEquals("Test entry", row.getVariables().get("ENTRY_TYPE").getValue());
+		Assert.assertEquals("T", row.getVariables().get("ENTRY_TYPE").getValue());
 		Assert.assertEquals(GERMPLASM_PREFIX + gid, row.getVariables().get("DESIGNATION").getValue());
 		Assert.assertNotNull(row.getVariables().get("OBS_UNIT_ID").getValue());
 	}
@@ -440,8 +429,8 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 	private void verifyPlotVariablesWereSaved() {
 		final List<Integer> plotVariableIds = this.daoFactory.getProjectPropertyDAO()
 			.getDatasetVariableIdsForVariableTypeIds(this.plotDatasetId, Arrays.asList(VariableType.GERMPLASM_DESCRIPTOR.getId(),
-				VariableType.EXPERIMENTAL_DESIGN.getId()), null);
-		for (final TermId variable : Lists.newArrayList(Iterables.concat(PLOT_VARIABLES, GERMPLASM_VARIABLES))) {
+				VariableType.EXPERIMENTAL_DESIGN.getId(), VariableType.ENTRY_DETAIL.getId()), null);
+		for (final TermId variable : Lists.newArrayList(Iterables.concat(PLOT_VARIABLES, GERMPLASM_VARIABLES, ENTRY_DETAIL_VARIABLES))) {
 			Assert.assertTrue(plotVariableIds.contains(variable.getId()));
 		}
 		Assert.assertTrue(plotVariableIds.contains(this.treatmentFactor.getCvTermId()));
@@ -547,6 +536,14 @@ public class ExperimentDesignServiceImplTest extends IntegrationTestBase {
 			plotVariable.setAlias(variable.name());
 			plotVariable.setTermId(variable.getId());
 			variables.add(plotVariable);
+		}
+
+		for (final TermId variable : ENTRY_DETAIL_VARIABLES) {
+			final MeasurementVariable entryDetailVariable = new MeasurementVariable();
+			entryDetailVariable.setVariableType(VariableType.ENTRY_DETAIL);
+			entryDetailVariable.setAlias(variable.name());
+			entryDetailVariable.setTermId(variable.getId());
+			variables.add(entryDetailVariable);
 		}
 
 		// Treatment Factor variables

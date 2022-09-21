@@ -5,14 +5,15 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.collections.Transformer;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.domain.samplelist.SampleListDTO;
 import org.generationcp.middleware.enumeration.SampleListType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.Sample;
 import org.generationcp.middleware.pojos.SampleList;
@@ -41,6 +42,8 @@ import java.util.Set;
 @Transactional(propagation = Propagation.REQUIRED)
 public class SampleListServiceImpl implements SampleListService {
 
+	public static final int MAX_SAMPLE_NAME_SIZE = 5000;
+
 	private StudyMeasurements studyMeasurements;
 
 	private DaoFactory daoFactory;
@@ -52,7 +55,7 @@ public class SampleListServiceImpl implements SampleListService {
 	private UserService userService;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	public SampleListServiceImpl(final HibernateSessionProvider sessionProvider) {
 		this.studyMeasurements = new StudyMeasurements(sessionProvider.getSession());
@@ -101,7 +104,7 @@ public class SampleListServiceImpl implements SampleListService {
 				 */
 				throw new NotImplementedException();
 			} else {
-				 samples = this.createSamplesFromStudy(sampleListDTO, sampleList, workbenchUser);
+				samples = this.createSamplesFromStudy(sampleListDTO, sampleList, workbenchUser);
 			}
 
 			sampleList.setSamples(samples);
@@ -125,7 +128,7 @@ public class SampleListServiceImpl implements SampleListService {
 			takenBy = this.userService.getUserByUsername(sampleListDTO.getTakenBy()).getUserid();
 		}
 
-		final String cropPrefix = this.workbenchDataManager.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
+		final String cropPrefix = this.cropService.getCropTypeByName(sampleListDTO.getCropName()).getPlotCodePrefix();
 		final Collection<Integer> gids = this.getGids(observationDtos);
 		final Collection<Integer> experimentIds = this.getExperimentIds(observationDtos);
 		final Map<Integer, Integer> maxSampleNumbers = this.getMaxSampleNumber(experimentIds);
@@ -161,6 +164,10 @@ public class SampleListServiceImpl implements SampleListService {
 				entryNumber++;
 
 				final String sampleName = observationDto.getDesignation() + ':' + maxSequence;
+
+				if (sampleName.length() > MAX_SAMPLE_NAME_SIZE) {
+					throw new MiddlewareRequestException("", "error.save.resulting.name.exceeds.limit");
+				}
 
 				final Sample sample = this.sampleService
 					.buildSample(sampleListDTO.getCropName(), cropPrefix, entryNumber, sampleName,
@@ -497,8 +504,8 @@ public class SampleListServiceImpl implements SampleListService {
 		this.studyMeasurements = studyMeasurements;
 	}
 
-	public void setWorkbenchDataManager(final WorkbenchDataManager workbenchDataManager) {
-		this.workbenchDataManager = workbenchDataManager;
+	public void setCropService(final CropService cropService) {
+		this.cropService = cropService;
 	}
 
 	public void setSampleService(final SampleService sampleService) {

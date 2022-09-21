@@ -25,14 +25,10 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.LogicalExpression;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToEntityMapResultTransformer;
 import org.hibernate.transform.Transformers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
@@ -52,8 +48,6 @@ import java.util.stream.Collectors;
 public class MethodDAO extends GenericDAO<Method, Integer> {
 
 	private static final String METHOD_NAME = "mname";
-
-	private static final Logger LOG = LoggerFactory.getLogger(MethodDAO.class);
 
 	private static final String COUNT_BREEDING_METHODS_WITH_VARIABLE =
 		" SELECT count(1) FROM methods where "
@@ -100,36 +94,6 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			return criteria.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(this.getLogExceptionMessage("getMethodsByType", "type", type, e.getMessage(), "Method"), e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<Method> getByGroupAndTypeAndName(final String group, final String type, final String name) {
-		try {
-
-			final Criteria criteria = this.getSession().createCriteria(Method.class);
-
-			if (type != null && !type.isEmpty()) {
-				criteria.add(Restrictions.eq("mtype", type));
-			}
-
-			if (name != null && !name.isEmpty()) {
-				criteria.add(Restrictions.like(METHOD_NAME, "%" + name.trim() + "%"));
-			}
-
-			if (group != null && !group.isEmpty()) {
-				final Criterion group1 = Restrictions.eq("mgrp", group);
-				final Criterion group2 = Restrictions.eq("mgrp", "G");
-				final LogicalExpression orExp = Restrictions.or(group1, group2);
-
-				criteria.add(orExp);
-			}
-
-			criteria.addOrder(Order.asc(METHOD_NAME));
-			return criteria.list();
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				this.getLogExceptionMessage("getMethodsByGroupAndType", "group|type", group + "|" + type, e.getMessage(), "Method"), e);
 		}
 	}
 
@@ -279,6 +243,8 @@ public class MethodDAO extends GenericDAO<Method, Integer> {
 			breedingMethodDTO.setSuffix((String) row.get(BreedingMethodSearchDAOQuery.SUFFIX_ALIAS));
 			breedingMethodDTO.setCreationDate((Date) row.get(BreedingMethodSearchDAOQuery.DATE_ALIAS));
 			breedingMethodDTO.setIsBulkingMethod(MethodHelper.isBulkingMethod(breedingMethodDTO.getMethodClass()));
+			breedingMethodDTO.setSnameTypeCode((String) row.get(BreedingMethodSearchDAOQuery.SNAME_TYPE_CODE_ALIAS));
+			breedingMethodDTO.setSnameTypeId((Integer) row.get(BreedingMethodSearchDAOQuery.SNAME_TYPE_ID_ALIAS));
 
 			final Integer programFavoriteId = (Integer) row.get(BreedingMethodSearchDAOQuery.FAVORITE_PROGRAM_ID_ALIAS);
 			if (programFavoriteId != null) {

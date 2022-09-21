@@ -2,7 +2,6 @@ package org.generationcp.middleware.dao;
 
 import org.generationcp.middleware.domain.workbench.RoleType;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
-import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.PermissionsEnum;
 import org.generationcp.middleware.pojos.workbench.UserRole;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
@@ -14,22 +13,21 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class UserRoleDao extends GenericDAO<UserRole, Long> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(UserRole.class);
 
-		private static final String HAS_INSTANCE_ROLE_WITH_ADD_PROGRAM_PERMISSION_SQL = "select ur.role_id from users_roles ur " //
-			+"  inner join role r on ur.role_id = r.id " //
-			+"  inner join role_type type on type.role_type_id = r.role_type_id " //
-			+"  inner join role_permission rp on r.id = rp.role_id " //
-			+"  inner join permission p on rp.permission_id = p.permission_id " //
-			+"  where (r.role_type_id = " + RoleType.INSTANCE.getId() + " and p.name in ('" + PermissionsEnum.ADMIN.toString() + "', '"+ PermissionsEnum.CROP_MANAGEMENT.toString() //
-			+"','"+ PermissionsEnum.ADD_PROGRAM.toString()+"', '"+ PermissionsEnum.MANAGE_PROGRAMS+"'))" //
-			+"  and ur.userid = :userId and r.active = 1";//
+	private static final String HAS_INSTANCE_ROLE_WITH_ADD_PROGRAM_PERMISSION_SQL = "select ur.role_id from users_roles ur " //
+		+ "  inner join role r on ur.role_id = r.id " //
+		+ "  inner join role_type type on type.role_type_id = r.role_type_id " //
+		+ "  inner join role_permission rp on r.id = rp.role_id " //
+		+ "  inner join permission p on rp.permission_id = p.permission_id " //
+		+ "  where (r.role_type_id = " + RoleType.INSTANCE.getId() + " and p.name in ('" + PermissionsEnum.ADMIN.toString() + "', '"
+		+ PermissionsEnum.CROP_MANAGEMENT.toString() //
+		+ "','" + PermissionsEnum.ADD_PROGRAM.toString() + "', '" + PermissionsEnum.MANAGE_PROGRAMS + "'))" //
+		+ "  and ur.userid = :userId and r.active = 1";//
 
 	/**
 	 * See also {@link PermissionDAO#SQL_FILTERED_PERMISSIONS}
@@ -91,7 +89,7 @@ public class UserRoleDao extends GenericDAO<UserRole, Long> {
 	public void delete(final UserRole userRole) {
 
 		try {
-			makeTransient(userRole);
+			this.makeTransient(userRole);
 
 		} catch (final Exception e) {
 			final String message = "Cannot delete UserRole (UserRole=" + userRole
@@ -126,21 +124,6 @@ public class UserRoleDao extends GenericDAO<UserRole, Long> {
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException("Error in hasInstanceRoleWithAddProgramPermission(userId=" + userId + ")", e);
 		}
-	}
-
-	public Set<CropType> getCropsWithAddProgramPermissionForCropRoles(final int userId) {
-		final Set<CropType> cropTypes = new HashSet<>();
-		try {
-			final SQLQuery query = this.getSession().createSQLQuery(GET_CROPS_WITH_ADD_PROGRAM_PERMISSION_FOR_A_CROP_ROLE_SQL);
-			query.setParameter("userId", userId);
-			final List<String> results = query.list();
-			for (final String s : results) {
-				cropTypes.add(new CropType(s));
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in getCropsWithAddProgramPermissionForCropRoles(userId=" + userId + ")", e);
-		}
-		return cropTypes;
 	}
 
 	public void deleteProgramRolesAssociations(final String programUUID) {

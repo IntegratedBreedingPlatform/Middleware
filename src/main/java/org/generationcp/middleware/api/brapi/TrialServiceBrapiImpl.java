@@ -450,7 +450,7 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 			properties.add(locationNameProp);
 		} else {
 			final ProjectProperty entryTypeProp =
-				new ProjectProperty(dataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, 4, TermId.ENTRY_TYPE.getId(),
+				new ProjectProperty(dataset, VariableType.ENTRY_DETAIL.getId(), null, 4, TermId.ENTRY_TYPE.getId(),
 					"ENTRY_TYPE");
 			properties.add(entryTypeProp);
 
@@ -465,7 +465,7 @@ public class TrialServiceBrapiImpl implements TrialServiceBrapi {
 			properties.add(designationProp);
 
 			final ProjectProperty entryNoProp =
-				new ProjectProperty(dataset, VariableType.GERMPLASM_DESCRIPTOR.getId(), null, 7, TermId.ENTRY_NO.getId(),
+				new ProjectProperty(dataset, VariableType.ENTRY_DETAIL.getId(), null, 7, TermId.ENTRY_NO.getId(),
 					"ENTRY_NO");
 			properties.add(entryNoProp);
 

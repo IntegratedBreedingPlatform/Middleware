@@ -1,0 +1,151 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="mderamos" id="v21.2.0-1">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="listdata" columnName="desig"></columnExists>
+		</preConditions>
+		<comment>Remove desig column from listdata table</comment>
+		<dropColumn tableName="listdata" columnName="desig"></dropColumn>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v21.2.0-2">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="program_location_default" columnName="location_id"/>
+		</preConditions>
+		<comment>
+			Rename location_id column name to breeding_location_id
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE program_location_default
+			CHANGE COLUMN location_id breeding_location_id INT(11);
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v21.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="program_location_default" columnName="storage_location_id" />
+			</not>
+		</preConditions>
+		<comment>Add storage_location_id column in program_location_default table</comment>
+		<addColumn tableName="program_location_default">
+			<column name="storage_location_id" type="INT(11)" afterColumn="breeding_location_id">
+				<constraints nullable="false" foreignKeyName="fk_program_storage_location_default" references="location(locid)"/>
+			</column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v22.1.0-4">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(*) FROM location WHERE labbr = 'DSS';
+			</sqlCheck>
+		</preConditions>
+		<comment>ADD Default Seed Store location </comment>
+		<sql dbms="mysql">
+			INSERT INTO location (`ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`) VALUES
+			(1500,0,'Default Seed Store','DSS',0,0,0,0,0,0);
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v22.1.0-5">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="program_location_default"/>
+				<not>
+					<sqlCheck expectedResult="0">
+						SELECT COUNT(1) FROM workbench.workbench_project project
+						INNER JOIN workbench.workbench_crop crop
+						WHERE crop.crop_name = project.crop_type
+						AND crop.db_name = DATABASE()
+					</sqlCheck>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Populate program_location_default.storage_location_id for existing programs, set DSS(id=6000) as default
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @dss_location_id = (select locid from location where labbr = 'DSS');
+
+			UPDATE program_location_default
+			set storage_location_id = @dss_location_id;
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v22.1.0-6">
+		<preConditions onFail="MARK_RAN">
+			<columnExists tableName="location" columnName="ldefault"/>
+		</preConditions>
+		<comment>
+			Drop ldefault column from location table
+		</comment>
+		<dropColumn tableName="location" columnName="ldefault"></dropColumn>
+	</changeSet>
+
+	<changeSet id="v21.2.0-7" author="cheryleigh">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				select count(*) from cvterm where cvterm_id = 1816;
+			</sqlCheck>
+		</preConditions>
+		<comment>Add cvterm entry for inventory attributes</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO cvterm (cvterm_id, cv_id, name, definition, dbxref_id, is_obsolete, is_relationshiptype)
+			VALUES (1816, 1041, 'Inventory Attribute', 'Inventory Attribute', null, 0, 0);
+		</sql>
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v21.2.0-8">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="ims_lot_attribute"></tableExists>
+			</not>
+		</preConditions>
+		<comment>
+			Create table 'ims_lot_attribute'
+		</comment>
+		<createTable tableName="ims_lot_attribute">
+			<column name="aid" type="int" autoIncrement="true">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="lotid" type="int" defaultValue="0">
+				<constraints nullable="false" foreignKeyName="fk_ims_lot_attribute_lotid" references="ims_lot(lotid)"/>
+			</column>
+			<column name="atype" type="int">
+				<constraints nullable="false" foreignKeyName="fk_ims_lot_attribute_atype" references="cvterm(cvterm_id)"/>
+			</column>
+			<column name="aval" type="varchar(5000)" defaultValue="-">
+				<constraints nullable="false"/>
+			</column>
+			<column name="cval_id" type="int">
+				<constraints nullable="true" foreignKeyName="fk_ims_lot_attribute_cval_id" referencedTableName="cvterm" referencedColumnNames="cvterm_id"/>
+			</column>
+			<column name="alocn" type="int" defaultValue="0">>
+				<constraints nullable="true" foreignKeyName="fk_ims_lot_attribute_alocn" references="location(locid)"/>
+			</column>
+			<column name="aref" type="int" defaultValue="0">>
+				<constraints nullable="true" />
+			</column>
+			<column name="adate" type="int" defaultValue="0">>
+				<constraints nullable="true" />
+			</column>
+			<column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_by" type="int" defaultValue="0">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_date" type="timestamp">
+				<constraints nullable="true"/>
+			</column>
+			<column name="modified_by" type="int">
+				<constraints nullable="true" />
+			</column>
+		</createTable>
+	</changeSet>
+</databaseChangeLog>

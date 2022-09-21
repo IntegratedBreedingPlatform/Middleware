@@ -1,26 +1,15 @@
 
 package org.generationcp.middleware.operation.builder;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.Set;
-
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
-import org.generationcp.middleware.domain.dms.Stock;
 import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
@@ -31,6 +20,16 @@ import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
+import java.util.Set;
 
 public class ExperimentBuilderTest extends IntegrationTestBase {
 
@@ -148,18 +147,6 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testCreateGermplasmFactorForEntryCode() {
-
-		final StockModel stockModel = this.createStockModel();
-		final DMSVariableType variableType = this.createDMSVariableType(TermId.ENTRY_CODE);
-
-		final Variable variable = builder.createGermplasmFactor(stockModel, variableType);
-
-		Assert.assertNotNull(variable);
-		Assert.assertEquals(stockModel.getValue(), variable.getValue());
-	}
-
-	@Test
 	public void testCreateGermplasmFactorForEntryType() {
 
 		final StockModel stockModel = this.createStockModel();
@@ -168,7 +155,9 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final Variable variable = builder.createGermplasmFactor(stockModel, variableType);
 
 		Assert.assertNotNull(variable);
-		Assert.assertEquals(stockModel.getProperties().iterator().next().getValue(), variable.getValue());
+		Optional<StockProperty>
+			stockProperty = stockModel.getProperties().stream().filter(property -> property.getTypeId().equals(TermId.ENTRY_TYPE.getId())).findFirst();
+				Assert.assertEquals(stockProperty.get().getCategoricalValueId().toString(), variable.getValue());
 	}
 
 	@Test
@@ -188,7 +177,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		final StockModel stockModel = this.createStockModel();
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setStock(stockModel);
-		final Map<Integer, StockModel> stockMap = new HashMap<Integer, StockModel>();
+		final Map<Integer, StockModel> stockMap = new HashMap<>();
 		stockMap.put(stockModel.getStockId(), stockModel);
 		final VariableTypeList variableTypes = new VariableTypeList();
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_NO));
@@ -196,24 +185,28 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		variableTypes.add(this.createDMSVariableType(TermId.DESIG));
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_CODE));
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_TYPE));
-		
+		variableTypes.add(this.createDMSVariableType(TermId.GROUPGID));
+		variableTypes.add(this.createDMSVariableType(TermId.CROSS));
+
 		final VariableList factors = new VariableList();
-		builder.addGermplasmFactors(factors, experimentModel, variableTypes, stockMap);
+		builder.addGermplasmFactors(factors, experimentModel, variableTypes, stockMap, null, null);
 		final List<Variable> variables = factors.getVariables();
-		Assert.assertEquals(5, variables.size());
+		Assert.assertEquals(7, variables.size());
 		final Iterator<Variable> iterator = variables.iterator();
 		verifyFactorVariable(iterator.next(), TermId.ENTRY_NO.getId(), stockModel.getUniqueName());
 		verifyFactorVariable(iterator.next(), TermId.GID.getId(), String.valueOf(stockModel.getGermplasm().getGid()));
 		verifyFactorVariable(iterator.next(), TermId.DESIG.getId(), stockModel.getName());
-		verifyFactorVariable(iterator.next(), TermId.ENTRY_CODE.getId(), stockModel.getValue());
-		verifyFactorVariable(iterator.next(), TermId.ENTRY_TYPE.getId(), stockModel.getProperties().iterator().next().getValue());
+		verifyFactorVariable(iterator.next(), TermId.ENTRY_CODE.getId(), findStockProperty(stockModel.getProperties(),TermId.ENTRY_CODE).getValue());
+		verifyFactorVariable(iterator.next(), TermId.ENTRY_TYPE.getId(), String.valueOf(findStockProperty(stockModel.getProperties(),TermId.ENTRY_TYPE).getCategoricalValueId()));
+		verifyFactorVariable(iterator.next(), TermId.GROUPGID.getId(), String.valueOf(stockModel.getGermplasm().getMgid()));
+		verifyFactorVariable(iterator.next(), TermId.CROSS.getId(), String.valueOf(stockModel.getCross()));
 	}
-	
+
 	@Test
 	public void testAddGermplasmFactors_NoStock() {
 		final StockModel stockModel = this.createStockModel();
 		final ExperimentModel experimentModel = new ExperimentModel();
-		final Map<Integer, StockModel> stockMap = new HashMap<Integer, StockModel>();
+		final Map<Integer, StockModel> stockMap = new HashMap<>();
 		stockMap.put(stockModel.getStockId(), stockModel);
 		final VariableTypeList variableTypes = new VariableTypeList();
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_NO));
@@ -223,7 +216,7 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		variableTypes.add(this.createDMSVariableType(TermId.ENTRY_TYPE));
 		
 		final VariableList factors = new VariableList();
-		builder.addGermplasmFactors(factors, experimentModel, variableTypes, stockMap);
+		builder.addGermplasmFactors(factors, experimentModel, variableTypes, stockMap, null, null);
 		Assert.assertTrue(factors.getVariables().isEmpty());
 	}
 	
@@ -232,33 +225,42 @@ public class ExperimentBuilderTest extends IntegrationTestBase {
 		Assert.assertEquals(value, variable.getValue());
 	}
 
-
 	private DMSVariableType createDMSVariableType(final TermId termId) {
 
 		final DMSVariableType dmsVariableType = new DMSVariableType();
 		final StandardVariable standardVariable = new StandardVariable();
 		standardVariable.setId(termId.getId());
 		dmsVariableType.setStandardVariable(standardVariable);
+		dmsVariableType.setLocalName(termId.name());
 		return dmsVariableType;
 	}
 
 	private StockModel createStockModel() {
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName(RandomStringUtils.randomAlphanumeric(20));
-		stockModel.setGermplasm(new Germplasm(new Random().nextInt(Integer.MAX_VALUE)));
+
+		final Germplasm germplasm = new Germplasm(new Random().nextInt(Integer.MAX_VALUE));
+		germplasm.setMgid(new Random().nextInt(Integer.MAX_VALUE));
+		stockModel.setGermplasm(germplasm);
 		stockModel.setName(RandomStringUtils.randomAlphanumeric(20));
-		stockModel.setValue(RandomStringUtils.randomAlphanumeric(20));
 
 		final Set<StockProperty> stockProperties = new HashSet<>();
-		final StockProperty stockProperty = new StockProperty();
-		stockProperty.setStock(stockModel);
-		stockProperty.setValue(RandomStringUtils.randomAlphanumeric(20));
-		stockProperty.setTypeId(TermId.ENTRY_TYPE.getId());
-		stockProperties.add(stockProperty);
+		final StockProperty entryCodeProperty = new StockProperty(stockModel, TermId.ENTRY_CODE.getId(), RandomStringUtils.randomAlphanumeric(20), null);
+		stockProperties.add(entryCodeProperty);
+
+		final StockProperty entryTypeProperty = new StockProperty(stockModel, TermId.ENTRY_TYPE.getId(), null, new Random().nextInt(Integer.MAX_VALUE));
+		stockProperties.add(entryTypeProperty);
 
 		stockModel.setProperties(stockProperties);
-
+		stockModel.setCross(RandomStringUtils.randomAlphanumeric(20));
 		return stockModel;
 
 	}
+
+	private StockProperty findStockProperty(final Set<StockProperty> properties, final TermId termId) {
+		final Optional<StockProperty>
+			stockProperty = properties.stream().filter(property -> property.getTypeId().equals(termId.getId())).findFirst();
+		return stockProperty.get();
+	}
+
 }

@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.domain.etl;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.ValueReference;
@@ -89,21 +90,11 @@ public class Workbook {
 
 	private Integer plotsIdNotfound;
 
+	private List<MeasurementVariable> entryDetails;
+
 	public Workbook() {
 		this.reset();
 		this.trialObservations = new ArrayList<>();
-	}
-
-	public Workbook(final StudyDetails studyDetails, final List<MeasurementVariable> conditions, final List<MeasurementVariable> factors,
-			final List<MeasurementVariable> constants, final List<MeasurementVariable> variates, final List<MeasurementRow> observations) {
-		this.studyDetails = studyDetails;
-		this.conditions = conditions;
-		this.factors = factors;
-		this.constants = constants;
-		this.variates = variates;
-		this.observations = observations;
-		this.trialObservations = new ArrayList<>();
-		this.reset();
 	}
 
 	// TODO : rename reset method to something more indicative of its actual purpose : clearDerivedVariables maybe.
@@ -187,6 +178,10 @@ public class Workbook {
 			this.measurementDatasetVariables.addAll(this.getNonTrialFactors());
 			if (this.variates != null && !this.variates.isEmpty()) {
 				this.measurementDatasetVariables.addAll(this.variates);
+			}
+
+			if (!CollectionUtils.isEmpty(this.entryDetails)) {
+				this.measurementDatasetVariables.addAll(this.entryDetails);
 			}
 		}
 		this.measurementDatasetVariables = this.arrangeMeasurementVariables(this.measurementDatasetVariables);
@@ -430,6 +425,18 @@ public class Workbook {
 		return list;
 	}
 
+	private List<MeasurementVariable> getEntryDetailVariables(final List<MeasurementVariable> variables) {
+		final List<MeasurementVariable> list = new ArrayList<>();
+		if (variables != null && !variables.isEmpty()) {
+			for (final MeasurementVariable variable : variables) {
+				if (PhenotypicType.ENTRY_DETAIL.getLabelList().contains(variable.getLabel().toUpperCase())) {
+					list.add(variable);
+				}
+			}
+		}
+		return list;
+	}
+
 	private List<MeasurementVariable> getTrialVariables(final List<MeasurementVariable> variables) {
 		final List<MeasurementVariable> list = new ArrayList<>();
 		if (variables != null && !variables.isEmpty()) {
@@ -471,7 +478,9 @@ public class Workbook {
 		if (this.variates != null) {
 			variableList.addAll(this.variates);
 		}
-
+		if (this.entryDetails != null) {
+			variableList.addAll(this.entryDetails);
+		}
 		return variableList;
 	}
 
@@ -1055,5 +1064,13 @@ public class Workbook {
 
 	public void setPlotsIdNotfound(final Integer plotsIdNotfound) {
 		this.plotsIdNotfound = plotsIdNotfound;
+	}
+
+	public List<MeasurementVariable> getEntryDetails() {
+		return this.entryDetails;
+	}
+
+	public void setEntryDetails(final List<MeasurementVariable> entryDetails) {
+		this.entryDetails = entryDetails;
 	}
 }

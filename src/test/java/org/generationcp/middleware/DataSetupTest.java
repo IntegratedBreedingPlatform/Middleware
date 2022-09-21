@@ -1,19 +1,19 @@
 
 package org.generationcp.middleware;
 
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.program.ProgramService;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.etl.StudyDetails;
 import org.generationcp.middleware.domain.etl.Workbook;
+import org.generationcp.middleware.domain.gms.SystemDefinedEntryType;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.study.StudyTypeDto;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
 import org.generationcp.middleware.pojos.Person;
@@ -52,16 +52,13 @@ public class DataSetupTest extends IntegrationTestBase {
     public static final String STUDY_INSTITUTE = "STUDY_INSTITUTE";
 
     @Autowired
-    private WorkbenchDataManager workbenchDataManager;
+    private CropService cropService;
 
     @Autowired
     private UserService userService;
 
     @Autowired
     private DataImportService dataImportService;
-
-    @Autowired
-    private GermplasmDataManager germplasmManager;
 
     @Autowired
     private GermplasmListManager germplasmListManager;
@@ -71,6 +68,8 @@ public class DataSetupTest extends IntegrationTestBase {
 
 	@Autowired
 	private ProgramService programService;
+
+    private DaoFactory daoFactory;
 
     private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
@@ -100,8 +99,6 @@ public class DataSetupTest extends IntegrationTestBase {
 
     private static final String SCALE_TEXT = "Text";
     private static final String ENUMERATED = "ENUMERATED";
-    private static final String DESCRIBED = "Described";
-    private static final String DATE = "Date (yyyymmdd)";
     private static final String OBSERVED = "Observed";
 
     private static final String GID = "GID";
@@ -118,15 +115,15 @@ public class DataSetupTest extends IntegrationTestBase {
     @Before
     public void setUp() {
         if (this.germplasmTestDataGenerator == null) {
-            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager, new NameDAO(this.sessionProvder
-                .getSession()));
+            this.daoFactory = new DaoFactory(this.sessionProvder);
+            this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
         }
     }
 
     @Test
     public void setUpBasicTestData() {
         final String programUUID = this.createWorkbenchProgram();
-        this.createNursery(programUUID, cropPrefix);
+        this.createNursery(programUUID, this.cropPrefix);
     }
 
     private String createWorkbenchProgram() {
@@ -164,12 +161,12 @@ public class DataSetupTest extends IntegrationTestBase {
 
         this.userService.addUser(workbenchUser);
 
-        CropType cropType = this.workbenchDataManager.getCropTypeByName("maize");
+        CropType cropType = this.cropService.getCropTypeByName("maize");
         if (cropType == null) {
             cropType = new CropType("maize");
             cropType.setDbName("ibdbv2_maize_merged");
             cropType.setVersion("4.0.0");
-            this.workbenchDataManager.addCropType(cropType);
+            this.daoFactory.getCropTypeDAO().saveOrUpdate(cropType);
         }
 
         final Project program = new Project();
@@ -212,9 +209,9 @@ public class DataSetupTest extends IntegrationTestBase {
         // Germplasm list data
         final List<GermplasmListData> germplasmListData = new ArrayList<GermplasmListData>();
         for (int i = 0; i < DataSetupTest.NUMBER_OF_GERMPLASM; i++) {
-            germplasmListData.add(new GermplasmListData(null, germplasmList, gids[i], i, "EntryCode" + i,
-                    DataSetupTest.GERMPLSM_PREFIX + i + " Source", DataSetupTest.GERMPLSM_PREFIX + i,
-                    DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));
+            germplasmListData.add(new GermplasmListData(null, germplasmList, gids[i], i,
+                    DataSetupTest.GERMPLSM_PREFIX + i + " Source",
+                DataSetupTest.GERMPLSM_PREFIX + "Group A", 0, 0));
         }
         this.germplasmListManager.addGermplasmListData(germplasmListData);
 
@@ -277,10 +274,20 @@ public class DataSetupTest extends IntegrationTestBase {
 
         // Factors
         final List<MeasurementVariable> factors = new ArrayList<MeasurementVariable>();
-        final MeasurementVariable entryFactor = this.createMeasurementVariable(TermId.ENTRY_NO.getId(), "ENTRY_NO",
+        final MeasurementVariable entryNumberFactor = this.createMeasurementVariable(TermId.ENTRY_NO.getId(), "ENTRY_NO",
                 "Germplasm entry - enumerated (number)", "Germplasm entry", DataSetupTest.ENUMERATED,
-                DataSetupTest.NUMBER, DataSetupTest.NUMERIC, null, DataSetupTest.ENTRY, PhenotypicType.GERMPLASM, true);
-        factors.add(entryFactor);
+                DataSetupTest.NUMBER, DataSetupTest.NUMERIC, null, DataSetupTest.ENTRY, PhenotypicType.ENTRY_DETAIL, true);
+        factors.add(entryNumberFactor);
+
+        final MeasurementVariable entryTypeFactor = this.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), "ENTRY_TYPE",
+            "Entry type (test/check)- assigned (type)", "Entry type", DataSetupTest.ENUMERATED,
+            DataSetupTest.CHAR, "C", null, DataSetupTest.ENTRY, PhenotypicType.ENTRY_DETAIL, true);
+        factors.add(entryTypeFactor);
+
+        final MeasurementVariable entryCodeFactor = this.createMeasurementVariable(TermId.ENTRY_CODE.getId(), "ENTRY_CODE",
+            "Germplasm ID - Assigned (Code)", "Germplasm entry", DataSetupTest.ENUMERATED,
+            DataSetupTest.CHAR, "C", null, DataSetupTest.ENTRY, PhenotypicType.ENTRY_DETAIL, true);
+        factors.add(entryCodeFactor);
 
         final MeasurementVariable designationFactor = this.createMeasurementVariable(TermId.DESIG.getId(),
                 "DESIGNATION", "Germplasm designation - assigned (DBCV)", "Germplasm Designation",
@@ -330,8 +337,8 @@ public class DataSetupTest extends IntegrationTestBase {
             for (int i = 0; i < DataSetupTest.NUMBER_OF_GERMPLASM; i++) {
                 row = new MeasurementRow();
                 dataList = new ArrayList<>();
-                final MeasurementData entryData = new MeasurementData(entryFactor.getLabel(), String.valueOf(i));
-                entryData.setMeasurementVariable(entryFactor);
+                final MeasurementData entryData = new MeasurementData(entryNumberFactor.getLabel(), String.valueOf(i));
+                entryData.setMeasurementVariable(entryNumberFactor);
                 dataList.add(entryData);
 
                 final MeasurementData designationData = new MeasurementData(designationFactor.getLabel(),
@@ -360,6 +367,15 @@ public class DataSetupTest extends IntegrationTestBase {
                     String.valueOf(new Random().nextInt(100)));
                 variateData.setMeasurementVariable(variate);
                 dataList.add(variateData);
+
+                final MeasurementData entryTypeData = new MeasurementData(entryTypeFactor.getLabel(),SystemDefinedEntryType.TEST_ENTRY.getEntryTypeValue());
+                entryTypeData.setMeasurementVariable(entryTypeFactor);
+                entryTypeData.setcValueId(String.valueOf(SystemDefinedEntryType.TEST_ENTRY.getEntryTypeCategoricalId()));
+                dataList.add(entryTypeData);
+
+                final MeasurementData entryCodeData = new MeasurementData(entryCodeFactor.getLabel(),String.valueOf(i));
+                entryCodeData.setMeasurementVariable(entryCodeFactor);
+                dataList.add(entryCodeData);
 
                 row.setDataList(dataList);
                 observations.add(row);

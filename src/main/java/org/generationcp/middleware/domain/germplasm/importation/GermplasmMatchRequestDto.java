@@ -1,5 +1,7 @@
 package org.generationcp.middleware.domain.germplasm.importation;
 
+import com.google.common.collect.Lists;
+import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.pojomatic.Pojomatic;
 import org.pojomatic.annotations.AutoProperty;
 import org.springframework.util.CollectionUtils;
@@ -9,13 +11,14 @@ import java.util.List;
 @AutoProperty
 public class GermplasmMatchRequestDto {
 
-	private List<String> germplasmPUIs;
-
-	private List<String> germplasmUUIDs;
-
-	private List<String> names;
-
-	private List<Integer> gids;
+	private List<String> germplasmPUIs = Lists.newArrayList();
+	private List<String> germplasmUUIDs = Lists.newArrayList();
+	private List<String> names = Lists.newArrayList();
+	private List<Integer> gids = Lists.newArrayList();
+	private SqlTextFilter locationName;
+	private SqlTextFilter locationAbbreviation;
+	private List<String> methods;
+	private List<String> nameTypes;
 
 	public List<String> getGermplasmPUIs() {
 		return this.germplasmPUIs;
@@ -34,7 +37,7 @@ public class GermplasmMatchRequestDto {
 	}
 
 	public List<String> getGermplasmUUIDs() {
-		return germplasmUUIDs;
+		return this.germplasmUUIDs;
 	}
 
 	public void setGermplasmUUIDs(final List<String> germplasmUUIDs) {
@@ -47,6 +50,38 @@ public class GermplasmMatchRequestDto {
 
 	public void setGids(final List<Integer> gids) {
 		this.gids = gids;
+	}
+
+	public SqlTextFilter getLocationName() {
+		return this.locationName;
+	}
+
+	public void setLocationName(final SqlTextFilter locationName) {
+		this.locationName = locationName;
+	}
+
+	public SqlTextFilter getLocationAbbreviation() {
+		return this.locationAbbreviation;
+	}
+
+	public void setLocationAbbreviation(final SqlTextFilter locationAbbreviation) {
+		this.locationAbbreviation = locationAbbreviation;
+	}
+
+	public List<String> getMethods() {
+		return this.methods;
+	}
+
+	public void setMethods(final List<String> methods) {
+		this.methods = methods;
+	}
+
+	public List<String> getNameTypes() {
+		return this.nameTypes;
+	}
+
+	public void setNameTypes(final List<String> nameTypes) {
+		this.nameTypes = nameTypes;
 	}
 
 	@Override
@@ -65,10 +100,17 @@ public class GermplasmMatchRequestDto {
 	}
 
 	public boolean isValid() {
-		if (CollectionUtils.isEmpty(this.germplasmPUIs) && CollectionUtils.isEmpty(this.germplasmUUIDs) && CollectionUtils.isEmpty(this.gids) && CollectionUtils.isEmpty(this.names)) {
-			return false;
-		}
-		return true;
+		// GID, GUUID, PUI and NAMES are the MAIN match parameters; hence lack of these renders request invalid
+		// Location, Name type and method will merely restrict any initial matches from the main filters
+		return !CollectionUtils.isEmpty(this.germplasmPUIs) || !CollectionUtils.isEmpty(this.germplasmUUIDs) || !CollectionUtils
+			.isEmpty(this.gids) || !CollectionUtils.isEmpty(this.names);
 	}
+
+	public boolean restrictingFiltersSpecified() {
+		// Location and method filters will merely restrict any initial matches from the main filters
+		return this.locationAbbreviation != null || this.locationName != null || !CollectionUtils.isEmpty(this.methods);
+	}
+
+
 
 }

@@ -29,19 +29,9 @@ public interface GermplasmExportSource {
 	Integer getEntryId();
 
 	/**
-	 * @return the entryCode
-	 */
-	String getEntryCode();
-
-	/**
 	 * @return the seedSource
 	 */
 	String getSeedSource();
-
-	/**
-	 * @return the designation
-	 */
-	String getDesignation();
 
 	/**
 	 * @return the groupName

@@ -13,34 +13,57 @@ package org.generationcp.middleware.dao;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.generationcp.middleware.api.brapi.v1.attribute.AttributeDTO;
-import org.generationcp.middleware.domain.germplasm.GermplasmAttributeDto;
+import org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueDto;
+import org.generationcp.middleware.dao.util.BrapiVariableUtils;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.domain.ontology.TermRelationshipId;
+import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.domain.search_request.brapi.v2.AttributeValueSearchRequestDto;
+import org.generationcp.middleware.domain.shared.AttributeDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
+import org.generationcp.middleware.util.Util;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
-import org.hibernate.type.BooleanType;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.StringType;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link Attribute}.
  */
-public class AttributeDAO extends GenericDAO<Attribute, Integer> {
+public class AttributeDAO extends GenericAttributeDAO<Attribute> {
 
 	private static final String COUNT_ATTRIBUTE_WITH_VARIABLES =
 		"SELECT COUNT(A.ATYPE) FROM ATRIBUTS A INNER JOIN GERMPLSM G ON G.GID = A.GID AND G.DELETED = 0 AND g.grplce = 0 WHERE A.ATYPE IN (:variableIds)";
 
 	private static final String COUNT_ATTRIBUTE_WITH_GERMPLASM_DELETED =
 		"SELECT COUNT(A.ATYPE) FROM ATRIBUTS A INNER JOIN GERMPLSM G ON G.GID = A.GID AND G.DELETED = 1 WHERE A.ATYPE = :variableId";
+
+	private static final String ATTRIBUTE_VALUE_SELECT =
+		"SELECT a.aid, cv.cvterm_id AS attributeDbId, "
+			+ "IFNULL(vpo.alias, cv.name) AS attributeName, "
+			+ "a.aid AS attributeValueDbId, "
+			+ "a.adate, "
+			+ "a.alocn AS locationDbId, "
+			+ "g.germplsm_uuid AS germplasmDbId, "
+			+ "names.nval AS germplasmName, "
+			+ "a.aval AS value ";
+
+	public static final String ADDTL_INFO_LOCATION = "locationDbId";
+	public static final String PROGRAM_UUID = "programUUID";
 
 	@SuppressWarnings("unchecked")
 	public List<Attribute> getByGID(final Integer gid) {
@@ -115,7 +138,62 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return returnList;
 	}
 
-	public List<GermplasmAttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId,
+	public long countAttributeValueDtos(final AttributeValueSearchRequestDto attributeValueSearchRequestDto, final String programUUID) {
+		final StringBuilder sql = new StringBuilder(" SELECT COUNT(DISTINCT a.aid) ");
+		this.appendAttributeValuesFromQuery(sql);
+		this.appendAttributeValueSearchFilters(sql, attributeValueSearchRequestDto);
+
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(sql.toString());
+		this.addAttributeValueSearchParameters(sqlQuery, attributeValueSearchRequestDto);
+		sqlQuery.setParameter(PROGRAM_UUID, programUUID);
+
+		return ((BigInteger) sqlQuery.uniqueResult()).longValue();
+	}
+
+	public List<AttributeValueDto> getAttributeValueDtos(final AttributeValueSearchRequestDto attributeValueSearchRequestDto,
+		final Pageable pageable,
+		final String programUUID) {
+		final SQLQuery sqlQuery = this.getSession().createSQLQuery(this.createAttributeValuesQueryString(attributeValueSearchRequestDto));
+		sqlQuery.setParameter(PROGRAM_UUID, programUUID);
+		if (pageable != null) {
+			sqlQuery.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
+			sqlQuery.setMaxResults(pageable.getPageSize());
+		}
+		this.addAttributeValueSearchParameters(sqlQuery, attributeValueSearchRequestDto);
+
+		sqlQuery.addScalar("aid", IntegerType.INSTANCE);
+		sqlQuery.addScalar(ADDTL_INFO_LOCATION, StringType.INSTANCE);
+		sqlQuery.addScalar("attributeDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("attributeName", StringType.INSTANCE);
+		sqlQuery.addScalar("attributeValueDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("adate", StringType.INSTANCE);
+		sqlQuery.addScalar("germplasmDbId", StringType.INSTANCE);
+		sqlQuery.addScalar("germplasmName", StringType.INSTANCE);
+		sqlQuery.addScalar("value", StringType.INSTANCE);
+		sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(AttributeValueDto.class));
+
+		final List<AttributeValueDto> results = sqlQuery.list();
+
+		if (results != null && !results.isEmpty()) {
+			results.stream().map(this::processAttributeValueData)
+				.collect(Collectors.toList());
+		}
+
+		return results;
+	}
+
+	private AttributeValueDto processAttributeValueData(final AttributeValueDto attributeValue) {
+		// add additional info from retrieved location db id
+		final Map<String, String> additionalInfo = new HashMap<>();
+		additionalInfo.put(ADDTL_INFO_LOCATION, attributeValue.getLocationDbId());
+		attributeValue.setAdditionalInfo(additionalInfo);
+
+		// parse adate value
+		attributeValue.setDeterminedDate(Util.tryParseDate(attributeValue.getAdate()));
+		return attributeValue;
+	}
+
+	public List<AttributeDto> getGermplasmAttributeDtos(final Integer gid, final Integer variableTypeId,
 		final String programUUID) {
 		try {
 			final StringBuilder queryString = new StringBuilder();
@@ -142,23 +220,14 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 				queryString.append("AND cp.value = (select name from cvterm where cvterm_id = :variableTypeId) ");
 			}
 			final SQLQuery sqlQuery = this.getSession().createSQLQuery(queryString.toString());
-			sqlQuery.addScalar("id");
-			sqlQuery.addScalar("variableId");
-			sqlQuery.addScalar("value");
-			sqlQuery.addScalar("variableName");
-			sqlQuery.addScalar("variableTypeName");
-			sqlQuery.addScalar("variableDescription");
-			sqlQuery.addScalar("date");
-			sqlQuery.addScalar("locationId");
-			sqlQuery.addScalar("locationName");
-			sqlQuery.addScalar("hasFiles", new BooleanType());
+			this.addQueryScalars(sqlQuery);
 			sqlQuery.setParameter("gid", gid);
 			if (variableTypeId != null) {
 				sqlQuery.setParameter("variableTypeId", variableTypeId);
 			}
 
-			sqlQuery.setParameter("programUUID", programUUID);
-			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(GermplasmAttributeDto.class));
+			sqlQuery.setParameter(PROGRAM_UUID, programUUID);
+			sqlQuery.setResultTransformer(new AliasToBeanResultTransformer(AttributeDto.class));
 			return sqlQuery.list();
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
@@ -221,10 +290,8 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			+ "    a.aval AS value "
 			+ " FROM"
 			+ "    atributs a"
-			+ "        INNER JOIN"
-			+ "    cvterm u ON a.atype = u.cvterm_id "
-			+ "        INNER JOIN"
-			+ "    germplsm g ON a.gid = g.gid "
+			+ "        INNER JOIN  cvterm u ON a.atype = u.cvterm_id "
+			+ "        INNER JOIN germplsm g ON a.gid = g.gid "
 			+ " WHERE"
 			+ "    g.germplsm_uuid = :germplasmUUID ";
 
@@ -278,20 +345,6 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 		return attributesMap;
 	}
 
-	public long countByVariables(final List<Integer> variablesIds) {
-		try {
-			final SQLQuery query =
-				this.getSession().createSQLQuery(COUNT_ATTRIBUTE_WITH_VARIABLES);
-			query.setParameterList("variableIds", variablesIds);
-
-			return ((BigInteger) query.uniqueResult()).longValue();
-
-		} catch (final HibernateException e) {
-			final String errorMessage = "Error at countByVariables=" + variablesIds + " in AttributeDAO: " + e.getMessage();
-			throw new MiddlewareQueryException(errorMessage, e);
-		}
-	}
-
 	public long countByVariablesUsedInHistoricalGermplasm(final Integer variablesId) {
 		try {
 			final SQLQuery query =
@@ -317,5 +370,186 @@ public class AttributeDAO extends GenericDAO<Attribute, Integer> {
 			final String message = "Error with isLocationIdUsedInAttributes(locationId=" + locationId + "): " + e.getMessage();
 			throw new MiddlewareQueryException(message, e);
 		}
+	}
+
+	private String createAttributeValuesQueryString(final AttributeValueSearchRequestDto attributeValueSearchRequestDto) {
+		final StringBuilder sql = new StringBuilder();
+		sql.append(ATTRIBUTE_VALUE_SELECT);
+		this.appendAttributeValuesFromQuery(sql);
+		this.appendAttributeValueSearchFilters(sql, attributeValueSearchRequestDto);
+		return sql.toString();
+	}
+
+	private void appendAttributeValuesFromQuery(final StringBuilder sql) {
+		sql.append("FROM atributs a ");
+		sql.append(" INNER JOIN germplsm g ON (g.gid = a.gid AND g.deleted = 0 AND g.grplce = 0) ");
+		sql.append(" INNER JOIN cvterm cv ON a.atype = cv.cvterm_id ");
+		sql.append(" LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = cv.cvterm_id AND vpo.program_uuid = :programUUID  ");
+		sql.append(" LEFT JOIN names ON names.gid = a.gid AND names.nstat = 1 ");
+		sql.append(" WHERE 1=1 ");
+	}
+
+	private void appendAttributeValueSearchFilters(final StringBuilder sql, final AttributeValueSearchRequestDto requestDTO) {
+		if (!CollectionUtils.isEmpty(requestDTO.getAttributeDbIds())) {
+			sql.append(" AND cv.cvterm_id IN (:attributeDbIds)");
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getAttributeNames())) {
+			sql.append(" AND IFNULL(vpo.alias, cv.name) IN (:attributeNames)");
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getAttributeValueDbIds())) {
+			sql.append(" AND a.aid IN (:attributeValueDbIds)");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
+			sql.append(" AND cv.cvterm_id IN (  SELECT vrsr.subject_id ");
+			sql.append(
+				"FROM cvterm_relationship vrsr INNER JOIN cvterm s ON s.cvterm_id = vrsr.object_id AND vrsr.type_id = ");
+			sql.append(TermRelationshipId.HAS_SCALE.getId() + " ");
+			sql.append(
+				"INNER JOIN cvterm_relationship drsr ON drsr.subject_id = vrsr.object_id AND drsr.type_id = ");
+			sql.append(TermRelationshipId.HAS_TYPE.getId() + " AND drsr.object_id IN (:dataTypeIds) ) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
+			sql.append(" AND g.germplsm_uuid IN (:germplasmDbIds)");
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
+			sql.append(" AND EXISTS (SELECT * FROM external_reference_atributs ref ");
+			sql.append(" WHERE a.aid = ref.aid AND ref.reference_id IN (:referenceIDs)) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
+			sql.append(" AND EXISTS (SELECT * FROM external_reference_atributs ref ");
+			sql.append(" WHERE a.aid = ref.aid AND ref.reference_source IN (:referenceSources)) ");
+		}
+
+		// Search preferred names
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmNames())) {
+			sql.append(" AND names.nval IN (:germplasmNames) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getMethodDbIds())) {
+			sql.append(" AND cv.cvterm_id IN (  SELECT mr.subject_id ");
+			sql.append(
+				"FROM cvterm_relationship mr INNER JOIN cvterm m ON m.cvterm_id = mr.object_id AND mr.type_id = ");
+			sql.append(TermRelationshipId.HAS_METHOD.getId() + " AND m.cvterm_id IN (:methodDbIds) ) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getOntologyDbIds())) {
+			sql.append(" AND cv.cvterm_id IN (:ontologyDbIds) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getScaleDbIds())) {
+			sql.append(" AND cv.cvterm_id IN (  SELECT sr.subject_id ");
+			sql.append(
+				"FROM cvterm_relationship sr INNER JOIN cvterm s ON s.cvterm_id = sr.object_id AND sr.type_id = ");
+			sql.append(TermRelationshipId.HAS_SCALE.getId() + " AND s.cvterm_id IN (:scaleDbIds) ) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getTraitDbIds())) {
+			sql.append(" AND cv.cvterm_id IN (  SELECT vrpr.subject_id ");
+			sql.append(
+				"FROM cvterm_relationship vrpr INNER JOIN cvterm p ON p.cvterm_id = vrpr.object_id AND vrpr.type_id = ");
+			sql.append(TermRelationshipId.HAS_PROPERTY.getId() + " AND p.cvterm_id IN (:traitDbIds) ) ");
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getTraitClasses())) {
+			sql.append(" AND cv.cvterm_id IN (  SELECT vrpr2.subject_id ");
+			sql.append(
+				"FROM cvterm_relationship vrpr2 INNER JOIN cvterm p2 ON p2.cvterm_id = vrpr2.object_id AND vrpr2.type_id = ");
+			sql.append(TermRelationshipId.HAS_PROPERTY.getId() + " ");
+			sql.append(
+				"INNER JOIN cvterm_relationship trpr2 ON trpr2.subject_id = vrpr2.object_id AND trpr2.type_id = ");
+			sql.append(TermRelationshipId.IS_A.getId() + " ");
+			sql.append(
+				"INNER JOIN cvterm trait ON trait.cvterm_id = trpr2.object_id AND trait.name IN (:traitClasses) )");
+		}
+	}
+
+	private void addAttributeValueSearchParameters(final SQLQuery sqlQuery, final AttributeValueSearchRequestDto requestDTO) {
+		if (!CollectionUtils.isEmpty(requestDTO.getAttributeDbIds())) {
+			sqlQuery.setParameterList("attributeDbIds", requestDTO.getAttributeDbIds());
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getAttributeNames())) {
+			sqlQuery.setParameterList("attributeNames", requestDTO.getAttributeNames());
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getAttributeValueDbIds())) {
+			sqlQuery.setParameterList("attributeValueDbIds", requestDTO.getAttributeValueDbIds());
+		}
+		if (!CollectionUtils.isEmpty(requestDTO.getDataTypes())) {
+			sqlQuery.setParameterList("dataTypeIds", BrapiVariableUtils.convertBrapiDataTypeToDataTypeIds(requestDTO.getDataTypes()));
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmDbIds())) {
+			sqlQuery.setParameterList("germplasmDbIds", requestDTO.getGermplasmDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceIDs())) {
+			sqlQuery.setParameterList("referenceIDs", requestDTO.getExternalReferenceIDs());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getExternalReferenceSources())) {
+			sqlQuery.setParameterList("referenceSources", requestDTO.getExternalReferenceSources());
+		}
+
+		// Search preferred names
+		if (!CollectionUtils.isEmpty(requestDTO.getGermplasmNames())) {
+			sqlQuery.setParameterList("germplasmNames", requestDTO.getGermplasmNames());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getMethodDbIds())) {
+			sqlQuery.setParameterList("methodDbIds", requestDTO.getMethodDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getOntologyDbIds())) {
+			sqlQuery.setParameterList("ontologyDbIds", requestDTO.getOntologyDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getScaleDbIds())) {
+			sqlQuery.setParameterList("scaleDbIds", requestDTO.getScaleDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getTraitDbIds())) {
+			sqlQuery.setParameterList("traitDbIds", requestDTO.getTraitDbIds());
+		}
+
+		if (!CollectionUtils.isEmpty(requestDTO.getTraitClasses())) {
+			sqlQuery.setParameterList("traitClasses", requestDTO.getTraitClasses());
+		}
+	}
+
+	/**
+	 * Given a list of Germplasms return the Variables related with type GERMPLASM_PASSPORT, GERMPLASM_ATTRIBUTE.
+	 * The programUUID is used to return the expected range and alias of the program if it exists.
+	 *
+	 * @param List        of gids
+	 * @param programUUID program's unique id
+	 * @return List of Variable or empty list if none found
+	 */
+	public List<Variable> getGermplasmAttributeVariables(final List<Integer> gids, final String programUUID) {
+		return this.getAttributeVariables(gids, programUUID,
+			Arrays.asList(VariableType.GERMPLASM_ATTRIBUTE.getId(), VariableType.GERMPLASM_PASSPORT.getId()));
+	}
+
+	@Override
+	protected Attribute getNewAttributeInstance(final Integer id) {
+		final Attribute newAttribute = new Attribute();
+		newAttribute.setGermplasmId(id);
+		return newAttribute;
+	}
+
+	@Override
+	protected String getCountAttributeWithVariablesQuery() {
+		return COUNT_ATTRIBUTE_WITH_VARIABLES;
+	}
+
+	@Override
+	protected String getAttributeTable() {
+		return "atributs";
+	}
+
+	@Override
+	protected String getForeignKeyToMainRecord() {
+		return "gid";
 	}
 }

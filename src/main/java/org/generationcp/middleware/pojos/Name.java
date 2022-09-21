@@ -25,6 +25,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import java.io.Serializable;
+import java.util.Optional;
 
 /**
  * POJO for names table.
@@ -51,6 +52,8 @@ public class Name extends AbstractEntity implements Serializable {
 	public static final String GET_PREFERRED_NAMES_BY_GIDS = "SELECT gid, nval " + "FROM names " + "WHERE nstat = 1 AND gid IN (:gids)";
 
 	public static final String GET_PREFERRED_NAME_IDS_BY_GIDS = "SELECT gid, nid " + "FROM names " + "WHERE nstat = 1 AND gid IN (:gids)";
+
+	public static final String GET_PUI_NAMES_BY_GIDS = "SELECT gid, nval " + "FROM names " + "WHERE ntype = 40 AND gid IN (:gids)";
 
 	public static final String GET_GROUP_SOURCE_PREFERRED_NAME_IDS_BY_GIDS = "SELECT g.gid,\n" + "    CASE   \n"
 		+ " WHEN g.gnpgs = -1 AND g.gpid1 IS NOT NULL AND g.gpid1 <> 0 THEN n.nval \n"
@@ -210,8 +213,8 @@ public class Name extends AbstractEntity implements Serializable {
 		final StringBuilder builder = new StringBuilder();
 		builder.append("Name [nid=");
 		builder.append(this.nid);
-		builder.append(", germplasm=");
-		builder.append(this.germplasm);
+		builder.append(", gid=");
+		builder.append(Optional.ofNullable(this.germplasm).map(Germplasm::getGid).orElse(0));
 		builder.append(", typeId=");
 		builder.append(this.typeId);
 		builder.append(", nstat=");

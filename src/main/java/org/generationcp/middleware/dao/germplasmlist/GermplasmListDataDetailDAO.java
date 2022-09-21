@@ -16,7 +16,9 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -142,4 +144,30 @@ public class GermplasmListDataDetailDAO extends GenericDAO<GermplasmListDataDeta
 			throw new MiddlewareQueryException(message);
 		}
 	}
+
+	/**
+	 *
+	 * @param listId
+	 * @param variableIds
+	 * @return a {@link Map} with listDataId as key and {@link Map} as value which contains the variableId as key and the observation value
+	 * as value
+	 */
+	public Map<Integer, Map<Integer, String>> getObservationValuesByListAndVariableIds(final Integer listId, final Set<Integer> variableIds) {
+		final SQLQuery query = this.getSession().createSQLQuery("SELECT ldd.lrecid, ldd.variable_id, ldd.value "
+			+ "		FROM list_data_details ldd "
+			+ " 		INNER JOIN listdata ld ON ld.lrecid = ldd.lrecid "
+			+ " WHERE ld.listid = :listId AND variable_id IN (:variableIds)");
+		query.setParameter("listId", listId);
+		query.setParameterList("variableIds", variableIds);
+
+		final Map<Integer, Map<Integer, String>> results = new HashMap<>();
+		final List<Object[]> queryResults = query.list();
+		queryResults.forEach(result -> {
+			final Integer listDataId = (Integer) result[0];
+			results.putIfAbsent(listDataId, new HashMap<>());
+			results.get(listDataId).putIfAbsent((Integer) result[1], (String) result[2]);
+		});
+		return results;
+	}
+
 }

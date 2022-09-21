@@ -3,9 +3,9 @@ package org.generationcp.middleware.dao;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.workbench.PermissionDto;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Permission;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -33,7 +33,7 @@ import static org.junit.Assert.assertThat;
 public class PermissionDAOTest extends IntegrationTestBase {
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -45,6 +45,9 @@ public class PermissionDAOTest extends IntegrationTestBase {
 	private UserService userService;
 	
 	private PermissionDAO permissionDAO;
+	private UserRoleDao userRoleDao;
+	private RoleDAO roleDAO;
+	private RoleTypeDAO roleTypeDAO;
 
 	private Role programAdminRole;
 	private Role cropAdminRole;
@@ -65,8 +68,23 @@ public class PermissionDAOTest extends IntegrationTestBase {
 			this.permissionDAO.setSession(this.workbenchSessionProvider.getSession());
 		}
 
+		if (this.roleTypeDAO == null) {
+			this.roleTypeDAO = new RoleTypeDAO();
+			this.roleTypeDAO.setSession(this.workbenchSessionProvider.getSession());
+		}
+
+		if (this.userRoleDao == null) {
+			this.userRoleDao = new UserRoleDao();
+			this.userRoleDao.setSession(this.workbenchSessionProvider.getSession());
+		}
+
+		if (this.roleDAO == null) {
+			this.roleDAO = new RoleDAO();
+			this.roleDAO.setSession(this.workbenchSessionProvider.getSession());
+		}
+
 		final org.generationcp.middleware.pojos.workbench.RoleType cropRoleType =
-			this.workbenchDataManager.getRoleType(org.generationcp.middleware.domain.workbench.RoleType.CROP.getId());
+			roleTypeDAO.getById(org.generationcp.middleware.domain.workbench.RoleType.CROP.getId());
 		this.cropAdminRole = new Role();
 		this.cropAdminRole.setName("Test Crop Role " + nextInt());
 		this.cropAdminRole.setRoleType(cropRoleType);
@@ -77,10 +95,10 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		this.cropPermission.setDescription(randomAlphabetic(10));
 		this.permissionDAO.save(this.cropPermission);
 		this.cropAdminRole.getPermissions().add(this.cropPermission);
-		this.workbenchDataManager.saveRole(this.cropAdminRole);
+		roleDAO.saveOrUpdate(this.cropAdminRole);
 
 		final RoleType programAdminRoleType =
-			this.workbenchDataManager.getRoleType(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.getId());
+			roleTypeDAO.getById(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.getId());
 		this.programAdminRole = new Role();
 		this.programAdminRole.setName("Test Program Role " + nextInt());
 		this.programAdminRole.setRoleType(programAdminRoleType);
@@ -91,17 +109,17 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		this.programPermission.setDescription(randomAlphabetic(10));
 		this.permissionDAO.save(this.programPermission);
 		this.programAdminRole.getPermissions().add(this.programPermission);
-		this.workbenchDataManager.saveRole(this.programAdminRole);
+		roleDAO.saveOrUpdate(this.programAdminRole);
 
 		final org.generationcp.middleware.pojos.workbench.RoleType instanceRoleType =
-			this.workbenchDataManager.getRoleType(org.generationcp.middleware.domain.workbench.RoleType.INSTANCE.getId());
+			roleTypeDAO.getById(org.generationcp.middleware.domain.workbench.RoleType.INSTANCE.getId());
 		this.instanceAdminRole = new Role();
 		this.instanceAdminRole.setName("Test Instance Role " + nextInt());
 		this.instanceAdminRole.setRoleType(instanceRoleType);
 		this.instanceAdminRole.setActive(true);
 		this.instanceAdminRole.getPermissions().add(this.cropPermission);
 		this.instanceAdminRole.getPermissions().add(this.programPermission);
-		this.workbenchDataManager.saveRole(this.instanceAdminRole);
+		roleDAO.saveOrUpdate(this.instanceAdminRole);
 
 		if (this.workbenchProjectDao == null) {
 			this.workbenchProjectDao = new ProjectDAO();
@@ -109,7 +127,7 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		}
 
 		if (this.cropType == null) {
-			this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.name());
+			this.cropType = this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.name());
 		}
 
 		if (this.project1 == null) {
@@ -134,7 +152,7 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		final UserRole adminUserRole = new UserRole();
 		adminUserRole.setUser(admin);
 		adminUserRole.setRole(this.instanceAdminRole);
-		this.workbenchDataManager.saveOrUpdateUserRole(adminUserRole);
+		userRoleDao.saveOrUpdate(adminUserRole);
 
 		this.workbenchSessionProvider.getSession().flush();
 
@@ -159,7 +177,7 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		cropUserRole.setUser(cropAdmin);
 		cropUserRole.setRole(this.cropAdminRole);
 		cropUserRole.setCropType(this.cropType);
-		this.workbenchDataManager.saveOrUpdateUserRole(cropUserRole);
+		userRoleDao.saveOrUpdate(cropUserRole);
 
 		this.workbenchSessionProvider.getSession().flush();
 
@@ -184,14 +202,14 @@ public class PermissionDAOTest extends IntegrationTestBase {
 		cropUserRole.setUser(programAdmin);
 		cropUserRole.setRole(this.cropAdminRole);
 		cropUserRole.setCropType(this.cropType);
-		this.workbenchDataManager.saveOrUpdateUserRole(cropUserRole);
+		userRoleDao.saveOrUpdate(cropUserRole);
 		
 		final UserRole programUserRole = new UserRole();
 		programUserRole.setUser(programAdmin);
 		programUserRole.setRole(this.programAdminRole);
 		programUserRole.setCropType(this.cropType);
 		programUserRole.setWorkbenchProject(this.project1);
-		this.workbenchDataManager.saveOrUpdateUserRole(programUserRole);
+		userRoleDao.saveOrUpdate(programUserRole);
 
 		this.workbenchSessionProvider.getSession().flush();
 

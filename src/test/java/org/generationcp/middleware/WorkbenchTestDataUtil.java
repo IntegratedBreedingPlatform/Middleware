@@ -2,8 +2,8 @@
 package org.generationcp.middleware;
 
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.program.ProgramService;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -30,7 +30,7 @@ import java.util.Set;
 public class WorkbenchTestDataUtil {
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	@Autowired
 	private UserService userService;
@@ -125,7 +125,7 @@ public class WorkbenchTestDataUtil {
 
 	public void setUpWorkbench() {
 		this.commonTestProject = this.createTestProjectData();
-		this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
+		this.cropType = this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.toString());
 		this.commonTestProject.setCropType(this.cropType);
 		final Set<CropType> crops = new HashSet<>();
 		crops.add(this.cropType);
@@ -148,10 +148,10 @@ public class WorkbenchTestDataUtil {
 		this.programService.addProgram(this.commonTestProject);
 
 		this.testProjectActivity1 = this.createTestProjectActivityData(this.commonTestProject, this.testUser1);
-		this.workbenchDataManager.addProjectActivity(this.testProjectActivity1);
+		this.programService.addProjectActivity(this.testProjectActivity1);
 
 		this.testProjectActivity2 = this.createTestProjectActivityData(this.commonTestProject, this.testUser2);
-		this.workbenchDataManager.addProjectActivity(this.testProjectActivity2);
+		this.programService.addProjectActivity(this.testProjectActivity2);
 
 		final UserInfo userInfo = new UserInfo();
 		//TODO check if this is needed since we are hardcoding to user id 3

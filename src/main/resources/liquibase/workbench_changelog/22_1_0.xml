@@ -1,0 +1,16 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+	<changeSet author="mderamos" id="v22.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<columnExists tableName="crop_genotyping_parameter" columnName="base_url" />
+			</not>
+		</preConditions>
+		<addColumn tableName="crop_genotyping_parameter">
+			<column name="base_url" type="varchar(500)" />
+		</addColumn>
+	</changeSet>
+</databaseChangeLog>

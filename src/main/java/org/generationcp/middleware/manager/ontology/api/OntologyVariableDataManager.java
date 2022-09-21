@@ -38,6 +38,14 @@ public interface OntologyVariableDataManager {
 	List<Variable> getWithFilter(VariableFilter variableFilter);
 
 	/**
+	 * Return list of variable by Ids with details based on programUuid
+	 * @param variableIds Ids to be filtered
+	 * @param programUuid as the unique id of the program
+	 * @return List<Variable>
+	 */
+	List<Variable> getVariablesByIds(List<Integer> variableIds, String programUuid);
+
+	/**
 	 * Return variable by Id with details based on programUuid. After the first read, the variable is cached in memory. Don't filter
 	 * obsolete terms if filterObsolete is false.
 	 *
@@ -105,7 +113,7 @@ public interface OntologyVariableDataManager {
 
 	void fillVariableUsage(Variable variable);
 
-	List<Variable> searchAttributeVariables(String query, String programUUID);
+	List<Variable> searchAttributeVariables(String query, List<Integer> variableTypeIds, String programUUID);
 
 	boolean hasUsage(int variableId);
 

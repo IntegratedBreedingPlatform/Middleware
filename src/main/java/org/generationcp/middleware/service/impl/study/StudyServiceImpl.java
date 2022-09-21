@@ -75,8 +75,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 		 */
 		final List<Integer> fixedGermplasmDescriptors =
 			Lists.newArrayList(TermId.GID.getId(), TermId.DESIG.getId(), TermId.ENTRY_NO.getId(), TermId.ENTRY_TYPE.getId(),
-				TermId.ENTRY_CODE.getId(), TermId.OBS_UNIT_ID
-					.getId());
+				TermId.ENTRY_CODE.getId(), TermId.OBS_UNIT_ID.getId(), TermId.CROSS.getId());
 		final Map<Integer, String> genericGermplasmDescriptors = Maps.newHashMap();
 
 		for (final Map.Entry<Integer, String> gpDescriptor : allGermplasmDescriptors.entrySet()) {
@@ -139,7 +138,7 @@ public class StudyServiceImpl extends Service implements StudyService {
 	@Override
 	public boolean studyHasGivenDatasetType(final Integer studyId, final Integer datasetTypeId) {
 		final List<DmsProject> datasets = this.daoFactory.getDmsProjectDAO()
-			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.MEANS_DATA.getId());
+			.getDatasetsByTypeForStudy(studyId, datasetTypeId);
 		return (!org.springframework.util.CollectionUtils.isEmpty(datasets));
 	}
 

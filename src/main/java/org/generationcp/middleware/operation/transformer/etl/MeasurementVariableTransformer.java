@@ -11,6 +11,8 @@ import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.ontology.VariableType;
+import org.generationcp.middleware.manager.Operation;
+import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -33,6 +35,7 @@ public class MeasurementVariableTransformer extends Transformer {
 		if (variableTypeList != null && !variableTypeList.isEmpty()) {
 			for (final DMSVariableType dmsVariableType : variableTypeList.getVariableTypes()) {
 				final MeasurementVariable measurementVariable = this.transform(dmsVariableType, isFactor, isStudy);
+				measurementVariable.setOperation(Operation.UPDATE);
 				measurementVariables.add(measurementVariable);
 			}
 		}
@@ -64,6 +67,7 @@ public class MeasurementVariableTransformer extends Transformer {
 		if (dmsVariableType.getTreatmentLabel() != null && !"".equals(dmsVariableType.getTreatmentLabel())) {
 			measurementVariable.setTreatmentLabel(dmsVariableType.getTreatmentLabel());
 		}
+		measurementVariable.setOperation(Operation.UPDATE);
 		return measurementVariable;
 	}
 
@@ -131,10 +135,10 @@ public class MeasurementVariableTransformer extends Transformer {
 	}
 
 	private String getLabelBasedOnRole(final PhenotypicType role) {
-		if (role == null) {
+		// TODO: review PhenotypicType.UNASSIGNED empty labelList
+		if (role == null || CollectionUtils.isEmpty(role.getLabelList())) {
 			return "";
 		}
-
 		return role.getLabelList().get(0);
 	}
 }

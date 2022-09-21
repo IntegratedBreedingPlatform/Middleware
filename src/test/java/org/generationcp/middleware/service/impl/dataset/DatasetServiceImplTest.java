@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import com.google.common.collect.Table;
 import org.apache.commons.lang.RandomStringUtils;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.dao.FileMetadataDAO;
 import org.generationcp.middleware.dao.FormulaDAO;
@@ -13,6 +14,7 @@ import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.ObservationUnitsSearchDao;
 import org.generationcp.middleware.dao.dms.PhenotypeDao;
 import org.generationcp.middleware.dao.dms.ProjectPropertyDao;
+import org.generationcp.middleware.dao.dms.StockDao;
 import org.generationcp.middleware.data.initializer.MeasurementVariableTestDataInitializer;
 import org.generationcp.middleware.domain.dataset.ObservationDto;
 import org.generationcp.middleware.domain.dms.DatasetDTO;
@@ -26,7 +28,7 @@ import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.derived_variables.Formula;
 import org.generationcp.middleware.pojos.dms.DatasetType;
 import org.generationcp.middleware.pojos.dms.DmsProject;
@@ -139,11 +141,16 @@ public class DatasetServiceImplTest {
 	private FileMetadataDAO fileMetadataDAO;
 
 	@Mock
-	private WorkbenchDataManager workbenchDataManager;
+	private RoleService roleService;
 
 	@Mock
 	private DerivedVariableService derivedVariableService;
 
+	@Mock
+	private ProgramService programService;
+
+	@Mock
+	private StockDao stockDao;
 	@InjectMocks
 	private DatasetServiceImpl datasetService = new DatasetServiceImpl();
 
@@ -168,13 +175,14 @@ public class DatasetServiceImplTest {
 
 		this.datasetService.setDaoFactory(this.daoFactory);
 		this.datasetService.setStudyService(this.studyService);
-		this.datasetService.setWorkbenchDataManager(this.workbenchDataManager);
+		this.datasetService.setRoleService(this.roleService);
 		when(this.daoFactory.getPhenotypeDAO()).thenReturn(this.phenotypeDao);
 		when(this.daoFactory.getDmsProjectDAO()).thenReturn(this.dmsProjectDao);
 		when(this.daoFactory.getProjectPropertyDAO()).thenReturn(this.projectPropertyDao);
 		when(this.daoFactory.getExperimentDao()).thenReturn(this.experimentDao);
 		when(this.daoFactory.getFormulaDAO()).thenReturn(this.formulaDao);
 		when(this.daoFactory.getObservationUnitsSearchDAO()).thenReturn(this.obsUnitsSearchDao);
+		when(daoFactory.getStockDao()).thenReturn(this.stockDao);
 	}
 
 	@Test
@@ -232,8 +240,9 @@ public class DatasetServiceImplTest {
 	public void testRemoveVariables() {
 		final Random ran = new Random();
 		final int datasetId = ran.nextInt();
+		final int studyId = ran.nextInt();
 		final List<Integer> variableIds = Arrays.asList(ran.nextInt(), ran.nextInt());
-		this.datasetService.removeDatasetVariables(datasetId, variableIds);
+		this.datasetService.removeDatasetVariables(studyId, datasetId, variableIds);
 		Mockito.verify(this.phenotypeDao).deletePhenotypesByProjectIdAndVariableIds(datasetId, variableIds);
 		Mockito.verify(this.projectPropertyDao).deleteProjectVariables(datasetId, variableIds);
 	}
@@ -402,11 +411,42 @@ public class DatasetServiceImplTest {
 	public void testGetDataset() {
 		final List<DatasetDTO> datasetDTOList = this.setUpDatasets(null);
 		final DatasetDTO datasetDTO = datasetDTOList.get(4);
-		final DatasetType datasetType = new DatasetType();
-		datasetType.setDatasetTypeId(datasetDTO.getDatasetTypeId());
 		Mockito.when(this.datasetService.getDataset(datasetDTOList.get(4).getDatasetId())).thenReturn(datasetDTO);
 		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
 		assertThat(datasetDTOList.get(4), equalTo(result));
+		Mockito.verify(this.dmsProjectDao)
+			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetServiceImpl.OBSERVATION_DATASET_VARIABLE_TYPES);
+	}
+
+	@Test
+	public void testGetDataset_EnvironmentDataset() {
+		final DatasetDTO datasetDTO = createDataset(25020, 25019, "STUDY-ENVIRONMENT", DatasetTypeEnum.SUMMARY_DATA.getId());
+		Mockito.when(this.datasetService.getDataset(datasetDTO.getDatasetId())).thenReturn(datasetDTO);
+		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
+		assertThat(datasetDTO, equalTo(result));
+		Mockito.verify(this.dmsProjectDao)
+			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetServiceImpl.ENVIRONMENT_DATASET_VARIABLE_TYPES);
+	}
+
+	@Test
+	public void testGetDataset_MeansDataset() {
+		final DatasetDTO datasetDTO = createDataset(25020, 25019, "STUDY-MEANS", DatasetTypeEnum.MEANS_DATA.getId());
+		Mockito.when(this.datasetService.getDataset(datasetDTO.getDatasetId())).thenReturn(datasetDTO);
+		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
+		assertThat(datasetDTO, equalTo(result));
+		Mockito.verify(this.dmsProjectDao)
+			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetServiceImpl.MEANS_DATASET_VARIABLE_TYPES);
+	}
+
+	@Test
+	public void testGetDataset_SummaryStatisticsDataset() {
+		final DatasetDTO datasetDTO =
+			createDataset(25020, 25019, "STUDY-SUMMARY-STATISTICS", DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId());
+		Mockito.when(this.datasetService.getDataset(datasetDTO.getDatasetId())).thenReturn(datasetDTO);
+		final DatasetDTO result = this.datasetService.getDataset(datasetDTO.getDatasetId());
+		assertThat(datasetDTO, equalTo(result));
+		Mockito.verify(this.dmsProjectDao)
+			.getObservationSetVariables(datasetDTO.getDatasetId(), DatasetServiceImpl.SUMMARY_STATISTICS_DATASET_VARIABLE_TYPES);
 	}
 
 	@Test
@@ -613,13 +653,17 @@ public class DatasetServiceImplTest {
 		final int datasetId = random.nextInt();
 		final int studyId = random.nextInt();
 		final DmsProject dmsProject = new DmsProject();
+		final DatasetType datasetSymmaryData = new DatasetType();
+		datasetSymmaryData.setDatasetTypeId(DatasetTypeEnum.SUMMARY_DATA.getId());
 		dmsProject.setProjectId(datasetId);
-
+		dmsProject.setDatasetType(datasetSymmaryData);
+		dmsProject.setParent(new DmsProject());
+		dmsProject.getParent().setProjectId(random.nextInt());
 		Mockito.doReturn(Maps.newHashMap()).when(this.studyService).getGenericGermplasmDescriptors(studyId);
 		Mockito.doReturn(Maps.newHashMap()).when(this.studyService).getAdditionalDesignFactors(studyId);
 		Mockito.doReturn(Arrays.asList(dmsProject)).when(this.dmsProjectDao)
 			.getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
-
+		Mockito.doReturn(dmsProject).when(this.dmsProjectDao).getById(datasetId);
 		this.datasetService.getAllObservationUnitRows(studyId, datasetId);
 		Mockito.verify(this.dmsProjectDao).getDatasetsByTypeForStudy(studyId, DatasetTypeEnum.SUMMARY_DATA.getId());
 		Mockito.verify(this.dmsProjectDao).getObservationSetVariables(studyId, Lists.newArrayList(VariableType.STUDY_DETAIL.getId()));
@@ -1000,7 +1044,7 @@ public class DatasetServiceImplTest {
 		crop.setUseUUID(false);
 		final Project project = new Project();
 		project.setCropType(crop);
-		Mockito.doReturn(project).when(this.workbenchDataManager).getProjectByUuid(DatasetServiceImplTest.PROGRAM_UUID);
+		Mockito.doReturn(project).when(this.programService).getProjectByUuid(DatasetServiceImplTest.PROGRAM_UUID);
 
 		final int plotCount = 3;
 		final List<ExperimentModel> plotExperiments = this.getPlotExperiments(plotCount);

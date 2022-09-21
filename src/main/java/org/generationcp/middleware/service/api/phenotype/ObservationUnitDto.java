@@ -20,6 +20,9 @@ public class ObservationUnitDto {
 	@JsonIgnore
 	private Integer experimentId;
 
+	@JsonIgnore
+	private Integer experimentParentId;
+
 	@JsonView(BrapiView.BrapiV2.class)
 	private Map<String, String> additionalInfo;
 
@@ -111,7 +114,6 @@ public class ObservationUnitDto {
 
 	@JsonView({BrapiView.BrapiV1_3.class, BrapiView.BrapiV2.class})
 	private String trialName;
-
 
 	protected static class ObservationUnitXRef {
 
@@ -429,6 +431,14 @@ public class ObservationUnitDto {
 
 	public void setExperimentId(final Integer experimentId) {
 		this.experimentId = experimentId;
+	}
+
+	public Integer getExperimentParentId() {
+		return experimentParentId;
+	}
+
+	public void setExperimentParentId(Integer experimentParentId) {
+		this.experimentParentId = experimentParentId;
 	}
 
 	@Override

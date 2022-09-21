@@ -36,6 +36,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * DAO class for {@link GeolocationProperty}.
@@ -43,6 +44,19 @@ import java.util.Map;
 public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(GeolocationPropertyDao.class);
+
+
+	private static final String GEOLOCATIONPROP_ID_TYPE_CONDITION = "FROM nd_geolocationprop ngp "
+		+ "WHERE ngp.nd_geolocation_id IN (:geolocationIds) AND ngp.type_id = (:variableIds) ";
+
+	private static final String GET_BLOCK_IDS_TO_DELETE = "SELECT ngp.nd_geolocation_id, ngp.value "
+		+ GEOLOCATIONPROP_ID_TYPE_CONDITION
+		+ " AND not exists ( select 1 from nd_geolocationprop others "
+		+ " 	where others.value = ngp.value "
+		+ " 	and others.nd_geolocation_id not in (:geolocationIds))";
+
+	private static final String DELETE_GEOLOCATIONPROP_BY_ID_TYPE = "Delete ngp.* "
+		+ GEOLOCATIONPROP_ID_TYPE_CONDITION;
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getGeolocationIdsByPropertyTypeAndValue(final Integer typeId, final String value) {
@@ -76,6 +90,50 @@ public class GeolocationPropertyDao extends GenericDAO<GeolocationProperty, Inte
 		} catch (final HibernateException e) {
 			throw new MiddlewareQueryException(
 				"Error at getValueOfTrialInstance=" + datasetId + " query on GeolocationPropertyDao: " + e.getMessage(), e);
+		}
+	}
+
+	public Map<Integer, Integer> getSafeToDeleteLocationBlockIdMap (final List<Integer> geolocationIds) {
+		// block IDs to return to be used for locdes deletion
+		// only return if no other geolocation uses the block
+		try{
+			SQLQuery sqlQuery1 = this.getSession().createSQLQuery(GET_BLOCK_IDS_TO_DELETE)
+				.addScalar("nd_geolocation_id")
+				.addScalar("value");
+			sqlQuery1.setParameterList("geolocationIds", geolocationIds);
+			sqlQuery1.setParameter("variableIds", TermId.BLOCK_ID.getId());
+
+			final List<Object[]> result = sqlQuery1.list();
+			final Map<Integer, Integer> geolocationIdBlockIdMap = new HashMap<>();
+			result.forEach(geoprop -> geolocationIdBlockIdMap.put((Integer) geoprop[0], Integer.valueOf((String) geoprop[1])));
+
+			return  geolocationIdBlockIdMap;
+		} catch (final HibernateException e) {
+			final String message = "Error in deletePropertiesByGeolocationId("
+				+ geolocationIds.stream().map(id -> id.toString()).collect(Collectors.joining(","))
+				+ ") in GeolocationPropertyDao: " + e.getMessage();
+			GeolocationPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
+	}
+
+	public void deleteBlockPropertiesByGeolocationId(final List<Integer> geolocationIds) {
+		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+
+			SQLQuery sqlQuery1 = this.getSession().createSQLQuery(DELETE_GEOLOCATIONPROP_BY_ID_TYPE);
+			sqlQuery1.setParameterList("geolocationIds", geolocationIds);
+			sqlQuery1.setParameter("variableIds", TermId.BLOCK_ID.getId());
+			sqlQuery1.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error in deletePropertiesByGeolocationId("
+				+ geolocationIds.stream().map(id -> id.toString()).collect(Collectors.joining(","))
+				+ ") in GeolocationPropertyDao: " + e.getMessage();
+			GeolocationPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 

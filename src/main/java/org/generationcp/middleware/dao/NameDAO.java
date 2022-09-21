@@ -45,6 +45,8 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NameDAO.class);
 
+	private static final int DELETED = 9;
+
 	private static final String SELECT_GERMPLASM_NAMES = "select n.nid as id, " //
 		+ "    n.gid as gid, " //
 		+ "    n.nval as name, " //
@@ -261,6 +263,32 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 		return toreturn;
 	}
 
+	public Map<Integer, String> getPUIsByGIDs(final List<Integer> gids) {
+		final Map<Integer, String> toreturn = new HashMap<>();
+		for (final Integer gid : gids) {
+			toreturn.put(gid, null);
+		}
+
+		try {
+			final SQLQuery query = this.getSession().createSQLQuery(Name.GET_PUI_NAMES_BY_GIDS);
+			query.setParameterList("gids", gids);
+
+			final List<Object> results = query.list();
+			for (final Object result : results) {
+				final Object[] resultArray = (Object[]) result;
+				final Integer gid = (Integer) resultArray[0];
+				final String preferredId = (String) resultArray[1];
+				toreturn.put(gid, preferredId);
+			}
+		} catch (final HibernateException e) {
+			final String message = "Error with getPUIsByGIDs(gids=" + gids + ") query from Name " + e.getMessage();
+			NameDAO.LOG.error(message);
+			throw new MiddlewareQueryException(message, e);
+		}
+
+		return toreturn;
+	}
+
 	@SuppressWarnings("unchecked")
 	public List<Name> getNamesByGids(final List<Integer> gids) {
 		List<Name> toReturn = new ArrayList<>();
@@ -315,6 +343,7 @@ public class NameDAO extends GenericDAO<Name, Integer> {
 			final Criteria criteria = this.getSession().createCriteria(Name.class);
 			criteria.createAlias("germplasm", "germplasm");
 			criteria.add(Restrictions.in("germplasm.gid", gids));
+			criteria.add(Restrictions.ne("nstat", DELETED));
 			if (!CollectionUtils.isEmpty(ntypeIds)) {
 				criteria.add(Restrictions.in("typeId", ntypeIds));
 			}

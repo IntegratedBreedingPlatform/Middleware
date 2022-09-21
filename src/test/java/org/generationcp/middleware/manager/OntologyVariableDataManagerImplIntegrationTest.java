@@ -29,7 +29,7 @@ import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareException;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.manager.ontology.VariableCache;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
@@ -50,6 +50,7 @@ import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationTestBase {
@@ -69,7 +70,7 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 	private OntologyScaleDataManager scaleManager;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private RoleService roleService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -136,7 +137,16 @@ public class OntologyVariableDataManagerImplIntegrationTest extends IntegrationT
 		Assert.assertTrue(!variables.isEmpty());
 		Debug.println(IntegrationTestBase.INDENT, "From Total Variables:  " + variables.size());
 	}
-	
+
+	@Test
+	public void testGetAllVariablesById() {
+		final List<Variable> variables = this.variableManager.getVariablesByIds(
+			Arrays.asList(this.testVariableInfo.getId()), null
+		);
+		Assert.assertTrue(!variables.isEmpty());
+		Debug.println(IntegrationTestBase.INDENT, "From Total Variables:  " + variables.size());
+	}
+
 	@Test
 	public void testGetVariablesForCurrentProgramUsingFilter() {
 		final VariableFilter variableFilter = new VariableFilter();

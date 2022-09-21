@@ -156,12 +156,6 @@ public class SimplifiedWorkbookTestDataInitializer {
 			CROSS_HISTORY, CHAR, STUDY,
 			ENTRY, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.GERMPLASM, false));
 
-		factors.add(
-			createMeasurementVariable(TermId.SEED_SOURCE.getId(), SEED_SOURCE,
-				"The seed source of the germplasm", TEXT, SELECTED,
-				SEED_SOURCE, CHAR, STUDY,
-				ENTRY, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.GERMPLASM, false));
-
 		factors.add(createMeasurementVariable(TermId.PLOT_NO.getId(), PLOT,
 			"Plot number ", NESTED_NUMBER, ENUMERATED,
 			FIELD_PLOT, NUMERIC, NUMERIC_VALUE,
@@ -224,8 +218,6 @@ public class SimplifiedWorkbookTestDataInitializer {
 
 			measurementDataList.add(createMeasurementData(CROSS, "-", TermId.CROSS.getId(),
 				factors));
-			measurementDataList.add(createMeasurementData(SOURCE, "-",
-				TermId.SEED_SOURCE.getId(), factors));
 
 			measurementDataList.add(createMeasurementData(PLOT, String.valueOf(i),
 				TermId.PLOT_NO.getId(), factors));

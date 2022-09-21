@@ -18,6 +18,10 @@ public class PlantingRequestDto {
 
 		private boolean withdrawAllAvailableBalance;
 
+		private boolean withdrawUsingEntryDetail;
+
+		private Integer entryDetailVariableId;
+
 		private Double withdrawalAmount;
 
 		public boolean isGroupTransactions() {
@@ -44,6 +48,22 @@ public class PlantingRequestDto {
 			this.withdrawalAmount = withdrawalAmount;
 		}
 
+		public boolean isWithdrawUsingEntryDetail() {
+			return this.withdrawUsingEntryDetail;
+		}
+
+		public void setWithdrawUsingEntryDetail(final boolean withdrawUsingEntryDetail) {
+			this.withdrawUsingEntryDetail = withdrawUsingEntryDetail;
+		}
+
+		public Integer getEntryDetailVariableId() {
+			return this.entryDetailVariableId;
+		}
+
+		public void setEntryDetailVariableId(final Integer entryDetailVariableId) {
+			this.entryDetailVariableId = entryDetailVariableId;
+		}
+
 		@Override
 		public int hashCode() {
 			return Pojomatic.hashCode(this);
@@ -60,9 +80,9 @@ public class PlantingRequestDto {
 		}
 
 		public boolean isValid() {
-			return (groupTransactions && !isWithdrawAllAvailableBalance() && withdrawalAmount != null && withdrawalAmount > 0)
-				|| (groupTransactions && isWithdrawAllAvailableBalance() && withdrawalAmount == null)
-				|| (!groupTransactions && !isWithdrawAllAvailableBalance() && withdrawalAmount != null && withdrawalAmount > 0);
+			return (!isWithdrawAllAvailableBalance() && !isWithdrawUsingEntryDetail() && entryDetailVariableId == null && withdrawalAmount != null && withdrawalAmount > 0)
+				|| (groupTransactions && isWithdrawAllAvailableBalance() && !isWithdrawUsingEntryDetail() && entryDetailVariableId == null && withdrawalAmount == null)
+				|| (!isWithdrawAllAvailableBalance() && isWithdrawUsingEntryDetail() && entryDetailVariableId != null && withdrawalAmount == null);
 		}
 	}
 

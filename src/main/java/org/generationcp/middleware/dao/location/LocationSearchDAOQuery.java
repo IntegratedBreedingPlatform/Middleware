@@ -7,7 +7,7 @@ import org.generationcp.middleware.dao.util.DAOQueryUtils;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.util.SQLQueryBuilder;
-import org.hibernate.type.BooleanType;
+import org.generationcp.middleware.util.Scalar;
 import org.springframework.data.domain.Pageable;
 import org.springframework.util.CollectionUtils;
 
@@ -28,7 +28,7 @@ public class LocationSearchDAOQuery {
     TYPE(LOCATION_TYPE_NAME_ALIAS),
     FAVORITE_PROGRAM_UUID(FAVORITE_PROGRAM_UUID_ALIAS);
 
-    private String value;
+    private final String value;
 
     SortColumn(final String value) {
       this.value = value;
@@ -54,7 +54,6 @@ public class LocationSearchDAOQuery {
   public static final String COUNTRY_NAME_ALIAS = "countryName";
   public static final String COUNTRY_CODE_ALIAS = "countryCode";
   public static final String PROVINCE_NAME_ALIAS = "provinceName";
-  public static final String LOCATION_DEFAULT_ALIAS = "locationDefault";
   public static final String FAVORITE_PROGRAM_UUID_ALIAS = "favoriteProgramUUID";
   public static final String FAVORITE_PROGRAM_ID_ALIAS = "favoriteProgramId";
 
@@ -74,8 +73,7 @@ public class LocationSearchDAOQuery {
       + " l.snl1id AS " + PROVINCE_ID_ALIAS + ", "
       + " c.isoabbr AS " + COUNTRY_NAME_ALIAS + ", "
       + " c.isothree AS " + COUNTRY_CODE_ALIAS + ", "
-      + " province.lname AS " + PROVINCE_NAME_ALIAS + ", "
-      + " l.ldefault AS " + LOCATION_DEFAULT_ALIAS;
+      + " province.lname AS " + PROVINCE_NAME_ALIAS;
 
   private final static String GEOREF_JOIN_QUERY = " LEFT JOIN georef g on l.locid = g.locid ";
   private final static String COUNTRY_JOIN_QUERY = " LEFT JOIN cntry c on l.cntryid = c.cntryid ";
@@ -114,23 +112,22 @@ public class LocationSearchDAOQuery {
   }
 
   private static void addCommonScalars(final SQLQueryBuilder sqlQueryBuilder, final String programUUID) {
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(LOCATION_ID_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(LOCATION_NAME_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(LOCATION_TYPE_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(LOCATION_TYPE_NAME_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(ABBREVIATION_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(LATITUDE_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(LONGITUDE_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(ALTITUDE_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(COUNTRY_ID_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(PROVINCE_ID_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(COUNTRY_NAME_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(COUNTRY_CODE_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(PROVINCE_NAME_ALIAS));
-    sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(LOCATION_DEFAULT_ALIAS, BooleanType.INSTANCE));
+    sqlQueryBuilder.addScalar(new Scalar(LOCATION_ID_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(LOCATION_NAME_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(LOCATION_TYPE_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(LOCATION_TYPE_NAME_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(ABBREVIATION_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(LATITUDE_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(LONGITUDE_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(ALTITUDE_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(COUNTRY_ID_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(PROVINCE_ID_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(COUNTRY_NAME_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(COUNTRY_CODE_ALIAS));
+    sqlQueryBuilder.addScalar(new Scalar(PROVINCE_NAME_ALIAS));
     if (!StringUtils.isEmpty(programUUID)) {
-      sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(FAVORITE_PROGRAM_UUID_ALIAS));
-      sqlQueryBuilder.addScalar(new SQLQueryBuilder.Scalar(FAVORITE_PROGRAM_ID_ALIAS));
+      sqlQueryBuilder.addScalar(new Scalar(FAVORITE_PROGRAM_UUID_ALIAS));
+      sqlQueryBuilder.addScalar(new Scalar(FAVORITE_PROGRAM_ID_ALIAS));
     }
   }
 
@@ -174,7 +171,7 @@ public class LocationSearchDAOQuery {
     return joinBuilder.toString();
   }
 
-  private static String getProgramFavoriteJoinQuery(String programUUID) {
+  private static String getProgramFavoriteJoinQuery(final String programUUID) {
     return String.format(PROGRAM_FAVORITE_JOIN_QUERY, programUUID);
   }
 
@@ -207,6 +204,17 @@ public class LocationSearchDAOQuery {
       sqlQueryBuilder.append(" AND l.labbr IN (:locationAbbrs) ");
       sqlQueryBuilder.setParameter("locationAbbrs", request.getLocationAbbreviations());
     }
+
+    if (!CollectionUtils.isEmpty(request.getCountryIds())) {
+      sqlQueryBuilder.append("AND l.cntryid IN (:contryIds) ");
+      sqlQueryBuilder.setParameter("contryIds", request.getCountryIds());
+    }
+
+    if (!CollectionUtils.isEmpty(request.getProvinceIds())) {
+      sqlQueryBuilder.append("AND l.snl1id IN (:provinceId) ");
+      sqlQueryBuilder.setParameter("provinceId", request.getProvinceIds());
+    }
+
 
     final SqlTextFilter locationNameFilter = request.getLocationNameFilter();
     if (locationNameFilter != null && !locationNameFilter.isEmpty()) {

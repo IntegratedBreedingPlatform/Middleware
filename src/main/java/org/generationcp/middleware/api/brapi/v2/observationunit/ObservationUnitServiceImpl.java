@@ -2,6 +2,7 @@ package org.generationcp.middleware.api.brapi.v2.observationunit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Sets;
 import org.apache.commons.collections.MapUtils;
 import org.apache.commons.collections.map.LinkedMap;
 import org.apache.commons.collections.map.MultiKeyMap;
@@ -12,7 +13,11 @@ import org.generationcp.middleware.api.brapi.v1.germplasm.GermplasmDTO;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationDto;
 import org.generationcp.middleware.api.brapi.v2.observation.ObservationSearchRequestDto;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelEnum;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevelFilter;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
+import org.generationcp.middleware.domain.dms.DatasetDTO;
 import org.generationcp.middleware.domain.dms.Enumeration;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -37,11 +42,16 @@ import org.generationcp.middleware.pojos.dms.StockProperty;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.ObservationUnitIDGenerator;
 import org.generationcp.middleware.service.api.OntologyService;
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.service.api.dataset.DatasetService;
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitDto;
 import org.generationcp.middleware.service.api.phenotype.ObservationUnitSearchRequestDTO;
 import org.generationcp.middleware.service.api.phenotype.PhenotypeSearchObservationDTO;
+import org.generationcp.middleware.service.api.study.StudyInstanceService;
+import org.generationcp.middleware.service.impl.study.StudyInstance;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -49,9 +59,11 @@ import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -87,6 +99,18 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 	@Resource
 	private ObservationServiceBrapi observationService;
+
+	@Resource
+	private PedigreeService pedigreeService;
+
+	@Resource
+	private CrossExpansionProperties crossExpansionProperties;
+
+	@Resource
+	private StudyInstanceService studyInstanceService;
+
+	@Resource
+	private DatasetService datasetService;
 
 	private final HibernateSessionProvider sessionProvider;
 	private final DaoFactory daoFactory;
@@ -139,7 +163,8 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 				ObservationLevelRelationship::getExperimentId));
 
 			final ObservationSearchRequestDto observationSearchRequest = new ObservationSearchRequestDto();
-			observationSearchRequest.setObservationUnitDbIds(dtos.stream().map(ObservationUnitDto::getObservationUnitDbId).collect(Collectors.toList()));
+			observationSearchRequest.setObservationUnitDbIds(
+				dtos.stream().map(ObservationUnitDto::getObservationUnitDbId).collect(Collectors.toList()));
 			final List<ObservationDto> observationDtos = this.observationService.searchObservations(observationSearchRequest, null);
 			final Map<String, List<PhenotypeSearchObservationDTO>> phenotypeObservationsMap = observationDtos.stream()
 				.map(observation -> new PhenotypeSearchObservationDTO(observation))
@@ -193,8 +218,15 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			);
 		}
 
+		final Map<Integer, Integer> generationLevelByTrialIds = this.daoFactory.getDmsProjectDAO().getByIds(trialIds)
+			.stream()
+			.collect(
+				Collectors.toMap(DmsProject::getProjectId, trial -> trial.getGenerationLevel() == null ? 1 : trial.getGenerationLevel()));
 		final Map<Integer, DmsProject> trialIdPlotDatasetMap =
 			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.PLOT_DATA.getId()).stream()
+				.collect(Collectors.toMap(plotDataset -> plotDataset.getStudy().getProjectId(), Function.identity()));
+		final Map<Integer, DmsProject> trialIdMeansDatasetMap =
+			this.daoFactory.getDmsProjectDAO().getDatasetsByTypeForStudy(trialIds, DatasetTypeEnum.MEANS_DATA.getId()).stream()
 				.collect(Collectors.toMap(plotDataset -> plotDataset.getStudy().getProjectId(), Function.identity()));
 		final Map<Integer, List<Integer>> plotExperimentVariablesMap = this.populatePlotExperimentVariablesMap(trialIdPlotDatasetMap);
 
@@ -216,38 +248,50 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 
 		final List<String> observationUnitDbIds = new ArrayList<>();
 
-		final Map<String, Integer> entryTypes =
+		final Map<String, Enumeration> entryTypes =
 			this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), null).getEnumerations()
-				.stream().collect(Collectors.toMap(enumeration -> enumeration.getDescription().toUpperCase(), Enumeration::getId));
+				.stream().collect(Collectors.toMap(enumeration -> enumeration.getDescription().toUpperCase(), enumeration -> enumeration));
 
-		final Map<String, Map<String, Integer>> entryTypesMap = new HashMap<>();
+		final Map<String, Map<String, Enumeration>> entryTypesMap = new HashMap<>();
 		for (final ObservationUnitImportRequestDto dto : requestDtos) {
 			final Integer trialDbId = Integer.valueOf(dto.getTrialDbId());
 			final Integer studyDbId = Integer.valueOf(dto.getStudyDbId());
+			final boolean isObservationUnitForMeansDataset = this.isObservationUnitForMeans(dto);
+
 			final Optional<String> entryNoOptional =
 				!MapUtils.isEmpty(dto.getAdditionalInfo()) ? Optional.ofNullable(dto.getAdditionalInfo().getOrDefault(ENTRY_NO, null)) :
 					Optional.empty();
 
-			this.addExperimentVariablesIfNecessary(dto, plotExperimentVariablesMap, trialIdPlotDatasetMap, variableNamesMap,
-				variableSynonymsMap);
 			// If combination of germplasmDbId and entryNumber (if specified) does not exist, create new stock
 			if (!stockMap.get(trialDbId)
 				.containsKey(dto.getGermplasmDbId(), entryNoOptional.orElse(StringUtils.EMPTY))) {
+				final GermplasmDTO germplasmDTO = germplasmDTOMap.get(dto.getGermplasmDbId());
+				final Integer generationLevel = generationLevelByTrialIds.get(trialDbId);
+				final String crossExpansion = this.pedigreeService
+					.getCrossExpansion(Integer.valueOf(germplasmDTO.getGid()), generationLevel, this.crossExpansionProperties);
 				final StockModel stockModel =
-					this.createStockModel(germplasmDTOMap.get(dto.getGermplasmDbId()), stockMap, dto, trialDbId, entryTypes, entryTypesMap);
+					this.createStockModel(germplasmDTO, stockMap, dto, trialDbId, entryTypes, entryTypesMap, crossExpansion);
 				stockMap.get(trialDbId).put(dto.getGermplasmDbId(), entryNoOptional.orElse(StringUtils.EMPTY), stockModel);
 			}
 
 			final ExperimentModel experimentModel = new ExperimentModel();
-			experimentModel.setProject(trialIdPlotDatasetMap.get(trialDbId));
+			if (isObservationUnitForMeansDataset) {
+				experimentModel.setProject(trialIdMeansDatasetMap.get(trialDbId));
+				experimentModel.setTypeId(TermId.AVERAGE_EXPERIMENT.getId());
+			} else {
+				experimentModel.setProject(trialIdPlotDatasetMap.get(trialDbId));
+				experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
+				this.setJsonProps(experimentModel, dto);
+				this.addExperimentVariablesIfNecessary(dto, plotExperimentVariablesMap, trialIdPlotDatasetMap, variableNamesMap,
+					variableSynonymsMap);
+				this.addExperimentProperties(experimentModel, dto, variableNamesMap, variableSynonymsMap, categoricalVariablesMap);
+			}
 			experimentModel.setGeoLocation(new Geolocation(studyDbId));
-			experimentModel.setTypeId(TermId.PLOT_EXPERIMENT.getId());
 			experimentModel.setStock(
 				(StockModel) stockMap.get(trialDbId).get(dto.getGermplasmDbId(), entryNoOptional.orElse(StringUtils.EMPTY)));
 
-			this.setJsonProps(experimentModel, dto);
 			ObservationUnitIDGenerator.generateObservationUnitIds(cropType, Collections.singletonList(experimentModel));
-			this.addExperimentProperties(experimentModel, dto, variableNamesMap, variableSynonymsMap, categoricalVariablesMap);
+
 			this.setExperimentExternalReferences(dto, experimentModel);
 			this.daoFactory.getExperimentDao().save(experimentModel);
 
@@ -266,6 +310,121 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	public Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocations(
 		final Set<String> geolocationIds) {
 		return this.daoFactory.getExperimentPropertyDao().getPlotObservationLevelRelationshipsByGeolocations(geolocationIds);
+	}
+
+	@Override
+	public List<ObservationLevel> getObservationLevels(final ObservationLevelFilter observationLevelFilter) {
+		final List<ObservationLevel> observationLevels = new ArrayList<>();
+		if (StringUtils.isEmpty(observationLevelFilter.getTrialDbId()) && StringUtils.isEmpty(observationLevelFilter.getStudyDbId())) {
+			final Iterator<ObservationLevelEnum> iterator = Arrays.stream(ObservationLevelEnum.values()).iterator();
+			while (iterator.hasNext()) {
+				final ObservationLevelEnum next = iterator.next();
+				observationLevels.add(new ObservationLevel(next));
+			}
+		} else if (StringUtils.isNotEmpty(observationLevelFilter.getStudyDbId())) {
+			// Get Observation Levels present in the Instance(Study in BrAPI context)
+			this.getObservationLevelsForStudy(observationLevelFilter, observationLevels);
+		} else if (StringUtils.isNotEmpty(observationLevelFilter.getTrialDbId())) {
+			// Get Observation Levels present in the Study(Trial in BrAPI context)
+			this.getObservationLevelsForTrial(observationLevelFilter, observationLevels);
+		}
+		return observationLevels;
+	}
+
+	private void getObservationLevelsForStudy(final ObservationLevelFilter observationLevelFilter,
+		final List<ObservationLevel> observationLevels) {
+		final Integer instanceId = Integer.valueOf(observationLevelFilter.getStudyDbId());
+		final Integer studyId = Integer.valueOf(observationLevelFilter.getTrialDbId());
+		observationLevels.add(new ObservationLevel(ObservationLevelEnum.STUDY));
+		final StudyInstance studyInstance = this.studyInstanceService.getStudyInstance(studyId, instanceId).get();
+		if (studyInstance.isHasExperimentalDesign()) {
+			final List<Integer> datasetTypeIdsOfEnvironment = this.daoFactory.getDmsProjectDAO()
+				.getDatasetTypeIdsOfEnvironment(instanceId);
+			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUMMARY_STATISTICS));
+			}
+			if (studyInstance.isHasFieldmap()) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.FIELD));
+			}
+			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.MEANS_DATA.getId())) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.MEANS));
+			}
+
+			final DatasetDTO plotDataset =
+				this.datasetService.getDatasets(studyId, Sets.newHashSet(DatasetTypeEnum.PLOT_DATA.getId())).get(0);
+			this.addPlotRelatedObservationLevels(observationLevels, plotDataset);
+
+			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUB_PLOT));
+			}
+			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.PLANT));
+			}
+			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId())) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.TIMESERIES));
+			}
+			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId())) {
+				observationLevels.add(new ObservationLevel(ObservationLevelEnum.CUSTOM));
+			}
+		} else {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.PLOT));
+		}
+
+	}
+
+	private void addPlotRelatedObservationLevels(final List<ObservationLevel> observationLevels, final DatasetDTO plotDataset) {
+		final List<ProjectProperty> projectProperties = this.daoFactory.getProjectPropertyDAO()
+			.getByProjectId(plotDataset.getDatasetId());
+		final Map<Integer, ProjectProperty> projectPropertyMap = projectProperties.stream()
+			.collect(Collectors.toMap(ProjectProperty::getVariableId, Function.identity()));
+		if (projectPropertyMap.containsKey(TermId.BLOCK_NO.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.BLOCK));
+		}
+		if (projectPropertyMap.containsKey(TermId.REP_NO.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.REP));
+		}
+		observationLevels.add(new ObservationLevel(ObservationLevelEnum.PLOT));
+	}
+
+	private void getObservationLevelsForTrial(final ObservationLevelFilter observationLevelFilter,
+		final List<ObservationLevel> observationLevels) {
+		observationLevels.add(new ObservationLevel(ObservationLevelEnum.STUDY));
+		final List<DatasetDTO> datasets = this.daoFactory.getDmsProjectDAO()
+			.getDatasets(Integer.valueOf(observationLevelFilter.getTrialDbId()));
+		final Map<Integer, DatasetDTO> datasetDTOMap = datasets.stream()
+			.collect(Collectors.toMap(DatasetDTO::getDatasetTypeId, Function.identity()));
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUMMARY_STATISTICS));
+		}
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.PLOT_DATA.getId()) &&
+			this.daoFactory.getExperimentDao().hasFieldmap(datasetDTOMap.get(DatasetTypeEnum.PLOT_DATA.getId()).getDatasetId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.FIELD));
+		}
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.MEANS_DATA.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.MEANS));
+		}
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.PLOT_DATA.getId())) {
+			this.addPlotRelatedObservationLevels(observationLevels, datasetDTOMap.get(DatasetTypeEnum.PLOT_DATA.getId()));
+		}
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.QUADRAT_SUBOBSERVATIONS.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUB_PLOT));
+		}
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.PLANT_SUBOBSERVATIONS.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.PLANT));
+		}
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.TIME_SERIES_SUBOBSERVATIONS.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.TIMESERIES));
+		}
+		if (datasetDTOMap.containsKey(DatasetTypeEnum.CUSTOM_SUBOBSERVATIONS.getId())) {
+			observationLevels.add(new ObservationLevel(ObservationLevelEnum.CUSTOM));
+		}
+	}
+
+	private boolean isObservationUnitForMeans(final ObservationUnitImportRequestDto observationUnitDto) {
+		return observationUnitDto.getObservationUnitPosition() != null
+			&& observationUnitDto.getObservationUnitPosition().getObservationLevel() != null
+			&& observationUnitDto.getObservationUnitPosition().getObservationLevel().getLevelName()
+			.equalsIgnoreCase(DatasetTypeEnum.MEANS_DATA.getName());
 	}
 
 	private void setJsonProps(final ExperimentModel model, final ObservationUnitImportRequestDto dto) {
@@ -386,21 +545,22 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 	}
 
 	private StockModel createStockModel(final GermplasmDTO germplasmDTO, final Map<Integer, MultiKeyMap> stockMap,
-		final ObservationUnitImportRequestDto dto, final Integer trialDbId, final Map<String, Integer> entryTypes,
-		final Map<String, Map<String, Integer>> entryTypesMap) {
+		final ObservationUnitImportRequestDto dto, final Integer trialDbId, final Map<String, Enumeration> entryTypes,
+		final Map<String, Map<String, Enumeration>> entryTypesMap, final String cross) {
+
 		final StockModel stockModel = new StockModel();
+		stockModel.setCross(cross);
 
 		final Optional<String> entryNoOptional =
 			!MapUtils.isEmpty(dto.getAdditionalInfo()) ? Optional.ofNullable(dto.getAdditionalInfo().getOrDefault(ENTRY_NO, null)) :
 				Optional.empty();
 
 		if (entryNoOptional.isPresent()) {
+			// TODO: create entry_code as property
 			stockModel.setUniqueName(entryNoOptional.get());
-			stockModel.setValue(entryNoOptional.get());
 		} else {
 			final int entryNo = !stockMap.containsKey(trialDbId) ? 1 : stockMap.get(trialDbId).size() + 1;
 			stockModel.setUniqueName(Integer.toString(entryNo));
-			stockModel.setValue(Integer.toString(entryNo));
 		}
 
 		stockModel.setName(germplasmDTO.getGermplasmName());
@@ -411,22 +571,21 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 		germplasm.setGid(Integer.valueOf(germplasmDTO.getGid()));
 		germplasm.setGermplasmUUID(germplasmDTO.getGermplasmDbId());
 		stockModel.setGermplasm(germplasm);
-		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 
-		final Set<StockProperty> properties = new HashSet<>();
-		final StockProperty stockProperty = new StockProperty();
-		stockProperty.setStock(stockModel);
-		Integer entryType = entryTypes.get(dto.getObservationUnitPosition().getEntryType().toUpperCase());
+		Enumeration entryType = entryTypes.get(dto.getObservationUnitPosition().getEntryType().toUpperCase());
 		if (entryType == null) {
 			if (!entryTypesMap.containsKey(dto.getProgramDbId())) {
 				entryTypesMap.put(dto.getProgramDbId(),
 					this.ontologyService.getStandardVariable(TermId.ENTRY_TYPE.getId(), dto.getProgramDbId()).getEnumerations()
-						.stream().collect(Collectors.toMap(enumeration -> enumeration.getDescription().toUpperCase(), Enumeration::getId)));
+						.stream()
+						.collect(Collectors.toMap(enumeration -> enumeration.getDescription().toUpperCase(), enumeration -> enumeration)));
 			}
 			entryType = entryTypesMap.get(dto.getProgramDbId()).get(dto.getObservationUnitPosition().getEntryType().toUpperCase());
 		}
-		stockProperty.setValue(entryType.toString());
-		stockProperty.setTypeId(TermId.ENTRY_TYPE.getId());
+
+		final StockProperty stockProperty =
+			new StockProperty(stockModel, TermId.ENTRY_TYPE.getId(), entryType.getName(), entryType.getId());
+		final Set<StockProperty> properties = new HashSet<>();
 		properties.add(stockProperty);
 		stockModel.setProperties(properties);
 		this.daoFactory.getStockDao().save(stockModel);
@@ -481,4 +640,5 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			}
 		}
 	}
+
 }

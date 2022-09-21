@@ -17,8 +17,8 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.sample.SampleDetailsDTO;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleServiceImpl;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Person;
 import org.generationcp.middleware.pojos.Sample;
@@ -66,7 +66,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 	private ExperimentPropertyDao experimentPropertyDao;
 	private GermplasmDAO germplasmDao;
 	private ProjectPropertyDao projectPropertyDao;
-	private WorkbenchDataManager workbenchDataManager;
+	private RoleService roleService;
 	private UserService userService;
 
 	private DaoFactory daoFactory;
@@ -103,7 +103,7 @@ public class SampleListDaoTest extends IntegrationTestBase {
 		this.projectPropertyDao = new ProjectPropertyDao();
 		this.projectPropertyDao.setSession(this.sessionProvder.getSession());
 
-		this.workbenchDataManager = new WorkbenchDataManagerImpl(this.workbenchSessionProvider);
+		this.roleService = new RoleServiceImpl(this.workbenchSessionProvider);
 		this.userService = new UserServiceImpl(this.workbenchSessionProvider);
 		// Create three sample lists test data for search
 		this.createSampleListForSearch("TEST-LIST-1");
@@ -385,10 +385,10 @@ public class SampleListDaoTest extends IntegrationTestBase {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
-		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		stockModel.setName("Germplasm 1");
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
+		stockModel.setCross("-");
 		stockModel.setProject(study);
 
 		this.stockDao.saveOrUpdate(stockModel);

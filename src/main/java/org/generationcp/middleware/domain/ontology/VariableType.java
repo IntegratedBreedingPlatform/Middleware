@@ -48,7 +48,8 @@ public enum VariableType {
 		"Observation Unit Variables", PhenotypicType.UNASSIGNED),
 	GERMPLASM_PASSPORT(1813, "Germplasm Passport", "Germplasm Passport", PhenotypicType.UNASSIGNED),
 	GERMPLASM_ATTRIBUTE(1814, "Germplasm Attribute", "Germplasm Attribute", PhenotypicType.UNASSIGNED),
-	ENTRY_DETAIL(1815, "Entry Detail", "Variables that describes list entries", PhenotypicType.UNASSIGNED);
+	ENTRY_DETAIL(1815, "Entry Detail", "Variables that describes list entries", PhenotypicType.ENTRY_DETAIL),
+	INVENTORY_ATTRIBUTE(1816, "Inventory Attribute", "Inventory Attribute", PhenotypicType.UNASSIGNED);
 
 
 	private final Integer id;
@@ -134,7 +135,7 @@ public enum VariableType {
 		return Arrays.asList(ANALYSIS, ANALYSIS_SUMMARY);
 	}
 
-	public static List<VariableType> getAttributeVariableTypes() {
+	public static List<VariableType> getGermplasmAttributeVariableTypes() {
 		return Arrays.asList(GERMPLASM_ATTRIBUTE, GERMPLASM_PASSPORT);
 	}
 

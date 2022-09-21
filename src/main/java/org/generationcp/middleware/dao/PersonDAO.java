@@ -36,26 +36,6 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(PersonDAO.class);
 
-	public boolean isPersonExists(final String firstName, final String lastName) throws MiddlewareQueryException {
-		try {
-			final String sql = "SELECT COUNT(1) FROM persons p " + "WHERE UPPER(p.fname) = :firstName "
-				+ "AND UPPER(p.lname) = :lastName";
-			final SQLQuery query = this.getSession().createSQLQuery(sql);
-			query.setParameter("firstName", firstName);
-			query.setParameter("lastName", lastName);
-
-			final BigInteger count = (BigInteger) query.uniqueResult();
-
-			return count.longValue() > 0;
-		} catch (final HibernateException e) {
-			final String message =
-				"Error with isPersonExists(firstName=" + firstName + ", lastName=" + lastName
-					+ ") query from Person: " + e.getMessage();
-			PersonDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
 	public boolean isPersonWithEmailExists(final String email) throws MiddlewareQueryException {
 		try {
 			final String sql = "SELECT COUNT(1) FROM persons p WHERE UPPER(p.pemail) = :email";
@@ -120,7 +100,8 @@ public class PersonDAO extends GenericDAO<Person, Integer> {
 		} catch (final HibernateException e) {
 			final String message = "Error with getPersonsByCrop(cropType=" + cropType + "";
 			LOG.error(message, e);
-			throw new MiddlewareQueryException(message,
+			throw new MiddlewareQueryException(
+				message,
 				e);
 		}
 	}

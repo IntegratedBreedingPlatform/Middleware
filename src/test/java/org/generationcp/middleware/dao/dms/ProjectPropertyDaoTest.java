@@ -14,7 +14,6 @@ import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.DataSetupTest;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.dao.oms.CVTermRelationshipDao;
 import org.generationcp.middleware.data.initializer.CVTermTestDataInitializer;
@@ -90,8 +89,7 @@ public class ProjectPropertyDaoTest extends IntegrationTestBase {
 		this.projectDao = new DmsProjectDao();
 		this.projectDao.setSession(this.sessionProvder.getSession());
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmManager, new NameDAO(this.sessionProvder
-				.getSession()));
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 		}
 		this.dataSetupTest = new DataSetupTest();
 		this.dataSetupTest.setDataImportService(this.dataImportService);

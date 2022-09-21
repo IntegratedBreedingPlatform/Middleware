@@ -13,9 +13,9 @@ package org.generationcp.middleware.pojos;
 
 import org.hibernate.annotations.NotFound;
 import org.hibernate.annotations.NotFoundAction;
-import org.hibernate.annotations.Type;
 
 import javax.persistence.Basic;
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -41,8 +41,9 @@ import java.io.Serializable;
  *
  * @author Kevin Manansala, Mark Agarrado, Joyce Avestro
  */
-@NamedQueries({@NamedQuery(name = "getAllLocation", query = "FROM Location"),
-		@NamedQuery(name = "countAllLocation", query = "SELECT COUNT(l) FROM Location l")})
+@NamedQueries({
+	@NamedQuery(name = "getAllLocation", query = "FROM Location"),
+	@NamedQuery(name = "countAllLocation", query = "SELECT COUNT(l) FROM Location l")})
 @Entity
 @Table(name = "location")
 // JAXB Element Tags for JSON output
@@ -53,13 +54,12 @@ public class Location implements Serializable, Comparable<Location> {
 
 	private static final long serialVersionUID = 1L;
 
-	public static final String GET_PROVINCE_BY_COUNTRY =
-			"select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV'  and l.cntryid = (:countryId) order by l.lname";
-	public static final String GET_ALL_PROVINCES =
-			"select l.* from location l, udflds u where l.ltype = u.fldno and u.fcode = 'PROV' order by l.lname";
+	public static final String GET_ALL_COUNTRY =
+		"select l.* from location l, udflds u where l.ltype = u.fldno and u.ftable='LOCATION' and u.fcode='COUNTRY' "
+			+ "and exists (select 1 from cntry c where c.cntryid =l.cntryid) order by l.lname";
 
 	public static final String UNSPECIFIED_LOCATION = "Unspecified Location";
-	
+
 	public static final Integer[] BREEDING_LOCATION_TYPE_IDS = {410, 411, 412};
 
 	@Id
@@ -108,11 +108,7 @@ public class Location implements Serializable, Comparable<Location> {
 	@Column(name = "lrplce")
 	private Integer lrplce;
 
-	@Type(type = "org.hibernate.type.NumericBooleanType")
-	@Column(name = "ldefault", columnDefinition = "TINYINT")
-	private Boolean ldefault;
-
-	@OneToOne(fetch = FetchType.EAGER)
+	@OneToOne(fetch = FetchType.EAGER, cascade = CascadeType.REMOVE, orphanRemoval = true)
 	@JoinColumn(name = "locid")
 	private Georef georef;
 
@@ -127,7 +123,7 @@ public class Location implements Serializable, Comparable<Location> {
 
 	public static final String COUNT_ALL_BREEDING_LOCATIONS = "SELECT count(*) AS count FROM location WHERE ltype IN (410, 411, 412)";
 	public static final String GET_LOCATION_NAMES_BY_GIDS = "SELECT gid, g.glocn, lname " + "FROM germplsm g " + "LEFT JOIN location l "
-			+ "ON g.glocn = l.locid " + "WHERE gid IN (:gids)";
+		+ "ON g.glocn = l.locid " + "WHERE gid IN (:gids)";
 
 	public Location() {
 	}
@@ -136,7 +132,8 @@ public class Location implements Serializable, Comparable<Location> {
 		this.locid = locid;
 	}
 
-	public Location(final Integer locid, final Integer ltype, final Integer nllp, final String lname, final String labbr,
+	public Location(
+		final Integer locid, final Integer ltype, final Integer nllp, final String lname, final String labbr,
 		final Integer snl3id, final Integer snl2id, final Location province,
 		final Country country, final Integer lrplce) {
 		super();
@@ -169,7 +166,7 @@ public class Location implements Serializable, Comparable<Location> {
 	}
 
 	public Country getCountry() {
-		return country;
+		return this.country;
 	}
 
 	public void setCountry(final Country country) {
@@ -217,7 +214,7 @@ public class Location implements Serializable, Comparable<Location> {
 	}
 
 	public Location getProvince() {
-		return province;
+		return this.province;
 	}
 
 	public void setProvince(final Location province) {
@@ -290,7 +287,7 @@ public class Location implements Serializable, Comparable<Location> {
 	/**
 	 * @return the parentLocationName
 	 */
-	 public String getParentLocationName() {
+	public String getParentLocationName() {
 		return this.parentLocationName;
 	}
 
@@ -321,14 +318,6 @@ public class Location implements Serializable, Comparable<Location> {
 
 	public void setParentLocationAbbr(final String parentLocationAbbr) {
 		this.parentLocationAbbr = parentLocationAbbr;
-	}
-
-	public Boolean getLdefault() {
-		return ldefault;
-	}
-
-	public void setLdefault(final Boolean ldefault) {
-		this.ldefault = ldefault;
 	}
 
 	@Override
@@ -376,8 +365,6 @@ public class Location implements Serializable, Comparable<Location> {
 		builder.append(this.georef != null ? this.georef.getAlt() : null);
 		builder.append(", parentLocationName=");
 		builder.append(this.parentLocationName);
-		builder.append(", ldefault=");
-		builder.append(this.ldefault);
 		builder.append("]");
 		return builder.toString();
 	}

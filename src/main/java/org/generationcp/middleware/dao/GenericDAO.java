@@ -200,6 +200,14 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 		}
 	}
 
+	public void evict(T entity) throws MiddlewareQueryException {
+		try {
+			this.getSession().evict(entity);
+		} catch (HibernateException e) {
+			throw new MiddlewareQueryException("Error in evict(" + entity + "): " + e.getMessage(), e);
+		}
+	}
+
 	public void setStartAndNumOfRows(Query query, int start, int numOfRows) {
 		if (numOfRows > 0) {
 			query.setFirstResult(start);
@@ -276,6 +284,14 @@ public abstract class GenericDAO<T, ID extends Serializable> {
 					criteria.addOrder(Order.desc(order.getProperty()));
 			}
 		}
+	}
+
+	public static void addPagination(final Query query, final Pageable pageable) {
+		if (pageable == null || query == null) {
+			return;
+		}
+		query.setFirstResult(pageable.getPageSize() * pageable.getPageNumber());
+		query.setMaxResults(pageable.getPageSize());
 	}
 
 	public static void addPagination(final Criteria criteria, final Pageable pageable) {

@@ -18,6 +18,7 @@ import com.google.common.collect.Table;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ExperimentType;
+import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.VariableType;
@@ -122,8 +123,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 		+ "FROM nd_experiment e INNER JOIN stock s ON s.stock_id = e.stock_id "
 		+ "WHERE (" + TermId.ENTRY_NO.getId() + "= :variableId AND s.uniquename IS NOT NULL)  OR (" + TermId.GID.getId()
 		+ " = :variableId AND s.dbxref_id IS NOT NULL) "
-		+ "OR (" + TermId.DESIG.getId() + " = :variableId AND s.name IS NOT NULL) OR (" + TermId.ENTRY_CODE.getId()
-		+ " = :variableId AND s.value IS NOT NULL)";
+		+ "OR (" + TermId.DESIG.getId() + " = :variableId AND s.name IS NOT NULL)";
 
 	private static final String COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP = "SELECT count(e.nd_experiment_id) "
 		+ "FROM nd_experiment e INNER JOIN stockprop sp ON sp.stock_id = e.stock_id "
@@ -168,6 +168,15 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 		return null;
+	}
+
+	public void deleteGeoreferencesByExperimentTypeAndInstanceId(final Integer experimentType, final Integer instanceId) {
+		final String hqlUpdate =
+			"UPDATE ExperimentModel e set e.jsonProps = null where e.typeId = :experimentType AND e.geoLocation.locationId = :instanceId";
+		this.getSession().createQuery(hqlUpdate)
+			.setParameter("experimentType", experimentType)
+			.setParameter("instanceId", instanceId)
+			.executeUpdate();
 	}
 
 	public ExperimentModel getExperimentByTypeInstanceId(final Integer experimentType, final Integer instanceId) {
@@ -921,8 +930,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			} else if (VariableType.EXPERIMENTAL_DESIGN.getId() == variableTypeId
 				|| VariableType.TREATMENT_FACTOR.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_EXPERIMENTPROP;
-			} else if (TermId.ENTRY_NO.getId() == variableId || TermId.GID.getId() == variableId || TermId.DESIG.getId() == variableId
-				|| TermId.ENTRY_CODE.getId() == variableId) {
+			} else if (TermId.ENTRY_NO.getId() == variableId || TermId.GID.getId() == variableId || TermId.DESIG.getId() == variableId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCK;
 			} else if (VariableType.GERMPLASM_DESCRIPTOR.getId() == variableTypeId) {
 				sql = ExperimentDao.COUNT_EXPERIMENT_BY_VARIABLE_IN_STOCKPROP;
@@ -1057,7 +1065,7 @@ public class ExperimentDao extends GenericDAO<ExperimentModel, Integer> {
 			+ "FROM nd_experiment e \n"
 			+ "INNER JOIN project proj ON proj.project_id = e.project_id AND proj.study_id = :studyId \n"
 			+ "INNER JOIN phenotype p ON p.nd_experiment_id = e.nd_experiment_id \n"
-			+ "WHERE proj.dataset_type_id IN (:datasetTypeIds) ");
+			+ "WHERE proj.dataset_type_id IN (:datasetTypeIds) AND p.value != '" + MeasurementData.MISSING_VALUE + "' ");
 
 		if (!inputVariableDatasetMap.isEmpty()) {
 			queryString.append("AND (");

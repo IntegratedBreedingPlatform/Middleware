@@ -36,6 +36,9 @@ public class RCall {
 	@JoinColumn(name = "call_id")
 	private List<RCallParameter> rCallParameters;
 
+	@Column(name = "is_aggregate")
+	private boolean isAggregate;
+
 	public Integer getId() {
 		return this.id;
 	}
@@ -68,4 +71,11 @@ public class RCall {
 		this.rCallParameters = rCallParameters;
 	}
 
+	public boolean isAggregate() {
+		return this.isAggregate;
+	}
+
+	public void setAggregate(final boolean aggregate) {
+		this.isAggregate = aggregate;
+	}
 }

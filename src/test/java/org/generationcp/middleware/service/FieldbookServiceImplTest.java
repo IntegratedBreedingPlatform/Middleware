@@ -13,12 +13,13 @@ package org.generationcp.middleware.service;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.GermplasmTestDataInitializer;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.operation.saver.WorkbookSaver;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.Germplasm;
@@ -56,19 +57,22 @@ public class FieldbookServiceImplTest {
 
 	public static final String PROGRAM_UUID = "9f9c606e-03c1-4073-bf0c-2ffa58c36037";
 	@Mock
-	Session session;
+	private Session session;
 
 	@Mock
-	HibernateSessionProvider sessionProvider;
+	private HibernateSessionProvider sessionProvider;
 
 	@Mock
-	SQLQuery query;
+	private SQLQuery query;
 
 	@Mock
-	LocationDataManager locationDataManager;
+	private LocationService locationService;
 
 	@Mock
-	GermplasmListManager germplasmListManager;
+	private GermplasmListManager germplasmListManager;
+
+	@Mock
+	private GermplasmListDataService germplasmListDataService;
 
 	@Mock
 	private CrossExpansionProperties crossExpansionProperties;
@@ -92,8 +96,9 @@ public class FieldbookServiceImplTest {
 	public void setUp() {
 		this.fieldbookServiceImpl.setCrossExpansionProperties(this.crossExpansionProperties);
 		this.fieldbookServiceImpl.setGermplasmGroupingService(this.germplasmGroupingService);
-		this.fieldbookServiceImpl.setLocationDataManager(this.locationDataManager);
+		this.fieldbookServiceImpl.setLocationService(this.locationService);
 		this.fieldbookServiceImpl.setGermplasmListManager(this.germplasmListManager);
+		this.fieldbookServiceImpl.setGermplasmListDataService(this.germplasmListDataService);
 		this.fieldbookServiceImpl.setWorkbookSaver(this.workbookSaver);
 		Mockito.doReturn(this.session).when(this.sessionProvider).getSession();
 		Mockito.doReturn(this.query).when(this.session).createSQLQuery(ArgumentMatchers.anyString());
@@ -127,23 +132,22 @@ public class FieldbookServiceImplTest {
 
 	@Test
 	public void testAddLocation() {
-		Mockito.when(this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode()))
+		Mockito.when(this.locationService.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode()))
 			.thenReturn(1001);
-		Mockito.when(this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode()))
+		Mockito.when(this.locationService.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode()))
 			.thenReturn(1002);
 
 		this.fieldbookServiceImpl.addLocation("LOCNAME", 1, 101, LocationType.BLOCK.getCode(), LocdesType.BLOCK_PARENT.getCode());
 
-		Mockito.verify(this.locationDataManager).getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
-		Mockito.verify(this.locationDataManager).getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode());
+		Mockito.verify(this.locationService).getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.BLOCK.getCode());
+		Mockito.verify(this.locationService).getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, LocdesType.BLOCK_PARENT.getCode());
 		final ArgumentCaptor<Location> locationCaptor = ArgumentCaptor.forClass(Location.class);
 		final ArgumentCaptor<Locdes> locdesCaptor = ArgumentCaptor.forClass(Locdes.class);
-		Mockito.verify(this.locationDataManager).addLocationAndLocdes(locationCaptor.capture(), locdesCaptor.capture());
+		Mockito.verify(this.locationService).addLocationAndLocdes(locationCaptor.capture(), locdesCaptor.capture());
 		final Location location = locationCaptor.getValue();
 		final Locdes locdes = locdesCaptor.getValue();
 		Assert.assertEquals("1001", location.getLtype().toString());
 		Assert.assertEquals("LOCNAME", location.getLname());
-		Assert.assertFalse(location.getLdefault());
 		Assert.assertNull(location.getLabbr());
 		Assert.assertEquals("1002", locdes.getTypeId().toString());
 		Assert.assertEquals("101", locdes.getUserId().toString());

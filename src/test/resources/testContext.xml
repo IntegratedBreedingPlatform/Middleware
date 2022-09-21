@@ -11,7 +11,7 @@
 						http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd
 						http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
 
-	<context:property-placeholder location="classpath:test.properties" />
+	<context:property-placeholder location="classpath:test.properties, classpath:crossing.properties" />
 	<util:properties id="testProperties" location="classpath:test.properties"/>
 	<context:annotation-config />
 
@@ -42,8 +42,8 @@
 		<property name="userTransaction" ref="atomikosUserTransaction" />
 	</bean>
 
-	<bean id="workbenchDataManager"
-		class="org.generationcp.middleware.manager.WorkbenchDataManagerImpl"
+	<bean id="roleService"
+		class="org.generationcp.middleware.api.role.RoleServiceImpl"
 		destroy-method="close">
 		<constructor-arg ref="workbenchSessionProvider" />
 	</bean>
@@ -107,10 +107,6 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
-    <bean id="locationDataManager" class="org.generationcp.middleware.manager.LocationDataManagerImpl">
-        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
-    </bean>
-
     <bean id="crossStudyDataManager" class="org.generationcp.middleware.manager.CrossStudyDataManagerImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
@@ -121,10 +117,6 @@
 
     <bean id="inventoryDataManager" class="org.generationcp.middleware.manager.InventoryDataManagerImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
-    </bean>
-
-    <bean id="inventoryService" class="org.generationcp.middleware.service.InventoryServiceImpl">
-        <constructor-arg ref="cropSessionProvider"/>
     </bean>
 
 	<bean id="programFavoriteService" class="org.generationcp.middleware.api.program.ProgramFavoriteServiceImpl">
@@ -314,6 +306,10 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
 
+	<bean id="germplasmListServiceBrapi" class="org.generationcp.middleware.api.brapi.GermplasmListServiceBrapiImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 	<bean id="observationServiceBrapi" class="org.generationcp.middleware.api.brapi.ObservationServiceBrapiImpl">
 		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
 	</bean>
@@ -369,6 +365,18 @@
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
 
+	<bean id="lotAttributeService" class="org.generationcp.middleware.service.impl.inventory.LotAttributeServiceImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
+	<bean id="copService" class="org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
+	<bean id="copServiceAsync" class="org.generationcp.middleware.api.germplasm.pedigree.cop.CopServiceAsyncImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
 	<bean id="germplasmListDataService" class="org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataServiceImpl">
         <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
     </bean>
@@ -379,6 +387,42 @@
 
 	<bean id="feedbackService" class="org.generationcp.middleware.service.impl.feedback.FeedbackServiceImpl">
 		<constructor-arg name="sessionProvider" ref="workbenchSessionProvider"/>
+	</bean>
+
+	<bean id="attributeValueService" class="org.generationcp.middleware.api.brapi.v2.attribute.AttributeValueServiceBrapiImpl">
+        <constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+    </bean>
+
+	<bean id="ontologyVariableService" class="org.generationcp.middleware.api.ontology.OntologyVariableServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
+	<bean id="siteAnalysisService" class="org.generationcp.middleware.service.impl.analysis.SiteAnalysisServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
+	<bean id="cropGenotypingParameterService" class="org.generationcp.middleware.service.impl.crop.CropGenotypingParameterServiceImpl">
+		<constructor-arg name="workbenchSessionProvider" ref="workbenchSessionProvider"/>
+	</bean>
+
+	<bean id="pedigreeServiceBrapi" class="org.generationcp.middleware.api.brapi.PedigreeServiceBrapiImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
+	<bean id="cropService" class="org.generationcp.middleware.api.crop.CropServiceImpl">
+		<constructor-arg ref="workbenchSessionProvider" />
+	</bean>
+
+	<bean id="toolService" class="org.generationcp.middleware.api.tool.ToolServiceImpl">
+		<constructor-arg ref="workbenchSessionProvider" />
+	</bean>
+
+	<bean id="studyEntryObservationService" class="org.generationcp.middleware.api.study.StudyEntryObservationServiceImpl">
+		<constructor-arg name="sessionProvider" ref="cropSessionProvider"/>
+	</bean>
+
+	<bean id="roleTypeService" class="org.generationcp.middleware.api.role.RoleTypeServiceImpl">
+		<constructor-arg ref="workbenchSessionProvider" />
 	</bean>
 
 </beans>

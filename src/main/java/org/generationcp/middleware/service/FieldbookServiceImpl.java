@@ -11,8 +11,11 @@
 package org.generationcp.middleware.service;
 
 import com.google.common.base.Optional;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.generationcp.middleware.api.germplasm.GermplasmGuidGenerator;
+import org.generationcp.middleware.api.germplasmlist.data.GermplasmListDataService;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.dao.AttributeDAO;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
@@ -27,12 +30,12 @@ import org.generationcp.middleware.domain.etl.TreatmentVariable;
 import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldmapBlockInfo;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
@@ -50,6 +53,7 @@ import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.UserDefinedField;
+import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.ProgramFavorite;
 import org.generationcp.middleware.pojos.oms.CVTerm;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -67,10 +71,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Transactional
 public class FieldbookServiceImpl extends Service implements FieldbookService {
@@ -103,11 +109,16 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	private StockBuilder stockBuilder;
 
 	@Resource
-	private LocationDataManager locationDataManager;
+	private LocationService locationService;
+
+	@Resource
+	private GermplasmListDataService germplasmListDataService;
 
 	private DaoFactory daoFactory;
 
 	private static final Logger LOG = LoggerFactory.getLogger(FieldbookServiceImpl.class);
+	private static final List<Integer> FIELDMAP_TERM_IDS =
+		Arrays.asList(TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId());
 
 	public FieldbookServiceImpl() {
 		super();
@@ -132,12 +143,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Location> getAllLocations() {
-		return this.locationDataManager.getAllLocations();
+		return this.locationService.getAllLocations();
 	}
 
 	@Override
 	public List<Location> getAllBreedingLocations() {
-		return this.locationDataManager.getAllBreedingLocations();
+		return this.locationService.getAllBreedingLocations();
 	}
 
 	@Override
@@ -158,16 +169,16 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		if (isBreedingLocation) {
-			return this.locationDataManager.getAllBreedingLocations(locationIds);
+			return this.locationService.getAllBreedingLocations(locationIds);
 		}
 
-		return this.locationDataManager.getAllSeedingLocations(locationIds);
+		return this.locationService.getAllSeedingLocations(locationIds);
 
 	}
 
 	@Override
 	public List<Location> getFavoriteLocationByLocationIDs(final List<Integer> locationIds) {
-		return this.locationDataManager.getLocationsByIDs(locationIds);
+		return this.locationService.getLocationsByIDs(locationIds);
 	}
 
 	@Override
@@ -332,6 +343,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				counter++;
 			}
 
+			// Add default columns
+			this.germplasmListDataService.saveDefaultView(germplasmList);
+
 		} catch (final Exception e) {
 
 			this.logAndThrowException(
@@ -381,6 +395,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				germplasmListDataDAO.save(germplasmListData);
 			}
 
+			this.germplasmListDataService.saveDefaultView(germplasmList);
+
 			// For Management Group Settings Processing
 			this.germplasmGroupingService.processGroupInheritanceForCrosses(cropName, germplasmIdMethodIdMap, isApplyNewGroupToPreviousCrosses,
 					this.crossExpansionProperties.getHybridBreedingMethods());
@@ -418,7 +434,6 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public int countPlotsWithRecordedVariatesInDataset(final int datasetId, final List<Integer> variateIds) {
-
 		return this.studyDataManager.countPlotsWithRecordedVariatesInDataset(datasetId, variateIds);
 	}
 
@@ -434,22 +449,22 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public List<Location> getAllFieldLocations(final int locationId) {
-		return this.locationDataManager.getAllFieldLocations(locationId);
+		return this.locationService.getAllFieldLocations(locationId);
 	}
 
 	@Override
 	public List<Location> getAllBlockLocations(final int fieldId) {
-		return this.locationDataManager.getAllBlockLocations(fieldId);
+		return this.locationService.getAllBlockLocations(fieldId);
 	}
 
 	@Override
 	public FieldmapBlockInfo getBlockInformation(final int blockId) {
-		return this.locationDataManager.getBlockInformation(blockId);
+		return this.locationService.getBlockInformation(blockId);
 	}
 
 	@Override
 	public List<Location> getAllFields() {
-		return this.locationDataManager.getAllFields();
+		return this.locationService.getAllFields();
 	}
 
 	@Override
@@ -466,14 +481,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	public int addLocation(final String locationName, final Integer parentId, final Integer currentUserId, final String locCode,
 			final String parentCode) {
 
-		final Integer lType = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locCode);
+		final Integer lType = this.locationService.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, locCode);
 		final Location location = new Location(null, lType, 0, locationName, null, 0, 0, null, null, 0);
 
-		final Integer dType = this.locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, parentCode);
+		final Integer dType = this.locationService.getUserDefinedFieldIdOfCode(UDTableType.LOCDES_DTYPE, parentCode);
 		final Locdes locdes = new Locdes(null, null, dType, currentUserId, String.valueOf(parentId), 0, 0);
-
-		location.setLdefault(false);
-		return this.locationDataManager.addLocationAndLocdes(location, locdes);
+		return this.locationService.addLocationAndLocdes(location, locdes);
 	}
 
 	@Override
@@ -516,12 +529,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 
 	@Override
 	public Location getLocationById(final int id) {
-		return this.locationDataManager.getLocationByID(id);
+		return this.locationService.getLocationByID(id);
 	}
 
 	@Override
 	public Location getLocationByName(final String locationName, final Operation op) {
-		final List<Location> locations = this.locationDataManager.getLocationsByName(locationName, 0, 1, op);
+		final List<Location> locations = this.locationService.getLocationsByName(locationName, 0, 1, op);
 		if (locations != null && !locations.isEmpty()) {
 			return locations.get(0);
 		}
@@ -708,8 +721,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		this.germplasmListManager = germplasmListManager;
 	}
 
-	protected void setLocationDataManager(final LocationDataManager locationDataManager) {
-		this.locationDataManager = locationDataManager;
+	protected void setLocationService(final LocationService locationService) {
+		this.locationService = locationService;
 	}
 
 	@Override
@@ -736,4 +749,39 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	void setWorkbookSaver(final WorkbookSaver workbookSaver) {
 		this.workbookSaver = workbookSaver;
 	}
+
+	public void setGermplasmListDataService(final GermplasmListDataService germplasmListDataService) {
+		this.germplasmListDataService = germplasmListDataService;
+	}
+
+	@Override
+	public List<String> deleteAllFieldMapsByTrialInstanceIds(final List<Integer> geolocationIds, final Integer projectId,
+		final boolean deleteProjectProp, final boolean deleteFieldAndBlock) {
+		this.daoFactory.getExperimentPropertyDao().deleteExperimentPropByLocationIds(geolocationIds, FIELDMAP_TERM_IDS);
+
+		final Map<Integer, Integer> blocksToDeleteMap = this.daoFactory.getGeolocationPropertyDao()
+			.getSafeToDeleteLocationBlockIdMap(geolocationIds);
+		this.daoFactory.getGeolocationPropertyDao().deleteBlockPropertiesByGeolocationId(geolocationIds);
+
+		final List<Integer> blockIdsToDelete = new ArrayList<>(blocksToDeleteMap.values());
+		final List<Integer> instancesWithSharedBlock = geolocationIds.stream().filter(
+			id -> !blocksToDeleteMap.containsKey(id)).collect(Collectors.toList());
+
+		if (deleteFieldAndBlock && CollectionUtils.isNotEmpty(blockIdsToDelete)) {
+			this.locationService.deleteBlockFieldLocationByBlockId(blockIdsToDelete);
+		}
+
+		if (deleteProjectProp) {
+			this.daoFactory.getProjectPropertyDAO().deleteProjectVariables(
+				projectId, Arrays.asList(TermId.FIELDMAP_COLUMN.getId(), TermId.FIELDMAP_RANGE.getId()));
+		}
+
+		if (deleteFieldAndBlock && CollectionUtils.isNotEmpty(instancesWithSharedBlock)) {
+			List<Geolocation> geolocationList = this.daoFactory.getGeolocationDao().getByIds(instancesWithSharedBlock);
+			return geolocationList.stream().map(Geolocation::getDescription).collect(Collectors.toList());
+		}
+
+		return Collections.EMPTY_LIST;
+	}
+
 }

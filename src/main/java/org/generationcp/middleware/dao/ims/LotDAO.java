@@ -10,15 +10,14 @@
 
 package org.generationcp.middleware.dao.ims;
 
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MapUtils;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.inventory.LotAggregateData;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotAttributeColumnDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotsSearchDto;
-import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.Attribute;
 import org.generationcp.middleware.pojos.ims.Lot;
@@ -31,6 +30,7 @@ import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.transform.AliasToBeanResultTransformer;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.DateType;
 import org.hibernate.type.IntegerType;
@@ -44,7 +44,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -56,61 +55,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LotDAO.class);
 
-	private static final String QUERY_FROM_LOT = ") query from Lot: ";
-
 	private static final String AT_LOT_DAO = " at LotDAO: ";
-
-	private static final String ENTITY_TYPE = "entityType";
-
-	/*
-	 * NOTE setting the trnstat=0 for actual_balance to include anticipated transaction to the total_amount. This is only temporary change
-	 * as required by BMS-1052
-	 */
-	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS = "SELECT i.lotid, i.eid, " + "  locid, scaleid, i.comments, i.status,"
-		+ "  SUM(CASE WHEN trnstat = 1 THEN trnqty ELSE 0 END) AS actual_balance, "
-		+ "  SUM(CASE WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " OR (trnstat = "
-		+ TransactionStatus.PENDING.getIntValue() + " AND trntype = " + TransactionType.WITHDRAWAL.getId()
-		+ ") THEN trnqty ELSE 0 END) AS available_balance, "
-		+ "  SUM(CASE WHEN trnstat = 0 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS reserved_amt, "
-		+ "  SUM(CASE WHEN trnstat = 1 AND trnqty <=0 THEN trnqty * -1 ELSE 0 END) AS committed_amt, ";
-
-	private static final String GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS =
-		LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS + "  GROUP_CONCAT(DISTINCT stock_id SEPARATOR ', ') AS stockids, created_date ";
-
-	private static final String GET_LOTS_FOR_GERMPLASM_CONDITION =
-		"FROM ims_lot i " + "LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-			+ "WHERE (i.status = 0 OR :includeCloseLots) AND i.etype = 'GERMPLSM' AND i.eid  IN (:gids) " + "GROUP BY i.lotid ";
-
-	private static final String GET_LOTS_FOR_GERMPLASM =
-		LotDAO.GET_LOTS_FOR_GERMPLASM_COLUMNS_WITH_STOCKS + LotDAO.GET_LOTS_FOR_GERMPLASM_CONDITION;
-
-	private static final String GET_LOTS_FOR_LIST_ENTRIES =
-		"SELECT lot.*, recordid, trnqty * -1, trnstat, trnid " + "FROM " + "   (" + LotDAO.GET_LOTS_FOR_GERMPLASM + "   ) lot "
-			+ " LEFT JOIN ims_transaction res ON res.lotid = lot.lotid " + "  AND trnstat in (:statusList) AND trnqty < 0 "
-			+ "  AND sourceid = :listId AND sourcetype = 'LIST' ";
-
-	private static final String GET_LOTS_STATUS_FOR_GERMPLASM = "SELECT i.lotid, COUNT(DISTINCT (act.trnstat)), act.trnstat"
-		+ " FROM ims_lot i LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9"
-		+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND act.trnqty < 0 AND i.eid IN (:gids)" + "GROUP BY i.lotid ORDER BY lotid";
-
-	private static final String GET_LOT_SCALE_FOR_GERMPLSMS = "select  lot.eid, lot.scaleid, cv.name from ims_lot lot "
-		+ " LEFT JOIN cvterm_relationship cvr ON cvr.subject_id = lot.scaleid AND cvr.type_id =" + TermId.HAS_SCALE.getId()
-		+ " LEFT JOIN cvterm cv ON cv.cvterm_id = cvr.object_id "
-		+ " where lot.eid in (:gids) AND lot.etype = 'GERMPLSM' AND lot.status <> 9 ORDER BY lot.eid";
-
-	@SuppressWarnings("unchecked")
-	public List<Lot> getByEntityType(final String type, final int start, final int numOfRows) throws MiddlewareQueryException {
-		try {
-			final Criteria criteria = this.getSession().createCriteria(Lot.class);
-			criteria.add(Restrictions.eq(ENTITY_TYPE, type));
-			criteria.setFirstResult(start);
-			criteria.setMaxResults(numOfRows);
-			return criteria.list();
-		} catch (final HibernateException e) {
-			this.logAndThrowException("Error with getByEntityType(type=" + type + QUERY_FROM_LOT + e.getMessage(), e);
-		}
-		return new ArrayList<Lot>();
-	}
 
 	public List<Lot> getByGids(final List<Integer> gids) {
 		if (CollectionUtils.isNotEmpty(gids)) {
@@ -123,33 +68,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			}
 		}
 		return new ArrayList<>();
-	}
-
-	@SuppressWarnings("unchecked")
-	public Map<Integer, BigInteger> countLotsWithAvailableBalance(final List<Integer> gids) throws MiddlewareQueryException {
-		final Map<Integer, BigInteger> lotCounts = new HashMap<Integer, BigInteger>();
-
-		try {
-			final String sql = "SELECT entity_id, CAST(SUM(CASE WHEN avail_bal = 0 THEN 0 ELSE 1 END) AS UNSIGNED) FROM ( "
-				+ "SELECT i.lotid, i.eid AS entity_id, " + "   SUM(trnqty) AS avail_bal " + "  FROM ims_lot i "
-				+ "  LEFT JOIN ims_transaction act ON act.lotid = i.lotid AND act.trnstat <> 9 "
-				+ " WHERE i.status = 0 AND i.etype = 'GERMPLSM' AND i.eid  in (:gids) " + " GROUP BY i.lotid ) inv "
-				+ "WHERE avail_bal > -1 " + "GROUP BY entity_id;";
-
-			final Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
-			final List<Object[]> result = query.list();
-			for (final Object[] row : result) {
-				final Integer gid = (Integer) row[0];
-				final BigInteger count = (BigInteger) row[1];
-
-				lotCounts.put(gid, count);
-			}
-
-		} catch (final Exception e) {
-			this.logAndThrowException("Error at countLotsWithAvailableBalance=" + gids + AT_LOT_DAO + e.getMessage(), e);
-		}
-
-		return lotCounts;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -191,96 +109,6 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		return lotCounts;
 	}
 
-	public List<Lot> getLotAggregateDataForListEntry(final Integer listId, final Integer gid) throws MiddlewareQueryException {
-		final List<Lot> lots = new ArrayList<Lot>();
-
-		try {
-			final String sql = LotDAO.GET_LOTS_FOR_LIST_ENTRIES + " ORDER by lot.lotid ";
-
-			final Query query = this.getSession().createSQLQuery(sql);
-			query.setParameterList("gids", Collections.singletonList(gid));
-			query.setParameter("listId", listId);
-			query.setParameter("includeCloseLots", 1);
-
-			final List<Integer> statusList = Lists.newArrayList();
-			statusList.add(0);
-			statusList.add(1);
-			query.setParameterList("statusList", statusList);
-
-			this.createLotRows(lots, query, true);
-
-		} catch (final Exception e) {
-			this.logAndThrowException(
-				"Error at getLotAggregateDataForListEntry for list ID = " + listId + " and GID = " + gid + AT_LOT_DAO + e.getMessage(),
-				e);
-		}
-		return lots;
-	}
-
-	public List<Lot> getLotAggregateDataForGermplasm(final Integer gid) throws MiddlewareQueryException {
-		final List<Lot> lots = new ArrayList<Lot>();
-
-		try {
-			final String sql = LotDAO.GET_LOTS_FOR_GERMPLASM + "ORDER by lotid ";
-
-			final Query query = this.getSession().createSQLQuery(sql);
-			query.setParameterList("gids", Collections.singleton(gid));
-			query.setParameter("includeCloseLots", 1);
-
-			this.createLotRows(lots, query, false);
-
-		} catch (final Exception e) {
-			this.logAndThrowException("Error at getLotAggregateDataForGermplasm for GID = " + gid + AT_LOT_DAO + e.getMessage(), e);
-		}
-
-		return lots;
-	}
-
-	public Map<Integer, Object[]> getLotStatusDataForGermplasm(final Integer gid) throws MiddlewareQueryException {
-		final Map<Integer, Object[]> lotStatusCounts = new HashMap<Integer, Object[]>();
-
-		try {
-			final String sql = LotDAO.GET_LOTS_STATUS_FOR_GERMPLASM;
-
-			final Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", Collections.singletonList(gid));
-			final List<Object[]> result = query.list();
-			for (final Object[] row : result) {
-				final Integer lotId = (Integer) row[0];
-				final BigInteger lotDistinctStatusCount = (BigInteger) row[1];
-				final Integer distinctStatus = (Integer) row[2];
-
-				lotStatusCounts.put(lotId, new Object[] {lotDistinctStatusCount, distinctStatus});
-			}
-
-		} catch (final Exception e) {
-			this.logAndThrowException("Error at getLotStatusDataForGermplasm for GID = " + gid + AT_LOT_DAO + e.getMessage(), e);
-		}
-
-		return lotStatusCounts;
-	}
-
-	public List<Object[]> retrieveLotScalesForGermplasms(final List<Integer> gids) throws MiddlewareQueryException {
-		final List<Object[]> lotScalesForGermplasm = new ArrayList<>();
-
-		try {
-			final String sql = LotDAO.GET_LOT_SCALE_FOR_GERMPLSMS;
-
-			final Query query = this.getSession().createSQLQuery(sql).setParameterList("gids", gids);
-			final List<Object[]> result = query.list();
-			for (final Object[] row : result) {
-				final Integer gid = (Integer) row[0];
-				final Integer scaleId = (Integer) row[1];
-				final String scaleName = (String) row[2];
-				lotScalesForGermplasm.add(new Object[] {gid, scaleId, scaleName});
-			}
-
-		} catch (final Exception e) {
-			this.logAndThrowException("Error at retrieveLotScalesForGermplasms for GIDss = " + gids + AT_LOT_DAO + e.getMessage(), e);
-		}
-
-		return lotScalesForGermplasm;
-	}
-
 	public Set<Integer> getGermplasmsWithOpenLots(final List<Integer> gids) {
 		if (CollectionUtils.isEmpty(gids)) {
 			return Collections.emptySet();
@@ -296,122 +124,11 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	private void createLotRows(final List<Lot> lots, final Query query, final boolean withReservationMap) {
-		final List<Object[]> result = query.list();
-
-		Map<Integer, Double> reservationMap = null;
-		Map<Integer, Double> committedMap = null;
-		Map<Integer, Set<String>> reservationStatusMap = null;
-		Lot lot = null;
-
-		for (final Object[] row : result) {
-			final Integer lotId = (Integer) row[0];
-			if (lot == null || !lot.getId().equals(lotId)) {
-				if (lot != null && reservationMap != null && committedMap != null) {
-					lot.getAggregateData().setReservationMap(reservationMap);
-					lot.getAggregateData().setReservationStatusMap(reservationStatusMap);
-					lot.getAggregateData().setCommittedMap(committedMap);
-				}
-				final Integer entityId = (Integer) row[1];
-				final Integer locationId = (Integer) row[2];
-				final Integer scaleId = (Integer) row[3];
-				final String comments = (String) row[4];
-				final Integer lotStatus = (Integer) row[5];
-				final Double actualBalance = (Double) row[6];
-				final Double availableBalance = (Double) row[7];
-				final Double reservedTotal = (Double) row[8];
-				final Double committedTotal = (Double) row[9];
-				final String stockIds = (String) row[10];
-				final Date createdDate = (Date) row[11];
-
-				lot = new Lot(lotId);
-				lot.setEntityId(entityId);
-				lot.setLocationId(locationId);
-				lot.setScaleId(scaleId);
-				lot.setComments(comments);
-				lot.setStatus(lotStatus);
-				lot.setCreatedDate(createdDate);
-
-				final LotAggregateData aggregateData = new LotAggregateData(lotId);
-				aggregateData.setActualBalance(actualBalance);
-				aggregateData.setAvailableBalance(availableBalance);
-				aggregateData.setReservedTotal(reservedTotal);
-				aggregateData.setCommittedTotal(committedTotal);
-				aggregateData.setStockIds(stockIds);
-
-				reservationMap = new HashMap<Integer, Double>();
-				aggregateData.setReservationMap(reservationMap);
-
-				committedMap = new HashMap<>();
-				aggregateData.setCommittedMap(committedMap);
-
-				reservationStatusMap = new HashMap<>();
-				aggregateData.setReservationStatusMap(reservationStatusMap);
-
-				lot.setAggregateData(aggregateData);
-
-				lots.add(lot);
-			}
-
-			if (withReservationMap) {
-				final Integer recordId = (Integer) row[12];
-				final Double qty = (Double) row[13];
-				final Integer transactionState = (Integer) row[14];
-
-				// compute total reserved and committed for entry
-				if (recordId != null && qty != null && transactionState != null) {
-					Double prevValue = null;
-					Double prevTotal = null;
-					if (TransactionStatus.PENDING.getIntValue() == transactionState && (qty * -1) < 0.0) {
-						prevValue = reservationMap.get(recordId);
-						prevTotal = prevValue == null ? 0d : prevValue;
-
-						reservationMap.put(recordId, prevTotal + qty);
-					}
-
-					if (TransactionStatus.CONFIRMED.getIntValue() == transactionState) {
-						prevValue = committedMap.get(recordId);
-						prevTotal = prevValue == null ? 0d : prevValue;
-
-						committedMap.put(recordId, prevTotal + qty);
-					}
-
-				}
-
-				if (transactionState != null) {
-					if (!reservationStatusMap.containsKey(recordId)) {
-						reservationStatusMap.put(recordId, new HashSet<String>());
-					}
-					reservationStatusMap.get(recordId).add(String.valueOf(transactionState));
-				}
-
-				if (row[15] != null) {
-					final Integer transactionId = (Integer) row[15];
-					lot.getAggregateData().setTransactionId(transactionId);
-				}
-
-			}
-
-		}
-
-		// set last lot's reservation map
-		if (lot != null && reservationMap != null) {
-			lot.getAggregateData().setReservationMap(reservationMap);
-		}
-
-		// set last lot's comiitted map
-		if (lot != null && committedMap != null) {
-			lot.getAggregateData().setCommittedMap(committedMap);
-		}
-	}
-
 	public List<ExtendedLotDto> searchLots(final LotsSearchDto lotsSearchDto, final Pageable pageable, final Integer maxTotalResults) {
 		try {
-			final StringBuilder searchLotQuerySql = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
+			final StringBuilder searchLotQuerySql = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery(lotsSearchDto));
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(searchLotQuerySql), lotsSearchDto);
 			SearchLotDaoQuery.addSortToSearchLotsQuery(searchLotQuerySql, pageable);
-
 			final SQLQuery query = this.getSession().createSQLQuery(searchLotQuerySql.toString());
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(query), lotsSearchDto);
 
@@ -426,6 +143,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("status");
 			query.addScalar("locationId");
 			query.addScalar("locationName");
+			query.addScalar("locationAbbr");
 			query.addScalar("unitId");
 			query.addScalar("unitName");
 			query.addScalar("actualBalance");
@@ -439,16 +157,60 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 			query.addScalar("lastDepositDate", DateType.INSTANCE);
 			query.addScalar("lastWithdrawalDate", DateType.INSTANCE);
 			query.addScalar("germplasmUUID");
-
-			query.setResultTransformer(Transformers.aliasToBean(ExtendedLotDto.class));
-
+			if(lotsSearchDto != null && !MapUtils.isEmpty(lotsSearchDto.getAttributes())) {
+				final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributes();
+				for (final Integer attributeVariableId : attributeFilters.keySet()) {
+					query.addScalar(SearchLotDaoQuery.formatDynamicAttributeAlias(attributeVariableId));
+				}
+			}
 			if (maxTotalResults != null) {
 				query.setMaxResults(maxTotalResults);
 			}
 
 			GenericDAO.addPaginationToSQLQuery(query, pageable);
 
-			final List<ExtendedLotDto> extendedLotDtos = query.list();
+			final List<ExtendedLotDto> extendedLotDtos = new ArrayList<>();
+
+			final List<Object[]> results = query.list();
+			for (final Object[] result: results) {
+				final ExtendedLotDto lotDto = new ExtendedLotDto();
+				lotDto.setLotId((Integer) result[0]);
+				lotDto.setLotUUID((String) result[1]);
+				lotDto.setStockId((String) result[2]);
+				lotDto.setGid((Integer) result[3]);
+				lotDto.setMgid((Integer) result[4]);
+				lotDto.setGermplasmMethodName((String) result[5]);
+				lotDto.setGermplasmLocation((String) result[6]);
+				lotDto.setDesignation((String) result[7]);
+				lotDto.setStatus((String) result[8]);
+				lotDto.setLocationId((Integer) result[9]);
+				lotDto.setLocationName((String) result[10]);
+				lotDto.setLocationAbbr((String) result[11]);
+				lotDto.setUnitId((Integer) result[12]);
+				lotDto.setUnitName((String) result[13]);
+				lotDto.setActualBalance((Double) result[14]);
+				lotDto.setAvailableBalance((Double) result[15]);
+				lotDto.setReservedTotal((Double) result[16]);
+				lotDto.setWithdrawalTotal((Double) result[17]);
+				lotDto.setPendingDepositsTotal((Double) result[18]);
+				lotDto.setNotes((String) result[19]);
+				lotDto.setCreatedByUsername((String) result[20]);
+				lotDto.setCreatedDate((Date) result[21]);
+				lotDto.setLastDepositDate((Date) result[22]);
+				lotDto.setLastWithdrawalDate((Date) result[23]);
+				lotDto.setGermplasmUUID((String) result[24]);
+
+				if(lotsSearchDto != null && !MapUtils.isEmpty(lotsSearchDto.getAttributes())) {
+					final Map<Integer, Object> attributeFilters = lotsSearchDto.getAttributes();
+					lotDto.setAttributeTypesValueMap(new HashMap<>());
+					int i = result.length - attributeFilters.size();
+					for (final Integer attributeVariableId : attributeFilters.keySet()) {
+						lotDto.getAttributeTypesValueMap().put(attributeVariableId, result[i++]);
+					}
+				}
+
+				extendedLotDtos.add(lotDto);
+			}
 
 			return extendedLotDtos;
 		} catch (final HibernateException e) {
@@ -459,7 +221,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public long countSearchLots(final LotsSearchDto lotsSearchDto) {
 		try {
-			final StringBuilder filteredLotsQuery = new StringBuilder(SearchLotDaoQuery.getCountBaseQuery());
+			final StringBuilder filteredLotsQuery = new StringBuilder(SearchLotDaoQuery.getCountBaseQuery(lotsSearchDto));
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filteredLotsQuery), lotsSearchDto);
 			SearchLotDaoQuery.addLimit(filteredLotsQuery);
 			final String countLotsQuery = "Select count(1) from (" + filteredLotsQuery + ") as filteredLots";
@@ -474,7 +236,7 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 
 	public Map<Integer, Map<Integer, String>> getGermplasmAttributeValues(final LotsSearchDto searchDto) {
 		try {
-			final StringBuilder lotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
+			final StringBuilder lotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery(searchDto));
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(lotsQuery), searchDto);
 
 			final String sql = "select distinct {a.*} from atributs a inner join (" + lotsQuery + ") lots on lots.gid = a.gid";
@@ -504,11 +266,27 @@ public class LotDAO extends GenericDAO<Lot, Integer> {
 		}
 	}
 
+	public List<LotAttributeColumnDto> getLotAttributeColumnDtos(final String programUUID) {
+		try {
+			final String sql = "SELECT DISTINCT (a.atype) AS id, c.name AS name, vpo.alias AS alias"
+				+ "	FROM ims_lot_attribute a "
+				+ "	INNER JOIN ims_lot lots ON lots.lotid = a.lotid "
+				+ " INNER JOIN cvterm c ON c.cvterm_id = a.atype "
+				+ "	LEFT JOIN variable_overrides vpo ON vpo.cvterm_id = c.cvterm_id AND vpo.program_uuid = :programUUID ";
+			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			query.setParameter("programUUID", programUUID);
+			query.setResultTransformer(new AliasToBeanResultTransformer(LotAttributeColumnDto.class));
+			return  query.list();
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error at getGermplasmAttributeValues() in LotDAO: " + e.getMessage(), e);
+		}
+	}
+
 	public Map<String, BigInteger> getLotsCountPerScaleName(final LotsSearchDto lotsSearchDto) {
 		try {
 			final Map<String, BigInteger> lotsCountPerScaleName = new HashMap<>();
 
-			final StringBuilder filterLotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery());
+			final StringBuilder filterLotsQuery = new StringBuilder(SearchLotDaoQuery.getSelectBaseQuery(lotsSearchDto));
 			SearchLotDaoQuery.addSearchLotsQueryFiltersAndGroupBy(new SqlQueryParamBuilder(filterLotsQuery), lotsSearchDto);
 
 			final String countQuery = "SELECT scale.name, count(*) from ("  //

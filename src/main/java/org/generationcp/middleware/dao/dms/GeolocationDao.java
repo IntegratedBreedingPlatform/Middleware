@@ -485,10 +485,23 @@ public class GeolocationDao extends GenericDAO<Geolocation, Integer> {
 		return 1;
 	}
 
-	public void deleteGeolocations(final List<Integer> instanceIds) {
-		final List<Geolocation> geolocations = this.getByCriteria(Collections.singletonList(Restrictions.in("locationId", instanceIds)));
-		for (final Geolocation geolocation : geolocations) {
-			this.makeTransient(geolocation);
+	public List<Geolocation> getByIds (final List<Integer> instanceIds) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.in("locationId", instanceIds));
+		return criteria.list();
+	}
+
+	public void deleteGeolocations(final List<Integer> locationIds) {
+		try {
+			final List<Geolocation> geolocations =
+				this.getByCriteria(Collections.singletonList(Restrictions.in("locationId", locationIds)));
+			for (final Geolocation geolocation : geolocations) {
+				this.makeTransient(geolocation);
+			}
+		} catch (final HibernateException e) {
+			final String message = "Error in deleteGeolocations(locationIds=" + locationIds + ") in GeolocationDao: " + e.getMessage();
+			LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
 		}
 	}
 

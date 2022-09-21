@@ -7,16 +7,13 @@ import org.generationcp.middleware.domain.etl.MeasurementData;
 import org.generationcp.middleware.domain.etl.MeasurementRow;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
 import org.generationcp.middleware.domain.oms.TermId;
-import org.generationcp.middleware.operation.saver.PhenotypeOutlierSaver;
 import org.generationcp.middleware.operation.saver.PhenotypeSaver;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.PhenotypeOutlier;
-import org.hibernate.FlushMode;
 import org.hibernate.Session;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
 import org.mockito.Mockito;
 
@@ -32,8 +29,6 @@ public class MeasurementsTest {
 
 	private PhenotypeSaver mockPhenotypeSaver;
 
-	private PhenotypeOutlierSaver mockPhenotypeOutlierSaver;
-
 	private Measurements measurements;
 
 	private final MeasurementTestDataInitializer initializer = new MeasurementTestDataInitializer();
@@ -41,9 +36,8 @@ public class MeasurementsTest {
 	@Before
 	public void setup() {
 		this.mockPhenotypeSaver = Mockito.mock(PhenotypeSaver.class);
-		this.mockPhenotypeOutlierSaver = Mockito.mock(PhenotypeOutlierSaver.class);
 		this.mockHibernateSessiong = Mockito.mock(Session.class);
-		this.measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver, this.mockPhenotypeOutlierSaver);
+		this.measurements = new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver);
 	}
 
 	@Test
@@ -173,7 +167,7 @@ public class MeasurementsTest {
 	@Test
 	public void testPhenotypeIdSetOnSave() {
 		final Measurements measurements =
-				new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver, this.mockPhenotypeOutlierSaver);
+				new Measurements(this.mockHibernateSessiong, this.mockPhenotypeSaver);
 		final MeasurementData testMeasurementData = Mockito.mock(MeasurementData.class);
 		final MeasurementVariable testMeasurementVariable = new MeasurementVariable();
 		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
@@ -190,89 +184,6 @@ public class MeasurementsTest {
 
 		measurements.saveMeasurementData(Collections.<MeasurementRow>singletonList(measurementRow));
 		Mockito.verify(testMeasurementData).setMeasurementDataId(245);
-	}
-
-	@Test
-	public void testSaveOutlierWithMeasurementDataValueAsMissing() {
-
-		final int phenotypeId = 123;
-		final String measurementOldValue = "6";
-
-		final MeasurementData testMeasurementData =
-				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "missing");
-		testMeasurementData.setOldValue(measurementOldValue);
-		testMeasurementData.setMeasurementDataId(phenotypeId);
-
-		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
-
-		this.measurements.saveOutliers(Collections.<MeasurementRow>singletonList(measurementRow));
-
-		final ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-
-		Mockito.verify(this.mockPhenotypeOutlierSaver, Mockito.timeout(1)).savePhenotypeOutliers(captor.capture());
-
-		final List<PhenotypeOutlier> list = captor.getValue();
-
-		Assert.assertFalse(
-				"PhenotypeOutlier list should not be empty. The measurement data is marked as missing so it should be logged and saved in the phenotype_outlier table",
-				list.isEmpty());
-
-		Assert.assertEquals(testMeasurementData.getOldValue(), testMeasurementData.getValue());
-
-	}
-
-	@Test
-	public void testSaveOutlierWithMeasurementDataOldValueIsBlank() {
-
-		final int phenotypeId = 123;
-		final String measurementOldValue = null;
-
-		final MeasurementData testMeasurementData =
-				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "missing");
-		testMeasurementData.setOldValue(measurementOldValue);
-		testMeasurementData.setMeasurementDataId(phenotypeId);
-
-		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
-
-		this.measurements.saveOutliers(Collections.<MeasurementRow>singletonList(measurementRow));
-
-		final ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-
-		Mockito.verify(this.mockPhenotypeOutlierSaver, Mockito.timeout(1)).savePhenotypeOutliers(captor.capture());
-
-		final List<PhenotypeOutlier> list = captor.getValue();
-
-		Assert.assertTrue(
-				"PhenotypeOutlier list should be empty. The measurement data is marked as missing but if the original value is blank. No outlier log should be created",
-				list.isEmpty());
-
-	}
-
-	@Test
-	public void testSaveOutlierWithMeasurementDataWithoutMissingValue() {
-
-		final int phenotypeId = 123;
-		final String measurementOldValue = "6";
-
-		final MeasurementData testMeasurementData =
-				this.initializer.createMeasurementData(TEST_TERM_ID, TermId.NUMERIC_VARIABLE.getId(), "9");
-		testMeasurementData.setOldValue(measurementOldValue);
-		testMeasurementData.setMeasurementDataId(phenotypeId);
-
-		final MeasurementRow measurementRow = this.initializer.createMeasurementRowWithAtLeast1MeasurementVar(testMeasurementData);
-
-		this.measurements.saveOutliers(Collections.<MeasurementRow>singletonList(measurementRow));
-
-		final ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
-
-		Mockito.verify(this.mockPhenotypeOutlierSaver, Mockito.timeout(1)).savePhenotypeOutliers(captor.capture());
-
-		final List<PhenotypeOutlier> list = captor.getValue();
-
-		Assert.assertTrue("There is no missing data so the PhenotypeOutlier list should be empty", list.isEmpty());
-
-		Assert.assertEquals(testMeasurementData.getOldValue(), testMeasurementData.getValue());
-
 	}
 
 	@Test

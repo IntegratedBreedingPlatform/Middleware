@@ -2,6 +2,8 @@ package org.generationcp.middleware.dao;
 
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersQuery;
+import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
+import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.dao.workbench.ProgramMembersQuery;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -10,6 +12,7 @@ import org.generationcp.middleware.pojos.workbench.Role;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
 import org.generationcp.middleware.service.api.user.RoleDto;
 import org.generationcp.middleware.service.api.user.UserDto;
+import org.generationcp.middleware.util.SQLQueryBuilder;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
@@ -54,37 +57,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			throw new MiddlewareQueryException(message, e);
 		}
 		return false;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<WorkbenchUser> getAllActiveUsersSorted() {
-		try {
-			final Query query = this.getSession().getNamedQuery(WorkbenchUser.GET_ALL_ACTIVE_USERS_SORTED);
-			return query.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getAllUsersSorted query from User: " + e.getMessage();
-			WorkbenchUserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<WorkbenchUser> getUsersByCrop(final String cropName) {
-		try {
-			final Query query = this.getSession().createQuery("SELECT u FROM WorkbenchUser u "
-				+ " INNER JOIN FETCH u.person p "
-				+ " INNER JOIN FETCH p.crops c "
-				+ " WHERE u.status = 0 "
-				+ " AND EXISTS(FROM WorkbenchUser wu INNER JOIN wu.person.crops ct WHERE ct.cropName = :cropName AND wu.userid = u.userid)"
-				+ " ORDER BY p.firstName, p.lastName");
-			query.setParameter("cropName", cropName);
-			query.setResultTransformer(CriteriaSpecification.DISTINCT_ROOT_ENTITY);
-			return query.list();
-		} catch (final HibernateException e) {
-			final String message = "Error with getUsersByCrop query from User: " + e.getMessage();
-			WorkbenchUserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
 	}
 
 	@SuppressWarnings("unchecked")
@@ -211,27 +183,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 	}
 
-	@SuppressWarnings("unchecked")
-	public boolean isSuperAdminUser(final Integer userId) {
-		try {
-			if (userId != null) {
-				final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
-				criteria.createAlias("roles", "roles");
-				criteria.createAlias("roles.role", "role");
-				criteria.add(Restrictions.eq("role.name", Role.SUPERADMIN));
-				criteria.add(Restrictions.eq("userid", userId));
-
-				final List<WorkbenchUser> users = criteria.list();
-				return !users.isEmpty();
-			}
-		} catch (final HibernateException e) {
-			final String message = "Error with isSuperAdminUser(userid=" + userId + ") query from User: " + e.getMessage();
-			WorkbenchUserDAO.LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-		return false;
-	}
-
 	public List<WorkbenchUser> getUsers(final List<Integer> userIds) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(WorkbenchUser.class);
@@ -334,22 +285,6 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 
 	}
 
-	public List<Integer> getActiveUserIDsWithAccessToTheProject(final Long projectId) {
-		final List<Integer> userIDs = new ArrayList<>();
-		try {
-			if (projectId != null) {
-				final SQLQuery query = this.getSession().createSQLQuery(WorkbenchUser.GET_ACTIVE_USER_IDS_WITH_ACCESS_TO_A_PROGRAM);
-				query.setParameter("projectId", projectId);
-				return query.list();
-			}
-		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException(
-				"Error in getActiveUserIDsWithAccessToTheProject(projectId=" + projectId + ") query from WorkbenchUserDAO: "
-					+ e.getMessage(), e);
-		}
-		return userIDs;
-	}
-
 	@SuppressWarnings("unchecked")
 	public List<WorkbenchUser> getUsersByProjectId(final Long projectId) {
 		final List<WorkbenchUser> users = new ArrayList<>();
@@ -388,16 +323,20 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		return users;
 	}
 
-	public long countAllProgramEligibleUsers(final String programUUID) {
-		final SQLQuery query = this.getSession().createSQLQuery(ProgramEligibleUsersQuery.getCountQuery());
+	public long countAllProgramEligibleUsers(final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest) {
+		final SQLQueryBuilder queryBuilder = ProgramEligibleUsersQuery.getCountQuery(searchRequest);
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
 		query.setParameter("programUUID", programUUID);
+		queryBuilder.addParamsToQuery(query);
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 
-	public List<UserDto> getAllProgramEligibleUsers(final String programUUID, final Pageable pageable) {
+	public List<UserDto> getAllProgramEligibleUsers(
+		final String programUUID, final ProgramEligibleUsersSearchRequest searchRequest,
+		final Pageable pageable) {
 		try {
-			final String sql = ProgramEligibleUsersQuery.getSelectQuery(pageable);
-			final SQLQuery query = this.getSession().createSQLQuery(sql);
+			final SQLQueryBuilder queryBuilder = ProgramEligibleUsersQuery.getSelectQuery(pageable, searchRequest);
+			final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
 			query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 			query.addScalar(ProgramEligibleUsersQuery.USER_ID);
 			query.addScalar(ProgramEligibleUsersQuery.USERNAME);
@@ -405,7 +344,9 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			query.addScalar(ProgramEligibleUsersQuery.LAST_NAME);
 			query.addScalar(ProgramEligibleUsersQuery.EMAIL);
 
-			query.setParameter("programUUID", programUUID);
+			queryBuilder.setParameter("programUUID", programUUID);
+			queryBuilder.addParamsToQuery(query);
+
 			addPaginationToSQLQuery(query, pageable);
 			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) query.list();
 
@@ -425,9 +366,12 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 	}
 
-	public List<ProgramMemberDto> getProgramMembers(final String programUUID, final Pageable pageable) {
+	public List<ProgramMemberDto> getProgramMembers(
+		final String programUUID, final ProgramMembersSearchRequest searchRequest,
+		final Pageable pageable) {
 		try {
-			final SQLQuery query = this.getSession().createSQLQuery(ProgramMembersQuery.getSelectQuery(pageable));
+			final SQLQueryBuilder queryBuilder = ProgramMembersQuery.getSelectQuery(pageable, searchRequest);
+			final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
 			query.setParameter("programUUID", programUUID);
 			query.setResultTransformer(Transformers.ALIAS_TO_ENTITY_MAP);
 			query.addScalar(ProgramMembersQuery.USER_ID);
@@ -441,6 +385,7 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 			query.addScalar(ProgramMembersQuery.ROLE_TYPE_NAME);
 			query.addScalar(ProgramMembersQuery.ROLE_ACTIVE);
 
+			queryBuilder.addParamsToQuery(query);
 			GenericDAO.addPaginationToSQLQuery(query, pageable);
 
 			final List<Map<String, Object>> queryResults = (List<Map<String, Object>>) query.list();
@@ -464,9 +409,11 @@ public class WorkbenchUserDAO extends GenericDAO<WorkbenchUser, Integer> {
 		}
 	}
 
-	public long countAllProgramMembers(final String programUUID) {
-		final SQLQuery query = this.getSession().createSQLQuery(ProgramMembersQuery.getCountQuery());
-		query.setParameter("programUUID", programUUID);
+	public long countAllProgramMembers(final String programUUID, final ProgramMembersSearchRequest searchRequest) {
+		final SQLQueryBuilder queryBuilder = ProgramMembersQuery.getCountQuery(searchRequest);
+		final SQLQuery query = this.getSession().createSQLQuery(queryBuilder.build());
+		queryBuilder.setParameter("programUUID", programUUID);
+		queryBuilder.addParamsToQuery(query);
 		return ((BigInteger) query.uniqueResult()).longValue();
 	}
 

@@ -12,10 +12,9 @@
 package org.generationcp.middleware.manager;
 
 import com.google.common.base.Function;
-import com.google.common.collect.BiMap;
-import com.google.common.collect.HashBiMap;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.location.LocationService;
 import org.generationcp.middleware.dao.dms.DmsProjectDao;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.dms.PhenotypeOutlierDao;
@@ -26,8 +25,8 @@ import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.Reference;
+import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Stocks;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
@@ -50,9 +49,9 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
+import org.generationcp.middleware.operation.builder.StandardVariableBuilder;
 import org.generationcp.middleware.operation.builder.StockBuilder;
 import org.generationcp.middleware.operation.builder.TrialEnvironmentBuilder;
 import org.generationcp.middleware.pojos.Location;
@@ -93,8 +92,8 @@ import java.util.stream.Collectors;
 public class StudyDataManagerImpl extends DataManager implements StudyDataManager {
 
 	private PedigreeService pedigreeService;
-	private LocationDataManager locationDataManager;
 	private DaoFactory daoFactory;
+	private StandardVariableBuilder standardVariableBuilder;
 
 	@Resource
 	private UserService userService;
@@ -108,13 +107,16 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	@Resource
 	private TrialEnvironmentBuilder trialEnvironmentBuilder;
 
+	@Resource
+	private LocationService locationService;
+
 	public StudyDataManagerImpl() {
 	}
 
 	private void init(final HibernateSessionProvider sessionProvider) {
-		this.locationDataManager = new LocationDataManagerImpl(sessionProvider);
 		this.pedigreeService = this.getPedigreeService();
 		this.daoFactory = new DaoFactory(sessionProvider);
+		this.standardVariableBuilder = new StandardVariableBuilder(sessionProvider);
 	}
 
 	public StudyDataManagerImpl(final HibernateSessionProvider sessionProvider) {
@@ -469,26 +471,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	}
 
-	@Override
-	public void saveTrialDatasetSummary(
-		final DmsProject project, final VariableTypeList variableTypeList,
-		final List<ExperimentValues> experimentValues, final List<Integer> locationIds) {
-
-		try {
-
-			if (variableTypeList != null && variableTypeList.getVariableTypes() != null && !variableTypeList.getVariableTypes().isEmpty()) {
-				this.getProjectPropertySaver().saveProjectProperties(project, variableTypeList, null);
-			}
-			if (experimentValues != null && !experimentValues.isEmpty()) {
-				this.updateExperimentValues(experimentValues, project.getProjectId());
-			}
-
-		} catch (final Exception e) {
-
-			throw new MiddlewareQueryException("error in saveTrialDatasetSummary " + e.getMessage(), e);
-		}
-	}
-
 	void updateExperimentValues(final List<ExperimentValues> experimentValues, final Integer projectId) {
 		for (final ExperimentValues exp : experimentValues) {
 			if (exp.getVariableList() != null && !exp.getVariableList().isEmpty()) {
@@ -592,6 +574,17 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 			throw new MiddlewareQueryException(
 				"Error encountered with renameStudy(studyId=" + studyId + ", label=" + newStudyName + ": " + e.getMessage(), e);
 		}
+	}
+
+	@Override
+	public List<Experiment> getExperimentsWithGidAndCross(final int dataSetId, final List<Integer> instanceNumbers,
+		final List<Integer> repNumbers) {
+		final VariableTypeList variableTypes = this.dataSetBuilder.getVariableTypes(dataSetId);
+		this.addVariableIfNotPresent(variableTypes, TermId.GID);
+		// Forcing to add CROSS variable because we need cross values to show them in Advance Study > REVIEW ADVANCED LINES
+		this.addVariableIfNotPresent(variableTypes, TermId.CROSS);
+
+		return this.getExperimentBuilder().build(dataSetId, PlotUtil.getAllPlotTypes(), variableTypes, instanceNumbers, repNumbers);
 	}
 
 	@Override
@@ -744,11 +737,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 	}
 
 	@Override
-	public List<FolderReference> getAllFolders() {
-		return this.daoFactory.getDmsProjectDAO().getAllFolders();
-	}
-
-	@Override
 	public int countPlotsWithRecordedVariatesInDataset(final int dataSetId, final List<Integer> variateIds) {
 		return this.daoFactory.getPhenotypeDAO().countRecordedVariatesOfStudy(dataSetId, variateIds);
 	}
@@ -862,7 +850,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		if (dataset != null && dataset.getTrialInstances() != null) {
 			for (final FieldMapTrialInstanceInfo trial : dataset.getTrialInstances()) {
 				if (trial.getBlockId() != null) {
-					trial.updateBlockInformation(this.locationDataManager.getBlockInformation(trial.getBlockId()));
+					trial.updateBlockInformation(this.locationService.getBlockInformation(trial.getBlockId()));
 				} else if (!Util.isEmpty(trial.getFieldMapLabels())) {
 					// Row and Column should not be empty
 					final List<FieldMapLabel> rows =
@@ -957,30 +945,12 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return this.daoFactory.getPhenotypeDAO().containsAtLeast2CommonEntriesWithValues(projectId, locationId, germplasmTermId);
 	}
 
-	public void setLocationDataManager(final LocationDataManager locationDataManager) {
-		this.locationDataManager = locationDataManager;
+	public void setLocationService(final LocationService locationService) {
+		this.locationService = locationService;
 	}
 
 	public void setUserService(final UserService userService) {
 		this.userService = userService;
-	}
-
-	@Override
-	public StudyTypeDto getStudyType(final int studyTypeId) {
-		return this.getStudyTypeBuilder().createStudyTypeDto(this.daoFactory.getStudyTypeDao().getById(studyTypeId));
-	}
-
-	@Override
-	public void deleteProgramStudies(final String programUUID) {
-		final List<Integer> projectIds = this.daoFactory.getDmsProjectDAO().getAllProgramStudiesAndFolders(programUUID);
-
-		try {
-			for (final Integer projectId : projectIds) {
-				this.deleteStudy(projectId);
-			}
-		} catch (final Exception e) {
-			throw new MiddlewareQueryException("Error encountered with saveMeasurementRows(): " + e.getMessage(), e);
-		}
 	}
 
 	@Override
@@ -992,20 +962,6 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		} catch (final Exception e) {
 			throw new MiddlewareQueryException("Error in updateVariableOrdering " + e.getMessage(), e);
 		}
-	}
-
-	@Override
-	public String getTrialInstanceNumberByGeolocationId(final int geolocationId) {
-		final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(geolocationId);
-		if (geolocation != null) {
-			return geolocation.getDescription();
-		}
-		return null;
-	}
-
-	@Override
-	public List<String> getAllSharedProjectNames() {
-		return this.daoFactory.getDmsProjectDAO().getAllSharedProjectNames();
 	}
 
 	@Override
@@ -1164,7 +1120,7 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 
 	@Override
 	public FieldmapBlockInfo getBlockInformation(final int blockId) {
-		return this.locationDataManager.getBlockInformation(blockId);
+		return this.locationService.getBlockInformation(blockId);
 	}
 
 	@Override
@@ -1247,32 +1203,11 @@ public class StudyDataManagerImpl extends DataManager implements StudyDataManage
 		return false;
 	}
 
-	@Override
-	public void deleteStudy(final int studyId) {
-		final DmsProject study = this.daoFactory.getDmsProjectDAO().getById(studyId);
-		this.renameStudyAndDatasets(study);
-		this.updateStudyStatusToDeleted(study);
-	}
-
-	private void updateStudyStatusToDeleted(final DmsProject study) {
-		if (null != study) {
-			study.setDeleted(true);
-			this.daoFactory.getDmsProjectDAO().save(study);
+	private void addVariableIfNotPresent(final VariableTypeList variableTypes, final TermId termId) {
+		if (variableTypes.findById(termId) == null) {
+			final StandardVariable variable = this.standardVariableBuilder.getByName(termId.name(), null);
+			variableTypes.add(new DMSVariableType(termId.name(), null, variable, 0));
 		}
 	}
 
-	private void renameStudyAndDatasets(final DmsProject study) {
-		final String tstamp = Util.getCurrentDateAsStringValue("yyyyMMddHHmmssSSS");
-		study.setName(study.getName() + "#" + tstamp);
-		this.daoFactory.getDmsProjectDAO().save(study);
-
-		final List<DmsProject> datasets = this.daoFactory.getDmsProjectDAO().getDatasetsByParent(study.getProjectId());
-		if (datasets != null) {
-			for (final DmsProject dataset : datasets) {
-				dataset.setName(dataset.getName() + "#" + tstamp);
-				dataset.setDeleted(true);
-				this.daoFactory.getDmsProjectDAO().save(dataset);
-			}
-		}
-	}
 }

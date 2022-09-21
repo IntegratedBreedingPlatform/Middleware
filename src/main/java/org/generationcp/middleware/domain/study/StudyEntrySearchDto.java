@@ -9,27 +9,20 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 @AutoProperty
 public class StudyEntrySearchDto {
 
 	private int studyId;
 
-	//In the near future the fixed descriptors will be removed
-	private List<MeasurementVariable> fixedEntryDescriptors;
-
-	private List<MeasurementVariable> variableEntryDescriptors;
-
 	private Filter filter;
 
 	public StudyEntrySearchDto() {
 	}
 
-	public StudyEntrySearchDto(final int studyId, final List<MeasurementVariable> fixedEntryDescriptors,
-		final List<MeasurementVariable> variableEntryDescriptors, final Filter filter) {
+	public StudyEntrySearchDto(final int studyId, final Filter filter) {
 		this.studyId = studyId;
-		this.fixedEntryDescriptors = fixedEntryDescriptors;
-		this.variableEntryDescriptors = variableEntryDescriptors;
 		this.filter = filter;
 	}
 
@@ -40,6 +33,8 @@ public class StudyEntrySearchDto {
 		private Map<String, List<String>> filteredValues;
 		private Map<String, String> filteredTextValues;
 		private Map<String, String> variableTypeMap;
+		// FIXME: Remove it after solver the filter for Female and Male Parents into the query.
+		private Set<Integer> preFilteredGids;
 
 		public Filter() {
 			this.entryNumbers = new ArrayList<>();
@@ -88,6 +83,13 @@ public class StudyEntrySearchDto {
 			this.variableTypeMap = variableTypeMap;
 		}
 
+		public Set<Integer> getPreFilteredGids() {
+			return this.preFilteredGids;
+		}
+
+		public void setPreFilteredGids(final Set<Integer> preFilteredGids) {
+			this.preFilteredGids = preFilteredGids;
+		}
 	}
 
 	public int getStudyId() {
@@ -96,22 +98,6 @@ public class StudyEntrySearchDto {
 
 	public void setStudyId(final int studyId) {
 		this.studyId = studyId;
-	}
-
-	public List<MeasurementVariable> getFixedEntryDescriptors() {
-		return fixedEntryDescriptors;
-	}
-
-	public void setFixedEntryDescriptors(final List<MeasurementVariable> fixedEntryDescriptors) {
-		this.fixedEntryDescriptors = fixedEntryDescriptors;
-	}
-
-	public List<MeasurementVariable> getVariableEntryDescriptors() {
-		return variableEntryDescriptors;
-	}
-
-	public void setVariableEntryDescriptors(final List<MeasurementVariable> variableEntryDescriptors) {
-		this.variableEntryDescriptors = variableEntryDescriptors;
 	}
 
 	public Filter getFilter() {

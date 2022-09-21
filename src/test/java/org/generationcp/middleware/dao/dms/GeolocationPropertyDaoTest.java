@@ -17,6 +17,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +34,8 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 	private DmsProject study;
 	private CVTerm variable1;
 	private CVTerm variable2;
+
+	private static final String DEFAULT_PROP_VALUE = "1111";
 
 	@Before
 	public void test() {
@@ -149,11 +152,58 @@ public class GeolocationPropertyDaoTest extends IntegrationTestBase {
 			prop.setType(variableId);
 			prop.setGeolocation(geolocation);
 			prop.setRank(rank++);
-			prop.setValue(RandomStringUtils.randomAlphabetic(10));
+			prop.setValue(DEFAULT_PROP_VALUE);
 			this.geolocationPropDao.save(prop);
 		}
 
 		return geolocation.getLocationId();
 	}
 
+	@Test
+	public void testDeleteBlockPropertiesByGeolocationId() {
+		final Integer geolocationIdMain =
+			this.createEnvironmentData(this.study, Arrays.asList(TermId.BLOCK_ID.getId()));
+
+		// Verify that geolocation props exist before deletion
+		final Map<String, String> studyProperties = this.geolocationPropDao
+			.getGeolocationPropsAndValuesByGeolocation(Collections.singletonList(geolocationIdMain), Collections.emptyList())
+			.get(geolocationIdMain);
+		Assert.assertNotNull(studyProperties);
+		Assert.assertFalse(studyProperties.isEmpty());
+
+		this.geolocationPropDao.deleteBlockPropertiesByGeolocationId(Arrays.asList(geolocationIdMain));
+
+		final Map<String, String> afterDelete = this.geolocationPropDao
+			.getGeolocationPropsAndValuesByGeolocation(Collections.singletonList(geolocationIdMain), Collections.emptyList())
+			.get(geolocationIdMain);
+		Assert.assertNull(afterDelete);
+	}
+
+	@Test
+	public void testGetSafeToDeleteLocationBlockIdMap_ReturnBlockIdForDeletion() {
+		final Integer geolocationIdMain =
+			this.createEnvironmentData(this.study, Arrays.asList(TermId.BLOCK_ID.getId()));
+
+		final Map<Integer, Integer> blocksToDeleteMap = this.geolocationPropDao
+			.getSafeToDeleteLocationBlockIdMap(Arrays.asList(geolocationIdMain));
+		final List<Integer> blockIdsToDelete = new ArrayList<>(blocksToDeleteMap.values());
+		Assert.assertNotNull(blockIdsToDelete);
+		Assert.assertFalse(blockIdsToDelete.isEmpty());
+	}
+
+	@Test
+	public void testGetSafeToDeleteLocationBlockIdMap_HasOtherUsage() {
+		final Integer geolocationIdMain =
+			this.createEnvironmentData(this.study, Arrays.asList(TermId.BLOCK_ID.getId()));
+
+		// create other geolocation with the same block
+		final Integer geolocationIdDataset2 =
+			this.createEnvironmentData(this.study, Arrays.asList(TermId.BLOCK_ID.getId()));
+
+		final Map<Integer, Integer> blocksToDeleteMap = this.geolocationPropDao
+			.getSafeToDeleteLocationBlockIdMap(Arrays.asList(geolocationIdMain));
+		final List<Integer> blockIdsToDelete = new ArrayList<>(blocksToDeleteMap.values());
+		Assert.assertNotNull(blockIdsToDelete);
+		Assert.assertTrue(blockIdsToDelete.isEmpty());
+	}
 }

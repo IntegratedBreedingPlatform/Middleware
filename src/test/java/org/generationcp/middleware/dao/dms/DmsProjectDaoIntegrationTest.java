@@ -35,7 +35,7 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.service.api.study.ObservationLevel;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -313,10 +313,10 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
-		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		stockModel.setName("Germplasm 1");
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
+		stockModel.setCross("-");
 		stockModel.setProject(this.study);
 		this.stockDao.saveOrUpdate(stockModel);
 		experimentModel.setStock(stockModel);
@@ -697,9 +697,9 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			final StockModel stockModel = new StockModel();
 			stockModel.setName("Germplasm " + i);
 			stockModel.setIsObsolete(false);
-			stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 			stockModel.setUniqueName(String.valueOf(i));
 			stockModel.setGermplasm(germplasm);
+			stockModel.setCross("-");
 			stockModel.setProject(this.study);
 			this.stockDao.saveOrUpdate(stockModel);
 

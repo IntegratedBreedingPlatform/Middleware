@@ -11,9 +11,8 @@
 
 package org.generationcp.middleware.dao.dms;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import org.apache.commons.collections.map.LinkedMap;
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.pojos.dms.StockProperty;
@@ -24,19 +23,25 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 
+import java.util.List;
+import java.util.Optional;
+
 /**
  * DAO class for {@link StockProperty}.
  *
  */
 public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 
+	public static final String MODEL_STOCK_ID = "stockModel.stockId";
+	public static final String TYPE_ID = "typeId";
+
 	@SuppressWarnings("unchecked")
 	public List<Integer> getStockIdsByPropertyTypeAndValue(final Integer typeId, final String value) {
 		try {
 			final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
-			criteria.add(Restrictions.eq("typeId", typeId));
+			criteria.add(Restrictions.eq(TYPE_ID, typeId));
 			criteria.add(Restrictions.eq("value", value));
-			criteria.setProjection(Projections.property("stockModel.stockId"));
+			criteria.setProjection(Projections.property(MODEL_STOCK_ID));
 
 			return criteria.list();
 
@@ -69,21 +74,60 @@ public class StockPropertyDao extends GenericDAO<StockProperty, Integer> {
 		}
 	}
 
-	public boolean updateByStockIdsAndTypeId(final List<Integer> stockIds, final Integer typeId, final String value) {
+	public boolean updateByStockIdsAndTypeId(final List<Integer> stockIds, final Integer typeId, final String entryTypeId,
+		final String value) {
 		try {
 			this.getSession().flush();
 
-			final String queryString = "UPDATE stockprop SET value = :value WHERE type_id = :typeId AND stock_id IN (:stockIds)";
+			final String queryString = "UPDATE stockprop SET value = :value, cvalue_id = :entryTypeId WHERE type_id = :typeId AND stock_id IN (:stockIds)";
 			final SQLQuery query = this.getSession().createSQLQuery(queryString);
 			query.setParameter("value", value);
-			query.setParameter("typeId", typeId);
+			query.setParameter("entryTypeId", entryTypeId);
+			query.setParameter(TYPE_ID, typeId);
 			query.setParameterList("stockIds", stockIds);
 			return query.executeUpdate() > 0;
 
 		} catch (final HibernateException e) {
-			throw new MiddlewareQueryException("Error in updateByStockIdsAndTypeId(" + stockIds + ", " + typeId  + ", " + value
+			throw new MiddlewareQueryException("Error in updateByStockIdsAndTypeId(" + stockIds + ", " + typeId  + ", " + entryTypeId
 				+ ") in StockPropertyDao: "	+ e.getMessage(), e);
 		}
+	}
+
+	/**
+	 * @param stockIds list of stock IDs to filter
+	 * @return MultiKeyMap with stock ID and type ID as keys and StockProperty object as value
+	 */
+	public MultiKeyMap getStockPropertiesMap(final List<Integer> stockIds) {
+		final Criteria criteria = this.getSession().createCriteria(StockProperty.class);
+		criteria.add(Restrictions.in(MODEL_STOCK_ID, stockIds));
+		final List<StockProperty> stockPropertyList = criteria.list();
+
+		final MultiKeyMap stockPropertyMap = MultiKeyMap.decorate(new LinkedMap());
+		stockPropertyList.forEach(stockProperty ->
+			stockPropertyMap.put(stockProperty.getStock().getStockId(), stockProperty.getTypeId(), stockProperty)
+		);
+
+		return stockPropertyMap;
+	}
+
+	public Optional<StockProperty> getByStockIdAndTypeId(final Integer stockId, final Integer typeId) {
+		final Criteria criteria = this.getSession().createCriteria(StockProperty.class);
+		criteria.add(Restrictions.eq(MODEL_STOCK_ID, stockId));
+		criteria.add(Restrictions.eq(TYPE_ID, typeId));
+		return Optional.ofNullable((StockProperty) criteria.uniqueResult());
+	}
+
+	public long countObservationsByStudyIdAndVariableIds(final Integer studyId, final List<Integer> variableIds) {
+		if (variableIds.isEmpty()) {
+			return 0l;
+		}
+		final Criteria criteria = this.getSession().createCriteria(StockProperty.class);
+		criteria.createAlias("stockModel", "stockModel");
+		criteria.createAlias("stockModel.project", "study");
+		criteria.add(Restrictions.eq("study.projectId", studyId));
+		criteria.add(Restrictions.in(TYPE_ID, variableIds));
+		criteria.setProjection(Projections.rowCount());
+		return (Long) criteria.uniqueResult();
 	}
 
 }

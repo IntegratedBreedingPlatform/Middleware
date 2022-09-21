@@ -32,7 +32,7 @@ import java.io.Serializable;
 	query = "FROM Attribute a WHERE a.germplasmId = :gid ")})
 @Entity
 @Table(name = "atributs")
-public class Attribute extends AbstractEntity implements Serializable {
+public class Attribute extends AbstractEntity implements GenericAttribute, Serializable {
 
 	private static final long serialVersionUID = 1L;
 

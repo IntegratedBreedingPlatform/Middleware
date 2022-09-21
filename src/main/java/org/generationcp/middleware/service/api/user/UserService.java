@@ -1,5 +1,7 @@
 package org.generationcp.middleware.service.api.user;
 
+import org.generationcp.middleware.dao.workbench.ProgramEligibleUsersSearchRequest;
+import org.generationcp.middleware.dao.workbench.ProgramMembersSearchRequest;
 import org.generationcp.middleware.domain.workbench.ProgramMemberDto;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.pojos.Person;
@@ -22,7 +24,7 @@ public interface UserService {
 	 * @param userId - the user id to match
 	 * @return the user matching the given id
 	 */
-	WorkbenchUser getUserById(final Integer userId);
+	WorkbenchUser getUserById(Integer userId);
 
 	List<WorkbenchUser> getUsersByIds(List<Integer> userIds);
 
@@ -37,22 +39,13 @@ public interface UserService {
 	 */
 	List<WorkbenchUser> getUserByName(String name, int start, int numOfRows, Operation op);
 
-	WorkbenchUser getUserByFullname(final String fullname);
+	WorkbenchUser getUserByFullname(String fullname);
 
-	Long countUsersByFullname(final String fullname);
+	Long countUsersByFullname(String fullname);
 
-	Map<Integer, String> getUserIDFullNameMap(final List<Integer> userIds);
+	Map<Integer, String> getUserIDFullNameMap(List<Integer> userIds);
 
 	Map<Integer, String> getAllUserIDFullNameMap();
-
-	List<WorkbenchUser> getUsersByCrop(final String cropName);
-
-	/**
-	 * Returns all the Workbench users.
-	 *
-	 * @return A {@code List} of all the {@code WorkbenchUser}s in the Workbench database.
-	 */
-	List<WorkbenchUser> getAllUsers();
 
 	/**
 	 * Return a List of {@link WorkbenchUser} records associated with a {@link Project}.
@@ -70,26 +63,12 @@ public interface UserService {
 	List<UserDto> getAllUsersSortedByLastName();
 
 	/**
-	 * Returns all the Workbench users ordered by First Name then Last Name.
-	 *
-	 * @return A {@code List} of all the {@code WorkbenchUser}s in the Workbench database.
-	 */
-	List<WorkbenchUser> getAllActiveUsersSorted();
-
-	/**
 	 * Adds a user.
 	 *
 	 * @param user - the user to add
 	 * @return Returns the the {@code WorkbenchUser} record added
 	 */
 	WorkbenchUser addUser(WorkbenchUser user);
-
-	/**
-	 * Returns number of all Users.
-	 *
-	 * @return the number of all Users
-	 */
-	long countAllUsers();
 
 	/**
 	 * create the user.
@@ -108,14 +87,6 @@ public interface UserService {
 	Integer updateUser(UserDto userDto);
 
 	/**
-	 * Updates the user.
-	 *
-	 * @param user the user to update
-	 * @return Returns the id of the {@code User} record updated
-	 */
-	void updateUser(WorkbenchUser user);
-
-	/**
 	 * Checks if a username exists.
 	 *
 	 * @param userName - the user name to check
@@ -123,15 +94,7 @@ public interface UserService {
 	 */
 	boolean isUsernameExists(String userName);
 
-	/**
-	 * Returns true if user has SUPERADMIN role assigned
-	 *
-	 * @param userId
-	 * @return
-	 */
-	boolean isSuperAdminUser(Integer userId);
-
-	List<UserDto> getUsersByPersonIds(final List<Integer> personIds);
+	List<UserDto> getUsersByPersonIds(List<Integer> personIds);
 
 	/**
 	 * Gets the person by id.
@@ -143,6 +106,7 @@ public interface UserService {
 
 	/**
 	 * Returns the user's person name given the user id
+	 *
 	 * @param userId
 	 * @return
 	 */
@@ -150,26 +114,13 @@ public interface UserService {
 
 	/**
 	 * Returns the person name given the person id
+	 *
 	 * @param personId
 	 * @return
 	 */
 	String getPersonNameForPersonId(int personId);
 
 	List<Person> getPersonsByCrop(CropType cropType);
-
-	/**
-	 * Returns all Persons.
-	 *
-	 * @return all Persons
-	 */
-	List<Person> getAllPersons();
-
-	/**
-	 * Returns number of all Persons.
-	 *
-	 * @return the number of all Persons
-	 */
-	long countAllPersons();
 
 	/**
 	 * Adds the person.
@@ -180,13 +131,6 @@ public interface UserService {
 	Person addPerson(Person person);
 
 	/**
-	 * Deletes a person.
-	 *
-	 * @param person - the Person to delete
-	 */
-	void deletePerson(Person person);
-
-	/**
 	 * Changes the password of the user.
 	 *
 	 * @param username - the username
@@ -194,15 +138,6 @@ public interface UserService {
 	 * @return true, if is user login is completed
 	 */
 	boolean changeUserPassword(String username, String password);
-
-	/**
-	 * Checks if is person exists.
-	 *
-	 * @param firstName - the first name
-	 * @param lastName  - the last name
-	 * @return true, if is person exists
-	 */
-	boolean isPersonExists(String firstName, String lastName);
 
 	/**
 	 * Checks if person with specified email exists.
@@ -265,15 +200,6 @@ public interface UserService {
 	List<WorkbenchUser> getSuperAdminUsers();
 
 	/**
-	 * Returns ProjectUserInfo with the given project id and user id
-	 *
-	 * @param projectId
-	 * @param userId
-	 * @return
-	 */
-	ProjectUserInfo getProjectUserInfoByProjectIdAndUserId(Long projectId, Integer userId);
-
-	/**
 	 * Saves or updates the ProjectUserInfo.
 	 *
 	 * @param projectUserInfo the project user info
@@ -283,22 +209,18 @@ public interface UserService {
 
 	void saveCropPerson(CropPerson cropPerson);
 
-	void removeCropPerson(CropPerson cropPerson);
-
 	Map<Integer, String> getPersonNamesByPersonIds(List<Integer> personIds);
 
-	WorkbenchUser getUserWithAuthorities(final String userName, final String cropName, final String programUuid);
+	WorkbenchUser getUserWithAuthorities(String userName, String cropName, String programUuid);
 
 	List<WorkbenchUser> getUsersWithRole(int id);
 
-	List<Integer> getActiveUserIDsWithAccessToTheProgram(Long projectId);
+	List<ProgramMemberDto> getProgramMembers(String programUUID, ProgramMembersSearchRequest userSearchRequest, Pageable pageable);
 
-	List<ProgramMemberDto> getProgramMembers(String programUUID, Pageable pageable);
+	long countAllProgramMembers(String programUUID, ProgramMembersSearchRequest userSearchRequest);
 
-	long countAllProgramMembers(String programUUID);
+	List<UserDto> getProgramMembersEligibleUsers(String programUUID, ProgramEligibleUsersSearchRequest searchRequest, Pageable pageable);
 
-	List<UserDto> getProgramMembersEligibleUsers(String programUUID, Pageable pageable);
-
-	long countProgramMembersEligibleUsers(String programUUID);
+	long countProgramMembersEligibleUsers(String programUUID, ProgramEligibleUsersSearchRequest searchRequest);
 
 }

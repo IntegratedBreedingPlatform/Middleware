@@ -2,6 +2,8 @@ package org.generationcp.middleware.utils.test;
 
 import liquibase.util.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.generationcp.middleware.api.crop.CropService;
+import org.generationcp.middleware.api.crop.CropServiceImpl;
 import org.generationcp.middleware.dao.GermplasmDAO;
 import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.SampleDao;
@@ -29,8 +31,6 @@ import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.WorkbenchDaoFactory;
-import org.generationcp.middleware.manager.WorkbenchDataManagerImpl;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmStudySource;
 import org.generationcp.middleware.pojos.GermplasmStudySourceType;
@@ -91,7 +91,7 @@ public class IntegrationTestDataInitializer {
 	private final WorkbenchDaoFactory workbenchDaoFactory;
 	private final DaoFactory daoFactory;
 	private final UserService userService;
-	private final WorkbenchDataManager workbenchDataManager;
+	private final CropService cropService;
 
 	public IntegrationTestDataInitializer(final HibernateSessionProvider hibernateSessionProvider,
 		final HibernateSessionProvider workbenchSessionProvider) {
@@ -110,7 +110,7 @@ public class IntegrationTestDataInitializer {
 		this.sampleDao = this.daoFactory.getSampleDao();
 		this.sampleListDao = this.daoFactory.getSampleListDao();
 		this.projectPropertyDao = this.daoFactory.getProjectPropertyDAO();
-		this.workbenchDataManager = new WorkbenchDataManagerImpl(workbenchSessionProvider);
+		this.cropService = new CropServiceImpl(workbenchSessionProvider);
 		this.userService = new UserServiceImpl(workbenchSessionProvider);
 		this.studyTypeDAO = new StudyTypeDAO();
 		this.studyTypeDAO.setSession(hibernateSessionProvider.getSession());
@@ -211,6 +211,11 @@ public class IntegrationTestDataInitializer {
 
 	public ExperimentModel createTestExperiment(final DmsProject project, final Geolocation geolocation, final int experimentType,
 		final String value, final ExperimentModel parent) {
+		return this.createTestExperiment(project, geolocation, experimentType, value, parent, false);
+	}
+
+	public ExperimentModel createTestExperiment(final DmsProject project, final Geolocation geolocation, final int experimentType,
+		final String value, final ExperimentModel parent, final boolean addFieldmapProps) {
 
 		final ExperimentModel experimentModel = new ExperimentModel();
 		experimentModel.setGeoLocation(geolocation);
@@ -221,16 +226,24 @@ public class IntegrationTestDataInitializer {
 		this.experimentDao.saveOrUpdate(experimentModel);
 
 		if (!StringUtils.isEmpty(value)) {
-			final ExperimentProperty experimentProperty = new ExperimentProperty();
-			experimentModel.setProperties(new ArrayList<>(Collections.singleton(experimentProperty)));
-			experimentProperty.setExperiment(experimentModel);
-			experimentProperty.setTypeId(TermId.PLOT_NO.getId());
-			experimentProperty.setValue(value);
-			experimentProperty.setRank(1);
-			this.experimentPropertyDao.saveOrUpdate(experimentProperty);
+			this.saveExperimentProperty(experimentModel, TermId.PLOT_NO.getId(), value);
+			if (addFieldmapProps) {
+				this.saveExperimentProperty(experimentModel, TermId.FIELDMAP_COLUMN.getId(), "1");
+				this.saveExperimentProperty(experimentModel, TermId.FIELDMAP_RANGE.getId(), "1");
+			}
 		}
 
 		return experimentModel;
+	}
+
+	private void saveExperimentProperty(final ExperimentModel experimentModel, final Integer typeId, final String value) {
+		final ExperimentProperty experimentProperty = new ExperimentProperty();
+		experimentModel.setProperties(new ArrayList<>(Collections.singleton(experimentProperty)));
+		experimentProperty.setExperiment(experimentModel);
+		experimentProperty.setTypeId(typeId);
+		experimentProperty.setValue(value);
+		experimentProperty.setRank(1);
+		this.experimentPropertyDao.saveOrUpdate(experimentProperty);
 	}
 
 	public CVTerm createTrait(final String name) {
@@ -267,10 +280,10 @@ public class IntegrationTestDataInitializer {
 
 		final StockModel stockModel = new StockModel();
 		stockModel.setUniqueName("1");
-		stockModel.setTypeId(TermId.ENTRY_CODE.getId());
 		stockModel.setName("Germplasm " + RandomStringUtils.randomAlphanumeric(5));
 		stockModel.setIsObsolete(false);
 		stockModel.setGermplasm(germplasm);
+		stockModel.setCross("-");
 		stockModel.setProject(study);
 
 		this.stockDao.saveOrUpdate(stockModel);
@@ -348,7 +361,8 @@ public class IntegrationTestDataInitializer {
 
 	}
 
-	public void addInstanceExternalReferenceSource(final Geolocation geolocation, final String externalReferenceId, final String externalReferenceSource) {
+	public void addInstanceExternalReferenceSource(final Geolocation geolocation, final String externalReferenceId,
+		final String externalReferenceSource) {
 		final InstanceExternalReference instanceExternalReference = new InstanceExternalReference();
 		instanceExternalReference.setInstance(geolocation);
 		instanceExternalReference.setReferenceId(externalReferenceId);
@@ -384,10 +398,10 @@ public class IntegrationTestDataInitializer {
 
 	public ObservationUnitsSearchDTO createTestObservationUnitsDTO() {
 		final ObservationUnitsSearchDTO observationUnitsSearchDTO = new ObservationUnitsSearchDTO();
-		observationUnitsSearchDTO.setSelectionMethodsAndTraits(new ArrayList<MeasurementVariableDto>());
-		observationUnitsSearchDTO.setEnvironmentConditions(new ArrayList<MeasurementVariableDto>());
-		observationUnitsSearchDTO.setAdditionalDesignFactors(new ArrayList<String>());
-		observationUnitsSearchDTO.setGenericGermplasmDescriptors(new ArrayList<String>());
+		observationUnitsSearchDTO.setDatasetVariables(new ArrayList<>());
+		observationUnitsSearchDTO.setEnvironmentConditions(new ArrayList<>());
+		observationUnitsSearchDTO.setAdditionalDesignFactors(new ArrayList<>());
+		observationUnitsSearchDTO.setGenericGermplasmDescriptors(new ArrayList<>());
 		return observationUnitsSearchDTO;
 	}
 
@@ -398,7 +412,7 @@ public class IntegrationTestDataInitializer {
 		project.setUserId(1);
 		project.setProjectName("Test Project " + programUUID);
 		project.setStartDate(new Date(System.currentTimeMillis()));
-		project.setCropType(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
+		project.setCropType(this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
 		project.setLastOpenDate(new Date(System.currentTimeMillis()));
 		project.setUniqueID(programUUID);
 
@@ -446,7 +460,7 @@ public class IntegrationTestDataInitializer {
 		workbenchUser.setCloseDate(20150101);
 		workbenchUser.setRoles(Arrays.asList(new UserRole(workbenchUser, role)));
 		final List<CropType> crops = new ArrayList<>();
-		crops.add(this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
+		crops.add(this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.toString()));
 		this.userService.addUser(workbenchUser);
 
 		return workbenchUser;

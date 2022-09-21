@@ -1,11 +1,14 @@
 package org.generationcp.middleware.service.impl.inventory;
 
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.inventory.manager.ExtendedLotDto;
+import org.generationcp.middleware.domain.inventory.manager.LotAttributeColumnDto;
 import org.generationcp.middleware.domain.inventory.manager.LotDto;
 import org.generationcp.middleware.domain.inventory.manager.LotGeneratorInputDto;
 import org.generationcp.middleware.domain.inventory.manager.LotItemDto;
@@ -18,13 +21,14 @@ import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
+import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.InventoryDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.ims.Lot;
+import org.generationcp.middleware.pojos.ims.LotAttribute;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionSourceType;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
@@ -33,6 +37,8 @@ import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.service.api.inventory.LotService;
 import org.generationcp.middleware.service.api.inventory.TransactionService;
 import org.generationcp.middleware.util.Util;
+import org.generationcp.middleware.util.VariableValueUtil;
+import org.generationcp.middleware.util.uid.UIDGenerator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,15 +54,23 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
 
 @Service
 @Transactional
 public class LotServiceImpl implements LotService {
+
+	private static final UIDGenerator.UID_ROOT UID_ROOT = UIDGenerator.UID_ROOT.LOT;
+	public static final int SUFFIX_LENGTH = 8;
 
 	private static final Logger LOG = LoggerFactory.getLogger(LotServiceImpl.class);
 
@@ -64,9 +78,6 @@ public class LotServiceImpl implements LotService {
 
 	@Value("${export.lot.max.total.results}")
 	public int maxTotalResults;
-
-	@Autowired
-	private InventoryDataManager inventoryDataManager;
 
 	@Autowired
 	private OntologyVariableDataManager ontologyVariableDataManager;
@@ -118,14 +129,14 @@ public class LotServiceImpl implements LotService {
 		//FIXME check if source has to be always 0
 		lot.setSource(0);
 		lot.setScaleId(lotDto.getUnitId());
-		this.inventoryDataManager.generateLotIds(cropType, Lists.newArrayList(lot));
+		this.generateLotIds(cropType, Lists.newArrayList(lot));
 		this.daoFactory.getLotDao().save(lot);
 
 		return lot.getLotUuId();
 	}
 
 	@Override
-	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotUpdateRequestDto) {
+	public void updateLots(final List<ExtendedLotDto> lotDtos, final LotUpdateRequestDto lotUpdateRequestDto, final String programUUID) {
 		final List<Lot> lots =
 			this.daoFactory.getLotDao()
 				.filterByColumnValues("lotUuId", lotDtos.stream().map(ExtendedLotDto::getLotUUID).collect(
@@ -133,7 +144,7 @@ public class LotServiceImpl implements LotService {
 		if (lotUpdateRequestDto.getSingleInput() != null) {
 			this.updateLots(lots, lotUpdateRequestDto.getSingleInput());
 		} else {
-			this.updateLots(lots, lotUpdateRequestDto.getMultiInput());
+			this.updateLots(lots, lotUpdateRequestDto.getMultiInput(), programUUID);
 		}
 	}
 
@@ -156,15 +167,32 @@ public class LotServiceImpl implements LotService {
 		}
 	}
 
-	private void updateLots(final List<Lot> lots, final LotMultiUpdateRequestDto lotMultiUpdateRequestDto) {
+	private void updateLots(final List<Lot> lots, final LotMultiUpdateRequestDto lotMultiUpdateRequestDto, final String programUUID) {
+
+		final Multimap<String, Object[]> conflictErrors = ArrayListMultimap.create();
 		try {
-			final Map<String, Integer> locationsByLocationAbbrMap =
-				this.buildLocationsByLocationAbbrMap(lotMultiUpdateRequestDto.getLotList().stream()
-					.map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr)
-					.collect(Collectors.toList()));
+			final List<String> locationAbbreviations = lotMultiUpdateRequestDto.getLotList().stream()
+				.filter(lotUpdateDto -> StringUtils.isNotBlank(lotUpdateDto.getStorageLocationAbbr())).distinct()
+				.map(LotMultiUpdateRequestDto.LotUpdateDto::getStorageLocationAbbr).collect(Collectors.toList());
+
+			final Map<String, Integer> locationsByLocationAbbrMap = CollectionUtils.isEmpty(locationAbbreviations) ? new HashMap<>() :
+				this.buildLocationsByLocationAbbrMap(locationAbbreviations);
+
 			final Map<String, Integer> unitMapByName = this.buildUnitsByNameMap();
 			final Map<String, LotMultiUpdateRequestDto.LotUpdateDto> lotUpdateMapByLotUID =
 				Maps.uniqueIndex(lotMultiUpdateRequestDto.getLotList(), LotMultiUpdateRequestDto.LotUpdateDto::getLotUID);
+
+			final Set<String> attributeKeys = new HashSet<>();
+			lotMultiUpdateRequestDto.getLotList().forEach(lot -> {
+				attributeKeys.addAll(lot.getAttributes().keySet().stream().map(String::toUpperCase).collect(Collectors.toList()));
+			});
+
+			final List<LotAttribute> attributes =
+				this.daoFactory.getLotAttributeDAO().getLotAttributeByIds(
+					lots.stream().map(a -> a.getId()).collect(Collectors.toList()));
+			final Map<String, Variable> attributeVariablesNameMap = this.getAttributesMap(programUUID, attributeKeys);
+			final Map<Integer, List<LotAttribute>> attributesMap =
+				attributes.stream().collect(groupingBy(LotAttribute::getLotId, LinkedHashMap::new, Collectors.toList()));
 
 			for (final Lot lot : lots) {
 				final LotMultiUpdateRequestDto.LotUpdateDto lotUpdateDto = lotUpdateMapByLotUID.get(lot.getLotUuId());
@@ -182,10 +210,83 @@ public class LotServiceImpl implements LotService {
 				}
 
 				this.daoFactory.getLotDao().saveOrUpdate(lot);
+
+				if (!CollectionUtils.isEmpty(lotUpdateDto.getAttributes())) {
+					lotUpdateDto.getAttributes().forEach((key, value) -> {
+						final String variableNameOrAlias = key.toUpperCase();
+						this.saveOrUpdateAttribute(attributeVariablesNameMap, attributesMap, lot,
+							variableNameOrAlias, value, conflictErrors);
+					});
+				}
 			}
 		} catch (final Exception e) {
 			LOG.error(e.getMessage(), e);
 			throw new MiddlewareRequestException("", "common.middleware.error.update.lots");
+		}
+
+		if (!conflictErrors.isEmpty()) {
+			throw new MiddlewareRequestException("", conflictErrors);
+		}
+	}
+
+	private void saveOrUpdateAttribute(final Map<String, Variable> attributeVariables,
+		final Map<Integer, List<LotAttribute>> attributesMap, final Lot lot,
+		final String variableNameOrAlias, final String value, final Multimap<String, Object[]> conflictErrors) {
+		// Check first if the code to save is a valid Attribute
+		if (attributeVariables.containsKey(variableNameOrAlias) && StringUtils.isNotEmpty(value)) {
+			final Variable variable = attributeVariables.get(variableNameOrAlias);
+			final List<LotAttribute> lotAttributes = attributesMap.getOrDefault(lot.getId(), new ArrayList<>());
+			final List<LotAttribute> existingLotAttributesForVariable =
+				lotAttributes.stream().filter(n -> n.getTypeId().equals(variable.getId())).collect(Collectors.toList());
+
+			// Check if there are multiple attributes with same type
+			if (existingLotAttributesForVariable.size() > 1) {
+				conflictErrors.put("lot.update.duplicate.attributes", new String[] {
+					variableNameOrAlias, String.valueOf(lot.getId())});
+			} else {
+				final boolean isValidValue = VariableValueUtil.isValidAttributeValue(variable, value);
+				if (isValidValue) {
+					final Integer cValueId = VariableValueUtil.resolveCategoricalValueId(variable, value);
+					if (existingLotAttributesForVariable.size() == 1) {
+						// if an attribute already exists for the variable, update the details from data input
+						final LotAttribute attribute = existingLotAttributesForVariable.get(0);
+						attribute.setLocationId(lot.getLocationId());
+						attribute.setAval(value);
+						attribute.setcValueId(cValueId);
+						this.daoFactory.getLotAttributeDAO().update(attribute);
+					} else {
+						// create new attribute for the variable and data input
+						final LotAttribute attribute =
+							new LotAttribute(null, lot.getId(), variable.getId(), value, cValueId,
+								lot.getLocationId(),
+								0, Util.getCurrentDateAsIntegerValue());
+						this.daoFactory.getLotAttributeDAO().save(attribute);
+					}
+				}
+			}
+		}
+	}
+
+	private Map<String, Variable> getAttributesMap(final String programUUID, final Set<String> variableNamesOrAlias) {
+		if (!variableNamesOrAlias.isEmpty()) {
+			final VariableFilter variableFilter = new VariableFilter();
+			variableFilter.setProgramUuid(programUUID);
+			variableFilter.addVariableType(VariableType.INVENTORY_ATTRIBUTE);
+			variableNamesOrAlias.forEach(variableFilter::addName);
+
+			final List<Variable> existingAttributeVariables =
+				this.ontologyVariableDataManager.getWithFilter(variableFilter);
+
+			final Map<String, Variable> map = new HashMap<>();
+			existingAttributeVariables.forEach(a -> {
+				map.put(a.getName().toUpperCase(), a);
+				if (StringUtils.isNotEmpty(a.getAlias())) {
+					map.put(a.getAlias().toUpperCase(), a);
+				}
+			});
+			return map;
+		} else {
+			return new HashMap<>();
 		}
 	}
 
@@ -244,7 +345,7 @@ public class LotServiceImpl implements LotService {
 					lot.setScaleId(unitsByNameMap.get(lotItemDto.getUnitName()));
 				}
 
-				this.inventoryDataManager.generateLotIds(cropType, Lists.newArrayList(lot));
+				this.generateLotIds(cropType, Lists.newArrayList(lot));
 				final Lot savedLot = this.daoFactory.getLotDao().save(lot);
 				lotUUIDs.add(savedLot.getLotUuId());
 
@@ -344,6 +445,57 @@ public class LotServiceImpl implements LotService {
 		final LotsSearchDto lotsSearchDto = new LotsSearchDto();
 		lotsSearchDto.setLocationIds(Arrays.asList(locationId));
 		return this.daoFactory.getLotDao().countSearchLots(lotsSearchDto) > 0;
+	}
+
+	@Override
+	public void generateLotIds(final CropType crop, final List<Lot> lots) {
+		UIDGenerator.generate(crop, lots, UID_ROOT, SUFFIX_LENGTH,
+			new UIDGenerator.UIDAdapter<Lot>() {
+
+				@Override
+				public String getUID(final Lot entry) {
+					return entry.getLotUuId();
+				}
+
+				@Override
+				public void setUID(final Lot entry, final String uid) {
+					entry.setLotUuId(uid);
+				}
+			});
+	}
+
+	@Override
+	public Integer getCurrentNotationNumberForBreederIdentifier(final String breederIdentifier) {
+		final List<String> inventoryIDs = this.daoFactory.getLotDao().getInventoryIDsWithBreederIdentifier(breederIdentifier);
+
+		if (CollectionUtils.isEmpty(inventoryIDs)) {
+			return 0;
+		}
+
+		final String expression = "(?i)"+ breederIdentifier + "([0-9]+)";
+		final Pattern pattern = Pattern.compile(expression);
+
+		return this.findCurrentMaxNotationNumberInInventoryIDs(inventoryIDs, pattern);
+	}
+
+	@Override
+	public List<LotAttributeColumnDto> getLotAttributeColumnDtos(final String programUUID) {
+		return this.daoFactory.getLotDao().getLotAttributeColumnDtos(programUUID);
+	}
+
+	private Integer findCurrentMaxNotationNumberInInventoryIDs(final List<String> inventoryIDs, final Pattern pattern) {
+		Integer currentMax = 0;
+
+		for (final String inventoryID : inventoryIDs) {
+			final Matcher matcher = pattern.matcher(inventoryID);
+			if (matcher.find()) {
+				// Matcher.group(1) is needed because group(0) includes the identifier in the match
+				// Matcher.group(1) only captures the value inside the parenthesis
+				currentMax = Math.max(currentMax, Integer.valueOf(matcher.group(1)));
+			}
+		}
+
+		return currentMax;
 	}
 
 	public void setTransactionService(final TransactionService transactionService) {

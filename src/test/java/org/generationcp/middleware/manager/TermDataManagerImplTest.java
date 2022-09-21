@@ -24,7 +24,7 @@ import org.generationcp.middleware.domain.ontology.Property;
 import org.generationcp.middleware.domain.ontology.Scale;
 import org.generationcp.middleware.domain.ontology.TermRelationshipId;
 import org.generationcp.middleware.domain.ontology.VariableType;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.manager.ontology.api.OntologyMethodDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyPropertyDataManager;
 import org.generationcp.middleware.manager.ontology.api.OntologyScaleDataManager;
@@ -51,7 +51,7 @@ public class TermDataManagerImplTest extends IntegrationTestBase {
 	@Autowired
 	private OntologyScaleDataManager scaleManager;
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private RoleService roleService;
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 

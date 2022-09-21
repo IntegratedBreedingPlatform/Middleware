@@ -16,7 +16,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
 import org.generationcp.middleware.dao.GenericDAO;
-import org.generationcp.middleware.domain.inventory.InventoryDetails;
 import org.generationcp.middleware.domain.inventory.manager.TransactionDto;
 import org.generationcp.middleware.domain.inventory.manager.TransactionsSearchDto;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
@@ -24,18 +23,15 @@ import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.ims.ExperimentTransaction;
 import org.generationcp.middleware.pojos.ims.ExperimentTransactionType;
-import org.generationcp.middleware.pojos.ims.LotStatus;
 import org.generationcp.middleware.pojos.ims.Transaction;
 import org.generationcp.middleware.pojos.ims.TransactionStatus;
 import org.generationcp.middleware.pojos.ims.TransactionType;
-import org.generationcp.middleware.pojos.report.TransactionReportRow;
 import org.generationcp.middleware.util.SqlQueryParamBuilder;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.SQLQuery;
-import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.AliasToBeanConstructorResultTransformer;
 import org.hibernate.transform.Transformers;
@@ -67,72 +63,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 
 	private static final Logger LOG = LoggerFactory.getLogger(TransactionDAO.class);
 	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd");
-
-	public boolean hasInventoryDetails(final Integer studyId) {
-		try {
-			final Session session = this.getSession();
-
-			final StringBuilder sql =
-				new StringBuilder().append("Select COUNT(1) ")
-					.append("FROM ims_transaction tran ")
-					.append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
-					.append("INNER JOIN stock s on s.dbxref_id = lot.eid ")
-					.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue()).append(" AND s.project_id = :studyId ");
-
-			final SQLQuery query = session.createSQLQuery(sql.toString());
-			query.setParameter("studyId", studyId);
-
-			return ((BigInteger) query.uniqueResult()).intValue() > 0 ;
-		} catch (final HibernateException e) {
-			final String message = "Error with getInventoryDetailsByTransactionRecordId() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-	}
-
-	public List<InventoryDetails> getInventoryDetails(final Integer studyId) {
-		final List<InventoryDetails> detailsList = new ArrayList<>();
-
-		try {
-			final Session session = this.getSession();
-
-			final StringBuilder sql =
-				new StringBuilder().append("Select lot.lotid, lot.userid, lot.eid, lot.locid, lot.scaleid, ")
-					.append("tran.trnqty, lot.comments ")
-					.append("FROM ims_transaction tran ")
-					.append("LEFT JOIN ims_lot lot ON lot.lotid = tran.lotid ")
-					.append("INNER JOIN stock s on s.dbxref_id = lot.eid ")
-					.append("WHERE lot.status = ").append(LotStatus.ACTIVE.getIntValue()).append(" AND s.project_id = :studyId ");
-
-			final SQLQuery query = session.createSQLQuery(sql.toString());
-			query.setParameter("studyId", studyId);
-
-			final List<Object[]> results = query.list();
-
-			if (!results.isEmpty()) {
-				for (final Object[] row : results) {
-					final Integer lotId = (Integer) row[0];
-					final Integer userId = (Integer) row[1];
-					final Integer gid = (Integer) row[2];
-					final Integer locationId = (Integer) row[3];
-					final Integer scaleId = (Integer) row[4];
-					final Double amount = (Double) row[5];
-					final String comment = (String) row[6];
-
-					final InventoryDetails details =
-						new InventoryDetails(gid, null, lotId, locationId, null, userId, amount, scaleId, null, comment);
-					detailsList.add(details);
-				}
-			}
-
-		} catch (final HibernateException e) {
-			final String message = "Error with getInventoryDetails() query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-		return detailsList;
-	}
 
 	public void cancelUnconfirmedTransactionsForListEntries(final List<Integer> listEntryIds) {
 		try {
@@ -179,73 +109,6 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			gIdStockIdMap.put(gid, stockIds);
 		}
 		return gIdStockIdMap;
-
-	}
-
-	// Used in Lot Details component
-	public List<TransactionReportRow> getTransactionDetailsForLot(final Integer lotId) {
-
-		final List<TransactionReportRow> transactions = new ArrayList<>();
-		try {
-			final String sql = "SELECT i.userid,i.lotid,i.trndate,"
-					+ "(CASE WHEN trnstat = " + TransactionStatus.PENDING.getIntValue() + " THEN '" + TransactionStatus.PENDING.getValue()
-					+ "' WHEN trnstat = " + TransactionStatus.CONFIRMED.getIntValue() + " THEN '" + TransactionStatus.CONFIRMED.getValue()
-					+ "' WHEN trnstat = " + TransactionStatus.CANCELLED.getIntValue() + " THEN '" + TransactionStatus.CANCELLED.getValue()
-					+ "' END) as trnStatus, "
-					+ " i.trnqty,i.sourceid,l.listname, i.comments,"
-					+ "(CASE WHEN trntype = " + TransactionType.DEPOSIT.getId() + " THEN '" + TransactionType.DEPOSIT.getValue()
-					+ "' WHEN trntype = " + TransactionType.WITHDRAWAL.getId() + " THEN '" + TransactionType.WITHDRAWAL.getValue()
-					+ "' WHEN trntype = " + TransactionType.DISCARD.getId() + " THEN '" + TransactionType.DISCARD.getValue()
-					+ "' WHEN trntype = " + TransactionType.ADJUSTMENT.getId() + " THEN '" + TransactionType.ADJUSTMENT.getValue()
-					+ "' END) as trntype "
-					+ "FROM ims_transaction i LEFT JOIN listnms l ON l.listid = i.sourceid "
-					+ " INNER JOIN ims_lot lot ON lot.lotid = i.lotid "
-					+ "WHERE i.lotid = :lotId ORDER BY i.trnid";
-
-			final Query query = this.getSession().createSQLQuery(sql);
-
-			query.setParameter("lotId", lotId);
-
-			this.createTransactionRow(transactions, query);
-
-		} catch (final Exception e) {
-			final String message = "Error with ggetTransactionDetailsForLot(" + lotId + ") query from Transaction: " + e.getMessage();
-			LOG.error(message, e);
-			throw new MiddlewareQueryException(message, e);
-		}
-
-		return transactions;
-	}
-
-	private void createTransactionRow(final List<TransactionReportRow> transactionReportRows, final Query query) {
-
-		final List<Object[]> result = query.list();
-		TransactionReportRow transaction = null;
-		for (final Object[] row : result) {
-
-			final Integer userId = (Integer) row[0];
-			final Integer lotId = (Integer) row[1];
-			final Date trnDate = (Date) row[2];
-			final String trnStatus = (String) row[3];
-			final Double trnQty = (Double) row[4];
-			final Integer listId = (Integer) row[5];
-			final String listName = (String) row[6];
-			final String comments = (String) row[7];
-			final String lotStatus = (String) row[8];
-
-			transaction = new TransactionReportRow();
-			transaction.setUserId(userId);
-			transaction.setLotId(lotId);
-			transaction.setDate(trnDate);
-			transaction.setTrnStatus(trnStatus);
-			transaction.setQuantity(trnQty);
-			transaction.setListId(listId);
-			transaction.setListName(listName);
-			transaction.setCommentOfLot(comments);
-			transaction.setLotStatus(lotStatus);
-
-			transactionReportRows.add(transaction);
-		}
 
 	}
 
@@ -785,7 +648,7 @@ public class TransactionDAO extends GenericDAO<Transaction, Integer> {
 			+ "     select iet.nd_experiment_id as ndExperimentId, " //
 			+ "         iet.trnid as transactionId, " //
 			+ "         cast(ndgeo.description as unsigned) as instanceNo, " //
-			+ "         (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.value WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') AS entryType, "  //
+			+ "         (SELECT iispcvt.definition FROM stockprop isp INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = isp.type_id INNER JOIN cvterm iispcvt ON iispcvt.cvterm_id = isp.cvalue_id WHERE isp.stock_id = s.stock_id AND ispcvt.name = 'ENTRY_TYPE') AS entryType, "  //
 			+ "         (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'REP_NO') AS repNo, "  //
 			+ "         (SELECT ndep.value FROM nd_experimentprop ndep INNER JOIN cvterm ispcvt ON ispcvt.cvterm_id = ndep.type_id WHERE ndep.nd_experiment_id = plot.nd_experiment_id AND ispcvt.name = 'BLOCK_NO') AS blockNo, "  //
 			+ "         cast(s.uniquename as unsigned) as entryNo, " //

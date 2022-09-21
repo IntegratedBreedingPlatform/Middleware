@@ -440,6 +440,7 @@ public class Util {
 	 * @param value
 	 * @return Message object
 	 */
+	@Deprecated // StringUtils.isNumeric not compatible with decimals
 	public static Optional<Message> validateVariableValues(final MeasurementVariable variable, final String value) {
 
 		if ((variable.getDataTypeId() != null && variable.getDataTypeId().equals(DataType.NUMERIC_VARIABLE.getId())) || variable.getDataType().equals(DataType.NUMERIC_VARIABLE.getDataTypeCode())) {

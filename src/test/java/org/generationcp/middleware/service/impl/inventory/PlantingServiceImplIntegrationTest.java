@@ -7,7 +7,6 @@ import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsDto;
 import org.generationcp.middleware.api.inventory.study.StudyTransactionsRequest;
-import org.generationcp.middleware.dao.NameDAO;
 import org.generationcp.middleware.dao.ims.TransactionDAO;
 import org.generationcp.middleware.domain.dms.Experiment;
 import org.generationcp.middleware.domain.inventory.common.SearchCompositeDto;
@@ -18,13 +17,9 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareRequestException;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
-import org.generationcp.middleware.pojos.LocationType;
-import org.generationcp.middleware.pojos.UDTableType;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.ims.EntityType;
 import org.generationcp.middleware.pojos.ims.ExperimentTransaction;
@@ -56,9 +51,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
-
-	@Autowired
-	private GermplasmDataManager germplasmDataManager;
+	private static final Integer DEFAULT_SEED_STORE_ID = 6000;
 
 	@Autowired
 	private DataImportService dataImportService;
@@ -78,9 +71,6 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 	@Autowired
 	private DatasetService datasetService;
 
-	@Autowired
-	private LocationDataManager locationDataManager;
-
 	private Project commonTestProject;
 
 	private GermplasmTestDataGenerator germplasmTestDataGenerator;
@@ -94,7 +84,6 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 	private Integer studyId;
 	private Integer observationDatasetId;
 	private Integer userId;
-	private Integer storageLocationId;
 	public String unitName;
 	private List<Experiment> experiments;
 
@@ -120,15 +109,13 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataManager, new NameDAO(this.sessionProvder
-				.getSession()));
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(daoFactory);
 		}
 
 		if (this.studyId == null) {
 			this.createTestStudyWithObservationDataset();
 		}
 		this.userId = this.findAdminUser();
-		this.resolveStorageLocation();
 		this.unitName = this.daoFactory.getCvTermDao().getById(UNIT_ID).getName();
 		experiments = studyDataManager.getExperiments(this.observationDatasetId, 0, 40);
 
@@ -336,14 +323,9 @@ public class PlantingServiceImplIntegrationTest extends IntegrationTestBase {
 		this.observationDatasetId = studyDataManager.getDataSetsByType(this.studyId, DatasetTypeEnum.PLOT_DATA.getId()).get(0).getId();
 	}
 
-	private void resolveStorageLocation() {
-		final Integer id = locationDataManager.getUserDefinedFieldIdOfCode(UDTableType.LOCATION_LTYPE, LocationType.SSTORE.name());
-		storageLocationId = this.daoFactory.getLocationDAO().getDefaultLocationByType(id).getLocid();
-	}
-
 	private Lot createLot(final Integer gid) {
 		final Lot lot =
-			new Lot(null, userId, EntityType.GERMPLSM.name(), gid, storageLocationId, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
+			new Lot(null, userId, EntityType.GERMPLSM.name(), gid, DEFAULT_SEED_STORE_ID, UNIT_ID, LotStatus.ACTIVE.getIntValue(), 0,
 				"Lot", RandomStringUtils.randomAlphabetic(35));
 		this.daoFactory.getLotDao().save(lot);
 		this.daoFactory.getLotDao().refresh(lot);

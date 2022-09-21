@@ -4,8 +4,6 @@ import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.study.StudyImportRequestDTO;
-import org.generationcp.middleware.api.location.LocationDTO;
-import org.generationcp.middleware.api.location.search.LocationSearchRequest;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.etl.MeasurementVariable;
@@ -28,7 +26,7 @@ import org.generationcp.middleware.service.api.ontology.CategoricalValueNameVali
 import org.generationcp.middleware.service.api.ontology.VariableDataValidatorFactory;
 import org.generationcp.middleware.service.api.ontology.VariableValueValidator;
 import org.generationcp.middleware.service.api.study.EnvironmentParameter;
-import org.generationcp.middleware.service.api.study.ObservationLevel;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.service.api.study.StudyDetailsDto;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;

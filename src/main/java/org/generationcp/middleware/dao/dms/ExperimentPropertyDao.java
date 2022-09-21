@@ -19,6 +19,7 @@ import org.generationcp.middleware.domain.fieldbook.FieldMapInfo;
 import org.generationcp.middleware.domain.fieldbook.FieldMapLabel;
 import org.generationcp.middleware.domain.fieldbook.FieldMapTrialInstanceInfo;
 import org.generationcp.middleware.domain.oms.TermId;
+import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.Season;
 import org.generationcp.middleware.pojos.dms.ExperimentProperty;
@@ -30,6 +31,7 @@ import org.hibernate.SQLQuery;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.BooleanType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyMap;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -52,6 +55,13 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 	private static final Logger LOG = LoggerFactory.getLogger(ExperimentPropertyDao.class);
 	private static final List<Integer> OBSERVATION_LEVEL_RELATIONSHIP_IDS =
 		Arrays.asList(TermId.REP_NO.getId(), TermId.PLOT_NO.getId(), TermId.BLOCK_NO.getId());
+
+	private static final String DELETE_EXPERIMENT_PROP_BY_LOCID_AND_TYPE =
+		"DELETE FROM nd_experimentprop "
+			+ "WHERE nd_experiment_id IN ( "
+			+ " 	SELECT e.nd_experiment_id FROM nd_experiment e "
+			+ " 	WHERE e.nd_geolocation_id IN (:locationIds) )"
+			+ " AND type_id IN (:termIds)";
 
 	@SuppressWarnings("unchecked")
 	public List<Integer> getExperimentIdsByPropertyTypeAndValue(final Integer typeId, final String value) {
@@ -103,6 +113,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					.append(" , siteId.value AS siteId")
 					.append(" , epropBlock.value AS blockNo ")
 					.append(" , geo.obs_unit_id as obsUnitId ")
+					.append(" , case when geo.json_props like '%geoCoordinates%' then 1 else 0 end as hasGeoJSON ")
+					.append(" , case when means.project_id is not null then 1 else 0 end as hasMeansData ")
 					.append(" FROM ")
 					.append(" nd_experiment nde ")
 					.append(" INNER JOIN project proj on proj.project_id = nde.project_id ")
@@ -135,6 +147,9 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					.append("       AND col.type_id = ").append(TermId.COLUMN_NO.getId())
 					.append(" LEFT JOIN nd_geolocationprop gpSeason ON geo.nd_geolocation_id = gpSeason.nd_geolocation_id ")
 					.append("       AND gpSeason.type_id =  ").append(TermId.SEASON_VAR.getId()).append(" ") // -- 8371 (2452)
+					.append(" LEFT JOIN project means ON proj.parent_project_id = means.parent_project_id AND means.dataset_type_id = ")
+					.append(
+						DatasetTypeEnum.MEANS_DATA.getId())
 					.append(" WHERE st.project_id = :studyId")
 					.append(" ORDER BY casted_trialInstance, inst.description, nde.nd_experiment_id ").append(order);
 
@@ -145,7 +160,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 				.addScalar("germplasmName").addScalar("rep").addScalar("plotNo").addScalar("row").addScalar("col")
 				.addScalar("block_id").addScalar("trialInstance").addScalar("studyName").addScalar("gid")
 				.addScalar("startDate").addScalar("season").addScalar("siteId").addScalar("blockNo").addScalar("obsUnitId",
-				StringType.INSTANCE);
+					StringType.INSTANCE).addScalar("hasGeoJSON", BooleanType.INSTANCE).addScalar("hasMeansData", BooleanType.INSTANCE);
 			query.setParameter("studyId", projectId);
 			final List<Object[]> list = query.list();
 			if (list != null && !list.isEmpty()) {
@@ -223,7 +238,7 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			query.addScalar("datasetId").addScalar("datasetName").addScalar("studyName")
 				.addScalar("instanceId").addScalar("siteName").addScalar("siteId").addScalar("experimentId").addScalar("entryNumber")
 				.addScalar("germplasmName").addScalar(
-				"rep").addScalar("plotNo").addScalar("row")
+					"rep").addScalar("plotNo").addScalar("row")
 				.addScalar("col").addScalar("blockId").addScalar("studyId").addScalar("trialInstance").addScalar("gid")
 				.addScalar("startDate").addScalar("season").addScalar("blockNo").addScalar("obsUnitId", StringType.INSTANCE);
 
@@ -262,6 +277,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		String siteName = null;
 		String trialInstanceNo = null;
 		Integer blockId = null;
+		Boolean hasGeoJSON = false;
+		Boolean hasMeansData = false;
 		Integer siteId = null;
 		for (final Object[] row : list) {
 			if (instanceId == null) {
@@ -280,6 +297,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 					if (blockId != null) {
 						trialInstance.setHasFieldMap(true);
 					}
+					trialInstance.setHasGeoJSON(hasGeoJSON);
+					trialInstance.setHasMeansData(hasMeansData);
 					trialInstances.add(trialInstance);
 					trialInstance = new FieldMapTrialInstanceInfo();
 					labels = new ArrayList<>();
@@ -344,6 +363,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 			}
 			trialInstanceNo = (String) row[12];
 			blockId = row[11] != null ? Integer.valueOf((String) row[11]) : null;
+			hasGeoJSON = (Boolean) row[20];
+			hasMeansData = (Boolean) row[21];
 		}
 		// add last trial instance and dataset
 		trialInstance.setInstanceId(instanceId);
@@ -353,6 +374,8 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		trialInstance.setBlockId(blockId);
 		trialInstance.setTrialInstanceNo(trialInstanceNo);
 		trialInstance.setFieldMapLabels(labels);
+		trialInstance.setHasGeoJSON(hasGeoJSON);
+		trialInstance.setHasMeansData(hasMeansData);
 
 		if (blockId != null) {
 			trialInstance.setHasFieldMap(true);
@@ -570,6 +593,13 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 		return (ExperimentProperty) criteria.uniqueResult();
 	}
 
+	public List<ExperimentProperty> getExperimentPropertiesByType(final Integer experimentId, final List<Integer> typeIds) {
+		final Criteria criteria = this.getSession().createCriteria(this.getPersistentClass());
+		criteria.add(Restrictions.eq("experiment.ndExperimentId", experimentId));
+		criteria.add(Restrictions.in("typeId", typeIds));
+		return (List<ExperimentProperty>) criteria.list();
+	}
+
 	public Map<String, List<String>> getPlotObservationLevelRelationshipsByGeolocations(final Set<String> geolocationIds) {
 		if (isEmpty(geolocationIds)) {
 			return emptyMap();
@@ -598,6 +628,28 @@ public class ExperimentPropertyDao extends GenericDAO<ExperimentProperty, Intege
 
 			});
 		return plotObservationLevelRelationships;
+	}
+
+	public void deleteExperimentPropByLocationIds(final List<Integer> locationIds, final List<Integer> termIds) {
+		try {
+			// Please note we are manually flushing because non hibernate based deletes and updates causes the Hibernate session to get out
+			// of synch with
+			// underlying database. Thus flushing to force Hibernate to synchronize with the underlying database before the delete
+			// statement
+			this.getSession().flush();
+
+			final SQLQuery query = this.getSession().createSQLQuery(DELETE_EXPERIMENT_PROP_BY_LOCID_AND_TYPE);
+			query.setParameterList("locationIds", locationIds);
+			query.setParameterList("termIds", termIds);
+			query.executeUpdate();
+		} catch (final HibernateException e) {
+			final String message = "Error in deleteExperimentPropByLocationIds("
+				+ locationIds.stream().map(id -> id.toString()).collect(Collectors.joining(","))
+				+ " , " + termIds.stream().map(termId -> termId.toString()).collect(Collectors.joining(","))
+				+ ") in ExperimentPropertyDao: " + e.getMessage();
+			ExperimentPropertyDao.LOG.error(message, e);
+			throw new MiddlewareQueryException(message, e);
+		}
 	}
 
 }

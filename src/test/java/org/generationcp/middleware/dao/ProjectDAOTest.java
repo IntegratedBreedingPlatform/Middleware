@@ -4,8 +4,8 @@ import com.google.common.collect.Sets;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.crop.CropService;
 import org.generationcp.middleware.api.program.ProgramService;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.Role;
@@ -30,7 +30,7 @@ import java.util.Set;
 public class ProjectDAOTest extends IntegrationTestBase {
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private CropService cropService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -42,6 +42,9 @@ public class ProjectDAOTest extends IntegrationTestBase {
 	private ProgramService programService;
 
 	private ProjectDAO workbenchProjectDao;
+	private UserRoleDao userRoleDao;
+	private RoleDAO roleDAO;
+	private RoleTypeDAO roleTypeDAO;
 
 	private CropType cropType;
 	private Project project1;
@@ -59,29 +62,44 @@ public class ProjectDAOTest extends IntegrationTestBase {
 
 		this.workbenchTestDataUtil.setUpWorkbench();
 
+		if (this.roleTypeDAO == null) {
+			this.roleTypeDAO = new RoleTypeDAO();
+			this.roleTypeDAO.setSession(this.workbenchSessionProvider.getSession());
+		}
+
+		if (this.userRoleDao == null) {
+			this.userRoleDao = new UserRoleDao();
+			this.userRoleDao.setSession(this.workbenchSessionProvider.getSession());
+		}
+
+		if (this.roleDAO == null) {
+			this.roleDAO = new RoleDAO();
+			this.roleDAO.setSession(this.workbenchSessionProvider.getSession());
+		}
+
 		final RoleType programAdminRoleType =
-			this.workbenchDataManager.getRoleType(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.getId());
+			roleTypeDAO.getById(org.generationcp.middleware.domain.workbench.RoleType.PROGRAM.getId());
 		this.programAdminRole = new Role();
 		this.programAdminRole.setName("Test Program Role " + new Random().nextInt());
 		this.programAdminRole.setRoleType(programAdminRoleType);
 		this.programAdminRole.setActive(true);
-		this.workbenchDataManager.saveRole(this.programAdminRole);
+		roleDAO.saveOrUpdate(this.programAdminRole);
 
 		final org.generationcp.middleware.pojos.workbench.RoleType instanceRoleType =
-			this.workbenchDataManager.getRoleType(org.generationcp.middleware.domain.workbench.RoleType.INSTANCE.getId());
+			roleTypeDAO.getById(org.generationcp.middleware.domain.workbench.RoleType.INSTANCE.getId());
 		this.instanceAdminRole = new Role();
 		this.instanceAdminRole.setName("Test Instance Role " + new Random().nextInt());
 		this.instanceAdminRole.setRoleType(instanceRoleType);
 		this.instanceAdminRole.setActive(true);
-		this.workbenchDataManager.saveRole(instanceAdminRole);
+		roleDAO.saveOrUpdate(instanceAdminRole);
 
 		final org.generationcp.middleware.pojos.workbench.RoleType cropRoleType =
-			this.workbenchDataManager.getRoleType(org.generationcp.middleware.domain.workbench.RoleType.CROP.getId());
+			roleTypeDAO.getById(org.generationcp.middleware.domain.workbench.RoleType.CROP.getId());
 		this.cropAdminRole = new Role();
 		this.cropAdminRole.setName("Test Crop Role " + new Random().nextInt());
 		this.cropAdminRole.setRoleType(cropRoleType);
 		this.cropAdminRole.setActive(true);
-		this.workbenchDataManager.saveRole(cropAdminRole);
+		roleDAO.saveOrUpdate(cropAdminRole);
 
 		if (this.workbenchProjectDao == null) {
 			this.workbenchProjectDao = new ProjectDAO();
@@ -89,7 +107,7 @@ public class ProjectDAOTest extends IntegrationTestBase {
 		}
 
 		if (this.cropType == null) {
-			this.cropType = this.workbenchDataManager.getCropTypeByName(CropType.CropEnum.MAIZE.name());
+			this.cropType = this.cropService.getCropTypeByName(CropType.CropEnum.MAIZE.name());
 		}
 
 		if (this.project1 == null) {
@@ -142,7 +160,7 @@ public class ProjectDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetProgramsByUserIdAdminAndProgramUser() {
 
-		final int count = this.workbenchDataManager.getProjects().size();
+		final int count = this.workbenchProjectDao.getAll().size();
 
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		programSearchRequest.setLoggedInUserId(this.adminInstanceProgram.getUserid());
@@ -157,7 +175,7 @@ public class ProjectDAOTest extends IntegrationTestBase {
 	@Test
 	public void testGetProgramsByUserIdAdminUser() {
 
-		final int count = this.workbenchDataManager.getProjects().size();
+		final int count = this.workbenchProjectDao.getAll().size();
 
 		final ProgramSearchRequest programSearchRequest = new ProgramSearchRequest();
 		programSearchRequest.setLoggedInUserId(this.admin.getUserid());
@@ -192,7 +210,7 @@ public class ProjectDAOTest extends IntegrationTestBase {
 				userRole.setCropType(this.cropType);
 				userRole.setWorkbenchProject(this.project1);
 			}
-			this.workbenchDataManager.saveOrUpdateUserRole(userRole);
+			this.userRoleDao.saveOrUpdate(userRole);
 		}
 
 	}

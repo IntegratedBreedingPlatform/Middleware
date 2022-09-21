@@ -16,6 +16,7 @@ public class BreedingMethodDTO extends BreedingMethodNewRequest {
 	private Boolean isFavorite;
 	private Date creationDate;
 	private String methodClassName;
+	private String snameTypeCode;
 
 	private List<ProgramFavoriteDTO> programFavorites;
 
@@ -37,7 +38,7 @@ public class BreedingMethodDTO extends BreedingMethodNewRequest {
 		this.setPrefix(method.getPrefix());
 		this.setCount(method.getCount());
 		this.setSuffix(method.getSuffix());
-
+		this.setSnameTypeId(method.getSnametype());
 		this.setMid(method.getMid());
 	}
 
@@ -58,15 +59,15 @@ public class BreedingMethodDTO extends BreedingMethodNewRequest {
 	}
 
 	public Boolean getFavorite() {
-		return isFavorite;
+		return this.isFavorite;
 	}
 
 	public void setFavorite(final Boolean favorite) {
-		isFavorite = favorite;
+		this.isFavorite = favorite;
 	}
 
 	public Date getCreationDate() {
-		return creationDate;
+		return this.creationDate;
 	}
 
 	public void setCreationDate(final Date creationDate) {
@@ -74,15 +75,23 @@ public class BreedingMethodDTO extends BreedingMethodNewRequest {
 	}
 
 	public String getMethodClassName() {
-		return methodClassName;
+		return this.methodClassName;
 	}
 
 	public void setMethodClassName(final String methodClassName) {
 		this.methodClassName = methodClassName;
 	}
 
+	public String getSnameTypeCode() {
+		return this.snameTypeCode;
+	}
+
+	public void setSnameTypeCode(final String snameTypeCode) {
+		this.snameTypeCode = snameTypeCode;
+	}
+
 	public List<ProgramFavoriteDTO> getProgramFavorites() {
-		return programFavorites;
+		return this.programFavorites;
 	}
 
 	public void setProgramFavorites(final List<ProgramFavoriteDTO> programFavorites) {

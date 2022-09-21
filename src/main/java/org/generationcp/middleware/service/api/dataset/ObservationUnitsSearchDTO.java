@@ -19,7 +19,12 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	private List<MeasurementVariableDto> environmentConditions;
 	private List<String> genericGermplasmDescriptors;
 	private List<String> additionalDesignFactors;
-	private List<MeasurementVariableDto> selectionMethodsAndTraits;
+	// Contains variables with variable types depending on the dataset type
+	// Plot and Subobservations: TRAIT and SELECTION_METHOD
+	// MEANS_DATA: TRAIT and ANALYSIS
+	// SUMMARY_STATISTICS_DATA: ANALYSIS_SUMMARY
+	private List<MeasurementVariableDto> datasetVariables;
+	private List<MeasurementVariableDto> entryDetails;
 	private int datasetId;
 	private Integer instanceId;
 	private Integer environmentDatasetId;
@@ -34,7 +39,7 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 	private String draw;
 
 	private Filter filter;
-
+	private List<MeasurementVariableDto> passportAndAttributes;
 
 	public class Filter {
 
@@ -47,6 +52,8 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		private Set<Integer> filteredNdExperimentIds;
 		private Map<String, String> variableTypeMap;
 		private Integer variableId;
+		// FIXME: Remove it after solver the filter for Female and Male Parents into the query.
+		private Set<Integer> preFilteredGids;
 
 		public Filter() {
 			this.byMissing = false;
@@ -123,11 +130,19 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		}
 
 		public Map<String, String> getVariableTypeMap() {
-			return variableTypeMap;
+			return this.variableTypeMap;
 		}
 
 		public void setVariableTypeMap(final Map<String, String> variableTypeMap) {
 			this.variableTypeMap = variableTypeMap;
+		}
+
+		public Set<Integer> getPreFilteredGids() {
+			return this.preFilteredGids;
+		}
+
+		public void setPreFilteredGids(final Set<Integer> preFilteredGids) {
+			this.preFilteredGids = preFilteredGids;
 		}
 
 	}
@@ -141,11 +156,11 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 
 	public ObservationUnitsSearchDTO(final int datasetId, final Integer instanceId, final List<String> genericGermplasmDescriptors,
 		final List<String> additionalDesignFactors,
-		final List<MeasurementVariableDto> selectionMethodsAndTraits) {
+		final List<MeasurementVariableDto> datasetVariables) {
 		this();
 		this.genericGermplasmDescriptors = genericGermplasmDescriptors;
 		this.additionalDesignFactors = additionalDesignFactors;
-		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
+		this.datasetVariables = datasetVariables;
 		this.datasetId = datasetId;
 		this.instanceId = instanceId;
 	}
@@ -182,12 +197,20 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 		this.additionalDesignFactors = additionalDesignFactors;
 	}
 
-	public List<MeasurementVariableDto> getSelectionMethodsAndTraits() {
-		return this.selectionMethodsAndTraits;
+	public List<MeasurementVariableDto> getDatasetVariables() {
+		return this.datasetVariables;
 	}
 
-	public void setSelectionMethodsAndTraits(final List<MeasurementVariableDto> selectionMethodsAndTraits) {
-		this.selectionMethodsAndTraits = selectionMethodsAndTraits;
+	public void setDatasetVariables(final List<MeasurementVariableDto> datasetVariables) {
+		this.datasetVariables = datasetVariables;
+	}
+
+	public List<MeasurementVariableDto> getEntryDetails() {
+		return this.entryDetails;
+	}
+
+	public void setEntryDetails(final List<MeasurementVariableDto> entryDetails) {
+		this.entryDetails = entryDetails;
 	}
 
 	public int getDatasetId() {
@@ -244,6 +267,14 @@ public class ObservationUnitsSearchDTO extends SearchRequestDto {
 
 	public void setFilterColumns(final List<String> filterColumns) {
 		this.filterColumns = filterColumns;
+	}
+
+	public List<MeasurementVariableDto> getPassportAndAttributes() {
+		return passportAndAttributes;
+	}
+
+	public void setPassportAndAttributes(final List<MeasurementVariableDto> passportAndAttributes) {
+		this.passportAndAttributes = passportAndAttributes;
 	}
 
 	@Override

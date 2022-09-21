@@ -48,10 +48,11 @@ public interface DatasetService {
 	/**
 	 * Given a dataset and a list of variables, it will de-associated them from the dataset
 	 *
+	 * @param studyId
 	 * @param datasetId   Id of the dataset
 	 * @param variableIds List of variables
 	 */
-	void removeDatasetVariables(Integer datasetId, List<Integer> variableIds);
+	void removeDatasetVariables(Integer studyId, Integer datasetId, List<Integer> variableIds);
 
 	/**
 	 * Return if an observation is valid
@@ -418,4 +419,7 @@ public interface DatasetService {
 	long countByVariableIdAndValue(final Integer variableId, final String value);
 
 	long countObservationsByVariableIdAndValue(final Integer variableId, final String value);
+
+	void updatePlotDatasetProperties(Integer studyId, List<Integer> variableIds, final String programUUID);
+
 }

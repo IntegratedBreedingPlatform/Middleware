@@ -52,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -81,6 +82,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	private static final String SCALE_IDS = "scaleIds";
 	private static final String DATASET_IDS = "datasetIds";
 	private static final String GERMPLASM_UUIDS = "germplasmUUIDs";
+	private static final String LOT_IDS = "lotIds";
 
 	private static final String VARIABLE_DOES_NOT_EXIST = "Variable does not exist";
 	private static final String TERM_IS_NOT_VARIABLE = "The term {0} is not Variable.";
@@ -298,6 +300,14 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 						+ " where g.germplsm_uuid in (:germplasmUUIDs) and a.atype = v.cvterm_id) ";
 					listParameters.put(GERMPLASM_UUIDS, germplasmUUIDs);
 				}
+
+				// filter by lotId
+				final List<Integer> lotIds = variableFilter.getLotIds();
+				if (!isEmpty(lotIds)) {
+					filterClause += " and exists(select 1 from ims_lot l inner join ims_lot_attribute a on a.lotid = l.lotid "
+						+ " where l.lotid in (:lotIds) and a.atype = v.cvterm_id) ";
+					listParameters.put(LOT_IDS, lotIds);
+				}
 			}
 
 			final String selectQueryProgramUUIDDependant;
@@ -325,7 +335,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 						+ leftJoinsProgramUUIDDependant
 						+ "WHERE (v.cv_id = 1040) " + filterClause)
 				.addScalar("vid").addScalar("vn").addScalar("vd").addScalar("pid").addScalar("pn").addScalar("pd").addScalar("mid")
-				.addScalar("mn").addScalar("md").addScalar("sid").addScalar("sn").addScalar("sd").addScalar("is_system").addScalar("p_alias")
+				.addScalar("mn").addScalar("md").addScalar("sid").addScalar("sn").addScalar("sd").addScalar("is_system")
+				.addScalar("p_alias")
 				.addScalar("p_min_value")
 				.addScalar("p_max_value").addScalar("fid");
 
@@ -370,7 +381,7 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 				}
 
 				variable.setScale(sMap.get(scaleId));
-				variable.setIsSystem((Boolean)items[12]);
+				variable.setIsSystem((Boolean) items[12]);
 
 				// Alias, Expected Min Value, Expected Max Value
 				final String pAlias = (String) items[13];
@@ -1013,7 +1024,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 
 	@Override
 	public boolean areVariablesUsedInAttributes(final List<Integer> variablesIds) {
-		return this.daoFactory.getAttributeDAO().countByVariables(variablesIds) > 0;
+		return this.daoFactory.getAttributeDAO().countByVariables(variablesIds) > 0
+			|| this.daoFactory.getLotAttributeDAO().countByVariables(variablesIds) > 0;
 	}
 
 	@Override
@@ -1061,8 +1073,8 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 	}
 
 	@Override
-	public List<Variable> searchAttributeVariables(final String query, final String programUUID) {
-		return this.daoFactory.getCvTermDao().searchAttributeVariables(query, programUUID);
+	public List<Variable> searchAttributeVariables(final String query, final List<Integer> variableTypeIds, final String programUUID) {
+		return this.daoFactory.getCvTermDao().searchAttributeVariables(query, variableTypeIds, programUUID);
 	}
 
 	/***
@@ -1078,5 +1090,19 @@ public class OntologyVariableDataManagerImpl extends DataManager implements Onto
 			this.areVariablesUsedInAttributes(Lists.newArrayList(variableId)) ||
 			this.isVariableUsedInBreedingMethods(variableId) ||
 			this.isVariableAssignedToLists(variableId);
+	}
+
+	@Override
+	public List<Variable> getVariablesByIds(final List<Integer> variableIds, final String programUUID) {
+		if (!CollectionUtils.isEmpty(variableIds)) {
+			final VariableFilter variableFilter = new VariableFilter();
+			if (StringUtils.isNotEmpty(programUUID)) {
+				variableFilter.setProgramUuid(programUUID);
+			}
+			variableIds
+				.forEach(variableFilter::addVariableId);
+			return this.getWithFilter(variableFilter);
+		}
+		return Collections.emptyList();
 	}
 }

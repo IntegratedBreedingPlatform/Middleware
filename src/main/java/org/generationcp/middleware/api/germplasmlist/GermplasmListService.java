@@ -10,6 +10,7 @@ import org.generationcp.middleware.pojos.GermplasmList;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -36,7 +37,7 @@ public interface GermplasmListService {
 
 	Integer updateGermplasmListFolder(String folderName, Integer folderId);
 
-	Integer moveGermplasmListFolder(Integer germplasmListId, Integer newParentFolderId, String programUUID);
+	GermplasmList moveGermplasmListFolder(Integer germplasmListId, Integer newParentFolderId, String programUUID);
 
 	void deleteGermplasmListFolder(Integer folderId);
 
@@ -92,4 +93,9 @@ public interface GermplasmListService {
 		SearchCompositeDto<GermplasmListDataSearchRequest, Integer> searchComposite);
 
 	void editListMetadata(GermplasmListDto germplasmListDto);
+
+	long countEntryDetailsNamesAndAttributesAdded(Integer listId);
+
+	Map<Integer, Map<Integer, String>> getObservationValuesByListAndVariableIds(Integer listId, Set<Integer> variableIds);
+
 }

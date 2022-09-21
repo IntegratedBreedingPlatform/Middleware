@@ -1,12 +1,17 @@
 
 package org.generationcp.middleware.service.api.study;
 
+import org.apache.commons.collections.map.MultiKeyMap;
+import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.study.StudyEntryPropertyBatchUpdateRequest;
 import org.generationcp.middleware.domain.study.StudyEntrySearchDto;
+import org.generationcp.middleware.pojos.dms.StockProperty;
+import org.generationcp.middleware.service.api.dataset.StockPropertyData;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public interface StudyEntryService {
@@ -25,15 +30,31 @@ public interface StudyEntryService {
 
 	Integer getNextEntryNumber(Integer studyId);
 
-	List<StudyEntryDto> saveStudyEntries(Integer studyId, List<StudyEntryDto> studyEntryDtoList);
+	void saveStudyEntries(Integer studyId, Integer listId);
 
-	long countStudyGermplasmByEntryTypeIds(int studyId, List<String> systemDefinedEntryTypeIds);
+	void saveStudyEntries(Integer studyId, List<Integer> gids, Integer entryTypeId);
 
-	StudyEntryDto replaceStudyEntry(int studyId, int entryId, int gid, String crossExpansion);
+	long countStudyGermplasmByEntryTypeIds(int studyId, List<Integer> systemDefinedEntryTypeIds);
+
+	void replaceStudyEntry(int studyId, int entryId, int gid);
 
 	void replaceStudyEntries(List<Integer> gidsToReplace, Integer replaceWithGid, String crossExpansion);
 
 	void updateStudyEntriesProperty(StudyEntryPropertyBatchUpdateRequest studyEntryPropertyBatchUpdateRequest);
 
 	Boolean hasUnassignedEntries(int studyId);
+
+	Optional<StockProperty> getByStockIdAndTypeId(Integer stockId, Integer typeId);
+
+	StockProperty getByStockPropertyId(Integer stockPropertyId);
+
+	void fillWithCrossExpansion(Integer studyId, Integer level);
+
+	Integer getCrossGenerationLevel(Integer studyId);
+
+	List<StudyEntryColumnDTO> getStudyEntryColumns(Integer studyId, final String programUUID);
+
+	List<Variable> getStudyEntryDetails(String cropName, String programUUID, Integer studyId, Integer variableTypeId);
+
+	MultiKeyMap getStudyEntryStockPropertyMap(Integer studyId, List<StudyEntryDto> studyEntries);
 }

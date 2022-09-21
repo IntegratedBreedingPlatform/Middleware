@@ -89,7 +89,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 	public static final String GROUP_SOURCE_GID = ColumnLabels.GROUP_SOURCE_GID.getName();
 	public static final String GROUP_SOURCE_PREFERRED_NAME = ColumnLabels.GROUP_SOURCE_PREFERRED_NAME.getName();
 	public static final String IMMEDIATE_SOURCE_GID = ColumnLabels.IMMEDIATE_SOURCE_GID.getName();
-	public static final String IMMEDIATE_SOURCE_PREFERRED_NAME = ColumnLabels.IMMEDIATE_SOURCE_PREFERRED_NAME.getName();
+	public static final String IMMEDIATE_SOURCE_NAME = ColumnLabels.IMMEDIATE_SOURCE_NAME.getName();
 
 	public static final String HAS_PROGENY = ColumnLabels.HAS_PROGENY.getName();
 	public static final String USED_IN_LOCKED_STUDY = ColumnLabels.USED_IN_LOCKED_STUDY.getName();
@@ -149,10 +149,10 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 						+ " AND g.gpid2 <> 0 THEN g.gpid2 \n ELSE '-' \n" + " END AS `%s` \n",
 					GermplasmSearchDAO.IMMEDIATE_SOURCE_GID));
 		GermplasmSearchDAO.selectClauseColumnsMap
-			.put(GermplasmSearchDAO.IMMEDIATE_SOURCE_PREFERRED_NAME,
+			.put(GermplasmSearchDAO.IMMEDIATE_SOURCE_NAME,
 				String.format(" CASE \n WHEN g.gnpgs = -1 AND g.gpid2 IS NOT NULL \n"
 						+ "	AND g.gpid2 <> 0 THEN immediateSource.nval \n" + "	ELSE '-' \n END AS `%s` \n",
-					GermplasmSearchDAO.IMMEDIATE_SOURCE_PREFERRED_NAME));
+					GermplasmSearchDAO.IMMEDIATE_SOURCE_NAME));
 
 	}
 
@@ -168,7 +168,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		GermplasmSearchDAO.fromClauseColumnsMap.put(GermplasmSearchDAO.GROUP_SOURCE_PREFERRED_NAME,
 			"LEFT JOIN names groupSource ON g.gpid1 = groupSource.gid AND groupSource.nstat = 1 \n");
 		GermplasmSearchDAO.fromClauseColumnsMap.put(GermplasmSearchDAO.IMMEDIATE_SOURCE_GID, " ");
-		GermplasmSearchDAO.fromClauseColumnsMap.put(GermplasmSearchDAO.IMMEDIATE_SOURCE_PREFERRED_NAME,
+		GermplasmSearchDAO.fromClauseColumnsMap.put(GermplasmSearchDAO.IMMEDIATE_SOURCE_NAME,
 			"LEFT JOIN names immediateSource ON g.gpid2 = immediateSource.gid AND immediateSource.nstat = 1 \n");
 
 	}
@@ -562,8 +562,7 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		response.setGroupSourcePreferredName(
 			this.getValueOfAddedColumns(GROUP_SOURCE_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
 		response.setImmediateSourceGID(this.getValueOfAddedColumns(IMMEDIATE_SOURCE_GID, row, addedColumnsPropertyIds, indexOffset));
-		response.setImmediateSourcePreferredName(
-			this.getValueOfAddedColumns(IMMEDIATE_SOURCE_PREFERRED_NAME, row, addedColumnsPropertyIds, indexOffset));
+		response.setImmediateSourceName(this.getValueOfAddedColumns(IMMEDIATE_SOURCE_NAME, row, addedColumnsPropertyIds, indexOffset));
 
 		this.setValuesMapForAttributeAndNameTypes(germplasm, row, addedColumnsPropertyIds, attributeTypesMap, nameTypesMap, indexOffset);
 
@@ -901,6 +900,22 @@ public class GermplasmSearchDAO extends GenericDAO<Germplasm, Integer> {
 		if (preFilteredGids != null && !preFilteredGids.isEmpty()) {
 			paramBuilder.append(" and g.gid in (:preFilteredGids) ");
 			paramBuilder.setParameterList("preFilteredGids", preFilteredGids);
+		}
+
+		final SqlTextFilter externalReferenceSource = germplasmSearchRequest.getExternalReferenceSource();
+		if (externalReferenceSource != null) {
+			final SqlTextFilter.Type type = externalReferenceSource.getType();
+			paramBuilder.append(" and g.gid in (select exref.gid from external_reference_germplasm exref ");
+			paramBuilder.append(" where exref.reference_source " + getOperator(type) + " :exrefSource) " );
+			paramBuilder.setParameter("exrefSource", getParameter(type, externalReferenceSource.getValue()));
+		}
+
+		final SqlTextFilter externalReferenceId = germplasmSearchRequest.getExternalReferenceId();
+		if (externalReferenceId != null) {
+			final SqlTextFilter.Type type = externalReferenceId.getType();
+			paramBuilder.append(" and g.gid in (select exref.gid from external_reference_germplasm exref ");
+			paramBuilder.append(" where exref.reference_id " + getOperator(type) + " :exrefId) " );
+			paramBuilder.setParameter("exrefId", getParameter(type, externalReferenceId.getValue()));
 		}
 
 		paramBuilder.append(" group by g.gid having 1 = 1 ");

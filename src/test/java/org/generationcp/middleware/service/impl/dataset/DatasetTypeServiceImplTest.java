@@ -29,7 +29,7 @@ public class DatasetTypeServiceImplTest extends IntegrationTestBase {
 	@Test
 	public void testGetAllDatasetTypes() {
 		final Map<Integer, DatasetTypeDTO> datasetTypeMap = this.datasetTypeService.getAllDatasetTypesMap();
-		Assert.assertEquals(11, datasetTypeMap.size());
+		Assert.assertEquals(12, datasetTypeMap.size());
 		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.STUDY_CONDITIONS.getId()));
 		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.MEANS_DATA.getId()));
 		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.SUMMARY_DATA.getId()));
@@ -41,6 +41,7 @@ public class DatasetTypeServiceImplTest extends IntegrationTestBase {
 		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.SUB_SAMPLE_DATA.getId()));
 		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.WEATHER_DATA.getId()));
 		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.MEANS_OVER_TRIAL_INSTANCES.getId()));
+		Assert.assertTrue(datasetTypeMap.containsKey(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId()));
 	}
 
 	@Test
@@ -88,7 +89,7 @@ public class DatasetTypeServiceImplTest extends IntegrationTestBase {
 	public List<String> getObservationLevels(final boolean isSubObs) {
 		List<String> levels = new ArrayList<>();
 		levels.add("PLANT");
-		levels.add("QUADRAT");
+		levels.add("SUB-PLOT");
 		levels.add("TIMESERIES");
 		levels.add("CUSTOM");
 

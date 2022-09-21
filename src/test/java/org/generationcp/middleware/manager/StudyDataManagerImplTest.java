@@ -11,15 +11,15 @@
 
 package org.generationcp.middleware.manager;
 
-import com.google.common.base.Function;
 import com.google.common.base.Optional;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
-import org.generationcp.middleware.dao.NameDAO;
+import org.generationcp.middleware.api.location.LocationService;
+import org.generationcp.middleware.api.program.ProgramService;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.dao.dms.InstanceMetadata;
 import org.generationcp.middleware.dao.oms.CVTermDao;
 import org.generationcp.middleware.data.initializer.DMSVariableTestDataInitializer;
@@ -30,15 +30,12 @@ import org.generationcp.middleware.domain.dms.DatasetReference;
 import org.generationcp.middleware.domain.dms.DatasetValues;
 import org.generationcp.middleware.domain.dms.ExperimentType;
 import org.generationcp.middleware.domain.dms.ExperimentValues;
-import org.generationcp.middleware.domain.dms.FolderReference;
 import org.generationcp.middleware.domain.dms.PhenotypicType;
 import org.generationcp.middleware.domain.dms.Reference;
 import org.generationcp.middleware.domain.dms.StandardVariable;
 import org.generationcp.middleware.domain.dms.Study;
 import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.dms.StudySearchMatchingOption;
-import org.generationcp.middleware.domain.dms.TrialEnvironments;
-import org.generationcp.middleware.domain.dms.Variable;
 import org.generationcp.middleware.domain.dms.VariableList;
 import org.generationcp.middleware.domain.dms.VariableTypeList;
 import org.generationcp.middleware.domain.etl.StudyDetails;
@@ -54,9 +51,7 @@ import org.generationcp.middleware.domain.study.StudyTypeDto;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
 import org.generationcp.middleware.manager.api.GermplasmDataManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.manager.ontology.OntologyVariableDataManagerImpl;
 import org.generationcp.middleware.manager.ontology.api.OntologyVariableDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
@@ -66,7 +61,6 @@ import org.generationcp.middleware.operation.saver.StandardVariableSaver;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
-import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.Phenotype;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -108,16 +102,16 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private OntologyDataManager ontologyManager;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private RoleService roleService;
 
 	@Autowired
 	private GermplasmDataManager germplasmDataDM;
 
 	@Autowired
-	private LocationDataManager locationManager;
+	private UserService userService;
 
 	@Autowired
-	private UserService userService;
+	private ProgramService programService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -145,6 +139,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	private CropType crop;
 
 	private StandardVariableSaver standardVariableSaver;
+
 	@Before
 	public void setUp() throws Exception {
 		this.manager = new StudyDataManagerImpl(this.sessionProvder);
@@ -166,7 +161,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
-			this.crop = this.workbenchDataManager.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
+			this.crop = this.programService.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
 		}
 
 		if (this.experimentModelSaver == null) {
@@ -174,15 +169,14 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		}
 
 		if (this.germplasmTestDataGenerator == null) {
-			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.germplasmDataDM, new NameDAO(this.sessionProvder
-				.getSession()));
+			this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 		}
 		final Properties mockProperties = Mockito.mock(Properties.class);
 		Mockito.when(mockProperties.getProperty("wheat.generation.level")).thenReturn("0");
 		StudyDataManagerImplTest.crossExpansionProperties = new CrossExpansionProperties(mockProperties);
 		StudyDataManagerImplTest.crossExpansionProperties.setDefaultLevel(1);
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject,
-			this.locationManager, this.sessionProvder);
+			this.sessionProvder);
 
 		this.studyReference = this.studyTDI.addTestStudy();
 
@@ -269,7 +263,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 	public void testSearchStudiesByGid() throws Exception {
 		final Germplasm parentGermplasm = this.germplasmTestDataGenerator.createGermplasmWithPreferredAndNonpreferredNames();
 		final Integer[] gids = this.germplasmTestDataGenerator
-				.createChildrenGermplasm(1, "PREF-ABC", parentGermplasm);
+			.createChildrenGermplasm(1, "PREF-ABC", parentGermplasm);
 		this.studyTDI.addStudyGermplasm(this.studyReference.getId(), 1, Arrays.asList(gids));
 
 		// Flushing to force Hibernate to synchronize with the underlying database before the search
@@ -283,7 +277,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		for (final StudyReference study : studyReferences) {
 			Assert.assertNotNull(study.getOwnerId());
 			final WorkbenchUser workbenchUser = this.userService.getUserById(study.getOwnerId());
-			Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
+			Assert.assertEquals(
+				workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
+				study.getOwnerName());
 
 		}
 	}
@@ -338,50 +334,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 				Assert.assertFalse(study.getIsLocked());
 				Assert.assertEquals(this.studyReference.getOwnerId(), study.getOwnerId());
 				final WorkbenchUser workbenchUser = this.userService.getUserById(this.studyReference.getOwnerId());
-				Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), study.getOwnerName());
-			}
-		}
-	}
-
-	@Test
-	public void testGetAllFolders() {
-		final int originalSize = this.manager.getAllFolders().size();
-		final String uniqueID = this.commonTestProject.getUniqueID();
-		final DmsProject folder1 = this.studyTDI.createFolderTestData(uniqueID);
-		final DmsProject folder2 = this.studyTDI.createFolderTestData(null);
-		final DmsProject folder3 = this.studyTDI.createFolderTestData(uniqueID, folder1.getProjectId());
-		this.sessionProvder.getSession().flush();
-
-		final List<FolderReference> allFolders = this.manager.getAllFolders();
-		final int newSize = allFolders.size();
-		final List<Integer> idList = Lists.transform(allFolders, new Function<FolderReference, Integer>() {
-
-			@Override
-			public Integer apply(final FolderReference dataset) {
-				return dataset.getId();
-			}
-		});
-		Assert.assertEquals("The new size should be equal to the original size + 3", originalSize + 3, newSize);
-		Assert.assertTrue(idList.contains(folder1.getProjectId()));
-		Assert.assertTrue(idList.contains(folder2.getProjectId()));
-		Assert.assertTrue(idList.contains(folder3.getProjectId()));
-		for (final FolderReference folder : allFolders) {
-			final Integer id = folder.getId();
-			if (id.equals(folder1.getProjectId())) {
-				Assert.assertEquals(folder1.getProjectId(), id);
-				Assert.assertEquals(folder1.getName(), folder.getName());
-				Assert.assertEquals(folder1.getDescription(), folder.getDescription());
-				Assert.assertEquals(DmsProject.SYSTEM_FOLDER_ID, folder.getParentFolderId());
-			} else if (id.equals(folder2.getProjectId())) {
-				Assert.assertEquals(folder2.getProjectId(), id);
-				Assert.assertEquals(folder2.getName(), folder.getName());
-				Assert.assertEquals(folder2.getDescription(), folder.getDescription());
-				Assert.assertEquals(DmsProject.SYSTEM_FOLDER_ID, folder.getParentFolderId());
-			} else if (id.equals(folder3.getProjectId())) {
-				Assert.assertEquals(folder3.getProjectId(), id);
-				Assert.assertEquals(folder3.getName(), folder.getName());
-				Assert.assertEquals(folder3.getDescription(), folder.getDescription());
-				Assert.assertEquals(folder1.getProjectId(), folder.getParentFolderId());
+				Assert.assertEquals(
+					workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
+					study.getOwnerName());
 			}
 		}
 	}
@@ -477,7 +432,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNotNull() {
-		final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
+		final LocationService locationService = Mockito.mock(LocationService.class);
 
 		final FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
 			FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
@@ -485,7 +440,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 		final List<FieldMapInfo> infos = FieldMapDataUtil.createFieldMapInfoList();
 
-		this.manager.setLocationDataManager(locationDataManager);
+		this.manager.setLocationService(locationService);
 
 		try {
 			final FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
@@ -494,7 +449,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 			trialInstance.setLocationId(this.studyTDI.addTestLocation(StudyDataManagerImplTest.LOCATION_NAME));
 			fieldMapBlockInfo.setFieldId(trialInstance.getFieldId());
 
-			Mockito.when(locationDataManager.getBlockInformation(trialInstance.getBlockId())).thenReturn(fieldMapBlockInfo);
+			Mockito.when(locationService.getBlockInformation(trialInstance.getBlockId())).thenReturn(fieldMapBlockInfo);
 			this.manager.updateFieldMapWithBlockInformation(infos, true);
 
 			final FieldMapTrialInstanceInfo resultTrialInstance =
@@ -532,7 +487,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 
 	@Test
 	public void testUpdateFieldMapWithBlockInformationWhenBlockIdIsNull() {
-		final LocationDataManager locationDataManager = Mockito.mock(LocationDataManager.class);
+		final LocationService locationService = Mockito.mock(LocationService.class);
 
 		final FieldmapBlockInfo fieldMapBlockInfo = new FieldmapBlockInfo(FieldMapDataUtil.BLOCK_ID, FieldMapDataUtil.ROWS_IN_BLOCK,
 			FieldMapDataUtil.RANGES_IN_BLOCK, FieldMapDataUtil.NUMBER_OF_ROWS_IN_PLOT, FieldMapDataUtil.PLANTING_ORDER,
@@ -542,14 +497,18 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		final FieldMapTrialInstanceInfo trialInstance = infos.get(0).getDataSet(FieldMapDataUtil.DATASET_ID).getTrialInstances().get(0);
 		trialInstance.setBlockId(null);
 
-		this.manager.setLocationDataManager(locationDataManager);
+		this.manager.setLocationService(locationService);
 
 		try {
-			Mockito.when(locationDataManager.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
+			Mockito.when(locationService.getBlockInformation(FieldMapDataUtil.BLOCK_ID)).thenReturn(fieldMapBlockInfo);
 			this.manager.updateFieldMapWithBlockInformation(infos, false);
 
-			Assert.assertNotNull("Expected maximum number of rows " + trialInstance.getRowsInBlock() + " instead.", trialInstance.getRowsInBlock());
-			Assert.assertNotNull("Expected maximum number of range " + trialInstance.getRangesInBlock() + " instead.", trialInstance.getRangesInBlock());
+			Assert.assertNotNull(
+				"Expected maximum number of rows " + trialInstance.getRowsInBlock() + " instead.",
+				trialInstance.getRowsInBlock());
+			Assert.assertNotNull(
+				"Expected maximum number of range " + trialInstance.getRangesInBlock() + " instead.",
+				trialInstance.getRangesInBlock());
 			Assert.assertEquals("Expected with default value of 1 ", 1, (int) trialInstance.getRowsPerPlot());
 			Assert.assertEquals("Expected with default value of 1", 1, (int) trialInstance.getPlantingOrder());
 			Assert.assertEquals("Expected with default value of 1", 1, (int) trialInstance.getMachineRowCapacity());
@@ -557,43 +516,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		} catch (final MiddlewareQueryException e) {
 			Assert.fail("Expected mocked value to be returned but used the original call for getBlockInformation instead.");
 		}
-	}
-
-	@Test
-	public void testGetStudyType() {
-		try {
-			Assert.assertEquals("Study type returned did not match.", StudyTypeDto.getTrialDto(),
-				this.manager.getStudyType(this.studyReference.getStudyType().getId()));
-		} catch (final MiddlewareQueryException e) {
-			Assert.fail("Unexpected exception: " + e.getMessage());
-		}
-	}
-
-	@Test
-	public void testGetStudyTypeNullEdgeCase() {
-		try {
-			Assert.assertNull(
-				"Expected null return value but was non null.",
-				this.manager.getStudyType(PRESUMABLY_NON_EXISTENT_STUDY_TYPE_ID));
-		} catch (final MiddlewareQueryException e) {
-			Assert.fail("Unexpected exception: " + e.getMessage());
-		}
-	}
-
-	@Test
-	public void testDeleteProgramStudies() throws Exception {
-		final String uniqueId = "100001001001";
-		this.studyTDI.createFolderTestData(uniqueId);
-		this.studyTDI.addTestStudy(uniqueId);
-
-		List<? extends Reference> programStudiesAndFolders = this.manager.getRootFolders(uniqueId);
-		final int sizeBeforeDelete = programStudiesAndFolders.size();
-		this.manager.deleteProgramStudies(uniqueId);
-		programStudiesAndFolders = this.manager.getRootFolders(uniqueId);
-		final int sizeAfterDelete = programStudiesAndFolders.size();
-
-		Assert.assertTrue("The size after the delete should be less than the size before.", sizeAfterDelete < sizeBeforeDelete);
-
 	}
 
 	@Test
@@ -668,26 +590,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(this.studyReference.getName(), studyDetails.getStudyName());
 		Assert.assertEquals(this.studyReference.getStudyType(), studyDetails.getStudyType());
 		this.verifyCommonStudyDetails(studyDetails);
-	}
-
-	@Test
-	public void testGetTrialInstanceNumberByGeolocationId() throws Exception {
-		final Integer studyId = this.studyReference.getId();
-		final Integer dataSetId = this.studyTDI.createEnvironmentDataset(this.crop, studyId, "1", "1");
-		final TrialEnvironments trialEnvironments = this.manager.getTrialEnvironmentsInDataset(dataSetId);
-		Assert.assertNotNull(trialEnvironments.getTrialEnvironments());
-		Assert.assertFalse(trialEnvironments.getTrialEnvironments().isEmpty());
-
-		final String trialInstanceNumberActual =
-			this.manager.getTrialInstanceNumberByGeolocationId(trialEnvironments.getTrialEnvironments().iterator().next().getId());
-		Assert.assertEquals("1", trialInstanceNumberActual);
-
-	}
-
-	@Test
-	public void testGetAllSharedProjectNames() {
-		final List<String> sharedProjectNames = this.manager.getAllSharedProjectNames();
-		Assert.assertNotNull("The shared project names should not be null", sharedProjectNames);
 	}
 
 	@Test
@@ -788,7 +690,9 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertFalse(studyFromDB.getIsLocked());
 		Assert.assertEquals(this.studyReference.getOwnerId(), studyFromDB.getOwnerId());
 		final WorkbenchUser workbenchUser = this.userService.getUserById(this.studyReference.getOwnerId());
-		Assert.assertEquals(workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(), studyFromDB.getOwnerName());
+		Assert.assertEquals(
+			workbenchUser.getPerson().getFirstName() + " " + workbenchUser.getPerson().getLastName(),
+			studyFromDB.getOwnerName());
 	}
 
 	@Test
@@ -860,7 +764,7 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		values.setVariableList(factors);
 		values.setLocationId(this.manager.getExperimentModelSaver().createNewGeoLocation().getLocationId());
 		//Save the experiment
-		experimentModelSaver.addExperiment(crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
+		this.experimentModelSaver.addExperiment(this.crop, 1, ExperimentType.TRIAL_ENVIRONMENT, values);
 
 		final ExperimentModel experiment =
 			this.daoFactory.getExperimentDao().getExperimentByProjectIdAndLocation(1, values.getLocationId());
@@ -949,7 +853,6 @@ public class StudyDataManagerImplTest extends IntegrationTestBase {
 		Assert.assertEquals(newStudyName, project.getName());
 
 	}
-
 
 	@Test
 	public void testIsStudy() {

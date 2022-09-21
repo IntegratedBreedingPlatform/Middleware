@@ -1,0 +1,68 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="cuenyad" id="v20.2.0-1">
+		<preConditions onFail="MARK_RAN">
+				<columnExists tableName="location" columnName="program_uuid_bkp"/>
+        </preConditions>
+		<comment>
+			Delete 'program_uuid_bkp' column of 'location' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE location DROP COLUMN program_uuid_bkp;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cuenyad" id="v20.2.0-2">
+		<preConditions onFail="MARK_RAN">
+				<columnExists tableName="methods" columnName="program_uuid_bkp"/>
+        </preConditions>
+		<comment>
+			Delete 'program_uuid_bkp' column of 'methods' table
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			ALTER TABLE methods DROP COLUMN program_uuid_bkp;
+		</sql>
+	</changeSet>
+
+	<changeSet author="cheryleigh" id="v20.2.0-3">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="external_reference_atributs"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create external_reference_atributs table
+		</comment>
+		<createTable tableName="external_reference_atributs">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="aid" type="int">
+				<constraints nullable="false" foreignKeyName="fk_external_reference_atributs" references="atributs(aid)"/>
+			</column>
+			<column name="reference_id" type="varchar(2000)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="reference_source" type="varchar(255)">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_by" type="int" defaultValue="0">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_date" type="timestamp">
+				<constraints nullable="true"/>
+			</column>
+			<column name="modified_by" type="int">
+				<constraints nullable="true" />
+			</column>
+		</createTable>
+    </changeSet>
+
+</databaseChangeLog>

@@ -1,22 +1,21 @@
 package org.generationcp.middleware.brapi;
 
 import com.google.common.collect.Maps;
-import gherkin.lexer.Da;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.brapi.TrialServiceBrapi;
-import org.generationcp.middleware.api.brapi.TrialServiceBrapiImpl;
 import org.generationcp.middleware.api.brapi.v2.germplasm.ExternalReferenceDTO;
 import org.generationcp.middleware.api.brapi.v2.trial.TrialImportRequestDTO;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.domain.dms.StudySummary;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.DataType;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
+import org.generationcp.middleware.api.role.RoleService;
 import org.generationcp.middleware.pojos.StudyExternalReference;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -39,14 +38,12 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
-import java.util.Set;
 
 public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 
@@ -54,10 +51,13 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 	private TrialServiceBrapi trialServiceBrapi;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
+	private RoleService roleService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
+
+	@Autowired
+	private ProgramService programService;
 
 	private DaoFactory daoFactory;
 	private IntegrationTestDataInitializer testDataInitializer;
@@ -74,7 +74,7 @@ public class TrialServiceBrapiImplTest extends IntegrationTestBase {
 		this.workbenchTestDataUtil.setUpWorkbench();
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
-			this.crop = this.workbenchDataManager.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
+			this.crop = this.programService.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
 		}
 
 		this.testDataInitializer = new IntegrationTestDataInitializer(this.sessionProvder, this.workbenchSessionProvider);

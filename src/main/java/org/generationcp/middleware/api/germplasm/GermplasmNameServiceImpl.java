@@ -13,19 +13,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 @Service
 @Transactional
 public class GermplasmNameServiceImpl implements GermplasmNameService {
 
+	public static final String COMMON_NAMES_PREFERRED_KEY = "PREFERRED NAME";
 	private final DaoFactory daoFactory;
-
-	@Autowired
-	private GermplasmService germplasmService;
 
 	@Autowired
 	private GermplasmNameTypeService germplasmNameTypeService;
@@ -122,6 +124,31 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 	}
 
 	@Override
+	public Map<String, Map<Integer, String>> getGermplasmCommonNamesMap(final ArrayList<Integer> gids) {
+		final Map<String, Map<Integer, String>> map = new LinkedHashMap<>();
+		map.putIfAbsent(COMMON_NAMES_PREFERRED_KEY, new HashMap<>());
+		final List<GermplasmNameDto> names = this.getGermplasmNamesByGids(gids);
+
+		for (final GermplasmNameDto germplasmNameDto : names) {
+			final Integer gid = germplasmNameDto.getGid();
+			final String name = germplasmNameDto.getName();
+			final String nameTypeCode = germplasmNameDto.getNameTypeCode();
+
+			if (germplasmNameDto.isPreferred()) {
+				map.get(COMMON_NAMES_PREFERRED_KEY).put(gid, name);
+			}
+
+			map.putIfAbsent(nameTypeCode, new HashMap<>());
+			map.get(nameTypeCode).put(gid, name);
+		}
+
+		// remove non-common names
+		map.entrySet().removeIf(entry -> entry.getValue().keySet().size() != gids.size());
+
+		return map;
+	}
+
+	@Override
 	public List<String> getExistingGermplasmPUIs(final List<String> germplasmPUIs) {
 		return this.daoFactory.getNameDao().getExistingGermplasmPUIs(germplasmPUIs);
 	}
@@ -136,4 +163,8 @@ public class GermplasmNameServiceImpl implements GermplasmNameService {
 		return this.daoFactory.getNameDao().isLocationUsedInGermplasmName(locationId);
 	}
 
+	@Override
+	public Map<Integer, String> getPreferredNamesByGIDs(final List<Integer> gids) {
+		return this.daoFactory.getNameDao().getPreferredNamesByGIDs(gids);
+	}
 }

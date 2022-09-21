@@ -8,7 +8,6 @@ import org.generationcp.middleware.data.initializer.LocationTestDataInitializer;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Location;
-import org.generationcp.middleware.pojos.LocationDetails;
 import org.hamcrest.MatcherAssert;
 import org.junit.Assert;
 import org.junit.Before;
@@ -38,7 +37,8 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void testGetLocations() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("Country");
-		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		final List<org.generationcp.middleware.api.location.Location> locationList =
+			this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected list of country location size > zero", locationList != null && locationList.size() > 0);
 	}
 
@@ -48,7 +48,8 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationAbbreviations(Collections.singletonList(location.getLabbr()));
-		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		final List<org.generationcp.middleware.api.location.Location> locationList =
+			this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected to return filtered list by abbreviation", locationList != null && locationList.size() > 0);
 	}
 
@@ -56,7 +57,8 @@ public class LocationDAOTest extends IntegrationTestBase {
 	public void testGetLocationsWithWrongLocType() {
 		final LocationSearchRequest locationSearchRequest = new LocationSearchRequest();
 		locationSearchRequest.setLocationTypeName("DUMMYLOCTYPE");
-		final List<org.generationcp.middleware.api.location.Location> locationList = this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
+		final List<org.generationcp.middleware.api.location.Location> locationList =
+			this.locationDAO.getLocations(locationSearchRequest, new PageRequest(0, 10));
 		MatcherAssert.assertThat("Expected list of location size equals to zero", locationList != null && locationList.size() == 0);
 
 	}
@@ -79,43 +81,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetLocationDetails() {
-
-		final int ltype = 405;
-		final String labbr = "ABCDEFG";
-		final String lname = "MyLocation";
-
-		// Country ID 1 = "Democratic Republic of Afghanistan"
-		final int cntryid = 1;
-		final Country country = this.countryDAO.getById(cntryid);
-		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
-		location.setCountry(country);
-		// Province Badakhshan
-		final int provinceId = 1001;
-		final Location province = this.locationDAO.getById(provinceId);
-		location.setProvince(province);
-		location.setLdefault(Boolean.FALSE);
-
-		this.locationDAO.saveOrUpdate(location);
-
-		final List<LocationDetails> result = this.locationDAO.getLocationDetails(location.getLocid(), 0, Integer.MAX_VALUE);
-		final LocationDetails locationDetails = result.get(0);
-
-		Assert.assertEquals(lname, locationDetails.getLocationName());
-		Assert.assertEquals(location.getLocid(), locationDetails.getLocid());
-		Assert.assertEquals(ltype, locationDetails.getLtype().intValue());
-		Assert.assertEquals(labbr, locationDetails.getLocationAbbreviation());
-		Assert.assertEquals(cntryid, locationDetails.getCntryid().intValue());
-		Assert.assertEquals(province.getLname(), locationDetails.getProvinceName());
-		Assert.assertEquals(provinceId, locationDetails.getProvinceId().intValue());
-
-		Assert.assertEquals("COUNTRY", locationDetails.getLocationType());
-		Assert.assertEquals("-", locationDetails.getLocationDescription());
-		Assert.assertEquals("Democratic Republic of Afghanistan", locationDetails.getCountryFullName());
-
-	}
-
-	@Test
 	public void testGetLocationDTO() {
 
 		final Country country = this.countryDAO.getById(1);
@@ -129,7 +94,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 
 		final Location province = this.locationDAO.getById(1001);
 		location.setProvince(province);
-		location.setLdefault(Boolean.FALSE);
 
 		this.locationDAO.saveOrUpdate(location);
 
@@ -140,86 +104,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 		Assert.assertThat(locationDTO.getName(), is(location.getLname()));
 		Assert.assertThat(locationDTO.getAbbreviation(), is(location.getLabbr()));
 		Assert.assertThat(locationDTO.getCountryId(), is(country.getCntryid()));
-	}
-
-	@Test
-	public void testGetFilteredLocations() {
-
-		final int ltype = 405;
-		final String labbr = "ABCDEFG";
-		final String lname = "MyLocation";
-
-		// Country ID 1 = "Democratic Republic of Afghanistan"
-		final int cntryid = 1;
-		final Country country = this.countryDAO.getById(cntryid);
-		final Location location = LocationTestDataInitializer.createLocation(null, lname, ltype, labbr);
-		location.setCountry(country);
-		// Province Badakhshan
-		final int provinceId = 1001;
-		final Location province = this.locationDAO.getById(provinceId);
-		location.setProvince(province);
-		location.setLdefault(Boolean.FALSE);
-
-		this.locationDAO.saveOrUpdate(location);
-
-		final List<LocationDetails> result = this.locationDAO.getFilteredLocations(cntryid, ltype, lname);
-		final LocationDetails locationDetails = result.get(0);
-
-		Assert.assertEquals(lname, locationDetails.getLocationName());
-		Assert.assertEquals(location.getLocid(), locationDetails.getLocid());
-		Assert.assertEquals(ltype, locationDetails.getLtype().intValue());
-		Assert.assertEquals(labbr, locationDetails.getLocationAbbreviation());
-		Assert.assertEquals(country.getCntryid(), locationDetails.getCntryid());
-		Assert.assertEquals(country.getIsoabbr(), locationDetails.getCountryName());
-		Assert.assertEquals(province.getLname(), locationDetails.getProvinceName());
-		Assert.assertEquals(provinceId, locationDetails.getProvinceId().intValue());
-
-		Assert.assertEquals("COUNTRY", locationDetails.getLocationType());
-		Assert.assertEquals("-", locationDetails.getLocationDescription());
-		Assert.assertEquals("Democratic Republic of Afghanistan", locationDetails.getCountryFullName());
-
-	}
-
-	@Test
-	public void testGetFilteredLocationsFilterByCountryId() {
-
-		final Integer cntryid = 1;
-
-		final List<LocationDetails> locationDetailsList = this.locationDAO.getFilteredLocations(cntryid, null, null);
-
-		// Verify that all locationDetails returned have cntryId = 1
-		for (final LocationDetails locationDetails : locationDetailsList) {
-			Assert.assertEquals(cntryid, locationDetails.getCntryid());
-		}
-
-	}
-
-	@Test
-	public void testGetFilteredLocationsFilterByLocationType() {
-
-		final Integer ltype = 405;
-
-		final List<LocationDetails> locationDetailsList = this.locationDAO.getFilteredLocations(null, ltype, null);
-
-		// Verify that all locationDetails returned have cntryId = 1
-		for (final LocationDetails locationDetails : locationDetailsList) {
-			Assert.assertEquals(ltype, locationDetails.getLtype());
-		}
-
-	}
-
-	@Test
-	public void testGetFilteredLocationsFilterByLocationName() {
-
-		final String lname = "Unknown";
-
-		final List<LocationDetails> locationDetailsList = this.locationDAO.getFilteredLocations(null, null, lname);
-
-		// Verify that all locationDetails returned have cntryId = 1
-		for (final LocationDetails locationDetails : locationDetailsList) {
-			Assert.assertEquals(lname, locationDetails.getLocationName());
-		}
-
 	}
 
 	@Test
@@ -317,7 +201,6 @@ public class LocationDAOTest extends IntegrationTestBase {
 		final Country country = this.countryDAO.getById(1);
 		final Location location = LocationTestDataInitializer.createLocation(null, lname, 0, labbr);
 		location.setCountry(country);
-		location.setLdefault(Boolean.FALSE);
 		this.locationDAO.saveOrUpdate(location);
 
 		return location;

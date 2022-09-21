@@ -84,11 +84,13 @@ public class WorkbookTestDataInitializer {
 	public static final String STUDY = "STUDY";
 	public static final String TRIAL = "TRIAL";
 	public static final String ENTRY = "ENTRY";
+	public static final String ENTRY_TYPE = "ENTRY_TYPE";
 	public static final String PLOT = "PLOT";
 	public static final String OBS_UNIT_ID = "OBS_UNIT_ID";
 	// DATA TYPES
-	public static final String CHAR = "C";
+	public static final String CHAR = "T";
 	public static final String NUMERIC = "N";
+	public static final String CATEGORICA = "C";
 
 	// FACTORS
 	public static final String GID = "GID";
@@ -208,9 +210,25 @@ public class WorkbookTestDataInitializer {
 			WorkbookTestDataInitializer.LOCATION_ID_1));
 		WorkbookTestDataInitializer.createFactors(workbook, true, hasMultipleLocations, studyNo);
 		WorkbookTestDataInitializer.createConstants(workbook);
+		WorkbookTestDataInitializer.createEntryDetails(workbook);
 		WorkbookTestDataInitializer.createVariates(workbook, isForMeansDataset);
 		WorkbookTestDataInitializer.createObservations(workbook, noOfObservations, hasMultipleLocations, studyNo, isForMeansDataset);
 		return workbook;
+	}
+
+	private static void createEntryDetails(final Workbook workbook) {
+		final List<MeasurementVariable> entryDetails = new ArrayList<>();
+
+		entryDetails.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), WorkbookTestDataInitializer.ENTRY,
+			"The germplasm entry number", WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
+			WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.STUDY,
+			WorkbookTestDataInitializer.ENTRY, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.ENTRY_DETAIL, false));
+
+		entryDetails.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), WorkbookTestDataInitializer.ENTRY_TYPE,
+			"The germplasm entry type", WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
+			WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.CATEGORICA, WorkbookTestDataInitializer.STUDY,
+			WorkbookTestDataInitializer.ENTRY_TYPE, TermId.CATEGORICAL_VARIATE.getId(), PhenotypicType.ENTRY_DETAIL, false));
+		workbook.setEntryDetails(entryDetails);
 	}
 
 	public static void setTrialObservations(final Workbook workbook) {
@@ -356,9 +374,15 @@ public class WorkbookTestDataInitializer {
 		// Entry Factors
 		if (withEntry) {
 			factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.ENTRY_NO.getId(), WorkbookTestDataInitializer.ENTRY,
-					"The germplasm entry number", WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
-					WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.STUDY,
-					WorkbookTestDataInitializer.ENTRY, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.GERMPLASM, false));
+				"The germplasm entry number", WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
+				WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.NUMERIC, WorkbookTestDataInitializer.STUDY,
+				WorkbookTestDataInitializer.ENTRY, TermId.NUMERIC_VARIABLE.getId(), PhenotypicType.ENTRY_DETAIL, false));
+
+			factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.ENTRY_TYPE.getId(), WorkbookTestDataInitializer.ENTRY_TYPE,
+				"The germplasm entry type", WorkbookTestDataInitializer.NUMBER, WorkbookTestDataInitializer.ENUMERATED,
+				WorkbookTestDataInitializer.GERMPLASM_ENTRY, WorkbookTestDataInitializer.CATEGORICA, WorkbookTestDataInitializer.STUDY,
+				WorkbookTestDataInitializer.ENTRY_TYPE, TermId.CATEGORICAL_VARIATE.getId(), PhenotypicType.ENTRY_DETAIL, false));
+
 		}
 
 		factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.GID.getId(), WorkbookTestDataInitializer.GID,
@@ -375,12 +399,6 @@ public class WorkbookTestDataInitializer {
 				"The pedigree string of the germplasm", WorkbookTestDataInitializer.PEDIGREE_STRING, WorkbookTestDataInitializer.ASSIGNED,
 				WorkbookTestDataInitializer.CROSS_HISTORY, WorkbookTestDataInitializer.CHAR, WorkbookTestDataInitializer.STUDY,
 				WorkbookTestDataInitializer.ENTRY, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.GERMPLASM, false));
-
-		factors.add(
-				WorkbookTestDataInitializer.createMeasurementVariable(TermId.SEED_SOURCE.getId(), WorkbookTestDataInitializer.SEED_SOURCE,
-						"The seed source of the germplasm", WorkbookTestDataInitializer.TEXT, WorkbookTestDataInitializer.SELECTED,
-						WorkbookTestDataInitializer.SEED_SOURCE, WorkbookTestDataInitializer.CHAR, WorkbookTestDataInitializer.STUDY,
-						WorkbookTestDataInitializer.ENTRY, TermId.CHARACTER_VARIABLE.getId(), PhenotypicType.GERMPLASM, false));
 
 		factors.add(WorkbookTestDataInitializer.createMeasurementVariable(TermId.PLOT_NO.getId(), WorkbookTestDataInitializer.PLOT,
 				"Plot number ", WorkbookTestDataInitializer.NESTED_NUMBER, WorkbookTestDataInitializer.ENUMERATED,
@@ -480,8 +498,6 @@ public class WorkbookTestDataInitializer {
 					WorkbookTestDataInitializer.G_NAMES[i], TermId.DESIG.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.CROSS, "-", TermId.CROSS.getId(),
 					workbook.getFactors()));
-			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.SOURCE, "-",
-					TermId.SEED_SOURCE.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.PLOT, String.valueOf(i),
 					TermId.PLOT_NO.getId(), workbook.getFactors()));
 			dataList.add(WorkbookTestDataInitializer.createMeasurementData(WorkbookTestDataInitializer.OBS_UNIT_ID, "PLOT010203P"+ i,
@@ -543,6 +559,8 @@ public class WorkbookTestDataInitializer {
 			variable.setVariableType(VariableType.ENVIRONMENT_DETAIL);
 		} else if (variable.getRole() == PhenotypicType.GERMPLASM) {
 			variable.setVariableType(VariableType.GERMPLASM_DESCRIPTOR);
+		} else if (variable.getRole() == PhenotypicType.ENTRY_DETAIL) {
+				variable.setVariableType(VariableType.ENTRY_DETAIL);
 		} else if (variable.getRole() == PhenotypicType.TRIAL_DESIGN) {
 			variable.setVariableType(VariableType.EXPERIMENTAL_DESIGN);
 		} else if (variable.getRole() == PhenotypicType.VARIATE && isAnalysisVariable) {
@@ -642,13 +660,11 @@ public class WorkbookTestDataInitializer {
 			WorkbookTestDataInitializer.NLLP, WorkbookTestDataInitializer.LNAME + " 1", WorkbookTestDataInitializer.LABBR1,
 			WorkbookTestDataInitializer.SNL3ID, WorkbookTestDataInitializer.SNL2ID, new Location(WorkbookTestDataInitializer.SNL1ID),
 			new Country(WorkbookTestDataInitializer.CNTRYID), WorkbookTestDataInitializer.LRPLCE);
-		location1.setLdefault(Boolean.FALSE);
 		locations.add(location1);
 		final Location location2 = new Location(WorkbookTestDataInitializer.LOCATION_ID_2, WorkbookTestDataInitializer.LTYPE,
 			WorkbookTestDataInitializer.NLLP, WorkbookTestDataInitializer.LNAME + " 2", WorkbookTestDataInitializer.LABBR2,
 			WorkbookTestDataInitializer.SNL3ID, WorkbookTestDataInitializer.SNL2ID, new Location(WorkbookTestDataInitializer.SNL1ID),
 				new Country(WorkbookTestDataInitializer.CNTRYID), WorkbookTestDataInitializer.LRPLCE);
-		location2.setLdefault(Boolean.FALSE);
 		locations.add(location2);
 		return locations;
 	}

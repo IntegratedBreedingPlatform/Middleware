@@ -11,6 +11,7 @@
 
 package org.generationcp.middleware.operation.saver;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.generationcp.middleware.dao.LocationDAO;
 import org.generationcp.middleware.domain.dms.DMSVariableType;
@@ -45,6 +46,8 @@ import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.workbench.CropType;
+import org.generationcp.middleware.service.api.PedigreeService;
+import org.generationcp.middleware.util.CrossExpansionProperties;
 import org.generationcp.middleware.util.TimerWatch;
 import org.generationcp.middleware.util.Util;
 import org.hibernate.FlushMode;
@@ -61,6 +64,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 // Assumptions - can be added to validations
@@ -91,6 +95,12 @@ public class WorkbookSaver extends Saver {
 
 	@Resource
 	private StudyDataManager studyDataManager;
+
+	@Resource
+	private PedigreeService pedigreeService;
+
+	@Resource
+	private CrossExpansionProperties crossExpansionProperties;
 
 	public WorkbookSaver() {
 
@@ -144,6 +154,8 @@ public class WorkbookSaver extends Saver {
 			this.getVariableTypeListTransformer().transform(workbook.getNonTrialFactors(), programUUID);
 		effectVariables
 			.addAll(this.getVariableTypeListTransformer().transform(workbook.getVariates(), effectVariables.size() + 1, programUUID));
+		effectVariables
+			.addAll(this.getVariableTypeListTransformer().transform(workbook.getEntryDetails(), effectVariables.size() + 1, programUUID));
 
 		// -- headers
 		headerMap.put(WorkbookSaver.TRIALHEADERS, trialHeaders);
@@ -277,6 +289,7 @@ public class WorkbookSaver extends Saver {
 			workbook.setFactors(null);
 			workbook.setStudyDetails(null);
 			workbook.setVariates(null);
+			workbook.setEntryDetails(null);
 		} else {
 			workbook.getStudyDetails().setId(studyId);
 			workbook.setTrialDatasetId(environmentDatasetId);
@@ -843,29 +856,35 @@ public class WorkbookSaver extends Saver {
 		final List<StockModel> studyGermplasm = this.daoFactory.getStockDao().getStocksForStudy(studyId);
 		final Map<String, Integer> entryNoStockIdMap = studyGermplasm.stream().collect(Collectors.toMap(StockModel::getUniqueName, StockModel::getStockId));
 
-
-		List<Integer> variableIndexesList = new ArrayList<>();
-		// we get the indexes so that in the next rows we dont need to compare
-		// anymore per row
-		if (workbook.getObservations() != null && !workbook.getObservations().isEmpty()) {
-			final MeasurementRow row = workbook.getObservations().get(0);
-			variableIndexesList = this.getVariableListTransformer().transformStockIndexes(row, effectVariables, trialHeaders);
-		}
-
 		if (workbook.getObservations() != null) {
 			final Session activeSession = this.getActiveSession();
 			final FlushMode existingFlushMode = activeSession.getFlushMode();
 			activeSession.setFlushMode(FlushMode.MANUAL);
+
+			final Set<Integer> newStocksGids = workbook.getObservations()
+				.stream()
+				.filter(row -> !entryNoStockIdMap.keySet().contains(row.getMeasurementData(TermId.ENTRY_NO.getId())))
+				.map(row -> row.getMeasurementData(TermId.GID.getId()).getValue())
+				.filter(NumberUtils::isNumber)
+				.map(Integer::valueOf)
+				.collect(Collectors.toSet());
+
+			final Map<Integer, String> preferredNamesByGIDs = new HashMap<>();
+			final Map<Integer, String> pedigreeByGids = new HashMap<>();
+			if (!newStocksGids.isEmpty()) {
+				preferredNamesByGIDs.putAll(this.daoFactory.getNameDao().getPreferredNamesByGIDs(new ArrayList<>(newStocksGids)));
+				pedigreeByGids.putAll(this.pedigreeService.getCrossExpansionsBulk(newStocksGids, 1, this.crossExpansionProperties));
+			}
+
 			try {
 				for (final MeasurementRow row : workbook.getObservations()) {
 
 					final VariableList stock = this.getVariableListTransformer()
-						.transformStockOptimize(variableIndexesList, row, effectVariables, trialHeaders);
+						.transformStockOptimize(row, effectVariables, trialHeaders);
 					final String entryNumber = this.getEntryNumber(stock);
 					Integer stockId = entryNoStockIdMap.get(entryNumber);
-
 					if (stockId == null) {
-						stockId = this.getStockSaver().saveStock(studyId, stock);
+						stockId = this.getStockSaver().saveStock(studyId, stock, preferredNamesByGIDs, pedigreeByGids);
 						entryNoStockIdMap.put(String.valueOf(entryNumber), stockId);
 					} else {
 						this.getStockSaver().saveOrUpdateStock(stock, stockId);

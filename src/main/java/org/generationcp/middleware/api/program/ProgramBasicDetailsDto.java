@@ -8,17 +8,22 @@ public class ProgramBasicDetailsDto {
 
 	private String name;
 	private String startDate;
+	private Integer breedingLocationDefaultId;
+	private Integer storageLocationDefaultId;
 
 	public ProgramBasicDetailsDto() {
 	}
 
-	public ProgramBasicDetailsDto(final String name, final String startDate) {
+	public ProgramBasicDetailsDto(final String name, final String startDate, final Integer breedingLocationDefaultId,
+		final Integer storageLocationDefaultId) {
 		this.name = name;
 		this.startDate = startDate;
+		this.breedingLocationDefaultId = breedingLocationDefaultId;
+		this.storageLocationDefaultId = storageLocationDefaultId;
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(final String name) {
@@ -26,15 +31,32 @@ public class ProgramBasicDetailsDto {
 	}
 
 	public String getStartDate() {
-		return startDate;
+		return this.startDate;
 	}
 
 	public void setStartDate(final String startDate) {
 		this.startDate = startDate;
 	}
 
+	public Integer getBreedingLocationDefaultId() {
+		return this.breedingLocationDefaultId;
+	}
+
+	public void setBreedingLocationDefaultId(final Integer breedingLocationDefaultId) {
+		this.breedingLocationDefaultId = breedingLocationDefaultId;
+	}
+
+	public Integer getStorageLocationDefaultId() {
+		return this.storageLocationDefaultId;
+	}
+
+	public void setStorageLocationDefaultId(final Integer storageLocationDefaultId) {
+		this.storageLocationDefaultId = storageLocationDefaultId;
+	}
+
 	public boolean allAttributesNull() {
-		return this.getName() == null && this.getStartDate() == null;
+		return this.getName() == null && this.getStartDate() == null && this.getBreedingLocationDefaultId() == null
+			&& this.storageLocationDefaultId == null;
 	}
 
 	@Override

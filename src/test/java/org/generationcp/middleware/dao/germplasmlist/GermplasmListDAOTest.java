@@ -1,25 +1,23 @@
 
 package org.generationcp.middleware.dao.germplasmlist;
 
+import org.generationcp.middleware.GermplasmTestDataGenerator;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchRequest;
 import org.generationcp.middleware.api.germplasmlist.search.GermplasmListSearchResponse;
 import org.generationcp.middleware.data.initializer.GermplasmListTestDataInitializer;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
-import org.generationcp.middleware.domain.dms.StudyReference;
 import org.generationcp.middleware.domain.sqlfilter.SqlTextFilter;
 import org.generationcp.middleware.exceptions.MiddlewareQueryException;
+import org.generationcp.middleware.manager.DaoFactory;
 import org.generationcp.middleware.manager.Operation;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.GermplasmDataManager;
 import org.generationcp.middleware.manager.api.GermplasmListManager;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.GermplasmList;
 import org.generationcp.middleware.pojos.GermplasmListData;
-import org.generationcp.middleware.pojos.ListMetadata;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.workbench.CropType;
 import org.generationcp.middleware.pojos.workbench.Project;
@@ -41,7 +39,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -55,7 +52,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	private static final String TEST_GERMPLASM_LIST_DESC = "TestGermplasmListDesc";
 	private static final long TEST_GERMPLASM_LIST_DATE = 20141103;
 	private static final String TEST_GERMPLASM_LIST_TYPE_LST = "LST";
-	private static final String TEST_GERMPLASM_LIST_TYPE_FOLDER = "FOLDER";
 	private static final String TEST_LIST_DESCRIPTION = "Test List Description";
 	private static final String TEST_LIST_NOTES = "Test List Notes";
 	private static final String PARENT_FOLDER_NAME = "Integration Test";
@@ -68,25 +64,20 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	private GermplasmListManager manager;
 
 	@Autowired
-	private GermplasmDataManager dataManager;
-
-	@Autowired
 	private OntologyDataManager ontologyManager;
-
-	@Autowired
-	private LocationDataManager locationManager;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
 
 	private GermplasmListDAO germplasmListDAO;
 	private GermplasmListDataDAO germplasmListDataDAO;
+	private GermplasmTestDataGenerator germplasmTestDataGenerator;
 
 	private GermplasmList list;
 	private Germplasm germplasm;
 	private Project commonTestProject;
 
-	private StudyReference studyReference;
+	private DaoFactory daoFactory;
 	private StudyTestDataInitializer studyTDI;
 
 	private CropType cropType;
@@ -103,8 +94,11 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 	@Before
 	public void setUp() throws Exception {
+		this.daoFactory = new DaoFactory(this.sessionProvder);
+
 		this.germplasmListDAO = new GermplasmListDAO();
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
+		this.germplasmTestDataGenerator = new GermplasmTestDataGenerator(this.daoFactory);
 
 		this.germplasmListDataDAO = new GermplasmListDataDAO();
 		this.germplasmListDataDAO.setSession(this.sessionProvder.getSession());
@@ -129,9 +123,8 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 
 		final StudyDataManagerImpl studyDataManager = new StudyDataManagerImpl(this.sessionProvder);
 		this.studyTDI = new StudyTestDataInitializer(studyDataManager, this.ontologyManager, this.commonTestProject,
-			this.locationManager, this.sessionProvder);
+			this.sessionProvder);
 
-		this.studyReference = this.studyTDI.addTestStudy("ABCD");
 
 	}
 
@@ -219,19 +212,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	}
 
 	@Test
-	public void testGetAllListMetadata() {
-		final List<GermplasmList> germplasmLists = this.germplasmListDAO.getListsByProgramUUID(PROGRAM_UUID);
-
-		final List<Integer> germplasmListIds = new ArrayList<>();
-		for (final GermplasmList germplasmList : germplasmLists) {
-			germplasmListIds.add(germplasmList.getId());
-		}
-
-		final List<Object[]> listMetadata = this.germplasmListDAO.getAllListMetadata(germplasmListIds);
-		Assert.assertEquals("Meta data size must be the same as the list size", listMetadata.size(), germplasmLists.size());
-	}
-
-	@Test
 	public void testGetListsByProgramUUID() {
 		final List<GermplasmList> germplasmLists = this.germplasmListDAO.getListsByProgramUUID(PROGRAM_UUID);
 		final GermplasmList resultList = germplasmLists.get(0);
@@ -257,22 +237,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final int result =
 			(int) this.germplasmListDAO.countByGIDandProgramUUID(this.germplasm.getGid(), PROGRAM_UUID);
 		Assert.assertEquals("The count should be 1", 1, result);
-	}
-
-	@Test
-	public void testGetGermplasmFolderMetadata() {
-		// Create germplasm test folder
-		final GermplasmList testFolder =
-			GermplasmListTestDataInitializer.createGermplasmListTestData("TestFolder", "Test Folder Description",
-				TEST_GERMPLASM_LIST_DATE, TEST_GERMPLASM_LIST_TYPE_FOLDER,
-				this.findAdminUser(), GermplasmList.Status.FOLDER.getCode(), PROGRAM_UUID, null);
-		this.saveGermplasmList(testFolder);
-		final Map<Integer, ListMetadata> result =
-			this.germplasmListDAO.getGermplasmFolderMetadata(Collections.singletonList(testFolder.getId()));
-		final ListMetadata germplasmFolderMetadata = result.get(testFolder.getId());
-		Assert.assertNotNull("Newly created folder should not be null", germplasmFolderMetadata);
-		Assert.assertEquals("Newly created folder should have zero children",
-			new Integer(0), germplasmFolderMetadata.getNumberOfChildren());
 	}
 
 	@Test
@@ -880,7 +844,6 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		assertThat(this.germplasmListDAO.searchGermplasmList(germplasmListSearchRequest4, new PageRequest(0, 50), PROGRAM_UUID),
 			hasSize(0));
 
-
 		final GermplasmList list2 = this.saveGermplasmList(
 			GermplasmListTestDataInitializer.createGermplasmListTestData("New List 1", TEST_LIST_DESCRIPTION,
 				20151103, TEST_GERMPLASM_LIST_TYPE_LST,
@@ -925,7 +888,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		final Germplasm germplasm =
 			new Germplasm(null, UNKNOWN_GENERATIVE_METHOD_ID, 0, 0, 0, 0, 0, Util.getCurrentDateAsIntegerValue(),
 				name);
-		this.dataManager.addGermplasm(germplasm, name, this.cropType);
+		this.germplasmTestDataGenerator.addGermplasm(germplasm, name, this.cropType);
 		return germplasm;
 	}
 
@@ -938,8 +901,8 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 	}
 
 	private GermplasmListData createGermplasmListData(final GermplasmList germplasmList, final Germplasm germplasm) {
-		final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(), 1, "EntryCode",
-			"SeedSource", "Germplasm Name 5", "GroupName", 0, 99995);
+		final GermplasmListData germplasmListData = new GermplasmListData(null, germplasmList, germplasm.getGid(),
+			1, "SeedSource", "GroupName", 0, 99995);
 		this.manager.addGermplasmListData(germplasmListData);
 		return germplasmListData;
 	}
@@ -955,7 +918,7 @@ public class GermplasmListDAOTest extends IntegrationTestBase {
 		return new PageRequest(0, 50, new Sort(new Sort.Order(direction, property)));
 	}
 
-	private Date convertLongToDate(long date) {
+	private Date convertLongToDate(final long date) {
 		return Date.valueOf(LocalDate.parse(String.valueOf(date), DATE_FORMATTER));
 	}
 

@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import org.apache.commons.lang.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
 import org.generationcp.middleware.WorkbenchTestDataUtil;
+import org.generationcp.middleware.api.program.ProgramService;
 import org.generationcp.middleware.dao.germplasmlist.GermplasmListDAO;
 import org.generationcp.middleware.data.initializer.StudyTestDataInitializer;
 import org.generationcp.middleware.domain.dms.DatasetReference;
@@ -13,10 +14,8 @@ import org.generationcp.middleware.domain.etl.Workbook;
 import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.manager.StudyDataManagerImpl;
-import org.generationcp.middleware.manager.api.LocationDataManager;
 import org.generationcp.middleware.manager.api.OntologyDataManager;
 import org.generationcp.middleware.manager.api.StudyDataManager;
-import org.generationcp.middleware.manager.api.WorkbenchDataManager;
 import org.generationcp.middleware.operation.builder.DataSetBuilder;
 import org.generationcp.middleware.operation.builder.WorkbookBuilder;
 import org.generationcp.middleware.pojos.workbench.CropType;
@@ -35,13 +34,10 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 	private OntologyDataManager ontologyManager;
 
 	@Autowired
-	private WorkbenchDataManager workbenchDataManager;
-
-	@Autowired
-	private LocationDataManager locationManager;
-
-	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private ProgramService programService;
 
 	@Autowired
 	private WorkbenchTestDataUtil workbenchTestDataUtil;
@@ -74,14 +70,14 @@ public class FieldbookServiceTest extends IntegrationTestBase {
 
 		if (this.commonTestProject == null) {
 			this.commonTestProject = this.workbenchTestDataUtil.getCommonTestProject();
-			this.crop = this.workbenchDataManager.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
+			this.crop = this.programService.getProjectByUuid(this.commonTestProject.getUniqueID()).getCropType();
 		}
 
 		this.germplasmListDAO = new GermplasmListDAO();
 		this.germplasmListDAO.setSession(this.sessionProvder.getSession());
 
 		this.studyTDI = new StudyTestDataInitializer(this.manager, this.ontologyManager, this.commonTestProject,
-			this.locationManager, this.sessionProvder);
+			this.sessionProvder);
 
 		this.studyReference = this.studyTDI.addTestStudy();
 		this.studyTDI.createEnvironmentDataset(this.crop, this.studyReference.getId(), "1", String.valueOf(TermId.SEASON_DRY.getId()));

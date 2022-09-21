@@ -56,9 +56,6 @@ public class Progenitor extends AbstractEntity implements Serializable {
 	@Column(name = "pid")
 	private Integer progenitorGid;
 
-	/**
-	 * Don't use it. This constructor is required by hibernate.
-	 */
 	@OneToOne(fetch = FetchType.LAZY)
 	@NotFound(action = NotFoundAction.IGNORE)
 	@JoinColumn(name = "pid", insertable = false, updatable = false)

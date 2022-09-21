@@ -11,6 +11,8 @@
 
 package org.generationcp.middleware.dao.oms;
 
+import org.apache.commons.collections.map.LinkedMap;
+import org.apache.commons.collections.map.MultiKeyMap;
 import org.generationcp.middleware.dao.GenericDAO;
 import org.generationcp.middleware.domain.dms.ValueReference;
 import org.generationcp.middleware.domain.oms.TermId;
@@ -259,11 +261,11 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 			final Set<String> allCategories = new HashSet<>();
 			allCategories.addAll(this.getScaleCategoriesUsedInObservations(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedAsConditions(scaleId));
-			allCategories.addAll(this.getScaleCategoriesUsedAsGermplasmDescriptors(scaleId));
+			allCategories.addAll(this.getScaleCategoriesUsedInStudyEntries(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedAsTrialDesignFactors(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedAsEnvironmentFactors(scaleId));
 			allCategories.addAll(this.getScaleCategoriesUsedInAttributes(scaleId));
-			allCategories.addAll(this.getScaleCategoriesUsedInListEntryDetails(scaleId));
+			allCategories.addAll(this.getScaleCategoriesUsedInListEntries(scaleId));
 			return allCategories;
 		} catch (final HibernateException e) {
 			final String message = "Error in getCategoriesInUse in CVTermRelationshipDao: "
@@ -278,8 +280,10 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		final SQLQuery query = this.getSession().createSQLQuery(
 			"SELECT DISTINCT v.name category "
 				+ " FROM cvterm_relationship scale_values "
-				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id and scale_values.subject_id = :scaleId and scale_values.type_id = " + TermId.HAS_VALUE.getId()
-				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE.getId()
+				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id and scale_values.subject_id = :scaleId and scale_values.type_id = "
+				+ TermId.HAS_VALUE.getId()
+				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = "
+				+ TermId.HAS_SCALE.getId()
 				+ " WHERE EXISTS ( "
 				+ "     SELECT 1    	 "
 				+ "     FROM atributs a "
@@ -289,18 +293,18 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 		return query.list();
 	}
 
-	public List<String> getScaleCategoriesUsedInListEntryDetails(final int scaleId) {
+	public List<String> getScaleCategoriesUsedInListEntries(final int scaleId) {
 		final SQLQuery query = this.getSession().createSQLQuery(
-			"SELECT DISTINCT v.name category "
+			"SELECT DISTINCT v.name as category "
 				+ " FROM cvterm_relationship scale_values "
-				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id and scale_values.subject_id = :scaleId and scale_values.type_id = "
+				+ " INNER JOIN cvterm v ON v.cvterm_id = scale_values.object_id AND scale_values.subject_id = :scaleId AND scale_values.type_id = "
 				+ TermId.HAS_VALUE.getId()
-				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id and var.type_id = " + TermId.HAS_SCALE
+				+ " INNER JOIN cvterm_relationship var ON var.object_id = scale_values.subject_id AND var.type_id = " + TermId.HAS_SCALE
 				.getId()
 				+ " WHERE EXISTS ( "
 				+ "     SELECT 1    	 "
 				+ "     FROM list_data_details a "
-				+ "     WHERE a.cvalue_id = v.cvterm_id and a.variable_id = var.subject_id ) ");
+				+ "     WHERE a.cvalue_id = v.cvterm_id AND a.variable_id = var.subject_id ) ");
 		query.setParameter("scaleId", scaleId);
 		query.addScalar("category", CVTermRelationshipDao.STRING);
 		return query.list();
@@ -318,7 +322,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 				+ "     FROM phenotype p "
 				+ "     INNER JOIN nd_experiment ep on ep.nd_experiment_id = p.nd_experiment_id "
 				+ "     INNER JOIN project pr ON pr.project_id = ep.project_id and pr.deleted = 0 "
-				+ "     WHERE cvalue_id = v.cvterm_id)"
+				+ "     WHERE p.cvalue_id = v.cvterm_id)"
 				+ "");
 		query.setParameter("scaleId", scaleId);
 		query.addScalar("category", CVTermRelationshipDao.STRING);
@@ -345,7 +349,7 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 	}
 
 	@SuppressWarnings("unchecked")
-	protected List<String> getScaleCategoriesUsedAsGermplasmDescriptors(final int scaleId) {
+	protected List<String> getScaleCategoriesUsedInStudyEntries(final int scaleId) {
 		final SQLQuery query = this.getSession().createSQLQuery(
 			"SELECT categ.name category "
 				+ " FROM cvterm_relationship scale_values "
@@ -356,9 +360,9 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 				+ " AND EXISTS ( "
 				+ "      SELECT 1 "
 				+ "      FROM stockprop sp "
-				+ "      INNER JOIN nd_experiment ep on ep.stock_id = sp.stock_id "
-				+ "      INNER JOIN project pr ON pr.project_id =ep.project_id and pr.deleted = 0 "
-				+ "      WHERE sp.type_id = var.subject_id and sp.value = categ.cvterm_id)");
+				+ "      INNER JOIN stock st ON st.stock_id = sp.stock_id "
+				+ "      INNER JOIN project pr ON pr.project_id = st.project_id AND pr.deleted = 0 "
+				+ "      WHERE sp.type_id = var.subject_id and sp.cvalue_id = categ.cvterm_id)");
 		query.setParameter("scaleId", scaleId);
 		query.addScalar("category", CVTermRelationshipDao.STRING);
 		return query.list();
@@ -433,6 +437,36 @@ public class CVTermRelationshipDao extends GenericDAO<CVTermRelationship, Intege
 			}
 		}
 		return map;
+	}
+
+	public MultiKeyMap retrieveAnalysisMethodsOfTraits(final List<Integer> traitVariableIds,
+		final List<Integer> analysisMethodIds) {
+		try {
+			final String sqlQuery = "select\n"
+				+ "cr.subject_id as originalVariableId,\n"
+				+ "cr.object_id as analysisVariableId,\n"
+				+ "mr.object_id as analysisVariableMethodId\n"
+				+ "from cvterm_relationship cr\n"
+				+ "INNER JOIN cvterm_relationship mr ON cr.object_id = mr.subject_id AND mr.type_id = " + TermId.HAS_METHOD.getId()
+				+ " AND mr.object_id in (:analysisMethodIds)\n"
+				+ "WHERE cr.type_id = " + TermId.HAS_ANALYSIS_VARIABLE.getId() + " and cr.subject_id IN (:traitVariableIds)";
+
+			final SQLQuery query = this.getSession().createSQLQuery(sqlQuery);
+			query.setParameterList("traitVariableIds", traitVariableIds);
+			query.setParameterList("analysisMethodIds", analysisMethodIds);
+			query.setResultTransformer(AliasToEntityMapResultTransformer.INSTANCE);
+
+			final MultiKeyMap returnValue = MultiKeyMap.decorate(new LinkedMap());
+			final List<Map<String, Integer>> results = query.list();
+			for (final Map<String, Integer> row : results) {
+				returnValue.put(row.get("originalVariableId"), row.get("analysisVariableMethodId"), row.get("analysisVariableId"));
+			}
+			return returnValue;
+
+		} catch (final HibernateException e) {
+			throw new MiddlewareQueryException("Error with retrieveAnalysisMethodsOfTraits=" + traitVariableIds
+				+ ", " + analysisMethodIds + " query from CVTermRelationship: " + e.getMessage(), e);
+		}
 	}
 
 }

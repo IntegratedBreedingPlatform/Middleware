@@ -4,6 +4,7 @@ import org.generationcp.middleware.api.germplasmlist.GermplasmListColumnDTO;
 import org.generationcp.middleware.api.germplasmlist.GermplasmListMeasurementVariableDTO;
 import org.generationcp.middleware.constant.ColumnLabels;
 import org.generationcp.middleware.domain.dms.ValueReference;
+import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.domain.ontology.Variable;
 import org.generationcp.middleware.domain.ontology.VariableType;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
@@ -35,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -150,15 +152,6 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			return this.transformDefaultStaticColumns();
 		}
 
-		// Check if there are only entry details columns
-		final List<Integer> entryDetailsColumnIds = this.getEntryDetailsColumnsIds(view);
-		// The user only added entry details to the view, so we provide a default view with static columns plus these entry details columns
-		if (view.size() == entryDetailsColumnIds.size()) {
-			final List<GermplasmListMeasurementVariableDTO> defaultStaticColumns = this.transformDefaultStaticColumns();
-			final List<GermplasmListMeasurementVariableDTO> variableColumns = this.getVariableColumns(entryDetailsColumnIds, programUUID);
-			return Stream.concat(defaultStaticColumns.stream(), variableColumns.stream()).collect(toList());
-		}
-
 		final List<GermplasmListMeasurementVariableDTO> header = new ArrayList<>();
 		final List<Integer> staticIds = view
 			.stream()
@@ -201,7 +194,10 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 			.collect(toList());
 		final List<GermplasmListMeasurementVariableDTO> variableColumns = this.getVariableColumns(variableIds, programUUID);
 		if (!CollectionUtils.isEmpty(variableColumns)) {
-			header.addAll(variableColumns);
+			final Map<Integer, GermplasmListMeasurementVariableDTO> columnsIndexedByTermId =
+				variableColumns.stream().collect(Collectors.toMap(GermplasmListMeasurementVariableDTO::getTermId, standardVariable -> standardVariable));
+			header.add(0, columnsIndexedByTermId.remove(TermId.ENTRY_NO.getId()));
+			header.addAll(columnsIndexedByTermId.values());
 		}
 		return header;
 	}
@@ -260,8 +256,31 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	}
 
 	@Override
+	public List<Integer> getGidsByListId(final Integer listId) {
+		return this.daoFactory.getGermplasmListDataDAO().getGidsByListId(listId);
+	}
+
+	@Override
 	public List<Integer> getListDataIdsByListId(final Integer listId) {
 		return this.daoFactory.getGermplasmListDataDAO().getListDataIdsByListId(listId);
+	}
+
+	@Override
+	public void saveDefaultView(final GermplasmList list) {
+		// Forcing add ENTRY_NO variable.
+		// It is particular case because is required after the migration of ENTRY_NO as a entry detail variable.
+		final GermplasmListDataView germplasmListDataView =
+			new GermplasmListDataView.GermplasmListDataVariableViewBuilder(list, TermId.ENTRY_NO.getId(),
+				VariableType.ENTRY_DETAIL.getId()).build();
+		this.daoFactory.getGermplasmListDataViewDAO().save(germplasmListDataView);
+
+		this.getDefaultViewColumns()
+			.stream()
+			.forEach(column -> {
+				final GermplasmListDataView view =
+					new GermplasmListDataView.GermplasmListDataStaticViewBuilder(list, column.getTermId()).build();
+				this.daoFactory.getGermplasmListDataViewDAO().save(view);
+			});
 	}
 
 	private void addParentsFromPedigreeTable(final Set<Integer> gids, final List<GermplasmListDataSearchResponse> response) {
@@ -327,7 +346,7 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 	}
 
 	private List<GermplasmListDataViewModel> transformDefaultView() {
-		return this.getDefaultColumns()
+		return this.getDefaultViewColumns()
 			.stream()
 			.map(column -> GermplasmListDataViewModel.buildStaticGermplasmListDataViewModel(column.getTermId()))
 			.collect(toList());
@@ -338,35 +357,19 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		if (CollectionUtils.isEmpty(view)) {
 			return this.getDefaultColumnIds();
 		}
-		final List<Integer> selectedColumnIds = view
-			.stream()
+		return view.stream()
 			.map(GermplasmListDataView::getColumnId)
 			.collect(toList());
-
-		final List<Integer> entryDetailsColumnsIds = this.getEntryDetailsColumnsIds(view);
-		// Check if there are only entry details added. If it's the case, add the default columns
-		if (view.size() == entryDetailsColumnsIds.size()) {
-			selectedColumnIds.addAll(this.getDefaultColumnIds());
-		}
-		return selectedColumnIds;
 	}
 
 	private List<Integer> getDefaultColumnIds() {
-		return this.getDefaultColumns()
+		return this.getDefaultViewColumns()
 			.stream()
 			.map(GermplasmListStaticColumns::getTermId)
 			.collect(toList());
 	}
 
-	private List<GermplasmListMeasurementVariableDTO> transformDefaultStaticColumns() {
-		return this.getDefaultColumns()
-			.stream()
-			.map(column -> new GermplasmListMeasurementVariableDTO(column.getTermId(), column.getName(), column.name(),
-				GermplasmListColumnCategory.STATIC))
-			.collect(toList());
-	}
-
-	private List<GermplasmListStaticColumns> getDefaultColumns() {
+	private List<GermplasmListStaticColumns> getDefaultViewColumns() {
 		if (this.defaultColumns == null) {
 			this.defaultColumns = this.daoFactory.getGermplasmListDataDefaultViewDAO()
 				.getAll()
@@ -378,11 +381,11 @@ public class GermplasmListDataServiceImpl implements GermplasmListDataService {
 		return this.defaultColumns;
 	}
 
-	private List<Integer> getEntryDetailsColumnsIds(final List<GermplasmListDataView> view) {
-		return view
+	private List<GermplasmListMeasurementVariableDTO> transformDefaultStaticColumns() {
+		return this.getDefaultViewColumns()
 			.stream()
-			.filter(GermplasmListDataView::isEntryDetailColumn)
-			.map(GermplasmListDataView::getCvtermId)
+			.map(column -> new GermplasmListMeasurementVariableDTO(column.getTermId(), column.getName(), column.name(),
+				GermplasmListColumnCategory.STATIC))
 			.collect(toList());
 	}
 

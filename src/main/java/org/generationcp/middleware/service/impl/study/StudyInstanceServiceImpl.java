@@ -3,6 +3,7 @@ package org.generationcp.middleware.service.impl.study;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
+import org.generationcp.middleware.api.location.LocationDTO;
 import org.generationcp.middleware.dao.dms.ExperimentDao;
 import org.generationcp.middleware.dao.dms.GeolocationDao;
 import org.generationcp.middleware.dao.dms.GeolocationPropertyDao;
@@ -15,7 +16,6 @@ import org.generationcp.middleware.domain.oms.TermId;
 import org.generationcp.middleware.enumeration.DatasetTypeEnum;
 import org.generationcp.middleware.hibernate.HibernateSessionProvider;
 import org.generationcp.middleware.manager.DaoFactory;
-import org.generationcp.middleware.pojos.Location;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
 import org.generationcp.middleware.pojos.dms.Geolocation;
 import org.generationcp.middleware.pojos.dms.GeolocationProperty;
@@ -69,7 +69,8 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 	}
 
 	@Override
-	public List<StudyInstance> createStudyInstances(final CropType crop, final int studyId, final int datasetId,
+	public List<StudyInstance> createStudyInstances(
+		final CropType crop, final int studyId, final int datasetId, final int locationId,
 		final Integer numberOfInstancesToGenerate) {
 		Preconditions.checkArgument(numberOfInstancesToGenerate > 0);
 
@@ -81,15 +82,15 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 		final List<StudyInstance> studyInstances = new ArrayList<>();
 		final boolean hasExperimentalDesign = this.experimentDesignService.getStudyExperimentDesignTypeTermId(studyId).isPresent();
 		int instancesGenerated = 0;
-		// The default value of an instance's locationOptional name is "Unspecified Location"
-		final Optional<Location> locationOptional = this.daoFactory.getLocationDAO().getUnspecifiedLocation();
 
-		if (locationOptional.isPresent()) {
+		final LocationDTO locationDTO = this.daoFactory.getLocationDAO().getLocationDTO(locationId);
+
+		if (locationDTO != null) {
 			while (instancesGenerated < numberOfInstancesToGenerate) {
 				final Geolocation geolocation = this.createNextGeolocation(instanceNumbers, hasExperimentalDesign);
 
 				final GeolocationProperty locationGeolocationProperty =
-					new GeolocationProperty(geolocation, String.valueOf(locationOptional.get().getLocid()), 1, TermId.LOCATION_ID.getId());
+					new GeolocationProperty(geolocation, String.valueOf(locationDTO.getId()), 1, TermId.LOCATION_ID.getId());
 				geolocation.setProperties(Lists.newArrayList(locationGeolocationProperty));
 				this.daoFactory.getGeolocationDao().save(geolocation);
 
@@ -102,9 +103,9 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				final StudyInstance studyInstance =
 					new StudyInstance(geolocation.getLocationId(), instanceNumber, false, false, false, true);
 
-				studyInstance.setLocationId(locationOptional.get().getLocid());
-				studyInstance.setLocationName(locationOptional.get().getLname());
-				studyInstance.setLocationAbbreviation(locationOptional.get().getLabbr());
+				studyInstance.setLocationId(locationDTO.getId());
+				studyInstance.setLocationName(locationDTO.getName());
+				studyInstance.setLocationAbbreviation(locationDTO.getAbbreviation());
 				studyInstance.setInstanceId(geolocation.getLocationId());
 				studyInstance.setLocationDescriptorDataId(locationGeolocationProperty.getGeolocationPropertyId());
 				studyInstance.setExperimentId(experimentModel.getNdExperimentId());
@@ -157,6 +158,9 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 			environmentsToDelete.stream().mapToInt(o -> Integer.valueOf(o.getDescription())).boxed()
 				.collect(Collectors.toList());
 
+		// Delete files associated to the instances
+		this.daoFactory.getFileMetadataDAO().removeFiles(null, environmentDatasetId, null, instanceIds, null);
+
 		//Update StudyExperimentGeolocation
 		this.daoFactory.getExperimentDao().updateStudyExperimentGeolocationIfNecessary(studyId, instanceIds);
 
@@ -178,7 +182,7 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 				allEnvironments.stream()
 					.filter(instance -> !instanceNumbersToDelete.contains(Integer.valueOf(instance.getDescription()))
 						&& Integer.valueOf(instance.getDescription()) > startingInstanceNumber).collect(
-					Collectors.toList());
+						Collectors.toList());
 			// Unfortunately, not possible in MySQL 5 to do batch update as row_number function is only available in MySQL 8
 			// Also tried using MySQL variable assignment like @instance_number:=@instance_number + 1 but it causes Hibernate error
 			// as it's being treated as named parameter. Hopefully can be optimized when we upgrade Hibernate and/or MySQL version
@@ -245,14 +249,16 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 		// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 		this.datasetService
-			.updateDependentPhenotypesStatusByGeolocation(instanceObservationData.getInstanceId(),
+			.updateDependentPhenotypesStatusByGeolocation(
+				instanceObservationData.getInstanceId(),
 				Arrays.asList(instanceObservationData.getVariableId()));
 
 		return instanceObservationData;
 	}
 
 	@Override
-	public Optional<InstanceObservationData> getInstanceObservation(final Integer instanceId, final Integer observationDataId,
+	public Optional<InstanceObservationData> getInstanceObservation(
+		final Integer instanceId, final Integer observationDataId,
 		final Integer variableId) {
 
 		final ExperimentModel experimentModel =
@@ -286,7 +292,8 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 			geolocationDao.save(geolocation);
 			// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 			this.datasetService
-				.updateDependentPhenotypesStatusByGeolocation(instanceDescriptorData.getInstanceId(),
+				.updateDependentPhenotypesStatusByGeolocation(
+					instanceDescriptorData.getInstanceId(),
 					Arrays.asList(instanceDescriptorData.getVariableId()));
 		} else {
 			final GeolocationProperty property = new GeolocationProperty(geolocation, value, 1, instanceDescriptorData.getVariableId());
@@ -313,14 +320,16 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 
 		// Change the status to OUT_OF_SYNC of calculated traits that depend on the changed/updated variable.
 		this.datasetService
-			.updateDependentPhenotypesStatusByGeolocation(instanceDescriptorData.getInstanceId(),
+			.updateDependentPhenotypesStatusByGeolocation(
+				instanceDescriptorData.getInstanceId(),
 				Arrays.asList(instanceDescriptorData.getVariableId()));
 
 		return instanceDescriptorData;
 	}
 
 	@Override
-	public Optional<InstanceDescriptorData> getInstanceDescriptorData(final Integer instanceId, final Integer descriptorDataId,
+	public Optional<InstanceDescriptorData> getInstanceDescriptorData(
+		final Integer instanceId, final Integer descriptorDataId,
 		final Integer variableId) {
 
 		final Geolocation geolocation = this.daoFactory.getGeolocationDao().getById(instanceId);
@@ -344,6 +353,11 @@ public class StudyInstanceServiceImpl extends Service implements StudyInstanceSe
 	public Optional<Integer> getDatasetIdForInstanceIdAndDatasetType(final Integer instanceId, final DatasetTypeEnum datasetTypeEnum) {
 		return
 			Optional.ofNullable(this.daoFactory.getDmsProjectDAO().getDatasetIdByEnvironmentIdAndDatasetType(instanceId, datasetTypeEnum));
+	}
+
+	@Override
+	public void deleteInstanceGeoreferences(final Integer instanceId) {
+		this.daoFactory.getExperimentDao().deleteGeoreferencesByExperimentTypeAndInstanceId(ExperimentType.PLOT.getTermId(), instanceId);
 	}
 
 	private Geolocation createNextGeolocation(final List<Integer> instanceNumbers, final boolean hasExperimentalDesign) {

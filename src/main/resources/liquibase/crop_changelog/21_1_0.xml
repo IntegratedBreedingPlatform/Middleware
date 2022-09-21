@@ -1,0 +1,101 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="aldrin" id="v21.1.0-1">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<sqlCheck expectedResult="0">
+					SELECT COUNT(1) FROM methods WHERE mtype = 'GEN' AND (prefix IS NULL OR TRIM(prefix) = '');
+				</sqlCheck>
+			</not>
+		</preConditions>
+		<comment>
+			Set the default prefix value ('IB') of GENERATIVE breeding methods with empty prefix
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			UPDATE methods
+			SET prefix = 'IB'
+			WHERE mtype = 'GEN' AND (prefix IS NULL OR TRIM(prefix) = '');
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v21.1.0-2">
+		<preConditions onFail="MARK_RAN">
+			<not>
+				<tableExists tableName="program_location_default"/>
+			</not>
+		</preConditions>
+		<comment>
+			Create program_location_default table
+		</comment>
+		<createTable tableName="program_location_default">
+			<column name="id" type="int" autoIncrement="true">
+				<constraints primaryKey="true"/>
+			</column>
+			<column name="program_uuid" type="varchar(255)">
+				<constraints nullable="false" unique="true"/>
+			</column>
+			<column name="location_id" type="INT(11)">
+				<constraints nullable="false" foreignKeyName="fk_program_location_default" references="location(locid)"/>
+			</column>
+			<column name="created_date" type="timestamp" defaultValueComputed="CURRENT_TIMESTAMP">
+				<constraints nullable="false"/>
+			</column>
+			<column name="created_by" type="int" defaultValue="0">
+				<constraints nullable="false" />
+			</column>
+			<column name="modified_date" type="timestamp">
+				<constraints nullable="true"/>
+			</column>
+			<column name="modified_by" type="int">
+				<constraints nullable="true" />
+			</column>
+		</createTable>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v21.1.0-3">
+		<preConditions onFail="MARK_RAN">
+			<sqlCheck expectedResult="0">
+				SELECT COUNT(1) FROM location where labbr = 'NOLOC';
+			</sqlCheck>
+		</preConditions>
+		<comment>
+			Reinsert Unspecified location if it was deleted.
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			INSERT INTO `location` (`ltype`, `nllp`, `lname`, `labbr`, `snl3id`, `snl2id`, `snl1id`, `cntryid`, `lrplce`, `nnpid`)
+			VALUES('410', '1', 'Unspecified Location', 'NOLOC', '0', '0', '0', '0', '0', '0');
+		</sql>
+	</changeSet>
+
+	<changeSet author="mderamos" id="v21.1.0-4">
+		<preConditions onFail="MARK_RAN">
+			<and>
+				<tableExists tableName="program_location_default"/>
+				<not>
+					<sqlCheck expectedResult="0">
+						SELECT COUNT(1) FROM workbench.workbench_project project
+						INNER JOIN workbench.workbench_crop crop
+						WHERE crop.crop_name = project.crop_type
+						AND crop.db_name = DATABASE()
+					</sqlCheck>
+				</not>
+			</and>
+		</preConditions>
+		<comment>
+			Populate program_location_default for existing programs, set unspecified location as default
+		</comment>
+		<sql dbms="mysql" splitStatements="true">
+			set @unspecified_location_id = (select locid from location where labbr = 'NOLOC');
+
+			INSERT INTO program_location_default(program_uuid, location_id)
+			SELECT project.project_uuid, @unspecified_location_id FROM workbench.workbench_project project
+			INNER JOIN workbench.workbench_crop crop
+			WHERE crop.crop_name = project.crop_type
+			AND crop.db_name = DATABASE()
+		</sql>
+	</changeSet>
+</databaseChangeLog>

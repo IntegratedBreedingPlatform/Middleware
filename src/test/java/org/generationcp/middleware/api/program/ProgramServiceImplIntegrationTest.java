@@ -81,7 +81,7 @@ public class ProgramServiceImplIntegrationTest extends IntegrationTestBase {
 		programBasicDetailsDto.setStartDate(date);
 		programService.addProgram(CROP, programBasicDetailsDto);
 
-		final Optional<ProgramDTO> programDTOOptional = programService.getProgram(CROP, programName);
+		final Optional<ProgramDTO> programDTOOptional = programService.getProgramByCropAndName(CROP, programName);
 		assertTrue(programDTOOptional.isPresent());
 		assertEquals(programDTOOptional.get().getStartDate(), Util.tryParseDate(date, Util.FRONTEND_DATE_FORMAT));
 	}

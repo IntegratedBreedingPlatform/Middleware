@@ -25,6 +25,7 @@ public class BreedingMethodSearchRequest {
 	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
 	private Date methodDateTo;
 	private List<Integer> methodClassIds = new ArrayList<>();
+	private List<Integer> snameTypeIds = new ArrayList<>();
 
 	public BreedingMethodSearchRequest() {
 
@@ -63,7 +64,7 @@ public class BreedingMethodSearchRequest {
 	}
 
 	public SqlTextFilter getNameFilter() {
-		return nameFilter;
+		return this.nameFilter;
 	}
 
 	public void setNameFilter(final SqlTextFilter nameFilter) {
@@ -71,7 +72,7 @@ public class BreedingMethodSearchRequest {
 	}
 
 	public Boolean getFilterFavoriteProgramUUID() {
-		return filterFavoriteProgramUUID;
+		return this.filterFavoriteProgramUUID;
 	}
 
 	public void setFilterFavoriteProgramUUID(final Boolean filterFavoriteProgramUUID) {
@@ -79,7 +80,7 @@ public class BreedingMethodSearchRequest {
 	}
 
 	public String getDescription() {
-		return description;
+		return this.description;
 	}
 
 	public void setDescription(final String description) {
@@ -87,7 +88,7 @@ public class BreedingMethodSearchRequest {
 	}
 
 	public List<String> getGroups() {
-		return groups;
+		return this.groups;
 	}
 
 	public void setGroups(final List<String> groups) {
@@ -95,7 +96,7 @@ public class BreedingMethodSearchRequest {
 	}
 
 	public Date getMethodDateFrom() {
-		return methodDateFrom;
+		return this.methodDateFrom;
 	}
 
 	public void setMethodDateFrom(final Date methodDateFrom) {
@@ -103,7 +104,7 @@ public class BreedingMethodSearchRequest {
 	}
 
 	public Date getMethodDateTo() {
-		return methodDateTo;
+		return this.methodDateTo;
 	}
 
 	public void setMethodDateTo(final Date methodDateTo) {
@@ -111,11 +112,19 @@ public class BreedingMethodSearchRequest {
 	}
 
 	public List<Integer> getMethodClassIds() {
-		return methodClassIds;
+		return this.methodClassIds;
 	}
 
 	public void setMethodClassIds(final List<Integer> methodClassIds) {
 		this.methodClassIds = methodClassIds;
+	}
+
+	public List<Integer> getSnameTypeIds() {
+		return this.snameTypeIds;
+	}
+
+	public void setSnameTypeIds(final List<Integer> snameTypeIds) {
+		this.snameTypeIds = snameTypeIds;
 	}
 
 	@Override
