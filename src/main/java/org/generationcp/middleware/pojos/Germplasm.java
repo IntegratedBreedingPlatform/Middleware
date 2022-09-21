@@ -444,12 +444,6 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		this.deleted = false;
 	}
 
-	public Germplasm(final Integer gid, final Integer methodId, final Integer gnpgs, final Integer gpid1, final Integer gpid2,
-		final Integer lgid, final Integer locationId, final Integer gdate, final Name preferredName) {
-		// gref =0, grplce = 0, mgid = 0
-		this(gid, gnpgs, gpid1, gpid2, lgid, locationId, gdate, 0, 0, 0, preferredName, null, new Method(methodId));
-	}
-
 	//TODO: cleanup - remove it.
 	@Deprecated
 	public Germplasm(final Integer gid) {
@@ -918,10 +912,8 @@ public class Germplasm extends AbstractEntity implements Serializable, Cloneable
 		try {
 			germplasm = (Germplasm) super.clone();
 		} catch (final CloneNotSupportedException e) {
-			germplasm = new Germplasm(this.gid, null, this.gnpgs, this.gpid1, this.gpid2,
-				this.lgid, this.locationId, this.gdate, this.preferredName);
-			germplasm.setMethod((Method) this.method.clone());
-			//TODO Complete with other objects
+			germplasm =  new Germplasm(this.getGid(), this.gnpgs, this.gpid1, this.gpid2, this.lgid, this.locationId, this.gdate,
+				this.referenceId, this.grplce, this.mgid, this.preferredName, this.preferredAbbreviation, this.method);
 		}
 		return germplasm;
 	}
