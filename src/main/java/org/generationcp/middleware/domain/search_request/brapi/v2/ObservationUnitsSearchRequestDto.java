@@ -21,6 +21,8 @@ public class ObservationUnitsSearchRequestDto extends SearchRequestDto {
 	private List<String> externalReferenceIDs;
 	private List<String> externalReferenceSources;
 
+	private Boolean includeObservations = false;
+
 	public ObservationUnitsSearchRequestDto() {
 		this.locationDbIds = Lists.newArrayList();
 		this.observationUnitDbIds = Lists.newArrayList();
@@ -102,6 +104,14 @@ public class ObservationUnitsSearchRequestDto extends SearchRequestDto {
 
 	public void setExternalReferenceSources(final List<String> externalReferenceSources) {
 		this.externalReferenceSources = externalReferenceSources;
+	}
+
+	public Boolean getIncludeObservations() {
+		return this.includeObservations;
+	}
+
+	public void setIncludeObservations(final Boolean includeObservations) {
+		this.includeObservations = includeObservations;
 	}
 
 	@Override

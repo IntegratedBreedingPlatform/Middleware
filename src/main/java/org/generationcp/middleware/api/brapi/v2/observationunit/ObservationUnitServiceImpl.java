@@ -165,19 +165,30 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			final ObservationSearchRequestDto observationSearchRequest = new ObservationSearchRequestDto();
 			observationSearchRequest.setObservationUnitDbIds(
 				dtos.stream().map(ObservationUnitDto::getObservationUnitDbId).collect(Collectors.toList()));
-			final List<ObservationDto> observationDtos = this.observationService.searchObservations(observationSearchRequest, null);
-			final Map<String, List<PhenotypeSearchObservationDTO>> phenotypeObservationsMap = observationDtos.stream()
-				.map(observation -> new PhenotypeSearchObservationDTO(observation))
-				.collect(groupingBy(PhenotypeSearchObservationDTO::getObservationUnitDbId));
 
 			for (final ObservationUnitDto dto : dtos) {
 				dto.setExternalReferences(externalReferencesMap.get(dto.getExperimentId().toString()));
 				dto.getObservationUnitPosition().setObservationLevelRelationships(observationRelationshipsMap.get(dto.getExperimentId()));
-				dto.setObservations(phenotypeObservationsMap.get(dto.getObservationUnitDbId()));
+			}
+
+			if (requestDTO.getIncludeObservations()) {
+				this.addObservationsPerObservationUnit(observationSearchRequest, dtos);
 			}
 		}
 
 		return dtos;
+	}
+
+	private void addObservationsPerObservationUnit(final ObservationSearchRequestDto observationSearchRequest,
+		final List<ObservationUnitDto> observationUnitDtos) {
+		final List<ObservationDto> observationDtos = this.observationService.searchObservations(observationSearchRequest, null);
+		final Map<String, List<PhenotypeSearchObservationDTO>> phenotypeObservationsMap = observationDtos.stream()
+			.map(observation -> new PhenotypeSearchObservationDTO(observation))
+			.collect(groupingBy(PhenotypeSearchObservationDTO::getObservationUnitDbId));
+
+		for (final ObservationUnitDto dto : observationUnitDtos) {
+			dto.setObservations(phenotypeObservationsMap.get(dto.getObservationUnitDbId()));
+		}
 	}
 
 	@Override

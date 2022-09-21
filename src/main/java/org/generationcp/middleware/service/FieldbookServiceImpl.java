@@ -387,7 +387,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 			for (final Pair<Germplasm, GermplasmListData> pair : listDataItems) {
 
 				final Germplasm germplasm = pair.getLeft();
-				germplasmIdMethodIdMap.put(germplasm.getGid(), germplasm.getMethodId());
+				germplasmIdMethodIdMap.put(germplasm.getGid(), germplasm.getMethod().getMid());
 				final GermplasmListData germplasmListData = pair.getRight();
 
 				germplasmListData.setGid(germplasm.getGid());
@@ -777,7 +777,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		if (deleteFieldAndBlock && CollectionUtils.isNotEmpty(instancesWithSharedBlock)) {
-			List<Geolocation> geolocationList = this.daoFactory.getGeolocationDao().getByIds(instancesWithSharedBlock);
+			final List<Geolocation> geolocationList = this.daoFactory.getGeolocationDao().getByIds(instancesWithSharedBlock);
 			return geolocationList.stream().map(Geolocation::getDescription).collect(Collectors.toList());
 		}
 

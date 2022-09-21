@@ -262,7 +262,7 @@ public class GermplasmServiceImpl implements GermplasmService {
 		final Germplasm germplasm = new Germplasm();
 
 		final Method method = methodsMapByAbbr.get(germplasmDto.getBreedingMethodAbbr().toUpperCase());
-		germplasm.setMethodId(method.getMid());
+		germplasm.setMethod(method);
 
 		germplasm.setGnpgs(PedigreeUtil.calculateGnpgs(method, germplasmDto.getProgenitor1(), germplasmDto.getProgenitor2(), null));
 		final Multimap<String, Object[]> progenitorsErrors = ArrayListMultimap.create();
@@ -561,12 +561,11 @@ public class GermplasmServiceImpl implements GermplasmService {
 			final Method breedingMethod = breedingMethodOptional.get();
 
 			// Only update the method if the new method has the same type as the old method.
-			germplasm.setMethodId(breedingMethod.getMid());
+			germplasm.setMethod(breedingMethod);
 
 			// Update the progenitors based on the new method
 			PedigreeUtil.assignProgenitors(germplasm, progenitorsMapByGid, conflictErrors, femaleParentGid,
-				maleParentGid,
-				breedingMethod, otherProgenitors);
+				maleParentGid, breedingMethod, otherProgenitors);
 		}
 
 	}
@@ -927,7 +926,6 @@ public class GermplasmServiceImpl implements GermplasmService {
 		if (this.isPedigreeUpdateDetected(germplasmBeforeUpdate, methodFinal, gpid1Final, gpid2Final, otherProgenitorsFinal)) {
 			final Multimap<String, Object[]> progenitorsErrors = ArrayListMultimap.create();
 			germplasm.setMethod(methodFinal);
-			germplasm.setMethodId(methodFinal.getMid());
 			final Map<String, Germplasm> progenitorsMap = this.loadProgenitors(gpid1Final, gpid2Final);
 			PedigreeUtil.setProgenitors(germplasm, methodFinal, String.valueOf(gpid1Final), String.valueOf(gpid2Final), progenitorsMap,
 				progenitorsErrors);

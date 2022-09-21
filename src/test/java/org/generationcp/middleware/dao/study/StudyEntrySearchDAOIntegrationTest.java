@@ -26,6 +26,7 @@ import org.generationcp.middleware.manager.ontology.daoElements.VariableFilter;
 import org.generationcp.middleware.pojos.Country;
 import org.generationcp.middleware.pojos.Germplasm;
 import org.generationcp.middleware.pojos.Location;
+import org.generationcp.middleware.pojos.Method;
 import org.generationcp.middleware.pojos.Name;
 import org.generationcp.middleware.pojos.dms.DmsProject;
 import org.generationcp.middleware.pojos.dms.ExperimentModel;
@@ -54,6 +55,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -453,6 +455,60 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 			.getStudyEntries(studyEntrySearchDto, this.entryVariables, null);
 		Assert.assertEquals(filteredCount, studyEntryDtosFilterByDesignation.size());
 		assertThat(studyEntryDtosFilterByDesignation.get(0).getDesignation(), is(studyEntryDtosAscending.get(0).getDesignation()));
+	}
+
+	@Test
+	public void testGetStudyEntries_FilterByBreedingMethod() {
+		// Assert ORDER descending
+		final List<StudyEntryDto> studyEntryDtosDescending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), null),
+				this.entryVariables,
+				new PageRequest(0, 20, new Sort(Sort.Direction.DESC, "BREEDING_METHOD_ABBR")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosDescending.size());
+		Assert.assertTrue(
+			Ordering.natural().reverse().isOrdered(
+				studyEntryDtosDescending.stream().map(e -> {
+						System.out.println(e.getProperties().get(TermId.BREEDING_METHOD_ABBR.getId()).getValue());
+						return e.getProperties().get(TermId.BREEDING_METHOD_ABBR.getId()).getValue();
+					})
+					.collect(Collectors.toList())));
+
+		// Assert ORDER ascending
+		final List<StudyEntryDto> studyEntryDtosAscending = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(
+				new StudyEntrySearchDto(this.project.getProjectId(), null),
+				this.entryVariables,
+				new PageRequest(0, 20, new Sort(Sort.Direction.ASC, "BREEDING_METHOD_ABBR")));
+		Assert.assertEquals(TEST_COUNT, studyEntryDtosAscending.size());
+		Assert.assertTrue(
+			Ordering.natural().isOrdered(
+				studyEntryDtosAscending.stream().map(e -> e.getProperties().get(TermId.BREEDING_METHOD_ABBR.getId()).getValue())
+					.collect(Collectors.toList())));
+
+		final String breedingMethodAbbrSearchString =
+			studyEntryDtosAscending.get(0).getProperties().get(TermId.BREEDING_METHOD_ABBR.getId()).getValue();
+
+		// Filter by Breeding method abbreviation
+		final StudyEntrySearchDto.Filter filterByBreedingMethodAbbr = new StudyEntrySearchDto.Filter();
+		filterByBreedingMethodAbbr.setFilteredTextValues(new HashMap<String, String>() {{
+			this.put(String.valueOf(TermId.BREEDING_METHOD_ABBR.getId()),
+				breedingMethodAbbrSearchString);
+		}});
+		filterByBreedingMethodAbbr.setVariableTypeMap(new HashMap<String, String>() {{
+			this.put(String.valueOf(TermId.BREEDING_METHOD_ABBR.getId()), VariableType.GERMPLASM_DESCRIPTOR.name());
+		}});
+		final StudyEntrySearchDto studyEntrySearchDto =
+			new StudyEntrySearchDto(this.project.getProjectId(), filterByBreedingMethodAbbr);
+		final long filteredCount =
+			this.daoFactory.getStudyEntrySearchDAO().countFilteredStudyEntries(studyEntrySearchDto, this.entryVariables);
+		assertEquals(TEST_COUNT, filteredCount);
+		final List<StudyEntryDto> studyEntryDtosFilterByBreedingMethodAbbr = this.daoFactory.getStudyEntrySearchDAO()
+			.getStudyEntries(studyEntrySearchDto, this.entryVariables, null);
+		Assert.assertEquals(filteredCount, studyEntryDtosFilterByBreedingMethodAbbr.size());
+		assertThat(studyEntryDtosFilterByBreedingMethodAbbr.get(0).getProperties().get(TermId.BREEDING_METHOD_ABBR.getId()).getValue(),
+			is(breedingMethodAbbrSearchString));
+
 	}
 
 	@Test
@@ -1182,6 +1238,7 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 		final List<MeasurementVariable> variables = new ArrayList<>();
 
 		final CVTerm immediateSourceTerm = this.daoFactory.getCvTermDao().getById(TermId.IMMEDIATE_SOURCE_NAME.getId());
+		final CVTerm breedingMethodAbbr = this.daoFactory.getCvTermDao().getById(TermId.BREEDING_METHOD_ABBR.getId());
 		variables.add(
 			this.addVariableToProject(null, immediateSourceTerm, project, VariableType.GERMPLASM_DESCRIPTOR, DataType.CHARACTER_VARIABLE,
 				1));
@@ -1202,7 +1259,11 @@ public class StudyEntrySearchDAOIntegrationTest extends IntegrationTestBase {
 				DataType.CHARACTER_VARIABLE,
 				6));
 		variables.add(
-			this.addVariableToProject(null, designationTerm, project, VariableType.GERMPLASM_DESCRIPTOR, DataType.CHARACTER_VARIABLE, 7));
+			this.addVariableToProject(null, breedingMethodAbbr, project, VariableType.GERMPLASM_DESCRIPTOR, DataType.CHARACTER_VARIABLE,
+				7));
+		variables.add(
+			this.addVariableToProject(null, designationTerm, project, VariableType.GERMPLASM_DESCRIPTOR, DataType.CHARACTER_VARIABLE,
+				8));
 
 		return variables;
 	}
