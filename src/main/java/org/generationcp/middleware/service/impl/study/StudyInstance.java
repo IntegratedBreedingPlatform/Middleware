@@ -15,12 +15,11 @@ public class StudyInstance {
 	private String locationAbbreviation;
 	private String customLocationAbbreviation;
 	private int instanceNumber;
-	private boolean hasFieldmap;
 	private Boolean hasGeoJSON;
 	/**
 	 * has X/Y coordinates
 	 */
-	private Boolean hasFieldLayout;
+	private boolean hasFieldLayout;
 	private Boolean hasInventory;
 	private Boolean hasExperimentalDesign;
 	private Boolean hasMeasurements;
@@ -31,12 +30,11 @@ public class StudyInstance {
 
 	}
 
-	public StudyInstance(final int instanceId, final int instanceNumber, final boolean hasFieldmap,
+	public StudyInstance(final int instanceId, final int instanceNumber,
 		final Boolean hasExperimentalDesign,
 		final Boolean hasMeasurements, final Boolean canBeDeleted) {
 		this.instanceId = instanceId;
 		this.instanceNumber = instanceNumber;
-		this.hasFieldmap = hasFieldmap;
 		this.hasExperimentalDesign = hasExperimentalDesign;
 		this.hasMeasurements = hasMeasurements;
 		this.canBeDeleted = canBeDeleted;
@@ -44,14 +42,13 @@ public class StudyInstance {
 
 	public StudyInstance(final int instanceId, final Integer locationId, final String locationName,
 		final String locationAbbreviation,
-		final int instanceNumber, final String customLocationAbbreviation, final boolean hasFieldMap) {
+		final int instanceNumber, final String customLocationAbbreviation) {
 		this.instanceId = instanceId;
 		this.locationId = locationId;
 		this.locationName = locationName;
 		this.locationAbbreviation = locationAbbreviation;
 		this.instanceNumber = instanceNumber;
 		this.customLocationAbbreviation = customLocationAbbreviation;
-		this.hasFieldmap = hasFieldMap;
 	}
 
 	public int getInstanceId() {
@@ -100,14 +97,6 @@ public class StudyInstance {
 
 	public void setCustomLocationAbbreviation(final String customLocationAbbreviation) {
 		this.customLocationAbbreviation = customLocationAbbreviation;
-	}
-
-	public boolean isHasFieldmap() {
-		return this.hasFieldmap;
-	}
-
-	public void setHasFieldmap(final boolean hasFieldmap) {
-		this.hasFieldmap = hasFieldmap;
 	}
 
 	public Boolean getHasGeoJSON() {

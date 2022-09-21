@@ -370,7 +370,7 @@ public interface FieldbookService {
 	 *            the dataset id
 	 * @return true, if successful
 	 */
-	boolean hasFieldMap(int datasetId);
+	boolean hasFieldLayout(int datasetId);
 
 	/**
 	 * Gets the germplasm list by id.
