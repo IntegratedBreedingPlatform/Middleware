@@ -5,6 +5,7 @@ import com.google.common.base.Optional;
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.generationcp.middleware.IntegrationTestBase;
+import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.api.study.StudyDTO;
 import org.generationcp.middleware.api.study.StudySearchRequest;
 import org.generationcp.middleware.dao.GermplasmDAO;
@@ -35,7 +36,6 @@ import org.generationcp.middleware.pojos.dms.StockModel;
 import org.generationcp.middleware.pojos.dms.StudyType;
 import org.generationcp.middleware.pojos.workbench.Project;
 import org.generationcp.middleware.pojos.workbench.WorkbenchUser;
-import org.generationcp.middleware.api.brapi.v2.observationlevel.ObservationLevel;
 import org.generationcp.middleware.service.api.study.StudyInstanceDto;
 import org.generationcp.middleware.service.api.study.StudyMetadata;
 import org.generationcp.middleware.service.api.study.StudySearchFilter;
@@ -48,6 +48,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -57,6 +58,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
@@ -168,10 +170,10 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 
 	@Test
 	public void testGetDatasetInstances() {
-		final Integer env1 = this.createEnvironmentData("1", 1, Optional.<String>absent(), Optional.of(1));
-		final Integer env2 = this.createEnvironmentData("2", 2, Optional.<String>absent(), Optional.of(2));
+		final Integer env1 = this.createEnvironmentData("1", 1, Optional.<String>absent(), Optional.of(1), true);
+		final Integer env2 = this.createEnvironmentData("2", 2, Optional.<String>absent(), Optional.of(2), true);
 		final String customLocation = RandomStringUtils.randomAlphabetic(10);
-		final Integer env3 = this.createEnvironmentData("3", 3, Optional.of(customLocation), Optional.<Integer>absent());
+		final Integer env3 = this.createEnvironmentData("3", 3, Optional.of(customLocation), Optional.<Integer>absent(), false);
 		final List<StudyInstance> instances = this.dmsProjectDao.getDatasetInstances(this.study.getProjectId());
 		Assert.assertEquals(3, instances.size());
 
@@ -181,7 +183,9 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Afghanistan", instance1.getLocationName());
 		Assert.assertEquals("AFG", instance1.getLocationAbbreviation());
 		Assert.assertNull(instance1.getCustomLocationAbbreviation());
-		Assert.assertTrue(instance1.isHasFieldmap());
+		Assert.assertTrue(instance1.getHasFieldLayout());
+
+		assertTrue(this.experimentDao.hasFieldLayout(this.study.getProjectId()));
 
 		final StudyInstance instance2 = instances.get(1);
 		Assert.assertEquals(env2.intValue(), instance2.getInstanceId());
@@ -189,7 +193,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Albania", instance2.getLocationName());
 		Assert.assertEquals("ALB", instance2.getLocationAbbreviation());
 		Assert.assertNull(instance2.getCustomLocationAbbreviation());
-		Assert.assertTrue(instance2.isHasFieldmap());
+		Assert.assertTrue(instance2.getHasFieldLayout());
 
 		final StudyInstance instance3 = instances.get(2);
 		Assert.assertEquals(env3.intValue(), instance3.getInstanceId());
@@ -197,7 +201,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 		Assert.assertEquals("Algeria", instance3.getLocationName());
 		Assert.assertEquals("DZA", instance3.getLocationAbbreviation());
 		Assert.assertEquals(customLocation, instance3.getCustomLocationAbbreviation());
-		Assert.assertFalse(instance3.isHasFieldmap());
+		Assert.assertFalse(instance3.getHasFieldLayout());
 	}
 
 	@Test
@@ -418,7 +422,7 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			this.createDataset(this.study.getName() + " - Plot Dataset", this.study.getProgramUUID(), DatasetTypeEnum.PLOT_DATA.getId(),
 				this.study, this.study);
 		final Integer locationId = 3;
-		final Integer instanceId = this.createEnvironmentData(plot, "1", locationId, Optional.<String>absent(), Optional.<Integer>absent());
+		final Integer instanceId = this.createEnvironmentData(plot, "1", locationId, Optional.<String>absent(), Optional.<Integer>absent(), false);
 		final StudyMetadata studyMetadata = this.dmsProjectDao.getStudyMetadataForInstanceId(instanceId);
 		Assert.assertNotNull(studyMetadata);
 		Assert.assertEquals(instanceId, studyMetadata.getStudyDbId());
@@ -653,12 +657,14 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 	}
 
 	private Integer createEnvironmentData(
-		final String instanceNumber, final Integer locationId, final Optional<String> customAbbev, final Optional<Integer> blockId) {
-		return this.createEnvironmentData(this.study, instanceNumber, locationId, customAbbev, blockId);
+		final String instanceNumber, final Integer locationId, final Optional<String> customAbbev, final Optional<Integer> blockId,
+		final boolean addFieldLayout) {
+		return this.createEnvironmentData(this.study, instanceNumber, locationId, customAbbev, blockId, addFieldLayout);
 	}
 
 	private Integer createEnvironmentData(final DmsProject project,
-		final String instanceNumber, final Integer locationId, final Optional<String> customAbbev, final Optional<Integer> blockId) {
+		final String instanceNumber, final Integer locationId, final Optional<String> customAbbev, final Optional<Integer> blockId,
+		final boolean addFieldLayout) {
 		final Geolocation geolocation = new Geolocation();
 		geolocation.setDescription(instanceNumber);
 		this.geolocationDao.saveOrUpdate(geolocation);
@@ -708,9 +714,24 @@ public class DmsProjectDaoIntegrationTest extends IntegrationTestBase {
 			experimentModel.setProject(project);
 			experimentModel.setStock(stockModel);
 			this.experimentDao.saveOrUpdate(experimentModel);
+
+			if (addFieldLayout) {
+				this.saveExperimentProperty(experimentModel, TermId.FIELDMAP_COLUMN.getId(), "1");
+				this.saveExperimentProperty(experimentModel, TermId.FIELDMAP_RANGE.getId(), "1");
+			}
 		}
 
 		return geolocation.getLocationId();
+	}
+
+	private void saveExperimentProperty(final ExperimentModel experimentModel, final Integer typeId, final String value) {
+		final ExperimentProperty experimentProperty = new ExperimentProperty();
+		experimentModel.setProperties(new ArrayList<>(Collections.singleton(experimentProperty)));
+		experimentProperty.setExperiment(experimentModel);
+		experimentProperty.setTypeId(typeId);
+		experimentProperty.setValue(value);
+		experimentProperty.setRank(1);
+		this.experimentPropertyDao.saveOrUpdate(experimentProperty);
 	}
 
 }

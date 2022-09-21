@@ -354,7 +354,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.SUMMARY_STATISTICS_DATA.getId())) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUMMARY_STATISTICS));
 			}
-			if (studyInstance.isHasFieldmap()) {
+			if (studyInstance.getHasFieldLayout()) {
 				observationLevels.add(new ObservationLevel(ObservationLevelEnum.FIELD));
 			}
 			if (datasetTypeIdsOfEnvironment.contains(DatasetTypeEnum.MEANS_DATA.getId())) {
@@ -408,7 +408,7 @@ public class ObservationUnitServiceImpl implements ObservationUnitService {
 			observationLevels.add(new ObservationLevel(ObservationLevelEnum.SUMMARY_STATISTICS));
 		}
 		if (datasetDTOMap.containsKey(DatasetTypeEnum.PLOT_DATA.getId()) &&
-			this.daoFactory.getExperimentDao().hasFieldmap(datasetDTOMap.get(DatasetTypeEnum.PLOT_DATA.getId()).getDatasetId())) {
+			this.daoFactory.getExperimentDao().hasFieldLayout(datasetDTOMap.get(DatasetTypeEnum.PLOT_DATA.getId()).getDatasetId())) {
 			observationLevels.add(new ObservationLevel(ObservationLevelEnum.FIELD));
 		}
 		if (datasetDTOMap.containsKey(DatasetTypeEnum.MEANS_DATA.getId())) {

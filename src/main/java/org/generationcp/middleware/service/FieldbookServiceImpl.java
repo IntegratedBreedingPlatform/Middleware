@@ -74,8 +74,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Transactional
@@ -269,6 +272,25 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		try {
 			germplasmListDao.save(germplasmList);
 			int counter = 0;
+
+			final Set<Integer> existingGids = new HashSet<>();
+			final Set<Integer> parentGids = new HashSet<>();
+			germplasms.stream()
+				.map(Pair::getKey)
+				.forEach(germplasm -> {
+					if (germplasm.getGid() != null) {
+						existingGids.add(germplasm.getGid());
+					}
+					if (germplasm.getMgid() > 0 && germplasm.getGpid2() > 0) {
+						parentGids.add(germplasm.getGpid2());
+					}
+				});
+
+			final Map<Integer, Germplasm> existingGermplasmsByGids =
+				CollectionUtils.isEmpty(existingGids) ? new HashMap<>() : this.getGermplasmByGids(existingGids);
+			final Map<Integer, Germplasm> parentGermplasmsByGids =
+				CollectionUtils.isEmpty(parentGids) ? new HashMap<>() : this.getGermplasmByGids(parentGids);
+
 			// Save germplasms, names, list data
 			for (final Pair<Germplasm, List<Name>> pair : germplasms) {
 				Germplasm germplasm = pair.getLeft();
@@ -278,7 +300,7 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 				// Check if germplasm exists
 				if (germplasm.getGid() != null) {
 					// Check if the given gid exists
-					germplasmFound = this.getGermplasmDataManager().getGermplasmByGID(germplasm.getGid());
+					germplasmFound = existingGermplasmsByGids.get(germplasm.getGid());
 
 					// Check if the given germplasm name exists
 					if (germplasmFound == null) {
@@ -317,9 +339,9 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 					// parent
 					// if parent is part of a group (= has mgid)
 					if (germplasm.getMgid() > 0) {
-						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm);
-						this.germplasmGroupingService
-							.copyCodedNames(germplasm, this.daoFactory.getGermplasmDao().getById(germplasm.getGpid2()));
+						final Germplasm parent = parentGermplasmsByGids.get(germplasm.getGpid2());
+						this.germplasmGroupingService.copyParentalSelectionHistoryAtFixation(germplasm, parent);
+						this.germplasmGroupingService.copyCodedNames(germplasm, parent);
 					}
 
 					// set Lgid to GID if it's value was not set previously
@@ -557,8 +579,8 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 	}
 
 	@Override
-	public boolean hasFieldMap(final int datasetId) {
-		return this.getExperimentBuilder().hasFieldmap(datasetId);
+	public boolean hasFieldLayout(final int datasetId) {
+		return this.getExperimentBuilder().hasFieldLayout(datasetId);
 	}
 
 	@Override
@@ -782,6 +804,12 @@ public class FieldbookServiceImpl extends Service implements FieldbookService {
 		}
 
 		return Collections.EMPTY_LIST;
+	}
+
+	private Map<Integer, Germplasm> getGermplasmByGids(final Set<Integer> gids) {
+		return this.daoFactory.getGermplasmDao().getByGIDList(new ArrayList<>(gids))
+			.stream()
+			.collect(Collectors.toMap(Germplasm::getGid, Function.identity()));
 	}
 
 }
